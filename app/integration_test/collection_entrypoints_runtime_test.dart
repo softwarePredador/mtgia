@@ -5,8 +5,6 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
 import 'package:manaloom/features/collection/screens/collection_screen.dart';
-import 'package:manaloom/features/market/providers/market_provider.dart';
-import 'package:manaloom/features/market/screens/market_screen.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:manaloom/features/trades/providers/trade_provider.dart';
@@ -77,29 +75,5 @@ void main() {
     );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
-  });
-
-  testWidgets('market screen renders the visual system on live movers state', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => MarketProvider()),
-          ChangeNotifierProvider(create: (_) => MessageProvider()),
-          ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ],
-        child: MaterialApp(
-          title: 'ManaLoom Market Runtime',
-          theme: AppTheme.darkTheme,
-          home: const MarketScreen(),
-        ),
-      ),
-    );
-
-    await pumpUntilFound(tester, find.text('Market'));
-    await pumpUntilFound(tester, find.text('Valorizando'));
-    await tester.pump(const Duration(seconds: 2));
-    await captureVisualProof(binding, tester, 'collection_05_market_screen');
   });
 }

@@ -226,10 +226,9 @@ void main() {
     (tester) async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/decks/deck-1':
-              () => ApiResponse(401, {
-                'message': 'Sessão expirada. Faça login novamente.',
-              }),
+          '/decks/deck-1': () => ApiResponse(401, {
+            'message': 'Sessão expirada. Faça login novamente.',
+          }),
         },
       );
 
@@ -299,24 +298,75 @@ void main() {
   });
 
   testWidgets(
+    'DeckDetailsScreen opens optimization when reused route gains intent',
+    (tester) async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              {'spell-1': 1, 'land-1': 36},
+              deckId: 'deck-1',
+              name: 'Reusable Deck Route',
+            ),
+          ),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+      final intent = ValueNotifier<String?>(null);
+      addTearDown(intent.dispose);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<DeckProvider>.value(value: provider),
+            ChangeNotifierProvider<CardProvider>(
+              create: (_) => CardProvider(apiClient: apiClient),
+            ),
+            ChangeNotifierProvider<AuthProvider>(
+              create: (_) => AuthProvider(apiClient: apiClient),
+            ),
+          ],
+          child: MaterialApp(
+            home: ValueListenableBuilder<String?>(
+              valueListenable: intent,
+              builder: (_, optimizationIntent, _) => DeckDetailsScreen(
+                deckId: 'deck-1',
+                initialOptimizationIntent: optimizationIntent,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('optimize-sheet-body')), findsNothing);
+
+      intent.value = 'rebuild';
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const Key('optimize-sheet-body')), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'DeckDetailsScreen shows calm onboarding state for a newly created empty deck',
     (tester) async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/decks/deck-1':
-              () => ApiResponse(200, {
-                'id': 'deck-1',
-                'name': 'Novo Deck',
-                'format': 'commander',
-                'description': null,
-                'archetype': null,
-                'is_public': false,
-                'created_at': '2026-03-25T00:00:00.000Z',
-                'color_identity': const <String>[],
-                'stats': const {'total_cards': 0},
-                'commander': const <Map<String, dynamic>>[],
-                'main_board': const <String, dynamic>{},
-              }),
+          '/decks/deck-1': () => ApiResponse(200, {
+            'id': 'deck-1',
+            'name': 'Novo Deck',
+            'format': 'commander',
+            'description': null,
+            'archetype': null,
+            'is_public': false,
+            'created_at': '2026-03-25T00:00:00.000Z',
+            'color_identity': const <String>[],
+            'stats': const {'total_cards': 0},
+            'commander': const <Map<String, dynamic>>[],
+            'main_board': const <String, dynamic>{},
+          }),
         },
       );
 
@@ -340,15 +390,14 @@ void main() {
   ) async {
     final apiClient = _FakeApiClient(
       getHandlers: {
-        '/decks/deck-1':
-            () => ApiResponse(
-              200,
-              _buildDeckDetailsJson(
-                {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
-                deckId: 'deck-1',
-                name: 'Talrand Tempo',
-              ),
-            ),
+        '/decks/deck-1': () => ApiResponse(
+          200,
+          _buildDeckDetailsJson(
+            {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
+            deckId: 'deck-1',
+            name: 'Talrand Tempo',
+          ),
+        ),
       },
     );
 
@@ -386,80 +435,75 @@ void main() {
 
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/decks/deck-1':
-              () => ApiResponse(
-                200,
-                _buildDeckDetailsJson(
-                  cardsById,
-                  deckId: 'deck-1',
-                  name: 'Smoke Deck',
-                ),
-              ),
-          '/cards?name=Arcane+Signet&limit=1':
-              () => ApiResponse(200, {
-                'data': const [
-                  {
-                    'id': 'add-1',
-                    'name': 'Arcane Signet',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-              }),
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              cardsById,
+              deckId: 'deck-1',
+              name: 'Smoke Deck',
+            ),
+          ),
+          '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
+            'data': const [
+              {
+                'id': 'add-1',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+          }),
         },
         postHandlers: {
-          '/decks/deck-1/pricing':
-              (_) => ApiResponse(200, {
-                'currency': 'USD',
-                'estimated_total_usd': 120.0,
-                'missing_price_cards': 0,
-                'items': const [],
-              }),
+          '/decks/deck-1/pricing': (_) => ApiResponse(200, {
+            'currency': 'USD',
+            'estimated_total_usd': 120.0,
+            'missing_price_cards': 0,
+            'items': const [],
+          }),
           '/decks/deck-1/validate': (_) => ApiResponse(200, {'ok': true}),
-          '/ai/archetypes':
-              (_) => ApiResponse(200, {
-                'options': const [
-                  {
-                    'title': 'control',
-                    'description': 'Controle e valor.',
-                    'difficulty': 'mid',
-                  },
-                ],
-              }),
-          '/ai/optimize':
-              (_) => ApiResponse(200, {
-                'mode': 'optimize',
-                'removals': const ['Mind Stone'],
-                'additions': const ['Arcane Signet'],
-                'removals_detailed': const [
-                  {
-                    'card_id': 'remove-1',
-                    'name': 'Mind Stone',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-                'additions_detailed': const [
-                  {
-                    'card_id': 'add-1',
-                    'name': 'Arcane Signet',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-                'reasoning': 'Mais aceleração e menos peça lenta.',
-                'constraints': {'keep_theme': true},
-                'theme_info': {'theme': 'spellslinger'},
-                'warnings': const <String, dynamic>{},
-                'deck_analysis': {
-                  'average_cmc': 3.1,
-                  'mana_curve_assessment': 'ok',
-                },
-                'post_analysis': {
-                  'average_cmc': 2.9,
-                  'improvements': const ['Mais ramp'],
-                },
-              }),
+          '/ai/archetypes': (_) => ApiResponse(200, {
+            'options': const [
+              {
+                'title': 'control',
+                'description': 'Controle e valor.',
+                'difficulty': 'mid',
+              },
+            ],
+          }),
+          '/ai/optimize': (_) => ApiResponse(200, {
+            'mode': 'optimize',
+            'removals': const ['Mind Stone'],
+            'additions': const ['Arcane Signet'],
+            'removals_detailed': const [
+              {
+                'card_id': 'remove-1',
+                'name': 'Mind Stone',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+            'additions_detailed': const [
+              {
+                'card_id': 'add-1',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+            'reasoning': 'Mais aceleração e menos peça lenta.',
+            'constraints': {'keep_theme': true},
+            'theme_info': {'theme': 'spellslinger'},
+            'warnings': const <String, dynamic>{},
+            'deck_analysis': {
+              'average_cmc': 3.1,
+              'mana_curve_assessment': 'ok',
+            },
+            'post_analysis': {
+              'average_cmc': 2.9,
+              'improvements': const ['Mais ramp'],
+            },
+          }),
         },
         putHandlers: {
           '/decks/deck-1': (body) {
@@ -531,78 +575,71 @@ void main() {
     (tester) async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/decks/deck-1':
-              () => ApiResponse(
-                200,
-                _buildDeckDetailsJson(
-                  {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
-                  deckId: 'deck-1',
-                  name: 'Broken Deck',
-                ),
-              ),
-          '/decks/draft-1':
-              () => ApiResponse(
-                200,
-                _buildDeckDetailsJson(
-                  {'add-1': 1, 'spell-1': 1, 'land-1': 37},
-                  deckId: 'draft-1',
-                  name: 'Draft Deck',
-                ),
-              ),
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
+              deckId: 'deck-1',
+              name: 'Broken Deck',
+            ),
+          ),
+          '/decks/draft-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              {'add-1': 1, 'spell-1': 1, 'land-1': 37},
+              deckId: 'draft-1',
+              name: 'Draft Deck',
+            ),
+          ),
         },
         postHandlers: {
-          '/decks/deck-1/pricing':
-              (_) => ApiResponse(200, {
-                'currency': 'USD',
-                'estimated_total_usd': 80.0,
-                'missing_price_cards': 0,
-                'items': const [],
-              }),
+          '/decks/deck-1/pricing': (_) => ApiResponse(200, {
+            'currency': 'USD',
+            'estimated_total_usd': 80.0,
+            'missing_price_cards': 0,
+            'items': const [],
+          }),
           '/decks/deck-1/validate': (_) => ApiResponse(200, {'ok': true}),
-          '/decks/draft-1/pricing':
-              (_) => ApiResponse(200, {
-                'currency': 'USD',
-                'estimated_total_usd': 90.0,
-                'missing_price_cards': 0,
-                'items': const [],
-              }),
+          '/decks/draft-1/pricing': (_) => ApiResponse(200, {
+            'currency': 'USD',
+            'estimated_total_usd': 90.0,
+            'missing_price_cards': 0,
+            'items': const [],
+          }),
           '/decks/draft-1/validate': (_) => ApiResponse(200, {'ok': true}),
-          '/ai/archetypes':
-              (_) => ApiResponse(200, {
-                'options': const [
-                  {
-                    'title': 'control',
-                    'description': 'Controle e valor.',
-                    'difficulty': 'mid',
-                  },
-                ],
-              }),
-          '/ai/optimize':
-              (_) => ApiResponse(422, {
-                'error': 'O deck precisa de reparo estrutural.',
-                'outcome_code': 'needs_repair',
-                'quality_error': {
-                  'code': 'OPTIMIZE_NEEDS_REPAIR',
-                  'message': 'O deck atual está fora da faixa de optimize.',
-                  'reasons': ['Poucas mágicas relevantes para o comandante.'],
-                },
-                'next_action': {
-                  'type': 'rebuild_guided',
-                  'endpoint': '/ai/rebuild',
-                  'payload': {
-                    'deck_id': 'deck-1',
-                    'rebuild_scope': 'auto',
-                    'save_mode': 'draft_clone',
-                  },
-                },
-              }),
-          '/ai/rebuild':
-              (_) => ApiResponse(200, {
-                'mode': 'rebuild_guided',
-                'outcome_code': 'rebuild_created',
-                'draft_deck_id': 'draft-1',
-                'rebuild_scope_selected': 'full_non_commander_rebuild',
-              }),
+          '/ai/archetypes': (_) => ApiResponse(200, {
+            'options': const [
+              {
+                'title': 'control',
+                'description': 'Controle e valor.',
+                'difficulty': 'mid',
+              },
+            ],
+          }),
+          '/ai/optimize': (_) => ApiResponse(422, {
+            'error': 'O deck precisa de reparo estrutural.',
+            'outcome_code': 'needs_repair',
+            'quality_error': {
+              'code': 'OPTIMIZE_NEEDS_REPAIR',
+              'message': 'O deck atual está fora da faixa de optimize.',
+              'reasons': ['Poucas mágicas relevantes para o comandante.'],
+            },
+            'next_action': {
+              'type': 'rebuild_guided',
+              'endpoint': '/ai/rebuild',
+              'payload': {
+                'deck_id': 'deck-1',
+                'rebuild_scope': 'auto',
+                'save_mode': 'draft_clone',
+              },
+            },
+          }),
+          '/ai/rebuild': (_) => ApiResponse(200, {
+            'mode': 'rebuild_guided',
+            'outcome_code': 'rebuild_created',
+            'draft_deck_id': 'draft-1',
+            'rebuild_scope_selected': 'full_non_commander_rebuild',
+          }),
         },
       );
 

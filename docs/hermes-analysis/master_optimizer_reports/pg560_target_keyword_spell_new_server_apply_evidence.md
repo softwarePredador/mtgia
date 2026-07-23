@@ -37,7 +37,7 @@ Cards:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg560_target_keyword_spell_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`

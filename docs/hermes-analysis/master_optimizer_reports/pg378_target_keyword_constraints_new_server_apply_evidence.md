@@ -68,7 +68,7 @@ new-server tunnel).
   -> `178` tests OK.
 - `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`
   -> OK.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg378_target_keyword_constraints_new_server_docs_after_update.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   -> `26/26` pass.
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg378_target_keyword_constraints_new_server_docs_after_update.md`
   -> pass.

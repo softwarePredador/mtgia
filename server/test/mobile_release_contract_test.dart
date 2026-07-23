@@ -18,6 +18,14 @@ void main() {
           File('../scripts/manaloom_patrol_smoke.sh').readAsStringSync();
       final localCi =
           File('../scripts/manaloom_local_ci.sh').readAsStringSync();
+      final verifier =
+          File(
+            '../scripts/manaloom_verify_android_release_artifacts.sh',
+          ).readAsStringSync();
+      final releaseManifest =
+          File(
+            '../app/android/app/src/release/AndroidManifest.xml',
+          ).readAsStringSync();
       final nginx = File('../app/release-host/nginx.conf').readAsStringSync();
 
       expect(build, contains('origin/master'));
@@ -63,8 +71,19 @@ void main() {
       expect(sshInitialization, greaterThan(approval));
       expect(publish, isNot(contains('StrictHostKeyChecking=accept-new')));
       expect(build, contains('--dart-define="RELEASE_STARTUP_PROOF=true"'));
-      expect(build, contains('--dart-define="ENABLE_SCANNER_RELEASE=true"'));
-      expect(build, contains('scanner_release_enabled: true'));
+      expect(build, contains('--dart-define="ENABLE_SCANNER_RELEASE=false"'));
+      expect(build, contains('scanner_release_enabled: false'));
+      expect(build, isNot(contains('ENABLE_SCANNER_RELEASE=true')));
+      expect(build, isNot(contains('scanner_release_enabled: true')));
+      expect(releaseManifest, contains('android.permission.CAMERA'));
+      expect(releaseManifest, contains('tools:node="remove"'));
+      expect(
+        verifier,
+        contains(
+          'APK de beta nao pode declarar camera com Scanner DEFERRED_BY_SCOPE',
+        ),
+      );
+      expect(verifier, isNot(contains('android.permission.CAMERA|\\')));
       expect(localCi, contains('manaloom_build_android_release.sh'));
       expect(localCi, contains('run_battle_gate'));
       expect(

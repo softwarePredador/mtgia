@@ -23,6 +23,7 @@ EXPECTED_SHELL_MODES = {
         "--read-only",
         "--read-only",
         "--read-only",
+        "--read-only",
     ),
     "scripts/manaloom_e2e_suite.sh": ("--write-approved",),
     "scripts/manaloom_global_battle_closure.sh": (

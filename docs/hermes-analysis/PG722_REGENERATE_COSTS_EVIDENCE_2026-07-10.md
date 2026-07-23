@@ -142,7 +142,7 @@ Global readiness after PG722B:
 
 Passed:
 
-- `xmage_strategy_consistency_audit_20260710_post_pg722_regenerate_costs_new_server_final.md`:
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`:
   `26/26`
 - `operational_surface_alignment_audit_20260710_post_pg722_regenerate_costs_new_server_final.md`:
   `pass`

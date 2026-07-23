@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
@@ -73,6 +75,13 @@ class _FakeApiClient extends ApiClient {
     }
     return handler();
   }
+}
+
+class _DelayedGetApiClient extends ApiClient {
+  final Completer<ApiResponse> response = Completer<ApiResponse>();
+
+  @override
+  Future<ApiResponse> get(String endpoint) => response.future;
 }
 
 Map<String, dynamic> _buildDeckDetailsJson(
@@ -179,12 +188,33 @@ void main() {
     ApiClient.resetForTesting();
   });
 
+  test(
+    'in-flight deck fetch completes safely after provider disposal',
+    () async {
+      final client = _DelayedGetApiClient();
+      final provider = DeckProvider(apiClient: client);
+      var notifications = 0;
+      provider.addListener(() => notifications++);
+
+      final fetch = provider.fetchDecks();
+      await Future<void>.delayed(Duration.zero);
+      expect(notifications, equals(1));
+
+      provider.dispose();
+      client.response.complete(ApiResponse(200, const <Object?>[]));
+
+      await expectLater(fetch, completes);
+      expect(provider.isDisposedForTesting, isTrue);
+      expect(notifications, equals(1));
+    },
+  );
+
   group('DeckProvider.createDeck', () {
     test('fails when batch resolve endpoint fails', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/cards/resolve/batch':
-              (_) => ApiResponse(500, {'error': 'resolve failed'}),
+          '/cards/resolve/batch': (_) =>
+              ApiResponse(500, {'error': 'resolve failed'}),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -208,13 +238,12 @@ void main() {
     test('fails when batch resolve returns unresolved names', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/cards/resolve/batch':
-              (_) => ApiResponse(200, {
-                'data': const [],
-                'unresolved': const ['Unknown Card'],
-                'total_input': 1,
-                'total_resolved': 0,
-              }),
+          '/cards/resolve/batch': (_) => ApiResponse(200, {
+            'data': const [],
+            'unresolved': const ['Unknown Card'],
+            'total_input': 1,
+            'total_resolved': 0,
+          }),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -238,20 +267,19 @@ void main() {
     test('fails when batch resolve returns ambiguous names', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/cards/resolve/batch':
-              (_) => ApiResponse(200, {
-                'data': const [],
-                'unresolved': const [],
-                'ambiguous': const [
-                  {
-                    'input_name': 'Lightning',
-                    'candidates': ['Lightning Bolt', 'Lightning Helix'],
-                  },
-                ],
-                'total_input': 1,
-                'total_resolved': 0,
-                'total_ambiguous': 1,
-              }),
+          '/cards/resolve/batch': (_) => ApiResponse(200, {
+            'data': const [],
+            'unresolved': const [],
+            'ambiguous': const [
+              {
+                'input_name': 'Lightning',
+                'candidates': ['Lightning Bolt', 'Lightning Helix'],
+              },
+            ],
+            'total_input': 1,
+            'total_resolved': 0,
+            'total_ambiguous': 1,
+          }),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -374,17 +402,16 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/ai/commander-learning':
-                () => ApiResponse(200, {
-                  'available': true,
-                  'count': 1,
-                  'commanders': const [
-                    {
-                      'commander': 'Lorehold, the Historian',
-                      'source_ref': 'learned_deck:82',
-                    },
-                  ],
-                }),
+            '/ai/commander-learning': () => ApiResponse(200, {
+              'available': true,
+              'count': 1,
+              'commanders': const [
+                {
+                  'commander': 'Lorehold, the Historian',
+                  'source_ref': 'learned_deck:82',
+                },
+              ],
+            }),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);
@@ -401,8 +428,8 @@ void main() {
     test('learned deck failures do not expose raw status codes', () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/ai/commander-learning':
-              () => ApiResponse(503, {'error': 'database stack trace'}),
+          '/ai/commander-learning': () =>
+              ApiResponse(503, {'error': 'database stack trace'}),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -470,18 +497,19 @@ void main() {
         final provider = DeckProvider(
           apiClient: apiClient,
           pollDelay: (_) async {},
-          trackActivationEvent: (
-            String eventName, {
-            String? format,
-            String? deckId,
-            String source = 'app',
-            Map<String, dynamic>? metadata,
-          }) async {
-            trackedEvents.add(eventName);
-            trackedMetadata = metadata;
-            expect(format, 'commander');
-            expect(source, 'deck_provider.generateDeck');
-          },
+          trackActivationEvent:
+              (
+                String eventName, {
+                String? format,
+                String? deckId,
+                String source = 'app',
+                Map<String, dynamic>? metadata,
+              }) async {
+                trackedEvents.add(eventName);
+                trackedMetadata = metadata;
+                expect(format, 'commander');
+                expect(source, 'deck_provider.generateDeck');
+              },
         );
 
         final result = await provider.generateDeck(
@@ -599,25 +627,23 @@ void main() {
       final progressMessages = <String>[];
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/ai/generate':
-              (_) => ApiResponse(202, {
-                'job_id': 'job-invalid-deck',
-                'status': 'pending',
-                'poll_url': '/ai/generate/jobs/job-invalid-deck',
-                'poll_interval_ms': 1,
-              }),
+          '/ai/generate': (_) => ApiResponse(202, {
+            'job_id': 'job-invalid-deck',
+            'status': 'pending',
+            'poll_url': '/ai/generate/jobs/job-invalid-deck',
+            'poll_interval_ms': 1,
+          }),
         },
         getHandlers: {
-          '/ai/generate/jobs/job-invalid-deck':
-              () => ApiResponse(200, {
-                'job_id': 'job-invalid-deck',
-                'status': 'completed',
-                'result_status_code': 422,
-                'result': {
-                  'error': 'Generated deck failed validation',
-                  'generated_deck': {'cards': const <Map<String, dynamic>>[]},
-                },
-              }),
+          '/ai/generate/jobs/job-invalid-deck': () => ApiResponse(200, {
+            'job_id': 'job-invalid-deck',
+            'status': 'completed',
+            'result_status_code': 422,
+            'result': {
+              'error': 'Generated deck failed validation',
+              'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+            },
+          }),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -644,25 +670,23 @@ void main() {
       final progressMessages = <String>[];
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/ai/generate':
-              (_) => ApiResponse(202, {
-                'job_id': 'job-malformed-deck',
-                'status': 'pending',
-                'poll_url': '/ai/generate/jobs/job-malformed-deck',
-                'poll_interval_ms': 1,
-              }),
+          '/ai/generate': (_) => ApiResponse(202, {
+            'job_id': 'job-malformed-deck',
+            'status': 'pending',
+            'poll_url': '/ai/generate/jobs/job-malformed-deck',
+            'poll_interval_ms': 1,
+          }),
         },
         getHandlers: {
-          '/ai/generate/jobs/job-malformed-deck':
-              () => ApiResponse(200, {
-                'job_id': 'job-malformed-deck',
-                'status': 'completed',
-                'result_status_code': 200,
-                'result': {
-                  'generated_deck': {'cards': const <Map<String, dynamic>>[]},
-                  'validation': const {'is_valid': true},
-                },
-              }),
+          '/ai/generate/jobs/job-malformed-deck': () => ApiResponse(200, {
+            'job_id': 'job-malformed-deck',
+            'status': 'completed',
+            'result_status_code': 200,
+            'result': {
+              'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+              'validation': const {'is_valid': true},
+            },
+          }),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -743,11 +767,10 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           postHandlers: {
-            '/ai/generate':
-                (_) => ApiResponse(202, {
-                  'job_id': 'job-without-poll-url',
-                  'status': 'pending',
-                }),
+            '/ai/generate': (_) => ApiResponse(202, {
+              'job_id': 'job-without-poll-url',
+              'status': 'pending',
+            }),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);
@@ -775,17 +798,16 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           postHandlers: {
-            '/ai/generate':
-                (_) => ApiResponse(202, {
-                  'job_id': 'job-expired',
-                  'status': 'pending',
-                  'poll_url': '/ai/generate/jobs/job-expired',
-                  'poll_interval_ms': 1,
-                }),
+            '/ai/generate': (_) => ApiResponse(202, {
+              'job_id': 'job-expired',
+              'status': 'pending',
+              'poll_url': '/ai/generate/jobs/job-expired',
+              'poll_interval_ms': 1,
+            }),
           },
           getHandlers: {
-            '/ai/generate/jobs/job-expired':
-                () => ApiResponse(404, {'error': 'async job not found'}),
+            '/ai/generate/jobs/job-expired': () =>
+                ApiResponse(404, {'error': 'async job not found'}),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);
@@ -806,21 +828,19 @@ void main() {
     test('generateDeck surfaces friendly polling timeout', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/ai/generate':
-              (_) => ApiResponse(202, {
-                'job_id': 'job-timeout',
-                'status': 'pending',
-                'poll_url': '/ai/generate/jobs/job-timeout',
-                'poll_interval_ms': 1,
-              }),
+          '/ai/generate': (_) => ApiResponse(202, {
+            'job_id': 'job-timeout',
+            'status': 'pending',
+            'poll_url': '/ai/generate/jobs/job-timeout',
+            'poll_interval_ms': 1,
+          }),
         },
         getHandlers: {
-          '/ai/generate/jobs/job-timeout':
-              () => ApiResponse(200, {
-                'job_id': 'job-timeout',
-                'status': 'processing',
-                'stage': 'generation',
-              }),
+          '/ai/generate/jobs/job-timeout': () => ApiResponse(200, {
+            'job_id': 'job-timeout',
+            'status': 'processing',
+            'stage': 'generation',
+          }),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -839,10 +859,9 @@ void main() {
     test('generateDeck maps 4xx failure to friendly message', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/ai/generate':
-              (_) => ApiResponse(400, {
-                'error': 'FormatException: /ai/generate stack trace',
-              }),
+          '/ai/generate': (_) => ApiResponse(400, {
+            'error': 'FormatException: /ai/generate stack trace',
+          }),
         },
       );
       final provider = DeckProvider(apiClient: apiClient);
@@ -891,26 +910,30 @@ void main() {
         final cancellation = GenerateDeckCancellation();
         final apiClient = _FakeApiClient(
           postHandlers: {
-            '/ai/generate':
-                (_) => ApiResponse(202, {
-                  'job_id': 'job-cancel',
-                  'status': 'pending',
-                  'poll_url': '/ai/generate/jobs/job-cancel',
-                  'poll_interval_ms': 1,
-                }),
+            '/ai/generate': (_) => ApiResponse(202, {
+              'job_id': 'job-cancel',
+              'status': 'pending',
+              'poll_url': '/ai/generate/jobs/job-cancel',
+              'poll_interval_ms': 1,
+            }),
           },
           getHandlers: {
-            '/ai/generate/jobs/job-cancel':
-                () => ApiResponse(200, {
-                  'job_id': 'job-cancel',
-                  'status': 'processing',
-                }),
+            '/ai/generate/jobs/job-cancel': () => ApiResponse(200, {
+              'job_id': 'job-cancel',
+              'status': 'processing',
+            }),
+          },
+          deleteHandlers: {
+            '/ai/generate/jobs/job-cancel': () => ApiResponse(200, {
+              'job_id': 'job-cancel',
+              'status': 'cancelled',
+            }),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);
 
-        expect(
-          () => provider.generateDeck(
+        await expectLater(
+          provider.generateDeck(
             prompt: 'Talrand spellslinger',
             format: 'Commander',
             cancellation: cancellation,
@@ -923,6 +946,7 @@ void main() {
           throwsA(isA<GenerateDeckCancelledException>()),
         );
         expect(apiClient.getCalls, isEmpty);
+        expect(apiClient.deleteCalls, ['/ai/generate/jobs/job-cancel']);
       },
     );
 
@@ -931,26 +955,25 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           postHandlers: {
-            '/ai/optimize':
-                (_) => ApiResponse(422, {
-                  'error': 'O deck precisa de reparo estrutural.',
-                  'outcome_code': 'needs_repair',
-                  'quality_error': {
-                    'code': 'OPTIMIZE_NEEDS_REPAIR',
-                    'message': 'O deck atual está fora da faixa de optimize.',
-                    'reasons': ['Poucas mágicas relevantes para o comandante.'],
-                    'repair_plan': {'target_land_count': 36},
-                  },
-                  'next_action': {
-                    'type': 'rebuild_guided',
-                    'endpoint': '/ai/rebuild',
-                    'payload': {
-                      'deck_id': 'deck-1',
-                      'rebuild_scope': 'auto',
-                      'save_mode': 'draft_clone',
-                    },
-                  },
-                }),
+            '/ai/optimize': (_) => ApiResponse(422, {
+              'error': 'O deck precisa de reparo estrutural.',
+              'outcome_code': 'needs_repair',
+              'quality_error': {
+                'code': 'OPTIMIZE_NEEDS_REPAIR',
+                'message': 'O deck atual está fora da faixa de optimize.',
+                'reasons': ['Poucas mágicas relevantes para o comandante.'],
+                'repair_plan': {'target_land_count': 36},
+              },
+              'next_action': {
+                'type': 'rebuild_guided',
+                'endpoint': '/ai/rebuild',
+                'payload': {
+                  'deck_id': 'deck-1',
+                  'rebuild_scope': 'auto',
+                  'save_mode': 'draft_clone',
+                },
+              },
+            }),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);
@@ -1015,17 +1038,18 @@ void main() {
         final provider = DeckProvider(
           apiClient: apiClient,
           pollDelay: (_) async {},
-          trackActivationEvent: (
-            String eventName, {
-            String? format,
-            String? deckId,
-            String source = 'app',
-            Map<String, dynamic>? metadata,
-          }) async {
-            trackedEvents.add(eventName);
-            expect(deckId, 'deck-1');
-            expect(source, 'deck_provider.optimizeDeck');
-          },
+          trackActivationEvent:
+              (
+                String eventName, {
+                String? format,
+                String? deckId,
+                String source = 'app',
+                Map<String, dynamic>? metadata,
+              }) async {
+                trackedEvents.add(eventName);
+                expect(deckId, 'deck-1');
+                expect(source, 'deck_provider.optimizeDeck');
+              },
         );
 
         final result = await provider.optimizeDeck(
@@ -1046,79 +1070,85 @@ void main() {
       },
     );
 
-    test('optimize cancellation reaches server and clears resumable state', () async {
-      final cancellation = OptimizeJobCancellation();
-      final apiClient = _FakeApiClient(
-        postHandlers: {
-          '/ai/optimize': (_) => ApiResponse(202, {
-            'job_id': 'job-cancel-optimize',
-            'poll_interval_ms': 1000,
-            'total_stages': 6,
-            'idempotency': {'request_key': 'optimize:request-cancel'},
-          }),
-        },
-        deleteHandlers: {
-          '/ai/optimize/jobs/job-cancel-optimize': () => ApiResponse(200, {
-            'job_id': 'job-cancel-optimize',
-            'status': 'cancelled',
-          }),
-        },
-      );
-      final provider = DeckProvider(apiClient: apiClient);
-
-      await expectLater(
-        () => provider.optimizeDeck(
-          'deck-1',
-          'control',
-          cancellation: cancellation,
-          requestKey: 'optimize:request-cancel',
-          onProgress: (stage, stageNumber, _) {
-            if (stageNumber == 1) cancellation.cancel();
+    test(
+      'optimize cancellation reaches server and clears resumable state',
+      () async {
+        final cancellation = OptimizeJobCancellation();
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/optimize': (_) => ApiResponse(202, {
+              'job_id': 'job-cancel-optimize',
+              'poll_interval_ms': 1000,
+              'total_stages': 6,
+              'idempotency': {'request_key': 'optimize:request-cancel'},
+            }),
           },
-        ),
-        throwsA(isA<OptimizeJobCancelledException>()),
-      );
+          deleteHandlers: {
+            '/ai/optimize/jobs/job-cancel-optimize': () => ApiResponse(200, {
+              'job_id': 'job-cancel-optimize',
+              'status': 'cancelled',
+            }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
 
-      expect(apiClient.getCalls, isEmpty);
-      expect(apiClient.deleteCalls, [
-        '/ai/optimize/jobs/job-cancel-optimize',
-      ]);
-      expect(provider.hasActiveOptimizeJob, isFalse);
-    });
+        await expectLater(
+          () => provider.optimizeDeck(
+            'deck-1',
+            'control',
+            cancellation: cancellation,
+            requestKey: 'optimize:request-cancel',
+            onProgress: (stage, stageNumber, _) {
+              if (stageNumber == 1) cancellation.cancel();
+            },
+          ),
+          throwsA(isA<OptimizeJobCancelledException>()),
+        );
 
-    test('resume optimize polls existing job without creating a new one', () async {
-      final apiClient = _FakeApiClient(
-        getHandlers: {
-          '/ai/optimize/jobs/job-resume': () => ApiResponse(200, {
-            'job_id': 'job-resume',
-            'status': 'completed',
-            'result': {'mode': 'optimize', 'resumed': true},
-          }),
-          '/ai/optimize/jobs/latest?deck_id=deck-1&active=true': () =>
-              ApiResponse(200, {
-                'job_id': 'job-resume',
-                'deck_id': 'deck-1',
-                'archetype': 'control',
-                'status': 'processing',
-              }),
-        },
-      );
-      final provider = DeckProvider(
-        apiClient: apiClient,
-        pollDelay: (_) async {},
-      );
+        expect(apiClient.getCalls, isEmpty);
+        expect(apiClient.deleteCalls, [
+          '/ai/optimize/jobs/job-cancel-optimize',
+        ]);
+        expect(provider.hasActiveOptimizeJob, isFalse);
+      },
+    );
 
-      final latest = await provider.fetchLatestOptimizeJob('deck-1');
-      final result = await provider.resumeOptimizeJob(
-        jobId: 'job-resume',
-        deckId: 'deck-1',
-      );
+    test(
+      'resume optimize polls existing job without creating a new one',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/ai/optimize/jobs/job-resume': () => ApiResponse(200, {
+              'job_id': 'job-resume',
+              'status': 'completed',
+              'result': {'mode': 'optimize', 'resumed': true},
+            }),
+            '/ai/optimize/jobs/latest?deck_id=deck-1&active=true': () =>
+                ApiResponse(200, {
+                  'job_id': 'job-resume',
+                  'deck_id': 'deck-1',
+                  'archetype': 'control',
+                  'status': 'processing',
+                }),
+          },
+        );
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          pollDelay: (_) async {},
+        );
 
-      expect(latest?['archetype'], 'control');
-      expect(result['resumed'], isTrue);
-      expect(apiClient.postCalls, isEmpty);
-      expect(provider.hasActiveOptimizeJob, isFalse);
-    });
+        final latest = await provider.fetchLatestOptimizeJob('deck-1');
+        final result = await provider.resumeOptimizeJob(
+          jobId: 'job-resume',
+          deckId: 'deck-1',
+        );
+
+        expect(latest?['archetype'], 'control');
+        expect(result['resumed'], isTrue);
+        expect(apiClient.postCalls, isEmpty);
+        expect(provider.hasActiveOptimizeJob, isFalse);
+      },
+    );
 
     test('optimize timeout keeps the job resumable', () async {
       final provider = DeckProvider(
@@ -1141,12 +1171,11 @@ void main() {
     test('telemetry failure never breaks a successful optimize flow', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
-          '/ai/optimize':
-              (_) => ApiResponse(200, {
-                'mode': 'optimize',
-                'removals': const <String>[],
-                'additions': const <String>[],
-              }),
+          '/ai/optimize': (_) => ApiResponse(200, {
+            'mode': 'optimize',
+            'removals': const <String>[],
+            'additions': const <String>[],
+          }),
         },
       );
       final provider = DeckProvider(
@@ -1173,13 +1202,12 @@ void main() {
         var pollCount = 0;
         final apiClient = _FakeApiClient(
           postHandlers: {
-            '/ai/optimize':
-                (_) => ApiResponse(202, {
-                  'job_id': 'job-long-aggressive',
-                  'status': 'pending',
-                  'poll_interval_ms': 1,
-                  'total_stages': 6,
-                }),
+            '/ai/optimize': (_) => ApiResponse(202, {
+              'job_id': 'job-long-aggressive',
+              'status': 'pending',
+              'poll_interval_ms': 1,
+              'total_stages': 6,
+            }),
           },
           getHandlers: {
             '/ai/optimize/jobs/job-long-aggressive': () {
@@ -1239,15 +1267,16 @@ void main() {
       final trackedEvents = <String>[];
       final provider = DeckProvider(
         apiClient: apiClient,
-        trackActivationEvent: (
-          String eventName, {
-          String? format,
-          String? deckId,
-          String source = 'app',
-          Map<String, dynamic>? metadata,
-        }) async {
-          trackedEvents.add(eventName);
-        },
+        trackActivationEvent:
+            (
+              String eventName, {
+              String? format,
+              String? deckId,
+              String source = 'app',
+              Map<String, dynamic>? metadata,
+            }) async {
+              trackedEvents.add(eventName);
+            },
       );
 
       final result = await provider.rebuildDeck('deck-1');
@@ -1267,54 +1296,51 @@ void main() {
 
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks/deck-1':
-                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
-            '/cards?name=Arcane+Signet&limit=1':
-                () => ApiResponse(200, {
-                  'data': const [
-                    {
-                      'id': 'add-1',
-                      'name': 'Arcane Signet',
-                      'type_line': 'Artifact',
-                      'color_identity': <String>[],
-                    },
-                  ],
-                }),
+            '/decks/deck-1': () =>
+                ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
+              'data': const [
+                {
+                  'id': 'add-1',
+                  'name': 'Arcane Signet',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+            }),
           },
           postHandlers: {
-            '/ai/optimize':
-                (_) => ApiResponse(200, {
-                  'mode': 'optimize',
-                  'removals': const ['Mind Stone'],
-                  'additions': const ['Arcane Signet'],
-                  'removals_detailed': const [
-                    {
-                      'card_id': 'remove-1',
-                      'name': 'Mind Stone',
-                      'type_line': 'Artifact',
-                      'color_identity': <String>[],
-                    },
-                  ],
-                  'additions_detailed': const [
-                    {
-                      'card_id': 'add-1',
-                      'name': 'Arcane Signet',
-                      'type_line': 'Artifact',
-                      'color_identity': <String>[],
-                    },
-                  ],
-                }),
-            '/decks/deck-1/validate':
-                (_) => ApiResponse(200, {
-                  'valid': true,
-                  'ok': true,
-                  'errors': const <String>[],
-                }),
+            '/ai/optimize': (_) => ApiResponse(200, {
+              'mode': 'optimize',
+              'removals': const ['Mind Stone'],
+              'additions': const ['Arcane Signet'],
+              'removals_detailed': const [
+                {
+                  'card_id': 'remove-1',
+                  'name': 'Mind Stone',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+              'additions_detailed': const [
+                {
+                  'card_id': 'add-1',
+                  'name': 'Arcane Signet',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+            }),
+            '/decks/deck-1/validate': (_) => ApiResponse(200, {
+              'valid': true,
+              'ok': true,
+              'errors': const <String>[],
+            }),
           },
           putHandlers: {
             '/decks/deck-1': (body) {
-              final cards =
-                  (body['cards'] as List).cast<Map<String, dynamic>>();
+              final cards = (body['cards'] as List)
+                  .cast<Map<String, dynamic>>();
               expect(cards.any((entry) => entry['card_id'] == 'add-1'), isTrue);
               expect(
                 cards.any((entry) => entry['card_id'] == 'remove-1'),
@@ -1347,12 +1373,10 @@ void main() {
         final optimizeResult = await provider.optimizeDeck('deck-1', 'control');
         final applied = await provider.applyOptimizationWithIds(
           deckId: 'deck-1',
-          removalsDetailed:
-              (optimizeResult['removals_detailed'] as List)
-                  .cast<Map<String, dynamic>>(),
-          additionsDetailed:
-              (optimizeResult['additions_detailed'] as List)
-                  .cast<Map<String, dynamic>>(),
+          removalsDetailed: (optimizeResult['removals_detailed'] as List)
+              .cast<Map<String, dynamic>>(),
+          additionsDetailed: (optimizeResult['additions_detailed'] as List)
+              .cast<Map<String, dynamic>>(),
         );
         final validation = await provider.validateDeck('deck-1');
 
@@ -1369,8 +1393,8 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks/deck-1':
-                () => ApiResponse(200, _buildDeckDetailsJson({'remove-1': 1})),
+            '/decks/deck-1': () =>
+                ApiResponse(200, _buildDeckDetailsJson({'remove-1': 1})),
           },
           putHandlers: {
             '/decks/deck-1': (_) {
@@ -1410,8 +1434,8 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks/deck-1':
-                () => ApiResponse(200, _buildDeckDetailsJson({'remove-1': 1})),
+            '/decks/deck-1': () =>
+                ApiResponse(200, _buildDeckDetailsJson({'remove-1': 1})),
           },
           putHandlers: {
             '/decks/deck-1': (_) {
@@ -1455,24 +1479,23 @@ void main() {
 
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks/deck-1':
-                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
-            '/cards?name=Arcane+Signet&limit=1':
-                () => ApiResponse(200, {
-                  'data': const [
-                    {
-                      'id': 'add-1',
-                      'name': 'Arcane Signet',
-                      'type_line': 'Artifact',
-                      'color_identity': <String>[],
-                    },
-                  ],
-                }),
+            '/decks/deck-1': () =>
+                ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
+              'data': const [
+                {
+                  'id': 'add-1',
+                  'name': 'Arcane Signet',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+            }),
           },
           putHandlers: {
             '/decks/deck-1': (body) {
-              final cards =
-                  (body['cards'] as List).cast<Map<String, dynamic>>();
+              final cards = (body['cards'] as List)
+                  .cast<Map<String, dynamic>>();
               expect(
                 cards.any((entry) => entry['card_id'] == 'remove-1'),
                 isFalse,
@@ -1487,11 +1510,10 @@ void main() {
             },
           },
           postHandlers: {
-            '/decks/deck-1/validate':
-                (_) => ApiResponse(400, {
-                  'ok': false,
-                  'error': 'Commander deck must contain exactly 100 cards.',
-                }),
+            '/decks/deck-1/validate': (_) => ApiResponse(400, {
+              'ok': false,
+              'error': 'Commander deck must contain exactly 100 cards.',
+            }),
           },
         );
 
@@ -1525,57 +1547,53 @@ void main() {
 
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks/deck-1':
-                () => ApiResponse(
-                  200,
-                  _buildDeckDetailsJson(
-                    currentCards,
-                    deckColorIdentity: const <String>[],
-                    commanderColors: const <String>[],
-                    commanderColorIdentity: const <String>[],
-                    commanderName: 'Kozilek, the Great Distortion',
-                    commanderManaCost: '{8}{C}{C}',
-                    commanderTypeLine: 'Legendary Creature — Eldrazi',
-                  ),
-                ),
-            '/cards?name=Sol%20Ring&limit=1':
-                () => ApiResponse(200, {
-                  'data': const [
-                    {
-                      'id': 'add-1',
-                      'name': 'Sol Ring',
-                      'type_line': 'Artifact',
-                      'color_identity': <String>[],
-                    },
-                  ],
-                }),
-            '/cards?name=Sol+Ring&limit=1':
-                () => ApiResponse(200, {
-                  'data': const [
-                    {
-                      'id': 'add-1',
-                      'name': 'Sol Ring',
-                      'type_line': 'Artifact',
-                      'color_identity': <String>[],
-                    },
-                  ],
-                }),
-            '/cards?name=Swan+Song&limit=1':
-                () => ApiResponse(200, {
-                  'data': const [
-                    {
-                      'id': 'illegal-1',
-                      'name': 'Swan Song',
-                      'type_line': 'Instant',
-                      'color_identity': <String>['U'],
-                    },
-                  ],
-                }),
+            '/decks/deck-1': () => ApiResponse(
+              200,
+              _buildDeckDetailsJson(
+                currentCards,
+                deckColorIdentity: const <String>[],
+                commanderColors: const <String>[],
+                commanderColorIdentity: const <String>[],
+                commanderName: 'Kozilek, the Great Distortion',
+                commanderManaCost: '{8}{C}{C}',
+                commanderTypeLine: 'Legendary Creature — Eldrazi',
+              ),
+            ),
+            '/cards?name=Sol%20Ring&limit=1': () => ApiResponse(200, {
+              'data': const [
+                {
+                  'id': 'add-1',
+                  'name': 'Sol Ring',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+            }),
+            '/cards?name=Sol+Ring&limit=1': () => ApiResponse(200, {
+              'data': const [
+                {
+                  'id': 'add-1',
+                  'name': 'Sol Ring',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+            }),
+            '/cards?name=Swan+Song&limit=1': () => ApiResponse(200, {
+              'data': const [
+                {
+                  'id': 'illegal-1',
+                  'name': 'Swan Song',
+                  'type_line': 'Instant',
+                  'color_identity': <String>['U'],
+                },
+              ],
+            }),
           },
           putHandlers: {
             '/decks/deck-1': (body) {
-              final cards =
-                  (body['cards'] as List).cast<Map<String, dynamic>>();
+              final cards = (body['cards'] as List)
+                  .cast<Map<String, dynamic>>();
               expect(cards.any((entry) => entry['card_id'] == 'add-1'), isTrue);
               expect(
                 cards.any((entry) => entry['card_id'] == 'illegal-1'),
@@ -1594,12 +1612,11 @@ void main() {
             },
           },
           postHandlers: {
-            '/decks/deck-1/validate':
-                (_) => ApiResponse(200, {
-                  'valid': true,
-                  'ok': true,
-                  'errors': const <String>[],
-                }),
+            '/decks/deck-1/validate': (_) => ApiResponse(200, {
+              'valid': true,
+              'ok': true,
+              'errors': const <String>[],
+            }),
           },
         );
 
@@ -1676,8 +1693,8 @@ void main() {
             ),
           },
           postHandlers: {
-            '/decks/deck-1/cards/set':
-                (_) => ApiResponse(400, {'error': 'regra violada'}),
+            '/decks/deck-1/cards/set': (_) =>
+                ApiResponse(400, {'error': 'regra violada'}),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);
@@ -1705,20 +1722,19 @@ void main() {
 
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks':
-                () => ApiResponse(200, [
-                  {
-                    'id': 'deck-1',
-                    'name': 'Smoke Deck',
-                    'format': 'commander',
-                    'is_public': false,
-                    'created_at': '2026-03-23T00:00:00.000Z',
-                    'card_count': 37,
-                    'color_identity': ['W'],
-                  },
-                ]),
-            '/decks/deck-1':
-                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/decks': () => ApiResponse(200, [
+              {
+                'id': 'deck-1',
+                'name': 'Smoke Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-23T00:00:00.000Z',
+                'card_count': 37,
+                'color_identity': ['W'],
+              },
+            ]),
+            '/decks/deck-1': () =>
+                ApiResponse(200, _buildDeckDetailsJson(currentCards)),
           },
           postHandlers: {
             '/decks/deck-1/cards': (_) => ApiResponse(200, {'ok': true}),
@@ -1745,23 +1761,21 @@ void main() {
       () async {
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks':
-                () => ApiResponse(200, [
-                  {
-                    'id': 'deck-1',
-                    'name': 'Smoke Deck',
-                    'format': 'commander',
-                    'is_public': false,
-                    'created_at': '2026-03-23T00:00:00.000Z',
-                    'card_count': 37,
-                    'color_identity': ['W'],
-                  },
-                ]),
-            '/decks/deck-1':
-                () => ApiResponse(
-                  200,
-                  _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
-                ),
+            '/decks': () => ApiResponse(200, [
+              {
+                'id': 'deck-1',
+                'name': 'Smoke Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-23T00:00:00.000Z',
+                'card_count': 37,
+                'color_identity': ['W'],
+              },
+            ]),
+            '/decks/deck-1': () => ApiResponse(
+              200,
+              _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+            ),
           },
           deleteHandlers: {'/decks/deck-1': () => ApiResponse(204, const {})},
         );
@@ -1781,30 +1795,27 @@ void main() {
     test('refreshAiAnalysis updates selected deck and list', () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/decks':
-              () => ApiResponse(200, [
-                {
-                  'id': 'deck-1',
-                  'name': 'Smoke Deck',
-                  'format': 'commander',
-                  'is_public': false,
-                  'created_at': '2026-03-23T00:00:00.000Z',
-                  'card_count': 37,
-                },
-              ]),
-          '/decks/deck-1':
-              () => ApiResponse(
-                200,
-                _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
-              ),
+          '/decks': () => ApiResponse(200, [
+            {
+              'id': 'deck-1',
+              'name': 'Smoke Deck',
+              'format': 'commander',
+              'is_public': false,
+              'created_at': '2026-03-23T00:00:00.000Z',
+              'card_count': 37,
+            },
+          ]),
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+          ),
         },
         postHandlers: {
-          '/decks/deck-1/ai-analysis':
-              (_) => ApiResponse(200, {
-                'synergy_score': 87,
-                'strengths': 'draw',
-                'weaknesses': 'ramp',
-              }),
+          '/decks/deck-1/ai-analysis': (_) => ApiResponse(200, {
+            'synergy_score': 87,
+            'strengths': 'draw',
+            'weaknesses': 'ramp',
+          }),
         },
       );
 
@@ -1826,20 +1837,19 @@ void main() {
         var analysisFetchCount = 0;
         final apiClient = _FakeApiClient(
           getHandlers: {
-            '/decks':
-                () => ApiResponse(200, [
-                  {
-                    'id': 'deck-1',
-                    'name': 'Smoke Deck',
-                    'format': 'commander',
-                    'is_public': false,
-                    'created_at': '2026-03-23T00:00:00.000Z',
-                    'card_count': 37,
-                    'color_identity': ['W'],
-                  },
-                ]),
-            '/decks/deck-1':
-                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/decks': () => ApiResponse(200, [
+              {
+                'id': 'deck-1',
+                'name': 'Smoke Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-23T00:00:00.000Z',
+                'card_count': 37,
+                'color_identity': ['W'],
+              },
+            ]),
+            '/decks/deck-1': () =>
+                ApiResponse(200, _buildDeckDetailsJson(currentCards)),
             '/decks/deck-1/analysis': () {
               analysisFetchCount += 1;
               return ApiResponse(200, {
@@ -1917,10 +1927,9 @@ void main() {
           },
         },
         postHandlers: {
-          '/community/decks/public-1':
-              (_) => ApiResponse(201, {
-                'deck': {'id': 'deck-copy'},
-              }),
+          '/community/decks/public-1': (_) => ApiResponse(201, {
+            'deck': {'id': 'deck-copy'},
+          }),
         },
       );
 
@@ -1941,34 +1950,31 @@ void main() {
           getHandlers: {
             '/decks/deck-1': () {
               detailsFetchCount += 1;
-              final cards =
-                  detailsFetchCount == 1
-                      ? {'spell-1': 1, 'land-1': 36}
-                      : {'spell-1': 1, 'imported-1': 2, 'land-1': 36};
+              final cards = detailsFetchCount == 1
+                  ? {'spell-1': 1, 'land-1': 36}
+                  : {'spell-1': 1, 'imported-1': 2, 'land-1': 36};
               return ApiResponse(200, _buildDeckDetailsJson(cards));
             },
-            '/decks':
-                () => ApiResponse(200, [
-                  {
-                    'id': 'deck-1',
-                    'name': 'Smoke Deck',
-                    'format': 'commander',
-                    'is_public': false,
-                    'created_at': '2026-03-23T00:00:00.000Z',
-                    'card_count': 39,
-                  },
-                ]),
+            '/decks': () => ApiResponse(200, [
+              {
+                'id': 'deck-1',
+                'name': 'Smoke Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-23T00:00:00.000Z',
+                'card_count': 39,
+              },
+            ]),
           },
           postHandlers: {
-            '/import/to-deck':
-                (_) => ApiResponse(200, {
-                  'success': true,
-                  'deck_id': 'deck-1',
-                  'cards_imported': 2,
-                  'total_cards': 39,
-                  'not_found_lines': [],
-                  'warnings': [],
-                }),
+            '/import/to-deck': (_) => ApiResponse(200, {
+              'success': true,
+              'deck_id': 'deck-1',
+              'cards_imported': 2,
+              'total_cards': 39,
+              'not_found_lines': [],
+              'warnings': [],
+            }),
           },
         );
         final provider = DeckProvider(apiClient: apiClient);

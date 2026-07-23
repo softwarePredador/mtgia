@@ -369,7 +369,8 @@ void main() {
 
     expect(
       find.text(
-        'Sem conexão com o servidor. Confira sua internet e tente novamente.',
+        'Sem conexão com o servidor. Seus dados continuam nesta tela; '
+        'reconecte e tente novamente.',
       ),
       findsOneWidget,
     );
@@ -687,7 +688,8 @@ void main() {
 
     expect(
       find.text(
-        'Sem conexão com o servidor. Confira sua internet e tente novamente.',
+        'Sem conexão com o servidor. Seus dados continuam nesta tela; '
+        'reconecte e tente novamente.',
       ),
       findsOneWidget,
     );

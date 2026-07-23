@@ -75,6 +75,10 @@ class ApiClient {
   static bool _performanceUnavailable = false;
   static final Random _requestIdRandom = Random.secure();
   static const int _requestIdEntropyChunkMax = 0x10000;
+  static const int requestIdMaxLength = 96;
+  static final RegExp _requestIdPattern = RegExp(
+    r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$',
+  );
 
   @visibleForTesting
   static void resetForTesting({
@@ -156,12 +160,22 @@ class ApiClient {
     return 'mob-$timestamp-$entropy';
   }
 
+  @visibleForTesting
+  static bool isValidRequestId(String? value) {
+    final candidate = value?.trim();
+    return candidate != null &&
+        candidate.isNotEmpty &&
+        candidate.length <= requestIdMaxLength &&
+        _requestIdPattern.hasMatch(candidate);
+  }
+
   static Map<String, String> appendRequestIdHeaders(
     Map<String, String> headers, {
     String? requestId,
   }) {
-    final resolvedRequestId = requestId?.trim().isNotEmpty == true
-        ? requestId!.trim()
+    final candidate = requestId?.trim();
+    final resolvedRequestId = isValidRequestId(candidate)
+        ? candidate!
         : generateRequestId();
     return {...headers, 'x-request-id': resolvedRequestId};
   }

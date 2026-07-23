@@ -43,7 +43,7 @@
     "community": ["test/features/community/screens/community_screen_responsive_test.dart","test/features/community/screens/community_deck_detail_screen_test.dart"],
     "decks": ["test/features/decks/screens/deck_flow_entry_screens_test.dart","test/features/decks/screens/deck_list_responsive_test.dart"],
     "home": ["test/features/home/home_screen_test.dart","test/features/home/lotus_life_counter_overflow_test.dart"],
-    "market": ["test/features/market/screens/market_screen_responsive_test.dart"],
+    "market": ["test/features/community/screens/community_screen_responsive_test.dart"],
     "messages": ["test/features/messages/screens/message_inbox_screen_test.dart","test/features/messages/screens/chat_screen_test.dart"],
     "notifications": ["test/features/notifications/screens/notification_screen_test.dart"],
     "profile": ["test/features/profile/profile_screen_test.dart"],

@@ -114,7 +114,7 @@ Final queue/readiness:
 
 Final audits:
 
-- `xmage_strategy_consistency_audit_20260708_post_pg669b_trusted_rule_oracle_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `operational_surface_alignment_audit_20260708_post_pg669b_trusted_rule_oracle_hash_backfill_new_server_final.md`
 - `legacy_contamination_audit_20260708_post_pg669b_trusted_rule_oracle_hash_backfill_new_server_final.md`
 - `pg_hermes_sqlite_contract_audit_20260708_post_pg669b_trusted_rule_oracle_hash_backfill_new_server_final.md`

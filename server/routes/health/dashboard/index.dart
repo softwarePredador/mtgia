@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../lib/http_responses.dart';
 import '../../../lib/commercial_metrics_service.dart';
+import '../../../lib/http_responses.dart';
+import '../../../lib/operational_alerts.dart';
 import '../../../lib/request_metrics_service.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -25,6 +26,11 @@ Future<Response> onRequest(RequestContext context) async {
       bucket: 'day',
     );
     final commercial = await commercialMetrics.snapshot(days: 30);
+    final operationalAlerts = evaluateOperationalAlerts(
+      requestMetrics: requestMetrics,
+      aiJobs: aiJobs,
+      aiCost: aiCost,
+    );
 
     return Response.json(
       statusCode: HttpStatus.ok,
@@ -36,6 +42,7 @@ Future<Response> onRequest(RequestContext context) async {
           'ai_cost_proxy': aiCost,
           'ai_optimize': aiOptimize,
           'ai_jobs': aiJobs,
+          'operational_alerts': operationalAlerts,
           'ai_history': aiHistory,
           'commercial': commercial,
         },

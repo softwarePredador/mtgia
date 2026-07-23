@@ -54,4 +54,23 @@ void main() {
     );
     expect(message, isNot(contains('500')));
   });
+
+  test('network errors explain durable deck draft preservation', () {
+    final message = FriendlyErrorMapper.fromException(
+      Exception('ClientException: network is unreachable'),
+      context: FriendlyErrorContext.deckGenerate,
+    );
+
+    expect(message, contains('rascunho continua salvo'));
+    expect(message, contains('reconecte'));
+    expect(message, isNot(contains('ClientException')));
+  });
+
+  test('every friendly context resolves to an offline contract', () {
+    for (final context in FriendlyErrorContext.values) {
+      final contract = FriendlyErrorMapper.offlineContractForContext(context);
+      expect(contract.key, isNotEmpty, reason: context.name);
+      expect(contract.disconnectedMessage, isNotEmpty, reason: context.name);
+    }
+  });
 }

@@ -2,7 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart';
+
+enum FcmDeliveryOutcome { delivered, invalidRegistration, failed }
+
+typedef FcmMessageSender =
+    Future<FcmDeliveryOutcome> Function({
+      required String projectId,
+      required String token,
+      required String title,
+      String? body,
+      Map<String, String>? data,
+    });
 
 /// Serviço para enviar push notifications via Firebase Cloud Messaging (FCM).
 ///
@@ -35,7 +47,7 @@ class PushNotificationService {
           print('[FCM] Service Account carregado de: $path');
           return _serviceAccount;
         } catch (e) {
-          print('[⚠️ FCM] Erro ao ler Service Account: $e');
+          print('[FCM] Falha ao ler Service Account: ${e.runtimeType}');
         }
       }
     }
@@ -49,11 +61,11 @@ class PushNotificationService {
         print('[FCM] Service Account carregado de env var');
         return _serviceAccount;
       } catch (e) {
-        print('[⚠️ FCM] Erro ao decodificar Service Account da env: $e');
+        print('[FCM] Falha ao decodificar Service Account: ${e.runtimeType}');
       }
     }
 
-    print('[⚠️ FCM] Service Account não encontrado - push desabilitado');
+    print('[FCM] Service Account não encontrado - push desabilitado');
     return null;
   }
 
@@ -87,19 +99,18 @@ class PushNotificationService {
 
   /// Assina dados com RSA-SHA256 usando PEM private key
   static String _signWithRsa256(String data, String privateKeyPem) {
-    // Usar dart:io para assinar (mais simples que importar crypto pesado)
-    // Alternativa: usar package:pointycastle ou package:crypto_keys
-    // Aqui usamos uma abordagem via Process (openssl)
+    Directory? tempDir;
     try {
-      // Criar arquivos temporários
-      final tempDir = Directory.systemTemp.createTempSync('fcm_');
+      tempDir = Directory.systemTemp.createTempSync('fcm_');
       final keyFile = File('${tempDir.path}/key.pem')
         ..writeAsStringSync(privateKeyPem);
+      if (!Platform.isWindows) {
+        Process.runSync('chmod', ['600', keyFile.path]);
+      }
       final dataFile = File('${tempDir.path}/data.txt')
         ..writeAsStringSync(data);
       final sigFile = File('${tempDir.path}/sig.bin');
 
-      // Assinar com openssl
       final result = Process.runSync('openssl', [
         'dgst',
         '-sha256',
@@ -111,20 +122,24 @@ class PushNotificationService {
       ]);
 
       if (result.exitCode != 0) {
-        print('[⚠️ FCM] Erro ao assinar JWT: ${result.stderr}');
+        print('[FCM] Falha ao assinar JWT com OpenSSL');
         return '';
       }
 
       final signature = sigFile.readAsBytesSync();
       final sigB64 = base64Url.encode(signature).replaceAll('=', '');
-
-      // Limpar arquivos temporários
-      tempDir.deleteSync(recursive: true);
-
       return sigB64;
     } catch (e) {
-      print('[⚠️ FCM] Exceção ao assinar JWT: $e');
+      print('[FCM] Falha ao assinar JWT: ${e.runtimeType}');
       return '';
+    } finally {
+      if (tempDir?.existsSync() == true) {
+        try {
+          tempDir!.deleteSync(recursive: true);
+        } catch (_) {
+          print('[FCM] Falha ao remover material temporário de assinatura');
+        }
+      }
     }
   }
 
@@ -163,12 +178,13 @@ class PushNotificationService {
         print('[FCM] Access Token obtido (expira em ${expiresIn}s)');
         return _cachedAccessToken;
       } else {
-        print('[⚠️ FCM] Falha ao obter token: ${response.statusCode}');
-        print('[⚠️ FCM] Response: ${response.body}');
+        print(
+          '[FCM] Falha ao obter access token: status=${response.statusCode}',
+        );
         return null;
       }
     } catch (e) {
-      print('[⚠️ FCM] Exceção ao obter Access Token: $e');
+      print('[FCM] Falha ao obter access token: ${e.runtimeType}');
       return null;
     }
   }
@@ -184,11 +200,48 @@ class PushNotificationService {
     String? body,
     Map<String, String>? data,
   }) async {
-    final sa = _loadServiceAccount();
-    if (sa == null) {
-      // FCM não configurado — pula silenciosamente (dev mode)
-      return;
-    }
+    await _sendToUser(
+      pool: pool,
+      userId: userId,
+      actorUserId: actorUserId,
+      title: title,
+      body: body,
+      data: data,
+    );
+  }
+
+  @visibleForTesting
+  static Future<void> sendToUserForTesting({
+    required Pool pool,
+    required String userId,
+    String? actorUserId,
+    required String title,
+    String? body,
+    Map<String, String>? data,
+    required FcmMessageSender sender,
+  }) {
+    return _sendToUser(
+      pool: pool,
+      userId: userId,
+      actorUserId: actorUserId,
+      title: title,
+      body: body,
+      data: data,
+      sender: sender,
+    );
+  }
+
+  static Future<void> _sendToUser({
+    required Pool pool,
+    required String userId,
+    String? actorUserId,
+    required String title,
+    String? body,
+    Map<String, String>? data,
+    FcmMessageSender? sender,
+  }) async {
+    final sa = sender == null ? _loadServiceAccount() : null;
+    if (sender == null && sa == null) return;
 
     try {
       // Busca FCM token do usuário
@@ -216,21 +269,33 @@ class PushNotificationService {
       final fcmToken = result.first.toColumnMap()['fcm_token'] as String?;
       if (fcmToken == null || fcmToken.isEmpty) return;
 
-      // Envia via FCM HTTP v1 API
-      await _sendFcmMessageV1(
-        projectId: sa['project_id'] as String,
+      final outcome = await (sender ?? _sendFcmMessageV1)(
+        projectId: sa?['project_id'] as String? ?? 'test',
         token: fcmToken,
         title: title,
         body: body,
         data: data,
       );
+      if (outcome == FcmDeliveryOutcome.invalidRegistration) {
+        await pool.execute(
+          Sql.named('''
+            UPDATE users
+            SET fcm_token = NULL,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = @id
+              AND fcm_token = @token
+          '''),
+          parameters: {'id': userId, 'token': fcmToken},
+        );
+        print('[FCM] Token inválido removido do usuário');
+      }
     } catch (e) {
-      print('[⚠️ PushNotificationService] Falha ao enviar push: $e');
+      print('[FCM] Falha ao enviar push: ${e.runtimeType}');
     }
   }
 
   /// Envia mensagem FCM via HTTP v1 API
-  static Future<void> _sendFcmMessageV1({
+  static Future<FcmDeliveryOutcome> _sendFcmMessageV1({
     required String projectId,
     required String token,
     required String title,
@@ -239,8 +304,8 @@ class PushNotificationService {
   }) async {
     final accessToken = await _getAccessToken();
     if (accessToken == null) {
-      print('[⚠️ FCM] Sem Access Token, abortando envio');
-      return;
+      print('[FCM] Sem access token, envio abortado');
+      return FcmDeliveryOutcome.failed;
     }
 
     final payload = {
@@ -279,26 +344,63 @@ class PushNotificationService {
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        print('[FCM] ✅ Push enviado com sucesso');
-      } else {
-        print('[⚠️ FCM] Status ${response.statusCode}: ${response.body}');
+        print('[FCM] Push enviado com sucesso');
+        return FcmDeliveryOutcome.delivered;
+      }
+      final outcome = classifyDeliveryResponse(
+        statusCode: response.statusCode,
+        body: response.body,
+      );
+      print(
+        '[FCM] Envio recusado: status=${response.statusCode} '
+        'outcome=${outcome.name}',
+      );
+      return outcome;
+    } catch (e) {
+      print('[FCM] Falha na request v1: ${e.runtimeType}');
+      return FcmDeliveryOutcome.failed;
+    }
+  }
 
-        // Erros de token inválido
-        if (response.statusCode == 404 || response.statusCode == 400) {
-          final errorBody = jsonDecode(response.body) as Map<String, dynamic>;
-          final error = errorBody['error'] as Map<String, dynamic>?;
-          final details = error?['details'] as List?;
-          final errorCode = details?.firstOrNull?['errorCode'] as String?;
+  @visibleForTesting
+  static FcmDeliveryOutcome classifyDeliveryResponse({
+    required int statusCode,
+    required String body,
+  }) {
+    if (statusCode == HttpStatus.ok) {
+      return FcmDeliveryOutcome.delivered;
+    }
 
-          if (errorCode == 'UNREGISTERED' || errorCode == 'INVALID_ARGUMENT') {
-            print('[FCM] Token inválido ou expirado');
-            // Aqui poderíamos limpar o token do banco se tivéssemos o pool
-          }
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is! Map<String, dynamic>) {
+        return FcmDeliveryOutcome.failed;
+      }
+      final error = decoded['error'];
+      if (error is! Map<String, dynamic>) {
+        return FcmDeliveryOutcome.failed;
+      }
+      if (statusCode == HttpStatus.notFound &&
+          error['status'] == 'UNREGISTERED') {
+        return FcmDeliveryOutcome.invalidRegistration;
+      }
+
+      final details = error['details'];
+      if (details is! List) return FcmDeliveryOutcome.failed;
+      for (final detail in details) {
+        if (detail is! Map) continue;
+        final type = detail['@type']?.toString() ?? '';
+        final code = detail['errorCode']?.toString();
+        final isFcmError = type.endsWith('google.firebase.fcm.v1.FcmError');
+        if (code == 'UNREGISTERED' ||
+            (code == 'INVALID_ARGUMENT' && isFcmError)) {
+          return FcmDeliveryOutcome.invalidRegistration;
         }
       }
-    } catch (e) {
-      print('[⚠️ FCM] Erro na request v1: $e');
+    } catch (_) {
+      return FcmDeliveryOutcome.failed;
     }
+    return FcmDeliveryOutcome.failed;
   }
 
   /// Envia push para múltiplos tokens (batch)
@@ -315,7 +417,7 @@ class PushNotificationService {
 
     // FCM v1 não tem envio em batch direto, então enviamos um por um
     // mas em paralelo com limite de 10 simultâneos
-    final futures = <Future>[];
+    final futures = <Future<FcmDeliveryOutcome>>[];
     for (final token in tokens) {
       futures.add(
         _sendFcmMessageV1(

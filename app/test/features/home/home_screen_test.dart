@@ -301,7 +301,7 @@ void main() {
     expect(find.byKey(const Key('home-decks-empty-state')), findsNothing);
   });
 
-  testWidgets('keeps cached decks visible and labels an offline refresh', (
+  testWidgets('keeps cached decks visible and labels a cached-only refresh', (
     tester,
   ) async {
     final deck = Deck(
@@ -320,7 +320,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(
-      find.byKey(const Key('home-decks-offline-cache-state')),
+      find.byKey(const Key('home-decks-cached-read-only-state')),
       findsOneWidget,
     );
     expect(find.text('Deck salvo'), findsOneWidget);

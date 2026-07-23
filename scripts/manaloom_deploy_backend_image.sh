@@ -704,6 +704,69 @@ SQL
   fi
 }
 
+require_migrations_041_051_contract() {
+  local contract_status
+  contract_status="$(
+    "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
+      psql -X -v ON_ERROR_STOP=1 -qAt <<'SQL'
+BEGIN TRANSACTION READ ONLY;
+WITH required_migrations(version, name) AS (
+  VALUES
+    ('041', 'create_social_trade_messaging_runtime_schema'),
+    ('042', 'create_account_recovery_and_session_revocation'),
+    ('043', 'record_versioned_legal_acceptance'),
+    ('044', 'create_email_verification_gate'),
+    ('045', 'create_collection_availability_contract'),
+    ('046', 'restore_price_history_runtime_contract'),
+    ('047', 'close_deck_validation_state_transitions'),
+    ('048', 'close_ai_job_lifecycle'),
+    ('049', 'preserve_binder_physical_identity'),
+    ('050', 'canonicalize_pricing_provenance'),
+    ('051', 'close_social_safety_contract')
+), checks(check_name, ok) AS (
+  VALUES
+    (
+      'transaction_read_only',
+      current_setting('transaction_read_only') = 'on'
+    ),
+    (
+      'required_migrations_registered',
+      (
+        SELECT COUNT(*) = 11
+        FROM required_migrations required
+        JOIN public.schema_migrations actual
+          ON actual.version = required.version
+         AND actual.name = required.name
+      )
+    ),
+    (
+      'latest_migration_051',
+      COALESCE(
+        (SELECT MAX(version) FROM public.schema_migrations),
+        ''
+      ) = '051'
+    )
+), missing AS (
+  SELECT check_name
+  FROM checks
+  WHERE NOT ok
+)
+SELECT CASE
+  WHEN COUNT(*) = 0 THEN 'migrations_041_051_ready'
+  ELSE 'migrations_041_051_incomplete:' ||
+       string_agg(check_name, ',' ORDER BY check_name)
+END
+FROM missing;
+ROLLBACK;
+SQL
+  )"
+
+  if [[ "$contract_status" != "migrations_041_051_ready" ]]; then
+    echo "deploy recusado: contrato read-only das migrations 041-051 incompleto: $contract_status" >&2
+    exit 2
+  fi
+}
+
 for key in SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL MANALOOM_ALLOWED_ORIGINS ENVIRONMENT JWT_SECRET MANALOOM_TRUSTED_PROXY_HOPS MANALOOM_TRUSTED_PROXY_PEERS PASSWORD_RESET_WEBHOOK_URL PASSWORD_RESET_WEBHOOK_TOKEN PASSWORD_RESET_APP_URL EMAIL_VERIFICATION_WEBHOOK_URL EMAIL_VERIFICATION_WEBHOOK_TOKEN EMAIL_VERIFICATION_APP_URL SENTRY_DSN; do
   if [[ -z "${!key:-}" ]]; then
     echo "variavel obrigatoria ausente: $key" >&2
@@ -846,6 +909,7 @@ require_clean_worktree
 require_migration_038_contract
 require_migration_039_contract
 require_migration_040_contract
+require_migrations_041_051_contract
 
 drain_timeout_seconds="${MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS:-300}"
 if ! [[ "$drain_timeout_seconds" =~ ^[0-9]+$ ]]; then
@@ -1051,7 +1115,6 @@ docker service update \
   --detach=true \
   --image '$image_digest_ref' \
   --env-add GIT_SHA='$sha' \
-  --env-add SENTRY_RELEASE='$sha' \
   --env-add DEPLOY_TIMESTAMP='$deploy_timestamp' \
   --env-add MANALOOM_ALLOWED_ORIGINS='$ALLOWED_ORIGINS_CANONICAL' \
   --env-add MANALOOM_TRUSTED_PROXY_HOPS='$MANALOOM_TRUSTED_PROXY_HOPS' \
@@ -1220,6 +1283,9 @@ for attempt in $(seq 1 "$readiness_attempts"); do
      jq -e '
        .status == "ready" and
        .environment == "production" and
+       .checks.release_schema.status == "healthy" and
+       .checks.release_schema.required_range == "038-051" and
+       .checks.release_schema.latest_migration == "051" and
        .checks.ai_runtime.status == "healthy" and
        .checks.ai_runtime.provider_configured == true and
        .checks.ai_runtime.mock_fallbacks_allowed == false and

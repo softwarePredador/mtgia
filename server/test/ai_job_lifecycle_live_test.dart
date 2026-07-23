@@ -159,12 +159,14 @@ void main() {
         headers: headers(strangerToken),
       );
       expect(response.statusCode, 404, reason: response.body);
+      expect(await AiGenerateJobStore.heartbeat(pool, generate.jobId), isTrue);
       response = await http.delete(
         Uri.parse('$baseUrl/ai/generate/jobs/${generate.jobId}'),
         headers: headers(ownerToken),
       );
       expect(response.statusCode, 200, reason: response.body);
       expect(decode(response)['status'], 'cancelled');
+      expect(await AiGenerateJobStore.heartbeat(pool, generate.jobId), isFalse);
       expect(
         await AiGenerateJobStore.progress(
           pool,
@@ -239,12 +241,14 @@ void main() {
         headers: headers(strangerToken),
       );
       expect(response.statusCode, 404, reason: response.body);
+      expect(await OptimizeJobStore.heartbeat(pool, optimize.jobId), isTrue);
       response = await http.delete(
         Uri.parse('$baseUrl/ai/optimize/jobs/${optimize.jobId}'),
         headers: headers(ownerToken),
       );
       expect(response.statusCode, 200, reason: response.body);
       expect(decode(response)['can_resume'], isFalse);
+      expect(await OptimizeJobStore.heartbeat(pool, optimize.jobId), isFalse);
       expect(
         await OptimizeJobStore.progress(
           pool,
@@ -280,7 +284,8 @@ void main() {
       await pool.execute(
         Sql.named('''
           UPDATE ai_generate_jobs
-          SET updated_at = NOW() - INTERVAL '5 minutes'
+          SET created_at = NOW() - INTERVAL '5 minutes',
+              updated_at = NOW()
           WHERE id = @id
         '''),
         parameters: {'id': staleGenerateId},

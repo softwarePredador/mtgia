@@ -509,39 +509,41 @@ $metaContext
     http.Response response;
     final openAiStopwatch = Stopwatch()..start();
     try {
-      response = await http
-          .post(
-            Uri.parse('https://api.openai.com/v1/chat/completions'),
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $apiKey',
-            },
-            body: jsonEncode({
-              ...aiSafetyIdentifierPayload(userId),
-              'model': model,
-              'messages': [
-                {
-                  'role': 'system',
-                  'content': '$systemPromptPrefix\nFormat: "$format".',
-                },
-                {'role': 'user', 'content': userMessage},
-              ],
-              'temperature': aiConfig.temperatureFor(
-                key: 'OPENAI_TEMP_GENERATE',
-                fallback: 0.4,
-                devFallback: 0.45,
-                stagingFallback: 0.4,
-                prodFallback: 0.35,
-              ),
-              ...openAiTokenLimitPayload(model: model, maxTokens: maxTokens),
-              'response_format': openAiStructuredResponseFormat(
-                model: model,
-                name: 'deck_generation',
-                schema: openAiDeckGenerationSchema,
-              ),
-            }),
-          )
-          .timeout(openAiTimeout);
+      response = await executeAiGenerateProviderRequest(
+        send:
+            () => http.post(
+              Uri.parse('https://api.openai.com/v1/chat/completions'),
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $apiKey',
+              },
+              body: jsonEncode({
+                ...aiSafetyIdentifierPayload(userId),
+                'model': model,
+                'messages': [
+                  {
+                    'role': 'system',
+                    'content': '$systemPromptPrefix\nFormat: "$format".',
+                  },
+                  {'role': 'user', 'content': userMessage},
+                ],
+                'temperature': aiConfig.temperatureFor(
+                  key: 'OPENAI_TEMP_GENERATE',
+                  fallback: 0.4,
+                  devFallback: 0.45,
+                  stagingFallback: 0.4,
+                  prodFallback: 0.35,
+                ),
+                ...openAiTokenLimitPayload(model: model, maxTokens: maxTokens),
+                'response_format': openAiStructuredResponseFormat(
+                  model: model,
+                  name: 'deck_generation',
+                  schema: openAiDeckGenerationSchema,
+                ),
+              }),
+            ),
+        timeout: openAiTimeout,
+      );
     } on TimeoutException {
       timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
       await recordAiProviderCall(
@@ -554,57 +556,18 @@ $metaContext
         failureCode: 'provider_timeout',
       );
       Log.w(
-        'AI generate OpenAI timeout; using deterministic fallback. '
+        'AI generate OpenAI timeout; failing closed. '
         'format=$format timeout_ms=${openAiTimeout.inMilliseconds} '
         'timeout_key=${openAiTimeoutSelection.envKey} '
         'reference_guidance=${openAiTimeoutSelection.referenceGuidanceBudget}',
       );
-      final fallbackBody = await enforceGenerationConstraints(
-        await _buildMockGenerateResponse(
-          pool: pool,
-          prompt: prompt,
-          format: format,
-          requestedCommanderName: requestedCommanderName,
-          referenceProfile: referenceProfile,
-          referenceCardStats: referenceCardStats,
-          unresolvedReferenceCards: unresolvedReferenceCards,
-          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-          activeLearnedDeck: activeLearnedDeck,
-          archetypeReferenceStats: archetypeReferenceStats,
-          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
-          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-          usageHotCards: usageHotCards,
-          isMock: false,
-          generationMode: 'openai_timeout_deterministic_fallback',
-          warningCode: 'openai_timeout_deterministic_fallback',
-          warningMessage:
-              'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
-        ),
-      );
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
-      final responseBody = withAiGenerateRuntimeMetadata(
-        payload: {...fallbackBody, 'ai_generation_timed_out': true},
+      return buildAiGenerateProviderTimeoutResponse(
         cacheKey: cacheKey,
-        cacheHit: false,
         timings: timings,
-      );
-
-      if (!generationConstraints.isRequested &&
-          _aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
-        writeAiGenerateCache(
-          cacheKey: cacheKey,
-          payload: responseBody,
-          ttl: const Duration(seconds: 120),
-        );
-        return Response.json(body: responseBody);
-      }
-
-      return Response.json(
-        statusCode: 422,
-        body: {
-          'error': 'Generated fallback deck failed validation',
-          ...responseBody,
-        },
+        timeout: openAiTimeout,
+        timeoutKey: openAiTimeoutSelection.envKey,
+        referenceGuidanceBudget: openAiTimeoutSelection.referenceGuidanceBudget,
       );
     } catch (error) {
       await recordAiProviderCall(
@@ -1039,6 +1002,47 @@ $metaContext
   }
 }
 
+Future<http.Response> executeAiGenerateProviderRequest({
+  required Future<http.Response> Function() send,
+  required Duration timeout,
+}) => send().timeout(timeout);
+
+Response buildAiGenerateProviderTimeoutResponse({
+  required String cacheKey,
+  required Map<String, int> timings,
+  required Duration timeout,
+  required String timeoutKey,
+  required bool referenceGuidanceBudget,
+}) {
+  return Response.json(
+    statusCode: HttpStatus.gatewayTimeout,
+    headers: const {'Cache-Control': 'no-store'},
+    body: withAiGenerateRuntimeMetadata(
+      payload: {
+        'error': aiProviderUnavailableMessage,
+        'error_code': 'provider_timeout',
+        'outcome_code': 'provider_unavailable',
+        'ai_generation_timed_out': true,
+        'retryable': true,
+        'can_save': false,
+        'learning_eligible': false,
+        'generated_deck': null,
+        'provider': {
+          'name': 'openai',
+          'operation': 'generate',
+          'status': 'timeout',
+          'timeout_ms': timeout.inMilliseconds,
+          'timeout_key': timeoutKey,
+          'reference_guidance_budget': referenceGuidanceBudget,
+        },
+      },
+      cacheKey: cacheKey,
+      cacheHit: false,
+      timings: timings,
+    ),
+  );
+}
+
 Future<Response> _startAiGenerateAsyncJob({
   required RequestContext context,
   required Map<String, dynamic> body,
@@ -1109,12 +1113,17 @@ Future<Response> _startAiGenerateAsyncJob({
     unawaited(
       runZonedGuarded(
         () async {
-          final successful = await _processAiGenerateAsyncJob(
+          final successful = await _runAiGenerateAsyncJob(
             pool: pool,
             jobId: jobId,
-            internalGenerateUrl: internalGenerateUrl,
-            syncPayload: syncPayload,
-            authorization: authorization,
+            operation:
+                () => _processAiGenerateAsyncJob(
+                  pool: pool,
+                  jobId: jobId,
+                  internalGenerateUrl: internalGenerateUrl,
+                  syncPayload: syncPayload,
+                  authorization: authorization,
+                ),
           );
           if (planReservation != null) {
             try {
@@ -1159,7 +1168,7 @@ Future<Response> _startAiGenerateAsyncJob({
       'cancel_url': '/ai/generate/jobs/$jobId',
       'resume_url': '/ai/generate/jobs/$jobId',
       'poll_interval_ms': 1000,
-      'job_timeout_ms': const Duration(minutes: 3).inMilliseconds,
+      'job_timeout_ms': AiGenerateJobStore.executionTimeout.inMilliseconds,
       'total_stages': 4,
       'cache': {'hit': false, 'cache_key': cacheKey},
       'idempotency': {
@@ -1289,7 +1298,7 @@ Future<bool> _processAiGenerateAsyncJob({
           headers: headers,
           body: jsonEncode(syncPayload),
         )
-        .timeout(const Duration(minutes: 3));
+        .timeout(AiGenerateJobStore.executionTimeout);
   } on TimeoutException {
     await AiGenerateJobStore.fail(
       pool,
@@ -1349,6 +1358,29 @@ Future<bool> _processAiGenerateAsyncJob({
     error: resultBody['error']?.toString() ?? 'Falha ao gerar deck async.',
   );
   return false;
+}
+
+Future<bool> _runAiGenerateAsyncJob({
+  required Pool pool,
+  required String jobId,
+  required Future<bool> Function() operation,
+}) async {
+  try {
+    return await runAiJobExecution<bool>(
+      operation: operation,
+      heartbeat: () => AiGenerateJobStore.heartbeat(pool, jobId),
+      timeout: AiGenerateJobStore.executionTimeout,
+    );
+  } on AiJobNoLongerActiveException {
+    return false;
+  } on AiJobExecutionTimeoutException {
+    await AiGenerateJobStore.fail(
+      pool,
+      jobId,
+      error: 'A geração excedeu o tempo limite total.',
+    );
+    return false;
+  }
 }
 
 Future<void> _failGenerateJobAndReleaseQuota({

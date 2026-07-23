@@ -89,7 +89,7 @@ Results:
   - `Ran 845 tests`
   - `OK`
 - XMage strategy consistency:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg510_etb_dynamic_count_damage.md`
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   - `26/26` pass
 - Operational surface alignment:
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg510_etb_dynamic_count_damage.md`

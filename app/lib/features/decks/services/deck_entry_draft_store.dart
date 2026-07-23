@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DeckEntryDraftStore {
   static const _generatePrefix = 'manaloom.deck_generate_draft.v1';
   static const _importPrefix = 'manaloom.deck_import_draft.v1';
+  static const _editDescriptionPrefix =
+      'manaloom.deck_edit_description_draft.v1';
 
   Future<Map<String, String>?> loadGenerate(String ownerId) =>
       _load(_key(_generatePrefix, ownerId));
@@ -59,11 +61,34 @@ class DeckEntryDraftStore {
   Future<void> clearImport(String ownerId) =>
       _clear(_key(_importPrefix, ownerId));
 
+  Future<String?> loadEditDescription(String ownerId, String deckId) async {
+    final draft = await _load(
+      _resourceKey(_editDescriptionPrefix, ownerId, deckId),
+    );
+    return draft?['description'];
+  }
+
+  Future<void> saveEditDescription(
+    String ownerId,
+    String deckId,
+    String description,
+  ) => _save(
+    _resourceKey(_editDescriptionPrefix, ownerId, deckId),
+    <String, String>{'description': description},
+  );
+
+  Future<void> clearEditDescription(String ownerId, String deckId) =>
+      _clear(_resourceKey(_editDescriptionPrefix, ownerId, deckId));
+
   String _key(String prefix, String ownerId) {
     final normalizedOwner = ownerId.trim().isEmpty
         ? 'anonymous'
         : ownerId.trim();
     return '$prefix.${Uri.encodeComponent(normalizedOwner)}';
+  }
+
+  String _resourceKey(String prefix, String ownerId, String resourceId) {
+    return '${_key(prefix, ownerId)}.${Uri.encodeComponent(resourceId.trim())}';
   }
 
   Future<Map<String, String>?> _load(String key) async {

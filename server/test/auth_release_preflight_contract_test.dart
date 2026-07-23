@@ -64,6 +64,16 @@ void main() {
             '"2e1cc23c01e5b7d989edc2f1d046c3e7de34a3fa57e995c0f2e6252902153e49"',
       ),
     );
-    expect(mainSource, contains('validateAuthRuntimeEnvironment'));
+    expect(
+      mainSource,
+      contains('authRuntimeEnvironmentValues((key) => environment[key])'),
+      reason:
+          'the server bootstrap must select the centralized auth/email '
+          'contract instead of maintaining a hand-picked subset',
+    );
+    expect(
+      mainSource,
+      isNot(contains("'ENVIRONMENT': environment['ENVIRONMENT']")),
+    );
   });
 }

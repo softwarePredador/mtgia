@@ -39,8 +39,9 @@ class PushNotificationService {
   FirebaseMessaging? _messaging;
   String? _currentToken;
   Future<void>? _initFuture;
+  StreamSubscription<String>? _tokenRefreshSubscription;
   RemoteMessage? _pendingTapMessage;
-  bool _isListeningForTokenRefresh = false;
+  int _registrationGeneration = 0;
   void Function(RemoteMessage message)? _onForegroundMessage;
   void Function(RemoteMessage message)? _onMessageTap;
 
@@ -121,12 +122,44 @@ class PushNotificationService {
   Future<bool> probeReleaseFcmTokenAvailability() async {
     if (kIsWeb) return false;
     await init();
+    final settings = await _messaging?.getNotificationSettings();
+    if (settings == null ||
+        !authorizationAllowsRegistration(settings.authorizationStatus)) {
+      return false;
+    }
     final token = await _messaging?.getToken();
     return token?.trim().isNotEmpty == true;
   }
 
+  @visibleForTesting
+  static bool authorizationAllowsRegistration(AuthorizationStatus status) {
+    return status == AuthorizationStatus.authorized ||
+        status == AuthorizationStatus.provisional;
+  }
+
+  /// Revalida o token sem exibir prompt. Usado no warmup de uma sessão já
+  /// autorizada pelo sistema operacional.
+  Future<void> registerIfAuthorized() async {
+    if (kIsWeb) return;
+    await init();
+    final messaging = _messaging;
+    if (messaging == null) return;
+
+    try {
+      final settings = await messaging.getNotificationSettings();
+      if (!authorizationAllowsRegistration(settings.authorizationStatus)) {
+        return;
+      }
+      await _registerCurrentToken(messaging);
+    } catch (e) {
+      debugPrint(
+        '[Push] Não foi possível revalidar a autorização: ${e.runtimeType}',
+      );
+    }
+  }
+
   /// Solicita permissão e registra FCM token no server.
-  /// Chamar após o login do usuário.
+  /// Chamar em uma superfície cujo contexto explique o valor da notificação.
   Future<void> requestPermissionAndRegister() async {
     if (_messaging == null) {
       debugPrint('[Push] Firebase ainda não inicializado; aguardando init');
@@ -148,38 +181,28 @@ class PushNotificationService {
         provisional: false,
       );
 
-      if (settings.authorizationStatus == AuthorizationStatus.denied) {
+      if (!authorizationAllowsRegistration(settings.authorizationStatus)) {
         debugPrint('[Push] Permissão negada pelo usuário');
         return;
       }
 
       debugPrint('[Push] Permissão: ${settings.authorizationStatus}');
-
-      // Obtém FCM token
-      final token = await _messaging!.getToken();
-      if (token != null) {
-        _currentToken = token;
-        await _sendTokenToServer(token);
-      }
-
-      // Escuta mudanças de token (rotação automática do Firebase)
-      if (!_isListeningForTokenRefresh) {
-        _isListeningForTokenRefresh = true;
-        _messaging!.onTokenRefresh.listen((newToken) {
-          _currentToken = newToken;
-          unawaited(_sendTokenToServer(newToken));
-        });
-      }
+      await _registerCurrentToken(_messaging!);
     } catch (e) {
-      debugPrint('[Push] Erro ao registrar: $e');
+      debugPrint('[Push] Erro ao registrar: ${e.runtimeType}');
     }
   }
 
   /// Remove o token do server (chamar no logout).
   Future<void> unregister() async {
+    _registrationGeneration++;
+    _currentToken = null;
+    final tokenRefreshSubscription = _tokenRefreshSubscription;
+    _tokenRefreshSubscription = null;
+    await tokenRefreshSubscription?.cancel();
+
     try {
       final response = await _api.delete('/users/me/fcm-token');
-      _currentToken = null;
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         debugPrint('[Push] Token removido do server');
@@ -193,8 +216,39 @@ class PushNotificationService {
         );
       }
     } catch (e) {
-      debugPrint('[Push] Erro ao remover token: $e');
+      debugPrint('[Push] Erro ao remover token: ${e.runtimeType}');
     }
+
+    try {
+      await _messaging?.deleteToken();
+      debugPrint('[Push] Token local invalidado');
+    } catch (e) {
+      debugPrint('[Push] Erro ao invalidar token local: ${e.runtimeType}');
+    }
+  }
+
+  Future<void> _registerCurrentToken(FirebaseMessaging messaging) async {
+    final generation = _registrationGeneration;
+    final token = (await messaging.getToken())?.trim();
+    if (token == null ||
+        token.isEmpty ||
+        generation != _registrationGeneration) {
+      return;
+    }
+
+    _currentToken = token;
+    await _sendTokenToServer(token);
+    if (generation != _registrationGeneration) return;
+
+    await _tokenRefreshSubscription?.cancel();
+    _tokenRefreshSubscription = messaging.onTokenRefresh.listen((newToken) {
+      final normalized = newToken.trim();
+      if (normalized.isEmpty || generation != _registrationGeneration) {
+        return;
+      }
+      _currentToken = normalized;
+      unawaited(_sendTokenToServer(normalized));
+    });
   }
 
   /// Envia o FCM token para o server.
@@ -203,7 +257,7 @@ class PushNotificationService {
       await _api.put('/users/me/fcm-token', {'token': token});
       debugPrint('[Push] Token registrado no server');
     } catch (e) {
-      debugPrint('[Push] Erro ao enviar token: $e');
+      debugPrint('[Push] Erro ao enviar token: ${e.runtimeType}');
     }
   }
 

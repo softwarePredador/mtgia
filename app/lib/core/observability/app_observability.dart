@@ -8,6 +8,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/auth/models/user.dart';
+import 'app_observability_sanitizer.dart';
 
 class AppObservability {
   AppObservability._();
@@ -116,16 +117,19 @@ class AppObservability {
       await WidgetsBinding.instance.endOfFrame;
       await SentryFlutter.init((options) {
         options.dsn = _dsn.trim();
-        options.environment =
-            _environment.trim().isNotEmpty
-                ? _environment.trim()
-                : (kReleaseMode ? 'production' : 'development');
+        options.environment = _environment.trim().isNotEmpty
+            ? _environment.trim()
+            : (kReleaseMode ? 'production' : 'development');
         if (_release.trim().isNotEmpty) {
           options.release = _release.trim();
         }
         options.sendDefaultPii = false;
         options.enableLogs = !kReleaseMode;
         options.tracesSampleRate = _tracesSampleRate;
+        options.beforeSend = (event, hint) => sanitizeAppObservedEvent(event);
+        options.beforeBreadcrumb = (breadcrumb, hint) => breadcrumb == null
+            ? null
+            : sanitizeAppObservedBreadcrumb(breadcrumb);
       }).timeout(_sentryStartupTimeout);
       _sentryReady = true;
       debugPrint('[Observability] Sentry inicializado apos primeiro frame.');
@@ -135,7 +139,10 @@ class AppObservability {
         '${_sentryStartupTimeout.inSeconds}s; app segue renderizado.',
       );
     } catch (error) {
-      debugPrint('[Observability] Sentry indisponivel no boot: $error');
+      debugPrint(
+        '[Observability] Sentry indisponivel no boot: '
+        '${sanitizeAppObservedText(error.toString())}',
+      );
     }
   }
 
@@ -226,7 +233,7 @@ class AppObservability {
     }
 
     await Sentry.configureScope((scope) {
-      scope.setTag('route', route);
+      scope.setTag('route', sanitizeAppObservedText(route));
     });
   }
 
@@ -249,13 +256,7 @@ class AppObservability {
 
   @visibleForTesting
   SentryUser sentryUserFor(User user) {
-    return SentryUser(
-      id: user.id,
-      username:
-          user.displayName?.trim().isNotEmpty == true
-              ? user.displayName
-              : user.username,
-    );
+    return SentryUser(id: sanitizeAppObservedText(user.id));
   }
 
   Future<void> recordEvent(
@@ -264,10 +265,14 @@ class AppObservability {
     SentryLevel level = SentryLevel.info,
     Map<String, Object?>? data,
   }) async {
+    final sanitizedCategory = sanitizeAppObservedText(category);
+    final sanitizedMessage = sanitizeAppObservedText(message);
+    final sanitizedData = data == null ? null : sanitizeAppObservedMap(data);
     if (kDebugMode) {
       debugPrint(
         '[Observability] breadcrumb '
-        'category=$category message=$message data=${data ?? const <String, Object?>{}}',
+        'category=$sanitizedCategory message=$sanitizedMessage '
+        'data=${sanitizedData ?? const <String, Object?>{}}',
       );
     }
 
@@ -277,10 +282,12 @@ class AppObservability {
 
     await Sentry.addBreadcrumb(
       Breadcrumb(
-        category: category,
-        message: message,
+        category: sanitizedCategory,
+        message: sanitizedMessage,
         level: level,
-        data: data,
+        data: sanitizedData == null
+            ? null
+            : Map<String, dynamic>.from(sanitizedData),
       ),
     );
   }
@@ -304,12 +311,17 @@ class AppObservability {
 
         if (tags != null) {
           for (final entry in tags.entries) {
-            scope.setTag(entry.key, entry.value);
+            scope.setTag(
+              sanitizeAppObservedText(entry.key),
+              isSensitiveAppObservedKey(entry.key)
+                  ? appObservedFilteredValue
+                  : sanitizeAppObservedText(entry.value),
+            );
           }
         }
 
         if (extras != null && extras.isNotEmpty) {
-          scope.setContexts('observability', extras);
+          scope.setContexts('observability', sanitizeAppObservedMap(extras));
         }
       },
     );
@@ -344,10 +356,9 @@ class AppObservabilityNavigatorObserver extends NavigatorObserver {
     }
 
     final routeName = route.settings.name?.trim();
-    final resolvedName =
-        routeName != null && routeName.isNotEmpty
-            ? routeName
-            : route.toString();
+    final resolvedName = routeName != null && routeName.isNotEmpty
+        ? routeName
+        : route.toString();
     unawaited(AppObservability.instance.setCurrentRoute(resolvedName));
   }
 

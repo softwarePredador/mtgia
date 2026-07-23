@@ -978,7 +978,7 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
   passed with `49` pass and `1` inherited warning.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   passed with `26/26` checks.
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
   passed.
@@ -986,7 +986,7 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg378_target_keyword_constraints_new_server.md`
   passed with `49` pass and `1` inherited warning.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg378_target_keyword_constraints_new_server_docs_after_update.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   passed with `26/26` checks.
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg378_target_keyword_constraints_new_server_docs_after_update.md`
   passed.
@@ -994,7 +994,7 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg377_keyword_reminder_new_server.md`
   passed with `49` pass and `1` inherited warning.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg377_keyword_reminder_new_server_docs_after_update.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   passed with `26/26` checks.
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg377_keyword_reminder_new_server_docs_after_update.md`
   passed.
@@ -1002,7 +1002,7 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg376_scry_damage_draw_new_server.md`
   passed with `49` pass and `1` inherited warning.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg376_scry_damage_draw_new_server_docs_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   passed with `26/26` checks.
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg376_scry_damage_draw_new_server_docs_final.md`
   passed.

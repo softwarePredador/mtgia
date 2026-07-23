@@ -123,7 +123,7 @@ jq -n \
     status: "release",
     release_identity_embedded: true,
     features: {
-      scanner_release_enabled: true
+      scanner_release_enabled: false
     },
     git_sha: $git_sha,
     version: $version,
@@ -154,7 +154,7 @@ build_args=(
   --dart-define="RELEASE_GIT_SHA=$SHA"
   --dart-define="RELEASE_IDENTITY_SHA256=$EMBEDDED_IDENTITY_SOURCE_SHA256"
   --dart-define="RELEASE_STARTUP_PROOF=true"
-  --dart-define="ENABLE_SCANNER_RELEASE=true"
+  --dart-define="ENABLE_SCANNER_RELEASE=false"
   --no-version-check
   --no-pub
 )

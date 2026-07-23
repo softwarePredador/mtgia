@@ -392,7 +392,8 @@ void main() {
       expect(find.textContaining('SocketException'), findsNothing);
       expect(
         find.text(
-          'Sem conexão com o servidor. Confira sua internet e tente novamente.',
+          'Sem conexão com o servidor. Os dados já carregados continuam '
+          'disponíveis; reconecte para atualizar.',
         ),
         findsOneWidget,
       );

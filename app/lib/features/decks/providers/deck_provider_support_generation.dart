@@ -48,11 +48,25 @@ class GenerateDeckProgressSnapshot {
 
 class GenerateDeckCancellation {
   bool _isCancelled = false;
+  String? _jobId;
+  bool _serverCancellationRequested = false;
 
   bool get isCancelled => _isCancelled;
+  String? get jobId => _jobId;
 
   void cancel() {
     _isCancelled = true;
+  }
+
+  void attachJob(String jobId) {
+    final normalized = jobId.trim();
+    if (normalized.isNotEmpty) _jobId = normalized;
+  }
+
+  bool markServerCancellationRequested() {
+    if (_serverCancellationRequested) return false;
+    _serverCancellationRequested = true;
+    return true;
   }
 }
 
@@ -283,10 +297,9 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       'generation_constraints': generationConstraints,
   });
 
-  _throwIfGenerateCancelled(cancellation);
-
   final legacyResult = _tryParseLegacyGenerateResponse(response);
   if (legacyResult != null) {
+    _throwIfGenerateCancelled(cancellation);
     AppLogger.info(
       '[DeckGenerate] backend returned legacy sync status=${response.statusCode}',
     );
@@ -309,6 +322,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
         'Tente novamente em instantes.',
       );
     }
+    cancellation?.attachJob(jobId);
 
     AppLogger.info(
       '[DeckGenerate] async accepted status=202 job_id=$jobId '
@@ -474,13 +488,25 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
   var attempt = 0;
 
   while (stopwatch.elapsed < timeout) {
-    _throwIfGenerateCancelled(cancellation);
+    await _cancelGeneratedJobIfRequested(
+      apiClient,
+      cancellation: cancellation,
+      jobId: jobId,
+    );
     await Future<void>.delayed(pollInterval);
-    _throwIfGenerateCancelled(cancellation);
+    await _cancelGeneratedJobIfRequested(
+      apiClient,
+      cancellation: cancellation,
+      jobId: jobId,
+    );
     attempt += 1;
 
     final response = await apiClient.get(pollUrl);
-    _throwIfGenerateCancelled(cancellation);
+    await _cancelGeneratedJobIfRequested(
+      apiClient,
+      cancellation: cancellation,
+      jobId: jobId,
+    );
 
     if (response.statusCode == 429) {
       _recordGenerateEvent('ai_generate_poll_rate_limited', {
@@ -600,6 +626,27 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
     'timeout_ms': timeout.inMilliseconds,
   });
   throw const GenerateDeckTimeoutException();
+}
+
+Future<void> _cancelGeneratedJobIfRequested(
+  ApiClient apiClient, {
+  required GenerateDeckCancellation? cancellation,
+  required String jobId,
+}) async {
+  if (cancellation?.isCancelled != true) return;
+  cancellation!.attachJob(jobId);
+  if (cancellation.markServerCancellationRequested()) {
+    try {
+      await cancelGenerateJobRequest(apiClient, jobId);
+      _recordGenerateEvent('ai_generate_cancelled', {'job_id': jobId});
+    } catch (error) {
+      _recordGenerateEvent('ai_generate_cancel_failure', {
+        'job_id': jobId,
+        'error_type': error.runtimeType.toString(),
+      });
+    }
+  }
+  throw const GenerateDeckCancelledException();
 }
 
 Map<String, dynamic> _requireReviewableGenerateResult(

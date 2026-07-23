@@ -174,7 +174,7 @@ class OptimizeJobStore {
           updated_at = NOW()
         WHERE id = @id
           AND status IN ('pending', 'processing')
-          AND updated_at <
+          AND created_at <
             NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
       '''),
       parameters: {'id': id, 'timeout_seconds': executionTimeout.inSeconds},
@@ -217,6 +217,29 @@ class OptimizeJobStore {
     bool activeOnly = false,
   }) async {
     await _cleanupIfDue(pool);
+    await pool.execute(
+      Sql.named('''
+        UPDATE ai_optimize_jobs
+        SET
+          status = 'failed',
+          stage = 'Erro',
+          error = 'A otimização excedeu o tempo limite total. Inicie uma nova tentativa.',
+          updated_at = NOW()
+        WHERE user_id = CAST(@user_id AS uuid)
+          AND (
+            CAST(@deck_id AS text) IS NULL
+            OR deck_id = CAST(@deck_id AS uuid)
+          )
+          AND status IN ('pending', 'processing')
+          AND created_at <
+            NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
+      '''),
+      parameters: {
+        'user_id': userId,
+        'deck_id': deckId,
+        'timeout_seconds': executionTimeout.inSeconds,
+      },
+    );
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -308,6 +331,27 @@ class OptimizeJobStore {
         ..stage = stage
         ..stageNumber = stageNumber
         ..updatedAt = DateTime.now();
+    }
+    return true;
+  }
+
+  static Future<bool> heartbeat(Pool pool, String id) async {
+    final updated = await pool.execute(
+      Sql.named('''
+        UPDATE ai_optimize_jobs
+        SET updated_at = NOW()
+        WHERE id = @id
+          AND status IN ('pending', 'processing')
+          AND created_at >=
+            NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
+        RETURNING id
+      '''),
+      parameters: {'id': id, 'timeout_seconds': executionTimeout.inSeconds},
+    );
+    if (updated.isEmpty) return false;
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) {
+      memoryJob.updatedAt = DateTime.now();
     }
     return true;
   }
@@ -510,6 +554,10 @@ class OptimizeJob {
     'can_resume': !isTerminal,
     'poll_url': '/ai/optimize/jobs/$id',
     'cancel_url': '/ai/optimize/jobs/$id',
+    'job_timeout_ms': OptimizeJobStore.executionTimeout.inMilliseconds,
+    'heartbeat_at': updatedAt.toIso8601String(),
+    'deadline_at':
+        createdAt.add(OptimizeJobStore.executionTimeout).toIso8601String(),
     'created_at': createdAt.toIso8601String(),
     'updated_at': updatedAt.toIso8601String(),
   };

@@ -715,6 +715,7 @@ class OptimizationSheetBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      key: const Key('optimize-sheet-body'),
       controller: scrollController,
       padding: const EdgeInsets.all(AppTheme.space16),
       children: [

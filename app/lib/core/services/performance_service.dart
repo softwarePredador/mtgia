@@ -18,6 +18,10 @@ import 'package:flutter/material.dart';
 ///    - `fetch_decks` - tempo para carregar lista de decks
 ///    - HTTP traces automáticos com tempo de cada requisição
 class PerformanceService {
+  static const int maxSamplesPerSeries = 100;
+  static const int maxLocalSeries = 128;
+  static const String overflowSeriesName = 'other';
+
   static PerformanceService? _instance;
   static PerformanceService get instance =>
       _instance ??= PerformanceService._();
@@ -46,6 +50,9 @@ class PerformanceService {
 
   /// Estatísticas locais para debug
   final Map<String, List<int>> _localStats = {};
+  final Map<String, int> _localFailureCounts = {};
+  final Map<String, Stopwatch> _screenStopwatches = {};
+  final Map<String, Stopwatch> _customStopwatches = {};
 
   /// Inicializa o Firebase Performance
   Future<void> init() async {
@@ -78,15 +85,14 @@ class PerformanceService {
 
   /// Inicia trace para uma tela
   void startScreenTrace(String screenName) {
+    if (_screenStopwatches.containsKey(screenName)) {
+      debugPrint('[PerformanceService] ⚠️ Trace já existe: $screenName');
+      return;
+    }
+    _screenStopwatches[screenName] = Stopwatch()..start();
     if (!_isEnabled || _performance == null) return;
 
     try {
-      // Evita traces duplicados
-      if (_screenTraces.containsKey(screenName)) {
-        debugPrint('[PerformanceService] ⚠️ Trace já existe: $screenName');
-        return;
-      }
-
       final trace = _performance!.newTrace('screen_$screenName');
       trace.start();
       _screenTraces[screenName] = trace;
@@ -98,6 +104,11 @@ class PerformanceService {
 
   /// Finaliza trace de uma tela
   void stopScreenTrace(String screenName) {
+    final stopwatch = _screenStopwatches.remove(screenName);
+    if (stopwatch != null) {
+      stopwatch.stop();
+      recordLocalDuration('screen_$screenName', stopwatch.elapsedMilliseconds);
+    }
     if (!_isEnabled) return;
 
     try {
@@ -113,16 +124,14 @@ class PerformanceService {
 
   /// Inicia um trace customizado (ex: "fetch_decks", "analyze_deck")
   void startTrace(String name) {
+    if (_customStopwatches.containsKey(name)) {
+      debugPrint('[PerformanceService] ⚠️ Trace customizado já existe: $name');
+      return;
+    }
+    _customStopwatches[name] = Stopwatch()..start();
     if (!_isEnabled || _performance == null) return;
 
     try {
-      if (_customTraces.containsKey(name)) {
-        debugPrint(
-          '[PerformanceService] ⚠️ Trace customizado já existe: $name',
-        );
-        return;
-      }
-
       final trace = _performance!.newTrace(name);
       trace.start();
       _customTraces[name] = trace;
@@ -137,6 +146,11 @@ class PerformanceService {
     Map<String, String>? attributes,
     Map<String, int>? metrics,
   }) {
+    final stopwatch = _customStopwatches.remove(name);
+    if (stopwatch != null) {
+      stopwatch.stop();
+      recordLocalDuration(name, stopwatch.elapsedMilliseconds);
+    }
     if (!_isEnabled) return;
 
     try {
@@ -161,44 +175,82 @@ class PerformanceService {
 
   /// Cria um trace customizado para operações específicas (wrapper async)
   Future<T> traceAsync<T>(String name, Future<T> Function() operation) async {
-    if (!_isEnabled || _performance == null) {
-      return operation();
+    final stopwatch = Stopwatch()..start();
+    Trace? trace;
+    Object? operationError;
+
+    if (_isEnabled && _performance != null) {
+      try {
+        trace = _performance!.newTrace(name);
+        await trace.start();
+      } catch (error) {
+        trace = null;
+        debugPrint(
+          '[PerformanceService] ❌ Erro ao iniciar trace $name: $error',
+        );
+      }
     }
 
-    final trace = _performance!.newTrace(name);
-    final stopwatch = Stopwatch()..start();
-
-    await trace.start();
-
     try {
-      final result = await operation();
-      stopwatch.stop();
-
-      // Registra estatísticas locais
-      _recordLocalStat(name, stopwatch.elapsedMilliseconds);
-
-      await trace.stop();
-      return result;
-    } catch (e) {
-      stopwatch.stop();
-      trace.putAttribute(
-        'error',
-        e.toString().substring(0, 100.clamp(0, e.toString().length)),
-      );
-      await trace.stop();
+      return await operation();
+    } catch (error) {
+      operationError = error;
       rethrow;
+    } finally {
+      stopwatch.stop();
+      recordLocalDuration(
+        name,
+        stopwatch.elapsedMilliseconds,
+        failed: operationError != null,
+      );
+      if (trace != null) {
+        try {
+          if (operationError != null) {
+            trace.putAttribute(
+              'error_type',
+              operationError.runtimeType.toString(),
+            );
+          }
+          await trace.stop();
+        } catch (error) {
+          debugPrint(
+            '[PerformanceService] ❌ Erro ao parar trace $name: $error',
+          );
+        }
+      }
     }
   }
 
   /// Registra estatística local para debug
-  void _recordLocalStat(String name, int durationMs) {
-    _localStats.putIfAbsent(name, () => []);
-    _localStats[name]!.add(durationMs);
-
-    // Mantém apenas últimas 100 amostras
-    if (_localStats[name]!.length > 100) {
-      _localStats[name]!.removeAt(0);
+  void recordLocalDuration(String name, int durationMs, {bool failed = false}) {
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) return;
+    final seriesName =
+        _localStats.containsKey(trimmedName) ||
+            _localStats.length < maxLocalSeries
+        ? trimmedName
+        : overflowSeriesName;
+    _localStats.putIfAbsent(seriesName, () => <int>[]);
+    _localStats[seriesName]!.add(durationMs < 0 ? 0 : durationMs);
+    if (failed) {
+      _localFailureCounts.update(
+        seriesName,
+        (count) => count + 1,
+        ifAbsent: () => 1,
+      );
     }
+
+    if (_localStats[seriesName]!.length > maxSamplesPerSeries) {
+      _localStats[seriesName]!.removeAt(0);
+    }
+  }
+
+  @visibleForTesting
+  void clearLocalStats() {
+    _localStats.clear();
+    _localFailureCounts.clear();
+    _screenStopwatches.clear();
+    _customStopwatches.clear();
   }
 
   /// Adiciona métrica customizada a um trace ativo
@@ -226,27 +278,35 @@ class PerformanceService {
     final result = <String, Map<String, dynamic>>{};
 
     for (final entry in _localStats.entries) {
-      final samples = entry.value;
+      final samples = List<int>.of(entry.value)..sort();
       if (samples.isEmpty) continue;
 
-      samples.sort();
       final avg = samples.reduce((a, b) => a + b) / samples.length;
       final min = samples.first;
       final max = samples.last;
-      final p50 = samples[samples.length ~/ 2];
-      final p90 = samples[(samples.length * 0.9).floor()];
+      final p50 = _percentile(samples, 0.50);
+      final p90 = _percentile(samples, 0.90);
+      final p95 = _percentile(samples, 0.95);
 
       result[entry.key] = {
         'count': samples.length,
+        'error_count': _localFailureCounts[entry.key] ?? 0,
         'avg_ms': avg.round(),
         'min_ms': min,
         'max_ms': max,
         'p50_ms': p50,
         'p90_ms': p90,
+        'p95_ms': p95,
       };
     }
 
     return result;
+  }
+
+  int _percentile(List<int> sortedSamples, double percentile) {
+    final rank = (percentile * sortedSamples.length).ceil();
+    final index = (rank - 1).clamp(0, sortedSamples.length - 1);
+    return sortedSamples[index];
   }
 
   /// Imprime estatísticas locais no console (útil para debug)
@@ -262,7 +322,9 @@ class PerformanceService {
       final s = entry.value;
       debugPrint('[📊 Performance] ${entry.key}:');
       debugPrint(
-        '    count=${s['count']} | avg=${s['avg_ms']}ms | p50=${s['p50_ms']}ms | p90=${s['p90_ms']}ms | max=${s['max_ms']}ms',
+        '    count=${s['count']} | errors=${s['error_count']} | '
+        'avg=${s['avg_ms']}ms | p50=${s['p50_ms']}ms | '
+        'p95=${s['p95_ms']}ms | max=${s['max_ms']}ms',
       );
     }
     debugPrint('[📊 Performance] ═══════════════════════════════════════');
@@ -272,9 +334,8 @@ class PerformanceService {
 /// NavigatorObserver para rastrear tempo de telas automaticamente
 class PerformanceNavigatorObserver extends NavigatorObserver {
   final PerformanceService _service = PerformanceService.instance;
-
-  /// Mapa para rastrear tempo local (para debug logs)
-  final Map<String, DateTime> _screenStartTimes = {};
+  final Map<Route<dynamic>, DateTime> _visibleRouteStartTimes = {};
+  Route<dynamic>? _visibleRoute;
 
   String _getScreenName(Route? route) {
     final name = route?.settings.name;
@@ -294,10 +355,7 @@ class PerformanceNavigatorObserver extends NavigatorObserver {
   void didPush(Route route, Route? previousRoute) {
     super.didPush(route, previousRoute);
     final screenName = _getScreenName(route);
-
     if (screenName != 'unknown') {
-      _screenStartTimes[screenName] = DateTime.now();
-      _service.startScreenTrace(screenName);
       debugPrint('[📱 Screen] → PUSH: $screenName');
     }
   }
@@ -306,44 +364,43 @@ class PerformanceNavigatorObserver extends NavigatorObserver {
   void didPop(Route route, Route? previousRoute) {
     super.didPop(route, previousRoute);
     final screenName = _getScreenName(route);
-
     if (screenName != 'unknown') {
-      final startTime = _screenStartTimes.remove(screenName);
-      _service.stopScreenTrace(screenName);
-
-      if (startTime != null) {
-        final duration = DateTime.now().difference(startTime);
-        debugPrint(
-          '[📱 Screen] ← POP: $screenName (${duration.inMilliseconds}ms)',
-        );
-
-        // Alerta se a tela foi muito lenta
-        if (duration.inMilliseconds > 3000) {
-          debugPrint(
-            '[⚠️ SLOW SCREEN] $screenName demorou ${duration.inSeconds}s',
-          );
-        }
-      }
+      debugPrint('[📱 Screen] ← POP: $screenName');
     }
   }
 
   @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
-    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+  void didChangeTop(Route topRoute, Route? previousTopRoute) {
+    super.didChangeTop(topRoute, previousTopRoute);
+    if (identical(_visibleRoute, topRoute)) return;
+    _stopVisibleRoute(previousTopRoute ?? _visibleRoute);
+    _startVisibleRoute(topRoute);
+  }
 
-    final oldName = _getScreenName(oldRoute);
-    final newName = _getScreenName(newRoute);
+  void _startVisibleRoute(Route<dynamic> route) {
+    final screenName = _getScreenName(route);
+    _visibleRoute = route;
+    if (screenName == 'unknown') return;
+    _visibleRouteStartTimes[route] = DateTime.now();
+    _service.startScreenTrace(screenName);
+  }
 
-    if (oldName != 'unknown') {
-      _screenStartTimes.remove(oldName);
-      _service.stopScreenTrace(oldName);
+  void _stopVisibleRoute(Route<dynamic>? route) {
+    if (route == null) return;
+    final screenName = _getScreenName(route);
+    final startTime = _visibleRouteStartTimes.remove(route);
+    if (screenName == 'unknown' || startTime == null) return;
+    _service.stopScreenTrace(screenName);
+
+    final duration = DateTime.now().difference(startTime);
+    debugPrint(
+      '[📱 Screen] ◼ VISIBLE: $screenName (${duration.inMilliseconds}ms)',
+    );
+    if (duration.inMilliseconds > 3000) {
+      debugPrint(
+        '[⚠️ SLOW SCREEN] $screenName ficou visível por '
+        '${duration.inSeconds}s',
+      );
     }
-
-    if (newName != 'unknown') {
-      _screenStartTimes[newName] = DateTime.now();
-      _service.startScreenTrace(newName);
-    }
-
-    debugPrint('[📱 Screen] ↔ REPLACE: $oldName → $newName');
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../api/api_client.dart';
+import '../resilience/offline_capability.dart';
 
 enum FriendlyErrorContext {
   authLogin,
@@ -19,6 +20,7 @@ enum FriendlyErrorContext {
   tradeCreate,
   tradeAction,
   tradeMessage,
+  directMessage,
   binder,
   marketplace,
   generic,
@@ -46,8 +48,9 @@ class FriendlyErrorMapper {
     FriendlyErrorContext context = FriendlyErrorContext.generic,
     String? fallback,
   }) {
-    final specific =
-        statusCode < 500 ? _messageFromBody(body, context: context) : null;
+    final specific = statusCode < 500
+        ? _messageFromBody(body, context: context)
+        : null;
     if (specific != null) return specific;
 
     if (statusCode == 400 || statusCode == 422) {
@@ -137,11 +140,10 @@ class FriendlyErrorMapper {
     }
 
     final raw = error.toString().trim();
-    final normalized =
-        raw
-            .replaceFirst(RegExp(r'^Exception:\s*'), '')
-            .replaceFirst(RegExp(r'^Error:\s*'), '')
-            .trim();
+    final normalized = raw
+        .replaceFirst(RegExp(r'^Exception:\s*'), '')
+        .replaceFirst(RegExp(r'^Error:\s*'), '')
+        .trim();
     final lower = normalized.toLowerCase();
 
     final statusMatch = RegExp(r'\b(4\d\d|5\d\d)\b').firstMatch(lower);
@@ -153,7 +155,7 @@ class FriendlyErrorMapper {
     }
 
     if (_looksLikeNetworkError(lower, error.runtimeType.toString())) {
-      return 'Sem conexão com o servidor. Confira sua internet e tente novamente.';
+      return offlineContractForContext(context).disconnectedMessage;
     }
 
     if (lower.contains('timeout') || lower.contains('timed out')) {
@@ -217,12 +219,43 @@ class FriendlyErrorMapper {
         'Não foi possível atualizar esta troca agora. Tente novamente.',
       FriendlyErrorContext.tradeMessage =>
         'Não foi possível enviar a mensagem agora. Tente novamente.',
+      FriendlyErrorContext.directMessage =>
+        'Não foi possível carregar ou enviar mensagens agora. Tente novamente.',
       FriendlyErrorContext.binder =>
         'Não foi possível atualizar o fichário agora. Tente novamente.',
       FriendlyErrorContext.marketplace =>
         'Não foi possível carregar o marketplace agora. Tente novamente.',
       _ => 'Não foi possível concluir a ação. Tente novamente.',
     };
+  }
+
+  static OfflineFlowContract offlineContractForContext(
+    FriendlyErrorContext context,
+  ) {
+    final flow = switch (context) {
+      FriendlyErrorContext.authLogin ||
+      FriendlyErrorContext.authRegister => OfflineProductFlow.authentication,
+      FriendlyErrorContext.authProfile => OfflineProductFlow.profileSettings,
+      FriendlyErrorContext.deckGenerate =>
+        OfflineProductFlow.deckGenerateImport,
+      FriendlyErrorContext.deckSave => OfflineProductFlow.deckEdit,
+      FriendlyErrorContext.deckDetails ||
+      FriendlyErrorContext.deckValidate => OfflineProductFlow.deckRead,
+      FriendlyErrorContext.deckOptimize => OfflineProductFlow.deckOptimize,
+      FriendlyErrorContext.deckPricing => OfflineProductFlow.marketplace,
+      FriendlyErrorContext.setsCatalog ||
+      FriendlyErrorContext.setCards => OfflineProductFlow.cardCatalog,
+      FriendlyErrorContext.tradeList ||
+      FriendlyErrorContext.tradeDetail ||
+      FriendlyErrorContext.tradeCreate ||
+      FriendlyErrorContext.tradeAction => OfflineProductFlow.trades,
+      FriendlyErrorContext.tradeMessage => OfflineProductFlow.directMessages,
+      FriendlyErrorContext.directMessage => OfflineProductFlow.directMessages,
+      FriendlyErrorContext.binder => OfflineProductFlow.binderMutation,
+      FriendlyErrorContext.marketplace => OfflineProductFlow.marketplace,
+      FriendlyErrorContext.generic => OfflineProductFlow.genericOnlineAction,
+    };
+    return offlineContractFor(flow);
   }
 
   static String? _messageFromBody(

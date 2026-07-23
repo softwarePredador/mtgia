@@ -1439,6 +1439,7 @@ class _OverviewQuickActions extends StatelessWidget {
       ),
     );
     final optimizeButton = OutlinedButton.icon(
+      key: const Key('deck-optimize-button'),
       onPressed: onOptimize,
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(0, AppTheme.touchTargetMin),

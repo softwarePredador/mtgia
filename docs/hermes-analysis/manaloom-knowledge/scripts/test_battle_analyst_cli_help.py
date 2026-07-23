@@ -40,7 +40,10 @@ class BattleAnalystCliHelpTests(unittest.TestCase):
                     "print(b.target_player_name_for_commander({'name':'Lorehold, the Historian'})); "
                     "print(b.commander_log_slug({'name':'Kaalia of the Vast'})); "
                     "print(b.commander_log_slug({'name':'Lorehold, the Historian'})); "
-                    "print(b.battle_log_path_for_commander({'name':'Kaalia of the Vast'}).endswith('/decks/kaalia-of-the-vast/BATTLE_LOG.md'))"
+                    "path=b.battle_log_path_for_commander({'name':'Kaalia of the Vast'}); "
+                    "print(path.endswith('/decks/kaalia-of-the-vast/BATTLE_LOG.md')); "
+                    "import tempfile; "
+                    "print(path.startswith(tempfile.gettempdir()))"
                 ),
             ],
             capture_output=True,
@@ -56,6 +59,7 @@ class BattleAnalystCliHelpTests(unittest.TestCase):
                 "Lorehold",
                 "kaalia-of-the-vast",
                 "lorehold-the-historian",
+                "True",
                 "True",
             ],
         )

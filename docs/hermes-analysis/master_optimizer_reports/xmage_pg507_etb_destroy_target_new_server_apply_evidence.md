@@ -74,7 +74,7 @@
 
 ## Surface Audits
 
-- XMage strategy consistency: `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg507_etb_destroy_target_new_server.md` -> `pass`
+- XMage strategy consistency: `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md` -> `pass`
 - Operational surface alignment: `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg507_etb_destroy_target_new_server.md` -> `pass`
 - Legacy contamination audit: `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg507_etb_destroy_target_new_server.md` -> `pass`
 - PostgreSQL/Hermes/SQLite contract audit: `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg507_etb_destroy_target_new_server.md` -> `pass`

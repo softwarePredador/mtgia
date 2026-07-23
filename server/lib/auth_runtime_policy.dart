@@ -6,6 +6,27 @@ const jwtSecretMinimumProductionCharacters = 32;
 const maximumTrustedProxyHops = 5;
 const trustedProxyHopsEnvironmentKey = 'MANALOOM_TRUSTED_PROXY_HOPS';
 const trustedProxyPeersEnvironmentKey = 'MANALOOM_TRUSTED_PROXY_PEERS';
+const authRuntimeEnvironmentKeys = <String>{
+  'ENVIRONMENT',
+  'JWT_SECRET',
+  trustedProxyHopsEnvironmentKey,
+  trustedProxyPeersEnvironmentKey,
+  'PASSWORD_RESET_WEBHOOK_URL',
+  'PASSWORD_RESET_WEBHOOK_TOKEN',
+  'PASSWORD_RESET_APP_URL',
+  'EMAIL_VERIFICATION_WEBHOOK_URL',
+  'EMAIL_VERIFICATION_WEBHOOK_TOKEN',
+  'EMAIL_VERIFICATION_APP_URL',
+  'MANALOOM_PASSWORD_RESET_TEST_RESPONSE',
+  'MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE',
+};
+
+Map<String, String> authRuntimeEnvironmentValues(
+  String? Function(String key) read,
+) => {
+  for (final key in authRuntimeEnvironmentKeys)
+    if (read(key) case final String value) key: value,
+};
 
 /// Validates the authentication settings that must be safe before the server
 /// accepts traffic. Error messages deliberately describe only the violated

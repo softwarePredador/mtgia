@@ -90,13 +90,20 @@ if [[ -n "$EXPECTED_CERT_SHA256" ]]; then
 fi
 
 PERMISSIONS="$($AAPT dump permissions "$APK" | sed -n "s/^uses-permission: name='\([^']*\)'.*/\1/p" | sort -u)"
+if grep -Fxq 'android.permission.CAMERA' <<<"$PERMISSIONS"; then
+  echo "APK de beta nao pode declarar camera com Scanner DEFERRED_BY_SCOPE" >&2
+  exit 1
+fi
+if grep -Fq 'android.hardware.camera' <<<"$BADGING"; then
+  echo "APK de beta nao pode declarar feature de camera com Scanner DEFERRED_BY_SCOPE" >&2
+  exit 1
+fi
 UNEXPECTED=()
 while IFS= read -r permission; do
   [[ -z "$permission" ]] && continue
   case "$permission" in
     android.permission.INTERNET|\
     android.permission.POST_NOTIFICATIONS|\
-    android.permission.CAMERA|\
     android.permission.WAKE_LOCK|\
     android.permission.ACCESS_NETWORK_STATE|\
     com.google.android.c2dm.permission.RECEIVE|\

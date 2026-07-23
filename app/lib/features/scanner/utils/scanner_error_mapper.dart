@@ -1,3 +1,5 @@
+import '../../../core/resilience/offline_capability.dart';
+
 enum ScannerErrorStage { camera, capture, processing, search }
 
 /// Converts camera, OCR and lookup failures into short, actionable copy.
@@ -12,7 +14,9 @@ class ScannerErrorMapper {
     final raw = error?.toString().toLowerCase() ?? '';
 
     if (_looksLikeNetworkFailure(raw)) {
-      return 'Sem conexão para buscar a carta. Confira sua internet e tente novamente.';
+      return offlineContractFor(
+        OfflineProductFlow.cardCatalog,
+      ).disconnectedMessage;
     }
     if (raw.contains('timeout') || raw.contains('timed out')) {
       return 'A busca demorou mais que o esperado. Tente novamente em instantes.';

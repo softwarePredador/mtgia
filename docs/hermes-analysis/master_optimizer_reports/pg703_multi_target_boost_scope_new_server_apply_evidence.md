@@ -62,7 +62,7 @@ Status: `applied_synced_validated`
 - Exact recheck: `xmage_authoritative_exact_scope_split_20260710_post_pg703b_trusted_rule_oracle_hash_backfill_new_server_recheck.md`
   - `proposal_count=0`
   - `safe_for_batch_pg_package_count=0`
-- XMage strategy audit: `xmage_strategy_consistency_audit_20260710_post_pg703b_trusted_rule_oracle_hash_backfill_new_server_final.md` passed `26/26`.
+- XMage strategy audit: `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md` passed `26/26`.
 - Operational surface audit: `operational_surface_alignment_audit_20260710_post_pg703b_trusted_rule_oracle_hash_backfill_new_server_final.md` passed.
 - PostgreSQL/Hermes/SQLite contract audit: `pg_hermes_sqlite_contract_audit_20260710_post_pg703b_trusted_rule_oracle_hash_backfill_new_server_final.md` passed `51/51`.
 - Legacy contamination audit: `legacy_contamination_audit_20260710_post_pg703b_trusted_rule_oracle_hash_backfill_new_server_final.md` passed.

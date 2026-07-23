@@ -1815,7 +1815,7 @@ The next learning artifacts are:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_structure_routed_current.json`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_structure_routed_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_structure_routed_current.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_structure_routed_current.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_structure_routed_current.json`
 
 This matrix is the first scoring surface after the miracle-access-first
@@ -1915,7 +1915,7 @@ The next learning artifacts are:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_candidate_queue_routed_current.json`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_candidate_queue_routed_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_candidate_queue_routed_current.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_candidate_queue_routed_current.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_candidate_queue_routed_current.json`
 
 This queue attempts to convert post-identity external/internal candidates into
@@ -2061,7 +2061,7 @@ The next route-selection artifacts are:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_route_planner_governed_current.json`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_route_planner_governed_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_route_planner_governed_current.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_route_planner_governed_current.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_route_planner_governed_current.json`
 
 This planner ranks the current post-identity miracle/topdeck candidates after

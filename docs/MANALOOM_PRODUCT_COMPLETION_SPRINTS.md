@@ -2,7 +2,7 @@
 
 **Estado:** `ACTIVE / EXECUTION_REQUIRED`
 
-**Atualizado em:** 2026-07-22
+**Atualizado em:** 2026-07-23
 
 **Escopo:** produto Web + Android da beta gratuita; iOS somente quando entrar no
 alvo declarado
@@ -273,7 +273,7 @@ isolados.
 | S3-01 | P0 | Inventariar todas as superfícies | Rotas, tabs, sheets, dialogs, menus, transientes e `MaterialPageRoute` declaram job, owner, source of truth, estados, stable key, criticidade, ação/sucesso/recuperação e deep link. |
 | S3-02 | P0 | Validar todos os estados | Loading, skeleton/progresso, partial, stale, loading-more, saving, optimistic, disabled, empty, erro, retry, offline, sessão expirada, permissão negada e sucesso têm apresentação/copy/a11y; erro preserva entrada e nunca expõe exception crua. |
 | S3-03 | P0 | Fechar responsividade | Matriz inclui 320×568, 390×844, 412×915, 768×1024, 1024×768 landscape, boundaries, 1280×900, 1440×900 e 1920×1080, teclado virtual e texto 200%; nenhuma ação/conteúdo fica inacessível. |
-| S3-04 | P0 | Fechar acessibilidade móvel | TalkBack/VoiceOver manual + semantics automático, ordem/labels/estado/busy/error/live-region, alvo 48 px, texto 200%, contraste WCAG AA 4.5:1 normal e 3:1 grande/controle; cor não é único indicador. |
+| S3-04 | P0 | Fechar acessibilidade móvel | TalkBack manual no Android alvo + semantics automático, ordem/labels/estado/busy/error/live-region, alvo 48 px, texto 200%, contraste WCAG AA 4.5:1 normal e 3:1 grande/controle; cor não é único indicador. VoiceOver só é obrigatório se iOS entrar no escopo de S10-01; fora dele fica `DEFERRED_BY_SCOPE` com rotas vazias. |
 | S3-05 | P0 | Fechar acessibilidade Web | Tab/Shift+Tab, Enter/Space/Escape, foco visível, trap/restoration de modal, browser back e reduced motion passam por automação e roteiro manual. |
 | S3-06 | P0 | Fechar navegação e retomada | Query-tabs, deep links autenticados, back/forward, refresh `/app/#/...`, sessão expirada e formulário não salvo preservam contexto; Card Detail e Battle/Replays têm decisão de rota canônica. |
 | S3-07 | P0 | Produzir regressão visual autenticada | Fixture seedada evita cadastro por run; build `/app` real em Web desktop/mobile e Android captura rotas P0 acima/abaixo da dobra, modais e sucesso/vazio/erro; pixel diff + aprovação humana, console limpo e teste ligado a cada print original. |
@@ -414,13 +414,13 @@ lista exata, sem limpeza em massa cega.
 
 | ID | Pri | Task | Critério de aceite e evidência |
 |---|---:|---|---|
-| S10-01 | P0 | Congelar escopo e identidade | Plataforma, Scanner, Community, iOS e IA experimental/definitiva decididos; checkout limpo; versão e SHA únicas; nenhuma edição durante o run. |
+| S10-01 | P0 | Congelar escopo e identidade | Beta alvo Web+Android; Scanner fica desabilitado e inacessível no release, iOS/VoiceOver fica `DEFERRED_BY_SCOPE`, Community e IA experimental/definitiva são decididos; checkout limpo; versão e SHA únicas; nenhuma edição durante o run. |
 | S10-02 | P0 | Rodar gates determinísticos pré-banco | `full`, `deps`, `custom-lint`, `ui-audit`, `patrol-smoke`, `ai-eval`, `ai-bridge`, `server-target`, `report-retention`, `battle`, `engine-delta`, `web` e E2E determinístico sem falha; `PARTIAL` só com skips guardados exatos inventariados. |
-| S10-03 | P0 | Aplicar banco somente com autoridade específica | Backup fresco, precheck, autorização literal, migrations 038–040 em ordem, postcheck e rollback prontos; mesma SHA de backend. |
+| S10-03 | P0 | Aplicar banco somente com autoridade específica | Backup fresco, precheck, autorização literal, migrations 038–051 exigidas pela SHA em ordem, postcheck e rollback prontos; readiness confirma o conjunto/nome exato e a última migration 051; mesma SHA de backend. |
 | S10-04 | P0 | Rodar gates PostgreSQL guardados e E2E completo | Após postcheck: `pg-contract`, `deep-ai`, `resolution` preflight/mutante, Battle isolado e perfis E2E solicitados usam aprovações específicas; `summary.json` exige `result=pass`, failed/blocked/skipped=0. |
 | S10-05 | P0 | Percorrer Web autenticada | Cadastro/login/recuperação, Home, decks, coleção, optimize, Battle/replay, Life Counter, pós-jogo, social em escopo, perfil, export/delete e logout em desktop/móvel. |
 | S10-06 | P0 | Percorrer artefato Android exato | Instalação limpa e upgrade, login, retomada, lifecycle, offline, push, core de decks, Battle e Life Counter em aparelho físico representativo. |
-| S10-07 | P0 | Repetir regressão visual e acessibilidade | Capturas aprovadas nos viewports/dispositivos, teclado/Web e leitor de tela/texto 200%; zero problema conhecido sem disposition. |
+| S10-07 | P0 | Repetir regressão visual e acessibilidade | Capturas aprovadas nos viewports/dispositivos, teclado/Web, TalkBack Android e texto 200%; VoiceOver somente se iOS for incluído; zero problema conhecido sem disposition. |
 | S10-08 | P0 | Provar dados entre clientes | Coleção/deck/pós-jogo/sessão/tombstone/export/delete convergem em dois clientes e não deixam resíduo indevido. |
 | S10-09 | P0 | Validar falhas e recuperação | Rede lenta/offline, 401/429/5xx, engine/IA indisponível, imagem 404, processo interrompido e retry não corrompem estado. |
 | S10-10 | P0 | Limpar QA e auditar estado final | Identidades/dados/processos/listeners temporários são removidos; `report-retention` roda após todos os produtores; status/diff/SHA final coincidem com o congelado e o manifest registra riscos. |

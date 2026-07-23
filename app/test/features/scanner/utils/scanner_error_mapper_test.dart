@@ -20,7 +20,8 @@ void main() {
         stage: ScannerErrorStage.search,
       );
 
-      expect(message, contains('Confira sua internet'));
+      expect(message, contains('reconecte'));
+      expect(message, contains('continuam nesta tela'));
       expect(message, isNot(contains('SocketException')));
       expect(message, isNot(contains('api.example.test')));
     });

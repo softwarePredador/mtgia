@@ -10,6 +10,16 @@ class RequestTrace {
 }
 
 final Random _requestIdRandom = Random.secure();
+const int requestIdMaxLength = 96;
+final RegExp _requestIdPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$');
+
+bool isValidRequestId(String? value) {
+  final candidate = value?.trim();
+  return candidate != null &&
+      candidate.isNotEmpty &&
+      candidate.length <= requestIdMaxLength &&
+      _requestIdPattern.hasMatch(candidate);
+}
 
 String? headerValueIgnoreCase(Map<String, String> headers, String key) {
   for (final entry in headers.entries) {
@@ -27,9 +37,13 @@ String generateRequestId({
 }) {
   final resolvedNow = now ?? DateTime.now();
   final resolvedRandom = random ?? _requestIdRandom;
+  final resolvedPrefix =
+      RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,15}$').hasMatch(prefix)
+          ? prefix
+          : 'srv';
   final timestamp = resolvedNow.microsecondsSinceEpoch.toRadixString(16);
   final entropy = resolvedRandom.nextInt(1 << 32).toRadixString(16);
-  return '$prefix-$timestamp-$entropy';
+  return '$resolvedPrefix-$timestamp-$entropy';
 }
 
 String resolveRequestId(
@@ -39,8 +53,8 @@ String resolveRequestId(
   Random? random,
 }) {
   final existing = headerValueIgnoreCase(headers, 'x-request-id')?.trim();
-  if (existing != null && existing.isNotEmpty) {
-    return existing;
+  if (isValidRequestId(existing)) {
+    return existing!;
   }
   return generateRequestId(prefix: prefix, now: now, random: random);
 }

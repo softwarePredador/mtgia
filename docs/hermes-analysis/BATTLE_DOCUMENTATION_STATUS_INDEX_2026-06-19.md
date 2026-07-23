@@ -48,7 +48,7 @@ Regra operacional:
 | `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md` | current | Runbook unico para cobertura global, reconciliacao source/catalog, residual semantico, runner assincrono retomavel e evidencia positiva consumivel pelo deckbuilder. |
 | `EXTERNAL_BATTLE_EXECUTION_CONTRACT.md` | current | Contrato atual de execucao global: XMage primario, Forge secundario apenas para gap estruturado e runtime native como residual explicito; nao confundir cobertura externa com promocao PostgreSQL ou prova individual de carta. |
 | `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` | current | Contrato congelado para seguir battle rules/family mapping: checkpoint curto de invariantes, depois familias/subpadroes; nao reabrir estrategia inteira quando o checkpoint passa. |
-| `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` | current | Fluxo operacional atual para absorcao XMage/Oracle -> ManaLoom; supersede o uso operacional dos planos XMage de 2026-06-23/24 e fixa gates contra promocao automatica de escopos genericos. |
+| `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` | historical | Preserva a adaptacao nativa de junho e o fato de ter supersedido os planos de 2026-06-23/24; a operacao corrente pertence a `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`. |
 | `BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md` | current | Matriz de trabalho atualizada em 2026-06-19; usar como backlog/priorizacao. |
 | `ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md` | current | Fila atual de candidatos/templates/review. |
 | `LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md` | current | Fonte atual sobre coerencia do deck aprendido Lorehold e metadata resolvida. |

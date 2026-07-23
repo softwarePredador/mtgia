@@ -88,7 +88,7 @@ Validation evidence:
   - events: `16`
   - Drowner of Secrets and Hair-Strung Koto tapped separate cost targets.
 - XMage strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260712_pg851_activated_target_player_mill_new_server.md`
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
   - status: `pass`
   - checks: `26/26`
 - PG/Hermes/SQLite contract audit:

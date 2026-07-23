@@ -4,6 +4,25 @@ import 'package:test/test.dart';
 void main() {
   const productionSecret = '4L!u9v#Q2m@R7x%T5p&K8s*D3n+W6y=H1c?J0z_A';
 
+  test('runtime selector carries every auth and email contract coordinate', () {
+    final source = {
+      for (final key in authRuntimeEnvironmentKeys) key: 'value-$key',
+      'UNRELATED': 'ignored',
+    };
+
+    final selected = authRuntimeEnvironmentValues((key) => source[key]);
+
+    expect(selected.keys, unorderedEquals(authRuntimeEnvironmentKeys));
+    expect(selected, isNot(contains('UNRELATED')));
+    expect(
+      selected,
+      containsPair(
+        'MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE',
+        'value-MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE',
+      ),
+    );
+  });
+
   group('JWT secret runtime policy', () {
     test('accepts a non-placeholder production secret without exposing it', () {
       expect(

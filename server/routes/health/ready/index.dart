@@ -52,6 +52,14 @@ Future<Response> onRequest(RequestContext context) async {
     databaseStopwatch.stop();
   }
 
+  final releaseSchema = await evaluateReleaseSchemaReadiness(
+    context.read<Pool>(),
+  );
+  checks['release_schema'] = releaseSchema.check;
+  if (!releaseSchema.healthy) {
+    allHealthy = false;
+  }
+
   // Schema required to preserve Deckbuilder draft/review state across reloads.
   final deckValidationSchema = await evaluateDeckValidationSchemaReadiness(
     context.read<Pool>(),
@@ -68,11 +76,8 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   final collectionAvailabilitySchema =
-      await evaluateCollectionAvailabilitySchemaReadiness(
-        context.read<Pool>(),
-      );
-  checks['collection_availability_schema'] =
-      collectionAvailabilitySchema.check;
+      await evaluateCollectionAvailabilitySchemaReadiness(context.read<Pool>());
+  checks['collection_availability_schema'] = collectionAvailabilitySchema.check;
   if (!collectionAvailabilitySchema.healthy) {
     allHealthy = false;
   }

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import '../lib/health_readiness_support.dart';
+
 void main() {
   test('operational dashboard reports persisted async job health', () {
     final source =
@@ -31,7 +33,32 @@ void main() {
     expect(source, contains('deploy recusado:'));
   });
 
-  test('backend deploy proves migrations 038-040 before remote mutation', () {
+  test('backend deploy writes one canonical Sentry release identity', () {
+    final source =
+        File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
+    final releaseWrites =
+        RegExp(r"--env-add SENTRY_RELEASE=").allMatches(source).length;
+
+    expect(releaseWrites, equals(1));
+    expect(
+      source,
+      contains("--env-add SENTRY_RELEASE='manaloom-backend@\$short_sha'"),
+    );
+    expect(
+      source,
+      contains(
+        r'"$spec_sentry_metadata" != "1|production|1|manaloom-backend@$short_sha"',
+      ),
+    );
+    expect(
+      source,
+      contains(
+        r'"$runtime_sentry_metadata" != "1|production|1|manaloom-backend@$short_sha"',
+      ),
+    );
+  });
+
+  test('backend deploy proves migrations 038-051 before remote mutation', () {
     final source =
         File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
     final guard =
@@ -57,6 +84,13 @@ void main() {
       '\nrequire_migration_040_contract\n',
       migration040Definition + 1,
     );
+    final migration041To051Definition = source.indexOf(
+      'require_migrations_041_051_contract() {',
+    );
+    final migration041To051Call = source.indexOf(
+      '\nrequire_migrations_041_051_contract\n',
+      migration041To051Definition + 1,
+    );
     final environmentSource = source.indexOf(
       r'load_manaloom_env_keys "$ENV_FILE"',
     );
@@ -79,6 +113,8 @@ void main() {
     expect(migration040Call, greaterThan(migration040Definition));
     expect(migration039Call, greaterThan(preflightCall));
     expect(migration040Call, greaterThan(migration039Call));
+    expect(migration041To051Call, greaterThan(migration041To051Definition));
+    expect(migration041To051Call, greaterThan(migration040Call));
     expect(approval, greaterThan(guardSource));
     expect(
       source.lastIndexOf(
@@ -93,9 +129,9 @@ void main() {
     );
     expect(source, isNot(contains(r'. "$ENV_FILE"')));
     expect(preflightCall, greaterThan(environmentSource));
-    expect(mutationStart, greaterThan(migration040Call));
-    expect(firstServiceUpdate, greaterThan(migration040Call));
-    expect(firstRemoteFilesystemMutation, greaterThan(migration040Call));
+    expect(mutationStart, greaterThan(migration041To051Call));
+    expect(firstServiceUpdate, greaterThan(migration041To051Call));
+    expect(firstRemoteFilesystemMutation, greaterThan(migration041To051Call));
     expect(
       source,
       contains('source "\$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"'),
@@ -113,6 +149,15 @@ void main() {
     expect(source, contains("version = '038'"));
     expect(source, contains("version = '039'"));
     expect(source, contains("version = '040'"));
+    for (final entry in requiredReleaseSchemaMigrations.entries.where(
+      (entry) => entry.key.compareTo('041') >= 0,
+    )) {
+      expect(
+        source,
+        contains("('${entry.key}', '${entry.value}')"),
+        reason: '${entry.key}_${entry.value}',
+      );
+    }
     expect(
       source,
       contains("name = 'add_privacy_and_post_game_sync_contracts'"),
@@ -132,6 +177,7 @@ void main() {
       'migration_038_ready',
       'migration_039_ready',
       'migration_040_ready',
+      'migrations_041_051_ready',
       'manaloom_deck_cards_require_review',
       'manaloom_deck_format_require_review',
       'idx_decks_user_validation_state',
@@ -144,6 +190,11 @@ void main() {
     expect(source, contains("column_default IN ('1', '1::bigint')"));
     expect(source, contains('ROLLBACK;'));
     expect(source, isNot(contains('dart run bin/migrate.dart')));
+    expect(source, contains('.checks.release_schema.status == "healthy"'));
+    expect(
+      source,
+      contains('.checks.release_schema.latest_migration == "051"'),
+    );
   });
 
   test(

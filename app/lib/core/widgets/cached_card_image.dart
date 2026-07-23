@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../services/image_cache_policy.dart';
 import '../theme/app_theme.dart';
 
 /// Widget centralizado para exibir imagens de cartas MTG com cache local.
@@ -59,6 +60,16 @@ class CachedCardImage extends StatelessWidget {
     String? rawUrl, {
     bool allowLoopbackHttp = false,
   }) => _sanitizeImageUrl(rawUrl, allowLoopbackHttp: allowLoopbackHttp);
+
+  @visibleForTesting
+  static String sizeScryfallImageUrlForTesting(
+    String imageUrl, {
+    int? decodeWidth,
+    int? decodeHeight,
+  }) => _sizeScryfallImageUrl(
+    imageUrl,
+    ImageDecodeTarget(width: decodeWidth, height: decodeHeight),
+  );
 
   static String? _sanitizeImageUrl(
     String? rawUrl, {
@@ -123,16 +134,39 @@ class CachedCardImage extends StatelessWidget {
       return _placeholder();
     }
 
-    final image = _networkImage(primaryUrl, fallbackUrl: fallbackUrl);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final decodeTarget = AppImageCachePolicy.targetFor(
+          width: width,
+          height: height,
+          constrainedWidth: constraints.maxWidth,
+          constrainedHeight: constraints.maxHeight,
+          devicePixelRatio: MediaQuery.maybeDevicePixelRatioOf(context) ?? 1,
+        );
+        final sizedPrimaryUrl = _sizeScryfallImageUrl(primaryUrl, decodeTarget);
+        final sizedFallbackUrl = fallbackUrl == null
+            ? null
+            : _sizeScryfallImageUrl(fallbackUrl, decodeTarget);
+        final image = _networkImage(
+          sizedPrimaryUrl,
+          fallbackUrl: sizedFallbackUrl,
+          decodeTarget: decodeTarget,
+        );
 
-    if (borderRadius != null) {
-      return ClipRRect(borderRadius: borderRadius!, child: image);
-    }
+        if (borderRadius != null) {
+          return ClipRRect(borderRadius: borderRadius!, child: image);
+        }
 
-    return image;
+        return image;
+      },
+    );
   }
 
-  Widget _networkImage(String effectiveImageUrl, {String? fallbackUrl}) {
+  Widget _networkImage(
+    String effectiveImageUrl, {
+    String? fallbackUrl,
+    required ImageDecodeTarget decodeTarget,
+  }) {
     final image = CachedNetworkImage(
       key: networkImageKey,
       imageUrl: effectiveImageUrl,
@@ -141,6 +175,8 @@ class CachedCardImage extends StatelessWidget {
       fit: fit,
       alignment: alignment,
       httpHeaders: _scryfallHeaders,
+      memCacheWidth: decodeTarget.width,
+      memCacheHeight: decodeTarget.height,
       fadeInDuration: const Duration(milliseconds: 200),
       placeholder: (_, __) => _loadingWidget(),
       errorWidget: (_, __, error) {
@@ -155,6 +191,8 @@ class CachedCardImage extends StatelessWidget {
             fit: fit,
             alignment: alignment,
             httpHeaders: _scryfallHeaders,
+            memCacheWidth: decodeTarget.width,
+            memCacheHeight: decodeTarget.height,
             fadeInDuration: const Duration(milliseconds: 120),
             placeholder: (_, __) => _loadingWidget(),
             errorWidget: (_, __, ___) => _errorWidget(),
@@ -162,11 +200,31 @@ class CachedCardImage extends StatelessWidget {
         }
         return _errorWidget();
       },
-      // Cache por 30 dias (default do flutter_cache_manager)
-      // As imagens do Scryfall raramente mudam, então cache longo é seguro.
     );
 
     return image;
+  }
+
+  static String _sizeScryfallImageUrl(
+    String imageUrl,
+    ImageDecodeTarget decodeTarget,
+  ) {
+    final uri = Uri.tryParse(imageUrl);
+    if (uri == null || uri.host != 'cards.scryfall.io') return imageUrl;
+    final segments = List<String>.of(uri.pathSegments);
+    if (segments.isEmpty ||
+        !const {'small', 'normal', 'large'}.contains(segments.first)) {
+      return imageUrl;
+    }
+
+    final decodeDimension = decodeTarget.width ?? decodeTarget.height;
+    if (decodeDimension == null) return imageUrl;
+    segments[0] = switch (decodeDimension) {
+      <= 128 => 'small',
+      <= 768 => 'normal',
+      _ => 'large',
+    };
+    return uri.replace(pathSegments: segments).toString();
   }
 
   /// Placeholder estático quando não há URL (sem imagem para carregar)

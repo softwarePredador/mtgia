@@ -32,6 +32,45 @@ void main() {
     });
 
     test(
+      'release schema readiness tracks every migration required since 038',
+      () {
+        final migrationSource = File('bin/migrate.dart').readAsStringSync();
+        final migrationsFromSource = <String, String>{
+          for (final match in RegExp(
+            r"version: '(\d{3})',\s+name: '([^']+)'",
+          ).allMatches(migrationSource))
+            if (match.group(1)!.compareTo('038') >= 0)
+              match.group(1)!: match.group(2)!,
+        };
+
+        expect(requiredReleaseSchemaMigrations, migrationsFromSource);
+        expect(requiredReleaseSchemaMigrations.keys.first, '038');
+        expect(requiredReleaseSchemaMigrations.keys.last, '051');
+        expect(releaseSchemaReadinessSql, contains("MAX(version)"));
+        expect(releaseSchemaReadinessSql, contains(") = '051'"));
+        for (final entry in requiredReleaseSchemaMigrations.entries) {
+          expect(
+            releaseSchemaReadinessSql,
+            contains("('${entry.key}', '${entry.value}')"),
+            reason: '${entry.key}_${entry.value}',
+          );
+        }
+        for (final anchor in const [
+          'password_reset_tokens',
+          'email_verification_tokens',
+          'collection_availability_snapshot',
+          'price_history',
+          'idx_cards_price_usd',
+          'user_blocks',
+          'content_report_appeals',
+          'chk_content_reports_resolution_action',
+        ]) {
+          expect(releaseSchemaReadinessSql, contains(anchor), reason: anchor);
+        }
+      },
+    );
+
+    test(
       'Deckbuilder schema readiness requires the closed state migrations',
       () {
         expect(deckValidationSchemaReadinessSql, contains("version = '039'"));
@@ -242,6 +281,7 @@ void main() {
           "checks['deck_validation_schema'] = deckValidationSchema.check",
         ),
       );
+      expect(route, contains("checks['release_schema'] = releaseSchema.check"));
       expect(route, contains("checks['collection_availability_schema'] ="));
     });
   });

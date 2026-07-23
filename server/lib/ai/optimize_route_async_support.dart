@@ -109,12 +109,17 @@ void startOptimizeModeAsyncJob({
   unawaited(
     runZonedGuarded(
       () async {
-        await processOptimizeModeAsync(
+        await _runOptimizeJobExecution(
           pool: pool,
           jobId: jobId,
-          internalOptimizeUrl: internalOptimizeUrl,
-          syncPayload: syncPayload,
-          authorization: authorization,
+          operation:
+              () => processOptimizeModeAsync(
+                pool: pool,
+                jobId: jobId,
+                internalOptimizeUrl: internalOptimizeUrl,
+                syncPayload: syncPayload,
+                authorization: authorization,
+              ),
         );
         await _settleOptimizeJobQuota(
           pool: pool,
@@ -197,32 +202,37 @@ void startCompleteModeAsyncJob({
   unawaited(
     runZonedGuarded(
       () async {
-        await processCompleteModeAsync(
-          jobId: jobId,
+        await _runOptimizeJobExecution(
           pool: pool,
-          deckId: deckId,
-          deckFormat: deckFormat,
-          maxTotal: maxTotal,
-          currentTotalCards: currentTotalCards,
-          commanders: commanders,
-          allCardData: allCardData,
-          deckColors: deckColors,
-          commanderColorIdentity: commanderColorIdentity,
-          originalCountsById: originalCountsById,
-          optimizer: optimizer,
-          themeProfile: themeProfile,
-          targetArchetype: targetArchetype,
-          bracket: bracket,
-          keepTheme: keepTheme,
-          deckAnalysis: deckAnalysis,
-          userId: userId,
-          deckSignature: deckSignature,
-          cacheKey: cacheKey,
-          intensity: intensity,
-          userPreferences: userPreferences,
-          hasBracketOverride: hasBracketOverride,
-          hasKeepThemeOverride: hasKeepThemeOverride,
-          recommendationContext: recommendationContext,
+          jobId: jobId,
+          operation:
+              () => processCompleteModeAsync(
+                jobId: jobId,
+                pool: pool,
+                deckId: deckId,
+                deckFormat: deckFormat,
+                maxTotal: maxTotal,
+                currentTotalCards: currentTotalCards,
+                commanders: commanders,
+                allCardData: allCardData,
+                deckColors: deckColors,
+                commanderColorIdentity: commanderColorIdentity,
+                originalCountsById: originalCountsById,
+                optimizer: optimizer,
+                themeProfile: themeProfile,
+                targetArchetype: targetArchetype,
+                bracket: bracket,
+                keepTheme: keepTheme,
+                deckAnalysis: deckAnalysis,
+                userId: userId,
+                deckSignature: deckSignature,
+                cacheKey: cacheKey,
+                intensity: intensity,
+                userPreferences: userPreferences,
+                hasBracketOverride: hasBracketOverride,
+                hasKeepThemeOverride: hasKeepThemeOverride,
+                recommendationContext: recommendationContext,
+              ),
         );
         await _settleOptimizeJobQuota(
           pool: pool,
@@ -246,6 +256,28 @@ void startCompleteModeAsyncJob({
       },
     ),
   );
+}
+
+Future<void> _runOptimizeJobExecution({
+  required Pool pool,
+  required String jobId,
+  required Future<void> Function() operation,
+}) async {
+  try {
+    await runAiJobExecution<void>(
+      operation: operation,
+      heartbeat: () => OptimizeJobStore.heartbeat(pool, jobId),
+      timeout: OptimizeJobStore.executionTimeout,
+    );
+  } on AiJobNoLongerActiveException {
+    return;
+  } on AiJobExecutionTimeoutException {
+    await OptimizeJobStore.fail(
+      pool,
+      jobId,
+      error: 'A otimização excedeu o tempo limite total.',
+    );
+  }
 }
 
 Future<void> _settleOptimizeJobQuota({

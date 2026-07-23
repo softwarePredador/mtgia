@@ -81,7 +81,7 @@ Campos iniciais `—` são obrigatoriamente preenchidos antes de `IN_PROGRESS`.
 | S3-01 | `PASS` | S2-08, S2-09 | `/root` | `app/doc/UI_TEST_SURFACE_MAP.md`; `app/test/ui/fixtures/ui_surface_inventory.json`; `app/test/ui/ui_surface_inventory_test.dart`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | route/surface inventory | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — 218 superfícies classificadas, guard 4/4, analyzer zero e `ui-audit` 17/17 PASS |
 | S3-02 | `PASS` | S3-01 | `/root` | `app/lib/core/widgets/app_state_panel.dart`; telas com lacuna comprovada; `app/test/ui/fixtures/ui_state_matrix.json`; `app/test/ui/ui_state_matrix_test.dart`; `app/doc/UI_TEST_SURFACE_MAP.md`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | state-matrix tests | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — 18 domínios × 15 estados decididos, 17 loadings acessíveis, matriz 288/288 e `ui-audit` 21/21 PASS |
 | S3-03 | `PASS` | S3-01 | `/root` | `app/lib/core/widgets/responsive_page_frame.dart`; telas com overflow comprovado; `app/test/ui/fixtures/ui_viewport_matrix.json`; `app/test/ui/ui_viewport_matrix_test.dart`; testes responsivos por domínio; `app/doc/UI_TEST_SURFACE_MAP.md`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | viewport matrix | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — 16 viewports/boundaries, 18 domínios, teclado + texto 200%, matriz 125/125 e `ui-audit` 25/25 PASS |
-| S3-04 | `BLOCKED` | S3-01 | `/root` | `app/test/ui/fixtures/ui_accessibility_matrix.json`; `app/test/ui/ui_accessibility_matrix_test.dart`; componentes/telas com falha comprovada; testes semantics/contraste/alvo; `app/doc/UI_TEST_SURFACE_MAP.md`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | semantics/text 200% | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — automação fresca 123/123 e `ui-audit` 35/35 PASS; APK release instalado no Samsung físico e cleanup confirmado; fechamento depende de interação humana TalkBack e de um iPhone físico online para VoiceOver |
+| S3-04 | `BLOCKED` | S3-01 | `/root` | `app/test/ui/fixtures/ui_accessibility_matrix.json`; `app/test/ui/ui_accessibility_matrix_test.dart`; componentes/telas com falha comprovada; testes semantics/contraste/alvo; `app/doc/UI_TEST_SURFACE_MAP.md`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | semantics/text 200% | automação corrente e `ui-audit` 48/48 PASS; fechamento depende somente de interação humana TalkBack no Samsung alvo. S10 fixou Web+Android, então iOS/VoiceOver está `DEFERRED_BY_SCOPE` e não bloqueia a candidata |
 | S3-05 | `PASS` | S3-01 | `/root` | `app/test/ui/fixtures/ui_keyboard_focus_matrix.json`; `app/test/ui/ui_keyboard_focus_matrix_test.dart`; `app/lib/features/profile/profile_screen.dart`; `app/lib/features/auth/screens/login_screen.dart`; testes de teclado/foco Web; `app/doc/UI_TEST_SURFACE_MAP.md`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | keyboard/focus Web | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — widget focado 25/25, `ui-audit` 35/35, rotas autenticadas Home/Decks/Collection/Community/Profile/Battle-Replays, modal real com trap/Escape/restauração, reduced-motion, DOM sem duplicação, console zero e cleanup da conta QA pelo app |
 | S3-06 | `PASS` | S3-01 | `/root` | `app/lib/main.dart`; `app/lib/core/api/api_client.dart`; `app/lib/features/auth/providers/auth_provider.dart`; rotas/provedor/call sites de Card Detail; drafts de Generate/Import; `server/routes/cards/index.dart`; `app/test/ui/fixtures/ui_navigation_resume_matrix.json`; testes app/server; `app/doc/UI_TEST_SURFACE_MAP.md`; `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` | deep-link/reload suite | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — 38 rotas, query-tab/back-forward/reload, Battle/Card canônicos, drafts por usuário, sessão expirada automatizada, browser real e gates `full`, `ui-audit` e `project-logic` PASS; duas verificações pós-deploy explicitamente retidas |
 | S3-07 | `PASS` | S3-02–S3-06 | `/root` | harness visual autenticado isolado; fixture determinística; matriz/guard; 80 goldens; comparador pixel a pixel; Web real e Android físico; evidência Sprint 3 | visual authenticated harness | `docs/qa/MANALOOM_SPRINT3_UX_EVIDENCE_2026-07-21.md` — 20 checkpoints × Web 390/1440/1920 e Samsung SM-A135M, revisão humana aprovada, console warn/error zero, pixel diff 80/80 e estado descartável removido |
@@ -114,7 +114,7 @@ Campos iniciais `—` são obrigatoriamente preenchidos antes de `IN_PROGRESS`.
 | S5-07 | `PASS` | S5-02 | `/root` | fila XMage/Forge/native, ownership e auditorias operacionais | priority/owner-intent audit | Fila combina decks de produto, uso natural tipado, impacto e residual; XMage/Forge executam catálogo coberto; native só residual provado; user skeleton não é alterado e PostgreSQL permanece canônico; queue 11/11 |
 | S5-08 | `PASS` | S5-01–S5-07 | `/root` | `scripts/quality_gate.sh`; gate Battle e testes/auditorias associados | `quality_gate.sh battle` 2× | Duas execuções válidas com exit 0 no mesmo HEAD/digest `cf7db6175a68171271723c00469ffa18f9b6311830764bc40c07cb5b466c0928`; em cada execução: auditorias 41/41 + 29/29, produto 45/45 e Dart 100/100 |
 | S5-09 | `PASS` | S5-08 | `/root` | harness Battle E2E, PostgreSQL descartável e auditoria `/tmp/manaloom_s5_09_disposable_final.json` | guarded Battle isolated E2E | E2E 1/1; 2 usuários, 2 decks, 200 deck_cards e 2 replays; owner/intruder e IDs duráveis validados; tabelas zeradas, cluster destruído, 3 processos encerrados e listeners fechados |
-| S5-10 | `PASS` | S5-01 | `/root` | evidências Sprint 5 e auditoria XMage/Forge; outputs candidatos em `/tmp` | `quality_gate.sh engine-delta` + capability gate | 95/95 checks; fonte local explícita/limpa/pinada; delta atual 305 cartas/317 fixtures, XMage +111 e Forge +105 commits; pins preservados; zero promoção/deploy; `docs/qa/MANALOOM_XMAGE_FORGE_CAPABILITY_AUDIT_2026-07-22.md` |
+| S5-10 | `PASS` | S5-01 | `/root` | evidências Sprint 5 e auditoria XMage/Forge; outputs candidatos em `/tmp` | `quality_gate.sh engine-delta` + capability gate | 95/95 checks; fonte local explícita/limpa/pinada; auditor reexecutado com 316 cartas/328 fixtures (XMage 120/131, Forge 196/197), ambos +113 commits; compare Forge truncado exige revisão antes de qualquer avanço; pins preservados e zero promoção/deploy; `docs/qa/MANALOOM_XMAGE_FORGE_CAPABILITY_AUDIT_2026-07-22.md` |
 
 ## Sprint 6
 
@@ -147,34 +147,34 @@ Campos iniciais `—` são obrigatoriamente preenchidos antes de `IN_PROGRESS`.
 
 | ID | Estado | Depende de | Owner | Arquivos pretendidos | Gate mínimo | Evidência |
 |---|---|---|---|---|---|---|
-| S8-01 | `TODO` | S4, S6, S7 | — | — | offline/reconnect matrix | — |
-| S8-02 | `TODO` | S4, S6 | — | — | p50/p95 benchmark | — |
-| S8-03 | `TODO` | S2, S4 | — | — | memory/image profile | — |
-| S8-04 | `TODO` | S4-04, S6 | — | — | AI failure injection | — |
-| S8-05 | `TODO` | S4, S5, S6 | — | — | Sentry/request-id proof | — |
-| S8-06 | `TODO` | S7-05 | — | — | FCM device proof | — |
-| S8-07 | `TODO` | S1-03 | — | — | off-site restore proof | — |
-| S8-08 | `TODO` | S1, S8-05 | — | — | security/SBOM/OSV | — |
-| S8-09 | `TODO` | S8-01 | — | — | offline contract guard | — |
+| S8-01 | `PASS` | S4, S6, S7 | `/root` | `OfflineFlowContract`; stores locais de notas/deck/mensagem; matriz e guard; evidência Sprint 8 | offline/reconnect matrix | evidência Sprint 8 — 19 fluxos, única fila remota em pós-jogo, descrição de deck persistida e 56/56 testes focados |
+| S8-02 | `IN_PROGRESS` | S4, S6 | `/root` | `PerformanceService`; harness core Web/device; budgets p50/p95; evidência Sprint 8 | p50/p95 benchmark | evidência Sprint 8 — startup Web Chrome 150 PASS em 7 amostras (cold p50/p95 490/528 ms; warm 143/146 ms); faltam startup Android e matriz autenticada das oito superfícies Web+device, dependente da fixture descartável autorizada |
+| S8-03 | `IN_PROGRESS` | S2, S4 | `/root` | `CachedCardImage`; cache/eviction; `app/integration_test/image_memory_runtime_test.dart`; evidência Sprint 8 | memory/image profile | evidência Sprint 8 — 180 imagens PASS no Samsung e Chrome, cache <32 MiB, RSS/repetição Android dentro do orçamento; falta incorporar ao perfil completo e SHA limpa |
+| S8-04 | `IN_PROGRESS` | S4-04, S6 | `/root` | `server/routes/ai/generate/index.dart`; lifecycle de jobs; teste de timeout do provider; contrato API; evidência Sprint 8 | AI failure injection | evidência Sprint 8 — timeout falha fechado em HTTP 504 sem mock/cache e suíte focada 26/26 PASS; faltam cancelamento físico e matriz externa completa |
+| S8-05 | `BLOCKED` | S4, S5, S6 | `/root` | observabilidade app/server; request ID; redaction; health/readiness; evidência Sprint 8 | Sentry/request-id proof | bloqueado até existir SHA limpa publicada e ambiente Sentry para provar evento e correlação app→API→erro da mesma revisão |
+| S8-06 | `BLOCKED` | S7-05 | `/root` | serviço/harness FCM; artefato Android final; evidência Sprint 8 | FCM device proof | bloqueado até existir APK assinado exato da SHA congelada e credenciais FCM para foreground/background/tap |
+| S8-07 | `BLOCKED` | S1-03 | `/root` | scripts/contratos de backup off-site; restore isolado; evidência Sprint 8 | off-site restore proof | bloqueado por destino/chave e autorização específica; falta backup fresco, checksum, restore e RPO/RTO |
+| S8-08 | `BLOCKED` | S1, S8-05 | `/root` | dependency audit; secret scan; SBOM/OSV; auth/runtime policy; evidência Sprint 8 | security/SBOM/OSV | evidência Sprint 8 — `deps` e secret scan verdes; bloqueado por S8-05, SBOM/OSV do artefato congelado e rejeição de token antigo pós-deploy |
+| S8-09 | `PASS` | S8-01 | `/root` | contrato consumido por erros de rede; nomenclatura cached-only; guard de claims/exceções cruas | offline contract guard | evidência Sprint 8 — claims governados, scanner/erros centralizados e guard 6/6 |
 
 ## Sprint 9
 
 | ID | Estado | Depende de | Owner | Arquivos pretendidos | Gate mínimo | Evidência |
 |---|---|---|---|---|---|---|
-| S9-01 | `TODO` | S8 | — | — | consumer/retention inventory | — |
-| S9-02 | `TODO` | S9-01 | — | — | status/link consistency | — |
-| S9-03 | `TODO` | S9-01 | — | — | canonical-auditor regression | — |
-| S9-04 | `TODO` | S9-01 | — | — | route/import consumers + gates | — |
-| S9-05 | `TODO` | S9-01 | — | — | `quality_gate.sh report-retention` | — |
-| S9-06 | `TODO` | S9-02–S9-05 | — | — | docs/link/secret audit | — |
+| S9-01 | `IMPLEMENTED_UNPROVEN` | S8 | `/root` | manifestos/índices de retenção; 23 conteúdos canônicos; auditor e testes | consumer/retention inventory | evidência Sprint 9 — 942 fontes classificadas, 0 não governadas; falta revisão final/commit atômico e S8 continua aberta |
+| S9-02 | `IMPLEMENTED_UNPROVEN` | S9-01 | `/root` | `docs/CONTEXTO_PRODUTO_ATUAL.md`; plano/tracker; referências históricas/correntes | status/link consistency | evidência Sprint 9 — contexto corrente e project logic sincronizados; falta auditoria final de links após o diff congelado |
+| S9-03 | `IMPLEMENTED_UNPROVEN` | S9-01 | `/root` | contratos/índices XMage; auditor de retenção; conteúdo deduplicado | canonical-auditor regression | evidência Sprint 9 — 23/23 canônicos selados e 16 testes PASS; falta disposição final dos contratos gigantes restantes |
+| S9-04 | `IMPLEMENTED_UNPROVEN` | S9-01 | `/root` | rotas/imports sem consumidor; compatibility routes; source reachability; gates | route/import consumers + gates | evidência Sprint 9 — `deps`, `server-target`, `full` e E2E determinístico sem falhas após a regeneração; falta repetir na identidade limpa congelada |
+| S9-05 | `IMPLEMENTED_UNPROVEN` | S9-01 | `/root` | duplicatas/efêmeros; manifestos de recuperação; gate de retenção | `quality_gate.sh report-retention` | evidência Sprint 9 — 12/12 checks, 16/16 testes, 0 duplicatas/resíduos; falta rastrear índices+canônicos+deleções no mesmo commit |
+| S9-06 | `IMPLEMENTED_UNPROVEN` | S9-02–S9-05 | `/root` | documentação operacional; links; secret scan; project logic | docs/link/secret audit | evidência Sprint 9 — secret scan, project logic e gate local completo verdes; faltam links e diff final congelado |
 
 ## Sprint 10
 
 | ID | Estado | Depende de | Owner | Arquivos pretendidos | Gate mínimo | Evidência |
 |---|---|---|---|---|---|---|
-| S10-01 | `TODO` | S0–S9 | — | — | clean SHA/scope manifest | — |
-| S10-02 | `TODO` | S10-01 | — | — | deterministic gates + summary | — |
-| S10-03 | `TODO` | S10-02 | — | — | backup/pre/apply/post/rollback | — |
+| S10-01 | `IMPLEMENTED_UNPROVEN` | S0–S9 | `/root` | plano/tracker; flags/rotas/manifesto release; matriz de acessibilidade | clean SHA/scope manifest | escopo fixado em Web+Android, scanner inacessível e iOS/VoiceOver `DEFERRED_BY_SCOPE`; checkout dirty/S9 aberta impedem congelamento |
+| S10-02 | `IMPLEMENTED_UNPROVEN` | S10-01 | `/root` | scripts/gates locais; testes release/readiness; summary final | deterministic gates + summary | `full` local PASS (backend 1736, Flutter 1157 + 1 skip, Web, Patrol e schema 51); `ai-eval`, `ai-bridge`, Battle 2× e `web` PASS; E2E determinístico `PARTIAL` com 10 PASS, 9 skips guardados e 0 falha/bloqueio; faltam SHA limpa e revisão do `engine-delta` (`review_required`: 316 cartas/328 fixtures) |
+| S10-03 | `BLOCKED` | S10-02 | `/root` | migrations 038–051; deploy/readiness; backup/pre/post/rollback | backup/pre/apply/post/rollback | schema PostgreSQL descartável passou 51 migrations e readiness 11/11; live bloqueado por S10-02, backup fresco e autorização específica |
 | S10-04 | `TODO` | S10-03 | — | — | guarded PG/E2E + summary PASS | — |
 | S10-05 | `TODO` | S10-04 | — | — | Web authenticated E2E | — |
 | S10-06 | `TODO` | S10-04 | — | — | Android physical E2E | — |

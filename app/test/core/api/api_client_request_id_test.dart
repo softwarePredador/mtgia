@@ -60,6 +60,28 @@ void main() {
       expect(headers['x-request-id'], equals('req-123'));
     });
 
+    test('replaces unsafe caller-provided request ids', () {
+      final headers = ApiClient.appendRequestIdHeaders(
+        const {},
+        requestId: 'trusted\r\nx-forged: value',
+      );
+
+      expect(headers['x-request-id'], startsWith('mob-'));
+      expect(headers['x-request-id'], isNot(contains('forged')));
+    });
+
+    test('rejects oversized and non-ASCII request ids', () {
+      expect(
+        ApiClient.isValidRequestId('a' * ApiClient.requestIdMaxLength),
+        isTrue,
+      );
+      expect(
+        ApiClient.isValidRequestId('a' * (ApiClient.requestIdMaxLength + 1)),
+        isFalse,
+      );
+      expect(ApiClient.isValidRequestId('requisição-1'), isFalse);
+    });
+
     test('classifies 4xx and 5xx as reportable HTTP errors', () {
       expect(ApiClient.isReportableHttpStatus(200), isFalse);
       expect(ApiClient.isReportableHttpStatus(399), isFalse);

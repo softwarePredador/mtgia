@@ -18,17 +18,58 @@ class ReportRetentionAuditTests(unittest.TestCase):
         self.assertEqual(report["status"], "pass", report["summary"])
         self.assertEqual(report["summary"]["ungoverned_tracked_raw_count"], 0)
         self.assertEqual(report["summary"]["ignored_local_count"], 0)
+        self.assertEqual(report["summary"]["exact_duplicate_group_count"], 0)
         self.assertGreater(report["summary"]["manifest_only_tracked_raw_count"], 0)
         self.assertTrue(report["retention_manifest"]["justification"])
+        self.assertEqual(report["summary"]["check_count"], 12)
+        self.assertEqual(report["summary"]["deduplicated_group_count"], 23)
+        self.assertEqual(
+            report["summary"]["deduplicated_canonical_file_count"],
+            23,
+        )
+        self.assertEqual(
+            report["summary"]["deduplicated_removed_file_count"],
+            473,
+        )
+        self.assertEqual(
+            report["summary"]["deduplicated_recovered_removed_file_count"],
+            473,
+        )
+        self.assertEqual(
+            report["summary"]["deduplicated_content_sealed_untracked_count"]
+            + report["deduplicated_report_retention"][
+                "tracked_canonical_file_count"
+            ],
+            23,
+        )
+        self.assertEqual(report["summary"]["archived_large_artifact_count"], 6)
+        self.assertEqual(
+            report["summary"]["archived_large_artifact_recovered_count"],
+            6,
+        )
+        self.assertEqual(
+            report["summary"]["archived_large_artifact_replacement_count"],
+            6,
+        )
+        self.assertEqual(report["summary"]["retention_reference_issue_count"], 0)
+        self.assertEqual(
+            {
+                item["seal_status"]
+                for item in report["deduplicated_report_retention"][
+                    "canonical_files"
+                ]
+            },
+            {"pass"},
+        )
 
     def test_manifest_is_not_counted_as_an_active_reference_surface(self) -> None:
         self.assertNotIn(audit.RETENTION_MANIFEST_FILE, audit.active_reference_files())
 
-        report = audit.build_report(fail_on_ignored_local=False)
+        classified = audit.classify_raw_files()
 
         self.assertLess(
-            report["summary"]["active_consumer_tracked_raw_count"],
-            report["summary"]["tracked_raw_count"],
+            len(classified["active_consumer"]),
+            sum(len(paths) for paths in classified.values()),
         )
 
     def test_raw_without_consumer_or_manifest_is_ungoverned(self) -> None:
@@ -63,11 +104,67 @@ class ReportRetentionAuditTests(unittest.TestCase):
         self.assertIsNotNone(metadata["age_days"])
         self.assertEqual(metadata["classification"], "manifest_only")
 
+    def test_exact_duplicate_groups_are_content_based(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            first = root / "first.md"
+            second = root / "second.json"
+            distinct = root / "distinct.md"
+            first.write_text("same payload\n", encoding="utf-8")
+            second.write_text("same payload\n", encoding="utf-8")
+            distinct.write_text("different\n", encoding="utf-8")
+
+            groups = audit.exact_duplicate_report_groups(
+                [first, second, distinct],
+            )
+
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0]["bytes"], 13)
+        self.assertEqual(len(groups[0]["paths"]), 2)
+
     def test_raw_report_suffixes_cover_heavy_artifact_types(self) -> None:
         self.assertIn(".json", audit.RAW_REPORT_SUFFIXES)
         self.assertIn(".jsonl", audit.RAW_REPORT_SUFFIXES)
         self.assertIn(".db", audit.RAW_REPORT_SUFFIXES)
         self.assertIn(".log", audit.RAW_REPORT_SUFFIXES)
+
+    def test_retention_reference_audit_rejects_stale_and_malformed_paths(
+        self,
+    ) -> None:
+        canonical_path = (
+            f"{audit.DEDUPLICATED_REPORT_PATH_PREFIX}{'a' * 64}.md"
+        )
+        removed_path = f"{audit.REPORT_PATH_PREFIX}removed.md"
+        archived_path = f"{audit.REPORT_PATH_PREFIX}archived.json"
+        text = "\n".join(
+            [
+                f"`{canonical_path}`",
+                (
+                    "`master_optimizer_reports/"
+                    f"{canonical_path}`"
+                ),
+                "`removed.md`",
+                "`master_optimizer_reports/archived.json`",
+            ]
+        )
+
+        issues, canonical_reference_count = audit.audit_retention_reference_text(
+            source="example.md",
+            text=text,
+            canonical_paths={canonical_path},
+            removed_paths={removed_path},
+            archived_removed_paths={archived_path},
+        )
+
+        self.assertEqual(canonical_reference_count, 2)
+        self.assertEqual(
+            {issue["kind"] for issue in issues},
+            {
+                "unknown_or_malformed_canonical_reference",
+                "removed_duplicate_reference",
+                "archived_raw_reference",
+            },
+        )
 
     def test_complete_manifested_local_sql_quartet_is_governed(self) -> None:
         prefix = audit.REPORT_DIR / "pg999_example_20260716"
@@ -184,6 +281,21 @@ class ReportRetentionAuditTests(unittest.TestCase):
 
         self.assertIn(evidence, audit.CURRENT_CONTRACT_FILES)
         self.assertTrue(evidence.exists())
+
+    def test_superseded_xmage_flow_is_not_a_current_contract(self) -> None:
+        superseded = (
+            audit.DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
+        )
+        current_contracts = {
+            audit.DOCS_DIR
+            / "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+            audit.DOCS_DIR / "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+            audit.DOCS_DIR / "EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
+        }
+
+        self.assertNotIn(superseded, audit.CURRENT_CONTRACT_FILES)
+        self.assertIn(superseded, audit.HISTORICAL_REFERENCE_FILES)
+        self.assertTrue(current_contracts.issubset(audit.CURRENT_CONTRACT_FILES))
 
 
 if __name__ == "__main__":

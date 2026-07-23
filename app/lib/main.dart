@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
 import 'core/config/launch_features.dart';
 import 'core/observability/app_observability.dart';
+import 'core/services/image_cache_policy.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
@@ -59,6 +60,7 @@ import 'features/messages/screens/message_inbox_screen.dart';
 import 'features/messages/screens/chat_screen.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
+import 'features/notifications/widgets/notification_permission_boundary.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
@@ -232,6 +234,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    AppImageCachePolicy.apply();
     WidgetsBinding.instance.addObserver(this);
     // go_router keeps imperative pushes out of the browser URL by default.
     // ManaLoom uses push for drill-down screens, so reflecting those pushes is
@@ -656,7 +659,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             ),
             GoRoute(
               path: '/notifications',
-              builder: (context, state) => const NotificationScreen(),
+              builder: (context, state) => const NotificationPermissionBoundary(
+                child: NotificationScreen(),
+              ),
             ),
             GoRoute(
               path: '/trades',
@@ -763,7 +768,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       unawaited(_commercialProvider.refreshFromServer());
 
       if (!_disableFirebaseStartup && !_disablePushInit) {
-        unawaited(PushNotificationService().requestPermissionAndRegister());
+        unawaited(PushNotificationService().registerIfAuthorized());
       }
     });
   }

@@ -20,6 +20,7 @@ Regras implementadas agora:
 """
 import argparse
 import sqlite3, random, json, os, re, copy, sys
+import tempfile
 from datetime import datetime, timezone
 from collections import defaultdict
 from itertools import combinations, product
@@ -133,8 +134,8 @@ KNOWLEDGE_DIR = os.environ.get(
     "MANALOOM_KNOWLEDGE_DIR",
     str(_resolve_knowledge_dir()),
 )
-LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
 LOG_PATH_ENV = "MANALOOM_BATTLE_LOG_PATH"
+BATTLE_LOG_DIR_ENV = "MANALOOM_BATTLE_LOG_DIR"
 
 REPLAY_EVENT_HANDLER = None
 DECISION_TRACE_HANDLER = None
@@ -270,7 +271,16 @@ def battle_log_path_for_commander(commander):
     explicit = os.environ.get(LOG_PATH_ENV)
     if explicit:
         return explicit
-    return f"{KNOWLEDGE_DIR}/decks/{commander_log_slug(commander)}/BATTLE_LOG.md"
+    log_root = os.environ.get(
+        BATTLE_LOG_DIR_ENV,
+        os.path.join(tempfile.gettempdir(), "manaloom-battle-logs"),
+    )
+    return os.path.join(
+        log_root,
+        "decks",
+        commander_log_slug(commander),
+        "BATTLE_LOG.md",
+    )
 
 
 def set_default_evaluation_target_for_commander(commander):

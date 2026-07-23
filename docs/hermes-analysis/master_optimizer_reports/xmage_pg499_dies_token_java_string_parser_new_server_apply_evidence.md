@@ -47,7 +47,7 @@ Promoted cards:
   found `target_card_rows=1` for each promoted card and no existing executable
   rows or shadow rows to deprecate.
 - Apply:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_apply.out`
+  `docs/hermes-analysis/deduplicated-report-content/79180e3872cc748c7fc6445c8c011fae95f7a9cff6ee172107deeeb35fc4a439.txt`
   reported `upserted_rows=2`, `deprecated_shadow_rows=0`, and `COMMIT`.
 - Postcheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_postcheck.out`

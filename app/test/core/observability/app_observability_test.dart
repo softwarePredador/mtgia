@@ -16,7 +16,7 @@ void main() {
       expect(runnerCalled, isTrue);
     });
 
-    test('does not attach email to Sentry user context', () {
+    test('attaches only the opaque user id to Sentry context', () {
       final sentryUser = AppObservability.instance.sentryUserFor(
         User(
           id: 'user-1',
@@ -27,8 +27,9 @@ void main() {
       );
 
       expect(sentryUser.id, equals('user-1'));
-      expect(sentryUser.username, equals('QA User'));
+      expect(sentryUser.username, isNull);
       expect(sentryUser.email, isNull);
+      expect(sentryUser.name, isNull);
     });
   });
 }

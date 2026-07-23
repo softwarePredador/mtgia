@@ -1032,7 +1032,7 @@ class _CachedDecksStatus extends StatelessWidget {
       key: Key(
         isLoading
             ? 'home-decks-cache-refreshing-state'
-            : 'home-decks-offline-cache-state',
+            : 'home-decks-cached-read-only-state',
       ),
       width: double.infinity,
       padding: const EdgeInsets.symmetric(

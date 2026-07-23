@@ -51,6 +51,269 @@ class CollectionAvailabilitySchemaReadiness {
   final Map<String, dynamic> check;
 }
 
+class ReleaseSchemaReadiness {
+  const ReleaseSchemaReadiness({required this.healthy, required this.check});
+
+  final bool healthy;
+  final Map<String, dynamic> check;
+}
+
+const requiredReleaseSchemaMigrations = <String, String>{
+  '038': 'add_privacy_and_post_game_sync_contracts',
+  '039': 'persist_deck_validation_review_state',
+  '040': 'align_cards_reserved_runtime_schema',
+  '041': 'create_social_trade_messaging_runtime_schema',
+  '042': 'create_account_recovery_and_session_revocation',
+  '043': 'record_versioned_legal_acceptance',
+  '044': 'create_email_verification_gate',
+  '045': 'create_collection_availability_contract',
+  '046': 'restore_price_history_runtime_contract',
+  '047': 'close_deck_validation_state_transitions',
+  '048': 'close_ai_job_lifecycle',
+  '049': 'preserve_binder_physical_identity',
+  '050': 'canonicalize_pricing_provenance',
+  '051': 'close_social_safety_contract',
+};
+
+const releaseSchemaReadinessSql = '''
+  WITH required_migrations(version, name) AS (
+    VALUES
+      ('038', 'add_privacy_and_post_game_sync_contracts'),
+      ('039', 'persist_deck_validation_review_state'),
+      ('040', 'align_cards_reserved_runtime_schema'),
+      ('041', 'create_social_trade_messaging_runtime_schema'),
+      ('042', 'create_account_recovery_and_session_revocation'),
+      ('043', 'record_versioned_legal_acceptance'),
+      ('044', 'create_email_verification_gate'),
+      ('045', 'create_collection_availability_contract'),
+      ('046', 'restore_price_history_runtime_contract'),
+      ('047', 'close_deck_validation_state_transitions'),
+      ('048', 'close_ai_job_lifecycle'),
+      ('049', 'preserve_binder_physical_identity'),
+      ('050', 'canonicalize_pricing_provenance'),
+      ('051', 'close_social_safety_contract')
+  )
+  SELECT
+    (
+      SELECT COUNT(*) = 14
+      FROM required_migrations required
+      JOIN public.schema_migrations actual
+        ON actual.version = required.version
+       AND actual.name = required.name
+    ) AS required_migrations_registered,
+    COALESCE(
+      (SELECT MAX(version) FROM public.schema_migrations),
+      ''
+    ) = '051' AS latest_migration_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_class
+      WHERE oid IN (
+        to_regclass('public.user_binder_items'),
+        to_regclass('public.trade_offers'),
+        to_regclass('public.trade_items'),
+        to_regclass('public.trade_messages'),
+        to_regclass('public.trade_status_history'),
+        to_regclass('public.conversations'),
+        to_regclass('public.direct_messages'),
+        to_regclass('public.notifications'),
+        to_regclass('public.password_reset_tokens'),
+        to_regclass('public.email_verification_tokens'),
+        to_regclass('public.price_history')
+      )
+        AND relkind IN ('r', 'p')
+    ) = 11 AS release_runtime_tables_ready,
+    (
+      SELECT COUNT(*)
+      FROM (
+        VALUES
+          ('users', 'auth_version'),
+          ('users', 'password_changed_at'),
+          ('users', 'terms_version'),
+          ('users', 'terms_accepted_at'),
+          ('users', 'privacy_version'),
+          ('users', 'privacy_accepted_at'),
+          ('users', 'email_verified_at')
+      ) AS required(table_name, column_name)
+      WHERE EXISTS (
+        SELECT 1
+        FROM information_schema.columns actual
+        WHERE actual.table_schema = 'public'
+          AND actual.table_name = required.table_name
+          AND actual.column_name = required.column_name
+      )
+    ) = 7 AS account_columns_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_constraint
+      WHERE conrelid = to_regclass('public.users')
+        AND conname IN (
+          'chk_users_terms_acceptance_pair',
+          'chk_users_privacy_acceptance_pair'
+        )
+        AND convalidated
+    ) = 2 AS legal_constraints_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_class
+      WHERE oid IN (
+        to_regclass('public.collection_availability_snapshot'),
+        to_regclass('public.binder_item_availability')
+      )
+        AND relkind = 'v'
+    ) = 2 AS collection_views_ready,
+    (
+      (
+        SELECT COUNT(*)
+        FROM pg_index
+        WHERE indexrelid IN (
+          to_regclass('public.idx_price_history_date'),
+          to_regclass('public.idx_price_history_card_date'),
+          to_regclass('public.idx_price_history_date_card_price'),
+          to_regclass('public.idx_cards_price_usd')
+        )
+          AND indisvalid
+          AND indisready
+      ) = 4
+      AND (
+        SELECT COUNT(*)
+        FROM (
+          VALUES
+            ('cards', 'price_usd'),
+            ('cards', 'price_usd_foil'),
+            ('cards', 'price_source'),
+            ('decks', 'pricing_source')
+        ) AS required(table_name, column_name)
+        WHERE EXISTS (
+          SELECT 1
+          FROM information_schema.columns actual
+          WHERE actual.table_schema = 'public'
+            AND actual.table_name = required.table_name
+            AND actual.column_name = required.column_name
+        )
+      ) = 4
+      AND EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.cards')
+          AND conname = 'chk_cards_price_source'
+          AND convalidated
+      )
+    ) AS pricing_contract_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_class
+      WHERE oid IN (
+        to_regclass('public.user_blocks'),
+        to_regclass('public.user_block_events'),
+        to_regclass('public.moderation_actions'),
+        to_regclass('public.content_report_appeals')
+      )
+        AND relkind IN ('r', 'p')
+    ) = 4 AS social_safety_tables_ready,
+    (
+      SELECT COUNT(*)
+      FROM (
+        VALUES
+          ('users', 'profile_visibility'),
+          ('users', 'binder_visibility'),
+          ('users', 'location_visibility'),
+          ('users', 'message_visibility'),
+          ('users', 'trade_visibility'),
+          ('users', 'trade_notes_visibility'),
+          ('direct_messages', 'client_request_id'),
+          ('direct_messages', 'moderation_status'),
+          ('trade_messages', 'client_request_id'),
+          ('trade_messages', 'moderation_status'),
+          ('content_reports', 'priority'),
+          ('content_reports', 'evidence'),
+          ('content_reports', 'sla_due_at'),
+          ('content_reports', 'resolution'),
+          ('content_reports', 'resolution_action'),
+          ('content_reports', 'updated_at')
+      ) AS required(table_name, column_name)
+      WHERE EXISTS (
+        SELECT 1
+        FROM information_schema.columns actual
+        WHERE actual.table_schema = 'public'
+          AND actual.table_name = required.table_name
+          AND actual.column_name = required.column_name
+      )
+    ) = 16 AS social_safety_columns_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_constraint
+      WHERE conname IN (
+        'chk_users_profile_visibility',
+        'chk_users_binder_visibility',
+        'chk_users_location_visibility',
+        'chk_users_message_visibility',
+        'chk_users_trade_visibility',
+        'chk_users_trade_notes_visibility',
+        'chk_direct_messages_moderation_status',
+        'chk_trade_messages_moderation_status',
+        'chk_content_reports_target_type',
+        'chk_content_reports_status',
+        'chk_content_reports_priority',
+        'chk_content_reports_resolution_action'
+      )
+        AND convalidated
+    ) = 12 AS social_safety_constraints_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_index
+      WHERE indexrelid IN (
+        to_regclass('public.idx_user_blocks_blocked'),
+        to_regclass('public.idx_user_block_events_actor_created'),
+        to_regclass('public.uq_direct_messages_sender_request'),
+        to_regclass('public.uq_trade_messages_sender_request'),
+        to_regclass('public.idx_content_reports_queue'),
+        to_regclass('public.uq_content_reports_active_reporter_target'),
+        to_regclass('public.idx_moderation_actions_report_created'),
+        to_regclass('public.uq_content_report_appeals_pending'),
+        to_regclass('public.idx_content_report_appeals_queue')
+      )
+        AND indisvalid
+        AND indisready
+    ) = 9 AS social_safety_indexes_ready
+''';
+
+Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
+  try {
+    final result = await pool
+        .execute(releaseSchemaReadinessSql)
+        .timeout(const Duration(seconds: 5));
+    final row = result.first;
+    final healthy =
+        row.length >= 11 && row.take(11).every((value) => value == true);
+    return ReleaseSchemaReadiness(
+      healthy: healthy,
+      check: {
+        'status': healthy ? 'healthy' : 'unhealthy',
+        'required_range': '038-051',
+        'latest_migration': '051',
+        'migrations': requiredReleaseSchemaMigrations.keys.toList(
+          growable: false,
+        ),
+        if (!healthy) 'error_code': 'release_schema_not_ready',
+      },
+    );
+  } on Object {
+    return ReleaseSchemaReadiness(
+      healthy: false,
+      check: {
+        'status': 'unhealthy',
+        'required_range': '038-051',
+        'latest_migration': '051',
+        'migrations': requiredReleaseSchemaMigrations.keys.toList(
+          growable: false,
+        ),
+        'error_code': 'release_schema_check_failed',
+      },
+    );
+  }
+}
+
 const aiJobSchemaReadinessSql = '''
   SELECT
     EXISTS (

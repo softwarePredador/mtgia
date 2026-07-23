@@ -59,7 +59,7 @@
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg562_etb_token_static_keyword_new_server.md`
   remains `action_required`, expected for the global all-card backlog, with `battle_and_oracle_ready=5510` and `battle_family_mapper_required=28363`.
 - Governance gates passed:
-  `xmage_strategy_consistency_audit_20260706_post_pg562_etb_token_static_keyword_new_server_final.md` (`26/26`),
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md` (`26/26`),
   `pg_hermes_sqlite_contract_audit_20260706_post_pg562_etb_token_static_keyword_new_server_final.md` (`51/51`),
   `operational_surface_alignment_audit_20260706_post_pg562_etb_token_static_keyword_new_server_final.md`,
   `legacy_contamination_audit_20260706_post_pg562_etb_token_static_keyword_new_server_final.md`.

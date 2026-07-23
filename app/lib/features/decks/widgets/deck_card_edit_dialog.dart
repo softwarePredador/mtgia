@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
 import '../models/deck_card_item.dart';
 
@@ -235,7 +236,10 @@ Future<void> showDeckCardEditDialog({
                         if (!ctx.mounted) return;
                         setDialogState(() {
                           isSaving = false;
-                          error = e.toString().replaceFirst('Exception: ', '');
+                          error = FriendlyErrorMapper.fromException(
+                            e,
+                            context: FriendlyErrorContext.deckSave,
+                          );
                         });
                       }
                     },

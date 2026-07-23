@@ -18,7 +18,25 @@ Operational rules:
   durable evidence that must survive as a contract.
 
 For the current XMage to ManaLoom flow, use
-`../XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` as the operating contract.
+`../GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md` together with
+`../EXTERNAL_BATTLE_EXECUTION_CONTRACT.md`.
+`../XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` is retained only as
+historical evidence.
+
+## Content-Addressed Deduplicated Evidence
+
+Exact duplicate report artifacts are stored once outside this directory. The
+historical filename-to-content mapping, canonical SHA-256, byte count, recovery
+commit, and removal policy are recorded in
+`docs/hermes-analysis/DEDUPLICATED_REPORTS_2026-07-23.json`. Canonical bytes live
+under `docs/hermes-analysis/deduplicated-report-content/`.
+
+Large point-in-time artifacts that were archived without deduplication are
+recorded in `docs/hermes-analysis/ARCHIVED_LARGE_ARTIFACTS.md`. The retention
+gate validates both indexes, every canonical content seal, the recovery commit,
+replacement summaries, and current references. An untracked canonical file is
+governed only while its exact path, byte count, and SHA-256 match the
+deduplication manifest.
 
 ## Retained Raw Evidence Manifest
 
@@ -255,20 +273,6 @@ manifest. This exception does not cover arbitrary generated JSON/Markdown.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_probe_post_pg595_limited_any_color_mana_new_server.json`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_probe_post_pg596b_oracle_hash_backfill_new_server.json`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_probe_post_pg597_pay_life_mana_source_new_server.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg585_attack_self_boost_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg586_static_controlled_trample_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg587_becomes_blocked_self_boost_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg588_limited_activated_self_boost_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg589_damage_each_opponent_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg589b_trusted_oracle_hash_backfill_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg590_creature_etb_library_pick_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg591_bounce_target_variants_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg592_multi_target_removal_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg593_multi_target_damage_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg594_limited_mana_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg595_limited_any_color_mana_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg596_any_color_mana_rock_alias_new_server_final.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg597_pay_life_mana_source_new_server_final.json`
 - `docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_e2e_validation.json`
 - `docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_apply.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_manifest.json`

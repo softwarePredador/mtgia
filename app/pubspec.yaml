@@ -65,8 +65,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_driver:
-    sdk: flutter
   integration_test:
     sdk: flutter
 
@@ -83,6 +81,7 @@ dev_dependencies:
     path: ../tools/manaloom_lints
   patrol: ^4.6.1
   patrol_cli: ^4.4.0
+  flutter_cache_manager: ^3.4.1
   sqflite_common_ffi: ^2.4.0+3
 
 # For information on the generic Dart part of this file, see the

@@ -49,10 +49,14 @@ void main() {
         expect(
           routeSource,
           contains(
-            "'job_timeout_ms': const Duration(minutes: 3).inMilliseconds",
+            "'job_timeout_ms': "
+            'AiGenerateJobStore.executionTimeout.inMilliseconds',
           ),
         );
-        expect(routeSource, contains('.timeout(const Duration(minutes: 3))'));
+        expect(
+          routeSource,
+          contains('.timeout(AiGenerateJobStore.executionTimeout)'),
+        );
       },
     );
   });

@@ -105,6 +105,20 @@ class _RuntimeApi {
     return _decode(response, expected: expected);
   }
 
+  Future<void> deleteAccount(_RuntimeUser user) async {
+    final response = await _client
+        .delete(
+          Uri.parse('$baseUrl/users/me'),
+          headers: _headers(user.token),
+          body: jsonEncode({
+            'confirmation': 'EXCLUIR MINHA CONTA',
+            'password': user.password,
+          }),
+        )
+        .timeout(const Duration(seconds: 30));
+    _decode(response, expected: const {200});
+  }
+
   Map<String, String> _headers(String? token) {
     return {
       'Content-Type': 'application/json',
@@ -170,6 +184,19 @@ void main() {
 
     final seller = await api.registerUser('${marker}_seller');
     final buyer = await api.registerUser('${marker}_buyer');
+    addTearDown(() async {
+      for (final user in [seller, buyer]) {
+        try {
+          await api.deleteAccount(user);
+        } catch (error) {
+          _log(
+            'FCM_RUNTIME_USER_CLEANUP_FAILED '
+            'suffix=${_suffix(user.id)} error_type=${error.runtimeType}',
+          );
+        }
+      }
+      _log('FCM_RUNTIME_USERS_CLEANED');
+    });
     _log(
       'FCM_RUNTIME_USERS_CREATED buyer_username=${buyer.username} '
       'buyer_suffix=${_suffix(buyer.id)} seller_username=${seller.username} '
@@ -316,10 +343,8 @@ _RuntimeApp _runtimeApp({
       ),
       GoRoute(
         path: '/messages/:conversationId',
-        builder:
-            (_, state) => ChatScreen(
-              conversationId: state.pathParameters['conversationId']!,
-            ),
+        builder: (_, state) =>
+            ChatScreen(conversationId: state.pathParameters['conversationId']!),
       ),
     ],
   );

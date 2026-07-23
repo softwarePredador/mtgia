@@ -21,7 +21,7 @@
     "dialog": 43,
     "bottom_sheet": 22,
     "menu": 8,
-    "tabs": 11,
+    "tabs": 10,
     "navigation": 2,
     "transient": 107
   },
@@ -328,7 +328,6 @@
     {"source":"lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart","domain":"home","occurrences":{"bottom_sheet":1}},
     {"source":"lib/features/home/lotus_life_counter_screen.dart","domain":"home","occurrences":{"transient":1}},
     {"source":"lib/features/home/onboarding_core_flow_screen.dart","domain":"home","occurrences":{"transient":1}},
-    {"source":"lib/features/market/screens/market_screen.dart","domain":"market","occurrences":{"tabs":1}},
     {"source":"lib/features/messages/screens/chat_screen.dart","domain":"messages","occurrences":{"dialog":1,"menu":1,"transient":3}},
     {"source":"lib/features/notifications/screens/notification_screen.dart","domain":"notifications","occurrences":{"transient":1}},
     {"source":"lib/features/profile/profile_screen.dart","domain":"profile","occurrences":{"dialog":6,"transient":8}},

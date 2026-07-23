@@ -11,6 +11,7 @@ import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/deck_provider.dart';
+import '../services/deck_entry_draft_store.dart';
 import '../models/deck_analysis.dart';
 import '../models/commander_bracket.dart';
 import '../models/deck_card_item.dart';
@@ -58,6 +59,7 @@ class DeckDetailsScreen extends StatefulWidget {
 
 class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     with SingleTickerProviderStateMixin {
+  final DeckEntryDraftStore _draftStore = DeckEntryDraftStore();
   late TabController _tabController;
   Map<String, dynamic>? _pricing;
   bool _isPricingLoading = false;
@@ -103,6 +105,19 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context.read<DeckProvider>().fetchDeckDetails(widget.deckId);
       _openInitialOptimizationIntent();
       unawaited(_offerResumableOptimization());
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant DeckDetailsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialOptimizationIntent ==
+        widget.initialOptimizationIntent) {
+      return;
+    }
+    _autoOpenedOptimization = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _openInitialOptimizationIntent();
     });
   }
 
@@ -1154,21 +1169,32 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }
 
   Future<void> _showEditDescriptionDialog(String? currentDescription) async {
+    final ownerId = context.read<AuthProvider>().user?.id ?? 'anonymous';
+    final updateDeckDescription = context
+        .read<DeckProvider>()
+        .updateDeckDescription;
+    final savedDraft = await _draftStore.loadEditDescription(
+      ownerId,
+      widget.deckId,
+    );
+    if (!mounted) return;
     final result = await showDeckDescriptionEditorDialog(
       context: context,
-      currentDescription: currentDescription,
+      currentDescription: savedDraft ?? currentDescription,
     );
 
     if (!mounted) return;
-    if (result == null) return;
+    if (result == null) {
+      await _draftStore.clearEditDescription(ownerId, widget.deckId);
+      return;
+    }
 
     try {
+      await _draftStore.saveEditDescription(ownerId, widget.deckId, result);
       await executeDeckDescriptionUpdate(
         deckId: widget.deckId,
         description: result,
-        updateDeckDescription: context
-            .read<DeckProvider>()
-            .updateDeckDescription,
+        updateDeckDescription: updateDeckDescription,
         showSnackBar: ({required message, required backgroundColor}) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1176,6 +1202,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           );
         },
       );
+      await _draftStore.clearEditDescription(ownerId, widget.deckId);
       if (!mounted) return;
     } catch (e) {
       if (!mounted) return;

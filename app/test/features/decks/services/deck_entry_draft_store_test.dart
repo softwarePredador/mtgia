@@ -54,4 +54,24 @@ void main() {
     await store.clearImport('user-a');
     expect(await store.loadImport('user-a'), isNull);
   });
+
+  test('keeps a failed description edit scoped by owner and deck', () async {
+    final store = DeckEntryDraftStore();
+
+    await store.saveEditDescription(
+      'user-a',
+      'deck-607',
+      'Rascunho preservado durante a queda de rede',
+    );
+
+    expect(
+      await store.loadEditDescription('user-a', 'deck-607'),
+      'Rascunho preservado durante a queda de rede',
+    );
+    expect(await store.loadEditDescription('user-a', 'deck-608'), isNull);
+    expect(await store.loadEditDescription('user-b', 'deck-607'), isNull);
+
+    await store.clearEditDescription('user-a', 'deck-607');
+    expect(await store.loadEditDescription('user-a', 'deck-607'), isNull);
+  });
 }

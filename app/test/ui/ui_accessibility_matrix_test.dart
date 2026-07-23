@@ -131,23 +131,28 @@ void main() {
     }
   });
 
-  test('physical TalkBack and VoiceOver evidence stays explicit', () {
+  test('TalkBack stays required and out-of-scope VoiceOver stays explicit', () {
     final manual = matrix['manual_screen_reader'] as Map<String, dynamic>;
     expect(manual.keys.toSet(), {'android', 'ios'});
-    for (final entry in manual.entries) {
-      final contract = entry.value as Map<String, dynamic>;
-      expect(contract['reader'], isNotEmpty);
-      expect(contract['status'], anyOf('pending_physical', 'pass'));
-      expect((contract['required_routes'] as List<dynamic>).toSet(), {
-        '/login',
-        '/home',
-        '/decks',
-        '/collection',
-        '/community',
-        '/profile',
-        '/battle/replays',
-      });
-    }
+
+    final android = manual['android'] as Map<String, dynamic>;
+    expect(android['reader'], 'TalkBack');
+    expect(android['status'], anyOf('pending_physical', 'pass'));
+    expect((android['required_routes'] as List<dynamic>).toSet(), {
+      '/login',
+      '/home',
+      '/decks',
+      '/collection',
+      '/community',
+      '/profile',
+      '/battle/replays',
+    });
+
+    final ios = manual['ios'] as Map<String, dynamic>;
+    expect(ios['reader'], 'VoiceOver');
+    expect(ios['status'], 'DEFERRED_BY_SCOPE');
+    expect(ios['deferred_reason'], 'ios_not_in_web_android_beta_scope');
+    expect(ios['required_routes'], isEmpty);
   });
 }
 

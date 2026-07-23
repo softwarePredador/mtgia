@@ -33,8 +33,8 @@ Commands and results:
 
 - Post-PG578 queue:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.md`
-- Post-PG578 queue JSON:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.json`
+- Post-PG578 archived queue summary:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.md`
 - Post-PG578 exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg578_look_library_graveyard_new_server_recheck.md`
 - Post-PG578 exact-scope recheck JSON:
@@ -55,9 +55,9 @@ Result:
 - Global readiness JSON:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg578_look_library_graveyard_new_server.json`
 - XMage strategy consistency:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg578_look_library_graveyard_new_server.md`
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - XMage strategy consistency JSON:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg578_look_library_graveyard_new_server.json`
+  `docs/hermes-analysis/deduplicated-report-content/cb3f1e0efbd91f01394f80a98e1c85f2f4dbee8cde287522e635af626bcd2a6f.json`
 - PG/Hermes/SQLite contract:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg578_look_library_graveyard_new_server_wrapped.md`
 - PG/Hermes/SQLite contract JSON:

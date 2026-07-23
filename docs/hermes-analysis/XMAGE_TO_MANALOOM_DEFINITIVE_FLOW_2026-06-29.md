@@ -22,8 +22,9 @@ Historically, this document superseded the operational parts of:
 - `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md`
 
-Those files remain historical evidence. This file defines the current flow to
-use for card-rule acceleration.
+Those files remain historical evidence. At that time, this file defined the
+native card-rule acceleration flow; it does not define the current operational
+flow.
 
 Execution contract:
 
@@ -289,7 +290,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg400_play_lands_from_graveyard_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg400_play_lands_from_graveyard_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg400_play_lands_from_graveyard_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
@@ -302,7 +303,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg401_dynamic_graveyard_damage_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg401_dynamic_graveyard_damage_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg401_dynamic_graveyard_damage_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
@@ -317,7 +318,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_docs_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_hash_backfill_final.md`
@@ -330,7 +331,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg403_dynamic_graveyard_count_boost_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
@@ -343,7 +344,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg404_dynamic_count_boost_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg404_dynamic_count_boost_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg404_dynamic_count_boost_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
@@ -358,7 +359,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg405_dynamic_count_damage_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg405_oracle_hash_integrity_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg405_oracle_hash_integrity_backfill_new_server_pg_to_sqlite_sync.json`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_docs_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_hash_backfill_final.md`
@@ -369,7 +370,7 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_e2e_validation.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg408_mana_etb_draw_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg408_mana_etb_draw_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
@@ -12576,7 +12577,7 @@ Validation and deploy evidence:
   `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_precheck.out`
   validated both target rows and found no existing executable/shadow rows.
 - Apply:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_apply.out`
+  `docs/hermes-analysis/deduplicated-report-content/79180e3872cc748c7fc6445c8c011fae95f7a9cff6ee172107deeeb35fc4a439.txt`
   reported `upserted_rows=2`, `deprecated_shadow_rows=0`, and `COMMIT`.
 - Postcheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_postcheck.out`
@@ -13899,7 +13900,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg523_self_sacrifice_mana_new_server.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg523_self_sacrifice_mana_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg523_self_sacrifice_mana_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg523_self_sacrifice_mana_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg523_self_sacrifice_mana_new_server_final.md`
@@ -13965,7 +13966,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg524_tap_and_self_sacrifice_mana_new_server.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg524_tap_and_self_sacrifice_mana_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg524_tap_and_self_sacrifice_mana_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg524_tap_and_self_sacrifice_mana_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg524_tap_and_self_sacrifice_mana_new_server_final.md`
@@ -14028,7 +14029,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg525_dies_fixed_mana_new_server.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg525_dies_fixed_mana_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg525_dies_fixed_mana_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg525_dies_fixed_mana_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg525_dies_fixed_mana_new_server_final.md`
@@ -14290,7 +14291,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg530_equipment_static_pt_new_server_recheck.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg530_equipment_static_pt_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg530_equipment_static_pt_new_server_final_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg530_equipment_static_pt_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg530_equipment_static_pt_new_server_final.md`
@@ -14350,7 +14351,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg531_static_global_pt_new_server_recheck.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg531_static_global_pt_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg531_static_global_pt_new_server_final_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg531_static_global_pt_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg531_static_global_pt_new_server_final.md`
@@ -14411,7 +14412,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg532_aura_static_pt_new_server_recheck.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg532_aura_static_pt_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg532_aura_static_pt_new_server_final_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg532_aura_static_pt_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg532_aura_static_pt_new_server_final.md`
@@ -14478,7 +14479,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg533_destroy_treasure_new_server_recheck.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg533_destroy_treasure_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg533_destroy_treasure_new_server_final_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg533_destroy_treasure_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg533_destroy_treasure_new_server_final.md`
@@ -14545,7 +14546,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg534_multi_tokens_new_server_recheck.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg534_multi_tokens_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg534_multi_tokens_new_server_final_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg534_multi_tokens_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg534_multi_tokens_new_server_final.md`
@@ -14613,7 +14614,7 @@ Evidence:
 - final exact-scope recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg535_fixed_tapped_tokens_new_server_recheck.md`
 - final alignment audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final.md`
@@ -14735,7 +14736,7 @@ Evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg537_etb_treasure_condition_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg537_etb_treasure_condition_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg537_etb_treasure_condition_new_server_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg537_etb_treasure_condition_new_server.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg537_etb_treasure_condition_new_server.md`
@@ -14809,7 +14810,7 @@ Evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg538_dies_token_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg538_dies_token_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg538_dies_token_new_server_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg538_dies_token_new_server.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg538_dies_token_new_server.md`
@@ -14885,7 +14886,7 @@ Evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg541_dies_treasure_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg541_dies_treasure_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg541_dies_treasure_new_server_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg541_dies_treasure_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg541_dies_treasure_new_server_final.md`
@@ -14947,7 +14948,7 @@ PG550 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg550_etb_scry_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg550_etb_scry_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg550_etb_scry_new_server_with_pg.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg550_etb_scry_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg550_etb_scry_new_server_final.md`
@@ -15004,7 +15005,7 @@ PG551 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg551_etb_scry_static_keyword_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg551_etb_scry_static_keyword_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg551_etb_scry_static_keyword_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg551_etb_scry_static_keyword_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg551_etb_scry_static_keyword_new_server_final.md`
@@ -15063,7 +15064,7 @@ PG552 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg552_activated_tap_target_creature_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`
@@ -15131,7 +15132,7 @@ PG553 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg553_self_keyword_until_eot_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`
@@ -15203,7 +15204,7 @@ PG554 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg554_self_keyword_extra_costs_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final_env.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`
@@ -15276,7 +15277,7 @@ PG555 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg555_independent_mana_aux_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`
@@ -15348,7 +15349,7 @@ PG556 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg556_dynamic_life_gain_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`
@@ -15421,7 +15422,7 @@ PG557 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg557_etb_dynamic_life_gain_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`
@@ -15497,7 +15498,7 @@ PG558 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg558_creature_enters_life_gain_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`
@@ -15567,7 +15568,7 @@ PG559 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg559_spell_cast_gain_life_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`
@@ -15642,7 +15643,7 @@ PG560 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg560_target_keyword_spell_new_server.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg560_target_keyword_spell_new_server_final.md`
@@ -15819,7 +15820,7 @@ PG571 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg571_activated_tutor_to_hand_simple.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg571_activated_tutor_to_hand_simple.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg571_activated_tutor_to_hand_simple.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg571_activated_tutor_to_hand_simple.md`
 
@@ -15867,7 +15868,7 @@ PG572 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg572_activated_life_gain_sacrifice_target.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`
@@ -15932,7 +15933,7 @@ PG573 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg573_activated_destroy_sacrifice_target.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`
@@ -16010,7 +16011,7 @@ PG574 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg574_target_sacrifice_mana_source.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg574_target_sacrifice_mana_source.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg574_target_sacrifice_mana_source.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg574_target_sacrifice_mana_source.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg574_target_sacrifice_mana_source.md`
@@ -16076,7 +16077,7 @@ PG575 evidence:
 - post-sync queue:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg575_self_sacrifice_mana_source_auxiliary_commander_legal.md`
 - post split recheck:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg575_self_sacrifice_mana_source_auxiliary_recheck.md`
+  `docs/hermes-analysis/deduplicated-report-content/8fccfcb7a11a54f0d06fdc3469d03e111a00f839412677d61af26534124a07ed.md`
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg575_self_sacrifice_mana_source_auxiliary.md`
 
@@ -16120,7 +16121,7 @@ unsupported conditional or dynamic mana, or source/Oracle mismatches.
 PG576 evidence:
 
 - candidate split:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg576_simple_mana_source_auxiliary_draw_candidate.md`
+  `docs/hermes-analysis/deduplicated-report-content/8fccfcb7a11a54f0d06fdc3469d03e111a00f839412677d61af26534124a07ed.md`
 - package:
   `docs/hermes-analysis/master_optimizer_reports/pg576_simple_mana_source_auxiliary_draw_package.md`
 - apply evidence:
@@ -16136,7 +16137,7 @@ PG576 evidence:
 - readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`
 - final audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`
@@ -16250,7 +16251,7 @@ PG577b evidence:
 - final PG/Hermes/SQLite audit:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg577b_final_after_docs.md`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg577b_final_after_docs.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg577b_final_after_docs.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg577b_final_after_docs.md`
 
@@ -16306,8 +16307,8 @@ PG578 evidence:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg578_look_library_graveyard_new_server.json`
 - post-PG578 queue:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.md`
-- post-PG578 queue JSON:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.json`
+- archived raw queue snapshot:
+  `docs/hermes-analysis/ARCHIVED_LARGE_ARTIFACTS.md`
 - post-PG578 exact split:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg578_look_library_graveyard_new_server_recheck.md`
 - post-PG578 exact split JSON:
@@ -16317,8 +16318,8 @@ PG578 evidence:
 - final PG/Hermes/SQLite audit JSON:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg578_look_library_graveyard_new_server_wrapped.json`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg578_look_library_graveyard_new_server.md`,
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg578_look_library_graveyard_new_server.json`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
+  `docs/hermes-analysis/deduplicated-report-content/cb3f1e0efbd91f01394f80a98e1c85f2f4dbee8cde287522e635af626bcd2a6f.json`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg578_look_library_graveyard_new_server.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg578_look_library_graveyard_new_server.json`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg578_look_library_graveyard_new_server.md`,
@@ -16400,8 +16401,8 @@ PG579 evidence:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg579_creature_enters_draw_new_server.json`
 - post-PG579 queue:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg579_creature_enters_draw_new_server_commander_legal.md`
-- post-PG579 queue JSON:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg579_creature_enters_draw_new_server_commander_legal.json`
+- archived raw queue snapshot:
+  `docs/hermes-analysis/ARCHIVED_LARGE_ARTIFACTS.md`
 - post-PG579 exact split:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg579_creature_enters_draw_new_server_recheck.md`
 - post-PG579 exact split JSON:
@@ -16472,11 +16473,11 @@ PG580 evidence:
 - final PG/Hermes/SQLite audit JSON:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`
 - final governance audit JSONs:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`,
+  `docs/hermes-analysis/deduplicated-report-content/cb3f1e0efbd91f01394f80a98e1c85f2f4dbee8cde287522e635af626bcd2a6f.json`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`
 
@@ -16506,8 +16507,9 @@ PG581 evidence:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg580_current.json`,
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg580_current.md`
 - baseline queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg580_current_commander_legal.json`,
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg580_current_commander_legal.md`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg580_current_commander_legal.md`;
+  raw snapshot metadata is retained in
+  `docs/hermes-analysis/ARCHIVED_LARGE_ARTIFACTS.md`
 - baseline exact split:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg580_current_analysis.json`,
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg580_current_analysis.md`
@@ -16533,8 +16535,9 @@ PG581 evidence:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg581_each_player_sacrifice_new_server.json`,
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg581_each_player_sacrifice_new_server.md`
 - post-PG581 queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg581_each_player_sacrifice_new_server_commander_legal.json`,
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg581_each_player_sacrifice_new_server_commander_legal.md`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg581_each_player_sacrifice_new_server_commander_legal.md`;
+  raw snapshot metadata is retained in
+  `docs/hermes-analysis/ARCHIVED_LARGE_ARTIFACTS.md`
 - post-PG581 exact split recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg581_each_player_sacrifice_new_server_recheck.json`,
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg581_each_player_sacrifice_new_server_recheck.md`
@@ -16542,8 +16545,8 @@ PG581 evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/cb3f1e0efbd91f01394f80a98e1c85f2f4dbee8cde287522e635af626bcd2a6f.json`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
@@ -16615,8 +16618,9 @@ PG582 evidence:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg582_exile_restricted_targets_new_server.json`,
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg582_exile_restricted_targets_new_server.md`
 - post-PG582 queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg582_exile_restricted_targets_new_server_commander_legal.json`,
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg582_exile_restricted_targets_new_server_commander_legal.md`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg582_exile_restricted_targets_new_server_commander_legal.md`;
+  raw snapshot metadata is retained in
+  `docs/hermes-analysis/ARCHIVED_LARGE_ARTIFACTS.md`
 - post-PG582 exact split recheck:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg582_exile_restricted_targets_new_server_recheck.json`,
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg582_exile_restricted_targets_new_server_recheck.md`
@@ -16632,8 +16636,8 @@ PG582 evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg582_trusted_rule_oracle_hash_backfill_new_server_postcheck.sql`,
   `docs/hermes-analysis/master_optimizer_reports/pg582_trusted_rule_oracle_hash_backfill_new_server_rollback.sql`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/cb3f1e0efbd91f01394f80a98e1c85f2f4dbee8cde287522e635af626bcd2a6f.json`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
@@ -16949,7 +16953,7 @@ PG585 evidence:
 - final PG/Hermes/SQLite audit:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`
 
@@ -17061,7 +17065,7 @@ PG586 evidence:
 - final PG/Hermes/SQLite audit:
   `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg586_static_controlled_trample_new_server_final_after_hash_backfill.md`
 - final governance audits:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg586_static_controlled_trample_new_server_final.md`,
+  `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`,
   `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg586_static_controlled_trample_new_server_final.md`,
   `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg586_static_controlled_trample_new_server_final.md`
 
@@ -19111,7 +19115,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg655b_hash_backfill_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg655b_hash_backfill_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg655b_hash_backfill_new_server.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg655b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg655b_hash_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg655b_hash_backfill_new_server.md`
 
@@ -19179,7 +19183,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
 
@@ -19265,7 +19269,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/pg657b_trusted_oracle_hash_backfill_new_server_package.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg657b_trusted_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg657b_hash_backfill_new_server.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg657b_hash_backfill_new_server_final.md`
@@ -19341,7 +19345,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg658_static_fear_intimidate_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg658_static_fear_intimidate_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg658_static_fear_intimidate_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
@@ -19412,7 +19416,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg659_special_equip_cost_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg659_special_equip_cost_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg659_special_equip_cost_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
@@ -19499,7 +19503,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg661_hash_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg661_hash_backfill_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg661_hash_backfill_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
@@ -19585,7 +19589,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg662_counter_draw_special_targets_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg662_counter_draw_special_targets_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg662_counter_draw_special_targets_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
@@ -19662,7 +19666,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill.md`
@@ -19738,7 +19742,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_current_answer_post_pg664_hash_backfill.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_current_answer_post_pg664_hash_backfill_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
@@ -19819,7 +19823,7 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`

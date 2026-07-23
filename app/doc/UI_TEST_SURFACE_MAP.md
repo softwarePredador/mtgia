@@ -140,8 +140,10 @@ O guard `app/test/ui/ui_accessibility_matrix_test.dart`:
 - rejeita `IconButton` ativo sem tooltip nativo;
 - calcula contraste dos pares canônicos (4.5:1 para texto normal e 3:1 para
   texto grande/controle/foco);
-- mantém TalkBack e VoiceOver como `pending_physical` até haver roteiro manual
-  executado de verdade.
+- mantém TalkBack como `pending_physical` até haver roteiro manual executado de
+  verdade no Android alvo;
+- registra VoiceOver como `DEFERRED_BY_SCOPE`, com rotas vazias, enquanto iOS
+  permanecer fora do beta Web+Android definido em S10-01.
 
 O helper `expectManaLoomBaselineAccessibility` executa em conjunto alvo Android
 de 48 px, nome acessível para alvos tocáveis e contraste de texto. Ele já é

@@ -11,7 +11,7 @@ class AiGenerateJobStore {
 
   static const _jobTtl = Duration(minutes: 30);
   static const _cleanupInterval = Duration(minutes: 5);
-  static const _executionTimeout = Duration(minutes: 4);
+  static const executionTimeout = Duration(minutes: 3);
   static DateTime? _lastCleanupAt;
 
   static Future<String> create({
@@ -127,10 +127,10 @@ class AiGenerateJobStore {
           updated_at = NOW()
         WHERE id = @id
           AND status IN ('pending', 'processing')
-          AND updated_at <
+          AND created_at <
             NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
       '''),
-      parameters: {'id': id, 'timeout_seconds': _executionTimeout.inSeconds},
+      parameters: {'id': id, 'timeout_seconds': executionTimeout.inSeconds},
     );
     final result = await pool.execute(
       Sql.named('''
@@ -167,6 +167,24 @@ class AiGenerateJobStore {
     bool activeOnly = false,
   }) async {
     await _cleanupIfDue(pool);
+    await pool.execute(
+      Sql.named('''
+        UPDATE ai_generate_jobs
+        SET
+          status = 'failed',
+          stage = 'Erro',
+          error = 'A geração excedeu o tempo limite total. Inicie uma nova tentativa.',
+          updated_at = NOW()
+        WHERE user_id = CAST(@user_id AS uuid)
+          AND status IN ('pending', 'processing')
+          AND created_at <
+            NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
+      '''),
+      parameters: {
+        'user_id': userId,
+        'timeout_seconds': executionTimeout.inSeconds,
+      },
+    );
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -238,6 +256,22 @@ class AiGenerateJobStore {
         RETURNING id
       '''),
       parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
+    );
+    return updated.isNotEmpty;
+  }
+
+  static Future<bool> heartbeat(Pool pool, String id) async {
+    final updated = await pool.execute(
+      Sql.named('''
+        UPDATE ai_generate_jobs
+        SET updated_at = NOW()
+        WHERE id = @id
+          AND status IN ('pending', 'processing')
+          AND created_at >=
+            NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
+        RETURNING id
+      '''),
+      parameters: {'id': id, 'timeout_seconds': executionTimeout.inSeconds},
     );
     return updated.isNotEmpty;
   }
@@ -407,6 +441,10 @@ class AiGenerateJob {
     'can_resume': !isTerminal,
     'poll_url': '/ai/generate/jobs/$id',
     'cancel_url': '/ai/generate/jobs/$id',
+    'job_timeout_ms': AiGenerateJobStore.executionTimeout.inMilliseconds,
+    'heartbeat_at': updatedAt.toIso8601String(),
+    'deadline_at':
+        createdAt.add(AiGenerateJobStore.executionTimeout).toIso8601String(),
     'created_at': createdAt.toIso8601String(),
     'updated_at': updatedAt.toIso8601String(),
   };

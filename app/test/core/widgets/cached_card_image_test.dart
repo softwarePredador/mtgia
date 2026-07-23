@@ -33,6 +33,30 @@ void main() {
     );
   });
 
+  test('selects a bounded Scryfall CDN variant for the decode target', () {
+    const normal =
+        'https://cards.scryfall.io/normal/front/a/b/card.jpg?version=1';
+    const artCrop =
+        'https://cards.scryfall.io/art_crop/front/a/b/card.jpg?version=1';
+
+    expect(
+      CachedCardImage.sizeScryfallImageUrlForTesting(normal, decodeWidth: 128),
+      'https://cards.scryfall.io/small/front/a/b/card.jpg?version=1',
+    );
+    expect(
+      CachedCardImage.sizeScryfallImageUrlForTesting(normal, decodeWidth: 384),
+      normal,
+    );
+    expect(
+      CachedCardImage.sizeScryfallImageUrlForTesting(normal, decodeWidth: 1024),
+      'https://cards.scryfall.io/large/front/a/b/card.jpg?version=1',
+    );
+    expect(
+      CachedCardImage.sizeScryfallImageUrlForTesting(artCrop, decodeWidth: 128),
+      artCrop,
+    );
+  });
+
   testWidgets('removes fragile set filter from Scryfall named image URLs', (
     tester,
   ) async {
@@ -54,5 +78,36 @@ void main() {
     expect(uri.queryParameters['version'], 'normal');
     expect(image.httpHeaders?['User-Agent'], 'ManaLoom/1.0');
     expect(image.httpHeaders?['Accept'], 'image/*');
+  });
+
+  testWidgets('bounds thumbnail decode without a second disk resize', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(devicePixelRatio: 3),
+          child: Center(
+            child: SizedBox(
+              width: 60,
+              height: 84,
+              child: CachedCardImage(
+                imageUrl: 'https://cards.scryfall.io/large/front/a/b/card.png',
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final image = tester.widget<CachedNetworkImage>(
+      find.byType(CachedNetworkImage),
+    );
+    expect(image.memCacheWidth, 256);
+    expect(image.memCacheHeight, isNull);
+    expect(image.maxWidthDiskCache, isNull);
+    expect(image.maxHeightDiskCache, isNull);
   });
 }

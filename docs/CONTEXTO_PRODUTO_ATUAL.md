@@ -3,125 +3,80 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
-## Revalidação técnica — 2026-07-21
+## Revalidação técnica — 2026-07-23
 
-- auditoria vigente: `docs/qa/MANALOOM_E2E_CORE_DOCUMENTATION_AUDIT_2026-07-21.md`;
-- backend determinístico passou `1.589/1.589`; deckbuilder Flutter passou
-  `240/240`; Patrol local passou `9/9`; Web pública e Battle canônico passaram
-  em gates isolados com o Flutter pinado `3.44.6`;
-- no Lorehold, somente o mecanismo do novo gate estatístico passou `16/16`
-  testes. O gate real de promoção permanece **BLOCKED**: o agregado do
-  candidato foi `138/384` contra `95/384` do baseline, mas houve timeouts e
-  regressão contra `Lumra, Bellow of the Woods` de `9/32` para `5/32`; deck
-  `607` continua sendo o baseline protegido;
-- o aggregate E2E mais recente continua **FAIL**, com `8 PASS`, `2 FAIL` e
-  `9 SKIP`: retenção encontrou 18 arquivos locais ignorados e o gate Battle
-  sofreu um crash transitório do analysis server durante o aggregate, embora
-  tenha passado imediatamente em execução isolada;
-- `quality_gate.sh full` e a suíte Flutter completa não concluíram porque o
-  volume temporário do host ficou sem espaço (`errno 28`); isso é `BLOCKED`,
-  não `PASS`;
-- o mapa de API foi atualizado para cobrir sessão/rate-limit, Battle replays,
-  engagement da comunidade, trade matches e relatórios compartilháveis;
-- o estado de release permanece **NO-GO**: checkout dirty/não congelado,
-  migrations live, mesma SHA publicada, E2E live, device/observabilidade e
-  backup off-site continuam pendentes.
+- revisão em andamento na branch
+  `codex/free-beta-release-candidate-2026-07-17`, HEAD
+  `4700fc38317aae0d3c1955176b32c18ac3b34339`; o checkout continua dirty e
+  essa identidade ainda não é uma SHA de release;
+- o alvo S10 está congelado como beta gratuita Web + Android. Scanner/câmera
+  ficam desabilitados e inacessíveis no artefato de release; iOS e VoiceOver
+  ficam `DEFERRED_BY_SCOPE`. TalkBack no Android alvo continua obrigatório;
+- o timeout do provider de geração passou a falhar fechado com HTTP 504,
+  `no-store`, `can_save=false`, `learning_eligible=false` e sem deck/mock.
+  A matriz completa de indisponibilidade/cancelamento ainda está aberta;
+- o perfil de imagens com 180 itens passou no Samsung SM-A135M e no Chrome:
+  cache abaixo de 32 MiB, crescimento de RSS Android abaixo de 192 MiB e
+  repetição abaixo de 32 MiB. O orçamento completo de desempenho S8-02 e o
+  fechamento integral de S8-03 ainda não foram emitidos;
+- o startup Web em Chrome 150 passou 7 amostras: cold p50/p95 490/528 ms
+  contra 3000 ms e warm 143/146 ms contra 1500 ms. Ainda faltam startup
+  Android e a matriz autenticada das superfícies core nos dois alvos;
+- `manaloom_local_ci.sh full` passou com backend 1736/1736, Flutter 1157
+  testes + 1 skip Web-only conhecido, Web pública, Patrol, dependências e
+  schema descartável. Também passaram `ai-eval`, `ai-bridge`, Battle 2×,
+  `web`, `deps`, `custom-lint`, `ui-audit` (48/48), `server-target`,
+  `report-retention` (12/12 checks e 16 testes), secret scan, project logic e
+  os 25 contratos de release, com Flutter 3.44.6/Dart 3.12.2 pinados;
+- o E2E determinístico terminou `PARTIAL`: 10 etapas passaram, 9 skips
+  protegidos foram inventariados e não houve falha nem bloqueio. O
+  `engine-delta` não alterou pins, mas exige revisão explícita de 316 cartas e
+  328 fixtures nos dois engines; o compare Forge atingiu o limite de 300
+  arquivos e está truncado;
+- o gate de schema descartável passou as migrations 038–051 e a readiness
+  confirmou 11/11 âncoras. Isso não prova nem autoriza aplicação no PostgreSQL
+  live;
+- a retenção consolidou 473 originais removidos em 23 conteúdos canônicos e
+  registrou seis artefatos grandes arquivados, todos recuperáveis a partir do
+  HEAD de origem. Manifesto, índice e conteúdos canônicos precisam entrar
+  atomicamente no futuro commit; o checkout dirty ainda impede fechar S9;
+- o estado de release permanece **NO-GO**: faltam checkout/SHA limpos,
+  repetição dos gates na identidade congelada, revisão do delta de engines,
+  migrations e jornadas publicadas da mesma SHA, TalkBack humano, Sentry, FCM
+  no APK assinado exato e backup off-site com restore.
 
-## Estado operacional vigente — candidato de beta gratuita, atualizado em 2026-07-17
+## Escopo e estado operacional vigente
 
-- alvo da rodada final: beta gratuita para Web + Android; checkout pago fica
-  desabilitado/não anunciado e billing falha fechado;
-- estado local: **Battle, Deckbuilder e Life Counter fechados nos gates locais**;
-  a promoção live ainda não foi executada nem validada e, portanto, não há GO
-  de produção emitido;
-- versão selecionada: `1.0.0+2`; a SHA final ainda precisa ser congelada em
-  checkout limpo com `HEAD == origin/master`;
-- as suítes integradas passaram com servidor all-local 1.583/1.583, Flutter
-  analyze com 0 issues e Flutter 948 testes + 1 skip web-only; o gate
-  operacional passou 25/25 contratos;
-- a Web pública passou `npm ci`, audit de produção com 0 vulnerabilidades,
-  lint e build Next.js de 13 rotas; o host Web do app passou build/runtime
-  Docker, `/healthz` 200, `/app/` 200 e validação de headers/cache;
-- o E2E passou com 14 etapas executadas e 5 perfis opt-in em SKIP; resolution
-  preflight passou 19/19 sem writes e o Patrol smoke passou 9/9;
-- builds locais Web, Android e iOS sem codesign passaram para `1.0.0+2`;
-  APK/AAB Android
-  tiveram package, versão, assinatura e permissões validados, e o APK instalou
-  e abriu no emulador Android 36 sem fatal; o APK tem SHA-256
-  `f8cc6a5b74c24ccb601e5577053d59439121f60f06f8b52c82fac27c94b395b4`
-  e o AAB `3f9b55d216646797e757f61d6a8ba963151948e77dd7e79db3936dcb4c5b9fd4`;
-- o SBOM Android provou paridade bidirecional de 158/158 dependências entre
-  `releaseRuntimeClasspath` e o `dependencies.pb` do AAB; o OSV consultou os
-  936 componentes, preservou 60 vulnerabilidades apenas em dependências
-  excluídas/não-release e encontrou 0 vulnerabilidade no artefato de release;
-- o Life Counter web passou em desktop e 390 × 844, com vida 40→41 persistida
-  após reload, menu/histórico/rota direta e console sem erros ou warnings; a
-  recaptura desktop final confirmou dados, personalizado, moeda, fechar e
-  `ROLAR` sem corte;
-- no Android 36, o Life Counter passou na matriz de 2 a 6 jogadores e na
-  persistência 40→41 após fechar e reabrir; a captura antes/depois da
-  reabertura foi idêntica byte a byte. Isso continua sendo prova de emulador,
-  não de aparelho físico;
-- o backup PostgreSQL pré-migration tem 300.692.505 bytes, modo `0600`, SHA-256
-  validado e restaurou o schema em PostgreSQL 17 com 87 tabelas. Como ele
-  antecede a rotação da credencial, um dump fresco ainda é obrigatório antes
-  das migrations live. A cadeia off-site criptografada permanece pendente;
-- exportação/exclusão de conta e sync pós-jogo com revisão/cursor/tombstones
-  estão implementados no cliente/servidor; dependem da migration 038 e de prova
-  autenticada/multi-device;
-- as migrations 038–040 estão preparadas e não devem ser tratadas como
-  aplicadas: 038 cobre privacidade/sync; 039 persiste o ciclo
-  `unknown/draft/validated` do deck e seus triggers de invalidação; 040
-  normaliza `cards.is_reserved` para `BOOLEAN NOT NULL DEFAULT FALSE`. O banco
-  live ainda reporta migration máxima 037;
+- produto ativo: `app/` + `server/`; PostgreSQL/backend é a verdade e
+  Hermes/SQLite é cache ou laboratório;
+- o plano executável é
+  `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` e o estado por task fica em
+  `docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md`;
+- Battle, Deckbuilder e Life Counter mantêm suas provas locais anteriores,
+  mas nenhuma delas autoriza promoção, migration ou escrita live;
+- migrations 038–051 compõem o schema exigido pelo candidato atual. O estado
+  live não foi reconsultado nesta rodada e não deve ser inferido de snapshots
+  anteriores;
+- checkout pago permanece desabilitado/não anunciado e billing falha fechado;
 - trocas são coordenação P2P: ManaLoom não processa, protege nem garante
-  pagamento ou entrega; o aviso de segurança foi incorporado à interface;
-- scanner está habilitado no pipeline Android release após prova física fresca
-  de permissão, câmera, frame NV21, MLKit e OCR controlado; Web, builds comuns
-  sem opt-in e iOS ainda usam busca manual;
-- build iOS sem codesign passou com baseline mínimo 15.5 e dependências
-  CocoaPods/SwiftPM fixadas, mas publicação iOS segue fora do alvo e bloqueada
-  pela cadeia Apple;
-- auth de produção agora rejeita JWT fraco/placeholder, senha fraca e proxy
-  confiável incompleto; backend/Web/host de distribuição Android e sidecars
-  convergem por digest imutável e health em deploy/rollback, cobertos por
-  contratos locais;
-- residual P1 local: o master Nginx do app Web inicia como root;
-  manaloom-ops, XMage e Forge rodam como root sem `Dockerfile HEALTHCHECK`, e
-  o Forge já passou build dos seis módulos e `/health` 200 com 33.288 cartas
-  indexadas;
-- uma credencial de conta ficou exposta no snapshot predecessor de
-  `origin/master` e permanece no histórico Git, mas a senha da conta já foi rotacionada:
-  a senha antiga retornou HTTP 401 e a nova HTTP 200. O candidato remove o
-  literal e o novo segredo permanece fora do repositório; a rotação do JWT e a
-  revogação prática dos tokens antigos dependem do deploy do backend;
-- a API/Web/APK já existentes em produção pertencem à versão anterior. Nenhum
-  artefato deste candidato deve ser descrito como publicado;
-- PostgreSQL continua como verdade de produto; Hermes/SQLite é cache
-  operacional;
-- os documentos canônicos desta decisão são:
-  `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`,
-  `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md` e
-  `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`; o fechamento
-  específico dos três módulos fica em
-  `docs/qa/MANALOOM_BATTLE_DECKBUILDER_LIFE_COUNTER_RELEASE_2026-07-17.md`.
+  pagamento ou entrega;
+- nenhum artefato deste checkout deve ser descrito como publicado.
 
 ## Próxima ação oficial
 
-1. fazer staging explícito, commitar e publicar a branch candidata sem misturar
-   artefatos; as suítes integradas e os gates de Battle, Deckbuilder e Life
-   Counter já têm evidência local verde;
-2. congelar `origin/master` e reconstruir Web/APK/AAB/SBOM/provenance a partir
-   da mesma SHA limpa;
-3. gerar backup fresco pós-rotação, executar o precheck read-only das migrations
-   038–040 e preparar rollback;
-4. aplicar as migrations 038–040 e promover backend/Web somente com as
-   autorizações literais já definidas, registrando postcheck e identidade;
-5. provar revogação dos JWTs antigos, login novo, Battle persistida,
-   Deckbuilder validado e Life Counter com persistência no runtime publicado;
-6. provar compatibilidade Play App Signing, APK assinado exato em Android
-   físico, Sentry/FCM e backup off-site criptografado;
-7. somente então registrar o fechamento de produção Web + Android.
+1. concluir a matriz p50/p95 e falhas/cancelamento da Sprint 8, revisar o
+   delta de engines e a disposição dos contratos grandes restantes da Sprint
+   9;
+2. revisar a atomicidade da retenção, links e diff final, fechando somente as
+   tasks realmente provadas e mantendo bloqueadas as dependências humanas,
+   externas ou live;
+3. formar um commit atômico revisável, congelar uma SHA limpa e reconstruir
+   Web/APK/AAB/SBOM/provenance dessa mesma identidade;
+4. obter autorização específica antes de backup/precheck/aplicação das
+   migrations 038–051, deploy ou qualquer escrita live;
+5. na mesma SHA publicada, executar Web autenticada, Android físico, dois
+   clientes, falha/recuperação, Sentry, FCM, TalkBack e restore off-site;
+6. somente então emitir o GO/NO-GO assinado da beta Web + Android.
 
 ## Histórico acumulado anterior
 

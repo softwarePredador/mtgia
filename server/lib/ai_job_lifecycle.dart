@@ -1,6 +1,22 @@
+import 'dart:async';
 import 'dart:math';
 
 const aiJobRequestKeyMaxLength = 128;
+const aiJobHeartbeatInterval = Duration(seconds: 10);
+
+class AiJobExecutionTimeoutException implements Exception {
+  const AiJobExecutionTimeoutException();
+
+  @override
+  String toString() => 'AI job exceeded its total execution deadline.';
+}
+
+class AiJobNoLongerActiveException implements Exception {
+  const AiJobNoLongerActiveException();
+
+  @override
+  String toString() => 'AI job is no longer active.';
+}
 
 class AiJobRequestKeyException implements Exception {
   const AiJobRequestKeyException(this.message);
@@ -57,4 +73,64 @@ String createServerAiJobRequestKey(String prefix) {
         (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
       ).join();
   return '$prefix:$suffix';
+}
+
+Future<T> runAiJobExecution<T>({
+  required Future<T> Function() operation,
+  required Future<bool> Function() heartbeat,
+  required Duration timeout,
+  Duration heartbeatInterval = aiJobHeartbeatInterval,
+}) async {
+  if (timeout <= Duration.zero) {
+    throw ArgumentError.value(timeout, 'timeout', 'Must be positive.');
+  }
+  if (heartbeatInterval <= Duration.zero) {
+    throw ArgumentError.value(
+      heartbeatInterval,
+      'heartbeatInterval',
+      'Must be positive.',
+    );
+  }
+
+  if (!await heartbeat()) {
+    throw const AiJobNoLongerActiveException();
+  }
+
+  final inactive = Completer<T>();
+  var heartbeatInFlight = false;
+
+  Future<void> sendHeartbeat() async {
+    if (heartbeatInFlight || inactive.isCompleted) return;
+    heartbeatInFlight = true;
+    try {
+      if (!await heartbeat() && !inactive.isCompleted) {
+        inactive.completeError(const AiJobNoLongerActiveException());
+      }
+    } catch (error, stackTrace) {
+      if (!inactive.isCompleted) {
+        inactive.completeError(error, stackTrace);
+      }
+    } finally {
+      heartbeatInFlight = false;
+    }
+  }
+
+  final timer = Timer.periodic(
+    heartbeatInterval,
+    (_) => unawaited(sendHeartbeat()),
+  );
+  final deadline = Future<T>.delayed(
+    timeout,
+    () => throw const AiJobExecutionTimeoutException(),
+  );
+
+  try {
+    return await Future.any<T>([
+      Future<T>.sync(operation),
+      inactive.future,
+      deadline,
+    ]);
+  } finally {
+    timer.cancel();
+  }
 }

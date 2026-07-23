@@ -60,6 +60,7 @@ class DeckProvider extends ChangeNotifier {
   String? _activeOptimizeJobId;
   String? _activeOptimizeDeckId;
   String? _activeOptimizeRequestKey;
+  bool _isDisposed = false;
 
   // Cache de detalhes do deck (evita recarregar se já temos os dados)
   final Map<String, DeckDetails> _deckDetailsCache = {};
@@ -88,6 +89,9 @@ class DeckProvider extends ChangeNotifier {
       _deckAnalysisLoading[deckId] == true;
   String? deckAnalysisErrorFor(String deckId) => _deckAnalysisErrors[deckId];
 
+  @visibleForTesting
+  bool get isDisposedForTesting => _isDisposed;
+
   DeckProvider({
     ApiClient? apiClient,
     ActivationEventTracker? trackActivationEvent,
@@ -96,6 +100,12 @@ class DeckProvider extends ChangeNotifier {
        _trackActivationEvent =
            trackActivationEvent ?? ActivationFunnelService.instance.track,
        _pollDelay = pollDelay ?? ((duration) => Future<void>.delayed(duration));
+
+  @override
+  void notifyListeners() {
+    if (_isDisposed) return;
+    super.notifyListeners();
+  }
 
   void _trackActivationInBackground(
     String eventName, {
@@ -234,6 +244,7 @@ class DeckProvider extends ChangeNotifier {
 
     try {
       final state = await fetchDeckDetailsRequest(_apiClient, deckId);
+      if (_isDisposed) return;
       _selectedDeck = state.selectedDeck;
       _detailsErrorMessage = state.errorMessage;
       _detailsStatusCode = state.statusCode;
@@ -252,6 +263,7 @@ class DeckProvider extends ChangeNotifier {
         );
       }
     } catch (e, stackTrace) {
+      if (_isDisposed) return;
       _detailsErrorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.deckDetails,
@@ -263,8 +275,10 @@ class DeckProvider extends ChangeNotifier {
         extras: {'deck_id': deckId},
       );
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -293,9 +307,11 @@ class DeckProvider extends ChangeNotifier {
 
     try {
       final analysis = await fetchDeckAnalysisRequest(_apiClient, deckId);
+      if (_isDisposed) return null;
       _deckAnalysisCache[deckId] = analysis;
       return analysis;
     } catch (e, stackTrace) {
+      if (_isDisposed) return null;
       _deckAnalysisErrors[deckId] = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.deckDetails,
@@ -309,9 +325,11 @@ class DeckProvider extends ChangeNotifier {
       );
       return null;
     } finally {
-      _deckAnalysisLoading[deckId] = false;
-      _deckAnalysisInFlight.remove(deckId);
-      notifyListeners();
+      if (!_isDisposed) {
+        _deckAnalysisLoading[deckId] = false;
+        _deckAnalysisInFlight.remove(deckId);
+        notifyListeners();
+      }
     }
   }
 
@@ -325,6 +343,7 @@ class DeckProvider extends ChangeNotifier {
       '[DeckProvider] Fetching color identity for ${missing.length} deck(s)...',
     );
     final result = await fetchMissingDeckColorIdentities(_apiClient, missing);
+    if (_isDisposed) return;
     for (final deck in missing.where(
       (deck) => result.failedDeckIds.contains(deck.id),
     )) {
@@ -366,6 +385,7 @@ class DeckProvider extends ChangeNotifier {
 
     try {
       final state = await fetchDeckListRequest(_apiClient);
+      if (_isDisposed) return;
       if (state.decks != null) {
         final hydration = buildDeckListHydrationResult(
           state.decks!,
@@ -375,7 +395,9 @@ class DeckProvider extends ChangeNotifier {
         _errorMessage = null;
         _listStatusCode = state.statusCode;
         // Busca color identity em background para decks que ainda não a possuem.
-        fetchMissingColorIdentities(hydration.missingColorIdentityDecks);
+        unawaited(
+          fetchMissingColorIdentities(hydration.missingColorIdentityDecks),
+        );
       } else {
         if (!silent) {
           _errorMessage = state.errorMessage;
@@ -383,6 +405,7 @@ class DeckProvider extends ChangeNotifier {
         }
       }
     } catch (e, stackTrace) {
+      if (_isDisposed) return;
       if (!silent) {
         _errorMessage = FriendlyErrorMapper.fromException(
           e,
@@ -398,10 +421,12 @@ class DeckProvider extends ChangeNotifier {
       );
       // Não limpa _decks para permitir cache visual em caso de erro
     } finally {
-      if (!silent) {
-        _isLoading = false;
+      if (!_isDisposed) {
+        if (!silent) {
+          _isLoading = false;
+        }
+        notifyListeners();
       }
-      notifyListeners();
     }
   }
 
@@ -1547,5 +1572,12 @@ class DeckProvider extends ChangeNotifier {
         extras: extras,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
+    super.dispose();
   }
 }

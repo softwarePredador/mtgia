@@ -56,7 +56,7 @@ distinguishes ordinary discard, random discard, and land-card discard costs.
 
 ## Final Audits
 
-- `xmage_strategy_consistency_audit_20260706_post_pg539_activated_damage_discard_new_server_final.md`: pass, 26/26
+- `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`: pass, 26/26
 - `pg_hermes_sqlite_contract_audit_20260706_post_pg539_activated_damage_discard_new_server_with_pg.md`: pass, 51/51
 - `operational_surface_alignment_audit_20260706_post_pg539_activated_damage_discard_new_server.md`: pass
 - `legacy_contamination_audit_20260706_post_pg539_activated_damage_discard_new_server.md`: pass

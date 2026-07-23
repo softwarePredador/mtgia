@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 
 // ─── Models ──────────────────────────────────────────────────
 
@@ -231,7 +232,10 @@ class MessageProvider extends ChangeNotifier {
           requestGeneration != _conversationFetchGeneration) {
         return;
       }
-      _error = '$e';
+      _error = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.directMessage,
+      );
       debugPrint('[MessageProvider] fetchConversations error: $e');
     } finally {
       if (generation == _stateGeneration &&
@@ -350,7 +354,10 @@ class MessageProvider extends ChangeNotifier {
       if (generation != _stateGeneration) {
         return;
       }
-      _error = '$e';
+      _error = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.directMessage,
+      );
       didChange = true;
       debugPrint('[MessageProvider] fetchMessages error: $e');
     } finally {
@@ -396,6 +403,12 @@ class MessageProvider extends ChangeNotifier {
         return true;
       }
     } catch (e) {
+      if (generation == _stateGeneration) {
+        _error = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.directMessage,
+        );
+      }
       debugPrint('[MessageProvider] sendMessage error: $e');
     } finally {
       if (generation == _stateGeneration) {

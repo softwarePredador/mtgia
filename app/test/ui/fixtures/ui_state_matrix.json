@@ -103,9 +103,9 @@
     "market": {
       "covered": ["disabled","success"],
       "not_applicable": ["loading","progress","partial","stale","loading_more","saving","optimistic","empty","error","retry","offline","session_expired","permission_denied"],
-      "sources": ["lib/features/market/screens/market_screen.dart"],
-      "tests": ["test/features/market/screens/market_screen_responsive_test.dart"],
-      "anchors": ["market-tab-bar","market-content"],
+      "sources": ["lib/main.dart","lib/features/community/screens/community_screen.dart"],
+      "tests": ["test/features/community/screens/community_screen_responsive_test.dart"],
+      "anchors": ["path: '/market'","community-tabs"],
       "input_policy": "not_applicable: rota /market é compatibilidade e redireciona para Community",
       "raw_error_policy": "sanitized: superfície canônica é /community?tab=3"
     },

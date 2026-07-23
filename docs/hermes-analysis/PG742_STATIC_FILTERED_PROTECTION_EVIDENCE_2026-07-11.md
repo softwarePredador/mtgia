@@ -85,7 +85,7 @@ Final audits:
 - PG/Hermes/SQLite contract: `docs/hermes-analysis/master_optimizer_reports/pg742_after_oracle_hash_backfill_pg_hermes_sqlite_contract_audit.md`, pass 51/51.
 - Operational surface alignment: `docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_operational_surface_alignment_audit.md`, pass.
 - Legacy contamination: `docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_legacy_contamination_audit.md`, pass.
-- XMage strategy consistency: `docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_xmage_strategy_consistency_audit.md`, pass 26/26.
+- XMage strategy consistency: `docs/hermes-analysis/deduplicated-report-content/d03981cd01e411c535e893ccb94c8fa769d8c184ddf283702189e66f52e646ce.md`, pass 26/26.
 
 ## Final Counters
 

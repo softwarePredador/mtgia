@@ -230,6 +230,12 @@ if "$ROOT_DIR/scripts/manaloom_install_remote_backup_cron.sh" >/dev/null 2>&1; t
   echo "instalador de backup aceitou mutacao live sem acknowledgement" >&2
   exit 1
 fi
+REMOTE_BACKUP_INSTALLER="$ROOT_DIR/scripts/manaloom_install_remote_backup_cron.sh"
+grep -Fq 'sha256sum "$tmp_file"' "$REMOTE_BACKUP_INSTALLER"
+grep -Fq 'MANALOOM_RESTORE_VALIDATE_MODE:-full' "$REMOTE_BACKUP_INSTALLER"
+grep -Fq -- '--network none' "$REMOTE_BACKUP_INSTALLER"
+grep -Fq -- '--exit-on-error' "$REMOTE_BACKUP_INSTALLER"
+grep -Fq 'rto_seconds' "$REMOTE_BACKUP_INSTALLER"
 
 IDENTITY_ORIGIN="$TMP_DIR/identity-origin.git"
 IDENTITY_REPO="$TMP_DIR/identity-repo"
@@ -321,8 +327,13 @@ grep -Fq 'artifact_installation: "confirmed"' "$ROOT_DIR/scripts/manaloom_releas
 grep -Fq 'MANALOOM_RELEASE_STARTUP_PROOF status=captured' "$ROOT_DIR/scripts/manaloom_release_observability_gate.sh"
 grep -Fq 'scope: "exact_signed_apk"' "$ROOT_DIR/scripts/manaloom_release_observability_gate.sh"
 grep -Fq -- '--dart-define="RELEASE_STARTUP_PROOF=true"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
-grep -Fq -- '--dart-define="ENABLE_SCANNER_RELEASE=true"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
-grep -Fq 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq -- '--dart-define="ENABLE_SCANNER_RELEASE=false"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'scanner_release_enabled: false' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+! grep -Fq 'ENABLE_SCANNER_RELEASE=true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+! grep -Fq 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'android.permission.CAMERA' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
+grep -Fq 'tools:node="remove"' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
+grep -Fq 'Scanner DEFERRED_BY_SCOPE' "$ROOT_DIR/scripts/manaloom_verify_android_release_artifacts.sh"
 grep -Fq 'manaloom_build_android_release.sh' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
 grep -Fq 'run_battle_gate' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
 [[ ! -e "$ROOT_DIR/.github/workflows/manaloom-guardrails.yml" ]]
@@ -334,8 +345,13 @@ grep -Fq 'BEGIN TRANSACTION READ ONLY;' "$ROOT_DIR/scripts/manaloom_deploy_backe
 grep -Fq "name = 'add_privacy_and_post_game_sync_contracts'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "name = 'persist_deck_validation_review_state'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "name = 'align_cards_reserved_runtime_schema'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('041', 'create_social_trade_messaging_runtime_schema')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('051', 'close_social_safety_contract')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_039_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_040_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'migrations_041_051_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.latest_migration == "051"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'require_live_mutation_approval "deploy do backend ManaLoom"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_runtime.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

@@ -38,6 +38,55 @@ void main() {
       expect(normalizeOptionalAiJobRequestKey(first), first);
     });
 
+    test('execution runner emits heartbeat while work is active', () async {
+      var heartbeatCount = 0;
+
+      final result = await runAiJobExecution<String>(
+        operation: () async {
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          return 'done';
+        },
+        heartbeat: () async {
+          heartbeatCount += 1;
+          return true;
+        },
+        timeout: const Duration(seconds: 1),
+        heartbeatInterval: const Duration(milliseconds: 5),
+      );
+
+      expect(result, 'done');
+      expect(heartbeatCount, greaterThanOrEqualTo(2));
+    });
+
+    test('execution runner stops observing work after cancellation', () async {
+      var heartbeatCount = 0;
+
+      await expectLater(
+        runAiJobExecution<void>(
+          operation: () => Future<void>.delayed(const Duration(seconds: 1)),
+          heartbeat: () async {
+            heartbeatCount += 1;
+            return heartbeatCount < 2;
+          },
+          timeout: const Duration(seconds: 1),
+          heartbeatInterval: const Duration(milliseconds: 5),
+        ),
+        throwsA(isA<AiJobNoLongerActiveException>()),
+      );
+    });
+
+    test('execution runner enforces a total deadline', () async {
+      await expectLater(
+        runAiJobExecution<void>(
+          operation: () => Future<void>.delayed(const Duration(seconds: 1)),
+          heartbeat: () async => true,
+          timeout: const Duration(milliseconds: 10),
+          heartbeatInterval: const Duration(milliseconds: 5),
+        ),
+        throwsA(isA<AiJobExecutionTimeoutException>()),
+      );
+    });
+
     test('optimize fingerprint is canonical and ignores transport flags', () {
       final first = buildOptimizeAsyncRequestDigest({
         'deck_id': 'deck-1',
@@ -105,9 +154,19 @@ void main() {
       expect(activeGenerate['can_cancel'], isTrue);
       expect(activeGenerate['can_resume'], isTrue);
       expect(activeGenerate['request_key'], 'generate:req-1');
+      expect(
+        activeGenerate['job_timeout_ms'],
+        AiGenerateJobStore.executionTimeout.inMilliseconds,
+      );
+      expect(activeGenerate['heartbeat_at'], isNotNull);
+      expect(activeGenerate['deadline_at'], isNotNull);
       expect(cancelledOptimize['can_cancel'], isFalse);
       expect(cancelledOptimize['can_resume'], isFalse);
       expect(cancelledOptimize['cancelled_at'], isNotNull);
+      expect(
+        cancelledOptimize['job_timeout_ms'],
+        OptimizeJobStore.executionTimeout.inMilliseconds,
+      );
     });
   });
 }

@@ -1,0 +1,195 @@
+# Evidências da Sprint 8 — Resiliência, desempenho e operação
+
+Data: 2026-07-23
+Branch: `codex/free-beta-release-candidate-2026-07-17`
+HEAD observado: `4700fc38317aae0d3c1955176b32c18ac3b34339`
+SDK: Flutter `3.44.6`, Dart `3.12.2`
+
+Este relatório registra somente provas executadas na revisão corrente. Provas
+de artefato assinado, serviço externo ou escrita off-site permanecem pendentes
+até que a mesma SHA esteja congelada e os pré-requisitos estejam disponíveis.
+O worktree estava dirty durante a execução; portanto o HEAD acima identifica a
+base, não uma identidade final do patch nem uma SHA candidata a release.
+
+## S8-01 e S8-09 — Offline e reconexão
+
+Resultado: `PASS`
+
+- `OfflineFlowContract` classifica 19 fluxos como `offline_supported`,
+  `cached_read_only` ou `online_required` e declara cache, fila, retry,
+  conflito, reconciliação e preservação de entrada.
+- somente `PostGameNoteStore` declara mutação remota offline: upserts e
+  tombstones persistentes, retry serializado e merge por ID/cursor;
+- Life Counter e onboarding são locais, sem fingir fila remota;
+- geração/importação e mensagens mantêm rascunho e chave idempotente, mas
+  continuam explicitamente online;
+- descrição de deck que falha ao salvar fica persistida por usuário/deck e é
+  removida somente após sucesso ou descarte;
+- Home usa `cached-read-only` para snapshot em memória; scanner e erros de
+  transporte consomem o contrato canônico;
+- um guard estático falha se uma nova promessa de offline surgir fora das
+  superfícies governadas ou se `MessageProvider` voltar a expor exceção crua.
+
+Provas executadas:
+
+```text
+flutter analyze (6 alvos)                         PASS, 0 issues
+offline/resilience + UI/provider focused tests   PASS, 56/56
+deck/detail + stores focused tests               PASS, 34/34
+```
+
+Arquivos centrais:
+
+- `app/lib/core/resilience/offline_capability.dart`
+- `app/test/core/resilience/offline_capability_test.dart`
+- `app/test/core/resilience/offline_ui_contract_guard_test.dart`
+- `app/lib/features/decks/services/deck_entry_draft_store.dart`
+- `app/lib/features/retention/services/post_game_note_store.dart`
+- `app/lib/core/services/message_draft_store.dart`
+
+## S8-02 — Orçamento de desempenho do core
+
+Resultado: `IN_PROGRESS`
+
+`PerformanceService` e o harness de Web/device estão implementados, mas a
+matriz completa de cold/warm start, Home, listas, busca, detalhe, deck,
+optimize e Battle ainda não tem p50/p95 da mesma revisão nos dois alvos.
+Fechamento exige a fixture real autorizada e uma execução sem checkout
+concorrente.
+
+Foi possível fechar a parcela de startup Web sem mutação de produto:
+
+```text
+Chrome 150 / 1440×757 / 7 amostras
+  cold start  valores 518, 500, 459, 425, 528, 490, 433 ms
+              p50/p95/max 490/528/528 <= orçamento 3000 ms
+  warm start  valores 143, 144, 146, 141, 146, 139, 141 ms
+              p50/p95/max 143/146/146 <= orçamento 1500 ms
+```
+
+O relatório canônico `manaloom_runtime_startup_v1` terminou `result=pass`.
+O startup Android não foi executado porque o aparelho não estava conectado.
+As oito superfícies autenticadas ainda exigem a fixture PostgreSQL/API
+loopback descartável; o runner falha fechado sem as aprovações explícitas de
+escrita PostgreSQL e mutação exigidas pelo contrato.
+
+## S8-03 — Memória e imagens
+
+Resultado: `IN_PROGRESS`
+
+O teste `app/integration_test/image_memory_runtime_test.dart` carregou 180
+imagens da fixture exata do HEAD e passou nos dois alvos disponíveis:
+
+```text
+Android Samsung SM-A135M / R58T300SREH
+  cache peak/final       7.864.320 bytes, 20 entradas
+  orçamento de cache    33.554.432 bytes, 96 entradas
+  RSS inicial/peak      363.450.368 / 466.591.744 bytes
+  crescimento RSS       103.141.376 <= 201.326.592 bytes
+  crescimento repetido  16.039.936 <= 33.554.432 bytes
+  passos                19 + 19
+
+Chrome 150 + ChromeDriver compatível
+  cache peak/final       31.457.280 bytes, 5 entradas
+  orçamento de cache    33.554.432 bytes, 96 entradas
+  passos                65 + 65
+  RSS                    indisponível no runtime Web
+```
+
+O app de teste e o `adb reverse` foram removidos do aparelho; o ChromeDriver
+foi encerrado. A prova fecha o cenário de scroll/cache observado, mas a task
+permanece aberta até ser incorporada ao perfil completo S8-02 e à identidade
+limpa do candidato.
+
+## S8-04 — IA longa, indisponibilidade e cancelamento
+
+Resultado: `IN_PROGRESS`
+
+- timeout do provider em `/ai/generate` agora retorna HTTP 504 e
+  `Cache-Control: no-store`;
+- o corpo declara `provider_timeout`, `provider_unavailable`,
+  `ai_generation_timed_out=true`, `retryable=true`, `can_save=false` e
+  `learning_eligible=false`;
+- `generated_deck=null`; não há mock, cache ou HTTP 200 no caminho de timeout;
+- o worker assíncrono trata 504 como job falho, não como conclusão;
+- `server/test/ai_generate_provider_timeout_test.dart` cobre o contrato e a
+  suíte focada passou `26/26`; análise dos alvos alterados passou sem issues.
+
+A task não recebe `PASS`: `Future.timeout` não comprova cancelamento físico da
+requisição HTTP subjacente, e ainda falta a matriz integral de cancelamento,
+indisponibilidade externa e retry idempotente.
+
+## S8-05 — Observabilidade acionável
+
+Resultado: `BLOCKED`
+
+As superfícies locais de request ID, redaction, health/readiness e
+observabilidade foram reforçadas e testadas, mas o aceite exige evento Sentry
+da mesma SHA e correlação app → API → erro em runtime publicado. Próxima
+condição: SHA limpa implantada e credenciais/ambiente Sentry disponíveis para
+prova read-only.
+
+## S8-06 — FCM no artefato alvo
+
+Resultado: `BLOCKED`
+
+O contrato e o harness local de notificações existem, porém foreground,
+background e tap/deep link precisam ser repetidos no APK assinado exato da SHA
+congelada. Próxima condição: artefato final instalável e credenciais FCM do
+ambiente candidato.
+
+## S8-07 — Backup e recuperação
+
+Resultado: `BLOCKED`
+
+Scripts e contratos locais de backup/cron foram reforçados, mas não houve
+escrita off-site nem restore de um backup fresco desta revisão. Próxima
+condição: destino off-site, chave e autorização específica, seguidos por
+checksum, restore isolado e registro de RPO/RTO.
+
+## S8-08 — Segurança técnica
+
+Resultado: `BLOCKED`
+
+```text
+./scripts/quality_gate.sh deps          PASS, 4 pacotes
+./scripts/manaloom_secret_scan.sh --worktree
+                                         PASS, 0 credenciais live literais
+gitleaks                                 PASS, 8.30.1
+```
+
+O fechamento depende de S8-05 e do SBOM/OSV do APK/AAB construído a partir da
+SHA limpa, além da rejeição de token antigo após o backend correspondente ser
+publicado. Nenhum deploy ou mutação live foi executado nesta rodada.
+
+## Validação determinística relacionada
+
+Depois das correções acima, a revisão local dirty passou:
+
+```text
+./scripts/manaloom_local_ci.sh full
+  backend                              1736/1736 PASS
+  Flutter                              1157 PASS + 1 skip Web-only conhecido
+  Web pública                          13 páginas, 0 vulnerabilidades, smoke PASS
+  Patrol local                         9/9 PASS
+  schema loopback                      73 tabelas, 6 views, 76 FKs, 51 migrations
+
+ai-eval / ai-bridge                    PASS
+battle                                 PASS em 2 execuções
+web                                    PASS
+E2E deterministic-read-only           PARTIAL, 10 PASS, 9 skips guardados,
+                                       0 FAIL, 0 BLOCKED
+```
+
+O `engine-delta` passou sem alterar pins, mas retornou `review_required` para
+316 cartas e 328 fixtures: XMage 120/131 e Forge 196/197, ambos 113 commits à
+frente dos pins. O compare Forge atingiu o limite de 300 arquivos e ficou
+truncado. Esses resultados reduzem o residual local; não substituem a revisão
+do delta, a repetição numa SHA limpa nem as provas externas/live das tasks
+bloqueadas.
+
+## Disposição de acessibilidade relacionada
+
+S3-04 continua `BLOCKED` somente pela interação humana TalkBack no Android
+alvo. O beta S10 foi fixado em Web + Android; iOS e VoiceOver estão
+`DEFERRED_BY_SCOPE`, com rotas vazias na matriz, e não bloqueiam esta candidata.
