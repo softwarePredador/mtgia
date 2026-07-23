@@ -213,6 +213,21 @@ All import entry points pass the normalized target format into card lookup so le
 > fallback sentence in the table row above; development-only fallback for a
 > missing/invalid key remains a separate policy.
 
+> S8-04 physical abort contract (2026-07-23): the OpenAI call is sent as an
+> `http.AbortableRequest`. Both the selected provider timeout and durable job
+> cancellation complete its abort trigger, so the server-side `IOClient`
+> aborts the underlying request instead of merely ignoring a late response.
+> The async worker carries a canonical job ID only on its token-authenticated
+> internal self-call; the sync executor polls the PostgreSQL job status and
+> treats any transition out of `pending`/`processing` as cancellation. The
+> internal cancelled execution returns `409`, `Cache-Control: no-store`,
+> `error_code=ai_generation_cancelled`, `outcome_code=cancelled`,
+> `retryable=true`, `can_save=false`, `learning_eligible=false`, and
+> `generated_deck=null`. Public async clients continue to observe the
+> authoritative `cancelled` job through polling. Covered by
+> `ai_generate_provider_abort_test.dart`,
+> `ai_generate_provider_timeout_test.dart`, and `ai_job_lifecycle_test.dart`.
+
 #### Async AI job lifecycle v2 (migration 048)
 
 The following lifecycle contract is authoritative for both generation and

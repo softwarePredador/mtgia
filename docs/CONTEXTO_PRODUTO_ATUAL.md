@@ -6,11 +6,12 @@
 ## Revalidação técnica — 2026-07-23
 
 - revisão em andamento na branch
-  `codex/free-beta-release-candidate-2026-07-17`; o commit de implementação
-  `2139ec9f6f902a8b266fbb852db6e834b25bceff` foi validado, publicado no
-  `origin` e confirmado com checkout limpo. Ele é uma identidade revisável,
-  mas ainda não recebeu GO de release. A rodada residual partiu da base limpa
-  `9deb607e4c09f8d8e6cd94241a61f2960262c6fe`;
+  `codex/free-beta-release-candidate-2026-07-17`; a base de implementação
+  `2139ec9f6f902a8b266fbb852db6e834b25bceff` e o lote residual
+  `bf035b7f15216bb74c34b172c84e20ad498a5174` foram validados e publicados.
+  O cancelamento físico foi consolidado no commit técnico
+  `b84302e1e7b1d19da23bb2d1cc6e4605f9703d6b`, que passou o gate completo.
+  Essas identidades são revisáveis, mas ainda não receberam GO de release;
 - o alvo S10 está congelado como beta gratuita Web + Android. Scanner/câmera
   ficam desabilitados e inacessíveis no artefato de release; iOS e VoiceOver
   ficam `DEFERRED_BY_SCOPE`. TalkBack no Android alvo continua obrigatório;
@@ -18,8 +19,10 @@
   `no-store`, `can_save=false`, `learning_eligible=false` e sem deck/mock.
   Falha terminal agora limpa job/request key e libera uma submissão nova,
   mantendo retomada somente para timeout/transiente; 57/57 testes focados,
-  incluindo widget real, passaram. Abort HTTP físico e a matriz completa de
-  indisponibilidade/cancelamento continuam abertos;
+  incluindo widget real, passaram. Timeout e `DELETE` do job agora propagam
+  pelo estado durável PostgreSQL e abortam fisicamente o request OpenAI; a
+  matriz E2E externa completa de indisponibilidade/cancelamento continua
+  aberta;
 - a prova física anterior de 180 imagens no Samsung SM-A135M permanece
   válida: cache abaixo de 32 MiB, crescimento de RSS abaixo de 192 MiB e
   repetição abaixo de 32 MiB. A revalidação Chrome falhou fechado como amostra
@@ -29,10 +32,10 @@
   622/660 ms contra 3000 ms e warm 222/238 ms contra 1500 ms. Ainda faltam
   startup Android, matriz autenticada das superfícies core nos dois alvos e
   integração do harness no gate;
-- `manaloom_local_ci.sh full` passou com backend 1736/1736, Flutter 1157
-  testes + 1 skip Web-only conhecido, Web pública, Patrol, dependências e
-  schema descartável. Também passaram `ai-eval`, `ai-bridge`, Battle 2×,
-  `web`, `deps`, `custom-lint`, `ui-audit` (48/48), `server-target`,
+- `manaloom_local_ci.sh full` passou em `b84302e1e` com backend 1742/1742,
+  Flutter 1159 testes + 1 skip Web-only conhecido, Web pública, Patrol,
+  dependências e schema descartável. Também passaram `ai-eval`, `ai-bridge`,
+  Battle 2×, `web`, `deps`, `custom-lint`, `ui-audit` (48/48), `server-target`,
   `report-retention` (12/12 checks e 17 testes), secret scan, project logic e
   os 25 contratos de release, com Flutter 3.44.6/Dart 3.12.2 pinados;
 - o E2E determinístico terminou `PARTIAL`: 10 etapas passaram, 9 skips
@@ -82,9 +85,9 @@
 ## Próxima ação oficial
 
 1. concluir startup Android, matriz autenticada p50/p95, métrica Web de
-   imagens e abort físico/falhas da Sprint 8; a disposição dos contratos
-   grandes da Sprint 9 está concluída e a decisão dos engines é manter os pins
-   atuais;
+   imagens e matriz E2E externa de falhas/cancelamento da Sprint 8; o abort
+   físico local, a disposição dos contratos grandes da Sprint 9 e a decisão
+   de manter os pins atuais já estão concluídos;
 2. fechar somente as tasks realmente provadas, mantendo bloqueadas as
    dependências humanas, externas ou live; a atomicidade, os links e o diff de
    retenção já estão registrados em `2139ec9f6`;

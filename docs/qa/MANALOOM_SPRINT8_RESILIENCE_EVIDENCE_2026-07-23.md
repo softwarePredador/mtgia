@@ -7,6 +7,10 @@ Commit de implementação validado/publicado:
 `2139ec9f6f902a8b266fbb852db6e834b25bceff`
 Base limpa da revalidação residual:
 `9deb607e4c09f8d8e6cd94241a61f2960262c6fe`
+Commit de retenção/retry publicado:
+`bf035b7f15216bb74c34b172c84e20ad498a5174`
+Commit técnico do cancelamento físico:
+`b84302e1e7b1d19da23bb2d1cc6e4605f9703d6b`
 SDK: Flutter `3.44.6`, Dart `3.12.2`
 
 Este relatório registra somente provas executadas na revisão corrente. Provas
@@ -131,12 +135,26 @@ Resultado: `IN_PROGRESS`
   resumível;
 - a mensagem terminal é sanitizada e não expõe o erro bruto do provedor;
   provider + fluxo widget real de retomada passaram `57/57`.
+- a chamada OpenAI usa `http.AbortableRequest`; timeout ou cancelamento
+  completa o `abortTrigger`, e o `IOClient` encerra fisicamente o
+  `HttpClientRequest` subjacente;
+- o worker envia o ID canônico do job somente junto do token interno. O
+  executor valida ambos, consulta no PostgreSQL se o job continua
+  `pending/processing` e propaga a transição feita pelo `DELETE` ao request em
+  andamento com cadência nominal de um segundo;
+- cada execução possui cliente HTTP próprio, fechado no `finally`; o caminho
+  cancelado retorna HTTP 409, `Cache-Control: no-store`,
+  `ai_generation_cancelled`, `can_save=false`, `learning_eligible=false` e
+  nenhum deck;
+- os testes específicos de timeout/abort passaram `9/9`; a malha ampliada de
+  lifecycle/provider passou `45/45`, o analyzer passou sem issues,
+  `ai-bridge` passou `114/114` e o gate local `full` passou no commit técnico
+  `b84302e1e7b1d19da23bb2d1cc6e4605f9703d6b`.
 
-A task não recebe `PASS`: `Future.timeout` ainda não aborta fisicamente a
-requisição HTTP subjacente no provider, o `DELETE` do job não comprova a
-propagação até esse request e ainda falta a matriz integral de cancelamento e
-indisponibilidade externa. O loop de retry terminal foi corrigido, mas o
-cancelamento físico continua aberto.
+A task permanece `IN_PROGRESS`: o residual local de abort físico e propagação
+foi fechado, mas ainda falta executar, na SHA final e contra um endpoint
+controlado, a matriz E2E integral de indisponibilidade/cancelamento
+(`429`, `5xx`, queda de conexão, timeout e cancelamento durante o request).
 
 ## S8-05 — Observabilidade acionável
 
@@ -200,13 +218,13 @@ backend correspondente. Nenhum deploy ou mutação live foi executado.
 
 ## Validação determinística relacionada
 
-Depois das correções acima, o commit de implementação limpo
-`2139ec9f6f902a8b266fbb852db6e834b25bceff` passou:
+O commit técnico limpo
+`b84302e1e7b1d19da23bb2d1cc6e4605f9703d6b` passou:
 
 ```text
 ./scripts/manaloom_local_ci.sh full
-  backend                              1736/1736 PASS
-  Flutter                              1157 PASS + 1 skip Web-only conhecido
+  backend                              1742/1742 PASS
+  Flutter                              1159 PASS + 1 skip Web-only conhecido
   Web pública                          13 páginas, 0 vulnerabilidades, smoke PASS
   Patrol local                         9/9 PASS
   schema loopback                      73 tabelas, 6 views, 76 FKs, 51 migrations
