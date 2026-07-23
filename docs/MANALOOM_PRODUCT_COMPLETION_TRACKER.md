@@ -134,14 +134,14 @@ Campos iniciais `—` são obrigatoriamente preenchidos antes de `IN_PROGRESS`.
 
 | ID | Estado | Depende de | Owner | Arquivos pretendidos | Gate mínimo | Evidência |
 |---|---|---|---|---|---|---|
-| S7-01 | `TODO` | S1 | — | — | UGC report tests | — |
-| S7-02 | `TODO` | S7-01 | — | — | two-user block E2E | — |
-| S7-03 | `TODO` | S7-01, S7-02 | — | — | moderation workflow E2E | — |
-| S7-04 | `TODO` | S1, S7-02 | — | — | ownership/privacy negative E2E | — |
-| S7-05 | `TODO` | S1, S7-02 | — | — | realtime/draft/push E2E | — |
-| S7-06 | `TODO` | S1-01, S1-07 | — | — | trade concurrency E2E | — |
-| S7-07 | `TODO` | S7-02, S7-04 | — | — | feed/follow/comment tests | — |
-| S7-08 | `TODO` | S7-01–S7-07 | — | — | full PASS or scope-disable proof | — |
+| S7-01 | `PASS` | S1 | `/root` | migration 051; `SocialSafetyService`; `/content-reports`; diálogo/ações UGC | UGC report tests | `docs/qa/MANALOOM_SPRINT7_SOCIAL_SAFETY_EVIDENCE_2026-07-23.md` — quatro superfícies, confirmação, 409 duplicado e 429 distribuído |
+| S7-02 | `PASS` | S7-01 | `/root` | `user_blocks`; rotas block/list; filtros sociais e UI de unblock | two-user block E2E | evidência Sprint 7 — corte bilateral de feed, perfil, follow, mensagem, notificação e trade; desbloqueio auditado |
+| S7-03 | `PASS` | S7-01, S7-02 | `/root` | fila/admin middleware; ação/SLA/auditoria/apelação; filtros de conteúdo | moderation workflow E2E | evidência Sprint 7 — ação transacional e mensagem removida ausente da lista e detalhe |
+| S7-04 | `PASS` | S1, S7-02 | `/root` | visibilidades fechadas em `users`; perfil/Binder/trade/mensagem; controles Flutter | ownership/privacy negative E2E | evidência Sprint 7 — allowlists e negativos entre dois usuários no PostgreSQL descartável |
+| S7-05 | `PASS` | S1, S7-02 | `/root` | `client_request_id`; `MessageDraftStore`; providers/chats; coordinator realtime | realtime/draft/push E2E | evidência Sprint 7 — Flutter 87/87, Android físico 1/1, draft/retry/unread/foreground/tap; transporte final permanece S8-06 |
+| S7-06 | `PASS` | S1-01, S1-07 | `/root` | máquina de trade, locks de disponibilidade e aviso P2P | trade concurrency E2E | evidência Sprint 7 — E2E combinado 5/5 e disponibilidade concorrente atômica |
+| S7-07 | `PASS` | S7-02, S7-04 | `/root` | feed canônico; follows; comentários visíveis/exclusão; estados Flutter | feed/follow/comment tests | evidência Sprint 7 — paginação, refresh, bloqueio, exclusão e erro/vazio cobertos |
+| S7-08 | `PASS` | S7-01–S7-07 | `/root` | decisão de escopo social | full PASS or scope-disable proof | conjunto Community/chat/trades permanece habilitado após S7-01–S7-07 `PASS` |
 
 ## Sprint 8
 

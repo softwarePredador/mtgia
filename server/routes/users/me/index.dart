@@ -31,6 +31,8 @@ Future<Response> _getMe(RequestContext context) async {
       Sql.named('''
         SELECT id, username, email, display_name, avatar_url,
                location_state, location_city, trade_notes,
+               profile_visibility, binder_visibility, location_visibility,
+               message_visibility, trade_visibility, trade_notes_visibility,
                created_at, updated_at, email_verified_at
         FROM users
         WHERE id = @id
@@ -59,6 +61,12 @@ Future<Response> _getMe(RequestContext context) async {
           'location_state': map['location_state'],
           'location_city': map['location_city'],
           'trade_notes': map['trade_notes'],
+          'profile_visibility': map['profile_visibility'],
+          'binder_visibility': map['binder_visibility'],
+          'location_visibility': map['location_visibility'],
+          'message_visibility': map['message_visibility'],
+          'trade_visibility': map['trade_visibility'],
+          'trade_notes_visibility': map['trade_notes_visibility'],
           'email_verified': map['email_verified_at'] != null,
           'created_at': (map['created_at'] as DateTime?)?.toIso8601String(),
           'updated_at': (map['updated_at'] as DateTime?)?.toIso8601String(),
@@ -200,6 +208,30 @@ Future<Response> _patchMe(RequestContext context) async {
     params['trade_notes'] = (value == null || value.isEmpty) ? null : value;
   }
 
+  const visibilityFields = <String, Set<String>>{
+    'profile_visibility': {'public', 'private'},
+    'binder_visibility': {'public', 'private'},
+    'location_visibility': {'public', 'trade_only', 'private'},
+    'message_visibility': {'everyone', 'followers', 'none'},
+    'trade_visibility': {'everyone', 'followers', 'none'},
+    'trade_notes_visibility': {'trade_only', 'private'},
+  };
+  for (final entry in visibilityFields.entries) {
+    if (!body.containsKey(entry.key)) continue;
+    final value = body[entry.key]?.toString().trim().toLowerCase() ?? '';
+    if (!entry.value.contains(value)) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error': '${entry.key} invalido',
+          'allowed_values': entry.value.toList(growable: false),
+        },
+      );
+    }
+    updateFields.add('${entry.key} = @${entry.key}');
+    params[entry.key] = value;
+  }
+
   if (updateFields.isEmpty) {
     Log.w(
       '[profile_route] invalid_payload endpoint=PATCH /users/me reason=no_fields',
@@ -220,6 +252,9 @@ Future<Response> _patchMe(RequestContext context) async {
           AND deleted_at IS NULL
         RETURNING id, username, email, display_name, avatar_url,
                   location_state, location_city, trade_notes,
+                  profile_visibility, binder_visibility, location_visibility,
+                  message_visibility, trade_visibility,
+                  trade_notes_visibility,
                   created_at, updated_at, email_verified_at
       '''),
       parameters: params,
@@ -244,6 +279,12 @@ Future<Response> _patchMe(RequestContext context) async {
           'location_state': map['location_state'],
           'location_city': map['location_city'],
           'trade_notes': map['trade_notes'],
+          'profile_visibility': map['profile_visibility'],
+          'binder_visibility': map['binder_visibility'],
+          'location_visibility': map['location_visibility'],
+          'message_visibility': map['message_visibility'],
+          'trade_visibility': map['trade_visibility'],
+          'trade_notes_visibility': map['trade_notes_visibility'],
           'email_verified': map['email_verified_at'] != null,
           'created_at': (map['created_at'] as DateTime?)?.toIso8601String(),
           'updated_at': (map['updated_at'] as DateTime?)?.toIso8601String(),

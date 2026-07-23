@@ -38,13 +38,17 @@
 | `/cards/{id}/rulings` | `GET` | `server/routes/cards/[id]/rulings/index.dart` | 1 | `source` |
 | `/community/binders/{userId}` | `GET` | `server/routes/community/binders/[userId].dart` | 2 | `source` |
 | `/community/decks` | `GET` | `server/routes/community/decks/index.dart` | 2 | `source` |
+| `/community/decks/following` | `GET` | `server/routes/community/decks/following/index.dart` | 2 | `source` |
 | `/community/decks/{id}` | `GET, POST` | `server/routes/community/decks/[id]/index.dart` | 2 | `source` |
 | `/community/decks/{id}/comments` | `GET, POST` | `server/routes/community/decks/[id]/comments/index.dart` | 2 | `source` |
+| `/community/decks/{id}/comments/{commentId}` | `DELETE` | `server/routes/community/decks/[id]/comments/[commentId]/index.dart` | 2 | `source` |
 | `/community/decks/{id}/reports` | `POST` | `server/routes/community/decks/[id]/reports/index.dart` | 2 | `source` |
 | `/community/marketplace` | `GET` | `server/routes/community/marketplace/index.dart` | 2 | `source` |
 | `/community/trade-matches` | `GET` | `server/routes/community/trade-matches/index.dart` | 2 | `source` |
 | `/community/users` | `GET` | `server/routes/community/users/index.dart` | 2 | `source` |
 | `/community/users/{id}` | `GET` | `server/routes/community/users/[id].dart` | 2 | `source` |
+| `/content-reports` | `POST` | `server/routes/content-reports/index.dart` | 2 | `source` |
+| `/content-reports/{id}/appeals` | `POST` | `server/routes/content-reports/[id]/appeals/index.dart` | 2 | `source` |
 | `/conversations` | `GET, POST` | `server/routes/conversations/index.dart` | 2 | `source` |
 | `/conversations/unread-count` | `GET` | `server/routes/conversations/unread-count.dart` | 2 | `source` |
 | `/conversations/{id}/messages` | `GET, POST` | `server/routes/conversations/[id]/messages.dart` | 2 | `source` |
@@ -81,6 +85,8 @@
 | `/import/validate` | `POST` | `server/routes/import/validate/index.dart` | 2 | `source` |
 | `/market/card/{cardId}` | `GET` | `server/routes/market/card/[cardId].dart` | 1 | `source` |
 | `/market/movers` | `GET` | `server/routes/market/movers/index.dart` | 1 | `source` |
+| `/moderation/reports` | `GET` | `server/routes/moderation/reports/index.dart` | 2 | `source` |
+| `/moderation/reports/{id}` | `PUT` | `server/routes/moderation/reports/[id]/index.dart` | 2 | `source` |
 | `/notifications` | `GET` | `server/routes/notifications/index.dart` | 2 | `source` |
 | `/notifications/count` | `GET` | `server/routes/notifications/count.dart` | 2 | `source` |
 | `/notifications/read-all` | `PUT` | `server/routes/notifications/read-all.dart` | 2 | `source` |
@@ -96,10 +102,12 @@
 | `/trades/{id}/status` | `PUT` | `server/routes/trades/[id]/status.dart` | 2 | `source` |
 | `/users/me` | `DELETE, GET, PATCH` | `server/routes/users/me/index.dart` | 2 | `source` |
 | `/users/me/activation-events` | `GET, POST` | `server/routes/users/me/activation-events/index.dart` | 2 | `source` |
+| `/users/me/blocks` | `GET` | `server/routes/users/me/blocks/index.dart` | 2 | `source` |
 | `/users/me/export` | `GET` | `server/routes/users/me/export/index.dart` | 2 | `source` |
 | `/users/me/fcm-token` | `DELETE, PUT` | `server/routes/users/me/fcm-token/index.dart` | 2 | `source` |
 | `/users/me/plan` | `GET` | `server/routes/users/me/plan/index.dart` | 2 | `source` |
 | `/users/me/plan/checkout` | `POST` | `server/routes/users/me/plan/checkout/index.dart` | 2 | `source` |
+| `/users/{id}/block` | `DELETE, GET, POST` | `server/routes/users/[id]/block/index.dart` | 2 | `source` |
 | `/users/{id}/follow` | `DELETE, GET, POST` | `server/routes/users/[id]/follow/index.dart` | 2 | `source` |
 | `/users/{id}/followers` | `GET` | `server/routes/users/[id]/followers/index.dart` | 2 | `source` |
 | `/users/{id}/following` | `GET` | `server/routes/users/[id]/following/index.dart` | 2 | `source` |

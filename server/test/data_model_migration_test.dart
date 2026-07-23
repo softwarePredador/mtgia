@@ -824,5 +824,41 @@ void main() {
         migrate.MigrationRollbackPolicy.manualOnly,
       );
     });
+
+    test('migration 051 closes social safety and privacy contracts', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '051',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(migration.name, equals('close_social_safety_contract'));
+      for (final table in const [
+        'user_blocks',
+        'user_block_events',
+        'moderation_actions',
+        'content_report_appeals',
+      ]) {
+        expect(up, contains('create table if not exists $table'));
+      }
+      for (final column in const [
+        'profile_visibility',
+        'binder_visibility',
+        'location_visibility',
+        'message_visibility',
+        'trade_visibility',
+        'trade_notes_visibility',
+      ]) {
+        expect(up, contains('add column if not exists $column'));
+      }
+      expect(up, contains('client_request_id'));
+      expect(up, contains('moderation_status'));
+      expect(up, contains('uq_content_reports_active_reporter_target'));
+      expect(up, contains('direct_messages_sender_request'));
+      expect(up, contains('trade_messages_sender_request'));
+      expect(
+        migrate.migrationRollbackPolicy('051'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
   });
 }

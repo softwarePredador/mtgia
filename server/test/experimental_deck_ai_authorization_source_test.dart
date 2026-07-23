@@ -471,9 +471,15 @@ void main() {
     test('following community feed is routed before deck id lookup', () {
       final dynamicRoute =
           File('routes/community/decks/[id]/index.dart').readAsStringSync();
+      final staticRoute =
+          File(
+            'routes/community/decks/following/index.dart',
+          ).readAsStringSync();
 
       expect(dynamicRoute, contains("if (id == 'following')"));
-      expect(dynamicRoute, contains('getFollowingFeed(context)'));
+      expect(dynamicRoute, contains('following_route.onRequest(context)'));
+      expect(staticRoute, contains('CommunityFollowingFeedService('));
+      expect(dynamicRoute, isNot(contains('JOIN user_follows uf')));
       expect(
         dynamicRoute.indexOf("if (id == 'following')"),
         lessThan(

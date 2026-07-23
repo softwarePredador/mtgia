@@ -152,6 +152,26 @@ class _DelayedTradeApiClient extends ApiClient {
   }
 }
 
+class _TradeMessageReplayApiClient extends ApiClient {
+  final bodies = <Map<String, dynamic>>[];
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    expect(endpoint, '/trades/trade-1/messages');
+    bodies.add(Map<String, dynamic>.from(body));
+    return ApiResponse(200, {
+      'id': 'trade-message-1',
+      'sender_id': 'sender-1',
+      'message': body['message'],
+      'created_at': '2026-07-23T10:00:00Z',
+    });
+  }
+}
+
 void main() {
   test(
     'createTrade maps item availability failure to friendly message',
@@ -300,4 +320,28 @@ void main() {
       expect(provider.isLoading, isFalse);
     },
   );
+
+  test('trade message replay keeps one local message and stable key', () async {
+    final api = _TradeMessageReplayApiClient();
+    final provider = TradeProvider(apiClient: api);
+
+    final first = await provider.sendMessage(
+      'trade-1',
+      'combinado',
+      clientRequestId: 'trade-request-1',
+    );
+    final replay = await provider.sendMessage(
+      'trade-1',
+      'combinado',
+      clientRequestId: 'trade-request-1',
+    );
+
+    expect(first, isTrue);
+    expect(replay, isTrue);
+    expect(provider.chatMessages, hasLength(1));
+    expect(
+      api.bodies.map((body) => body['client_request_id']),
+      everyElement('trade-request-1'),
+    );
+  });
 }

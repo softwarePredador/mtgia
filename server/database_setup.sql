@@ -14,6 +14,12 @@ CREATE TABLE IF NOT EXISTS users (
     location_state TEXT,
     location_city TEXT,
     trade_notes TEXT,
+    profile_visibility TEXT NOT NULL DEFAULT 'public',
+    binder_visibility TEXT NOT NULL DEFAULT 'public',
+    location_visibility TEXT NOT NULL DEFAULT 'private',
+    message_visibility TEXT NOT NULL DEFAULT 'everyone',
+    trade_visibility TEXT NOT NULL DEFAULT 'everyone',
+    trade_notes_visibility TEXT NOT NULL DEFAULT 'private',
     fcm_token TEXT,
     auth_version INTEGER NOT NULL DEFAULT 0,
     password_changed_at TIMESTAMP WITH TIME ZONE,
@@ -47,6 +53,12 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS location_state TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS location_city TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_notes TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_visibility TEXT NOT NULL DEFAULT 'public';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS binder_visibility TEXT NOT NULL DEFAULT 'public';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS location_visibility TEXT NOT NULL DEFAULT 'private';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS message_visibility TEXT NOT NULL DEFAULT 'everyone';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_visibility TEXT NOT NULL DEFAULT 'everyone';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_notes_visibility TEXT NOT NULL DEFAULT 'private';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_version INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_changed_at TIMESTAMP WITH TIME ZONE;
@@ -57,6 +69,24 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMP WITH TI
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_profile_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_profile_visibility
+CHECK (profile_visibility IN ('public', 'private'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_binder_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_binder_visibility
+CHECK (binder_visibility IN ('public', 'private'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_location_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_location_visibility
+CHECK (location_visibility IN ('public', 'trade_only', 'private'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_message_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_message_visibility
+CHECK (message_visibility IN ('everyone', 'followers', 'none'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_trade_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_trade_visibility
+CHECK (trade_visibility IN ('everyone', 'followers', 'none'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_trade_notes_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_trade_notes_visibility
+CHECK (trade_notes_visibility IN ('trade_only', 'private'));
 CREATE INDEX IF NOT EXISTS idx_users_active_identity
     ON users (LOWER(email), LOWER(username)) WHERE deleted_at IS NULL;
 
@@ -908,6 +938,29 @@ CREATE TABLE IF NOT EXISTS user_follows (
 CREATE INDEX IF NOT EXISTS idx_user_follows_follower ON user_follows (follower_id);
 CREATE INDEX IF NOT EXISTS idx_user_follows_following ON user_follows (following_id);
 
+CREATE TABLE IF NOT EXISTS user_blocks (
+    blocker_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    blocked_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (blocker_id, blocked_id),
+    CONSTRAINT chk_no_self_block CHECK (blocker_id <> blocked_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_blocks_blocked
+    ON user_blocks (blocked_id, blocker_id);
+
+CREATE TABLE IF NOT EXISTS user_block_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    target_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL CHECK (action IN ('blocked', 'unblocked')),
+    reason TEXT,
+    request_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_user_block_events_actor_created
+    ON user_block_events (actor_user_id, created_at DESC);
+
 -- ============================================================
 -- COLLECTION/TRADES: binder, negociação, mensagens e notificações
 -- ============================================================
@@ -1023,10 +1076,22 @@ CREATE TABLE IF NOT EXISTS trade_messages (
     attachment_url TEXT,
     attachment_type TEXT
         CHECK (attachment_type IS NULL OR attachment_type IN ('receipt', 'tracking', 'photo', 'other')),
+    client_request_id TEXT,
+    moderation_status TEXT NOT NULL DEFAULT 'visible',
+    CONSTRAINT chk_trade_messages_moderation_status
+        CHECK (moderation_status IN ('visible', 'removed')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE trade_messages ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+ALTER TABLE trade_messages ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'visible';
+ALTER TABLE trade_messages DROP CONSTRAINT IF EXISTS chk_trade_messages_moderation_status;
+ALTER TABLE trade_messages ADD CONSTRAINT chk_trade_messages_moderation_status
+CHECK (moderation_status IN ('visible', 'removed'));
 CREATE INDEX IF NOT EXISTS idx_trade_messages_offer
 ON trade_messages (trade_offer_id, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_trade_messages_sender_request
+ON trade_messages (sender_id, client_request_id)
+WHERE client_request_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS trade_status_history (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1161,13 +1226,25 @@ CREATE TABLE IF NOT EXISTS direct_messages (
     conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
     sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     message TEXT NOT NULL,
+    client_request_id TEXT,
+    moderation_status TEXT NOT NULL DEFAULT 'visible',
+    CONSTRAINT chk_direct_messages_moderation_status
+        CHECK (moderation_status IN ('visible', 'removed')),
     read_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'visible';
+ALTER TABLE direct_messages DROP CONSTRAINT IF EXISTS chk_direct_messages_moderation_status;
+ALTER TABLE direct_messages ADD CONSTRAINT chk_direct_messages_moderation_status
+CHECK (moderation_status IN ('visible', 'removed'));
 CREATE INDEX IF NOT EXISTS idx_dm_conversation
 ON direct_messages (conversation_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_dm_unread
 ON direct_messages (conversation_id) WHERE read_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_direct_messages_sender_request
+ON direct_messages (sender_id, client_request_id)
+WHERE client_request_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1344,22 +1421,108 @@ CREATE TABLE IF NOT EXISTS content_reports (
     reason TEXT NOT NULL,
     details TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'open',
+    priority SMALLINT NOT NULL DEFAULT 2,
+    evidence JSONB NOT NULL DEFAULT '{}'::jsonb,
+    sla_due_at TIMESTAMP WITH TIME ZONE NOT NULL
+        DEFAULT (CURRENT_TIMESTAMP + INTERVAL '72 hours'),
+    resolution TEXT,
+    resolution_action TEXT,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reviewed_at TIMESTAMP WITH TIME ZONE,
     reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT chk_content_reports_target_type CHECK (
-        target_type IN ('deck', 'comment', 'profile', 'binder_item')
+        target_type IN (
+            'deck', 'comment', 'profile', 'binder_item',
+            'message', 'trade_message'
+        )
     ),
     CONSTRAINT chk_content_reports_reason CHECK (
         reason IN ('spam', 'abuse', 'scam', 'inappropriate', 'copyright', 'other')
     ),
     CONSTRAINT chk_content_reports_status CHECK (
-        status IN ('open', 'reviewing', 'resolved', 'dismissed')
+        status IN ('open', 'reviewing', 'resolved', 'dismissed', 'appealed')
+    ),
+    CONSTRAINT chk_content_reports_priority CHECK (priority BETWEEN 1 AND 4),
+    CONSTRAINT chk_content_reports_resolution_action CHECK (
+        resolution_action IS NULL OR
+        resolution_action IN ('none', 'hide', 'remove', 'restrict')
     )
 );
 
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS priority SMALLINT NOT NULL DEFAULT 2;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS evidence JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS sla_due_at TIMESTAMP WITH TIME ZONE;
+UPDATE content_reports
+SET sla_due_at = created_at + INTERVAL '72 hours'
+WHERE sla_due_at IS NULL;
+ALTER TABLE content_reports ALTER COLUMN sla_due_at SET NOT NULL;
+ALTER TABLE content_reports ALTER COLUMN sla_due_at
+SET DEFAULT (CURRENT_TIMESTAMP + INTERVAL '72 hours');
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS resolution TEXT;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS resolution_action TEXT;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_target_type;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_target_type CHECK (
+    target_type IN (
+        'deck', 'comment', 'profile', 'binder_item',
+        'message', 'trade_message'
+    )
+);
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_status;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_status CHECK (
+    status IN ('open', 'reviewing', 'resolved', 'dismissed', 'appealed')
+);
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_priority;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_priority
+CHECK (priority BETWEEN 1 AND 4);
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_resolution_action;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_resolution_action CHECK (
+    resolution_action IS NULL OR
+    resolution_action IN ('none', 'hide', 'remove', 'restrict')
+);
 CREATE INDEX IF NOT EXISTS idx_content_reports_target_status
     ON content_reports (target_type, target_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_content_reports_queue
+    ON content_reports (status, priority, sla_due_at, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_content_reports_active_reporter_target
+    ON content_reports (reporter_user_id, target_type, target_id)
+    WHERE reporter_user_id IS NOT NULL
+      AND status IN ('open', 'reviewing', 'appealed');
+
+CREATE TABLE IF NOT EXISTS moderation_actions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    report_id UUID NOT NULL REFERENCES content_reports(id) ON DELETE CASCADE,
+    moderator_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL
+        CHECK (action IN (
+            'start_review', 'dismiss', 'hide', 'remove', 'restrict', 'restore'
+        )),
+    rationale TEXT NOT NULL,
+    evidence JSONB NOT NULL DEFAULT '{}'::jsonb,
+    request_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_moderation_actions_report_created
+    ON moderation_actions (report_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS content_report_appeals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    report_id UUID NOT NULL REFERENCES content_reports(id) ON DELETE CASCADE,
+    appellant_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL CHECK (char_length(reason) BETWEEN 10 AND 2000),
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'reviewing', 'upheld', 'overturned')),
+    reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    resolution TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_content_report_appeals_pending
+    ON content_report_appeals (report_id, appellant_user_id)
+    WHERE status IN ('pending', 'reviewing');
+CREATE INDEX IF NOT EXISTS idx_content_report_appeals_queue
+    ON content_report_appeals (status, created_at);
 
 -- Serializa qualquer FK de usuario com a exclusao da conta. Uma escrita que
 -- chegar antes sera limpa pela mesma transacao; uma escrita posterior falha.

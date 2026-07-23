@@ -50,6 +50,19 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
       );
       if (activeUsers.length != 2) return false;
 
+      final blocked = await session.execute(
+        Sql.named('''
+          SELECT EXISTS (
+            SELECT 1
+            FROM user_blocks
+            WHERE (blocker_id = @follower AND blocked_id = @following)
+               OR (blocker_id = @following AND blocked_id = @follower)
+          ) AS blocked
+        '''),
+        parameters: {'follower': userId, 'following': targetId},
+      );
+      if (blocked.first.toColumnMap()['blocked'] == true) return null;
+
       await session.execute(
         Sql.named('''
           INSERT INTO user_follows (follower_id, following_id)
@@ -60,6 +73,15 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
       );
       return true;
     });
+    if (targetActive == null) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {
+          'error': 'interaction_blocked',
+          'message': 'Esta interacao nao esta disponivel.',
+        },
+      );
+    }
     if (!targetActive) {
       return Response.json(
         statusCode: HttpStatus.notFound,

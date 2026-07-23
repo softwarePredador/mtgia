@@ -107,6 +107,24 @@ Future<Response> _createTrade(RequestContext context) async {
               AND deleted_at IS NULL
           ) AS receiver_exists,
           (
+            SELECT trade_visibility
+            FROM users
+            WHERE id = @receiverId
+              AND deleted_at IS NULL
+          ) AS receiver_trade_visibility,
+          EXISTS (
+            SELECT 1
+            FROM user_follows
+            WHERE follower_id = @userId
+              AND following_id = @receiverId
+          ) AS sender_follows_receiver,
+          EXISTS (
+            SELECT 1
+            FROM user_blocks
+            WHERE (blocker_id = @userId AND blocked_id = @receiverId)
+               OR (blocker_id = @receiverId AND blocked_id = @userId)
+          ) AS interaction_blocked,
+          (
             SELECT COUNT(*)::int
             FROM user_binder_items
             WHERE id = ANY(@myIds::uuid[]) AND user_id = @userId
@@ -145,6 +163,23 @@ Future<Response> _createTrade(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {'error': 'Usuário destinatário não encontrado'},
+      );
+    }
+    final tradeVisibility =
+        validation['receiver_trade_visibility']?.toString() ?? 'none';
+    if (validation['interaction_blocked'] == true ||
+        tradeVisibility == 'none' ||
+        (tradeVisibility == 'followers' &&
+            validation['sender_follows_receiver'] != true)) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {
+          'error':
+              validation['interaction_blocked'] == true
+                  ? 'interaction_blocked'
+                  : 'trades_not_allowed',
+          'message': 'Este usuario nao aceita novas propostas.',
+        },
       );
     }
     if ((validation['my_found'] as int) != parsedMyItems.uniqueIds.length) {
@@ -197,6 +232,37 @@ Future<Response> _createTrade(RequestContext context) async {
           parameters: {'participantIds': participantIds},
         );
         if (activeUsers.length != 2) return null;
+
+        final interactionPolicy = await session.execute(
+          Sql.named('''
+            SELECT
+              target.trade_visibility,
+              EXISTS (
+                SELECT 1
+                FROM user_follows
+                WHERE follower_id = @senderId
+                  AND following_id = @receiverId
+              ) AS sender_follows,
+              EXISTS (
+                SELECT 1
+                FROM user_blocks
+                WHERE (blocker_id = @senderId AND blocked_id = @receiverId)
+                   OR (blocker_id = @receiverId AND blocked_id = @senderId)
+              ) AS interaction_blocked
+            FROM users target
+            WHERE target.id = @receiverId
+          '''),
+          parameters: {'senderId': userId, 'receiverId': receiverId},
+        );
+        final policy = interactionPolicy.first.toColumnMap();
+        final visibility = policy['trade_visibility'] as String;
+        if (policy['interaction_blocked'] == true) {
+          return <String, dynamic>{'error': 'interaction_blocked'};
+        }
+        if (visibility == 'none' ||
+            (visibility == 'followers' && policy['sender_follows'] != true)) {
+          return <String, dynamic>{'error': 'trades_not_allowed'};
+        }
 
         final binderItemIds =
             <String>{
@@ -365,6 +431,15 @@ Future<Response> _createTrade(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {'error': 'Usuário destinatário não encontrado'},
+      );
+    }
+    if (tradeResult['error'] case final error?) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {
+          'error': error,
+          'message': 'Este usuario nao aceita novas propostas.',
+        },
       );
     }
 
@@ -618,7 +693,12 @@ Future<Response> _listTrades(RequestContext context) async {
         receiver_shipping.avg_shipping_hours as receiver_avg_shipping_hours,
         (SELECT COUNT(*) FROM trade_items ti WHERE ti.trade_offer_id = t.id AND ti.direction = 'offering')::int as offering_count,
         (SELECT COUNT(*) FROM trade_items ti WHERE ti.trade_offer_id = t.id AND ti.direction = 'requesting')::int as requesting_count,
-        (SELECT COUNT(*) FROM trade_messages tm WHERE tm.trade_offer_id = t.id)::int as message_count
+        (
+          SELECT COUNT(*)
+          FROM trade_messages tm
+          WHERE tm.trade_offer_id = t.id
+            AND tm.moderation_status = 'visible'
+        )::int as message_count
       FROM trade_offers t
       JOIN users s ON s.id = t.sender_id
       JOIN users r ON r.id = t.receiver_id

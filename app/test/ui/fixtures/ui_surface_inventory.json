@@ -18,12 +18,12 @@
     "go_route": 38,
     "shell_route": 1,
     "material_page_route": 6,
-    "dialog": 37,
+    "dialog": 43,
     "bottom_sheet": 22,
-    "menu": 5,
+    "menu": 8,
     "tabs": 11,
     "navigation": 2,
-    "transient": 99
+    "transient": 107
   },
   "domain_contracts": {
     "auth": {
@@ -299,7 +299,7 @@
     {"source":"lib/features/collection/screens/sets_catalog_screen.dart","domain":"collection","occurrences":{"material_page_route":1,"transient":1}},
     {"source":"lib/features/commercial/screens/checkout_screen.dart","domain":"commercial","occurrences":{"transient":3}},
     {"source":"lib/features/commercial/widgets/ai_usage_gate.dart","domain":"commercial","occurrences":{"dialog":1}},
-    {"source":"lib/features/community/screens/community_deck_detail_screen.dart","domain":"community","occurrences":{"transient":5}},
+    {"source":"lib/features/community/screens/community_deck_detail_screen.dart","domain":"community","occurrences":{"dialog":1,"menu":1,"transient":7}},
     {"source":"lib/features/community/screens/community_screen.dart","domain":"community","occurrences":{"tabs":2}},
     {"source":"lib/features/decks/screens/deck_details_screen.dart","domain":"decks","occurrences":{"material_page_route":1,"dialog":3,"bottom_sheet":1,"menu":1,"tabs":1,"transient":20}},
     {"source":"lib/features/decks/screens/deck_generate_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":12}},
@@ -329,15 +329,16 @@
     {"source":"lib/features/home/lotus_life_counter_screen.dart","domain":"home","occurrences":{"transient":1}},
     {"source":"lib/features/home/onboarding_core_flow_screen.dart","domain":"home","occurrences":{"transient":1}},
     {"source":"lib/features/market/screens/market_screen.dart","domain":"market","occurrences":{"tabs":1}},
-    {"source":"lib/features/messages/screens/chat_screen.dart","domain":"messages","occurrences":{"transient":1}},
+    {"source":"lib/features/messages/screens/chat_screen.dart","domain":"messages","occurrences":{"dialog":1,"menu":1,"transient":3}},
     {"source":"lib/features/notifications/screens/notification_screen.dart","domain":"notifications","occurrences":{"transient":1}},
-    {"source":"lib/features/profile/profile_screen.dart","domain":"profile","occurrences":{"dialog":4,"transient":7}},
+    {"source":"lib/features/profile/profile_screen.dart","domain":"profile","occurrences":{"dialog":6,"transient":8}},
     {"source":"lib/features/retention/screens/post_game_notes_screen.dart","domain":"retention","occurrences":{"transient":1}},
     {"source":"lib/features/scanner/screens/card_scanner_screen.dart","domain":"scanner","occurrences":{"transient":3}},
-    {"source":"lib/features/social/screens/user_profile_screen.dart","domain":"social","occurrences":{"bottom_sheet":1,"tabs":2,"transient":3}},
+    {"source":"lib/features/social/screens/user_profile_screen.dart","domain":"social","occurrences":{"dialog":1,"bottom_sheet":1,"menu":1,"tabs":2,"transient":5}},
     {"source":"lib/features/social/screens/user_search_screen.dart","domain":"social","occurrences":{"material_page_route":1}},
+    {"source":"lib/features/social/widgets/social_report_dialog.dart","domain":"social","occurrences":{"dialog":1}},
     {"source":"lib/features/trades/screens/create_trade_screen.dart","domain":"trades","occurrences":{"dialog":1,"bottom_sheet":1,"transient":1}},
-    {"source":"lib/features/trades/screens/trade_detail_screen.dart","domain":"trades","occurrences":{"dialog":2,"transient":4}},
+    {"source":"lib/features/trades/screens/trade_detail_screen.dart","domain":"trades","occurrences":{"dialog":2,"transient":5}},
     {"source":"lib/features/trades/screens/trade_inbox_screen.dart","domain":"trades","occurrences":{"tabs":2}}
   ]
 }

@@ -106,6 +106,21 @@ class _RuntimeApi {
     return _decode(response, expected: {200});
   }
 
+  Future<void> deleteAccount(_RuntimeUser user) async {
+    final response = await _client
+        .delete(
+          Uri.parse('$baseUrl/users/me'),
+          headers: _headers(user.token),
+          body: jsonEncode({
+            'confirmation': 'EXCLUIR MINHA CONTA',
+            'password': user.password,
+          }),
+        )
+        .timeout(const Duration(seconds: 20));
+    if (response.statusCode == 404) return;
+    _decode(response, expected: {200});
+  }
+
   Future<Map<String, dynamic>> findCard(String name) async {
     final data = await getJson(
       '/cards?name=${Uri.encodeQueryComponent(name)}&limit=1',
@@ -211,7 +226,9 @@ void main() {
       print('REALTIME_NOTIFICATIONS_MARKER $marker');
 
       final seller = await api.registerUser('${marker}_seller');
+      addTearDown(() => api.deleteAccount(seller));
       final buyer = await api.registerUser('${marker}_buyer');
+      addTearDown(() => api.deleteAccount(buyer));
 
       final auth = AuthProvider();
       final loggedIn = await auth.login(buyer.email, buyer.password);
@@ -350,16 +367,13 @@ _RuntimeApp _runtimeApp({
       ),
       GoRoute(
         path: '/messages/:conversationId',
-        builder:
-            (_, state) => ChatScreen(
-              conversationId: state.pathParameters['conversationId']!,
-            ),
+        builder: (_, state) =>
+            ChatScreen(conversationId: state.pathParameters['conversationId']!),
       ),
       GoRoute(
         path: '/trades/:tradeId',
-        builder:
-            (_, state) =>
-                TradeDetailScreen(tradeId: state.pathParameters['tradeId']!),
+        builder: (_, state) =>
+            TradeDetailScreen(tradeId: state.pathParameters['tradeId']!),
       ),
     ],
   );

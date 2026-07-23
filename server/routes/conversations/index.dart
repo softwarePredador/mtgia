@@ -28,7 +28,26 @@ Future<Response> _listConversations(RequestContext context) async {
     final countFuture = pool.execute(
       Sql.named('''
         SELECT COUNT(*)::int FROM conversations
-        WHERE user_a_id = @userId OR user_b_id = @userId
+        WHERE (user_a_id = @userId OR user_b_id = @userId)
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = @userId
+              AND b.blocked_id = CASE
+                WHEN conversations.user_a_id = @userId
+                  THEN conversations.user_b_id
+                ELSE conversations.user_a_id
+              END
+            ) OR (
+              b.blocked_id = @userId
+              AND b.blocker_id = CASE
+                WHEN conversations.user_a_id = @userId
+                  THEN conversations.user_b_id
+                ELSE conversations.user_a_id
+              END
+            )
+          )
       '''),
       parameters: {'userId': userId},
     );
@@ -50,18 +69,38 @@ Future<Response> _listConversations(RequestContext context) async {
           -- última mensagem (preview)
           (SELECT dm.message FROM direct_messages dm
            WHERE dm.conversation_id = c.id
+             AND dm.moderation_status = 'visible'
            ORDER BY dm.created_at DESC LIMIT 1) AS last_message,
           (SELECT dm.sender_id FROM direct_messages dm
            WHERE dm.conversation_id = c.id
+             AND dm.moderation_status = 'visible'
            ORDER BY dm.created_at DESC LIMIT 1) AS last_message_sender_id,
           -- contagem de não lidas
           (SELECT COUNT(*)::int FROM direct_messages dm
            WHERE dm.conversation_id = c.id
              AND dm.sender_id != @userId
-             AND dm.read_at IS NULL) AS unread_count
+             AND dm.read_at IS NULL
+             AND dm.moderation_status = 'visible') AS unread_count
         FROM conversations c
         JOIN users u ON u.id = CASE WHEN c.user_a_id = @userId THEN c.user_b_id ELSE c.user_a_id END
-        WHERE c.user_a_id = @userId OR c.user_b_id = @userId
+        WHERE (c.user_a_id = @userId OR c.user_b_id = @userId)
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = @userId
+              AND b.blocked_id = CASE
+                WHEN c.user_a_id = @userId THEN c.user_b_id
+                ELSE c.user_a_id
+              END
+            ) OR (
+              b.blocked_id = @userId
+              AND b.blocker_id = CASE
+                WHEN c.user_a_id = @userId THEN c.user_b_id
+                ELSE c.user_a_id
+              END
+            )
+          )
         ORDER BY COALESCE(c.last_message_at, c.created_at) DESC
         LIMIT @lim OFFSET @off
       '''),
@@ -166,14 +205,46 @@ Future<Response> _createConversation(RequestContext context) async {
 
       final userCheck = await session.execute(
         Sql.named('''
-          SELECT id, username, display_name, avatar_url
+          SELECT
+            id,
+            username,
+            display_name,
+            avatar_url,
+            message_visibility,
+            EXISTS (
+              SELECT 1
+              FROM user_follows
+              WHERE follower_id = @userId
+                AND following_id = @id
+            ) AS actor_follows,
+            EXISTS (
+              SELECT 1
+              FROM user_blocks
+              WHERE (blocker_id = @userId AND blocked_id = @id)
+                 OR (blocker_id = @id AND blocked_id = @userId)
+            ) AS interaction_blocked
           FROM users
           WHERE id = @id
             AND deleted_at IS NULL
         '''),
-        parameters: {'id': otherUserId},
+        parameters: {'id': otherUserId, 'userId': userId},
       );
       if (userCheck.isEmpty) return null;
+      final userPolicy = userCheck.first.toColumnMap();
+      final visibility = userPolicy['message_visibility'] as String;
+      final allowed =
+          userPolicy['interaction_blocked'] != true &&
+          (visibility == 'everyone' ||
+              (visibility == 'followers' &&
+                  userPolicy['actor_follows'] == true));
+      if (!allowed) {
+        return {
+          'error':
+              userPolicy['interaction_blocked'] == true
+                  ? 'interaction_blocked'
+                  : 'messages_not_allowed',
+        };
+      }
 
       // Tentar inserir; ON CONFLICT retorna a conversa existente.
       final result = await session.execute(
@@ -200,8 +271,17 @@ Future<Response> _createConversation(RequestContext context) async {
         body: {'error': 'Usuário não encontrado'},
       );
     }
-    final otherUser = creation['other_user']!;
-    final conv = creation['conversation']!;
+    if (creation['error'] case final error?) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {
+          'error': error,
+          'message': 'Este usuario nao aceita novas conversas.',
+        },
+      );
+    }
+    final otherUser = creation['other_user']! as Map<String, dynamic>;
+    final conv = creation['conversation']! as Map<String, dynamic>;
     final createdAt = conv['created_at'];
 
     return Response.json(

@@ -30,6 +30,9 @@ erDiagram
     cards ||--o{ commander_reference_card_stats : "card_id -> id"
     cards ||--o{ commander_reference_deck_cards : "card_id -> id"
     commander_reference_decks ||--o{ commander_reference_deck_cards : "source_deck_key -> source_deck_key"
+    users ||--o{ content_report_appeals : "appellant_user_id -> id"
+    content_reports ||--o{ content_report_appeals : "report_id -> id"
+    users ||--o{ content_report_appeals : "reviewed_by -> id"
     users ||--o{ content_reports : "reporter_user_id -> id"
     users ||--o{ content_reports : "reviewed_by -> id"
     users ||--o{ conversations : "user_a_id -> id"
@@ -49,6 +52,8 @@ erDiagram
     users ||--o{ email_verification_tokens : "user_id -> id"
     decks ||--o{ ml_prompt_feedback : "deck_id -> id"
     users ||--o{ ml_prompt_feedback : "user_id -> id"
+    users ||--o{ moderation_actions : "moderator_user_id -> id"
+    content_reports ||--o{ moderation_actions : "report_id -> id"
     users ||--o{ notifications : "user_id -> id"
     users ||--o{ password_reset_tokens : "user_id -> id"
     decks ||--o{ post_game_notes : "deck_id -> id"
@@ -68,6 +73,10 @@ erDiagram
     trade_offers ||--o{ trade_status_history : "trade_offer_id -> id"
     cards ||--o{ user_binder_items : "card_id -> id"
     users ||--o{ user_binder_items : "user_id -> id"
+    users ||--o{ user_block_events : "actor_user_id -> id"
+    users ||--o{ user_block_events : "target_user_id -> id"
+    users ||--o{ user_blocks : "blocked_id -> id"
+    users ||--o{ user_blocks : "blocker_id -> id"
     users ||--o{ user_follows : "follower_id -> id"
     users ||--o{ user_follows : "following_id -> id"
     users ||--o{ user_plans : "user_id -> id"
@@ -456,17 +465,34 @@ erDiagram
         string source
         datetime updated_at
     }
-    content_reports {
+    content_report_appeals {
+        uuid appellant_user_id
         datetime created_at
-        string details
         uuid id PK
         string reason
-        uuid reporter_user_id
+        uuid report_id
+        string resolution
         datetime reviewed_at
         uuid reviewed_by
         string status
+    }
+    content_reports {
+        datetime created_at
+        string details
+        json evidence
+        uuid id PK
+        number priority
+        string reason
+        uuid reporter_user_id
+        string resolution
+        string resolution_action
+        datetime reviewed_at
+        uuid reviewed_by
+        datetime sla_due_at
+        string status
         string target_id
         string target_type
+        datetime updated_at
     }
     conversations {
         datetime created_at
@@ -585,10 +611,12 @@ erDiagram
         string weaknesses
     }
     direct_messages {
+        string client_request_id
         uuid conversation_id
         datetime created_at
         uuid id PK
         string message
+        string moderation_status
         datetime read_at
         uuid sender_id
     }
@@ -674,6 +702,16 @@ erDiagram
         string prompt_version
         string user_comment
         uuid user_id
+    }
+    moderation_actions {
+        string action
+        datetime created_at
+        json evidence
+        uuid id PK
+        uuid moderator_user_id
+        string rationale
+        uuid report_id
+        string request_id
     }
     notifications {
         string body
@@ -819,9 +857,11 @@ erDiagram
     trade_messages {
         string attachment_type
         string attachment_url
+        string client_request_id
         datetime created_at
         uuid id PK
         string message
+        string moderation_status
         uuid sender_id
         uuid trade_offer_id
     }
@@ -866,6 +906,21 @@ erDiagram
         datetime updated_at
         uuid user_id
     }
+    user_block_events {
+        string action
+        uuid actor_user_id
+        datetime created_at
+        uuid id PK
+        string reason
+        string request_id
+        uuid target_user_id
+    }
+    user_blocks {
+        uuid blocked_id
+        uuid blocker_id
+        datetime created_at
+        string reason
+    }
     user_follows {
         datetime created_at
         uuid follower_id
@@ -883,6 +938,7 @@ erDiagram
     users {
         number auth_version
         string avatar_url
+        string binder_visibility
         datetime created_at
         datetime deleted_at
         string display_name
@@ -892,16 +948,19 @@ erDiagram
         uuid id PK
         string location_city
         string location_state
+        string location_visibility
+        string message_visibility
         datetime password_changed_at
         string password_hash
         datetime privacy_accepted_at
         string privacy_version
+        string profile_visibility
         datetime terms_accepted_at
         string terms_version
         string trade_notes
-        datetime updated_at
-        string username
+        string trade_notes_visibility
+        string trade_visibility
     }
 ```
 
-Tabelas: 69; views: 6; migrations: 50 (latest `050`).
+Tabelas: 73; views: 6; migrations: 51 (latest `051`).

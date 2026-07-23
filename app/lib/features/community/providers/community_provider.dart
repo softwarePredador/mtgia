@@ -54,6 +54,7 @@ class CommunityDeckComment {
     required this.id,
     required this.body,
     required this.createdAt,
+    this.authorId,
     this.authorName,
     this.authorAvatarUrl,
   });
@@ -61,6 +62,7 @@ class CommunityDeckComment {
   final String id;
   final String body;
   final DateTime createdAt;
+  final String? authorId;
   final String? authorName;
   final String? authorAvatarUrl;
 
@@ -72,10 +74,10 @@ class CommunityDeckComment {
       createdAt:
           DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.fromMillisecondsSinceEpoch(0),
-      authorName:
-          author?['display_name']?.toString().trim().isNotEmpty == true
-              ? author!['display_name'].toString()
-              : author?['username']?.toString(),
+      authorId: author?['id']?.toString() ?? json['user_id']?.toString(),
+      authorName: author?['display_name']?.toString().trim().isNotEmpty == true
+          ? author!['display_name'].toString()
+          : author?['username']?.toString(),
       authorAvatarUrl: author?['avatar_url']?.toString(),
     );
   }
@@ -109,10 +111,9 @@ class CommunityTradeMatch {
     return CommunityTradeMatch(
       cardName: card['name']?.toString() ?? '',
       wantedQuantity: _readInt(json['wanted_quantity']) ?? 0,
-      ownerName:
-          owner['display_name']?.toString().trim().isNotEmpty == true
-              ? owner['display_name'].toString()
-              : owner['username']?.toString() ?? 'Jogador',
+      ownerName: owner['display_name']?.toString().trim().isNotEmpty == true
+          ? owner['display_name'].toString()
+          : owner['username']?.toString() ?? 'Jogador',
       sources: (json['sources'] as List? ?? const [])
           .map((entry) => entry.toString())
           .toList(growable: false),
@@ -210,10 +211,9 @@ class CommunityProvider extends ChangeNotifier {
           );
           _errorMessage = 'Resposta inválida da comunidade';
         } else {
-          final newDecks =
-              deckList
-                  .map((d) => CommunityDeck.fromJson(d as Map<String, dynamic>))
-                  .toList();
+          final newDecks = deckList
+              .map((d) => CommunityDeck.fromJson(d as Map<String, dynamic>))
+              .toList();
 
           _decks.addAll(newDecks);
           _total = data['total'] as int? ?? 0;
@@ -340,38 +340,75 @@ class CommunityProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> reportDeck(
-    String deckId, {
-    String reason = 'other',
-    String details = '',
-  }) async {
+  Future<bool> deleteDeckComment(String deckId, String commentId) async {
     try {
-      final response = await _apiClient.post(
-        '/community/decks/${Uri.encodeComponent(deckId)}/reports',
-        {'target_type': 'deck', 'reason': reason, 'details': details},
+      final response = await _apiClient.delete(
+        '/community/decks/${Uri.encodeComponent(deckId)}/comments/'
+        '${Uri.encodeComponent(commentId)}',
       );
-      return response.statusCode == 201;
+      return response.statusCode == 204;
     } catch (e, stackTrace) {
-      debugPrint('[CommunityProvider] reportDeck error: $e');
+      debugPrint('[CommunityProvider] deleteDeckComment error: $e');
       unawaited(
         AppObservability.instance.captureProviderException(
           e,
           stackTrace: stackTrace,
           provider: 'CommunityProvider',
-          operation: 'reportDeck',
-          extras: {'endpoint': '/community/decks/:id/reports'},
+          operation: 'deleteDeckComment',
+          extras: {'endpoint': '/community/decks/:id/comments/:commentId'},
         ),
       );
       return false;
     }
   }
 
+  Future<bool> reportContent({
+    required String targetType,
+    required String targetId,
+    required String reason,
+    String details = '',
+  }) async {
+    try {
+      final response = await _apiClient.post('/content-reports', {
+        'target_type': targetType,
+        'target_id': targetId,
+        'reason': reason,
+        'details': details,
+      });
+      return response.statusCode == 201;
+    } catch (e, stackTrace) {
+      debugPrint('[CommunityProvider] reportContent error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'CommunityProvider',
+          operation: 'reportContent',
+          extras: {'endpoint': '/content-reports'},
+        ),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> reportDeck(
+    String deckId, {
+    String reason = 'other',
+    String details = '',
+  }) async {
+    return reportContent(
+      targetType: 'deck',
+      targetId: deckId,
+      reason: reason,
+      details: details,
+    );
+  }
+
   Future<List<CommunityTradeMatch>> fetchTradeMatches({String? deckId}) async {
     try {
-      final query =
-          deckId == null || deckId.isEmpty
-              ? ''
-              : '?deck_id=${Uri.encodeQueryComponent(deckId)}';
+      final query = deckId == null || deckId.isEmpty
+          ? ''
+          : '?deck_id=${Uri.encodeQueryComponent(deckId)}';
       final response = await _apiClient.get('/community/trade-matches$query');
       if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
         final data = (response.data as Map<String, dynamic>)['matches'];

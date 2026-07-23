@@ -16,8 +16,19 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
     // Verificar participação
     final convResult = await pool.execute(
-      Sql.named(
-          'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
+      Sql.named('''
+        SELECT
+          c.user_a_id,
+          c.user_b_id,
+          EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (b.blocker_id = c.user_a_id AND b.blocked_id = c.user_b_id)
+               OR (b.blocker_id = c.user_b_id AND b.blocked_id = c.user_a_id)
+          ) AS interaction_blocked
+        FROM conversations c
+        WHERE c.id = @id
+      '''),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -33,6 +44,12 @@ Future<Response> onRequest(RequestContext context, String id) async {
         body: {'error': 'Sem permissão'},
       );
     }
+    if (conv['interaction_blocked'] == true) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {'error': 'interaction_blocked'},
+      );
+    }
 
     // Marcar como lidas todas as mensagens do OUTRO usuário que ainda não foram lidas
     final result = await pool.execute(
@@ -42,6 +59,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
         WHERE conversation_id = @convId
           AND sender_id != @userId
           AND read_at IS NULL
+          AND moderation_status = 'visible'
       '''),
       parameters: {'convId': id, 'userId': userId},
     );
@@ -53,17 +71,26 @@ Future<Response> onRequest(RequestContext context, String id) async {
         JOIN conversations c ON c.id = dm.conversation_id
         WHERE dm.read_at IS NULL
           AND dm.sender_id != @userId
+          AND dm.moderation_status = 'visible'
           AND (c.user_a_id = @userId OR c.user_b_id = @userId)
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (b.blocker_id = c.user_a_id AND b.blocked_id = c.user_b_id)
+               OR (b.blocker_id = c.user_b_id AND b.blocked_id = c.user_a_id)
+          )
       '''),
       parameters: {'userId': userId},
     );
     final unread = (unreadResult.first[0] as int?) ?? 0;
 
-    return Response.json(body: {
-      'conversation_id': id,
-      'marked_read': result.affectedRows,
-      'unread': unread,
-    });
+    return Response.json(
+      body: {
+        'conversation_id': id,
+        'marked_read': result.affectedRows,
+        'unread': unread,
+      },
+    );
   } catch (e, st) {
     await captureRouteException(
       context,

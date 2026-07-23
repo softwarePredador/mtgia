@@ -6,6 +6,7 @@ import 'package:postgres/postgres.dart';
 import '../../../../../lib/community_engagement_service.dart';
 import '../../../../../lib/community_request_auth.dart';
 import '../../../../../lib/http_responses.dart';
+import '../../../../../lib/social_safety_service.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   if (context.request.method != HttpMethod.post) {
@@ -24,21 +25,10 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
   final service = CommunityEngagementService(context.read<Pool>());
   try {
-    if (!await service.publicDeckExists(id)) {
-      return notFound('Deck publico nao encontrado.');
-    }
-    final targetType =
-        body['target_type']?.toString().trim().isNotEmpty == true
-            ? body['target_type'].toString()
-            : 'deck';
-    final targetId =
-        body['target_id']?.toString().trim().isNotEmpty == true
-            ? body['target_id'].toString()
-            : id;
     final report = await service.reportContent(
       reporterUserId: userId,
-      targetType: targetType,
-      targetId: targetId,
+      targetType: 'deck',
+      targetId: id,
       reason: body['reason']?.toString() ?? 'other',
       details: body['details']?.toString() ?? '',
     );
@@ -48,6 +38,17 @@ Future<Response> onRequest(RequestContext context, String id) async {
     );
   } on FormatException catch (error) {
     return badRequest(error.message);
+  } on SocialSafetyException catch (error) {
+    final status = switch (error.code) {
+      'rate_limited' => HttpStatus.tooManyRequests,
+      'duplicate_report' => HttpStatus.conflict,
+      'target_not_found' => HttpStatus.notFound,
+      _ => HttpStatus.badRequest,
+    };
+    return Response.json(
+      statusCode: status,
+      body: {'error': error.code, 'message': error.message},
+    );
   } catch (error) {
     return internalServerError('Falha ao registrar denuncia', details: error);
   }

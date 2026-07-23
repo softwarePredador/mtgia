@@ -35,10 +35,9 @@ class PublicUser {
       followerCount: json['follower_count'] as int? ?? 0,
       followingCount: json['following_count'] as int? ?? 0,
       publicDeckCount: json['public_deck_count'] as int? ?? 0,
-      createdAt:
-          json['created_at'] != null
-              ? DateTime.tryParse(json['created_at'] as String)
-              : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'] as String)
+          : null,
     );
   }
 
@@ -79,10 +78,40 @@ class PublicDeckSummary {
       cardCount: json['card_count'] as int? ?? 0,
       commanderName: json['commander_name'] as String?,
       commanderImageUrl: json['commander_image_url'] as String?,
-      createdAt:
-          json['created_at'] != null
-              ? DateTime.tryParse(json['created_at'] as String)
-              : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'] as String)
+          : null,
+    );
+  }
+}
+
+class BlockedUser {
+  const BlockedUser({
+    required this.id,
+    required this.username,
+    this.displayName,
+    this.avatarUrl,
+    this.reason,
+    this.blockedAt,
+  });
+
+  final String id;
+  final String username;
+  final String? displayName;
+  final String? avatarUrl;
+  final String? reason;
+  final DateTime? blockedAt;
+
+  String get displayLabel => displayName ?? username;
+
+  factory BlockedUser.fromJson(Map<String, dynamic> json) {
+    return BlockedUser(
+      id: json['id']?.toString() ?? '',
+      username: json['username']?.toString() ?? '',
+      displayName: json['display_name']?.toString(),
+      avatarUrl: json['avatar_url']?.toString(),
+      reason: json['reason']?.toString(),
+      blockedAt: DateTime.tryParse(json['blocked_at']?.toString() ?? ''),
     );
   }
 }
@@ -158,6 +187,15 @@ class SocialProvider extends ChangeNotifier {
   bool get hasMoreFeed => _hasMoreFeed;
   int get feedTotal => _feedTotal;
 
+  // --- Segurança social ---
+  List<BlockedUser> _blockedUsers = [];
+  bool _isLoadingBlockedUsers = false;
+  String? _blockedUsersError;
+
+  List<BlockedUser> get blockedUsers => _blockedUsers;
+  bool get isLoadingBlockedUsers => _isLoadingBlockedUsers;
+  String? get blockedUsersError => _blockedUsersError;
+
   SocialProvider({ApiClient? apiClient})
     : _apiClient = apiClient ?? ApiClient();
 
@@ -196,10 +234,9 @@ class SocialProvider extends ChangeNotifier {
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        _searchResults =
-            list
-                .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
-                .toList();
+        _searchResults = list
+            .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
+            .toList();
         _searchTotal = data['total'] as int? ?? _searchResults.length;
       } else {
         _recordSocialEvent(
@@ -276,12 +313,9 @@ class SocialProvider extends ChangeNotifier {
         _isOwnProfile = userMap['is_own_profile'] == true;
 
         final decksList = (data['public_decks'] as List?) ?? [];
-        _visitedUserDecks =
-            decksList
-                .map(
-                  (d) => PublicDeckSummary.fromJson(d as Map<String, dynamic>),
-                )
-                .toList();
+        _visitedUserDecks = decksList
+            .map((d) => PublicDeckSummary.fromJson(d as Map<String, dynamic>))
+            .toList();
       } else if (response.statusCode == 404) {
         _profileError = 'Usuário não encontrado';
       } else {
@@ -414,6 +448,145 @@ class SocialProvider extends ChangeNotifier {
   }
 
   // ======================================================================
+  // Segurança Social
+  // ======================================================================
+
+  Future<bool> reportContent({
+    required String targetType,
+    required String targetId,
+    required String reason,
+    String details = '',
+  }) async {
+    try {
+      final response = await _apiClient.post('/content-reports', {
+        'target_type': targetType,
+        'target_id': targetId,
+        'reason': reason,
+        'details': details,
+      });
+      if (response.statusCode == 201) return true;
+      _recordSocialEvent(
+        'social_report_http_error',
+        operation: 'reportContent',
+        endpoint: '/content-reports',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
+    } catch (e, stackTrace) {
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'reportContent',
+          extras: {'endpoint': '/content-reports'},
+        ),
+      );
+    }
+    return false;
+  }
+
+  Future<bool> blockUser(String targetId, {String? reason}) async {
+    try {
+      final response = await _apiClient.post('/users/$targetId/block', {
+        if (reason?.trim().isNotEmpty == true) 'reason': reason!.trim(),
+      });
+      if (response.statusCode == 200) {
+        _isFollowingVisited = false;
+        _followers.removeWhere((user) => user.id == targetId);
+        _following.removeWhere((user) => user.id == targetId);
+        _searchResults.removeWhere((user) => user.id == targetId);
+        notifyListeners();
+        return true;
+      }
+      _recordSocialEvent(
+        'social_block_http_error',
+        operation: 'blockUser',
+        endpoint: '/users/:id/block',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
+    } catch (e, stackTrace) {
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'blockUser',
+          extras: {'endpoint': '/users/:id/block'},
+        ),
+      );
+    }
+    return false;
+  }
+
+  Future<void> fetchBlockedUsers() async {
+    if (_isLoadingBlockedUsers) return;
+    _isLoadingBlockedUsers = true;
+    _blockedUsersError = null;
+    notifyListeners();
+    try {
+      final response = await _apiClient.get('/users/me/blocks');
+      if (response.statusCode == 200 && response.data is Map) {
+        final data = response.data as Map<String, dynamic>;
+        final list = data['data'] as List? ?? const [];
+        _blockedUsers = list
+            .whereType<Map>()
+            .map((entry) => BlockedUser.fromJson(entry.cast()))
+            .where((entry) => entry.id.isNotEmpty)
+            .toList(growable: false);
+      } else {
+        _blockedUsersError = 'Não foi possível carregar contas bloqueadas.';
+      }
+    } catch (e, stackTrace) {
+      _blockedUsersError = 'Não foi possível carregar contas bloqueadas.';
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'fetchBlockedUsers',
+          extras: {'endpoint': '/users/me/blocks'},
+        ),
+      );
+    } finally {
+      _isLoadingBlockedUsers = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> unblockUser(String targetId) async {
+    try {
+      final response = await _apiClient.delete('/users/$targetId/block');
+      if (response.statusCode == 200) {
+        _blockedUsers = _blockedUsers
+            .where((user) => user.id != targetId)
+            .toList(growable: false);
+        notifyListeners();
+        return true;
+      }
+      _recordSocialEvent(
+        'social_unblock_http_error',
+        operation: 'unblockUser',
+        endpoint: '/users/:id/block',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
+    } catch (e, stackTrace) {
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'unblockUser',
+          extras: {'endpoint': '/users/:id/block'},
+        ),
+      );
+    }
+    return false;
+  }
+
+  // ======================================================================
   // Followers / Following Lists
   // ======================================================================
 
@@ -442,10 +615,9 @@ class SocialProvider extends ChangeNotifier {
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final newUsers =
-            list
-                .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
-                .toList();
+        final newUsers = list
+            .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
+            .toList();
         _followers.addAll(newUsers);
         _followersTotal = data['total'] as int? ?? _followers.length;
         _hasMoreFollowers = _followers.length < _followersTotal;
@@ -503,10 +675,9 @@ class SocialProvider extends ChangeNotifier {
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final newUsers =
-            list
-                .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
-                .toList();
+        final newUsers = list
+            .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
+            .toList();
         _following.addAll(newUsers);
         _followingTotal = data['total'] as int? ?? _following.length;
         _hasMoreFollowing = _following.length < _followingTotal;
@@ -567,12 +738,9 @@ class SocialProvider extends ChangeNotifier {
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final newDecks =
-            list
-                .map(
-                  (d) => PublicDeckSummary.fromJson(d as Map<String, dynamic>),
-                )
-                .toList();
+        final newDecks = list
+            .map((d) => PublicDeckSummary.fromJson(d as Map<String, dynamic>))
+            .toList();
         _followingFeed.addAll(newDecks);
         _feedTotal = data['total'] as int? ?? 0;
         _hasMoreFeed = _followingFeed.length < _feedTotal;
@@ -585,10 +753,9 @@ class SocialProvider extends ChangeNotifier {
           statusCode: response.statusCode,
           requestId: response.requestId,
         );
-        _feedError =
-            response.statusCode == 401
-                ? 'Entre novamente para ver o feed de seguidos'
-                : 'Erro ao carregar feed de seguidos';
+        _feedError = response.statusCode == 401
+            ? 'Entre novamente para ver o feed de seguidos'
+            : 'Erro ao carregar feed de seguidos';
       }
     } catch (e, stackTrace) {
       debugPrint('[SocialProvider] fetchFollowingFeed error: $e');
@@ -639,7 +806,10 @@ class SocialProvider extends ChangeNotifier {
         _feedError == null &&
         _hasMoreFeed &&
         _feedPage == 1 &&
-        _feedTotal == 0) {
+        _feedTotal == 0 &&
+        _blockedUsers.isEmpty &&
+        !_isLoadingBlockedUsers &&
+        _blockedUsersError == null) {
       return;
     }
 
@@ -673,6 +843,9 @@ class SocialProvider extends ChangeNotifier {
     _hasMoreFeed = true;
     _feedPage = 1;
     _feedTotal = 0;
+    _blockedUsers = [];
+    _isLoadingBlockedUsers = false;
+    _blockedUsersError = null;
     notifyListeners();
   }
 

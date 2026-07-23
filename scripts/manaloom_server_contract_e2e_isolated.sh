@@ -34,6 +34,7 @@ case "$DB_HOST" in
 esac
 
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)_$$"
+OPS_KEY="manaloom-isolated-ops-${RUN_ID}-key-material"
 DATABASE="manaloom_s1_api_${RUN_ID}"
 RUN_DIR="${TMPDIR:-/tmp}/manaloom_server_contract_e2e_${RUN_ID}"
 SERVER_LOG="$RUN_DIR/server.log"
@@ -218,6 +219,7 @@ psql -X -v ON_ERROR_STOP=1 \
     EMAIL_VERIFICATION_WEBHOOK_URL="http://127.0.0.1:$EMAIL_FIXTURE_PORT/deliver" \
     EMAIL_VERIFICATION_WEBHOOK_TOKEN="isolated-fixture" \
     EMAIL_VERIFICATION_APP_URL="http://127.0.0.1:$PORT/app/#/verify-email" \
+    MANALOOM_OPS_API_KEY="$OPS_KEY" \
     MANALOOM_REQUIRE_LEGAL_ACCEPTANCE="${MANALOOM_REQUIRE_LEGAL_ACCEPTANCE:-false}" \
     MANALOOM_REQUIRE_VERIFIED_EMAIL="${MANALOOM_REQUIRE_VERIFIED_EMAIL:-false}" \
     ENVIRONMENT="$ISOLATED_ENVIRONMENT" PORT="$PORT" \
@@ -278,6 +280,7 @@ fi
     DB_PASS="$DB_PASS" DB_NAME="$DATABASE" \
     RUN_INTEGRATION_TESTS=1 \
     MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
+    MANALOOM_TEST_OPS_API_KEY="$OPS_KEY" \
     TEST_API_BASE_URL="http://127.0.0.1:$PORT" \
     dart test "${tests[@]}"
 ) 2>&1 | tee "$TEST_LOG"
@@ -322,7 +325,7 @@ fi
   printf 'server_environment=%s\n' "$ISOLATED_ENVIRONMENT"
   printf 'openai_profile=%s\n' "${OPENAI_PROFILE:-default}"
   printf 'full_card_catalog_enabled=%s\n' "${MANALOOM_ISOLATED_FULL_CARD_CATALOG:-0}"
-  printf 'latest_migration=050\n'
+  printf 'latest_migration=051\n'
   printf 'email_delivery_count=%s\n' "$email_delivery_count"
   printf 'email_delivery_templates=%s\n' "$email_delivery_templates"
   printf 'email_delivery_log=sanitized_without_links_or_tokens\n'

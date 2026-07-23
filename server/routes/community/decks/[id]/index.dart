@@ -7,10 +7,13 @@ import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/scryfall_image_url.dart';
+import '../../../../lib/community_request_auth.dart';
+import '../following/index.dart' as following_route;
 
 Future<Response> onRequest(RequestContext context, String id) async {
-  // Caso especial: /community/decks/following é capturado como id="following"
-  if (id == 'following') return getFollowingFeed(context);
+  // Dart Frog mounts /community/decks/<id> before the static /following route.
+  // This dispatch contains no feed logic; it delegates to the canonical route.
+  if (id == 'following') return following_route.onRequest(context);
 
   if (context.request.method == HttpMethod.get) {
     return _getPublicDeck(context, id);
@@ -26,6 +29,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 /// GET /community/decks/:id — visualizar deck público (sem auth)
 Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
   final conn = context.read<Pool>();
+  final viewerUserId = await readAuthenticatedUserId(context);
 
   try {
     // Buscar deck público
@@ -49,8 +53,23 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
           AND d.is_public = true
           AND d.deleted_at IS NULL
           AND u.deleted_at IS NULL
+          AND u.profile_visibility = 'public'
+          AND (
+            CAST(@viewerUserId AS uuid) IS NULL
+            OR NOT EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (
+                b.blocker_id = CAST(@viewerUserId AS uuid)
+                AND b.blocked_id = d.user_id
+              ) OR (
+                b.blocked_id = CAST(@viewerUserId AS uuid)
+                AND b.blocker_id = d.user_id
+              )
+            )
+          )
       '''),
-      parameters: {'deckId': deckId},
+      parameters: {'deckId': deckId, 'viewerUserId': viewerUserId},
     );
 
     if (deckResult.isEmpty) {
@@ -304,8 +323,20 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
             AND d.is_public = true
             AND d.deleted_at IS NULL
             AND u.deleted_at IS NULL
+            AND u.profile_visibility = 'public'
+            AND NOT EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (
+                b.blocker_id = CAST(@userId AS uuid)
+                AND b.blocked_id = d.user_id
+              ) OR (
+                b.blocked_id = CAST(@userId AS uuid)
+                AND b.blocker_id = d.user_id
+              )
+            )
         '''),
-        parameters: {'deckId': deckId},
+        parameters: {'deckId': deckId, 'userId': userId},
       );
 
       if (original.isEmpty) {
@@ -373,141 +404,6 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Failed to copy deck'},
-    );
-  }
-}
-
-/// GET /community/decks/following?page=1&limit=20
-/// Retorna decks públicos dos usuários que o autenticado segue.
-/// Requer JWT (Authorization header).
-Future<Response> getFollowingFeed(RequestContext context) async {
-  if (context.request.method != HttpMethod.get) {
-    return Response(statusCode: HttpStatus.methodNotAllowed);
-  }
-
-  // Auth manual (comunidade é sem middleware de auth)
-  final authHeader = context.request.headers['Authorization'];
-  if (authHeader == null || !authHeader.startsWith('Bearer ')) {
-    return Response.json(
-      statusCode: HttpStatus.unauthorized,
-      body: {'error': 'Authentication required.'},
-    );
-  }
-
-  final token = authHeader.substring(7);
-  final authService = AuthService();
-  final user = await authService.getUserFromToken(token);
-  if (user == null) {
-    return Response.json(
-      statusCode: HttpStatus.unauthorized,
-      body: {'error': 'Invalid or expired token.'},
-    );
-  }
-
-  final userId = user['id'] as String;
-
-  try {
-    final conn = context.read<Pool>();
-    final params = context.request.uri.queryParameters;
-    final page = int.tryParse(params['page'] ?? '') ?? 1;
-    final limit = (int.tryParse(params['limit'] ?? '') ?? 20).clamp(1, 50);
-    final offset = (page - 1) * limit;
-
-    // Count total
-    final countResult = await conn.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int
-        FROM decks d
-        JOIN users u ON u.id = d.user_id
-        JOIN user_follows uf ON uf.following_id = d.user_id
-        WHERE uf.follower_id = @userId
-          AND d.is_public = true
-          AND d.deleted_at IS NULL
-          AND u.deleted_at IS NULL
-      '''),
-      parameters: {'userId': userId},
-    );
-    final total = (countResult.first[0] as int?) ?? 0;
-
-    // Fetch decks from followed users
-    final result = await conn.execute(
-      Sql.named('''
-        SELECT
-          d.id,
-          d.name,
-          d.format,
-          d.description,
-          d.synergy_score,
-          d.created_at,
-          u.username as owner_username,
-          u.id as owner_id,
-          cmd.commander_name,
-          COALESCE(cmd.commander_image_url, first_card.first_image_url) as commander_image_url,
-          COALESCE(SUM(dc.quantity), 0)::int as card_count
-        FROM decks d
-        JOIN users u ON u.id = d.user_id
-        JOIN user_follows uf ON uf.following_id = d.user_id
-        LEFT JOIN LATERAL (
-          SELECT
-            c.name as commander_name,
-            c.image_url as commander_image_url
-          FROM deck_cards dc_cmd
-          JOIN cards c ON c.id = dc_cmd.card_id
-          WHERE dc_cmd.deck_id = d.id
-            AND dc_cmd.is_commander = true
-          LIMIT 1
-        ) cmd ON true
-        LEFT JOIN LATERAL (
-          SELECT c.image_url as first_image_url
-          FROM deck_cards dc_fc
-          JOIN cards c ON c.id = dc_fc.card_id
-          WHERE dc_fc.deck_id = d.id
-            AND c.image_url IS NOT NULL
-            AND c.image_url != ''
-          ORDER BY dc_fc.quantity DESC, c.name
-          LIMIT 1
-        ) first_card ON true
-        LEFT JOIN deck_cards dc ON d.id = dc.deck_id
-        WHERE uf.follower_id = @userId
-          AND d.is_public = true
-          AND d.deleted_at IS NULL
-          AND u.deleted_at IS NULL
-        GROUP BY d.id, u.username, u.id, cmd.commander_name, cmd.commander_image_url, first_card.first_image_url
-        ORDER BY d.created_at DESC
-        LIMIT @lim OFFSET @off
-      '''),
-      parameters: {'userId': userId, 'lim': limit, 'off': offset},
-    );
-
-    final decks =
-        result.map((row) {
-          final m = row.toColumnMap();
-          if (m['created_at'] is DateTime) {
-            m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
-          }
-          m['commander_image_url'] = normalizeScryfallImageUrl(
-            m['commander_image_url']?.toString(),
-          );
-          return m;
-        }).toList();
-
-    return Response.json(
-      body: {'data': decks, 'page': page, 'limit': limit, 'total': total},
-    );
-  } catch (e, st) {
-    await captureRouteException(
-      context,
-      e,
-      stackTrace: st,
-      source: 'community_following_feed_route',
-      extras: {'operation': 'get_following_feed'},
-    );
-    Log.e(
-      '[community_route] server_error endpoint=GET /community/decks/following error=$e',
-    );
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Internal server error'},
     );
   }
 }

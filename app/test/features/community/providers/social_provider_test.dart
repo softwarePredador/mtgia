@@ -5,7 +5,7 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/social/providers/social_provider.dart';
 
 class _FakeSocialApiClient extends ApiClient {
-  _FakeSocialApiClient({this.getHandler, this.postHandler});
+  _FakeSocialApiClient({this.getHandler, this.postHandler, this.deleteHandler});
 
   final Future<ApiResponse> Function(String endpoint)? getHandler;
   final Future<ApiResponse> Function(
@@ -13,6 +13,7 @@ class _FakeSocialApiClient extends ApiClient {
     Map<String, dynamic> body,
   )?
   postHandler;
+  final Future<ApiResponse> Function(String endpoint)? deleteHandler;
 
   @override
   Future<ApiResponse> get(String endpoint) {
@@ -34,7 +35,9 @@ class _FakeSocialApiClient extends ApiClient {
 
   @override
   Future<ApiResponse> delete(String endpoint, {Map<String, dynamic>? body}) {
-    throw UnimplementedError('No DELETE for $endpoint');
+    final handler = deleteHandler;
+    if (handler == null) throw UnimplementedError('No DELETE for $endpoint');
+    return handler(endpoint);
   }
 }
 
@@ -66,10 +69,9 @@ void main() {
   test('fetchUserProfile maps 404 to user-facing error', () async {
     final provider = SocialProvider(
       apiClient: _FakeSocialApiClient(
-        getHandler:
-            (_) async => ApiResponse(404, {
-              'error': 'not found',
-            }, requestId: 'req-profile-404'),
+        getHandler: (_) async => ApiResponse(404, {
+          'error': 'not found',
+        }, requestId: 'req-profile-404'),
       ),
     );
 
@@ -82,10 +84,9 @@ void main() {
   test('followUser returns false for forbidden response', () async {
     final provider = SocialProvider(
       apiClient: _FakeSocialApiClient(
-        postHandler:
-            (_, __) async => ApiResponse(403, {
-              'error': 'forbidden',
-            }, requestId: 'req-follow-403'),
+        postHandler: (_, __) async => ApiResponse(403, {
+          'error': 'forbidden',
+        }, requestId: 'req-follow-403'),
       ),
     );
 
@@ -97,10 +98,9 @@ void main() {
   test('fetchFollowingFeed exposes 401 error state', () async {
     final provider = SocialProvider(
       apiClient: _FakeSocialApiClient(
-        getHandler:
-            (_) async => ApiResponse(401, {
-              'error': 'auth required',
-            }, requestId: 'req-feed-401'),
+        getHandler: (_) async => ApiResponse(401, {
+          'error': 'auth required',
+        }, requestId: 'req-feed-401'),
       ),
     );
 
@@ -132,5 +132,63 @@ void main() {
     expect(provider.isLoadingFollowers, isFalse);
     expect(provider.followers, isEmpty);
     expect(provider.followersError, isNull);
+  });
+
+  test('reportContent sends the canonical target contract', () async {
+    late String endpoint;
+    late Map<String, dynamic> payload;
+    final provider = SocialProvider(
+      apiClient: _FakeSocialApiClient(
+        postHandler: (nextEndpoint, body) async {
+          endpoint = nextEndpoint;
+          payload = body;
+          return ApiResponse(201, {
+            'report': {'id': 'report-1'},
+          });
+        },
+      ),
+    );
+
+    final ok = await provider.reportContent(
+      targetType: 'message',
+      targetId: 'message-1',
+      reason: 'abuse',
+      details: 'ameaça',
+    );
+
+    expect(ok, isTrue);
+    expect(endpoint, '/content-reports');
+    expect(payload['target_type'], 'message');
+    expect(payload['target_id'], 'message-1');
+    expect(payload['reason'], 'abuse');
+  });
+
+  test('blocked users can be loaded and explicitly unblocked', () async {
+    final provider = SocialProvider(
+      apiClient: _FakeSocialApiClient(
+        getHandler: (_) async => ApiResponse(200, {
+          'data': [
+            {
+              'id': 'blocked-1',
+              'username': 'blocked',
+              'display_name': 'Blocked User',
+              'blocked_at': '2026-07-23T10:00:00Z',
+            },
+          ],
+          'total': 1,
+        }),
+        deleteHandler: (endpoint) async {
+          expect(endpoint, '/users/blocked-1/block');
+          return ApiResponse(200, {'blocked': false, 'removed': true});
+        },
+      ),
+    );
+
+    await provider.fetchBlockedUsers();
+    expect(provider.blockedUsers.single.displayLabel, 'Blocked User');
+
+    final ok = await provider.unblockUser('blocked-1');
+    expect(ok, isTrue);
+    expect(provider.blockedUsers, isEmpty);
   });
 }

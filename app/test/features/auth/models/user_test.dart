@@ -10,6 +10,12 @@ void main() {
         'email': 'john@example.com',
         'display_name': 'John Doe',
         'avatar_url': 'https://img.example.com/avatar.png',
+        'profile_visibility': 'private',
+        'binder_visibility': 'private',
+        'location_visibility': 'trade_only',
+        'message_visibility': 'followers',
+        'trade_visibility': 'none',
+        'trade_notes_visibility': 'trade_only',
       };
 
       final user = User.fromJson(json);
@@ -19,6 +25,12 @@ void main() {
       expect(user.email, 'john@example.com');
       expect(user.displayName, 'John Doe');
       expect(user.avatarUrl, 'https://img.example.com/avatar.png');
+      expect(user.profileVisibility, 'private');
+      expect(user.binderVisibility, 'private');
+      expect(user.locationVisibility, 'trade_only');
+      expect(user.messageVisibility, 'followers');
+      expect(user.tradeVisibility, 'none');
+      expect(user.tradeNotesVisibility, 'trade_only');
     });
 
     test('fromJson deve lidar com campos opcionais nulos', () {
@@ -35,6 +47,12 @@ void main() {
       expect(user.email, 'jane@example.com');
       expect(user.displayName, isNull);
       expect(user.avatarUrl, isNull);
+      expect(user.profileVisibility, 'public');
+      expect(user.binderVisibility, 'public');
+      expect(user.locationVisibility, 'private');
+      expect(user.messageVisibility, 'everyone');
+      expect(user.tradeVisibility, 'everyone');
+      expect(user.tradeNotesVisibility, 'private');
     });
 
     test('toJson deve serializar corretamente', () {
@@ -56,11 +74,7 @@ void main() {
     });
 
     test('toJson deve incluir nulos para campos opcionais ausentes', () {
-      final user = User(
-        id: 'u2',
-        username: 'bare',
-        email: 'bare@test.com',
-      );
+      final user = User(id: 'u2', username: 'bare', email: 'bare@test.com');
 
       final json = user.toJson();
 

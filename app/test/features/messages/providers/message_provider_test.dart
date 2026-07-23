@@ -19,8 +19,12 @@ class _SlowMessagesApiClient extends ApiClient {
 }
 
 class _RealtimeMessagesApiClient extends ApiClient {
+  _RealtimeMessagesApiClient({this.sendStatus = 201});
+
+  final int sendStatus;
   final getEndpoints = <String>[];
   final postEndpoints = <String>[];
+  final postBodies = <Map<String, dynamic>>[];
   final putEndpoints = <String>[];
   int unread = 1;
 
@@ -87,8 +91,9 @@ class _RealtimeMessagesApiClient extends ApiClient {
     Duration? timeout,
   }) async {
     postEndpoints.add(endpoint);
+    postBodies.add(Map<String, dynamic>.from(body));
     if (endpoint == '/conversations/conversation-1/messages') {
-      return ApiResponse(201, {
+      return ApiResponse(sendStatus, {
         'id': 'message-sent',
         'sender_id': 'user-1',
         'message': body['message'],
@@ -211,6 +216,33 @@ void main() {
         contains('/conversations/conversation-1/messages'),
       );
       expect(api.getEndpoints, contains('/conversations?page=1&limit=20'));
+    },
+  );
+
+  test(
+    'sendMessage preserves client id and accepts idempotent replay',
+    () async {
+      final api = _RealtimeMessagesApiClient(sendStatus: 200);
+      final provider = MessageProvider(apiClient: api);
+
+      final first = await provider.sendMessage(
+        'conversation-1',
+        'resposta',
+        clientRequestId: 'stable-request-1',
+      );
+      final replay = await provider.sendMessage(
+        'conversation-1',
+        'resposta',
+        clientRequestId: 'stable-request-1',
+      );
+
+      expect(first, isTrue);
+      expect(replay, isTrue);
+      expect(
+        api.postBodies.map((body) => body['client_request_id']),
+        everyElement('stable-request-1'),
+      );
+      expect(provider.messages, hasLength(1));
     },
   );
 

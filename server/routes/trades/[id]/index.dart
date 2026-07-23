@@ -22,7 +22,8 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
     final pool = context.read<Pool>();
 
     // Buscar trade
-    final tradeResult = await pool.execute(Sql.named('''
+    final tradeResult = await pool.execute(
+      Sql.named('''
       SELECT
         t.id, t.status, t.type, t.message,
         t.payment_amount, t.payment_currency,
@@ -54,7 +55,9 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       LEFT JOIN LATERAL ${_responseTimeSql('r.id')} receiver_response ON TRUE
       LEFT JOIN LATERAL ${_shippingTimeSql('r.id')} receiver_shipping ON TRUE
       WHERE t.id = @tradeId
-    '''), parameters: {'tradeId': id});
+    '''),
+      parameters: {'tradeId': id},
+    );
 
     if (tradeResult.isEmpty) {
       return Response.json(
@@ -74,7 +77,8 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
     }
 
     // Buscar items com dados da carta
-    final itemsFuture = pool.execute(Sql.named('''
+    final itemsFuture = pool.execute(
+      Sql.named('''
       SELECT
         ti.id, ti.direction, ti.quantity, ti.agreed_price,
         ti.owner_id, ti.binder_item_id,
@@ -87,22 +91,29 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       JOIN cards c ON c.id = bi.card_id
       WHERE ti.trade_offer_id = @tradeId
       ORDER BY ti.direction, c.name
-    '''), parameters: {'tradeId': id});
+    '''),
+      parameters: {'tradeId': id},
+    );
 
     // Buscar mensagens (últimas 50)
-    final msgsFuture = pool.execute(Sql.named('''
+    final msgsFuture = pool.execute(
+      Sql.named('''
       SELECT
         tm.id, tm.sender_id, tm.message, tm.attachment_url, tm.attachment_type, tm.created_at,
         u.username as sender_username
       FROM trade_messages tm
       JOIN users u ON u.id = tm.sender_id
       WHERE tm.trade_offer_id = @tradeId
+        AND tm.moderation_status = 'visible'
       ORDER BY tm.created_at ASC
       LIMIT 50
-    '''), parameters: {'tradeId': id});
+    '''),
+      parameters: {'tradeId': id},
+    );
 
     // Buscar histórico de status
-    final historyFuture = pool.execute(Sql.named('''
+    final historyFuture = pool.execute(
+      Sql.named('''
       SELECT
         tsh.id, tsh.old_status, tsh.new_status, tsh.notes, tsh.created_at,
         u.username as changed_by_username
@@ -110,7 +121,9 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       JOIN users u ON u.id = tsh.changed_by
       WHERE tsh.trade_offer_id = @tradeId
       ORDER BY tsh.created_at ASC
-    '''), parameters: {'tradeId': id});
+    '''),
+      parameters: {'tradeId': id},
+    );
 
     final detailResults = await Future.wait([
       itemsFuture,
@@ -133,9 +146,10 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
         'binder_item_id': m['binder_item_id'],
         'direction': m['direction'],
         'quantity': m['quantity'],
-        'agreed_price': m['agreed_price'] != null
-            ? double.tryParse(m['agreed_price'].toString())
-            : null,
+        'agreed_price':
+            m['agreed_price'] != null
+                ? double.tryParse(m['agreed_price'].toString())
+                : null,
         'condition': m['condition'],
         'is_foil': m['is_foil'],
         'card': {
@@ -148,7 +162,8 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
         },
       };
 
-      final itemValue = (item['agreed_price'] as double? ?? 0) *
+      final itemValue =
+          (item['agreed_price'] as double? ?? 0) *
           ((item['quantity'] as int?) ?? 1);
       if (m['direction'] == 'offering') {
         offeringValue += itemValue;
@@ -164,36 +179,38 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       }
     }
 
-    final messages = msgsResult.map((row) {
-      final m = row.toColumnMap();
-      if (m['created_at'] is DateTime) {
-        m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
-      }
-      return {
-        'id': m['id'],
-        'sender_id': m['sender_id'],
-        'sender_username': m['sender_username'],
-        'message': m['message'],
-        'attachment_url': m['attachment_url'],
-        'attachment_type': m['attachment_type'],
-        'created_at': m['created_at'],
-      };
-    }).toList();
+    final messages =
+        msgsResult.map((row) {
+          final m = row.toColumnMap();
+          if (m['created_at'] is DateTime) {
+            m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
+          }
+          return {
+            'id': m['id'],
+            'sender_id': m['sender_id'],
+            'sender_username': m['sender_username'],
+            'message': m['message'],
+            'attachment_url': m['attachment_url'],
+            'attachment_type': m['attachment_type'],
+            'created_at': m['created_at'],
+          };
+        }).toList();
 
-    final history = historyResult.map((row) {
-      final m = row.toColumnMap();
-      if (m['created_at'] is DateTime) {
-        m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
-      }
-      return {
-        'id': m['id'],
-        'old_status': m['old_status'],
-        'new_status': m['new_status'],
-        'notes': m['notes'],
-        'changed_by_username': m['changed_by_username'],
-        'created_at': m['created_at'],
-      };
-    }).toList();
+    final history =
+        historyResult.map((row) {
+          final m = row.toColumnMap();
+          if (m['created_at'] is DateTime) {
+            m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
+          }
+          return {
+            'id': m['id'],
+            'old_status': m['old_status'],
+            'new_status': m['new_status'],
+            'notes': m['notes'],
+            'changed_by_username': m['changed_by_username'],
+            'created_at': m['created_at'],
+          };
+        }).toList();
 
     // Montar response
     for (final k in ['created_at', 'updated_at']) {
@@ -201,46 +218,49 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
         trade[k] = (trade[k] as DateTime).toIso8601String();
     }
     if (trade['payment_amount'] != null) {
-      trade['payment_amount'] =
-          double.tryParse(trade['payment_amount'].toString());
+      trade['payment_amount'] = double.tryParse(
+        trade['payment_amount'].toString(),
+      );
     }
 
-    return Response.json(body: {
-      'id': trade['id'],
-      'status': trade['status'],
-      'type': trade['type'],
-      'message': trade['message'],
-      'payment_amount': trade['payment_amount'],
-      'payment_currency': trade['payment_currency'],
-      'payment_method': trade['payment_method'],
-      'delivery_method': trade['delivery_method'],
-      'tracking_code': trade['tracking_code'],
-      'sender': {
-        'id': trade['sender_id'],
-        'username': trade['sender_username'],
-        'display_name': trade['sender_display_name'],
-        'avatar_url': trade['sender_avatar'],
-        'trust': _buildTrustInsight(trade, 'sender_'),
+    return Response.json(
+      body: {
+        'id': trade['id'],
+        'status': trade['status'],
+        'type': trade['type'],
+        'message': trade['message'],
+        'payment_amount': trade['payment_amount'],
+        'payment_currency': trade['payment_currency'],
+        'payment_method': trade['payment_method'],
+        'delivery_method': trade['delivery_method'],
+        'tracking_code': trade['tracking_code'],
+        'sender': {
+          'id': trade['sender_id'],
+          'username': trade['sender_username'],
+          'display_name': trade['sender_display_name'],
+          'avatar_url': trade['sender_avatar'],
+          'trust': _buildTrustInsight(trade, 'sender_'),
+        },
+        'receiver': {
+          'id': trade['receiver_id'],
+          'username': trade['receiver_username'],
+          'display_name': trade['receiver_display_name'],
+          'avatar_url': trade['receiver_avatar'],
+          'trust': _buildTrustInsight(trade, 'receiver_'),
+        },
+        'value_summary': _buildValueSummary(
+          offeredValue: offeringValue,
+          requestedValue: requestingValue,
+          paymentAmount: trade['payment_amount'] as double?,
+        ),
+        'my_items': myItems,
+        'their_items': theirItems,
+        'messages': messages,
+        'status_history': history,
+        'created_at': trade['created_at'],
+        'updated_at': trade['updated_at'],
       },
-      'receiver': {
-        'id': trade['receiver_id'],
-        'username': trade['receiver_username'],
-        'display_name': trade['receiver_display_name'],
-        'avatar_url': trade['receiver_avatar'],
-        'trust': _buildTrustInsight(trade, 'receiver_'),
-      },
-      'value_summary': _buildValueSummary(
-        offeredValue: offeringValue,
-        requestedValue: requestingValue,
-        paymentAmount: trade['payment_amount'] as double?,
-      ),
-      'my_items': myItems,
-      'their_items': theirItems,
-      'messages': messages,
-      'status_history': history,
-      'created_at': trade['created_at'],
-      'updated_at': trade['updated_at'],
-    });
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -313,9 +333,11 @@ Map<String, dynamic> _buildTrustInsight(
   final disputed = _toInt(cols['${prefix}disputed_trades']);
   final totalSignals = completed + cancelled + declined + disputed;
   final createdAt = cols['${prefix}created_at'];
-  final isNewAccount = createdAt is DateTime &&
+  final isNewAccount =
+      createdAt is DateTime &&
       DateTime.now().toUtc().difference(createdAt.toUtc()).inDays < 30;
-  final profileIncomplete = (cols['${prefix}display_name'] == null ||
+  final profileIncomplete =
+      (cols['${prefix}display_name'] == null ||
           cols['${prefix}display_name'].toString().trim().isEmpty) ||
       (cols['${prefix}location_state'] == null ||
           cols['${prefix}location_state'].toString().trim().isEmpty) ||
@@ -359,19 +381,21 @@ Map<String, dynamic> _buildValueSummary({
     'total_offered_value': _round2(totalOffered),
     'difference_abs': _round2(diff.abs()),
     'difference_pct': _round2(pct),
-    'direction': diff > 0
-        ? 'offer_higher'
-        : diff < 0
+    'direction':
+        diff > 0
+            ? 'offer_higher'
+            : diff < 0
             ? 'request_higher'
             : 'balanced',
     'threshold_pct': thresholdPct,
     'threshold_abs': thresholdAbs,
     'has_warning': hasWarning,
-    'message': hasWarning
-        ? (diff > 0
-            ? 'A oferta total está acima do pedido. Confirme se o bônus/pagamento é intencional.'
-            : 'O pedido está acima da oferta total. Combine a diferença antes de avançar.')
-        : 'Resumo calculado com preços acordados dos itens e pagamento informado.',
+    'message':
+        hasWarning
+            ? (diff > 0
+                ? 'A oferta total está acima do pedido. Confirme se o bônus/pagamento é intencional.'
+                : 'O pedido está acima da oferta total. Combine a diferença antes de avançar.')
+            : 'Resumo calculado com preços acordados dos itens e pagamento informado.',
   };
 }
 

@@ -30,7 +30,17 @@ Future<Response> _getMessages(RequestContext context, String id) async {
     // Verificar que o usuário participa do trade
     final tradeResult = await pool.execute(
       Sql.named('''
-      SELECT sender_id, receiver_id FROM trade_offers WHERE id = @id
+      SELECT
+        t.sender_id,
+        t.receiver_id,
+        EXISTS (
+          SELECT 1
+          FROM user_blocks b
+          WHERE (b.blocker_id = t.sender_id AND b.blocked_id = t.receiver_id)
+             OR (b.blocker_id = t.receiver_id AND b.blocked_id = t.sender_id)
+        ) AS interaction_blocked
+      FROM trade_offers t
+      WHERE t.id = @id
     '''),
       parameters: {'id': id},
     );
@@ -51,10 +61,19 @@ Future<Response> _getMessages(RequestContext context, String id) async {
         body: {'error': 'Sem permissão para ver mensagens deste trade'},
       );
     }
+    if (trade['interaction_blocked'] == true) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {'error': 'interaction_blocked'},
+      );
+    }
 
     final countResult = await pool.execute(
       Sql.named('''
-      SELECT COUNT(*) as total FROM trade_messages WHERE trade_offer_id = @id
+      SELECT COUNT(*) as total
+      FROM trade_messages
+      WHERE trade_offer_id = @id
+        AND moderation_status = 'visible'
     '''),
       parameters: {'id': id},
     );
@@ -69,6 +88,7 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       FROM trade_messages tm
       JOIN users u ON u.id = tm.sender_id
       WHERE tm.trade_offer_id = @id
+        AND tm.moderation_status = 'visible'
       ORDER BY tm.created_at ASC
       LIMIT @lim OFFSET @off
     '''),
@@ -124,6 +144,10 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     final message = body['message'] as String?;
     final attachmentUrl = body['attachment_url'] as String?;
     final attachmentType = body['attachment_type'] as String?;
+    final clientRequestId =
+        body['client_request_id']?.toString().trim().isEmpty == true
+            ? null
+            : body['client_request_id']?.toString().trim();
 
     if ((message == null || message.trim().isEmpty) && attachmentUrl == null) {
       _logInvalidPayload(context, id, 'missing_message_or_attachment');
@@ -146,11 +170,32 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         },
       );
     }
+    if (clientRequestId != null &&
+        (clientRequestId.length < 8 ||
+            clientRequestId.length > 128 ||
+            !RegExp(r'^[A-Za-z0-9._:-]+$').hasMatch(clientRequestId))) {
+      _logInvalidPayload(context, id, 'invalid_client_request_id');
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': 'invalid_client_request_id'},
+      );
+    }
 
     // Verificar trade e participação
     final tradeResult = await pool.execute(
       Sql.named('''
-      SELECT sender_id, receiver_id, status FROM trade_offers WHERE id = @id
+      SELECT
+        t.sender_id,
+        t.receiver_id,
+        t.status,
+        EXISTS (
+          SELECT 1
+          FROM user_blocks b
+          WHERE (b.blocker_id = t.sender_id AND b.blocked_id = t.receiver_id)
+             OR (b.blocker_id = t.receiver_id AND b.blocked_id = t.sender_id)
+        ) AS interaction_blocked
+      FROM trade_offers t
+      WHERE t.id = @id
     '''),
       parameters: {'id': id},
     );
@@ -171,6 +216,12 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         body: {'error': 'Sem permissão para enviar mensagens neste trade'},
       );
     }
+    if (trade['interaction_blocked'] == true) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {'error': 'interaction_blocked'},
+      );
+    }
 
     // Não permitir mensagens em trades finalizados (declined/cancelled)
     final closedStatuses = ['declined', 'cancelled'];
@@ -184,7 +235,7 @@ Future<Response> _postMessage(RequestContext context, String id) async {
       );
     }
 
-    final insertResult = await pool.runTx((session) async {
+    final sendResult = await pool.runTx((session) async {
       final participantIds = <String>[senderId, receiverId]..sort();
       final activeUsers = await session.execute(
         Sql.named('''
@@ -199,13 +250,50 @@ Future<Response> _postMessage(RequestContext context, String id) async {
       );
       if (activeUsers.length != 2) return null;
 
-      return session.execute(
+      final blocked = await session.execute(
+        Sql.named('''
+          SELECT EXISTS (
+            SELECT 1
+            FROM user_blocks
+            WHERE (blocker_id = @senderId AND blocked_id = @receiverId)
+               OR (blocker_id = @receiverId AND blocked_id = @senderId)
+          ) AS blocked
+        '''),
+        parameters: {'senderId': senderId, 'receiverId': receiverId},
+      );
+      if (blocked.first.toColumnMap()['blocked'] == true) {
+        return <String, dynamic>{'error': 'interaction_blocked'};
+      }
+
+      final result = await session.execute(
         Sql.named('''
         INSERT INTO trade_messages (
-          trade_offer_id, sender_id, message, attachment_url, attachment_type
+          trade_offer_id,
+          sender_id,
+          message,
+          attachment_url,
+          attachment_type,
+          client_request_id
         )
-        VALUES (@tradeId, @userId, @message, @attachmentUrl, @attachmentType)
-        RETURNING id, created_at
+        VALUES (
+          @tradeId,
+          @userId,
+          @message,
+          @attachmentUrl,
+          @attachmentType,
+          @clientRequestId
+        )
+        ON CONFLICT (sender_id, client_request_id)
+          WHERE client_request_id IS NOT NULL
+        DO UPDATE SET client_request_id = EXCLUDED.client_request_id
+        RETURNING
+          id,
+          created_at,
+          message,
+          attachment_url,
+          attachment_type,
+          client_request_id,
+          (xmax = 0) AS inserted
       '''),
         parameters: {
           'tradeId': id,
@@ -213,10 +301,18 @@ Future<Response> _postMessage(RequestContext context, String id) async {
           'message': message?.trim(),
           'attachmentUrl': attachmentUrl,
           'attachmentType': attachmentType,
+          'clientRequestId': clientRequestId,
         },
       );
+      final row = result.first.toColumnMap();
+      if (row['message'] != message?.trim() ||
+          row['attachment_url'] != attachmentUrl ||
+          row['attachment_type'] != attachmentType) {
+        return <String, dynamic>{'error': 'idempotency_conflict'};
+      }
+      return <String, dynamic>{'message': row};
     });
-    if (insertResult == null) {
+    if (sendResult == null) {
       return Response.json(
         statusCode: HttpStatus.conflict,
         body: {
@@ -225,29 +321,41 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         },
       );
     }
+    if (sendResult['error'] case final error?) {
+      return Response.json(
+        statusCode:
+            error == 'idempotency_conflict'
+                ? HttpStatus.conflict
+                : HttpStatus.forbidden,
+        body: {'error': error},
+      );
+    }
 
-    final row = insertResult.first.toColumnMap();
+    final row = sendResult['message']! as Map<String, dynamic>;
+    final inserted = row['inserted'] == true;
 
     // 🔔 Notificação: mensagem no trade → notificar a outra parte
     final recipientId = senderId == userId ? receiverId : senderId;
-    NotificationService.createFromActorDeferred(
-      pool: pool,
-      actorUserId: userId,
-      userId: recipientId,
-      type: 'trade_message',
-      titleBuilder: (senderName) => '$senderName enviou mensagem no trade',
-      body:
-          message != null && message.length > 100
-              ? '${message.substring(0, 100)}...'
-              : message,
-      referenceId: id,
-      endpoint: 'POST /trades/:id/messages',
-      requestId: _requestId(context),
-      tradeId: id,
-    );
+    if (inserted) {
+      NotificationService.createFromActorDeferred(
+        pool: pool,
+        actorUserId: userId,
+        userId: recipientId,
+        type: 'trade_message',
+        titleBuilder: (senderName) => '$senderName enviou mensagem no trade',
+        body:
+            message != null && message.length > 100
+                ? '${message.substring(0, 100)}...'
+                : message,
+        referenceId: id,
+        endpoint: 'POST /trades/:id/messages',
+        requestId: _requestId(context),
+        tradeId: id,
+      );
+    }
 
     return Response.json(
-      statusCode: HttpStatus.created,
+      statusCode: inserted ? HttpStatus.created : HttpStatus.ok,
       body: {
         'id': row['id'],
         'trade_offer_id': id,
@@ -255,6 +363,8 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         'message': message?.trim(),
         'attachment_url': attachmentUrl,
         'attachment_type': attachmentType,
+        'client_request_id': row['client_request_id'],
+        'idempotent_replay': !inserted,
         'created_at': row['created_at']?.toString(),
       },
     );

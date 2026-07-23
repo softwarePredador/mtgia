@@ -660,6 +660,12 @@ class AuthProvider extends ChangeNotifier {
     String? locationState,
     String? locationCity,
     String? tradeNotes,
+    String? profileVisibility,
+    String? binderVisibility,
+    String? locationVisibility,
+    String? messageVisibility,
+    String? tradeVisibility,
+    String? tradeNotesVisibility,
   }) async {
     final generation = _authGeneration;
     _errorMessage = null;
@@ -672,6 +678,14 @@ class AuthProvider extends ChangeNotifier {
         if (locationState != null) 'location_state': locationState,
         if (locationCity != null) 'location_city': locationCity,
         if (tradeNotes != null) 'trade_notes': tradeNotes,
+        if (profileVisibility != null) 'profile_visibility': profileVisibility,
+        if (binderVisibility != null) 'binder_visibility': binderVisibility,
+        if (locationVisibility != null)
+          'location_visibility': locationVisibility,
+        if (messageVisibility != null) 'message_visibility': messageVisibility,
+        if (tradeVisibility != null) 'trade_visibility': tradeVisibility,
+        if (tradeNotesVisibility != null)
+          'trade_notes_visibility': tradeNotesVisibility,
       });
       if (generation != _authGeneration) return false;
       if (response.statusCode != 200) {

@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "9f8256311fc4d7e8d1d61c0a7b0875cfef2cba6f6124e641d3db610d55473cca",
+  "x-manaloom-source-digest-sha256": "f2c6f8f9ef613b13c9fdf1b107454fba2499149066a2e5a6c953e4fc9e9eef00",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1369,6 +1369,36 @@
         }
       }
     },
+    "/community/decks/following": {
+      "get": {
+        "operationId": "getCommunityDecksFollowing",
+        "summary": "GET /community/decks/following",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/following/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
     "/community/decks/{id}": {
       "get": {
         "operationId": "getCommunityDecksId",
@@ -1506,6 +1536,54 @@
         "parameters": [
           {
             "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/decks/{id}/comments/{commentId}": {
+      "delete": {
+        "operationId": "deleteCommunityDecksIdCommentsCommentId",
+        "summary": "DELETE /community/decks/{id}/comments/{commentId}",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/[id]/comments/[commentId]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "commentId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1673,6 +1751,58 @@
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/content-reports": {
+      "post": {
+        "operationId": "postContentReports",
+        "summary": "POST /content-reports",
+        "tags": [
+          "content-reports"
+        ],
+        "x-manaloom-source": "server/routes/content-reports/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/content-reports/{id}/appeals": {
+      "post": {
+        "operationId": "postContentReportsIdAppeals",
+        "summary": "POST /content-reports/{id}/appeals",
+        "tags": [
+          "content-reports"
+        ],
+        "x-manaloom-source": "server/routes/content-reports/[id]/appeals/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
         "parameters": [
           {
             "name": "id",
@@ -3084,6 +3214,58 @@
         }
       }
     },
+    "/moderation/reports": {
+      "get": {
+        "operationId": "getModerationReports",
+        "summary": "GET /moderation/reports",
+        "tags": [
+          "moderation"
+        ],
+        "x-manaloom-source": "server/routes/moderation/reports/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/moderation/reports/{id}": {
+      "put": {
+        "operationId": "putModerationReportsId",
+        "summary": "PUT /moderation/reports/{id}",
+        "tags": [
+          "moderation"
+        ],
+        "x-manaloom-source": "server/routes/moderation/reports/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
     "/notifications": {
       "get": {
         "operationId": "getNotifications",
@@ -3581,6 +3763,27 @@
         }
       }
     },
+    "/users/me/blocks": {
+      "get": {
+        "operationId": "getUsersMeBlocks",
+        "summary": "GET /users/me/blocks",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/blocks/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
     "/users/me/export": {
       "get": {
         "operationId": "getUsersMeExport",
@@ -3672,6 +3875,95 @@
         ],
         "x-manaloom-source": "server/routes/users/me/plan/checkout/index.dart",
         "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/{id}/block": {
+      "delete": {
+        "operationId": "deleteUsersIdBlock",
+        "summary": "DELETE /users/{id}/block",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/block/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getUsersIdBlock",
+        "summary": "GET /users/{id}/block",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/block/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postUsersIdBlock",
+        "summary": "POST /users/{id}/block",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/block/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []

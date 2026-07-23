@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/scryfall_image_url.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/community_request_auth.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -18,6 +19,7 @@ Future<Response> onRequest(RequestContext context) async {
 Future<Response> _listPublicDecks(RequestContext context) async {
   try {
     final conn = context.read<Pool>();
+    final viewerUserId = await readAuthenticatedUserId(context);
     final params = context.request.uri.queryParameters;
 
     final search = params['search']?.trim();
@@ -31,8 +33,25 @@ Future<Response> _listPublicDecks(RequestContext context) async {
       'd.is_public = true',
       'd.deleted_at IS NULL',
       'u.deleted_at IS NULL',
+      "u.profile_visibility = 'public'",
     ];
-    final filterParams = <String, dynamic>{};
+    final filterParams = <String, dynamic>{'viewerUserId': viewerUserId};
+    whereParts.add('''
+      (
+        CAST(@viewerUserId AS uuid) IS NULL
+        OR NOT EXISTS (
+          SELECT 1
+          FROM user_blocks b
+          WHERE (
+            b.blocker_id = CAST(@viewerUserId AS uuid)
+            AND b.blocked_id = d.user_id
+          ) OR (
+            b.blocked_id = CAST(@viewerUserId AS uuid)
+            AND b.blocker_id = d.user_id
+          )
+        )
+      )
+    ''');
 
     if (search != null && search.isNotEmpty) {
       whereParts.add(

@@ -2527,6 +2527,181 @@ final migrations = <Migration>[
       ALTER TABLE cards DROP COLUMN IF EXISTS price_source;
     ''',
   ),
+  Migration(
+    version: '051',
+    name: 'close_social_safety_contract',
+    up: '''
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS profile_visibility TEXT NOT NULL DEFAULT 'public';
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS binder_visibility TEXT NOT NULL DEFAULT 'public';
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS location_visibility TEXT NOT NULL DEFAULT 'private';
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS message_visibility TEXT NOT NULL DEFAULT 'everyone';
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS trade_visibility TEXT NOT NULL DEFAULT 'everyone';
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS trade_notes_visibility TEXT NOT NULL DEFAULT 'private';
+
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_profile_visibility;
+      ALTER TABLE users ADD CONSTRAINT chk_users_profile_visibility
+      CHECK (profile_visibility IN ('public', 'private'));
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_binder_visibility;
+      ALTER TABLE users ADD CONSTRAINT chk_users_binder_visibility
+      CHECK (binder_visibility IN ('public', 'private'));
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_location_visibility;
+      ALTER TABLE users ADD CONSTRAINT chk_users_location_visibility
+      CHECK (location_visibility IN ('public', 'trade_only', 'private'));
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_message_visibility;
+      ALTER TABLE users ADD CONSTRAINT chk_users_message_visibility
+      CHECK (message_visibility IN ('everyone', 'followers', 'none'));
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_trade_visibility;
+      ALTER TABLE users ADD CONSTRAINT chk_users_trade_visibility
+      CHECK (trade_visibility IN ('everyone', 'followers', 'none'));
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_trade_notes_visibility;
+      ALTER TABLE users ADD CONSTRAINT chk_users_trade_notes_visibility
+      CHECK (trade_notes_visibility IN ('trade_only', 'private'));
+
+      CREATE TABLE IF NOT EXISTS user_blocks (
+        blocker_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        blocked_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        reason TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (blocker_id, blocked_id),
+        CONSTRAINT chk_no_self_block CHECK (blocker_id <> blocked_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_user_blocks_blocked
+      ON user_blocks (blocked_id, blocker_id);
+
+      CREATE TABLE IF NOT EXISTS user_block_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        actor_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        target_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        action TEXT NOT NULL CHECK (action IN ('blocked', 'unblocked')),
+        reason TEXT,
+        request_id TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_user_block_events_actor_created
+      ON user_block_events (actor_user_id, created_at DESC);
+
+      ALTER TABLE direct_messages
+      ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+      ALTER TABLE direct_messages
+      ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'visible';
+      ALTER TABLE direct_messages
+      DROP CONSTRAINT IF EXISTS chk_direct_messages_moderation_status;
+      ALTER TABLE direct_messages
+      ADD CONSTRAINT chk_direct_messages_moderation_status
+      CHECK (moderation_status IN ('visible', 'removed'));
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_direct_messages_sender_request
+      ON direct_messages (sender_id, client_request_id)
+      WHERE client_request_id IS NOT NULL;
+
+      ALTER TABLE trade_messages
+      ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+      ALTER TABLE trade_messages
+      ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'visible';
+      ALTER TABLE trade_messages
+      DROP CONSTRAINT IF EXISTS chk_trade_messages_moderation_status;
+      ALTER TABLE trade_messages
+      ADD CONSTRAINT chk_trade_messages_moderation_status
+      CHECK (moderation_status IN ('visible', 'removed'));
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_trade_messages_sender_request
+      ON trade_messages (sender_id, client_request_id)
+      WHERE client_request_id IS NOT NULL;
+
+      ALTER TABLE content_reports
+      ADD COLUMN IF NOT EXISTS priority SMALLINT NOT NULL DEFAULT 2;
+      ALTER TABLE content_reports
+      ADD COLUMN IF NOT EXISTS evidence JSONB NOT NULL DEFAULT '{}'::jsonb;
+      ALTER TABLE content_reports
+      ADD COLUMN IF NOT EXISTS sla_due_at TIMESTAMP WITH TIME ZONE;
+      UPDATE content_reports
+      SET sla_due_at = created_at + INTERVAL '72 hours'
+      WHERE sla_due_at IS NULL;
+      ALTER TABLE content_reports ALTER COLUMN sla_due_at SET NOT NULL;
+      ALTER TABLE content_reports ALTER COLUMN sla_due_at
+      SET DEFAULT (CURRENT_TIMESTAMP + INTERVAL '72 hours');
+      ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS resolution TEXT;
+      ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS resolution_action TEXT;
+      ALTER TABLE content_reports
+      ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE
+      NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+      ALTER TABLE content_reports
+      DROP CONSTRAINT IF EXISTS chk_content_reports_target_type;
+      ALTER TABLE content_reports
+      ADD CONSTRAINT chk_content_reports_target_type CHECK (
+        target_type IN (
+          'deck', 'comment', 'profile', 'binder_item',
+          'message', 'trade_message'
+        )
+      );
+      ALTER TABLE content_reports
+      DROP CONSTRAINT IF EXISTS chk_content_reports_status;
+      ALTER TABLE content_reports
+      ADD CONSTRAINT chk_content_reports_status CHECK (
+        status IN ('open', 'reviewing', 'resolved', 'dismissed', 'appealed')
+      );
+      ALTER TABLE content_reports
+      DROP CONSTRAINT IF EXISTS chk_content_reports_priority;
+      ALTER TABLE content_reports
+      ADD CONSTRAINT chk_content_reports_priority
+      CHECK (priority BETWEEN 1 AND 4);
+      ALTER TABLE content_reports
+      DROP CONSTRAINT IF EXISTS chk_content_reports_resolution_action;
+      ALTER TABLE content_reports
+      ADD CONSTRAINT chk_content_reports_resolution_action CHECK (
+        resolution_action IS NULL OR
+        resolution_action IN ('none', 'hide', 'remove', 'restrict')
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_content_reports_queue
+      ON content_reports (status, priority, sla_due_at, created_at);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_content_reports_active_reporter_target
+      ON content_reports (reporter_user_id, target_type, target_id)
+      WHERE reporter_user_id IS NOT NULL
+        AND status IN ('open', 'reviewing', 'appealed');
+
+      CREATE TABLE IF NOT EXISTS moderation_actions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        report_id UUID NOT NULL REFERENCES content_reports(id) ON DELETE CASCADE,
+        moderator_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        action TEXT NOT NULL CHECK (
+          action IN (
+            'start_review', 'dismiss', 'hide', 'remove', 'restrict', 'restore'
+          )
+        ),
+        rationale TEXT NOT NULL,
+        evidence JSONB NOT NULL DEFAULT '{}'::jsonb,
+        request_id TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_moderation_actions_report_created
+      ON moderation_actions (report_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS content_report_appeals (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        report_id UUID NOT NULL REFERENCES content_reports(id) ON DELETE CASCADE,
+        appellant_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        reason TEXT NOT NULL CHECK (char_length(reason) BETWEEN 10 AND 2000),
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'reviewing', 'upheld', 'overturned')),
+        reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        reviewed_at TIMESTAMP WITH TIME ZONE,
+        resolution TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_content_report_appeals_pending
+      ON content_report_appeals (report_id, appellant_user_id)
+      WHERE status IN ('pending', 'reviewing');
+      CREATE INDEX IF NOT EXISTS idx_content_report_appeals_queue
+      ON content_report_appeals (status, created_at);
+    ''',
+    down: 'SELECT 1;',
+  ),
 ];
 
 class Migration {
@@ -2614,7 +2789,8 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '047' ||
       '048' ||
       '049' ||
-      '050' => MigrationRollbackPolicy.manualOnly,
+      '050' ||
+      '051' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

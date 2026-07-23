@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/community_request_auth.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -30,6 +31,7 @@ Future<Response> _searchUsers(RequestContext context) async {
 
   try {
     final conn = context.read<Pool>();
+    final viewerId = await readAuthenticatedUserId(context);
 
     // Count
     final countResult = await conn.execute(
@@ -37,12 +39,27 @@ Future<Response> _searchUsers(RequestContext context) async {
         SELECT COUNT(*)::int
         FROM users
         WHERE deleted_at IS NULL
+          AND profile_visibility = 'public'
+          AND (
+            CAST(@viewerId AS uuid) IS NULL
+            OR NOT EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (
+                b.blocker_id = CAST(@viewerId AS uuid)
+                AND b.blocked_id = users.id
+              ) OR (
+                b.blocked_id = CAST(@viewerId AS uuid)
+                AND b.blocker_id = users.id
+              )
+            )
+          )
           AND (
             LOWER(username) LIKE @search
             OR LOWER(COALESCE(display_name, '')) LIKE @search
           )
       '''),
-      parameters: {'search': '%${query.toLowerCase()}%'},
+      parameters: {'search': '%${query.toLowerCase()}%', 'viewerId': viewerId},
     );
     final total = (countResult.first[0] as int?) ?? 0;
 
@@ -58,6 +75,21 @@ Future<Response> _searchUsers(RequestContext context) async {
             u.created_at
           FROM users u
           WHERE u.deleted_at IS NULL
+            AND u.profile_visibility = 'public'
+            AND (
+              CAST(@viewerId AS uuid) IS NULL
+              OR NOT EXISTS (
+                SELECT 1
+                FROM user_blocks b
+                WHERE (
+                  b.blocker_id = CAST(@viewerId AS uuid)
+                  AND b.blocked_id = u.id
+                ) OR (
+                  b.blocked_id = CAST(@viewerId AS uuid)
+                  AND b.blocker_id = u.id
+                )
+              )
+            )
             AND (
               LOWER(u.username) LIKE @search
               OR LOWER(COALESCE(u.display_name, '')) LIKE @search
@@ -104,6 +136,7 @@ Future<Response> _searchUsers(RequestContext context) async {
         'search': '%${query.toLowerCase()}%',
         'lim': limit,
         'off': offset,
+        'viewerId': viewerId,
       },
     );
 

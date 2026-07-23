@@ -4,4 +4,3 @@ import '../../lib/auth_middleware.dart';
 Handler middleware(Handler handler) {
   return handler.use(authMiddleware());
 }
-

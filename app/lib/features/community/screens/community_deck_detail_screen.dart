@@ -6,9 +6,11 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/mana_symbols.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../cards/screens/card_detail_screen.dart';
+import '../../social/widgets/social_report_dialog.dart';
 import '../providers/community_provider.dart';
 
 class CommunityDeckDetailScreen extends StatefulWidget {
@@ -146,17 +148,85 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   }
 
   Future<void> _reportDeck() async {
+    final draft = await showSocialReportDialog(context, targetLabel: 'deck');
+    if (draft == null || !mounted) return;
     setState(() => _isReporting = true);
     final ok = await context.read<CommunityProvider>().reportDeck(
       widget.deckId,
-      reason: 'other',
-      details: 'Denuncia enviada pelo app.',
+      reason: draft.reason,
+      details: draft.details,
     );
     if (!mounted) return;
     setState(() => _isReporting = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(ok ? 'Denúncia registrada.' : 'Falha ao denunciar.'),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
+  }
+
+  Future<void> _reportComment(CommunityDeckComment comment) async {
+    final draft = await showSocialReportDialog(
+      context,
+      targetLabel: 'comentário',
+    );
+    if (draft == null || !mounted) return;
+    final ok = await context.read<CommunityProvider>().reportContent(
+      targetType: 'comment',
+      targetId: comment.id,
+      reason: draft.reason,
+      details: draft.details,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Denúncia registrada.' : 'Não foi possível enviar a denúncia.',
+        ),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
+  }
+
+  Future<void> _deleteComment(CommunityDeckComment comment) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        key: const Key('community-comment-delete-dialog'),
+        title: const Text('Excluir comentário?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            key: const Key('community-comment-delete-confirm-button'),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final ok = await context.read<CommunityProvider>().deleteDeckComment(
+      widget.deckId,
+      comment.id,
+    );
+    if (!mounted) return;
+    if (ok) {
+      setState(() {
+        _comments = _comments
+            .where((entry) => entry.id != comment.id)
+            .toList(growable: false);
+      });
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Comentário excluído.' : 'Não foi possível excluir.',
+        ),
         backgroundColor: ok ? AppTheme.success : AppTheme.error,
       ),
     );
@@ -431,11 +501,14 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         const SizedBox(height: AppTheme.space14),
         _CommunityFeedbackPanel(
           comments: _comments,
+          currentUserId: context.read<AuthProvider>().user?.id,
           controller: _commentController,
           isSubmitting: _isSubmittingComment,
           isReporting: _isReporting,
           onSubmit: _submitComment,
           onReport: _reportDeck,
+          onReportComment: _reportComment,
+          onDeleteComment: _deleteComment,
         ),
       ],
     );
@@ -766,19 +839,25 @@ class _TradeMatchesPanel extends StatelessWidget {
 class _CommunityFeedbackPanel extends StatelessWidget {
   const _CommunityFeedbackPanel({
     required this.comments,
+    required this.currentUserId,
     required this.controller,
     required this.isSubmitting,
     required this.isReporting,
     required this.onSubmit,
     required this.onReport,
+    required this.onReportComment,
+    required this.onDeleteComment,
   });
 
   final List<CommunityDeckComment> comments;
+  final String? currentUserId;
   final TextEditingController controller;
   final bool isSubmitting;
   final bool isReporting;
   final VoidCallback onSubmit;
   final VoidCallback onReport;
+  final ValueChanged<CommunityDeckComment> onReportComment;
+  final ValueChanged<CommunityDeckComment> onDeleteComment;
 
   @override
   Widget build(BuildContext context) {
@@ -862,12 +941,51 @@ class _CommunityFeedbackPanel extends StatelessWidget {
                 .map(
                   (comment) => Padding(
                     padding: const EdgeInsets.only(top: AppTheme.space8),
-                    child: Text(
-                      '${comment.authorName ?? 'Jogador'}: ${comment.body}',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        height: 1.35,
-                      ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${comment.authorName ?? 'Jogador'}: ${comment.body}',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          key: Key('community-comment-actions-${comment.id}'),
+                          tooltip: 'Ações do comentário',
+                          icon: const Icon(Icons.more_vert, size: 18),
+                          onSelected: (value) {
+                            if (value == 'report') {
+                              onReportComment(comment);
+                            } else if (value == 'delete') {
+                              onDeleteComment(comment);
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            if (comment.authorId == currentUserId)
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: ListTile(
+                                  dense: true,
+                                  leading: Icon(Icons.delete_outline),
+                                  title: Text('Excluir'),
+                                ),
+                              )
+                            else
+                              const PopupMenuItem(
+                                value: 'report',
+                                child: ListTile(
+                                  dense: true,
+                                  leading: Icon(Icons.flag_outlined),
+                                  title: Text('Denunciar'),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),

@@ -1,11 +1,13 @@
 import 'package:postgres/postgres.dart';
 
+import 'social_safety_service.dart';
+
 class CommunityEngagementService {
   const CommunityEngagementService(this.pool);
 
   final Pool pool;
 
-  Future<bool> publicDeckExists(String deckId) async {
+  Future<bool> publicDeckExists(String deckId, {String? viewerUserId}) async {
     final result = await pool.execute(
       Sql.named('''
         SELECT 1
@@ -15,15 +17,31 @@ class CommunityEngagementService {
           AND d.is_public = TRUE
           AND d.deleted_at IS NULL
           AND u.deleted_at IS NULL
+          AND u.profile_visibility = 'public'
+          AND (
+            CAST(@viewerUserId AS uuid) IS NULL
+            OR NOT EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (
+                b.blocker_id = CAST(@viewerUserId AS uuid)
+                AND b.blocked_id = d.user_id
+              ) OR (
+                b.blocked_id = CAST(@viewerUserId AS uuid)
+                AND b.blocker_id = d.user_id
+              )
+            )
+          )
         LIMIT 1
       '''),
-      parameters: {'deckId': deckId},
+      parameters: {'deckId': deckId, 'viewerUserId': viewerUserId},
     );
     return result.isNotEmpty;
   }
 
   Future<List<Map<String, dynamic>>> listDeckComments({
     required String deckId,
+    String? viewerUserId,
     int limit = 50,
     int offset = 0,
   }) async {
@@ -43,11 +61,26 @@ class CommunityEngagementService {
         JOIN users u ON u.id = dc.user_id
         WHERE dc.deck_id = CAST(@deckId AS uuid)
           AND dc.status = 'visible'
+          AND (
+            CAST(@viewerUserId AS uuid) IS NULL
+            OR NOT EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (
+                b.blocker_id = CAST(@viewerUserId AS uuid)
+                AND b.blocked_id = dc.user_id
+              ) OR (
+                b.blocked_id = CAST(@viewerUserId AS uuid)
+                AND b.blocker_id = dc.user_id
+              )
+            )
+          )
         ORDER BY dc.created_at DESC
         LIMIT @limit OFFSET @offset
       '''),
       parameters: {
         'deckId': deckId,
+        'viewerUserId': viewerUserId,
         'limit': limit.clamp(1, 100),
         'offset': offset < 0 ? 0 : offset,
       },
@@ -71,12 +104,56 @@ class CommunityEngagementService {
     final result = await pool.execute(
       Sql.named('''
         INSERT INTO deck_comments (deck_id, user_id, body)
-        VALUES (CAST(@deckId AS uuid), CAST(@userId AS uuid), @body)
+        SELECT d.id, CAST(@userId AS uuid), @body
+        FROM decks d
+        JOIN users owner ON owner.id = d.user_id
+        WHERE d.id = CAST(@deckId AS uuid)
+          AND d.is_public = TRUE
+          AND d.deleted_at IS NULL
+          AND owner.deleted_at IS NULL
+          AND owner.profile_visibility = 'public'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = CAST(@userId AS uuid)
+              AND b.blocked_id = d.user_id
+            ) OR (
+              b.blocked_id = CAST(@userId AS uuid)
+              AND b.blocker_id = d.user_id
+            )
+          )
         RETURNING id, deck_id, user_id, body, created_at, updated_at
       '''),
       parameters: {'deckId': deckId, 'userId': userId, 'body': cleanBody},
     );
+    if (result.isEmpty) {
+      throw const SocialSafetyException(
+        'interaction_blocked',
+        'Este deck nao aceita novas interacoes.',
+      );
+    }
     return _commentRowToJson(result.first);
+  }
+
+  Future<bool> deleteDeckComment({
+    required String deckId,
+    required String commentId,
+    required String userId,
+  }) async {
+    final result = await pool.execute(
+      Sql.named('''
+        UPDATE deck_comments
+        SET status = 'deleted', updated_at = CURRENT_TIMESTAMP
+        WHERE id = CAST(@commentId AS uuid)
+          AND deck_id = CAST(@deckId AS uuid)
+          AND user_id = CAST(@userId AS uuid)
+          AND status <> 'deleted'
+        RETURNING id
+      '''),
+      parameters: {'deckId': deckId, 'commentId': commentId, 'userId': userId},
+    );
+    return result.isNotEmpty;
   }
 
   Future<Map<String, dynamic>> reportContent({
@@ -86,55 +163,13 @@ class CommunityEngagementService {
     required String reason,
     String details = '',
   }) async {
-    final normalizedTargetType = targetType.trim().toLowerCase();
-    final normalizedReason = reason.trim().toLowerCase();
-    if (!{
-      'deck',
-      'comment',
-      'profile',
-      'binder_item',
-    }.contains(normalizedTargetType)) {
-      throw const FormatException('Tipo de alvo invalido.');
-    }
-    if (!_allowedReportReasons.contains(normalizedReason)) {
-      throw const FormatException('Motivo de denuncia invalido.');
-    }
-
-    final result = await pool.execute(
-      Sql.named('''
-        INSERT INTO content_reports (
-          reporter_user_id,
-          target_type,
-          target_id,
-          reason,
-          details
-        )
-        VALUES (
-          CAST(@reporterUserId AS uuid),
-          @targetType,
-          @targetId,
-          @reason,
-          @details
-        )
-        RETURNING id, target_type, target_id, reason, status, created_at
-      '''),
-      parameters: {
-        'reporterUserId': reporterUserId,
-        'targetType': normalizedTargetType,
-        'targetId': targetId.trim(),
-        'reason': normalizedReason,
-        'details': details.trim(),
-      },
+    return SocialSafetyService(pool).reportContent(
+      reporterUserId: reporterUserId,
+      targetType: targetType,
+      targetId: targetId,
+      reason: reason,
+      details: details,
     );
-    final row = result.first.toColumnMap();
-    return {
-      'id': row['id']?.toString(),
-      'target_type': row['target_type'],
-      'target_id': row['target_id'],
-      'reason': row['reason'],
-      'status': row['status'],
-      'created_at': _dateString(row['created_at']),
-    };
   }
 
   Future<Map<String, dynamic>> findTradeMatches({
@@ -232,13 +267,44 @@ class CommunityEngagementService {
           u.username AS owner_username,
           u.display_name AS owner_display_name,
           u.avatar_url AS owner_avatar_url,
-          u.location_city AS owner_location_city,
-          u.location_state AS owner_location_state
+          CASE
+            WHEN u.location_visibility = 'public' THEN u.location_city
+            ELSE NULL
+          END AS owner_location_city,
+          CASE
+            WHEN u.location_visibility = 'public' THEN u.location_state
+            ELSE NULL
+          END AS owner_location_state
         FROM dedup_wanted w
         JOIN user_binder_items bi ON bi.card_id = w.card_id
         JOIN users u ON u.id = bi.user_id
         WHERE bi.user_id <> CAST(@userId AS uuid)
           AND u.deleted_at IS NULL
+          AND u.profile_visibility = 'public'
+          AND u.binder_visibility = 'public'
+          AND (
+            u.trade_visibility = 'everyone'
+            OR (
+              u.trade_visibility = 'followers'
+              AND EXISTS (
+                SELECT 1
+                FROM user_follows f
+                WHERE f.follower_id = CAST(@userId AS uuid)
+                  AND f.following_id = u.id
+              )
+            )
+          )
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = CAST(@userId AS uuid)
+              AND b.blocked_id = u.id
+            ) OR (
+              b.blocked_id = CAST(@userId AS uuid)
+              AND b.blocker_id = u.id
+            )
+          )
           AND bi.list_type = 'have'
           AND (bi.for_trade = TRUE OR bi.for_sale = TRUE)
         ORDER BY w.card_name ASC, bi.for_trade DESC, bi.price ASC NULLS LAST
@@ -347,12 +413,3 @@ class CommunityEngagementService {
     return const <String>[];
   }
 }
-
-const _allowedReportReasons = <String>{
-  'spam',
-  'abuse',
-  'scam',
-  'inappropriate',
-  'copyright',
-  'other',
-};

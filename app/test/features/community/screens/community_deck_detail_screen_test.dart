@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/features/auth/models/user.dart';
+import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/community/providers/community_provider.dart';
 import 'package:manaloom/features/community/screens/community_deck_detail_screen.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
@@ -66,6 +68,9 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider<AuthProvider>(
+            create: (_) => _FakeAuthProvider(),
+          ),
           ChangeNotifierProvider(
             create: (_) => CommunityProvider(apiClient: api),
           ),
@@ -137,9 +142,12 @@ Future<void> _pumpDetail(WidgetTester tester, Size size) async {
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<AuthProvider>(
+          create: (_) => _FakeAuthProvider(),
+        ),
         ChangeNotifierProvider(
-          create:
-              (_) => CommunityProvider(apiClient: _CommunityDetailApiFixture()),
+          create: (_) =>
+              CommunityProvider(apiClient: _CommunityDetailApiFixture()),
         ),
         ChangeNotifierProvider(
           create: (_) => DeckProvider(apiClient: _DeckApiFixture()),
@@ -196,3 +204,11 @@ class _CommunityDetailApiFixture extends ApiClient {
 }
 
 class _DeckApiFixture extends ApiClient {}
+
+class _FakeAuthProvider extends AuthProvider {
+  _FakeAuthProvider() : super(apiClient: _DeckApiFixture());
+
+  @override
+  User? get user =>
+      User(id: 'viewer-1', username: 'viewer', email: 'viewer@example.com');
+}

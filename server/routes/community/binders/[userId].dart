@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../lib/community_request_auth.dart';
+
 /// GET /community/binders/:userId → Cartas disponíveis para troca/venda de um usuário
 Future<Response> onRequest(RequestContext context, String userId) async {
   if (context.request.method != HttpMethod.get) {
@@ -10,6 +12,7 @@ Future<Response> onRequest(RequestContext context, String userId) async {
 
   try {
     final pool = context.read<Pool>();
+    final viewerUserId = await readAuthenticatedUserId(context);
     final params = context.request.uri.queryParameters;
 
     final page = int.tryParse(params['page'] ?? '1') ?? 1;
@@ -51,12 +54,98 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     // Dados do dono
     final userResult = await pool.execute(
       Sql.named('''
-      SELECT id, username, display_name, avatar_url, location_state, location_city, trade_notes
-      FROM users
-      WHERE id = @userId
-        AND deleted_at IS NULL
+      SELECT
+        u.id,
+        u.username,
+        u.display_name,
+        u.avatar_url,
+        CASE
+          WHEN u.id = CAST(@viewerUserId AS uuid)
+            OR u.location_visibility = 'public'
+            OR (
+              u.location_visibility = 'trade_only'
+              AND EXISTS (
+                SELECT 1
+                FROM trade_offers t
+                WHERE (
+                  t.sender_id = u.id
+                  AND t.receiver_id = CAST(@viewerUserId AS uuid)
+                ) OR (
+                  t.receiver_id = u.id
+                  AND t.sender_id = CAST(@viewerUserId AS uuid)
+                )
+              )
+            )
+          THEN u.location_state
+          ELSE NULL
+        END AS location_state,
+        CASE
+          WHEN u.id = CAST(@viewerUserId AS uuid)
+            OR u.location_visibility = 'public'
+            OR (
+              u.location_visibility = 'trade_only'
+              AND EXISTS (
+                SELECT 1
+                FROM trade_offers t
+                WHERE (
+                  t.sender_id = u.id
+                  AND t.receiver_id = CAST(@viewerUserId AS uuid)
+                ) OR (
+                  t.receiver_id = u.id
+                  AND t.sender_id = CAST(@viewerUserId AS uuid)
+                )
+              )
+            )
+          THEN u.location_city
+          ELSE NULL
+        END AS location_city,
+        CASE
+          WHEN u.id = CAST(@viewerUserId AS uuid)
+            OR (
+              u.trade_notes_visibility = 'trade_only'
+              AND EXISTS (
+                SELECT 1
+                FROM trade_offers t
+                WHERE (
+                  t.sender_id = u.id
+                  AND t.receiver_id = CAST(@viewerUserId AS uuid)
+                ) OR (
+                  t.receiver_id = u.id
+                  AND t.sender_id = CAST(@viewerUserId AS uuid)
+                )
+              )
+            )
+          THEN u.trade_notes
+          ELSE NULL
+        END AS trade_notes
+      FROM users u
+      WHERE u.id = @userId
+        AND u.deleted_at IS NULL
+        AND (
+          u.binder_visibility = 'public'
+          OR u.id = CAST(@viewerUserId AS uuid)
+        )
+        AND (
+          u.profile_visibility = 'public'
+          OR u.id = CAST(@viewerUserId AS uuid)
+        )
+        AND (
+          u.id = CAST(@viewerUserId AS uuid)
+          OR CAST(@viewerUserId AS uuid) IS NULL
+          OR NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = CAST(@viewerUserId AS uuid)
+              AND b.blocked_id = u.id
+            ) OR (
+              b.blocked_id = CAST(@viewerUserId AS uuid)
+              AND b.blocker_id = u.id
+            )
+          )
+        )
     '''),
-      parameters: {'userId': userId},
+      parameters: {'userId': userId, 'viewerUserId': viewerUserId},
     );
 
     if (userResult.isEmpty) {

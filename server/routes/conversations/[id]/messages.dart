@@ -30,9 +30,19 @@ Future<Response> _getMessages(RequestContext context, String id) async {
 
     // Verificar participação
     final convResult = await pool.execute(
-      Sql.named(
-        'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id',
-      ),
+      Sql.named('''
+        SELECT
+          c.user_a_id,
+          c.user_b_id,
+          EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (b.blocker_id = c.user_a_id AND b.blocked_id = c.user_b_id)
+               OR (b.blocker_id = c.user_b_id AND b.blocked_id = c.user_a_id)
+          ) AS interaction_blocked
+        FROM conversations c
+        WHERE c.id = @id
+      '''),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -46,6 +56,15 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       return Response.json(
         statusCode: HttpStatus.forbidden,
         body: {'error': 'Sem permissão para ver esta conversa'},
+      );
+    }
+    if (conv['interaction_blocked'] == true) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {
+          'error': 'interaction_blocked',
+          'message': 'Esta conversa nao esta disponivel.',
+        },
       );
     }
 
@@ -63,6 +82,7 @@ Future<Response> _getMessages(RequestContext context, String id) async {
           JOIN users u ON u.id = dm.sender_id
           WHERE dm.conversation_id = @id
             AND dm.created_at > @since
+            AND dm.moderation_status = 'visible'
           ORDER BY dm.created_at DESC
           LIMIT @lim
         '''),
@@ -75,7 +95,8 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       // Count completo para paginação tradicional.
       final countFuture = pool.execute(
         Sql.named(
-          'SELECT COUNT(*)::int FROM direct_messages WHERE conversation_id = @id',
+          "SELECT COUNT(*)::int FROM direct_messages "
+          "WHERE conversation_id = @id AND moderation_status = 'visible'",
         ),
         parameters: {'id': id},
       );
@@ -89,6 +110,7 @@ Future<Response> _getMessages(RequestContext context, String id) async {
           FROM direct_messages dm
           JOIN users u ON u.id = dm.sender_id
           WHERE dm.conversation_id = @id
+            AND dm.moderation_status = 'visible'
           ORDER BY dm.created_at DESC
           LIMIT @lim OFFSET @off
         '''),
@@ -147,11 +169,28 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     final body = await context.request.json() as Map<String, dynamic>;
 
     final message = (body['message'] as String?)?.trim();
+    final clientRequestId =
+        body['client_request_id']?.toString().trim().isEmpty == true
+            ? null
+            : body['client_request_id']?.toString().trim();
     if (message == null || message.isEmpty) {
       _logInvalidPayload(context, id, 'missing_message');
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {'error': 'message é obrigatório'},
+      );
+    }
+    if (clientRequestId != null &&
+        (clientRequestId.length < 8 ||
+            clientRequestId.length > 128 ||
+            !RegExp(r'^[A-Za-z0-9._:-]+$').hasMatch(clientRequestId))) {
+      _logInvalidPayload(context, id, 'invalid_client_request_id');
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error': 'invalid_client_request_id',
+          'message': 'client_request_id invalido.',
+        },
       );
     }
 
@@ -184,7 +223,7 @@ Future<Response> _postMessage(RequestContext context, String id) async {
 
     // Trava os participantes ativos antes do insert. Se a exclusão de uma das
     // contas vencer a corrida, nenhuma mensagem nova é persistida.
-    final insertResult = await pool.runTx((session) async {
+    final sendResult = await pool.runTx((session) async {
       final participants = <String>[userId, receiverId]..sort();
       final activeUsers = await session.execute(
         Sql.named('''
@@ -199,26 +238,86 @@ Future<Response> _postMessage(RequestContext context, String id) async {
       );
       if (activeUsers.length != 2) return null;
 
-      return session.execute(
+      final policy = await session.execute(
         Sql.named('''
-          WITH inserted AS (
-            INSERT INTO direct_messages (conversation_id, sender_id, message)
-            VALUES (@convId, @senderId, @message)
-            RETURNING id, created_at
+          SELECT
+            target.message_visibility,
+            EXISTS (
+              SELECT 1
+              FROM user_follows f
+              WHERE f.follower_id = @senderId
+                AND f.following_id = @receiverId
+            ) AS sender_follows,
+            EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (b.blocker_id = @senderId AND b.blocked_id = @receiverId)
+                 OR (b.blocker_id = @receiverId AND b.blocked_id = @senderId)
+            ) AS interaction_blocked
+          FROM users target
+          WHERE target.id = @receiverId
+        '''),
+        parameters: {'senderId': userId, 'receiverId': receiverId},
+      );
+      final policyRow = policy.first.toColumnMap();
+      final visibility = policyRow['message_visibility'] as String;
+      if (policyRow['interaction_blocked'] == true) {
+        return <String, dynamic>{'error': 'interaction_blocked'};
+      }
+      if (visibility == 'none' ||
+          (visibility == 'followers' && policyRow['sender_follows'] != true)) {
+        return <String, dynamic>{'error': 'messages_not_allowed'};
+      }
+
+      final result = await session.execute(
+        Sql.named('''
+          WITH upserted AS (
+            INSERT INTO direct_messages (
+              conversation_id,
+              sender_id,
+              message,
+              client_request_id
+            )
+            VALUES (@convId, @senderId, @message, @clientRequestId)
+            ON CONFLICT (sender_id, client_request_id)
+              WHERE client_request_id IS NOT NULL
+            DO UPDATE SET client_request_id = EXCLUDED.client_request_id
+            RETURNING
+              id,
+              created_at,
+              message,
+              client_request_id,
+              (xmax = 0) AS inserted
           ),
           updated AS (
             UPDATE conversations
-            SET last_message_at = (SELECT created_at FROM inserted)
+            SET last_message_at = (SELECT created_at FROM upserted)
             WHERE id = @convId
+              AND (SELECT inserted FROM upserted)
             RETURNING id
           )
-          SELECT inserted.id, inserted.created_at
-          FROM inserted, updated
+          SELECT
+            id,
+            created_at,
+            message,
+            client_request_id,
+            inserted
+          FROM upserted
         '''),
-        parameters: {'convId': id, 'senderId': userId, 'message': message},
+        parameters: {
+          'convId': id,
+          'senderId': userId,
+          'message': message,
+          'clientRequestId': clientRequestId,
+        },
       );
+      final row = result.first.toColumnMap();
+      if (row['message'] != message) {
+        return <String, dynamic>{'error': 'idempotency_conflict'};
+      }
+      return <String, dynamic>{'message': row};
     });
-    if (insertResult == null) {
+    if (sendResult == null) {
       return Response.json(
         statusCode: HttpStatus.conflict,
         body: {
@@ -227,30 +326,52 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         },
       );
     }
+    if (sendResult['error'] case final error?) {
+      final status =
+          error == 'idempotency_conflict'
+              ? HttpStatus.conflict
+              : HttpStatus.forbidden;
+      return Response.json(
+        statusCode: status,
+        body: {
+          'error': error,
+          'message':
+              error == 'idempotency_conflict'
+                  ? 'A chave de retry ja foi usada com outro conteudo.'
+                  : 'Esta conversa nao aceita novas mensagens.',
+        },
+      );
+    }
 
-    final msg = insertResult.first.toColumnMap();
+    final msg = sendResult['message']! as Map<String, dynamic>;
     final createdAt = msg['created_at'];
+    final inserted = msg['inserted'] == true;
 
-    NotificationService.createFromActorDeferred(
-      pool: pool,
-      actorUserId: userId,
-      userId: receiverId,
-      type: 'direct_message',
-      titleBuilder: (senderName) => 'Nova mensagem de $senderName',
-      body: message.length > 100 ? '${message.substring(0, 100)}...' : message,
-      referenceId: id, // conversation id
-      endpoint: 'POST /conversations/:id/messages',
-      requestId: _requestId(context),
-      conversationId: id,
-    );
+    if (inserted) {
+      NotificationService.createFromActorDeferred(
+        pool: pool,
+        actorUserId: userId,
+        userId: receiverId,
+        type: 'direct_message',
+        titleBuilder: (senderName) => 'Nova mensagem de $senderName',
+        body:
+            message.length > 100 ? '${message.substring(0, 100)}...' : message,
+        referenceId: id, // conversation id
+        endpoint: 'POST /conversations/:id/messages',
+        requestId: _requestId(context),
+        conversationId: id,
+      );
+    }
 
     return Response.json(
-      statusCode: HttpStatus.created,
+      statusCode: inserted ? HttpStatus.created : HttpStatus.ok,
       body: {
         'id': msg['id'],
         'conversation_id': id,
         'sender_id': userId,
         'message': message,
+        'client_request_id': msg['client_request_id'],
+        'idempotent_replay': !inserted,
         'created_at':
             createdAt is DateTime
                 ? createdAt.toIso8601String()

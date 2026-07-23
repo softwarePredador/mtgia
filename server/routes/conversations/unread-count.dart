@@ -22,7 +22,14 @@ Future<Response> onRequest(RequestContext context) async {
         JOIN conversations c ON c.id = dm.conversation_id
         WHERE dm.read_at IS NULL
           AND dm.sender_id != @userId
+          AND dm.moderation_status = 'visible'
           AND (c.user_a_id = @userId OR c.user_b_id = @userId)
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (b.blocker_id = c.user_a_id AND b.blocked_id = c.user_b_id)
+               OR (b.blocker_id = c.user_b_id AND b.blocked_id = c.user_a_id)
+          )
       '''),
       parameters: {'userId': userId},
     );

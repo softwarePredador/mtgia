@@ -11,6 +11,7 @@ import '../../binder/providers/binder_provider.dart';
 import '../../messages/providers/message_provider.dart';
 import '../../trades/screens/create_trade_screen.dart';
 import '../providers/social_provider.dart';
+import '../widgets/social_report_dialog.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -91,6 +92,66 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     context.push('/messages/${conv.id}', extra: conv.otherUser);
   }
 
+  Future<void> _reportProfile() async {
+    final draft = await showSocialReportDialog(context, targetLabel: 'perfil');
+    if (draft == null || !mounted) return;
+    final ok = await context.read<SocialProvider>().reportContent(
+      targetType: 'profile',
+      targetId: widget.userId,
+      reason: draft.reason,
+      details: draft.details,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Denúncia registrada.' : 'Não foi possível enviar a denúncia.',
+        ),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
+  }
+
+  Future<void> _blockProfile() async {
+    final user = context.read<SocialProvider>().visitedUser;
+    if (user == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        key: const Key('user-profile-block-confirmation-dialog'),
+        title: const Text('Bloquear jogador?'),
+        content: Text(
+          'Você e ${user.displayLabel} deixarão de interagir por mensagens, '
+          'comunidade e novas trocas.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            key: const Key('user-profile-block-confirm-button'),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Bloquear'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final ok = await context.read<SocialProvider>().blockUser(widget.userId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Jogador bloqueado.' : 'Não foi possível bloquear o jogador.',
+        ),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
+    if (ok) context.pop();
+  }
+
   void _loadTab(int index) {
     final provider = context.read<SocialProvider>();
     if (index == 1) {
@@ -112,6 +173,45 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       appBar: AppBar(
         title: const Text('Perfil'),
         backgroundColor: AppTheme.backgroundAbyss,
+        actions: [
+          Consumer<SocialProvider>(
+            builder: (context, provider, _) {
+              if (provider.isOwnProfile != false) {
+                return const SizedBox.shrink();
+              }
+              return PopupMenuButton<String>(
+                key: const Key('user-profile-safety-menu'),
+                tooltip: 'Opções de segurança',
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) {
+                  if (value == 'report') {
+                    _reportProfile();
+                  } else if (value == 'block') {
+                    _blockProfile();
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: 'report',
+                    child: ListTile(
+                      dense: true,
+                      leading: Icon(Icons.flag_outlined),
+                      title: Text('Denunciar perfil'),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'block',
+                    child: ListTile(
+                      dense: true,
+                      leading: Icon(Icons.block_outlined),
+                      title: Text('Bloquear jogador'),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer<SocialProvider>(
         builder: (context, provider, _) {

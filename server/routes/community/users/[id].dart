@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../lib/auth_service.dart';
+import '../../../lib/community_request_auth.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
@@ -21,6 +21,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 Future<Response> _getUserProfile(RequestContext context, String userId) async {
   try {
     final conn = context.read<Pool>();
+    final viewerId = await readAuthenticatedUserId(context);
 
     // Buscar usuário com contadores agregados (sem subqueries correlacionadas)
     final userResult = await conn.execute(
@@ -60,8 +61,27 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
         LEFT JOIN public_deck_counts pdc ON pdc.user_id = u.id
         WHERE u.id = @userId
           AND u.deleted_at IS NULL
+          AND (
+            u.profile_visibility = 'public'
+            OR u.id = CAST(@viewerId AS uuid)
+          )
+          AND (
+            CAST(@viewerId AS uuid) IS NULL
+            OR u.id = CAST(@viewerId AS uuid)
+            OR NOT EXISTS (
+              SELECT 1
+              FROM user_blocks b
+              WHERE (
+                b.blocker_id = CAST(@viewerId AS uuid)
+                AND b.blocked_id = u.id
+              ) OR (
+                b.blocked_id = CAST(@viewerId AS uuid)
+                AND b.blocker_id = u.id
+              )
+            )
+          )
       '''),
-      parameters: {'userId': userId},
+      parameters: {'userId': userId, 'viewerId': viewerId},
     );
 
     if (userResult.isEmpty) {
@@ -80,23 +100,16 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
 
     // Checar se o visitante segue esse usuário (se estiver autenticado)
     bool isFollowing = false;
-    final authHeader = context.request.headers['Authorization'];
-    if (authHeader != null && authHeader.startsWith('Bearer ')) {
-      final token = authHeader.substring(7);
-      final authService = AuthService();
-      final viewer = await authService.getUserFromToken(token);
-      if (viewer != null) {
-        final viewerId = viewer['id'] as String;
-        final followResult = await conn.execute(
-          Sql.named('''
+    if (viewerId != null) {
+      final followResult = await conn.execute(
+        Sql.named('''
             SELECT 1 FROM user_follows
             WHERE follower_id = @viewerId AND following_id = @userId
           '''),
-          parameters: {'viewerId': viewerId, 'userId': userId},
-        );
-        isFollowing = followResult.isNotEmpty;
-        user['is_own_profile'] = viewerId == userId;
-      }
+        parameters: {'viewerId': viewerId, 'userId': userId},
+      );
+      isFollowing = followResult.isNotEmpty;
+      user['is_own_profile'] = viewerId == userId;
     }
     user['is_following'] = isFollowing;
 

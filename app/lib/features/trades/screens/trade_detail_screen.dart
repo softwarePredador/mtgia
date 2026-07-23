@@ -1,20 +1,26 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/models/user_trust_insight.dart';
+import '../../../core/services/message_draft_store.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../social/providers/social_provider.dart';
+import '../../social/widgets/social_report_dialog.dart';
 import '../providers/trade_provider.dart';
 import '../widgets/trade_safety_notice.dart';
 
 /// Tela de detalhe de um trade — Timeline + Items + Chat + Ações
 class TradeDetailScreen extends StatefulWidget {
   final String tradeId;
-  const TradeDetailScreen({super.key, required this.tradeId});
+  final MessageDraftStore? draftStore;
+
+  const TradeDetailScreen({super.key, required this.tradeId, this.draftStore});
 
   @override
   State<TradeDetailScreen> createState() => _TradeDetailScreenState();
@@ -24,7 +30,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   Timer? _pollTimer;
+  Timer? _draftSaveTimer;
   TradeProvider? _tradeProvider;
+  late final MessageDraftStore _draftStore;
+  String? _clientRequestId;
+  String? _requestIdText;
+  bool _restoringDraft = false;
+
+  String get _draftKey => 'trade:${widget.tradeId}';
 
   @override
   void didChangeDependencies() {
@@ -35,10 +48,13 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _draftStore = widget.draftStore ?? MessageDraftStore();
+    _messageController.addListener(_onDraftChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = _tradeProvider;
       if (provider == null) return;
       provider.setActiveTrade(widget.tradeId);
+      unawaited(_restoreDraft());
       provider.fetchTradeDetail(widget.tradeId);
       // Polling leve atualiza status, timeline e mensagens quando push não chegar.
       _pollTimer = Timer.periodic(const Duration(seconds: 12), (_) {
@@ -52,8 +68,11 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   @override
   void dispose() {
     _pollTimer?.cancel();
+    _draftSaveTimer?.cancel();
+    unawaited(_persistDraft());
     _tradeProvider?.clearActiveTrade(widget.tradeId);
     _tradeProvider?.clearSelectedTrade();
+    _messageController.removeListener(_onDraftChanged);
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -155,7 +174,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                       _buildTimeline(trade),
                       const SizedBox(height: AppTheme.space16),
                       // Chat section — isolated rebuild via its own Selector
-                      _TradeChat(tradeId: widget.tradeId),
+                      _TradeChat(
+                        tradeId: widget.tradeId,
+                        onReport: _reportTradeMessage,
+                      ),
                     ],
                   ),
                 ),
@@ -1101,15 +1123,99 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     );
   }
 
+  Future<void> _restoreDraft() async {
+    final draft = await _draftStore.load(_draftKey);
+    if (!mounted || draft.isEmpty || _messageController.text.isNotEmpty) {
+      return;
+    }
+    _restoringDraft = true;
+    _messageController.text = draft.text;
+    _messageController.selection = TextSelection.collapsed(
+      offset: draft.text.length,
+    );
+    _clientRequestId = draft.clientRequestId;
+    _requestIdText = draft.clientRequestId == null ? null : draft.text.trim();
+    _restoringDraft = false;
+  }
+
+  void _onDraftChanged() {
+    if (_restoringDraft) return;
+    final currentText = _messageController.text.trim();
+    if (_requestIdText != null && currentText != _requestIdText) {
+      _clientRequestId = null;
+      _requestIdText = null;
+    }
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = Timer(
+      const Duration(milliseconds: 250),
+      () => unawaited(_persistDraft()),
+    );
+  }
+
+  Future<void> _persistDraft() {
+    return _draftStore.save(
+      _draftKey,
+      MessageDraft(
+        text: _messageController.text,
+        clientRequestId: _requestIdText == _messageController.text.trim()
+            ? _clientRequestId
+            : null,
+      ),
+    );
+  }
+
+  Future<void> _sendTradeMessage(TradeProvider provider) async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+    _clientRequestId ??= ApiClient.generateRequestId();
+    _requestIdText = text;
+    await _persistDraft();
+    final ok = await provider.sendMessage(
+      widget.tradeId,
+      text,
+      clientRequestId: _clientRequestId,
+    );
+    if (!mounted) return;
+    if (ok) {
+      _draftSaveTimer?.cancel();
+      _restoringDraft = true;
+      _messageController.clear();
+      _clientRequestId = null;
+      _requestIdText = null;
+      _restoringDraft = false;
+      await _draftStore.clear(_draftKey);
+      return;
+    }
+    await _persistDraft();
+    if (!mounted) return;
+    _showFriendlyTradeError(provider);
+  }
+
+  Future<void> _reportTradeMessage(TradeMessage message) async {
+    final draft = await showSocialReportDialog(
+      context,
+      targetLabel: 'mensagem',
+    );
+    if (draft == null || !mounted) return;
+    final ok = await context.read<SocialProvider>().reportContent(
+      targetType: 'trade_message',
+      targetId: message.id,
+      reason: draft.reason,
+      details: draft.details,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Denúncia registrada.' : 'Não foi possível enviar a denúncia.',
+        ),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
+  }
+
   // ─── Input de Mensagem ──────────────────────────────────────
   Widget _buildMessageInput(TradeProvider provider) {
-    Future<void> sendCurrentMessage() async {
-      final text = _messageController.text.trim();
-      if (text.isEmpty) return;
-      _messageController.clear();
-      await provider.sendMessage(widget.tradeId, text);
-    }
-
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.space12,
@@ -1125,7 +1231,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 controller: _messageController,
                 style: const TextStyle(color: AppTheme.textPrimary),
                 textInputAction: TextInputAction.send,
-                onSubmitted: (_) => sendCurrentMessage(),
+                onSubmitted: (_) => _sendTradeMessage(provider),
                 decoration: InputDecoration(
                   hintText: 'Mensagem sobre este trade...',
                   hintStyle: const TextStyle(color: AppTheme.textHint),
@@ -1146,7 +1252,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             IconButton(
               key: const ValueKey('trade-message-send-button'),
               tooltip: 'Enviar mensagem',
-              onPressed: sendCurrentMessage,
+              onPressed: () => _sendTradeMessage(provider),
               icon: const Icon(Icons.send, color: AppTheme.brass400),
             ),
           ],
@@ -1390,7 +1496,9 @@ class _TimelineStep {
 /// Evita reconstruir status/items/timeline a cada polling de 10s.
 class _TradeChat extends StatelessWidget {
   final String tradeId;
-  const _TradeChat({required this.tradeId});
+  final ValueChanged<TradeMessage> onReport;
+
+  const _TradeChat({required this.tradeId, required this.onReport});
 
   @override
   Widget build(BuildContext context) {
@@ -1435,66 +1543,85 @@ class _TradeChat extends StatelessWidget {
               final currentUserId = context.read<AuthProvider>().user?.id;
               final isMe = msg.senderId == currentUserId;
 
-              return Align(
-                alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.65,
-                  ),
-                  margin: const EdgeInsets.symmetric(vertical: AppTheme.space3),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.space10,
-                    vertical: AppTheme.space7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isMe
-                        ? AppTheme.frost400.withValues(alpha: 0.18)
-                        : AppTheme.outlineMuted,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: isMe
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      if (!isMe)
-                        Text(
-                          msg.senderUsername ?? '',
-                          style: const TextStyle(
-                            color: AppTheme.frost400,
-                            fontSize: AppTheme.fontSm,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      if (msg.message != null)
-                        Text(
-                          msg.message!,
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: AppTheme.fontMd,
-                          ),
-                        ),
-                      if (msg.attachmentUrl != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: AppTheme.space4),
-                          child: Text(
-                            '📎 ${msg.attachmentType ?? "anexo"}',
+              return Row(
+                mainAxisAlignment: isMe
+                    ? MainAxisAlignment.end
+                    : MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.65,
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                        vertical: AppTheme.space3,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.space10,
+                        vertical: AppTheme.space7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isMe
+                            ? AppTheme.frost400.withValues(alpha: 0.18)
+                            : AppTheme.outlineMuted,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: isMe
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          if (!isMe)
+                            Text(
+                              msg.senderUsername ?? '',
+                              style: const TextStyle(
+                                color: AppTheme.frost400,
+                                fontSize: AppTheme.fontSm,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          if (msg.message != null)
+                            Text(
+                              msg.message!,
+                              style: const TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontSize: AppTheme.fontMd,
+                              ),
+                            ),
+                          if (msg.attachmentUrl != null)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: AppTheme.space4,
+                              ),
+                              child: Text(
+                                'Anexo: ${msg.attachmentType ?? "arquivo"}',
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                            ),
+                          Text(
+                            _formatTime(msg.createdAt),
                             style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
+                              color: AppTheme.textHint,
+                              fontSize: AppTheme.fontXs,
                             ),
                           ),
-                        ),
-                      Text(
-                        _formatTime(msg.createdAt),
-                        style: const TextStyle(
-                          color: AppTheme.textHint,
-                          fontSize: AppTheme.fontXs,
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  if (!isMe)
+                    IconButton(
+                      key: Key('trade-message-actions-${msg.id}'),
+                      tooltip: 'Denunciar mensagem',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => onReport(msg),
+                      icon: const Icon(Icons.more_vert, size: 18),
+                    ),
+                ],
               );
             }),
           ] else

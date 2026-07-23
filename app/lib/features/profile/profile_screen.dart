@@ -15,6 +15,7 @@ import '../auth/models/user.dart';
 import '../auth/password_policy.dart';
 import '../auth/providers/auth_provider.dart';
 import '../commercial/widgets/ai_usage_meter.dart';
+import '../social/providers/social_provider.dart';
 import 'account_privacy_service.dart';
 
 typedef AccountDataShare = Future<void> Function(String content);
@@ -37,6 +38,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _cityController = TextEditingController();
   final _tradeNotesController = TextEditingController();
   String? _selectedState;
+  String _profileVisibility = 'public';
+  String _binderVisibility = 'public';
+  String _locationVisibility = 'private';
+  String _messageVisibility = 'everyone';
+  String _tradeVisibility = 'everyone';
+  String _tradeNotesVisibility = 'private';
   bool _isSaving = false;
   bool _isExporting = false;
   bool _isDeleting = false;
@@ -88,6 +95,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _tradeNotesController.text = user.tradeNotes ?? '';
       setState(() {
         _selectedState = user.locationState;
+        _profileVisibility = user.profileVisibility;
+        _binderVisibility = user.binderVisibility;
+        _locationVisibility = user.locationVisibility;
+        _messageVisibility = user.messageVisibility;
+        _tradeVisibility = user.tradeVisibility;
+        _tradeNotesVisibility = user.tradeNotesVisibility;
       });
     });
   }
@@ -113,6 +126,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       locationState: _selectedState,
       locationCity: cityText.isEmpty ? null : cityText,
       tradeNotes: tradeNotesText.isEmpty ? null : tradeNotesText,
+      profileVisibility: _profileVisibility,
+      binderVisibility: _binderVisibility,
+      locationVisibility: _locationVisibility,
+      messageVisibility: _messageVisibility,
+      tradeVisibility: _tradeVisibility,
+      tradeNotesVisibility: _tradeNotesVisibility,
     );
     if (!mounted) return;
     setState(() => _isSaving = false);
@@ -267,6 +286,103 @@ class _ProfileScreenState extends State<ProfileScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
+  Future<void> _showBlockedUsers() async {
+    final provider = context.read<SocialProvider>();
+    await provider.fetchBlockedUsers();
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        key: const Key('profile-blocked-users-dialog'),
+        title: const Text('Contas bloqueadas'),
+        content: SizedBox(
+          width: 480,
+          height: 360,
+          child: Consumer<SocialProvider>(
+            builder: (context, social, _) {
+              if (social.isLoadingBlockedUsers) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (social.blockedUsersError != null) {
+                return Center(
+                  child: Text(
+                    social.blockedUsersError!,
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+              if (social.blockedUsers.isEmpty) {
+                return const Center(child: Text('Nenhuma conta bloqueada.'));
+              }
+              return ListView.separated(
+                itemCount: social.blockedUsers.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final user = social.blockedUsers[index];
+                  return ListTile(
+                    title: Text(user.displayLabel),
+                    subtitle: Text('@${user.username}'),
+                    trailing: TextButton(
+                      key: Key('profile-unblock-${user.id}'),
+                      onPressed: () => _confirmUnblock(dialogContext, user),
+                      child: const Text('Desbloquear'),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Fechar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmUnblock(
+    BuildContext dialogContext,
+    BlockedUser user,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: dialogContext,
+      barrierDismissible: false,
+      builder: (confirmationContext) => AlertDialog(
+        key: const Key('profile-unblock-confirmation-dialog'),
+        title: const Text('Desbloquear jogador?'),
+        content: Text(
+          '${user.displayLabel} poderá voltar a encontrar seu conteúdo '
+          'público e iniciar interações permitidas.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(confirmationContext, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            key: const Key('profile-unblock-confirm-button'),
+            onPressed: () => Navigator.pop(confirmationContext, true),
+            child: const Text('Desbloquear'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final ok = await context.read<SocialProvider>().unblockUser(user.id);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Jogador desbloqueado.' : 'Não foi possível desbloquear.',
+        ),
+        backgroundColor: ok ? null : AppTheme.error,
       ),
     );
   }
@@ -737,11 +853,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
-                              'Baixe uma cópia portátil dos seus dados ou solicite a exclusão definitiva da conta.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppTheme.textSecondary,
-                                height: 1.4,
+                            _VisibilityField(
+                              fieldKey: const Key(
+                                'profile-profile-visibility-field',
+                              ),
+                              label: 'Visibilidade do perfil',
+                              value: _profileVisibility,
+                              options: const {
+                                'public': 'Público',
+                                'private': 'Privado',
+                              },
+                              onChanged: (value) =>
+                                  setState(() => _profileVisibility = value),
+                            ),
+                            const SizedBox(height: AppTheme.space10),
+                            _VisibilityField(
+                              fieldKey: const Key(
+                                'profile-binder-visibility-field',
+                              ),
+                              label: 'Fichário',
+                              value: _binderVisibility,
+                              options: const {
+                                'public': 'Público',
+                                'private': 'Privado',
+                              },
+                              onChanged: (value) =>
+                                  setState(() => _binderVisibility = value),
+                            ),
+                            const SizedBox(height: AppTheme.space10),
+                            _VisibilityField(
+                              fieldKey: const Key(
+                                'profile-location-visibility-field',
+                              ),
+                              label: 'Localização',
+                              value: _locationVisibility,
+                              options: const {
+                                'public': 'Pública',
+                                'trade_only': 'Somente em trades',
+                                'private': 'Privada',
+                              },
+                              onChanged: (value) =>
+                                  setState(() => _locationVisibility = value),
+                            ),
+                            const SizedBox(height: AppTheme.space10),
+                            _VisibilityField(
+                              fieldKey: const Key(
+                                'profile-message-visibility-field',
+                              ),
+                              label: 'Mensagens',
+                              value: _messageVisibility,
+                              options: const {
+                                'everyone': 'Todos',
+                                'followers': 'Seguidores',
+                                'none': 'Ninguém',
+                              },
+                              onChanged: (value) =>
+                                  setState(() => _messageVisibility = value),
+                            ),
+                            const SizedBox(height: AppTheme.space10),
+                            _VisibilityField(
+                              fieldKey: const Key(
+                                'profile-trade-visibility-field',
+                              ),
+                              label: 'Novas propostas',
+                              value: _tradeVisibility,
+                              options: const {
+                                'everyone': 'Todos',
+                                'followers': 'Seguidores',
+                                'none': 'Ninguém',
+                              },
+                              onChanged: (value) =>
+                                  setState(() => _tradeVisibility = value),
+                            ),
+                            const SizedBox(height: AppTheme.space10),
+                            _VisibilityField(
+                              fieldKey: const Key(
+                                'profile-trade-notes-visibility-field',
+                              ),
+                              label: 'Notas de troca',
+                              value: _tradeNotesVisibility,
+                              options: const {
+                                'trade_only': 'Somente em trades',
+                                'private': 'Privadas',
+                              },
+                              onChanged: (value) =>
+                                  setState(() => _tradeNotesVisibility = value),
+                            ),
+                            const SizedBox(height: AppTheme.space12),
+                            OutlinedButton.icon(
+                              key: const Key('profile-blocked-users-button'),
+                              onPressed: _showBlockedUsers,
+                              icon: const Icon(Icons.block_outlined),
+                              label: const Text('Contas bloqueadas'),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(48),
                               ),
                             ),
                             const SizedBox(height: AppTheme.space14),
@@ -849,6 +1054,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+    );
+  }
+}
+
+class _VisibilityField extends StatelessWidget {
+  const _VisibilityField({
+    required this.fieldKey,
+    required this.label,
+    required this.value,
+    required this.options,
+    required this.onChanged,
+  });
+
+  final Key fieldKey;
+  final String label;
+  final String value;
+  final Map<String, String> options;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      key: fieldKey,
+      initialValue: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: const Icon(Icons.visibility_outlined),
+      ),
+      items: options.entries
+          .map(
+            (entry) =>
+                DropdownMenuItem(value: entry.key, child: Text(entry.value)),
+          )
+          .toList(growable: false),
+      onChanged: (next) {
+        if (next != null) onChanged(next);
+      },
     );
   }
 }

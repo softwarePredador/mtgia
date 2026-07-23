@@ -34,6 +34,12 @@ class _ProfileApiClient extends ApiClient {
     'location_state': 'RJ',
     'location_city': 'Rio de Janeiro',
     'trade_notes': 'Initial notes',
+    'profile_visibility': 'public',
+    'binder_visibility': 'public',
+    'location_visibility': 'private',
+    'message_visibility': 'everyone',
+    'trade_visibility': 'everyone',
+    'trade_notes_visibility': 'private',
   };
 
   Map<String, dynamic>? lastPatchBody;
@@ -174,6 +180,12 @@ void main() {
       expect(api.lastPatchBody?['display_name'], 'Runtime Nick Edited');
       expect(api.lastPatchBody?['location_city'], 'Campinas');
       expect(api.lastPatchBody?['trade_notes'], 'Runtime trade notes edited');
+      expect(api.lastPatchBody?['profile_visibility'], 'public');
+      expect(api.lastPatchBody?['binder_visibility'], 'public');
+      expect(api.lastPatchBody?['location_visibility'], 'private');
+      expect(api.lastPatchBody?['message_visibility'], 'everyone');
+      expect(api.lastPatchBody?['trade_visibility'], 'everyone');
+      expect(api.lastPatchBody?['trade_notes_visibility'], 'private');
       expect(auth.user?.displayName, 'Runtime Nick Edited');
 
       final refreshed = await auth.refreshProfile();
@@ -214,7 +226,15 @@ void main() {
         findsNothing,
       );
 
-      await tester.tap(find.byKey(const Key('profile-delete-account-button')));
+      final deleteButton = find.byKey(
+        const Key('profile-delete-account-button'),
+      );
+      await tester.scrollUntilVisible(
+        deleteButton,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(deleteButton);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('profile-delete-confirm-button')));
       await tester.pump();

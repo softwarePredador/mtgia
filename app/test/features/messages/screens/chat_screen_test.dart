@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/services/message_draft_store.dart';
 import 'package:manaloom/features/auth/models/user.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/messages/screens/chat_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _NoopApiClient extends ApiClient {}
 
@@ -24,6 +26,7 @@ class _ChatApiClient extends ApiClient {
   final int sendStatus;
   int messageFetchCount = 0;
   int sendCount = 0;
+  final postBodies = <Map<String, dynamic>>[];
 
   @override
   Future<ApiResponse> get(String endpoint) async {
@@ -57,6 +60,7 @@ class _ChatApiClient extends ApiClient {
   }) async {
     if (endpoint == '/conversations/conversation-1/messages') {
       sendCount += 1;
+      postBodies.add(Map<String, dynamic>.from(body));
       if (sendStatus == 201) {
         return ApiResponse(201, {
           'id': 'message-sent',
@@ -74,6 +78,7 @@ class _ChatApiClient extends ApiClient {
 Future<void> _pumpChat(
   WidgetTester tester, {
   required MessageProvider provider,
+  MessageDraftStore? draftStore,
 }) async {
   await tester.pumpWidget(
     MultiProvider(
@@ -86,6 +91,7 @@ Future<void> _pumpChat(
       child: MaterialApp(
         home: ChatScreen(
           conversationId: 'conversation-1',
+          draftStore: draftStore,
           otherUser: ConversationUser(
             id: 'user-2',
             username: 'opponent',
@@ -100,6 +106,10 @@ Future<void> _pumpChat(
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
+
   testWidgets(
     'chat shows error state instead of empty state on fetch failure',
     (tester) async {
@@ -124,8 +134,9 @@ void main() {
   ) async {
     final api = _ChatApiClient(messagesStatus: 200, sendStatus: 500);
     final provider = MessageProvider(apiClient: api);
+    final draftStore = MessageDraftStore();
 
-    await _pumpChat(tester, provider: provider);
+    await _pumpChat(tester, provider: provider, draftStore: draftStore);
 
     expect(find.byKey(const Key('chat-empty-state')), findsOneWidget);
 
@@ -142,6 +153,19 @@ void main() {
     expect(
       find.text('Não foi possível enviar a mensagem. Tente novamente.'),
       findsOneWidget,
+    );
+    final persisted = await draftStore.load('direct:conversation-1');
+    expect(persisted.text, 'proposta de troca');
+    expect(persisted.clientRequestId, isNotNull);
+
+    await tester.tap(find.byKey(const Key('chat-message-send-button')));
+    await tester.pump();
+    await tester.pump();
+
+    expect(api.sendCount, 2);
+    expect(
+      api.postBodies.map((body) => body['client_request_id']).toSet(),
+      hasLength(1),
     );
   });
 

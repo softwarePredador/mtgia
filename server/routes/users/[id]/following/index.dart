@@ -17,6 +17,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 Future<Response> _getFollowing(RequestContext context, String userId) async {
   try {
     final conn = context.read<Pool>();
+    final viewerId = context.read<String>();
     final params = context.request.uri.queryParameters;
     final page = int.tryParse(params['page'] ?? '') ?? 1;
     final limit = (int.tryParse(params['limit'] ?? '') ?? 20).clamp(1, 50);
@@ -30,8 +31,44 @@ Future<Response> _getFollowing(RequestContext context, String userId) async {
         JOIN users u ON u.id = uf.following_id
         WHERE uf.follower_id = @id
           AND u.deleted_at IS NULL
+          AND u.profile_visibility = 'public'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = @viewerId
+              AND b.blocked_id = u.id
+            ) OR (
+              b.blocked_id = @viewerId
+              AND b.blocker_id = u.id
+            )
+          )
+          AND EXISTS (
+            SELECT 1
+            FROM users target
+            WHERE target.id = @id
+              AND target.deleted_at IS NULL
+              AND (
+                target.profile_visibility = 'public'
+                OR target.id = @viewerId
+              )
+              AND (
+                target.id = @viewerId
+                OR NOT EXISTS (
+                  SELECT 1
+                  FROM user_blocks target_block
+                  WHERE (
+                    target_block.blocker_id = @viewerId
+                    AND target_block.blocked_id = target.id
+                  ) OR (
+                    target_block.blocked_id = @viewerId
+                    AND target_block.blocker_id = target.id
+                  )
+                )
+              )
+          )
       '''),
-      parameters: {'id': userId},
+      parameters: {'id': userId, 'viewerId': viewerId},
     );
     final total = (countResult.first[0] as int?) ?? 0;
 
@@ -48,10 +85,51 @@ Future<Response> _getFollowing(RequestContext context, String userId) async {
         JOIN users u ON u.id = uf.following_id
         WHERE uf.follower_id = @userId
           AND u.deleted_at IS NULL
+          AND u.profile_visibility = 'public'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM user_blocks b
+            WHERE (
+              b.blocker_id = @viewerId
+              AND b.blocked_id = u.id
+            ) OR (
+              b.blocked_id = @viewerId
+              AND b.blocker_id = u.id
+            )
+          )
+          AND EXISTS (
+            SELECT 1
+            FROM users target
+            WHERE target.id = @userId
+              AND target.deleted_at IS NULL
+              AND (
+                target.profile_visibility = 'public'
+                OR target.id = @viewerId
+              )
+              AND (
+                target.id = @viewerId
+                OR NOT EXISTS (
+                  SELECT 1
+                  FROM user_blocks target_block
+                  WHERE (
+                    target_block.blocker_id = @viewerId
+                    AND target_block.blocked_id = target.id
+                  ) OR (
+                    target_block.blocked_id = @viewerId
+                    AND target_block.blocker_id = target.id
+                  )
+                )
+              )
+          )
         ORDER BY uf.created_at DESC
         LIMIT @lim OFFSET @off
       '''),
-      parameters: {'userId': userId, 'lim': limit, 'off': offset},
+      parameters: {
+        'userId': userId,
+        'viewerId': viewerId,
+        'lim': limit,
+        'off': offset,
+      },
     );
 
     final following =

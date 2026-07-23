@@ -184,6 +184,18 @@ class NotificationService {
         parameters: {'actorUserId': actorUserId},
       );
       if (actor.isEmpty) return null;
+      final blocked = await session.execute(
+        Sql.named('''
+          SELECT EXISTS (
+            SELECT 1
+            FROM user_blocks
+            WHERE (blocker_id = @actorUserId AND blocked_id = @userId)
+               OR (blocker_id = @userId AND blocked_id = @actorUserId)
+          ) AS blocked
+        '''),
+        parameters: {'actorUserId': actorUserId, 'userId': userId},
+      );
+      if (blocked.first.toColumnMap()['blocked'] == true) return null;
       final row = actor.first.toColumnMap();
       final actorName =
           (row['display_name'] ?? row['username']) as String? ?? 'Alguém';

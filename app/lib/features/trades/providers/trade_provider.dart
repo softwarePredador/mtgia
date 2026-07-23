@@ -92,10 +92,9 @@ class TradeItem {
       binderItemId: json['binder_item_id'] as String? ?? '',
       direction: json['direction'] as String? ?? 'offering',
       quantity: json['quantity'] as int? ?? 1,
-      agreedPrice:
-          json['agreed_price'] != null
-              ? (json['agreed_price'] as num).toDouble()
-              : null,
+      agreedPrice: json['agreed_price'] != null
+          ? (json['agreed_price'] as num).toDouble()
+          : null,
       condition: json['condition'] as String?,
       isFoil: json['is_foil'] as bool?,
       card: TradeItemCard.fromJson(json['card'] as Map<String, dynamic>? ?? {}),
@@ -232,10 +231,9 @@ class TradeOffer {
       status: json['status'] as String? ?? 'pending',
       type: json['type'] as String? ?? 'trade',
       message: json['message'] as String?,
-      paymentAmount:
-          json['payment_amount'] != null
-              ? (json['payment_amount'] as num).toDouble()
-              : null,
+      paymentAmount: json['payment_amount'] != null
+          ? (json['payment_amount'] as num).toDouble()
+          : null,
       paymentCurrency: json['payment_currency'] as String?,
       trackingCode: json['tracking_code'] as String?,
       deliveryMethod: json['delivery_method'] as String?,
@@ -263,10 +261,9 @@ class TradeOffer {
       status: json['status'] as String? ?? 'pending',
       type: json['type'] as String? ?? 'trade',
       message: json['message'] as String?,
-      paymentAmount:
-          json['payment_amount'] != null
-              ? (json['payment_amount'] as num).toDouble()
-              : null,
+      paymentAmount: json['payment_amount'] != null
+          ? (json['payment_amount'] as num).toDouble()
+          : null,
       paymentCurrency: json['payment_currency'] as String?,
       paymentMethod: json['payment_method'] as String?,
       deliveryMethod: json['delivery_method'] as String?,
@@ -530,10 +527,9 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
         final list = (data['data'] as List<dynamic>?) ?? [];
-        _trades =
-            list
-                .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
-                .toList();
+        _trades = list
+            .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
+            .toList();
         _totalTrades = data['total'] as int? ?? _trades.length;
         _currentPage = data['page'] as int? ?? page;
       } else {
@@ -593,10 +589,9 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
         final list = (data['data'] as List<dynamic>?) ?? [];
-        final newTrades =
-            list
-                .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
-                .toList();
+        final newTrades = list
+            .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
+            .toList();
         _trades.addAll(newTrades);
         _totalTrades = data['total'] as int? ?? _trades.length;
         _currentPage = data['page'] as int? ?? nextPage;
@@ -863,10 +858,9 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
         final list = (data['data'] as List<dynamic>?) ?? [];
-        final nextMessages =
-            list
-                .map((e) => TradeMessage.fromJson(e as Map<String, dynamic>))
-                .toList();
+        final nextMessages = list
+            .map((e) => TradeMessage.fromJson(e as Map<String, dynamic>))
+            .toList();
         final nextTotal = data['total'] as int? ?? nextMessages.length;
 
         final currentIds = _chatMessages.map((m) => m.id).toList();
@@ -898,6 +892,7 @@ class TradeProvider extends ChangeNotifier {
     String message, {
     String? attachmentUrl,
     String? attachmentType,
+    String? clientRequestId,
   }) async {
     final generation = _stateGeneration;
     final requestActiveTradeId = _activeTradeId;
@@ -905,6 +900,9 @@ class TradeProvider extends ChangeNotifier {
       final body = <String, dynamic>{'message': message};
       if (attachmentUrl != null) body['attachment_url'] = attachmentUrl;
       if (attachmentType != null) body['attachment_type'] = attachmentType;
+      if (clientRequestId != null) {
+        body['client_request_id'] = clientRequestId;
+      }
 
       final res = await _api.post('/trades/$tradeId/messages', body);
       if (generation != _stateGeneration ||
@@ -912,11 +910,14 @@ class TradeProvider extends ChangeNotifier {
         return false;
       }
 
-      if (res.statusCode == 201) {
+      if (res.statusCode == 200 || res.statusCode == 201) {
         // Adicionar localmente para feedback imediato
         final msgData = res.data as Map<String, dynamic>;
-        _chatMessages = [..._chatMessages, TradeMessage.fromJson(msgData)];
-        _chatTotal++;
+        final message = TradeMessage.fromJson(msgData);
+        if (_chatMessages.every((entry) => entry.id != message.id)) {
+          _chatMessages = [..._chatMessages, message];
+          _chatTotal++;
+        }
         notifyListeners();
         return true;
       } else {
