@@ -111,6 +111,17 @@ run_public_web_full() {
   "$ROOT_DIR/scripts/manaloom_public_web_smoke.sh"
 }
 
+run_runtime_performance_contract() {
+  print_header "ManaLoom runtime performance harness contract"
+  python3 -m py_compile \
+    "$ROOT_DIR/app/tool/measure_runtime_startup.py" \
+    "$ROOT_DIR/app/tool/test_measure_runtime_startup.py"
+  (
+    cd "$ROOT_DIR/app/tool"
+    python3 -m unittest -v test_measure_runtime_startup.py 2>&1
+  )
+}
+
 run_ui_audit() {
   print_header "ManaLoom Flutter UI audit"
   cd "$ROOT_DIR/app"
@@ -212,6 +223,7 @@ ensure_prerequisites() {
   ensure_cmd "$DART_BIN"
   ensure_cmd "$FLUTTER_BIN"
   ensure_cmd perl
+  ensure_cmd python3
 }
 
 print_usage() {
@@ -219,6 +231,7 @@ print_usage() {
 Uso:
   ./scripts/quality_gate.sh quick   # validação rápida (dart test + flutter analyze)
   ./scripts/quality_gate.sh full    # validação completa (dart test + flutter analyze + flutter test)
+  ./scripts/quality_gate.sh performance # contrato determinístico do harness p50/p95
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
   ./scripts/quality_gate.sh ui-audit # golden/accessibility audit das telas críticas Flutter
   ./scripts/quality_gate.sh web # lint, build, dependency audit e smoke HTTP do site público
@@ -240,6 +253,8 @@ Uso:
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
   O modo 'full' é determinístico e exclui tags live/live_backend/live_db_write/live_external.
+  O modo 'performance' valida o harness e seus orçamentos sem exigir browser,
+  device, fixture autenticada ou executar uma medição runtime.
   Use o perfil E2E live guardado para chamadas contra uma API real.
   Use 'resolution' para validar o corpus estável Commander fim a fim.
   Use 'ui-audit' depois de mexer em visual, paywall, login, home ou shell do app.
@@ -254,6 +269,7 @@ Dica:
 
 Exemplos:
   ./scripts/quality_gate.sh full
+  ./scripts/quality_gate.sh performance
   ./scripts/quality_gate.sh resolution
   ./scripts/quality_gate.sh ui-audit
   ./scripts/quality_gate.sh web
@@ -286,6 +302,10 @@ main() {
       run_backend_full
       run_frontend_full
       run_public_web_full
+      run_runtime_performance_contract
+      ;;
+    performance)
+      run_runtime_performance_contract
       ;;
     resolution)
       run_resolution_corpus

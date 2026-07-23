@@ -83,8 +83,14 @@ Também passaram 4/4 testes Python do harness, 13/13 testes Flutter de
 performance/cache/imagens e 19/19 de layout/fallback, com análise estática sem
 erros. O startup Android não foi executado porque o aparelho não estava
 conectado. As oito superfícies autenticadas ainda exigem PostgreSQL/API
-loopback descartáveis levantados na mesma revisão, e o harness ainda precisa
-entrar no gate de qualidade.
+loopback descartáveis levantados na mesma revisão.
+
+O contrato determinístico do harness agora é um modo próprio,
+`./scripts/quality_gate.sh performance`, e também participa de
+`quality_gate.sh full`. Ele compila os dois módulos Python e executa os 4/4
+testes de percentil, parser Android, orçamento e resultado agregado sem abrir
+browser/device nem acessar fixture. Isso fecha a integração no gate sem
+transformar ausência de runtime em `PASS`.
 
 ## S8-03 — Memória e imagens
 

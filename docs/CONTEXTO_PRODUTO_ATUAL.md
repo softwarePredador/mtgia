@@ -30,8 +30,9 @@
   zero. S8-03 precisa de métrica Web específica e repetição Android final;
 - o startup Web em Chrome 150 passou nova rodada de 7 amostras: cold p50/p95
   622/660 ms contra 3000 ms e warm 222/238 ms contra 1500 ms. Ainda faltam
-  startup Android, matriz autenticada das superfícies core nos dois alvos e
-  integração do harness no gate;
+  startup Android e a matriz autenticada das superfícies core nos dois alvos.
+  O contrato determinístico do harness agora possui
+  `quality_gate.sh performance` e integra o gate `full`;
 - `manaloom_local_ci.sh full` passou em `b84302e1e` com backend 1742/1742,
   Flutter 1159 testes + 1 skip Web-only conhecido, Web pública, Patrol,
   dependências e schema descartável. Também passaram `ai-eval`, `ai-bridge`,

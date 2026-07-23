@@ -41,6 +41,10 @@ scripts:
     description: Run ManaLoom Flutter golden/accessibility checks.
     run: ./scripts/quality_gate.sh ui-audit
 
+  performance:
+    description: Validate the deterministic p50/p95 runtime harness contract.
+    run: ./scripts/quality_gate.sh performance
+
   ai-bridge:
     description: Run app/AI bridge checks and Commander prompt eval.
     run: ./scripts/quality_gate.sh ai-bridge
