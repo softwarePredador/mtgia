@@ -2,14 +2,16 @@
 
 Data: 2026-07-23
 Branch: `codex/free-beta-release-candidate-2026-07-17`
-HEAD observado: `4700fc38317aae0d3c1955176b32c18ac3b34339`
+Commit de implementação validado/publicado:
+`2139ec9f6f902a8b266fbb852db6e834b25bceff`
 
-Esta é evidência de trabalho local em checkout dirty. Não identifica um commit
-final e não autoriza remoção remota, promoção ou escrita live.
+Esta evidência identifica o commit atômico de implementação e retenção
+publicado na branch. Ela não autoriza remoção remota de histórico, promoção,
+deploy, migration ou escrita live.
 
 ## Resultado atual
 
-Resultado da sprint: `IN_PROGRESS`
+Resultado da sprint: `IMPLEMENTED_UNPROVEN`
 
 O auditor de retenção foi ampliado de 5 para 12 checks e agora valida inventário,
 hashes, recuperação, referências, índices, conteúdo canônico e arquivos locais
@@ -48,6 +50,12 @@ Também passaram:
                                          9 skips guardados, 0 FAIL/BLOCKED
 ```
 
+O `pre-push` repetiu `manaloom_local_ci.sh full` sobre `2139ec9f6`, incluindo
+backend 1736/1736, Flutter 1157 + 1 skip Web-only conhecido, Web pública,
+UI audit, custom lint, Patrol 9/9, dependências e schema PostgreSQL loopback
+com 73 tabelas, 6 views, 76 FKs e 51 migrations. Ao fim, local e remoto
+apontavam para o mesmo SHA e o checkout estava limpo.
+
 Foram corrigidos o link PG848, referências residuais PG499/PG578, repetição no
 índice de reports e a distinção entre o contrato XMage histórico de junho e o
 contrato corrente.
@@ -56,6 +64,8 @@ contrato corrente.
 
 - recovery commit registrado:
   `4700fc38317aae0d3c1955176b32c18ac3b34339`;
+- commit atômico de implementação:
+  `2139ec9f6f902a8b266fbb852db6e834b25bceff`;
 - manifesto:
   `docs/hermes-analysis/DEDUPLICATED_REPORTS_2026-07-23.json`;
 - índice de grandes artefatos:
@@ -63,22 +73,25 @@ contrato corrente.
 - conteúdos preservados:
   `docs/hermes-analysis/deduplicated-report-content/`.
 
-Os dois índices e os 23 conteúdos canônicos ainda estão untracked. O auditor
-confirma seus hashes no worktree, mas o fechamento exige que índices,
-canônicos, referências corrigidas e deleções sejam revisados e incorporados
-atomicamente ao mesmo commit. Fazer somente as deleções destruiria a
-governança comprovada.
+Os dois índices, os 23 conteúdos canônicos, as referências corrigidas e as
+deleções foram incorporados no mesmo commit. O diff registrou 630 paths
+(`54` adicionados, `117` modificados e `482` removidos); o auditor confirmou
+os hashes, a recuperação de 473/473 originais e 6/6 artefatos grandes, além de
+7.378 referências válidas e zero referência inválida.
 
 ## Pendências por task
 
-- S9-01: revisar owner/retenção de cada decisão antes do commit atômico;
-- S9-02: contexto corrente e project logic foram sincronizados; resta a
-  auditoria final de links depois que o diff for congelado;
+- S9-01: inventário, owner/retenção, recuperação e commit atômico estão
+  comprovados; o estado permanece `IMPLEMENTED_UNPROVEN` porque S8 continua
+  aberta;
+- S9-02: contexto corrente, project logic e auditoria final de 7.378 links
+  estão sincronizados; permanece dependente de S9-01;
 - S9-03: índices e auditor estão verdes; contratos gigantes restantes ainda
   precisam de disposição explícita, sem apagar norma canônica;
 - S9-04: consumidores de rota/import, gates focados e agregados locais passaram
-  depois da regeneração; resta repetir a prova na identidade limpa congelada;
-- S9-05: duplicatas e artefatos governados estão verdes no gate, porém só
-  fecham quando a mudança estiver atômica e rastreada;
-- S9-06: secret scan, project logic e gate local completo passaram; faltam a
-  auditoria final de links e o diff do checkout congelado.
+  depois da regeneração e foram repetidos na identidade limpa; permanece
+  dependente de S9-01;
+- S9-05: duplicatas, artefatos governados e atomicidade estão verdes e
+  rastreados; permanece dependente de S9-01;
+- S9-06: secret scan, project logic, links, diff congelado e gate local
+  completo passaram; o fechamento aguarda S9-03 e a cadeia de dependências.

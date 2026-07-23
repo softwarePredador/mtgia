@@ -2,14 +2,18 @@
 
 Data: 2026-07-23
 Branch: `codex/free-beta-release-candidate-2026-07-17`
-HEAD observado: `4700fc38317aae0d3c1955176b32c18ac3b34339`
+Base das medições runtime: `4700fc38317aae0d3c1955176b32c18ac3b34339`
+Commit de implementação validado/publicado:
+`2139ec9f6f902a8b266fbb852db6e834b25bceff`
 SDK: Flutter `3.44.6`, Dart `3.12.2`
 
 Este relatório registra somente provas executadas na revisão corrente. Provas
 de artefato assinado, serviço externo ou escrita off-site permanecem pendentes
 até que a mesma SHA esteja congelada e os pré-requisitos estejam disponíveis.
-O worktree estava dirty durante a execução; portanto o HEAD acima identifica a
-base, não uma identidade final do patch nem uma SHA candidata a release.
+As medições físicas/Web focadas foram iniciadas sobre a base acima com o
+worktree dirty. Depois da consolidação, o gate determinístico completo foi
+repetido sobre o commit de implementação limpo, publicado e sem diferenças
+entre o ref local e o remoto.
 
 ## S8-01 e S8-09 — Offline e reconexão
 
@@ -98,8 +102,7 @@ Chrome 150 + ChromeDriver compatível
 
 O app de teste e o `adb reverse` foram removidos do aparelho; o ChromeDriver
 foi encerrado. A prova fecha o cenário de scroll/cache observado, mas a task
-permanece aberta até ser incorporada ao perfil completo S8-02 e à identidade
-limpa do candidato.
+permanece aberta até ser incorporada ao perfil completo S8-02.
 
 ## S8-04 — IA longa, indisponibilidade e cancelamento
 
@@ -164,7 +167,8 @@ publicado. Nenhum deploy ou mutação live foi executado nesta rodada.
 
 ## Validação determinística relacionada
 
-Depois das correções acima, a revisão local dirty passou:
+Depois das correções acima, o commit de implementação limpo
+`2139ec9f6f902a8b266fbb852db6e834b25bceff` passou:
 
 ```text
 ./scripts/manaloom_local_ci.sh full
@@ -181,11 +185,14 @@ E2E deterministic-read-only           PARTIAL, 10 PASS, 9 skips guardados,
                                        0 FAIL, 0 BLOCKED
 ```
 
-O `engine-delta` passou sem alterar pins, mas retornou `review_required` para
-316 cartas e 328 fixtures: XMage 120/131 e Forge 196/197, ambos 113 commits à
-frente dos pins. O compare Forge atingiu o limite de 300 arquivos e ficou
-truncado. Esses resultados reduzem o residual local; não substituem a revisão
-do delta, a repetição numa SHA limpa nem as provas externas/live das tasks
+O `engine-delta` passou sem alterar pins e retornou `review_required` para 316
+cartas e 328 fixtures: XMage 120/131 e Forge 196/197, ambos 113 commits à
+frente dos pins. A revisão explícita em
+`docs/qa/MANALOOM_ENGINE_DELTA_REVIEW_2026-07-23.md` decidiu
+`retain_current_pins`: o incremental XMage é restrito ao editor desktop; o
+Forge mantém regressão no orçamento público e possui mudanças gerais ainda
+não qualificadas, além do compare truncado em 300 arquivos. A disposição fecha
+a revisão local do delta, mas não substitui as provas externas/live das tasks
 bloqueadas.
 
 ## Disposição de acessibilidade relacionada

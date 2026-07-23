@@ -6,9 +6,10 @@
 ## Revalidação técnica — 2026-07-23
 
 - revisão em andamento na branch
-  `codex/free-beta-release-candidate-2026-07-17`, HEAD
-  `4700fc38317aae0d3c1955176b32c18ac3b34339`; o checkout continua dirty e
-  essa identidade ainda não é uma SHA de release;
+  `codex/free-beta-release-candidate-2026-07-17`; o commit de implementação
+  `2139ec9f6f902a8b266fbb852db6e834b25bceff` foi validado, publicado no
+  `origin` e confirmado com checkout limpo. Ele é uma identidade revisável,
+  mas ainda não recebeu GO de release;
 - o alvo S10 está congelado como beta gratuita Web + Android. Scanner/câmera
   ficam desabilitados e inacessíveis no artefato de release; iOS e VoiceOver
   ficam `DEFERRED_BY_SCOPE`. TalkBack no Android alvo continua obrigatório;
@@ -30,20 +31,28 @@
   os 25 contratos de release, com Flutter 3.44.6/Dart 3.12.2 pinados;
 - o E2E determinístico terminou `PARTIAL`: 10 etapas passaram, 9 skips
   protegidos foram inventariados e não houve falha nem bloqueio. O
-  `engine-delta` não alterou pins, mas exige revisão explícita de 316 cartas e
-  328 fixtures nos dois engines; o compare Forge atingiu o limite de 300
-  arquivos e está truncado;
+  `engine-delta` retornou o sinal esperado `review_required` para 316 cartas e
+  328 fixtures. A revisão explícita foi concluída com
+  `retain_current_pins`: o delta XMage posterior ao candidato testado é apenas
+  de editor desktop; o Forge mantém regressão no orçamento público e ganhou
+  mudanças gerais ainda não qualificadas. O compare Forge continua truncado
+  em 300 arquivos, portanto nenhum pin foi alterado;
 - o gate de schema descartável passou as migrations 038–051 e a readiness
   confirmou 11/11 âncoras. Isso não prova nem autoriza aplicação no PostgreSQL
   live;
 - a retenção consolidou 473 originais removidos em 23 conteúdos canônicos e
   registrou seis artefatos grandes arquivados, todos recuperáveis a partir do
-  HEAD de origem. Manifesto, índice e conteúdos canônicos precisam entrar
-  atomicamente no futuro commit; o checkout dirty ainda impede fechar S9;
-- o estado de release permanece **NO-GO**: faltam checkout/SHA limpos,
-  repetição dos gates na identidade congelada, revisão do delta de engines,
-  migrations e jornadas publicadas da mesma SHA, TalkBack humano, Sentry, FCM
-  no APK assinado exato e backup off-site com restore.
+  HEAD de origem. Manifesto, índices, conteúdos canônicos, referências
+  corrigidas e deleções entraram atomicamente em `2139ec9f6`; o auditor
+  confirmou 7.378 referências válidas, zero duplicata/resíduo e recuperação
+  integral. S9 continua aberta por sua dependência em S8 e pela disposição
+  final dos contratos gigantes remanescentes;
+- o estado de release permanece **NO-GO**: apesar da SHA de implementação
+  limpa/publicada e do gate completo repetido nessa identidade, faltam o
+  fechamento de S8/S9, migrations e jornadas publicadas da mesma SHA final,
+  TalkBack humano, Sentry, FCM no APK assinado exato e backup off-site com
+  restore. A revisão dos engines já está registrada em
+  `docs/qa/MANALOOM_ENGINE_DELTA_REVIEW_2026-07-23.md`.
 
 ## Escopo e estado operacional vigente
 
@@ -64,13 +73,13 @@
 
 ## Próxima ação oficial
 
-1. concluir a matriz p50/p95 e falhas/cancelamento da Sprint 8, revisar o
-   delta de engines e a disposição dos contratos grandes restantes da Sprint
-   9;
-2. revisar a atomicidade da retenção, links e diff final, fechando somente as
-   tasks realmente provadas e mantendo bloqueadas as dependências humanas,
-   externas ou live;
-3. formar um commit atômico revisável, congelar uma SHA limpa e reconstruir
+1. concluir a matriz p50/p95 e falhas/cancelamento da Sprint 8 e a disposição
+   dos contratos grandes restantes da Sprint 9; a decisão dos engines é manter
+   os pins atuais;
+2. fechar somente as tasks realmente provadas, mantendo bloqueadas as
+   dependências humanas, externas ou live; a atomicidade, os links e o diff de
+   retenção já estão registrados em `2139ec9f6`;
+3. depois do residual local, congelar a SHA final e reconstruir
    Web/APK/AAB/SBOM/provenance dessa mesma identidade;
 4. obter autorização específica antes de backup/precheck/aplicação das
    migrations 038–051, deploy ou qualquer escrita live;
