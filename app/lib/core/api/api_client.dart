@@ -47,10 +47,23 @@ class ApiClient {
   // Cache do token em memória (evita acessar o cofre seguro a cada request)
   // ──────────────────────────────────────────
   static String? _cachedToken;
+  static VoidCallback? _sessionExpiredHandler;
+  static bool _sessionExpiryDispatched = false;
 
   /// Atualiza o token em memória (chamar no login/register/logout).
   static void setToken(String? token) {
     _cachedToken = token;
+    _sessionExpiryDispatched = token?.trim().isEmpty != false;
+  }
+
+  /// Registers the app-level action that clears an authenticated session.
+  ///
+  /// The handler is dispatched only for backend responses that explicitly
+  /// describe a missing, invalid or expired authentication session. A 401
+  /// caused by domain validation (for example `invalid_password`) must remain
+  /// local to the form that initiated the request.
+  static void setSessionExpiredHandler(VoidCallback? handler) {
+    _sessionExpiredHandler = handler;
   }
 
   static bool get hasAuthenticationToken =>
@@ -70,8 +83,33 @@ class ApiClient {
     bool performanceUnavailable = false,
   }) {
     _cachedToken = token;
+    _sessionExpiredHandler = null;
+    _sessionExpiryDispatched = token?.trim().isEmpty != false;
     _httpClient = httpClient ?? http.Client();
     _performanceUnavailable = performanceUnavailable;
+  }
+
+  @visibleForTesting
+  static bool isSessionInvalidatingUnauthorized(ApiResponse response) {
+    if (response.statusCode != 401 || !hasAuthenticationToken) return false;
+    final data = response.data;
+    if (data is! Map) return false;
+
+    final error = data['error']?.toString().trim().toLowerCase() ?? '';
+    if (error == 'invalid_password' || error == 'current_password_invalid') {
+      return false;
+    }
+
+    final message = data['message']?.toString().trim().toLowerCase() ?? '';
+    final signal = '$error $message';
+    return signal.contains('token') ||
+        signal.contains('invalid_session') ||
+        signal.contains('authentication_required') ||
+        signal.contains('authentication required') ||
+        signal.contains('autenticacao necessaria') ||
+        signal.contains('autenticação necessária') ||
+        signal.contains('faça login novamente') ||
+        signal.contains('faca login novamente');
   }
 
   // Retorna a URL correta dependendo do ambiente
@@ -122,10 +160,9 @@ class ApiClient {
     Map<String, String> headers, {
     String? requestId,
   }) {
-    final resolvedRequestId =
-        requestId?.trim().isNotEmpty == true
-            ? requestId!.trim()
-            : generateRequestId();
+    final resolvedRequestId = requestId?.trim().isNotEmpty == true
+        ? requestId!.trim()
+        : generateRequestId();
     return {...headers, 'x-request-id': resolvedRequestId};
   }
 
@@ -568,6 +605,12 @@ class ApiClient {
       requestId: requestId,
       responseRequestId: response.headers['x-request-id'],
     );
+
+    if (!_sessionExpiryDispatched &&
+        isSessionInvalidatingUnauthorized(parsed)) {
+      _sessionExpiryDispatched = true;
+      _sessionExpiredHandler?.call();
+    }
 
     _recordHttpResult(
       method: method,

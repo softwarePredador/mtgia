@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
+import '../services/deck_entry_draft_store.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
 int detectedImportCardCount(String rawList) {
@@ -19,9 +22,16 @@ int detectedImportCardCount(String rawList) {
 }
 
 class DeckImportScreen extends StatefulWidget {
-  const DeckImportScreen({super.key, this.initialFormat});
+  const DeckImportScreen({
+    super.key,
+    this.initialFormat,
+    this.draftOwnerId = 'local',
+    this.draftStore,
+  });
 
   final String? initialFormat;
+  final String draftOwnerId;
+  final DeckEntryDraftStore? draftStore;
 
   @override
   State<DeckImportScreen> createState() => _DeckImportScreenState();
@@ -40,11 +50,22 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   int _cardsImported = 0;
   int _localizedMatchesCount = 0;
   String? _error;
+  late final DeckEntryDraftStore _draftStore;
+  Timer? _draftSaveTimer;
+  bool _restoringDraft = false;
 
   @override
   void initState() {
     super.initState();
+    _draftStore = widget.draftStore ?? DeckEntryDraftStore();
     _selectedFormat = _normalizeFormat(widget.initialFormat) ?? _selectedFormat;
+    _nameController.addListener(_scheduleDraftSave);
+    _descriptionController.addListener(_scheduleDraftSave);
+    _commanderController.addListener(_scheduleDraftSave);
+    _listController.addListener(_handleListChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_restoreDraft());
+    });
   }
 
   String? _normalizeFormat(String? format) {
@@ -75,6 +96,11 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
   @override
   void dispose() {
+    _draftSaveTimer?.cancel();
+    _nameController.removeListener(_scheduleDraftSave);
+    _descriptionController.removeListener(_scheduleDraftSave);
+    _commanderController.removeListener(_scheduleDraftSave);
+    _listController.removeListener(_handleListChanged);
     _nameController.dispose();
     _descriptionController.dispose();
     _listController.dispose();
@@ -86,6 +112,63 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       _selectedFormat == 'commander' || _selectedFormat == 'brawl';
 
   int get _detectedCount => detectedImportCardCount(_listController.text);
+
+  void _handleListChanged() {
+    _scheduleDraftSave();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _restoreDraft() async {
+    final draft = await _draftStore.loadImport(widget.draftOwnerId);
+    if (!mounted || draft == null) return;
+    _restoringDraft = true;
+    try {
+      if (_nameController.text.isEmpty) {
+        _nameController.text = draft['name'] ?? '';
+      }
+      if (_descriptionController.text.isEmpty) {
+        _descriptionController.text = draft['description'] ?? '';
+      }
+      if (_commanderController.text.isEmpty) {
+        _commanderController.text = draft['commander'] ?? '';
+      }
+      if (_listController.text.isEmpty) {
+        _listController.text = draft['card_list'] ?? '';
+      }
+      final draftFormat = _normalizeFormat(draft['format']);
+      if (_normalizeFormat(widget.initialFormat) == null &&
+          draftFormat != null) {
+        _selectedFormat = draftFormat;
+      }
+    } finally {
+      _restoringDraft = false;
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _scheduleDraftSave() {
+    if (_restoringDraft) return;
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = Timer(const Duration(milliseconds: 250), () {
+      _draftSaveTimer = null;
+      unawaited(_saveDraft());
+    });
+  }
+
+  Future<void> _saveDraft() => _draftStore.saveImport(
+    widget.draftOwnerId,
+    format: _selectedFormat,
+    name: _nameController.text,
+    description: _descriptionController.text,
+    commander: _commanderController.text,
+    cardList: _listController.text,
+  );
+
+  Future<void> _clearDraft() async {
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = null;
+    await _draftStore.clearImport(widget.draftOwnerId);
+  }
 
   Future<void> _importDeck() async {
     if (_nameController.text.isEmpty) {
@@ -115,14 +198,12 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       name: _nameController.text,
       format: _selectedFormat,
       list: _listController.text,
-      description:
-          _descriptionController.text.isNotEmpty
-              ? _descriptionController.text
-              : null,
-      commander:
-          _commanderController.text.isNotEmpty
-              ? _commanderController.text
-              : null,
+      description: _descriptionController.text.isNotEmpty
+          ? _descriptionController.text
+          : null,
+      commander: _commanderController.text.isNotEmpty
+          ? _commanderController.text
+          : null,
     );
 
     if (!mounted) return;
@@ -136,6 +217,8 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     });
 
     if (result['success'] == true) {
+      await _clearDraft();
+      if (!mounted) return;
       final deck = result['deck'];
       final isPartial =
           result['requires_review'] == true ||
@@ -205,195 +288,198 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-            contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            title: DeckDialogTitleBlock(
-              icon:
-                  success
-                      ? Icons.check_circle_outline_rounded
-                      : Icons.warning_amber_rounded,
-              title:
-                  success
-                      ? isPartial
-                          ? 'Importação parcial'
-                          : 'Importação concluída'
-                      : 'Revisão da importação',
-              subtitle:
-                  success
-                      ? isPartial
-                          ? 'O deck foi salvo como rascunho. Revise avisos e cartas não identificadas antes de otimizar.'
-                          : 'A lista foi processada e o deck já pode ser aberto.'
-                      : 'A lista foi lida, mas alguns pontos precisam de revisão.',
-              accent:
-                  success && !isPartial
-                      ? theme.colorScheme.primary
-                      : AppTheme.warning,
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (success) ...[
-                    DeckDialogSectionCard(
-                      title: 'Resumo',
-                      accent: theme.colorScheme.primary,
-                      icon: Icons.checklist_rounded,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$cardsImported cartas reconhecidas',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            isPartial
-                                ? 'O deck foi criado, mas ainda precisa de revisão antes de análise ou otimização.'
-                                : 'O deck já pode seguir para análise, otimização ou revisão manual.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textSecondary,
-                              height: 1.35,
-                            ),
-                          ),
-                          if (localizedMatchesCount > 0) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              '$localizedMatchesCount nomes localizados convertidos automaticamente.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppTheme.success,
-                                height: 1.35,
-                              ),
-                            ),
-                          ],
-                        ],
+      builder: (context) => AlertDialog(
+        titlePadding: const EdgeInsets.fromLTRB(
+          AppTheme.space24,
+          AppTheme.space24,
+          AppTheme.space24,
+          AppTheme.space0,
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(
+          AppTheme.space24,
+          AppTheme.space16,
+          AppTheme.space24,
+          AppTheme.space8,
+        ),
+        title: DeckDialogTitleBlock(
+          icon: success
+              ? Icons.check_circle_outline_rounded
+              : Icons.warning_amber_rounded,
+          title: success
+              ? isPartial
+                    ? 'Importação parcial'
+                    : 'Importação concluída'
+              : 'Revisão da importação',
+          subtitle: success
+              ? isPartial
+                    ? 'O deck foi salvo como rascunho. Revise avisos e cartas não identificadas antes de otimizar.'
+                    : 'A lista foi processada e o deck já pode ser aberto.'
+              : 'A lista foi lida, mas alguns pontos precisam de revisão.',
+          accent: success && !isPartial
+              ? theme.colorScheme.primary
+              : AppTheme.warning,
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (success) ...[
+                DeckDialogSectionCard(
+                  title: 'Resumo',
+                  accent: theme.colorScheme.primary,
+                  icon: Icons.checklist_rounded,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$cardsImported cartas reconhecidas',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                  if (error != null) ...[
-                    DeckDialogSectionCard(
-                      title: 'Erro principal',
-                      accent: AppTheme.error,
-                      icon: Icons.error_outline_rounded,
-                      child: Text(
-                        error,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.textPrimary,
+                      const SizedBox(height: AppTheme.space4),
+                      Text(
+                        isPartial
+                            ? 'O deck foi criado, mas ainda precisa de revisão antes de análise ou otimização.'
+                            : 'O deck já pode seguir para análise, otimização ou revisão manual.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
                           height: 1.35,
                         ),
                       ),
+                      if (localizedMatchesCount > 0) ...[
+                        const SizedBox(height: AppTheme.space8),
+                        Text(
+                          '$localizedMatchesCount nomes localizados convertidos automaticamente.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.success,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space12),
+              ],
+              if (error != null) ...[
+                DeckDialogSectionCard(
+                  title: 'Erro principal',
+                  accent: AppTheme.error,
+                  icon: Icons.error_outline_rounded,
+                  child: Text(
+                    error,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      height: 1.35,
                     ),
-                    const SizedBox(height: 12),
-                  ],
-                  if (warnings.isNotEmpty) ...[
-                    DeckDialogSectionCard(
-                      title: 'Avisos',
-                      accent: AppTheme.warning,
-                      icon: Icons.info_outline_rounded,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:
-                            warnings
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space12),
+              ],
+              if (warnings.isNotEmpty) ...[
+                DeckDialogSectionCard(
+                  title: 'Avisos',
+                  accent: AppTheme.warning,
+                  icon: Icons.info_outline_rounded,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: warnings
+                        .map(
+                          (warning) => Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppTheme.space8,
+                            ),
+                            child: Text(
+                              '• $warning',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: AppTheme.textPrimary,
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space12),
+              ],
+              if (notFound.isNotEmpty) ...[
+                DeckDialogSectionCard(
+                  title: '${notFound.length} cartas não identificadas',
+                  accent: AppTheme.warning,
+                  icon: Icons.search_off_rounded,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 220),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: notFound
                                 .map(
-                                  (warning) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
+                                  (line) => Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: AppTheme.space8,
+                                    ),
                                     child: Text(
-                                      '• $warning',
-                                      style: theme.textTheme.bodyMedium
+                                      line,
+                                      style: theme.textTheme.bodySmall
                                           ?.copyWith(
-                                            color: AppTheme.textPrimary,
-                                            height: 1.35,
+                                            fontFamily: 'monospace',
+                                            color: AppTheme.textSecondary,
                                           ),
                                     ),
                                   ),
                                 )
                                 .toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                  if (notFound.isNotEmpty) ...[
-                    DeckDialogSectionCard(
-                      title: '${notFound.length} cartas não identificadas',
-                      accent: AppTheme.warning,
-                      icon: Icons.search_off_rounded,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxHeight: 220),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children:
-                                    notFound
-                                        .map(
-                                          (line) => Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 8,
-                                            ),
-                                            child: Text(
-                                              line,
-                                              style: theme.textTheme.bodySmall
-                                                  ?.copyWith(
-                                                    fontFamily: 'monospace',
-                                                    color:
-                                                        AppTheme.textSecondary,
-                                                  ),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                              ),
-                            ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Tente usar o nome em inglês ou revisar a ortografia. Nomes em outros idiomas são reconhecidos quando a base localizada está sincronizada.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textSecondary,
-                              fontStyle: FontStyle.italic,
-                              height: 1.35,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actions: [
-              if (!success)
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Revisar Lista'),
-                ),
-              if (success) ...[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    context.go('/decks');
-                  },
-                  child: const Text('Ver Decks'),
-                ),
-                if (deckId != null)
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      context.go('/decks/$deckId');
-                    },
-                    child: Text(isPartial ? 'Abrir rascunho' : 'Abrir Deck'),
+                      const SizedBox(height: AppTheme.space8),
+                      Text(
+                        'Tente usar o nome em inglês ou revisar a ortografia. Nomes em outros idiomas são reconhecidos quando a base localizada está sincronizada.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                          fontStyle: FontStyle.italic,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
               ],
             ],
           ),
+        ),
+        actions: [
+          if (!success)
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Revisar Lista'),
+            ),
+          if (success) ...[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.go('/decks');
+              },
+              child: const Text('Ver Decks'),
+            ),
+            if (deckId != null)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go('/decks/$deckId');
+                },
+                child: Text(isPartial ? 'Abrir rascunho' : 'Abrir Deck'),
+              ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -432,9 +518,9 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           return SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
-              24,
+              AppTheme.space24,
               horizontalPadding,
-              32 + MediaQuery.paddingOf(context).bottom,
+              AppTheme.space32 + MediaQuery.paddingOf(context).bottom,
             ),
             child: Center(
               child: ConstrainedBox(
@@ -444,7 +530,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildImportIntro(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppTheme.space24),
                     if (isDesktop)
                       Row(
                         key: const Key('deck-import-desktop-panes'),
@@ -463,10 +549,10 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                               children: [
                                 _buildListEditor(theme),
                                 if (_error != null) ...[
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: AppTheme.space16),
                                   _buildImportError(theme),
                                 ],
-                                const SizedBox(height: 24),
+                                const SizedBox(height: AppTheme.space24),
                                 _buildImportFooter(theme, isDesktop: true),
                               ],
                             ),
@@ -475,13 +561,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                       )
                     else ...[
                       _buildMetadataFields(theme),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppTheme.space20),
                       _buildListEditor(theme),
                       if (_error != null) ...[
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppTheme.space16),
                         _buildImportError(theme),
                       ],
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppTheme.space24),
                       _buildImportFooter(theme, isDesktop: false),
                     ],
                   ],
@@ -497,7 +583,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   Widget _buildImportIntro(ThemeData theme) {
     return Container(
       key: const Key('deck-import-intro'),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(AppTheme.space18),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -510,7 +596,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(AppTheme.space10),
                 decoration: BoxDecoration(
                   color: AppTheme.primarySoft.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -521,7 +607,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,7 +619,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                         color: AppTheme.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppTheme.space2),
                     Text(
                       'Cole sua lista e transforme isso em um deck editável em poucos passos.',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -546,7 +632,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           const Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -571,7 +657,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         TextField(
           key: const Key('deck-import-screen-name-field'),
           controller: _nameController,
@@ -584,7 +670,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             fillColor: theme.colorScheme.surface,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.space16),
         DropdownButtonFormField<String>(
           key: const Key('deck-import-screen-format-field'),
           initialValue: _selectedFormat,
@@ -593,22 +679,22 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             border: OutlineInputBorder(),
             prefixIcon: Icon(Icons.category),
           ),
-          items:
-              _formats
-                  .map(
-                    (f) => DropdownMenuItem(
-                      value: f,
-                      child: Text(f[0].toUpperCase() + f.substring(1)),
-                    ),
-                  )
-                  .toList(),
+          items: _formats
+              .map(
+                (f) => DropdownMenuItem(
+                  value: f,
+                  child: Text(f[0].toUpperCase() + f.substring(1)),
+                ),
+              )
+              .toList(),
           onChanged: (value) {
             if (value != null) {
               setState(() => _selectedFormat = value);
+              _scheduleDraftSave();
             }
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.space16),
         if (_isCommanderFormat) ...[
           TextField(
             key: const Key('deck-import-screen-commander-field'),
@@ -622,7 +708,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   'Ajuda a validar identidade de cor; também aceita [Commander] na lista.',
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
         ],
         TextField(
           key: const Key('deck-import-screen-description-field'),
@@ -646,7 +732,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
         Row(
           children: [
             const Icon(Icons.list_alt, size: 20, color: AppTheme.primarySoft),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             const Expanded(
               child: Text(
                 'Lista de Cartas',
@@ -671,11 +757,12 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         TextField(
           key: const Key('deck-import-screen-list-field'),
           controller: _listController,
           decoration: InputDecoration(
+            labelText: 'Lista de cartas para importar',
             hintText:
                 'Cole aqui sua lista de cartas...\n\nFormato: 1 Sol Ring ou 1x Sol Ring (set)',
             border: const OutlineInputBorder(),
@@ -689,24 +776,25 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             color: theme.colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         Builder(
           builder: (context) {
             final hasCards = _detectedCount > 0;
             return Container(
               key: const Key('deck-import-screen-count-status'),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space10,
+                vertical: AppTheme.space8,
+              ),
               decoration: BoxDecoration(
-                color:
-                    hasCards
-                        ? AppTheme.primarySoft.withValues(alpha: 0.10)
-                        : AppTheme.surfaceElevated,
+                color: hasCards
+                    ? AppTheme.primarySoft.withValues(alpha: 0.10)
+                    : AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border: Border.all(
-                  color:
-                      hasCards
-                          ? AppTheme.primarySoft.withValues(alpha: 0.28)
-                          : AppTheme.outlineMuted.withValues(alpha: 0.55),
+                  color: hasCards
+                      ? AppTheme.primarySoft.withValues(alpha: 0.28)
+                      : AppTheme.outlineMuted.withValues(alpha: 0.55),
                 ),
               ),
               child: Row(
@@ -714,22 +802,20 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   Icon(
                     hasCards ? Icons.check_circle_outline : Icons.info_outline,
                     size: 16,
-                    color:
-                        hasCards
-                            ? AppTheme.primarySoft
-                            : AppTheme.textSecondary,
+                    color: hasCards
+                        ? AppTheme.primarySoft
+                        : AppTheme.textSecondary,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppTheme.space6),
                   Expanded(
                     child: Text(
                       hasCards
                           ? '${_detectedCount.toString()} cartas detectadas'
                           : 'Cole a lista ou use um exemplo para começar',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            hasCards
-                                ? AppTheme.textPrimary
-                                : AppTheme.textSecondary,
+                        color: hasCards
+                            ? AppTheme.textPrimary
+                            : AppTheme.textSecondary,
                       ),
                     ),
                   ),
@@ -745,7 +831,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   Widget _buildImportError(ThemeData theme) {
     return Container(
       key: const Key('deck-import-screen-error'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -755,7 +841,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Icon(Icons.error_outline_rounded, color: AppTheme.error),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,7 +853,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   _error!,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -785,8 +871,9 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
   Widget _buildImportFooter(ThemeData theme, {required bool isDesktop}) {
     return Column(
-      crossAxisAlignment:
-          isDesktop ? CrossAxisAlignment.end : CrossAxisAlignment.stretch,
+      crossAxisAlignment: isDesktop
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.stretch,
       children: [
         SizedBox(
           key: const Key('deck-import-cta-frame'),
@@ -799,43 +886,42 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: AppTheme.backgroundAbyss,
             ),
-            child:
-                _isImporting
-                    ? const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppTheme.backgroundAbyss,
-                          ),
+            child: _isImporting
+                ? const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: AppTheme.space20,
+                        height: AppTheme.space20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppTheme.backgroundAbyss,
                         ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Importando...',
-                          style: TextStyle(fontSize: AppTheme.fontLg),
+                      ),
+                      SizedBox(width: AppTheme.space12),
+                      Text(
+                        'Importando...',
+                        style: TextStyle(fontSize: AppTheme.fontLg),
+                      ),
+                    ],
+                  )
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.upload),
+                      SizedBox(width: AppTheme.space8),
+                      Text(
+                        'Criar Deck',
+                        style: TextStyle(
+                          fontSize: AppTheme.fontLg,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
-                    )
-                    : const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.upload),
-                        SizedBox(width: 8),
-                        Text(
-                          'Criar Deck',
-                          style: TextStyle(
-                            fontSize: AppTheme.fontLg,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         SizedBox(
           width: isDesktop ? 320 : double.infinity,
           child: Text(
@@ -862,7 +948,10 @@ class _ImportSourcePill extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space6,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),

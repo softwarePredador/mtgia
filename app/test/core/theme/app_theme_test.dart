@@ -23,4 +23,25 @@ void main() {
       );
     });
   });
+
+  group('AppTheme responsive boundaries', () {
+    test('owns every pixel around the canonical breakpoints', () {
+      expect(AppTheme.viewportClassForWidth(599), AppViewportClass.compact);
+      expect(AppTheme.viewportClassForWidth(600), AppViewportClass.medium);
+      expect(AppTheme.viewportClassForWidth(839), AppViewportClass.medium);
+      expect(AppTheme.viewportClassForWidth(840), AppViewportClass.expanded);
+      expect(AppTheme.viewportClassForWidth(1199), AppViewportClass.expanded);
+      expect(AppTheme.viewportClassForWidth(1200), AppViewportClass.wide);
+      expect(AppTheme.viewportClassForWidth(1599), AppViewportClass.wide);
+      expect(AppTheme.viewportClassForWidth(1600), AppViewportClass.ultraWide);
+    });
+
+    test('uses compact gutters only below 600 logical pixels', () {
+      expect(
+        AppTheme.horizontalGutterForWidth(599),
+        AppTheme.pageGutterCompact,
+      );
+      expect(AppTheme.horizontalGutterForWidth(600), AppTheme.pageGutter);
+    });
+  });
 }

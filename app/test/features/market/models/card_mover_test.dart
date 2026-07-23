@@ -29,19 +29,11 @@ void main() {
       expect(mover.changePct, 11.11);
     });
 
-    test('fromJson deve usar defaults para campos ausentes', () {
-      final json = <String, dynamic>{};
-
-      final mover = CardMover.fromJson(json);
-
-      expect(mover.cardId, '');
-      expect(mover.name, '');
-      expect(mover.setCode, isNull);
-      expect(mover.imageUrl, isNull);
-      expect(mover.priceToday, 0.0);
-      expect(mover.priceYesterday, 0.0);
-      expect(mover.changeUsd, 0.0);
-      expect(mover.changePct, 0.0);
+    test('fromJson não transforma preço ausente em zero', () {
+      expect(
+        () => CardMover.fromJson(<String, dynamic>{}),
+        throwsA(isA<FormatException>()),
+      );
     });
 
     test('isGainer retorna true para variação positiva', () {
@@ -90,6 +82,9 @@ void main() {
   group('MarketMoversData Model', () {
     test('fromJson deve parsear gainers e losers corretamente', () {
       final json = {
+        'currency': 'USD',
+        'price_source': 'price_history',
+        'cache_status': 'cache_hit',
         'date': '2025-01-30',
         'previous_date': '2025-01-29',
         'gainers': [
@@ -118,6 +113,9 @@ void main() {
       final data = MarketMoversData.fromJson(json);
 
       expect(data.date, '2025-01-30');
+      expect(data.currency, 'USD');
+      expect(data.priceSource, 'price_history');
+      expect(data.cacheStatus, 'cache_hit');
       expect(data.previousDate, '2025-01-29');
       expect(data.gainers, hasLength(1));
       expect(data.gainers.first.name, 'Gainer Card');

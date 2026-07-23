@@ -24,7 +24,17 @@ void main() {
       ]) {
         expect(service, contains(field));
       }
-      expect(service, contains('sha256.convert'));
+      expect(service, contains('buildDeckSnapshotHash'));
+      expect(service, contains("note['deck_snapshot_hash']"));
+      expect(service, contains("note['deck_version_at']"));
+      expect(
+        service,
+        contains(
+          'deck_snapshot_hash e deck_version_at devem ser enviados juntos.',
+        ),
+      );
+      expect(service, contains("currentMap['deck_snapshot_hash']"));
+      expect(service, contains("currentMap['deck_version_at']"));
       expect(service, contains('revision = revision + 1'));
       expect(service, contains("note['base_revision']"));
     });

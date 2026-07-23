@@ -35,18 +35,23 @@ Future<Response> onRequest(RequestContext context) async {
 
   final cached = _marketMoversCache.get(limit, minPrice);
   if (cached != null) {
+    cached['cache_status'] = 'cache_hit';
     return Response.json(body: cached);
   }
 
   try {
-    final payload = await _fetchMarketMovers(pool, limit, minPrice)
-        .timeout(marketMoversQueryTimeout);
+    final payload = await _fetchMarketMovers(
+      pool,
+      limit,
+      minPrice,
+    ).timeout(marketMoversQueryTimeout);
     _marketMoversCache.set(limit, minPrice, payload);
     return Response.json(body: payload);
   } on TimeoutException catch (e) {
     print('[WARN] Timeout ao buscar market movers: $e');
     final stale = _marketMoversCache.get(limit, minPrice, allowStale: true);
     if (stale != null) {
+      stale['cache_status'] = 'stale_fallback';
       return Response.json(body: stale);
     }
     return Response.json(

@@ -4,10 +4,13 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
 import 'package:manaloom/features/binder/widgets/binder_item_editor.dart';
 
+import '../../../ui/support/manaloom_ui_audit_harness.dart';
+
 void main() {
   testWidgets('lista Tenho e Quero exposes selection and 48px targets', (
     tester,
   ) async {
+    final semantics = tester.ensureSemantics();
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -61,5 +64,7 @@ void main() {
           .first,
     );
     expect(wantSemantics.properties.selected, isTrue);
+    await expectManaLoomBaselineAccessibility(tester);
+    semantics.dispose();
   });
 }

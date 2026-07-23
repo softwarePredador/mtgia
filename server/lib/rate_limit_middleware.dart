@@ -332,13 +332,49 @@ Middleware rateLimitMiddleware({
   };
 }
 
-/// Middleware específico para rotas de autenticação (mais restritivo)
-Middleware authRateLimit() {
+/// Returns whether the request submits credentials and therefore belongs to
+/// the authentication brute-force bucket.
+///
+/// Token validation (`GET /auth/me`) is deliberately excluded: it is a
+/// high-frequency session bootstrap/read operation, not a credential attempt.
+bool isAuthCredentialAttempt(Request request) {
+  if (request.method != HttpMethod.post) return false;
+
+  final path = request.uri.path;
+  final normalizedPath =
+      path.length > 1 && path.endsWith('/')
+          ? path.substring(0, path.length - 1)
+          : path;
+  return const {
+    '/auth/login',
+    '/auth/register',
+    '/auth/forgot-password',
+    '/auth/reset-password',
+    '/auth/change-password',
+    '/auth/revoke-sessions',
+    '/auth/verify-email',
+    '/auth/resend-verification',
+  }.contains(normalizedPath);
+}
+
+/// Middleware específico para tentativas de autenticação (mais restritivo).
+///
+/// Only credential submissions (`POST /auth/login` and
+/// `POST /auth/register`) consume this bucket. Other routes under `/auth`, in
+/// particular `GET /auth/me`, pass through without consuming or being blocked
+/// by the brute-force limiter.
+Middleware authRateLimit({RateLimiter? limiterOverrideForTesting}) {
   return (handler) {
     return (context) async {
+      if (!isAuthCredentialAttempt(context.request)) {
+        return handler(context);
+      }
+
       final environment = _rateLimitRuntimeEnvironment();
       final isProd = _isProductionEnvironment(environment);
-      final limiter = isProd ? _authRateLimiter : _authRateLimiterDev;
+      final limiter =
+          limiterOverrideForTesting ??
+          (isProd ? _authRateLimiter : _authRateLimiterDev);
       final remoteAddress = _requestRemoteAddress(context);
       final identity = resolveRateLimitClientIdentity(
         headers: context.request.headers,

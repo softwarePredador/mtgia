@@ -151,28 +151,27 @@ Widget _subject(
   _FakeApiClient? apiClient,
 }) {
   return MaterialApp(
-    theme: AppTheme.darkTheme,
+    theme: AppTheme.darkTheme.copyWith(splashFactory: InkRipple.splashFactory),
     home: ChangeNotifierProvider(
-      create:
-          (_) => DeckProvider(
-            apiClient:
-                apiClient ??
-                _FakeApiClient(
-                  analysisPayload ??
-                      {
-                        'deck_id': deck.id,
-                        'stats': {
-                          'composition': {
-                            'ramp': 0,
-                            'draw': 0,
-                            'removal': 0,
-                            'board_wipes': 0,
-                            'protection': 0,
-                          },
-                        },
+      create: (_) => DeckProvider(
+        apiClient:
+            apiClient ??
+            _FakeApiClient(
+              analysisPayload ??
+                  {
+                    'deck_id': deck.id,
+                    'stats': {
+                      'composition': {
+                        'ramp': 0,
+                        'draw': 0,
+                        'removal': 0,
+                        'board_wipes': 0,
+                        'protection': 0,
                       },
-                ),
-          ),
+                    },
+                  },
+            ),
+      ),
       child: Scaffold(
         body: SingleChildScrollView(child: DeckAnalysisTab(deck: deck)),
       ),
@@ -508,4 +507,203 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets(
+    'renders the Commander planning contract and all flow steps for protected Lorehold',
+    (tester) async {
+      final deck = _makeDeck(
+        id: 'deck-commander-contract',
+        name: 'Lorehold Contract',
+        synergyScore: 82,
+      );
+      final planningFlow = List.generate(
+        12,
+        (index) => {
+          'key': 'step_$index',
+          'label': index == 9
+              ? 'Staples por impacto e função'
+              : 'Etapa ${index + 1}',
+        },
+      );
+
+      await tester.pumpWidget(
+        _subject(
+          deck,
+          analysisPayload: {
+            'deck_id': deck.id,
+            'format': 'commander',
+            'stats': {
+              'composition': {
+                'ramp': 8,
+                'draw': 10,
+                'removal': 8,
+                'board_wipes': 3,
+                'protection': 4,
+              },
+            },
+            'commander_contract': {
+              'schema_version': 'commander_contract_summary_v3_2026-07-22',
+              'source_version': 'commander_deckbuilding_contract_v6_2026-07-22',
+              'status': 'ready_for_battle_gate',
+              'status_label': 'Pronto para Battle gate',
+              'is_commander_applicable': true,
+              'commander_name': 'Lorehold, the Historian',
+              'total_cards': 100,
+              'commander_count': 1,
+              'summary': 'Estrutura validada; falta comprovação em Battle.',
+              'battle_gate': {
+                'required': true,
+                'status': 'pending',
+                'label': 'Pendente',
+              },
+              'baseline_policy': {
+                'applies': true,
+                'baseline_deck_id': '607',
+                'status': 'experimental_blocked',
+                'label': 'Experimental: candidato bloqueado',
+                'detail': 'O deck 607 permanece como baseline protegido.',
+                'candidate_decision': 'rejected_historical_paired_seed_design',
+                'seed_pairing_claim': false,
+                'definitive_claim_allowed': false,
+                'automatic_candidate_apply_allowed': false,
+                'next_gate': 'Rodar amostras independentes.',
+              },
+              'gates': {
+                'commander_present': true,
+                'validation_valid': true,
+                'unresolved_cards_zero': true,
+                'has_reference_lane': true,
+                'deterministic_reference_ready': false,
+              },
+              'source_lanes': [
+                {
+                  'key': 'reference_profile',
+                  'label': 'Perfil do comandante',
+                  'available': true,
+                  'count': 1,
+                },
+                {
+                  'key': 'battle_gate',
+                  'label': 'Battle gate',
+                  'available': false,
+                  'count': 0,
+                },
+              ],
+              'provenance': {
+                'schema_version': 'commander_public_provenance_v1_2026-07-22',
+                'lanes': [
+                  {
+                    'key': 'verified_oracle',
+                    'label': 'Oracle verificado',
+                    'available': false,
+                    'confidence': 'not_provided_to_contract',
+                  },
+                  {
+                    'key': 'price',
+                    'label': 'Preço',
+                    'available': false,
+                    'confidence': 'not_provided_to_contract',
+                  },
+                  {
+                    'key': 'public_popularity',
+                    'label': 'Popularidade pública',
+                    'available': true,
+                    'confidence': 'source_backed',
+                  },
+                  {
+                    'key': 'reference_corpus',
+                    'label': 'Corpus de referência',
+                    'available': true,
+                    'confidence': 'aggregate_only',
+                  },
+                  {
+                    'key': 'learned_usage',
+                    'label': 'Uso aprendido',
+                    'available': true,
+                    'confidence': 'observed_usage',
+                  },
+                  {
+                    'key': 'ai_suggestion',
+                    'label': 'Sugestão de IA',
+                    'available': true,
+                    'confidence': 'advisory_only',
+                  },
+                ],
+                'internal_source_references_exposed': false,
+              },
+              'planning_coverage': {
+                'required_count': 12,
+                'ready_count': 7,
+                'partial_count': 3,
+                'pending_count': 2,
+                'items': [
+                  for (var index = 0; index < 12; index++)
+                    {
+                      'key': 'step_$index',
+                      'label': 'Etapa ${index + 1}',
+                      'status': index < 7
+                          ? 'ready'
+                          : index < 10
+                          ? 'partial'
+                          : 'pending',
+                    },
+                ],
+              },
+              'planning_flow': planningFlow,
+              'overview_fields': const <Map<String, dynamic>>[],
+              'blockers': const <String>[],
+              'warnings': const <String>[],
+              'next_actions': const [
+                'Rodar Battle com exposição natural das cartas.',
+              ],
+            },
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expectListTileInkIsUnobscured(tester);
+      final section = find.byKey(
+        const Key('deck-analysis-commander-plan-deck-commander-contract'),
+      );
+      await tester.ensureVisible(section);
+      expect(section, findsOneWidget);
+      expect(find.text('Plano Commander'), findsOneWidget);
+      expect(find.text('Experimental: candidato bloqueado'), findsOneWidget);
+      expect(
+        find.text('O deck 607 permanece como baseline protegido.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Baseline 607 protegido; aplicação automática bloqueada'),
+        findsOneWidget,
+      );
+      expect(find.text('12 etapas do planejamento'), findsOneWidget);
+      expect(find.text('7/12 etapas prontas'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('deck-analysis-commander-plan-flow')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Staples por impacto e função'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('deck-analysis-commander-plan-flow')),
+      );
+      await tester.pumpAndSettle();
+      final provenance = find.byKey(
+        const Key('deck-analysis-commander-provenance'),
+      );
+      await tester.ensureVisible(provenance);
+      await tester.tap(provenance);
+      await tester.pumpAndSettle();
+      expect(find.text('Oracle verificado'), findsOneWidget);
+      expect(find.text('Não disponível'), findsWidgets);
+      expect(find.text('Popularidade pública'), findsOneWidget);
+      expect(find.text('Fonte verificada'), findsOneWidget);
+      expect(find.text('Uso aprendido'), findsOneWidget);
+      expect(find.text('Uso observado'), findsOneWidget);
+      expect(find.textContaining('/private/'), findsNothing);
+    },
+  );
 }

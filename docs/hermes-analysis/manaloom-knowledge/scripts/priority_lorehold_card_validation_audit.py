@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 import battle_rule_registry
+import external_engine_source_contract as engine_source_contract
 from db_helper import connect, sanitized_database_target
 from master_optimizer_common import REPORT_DIR, resolve_default_knowledge_db
 
@@ -27,7 +28,7 @@ from master_optimizer_common import REPORT_DIR, resolve_default_knowledge_db
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 DEFAULT_SNAPSHOT = SCRIPT_DIR / "known_cards_canonical_snapshot.json"
-DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_XMAGE_ROOT: Path | None = None
 
 
 EXPECTED_RULES: dict[str, list[dict[str, str]]] = {
@@ -540,7 +541,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    report = build_report(args.sqlite_db, args.snapshot, args.xmage_root)
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    report = build_report(args.sqlite_db, args.snapshot, xmage_root)
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")
     json_path.parent.mkdir(parents=True, exist_ok=True)

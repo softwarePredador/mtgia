@@ -13,10 +13,9 @@ void _emitScreenshot(String name, List<int> pngBytes) {
   // ignore: avoid_print
   print('SCREENSHOT_BEGIN $name');
   for (var offset = 0; offset < encoded.length; offset += chunkSize) {
-    final end =
-        (offset + chunkSize < encoded.length)
-            ? offset + chunkSize
-            : encoded.length;
+    final end = (offset + chunkSize < encoded.length)
+        ? offset + chunkSize
+        : encoded.length;
     // ignore: avoid_print
     print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
   }
@@ -154,8 +153,33 @@ void main() {
     await tester.tap(submit);
     await tester.pump();
 
-    // Main shell should appear when authenticated.
-    await pumpUntilFound(tester, find.text('Decks'), attempts: 90);
+    // A primeira autenticação sem deep link entra no onboarding. O shell já
+    // está visível, mas o estado de produto continua pendente até salvar uma
+    // conclusão ou um pulo explícito.
+    await pumpUntilFound(
+      tester,
+      find.byKey(const Key('onboarding-format-dropdown')),
+      attempts: 90,
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await _capture(binding, tester, '03a_onboarding_first_login');
+
+    final skipOnboarding = find.byKey(const Key('onboarding-skip-action'));
+    await tester.scrollUntilVisible(
+      skipOnboarding,
+      240,
+      scrollable: find.descendant(
+        of: find.byKey(const Key('onboarding-scroll-view')),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    await tester.tap(skipOnboarding);
+    await tester.pump();
+    await pumpUntilFound(
+      tester,
+      find.byKey(const Key('home-hero-frame')),
+      attempts: 90,
+    );
     await tester.pump(const Duration(seconds: 1));
     await _capture(binding, tester, '03_home');
 
@@ -163,7 +187,7 @@ void main() {
     await tester.pump();
     await pumpUntilFound(
       tester,
-      find.text('Criar e Otimizar Deck'),
+      find.byKey(const Key('onboarding-format-dropdown')),
       attempts: 60,
     );
     await tester.pump(const Duration(seconds: 1));

@@ -5,11 +5,12 @@ import 'package:crypto/crypto.dart';
 import 'endpoint_cache.dart';
 import 'commander_bracket.dart';
 import 'openai_runtime_config.dart';
+import 'ai_job_lifecycle.dart';
 
 // Bump whenever the player-facing generate response contract changes. Cached
 // payloads are returned as-is, so an older key could omit safety diagnostics
 // such as deckbuilding_contract until its TTL expires.
-const aiGenerateCacheContractVersion = 'v2';
+const aiGenerateCacheContractVersion = 'v3';
 const aiGenerateMaxPromptLength = 8000;
 const aiGenerateMaxFormatLength = 80;
 const aiGenerateMaxCommanderNameLength = 300;
@@ -29,12 +30,40 @@ class AiGenerateRequestInput {
     required this.prompt,
     required this.format,
     required this.commanderName,
+    required this.constraints,
   });
 
   final Map<String, dynamic> body;
   final String prompt;
   final String format;
   final String? commanderName;
+  final AiGenerateConstraints constraints;
+}
+
+class AiGenerateConstraints {
+  const AiGenerateConstraints({
+    required this.preferCollection,
+    required this.collectionOnly,
+    required this.budgetLimitBrl,
+  });
+
+  const AiGenerateConstraints.empty()
+    : preferCollection = false,
+      collectionOnly = false,
+      budgetLimitBrl = null;
+
+  final bool preferCollection;
+  final bool collectionOnly;
+  final int? budgetLimitBrl;
+
+  bool get isRequested =>
+      preferCollection || collectionOnly || budgetLimitBrl != null;
+
+  Map<String, dynamic> toJson() => {
+    if (preferCollection || collectionOnly) 'prefer_collection': true,
+    if (collectionOnly) 'collection_only': true,
+    if (budgetLimitBrl != null) 'budget_limit_brl': budgetLimitBrl,
+  };
 }
 
 AiGenerateRequestInput parseAiGenerateRequestInput(Object? decoded) {
@@ -92,6 +121,22 @@ AiGenerateRequestInput parseAiGenerateRequestInput(Object? decoded) {
     throw AiGenerateRequestValidationException(bracketResult.error!);
   }
 
+  final constraints = parseAiGenerateConstraints(
+    body['generation_constraints'],
+    wasPresent: body.containsKey('generation_constraints'),
+  );
+
+  try {
+    final requestKey = normalizeOptionalAiJobRequestKey(body['request_key']);
+    if (requestKey == null) {
+      body.remove('request_key');
+    } else {
+      body['request_key'] = requestKey;
+    }
+  } on AiJobRequestKeyException catch (error) {
+    throw AiGenerateRequestValidationException(error.message);
+  }
+
   body['prompt'] = prompt;
   body['format'] = format;
   if (commanderName == null) {
@@ -104,12 +149,74 @@ AiGenerateRequestInput parseAiGenerateRequestInput(Object? decoded) {
   } else {
     body['bracket'] = bracketResult.value;
   }
+  if (constraints.isRequested) {
+    body['generation_constraints'] = constraints.toJson();
+  } else {
+    body.remove('generation_constraints');
+  }
 
   return AiGenerateRequestInput(
     body: body,
     prompt: prompt,
     format: format,
     commanderName: commanderName,
+    constraints: constraints,
+  );
+}
+
+AiGenerateConstraints parseAiGenerateConstraints(
+  Object? raw, {
+  bool wasPresent = true,
+}) {
+  if (!wasPresent || raw == null) return const AiGenerateConstraints.empty();
+  if (raw is! Map) {
+    throw const AiGenerateRequestValidationException(
+      'generation_constraints must be an object',
+    );
+  }
+  final values = raw.cast<Object?, Object?>();
+  const knownKeys = {
+    'prefer_collection',
+    'collection_only',
+    'budget_limit_brl',
+  };
+  final unknown = values.keys
+      .map((key) => key?.toString() ?? '')
+      .where((key) => !knownKeys.contains(key))
+      .toList(growable: false);
+  if (unknown.isNotEmpty) {
+    throw const AiGenerateRequestValidationException(
+      'generation_constraints contains unsupported fields',
+    );
+  }
+
+  bool readBool(String key) {
+    final value = values[key];
+    if (value == null) return false;
+    if (value is bool) return value;
+    throw AiGenerateRequestValidationException('$key must be a boolean');
+  }
+
+  final rawBudget = values['budget_limit_brl'];
+  final budget = switch (rawBudget) {
+    null => null,
+    int() => rawBudget,
+    num() when rawBudget == rawBudget.roundToDouble() => rawBudget.toInt(),
+    _ =>
+      throw const AiGenerateRequestValidationException(
+        'budget_limit_brl must be an integer',
+      ),
+  };
+  if (budget != null && (budget < 0 || budget > 100000)) {
+    throw const AiGenerateRequestValidationException(
+      'budget_limit_brl must be between 0 and 100000',
+    );
+  }
+  final collectionOnly = readBool('collection_only');
+  return AiGenerateConstraints(
+    preferCollection: readBool('prefer_collection') || collectionOnly,
+    collectionOnly: collectionOnly,
+    budgetLimitBrl: budget,
   );
 }
 
@@ -139,17 +246,19 @@ String buildAiGenerateCacheKey({
   Object? bracket,
   String? commanderName,
   String? referenceProfileVersion,
+  AiGenerateConstraints constraints = const AiGenerateConstraints.empty(),
 }) {
   final normalizedCommander = normalizeAiGenerateCommanderName(commanderName);
   final normalizedProfileVersion = referenceProfileVersion?.trim() ?? '';
   final payload = {
-    'version': 2,
+    'version': 3,
     'prompt': normalizeAiGeneratePrompt(prompt),
     'format': normalizeAiGenerateFormat(format),
     'bracket': normalizeAiGenerateBracket(bracket),
     if (normalizedCommander.isNotEmpty) 'commander_name': normalizedCommander,
     if (normalizedProfileVersion.isNotEmpty)
       'reference_profile_version': normalizedProfileVersion,
+    if (constraints.isRequested) 'generation_constraints': constraints.toJson(),
   };
   final material = jsonEncode(payload);
   final digest = sha256.convert(utf8.encode(material)).toString();
@@ -176,6 +285,7 @@ Map<String, dynamic> buildAiGenerateSyncPayloadForAsyncJob(
 ) {
   final payload = Map<String, dynamic>.from(body);
   payload.remove('async');
+  payload.remove('request_key');
   for (final key in const ['profile', 'response_mode', 'mode']) {
     final value = payload[key]?.toString().trim().toLowerCase();
     if (value == 'async' || value == 'background') {

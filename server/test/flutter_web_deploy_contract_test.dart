@@ -7,6 +7,7 @@ void main() {
     final dockerfile = File('../app/Dockerfile.web').readAsStringSync();
     final dockerignore = File('../app/.dockerignore').readAsStringSync();
     final nginx = File('../app/web/nginx.conf').readAsStringSync();
+    final index = File('../app/web/index.html').readAsStringSync();
     final deploy =
         File('../scripts/manaloom_deploy_flutter_web.sh').readAsStringSync();
 
@@ -30,6 +31,13 @@ void main() {
     expect(nginx, contains('add_header Referrer-Policy'));
     expect(nginx, contains('add_header Permissions-Policy'));
     expect(nginx, contains('add_header Strict-Transport-Security'));
+    expect(
+      index,
+      contains(
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+      ),
+      reason: 'mobile browsers must render Flutter at the CSS viewport width',
+    );
     expect(
       nginx,
       contains(

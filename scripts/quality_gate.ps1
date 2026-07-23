@@ -127,6 +127,7 @@ function Run-DependencyAudit {
   Run-DependencyValidator "app" "Flutter app"
   Run-DependencyValidator "server" "Dart Frog server"
   Run-DependencyValidator "tools/manaloom_lints" "ManaLoom custom lint package"
+  Run-DependencyValidator "tools/project_logic" "ManaLoom project logic generator"
 }
 
 function Run-CustomLint {
@@ -211,6 +212,43 @@ function Run-E2ESuite {
   bash (Join-Path $RootDir "scripts/manaloom_e2e_suite.sh")
 }
 
+function Run-ProjectLogic {
+  Write-Header "ManaLoom generated project logic and documentation drift"
+  $packageDir = Join-Path $RootDir "tools/project_logic"
+  Ensure-PackageResolved $packageDir "dart"
+  Push-Location $packageDir
+  try {
+    dart run bin/manaloom_project_logic.dart --check --root $RootDir
+    dart test
+  }
+  finally {
+    Pop-Location
+  }
+
+  foreach ($relativePackage in @("app", "server", "tools/manaloom_lints", "tools/project_logic")) {
+    $packageDir = Join-Path $RootDir $relativePackage
+    Ensure-PackageResolved $packageDir "dart"
+    Push-Location $packageDir
+    try {
+      $docOutput = @(dart doc --dry-run 2>&1)
+      if ($LASTEXITCODE -ne 0) {
+        $docOutput | Write-Host
+        throw "dart doc falhou em $relativePackage."
+      }
+      $warnings = @($docOutput | Select-String -Pattern '^  warning:').Count
+      $errors = @($docOutput | Select-String -Pattern '^  error:').Count
+      if ($warnings -ne 0 -or $errors -ne 0) {
+        $docOutput | Write-Host
+        throw "dart doc encontrou $warnings warning(s) e $errors erro(s) em $relativePackage."
+      }
+      Write-Host "dart doc: $relativePackage sem warnings/erros."
+    }
+    finally {
+      Pop-Location
+    }
+  }
+}
+
 function Show-Usage {
   @"
 Uso:
@@ -220,6 +258,7 @@ Uso:
   .\scripts\quality_gate.ps1 deps # valida dependências declaradas no app/server/lints
   .\scripts\quality_gate.ps1 custom-lint # roda regras customizadas ManaLoom no app/server
   .\scripts\quality_gate.ps1 patrol-smoke # valida fluxos E2E criticos do Patrol
+  .\scripts\quality_gate.ps1 project-logic # manifesto, OpenAPI, ERD e drift documental
   .\scripts\quality_gate.ps1 e2e # suite E2E local: app, deckbuilder, battle, IA, contratos e logs
 
 Dica:
@@ -234,6 +273,7 @@ Exemplos:
   .\scripts\quality_gate.ps1 deps
   .\scripts\quality_gate.ps1 custom-lint
   .\scripts\quality_gate.ps1 patrol-smoke
+  .\scripts\quality_gate.ps1 project-logic
   .\scripts\quality_gate.ps1 e2e
 "@
 }
@@ -267,6 +307,10 @@ try {
     }
     "patrol-smoke" {
       Run-PatrolSmoke
+      break
+    }
+    "project-logic" {
+      Run-ProjectLogic
       break
     }
     "e2e" {

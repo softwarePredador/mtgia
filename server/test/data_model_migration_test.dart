@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../bin/migrate.dart' as migrate;
 import 'package:server/sql_statement_splitter.dart';
 import 'package:test/test.dart';
@@ -105,6 +107,10 @@ void main() {
       );
       expect(
         migrate.migrationRollbackPolicy('040'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(
+        migrate.migrationRollbackPolicy('041'),
         migrate.MigrationRollbackPolicy.manualOnly,
       );
     });
@@ -536,6 +542,54 @@ void main() {
       );
     });
 
+    test('migration 041 creates the social runtime schema used by routes', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '041',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('create_social_trade_messaging_runtime_schema'),
+      );
+      for (final table in const [
+        'user_binder_items',
+        'trade_offers',
+        'trade_items',
+        'trade_messages',
+        'trade_status_history',
+        'conversations',
+        'direct_messages',
+        'notifications',
+      ]) {
+        expect(up, contains('create table if not exists $table'));
+        expect(down, contains('drop table if exists $table'));
+      }
+
+      expect(up, contains("list_type in ('have', 'want')"));
+      expect(up, contains('uq_user_binder_items_identity'));
+      expect(up, contains('on delete set null'));
+      expect(up, contains('uq_conversation_participants'));
+      expect(up, contains('least(user_a_id, user_b_id)'));
+      expect(up, contains('greatest(user_a_id, user_b_id)'));
+      expect(up, contains('chk_trade_offers_delivery_method'));
+      for (final deliveryMethod in const [
+        'correios',
+        'motoboy',
+        'pessoalmente',
+        'outro',
+      ]) {
+        expect(up, contains("'$deliveryMethod'"));
+      }
+      expect(up, contains(r'do $active_user_triggers$'));
+      expect(up, contains('manaloom_require_active_user'));
+      expect(
+        migrate.migrationRollbackPolicy('041'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
+
     test('migration 033 persists deck optimization events', () {
       final migration = migrate.migrations.singleWhere(
         (migration) => migration.version == '033',
@@ -645,6 +699,130 @@ void main() {
       expect(up, contains("'bracket_3_plus'"));
       expect(up, contains("'bracket_2_4'"));
       expect(up, contains("'bracket_3_5'"));
+    });
+
+    test('migration 046 restores the runtime price history dependency', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '046',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('restore_price_history_runtime_contract'));
+      for (final source in [up, bootstrap]) {
+        expect(source, contains('create table if not exists price_history'));
+        expect(source, contains('unique(card_id, price_date)'));
+        expect(source, contains('idx_price_history_date_card_price'));
+        expect(source, contains('include (price_usd)'));
+      }
+      expect(
+        migrate.migrationRollbackPolicy('046'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(migration.down, isNot(contains('drop table')));
+    });
+
+    test('migration 047 closes deck validation state transitions', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '047',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('close_deck_validation_state_transitions'));
+      for (final source in [up, bootstrap]) {
+        expect(source, contains('chk_decks_validation_state_payload'));
+        expect(
+          source,
+          contains("'[\"deck_cards_changed_since_validation\"]'::jsonb"),
+        );
+        expect(
+          source,
+          contains("'[\"deck_format_changed_since_validation\"]'::jsonb"),
+        );
+        expect(
+          source,
+          isNot(
+            contains(
+              "else validation_reasons ||\n                 '[\"deck_cards_changed_since_validation\"]'::jsonb",
+            ),
+          ),
+        );
+      }
+      expect(
+        migrate.migrationRollbackPolicy('047'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
+
+    test('migration 048 closes the async AI job lifecycle', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '048',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('close_ai_job_lifecycle'));
+      for (final source in [up, bootstrap]) {
+        expect(source, contains('request_key'));
+        expect(source, contains('request_fingerprint'));
+        expect(source, contains('cancelled_at'));
+        expect(source, contains("'cancelled'"));
+        expect(source, contains('idx_ai_generate_jobs_user_request_key'));
+        expect(source, contains('idx_ai_optimize_jobs_user_request_key'));
+      }
+      expect(
+        migrate.migrationRollbackPolicy('048'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
+
+    test('migration 049 preserves binder physical copy identity', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '049',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('preserve_binder_physical_identity'));
+      for (final source in [up, bootstrap]) {
+        expect(source, contains('uq_user_binder_items_physical_identity'));
+        expect(source, contains('user_id, card_id, condition, is_foil'));
+        expect(source, contains('language, list_type'));
+        expect(source, contains('chk_user_binder_items_language'));
+        expect(source, contains("replace(trim(language), '_', '-')"));
+      }
+      expect(
+        migrate.migrationRollbackPolicy('049'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
+
+    test('migration 050 canonicalizes price and records provenance', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '050',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('canonicalize_pricing_provenance'));
+      for (final source in [up, bootstrap]) {
+        expect(source, contains('price_usd'));
+        expect(source, contains('price_source'));
+        expect(source, contains('pricing_source'));
+        expect(source, contains('chk_cards_price_source'));
+      }
+      expect(up, contains('set price_usd = price'));
+      expect(up, contains("set price_source = 'legacy'"));
+      expect(
+        migrate.migrationRollbackPolicy('050'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
     });
   });
 }

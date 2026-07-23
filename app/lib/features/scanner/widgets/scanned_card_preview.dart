@@ -49,12 +49,10 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _slideController.forward();
   }
 
@@ -100,22 +98,22 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
           child: Container(
             constraints: const BoxConstraints(maxHeight: 360),
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-            child:
-                card.imageUrl != null
-                    ? ClipRRect(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                      child: CachedNetworkImage(
-                        imageUrl: card.imageUrl!,
-                        fit: BoxFit.contain,
-                        placeholder: (_, __) => _imagePlaceholder(),
-                        errorWidget:
-                            (_, __, ___) => _imagePlaceholder(
-                              icon: Icons.image_not_supported,
-                            ),
-                      ),
-                    )
-                    : _imagePlaceholder(icon: Icons.style),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space40,
+              vertical: AppTheme.space8,
+            ),
+            child: card.imageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    child: CachedNetworkImage(
+                      imageUrl: card.imageUrl!,
+                      fit: BoxFit.contain,
+                      placeholder: (_, __) => _imagePlaceholder(),
+                      errorWidget: (_, __, ___) =>
+                          _imagePlaceholder(icon: Icons.image_not_supported),
+                    ),
+                  )
+                : _imagePlaceholder(icon: Icons.style),
           ),
         ),
       ),
@@ -130,13 +128,12 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       ),
       child: Center(
-        child:
-            icon == Icons.hourglass_empty
-                ? const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppTheme.primarySoft,
-                )
-                : Icon(icon, size: 48, color: AppTheme.textSecondary),
+        child: icon == Icons.hourglass_empty
+            ? const CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppTheme.primarySoft,
+              )
+            : Icon(icon, size: 48, color: AppTheme.textSecondary),
       ),
     );
   }
@@ -145,12 +142,15 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
   Widget _buildInfoBar(DeckCardItem card) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space16,
+        vertical: AppTheme.space10,
+      ),
       color: AppTheme.backgroundAbyss,
       child: Row(
         children: [
           _RarityDot(rarity: card.rarity),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,11 +169,11 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppTheme.space8),
                     _ManaCostIcons(cost: card.manaCost),
                   ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.space2),
                 Text(
                   card.typeLine,
                   style: const TextStyle(
@@ -188,7 +188,10 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
           ),
           // Confidence badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space6,
+              vertical: AppTheme.space3,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.surfaceElevated,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -217,10 +220,10 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 8,
-        bottom: 8 + bottomPad,
+        left: AppTheme.space12,
+        right: AppTheme.space12,
+        top: AppTheme.space8,
+        bottom: AppTheme.space8 + bottomPad,
       ),
       decoration: const BoxDecoration(
         color: AppTheme.surfaceSlate,
@@ -238,7 +241,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
               AppTheme.textSecondary,
               AppTheme.surfaceElevated,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
           ],
           // Condition
           _badge(
@@ -247,7 +250,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
             _conditionBadgeColor(card.condition),
             AppTheme.surfaceElevated,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           // Set code (tappable)
           Semantics(
             button: true,
@@ -272,7 +275,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
           const Spacer(),
           // Retry
           _iconBtn(widget.onRetry),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           // +1 add
           _addButton(() {
             HapticFeedback.mediumImpact();
@@ -297,7 +300,10 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space16,
+              vertical: AppTheme.space8,
+            ),
             child: Row(
               children: [
                 const Icon(
@@ -305,7 +311,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
                   size: 14,
                   color: AppTheme.textSecondary,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppTheme.space6),
                 Text(
                   '${widget.foundCards.length} edições',
                   style: const TextStyle(
@@ -323,8 +329,8 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
                     child: GestureDetector(
                       onTap: () => setState(() => _showEditions = false),
                       child: const SizedBox(
-                        width: 48,
-                        height: 48,
+                        width: AppTheme.space48,
+                        height: AppTheme.space48,
                         child: Icon(
                           Icons.keyboard_arrow_down,
                           size: 20,
@@ -341,8 +347,9 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
             child: ListView.builder(
               shrinkWrap: true,
               padding: EdgeInsets.zero,
-              itemCount:
-                  widget.foundCards.length > 10 ? 10 : widget.foundCards.length,
+              itemCount: widget.foundCards.length > 10
+                  ? 10
+                  : widget.foundCards.length,
               itemBuilder: (context, index) {
                 final ed = widget.foundCards[index];
                 final sel = index == _selectedIndex;
@@ -393,7 +400,10 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     bool chevron = false,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space5,
+      ),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -403,7 +413,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 13, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppTheme.space4),
           Text(
             label,
             style: TextStyle(
@@ -413,7 +423,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
             ),
           ),
           if (chevron) ...[
-            const SizedBox(width: 2),
+            const SizedBox(width: AppTheme.space2),
             Icon(Icons.expand_more, size: 14, color: color),
           ],
         ],
@@ -435,8 +445,8 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             onTap: onTap,
             child: const SizedBox(
-              width: 48,
-              height: 48,
+              width: AppTheme.space48,
+              height: AppTheme.space48,
               child: Icon(
                 Icons.refresh_rounded,
                 size: 20,
@@ -457,12 +467,15 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppTheme.space14,
+            vertical: AppTheme.space8,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.add, size: 18, color: Colors.white),
-              SizedBox(width: 2),
+              SizedBox(width: AppTheme.space2),
               Text(
                 '+1',
                 style: TextStyle(
@@ -534,37 +547,36 @@ class _EditionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color:
-          isSelected
-              ? AppTheme.primarySoft.withValues(alpha: 0.12)
-              : Colors.transparent,
+      color: isSelected
+          ? AppTheme.primarySoft.withValues(alpha: 0.12)
+          : Colors.transparent,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space16,
+            vertical: AppTheme.space8,
+          ),
           child: Row(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                 child: SizedBox(
-                  width: 28,
-                  height: 40,
-                  child:
-                      card.imageUrl != null
-                          ? CachedNetworkImage(
-                            imageUrl: card.imageUrl!,
-                            fit: BoxFit.cover,
-                            placeholder:
-                                (_, __) =>
-                                    Container(color: AppTheme.surfaceSlate),
-                            errorWidget:
-                                (_, __, ___) =>
-                                    Container(color: AppTheme.surfaceSlate),
-                          )
-                          : Container(color: AppTheme.surfaceSlate),
+                  width: AppTheme.space28,
+                  height: AppTheme.space40,
+                  child: card.imageUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: card.imageUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) =>
+                              Container(color: AppTheme.surfaceSlate),
+                          errorWidget: (_, __, ___) =>
+                              Container(color: AppTheme.surfaceSlate),
+                        )
+                      : Container(color: AppTheme.surfaceSlate),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -574,8 +586,9 @@ class _EditionTile extends StatelessWidget {
                       style: TextStyle(
                         color: isSelected ? AppTheme.primarySoft : Colors.white,
                         fontSize: AppTheme.fontMd,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                       ),
                     ),
                     if (card.setName != null && card.setName!.isNotEmpty)
@@ -592,7 +605,7 @@ class _EditionTile extends StatelessWidget {
                 ),
               ),
               _RarityDot(rarity: card.rarity),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               if (isSelected)
                 const Icon(
                   Icons.check_circle,
@@ -644,8 +657,8 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppTheme.space16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -655,7 +668,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.search_off, color: AppTheme.error, size: 48),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Text(
             widget.errorMessage ?? 'Carta não encontrada',
             style: const TextStyle(
@@ -666,7 +679,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
             textAlign: TextAlign.center,
           ),
           if (widget.detectedName != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               'Detectado: "${widget.detectedName}"',
               style: const TextStyle(
@@ -675,7 +688,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
               ),
             ),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           TextField(
             key: const Key('scanner-manual-card-search-field'),
             controller: _searchController,
@@ -697,7 +710,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
             ),
             onSubmitted: widget.onManualSearch,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Row(
             children: [
               Expanded(

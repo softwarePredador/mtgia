@@ -18,15 +18,6 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 SERVER_BIN = REPO_ROOT / "server/bin"
-DEFAULT_LATEST_COVERAGE = Path(
-    "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/"
-    "battle-strategy-audit/latest/effect_coverage.json"
-)
-DEFAULT_EVIDENCE_OUTPUT_DIR = Path(
-    "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/"
-    "battle-strategy-audit/focused-template-dispatch"
-)
-
 ACCEPTED_WAIVER_STATUSES = {
     "accepted",
     "accepted_waiver",
@@ -38,8 +29,8 @@ ACCEPTED_WAIVER_STATUSES = {
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--coverage-json", type=Path, default=DEFAULT_LATEST_COVERAGE)
-    parser.add_argument("--evidence-output-dir", type=Path, default=DEFAULT_EVIDENCE_OUTPUT_DIR)
+    parser.add_argument("--coverage-json", type=Path, required=True)
+    parser.add_argument("--evidence-output-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--json-output", type=Path)
     parser.add_argument("--fail-on-not-ready", action="store_true")

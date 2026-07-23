@@ -29,12 +29,13 @@ from global_commander_deck_contract_audit import (
 )
 
 import xmage_local_rule_indexer as xmage_indexer
+import external_engine_source_contract as engine_source_contract
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 XMAGE_FLOW = REPO_ROOT / "docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
-DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_XMAGE_ROOT: Path | None = None
 
 PRODUCT_SCOPES = {"user_product", "registered_pg_variant"}
 FIXTURE_SCOPES = {"test_or_fixture"}
@@ -782,7 +783,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    payload = build_payload(xmage_root=args.xmage_root, xmage_limit=args.xmage_limit)
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    payload = build_payload(xmage_root=xmage_root, xmage_limit=args.xmage_limit)
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")

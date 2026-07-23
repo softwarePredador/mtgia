@@ -39,10 +39,15 @@ void main() {
           {
             'remove': 'Mind Stone',
             'add': 'Arcane Signet',
-            'role': 'ramp',
+            'remove_role': 'ramp',
+            'add_role': 'ramp',
+            'same_lane': true,
+            'same_lane_hypothesis':
+                'Trocar ramp por ramp preservando a base de mana.',
             'candidate_quality_sources': ['deterministic_semantic_v2'],
             'collection_match': true,
             'owned_quantity': 1,
+            'available_quantity': 1,
             'purchase_required': false,
             'estimated_price_brl': 12.34,
           },
@@ -72,8 +77,16 @@ void main() {
       );
       expect((response['swaps'] as List).single['collection_match'], isTrue);
       expect((response['swaps'] as List).single['owned_quantity'], 1);
+      expect((response['swaps'] as List).single['available_quantity'], 1);
       expect((response['swaps'] as List).single['purchase_required'], isFalse);
       expect((response['swaps'] as List).single['estimated_price_brl'], 12.34);
+      expect((response['swaps'] as List).single['remove_role'], 'ramp');
+      expect((response['swaps'] as List).single['add_role'], 'ramp');
+      expect((response['swaps'] as List).single['same_lane'], isTrue);
+      expect(
+        (response['swaps'] as List).single['same_lane_hypothesis'],
+        contains('ramp por ramp'),
+      );
       expect(detail['reason'], contains('Sugestão de saída'));
       expect(detail['role'], 'ramp');
       expect(detail['function'], 'ramp');

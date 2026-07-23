@@ -6,6 +6,7 @@ import '../auth_redirect.dart';
 import '../password_policy.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_visual_shell.dart';
+import '../../commercial/legal_policy.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key, this.redirectPath});
@@ -25,6 +26,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _legalAccepted = false;
+  String? _legalError;
 
   @override
   void initState() {
@@ -59,18 +62,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_legalAccepted) {
+      setState(() {
+        _legalError =
+            'Leia e aceite os Termos de uso e a Política de privacidade.';
+      });
+      return;
+    }
 
     final authProvider = context.read<AuthProvider>();
     final success = await authProvider.register(
       username: _usernameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      legalAccepted: true,
+      termsVersion: currentTermsVersion,
+      privacyVersion: currentPrivacyVersion,
     );
 
     if (!mounted) return;
 
     if (success) {
-      context.go(normalizePostAuthRedirect(widget.redirectPath) ?? '/home');
+      context.go(
+        Uri(
+          path: '/verify-email',
+          queryParameters: widget.redirectPath == null
+              ? null
+              : {'redirect': widget.redirectPath},
+        ).toString(),
+      );
       return;
     }
 
@@ -106,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             subtitle: 'Configure seu acesso em menos de um minuto.',
             logoSize: 76,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppTheme.space18),
           AuthFormSurface(
             child: Form(
               key: _formKey,
@@ -138,7 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
 
                   // Email
                   TextFormField(
@@ -166,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
 
                   // Senha
                   TextFormField(
@@ -180,10 +200,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Use 12+ caracteres e evite sequências, seu nome ou email.',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        tooltip:
-                            _obscurePassword
-                                ? 'Mostrar senha'
-                                : 'Ocultar senha',
+                        tooltip: _obscurePassword
+                            ? 'Mostrar senha'
+                            : 'Ocultar senha',
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility_outlined
@@ -201,14 +220,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                     ),
-                    validator:
-                        (value) => validateRegistrationPassword(
-                          value,
-                          username: _usernameController.text,
-                          email: _emailController.text,
-                        ),
+                    validator: (value) => validateRegistrationPassword(
+                      value,
+                      username: _usernameController.text,
+                      email: _emailController.text,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
 
                   // Confirmar Senha
                   TextFormField(
@@ -220,10 +238,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        tooltip:
-                            _obscureConfirmPassword
-                                ? 'Mostrar confirmação de senha'
-                                : 'Ocultar confirmação de senha',
+                        tooltip: _obscureConfirmPassword
+                            ? 'Mostrar confirmação de senha'
+                            : 'Ocultar confirmação de senha',
                         icon: Icon(
                           _obscureConfirmPassword
                               ? Icons.visibility_outlined
@@ -251,7 +268,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: AppTheme.space16),
+                  Semantics(
+                    container: true,
+                    label:
+                        'Aceite dos Termos de uso e da Política de privacidade',
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          key: const Key('register-legal-acceptance'),
+                          value: _legalAccepted,
+                          onChanged: (value) => setState(() {
+                            _legalAccepted = value ?? false;
+                            if (_legalAccepted) _legalError = null;
+                          }),
+                        ),
+                        const SizedBox(width: AppTheme.space4),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  const Text('Li e aceito os '),
+                                  TextButton(
+                                    key: const Key(
+                                      'register-open-terms-button',
+                                    ),
+                                    style: AppTheme.accessibleTextButtonStyle,
+                                    onPressed: () => context.push('/legal'),
+                                    child: const Text('Termos de uso'),
+                                  ),
+                                  const Text(' e a '),
+                                  TextButton(
+                                    key: const Key(
+                                      'register-open-privacy-button',
+                                    ),
+                                    style: AppTheme.accessibleTextButtonStyle,
+                                    onPressed: () => context.push('/legal'),
+                                    child: const Text(
+                                      'Política de privacidade',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              _legalError == null
+                                  ? Text(
+                                      'Versões $currentTermsVersion / $currentPrivacyVersion',
+                                      style: theme.textTheme.bodySmall,
+                                    )
+                                  : Text(
+                                      _legalError!,
+                                      key: const Key('register-legal-error'),
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.error,
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space14),
 
                   Consumer<AuthProvider>(
                     builder: (context, auth, child) {
@@ -316,7 +399,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
                     },
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: AppTheme.space14),
 
                   // Link para login
                   Wrap(
@@ -327,14 +410,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         'Já tem uma conta? ',
                         style: theme.textTheme.bodyMedium,
                       ),
-                      TextButton(
-                        key: const Key('register-open-login-button'),
-                        onPressed: _returnToLogin,
-                        child: const Text(
-                          'Entrar',
-                          style: TextStyle(
-                            color: AppTheme.brass400,
-                            fontWeight: FontWeight.bold,
+                      SizedBox(
+                        height: AppTheme.touchTargetCompactPlatformHeight,
+                        child: TextButton(
+                          key: const Key('register-open-login-button'),
+                          style: AppTheme.accessibleTextButtonStyle,
+                          onPressed: _returnToLogin,
+                          child: const Text(
+                            'Entrar',
+                            style: TextStyle(
+                              color: AppTheme.brass400,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

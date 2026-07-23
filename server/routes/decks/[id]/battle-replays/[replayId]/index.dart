@@ -14,6 +14,12 @@ Future<Response> onRequest(
   if (context.request.method != HttpMethod.get) {
     return methodNotAllowed();
   }
+  if (!isBattleReplayUuid(deckId)) {
+    return notFound('Deck nao encontrado.');
+  }
+  if (!isBattleReplayUuid(replayId)) {
+    return notFound('Replay nao encontrado.');
+  }
 
   final userId = context.read<String>();
   final service = BattleReplayReadService(context.read<Pool>());
@@ -36,9 +42,12 @@ Future<Response> onRequest(
     Log.e('[battle-replays] detail failed type=${error.runtimeType}');
     await captureRouteException(
       context,
-      error,
+      StateError('Battle replay detail failed'),
       stackTrace: stackTrace,
-      tags: const {'route': 'battle_replay_detail'},
+      tags: {
+        'route': 'battle_replay_detail',
+        'error_type': '${error.runtimeType}',
+      },
     );
     return internalServerError('Falha ao carregar replay de battle');
   }

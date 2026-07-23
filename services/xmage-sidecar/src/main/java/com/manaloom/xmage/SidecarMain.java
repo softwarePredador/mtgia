@@ -27,6 +27,13 @@ import java.util.UUID;
 public final class SidecarMain {
     static final String XMAGE_COMMIT = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec";
     static final String XMAGE_VERSION = "1.4.60";
+    static final String EXECUTION_SCHEMA = "external_battle_execution_v2";
+    static final String REQUEST_SCHEMA = "external_battle_request_v2";
+    static final String DECK_HASH_SCHEMA = "external_battle_deck_hash_v1";
+    static final String SIDECAR_PROTOCOL = "external_battle_sidecar_v2";
+    static final String AI_PROFILE = "computer_mad";
+    static final String SEED_SEMANTICS = "request_correlation_only_server_rng_uncontrolled";
+    static final String BUILD_IDENTITY = "xmage-sidecar-v2@" + XMAGE_COMMIT;
 
     private static final Gson GSON = new Gson();
     static final int MAX_REQUEST_BYTES = 8 * 1024 * 1024;
@@ -86,10 +93,12 @@ public final class SidecarMain {
         }
 
         Future<Map<String, Object>> simulation = null;
+        JsonObject request = null;
         try {
-            JsonObject request = JsonParser.parseString(readBody(exchange)).getAsJsonObject();
-            long timeoutMs = simulationTimeoutMillis(request);
-            simulation = SIMULATION_EXECUTOR.submit(() -> battleService.simulate(request));
+            JsonObject parsedRequest = JsonParser.parseString(readBody(exchange)).getAsJsonObject();
+            request = parsedRequest;
+            long timeoutMs = simulationTimeoutMillis(parsedRequest);
+            simulation = SIMULATION_EXECUTOR.submit(() -> battleService.simulate(parsedRequest));
             Map<String, Object> result;
             try {
                 result = simulation.get(timeoutMs + HARD_TIMEOUT_GRACE_MS, TimeUnit.MILLISECONDS);
@@ -100,6 +109,7 @@ public final class SidecarMain {
         } catch (XmageBattleService.UnsupportedCardsException error) {
             Map<String, Object> body = errorBody("xmage_coverage_incomplete", error.getMessage());
             body.put("unsupported_cards", error.getUnsupportedCards());
+            body.putAll(requestMetadata(battleService, request, "coverage_incomplete"));
             send(exchange, 422, body);
         } catch (IllegalArgumentException error) {
             send(exchange, 400, errorBody("invalid_request", error.getMessage()));
@@ -110,13 +120,16 @@ public final class SidecarMain {
             try {
                 Map<String, Object> body = errorBody("simulation_timeout", error.getMessage());
                 body.put("restart_required", true);
+                body.putAll(requestMetadata(battleService, request, "timeout"));
                 send(exchange, 504, body);
             } finally {
                 restartAfterTimeout();
             }
         } catch (Exception error) {
             error.printStackTrace(System.err);
-            send(exchange, 500, errorBody("simulation_failed", error.getMessage()));
+            Map<String, Object> body = errorBody("simulation_failed", error.getMessage());
+            body.putAll(requestMetadata(battleService, request, "failed"));
+            send(exchange, 500, body);
         }
     }
 
@@ -223,9 +236,35 @@ public final class SidecarMain {
             return body;
         }
         Map<String, Object> result = new LinkedHashMap<>((Map<String, Object>) body);
+        result.put("schema_version", EXECUTION_SCHEMA);
+        result.put("engine", "xmage");
+        result.put("engine_version", XMAGE_VERSION);
+        result.put("engine_commit", XMAGE_COMMIT);
+        result.put("sidecar_protocol_version", SIDECAR_PROTOCOL);
+        result.put("sidecar_build_identity", BUILD_IDENTITY);
         result.put("sidecar_process_id", PROCESS_ID);
         result.put("sidecar_started_at", STARTED_AT);
+        result.put("ai_profile", AI_PROFILE);
+        result.put("normalizer_version", ReplayNormalizer.VERSION);
+        result.put("seed_semantics", SEED_SEMANTICS);
+        result.put("deterministic", false);
+        result.putIfAbsent("fallback_reason", "none");
         return result;
+    }
+
+    private static Map<String, Object> requestMetadata(
+            XmageBattleService battleService,
+            JsonObject request,
+            String status
+    ) {
+        if (request == null) {
+            return new LinkedHashMap<>();
+        }
+        try {
+            return battleService.requestMetadata(request, status);
+        } catch (RuntimeException ignored) {
+            return new LinkedHashMap<>();
+        }
     }
 
     private static Map<String, Object> errorBody(String code, String message) {

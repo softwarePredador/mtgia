@@ -401,6 +401,10 @@ FOCUSED_EVIDENCE_BASENAMES = {
     "test_global_card_oracle_battle_readiness.py",
     "lorehold_entreat_rule_package_preapply.py",
     "test_lorehold_entreat_rule_package_preapply.py",
+    "lorehold_paired_battle_statistical_gate.py",
+    "test_lorehold_paired_battle_statistical_gate.py",
+    "lorehold_independent_battle_statistical_gate.py",
+    "test_lorehold_independent_battle_statistical_gate.py",
     "manaloom_battle_product_e2e_audit.py",
     "manaloom_battle_product_e2e_audit_test.py",
 }

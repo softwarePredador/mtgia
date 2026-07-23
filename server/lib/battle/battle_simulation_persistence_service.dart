@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 
+import 'battle_replay_payload_sanitizer.dart';
+
 class BattleSimulationPersistenceOutcome {
   const BattleSimulationPersistenceOutcome.saved(this.replayId)
     : status = 'saved',
@@ -37,6 +39,7 @@ class BattleSimulationPersistenceService {
     required Map<String, dynamic> result,
   }) async {
     try {
+      final sanitizedResult = sanitizeBattleReplayForStorage(result);
       final tableExists = await _pool.execute('''
         SELECT EXISTS (
           SELECT FROM information_schema.tables
@@ -69,12 +72,16 @@ class BattleSimulationPersistenceService {
       final hasWinnerDeckId = availableColumns.contains('winner_deck_id');
       final hasTurnsPlayed = availableColumns.contains('turns_played');
       final winnerDeckId = canonicalBattleWinnerDeckId(
-        result: result,
+        result: sanitizedResult,
         deckAId: deckAId,
         deckBId: deckBId,
       );
-      final payload = {...result, 'type': type, 'winner_deck_id': winnerDeckId};
-      final turnsPlayed = (result['turns'] as num?)?.toInt();
+      final payload = {
+        ...sanitizedResult,
+        'type': type,
+        'winner_deck_id': winnerDeckId,
+      };
+      final turnsPlayed = (sanitizedResult['turns'] as num?)?.toInt();
 
       final insertResult = await _pool.execute(
         Sql.named('''
@@ -105,7 +112,7 @@ class BattleSimulationPersistenceService {
           if (hasSimulationType) 'simulationType': type,
           if (hasMetrics)
             'metrics': jsonEncode(
-              _simulationMetrics(result, winnerDeckId: winnerDeckId),
+              _simulationMetrics(sanitizedResult, winnerDeckId: winnerDeckId),
             ),
           if (hasWinnerDeckId) 'winnerDeckId': winnerDeckId,
           if (hasTurnsPlayed) 'turnsPlayed': turnsPlayed,
@@ -121,6 +128,10 @@ class BattleSimulationPersistenceService {
         );
       }
       return BattleSimulationPersistenceOutcome.saved(replayId);
+    } on BattleReplayPayloadException {
+      return const BattleSimulationPersistenceOutcome.failed(
+        'simulation_payload_invalid',
+      );
     } catch (_) {
       return const BattleSimulationPersistenceOutcome.failed(
         'simulation_persistence_failed',

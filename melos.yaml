@@ -53,10 +53,34 @@ scripts:
     description: Run the canonical native, Forge, XMage, Python, and Dart battle product gate.
     run: ./scripts/quality_gate.sh battle
 
+  project-logic:
+    description: Verify generated architecture, API, ERD, traceability, and documentation drift.
+    run: ./scripts/quality_gate.sh project-logic
+
+  local:quick:
+    description: Run the free local pre-commit gate (MCP, secrets, project logic, tests).
+    run: ./scripts/manaloom_local_ci.sh quick
+
+  local:schema:
+    description: Validate the manifest against a disposable local PostgreSQL with tbls.
+    run: ./scripts/manaloom_local_ci.sh schema
+
+  local:full:
+    description: Run the free local pre-push gate replacing remote GitHub Actions.
+    run: ./scripts/manaloom_local_ci.sh full
+
+  local:e2e:
+    description: Run the full local gate followed by the complete ManaLoom E2E suite.
+    run: ./scripts/manaloom_local_ci.sh e2e
+
+  local:release:
+    description: Run local quality, schema, battle and signed Android release build gates.
+    run: ./scripts/manaloom_local_ci.sh release
+
   e2e:
     description: Run ManaLoom local E2E suite for app, deckbuilder, battle, AI, contracts, and logs.
     run: ./scripts/quality_gate.sh e2e
 
   quality:
     description: Run the main local quality gate set.
-    run: ./scripts/quality_gate.sh full && ./scripts/quality_gate.sh ui-audit && ./scripts/quality_gate.sh custom-lint && ./scripts/quality_gate.sh patrol-smoke && ./scripts/manaloom_dependency_audit.sh
+    run: ./scripts/quality_gate.sh project-logic && ./scripts/quality_gate.sh full && ./scripts/quality_gate.sh ui-audit && ./scripts/quality_gate.sh custom-lint && ./scripts/quality_gate.sh patrol-smoke && ./scripts/manaloom_dependency_audit.sh

@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from typing import Any
 
 import deck_card_battle_rule_coherence_audit as coherence
+import external_engine_source_contract as engine_source_contract
 import materialize_learned_deck_to_deck_cards as materializer
 import xmage_batch_validity_audit as validity_audit
 import xmage_effect_json_batch_generator as proposal_generator
@@ -23,10 +24,7 @@ from master_optimizer_common import resolve_default_knowledge_db
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_REPORT_DIR = SCRIPT_DIR.parent.parent / "master_optimizer_reports"
-DEFAULT_BATTLE_ARTIFACT_DIR = Path(
-    "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest"
-)
-DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_XMAGE_ROOT: Path | None = None
 
 
 def utc_now() -> str:
@@ -271,8 +269,12 @@ def markdown_manifest(manifest: dict[str, Any]) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
-    parser.add_argument("--battle-artifact-dir", default=str(DEFAULT_BATTLE_ARTIFACT_DIR))
-    parser.add_argument("--xmage-root", default=str(DEFAULT_XMAGE_ROOT))
+    parser.add_argument(
+        "--battle-artifact-dir",
+        required=True,
+        help="Explicit current battle artifact directory; no historical default is allowed.",
+    )
+    parser.add_argument("--xmage-root")
     parser.add_argument(
         "--include-deck-id",
         type=int,
@@ -297,7 +299,10 @@ def main() -> int:
     args = parse_args()
     sqlite_db = Path(args.sqlite_db)
     artifact_dir = Path(args.battle_artifact_dir)
-    xmage_root = Path(args.xmage_root)
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     external_harvest = family_classifier.load_json(Path(args.external_harvest)) if args.external_harvest else None
     timestamp = compact_timestamp()
     output_prefix = Path(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
@@ -16,6 +17,15 @@ const _maximumGeneratePollTimeout = Duration(minutes: 5);
 const _generateJobPersistenceGrace = Duration(seconds: 15);
 const maxAiGeneratePromptLength = 8000;
 const maxAiGenerateCommanderNameLength = 300;
+
+String createAiJobRequestKey(String prefix) {
+  final random = Random.secure();
+  final suffix = List.generate(
+    16,
+    (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+  ).join();
+  return '$prefix:$suffix';
+}
 
 typedef GenerateDeckProgressCallback =
     void Function(GenerateDeckProgressSnapshot progress);
@@ -115,21 +125,19 @@ Future<List<Map<String, dynamic>>> normalizeCreateDeckCards(
     }
   }
 
-  final normalized =
-      aggregatedByCardId.values
-          .map((card) => Map<String, dynamic>.from(card))
-          .toList();
+  final normalized = aggregatedByCardId.values
+      .map((card) => Map<String, dynamic>.from(card))
+      .toList();
 
   if (aggregatedByName.isEmpty) {
     return normalized;
   }
 
-  final names =
-      aggregatedByName.values
-          .map((card) => (card['name'] as String).trim())
-          .where((name) => name.isNotEmpty)
-          .toSet()
-          .toList();
+  final names = aggregatedByName.values
+      .map((card) => (card['name'] as String).trim())
+      .where((name) => name.isNotEmpty)
+      .toSet()
+      .toList();
 
   if (names.isEmpty) return normalized;
 
@@ -161,11 +169,10 @@ Future<List<Map<String, dynamic>>> normalizeCreateDeckCards(
     cardIdByInputName[inputName.toLowerCase()] = cardId;
   }
 
-  final unresolvedNames =
-      unresolvedList
-          .map((item) => item.toString().trim())
-          .where((name) => name.isNotEmpty)
-          .toSet();
+  final unresolvedNames = unresolvedList
+      .map((item) => item.toString().trim())
+      .where((name) => name.isNotEmpty)
+      .toSet();
   final ambiguousNames = <String>{};
 
   for (final item in ambiguousList) {
@@ -203,8 +210,8 @@ Future<List<Map<String, dynamic>>> normalizeCreateDeckCards(
   }
 
   if (unresolvedNames.isNotEmpty || ambiguousNames.isNotEmpty) {
-    final sortedNames =
-        {...unresolvedNames, ...ambiguousNames}.toList()..sort();
+    final sortedNames = {...unresolvedNames, ...ambiguousNames}.toList()
+      ..sort();
     throw Exception(
       'Nao foi possivel resolver todas as cartas antes de criar o deck: '
       '${sortedNames.join(', ')}.',
@@ -223,6 +230,10 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
   GenerateDeckCancellation? cancellation,
   Duration? pollTimeout,
   Duration? pollInterval,
+  String? requestKey,
+  bool preferCollection = false,
+  bool collectionOnly = false,
+  int? budgetLimitBrl,
 }) async {
   final normalizedPrompt = prompt.trim();
   if (normalizedPrompt.isEmpty) {
@@ -243,6 +254,15 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       'O nome do comandante está muito longo. Revise o campo e tente novamente.',
     );
   }
+  if (budgetLimitBrl != null &&
+      (budgetLimitBrl < 0 || budgetLimitBrl > 100000)) {
+    throw Exception('Informe um orçamento entre R\$ 0 e R\$ 100.000.');
+  }
+  final generationConstraints = buildAiGenerateConstraintsPayload(
+    preferCollection: preferCollection,
+    collectionOnly: collectionOnly,
+    budgetLimitBrl: budgetLimitBrl,
+  );
   _throwIfGenerateCancelled(cancellation);
   onProgress?.call(
     const GenerateDeckProgressSnapshot(
@@ -256,8 +276,11 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     'prompt': normalizedPrompt,
     'format': normalizedFormat,
     'async': true,
+    'request_key': requestKey ?? createAiJobRequestKey('generate'),
     if (normalizedCommanderName != null)
       'commander_name': normalizedCommanderName,
+    if (generationConstraints.isNotEmpty)
+      'generation_constraints': generationConstraints,
   });
 
   _throwIfGenerateCancelled(cancellation);
@@ -333,10 +356,55 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       prompt: normalizedPrompt,
       normalizedFormat: normalizedFormat,
       commanderName: normalizedCommanderName,
+      generationConstraints: generationConstraints,
       reason: 'async_not_supported',
     );
   }
 
+  throw _generateFriendlyException(response);
+}
+
+Future<Map<String, dynamic>> resumeGeneratedDeckJob(
+  ApiClient apiClient, {
+  required String jobId,
+  GenerateDeckProgressCallback? onProgress,
+  GenerateDeckCancellation? cancellation,
+  Duration? pollTimeout,
+  Duration? pollInterval,
+}) {
+  final normalizedJobId = jobId.trim();
+  if (normalizedJobId.isEmpty) {
+    throw ArgumentError.value(jobId, 'jobId', 'Job id is required.');
+  }
+  return _pollGeneratedDeckJob(
+    apiClient,
+    pollUrl: '/ai/generate/jobs/$normalizedJobId',
+    jobId: normalizedJobId,
+    cancellation: cancellation,
+    onProgress: onProgress,
+    timeout: pollTimeout ?? _defaultGeneratePollTimeout,
+    pollInterval: pollInterval ?? _defaultGeneratePollInterval,
+  );
+}
+
+Future<Map<String, dynamic>?> fetchLatestGenerateJobRequest(
+  ApiClient apiClient, {
+  bool activeOnly = true,
+}) async {
+  final response = await apiClient.get(
+    '/ai/generate/jobs/latest?active=${activeOnly ? 'true' : 'false'}',
+  );
+  if (response.statusCode == 404) return null;
+  if (response.statusCode != 200) throw _generateFriendlyException(response);
+  return _asStringMap(response.data);
+}
+
+Future<Map<String, dynamic>> cancelGenerateJobRequest(
+  ApiClient apiClient,
+  String jobId,
+) async {
+  final response = await apiClient.delete('/ai/generate/jobs/$jobId');
+  if (response.statusCode == 200) return _asStringMap(response.data);
   throw _generateFriendlyException(response);
 }
 
@@ -363,6 +431,7 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
   required String prompt,
   required String normalizedFormat,
   required String? commanderName,
+  required Map<String, dynamic> generationConstraints,
   required String reason,
 }) async {
   AppLogger.info('[DeckGenerate] falling back to sync generate reason=$reason');
@@ -370,6 +439,8 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
     'prompt': prompt,
     'format': normalizedFormat,
     if (commanderName != null) 'commander_name': commanderName,
+    if (generationConstraints.isNotEmpty)
+      'generation_constraints': generationConstraints,
   });
 
   final data = _tryParseLegacyGenerateResponse(response);
@@ -379,6 +450,16 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
 
   throw _generateFriendlyException(response);
 }
+
+Map<String, dynamic> buildAiGenerateConstraintsPayload({
+  required bool preferCollection,
+  required bool collectionOnly,
+  required int? budgetLimitBrl,
+}) => {
+  if (preferCollection || collectionOnly) 'prefer_collection': true,
+  if (collectionOnly) 'collection_only': true,
+  if (budgetLimitBrl != null) 'budget_limit_brl': budgetLimitBrl,
+};
 
 Future<Map<String, dynamic>> _pollGeneratedDeckJob(
   ApiClient apiClient, {
@@ -560,10 +641,9 @@ List<String> generatedDeckReviewBlockingReasons(Map<String, dynamic>? result) {
   final stats = _asStringMap(result['stats']);
   final validationInvalidCards = validation['invalid_cards'];
   final warningInvalidCards = warnings['invalid_cards'];
-  final statsInvalidCards =
-      stats['invalid_cards'] is num
-          ? (stats['invalid_cards'] as num).toInt()
-          : int.tryParse(stats['invalid_cards']?.toString() ?? '') ?? 0;
+  final statsInvalidCards = stats['invalid_cards'] is num
+      ? (stats['invalid_cards'] as num).toInt()
+      : int.tryParse(stats['invalid_cards']?.toString() ?? '') ?? 0;
   final hasUnresolvedEvidence =
       (validationInvalidCards is List && validationInvalidCards.isNotEmpty) ||
       (warningInvalidCards is List && warningInvalidCards.isNotEmpty) ||
@@ -574,6 +654,29 @@ List<String> generatedDeckReviewBlockingReasons(Map<String, dynamic>? result) {
     ];
   }
 
+  return const [];
+}
+
+List<String> generatedDeckSaveBlockingReasons(Map<String, dynamic>? result) {
+  final reviewBlockers = generatedDeckReviewBlockingReasons(result);
+  if (reviewBlockers.isNotEmpty) return reviewBlockers;
+  if (result == null) return const ['Nenhum deck foi gerado para salvar.'];
+
+  final constraintAudit = _asStringMap(result['generation_constraints']);
+  if (result['can_save'] == false || constraintAudit['can_save'] == false) {
+    final blockers = constraintAudit['blockers'];
+    if (blockers is Iterable) {
+      final messages = blockers
+          .whereType<Map>()
+          .map((blocker) => blocker['message']?.toString().trim() ?? '')
+          .where((message) => message.isNotEmpty)
+          .toList(growable: false);
+      if (messages.isNotEmpty) return messages;
+    }
+    return const [
+      'A proposta não atende às restrições de coleção ou orçamento.',
+    ];
+  }
   return const [];
 }
 
@@ -606,13 +709,12 @@ Duration? pollIntervalFromGenerateAccepted(Map<String, dynamic> accepted) {
     return null;
   }
   return Duration(
-    milliseconds:
-        parsed
-            .clamp(
-              _minimumGeneratePollInterval.inMilliseconds,
-              _maximumGeneratePollInterval.inMilliseconds,
-            )
-            .toInt(),
+    milliseconds: parsed
+        .clamp(
+          _minimumGeneratePollInterval.inMilliseconds,
+          _maximumGeneratePollInterval.inMilliseconds,
+        )
+        .toInt(),
   );
 }
 
@@ -625,13 +727,12 @@ Duration? pollTimeoutFromGenerateAccepted(Map<String, dynamic> accepted) {
   }
   final timeoutMs = parsed + _generateJobPersistenceGrace.inMilliseconds;
   return Duration(
-    milliseconds:
-        timeoutMs
-            .clamp(
-              _minimumGeneratePollTimeout.inMilliseconds,
-              _maximumGeneratePollTimeout.inMilliseconds,
-            )
-            .toInt(),
+    milliseconds: timeoutMs
+        .clamp(
+          _minimumGeneratePollTimeout.inMilliseconds,
+          _maximumGeneratePollTimeout.inMilliseconds,
+        )
+        .toInt(),
   );
 }
 
@@ -640,8 +741,9 @@ Duration _rateLimitBackoffForGeneratePoll({
   required int attempt,
 }) {
   if (pollInterval == Duration.zero) return Duration.zero;
-  final baseMs =
-      pollInterval.inMilliseconds <= 0 ? 5000 : pollInterval.inMilliseconds;
+  final baseMs = pollInterval.inMilliseconds <= 0
+      ? 5000
+      : pollInterval.inMilliseconds;
   final multiplier = attempt <= 1 ? 1 : 2;
   return Duration(
     milliseconds: (baseMs * multiplier).clamp(5000, 15000).toInt(),

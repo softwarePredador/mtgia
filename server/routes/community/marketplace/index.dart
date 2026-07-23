@@ -28,6 +28,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final whereClauses = <String>[
       '(bi.for_trade = TRUE OR bi.for_sale = TRUE)',
+      'item_availability.available_quantity > 0',
       'u.deleted_at IS NULL',
     ];
     final sqlParams = <String, dynamic>{};
@@ -76,12 +77,16 @@ Future<Response> onRequest(RequestContext context) async {
               FROM user_binder_items bi
               JOIN cards c ON c.id = bi.card_id
               JOIN users u ON u.id = bi.user_id
+              JOIN binder_item_availability item_availability
+                ON item_availability.binder_item_id = bi.id
               WHERE $where
             '''
             : '''
               SELECT COUNT(*) as cnt
               FROM user_binder_items bi
               JOIN users u ON u.id = bi.user_id
+              JOIN binder_item_availability item_availability
+                ON item_availability.binder_item_id = bi.id
               WHERE $where
             ''',
       ),
@@ -91,14 +96,18 @@ Future<Response> onRequest(RequestContext context) async {
     // Items com dados do dono e da carta
     final itemsFuture = pool.execute(
       Sql.named('''
-      SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
+      SELECT bi.id, bi.card_id,
+             item_availability.available_quantity,
+             bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency, bi.notes,
               bi.user_id, bi.language, bi.list_type,
               c.name AS card_name, c.image_url AS card_image_url,
               c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
               c.rarity AS card_rarity, c.type_line AS card_type_line,
               c.is_reserved AS card_is_reserved,
-              c.price AS card_reference_price,
+              COALESCE(c.price_usd, c.price) AS card_reference_price,
+              c.price_source AS card_reference_price_source,
+              c.price_updated_at AS card_reference_price_updated_at,
               ph.history_points AS price_history_points,
               ph.latest_price AS price_latest_price,
               ph.previous_price AS price_previous_price,
@@ -119,6 +128,8 @@ Future<Response> onRequest(RequestContext context) async {
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
       JOIN users u ON u.id = bi.user_id
+      JOIN binder_item_availability item_availability
+        ON item_availability.binder_item_id = bi.id
       LEFT JOIN LATERAL (
         SELECT
           COUNT(*)::int AS history_points,
@@ -198,7 +209,8 @@ Future<Response> onRequest(RequestContext context) async {
               'type_line': cols['card_type_line'],
               'is_reserved': cols['card_is_reserved'] == true,
             },
-            'quantity': cols['quantity'],
+            'quantity': cols['available_quantity'],
+            'available_quantity': cols['available_quantity'],
             'condition': cols['condition'],
             'is_foil': cols['is_foil'],
             'for_trade': cols['for_trade'],
@@ -250,6 +262,8 @@ Map<String, dynamic> _buildPriceInsight(Map<String, dynamic> cols) {
   final previous = _toDouble(cols['price_previous_price']);
   final historyPoints = _toInt(cols['price_history_points']);
   final advertised = _toDouble(cols['price']);
+  final advertisedCurrency =
+      cols['currency']?.toString().trim().toUpperCase() ?? 'BRL';
 
   final trend = <String, dynamic>{
     'status': 'insufficient_data',
@@ -292,7 +306,10 @@ Map<String, dynamic> _buildPriceInsight(Map<String, dynamic> cols) {
         'Comparação indisponível: falta preço anunciado ou referência interna.',
   };
 
-  if (advertised != null && reference != null && reference > 0) {
+  if (advertised != null &&
+      advertisedCurrency == 'USD' &&
+      reference != null &&
+      reference > 0) {
     final diff = advertised - reference;
     final pct = (diff / reference) * 100;
     final isAlert = diff.abs() >= thresholdAbs && pct.abs() >= thresholdPct;
@@ -314,10 +331,20 @@ Map<String, dynamic> _buildPriceInsight(Map<String, dynamic> cols) {
                   : 'Preço anunciado bem abaixo da referência interna; confirme se não há erro no anúncio.')
               : 'Preço anunciado próximo da referência interna disponível.';
   }
+  if (advertised != null && advertisedCurrency != 'USD' && reference != null) {
+    comparison['message'] =
+        'Comparacao indisponivel: anuncio em $advertisedCurrency e referencia em USD; nenhuma conversao cambial foi inferida.';
+  }
 
   return {
     'reference_price': reference,
     'reference_currency': 'USD',
+    'reference_source':
+        cols['card_reference_price_source'] ??
+        (reference == null ? null : 'legacy'),
+    'reference_updated_at': _dateTimeString(
+      cols['card_reference_price_updated_at'],
+    ),
     'history_points': historyPoints,
     'trend': trend,
     'comparison': comparison,
@@ -380,4 +407,10 @@ String? _dateString(Object? value) {
   if (value is DateTime) return value.toIso8601String().substring(0, 10);
   final text = value.toString();
   return text.length >= 10 ? text.substring(0, 10) : text;
+}
+
+String? _dateTimeString(Object? value) {
+  if (value == null) return null;
+  if (value is DateTime) return value.toUtc().toIso8601String();
+  return DateTime.tryParse(value.toString())?.toUtc().toIso8601String();
 }

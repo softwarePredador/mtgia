@@ -26,6 +26,13 @@ class _FakeBinderApiClient extends ApiClient {
             'currency': 'BRL',
             'language': 'pt',
             'list_type': 'have',
+            'playable_card_id': 'oracle-1',
+            'owned_quantity': 4,
+            'allocated_quantity': 2,
+            'committed_trade_quantity': 1,
+            'free_quantity': 1,
+            'missing_quantity': 0,
+            'available_quantity': 1,
           },
         ],
         'page': 1,
@@ -40,7 +47,14 @@ class _FakeBinderApiClient extends ApiClient {
         'unique_cards': 0,
         'for_trade_count': 0,
         'for_sale_count': 0,
-        'estimated_value': 0.0,
+        'estimated_value': null,
+        'estimated_value_brl': null,
+        'estimated_value_usd': null,
+        'owned_quantity': 8,
+        'allocated_quantity': 5,
+        'committed_trade_quantity': 1,
+        'free_quantity': 2,
+        'deck_missing_quantity': 0,
       });
     }
 
@@ -105,6 +119,32 @@ Map<String, dynamic> _binderItemJson({
 };
 
 void main() {
+  test('binder stats keep missing totals null and currencies separate', () {
+    final unavailable = BinderStats.fromJson({
+      'estimated_value': null,
+      'estimated_value_brl': null,
+      'estimated_value_usd': null,
+      'price_missing_count': 4,
+    });
+    final mixed = BinderStats.fromJson({
+      'estimated_value': null,
+      'estimated_value_brl': 30.0,
+      'estimated_value_usd': 12.5,
+      'estimated_value_mixed_currency': true,
+      'priced_copies_count': 3,
+    });
+
+    expect(unavailable.estimatedValue, isNull);
+    expect(unavailable.estimatedValueBrl, isNull);
+    expect(unavailable.estimatedValueUsd, isNull);
+    expect(unavailable.priceMissingCount, 4);
+    expect(mixed.estimatedValue, isNull);
+    expect(mixed.estimatedValueBrl, 30);
+    expect(mixed.estimatedValueUsd, 12.5);
+    expect(mixed.estimatedValueMixedCurrency, isTrue);
+    expect(mixed.pricedCopiesCount, 3);
+  });
+
   test('parses reserved-list metadata for binder and marketplace cards', () {
     final binderItem = BinderItem.fromJson({
       'id': 'binder-1',
@@ -118,6 +158,40 @@ void main() {
 
     expect(binderItem.cardIsReserved, isTrue);
     expect(marketplaceItem.cardIsReserved, isTrue);
+  });
+
+  test('parses the canonical owned, allocated, free and missing contract', () {
+    final item = BinderItem.fromJson({
+      'id': 'binder-availability',
+      'card_id': 'printing-1',
+      'card_name': 'Sol Ring',
+      'quantity': 3,
+      'playable_card_id': 'oracle-1',
+      'owned_quantity': 5,
+      'allocated_quantity': 3,
+      'committed_trade_quantity': 1,
+      'free_quantity': 1,
+      'missing_quantity': 0,
+      'available_quantity': 1,
+    });
+    final stats = BinderStats.fromJson({
+      'owned_quantity': 5,
+      'allocated_quantity': 3,
+      'committed_trade_quantity': 1,
+      'free_quantity': 1,
+      'deck_missing_quantity': 0,
+    });
+
+    expect(item.playableCardId, 'oracle-1');
+    expect(item.ownedQuantity, 5);
+    expect(item.allocatedQuantity, 3);
+    expect(item.committedTradeQuantity, 1);
+    expect(item.freeQuantity, 1);
+    expect(item.availableQuantity, 1);
+    expect(stats.ownedQuantity, 5);
+    expect(stats.allocatedQuantity, 3);
+    expect(stats.committedTradeQuantity, 1);
+    expect(stats.freeQuantity, 1);
   });
 
   test(

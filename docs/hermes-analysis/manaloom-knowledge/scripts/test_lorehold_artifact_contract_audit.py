@@ -349,7 +349,7 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
                     "source": "xmage_local_rule_indexer",
                     "status": "pass",
                     "summary": {},
-                    "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master",
+                    "xmage_root": "/tmp/pinned-xmage-checkout",
                 },
             ),
         ]

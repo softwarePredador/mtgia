@@ -103,9 +103,13 @@ void main() {
       expect(source, contains(r'--arg image "$ROLLBACK_SOURCE_IMAGE"'));
       expect(source, contains(r'ROLLBACK_SOURCE_IMAGE="$PREVIOUS_SPEC_IMAGE"'));
       expect(source, contains("--image '\$PREVIOUS_SPEC_IMAGE'"));
-      expect(source, contains('PREVIOUS_RELEASE_HASH='));
+      expect(source, contains('flutter_web_release_marker()'));
+      expect(source, contains('PREVIOUS_RELEASE_MARKER='));
       expect(source, contains(r'"$PUBLIC_BASE_URL/app/release.json"'));
-      expect(source, contains(r'"$release_hash" == "$PREVIOUS_RELEASE_HASH"'));
+      expect(
+        source,
+        contains(r'"$release_marker" == "$PREVIOUS_RELEASE_MARKER"'),
+      );
       expect(source, contains('servico Flutter Web precisa existir'));
       expect(source, isNot(contains('services.app.createService')));
       expect(source, contains('rollback Flutter Web comprovado'));

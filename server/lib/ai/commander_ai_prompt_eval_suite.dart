@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 const commanderAiPromptEvalSchemaVersion =
-    'commander_ai_prompt_eval_v1_2026-07-06';
+    'commander_ai_prompt_eval_v2_2026-07-22';
 
 Map<String, dynamic> evaluateCommanderAiPromptSuite(
   Map<String, dynamic> suite, {
@@ -48,7 +48,17 @@ Map<String, dynamic> evaluateCommanderAiPromptSuite(
       .where((entry) => entry['status'] != 'pass')
       .map((entry) => entry['id']?.toString() ?? 'unknown')
       .toList(growable: false);
-  final status = failedCases.isEmpty && score >= minimumScore ? 'pass' : 'fail';
+  final coverage = _evaluateSuiteCoverage(
+    suite,
+    cases,
+    applicable: onlyCaseId == null,
+  );
+  final status =
+      failedCases.isEmpty &&
+              score >= minimumScore &&
+              coverage['status'] != 'fail'
+          ? 'pass'
+          : 'fail';
 
   return {
     'schema_version': commanderAiPromptEvalSchemaVersion,
@@ -59,6 +69,7 @@ Map<String, dynamic> evaluateCommanderAiPromptSuite(
     'passed_case_count': evaluated.length - failedCases.length,
     'failed_case_count': failedCases.length,
     'failed_cases': failedCases,
+    'coverage': coverage,
     'cases': evaluated,
   };
 }
@@ -347,9 +358,12 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
 
   return {
     'id': caseId,
+    'split': testCase['split']?.toString() ?? '',
     'commander': testCase['commander']?.toString() ?? '',
     'archetype': testCase['archetype']?.toString() ?? '',
+    'archetype_family': testCase['archetype_family']?.toString() ?? '',
     'bracket': bracket,
+    'color_bucket': _commanderColorBucket(testCase['color_identity']),
     'status': status,
     'score': score,
     'minimum_score': minScoreForCase,
@@ -368,6 +382,7 @@ Map<String, dynamic> loadCommanderAiPromptEvalFixture(String path) {
 }
 
 String commanderAiPromptEvalMarkdown(Map<String, dynamic> report) {
+  final coverage = _mapValue(report['coverage']);
   final buffer =
       StringBuffer()
         ..writeln('# Commander AI Prompt Eval')
@@ -377,7 +392,26 @@ String commanderAiPromptEvalMarkdown(Map<String, dynamic> report) {
         ..writeln(
           '- cases: `${report['passed_case_count']}/${report['case_count']}`',
         )
+        ..writeln('- coverage: `${coverage['status'] ?? 'unknown'}`')
         ..writeln();
+  if (coverage.isNotEmpty && coverage['status'] != 'not_applicable') {
+    buffer
+      ..writeln('## Held-out coverage')
+      ..writeln()
+      ..writeln('- split: `${coverage['split']}`')
+      ..writeln('- brackets: `${coverage['brackets']}`')
+      ..writeln('- color buckets: `${coverage['color_buckets']}`')
+      ..writeln('- archetype families: `${coverage['archetype_family_count']}`')
+      ..writeln();
+    final failures = _mapList(coverage['failures']);
+    if (failures.isNotEmpty) {
+      buffer.writeln('Coverage failures:');
+      for (final failure in failures) {
+        buffer.writeln('- `${failure['code']}`: ${failure['message']}');
+      }
+      buffer.writeln();
+    }
+  }
   for (final testCase in _mapList(report['cases'])) {
     buffer
       ..writeln('## ${testCase['id']}')
@@ -403,6 +437,161 @@ String commanderAiPromptEvalMarkdown(Map<String, dynamic> report) {
     buffer.writeln();
   }
   return buffer.toString();
+}
+
+Map<String, dynamic> _evaluateSuiteCoverage(
+  Map<String, dynamic> suite,
+  List<Map<String, dynamic>> cases, {
+  required bool applicable,
+}) {
+  if (!applicable) {
+    return {
+      'status': 'not_applicable',
+      'reason': 'single_case_override',
+      'failures': const <Map<String, dynamic>>[],
+    };
+  }
+
+  const requiredSplit = 'held_out';
+  const minimumCaseCount = 6;
+  const requiredBrackets = <int>{1, 2, 3, 4, 5};
+  const requiredColorBuckets = <String>{
+    'colorless',
+    'mono',
+    'two',
+    'three_plus',
+  };
+  const minimumArchetypeFamilyCount = 6;
+  final declared = _mapValue(suite['coverage_requirements']);
+  final failures = <Map<String, dynamic>>[];
+
+  void requireCoverage(
+    bool condition,
+    String code,
+    String passMessage,
+    String failMessage, {
+    Map<String, dynamic>? details,
+  }) {
+    if (condition) return;
+    failures.add({
+      'code': code,
+      'message': failMessage,
+      if (details != null && details.isNotEmpty) 'details': details,
+    });
+  }
+
+  final declaredBrackets = _intList(declared['required_brackets']).toSet();
+  final declaredColorBuckets =
+      _stringList(declared['required_color_buckets']).toSet();
+  requireCoverage(
+    suite['schema_version'] == commanderAiPromptEvalSchemaVersion,
+    'fixture_schema_current',
+    'Fixture uses the current eval schema.',
+    'Fixture schema must match $commanderAiPromptEvalSchemaVersion.',
+    details: {'actual': suite['schema_version']},
+  );
+  requireCoverage(
+    declared['split'] == requiredSplit &&
+        (_intValue(declared['minimum_case_count']) ?? 0) >= minimumCaseCount &&
+        declaredBrackets.containsAll(requiredBrackets) &&
+        declaredColorBuckets.containsAll(requiredColorBuckets) &&
+        (_intValue(declared['minimum_archetype_family_count']) ?? 0) >=
+            minimumArchetypeFamilyCount,
+    'coverage_contract_declared',
+    'Fixture declares the complete held-out coverage contract.',
+    'Fixture coverage requirements cannot weaken the product eval contract.',
+    details: {'declared': declared},
+  );
+
+  final observedSplits =
+      cases
+          .map((entry) => entry['split']?.toString() ?? '')
+          .where((entry) => entry.isNotEmpty)
+          .toSet();
+  final observedBrackets =
+      cases
+          .map((entry) => _intValue(entry['bracket']))
+          .whereType<int>()
+          .toSet();
+  final observedColorBuckets =
+      cases
+          .map((entry) => _commanderColorBucket(entry['color_identity']))
+          .toSet();
+  final observedArchetypeFamilies =
+      cases
+          .map(
+            (entry) =>
+                _normalizeToken(entry['archetype_family']?.toString() ?? ''),
+          )
+          .where((entry) => entry.isNotEmpty)
+          .toSet();
+
+  requireCoverage(
+    cases.length >= minimumCaseCount,
+    'minimum_case_count',
+    'Held-out suite has enough cases.',
+    'Held-out suite must contain at least $minimumCaseCount cases.',
+    details: {'actual': cases.length, 'minimum': minimumCaseCount},
+  );
+  requireCoverage(
+    cases.every((entry) => entry['split'] == requiredSplit),
+    'held_out_split',
+    'Every case is held out.',
+    'Every product eval case must be marked held_out.',
+    details: {'observed': observedSplits.toList()..sort()},
+  );
+  requireCoverage(
+    observedBrackets.containsAll(requiredBrackets),
+    'required_brackets',
+    'All Commander brackets are represented.',
+    'Held-out suite must represent Commander brackets 1 through 5.',
+    details: {
+      'observed': observedBrackets.toList()..sort(),
+      'missing': requiredBrackets.difference(observedBrackets).toList()..sort(),
+    },
+  );
+  requireCoverage(
+    observedColorBuckets.containsAll(requiredColorBuckets),
+    'required_color_buckets',
+    'All commander color-count buckets are represented.',
+    'Held-out suite must represent colorless, mono, two, and three-plus colors.',
+    details: {
+      'observed': observedColorBuckets.toList()..sort(),
+      'missing':
+          requiredColorBuckets.difference(observedColorBuckets).toList()
+            ..sort(),
+    },
+  );
+  requireCoverage(
+    observedArchetypeFamilies.length >= minimumArchetypeFamilyCount,
+    'minimum_archetype_family_count',
+    'Held-out suite covers enough archetype families.',
+    'Held-out suite must cover at least $minimumArchetypeFamilyCount archetype families.',
+    details: {
+      'actual': observedArchetypeFamilies.length,
+      'minimum': minimumArchetypeFamilyCount,
+      'observed': observedArchetypeFamilies.toList()..sort(),
+    },
+  );
+
+  return {
+    'status': failures.isEmpty ? 'pass' : 'fail',
+    'split': requiredSplit,
+    'case_count': cases.length,
+    'brackets': observedBrackets.toList()..sort(),
+    'color_buckets': observedColorBuckets.toList()..sort(),
+    'archetype_families': observedArchetypeFamilies.toList()..sort(),
+    'archetype_family_count': observedArchetypeFamilies.length,
+    'failures': failures,
+  };
+}
+
+String _commanderColorBucket(dynamic raw) {
+  final count = _identitySet(raw).length;
+  if (count == 0) return 'colorless';
+  if (count == 1) return 'mono';
+  if (count == 2) return 'two';
+  return 'three_plus';
 }
 
 int _scoreChecks(List<Map<String, dynamic>> checks) {
@@ -581,6 +770,11 @@ List<String> _stringList(dynamic raw) {
         .toList(growable: false);
   }
   return const <String>[];
+}
+
+List<int> _intList(dynamic raw) {
+  if (raw is! List) return const <int>[];
+  return raw.map(_intValue).whereType<int>().toList(growable: false);
 }
 
 String _normalizeToken(String value) {

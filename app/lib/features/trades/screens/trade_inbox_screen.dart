@@ -250,8 +250,11 @@ class _TradeListViewState extends State<_TradeListView> {
     return Consumer<TradeProvider>(
       builder: (context, provider, _) {
         if (provider.isLoading && provider.trades.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppTheme.brass400),
+          return const AppStatePanel.loading(
+            key: Key('trade-inbox-loading'),
+            title: 'Carregando trades',
+            message: 'Sincronizando propostas e seus estados.',
+            accent: AppTheme.brass400,
           );
         }
         if (provider.errorMessage != null) {
@@ -280,7 +283,7 @@ class _TradeListViewState extends State<_TradeListView> {
             child: ListView.builder(
               key: const Key('trade-inbox-list'),
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: AppTheme.space12),
               itemCount: provider.trades.length,
               itemBuilder: (context, index) {
                 final trade = provider.trades[index];
@@ -304,12 +307,13 @@ class _TradeCard extends StatelessWidget {
     final statusIcon = TradeStatusHelper.icon(trade.status);
     final statusLabel = TradeStatusHelper.label(trade.status);
     final currentUserId = context.read<AuthProvider>().user?.id;
-    final otherUser =
-        trade.sender.id == currentUserId ? trade.receiver : trade.sender;
+    final otherUser = trade.sender.id == currentUserId
+        ? trade.receiver
+        : trade.sender;
 
     return Card(
       color: AppTheme.surfaceSlate,
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: AppTheme.space10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         side: BorderSide(color: statusColor.withValues(alpha: 0.4)),
@@ -320,7 +324,7 @@ class _TradeCard extends StatelessWidget {
           context.push('/trades/${trade.id}');
         },
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(AppTheme.space14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -335,7 +339,7 @@ class _TradeCard extends StatelessWidget {
                       style: const TextStyle(color: AppTheme.textPrimary),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppTheme.space10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,8 +363,8 @@ class _TradeCard extends StatelessWidget {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
+                      horizontal: AppTheme.space10,
+                      vertical: AppTheme.space4,
                     ),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.15),
@@ -370,7 +374,7 @@ class _TradeCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(statusIcon, size: 14, color: statusColor),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppTheme.space4),
                         Text(
                           statusLabel,
                           style: TextStyle(
@@ -384,7 +388,7 @@ class _TradeCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               // Info row: items counts + messages
               Row(
                 children: [
@@ -392,7 +396,7 @@ class _TradeCard extends StatelessWidget {
                     icon: Icons.upload,
                     label: '${trade.offeringCount ?? 0} oferecendo',
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   _InfoChip(
                     icon: Icons.download,
                     label: '${trade.requestingCount ?? 0} pedindo',
@@ -405,10 +409,10 @@ class _TradeCard extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               _TradeTrustLine(user: otherUser),
               if (trade.message != null && trade.message!.isNotEmpty) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Text(
                   trade.message!,
                   maxLines: 2,
@@ -451,7 +455,7 @@ class _InfoChip extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 14, color: AppTheme.textSecondary),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppTheme.space4),
         Text(
           label,
           style: const TextStyle(

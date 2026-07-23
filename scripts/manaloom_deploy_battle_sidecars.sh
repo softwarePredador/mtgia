@@ -152,6 +152,7 @@ FORGE_ROLLBACK_SOURCE_IMAGE=""
 FORGE_PREVIOUS_SPEC_IMAGE=""
 FORGE_PREVIOUS_RUNNING_IMAGE=""
 FORGE_PREVIOUS_UPDATE_STATE=""
+SOURCE_WORKTREE=""
 
 cleanup_remote_build_dir() {
   local proof expected
@@ -184,6 +185,10 @@ cleanup_on_exit() {
     rollback_battle_sidecars || rollback_status=$?
   fi
   cleanup_remote_build_dir || cleanup_status=$?
+  if [[ -n "$SOURCE_WORKTREE" && -d "$SOURCE_WORKTREE" ]]; then
+    git -C "$ROOT_DIR" worktree remove --force "$SOURCE_WORKTREE" \
+      >/dev/null 2>&1 || cleanup_status=1
+  fi
   cleanup_manaloom_secure_ssh
   if (( rollback_status != 0 || cleanup_status != 0 )); then
     exit 1
@@ -195,16 +200,26 @@ initialize_manaloom_secure_ssh "$SSH_HOST"
 trap cleanup_on_exit EXIT
 
 cd "$ROOT_DIR"
-"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
-git fetch origin master --quiet
-sha="$(git rev-parse HEAD)"
-origin_sha="$(git rev-parse origin/master)"
-if [[ "$sha" != "$origin_sha" ]]; then
-  echo "HEAD must match origin/master before sidecar deploy" >&2
+IDENTITY_JSON="$(
+  MANALOOM_RELEASE_SOURCE_SHA="${MANALOOM_RELEASE_SOURCE_SHA:-$(git rev-parse HEAD)}" \
+    "$ROOT_DIR/scripts/manaloom_release_identity.sh"
+)"
+sha="$(jq -er '.git_sha' <<<"$IDENTITY_JSON")"
+short_sha="$(jq -er '.short_sha' <<<"$IDENTITY_JSON")"
+SOURCE_WORKTREE="$(mktemp -d /tmp/manaloom-battle-sidecars-source.XXXXXX)"
+git -C "$ROOT_DIR" worktree add --detach "$SOURCE_WORKTREE" "$sha" >/dev/null
+if [[ "$(git -C "$SOURCE_WORKTREE" rev-parse HEAD)" != "$sha" ]]; then
+  echo "snapshot destacado dos sidecars diverge da identidade aprovada" >&2
   exit 2
 fi
+"$SOURCE_WORKTREE/scripts/manaloom_battle_product_gate.sh"
+if ! git -C "$SOURCE_WORKTREE" diff --quiet --ignore-submodules -- ||
+   ! git -C "$SOURCE_WORKTREE" diff --cached --quiet --ignore-submodules --; then
+  echo "gate de battle alterou fontes rastreadas do snapshot aprovado" >&2
+  exit 2
+fi
+readonly sha short_sha
 
-short_sha="$(git rev-parse --short=12 HEAD)"
 remote_dir="$REMOTE_BUILD_ROOT/battle-sidecars-$short_sha"
 ssh_target="$SSH_HOST"
 ssh_args=(-i "$SSH_KEY" -o BatchMode=yes)
@@ -378,7 +393,7 @@ fi
 
 REMOTE_DIR_CLEANUP_REQUIRED=1
 # shellcheck disable=SC2029
-git archive HEAD -- services/xmage-sidecar services/forge-sidecar |
+git archive "$sha" -- services/xmage-sidecar services/forge-sidecar |
   ssh "${ssh_args[@]}" "$ssh_target" \
     "rm -rf '$remote_dir' && mkdir -p '$remote_dir' && tar -x -C '$remote_dir'"
 

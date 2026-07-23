@@ -2,6 +2,7 @@ import 'package:postgres/postgres.dart';
 
 bool? _hasDeckMetaColumnsCache;
 bool? _hasDeckPricingColumnsCache;
+bool? _hasDeckPricingSourceColumnCache;
 bool? _hasDeckValidationStateColumnsCache;
 
 Future<bool> hasDeckMetaColumns(Pool pool) async {
@@ -42,6 +43,28 @@ Future<bool> hasDeckPricingColumns(Pool pool) async {
     _hasDeckPricingColumnsCache = false;
   }
   return _hasDeckPricingColumnsCache!;
+}
+
+Future<bool> hasDeckPricingSourceColumn(Pool pool) async {
+  if (_hasDeckPricingSourceColumnCache != null) {
+    return _hasDeckPricingSourceColumnCache!;
+  }
+  try {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT COUNT(*)::int
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'decks'
+          AND column_name = 'pricing_source'
+      '''),
+    );
+    final count = (result.first[0] as int?) ?? 0;
+    _hasDeckPricingSourceColumnCache = count >= 1;
+  } catch (_) {
+    _hasDeckPricingSourceColumnCache = false;
+  }
+  return _hasDeckPricingSourceColumnCache!;
 }
 
 Future<bool> hasDeckValidationStateColumns(Pool pool) async {

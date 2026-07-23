@@ -1,17 +1,141 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/mana_symbols.dart';
 import '../../decks/models/deck_card_item.dart';
+import '../providers/card_provider.dart';
 import '../widgets/card_edition_metadata.dart';
+
+String cardDetailRouteLocation(String cardId) =>
+    '/cards/${Uri.encodeComponent(cardId)}';
+
+Future<void> openCardDetailRoute(
+  BuildContext context,
+  DeckCardItem card,
+) async {
+  final router = GoRouter.maybeOf(context);
+  if (router != null) {
+    await router.push<void>(cardDetailRouteLocation(card.id), extra: card);
+    return;
+  }
+  if (!context.mounted) return;
+  await Navigator.of(
+    context,
+  ).push<void>(MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)));
+}
+
+class CardDetailRouteScreen extends StatefulWidget {
+  const CardDetailRouteScreen({
+    super.key,
+    required this.cardId,
+    this.initialCard,
+  });
+
+  final String cardId;
+  final DeckCardItem? initialCard;
+
+  @override
+  State<CardDetailRouteScreen> createState() => _CardDetailRouteScreenState();
+}
+
+class _CardDetailRouteScreenState extends State<CardDetailRouteScreen> {
+  DeckCardItem? _card;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _card = widget.initialCard?.id == widget.cardId ? widget.initialCard : null;
+    if (_card == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CardDetailRouteScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.cardId == widget.cardId &&
+        oldWidget.initialCard == widget.initialCard) {
+      return;
+    }
+    _card = widget.initialCard?.id == widget.cardId ? widget.initialCard : null;
+    _hasError = false;
+    if (_card == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    }
+  }
+
+  Future<void> _load() async {
+    if (!mounted) return;
+    setState(() => _hasError = false);
+    try {
+      final card = await context.read<CardProvider>().fetchCardById(
+        widget.cardId,
+      );
+      if (!mounted || widget.cardId != card.id) return;
+      setState(() => _card = card);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _hasError = true);
+    }
+  }
+
+  void _goBack() {
+    final router = GoRouter.maybeOf(context);
+    if (router?.canPop() == true) {
+      router!.pop();
+      return;
+    }
+    if (router != null) {
+      router.go('/collection');
+      return;
+    }
+    if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final card = _card;
+    if (card != null) return CardDetailScreen(card: card);
+
+    return Scaffold(
+      key: const Key('card-detail-route-state'),
+      backgroundColor: AppTheme.backgroundAbyss,
+      appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Voltar',
+          onPressed: _goBack,
+          icon: const Icon(Icons.arrow_back),
+        ),
+        title: const Text('Detalhes da carta'),
+      ),
+      body: !_hasError
+          ? const AppStatePanel.loading(
+              title: 'Carregando carta',
+              message: 'Buscando os dados canônicos desta impressão.',
+              accent: AppTheme.brass400,
+            )
+          : AppStatePanel(
+              icon: Icons.style_outlined,
+              title: 'Carta indisponível',
+              message:
+                  'Não foi possível carregar esta impressão agora. Verifique a conexão e tente novamente.',
+              accent: AppTheme.warning,
+              actionLabel: 'Tentar novamente',
+              onAction: _load,
+            ),
+    );
+  }
+}
 
 class CardDetailScreen extends StatelessWidget {
   final DeckCardItem card;
 
-  /// Standard MTG card proportion: 63mm wide × 88mm tall → width/height.
-  static const double _mtgCardAspectRatio = 63 / 88;
   static const double _desktopBreakpoint = 900;
   static const double _tabletBreakpoint = 560;
   static const double _desktopCardMaxWidth = 400;
@@ -33,6 +157,8 @@ class CardDetailScreen extends StatelessWidget {
             backgroundColor: AppTheme.backgroundAbyss,
             title: Text(
               card.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.bold,
@@ -41,7 +167,16 @@ class CardDetailScreen extends StatelessWidget {
             leading: IconButton(
               tooltip: 'Voltar',
               icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                final router = GoRouter.maybeOf(context);
+                if (router?.canPop() == true) {
+                  router!.pop();
+                } else if (router != null) {
+                  router.go('/collection');
+                } else if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
             ),
           ),
           SliverToBoxAdapter(child: _buildResponsiveContent(context, theme)),
@@ -60,7 +195,12 @@ class CardDetailScreen extends StatelessWidget {
           );
 
           return Padding(
-            padding: const EdgeInsets.fromLTRB(32, 28, 32, 48),
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.space32,
+              AppTheme.space28,
+              AppTheme.space32,
+              AppTheme.space48,
+            ),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
@@ -71,11 +211,11 @@ class CardDetailScreen extends StatelessWidget {
                       width: imageWidth,
                       child: _buildCardImage(context, roundedAllCorners: true),
                     ),
-                    const SizedBox(width: 36),
+                    const SizedBox(width: AppTheme.space36),
                     Expanded(
                       child: _buildCardInformation(
                         theme,
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.only(top: AppTheme.space4),
                       ),
                     ),
                   ],
@@ -86,20 +226,24 @@ class CardDetailScreen extends StatelessWidget {
         }
 
         final centerCard = constraints.maxWidth >= _tabletBreakpoint;
-        final image =
-            centerCard
-                ? Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: _stackedCardMaxWidth,
-                      ),
-                      child: _buildCardImage(context, roundedAllCorners: true),
+        final image = centerCard
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppTheme.space24,
+                  AppTheme.space24,
+                  AppTheme.space24,
+                  AppTheme.space0,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: _stackedCardMaxWidth,
                     ),
+                    child: _buildCardImage(context, roundedAllCorners: true),
                   ),
-                )
-                : _buildCardImage(context);
+                ),
+              )
+            : _buildCardImage(context);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +263,12 @@ class CardDetailScreen extends StatelessWidget {
 
   Widget _buildCardInformation(
     ThemeData theme, {
-    EdgeInsetsGeometry padding = const EdgeInsets.fromLTRB(20, 20, 20, 32),
+    EdgeInsetsGeometry padding = const EdgeInsets.fromLTRB(
+      AppTheme.space20,
+      AppTheme.space20,
+      AppTheme.space20,
+      AppTheme.space32,
+    ),
   }) {
     return Padding(
       padding: padding,
@@ -127,13 +276,13 @@ class CardDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(theme),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
           _buildDivider(),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           _buildOracleText(theme),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           _buildDivider(),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           _buildDetailsGrid(theme),
         ],
       ),
@@ -148,13 +297,12 @@ class CardDetailScreen extends StatelessWidget {
     bool roundedAllCorners = false,
   }) {
     final imageUrl = card.effectiveImageUrl;
-    final borderRadius =
-        roundedAllCorners
-            ? BorderRadius.circular(AppTheme.radiusLg)
-            : const BorderRadius.only(
-              bottomLeft: Radius.circular(AppTheme.radiusLg),
-              bottomRight: Radius.circular(AppTheme.radiusLg),
-            );
+    final borderRadius = roundedAllCorners
+        ? BorderRadius.circular(AppTheme.radiusLg)
+        : const BorderRadius.only(
+            bottomLeft: Radius.circular(AppTheme.radiusLg),
+            bottomRight: Radius.circular(AppTheme.radiusLg),
+          );
 
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
     final imageFrame = Material(
@@ -163,48 +311,45 @@ class CardDetailScreen extends StatelessWidget {
         key: const Key('card-detail-image-frame'),
         onTap: hasImage ? () => _showFullscreenImage(context) : null,
         borderRadius: borderRadius,
-        child: AspectRatio(
-          aspectRatio: _mtgCardAspectRatio,
-          child:
-              hasImage
-                  ? ClipRRect(
+        child: hasImage
+            ? CardArtwork(
+                variant: CardArtworkVariant.fullCard,
+                imageUrl: imageUrl,
+                semanticLabel: 'Imagem completa da carta ${card.name}',
+                borderRadius: borderRadius,
+              )
+            : AspectRatio(
+                aspectRatio: CardArtworkSpec.mtgCardAspectRatio,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSlate,
                     borderRadius: borderRadius,
-                    child: CachedCardImage(
-                      imageUrl: imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.contain,
-                    ),
-                  )
-                  : Container(
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceSlate,
-                      borderRadius: borderRadius,
-                      border: Border.all(
-                        color: AppTheme.outlineMuted.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    child: const Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.style,
-                            size: 48,
-                            color: AppTheme.textSecondary,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Sem imagem',
-                            style: TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontMd,
-                            ),
-                          ),
-                        ],
-                      ),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.5),
                     ),
                   ),
-        ),
+                  child: const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.style,
+                          size: 48,
+                          color: AppTheme.textSecondary,
+                        ),
+                        SizedBox(height: AppTheme.space8),
+                        Text(
+                          'Sem imagem',
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontMd,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
       ),
     );
 
@@ -223,24 +368,24 @@ class CardDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierColor: AppTheme.backgroundAbyss.withValues(alpha: 0.94),
-      builder:
-          (_) => Semantics(
-            button: true,
-            label: 'Fechar imagem da carta',
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Dialog(
-                backgroundColor: AppTheme.transparent,
-                insetPadding: const EdgeInsets.all(16),
-                child: InteractiveViewer(
-                  child: CachedCardImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+      builder: (_) => Semantics(
+        button: true,
+        label: 'Fechar imagem da carta',
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Dialog(
+            backgroundColor: AppTheme.transparent,
+            insetPadding: const EdgeInsets.all(AppTheme.space16),
+            child: InteractiveViewer(
+              child: CardArtwork(
+                variant: CardArtworkVariant.fullCard,
+                imageUrl: imageUrl,
+                semanticLabel: 'Imagem ampliada da carta ${card.name}',
               ),
             ),
           ),
+        ),
+      ),
     );
   }
 
@@ -265,12 +410,12 @@ class CardDetailScreen extends StatelessWidget {
               ),
             ),
             if (card.manaCost != null && card.manaCost!.isNotEmpty) ...[
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               _buildManaCostWidget(card.manaCost!),
             ],
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppTheme.space6),
         // Type line
         Text(
           card.typeLine,
@@ -305,10 +450,10 @@ class CardDetailScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppTheme.space10),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(AppTheme.space14),
           decoration: BoxDecoration(
             color: AppTheme.surfaceElevated,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -316,16 +461,15 @@ class CardDetailScreen extends StatelessWidget {
               color: AppTheme.outlineMuted.withValues(alpha: 0.4),
             ),
           ),
-          child:
-              hasText
-                  ? OracleTextWidget(card.oracleText!)
-                  : Text(
-                    'Sem texto de regras',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textHint,
-                      fontStyle: FontStyle.italic,
-                    ),
+          child: hasText
+              ? OracleTextWidget(card.oracleText!)
+              : Text(
+                  'Sem texto de regras',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textHint,
+                    fontStyle: FontStyle.italic,
                   ),
+                ),
         ),
       ],
     );
@@ -347,9 +491,12 @@ class CardDetailScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space14,
+            vertical: AppTheme.space12,
+          ),
           decoration: BoxDecoration(
             color: AppTheme.surfaceElevated,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -381,7 +528,7 @@ class CardDetailScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: AppTheme.space6),
                     Text(
                       _capitalizeRarity(card.rarity),
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -448,31 +595,18 @@ class CardDetailScreen extends StatelessWidget {
     required String label,
     required String value,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: AppTheme.textSecondary),
-          const SizedBox(width: 10),
-          Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const Spacer(),
-          Flexible(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.end,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+    return _adaptiveDetailRow(
+      theme,
+      icon: icon,
+      label: label,
+      value: Text(
+        value,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: AppTheme.textPrimary,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.end,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -483,22 +617,57 @@ class CardDetailScreen extends StatelessWidget {
     required String label,
     required Widget child,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: AppTheme.textSecondary),
-          const SizedBox(width: 10),
-          Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppTheme.textSecondary,
+    return _adaptiveDetailRow(theme, icon: icon, label: label, value: child);
+  }
+
+  Widget _adaptiveDetailRow(
+    ThemeData theme, {
+    required IconData icon,
+    required String label,
+    required Widget value,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scaledBody = MediaQuery.textScalerOf(
+          context,
+        ).scale(AppTheme.fontMd);
+        final stackValue =
+            constraints.maxWidth < 320 || scaledBody >= AppTheme.fontXxl;
+        final labelRow = Row(
+          children: [
+            Icon(icon, size: 18, color: AppTheme.textSecondary),
+            const SizedBox(width: AppTheme.space10),
+            Expanded(
+              child: Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
             ),
-          ),
-          const Spacer(),
-          child,
-        ],
-      ),
+          ],
+        );
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppTheme.space8),
+          child: stackValue
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    labelRow,
+                    const SizedBox(height: AppTheme.space6),
+                    Align(alignment: Alignment.centerRight, child: value),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: labelRow),
+                    const SizedBox(width: AppTheme.space12),
+                    Flexible(child: value),
+                  ],
+                ),
+        );
+      },
     );
   }
 
@@ -515,8 +684,9 @@ class CardDetailScreen extends StatelessWidget {
   Widget _buildColorBadges() {
     // Prefer colorIdentity (full commander identity) over colors (cast colors),
     // falling back to colors when identity data is absent.
-    final identityColors =
-        card.colorIdentity.isNotEmpty ? card.colorIdentity : card.colors;
+    final identityColors = card.colorIdentity.isNotEmpty
+        ? card.colorIdentity
+        : card.colors;
 
     return ColorIdentityPips(
       colors: identityColors,

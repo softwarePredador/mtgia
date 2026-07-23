@@ -83,26 +83,28 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
 
     if (result['success'] == true) {
       final copiedDeck = result['deck'];
-      final copiedDeckId =
-          copiedDeck is Map ? copiedDeck['id']?.toString() : null;
+      final copiedDeckId = copiedDeck is Map
+          ? copiedDeck['id']?.toString()
+          : null;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Deck copiado para sua coleção! 🎉'),
           backgroundColor: AppTheme.success,
-          action:
-              copiedDeckId == null || copiedDeckId.isEmpty
-                  ? null
-                  : SnackBarAction(
-                    label: 'Abrir deck',
-                    textColor: AppTheme.backgroundAbyss,
-                    onPressed: () => context.go('/decks/$copiedDeckId'),
-                  ),
+          action: copiedDeckId == null || copiedDeckId.isEmpty
+              ? null
+              : SnackBarAction(
+                  label: 'Abrir deck',
+                  textColor: AppTheme.backgroundAbyss,
+                  onPressed: () => context.go('/decks/$copiedDeckId'),
+                ),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['error'] ?? 'Erro ao copiar deck'),
+          content: const Text(
+            'Não foi possível copiar este deck agora. Tente novamente.',
+          ),
           backgroundColor: AppTheme.error,
         ),
       );
@@ -170,17 +172,16 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         actions: [
           if (_deckData != null)
             IconButton(
-              icon:
-                  _isCopying
-                      ? const SizedBox(
-                        width: AppTheme.iconSpinnerSm,
-                        height: AppTheme.iconSpinnerSm,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppTheme.brass400,
-                        ),
-                      )
-                      : const Icon(Icons.copy, color: AppTheme.brass400),
+              icon: _isCopying
+                  ? const SizedBox(
+                      width: AppTheme.iconSpinnerSm,
+                      height: AppTheme.iconSpinnerSm,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.brass400,
+                      ),
+                    )
+                  : const Icon(Icons.copy, color: AppTheme.brass400),
               tooltip: 'Copiar para meus decks',
               onPressed: _isCopying ? null : _copyDeck,
             ),
@@ -207,12 +208,12 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
               size: 48,
               color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Text(
               _error!,
               style: const TextStyle(color: AppTheme.textSecondary),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             ElevatedButton(
               onPressed: _loadDeck,
               child: const Text('Tentar novamente'),
@@ -234,7 +235,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         key: const Key('community-deck-detail-frame'),
         maxWidth: AppTheme.contentMaxWidth,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: AppTheme.space16),
           child: LayoutBuilder(
             builder: (context, constraints) {
               final isDesktop =
@@ -288,7 +289,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   ) {
     return Container(
       key: const Key('community-deck-header'),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -310,7 +311,10 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space8,
+                  vertical: AppTheme.space4,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.brass400.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -326,7 +330,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Row(
             children: [
               const Icon(
@@ -334,15 +338,13 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                 size: 16,
                 color: AppTheme.textSecondary,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppTheme.space4),
               Expanded(
                 child: GestureDetector(
-                  onTap:
-                      deck['owner_id'] != null
-                          ? () => context.push(
-                            '/community/user/${deck['owner_id']}',
-                          )
-                          : null,
+                  onTap: deck['owner_id'] != null
+                      ? () =>
+                            context.push('/community/user/${deck['owner_id']}')
+                      : null,
                   child: Text(
                     deck['owner_username'] ?? 'Anônimo',
                     maxLines: 1,
@@ -350,16 +352,15 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                     style: TextStyle(
                       color: AppTheme.brass400,
                       fontSize: AppTheme.fontMd,
-                      decoration:
-                          deck['owner_id'] != null
-                              ? TextDecoration.underline
-                              : null,
+                      decoration: deck['owner_id'] != null
+                          ? TextDecoration.underline
+                          : null,
                       decorationColor: AppTheme.brass400,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppTheme.space16),
               Text(
                 '${stats['total_cards'] ?? 0} cartas',
                 style: const TextStyle(
@@ -371,7 +372,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
           ),
           if (deck['description'] != null &&
               (deck['description'] as String).isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Text(
               deck['description'],
               style: const TextStyle(
@@ -381,7 +382,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
             ),
           ],
           if (deck['synergy_score'] != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Row(
               children: [
                 const Icon(
@@ -389,7 +390,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                   size: 16,
                   color: AppTheme.brass400,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppTheme.space4),
                 Text(
                   'Sinergia: ${deck['synergy_score']}%',
                   style: const TextStyle(
@@ -415,17 +416,19 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         if (isDesktop)
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: [SizedBox(width: 240, child: _buildCopyButton())],
+            children: [
+              SizedBox(width: AppTheme.space240, child: _buildCopyButton()),
+            ],
           )
         else
           SizedBox(width: double.infinity, child: _buildCopyButton()),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.space16),
         _VisualAnalysisPanel(analysis: visualAnalysis),
         if (_tradeMatches.isNotEmpty) ...[
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           _TradeMatchesPanel(matches: _tradeMatches),
         ],
-        const SizedBox(height: 14),
+        const SizedBox(height: AppTheme.space14),
         _CommunityFeedbackPanel(
           comments: _comments,
           controller: _commentController,
@@ -442,22 +445,24 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
     return ElevatedButton.icon(
       key: const Key('community-deck-copy-button'),
       onPressed: _isCopying ? null : _copyDeck,
-      icon:
-          _isCopying
-              ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppTheme.textPrimary,
-                ),
-              )
-              : const Icon(Icons.file_copy_outlined),
+      icon: _isCopying
+          ? const SizedBox(
+              width: AppTheme.space18,
+              height: AppTheme.space18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppTheme.textPrimary,
+              ),
+            )
+          : const Icon(Icons.file_copy_outlined),
       label: Text(_isCopying ? 'Copiando...' : 'Copiar para meus decks'),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppTheme.brass500,
         foregroundColor: AppTheme.backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space18,
+          vertical: AppTheme.space14,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         ),
@@ -469,7 +474,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
     if (commander.isEmpty && mainBoard.isEmpty) {
       return Container(
         key: const Key('community-deck-empty-list'),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppTheme.space20),
         decoration: BoxDecoration(
           color: AppTheme.surfaceSlate.withValues(alpha: 0.56),
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -478,7 +483,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         child: const Row(
           children: [
             Icon(Icons.style_outlined, color: AppTheme.textSecondary),
-            SizedBox(width: 10),
+            SizedBox(width: AppTheme.space10),
             Expanded(
               child: Text(
                 'A lista de cartas deste deck ainda não está disponível.',
@@ -503,11 +508,11 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
               fontSize: AppTheme.fontLg,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ...commander.map(
             (card) => _buildCardTile(card as Map<String, dynamic>),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
         ],
         ...mainBoard.entries.map((entry) {
           final cards = entry.value as List;
@@ -526,11 +531,11 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                   fontSize: AppTheme.fontLg,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppTheme.space6),
               ...cards.map(
                 (card) => _buildCardTile(card as Map<String, dynamic>),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space12),
             ],
           );
         }),
@@ -547,7 +552,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
 
     return Card(
       color: AppTheme.surfaceElevated,
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(bottom: AppTheme.space4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
@@ -555,10 +560,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         dense: true,
         onTap: () {
           final deckCard = DeckCardItem.fromJson(card);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => CardDetailScreen(card: deckCard)),
-          );
+          openCardDetailRoute(context, deckCard);
         },
         leading: CachedCardImage(
           imageUrl: imageUrl,
@@ -581,10 +583,9 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
             fontSize: AppTheme.fontSm,
           ),
         ),
-        trailing:
-            manaCost.isNotEmpty
-                ? ManaCostRow(cost: manaCost, symbolSize: 16)
-                : null,
+        trailing: manaCost.isNotEmpty
+            ? ManaCostRow(cost: manaCost, symbolSize: 16)
+            : null,
       ),
     );
   }
@@ -611,7 +612,7 @@ class _VisualAnalysisPanel extends StatelessWidget {
 
     return Container(
       key: const Key('community-deck-visual-analysis'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -623,7 +624,7 @@ class _VisualAnalysisPanel extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.insights_outlined, color: AppTheme.frost400),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   headline,
@@ -635,12 +636,12 @@ class _VisualAnalysisPanel extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Text(
             reading,
             style: const TextStyle(color: AppTheme.textSecondary, height: 1.35),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -665,7 +666,10 @@ class _ColorIdentityMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space9,
+        vertical: AppTheme.space6,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -685,7 +689,7 @@ class _ColorIdentityMetric extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppTheme.space6),
           ColorIdentityPips(
             colors: colors,
             symbolSize: 14,
@@ -707,7 +711,7 @@ class _TradeMatchesPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('community-deck-trade-matches'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -719,7 +723,7 @@ class _TradeMatchesPanel extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.swap_horiz_rounded, color: AppTheme.brass400),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   'Matches de cartas faltantes',
@@ -731,12 +735,12 @@ class _TradeMatchesPanel extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ...matches
               .take(3)
               .map(
                 (match) => Padding(
-                  padding: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(top: AppTheme.space8),
                   child: Text(
                     '${match.cardName} com ${match.ownerName}',
                     style: const TextStyle(
@@ -747,7 +751,7 @@ class _TradeMatchesPanel extends StatelessWidget {
                 ),
               ),
           if (matches.length > 3) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               '+${matches.length - 3} matches adicionais em trade.',
               style: const TextStyle(color: AppTheme.brass400),
@@ -780,7 +784,7 @@ class _CommunityFeedbackPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('community-deck-feedback-panel'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -792,7 +796,7 @@ class _CommunityFeedbackPanel extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.forum_outlined, color: AppTheme.frost400),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   'Feedback da comunidade',
@@ -805,17 +809,16 @@ class _CommunityFeedbackPanel extends StatelessWidget {
               IconButton(
                 tooltip: 'Denunciar deck',
                 onPressed: isReporting ? null : onReport,
-                icon:
-                    isReporting
-                        ? const SizedBox.square(
-                          dimension: AppTheme.iconSpinnerSm,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.flag_outlined),
+                icon: isReporting
+                    ? const SizedBox.square(
+                        dimension: AppTheme.iconSpinnerSm,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.flag_outlined),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           TextField(
             key: const Key('community-deck-comment-field'),
             controller: controller,
@@ -826,7 +829,7 @@ class _CommunityFeedbackPanel extends StatelessWidget {
               hintText: 'Sugira ajuste, risco ou carta para testar.',
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ValueListenableBuilder<TextEditingValue>(
             valueListenable: controller,
             builder: (context, value, _) {
@@ -836,19 +839,18 @@ class _CommunityFeedbackPanel extends StatelessWidget {
                 child: ElevatedButton.icon(
                   key: const Key('community-deck-comment-submit-button'),
                   onPressed: canSubmit ? onSubmit : null,
-                  icon:
-                      isSubmitting
-                          ? const SizedBox.square(
-                            dimension: AppTheme.iconSpinnerSm,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Icon(Icons.send_outlined),
+                  icon: isSubmitting
+                      ? const SizedBox.square(
+                          dimension: AppTheme.iconSpinnerSm,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.send_outlined),
                   label: const Text('Publicar'),
                 ),
               );
             },
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           if (comments.isEmpty)
             const Text(
               'Ainda não há comentários neste deck.',
@@ -859,7 +861,7 @@ class _CommunityFeedbackPanel extends StatelessWidget {
                 .take(3)
                 .map(
                   (comment) => Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.only(top: AppTheme.space8),
                     child: Text(
                       '${comment.authorName ?? 'Jogador'}: ${comment.body}',
                       style: const TextStyle(
@@ -884,7 +886,10 @@ class _MetricPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space7,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.36),
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),

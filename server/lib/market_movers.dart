@@ -143,8 +143,12 @@ Map<String, dynamic> buildMarketMoversPayload({
   required List<Map<String, dynamic>> losers,
   required int totalTracked,
   String? message,
+  String cacheStatus = 'fresh',
 }) {
   final payload = <String, dynamic>{
+    'currency': 'USD',
+    'price_source': 'price_history',
+    'cache_status': cacheStatus,
     'date': date,
     'previous_date': previousDate,
     'gainers': gainers,
@@ -160,6 +164,16 @@ Map<String, dynamic> buildMarketMoversPayload({
 }
 
 Map<String, dynamic> buildMarketMoverRow(Object? Function(int index) read) {
+  final priceToday = toDouble(read(6));
+  final priceYesterday = toDouble(read(7));
+  final changeUsd = toDouble(read(8));
+  final changePct = toDouble(read(9));
+  if (priceToday == null ||
+      priceYesterday == null ||
+      changeUsd == null ||
+      changePct == null) {
+    throw const FormatException('Market mover row has missing price data.');
+  }
   return {
     'card_id': read(0).toString(),
     'name': read(1),
@@ -167,10 +181,10 @@ Map<String, dynamic> buildMarketMoverRow(Object? Function(int index) read) {
     'image_url': read(3),
     'rarity': read(4),
     'type_line': read(5),
-    'price_today': toDouble(read(6)),
-    'price_yesterday': toDouble(read(7)),
-    'change_usd': toDouble(read(8)),
-    'change_pct': toDouble(read(9)),
+    'price_today': priceToday,
+    'price_yesterday': priceYesterday,
+    'change_usd': changeUsd,
+    'change_pct': changePct,
   };
 }
 
@@ -190,10 +204,7 @@ int toInt(Object? value) {
 }
 
 class MarketMoversCache {
-  MarketMoversCache({
-    this.ttl = marketMoversCacheTtl,
-    this.maxEntries = 16,
-  });
+  MarketMoversCache({this.ttl = marketMoversCacheTtl, this.maxEntries = 16});
 
   final Duration ttl;
   final int maxEntries;
@@ -229,10 +240,7 @@ class MarketMoversCache {
 }
 
 class _MarketMoversCacheEntry {
-  _MarketMoversCacheEntry({
-    required this.createdAt,
-    required this.payload,
-  });
+  _MarketMoversCacheEntry({required this.createdAt, required this.payload});
 
   final DateTime createdAt;
   final Map<String, dynamic> payload;

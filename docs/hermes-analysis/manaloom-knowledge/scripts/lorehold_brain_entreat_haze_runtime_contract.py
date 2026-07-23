@@ -16,13 +16,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import external_engine_source_contract as engine_source_contract
 from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
 
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_SPLIT_REPORT = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_post_authorized_full_validation.json"
@@ -35,7 +35,7 @@ DEFAULT_HINTS = SCRIPT_DIR / "xmage_to_manaloom_effect_hints.py"
 RUNTIME_CARDS = {
     "Brain in a Jar": {
         "implementation_priority": 2,
-        "xmage_path": XMAGE_ROOT / "Mage.Sets/src/mage/cards/b/BrainInAJar.java",
+        "xmage_path": Path("Mage.Sets/src/mage/cards/b/BrainInAJar.java"),
         "strategic_value": (
             "High-upside topdeck/miracle access bridge, but only if charge-counter "
             "timing can cast exact-mana-value instants or sorceries from hand."
@@ -59,7 +59,7 @@ RUNTIME_CARDS = {
     },
     "Entreat the Angels": {
         "implementation_priority": 1,
-        "xmage_path": XMAGE_ROOT / "Mage.Sets/src/mage/cards/e/EntreatTheAngels.java",
+        "xmage_path": Path("Mage.Sets/src/mage/cards/e/EntreatTheAngels.java"),
         "strategic_value": (
             "Most directly aligned with the current Lorehold 607 thesis: miracle "
             "timing turns topdeck control into a closing board."
@@ -82,7 +82,7 @@ RUNTIME_CARDS = {
     },
     "Haze of Rage": {
         "implementation_priority": 3,
-        "xmage_path": XMAGE_ROOT / "Mage.Sets/src/mage/cards/h/HazeOfRage.java",
+        "xmage_path": Path("Mage.Sets/src/mage/cards/h/HazeOfRage.java"),
         "strategic_value": (
             "Package-only payoff with Storm-Kiln Artist; it should teach combo "
             "pressure, not justify a standalone 607 inclusion."
@@ -104,7 +104,7 @@ RUNTIME_CARDS = {
     },
 }
 
-STORM_KILN_PATH = XMAGE_ROOT / "Mage.Sets/src/mage/cards/s/StormKilnArtist.java"
+STORM_KILN_PATH = Path("Mage.Sets/src/mage/cards/s/StormKilnArtist.java")
 
 
 def utc_now() -> str:
@@ -248,13 +248,17 @@ def contract_row(
     }
 
 
-def storm_kiln_summary(rule_index: Mapping[str, list[dict[str, Any]]]) -> dict[str, Any]:
-    text = read_text(STORM_KILN_PATH)
+def storm_kiln_summary(
+    rule_index: Mapping[str, list[dict[str, Any]]],
+    *,
+    xmage_path: Path = STORM_KILN_PATH,
+) -> dict[str, Any]:
+    text = read_text(xmage_path)
     rules = list(rule_index.get("storm-kiln artist") or rule_index.get("storm kiln artist") or [])
     scopes = [str(row.get("battle_model_scope") or "") for row in rules]
     return {
         "card_name": "Storm-Kiln Artist",
-        "xmage_path": str(STORM_KILN_PATH),
+        "xmage_path": str(xmage_path),
         "xmage_class_found": bool(text),
         "xmage_signal_hits": find_signals(text, ["MagecraftAbility", "CreateTokenEffect", "TreasureToken", "ArtifactYouControlCount"]),
         "active_rule_count": len(rules),
@@ -274,9 +278,21 @@ def build_payload(
     db_path: Path,
     battle_runtime_path: Path,
     hints_path: Path,
+    xmage_root: Path | None = None,
 ) -> dict[str, Any]:
     rule_index = active_rule_rows(db_path, [*RUNTIME_CARDS.keys(), "Storm-Kiln Artist"])
     foundations = runtime_foundations(read_text(battle_runtime_path), read_text(hints_path))
+    runtime_cards = {
+        card_name: {
+            **contract,
+            "xmage_path": (
+                xmage_root / Path(contract["xmage_path"])
+                if xmage_root is not None and not Path(contract["xmage_path"]).is_absolute()
+                else Path(contract["xmage_path"])
+            ),
+        }
+        for card_name, contract in RUNTIME_CARDS.items()
+    }
     contracts = [
         contract_row(
             card_name=card_name,
@@ -285,7 +301,7 @@ def build_payload(
             rule_index=rule_index,
             foundations=foundations,
         )
-        for card_name, contract in RUNTIME_CARDS.items()
+        for card_name, contract in runtime_cards.items()
     ]
     contracts.sort(key=lambda row: (row["implementation_priority"], row["card_name"]))
     best_first = contracts[0]["card_name"] if contracts else ""
@@ -299,7 +315,7 @@ def build_payload(
             "post_identity_queue_split": rel(split_path),
         },
         "source_db": str(db_path),
-        "xmage_root": str(XMAGE_ROOT),
+        "xmage_root": str(xmage_root) if xmage_root is not None else "injected_test_sources",
         "status": "runtime_contracts_drafted_no_battle_ready_keep_607",
         "summary": {
             "current_baseline": "deck_607",
@@ -314,7 +330,10 @@ def build_payload(
         },
         "runtime_foundations": foundations,
         "contracts": contracts,
-        "storm_kiln_artist_dependency": storm_kiln_summary(rule_index),
+        "storm_kiln_artist_dependency": storm_kiln_summary(
+            rule_index,
+            xmage_path=(xmage_root / STORM_KILN_PATH if xmage_root is not None else STORM_KILN_PATH),
+        ),
         "decision": {
             "keep_607_as_protected_baseline": True,
             "natural_battle_allowed_now": False,
@@ -393,18 +412,24 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--xmage-root", type=Path)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--split-report", type=Path, default=DEFAULT_SPLIT_REPORT)
     parser.add_argument("--battle-runtime", type=Path, default=DEFAULT_BATTLE_RUNTIME)
     parser.add_argument("--hints", type=Path, default=DEFAULT_HINTS)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     args = parser.parse_args()
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     payload = build_payload(
         split_report=read_json(args.split_report),
         split_path=args.split_report,
         db_path=args.db,
         battle_runtime_path=args.battle_runtime,
         hints_path=args.hints,
+        xmage_root=xmage_root,
     )
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")

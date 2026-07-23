@@ -107,9 +107,10 @@ Rodar o pacote principal de qualidade local:
 dart run melos run quality
 ```
 
-O workflow `.github/workflows/manaloom-guardrails.yml` tambem roda o pacote
-principal via `dart run melos run quality` em PR/push que altere `app`,
-`server`, `tools`, `scripts`, `melos.yaml` ou pubspecs.
+O projeto não usa runner hospedado. Ative uma vez os hooks gratuitos do
+checkout com `./scripts/manaloom_install_local_hooks.sh`; `pre-commit` executa o
+gate rápido e `pre-push` executa o gate completo. A execução manual equivalente
+é `./scripts/manaloom_local_ci.sh full`.
 
 ## Quando usar
 
@@ -162,7 +163,7 @@ corrente. A evidência atual fica no relatório de fechamento datado mais novo.
 - Observacao Patrol Web: o cadastro valida erro de senha, correcao e submit no Chrome headless; a navegacao pos-auth para `/home` e assertada no runner local, porque a leitura de rota pos-auth do cadastro ficou instavel no bridge web do Patrol.
 - `./scripts/quality_gate.sh ui-audit`: passou com 7 testes de golden/accessibility.
 - `dart run melos run quality`: passou com backend, 612 testes Flutter, UI audit, custom lint, Patrol smoke e dependency audit.
-- `.github/workflows/manaloom-guardrails.yml`: agora executa `dart run melos run quality` para app/server/tools/scripts/pubspecs.
+- os hooks locais versionados executam `quick` no commit e `full` no push, sem GitHub Actions;
 - `./scripts/quality_gate.sh e2e`: alvo criado para orquestrar Patrol, deckbuilder Flutter, contratos comerciais/retencao/trade, logs/observabilidade, contratos server de IA/deckbuilder/battle, pytest de battle runtime, corpus Commander, app/IA bridge, PG-Hermes-SQLite e deep-ai.
 - Dependencias diretas removidas do app por nao terem uso real: `cupertino_icons`, `flutter_animate`, `webview_flutter_android`.
 - Dependencias diretas adicionadas ao server por uso real: `meta`, `path`.

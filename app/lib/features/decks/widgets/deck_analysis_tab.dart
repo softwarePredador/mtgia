@@ -125,8 +125,9 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     final deck = context.select<DeckProvider, DeckDetails?>(
       (p) => p.selectedDeck,
     );
-    final effectiveDeck =
-        (deck != null && deck.id == widget.deck.id) ? deck : widget.deck;
+    final effectiveDeck = (deck != null && deck.id == widget.deck.id)
+        ? deck
+        : widget.deck;
 
     // Use cached mana curve & color distribution (recalculated only when deck changes)
     _recalculateIfNeeded(effectiveDeck);
@@ -139,24 +140,22 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     final landCount = allCards
         .where((card) => card.typeLine.toLowerCase().contains('land'))
         .fold<int>(0, (sum, card) => sum + card.quantity);
-    final spellCards =
-        allCards
-            .where((card) => !card.typeLine.toLowerCase().contains('land'))
-            .toList();
+    final spellCards = allCards
+        .where((card) => !card.typeLine.toLowerCase().contains('land'))
+        .toList();
     final spellQuantity = spellCards.fold<int>(
       0,
       (sum, card) => sum + card.quantity,
     );
-    final averageCmc =
-        spellQuantity == 0
-            ? 0.0
-            : spellCards.fold<double>(
-                  0,
-                  (sum, card) =>
-                      sum +
-                      (ManaHelper.calculateCMC(card.manaCost) * card.quantity),
-                ) /
-                spellQuantity;
+    final averageCmc = spellQuantity == 0
+        ? 0.0
+        : spellCards.fold<double>(
+                0,
+                (sum, card) =>
+                    sum +
+                    (ManaHelper.calculateCMC(card.manaCost) * card.quantity),
+              ) /
+              spellQuantity;
     final hasAiSummary =
         (effectiveDeck.synergyScore ?? 0) > 0 ||
         ((effectiveDeck.strengths ?? '').trim().isNotEmpty) ||
@@ -173,7 +172,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     );
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,30 +184,30 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           Text(
             'Resumo de sinergia, curva e pressão de cor para apoiar decisões reais no deck.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           _AnalysisSummaryStrip(
             legalityScore: _legalityScore(effectiveDeck),
             price: _priceSummary(effectiveDeck),
             averageCmc: averageCmc,
             landCount: landCount,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           _AnalysisActionBar(
             hasAnalysis: hasAiSummary,
             isRefreshing: _isRefreshingAi,
             onRefresh: () => _refreshAi(force: hasAiSummary),
           ),
           if (_isRefreshingAi) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             const LinearProgressIndicator(),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               'Atualizando leitura do deck...',
               style: theme.textTheme.bodySmall?.copyWith(
@@ -216,7 +215,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
               ),
             ),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           if (hasAiSummary) ...[
             _SectionCard(
               title: 'Leitura de sinergia',
@@ -230,7 +229,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                       score: effectiveDeck.synergyScore!,
                       color: AppTheme.manaViolet,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.space14),
                   ],
                   if ((effectiveDeck.strengths ?? '').trim().isNotEmpty)
                     _InsightBlock(
@@ -241,7 +240,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                     ),
                   if ((effectiveDeck.strengths ?? '').trim().isNotEmpty &&
                       (effectiveDeck.weaknesses ?? '').trim().isNotEmpty)
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppTheme.space12),
                   if ((effectiveDeck.weaknesses ?? '').trim().isNotEmpty)
                     _InsightBlock(
                       title: 'Pontos fracos',
@@ -266,7 +265,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
               ),
             ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
           _SectionCard(
             key: Key('deck-analysis-functional-section-${effectiveDeck.id}'),
             title: 'Funções do deck',
@@ -277,14 +276,25 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
               analysis: functionalAnalysis,
               isLoading: functionalAnalysisLoading,
               errorMessage: functionalAnalysisError,
-              onRefresh:
-                  () => context.read<DeckProvider>().fetchDeckAnalysis(
-                    effectiveDeck.id,
-                    forceRefresh: true,
-                  ),
+              onRefresh: () => context.read<DeckProvider>().fetchDeckAnalysis(
+                effectiveDeck.id,
+                forceRefresh: true,
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          if (functionalAnalysis?.commanderContract?.shouldDisplay == true) ...[
+            const SizedBox(height: AppTheme.space20),
+            _SectionCard(
+              key: Key('deck-analysis-commander-plan-${effectiveDeck.id}'),
+              title: 'Plano Commander',
+              subtitle:
+                  'Estrutura, fontes e gates que sustentam as próximas decisões.',
+              child: _CommanderPlanningOverview(
+                contract: functionalAnalysis!.commanderContract!,
+              ),
+            ),
+          ],
+          const SizedBox(height: AppTheme.space20),
           _SectionCard(
             title: 'Base de mana',
             subtitle:
@@ -297,122 +307,123 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                   subtitle:
                       'Distribuição de custo das mágicas, sem considerar terrenos.',
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppTheme.space10),
                 manaCurve.every((v) => v == 0)
                     ? SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: Text(
-                          'Adicione mágicas ao deck para ver a curva de mana.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.outline,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
-                    : SizedBox(
-                      height: 200,
-                      child: BarChart(
-                        BarChartData(
-                          alignment: BarChartAlignment.spaceAround,
-                          maxY:
-                              (manaCurve.reduce((a, b) => a > b ? a : b) + 1)
-                                  .toDouble(),
-                          barTouchData: BarTouchData(
-                            enabled: true,
-                            touchTooltipData: BarTouchTooltipData(
-                              getTooltipColor: (group) => AppTheme.surfaceSlate,
+                        height: 100,
+                        child: Center(
+                          child: Text(
+                            'Adicione mágicas ao deck para ver a curva de mana.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.outline,
+                              fontStyle: FontStyle.italic,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  final index = value.toInt();
-                                  if (index == 7) return const Text('7+');
-                                  return Text(index.toString());
-                                },
+                        ),
+                      )
+                    : SizedBox(
+                        height: 200,
+                        child: BarChart(
+                          BarChartData(
+                            alignment: BarChartAlignment.spaceAround,
+                            maxY:
+                                (manaCurve.reduce((a, b) => a > b ? a : b) + 1)
+                                    .toDouble(),
+                            barTouchData: BarTouchData(
+                              enabled: true,
+                              touchTooltipData: BarTouchTooltipData(
+                                getTooltipColor: (group) =>
+                                    AppTheme.surfaceSlate,
                               ),
                             ),
-                            leftTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            topTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            rightTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                          ),
-                          gridData: const FlGridData(show: false),
-                          borderData: FlBorderData(show: false),
-                          barGroups: List.generate(8, (index) {
-                            return BarChartGroupData(
-                              x: index,
-                              barRods: [
-                                BarChartRodData(
-                                  toY: manaCurve[index].toDouble(),
-                                  color: theme.colorScheme.primary,
-                                  width: 16,
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(AppTheme.radiusXs),
-                                  ),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    final index = value.toInt();
+                                    if (index == 7) return const Text('7+');
+                                    return Text(index.toString());
+                                  },
                                 ),
-                              ],
-                            );
-                          }),
+                              ),
+                              leftTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              topTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              rightTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                            ),
+                            gridData: const FlGridData(show: false),
+                            borderData: FlBorderData(show: false),
+                            barGroups: List.generate(8, (index) {
+                              return BarChartGroupData(
+                                x: index,
+                                barRods: [
+                                  BarChartRodData(
+                                    toY: manaCurve[index].toDouble(),
+                                    color: theme.colorScheme.primary,
+                                    width: AppTheme.space16,
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(AppTheme.radiusXs),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ),
                         ),
                       ),
-                    ),
-                const SizedBox(height: 18),
+                const SizedBox(height: AppTheme.space18),
                 Divider(color: AppTheme.outlineMuted.withValues(alpha: 0.35)),
-                const SizedBox(height: 18),
+                const SizedBox(height: AppTheme.space18),
                 const _AnalysisSubsectionHeader(
                   title: 'Distribuição de cores',
                   subtitle:
                       'Leitura baseada nos símbolos de mana das mágicas do deck.',
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppTheme.space10),
                 colorCounts.values.every((v) => v == 0)
                     ? SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: Text(
-                          'Adicione mágicas coloridas para ver a distribuição de cores.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.outline,
-                            fontStyle: FontStyle.italic,
+                        height: 100,
+                        child: Center(
+                          child: Text(
+                            'Adicione mágicas coloridas para ver a distribuição de cores.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.outline,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    )
+                      )
                     : SizedBox(
-                      height: 200,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: PieChart(
-                              PieChartData(
-                                sectionsSpace: 2,
-                                centerSpaceRadius: 40,
-                                sections: _buildPieSections(colorCounts),
+                        height: 200,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: PieChart(
+                                PieChartData(
+                                  sectionsSpace: 2,
+                                  centerSpaceRadius: 40,
+                                  sections: _buildPieSections(colorCounts),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _buildLegend(context, colorCounts),
-                          ),
-                        ],
+                            const SizedBox(width: AppTheme.space16),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildLegend(context, colorCounts),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
               ],
             ),
           ),
@@ -424,10 +435,9 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
   int _legalityScore(DeckDetails deck) {
     final format = deck.format.toLowerCase();
     final target = format == 'commander' ? 100 : (format == 'brawl' ? 60 : 60);
-    final hasCommander =
-        (format == 'commander' || format == 'brawl')
-            ? deck.commander.isNotEmpty
-            : true;
+    final hasCommander = (format == 'commander' || format == 'brawl')
+        ? deck.commander.isNotEmpty
+        : true;
     final countScore = ((deck.cardCount / target).clamp(0.0, 1.0) * 85).round();
     return (countScore + (hasCommander ? 15 : 0)).clamp(0, 100);
   }
@@ -437,7 +447,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     if (direct != null) {
       return _DeckPriceSummary(
         total: direct,
-        currency: deck.pricingCurrency ?? 'BRL',
+        currency: deck.pricingCurrency ?? 'USD',
         missingCards: deck.pricingMissingCards,
       );
     }
@@ -446,7 +456,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     if (fromStats != null) return fromStats;
 
     return _DeckPriceSummary(
-      currency: deck.pricingCurrency ?? 'BRL',
+      currency: deck.pricingCurrency ?? 'USD',
       missingCards: deck.pricingMissingCards,
     );
   }
@@ -485,12 +495,12 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
 
     return counts.entries.where((e) => e.value > 0).map((entry) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 3),
+        padding: const EdgeInsets.symmetric(vertical: AppTheme.space3),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             ManaSymbol(symbol: entry.key, size: 16),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             Text(
               namesMap[entry.key]!,
               style: textTheme.bodySmall?.copyWith(
@@ -498,7 +508,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppTheme.space6),
             Text(
               '${entry.value}',
               style: textTheme.bodySmall?.copyWith(
@@ -510,6 +520,260 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         ),
       );
     }).toList();
+  }
+}
+
+class _CommanderPlanningOverview extends StatelessWidget {
+  const _CommanderPlanningOverview({required this.contract});
+
+  final DeckCommanderContractSummary contract;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final availableSources = contract.sourceLanes
+        .where((lane) => lane.available)
+        .toList(growable: false);
+    final planningCoverageByKey = {
+      for (final item in contract.planningCoverage.items) item.key: item,
+    };
+    final statusColor = contract.hasBlockers
+        ? AppTheme.warning
+        : AppTheme.success;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              contract.hasBlockers
+                  ? Icons.pending_actions_outlined
+                  : Icons.check_circle_outline,
+              color: statusColor,
+              size: 20,
+            ),
+            const SizedBox(width: AppTheme.space8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    contract.safeStatusLabel,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space3),
+                  Text(
+                    contract.primaryDetail,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: AppTheme.lineHeightCompact,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTheme.space14),
+        _CommanderPlanFact(
+          icon: Icons.hub_outlined,
+          label: availableSources.isEmpty
+              ? 'Nenhuma fonte de referência disponível'
+              : '${availableSources.length}/${contract.sourceLanes.length} fontes disponíveis',
+        ),
+        const SizedBox(height: AppTheme.space8),
+        _CommanderPlanFact(
+          icon: Icons.sports_esports_outlined,
+          label: contract.footerLabel ?? 'Battle gate sem leitura',
+        ),
+        if (contract.baselinePolicy?.applies == true) ...[
+          const SizedBox(height: AppTheme.space8),
+          _CommanderPlanFact(
+            icon: Icons.shield_outlined,
+            label:
+                'Baseline ${contract.baselinePolicy!.baselineDeckId} protegido; aplicação automática bloqueada',
+          ),
+        ],
+        if (contract.planningCoverage.requiredCount > 0) ...[
+          const SizedBox(height: AppTheme.space8),
+          _CommanderPlanFact(
+            icon: Icons.checklist_outlined,
+            label:
+                '${contract.planningCoverage.readyCount}/${contract.planningCoverage.requiredCount} etapas prontas',
+          ),
+        ],
+        if (contract.nextActions.isNotEmpty) ...[
+          const SizedBox(height: AppTheme.space8),
+          _CommanderPlanFact(
+            icon: Icons.arrow_forward_rounded,
+            label: contract.nextActions.first,
+          ),
+        ],
+        if (contract.planningFlow.isNotEmpty) ...[
+          const SizedBox(height: AppTheme.space10),
+          ExpansionTile(
+            key: const Key('deck-analysis-commander-plan-flow'),
+            tilePadding: EdgeInsets.zero,
+            childrenPadding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            title: Text(
+              '${contract.planningFlow.length} etapas do planejamento',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            children: contract.planningFlow
+                .map(
+                  (step) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppTheme.space6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _CommanderPlanningStepStatus(
+                          status:
+                              planningCoverageByKey[step.key]?.status ??
+                              'pending',
+                        ),
+                        const SizedBox(width: AppTheme.space8),
+                        Expanded(
+                          child: Text(
+                            step.label,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(growable: false),
+          ),
+        ],
+        if (contract.provenanceLanes.isNotEmpty) ...[
+          const SizedBox(height: AppTheme.space6),
+          ExpansionTile(
+            key: const Key('deck-analysis-commander-provenance'),
+            tilePadding: EdgeInsets.zero,
+            childrenPadding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            title: Text(
+              'Fontes e confiança',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            children: contract.provenanceLanes
+                .map((lane) => _CommanderProvenanceRow(lane: lane))
+                .toList(growable: false),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _CommanderPlanningStepStatus extends StatelessWidget {
+  const _CommanderPlanningStepStatus({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, color, label) = switch (status.trim().toLowerCase()) {
+      'ready' => (Icons.check_circle_outline, AppTheme.success, 'Pronto'),
+      'partial' => (Icons.pending_outlined, AppTheme.warning, 'Parcial'),
+      _ => (Icons.radio_button_unchecked, AppTheme.textSecondary, 'Pendente'),
+    };
+    return Tooltip(
+      message: label,
+      child: Icon(icon, size: 16, color: color),
+    );
+  }
+}
+
+class _CommanderProvenanceRow extends StatelessWidget {
+  const _CommanderProvenanceRow({required this.lane});
+
+  final DeckCommanderProvenanceLane lane;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppTheme.space8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Tooltip(
+            message: lane.available ? 'Disponível' : 'Não disponível',
+            child: Icon(
+              lane.available
+                  ? Icons.check_circle_outline
+                  : Icons.remove_circle_outline,
+              size: 16,
+              color: lane.available ? AppTheme.success : AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(width: AppTheme.space8),
+          Expanded(
+            child: Text(
+              lane.safeLabel,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppTheme.space8),
+          Flexible(
+            child: Text(
+              lane.confidenceLabel,
+              textAlign: TextAlign.end,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: lane.available
+                    ? AppTheme.textPrimary
+                    : AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommanderPlanFact extends StatelessWidget {
+  const _CommanderPlanFact({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 17, color: AppTheme.textSecondary),
+        const SizedBox(width: AppTheme.space8),
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: AppTheme.lineHeightCompact,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -554,7 +818,7 @@ _DeckPriceSummary? _priceFromStats(Map<String, dynamic> stats) {
     if (total != null) {
       return _DeckPriceSummary(
         total: total,
-        currency: candidate.currency?.toString() ?? 'BRL',
+        currency: candidate.currency?.toString() ?? 'USD',
         missingCards: _readInt(stats['pricing_missing_cards']),
       );
     }
@@ -576,7 +840,7 @@ _DeckPriceSummary? _priceFromStats(Map<String, dynamic> stats) {
       if (total != null) {
         return _DeckPriceSummary(
           total: total,
-          currency: candidate.currency?.toString() ?? 'BRL',
+          currency: candidate.currency?.toString() ?? 'USD',
           missingCards:
               _readInt(nested['missing_price_cards']) ??
               _readInt(nested['pricing_missing_cards']),
@@ -600,10 +864,9 @@ double? _readPriceDouble(Object? value) {
   final text = value?.toString().trim();
   if (text == null || text.isEmpty) return null;
   final cleaned = text.replaceAll(RegExp(r'[^0-9,.-]'), '');
-  final normalized =
-      cleaned.contains('.') && cleaned.contains(',')
-          ? cleaned.replaceAll('.', '').replaceAll(',', '.')
-          : cleaned.replaceAll(',', '.');
+  final normalized = cleaned.contains('.') && cleaned.contains(',')
+      ? cleaned.replaceAll('.', '').replaceAll(',', '.')
+      : cleaned.replaceAll(',', '.');
   return double.tryParse(normalized);
 }
 
@@ -654,10 +917,9 @@ class _AnalysisSummaryStrip extends StatelessWidget {
             SizedBox(
               width: width,
               child: _SummaryMetricTile(
-                icon:
-                    price.hasTotal
-                        ? Icons.payments_outlined
-                        : Icons.price_check_outlined,
+                icon: price.hasTotal
+                    ? Icons.payments_outlined
+                    : Icons.price_check_outlined,
                 label: 'Preço total',
                 value: price.displayValue,
                 helper: price.helperText,
@@ -711,7 +973,7 @@ class _SummaryMetricTile extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       constraints: const BoxConstraints(minHeight: 108),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.88),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -746,7 +1008,7 @@ class _SummaryMetricTile extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           Text(
             label,
             maxLines: 1,
@@ -756,7 +1018,7 @@ class _SummaryMetricTile extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: AppTheme.space3),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -770,7 +1032,7 @@ class _SummaryMetricTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: AppTheme.space3),
           Text(
             helper,
             maxLines: 1,
@@ -807,8 +1069,9 @@ class _AnalysisActionBar extends StatelessWidget {
         final stacked = constraints.maxWidth < 420;
         final status = _AnalysisStatusPill(
           label: hasAnalysis ? 'Leitura pronta' : 'Leitura pendente',
-          icon:
-              hasAnalysis ? Icons.check_circle_outline : Icons.pending_outlined,
+          icon: hasAnalysis
+              ? Icons.check_circle_outline
+              : Icons.pending_outlined,
           accent: accent,
         );
         final action = SizedBox(
@@ -836,14 +1099,18 @@ class _AnalysisActionBar extends StatelessWidget {
         if (stacked) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [status, const SizedBox(height: 10), action],
+            children: [
+              status,
+              const SizedBox(height: AppTheme.space10),
+              action,
+            ],
           );
         }
 
         return Row(
           children: [
             Expanded(child: status),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
             action,
           ],
         );
@@ -868,7 +1135,7 @@ class _AnalysisStatusPill extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.space12),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -882,7 +1149,7 @@ class _AnalysisStatusPill extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 18, color: accent),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Text(
               label,
@@ -917,8 +1184,6 @@ class _SectionCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -927,26 +1192,32 @@ class _SectionCard extends StatelessWidget {
           width: AppTheme.strokeThin,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space4),
+              Text(
+                subtitle,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space14),
+              child,
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 14),
-          child,
-        ],
+        ),
       ),
     );
   }
@@ -1073,7 +1344,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
         icon: Icons.hourglass_top_rounded,
         message: 'Lendo as funcoes das cartas do deck...',
         child: Padding(
-          padding: EdgeInsets.only(top: 12),
+          padding: EdgeInsets.only(top: AppTheme.space12),
           child: LinearProgressIndicator(),
         ),
       );
@@ -1085,7 +1356,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
         icon: Icons.info_outline_rounded,
         message: errorMessage!,
         child: Padding(
-          padding: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.only(top: AppTheme.space12),
           child: OutlinedButton.icon(
             key: const Key('deck-analysis-functional-retry-button'),
             onPressed: () => onRefresh(),
@@ -1104,7 +1375,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
         message:
             'As funções ainda não estão disponíveis para este deck. Atualize para buscar a leitura do deck.',
         child: Padding(
-          padding: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.only(top: AppTheme.space12),
           child: FilledButton.tonalIcon(
             key: const Key('deck-analysis-functional-refresh-button'),
             onPressed: isLoading ? null : () => onRefresh(),
@@ -1121,7 +1392,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
         Container(
           key: Key('deck-analysis-functional-origin-${deck.id}'),
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppTheme.space12),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.42),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1140,10 +1411,9 @@ class _FunctionalTagsOverview extends StatelessWidget {
                 children: [
                   _FunctionalInfoChip(
                     icon: Icons.auto_awesome_outlined,
-                    label:
-                        data.hasFunctionalTags
-                            ? 'Leitura por funções do deck'
-                            : 'Leitura básica do deck',
+                    label: data.hasFunctionalTags
+                        ? 'Leitura por funções do deck'
+                        : 'Leitura básica do deck',
                   ),
                   _FunctionalInfoChip(
                     icon: Icons.touch_app_outlined,
@@ -1152,7 +1422,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
                 ],
               ),
               if (!data.hasFunctionalTags) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Text(
                   'Esta leitura mostra os totais, mas ainda não trouxe a lista de cartas de cada função.',
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -1164,10 +1434,10 @@ class _FunctionalTagsOverview extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         ..._functionalBuckets.map(
           (bucket) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: AppTheme.space10),
             child: _FunctionalBucketTile(
               deck: deck,
               bucket: bucket,
@@ -1176,7 +1446,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
           ),
         ),
         if (isLoading) ...[
-          const SizedBox(height: 2),
+          const SizedBox(height: AppTheme.space2),
           Text(
             'Atualizando funções...',
             style: theme.textTheme.bodySmall?.copyWith(
@@ -1206,7 +1476,7 @@ class _FunctionalAnalysisStatus extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.36),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1222,7 +1492,7 @@ class _FunctionalAnalysisStatus extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(icon, color: AppTheme.textSecondary, size: 20),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   message,
@@ -1251,7 +1521,10 @@ class _FunctionalInfoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space7,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.38),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1260,7 +1533,7 @@ class _FunctionalInfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: AppTheme.loomCyan),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppTheme.space6),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 220),
             child: Text(
@@ -1298,10 +1571,9 @@ class _FunctionalBucketTile extends StatelessWidget {
     );
     final samples = analysis.samplesFor(bucket.tagKey);
     final cardsByName = _cardsByName(deck);
-    final samplePreview =
-        samples.isEmpty
-            ? 'Sem amostras nesta resposta.'
-            : samples.take(2).map((sample) => sample.name).join(', ');
+    final samplePreview = samples.isEmpty
+        ? 'Sem amostras nesta resposta.'
+        : samples.take(2).map((sample) => sample.name).join(', ');
 
     return Material(
       color: AppTheme.surfaceSlate2.withValues(alpha: 0.68),
@@ -1315,8 +1587,16 @@ class _FunctionalBucketTile extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         key: Key('deck-analysis-functional-bucket-${deck.id}-${bucket.key}'),
-        tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        tilePadding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space2,
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space0,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         iconColor: bucket.color,
         collapsedIconColor: AppTheme.textSecondary,
         leading: Container(
@@ -1340,12 +1620,15 @@ class _FunctionalBucketTile extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             Container(
               key: Key(
                 'deck-analysis-functional-count-${deck.id}-${bucket.key}',
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space9,
+                vertical: AppTheme.space4,
+              ),
               decoration: BoxDecoration(
                 color: bucket.color.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1379,7 +1662,7 @@ class _FunctionalBucketTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _FunctionalBucketSamples(
             deckId: deck.id,
             bucket: bucket,
@@ -1412,10 +1695,9 @@ class _FunctionalBucketSamples extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final visibleSamples = samples.toList(growable: false);
-    final sampleSummary =
-        visibleSamples.length >= totalCount
-            ? 'Cartas deste grupo: ${visibleSamples.length}.'
-            : 'Cartas deste grupo: mostrando ${visibleSamples.length} de $totalCount.';
+    final sampleSummary = visibleSamples.length >= totalCount
+        ? 'Cartas deste grupo: ${visibleSamples.length}.'
+        : 'Cartas deste grupo: mostrando ${visibleSamples.length} de $totalCount.';
 
     return Column(
       key: Key('deck-analysis-functional-samples-$deckId-${bucket.key}'),
@@ -1425,13 +1707,13 @@ class _FunctionalBucketSamples extends StatelessWidget {
           icon: Icons.info_outline_rounded,
           text: _friendlyBucketExplanation(bucket),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppTheme.space6),
         _FunctionalMetaLine(
           icon: Icons.touch_app_outlined,
           text:
               'Toque em uma carta para ver a imagem e o motivo dela entrar aqui.',
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppTheme.space10),
         if (visibleSamples.isEmpty)
           Text(
             'Ainda não há uma lista de cartas para este indicador.',
@@ -1452,11 +1734,11 @@ class _FunctionalBucketSamples extends StatelessWidget {
               height: AppTheme.lineHeightCompact,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ...List.generate(visibleSamples.length, (index) {
             final sample = visibleSamples[index];
             return Padding(
-              padding: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.only(bottom: AppTheme.space6),
               child: _FunctionalSampleRow(
                 key: Key(
                   'deck-analysis-functional-sample-$deckId-${bucket.key}-$index',
@@ -1487,7 +1769,7 @@ class _FunctionalMetaLine extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 14, color: AppTheme.textSecondary),
-        const SizedBox(width: 7),
+        const SizedBox(width: AppTheme.space7),
         Expanded(
           child: Text(
             text,
@@ -1535,20 +1817,19 @@ class _FunctionalSampleRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          onTap:
-              () => _showFunctionalSamplePreview(
-                context,
-                sample: sample,
-                imageUrl: imageUrl,
-                fallbackImageUrl: fallbackImageUrl,
-                typeLine: typeLine,
-                quantity: quantity,
-                reason: reason,
-                accent: accent,
-              ),
+          onTap: () => _showFunctionalSamplePreview(
+            context,
+            sample: sample,
+            imageUrl: imageUrl,
+            fallbackImageUrl: fallbackImageUrl,
+            typeLine: typeLine,
+            quantity: quantity,
+            reason: reason,
+            accent: accent,
+          ),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(AppTheme.space10),
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1563,7 +1844,7 @@ class _FunctionalSampleRow extends StatelessWidget {
                   height: 64,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1578,7 +1859,7 @@ class _FunctionalSampleRow extends StatelessWidget {
                         ),
                       ),
                       if (typeLine.isNotEmpty) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: AppTheme.space2),
                         Text(
                           typeLine,
                           maxLines: 1,
@@ -1589,7 +1870,7 @@ class _FunctionalSampleRow extends StatelessWidget {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 3),
+                      const SizedBox(height: AppTheme.space3),
                       Text(
                         reason,
                         key: Key(
@@ -1606,7 +1887,7 @@ class _FunctionalSampleRow extends StatelessWidget {
                   ),
                 ),
                 if (quantity != null && quantity > 1) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppTheme.space8),
                   _FunctionalQuantityBadge(quantity: quantity, accent: accent),
                 ],
               ],
@@ -1633,7 +1914,7 @@ void _showFunctionalSamplePreview(
     builder: (context) {
       final theme = Theme.of(context);
       return Dialog(
-        insetPadding: const EdgeInsets.all(20),
+        insetPadding: const EdgeInsets.all(AppTheme.space20),
         backgroundColor: AppTheme.surfaceElevated,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1641,7 +1922,7 @@ void _showFunctionalSamplePreview(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppTheme.space16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1664,7 +1945,7 @@ void _showFunctionalSamplePreview(
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
                 Center(
                   child: CachedCardImage(
                     imageUrl: imageUrl,
@@ -1674,7 +1955,7 @@ void _showFunctionalSamplePreview(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
                 if (typeLine.isNotEmpty)
                   Text(
                     typeLine,
@@ -1683,7 +1964,7 @@ void _showFunctionalSamplePreview(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Text(
                   reason,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -1692,7 +1973,7 @@ void _showFunctionalSamplePreview(
                   ),
                 ),
                 if (quantity != null && quantity > 1) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppTheme.space10),
                   _FunctionalQuantityBadge(quantity: quantity, accent: accent),
                 ],
               ],
@@ -1717,7 +1998,10 @@ class _FunctionalQuantityBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space7,
+        vertical: AppTheme.space3,
+      ),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.11),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -1806,7 +2090,7 @@ class _InsightBlock extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1821,7 +2105,7 @@ class _InsightBlock extends StatelessWidget {
           Row(
             children: [
               Icon(icon, size: 16, color: accent),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Text(
                 title,
                 style: theme.textTheme.titleSmall?.copyWith(
@@ -1831,7 +2115,7 @@ class _InsightBlock extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Text(
             text,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -1867,7 +2151,7 @@ class _AnalysisSubsectionHeader extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: AppTheme.space3),
         Text(
           subtitle,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -1894,7 +2178,7 @@ class _AnalysisCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1915,7 +2199,7 @@ class _AnalysisCard extends StatelessWidget {
               backgroundColor: color.withValues(alpha: 0.18),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: AppTheme.space14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1926,7 +2210,7 @@ class _AnalysisCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: AppTheme.space2),
               Text(
                 '$score/100',
                 style: theme.textTheme.headlineSmall?.copyWith(

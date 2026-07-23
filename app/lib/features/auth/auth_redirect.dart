@@ -33,3 +33,12 @@ String buildAuthLocation(String authPath, String? redirectPath) {
     queryParameters: redirect == null ? null : {'redirect': redirect},
   ).toString();
 }
+
+/// Preserves an explicit safe deep link; otherwise uses the first-run-aware
+/// landing decision already loaded by [AuthProvider].
+String resolveAuthenticatedLocation({
+  required String defaultLocation,
+  String? redirectPath,
+}) {
+  return normalizePostAuthRedirect(redirectPath) ?? defaultLocation;
+}

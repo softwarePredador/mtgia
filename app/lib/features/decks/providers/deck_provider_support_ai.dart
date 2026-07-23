@@ -51,6 +51,7 @@ Map<String, dynamic> buildOptimizeRequestPayload({
   required bool keepTheme,
   OptimizeIntensity intensity = OptimizeIntensity.focused,
   Map<String, dynamic>? recommendationContext,
+  String? requestKey,
 }) {
   return <String, dynamic>{
     'deck_id': deckId,
@@ -60,6 +61,8 @@ Map<String, dynamic> buildOptimizeRequestPayload({
     'intensity': intensity.apiValue,
     if (recommendationContext != null && recommendationContext.isNotEmpty)
       'recommendation_context': recommendationContext,
+    if (requestKey != null && requestKey.trim().isNotEmpty)
+      'request_key': requestKey.trim(),
   };
 }
 
@@ -71,6 +74,7 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
   required bool keepTheme,
   OptimizeIntensity intensity = OptimizeIntensity.focused,
   Map<String, dynamic>? recommendationContext,
+  String? requestKey,
 }) async {
   final payload = buildOptimizeRequestPayload(
     deckId: deckId,
@@ -79,6 +83,7 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     keepTheme: keepTheme,
     intensity: intensity,
     recommendationContext: recommendationContext,
+    requestKey: requestKey,
   );
 
   AppLogger.debug('🧪 [AI Optimize] request=$payload');
@@ -126,12 +131,15 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     );
     final pollTimeout = normalizeOptimizePollTimeoutMs(data['job_timeout_ms']);
     final totalStages = data['total_stages'] as int? ?? 6;
+    final idempotency = asDynamicMap(data['idempotency']);
     AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
     return OptimizeDeckRequestResult.async(
       jobId: jobId,
       pollIntervalMs: pollInterval,
       pollTimeoutMs: pollTimeout,
       totalStages: totalStages,
+      requestKey:
+          idempotency['request_key']?.toString() ?? requestKey?.trim(),
     );
   }
 
@@ -281,6 +289,9 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
         fallbackCode: errorCode,
       );
     }
+    if (status == 'cancelled') {
+      throw const OptimizeJobCancelledException();
+    }
     return OptimizeJobPollResult.pending(
       stage: data['stage'] as String? ?? 'Processando...',
       stageNumber: data['stage_number'] as int? ?? 0,
@@ -294,6 +305,40 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
     );
   }
 
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckOptimize,
+    ),
+  );
+}
+
+Future<Map<String, dynamic>> cancelOptimizeJobRequest(
+  ApiClient apiClient,
+  String jobId,
+) async {
+  final response = await apiClient.delete('/ai/optimize/jobs/$jobId');
+  if (response.statusCode == 200) return asDynamicMap(response.data);
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckOptimize,
+    ),
+  );
+}
+
+Future<Map<String, dynamic>?> fetchLatestOptimizeJobRequest(
+  ApiClient apiClient, {
+  required String deckId,
+  bool activeOnly = true,
+}) async {
+  final query = Uri(queryParameters: {
+    'deck_id': deckId,
+    'active': activeOnly ? 'true' : 'false',
+  }).query;
+  final response = await apiClient.get('/ai/optimize/jobs/latest?$query');
+  if (response.statusCode == 404) return null;
+  if (response.statusCode == 200) return asDynamicMap(response.data);
   throw Exception(
     FriendlyErrorMapper.fromApiResponse(
       response,

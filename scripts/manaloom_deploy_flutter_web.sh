@@ -325,6 +325,10 @@ fi
 
 grep -Fq '<base href="/app/">' "$WORKTREE_DIR/app/build/web/index.html"
 BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+FLUTTER_SDK_JSON="$("$MANALOOM_FLUTTER_BIN_RESOLVED" --version --machine)"
+FLUTTER_VERSION="$(jq -er '.frameworkVersion' <<<"$FLUTTER_SDK_JSON")"
+DART_VERSION="$(jq -er '.dartSdkVersion' <<<"$FLUTTER_SDK_JSON")"
+WEB_RENDERER_CONTRACT="flutter-auto"
 python3 "$WORKTREE_DIR/scripts/manaloom_generate_release_sbom.py" \
   --app-dir "$WORKTREE_DIR/app" \
   --dart-bin "$MANALOOM_RELEASE_DART_BIN_RESOLVED" \
@@ -354,6 +358,9 @@ jq -n \
   --arg built_at "$BUILT_AT" \
   --arg source_committed_at "$SOURCE_COMMITTED_AT" \
   --arg api_base_url "$API_BASE_URL" \
+  --arg flutter_version "$FLUTTER_VERSION" \
+  --arg dart_version "$DART_VERSION" \
+  --arg renderer_contract "$WEB_RENDERER_CONTRACT" \
   --arg sentry_release "manaloom-web@$SHORT_SHA" \
   --arg sentry_dsn_sha256 "$MANALOOM_RELEASE_SENTRY_DSN_SHA256_RESOLVED" \
   --arg index_sha256 "$INDEX_SHA256" \
@@ -376,6 +383,11 @@ jq -n \
     built_at: $built_at,
     source_committed_at: $source_committed_at,
     api_base_url: $api_base_url,
+    build_mode: "release",
+    base_href: "/app/",
+    flutter_version: $flutter_version,
+    dart_version: $dart_version,
+    renderer_contract: $renderer_contract,
     sentry_release: $sentry_release,
     sentry_configured: $sentry_configured,
     sentry_dsn_sha256: (if ($sentry_dsn_sha256 | length) > 0 then $sentry_dsn_sha256 else null end),

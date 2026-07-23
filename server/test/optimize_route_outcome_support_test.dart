@@ -214,5 +214,21 @@ void main() {
         equals('blocked'),
       );
     });
+
+    test('failed optimize outcomes cannot apply or feed learning', () {
+      final body = <String, dynamic>{
+        'outcome_code': 'execution_failed',
+        'removals': ['Old Card'],
+        'additions': ['New Card'],
+        'can_apply': true,
+        'learning_eligible': true,
+      };
+
+      enforceFailedOptimizeOutcomeSafety(body);
+
+      expect(body['can_apply'], isFalse);
+      expect(body['learning_eligible'], isFalse);
+      expect(body['outcome_code'], 'execution_failed');
+    });
   });
 }

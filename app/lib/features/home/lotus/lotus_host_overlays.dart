@@ -13,21 +13,21 @@ class LotusLoadingOverlay extends StatelessWidget {
         decoration: BoxDecoration(gradient: AppTheme.heroGradient),
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 28),
+            padding: EdgeInsets.symmetric(horizontal: AppTheme.space28),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _LotusShellBadge(),
-                SizedBox(height: 24),
+                SizedBox(height: AppTheme.space24),
                 SizedBox(
-                  width: 34,
-                  height: 34,
+                  width: AppTheme.space34,
+                  height: AppTheme.space34,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.6,
                     color: AppTheme.primarySoft,
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: AppTheme.space20),
                 Text(
                   'ManaLoom',
                   style: TextStyle(
@@ -37,7 +37,7 @@ class LotusLoadingOverlay extends StatelessWidget {
                     letterSpacing: 0,
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: AppTheme.space8),
                 Text(
                   'Preparando o contador de vida',
                   textAlign: TextAlign.center,
@@ -76,7 +76,7 @@ class LotusErrorOverlay extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppTheme.space24),
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -91,13 +91,13 @@ class LotusErrorOverlay extends StatelessWidget {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppTheme.space20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const _LotusShellBadge(),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       const Text(
                         'Contador de vida indisponível',
                         style: TextStyle(
@@ -106,7 +106,7 @@ class LotusErrorOverlay extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppTheme.space10),
                       Text(
                         _localizedHostMessage(message),
                         style: const TextStyle(
@@ -115,7 +115,7 @@ class LotusErrorOverlay extends StatelessWidget {
                           height: AppTheme.lineHeightComfortable,
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton(
@@ -124,7 +124,9 @@ class LotusErrorOverlay extends StatelessWidget {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 AppTheme.radiusMd,
@@ -158,7 +160,10 @@ class _LotusShellBadge extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space7,
+        ),
         child: Text(
           'Interface ManaLoom',
           style: TextStyle(

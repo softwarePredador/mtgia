@@ -11,6 +11,7 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/login_screen.dart';
 import 'package:manaloom/features/auth/screens/register_screen.dart';
+import 'package:manaloom/features/auth/screens/verify_email_screen.dart';
 import 'package:manaloom/features/battle/models/battle_replay.dart';
 import 'package:manaloom/features/battle/screens/battle_replays_screen.dart';
 import 'package:manaloom/features/battle/services/battle_replay_service.dart';
@@ -27,6 +28,7 @@ import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_generate_screen.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_native_player_counter_sheet.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
+import 'package:manaloom/features/home/onboarding_core_flow_screen.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:manaloom/features/profile/profile_screen.dart';
@@ -74,6 +76,8 @@ void main() {
     ).enterText('Password123!');
     await $(find.byKey(const Key('login-submit-button'))).tap();
 
+    await _expectTextEventually($, 'Vamos preparar seu primeiro deck');
+    await _scrollUntilVisibleAndTap($, const Key('onboarding-skip-action'));
     await _expectTextEventually($, 'Beta gratuita');
     expect($(find.byKey(const Key('ai-usage-meter'))), findsOneWidget);
   });
@@ -95,31 +99,28 @@ void main() {
     ).enterText('qa_register_user@example.com');
     await $(
       find.byKey(const Key('register-password-field')),
-    ).enterText('Password123!');
+    ).enterText('CopperMoon!47');
     await $(
       find.byKey(const Key('register-confirm-password-field')),
-    ).enterText('Password124!');
+    ).enterText('CopperMoon!48');
     await _ensureVisibleAndTap($, const Key('register-submit-button'));
     expect($('Senhas não correspondem'), findsOneWidget);
 
     await $.tester.enterText(
       find.byKey(const Key('register-confirm-password-field')),
-      'Password123!',
+      'CopperMoon!47',
     );
     await $.pumpAndSettle();
+    await _ensureVisibleAndTap($, const Key('register-legal-acceptance'));
     await _ensureVisibleAndTap($, const Key('register-submit-button'));
     await $.pumpAndSettle();
     if (kIsWeb) {
       // Patrol Web executa o submit corrigido, mas a assercao de rota pos-auth
-      // fica instavel nesse runner. O runner local cobre a navegacao para /home.
+      // fica instavel nesse runner. O runner local cobre a verificação de email.
       return;
     }
 
-    await _expectTextEventually(
-      $,
-      'Beta gratuita',
-      timeout: const Duration(seconds: 10),
-    );
+    await _expectTextEventually($, 'Verifique seu email');
   });
 
   patrolTest(
@@ -490,10 +491,8 @@ void _installPathProviderMock() {
     databaseFactory = databaseFactoryFfi;
     _sqfliteFfiInitialized = true;
   }
-  final tempDir =
-      _pathProviderTestTempDir ??= Directory.systemTemp.createTempSync(
-        'manaloom_patrol_path_provider_',
-      );
+  final tempDir = _pathProviderTestTempDir ??= Directory.systemTemp
+      .createTempSync('manaloom_patrol_path_provider_');
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(
         const MethodChannel('plugins.flutter.io/path_provider'),
@@ -527,22 +526,40 @@ Future<void> _pumpProductApp(
   await commercialProvider.load();
 
   late final GoRouter router;
-  var redirectedAfterAuth = false;
   router = GoRouter(
     initialLocation: initialLocation,
     refreshListenable: authProvider,
     redirect: (context, state) {
       final location = state.uri.path;
-      final isAuthRoute = location == '/login' || location == '/register';
-      if (authProvider.isAuthenticated && isAuthRoute) {
-        return '/home';
+      if (location == '/register' &&
+          authProvider.isAuthenticated &&
+          authProvider.user?.emailVerified == false) {
+        return '/verify-email';
+      }
+      if (authProvider.isAuthenticated && location == '/login') {
+        return authProvider.defaultAuthenticatedLocation;
       }
       return null;
     },
     routes: [
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(
+        path: '/verify-email',
+        builder: (_, state) => VerifyEmailScreen(
+          token: state.uri.queryParameters['token'] ?? '',
+          redirectPath: state.uri.queryParameters['redirect'],
+        ),
+      ),
+      GoRoute(
+        path: '/onboarding/core-flow',
+        builder: (context, _) => OnboardingCoreFlowScreen(
+          userId: context.read<AuthProvider>().user?.id ?? '',
+          onSettled: context.read<AuthProvider>().markOnboardingSettled,
+        ),
+      ),
       GoRoute(path: '/home', builder: (_, _) => const PlanScreen()),
+      GoRoute(path: '/decks', builder: (_, _) => const PlanScreen()),
       GoRoute(path: '/plans', builder: (_, _) => const PlanScreen()),
       GoRoute(path: '/upgrade', builder: (_, _) => const UpgradeScreen()),
       GoRoute(path: '/checkout', builder: (_, _) => const CheckoutScreen()),
@@ -553,19 +570,18 @@ Future<void> _pumpProductApp(
       ),
     ],
   );
-  authProvider.addListener(() {
-    if (!redirectedAfterAuth && authProvider.isAuthenticated) {
-      redirectedAfterAuth = true;
-      router.go('/home');
-    }
-  });
-
   await $.pumpWidgetAndSettle(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         ChangeNotifierProvider<CommercialProvider>.value(
           value: commercialProvider,
+        ),
+        ChangeNotifierProvider<MessageProvider>(
+          create: (_) => MessageProvider(),
+        ),
+        ChangeNotifierProvider<NotificationProvider>(
+          create: (_) => NotificationProvider(),
         ),
       ],
       child: MaterialApp.router(
@@ -678,13 +694,13 @@ Future<AuthProvider> _pumpProfilePatrolApp(PatrolIntegrationTester $) async {
       ),
       GoRoute(
         path: '/messages',
-        builder:
-            (_, _) => const Scaffold(body: Center(child: Text('Mensagens'))),
+        builder: (_, _) =>
+            const Scaffold(body: Center(child: Text('Mensagens'))),
       ),
       GoRoute(
         path: '/notifications',
-        builder:
-            (_, _) => const Scaffold(body: Center(child: Text('Notificações'))),
+        builder: (_, _) =>
+            const Scaffold(body: Center(child: Text('Notificações'))),
       ),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
     ],
@@ -953,6 +969,7 @@ class _PatrolProductApiClient extends ApiClient {
     'id': 'patrol-user-1',
     'username': 'qa_user',
     'email': 'qa_user@example.com',
+    'email_verified': true,
     'display_name': 'Patrol Profile',
     'avatar_url': null,
     'location_state': 'SP',
@@ -1013,6 +1030,7 @@ class _PatrolProductApiClient extends ApiClient {
           'id': 'patrol-user-2',
           'username': body['username']?.toString() ?? 'qa_register_user',
           'email': body['email']?.toString() ?? 'qa_register_user@example.com',
+          'email_verified': false,
         },
       });
     }
@@ -1030,15 +1048,14 @@ class _PatrolProductApiClient extends ApiClient {
         'message': 'A beta gratuita não aceita pagamentos.',
       }),
       '/cards/resolve/batch' => ApiResponse(200, {
-        'data':
-            ((body['names'] as List?) ?? const [])
-                .map(
-                  (name) => {
-                    'input_name': name.toString(),
-                    'card_id': 'card-${name.toString().toLowerCase()}',
-                  },
-                )
-                .toList(),
+        'data': ((body['names'] as List?) ?? const [])
+            .map(
+              (name) => {
+                'input_name': name.toString(),
+                'card_id': 'card-${name.toString().toLowerCase()}',
+              },
+            )
+            .toList(),
         'unresolved': const [],
         'ambiguous': const [],
       }),

@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "matrix_id": "manaloom-s3-02-state-matrix-2026-07-21",
+  "canonical_states": [
+    "loading",
+    "progress",
+    "partial",
+    "stale",
+    "loading_more",
+    "saving",
+    "optimistic",
+    "disabled",
+    "empty",
+    "error",
+    "retry",
+    "offline",
+    "session_expired",
+    "permission_denied",
+    "success"
+  ],
+  "domains": {
+    "auth": {
+      "covered": ["loading","progress","saving","disabled","error","retry","offline","session_expired","permission_denied","success"],
+      "not_applicable": ["partial","stale","loading_more","optimistic","empty"],
+      "sources": ["lib/features/auth/screens/login_screen.dart","lib/features/auth/screens/register_screen.dart","lib/features/auth/screens/verify_email_screen.dart"],
+      "tests": ["test/features/auth/screens/auth_screens_test.dart","test/features/auth/providers/auth_provider_initialize_test.dart","test/features/auth/providers/auth_provider_log_sanitization_test.dart"],
+      "anchors": ["login-submit-button","register-submit-button","verify-email-error"],
+      "input_policy": "tested: credenciais/formulário permanecem controlados; token/senha nunca entram em log",
+      "raw_error_policy": "sanitized: AuthProvider expõe copy amigável e testes rejeitam payload/exception crua"
+    },
+    "battle": {
+      "covered": ["loading","progress","saving","disabled","empty","error","retry","permission_denied","success"],
+      "not_applicable": ["partial","stale","loading_more","optimistic","offline","session_expired"],
+      "sources": ["lib/features/battle/screens/battle_replays_screen.dart"],
+      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/services/battle_replay_service_test.dart"],
+      "anchors": ["battle-replays-loading-state","battle-replays-error-state","battle-replays-empty-state","battle-opponent-retry-button"],
+      "input_policy": "tested: seleção do oponente permanece até retry/cancelamento",
+      "raw_error_policy": "sanitized: _friendlyError converte falha operacional em mensagem de produto"
+    },
+    "binder": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","permission_denied","success"],
+      "not_applicable": ["optimistic","session_expired"],
+      "sources": ["lib/features/binder/screens/binder_screen.dart","lib/features/binder/screens/marketplace_screen.dart","lib/features/binder/widgets/binder_item_editor.dart"],
+      "tests": ["test/features/binder/screens/binder_screen_resilience_test.dart","test/features/binder/screens/marketplace_screen_overflow_test.dart","test/features/binder/providers/binder_provider_test.dart"],
+      "anchors": ["binder-list-loading-","binder-list-error-","binder-pagination-retry-","marketplace-list-empty"],
+      "input_policy": "tested: erro de paginação preserva cards e editor falho não descarta valores",
+      "raw_error_policy": "sanitized: falhas de lista/editor usam copy fixa e logging separado"
+    },
+    "cards": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","success"],
+      "not_applicable": ["optimistic","session_expired","permission_denied"],
+      "sources": ["lib/features/cards/screens/card_search_screen.dart","lib/features/cards/screens/card_detail_screen.dart"],
+      "tests": ["test/features/cards/screens/card_search_screen_test.dart","test/features/cards/providers/card_provider_search_test.dart","test/features/cards/screens/card_detail_screen_responsive_test.dart"],
+      "anchors": ["card-search-loading","card-search-error","card-search-empty-state","card-search-results-list"],
+      "input_policy": "tested: query e modo de adição sobrevivem a erro/retry",
+      "raw_error_policy": "sanitized: CardProvider usa FriendlyErrorMapper e detalhe usa fallback controlado"
+    },
+    "collection": {
+      "covered": ["loading","progress","partial","stale","loading_more","empty","error","retry","offline","success"],
+      "not_applicable": ["saving","optimistic","disabled","session_expired","permission_denied"],
+      "sources": ["lib/features/collection/screens/sets_catalog_screen.dart","lib/features/collection/screens/set_cards_screen.dart","lib/features/collection/screens/collection_screen.dart"],
+      "tests": ["test/features/collection/sets_catalog_screen_test.dart","test/features/collection/collection_screen_responsive_test.dart","test/features/collection/set_icon_svg_cache_test.dart"],
+      "anchors": ["sets-catalog-loading","setsCatalogList","set-cards-loading","setCardsEmptyState"],
+      "input_policy": "tested: filtro/tab permanecem durante retry e paginação",
+      "raw_error_policy": "sanitized: catch converte transporte em copy fixa sem interpolar exception"
+    },
+    "commercial": {
+      "covered": ["loading","progress","disabled","error","retry","offline","success"],
+      "not_applicable": ["partial","stale","loading_more","saving","optimistic","empty","session_expired","permission_denied"],
+      "sources": ["lib/features/commercial/screens/plan_screen.dart","lib/features/commercial/screens/upgrade_screen.dart","lib/features/commercial/screens/checkout_screen.dart"],
+      "tests": ["test/features/commercial/commercial_screens_responsive_test.dart","test/features/commercial/checkout_screen_test.dart","test/features/commercial/ai_usage_gate_test.dart"],
+      "anchors": ["upgrade-beta-notice","checkout-beta-notice","checkout-back-to-beta-button"],
+      "input_policy": "not_applicable: beta gratuita não coleta dados de pagamento",
+      "raw_error_policy": "sanitized: checkout desabilitado usa estado de produto e nunca mensagem do provedor"
+    },
+    "community": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","permission_denied","success"],
+      "not_applicable": ["optimistic","session_expired"],
+      "sources": ["lib/features/community/screens/community_screen.dart","lib/features/community/screens/community_deck_detail_screen.dart"],
+      "tests": ["test/features/community/screens/community_screen_responsive_test.dart","test/features/community/screens/community_deck_detail_screen_test.dart","test/features/community/providers/community_provider_test.dart"],
+      "anchors": ["community-explore-loading","community-explore-error","community-explore-retry","community-explore-empty"],
+      "input_policy": "tested: busca/comentário permanecem controlados durante erro e retry",
+      "raw_error_policy": "sanitized: providers registram exception somente em observabilidade e expõem copy fixa"
+    },
+    "decks": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","session_expired","permission_denied","success"],
+      "not_applicable": ["optimistic"],
+      "sources": ["lib/features/decks/screens/deck_list_screen.dart","lib/features/decks/screens/deck_details_screen.dart","lib/features/decks/screens/deck_generate_screen.dart","lib/features/decks/screens/deck_import_screen.dart"],
+      "tests": ["test/features/decks/screens/deck_details_screen_smoke_test.dart","test/features/decks/screens/deck_runtime_widget_flow_test.dart","test/features/decks/providers/deck_provider_test.dart"],
+      "anchors": ["deck-list-loading-state","deck-list-error-state","deck-details-loading-state","deck-details-error-state"],
+      "input_policy": "tested: import/prompt/diff permanecem até sucesso ou cancelamento explícito",
+      "raw_error_policy": "sanitized: FriendlyErrorMapper e dialogs de outcome impedem exception/metadata crua"
+    },
+    "home": {
+      "covered": ["loading","progress","partial","stale","saving","disabled","empty","error","retry","offline","success"],
+      "not_applicable": ["loading_more","optimistic","session_expired","permission_denied"],
+      "sources": ["lib/features/home/home_screen.dart","lib/features/home/lotus_life_counter_screen.dart","lib/features/home/lotus/lotus_host_overlays.dart"],
+      "tests": ["test/features/home/home_screen_test.dart","test/features/home/lotus_life_counter_screen_test.dart","test/features/home/lotus_host_controller_bootstrap_test.dart"],
+      "anchors": ["home-decks-error-state","home-decks-retry","lotus-loading-overlay","lotus-error-retry-button"],
+      "input_policy": "tested: sessão canônica do Life Counter e histórico sobrevivem a bootstrap/retry",
+      "raw_error_policy": "sanitized: overlays exibem copy fixa e diagnóstico permanece fora da UI"
+    },
+    "market": {
+      "covered": ["disabled","success"],
+      "not_applicable": ["loading","progress","partial","stale","loading_more","saving","optimistic","empty","error","retry","offline","session_expired","permission_denied"],
+      "sources": ["lib/features/market/screens/market_screen.dart"],
+      "tests": ["test/features/market/screens/market_screen_responsive_test.dart"],
+      "anchors": ["market-tab-bar","market-content"],
+      "input_policy": "not_applicable: rota /market é compatibilidade e redireciona para Community",
+      "raw_error_policy": "sanitized: superfície canônica é /community?tab=3"
+    },
+    "messages": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","session_expired","permission_denied","success"],
+      "not_applicable": ["optimistic"],
+      "sources": ["lib/features/messages/screens/message_inbox_screen.dart","lib/features/messages/screens/chat_screen.dart"],
+      "tests": ["test/features/messages/screens/message_inbox_screen_test.dart","test/features/messages/screens/chat_screen_test.dart","test/features/messages/providers/message_provider_test.dart"],
+      "anchors": ["messages-inbox-loading","messages-inbox-error","chat-loading-state","chat-message-field"],
+      "input_policy": "tested: falha de envio restaura e preserva o rascunho",
+      "raw_error_policy": "sanitized: UI usa copy fixa mesmo quando provider guarda diagnóstico interno"
+    },
+    "notifications": {
+      "covered": ["loading","progress","partial","stale","saving","disabled","empty","error","retry","offline","session_expired","success"],
+      "not_applicable": ["loading_more","optimistic","permission_denied"],
+      "sources": ["lib/features/notifications/screens/notification_screen.dart"],
+      "tests": ["test/features/notifications/screens/notification_screen_test.dart","test/features/notifications/models/notification_models_test.dart"],
+      "anchors": ["notifications-loading","notifications-error","notifications-empty","notifications-read-all-button"],
+      "input_policy": "not_applicable: ações não possuem campo de texto/draft",
+      "raw_error_policy": "sanitized: fetch e mutation exibem mensagens fixas e observabilidade separada"
+    },
+    "profile": {
+      "covered": ["loading","progress","saving","disabled","error","retry","offline","session_expired","permission_denied","success"],
+      "not_applicable": ["partial","stale","loading_more","optimistic","empty"],
+      "sources": ["lib/features/profile/profile_screen.dart"],
+      "tests": ["test/features/profile/profile_screen_test.dart","test/features/profile/account_privacy_service_test.dart","test/features/auth/account_security_service_test.dart"],
+      "anchors": ["profile-save-button","profile-change-password-button","profile-revoke-sessions-button","profile-delete-account-button"],
+      "input_policy": "tested: ações sensíveis exigem confirmação/reauth e falha não limpa o formulário",
+      "raw_error_policy": "sanitized: AccountPrivacyException/AccountSecurityUiException expõem somente copy allowlisted"
+    },
+    "retention": {
+      "covered": ["loading","progress","partial","stale","saving","disabled","empty","error","retry","offline","success"],
+      "not_applicable": ["loading_more","optimistic","session_expired","permission_denied"],
+      "sources": ["lib/features/retention/screens/post_game_notes_screen.dart"],
+      "tests": ["test/features/retention/post_game_notes_screen_resilience_test.dart","test/features/retention/post_game_note_store_test.dart"],
+      "anchors": ["post-game-loading","post-game-load-error","post-game-pending-sync","post-game-save-button"],
+      "input_policy": "tested: falha mantém formulário/nota e retry conclui sem duplicação",
+      "raw_error_policy": "sanitized: erro operacional vira copy de sync/carregamento controlada"
+    },
+    "scanner": {
+      "covered": ["disabled","error","retry","offline","permission_denied","success"],
+      "not_applicable": ["loading","progress","partial","stale","loading_more","saving","optimistic","empty","session_expired"],
+      "sources": ["lib/features/scanner/screens/card_scanner_screen.dart","lib/features/scanner/widgets/scanned_card_preview.dart"],
+      "tests": ["test/features/scanner/providers/scanner_provider_test.dart","test/features/scanner/utils/scanner_error_mapper_test.dart"],
+      "anchors": ["scanner-manual-card-search-field"],
+      "input_policy": "tested: fallback manual preserva texto; build beta não solicita câmera pela rota deferida",
+      "raw_error_policy": "sanitized: ScannerErrorMapper classifica permissão, OCR e transporte"
+    },
+    "shell": {
+      "covered": ["loading","progress","stale","disabled","error","retry","offline","session_expired","permission_denied","success"],
+      "not_applicable": ["partial","loading_more","saving","optimistic","empty"],
+      "sources": ["lib/main.dart","lib/core/widgets/main_scaffold.dart"],
+      "tests": ["test/features/auth/providers/auth_provider_initialize_test.dart","test/features/auth/screens/splash_screen_redirect_test.dart"],
+      "anchors": ["main-navigation-rail","main-bottom-navigation"],
+      "input_policy": "tested: redirect protegido é preservado durante auth e sessão inválida",
+      "raw_error_policy": "sanitized: router decide destino por status sem renderizar exception"
+    },
+    "social": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","permission_denied","success"],
+      "not_applicable": ["optimistic","session_expired"],
+      "sources": ["lib/features/social/screens/user_search_screen.dart","lib/features/social/screens/user_profile_screen.dart"],
+      "tests": ["test/features/social/screens/user_search_screen_test.dart","test/features/social/screens/user_profile_screen_responsive_test.dart","test/features/community/providers/social_provider_test.dart"],
+      "anchors": ["user-search-loading","user-search-error","user-profile-loading","public-binder-pagination-error-"],
+      "input_policy": "tested: query/filtro permanecem após falha e retry usa a consulta atual",
+      "raw_error_policy": "sanitized: SocialProvider observa exception e expõe mensagem fixa"
+    },
+    "trades": {
+      "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","session_expired","permission_denied","success"],
+      "not_applicable": ["optimistic"],
+      "sources": ["lib/features/trades/screens/trade_inbox_screen.dart","lib/features/trades/screens/trade_detail_screen.dart","lib/features/trades/screens/create_trade_screen.dart"],
+      "tests": ["test/features/trades/screens/trade_confirmation_flow_test.dart","test/features/trades/screens/create_trade_screen_overflow_test.dart","test/features/trades/providers/trade_provider_test.dart"],
+      "anchors": ["trade-inbox-loading","trade-detail-loading-state","trade-detail-error-state","create-trade-review-dialog"],
+      "input_policy": "tested: proposta só envia após review e falha/conflito não perde seleção",
+      "raw_error_policy": "sanitized: FriendlyErrorMapper converte lista/detalhe/mutation e conflito"
+    }
+  }
+}

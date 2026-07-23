@@ -35,7 +35,7 @@ class PlatformUnavailableScreen extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560),
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppTheme.space24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,7 @@ class PlatformUnavailableScreen extends StatelessWidget {
                       color: AppTheme.brass400,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.space20),
                   Text(
                     title,
                     style: theme.textTheme.headlineSmall?.copyWith(
@@ -62,7 +62,7 @@ class PlatformUnavailableScreen extends StatelessWidget {
                       letterSpacing: 0,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.space12),
                   Text(
                     message,
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -72,7 +72,7 @@ class PlatformUnavailableScreen extends StatelessWidget {
                     ),
                   ),
                   if (details != null) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppTheme.space12),
                     Text(
                       details!,
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -82,7 +82,7 @@ class PlatformUnavailableScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppTheme.space24),
                   FilledButton.icon(
                     onPressed: () => context.go(fallbackRoutePath),
                     icon: const Icon(Icons.arrow_back_rounded),

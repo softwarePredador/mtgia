@@ -130,15 +130,16 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              );
-              return host;
-            },
+            hostFactory:
+                ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  );
+                  return host;
+                },
           ),
         ),
       );
@@ -157,23 +158,24 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-                onLoadBundle: (host) async {
-                  if (host.loadBundleCallCount == 1) {
-                    host.failLoad('Test bundle load failure');
-                    return;
-                  }
+            hostFactory:
+                ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                    onLoadBundle: (host) async {
+                      if (host.loadBundleCallCount == 1) {
+                        host.failLoad('Test bundle load failure');
+                        return;
+                      }
 
-                  host.completeSuccessfulLoad();
+                      host.completeSuccessfulLoad();
+                    },
+                  );
+                  return host;
                 },
-              );
-              return host;
-            },
           ),
         ),
       );
@@ -206,9 +208,9 @@ void main() {
         routes: [
           GoRoute(
             path: lifeCounterRoutePath,
-            builder:
-                (context, state) => LotusLifeCounterScreen(
-                  hostFactory: ({
+            builder: (context, state) => LotusLifeCounterScreen(
+              hostFactory:
+                  ({
                     required onAppReviewRequested,
                     required onShellMessageRequested,
                   }) {
@@ -217,7 +219,7 @@ void main() {
                     );
                     return host;
                   },
-                ),
+            ),
           ),
         ],
       );
@@ -240,16 +242,20 @@ void main() {
           home: LotusLifeCounterScreen(
             deckId: 'deck-607',
             deckName: 'Lorehold reconstruído',
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-                onLoadBundle: (host) async => host.completeSuccessfulLoad(),
-              );
-              return host;
-            },
+            deckSnapshotHash:
+                'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            deckVersionAtEpochMs: 1784714400000,
+            hostFactory:
+                ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                    onLoadBundle: (host) async => host.completeSuccessfulLoad(),
+                  );
+                  return host;
+                },
           ),
         ),
       );
@@ -262,25 +268,100 @@ void main() {
       expect(session, isNotNull);
       expect(session!.deckId, 'deck-607');
       expect(session.deckName, 'Lorehold reconstruído');
+      expect(
+        session.deckSnapshotHash,
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      );
+      expect(session.deckVersionAtEpochMs, 1784714400000);
       expect(session.playSessionId, startsWith('play-'));
       expect(session.startedAtEpochMs, isNotNull);
       expect(history?.currentGameMeta?['deckId'], 'deck-607');
       expect(history?.currentGameMeta?['playSessionId'], session.playSessionId);
+      expect(
+        history?.currentGameMeta?['deckSnapshotHash'],
+        session.deckSnapshotHash,
+      );
+    });
+
+    testWidgets('a changed version of the same deck starts a clean game session', (
+      tester,
+    ) async {
+      final previousSession = LifeCounterSession.initial(
+        playerCount: 4,
+        playSessionId: 'play-deck-v1',
+        deckId: 'deck-607',
+        deckName: 'Lorehold',
+        deckSnapshotHash:
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        deckVersionAtEpochMs: 1000,
+        startedAtEpochMs: 2000,
+      ).copyWith(lives: const <int>[12, 40, 40, 40]);
+      await LifeCounterSessionStore().save(previousSession);
+      await LifeCounterHistoryStore().save(
+        const LifeCounterHistoryState(
+          currentGameName: 'Partida Lorehold v1',
+          currentGameMeta: <String, Object?>{
+            'id': 'game-v1',
+            'startDate': 2000,
+            'deckId': 'deck-607',
+            'playSessionId': 'play-deck-v1',
+          },
+          currentGameEntries: <LifeCounterHistoryEntry>[
+            LifeCounterHistoryEntry(message: 'Jogador 1 perdeu 28 de vida'),
+          ],
+          archiveEntries: <LifeCounterHistoryEntry>[],
+          archivedGameCount: 0,
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            deckId: 'deck-607',
+            deckName: 'Lorehold',
+            deckSnapshotHash:
+                'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+            deckVersionAtEpochMs: 3000,
+            hostFactory:
+                ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) => _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                  onLoadBundle: (host) async => host.completeSuccessfulLoad(),
+                ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      final history = await LifeCounterHistoryStore().load();
+      expect(session?.deckId, 'deck-607');
+      expect(
+        session?.deckSnapshotHash,
+        'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+      );
+      expect(session?.playSessionId, isNot('play-deck-v1'));
+      expect(session?.lives, everyElement(40));
+      expect(history?.currentGameEntries, isEmpty);
+      expect(history?.archivedGames, hasLength(1));
     });
 
     testWidgets(
       'switching decks starts a clean board and archives the previous game',
       (tester) async {
-        final previousSession = LifeCounterSession.initial(
-          playerCount: 4,
-          playSessionId: 'play-deck-a',
-          deckId: 'deck-a',
-          deckName: 'Deck A',
-          startedAtEpochMs: 1000,
-        ).copyWith(
-          lives: const <int>[17, 40, 40, 40],
-          poison: const <int>[4, 0, 0, 0],
-        );
+        final previousSession =
+            LifeCounterSession.initial(
+              playerCount: 4,
+              playSessionId: 'play-deck-a',
+              deckId: 'deck-a',
+              deckName: 'Deck A',
+              startedAtEpochMs: 1000,
+            ).copyWith(
+              lives: const <int>[17, 40, 40, 40],
+              poison: const <int>[4, 0, 0, 0],
+            );
         await LifeCounterSessionStore().save(previousSession);
         await LifeCounterHistoryStore().save(
           const LifeCounterHistoryState(
@@ -304,15 +385,17 @@ void main() {
             home: LotusLifeCounterScreen(
               deckId: 'deck-b',
               deckName: 'Deck B',
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                return _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                  onLoadBundle: (host) async => host.completeSuccessfulLoad(),
-                );
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    return _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                      onLoadBundle: (host) async =>
+                          host.completeSuccessfulLoad(),
+                    );
+                  },
             ),
           ),
         );
@@ -345,36 +428,35 @@ void main() {
           routes: [
             GoRoute(
               path: '/home',
-              builder:
-                  (context, state) => Scaffold(
-                    body: TextButton(
-                      onPressed: () async {
-                        routeResult =
-                            await openLifeCounterRoute<LifeCounterExitResult>(
-                              context,
-                            );
-                      },
-                      child: const Text('open-life-counter'),
-                    ),
-                  ),
+              builder: (context, state) => Scaffold(
+                body: TextButton(
+                  onPressed: () async {
+                    routeResult =
+                        await openLifeCounterRoute<LifeCounterExitResult>(
+                          context,
+                        );
+                  },
+                  child: const Text('open-life-counter'),
+                ),
+              ),
             ),
             GoRoute(
               path: lifeCounterRoutePath,
-              builder:
-                  (context, state) => LotusLifeCounterScreen(
-                    hostFactory: ({
+              builder: (context, state) => LotusLifeCounterScreen(
+                hostFactory:
+                    ({
                       required onAppReviewRequested,
                       required onShellMessageRequested,
                     }) {
                       host = _FakeLotusHost(
                         onShellMessageRequested: onShellMessageRequested,
                         onFlushStorageSnapshot: () => flushBarrier.future,
-                        onLoadBundle:
-                            (host) async => host.completeSuccessfulLoad(),
+                        onLoadBundle: (host) async =>
+                            host.completeSuccessfulLoad(),
                       );
                       return host;
                     },
-                  ),
+              ),
             ),
           ],
         );
@@ -416,28 +498,33 @@ void main() {
           routes: [
             GoRoute(
               path: '/home',
-              builder:
-                  (context, state) => Scaffold(
-                    body: TextButton(
-                      onPressed: () async {
-                        routeResult =
-                            await openLifeCounterRoute<LifeCounterExitResult>(
-                              context,
-                              deckId: 'deck-607',
-                              deckName: 'Lorehold',
-                            );
-                      },
-                      child: const Text('open-life-counter'),
-                    ),
-                  ),
+              builder: (context, state) => Scaffold(
+                body: TextButton(
+                  onPressed: () async {
+                    routeResult = await openLifeCounterRoute<LifeCounterExitResult>(
+                      context,
+                      deckId: 'deck-607',
+                      deckName: 'Lorehold',
+                      deckSnapshotHash:
+                          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                      deckVersionAtEpochMs: 1784714400000,
+                    );
+                  },
+                  child: const Text('open-life-counter'),
+                ),
+              ),
             ),
             GoRoute(
               path: lifeCounterRoutePath,
-              builder:
-                  (context, state) => LotusLifeCounterScreen(
-                    deckId: state.uri.queryParameters['deckId'],
-                    deckName: state.uri.queryParameters['deckName'],
-                    hostFactory: ({
+              builder: (context, state) => LotusLifeCounterScreen(
+                deckId: state.uri.queryParameters['deckId'],
+                deckName: state.uri.queryParameters['deckName'],
+                deckSnapshotHash: state.uri.queryParameters['deckSnapshotHash'],
+                deckVersionAtEpochMs: int.tryParse(
+                  state.uri.queryParameters['deckVersionAt'] ?? '',
+                ),
+                hostFactory:
+                    ({
                       required onAppReviewRequested,
                       required onShellMessageRequested,
                     }) {
@@ -456,12 +543,12 @@ void main() {
                           );
                           return true;
                         },
-                        onLoadBundle:
-                            (host) async => host.completeSuccessfulLoad(),
+                        onLoadBundle: (host) async =>
+                            host.completeSuccessfulLoad(),
                       );
                       return host;
                     },
-                  ),
+              ),
             ),
           ],
         );
@@ -481,6 +568,11 @@ void main() {
         expect(routeResult!.hadGameActivity, isTrue);
         expect(routeResult!.storageFlushed, isTrue);
         expect(routeResult!.deckId, 'deck-607');
+        expect(
+          routeResult!.deckSnapshotHash,
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        );
+        expect(routeResult!.deckVersionAtEpochMs, 1784714400000);
         expect(routeResult!.playSessionId, startsWith('play-'));
         expect(routeResult!.duration, isNotNull);
       },
@@ -494,31 +586,30 @@ void main() {
         routes: [
           GoRoute(
             path: '/home',
-            builder:
-                (context, state) => Scaffold(
-                  body: TextButton(
-                    onPressed: () => openLifeCounterRoute(context),
-                    child: const Text('open-life-counter'),
-                  ),
-                ),
+            builder: (context, state) => Scaffold(
+              body: TextButton(
+                onPressed: () => openLifeCounterRoute(context),
+                child: const Text('open-life-counter'),
+              ),
+            ),
           ),
           GoRoute(
             path: lifeCounterRoutePath,
-            builder:
-                (context, state) => LotusLifeCounterScreen(
-                  hostFactory: ({
+            builder: (context, state) => LotusLifeCounterScreen(
+              hostFactory:
+                  ({
                     required onAppReviewRequested,
                     required onShellMessageRequested,
                   }) {
                     host = _FakeLotusHost(
                       onShellMessageRequested: onShellMessageRequested,
                       onFlushStorageSnapshot: () => neverCompletes.future,
-                      onLoadBundle:
-                          (host) async => host.completeSuccessfulLoad(),
+                      onLoadBundle: (host) async =>
+                          host.completeSuccessfulLoad(),
                     );
                     return host;
                   },
-                ),
+            ),
           ),
         ],
       );
@@ -553,25 +644,25 @@ void main() {
         routes: [
           GoRoute(
             path: '/home',
-            builder:
-                (context, state) => const Scaffold(body: Text('home-screen')),
+            builder: (context, state) =>
+                const Scaffold(body: Text('home-screen')),
           ),
           GoRoute(
             path: lifeCounterRoutePath,
-            builder:
-                (context, state) => LotusLifeCounterScreen(
-                  hostFactory: ({
+            builder: (context, state) => LotusLifeCounterScreen(
+              hostFactory:
+                  ({
                     required onAppReviewRequested,
                     required onShellMessageRequested,
                   }) {
                     host = _FakeLotusHost(
                       onShellMessageRequested: onShellMessageRequested,
-                      onLoadBundle:
-                          (host) async => host.completeSuccessfulLoad(),
+                      onLoadBundle: (host) async =>
+                          host.completeSuccessfulLoad(),
                     );
                     return host;
                   },
-                ),
+            ),
           ),
         ],
       );
@@ -595,24 +686,24 @@ void main() {
         routes: [
           GoRoute(
             path: '/home',
-            builder:
-                (context, state) => const Scaffold(body: Text('home-screen')),
+            builder: (context, state) =>
+                const Scaffold(body: Text('home-screen')),
           ),
           GoRoute(
             path: lifeCounterRoutePath,
-            builder:
-                (context, state) => LotusLifeCounterScreen(
-                  hostFactory: ({
+            builder: (context, state) => LotusLifeCounterScreen(
+              hostFactory:
+                  ({
                     required onAppReviewRequested,
                     required onShellMessageRequested,
                   }) {
                     return _FakeLotusHost(
                       onShellMessageRequested: onShellMessageRequested,
-                      onLoadBundle:
-                          (host) async => host.completeSuccessfulLoad(),
+                      onLoadBundle: (host) async =>
+                          host.completeSuccessfulLoad(),
                     );
                   },
-                ),
+            ),
           ),
         ],
       );
@@ -639,14 +730,15 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                return _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                );
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    return _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    );
+                  },
             ),
           ),
         );
@@ -684,14 +776,15 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                return _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                );
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    return _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    );
+                  },
             ),
           ),
         );

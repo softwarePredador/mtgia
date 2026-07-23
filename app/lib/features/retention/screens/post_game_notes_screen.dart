@@ -15,6 +15,8 @@ class PostGameNotesScreen extends StatefulWidget {
     this.playSessionId,
     this.sessionStartedAt,
     this.sessionEndedAt,
+    this.deckSnapshotHash,
+    this.deckVersionAt,
   });
 
   final String deckId;
@@ -22,6 +24,8 @@ class PostGameNotesScreen extends StatefulWidget {
   final String? playSessionId;
   final DateTime? sessionStartedAt;
   final DateTime? sessionEndedAt;
+  final String? deckSnapshotHash;
+  final DateTime? deckVersionAt;
 
   @override
   State<PostGameNotesScreen> createState() => _PostGameNotesScreenState();
@@ -135,6 +139,8 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
       playSessionId: widget.playSessionId,
       sessionStartedAt: widget.sessionStartedAt,
       sessionEndedAt: widget.sessionEndedAt,
+      deckSnapshotHash: widget.deckSnapshotHash,
+      deckVersionAt: widget.deckVersionAt,
     );
     try {
       await _store.addNote(note);
@@ -217,139 +223,142 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
   Widget build(BuildContext context) {
     final horizontalGutter =
         MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
-            ? 16.0
-            : 24.0;
+        ? 16.0
+        : 24.0;
     return Scaffold(
       appBar: AppBar(title: const Text('Pós-jogo')),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _loadError != null
-              ? AppStatePanel(
-                key: const Key('post-game-load-error'),
-                icon: Icons.sync_problem_rounded,
-                title: 'Falha ao carregar o pós-jogo',
-                message: _loadError,
-                accent: AppTheme.error,
-                actionLabel: 'Tentar novamente',
-                onAction: _load,
-              )
-              : SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  top: 16,
-                  bottom: 16 + MediaQuery.of(context).padding.bottom,
-                ),
-                child: ResponsivePageFrame(
-                  key: const Key('post-game-responsive-frame'),
-                  maxWidth: AppTheme.contentMaxWidth,
-                  padding: EdgeInsets.symmetric(horizontal: horizontalGutter),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isDesktop =
-                          constraints.maxWidth >= AppTheme.breakpointExpanded;
-                      final summary = _EvolutionSummaryPanel(
-                        summary: _summary,
-                        contentSizedActions: isDesktop,
-                        onOptimize:
-                            () => context.go(
-                              '/decks/${widget.deckId}?optimize=post_game',
-                            ),
-                        onRebuild:
-                            () => context.go(
-                              '/decks/${widget.deckId}?optimize=rebuild',
-                            ),
-                      );
-                      final formAndHistory = Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (widget.playSessionId != null) ...[
-                            _LifeCounterSessionPanel(
-                              startedAt: widget.sessionStartedAt,
-                              endedAt: widget.sessionEndedAt,
-                            ),
-                            const SizedBox(height: 12),
-                          ],
-                          if (_pendingSyncCount > 0) ...[
-                            _PendingSyncPanel(count: _pendingSyncCount),
-                            const SizedBox(height: 12),
-                          ],
-                          _PostGameForm(
-                            resultController: _resultController,
-                            tableLevelController: _tableLevelController,
-                            notesController: _notesController,
-                            goodCardsController: _goodCardsController,
-                            badCardsController: _badCardsController,
-                            selectedIssues: _selectedIssues,
-                            contentSizedAction: isDesktop,
-                            isSaving: _isSaving,
-                            onIssueChanged: (issue, selected) {
-                              setState(() {
-                                if (selected) {
-                                  _selectedIssues.add(issue);
-                                } else {
-                                  _selectedIssues.remove(issue);
-                                }
-                              });
-                            },
-                            onSave: _saveNote,
+      body: _isLoading
+          ? const AppStatePanel.loading(
+              key: Key('post-game-loading'),
+              title: 'Carregando pós-jogo',
+              message: 'Recuperando notas locais e sincronizadas.',
+              accent: AppTheme.brass400,
+            )
+          : _loadError != null
+          ? AppStatePanel(
+              key: const Key('post-game-load-error'),
+              icon: Icons.sync_problem_rounded,
+              title: 'Falha ao carregar o pós-jogo',
+              message: _loadError,
+              accent: AppTheme.error,
+              actionLabel: 'Tentar novamente',
+              onAction: _load,
+            )
+          : SingleChildScrollView(
+              padding: EdgeInsets.only(
+                top: AppTheme.space16,
+                bottom:
+                    AppTheme.space16 + MediaQuery.of(context).padding.bottom,
+              ),
+              child: ResponsivePageFrame(
+                key: const Key('post-game-responsive-frame'),
+                maxWidth: AppTheme.contentMaxWidth,
+                padding: EdgeInsets.symmetric(horizontal: horizontalGutter),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isDesktop =
+                        constraints.maxWidth >= AppTheme.breakpointExpanded;
+                    final summary = _EvolutionSummaryPanel(
+                      summary: _summary,
+                      contentSizedActions: isDesktop,
+                      onOptimize: () => context.go(
+                        '/decks/${widget.deckId}?optimize=post_game',
+                      ),
+                      onRebuild: () => context.go(
+                        '/decks/${widget.deckId}?optimize=rebuild',
+                      ),
+                    );
+                    final formAndHistory = Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (widget.playSessionId != null) ...[
+                          _LifeCounterSessionPanel(
+                            startedAt: widget.sessionStartedAt,
+                            endedAt: widget.sessionEndedAt,
+                            deckSnapshotHash: widget.deckSnapshotHash,
                           ),
-                          const SizedBox(height: 18),
-                          _buildHistorySection(),
+                          const SizedBox(height: AppTheme.space12),
                         ],
-                      );
+                        if (_pendingSyncCount > 0) ...[
+                          _PendingSyncPanel(count: _pendingSyncCount),
+                          const SizedBox(height: AppTheme.space12),
+                        ],
+                        _PostGameForm(
+                          resultController: _resultController,
+                          tableLevelController: _tableLevelController,
+                          notesController: _notesController,
+                          goodCardsController: _goodCardsController,
+                          badCardsController: _badCardsController,
+                          selectedIssues: _selectedIssues,
+                          contentSizedAction: isDesktop,
+                          isSaving: _isSaving,
+                          onIssueChanged: (issue, selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedIssues.add(issue);
+                              } else {
+                                _selectedIssues.remove(issue);
+                              }
+                            });
+                          },
+                          onSave: _saveNote,
+                        ),
+                        const SizedBox(height: AppTheme.space18),
+                        _buildHistorySection(),
+                      ],
+                    );
 
-                      if (isDesktop) {
-                        return Row(
-                          key: const Key('post-game-desktop-layout'),
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: AppTheme.inspectorWidth,
-                              child: summary,
-                            ),
-                            const SizedBox(width: AppTheme.paneGap),
-                            Expanded(child: formAndHistory),
-                          ],
-                        );
-                      }
-
-                      return Column(
-                        key: const Key('post-game-mobile-layout'),
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                    if (isDesktop) {
+                      return Row(
+                        key: const Key('post-game-desktop-layout'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          summary,
-                          const SizedBox(height: 14),
-                          formAndHistory,
+                          SizedBox(
+                            width: AppTheme.inspectorWidth,
+                            child: summary,
+                          ),
+                          const SizedBox(width: AppTheme.paneGap),
+                          Expanded(child: formAndHistory),
                         ],
                       );
-                    },
-                  ),
+                    }
+
+                    return Column(
+                      key: const Key('post-game-mobile-layout'),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        summary,
+                        const SizedBox(height: AppTheme.space14),
+                        formAndHistory,
+                      ],
+                    );
+                  },
                 ),
               ),
-      bottomNavigationBar:
-          _operationError == null
-              ? null
-              : SafeArea(
-                top: false,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontalGutter,
-                    8,
-                    horizontalGutter,
-                    8,
-                  ),
-                  child: Center(
-                    heightFactor: 1,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 720),
-                      child: _OperationErrorPanel(
-                        message: _operationError!,
-                        onRetry: _retryFailedOperation,
-                      ),
+            ),
+      bottomNavigationBar: _operationError == null
+          ? null
+          : SafeArea(
+              top: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalGutter,
+                  AppTheme.space8,
+                  horizontalGutter,
+                  AppTheme.space8,
+                ),
+                child: Center(
+                  heightFactor: 1,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: _OperationErrorPanel(
+                      message: _operationError!,
+                      onRetry: _retryFailedOperation,
                     ),
                   ),
                 ),
               ),
+            ),
     );
   }
 
@@ -363,7 +372,7 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         if (_notes.isEmpty)
           const _EmptyHistoryPanel()
         else
@@ -380,26 +389,38 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
 }
 
 class _LifeCounterSessionPanel extends StatelessWidget {
-  const _LifeCounterSessionPanel({this.startedAt, this.endedAt});
+  const _LifeCounterSessionPanel({
+    this.startedAt,
+    this.endedAt,
+    this.deckSnapshotHash,
+  });
 
   final DateTime? startedAt;
   final DateTime? endedAt;
+  final String? deckSnapshotHash;
 
   @override
   Widget build(BuildContext context) {
     final duration =
         startedAt != null && endedAt != null && !endedAt!.isBefore(startedAt!)
-            ? endedAt!.difference(startedAt!)
-            : null;
-    final durationLabel =
-        duration == null
-            ? null
-            : duration.inHours > 0
-            ? '${duration.inHours}h ${duration.inMinutes.remainder(60)}min'
-            : '${duration.inMinutes.clamp(1, 9999)} min';
+        ? endedAt!.difference(startedAt!)
+        : null;
+    final durationLabel = duration == null
+        ? null
+        : duration.inHours > 0
+        ? '${duration.inHours}h ${duration.inMinutes.remainder(60)}min'
+        : '${duration.inMinutes.clamp(1, 9999)} min';
+    final normalizedHash = deckSnapshotHash?.trim();
+    final versionLabel = normalizedHash == null || normalizedHash.isEmpty
+        ? null
+        : 'versão ${normalizedHash.substring(0, normalizedHash.length.clamp(0, 8))}';
+    final contextParts = <String>[
+      if (durationLabel != null) durationLabel,
+      if (versionLabel != null) versionLabel,
+    ];
     return Container(
       key: const Key('post-game-life-counter-session'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -408,12 +429,12 @@ class _LifeCounterSessionPanel extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.favorite_outline, color: AppTheme.frost400),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
-              durationLabel == null
+              contextParts.isEmpty
                   ? 'Registro vinculado à sessão do Life Counter.'
-                  : 'Sessão do Life Counter vinculada • $durationLabel',
+                  : 'Sessão do Life Counter vinculada • ${contextParts.join(' • ')}',
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 height: 1.35,
@@ -439,7 +460,10 @@ class _PendingSyncPanel extends StatelessWidget {
           '$count ${count == 1 ? 'alteração pendente' : 'alterações pendentes'} de sincronização',
       child: Container(
         key: const Key('post-game-pending-sync'),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space14,
+          vertical: AppTheme.space12,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.frost400.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -449,7 +473,7 @@ class _PendingSyncPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Icon(Icons.sync_rounded, color: AppTheme.frost400, size: 20),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
             Expanded(
               child: Text(
                 '$count ${count == 1 ? 'alteração está salva' : 'alterações estão salvas'} '
@@ -482,13 +506,12 @@ class _EvolutionSummaryPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mainIssues =
-        summary.issueCounts.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
+    final mainIssues = summary.issueCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     return Container(
       key: const Key('post-game-evolution-summary'),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -500,7 +523,7 @@ class _EvolutionSummaryPanel extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.timeline, color: AppTheme.frost400),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   'Evolução do deck',
@@ -512,7 +535,7 @@ class _EvolutionSummaryPanel extends StatelessWidget {
               Text('${summary.totalMatches} jogos'),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           if (mainIssues.isEmpty)
             const Text(
               'Sem padrões ainda. Registre partidas para o app detectar problemas recorrentes.',
@@ -522,23 +545,22 @@ class _EvolutionSummaryPanel extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children:
-                  mainIssues
-                      .map(
-                        (entry) => Chip(
-                          label: Text('${entry.key.label} x${entry.value}'),
-                          avatar: const Icon(Icons.error_outline, size: 16),
-                        ),
-                      )
-                      .toList(),
+              children: mainIssues
+                  .map(
+                    (entry) => Chip(
+                      label: Text('${entry.key.label} x${entry.value}'),
+                      avatar: const Icon(Icons.error_outline, size: 16),
+                    ),
+                  )
+                  .toList(),
             ),
           if (summary.suggestions.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             ...summary.suggestions
                 .take(3)
                 .map(
                   (line) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.only(bottom: AppTheme.space6),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -547,7 +569,7 @@ class _EvolutionSummaryPanel extends StatelessWidget {
                           size: 16,
                           color: AppTheme.brass400,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppTheme.space8),
                         Expanded(
                           child: Text(
                             line,
@@ -564,25 +586,31 @@ class _EvolutionSummaryPanel extends StatelessWidget {
           ],
           if (summary.topPerformers.isNotEmpty ||
               summary.reviewCandidates.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             _CardSignalRows(summary: summary),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           if (contentSizedActions)
             Wrap(
               alignment: WrapAlignment.end,
               spacing: 10,
               runSpacing: 8,
               children: [
-                SizedBox(width: 150, child: _buildOptimizeButton()),
-                SizedBox(width: 150, child: _buildRebuildButton()),
+                SizedBox(
+                  width: AppTheme.space150,
+                  child: _buildOptimizeButton(),
+                ),
+                SizedBox(
+                  width: AppTheme.space150,
+                  child: _buildRebuildButton(),
+                ),
               ],
             )
           else
             Row(
               children: [
                 Expanded(child: _buildOptimizeButton()),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
                 Expanded(child: _buildRebuildButton()),
               ],
             ),
@@ -654,12 +682,12 @@ class _SignalRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppTheme.space8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 17, color: color),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Text(
               '$label: ${values.take(3).join(', ')}',
@@ -704,7 +732,7 @@ class _PostGameForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('post-game-form'),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -719,7 +747,7 @@ class _PostGameForm extends StatelessWidget {
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           TextField(
             key: const Key('post-game-result-field'),
             controller: resultController,
@@ -728,7 +756,7 @@ class _PostGameForm extends StatelessWidget {
               hintText: 'Ex: vitória, 2º lugar, perdeu para combo',
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           TextField(
             key: const Key('post-game-table-level-field'),
             controller: tableLevelController,
@@ -737,7 +765,7 @@ class _PostGameForm extends StatelessWidget {
               hintText: 'Casual, melhorada, otimizada ou cEDH',
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           TextField(
             key: const Key('post-game-notes-field'),
             controller: notesController,
@@ -748,7 +776,7 @@ class _PostGameForm extends StatelessWidget {
               hintText: 'O que aconteceu na partida?',
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           TextField(
             key: const Key('post-game-good-cards-field'),
             controller: goodCardsController,
@@ -757,7 +785,7 @@ class _PostGameForm extends StatelessWidget {
               hintText: 'Separe por vírgula',
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           TextField(
             key: const Key('post-game-bad-cards-field'),
             controller: badCardsController,
@@ -766,22 +794,21 @@ class _PostGameForm extends StatelessWidget {
               hintText: 'Separe por vírgula',
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children:
-                PostGameIssue.values.map((issue) {
-                  final selected = selectedIssues.contains(issue);
-                  return FilterChip(
-                    key: Key('post-game-issue-${issue.id}'),
-                    label: Text(issue.label),
-                    selected: selected,
-                    onSelected: (value) => onIssueChanged(issue, value),
-                  );
-                }).toList(),
+            children: PostGameIssue.values.map((issue) {
+              final selected = selectedIssues.contains(issue);
+              return FilterChip(
+                key: Key('post-game-issue-${issue.id}'),
+                label: Text(issue.label),
+                selected: selected,
+                onSelected: (value) => onIssueChanged(issue, value),
+              );
+            }).toList(),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
@@ -789,13 +816,12 @@ class _PostGameForm extends StatelessWidget {
               child: ElevatedButton.icon(
                 key: const Key('post-game-save-button'),
                 onPressed: isSaving ? null : onSave,
-                icon:
-                    isSaving
-                        ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.save),
+                icon: isSaving
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.save),
                 label: Text(isSaving ? 'Salvando...' : 'Salvar pós-jogo'),
               ),
             ),
@@ -812,7 +838,7 @@ class _EmptyHistoryPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(AppTheme.space18),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -840,8 +866,8 @@ class _PostGameNoteTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: AppTheme.space10),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -865,13 +891,12 @@ class _PostGameNoteTile extends StatelessWidget {
                 key: Key('post-game-delete-${note.id}'),
                 tooltip: 'Remover nota',
                 onPressed: isDeleting ? null : onDelete,
-                icon:
-                    isDeleting
-                        ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.delete_outline),
+                icon: isDeleting
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.delete_outline),
               ),
             ],
           ),
@@ -881,7 +906,7 @@ class _PostGameNoteTile extends StatelessWidget {
               style: const TextStyle(color: AppTheme.textSecondary),
             ),
           if (note.notes.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               note.notes,
               style: const TextStyle(
@@ -891,14 +916,13 @@ class _PostGameNoteTile extends StatelessWidget {
             ),
           ],
           if (note.issues.isNotEmpty) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             Wrap(
               spacing: 6,
               runSpacing: 6,
-              children:
-                  note.issues
-                      .map((issue) => Chip(label: Text(issue.label)))
-                      .toList(),
+              children: note.issues
+                  .map((issue) => Chip(label: Text(issue.label)))
+                  .toList(),
             ),
           ],
         ],
@@ -917,7 +941,7 @@ class _OperationErrorPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('post-game-operation-error'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.error.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -927,7 +951,7 @@ class _OperationErrorPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Icon(Icons.error_outline_rounded, color: AppTheme.error),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -939,7 +963,7 @@ class _OperationErrorPanel extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   message,
                   style: const TextStyle(
@@ -947,7 +971,7 @@ class _OperationErrorPanel extends StatelessWidget {
                     height: AppTheme.lineHeightCompact,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 TextButton.icon(
                   key: const Key('post-game-operation-retry'),
                   onPressed: onRetry,

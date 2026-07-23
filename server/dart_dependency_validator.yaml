@@ -1,2 +1,5 @@
 ignore:
   - manaloom_lints
+  # Release builds require this exact CLI and a dedicated supply-chain
+  # contract asserts the 1.2.14 pin. Keep all other dependency pins rejected.
+  - dart_frog_cli

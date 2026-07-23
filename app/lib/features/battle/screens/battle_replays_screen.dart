@@ -9,6 +9,9 @@ import '../../../core/widgets/mana_symbols.dart';
 import '../models/battle_replay.dart';
 import '../services/battle_replay_service.dart';
 
+String battleReplaysRouteLocation(String deckId) =>
+    '/decks/${Uri.encodeComponent(deckId)}/battle-replays';
+
 enum _ReplayDetailView { timeline, decisions, raw }
 
 class BattleReplaysScreen extends StatefulWidget {
@@ -155,11 +158,10 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   Future<String?> _askOpponentDeckId() async {
     return showDialog<String>(
       context: context,
-      builder:
-          (context) => _BattleOpponentPickerDialog(
-            gateway: _gateway,
-            currentDeckId: widget.deckId,
-          ),
+      builder: (context) => _BattleOpponentPickerDialog(
+        gateway: _gateway,
+        currentDeckId: widget.deckId,
+      ),
     );
   }
 
@@ -208,9 +210,8 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const AppStatePanel(
+      return const AppStatePanel.loading(
         key: Key('battle-replays-loading-state'),
-        icon: Icons.psychology_alt_outlined,
         title: 'Carregando replays',
         message: 'Buscando simulacoes salvas e trilhas de decisao do deck.',
         accent: AppTheme.frost400,
@@ -256,12 +257,16 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         SizedBox(
           key: const Key('battle-replays-history-pane'),
           width: 344,
-          child:
-              _replays.isEmpty
-                  ? _buildEmptyState()
-                  : _buildReplayList(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+          child: _replays.isEmpty
+              ? _buildEmptyState()
+              : _buildReplayList(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space12,
+                    AppTheme.space12,
+                    AppTheme.space12,
+                    AppTheme.space24,
                   ),
+                ),
         ),
         VerticalDivider(
           width: 1,
@@ -270,10 +275,9 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         ),
         const SizedBox(width: AppTheme.paneGap),
         Expanded(
-          child:
-              selectedReplay == null
-                  ? const _ReplaySelectionEmpty()
-                  : _buildDetailPane(selectedReplay, showBack: false),
+          child: selectedReplay == null
+              ? const _ReplaySelectionEmpty()
+              : _buildDetailPane(selectedReplay, showBack: false),
         ),
       ],
     );
@@ -303,7 +307,12 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Widget _buildReplayList({
-    EdgeInsetsGeometry padding = const EdgeInsets.fromLTRB(16, 12, 16, 24),
+    EdgeInsetsGeometry padding = const EdgeInsets.fromLTRB(
+      AppTheme.space16,
+      AppTheme.space12,
+      AppTheme.space16,
+      AppTheme.space24,
+    ),
   }) {
     return RefreshIndicator(
       onRefresh: _loadReplays,
@@ -311,7 +320,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         key: const Key('battle-replays-history-list'),
         padding: padding,
         itemCount: _replays.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, __) => const SizedBox(height: AppTheme.space10),
         itemBuilder: (context, index) {
           final replay = _replays[index];
           return _BattleReplaySummaryTile(
@@ -382,10 +391,9 @@ class _BattleOpponentPickerDialogState
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error =
-            error is BattleReplayException
-                ? error.message
-                : 'Nao foi possivel carregar os decks adversarios.';
+        _error = error is BattleReplayException
+            ? error.message
+            : 'Nao foi possivel carregar os decks adversarios.';
       });
     }
   }
@@ -419,10 +427,9 @@ class _BattleOpponentPickerDialogState
     final availableHeight =
         mediaQuery.size.height - mediaQuery.viewInsets.bottom;
     final contentHeight = (availableHeight - 220).clamp(220.0, 560.0);
-    final canSubmit =
-        _showTechnicalId
-            ? _technicalIdController.text.trim().isNotEmpty
-            : _selectedDeckId != null;
+    final canSubmit = _showTechnicalId
+        ? _technicalIdController.text.trim().isNotEmpty
+        : _selectedDeckId != null;
 
     return AlertDialog(
       key: const Key('battle-opponent-picker-dialog'),
@@ -440,7 +447,7 @@ class _BattleOpponentPickerDialogState
                 height: 1.35,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             if (!_isLoading && _error == null && _decks.isNotEmpty) ...[
               TextField(
                 key: const Key('battle-opponent-search-field'),
@@ -453,7 +460,7 @@ class _BattleOpponentPickerDialogState
                 ),
                 onChanged: (_) => setState(() {}),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               Text(
                 '$ownCount meus · $publicCount publicos',
                 style: theme.textTheme.labelSmall?.copyWith(
@@ -461,7 +468,7 @@ class _BattleOpponentPickerDialogState
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
             ],
             Expanded(
               child: _buildDeckBody(
@@ -470,7 +477,7 @@ class _BattleOpponentPickerDialogState
                 query: query,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             TextButton.icon(
               key: const Key('battle-opponent-technical-toggle'),
               onPressed: () {
@@ -489,7 +496,7 @@ class _BattleOpponentPickerDialogState
               ),
             ),
             if (_showTechnicalId) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: AppTheme.space6),
               TextField(
                 key: const Key('battle-opponent-deck-id-field'),
                 controller: _technicalIdController,
@@ -551,7 +558,7 @@ class _BattleOpponentPickerDialogState
               color: AppTheme.error,
               size: 30,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             Text(
               _error!,
               textAlign: TextAlign.center,
@@ -559,7 +566,7 @@ class _BattleOpponentPickerDialogState
                 context,
               ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             OutlinedButton.icon(
               key: const Key('battle-opponent-retry-button'),
               onPressed: _loadDecks,
@@ -605,7 +612,12 @@ class _BattleOpponentPickerDialogState
           children: [
             if (beginsSection)
               Padding(
-                padding: EdgeInsets.fromLTRB(4, index == 0 ? 4 : 14, 4, 6),
+                padding: EdgeInsets.fromLTRB(
+                  AppTheme.space4,
+                  index == AppTheme.space0 ? AppTheme.space4 : AppTheme.space14,
+                  AppTheme.space4,
+                  AppTheme.space6,
+                ),
                 child: Text(
                   deck.isOwn ? 'MEUS DECKS' : 'DECKS PUBLICOS',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -622,7 +634,9 @@ class _BattleOpponentPickerDialogState
               child: ListTile(
                 key: Key('battle-opponent-deck-${deck.id}'),
                 selected: selected,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space8,
+                ),
                 leading: Icon(
                   deck.isOwn ? Icons.style_outlined : Icons.public_rounded,
                   color: selected ? AppTheme.brass400 : AppTheme.frost400,
@@ -678,7 +692,12 @@ class _BattleReplayActions extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space16,
+        AppTheme.space14,
+        AppTheme.space16,
+        AppTheme.space12,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         border: Border(
@@ -703,13 +722,13 @@ class _BattleReplayActions extends StatelessWidget {
               ),
               if (isRunning)
                 const SizedBox(
-                  width: 18,
-                  height: 18,
+                  width: AppTheme.space18,
+                  height: AppTheme.space18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           Text(
             'Confira o motor e o contrato de cada replay. A simulacao nao substitui regra oficial, legalidade ou validacao de troca.',
             style: theme.textTheme.bodySmall?.copyWith(
@@ -717,7 +736,7 @@ class _BattleReplayActions extends StatelessWidget {
               height: 1.32,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Wrap(
             spacing: 10,
             runSpacing: 8,
@@ -757,24 +776,22 @@ class _BattleReplaySummaryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Material(
-      color:
-          selected
-              ? AppTheme.frost400.withValues(alpha: 0.08)
-              : AppTheme.surfaceElevated,
+      color: selected
+          ? AppTheme.frost400.withValues(alpha: 0.08)
+          : AppTheme.surfaceElevated,
       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       child: InkWell(
         key: Key('battle-replay-summary-${replay.id}'),
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(AppTheme.space14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color:
-                  selected
-                      ? AppTheme.frost400.withValues(alpha: 0.48)
-                      : AppTheme.outlineMuted.withValues(alpha: 0.62),
+              color: selected
+                  ? AppTheme.frost400.withValues(alpha: 0.48)
+                  : AppTheme.outlineMuted.withValues(alpha: 0.62),
             ),
           ),
           child: Column(
@@ -796,7 +813,7 @@ class _BattleReplaySummaryTile extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -810,7 +827,7 @@ class _BattleReplaySummaryTile extends StatelessWidget {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           replay.resultLabel,
                           maxLines: 1,
@@ -828,7 +845,7 @@ class _BattleReplaySummaryTile extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space12),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -859,7 +876,7 @@ class _ReplaySelectionEmpty extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(AppTheme.space32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -868,7 +885,7 @@ class _ReplaySelectionEmpty extends StatelessWidget {
                 size: 36,
                 color: AppTheme.frost400,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppTheme.space14),
               Text(
                 'Selecione um replay',
                 textAlign: TextAlign.center,
@@ -877,7 +894,7 @@ class _ReplaySelectionEmpty extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppTheme.space6),
               Text(
                 'O historico permanece visivel enquanto voce percorre a partida.',
                 textAlign: TextAlign.center,
@@ -915,7 +932,12 @@ class _BattleReplayDetailPane extends StatelessWidget {
     final summary = detail.summary;
     return ListView(
       key: const Key('battle-replay-detail-pane'),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space16,
+        AppTheme.space12,
+        AppTheme.space16,
+        AppTheme.space24,
+      ),
       children: [
         if (showBack)
           Align(
@@ -927,7 +949,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
             ),
           ),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.space16),
           decoration: BoxDecoration(
             color: AppTheme.surfaceElevated,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -945,7 +967,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               Text(
                 '${summary.resultLabel} · ${summary.turnLabel} · ${summary.sourceLabel}',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -953,7 +975,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
                   height: 1.32,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space12),
               SegmentedButton<_ReplayDetailView>(
                 segments: const [
                   ButtonSegment(
@@ -980,7 +1002,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         switch (view) {
           _ReplayDetailView.timeline => _ReplayTimeline(detail: detail),
           _ReplayDetailView.decisions => _ReplayDecisions(detail: detail),
@@ -1110,12 +1132,17 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.space12,
+              AppTheme.space12,
+              AppTheme.space12,
+              AppTheme.space8,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _ReplayStepBadge(label: snapshot.turnLabel),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.space12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1127,7 +1154,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Text(
                         snapshot.message,
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -1137,7 +1164,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                         ),
                       ),
                       if (snapshot.activePlayer != null) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           'Ativo: ${snapshot.activePlayer}',
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -1171,9 +1198,8 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
               max: (snapshots.length - 1).toDouble(),
               divisions: snapshots.length - 1,
               label: '${_index + 1}/${snapshots.length}',
-              semanticFormatterCallback:
-                  (value) =>
-                      'Jogada ${value.round() + 1} de ${snapshots.length}',
+              semanticFormatterCallback: (value) =>
+                  'Jogada ${value.round() + 1} de ${snapshots.length}',
               onChanged: (value) => setState(() => _index = value.round()),
             ),
           _VisualPlayerBoards(
@@ -1205,7 +1231,12 @@ class _VisualPlayerBoards extends StatelessWidget {
             children: [
               for (final player in players)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space10,
+                    AppTheme.space0,
+                    AppTheme.space10,
+                    AppTheme.space10,
+                  ),
                   child: _VisualPlayerBoard(
                     player: player,
                     isActive: player.name == activePlayer,
@@ -1217,12 +1248,17 @@ class _VisualPlayerBoards extends StatelessWidget {
 
         return Padding(
           key: const Key('battle-visual-player-grid'),
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.space10,
+            AppTheme.space0,
+            AppTheme.space10,
+            AppTheme.space10,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (var index = 0; index < players.length; index++) ...[
-                if (index > 0) const SizedBox(width: 10),
+                if (index > 0) const SizedBox(width: AppTheme.space10),
                 Expanded(
                   child: _VisualPlayerBoard(
                     player: players[index],
@@ -1249,18 +1285,16 @@ class _VisualPlayerBoard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       key: Key('battle-visual-player-${player.name}'),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
-        color:
-            isActive
-                ? AppTheme.frost400.withValues(alpha: 0.08)
-                : AppTheme.surfaceElevated,
+        color: isActive
+            ? AppTheme.frost400.withValues(alpha: 0.08)
+            : AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color:
-              isActive
-                  ? AppTheme.frost400.withValues(alpha: 0.44)
-                  : AppTheme.outlineMuted.withValues(alpha: 0.54),
+          color: isActive
+              ? AppTheme.frost400.withValues(alpha: 0.44)
+              : AppTheme.outlineMuted.withValues(alpha: 0.54),
         ),
       ),
       child: Column(
@@ -1280,11 +1314,11 @@ class _VisualPlayerBoard extends StatelessWidget {
                 ),
               ),
               _ReplayMetaChip(label: '${player.life} vida'),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppTheme.space6),
               _ReplayMetaChip(label: '${player.mana} mana'),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _VisualCardZone(
             key: Key('battle-visual-zone-battlefield-${player.name}'),
             title: 'Campo',
@@ -1292,7 +1326,7 @@ class _VisualPlayerBoard extends StatelessWidget {
             fallbackCount: player.lands,
             fallbackLabel: 'terrenos',
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _VisualCardZone(
             key: Key('battle-visual-zone-hand-${player.name}'),
             title: 'Mao',
@@ -1300,7 +1334,7 @@ class _VisualPlayerBoard extends StatelessWidget {
             fallbackCount: player.handSize,
             fallbackLabel: 'cartas',
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _VisualCardZone(
             key: Key('battle-visual-zone-graveyard-${player.name}'),
             title: 'Cemiterio',
@@ -1309,7 +1343,7 @@ class _VisualPlayerBoard extends StatelessWidget {
             fallbackLabel: 'cartas',
             compact: true,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Text(
             'Biblioteca: ${player.librarySize}',
             style: theme.textTheme.labelSmall?.copyWith(
@@ -1367,11 +1401,14 @@ class _VisualCardZone extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppTheme.space6),
         if (cards.isEmpty)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space10,
+              vertical: AppTheme.space9,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate.withValues(alpha: 0.68),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1456,12 +1493,12 @@ class _BattleVisualCardCarouselState extends State<_BattleVisualCardCarousel> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width =
-            constraints.maxWidth.isFinite
-                ? constraints.maxWidth
-                : MediaQuery.sizeOf(context).width;
-        final viewportFraction =
-            (cardExtent / width).clamp(0.08, 0.44).toDouble();
+        final width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
+        final viewportFraction = (cardExtent / width)
+            .clamp(0.08, 0.44)
+            .toDouble();
         final controller = _ensureController(viewportFraction);
 
         return SizedBox(
@@ -1488,7 +1525,9 @@ class _BattleVisualCardCarouselState extends State<_BattleVisualCardCarousel> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.only(
+                            right: AppTheme.space8,
+                          ),
                           child: _VisualCardTile(
                             card: card,
                             compact: widget.compact,
@@ -1515,10 +1554,9 @@ class _BattleVisualCardCarouselState extends State<_BattleVisualCardCarousel> {
                   child: _BattleCarouselNavButton(
                     tooltip: 'Proxima carta',
                     icon: Icons.chevron_right_rounded,
-                    onPressed:
-                        _index < widget.cards.length - 1
-                            ? () => _move(1)
-                            : null,
+                    onPressed: _index < widget.cards.length - 1
+                        ? () => _move(1)
+                        : null,
                   ),
                 ),
               ],
@@ -1586,7 +1624,7 @@ class _VisualCardTile extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   card.name,
                   maxLines: 2,
@@ -1647,7 +1685,7 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
       final theme = Theme.of(context);
       final imageUrl = _battleCardImageUrl(card, version: 'normal');
       return Dialog(
-        insetPadding: const EdgeInsets.all(20),
+        insetPadding: const EdgeInsets.all(AppTheme.space20),
         backgroundColor: AppTheme.surfaceElevated,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1655,7 +1693,7 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppTheme.space16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1678,7 +1716,7 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
                 Center(
                   child: CachedCardImage(
                     imageUrl: imageUrl,
@@ -1687,7 +1725,7 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
                 if (card.typeLine != null && card.typeLine!.trim().isNotEmpty)
                   Text(
                     card.typeLine!,
@@ -1696,7 +1734,7 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -1705,8 +1743,8 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
                         card.manaCost!.trim().isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 5,
+                          horizontal: AppTheme.space8,
+                          vertical: AppTheme.space5,
                         ),
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceSlate,
@@ -1742,8 +1780,8 @@ class _ReplayEventTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppTheme.space10),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1755,7 +1793,7 @@ class _ReplayEventTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ReplayStepBadge(label: event.turnLabel),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1767,7 +1805,7 @@ class _ReplayEventTile extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   event.message,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -1793,8 +1831,8 @@ class _ReplayDecisionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppTheme.space10),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1806,7 +1844,7 @@ class _ReplayDecisionTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ReplayStepBadge(label: decision.turnLabel),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1818,7 +1856,7 @@ class _ReplayDecisionTile extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   decision.reason,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -1827,7 +1865,7 @@ class _ReplayDecisionTile extends StatelessWidget {
                   ),
                 ),
                 if (decision.score != null) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppTheme.space6),
                   Text(
                     'Avaliacao ${decision.score!.toStringAsFixed(2)}',
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -1852,7 +1890,10 @@ class _ReplayMetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space9,
+        vertical: AppTheme.space5,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1881,7 +1922,7 @@ class _ReplayStepBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 46,
-      padding: const EdgeInsets.symmetric(vertical: 7),
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.space7),
       decoration: BoxDecoration(
         color: AppTheme.brass500.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1909,7 +1950,7 @@ class _ReplayTextBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1970,7 +2011,7 @@ class _InlineEmptyPanel extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1982,7 +2023,7 @@ class _InlineEmptyPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: AppTheme.frost400, size: 22),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1994,7 +2035,7 @@ class _InlineEmptyPanel extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   message,
                   style: theme.textTheme.bodySmall?.copyWith(

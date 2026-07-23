@@ -308,6 +308,13 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
                   candidate['remove_role'] ?? candidate['role'] ?? 'utility',
               'function':
                   candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+              'remove_role':
+                  candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+              if (candidate['add_role'] != null)
+                'add_role': candidate['add_role'],
+              'same_lane': candidate['same_lane'] == true,
+              if (candidate['same_lane_hypothesis'] != null)
+                'same_lane_hypothesis': candidate['same_lane_hypothesis'],
               'priority': intensity?.selected == 'light' ? 'Medium' : 'High',
               'impact':
                   intensity?.selected == 'aggressive'
@@ -326,6 +333,8 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
                 'collection_match': candidate['collection_match'],
               if (candidate['owned_quantity'] != null)
                 'owned_quantity': candidate['owned_quantity'],
+              if (candidate['available_quantity'] != null)
+                'available_quantity': candidate['available_quantity'],
               if (candidate['purchase_required'] != null)
                 'purchase_required': candidate['purchase_required'],
               if (candidate['estimated_price_brl'] != null)

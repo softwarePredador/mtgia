@@ -33,8 +33,8 @@ class PlanScreen extends StatelessWidget {
               viewport.maxWidth < AppTheme.breakpointCompact ? 16.0 : 24.0;
           return ListView(
             padding: EdgeInsets.only(
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: AppTheme.space16,
+              bottom: AppTheme.space16 + MediaQuery.of(context).padding.bottom,
             ),
             children: [
               ResponsivePageFrame(
@@ -53,7 +53,7 @@ class PlanScreen extends StatelessWidget {
                         child: const AiUsageMeter(),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     if (CommercialLaunchPolicy.isFreeBeta)
                       Align(
                         alignment: Alignment.centerLeft,
@@ -101,7 +101,7 @@ class PlanScreen extends StatelessWidget {
                             active: provider.tier == ManaLoomPlanTier.free,
                             onAction: null,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppTheme.space12),
                           _PlanComparisonCard(
                             plan: ManaLoomPlan.pro,
                             active: provider.tier == ManaLoomPlanTier.pro,
@@ -110,7 +110,7 @@ class PlanScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: ConstrainedBox(
@@ -122,7 +122,7 @@ class PlanScreen extends StatelessWidget {
                             if (provider.isRemoteSynced ||
                                 provider.lastRemoteError != null) ...[
                               _RemotePlanStatusPanel(provider: provider),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: AppTheme.space16),
                             ],
                             const _LegalShortcutPanel(),
                           ],
@@ -161,7 +161,7 @@ class _PlanComparisonCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       key: Key('plan-card-${plan.tier.id}'),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -198,7 +198,7 @@ class _PlanComparisonCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Text(
             plan.description,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -206,37 +206,36 @@ class _PlanComparisonCard extends StatelessWidget {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           ...plan.features.map(
             (feature) => _PlanLine(icon: Icons.check, text: feature),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ...plan.limits.map(
             (limit) =>
                 _PlanLine(icon: Icons.info_outline, text: limit, muted: true),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
               width: fullWidthAction ? double.infinity : 180,
-              child:
-                  featured
-                      ? ElevatedButton(
-                        key: const Key('plan-pro-upgrade-button'),
-                        onPressed: active ? null : onAction,
-                        child: Text(active ? 'Pro ativo' : 'Fazer upgrade'),
-                      )
-                      : OutlinedButton(
-                        onPressed: active ? null : onAction,
-                        child: Text(
-                          active
-                              ? 'Free ativo'
-                              : onAction == null
-                              ? 'Incluído no Pro'
-                              : 'Usar Free',
-                        ),
+              child: featured
+                  ? ElevatedButton(
+                      key: const Key('plan-pro-upgrade-button'),
+                      onPressed: active ? null : onAction,
+                      child: Text(active ? 'Pro ativo' : 'Fazer upgrade'),
+                    )
+                  : OutlinedButton(
+                      onPressed: active ? null : onAction,
+                      child: Text(
+                        active
+                            ? 'Free ativo'
+                            : onAction == null
+                            ? 'Incluído no Pro'
+                            : 'Usar Free',
                       ),
+                    ),
             ),
           ),
         ],
@@ -255,7 +254,7 @@ class _RemotePlanStatusPanel extends StatelessWidget {
     final synced = provider.isRemoteSynced;
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -267,7 +266,7 @@ class _RemotePlanStatusPanel extends StatelessWidget {
             synced ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
             color: synced ? AppTheme.success : AppTheme.warning,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               synced
@@ -296,7 +295,7 @@ class _PlanLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 7),
+      padding: const EdgeInsets.only(bottom: AppTheme.space7),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -305,7 +304,7 @@ class _PlanLine extends StatelessWidget {
             size: 17,
             color: muted ? AppTheme.textSecondary : AppTheme.success,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Text(
               text,
@@ -328,7 +327,7 @@ class _LegalShortcutPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -337,7 +336,7 @@ class _LegalShortcutPanel extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.policy_outlined, color: AppTheme.frost400),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               CommercialLaunchPolicy.isFreeBeta

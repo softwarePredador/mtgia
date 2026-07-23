@@ -11,11 +11,16 @@ void main() {
       expect(deckValidationOwnerScopeSql, contains('id = @deckId'));
       expect(deckValidationOwnerScopeSql, contains('user_id = @userId'));
       expect(deckValidationOwnerScopeSql, contains('LIMIT 1'));
+      expect(deckValidationOwnerScopeSql, contains('FOR UPDATE'));
     });
 
     test('success body matches validate endpoint contract', () {
       expect(
-        buildDeckValidationSuccessBody(deckId: 'deck-1', format: 'commander'),
+        buildDeckValidationSuccessBody(
+          deckId: 'deck-1',
+          format: 'commander',
+          validationUpdatedAt: DateTime.utc(2026, 7, 22, 12, 30),
+        ),
         {
           'ok': true,
           'format': 'commander',
@@ -23,6 +28,7 @@ void main() {
           'deck_state': 'validated',
           'requires_review': false,
           'review_reasons': const <String>[],
+          'validation_updated_at': '2026-07-22T12:30:00.000Z',
         },
       );
     });
@@ -39,6 +45,8 @@ void main() {
     test('DeckRulesException body preserves optional card name', () {
       final body = buildDeckValidationRuleErrorBody(
         DeckRulesException('Carta ilegal.', cardName: 'Vendetta'),
+        persistedReasons: const ['deck_cards_changed_since_validation'],
+        validationUpdatedAt: '2026-07-22T12:31:00Z',
       );
 
       expect(body['ok'], isFalse);
@@ -46,7 +54,11 @@ void main() {
       expect(body['card_name'], 'Vendetta');
       expect(body['deck_state'], 'draft');
       expect(body['requires_review'], isTrue);
-      expect(body['review_reasons'], ['strict_validation_failed']);
+      expect(body['review_reasons'], [
+        'deck_cards_changed_since_validation',
+        'strict_validation_failed',
+      ]);
+      expect(body['validation_updated_at'], '2026-07-22T12:31:00.000Z');
     });
 
     test('internal error body never leaks exception or SQL details', () {
@@ -71,6 +83,8 @@ void main() {
       expect(source, contains('buildDeckValidationRuleErrorBody'));
       expect(source, contains('deckValidationMarkSuccessSql'));
       expect(source, contains('deckValidationMarkFailureSql'));
+      expect(source, contains('on DeckRulesException catch (error)'));
+      expect(source, isNot(contains('await pool.execute(')));
     });
   });
 }

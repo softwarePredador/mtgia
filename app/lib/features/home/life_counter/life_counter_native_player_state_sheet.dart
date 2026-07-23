@@ -211,16 +211,20 @@ class _LifeCounterNativePlayerStateSheetState
 
   @override
   Widget build(BuildContext context) {
-    final playerStatusSummary =
-        LifeCounterTabletopEngine.playerBoardSummary(
-          _buildUpdatedSession(),
-          playerIndex: _targetPlayerIndex,
-        ).statusSummary;
+    final playerStatusSummary = LifeCounterTabletopEngine.playerBoardSummary(
+      _buildUpdatedSession(),
+      playerIndex: _targetPlayerIndex,
+    ).statusSummary;
 
     return SafeArea(
       key: const Key('life-counter-native-player-state-sheet'),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.74,
           child: DecoratedBox(
@@ -240,7 +244,12 @@ class _LifeCounterNativePlayerStateSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -255,7 +264,7 @@ class _LifeCounterNativePlayerStateSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Gerencie comandantes, ferramentas e o status do jogador selecionado.',
                               style: TextStyle(
@@ -279,7 +288,12 @@ class _LifeCounterNativePlayerStateSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       _SectionCard(
                         title: 'Jogador alvo',
@@ -301,7 +315,7 @@ class _LifeCounterNativePlayerStateSheetState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Status atual',
                         subtitle:
@@ -320,7 +334,7 @@ class _LifeCounterNativePlayerStateSheetState
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppTheme.space8),
                             Text(
                               playerStatusSummary.description,
                               key: const Key(
@@ -334,7 +348,7 @@ class _LifeCounterNativePlayerStateSheetState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Configuração de comandante',
                         subtitle:
@@ -356,12 +370,11 @@ class _LifeCounterNativePlayerStateSheetState
                             style: TextStyle(color: AppTheme.textSecondary),
                           ),
                           value: _partnerCommander,
-                          onChanged:
-                              (value) =>
-                                  setState(() => _partnerCommander = value),
+                          onChanged: (value) =>
+                              setState(() => _partnerCommander = value),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Ferramentas do jogador',
                         subtitle:
@@ -413,7 +426,7 @@ class _LifeCounterNativePlayerStateSheetState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Estado especial',
                         subtitle:
@@ -435,15 +448,13 @@ class _LifeCounterNativePlayerStateSheetState
                                         ),
                                       ),
                                       selected: _specialState == entry,
-                                      onSelected:
-                                          (_) => setState(
-                                            () => _specialState = entry,
-                                          ),
+                                      onSelected: (_) =>
+                                          setState(() => _specialState = entry),
                                     ),
                                   )
                                   .toList(growable: false),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppTheme.space16),
                             Text(
                               LifeCounterTabletopEngine.playerSpecialStateDescription(
                                 _specialState,
@@ -456,7 +467,7 @@ class _LifeCounterNativePlayerStateSheetState
                                 height: AppTheme.lineHeightComfortable,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppTheme.space16),
                             Wrap(
                               spacing: 10,
                               runSpacing: 10,
@@ -503,7 +514,12 @@ class _LifeCounterNativePlayerStateSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -514,25 +530,27 @@ class _LifeCounterNativePlayerStateSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key(
                             'life-counter-native-player-state-apply',
                           ),
-                          onPressed:
-                              () => Navigator.of(
-                                context,
-                              ).pop(_buildUpdatedSession()),
+                          onPressed: () =>
+                              Navigator.of(context).pop(_buildUpdatedSession()),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),
@@ -570,7 +588,7 @@ class _SectionCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppTheme.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -582,7 +600,7 @@ class _SectionCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               subtitle,
               style: const TextStyle(
@@ -591,7 +609,7 @@ class _SectionCard extends StatelessWidget {
                 height: AppTheme.lineHeightCompact,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             child,
           ],
         ),

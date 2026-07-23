@@ -102,11 +102,10 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
 
   int get _nonLandCount => _hand.length - _landCount;
 
-  int get _earlyPlayCount =>
-      _hand.where((card) {
-        if (card.typeLine.toLowerCase().contains('land')) return false;
-        return ManaHelper.calculateCMC(card.manaCost) <= 3;
-      }).length;
+  int get _earlyPlayCount => _hand.where((card) {
+    if (card.typeLine.toLowerCase().contains('land')) return false;
+    return ManaHelper.calculateCMC(card.manaCost) <= 3;
+  }).length;
 
   int get _coloredSpellCount => _hand
       .where((card) => !card.typeLine.toLowerCase().contains('land'))
@@ -188,10 +187,12 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
     final verticalPadding = widget.compact ? 14.0 : 16.0;
 
     return Container(
-      margin:
-          widget.compact
-              ? EdgeInsets.zero
-              : const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: widget.compact
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(
+              horizontal: AppTheme.space16,
+              vertical: AppTheme.space8,
+            ),
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
         vertical: verticalPadding,
@@ -208,7 +209,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
           Row(
             children: [
               const Icon(Icons.back_hand, color: AppTheme.mythicGold, size: 22),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Expanded(
                 child: Text(
                   widget.compact ? 'Playtest rápido' : 'Testar Mão Inicial',
@@ -222,7 +223,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
               ),
               if (_isDrawn)
                 Padding(
-                  padding: const EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.only(left: AppTheme.space8),
                   child: Text(
                     _mulligansTaken == 0
                         ? '${_hand.length} cartas'
@@ -236,7 +237,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
 
           if (!_isDrawn) ...[
             // Draw button
@@ -250,11 +251,13 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.brass500,
                   foregroundColor: AppTheme.backgroundAbyss,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppTheme.space12,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               widget.compact
                   ? 'Compre uma mão e veja rápido se ela parece keepável.'
@@ -269,7 +272,10 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
           if (_isDrawn) ...[
             // Stats bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space12,
+                vertical: AppTheme.space8,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -300,10 +306,10 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Container(
               key: const Key('sample-hand-assessment'),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppTheme.space12),
               decoration: BoxDecoration(
                 color: assessment.tone.background,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -317,7 +323,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                     size: 18,
                     color: assessment.tone.foreground,
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppTheme.space10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,7 +335,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: AppTheme.space3),
                         Text(
                           assessment.summary,
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -343,14 +349,14 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             if (_mulligansTaken > 0) ...[
               Container(
                 key: const Key('sample-hand-bottom-guidance'),
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+                  horizontal: AppTheme.space12,
+                  vertical: AppTheme.space10,
                 ),
                 decoration: BoxDecoration(
                   color: AppTheme.frost400.withValues(alpha: 0.10),
@@ -368,7 +374,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space12),
             ],
 
             // Hand display
@@ -383,7 +389,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 onShowCardDetails: widget.onShowCardDetails,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
 
             // Action buttons stay compact on desktop and become full-width
             // only when the available pane is genuinely narrow.
@@ -397,13 +403,14 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                   label: const Text('Mulligan'),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(0, AppTheme.touchTargetMin),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.space16,
+                    ),
                     foregroundColor: AppTheme.mythicGold,
                     side: BorderSide(
-                      color:
-                          _mulligansTaken < 7
-                              ? AppTheme.mythicGold.withValues(alpha: 0.5)
-                              : AppTheme.outlineMuted,
+                      color: _mulligansTaken < 7
+                          ? AppTheme.mythicGold.withValues(alpha: 0.5)
+                          : AppTheme.outlineMuted,
                     ),
                   ),
                 );
@@ -421,13 +428,21 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 if (stackActions) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [mulligan, const SizedBox(height: 8), newHand],
+                    children: [
+                      mulligan,
+                      const SizedBox(height: AppTheme.space8),
+                      newHand,
+                    ],
                   );
                 }
 
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: [mulligan, const SizedBox(width: 8), newHand],
+                  children: [
+                    mulligan,
+                    const SizedBox(width: AppTheme.space8),
+                    newHand,
+                  ],
                 );
               },
             ),
@@ -463,10 +478,9 @@ class _SampleHandCarousel extends StatelessWidget {
         builder: (context, constraints) {
           final itemExtent = imageWidth + 12;
           final maxFraction = compact ? 0.42 : 0.34;
-          final viewportFraction =
-              (itemExtent / max(1, constraints.maxWidth))
-                  .clamp(0.08, maxFraction)
-                  .toDouble();
+          final viewportFraction = (itemExtent / max(1, constraints.maxWidth))
+              .clamp(0.08, maxFraction)
+              .toDouble();
 
           return _SampleHandPageView(
             key: ValueKey(
@@ -624,8 +638,9 @@ class _SampleHandCard extends StatelessWidget {
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
-          onTap:
-              onShowCardDetails == null ? null : () => onShowCardDetails!(card),
+          onTap: onShowCardDetails == null
+              ? null
+              : () => onShowCardDetails!(card),
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
           child: Column(
             children: [
@@ -640,7 +655,7 @@ class _SampleHandCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.space4),
               SizedBox(
                 width: imageWidth,
                 child: Text(

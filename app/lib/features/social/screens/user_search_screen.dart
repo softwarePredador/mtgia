@@ -48,15 +48,15 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
         padding: EdgeInsets.symmetric(
           horizontal:
               MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
-                  ? 16
-                  : 24,
+              ? AppTheme.space16
+              : AppTheme.space24,
         ),
         child: Column(
           key: const Key('user-search-content'),
           children: [
             // Search bar
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: AppTheme.space12),
               color: AppTheme.surfaceElevated,
               child: TextField(
                 key: const Key('user-search-field'),
@@ -70,23 +70,22 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     Icons.search,
                     color: AppTheme.brass400,
                   ),
-                  suffixIcon:
-                      _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                            key: const Key('user-search-clear-button'),
-                            tooltip: 'Limpar busca',
-                            icon: const Icon(
-                              Icons.clear,
-                              color: AppTheme.textSecondary,
-                              size: 18,
-                            ),
-                            onPressed: () {
-                              _debounce?.cancel();
-                              setState(_searchController.clear);
-                              context.read<SocialProvider>().clearSearch();
-                            },
+                  suffixIcon: _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          key: const Key('user-search-clear-button'),
+                          tooltip: 'Limpar busca',
+                          icon: const Icon(
+                            Icons.clear,
+                            color: AppTheme.textSecondary,
+                            size: 18,
                           ),
+                          onPressed: () {
+                            _debounce?.cancel();
+                            setState(_searchController.clear);
+                            context.read<SocialProvider>().clearSearch();
+                          },
+                        ),
                   filled: true,
                   fillColor: AppTheme.surfaceSlate,
                   border: OutlineInputBorder(
@@ -94,8 +93,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                    horizontal: AppTheme.space16,
+                    vertical: AppTheme.space12,
                   ),
                 ),
                 onChanged: _onSearchChanged,
@@ -106,10 +105,11 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
               child: Consumer<SocialProvider>(
                 builder: (context, provider, _) {
                   if (provider.isSearching) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppTheme.brass500,
-                      ),
+                    return const AppStatePanel.loading(
+                      key: Key('user-search-loading'),
+                      title: 'Buscando jogadores',
+                      message: 'Consultando perfis públicos disponíveis.',
+                      accent: AppTheme.brass500,
                     );
                   }
 
@@ -121,10 +121,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                       message: provider.searchError,
                       accent: AppTheme.error,
                       actionLabel: 'Tentar novamente',
-                      onAction:
-                          () => provider.searchUsers(
-                            _searchController.text.trim(),
-                          ),
+                      onAction: () =>
+                          provider.searchUsers(_searchController.text.trim()),
                     );
                   }
 
@@ -140,7 +138,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                               alpha: 0.4,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppTheme.space16),
                           const Text(
                             'Digite para buscar usuários',
                             style: TextStyle(
@@ -165,7 +163,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                               alpha: 0.5,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppTheme.space12),
                           const Text(
                             'Nenhum usuário encontrado',
                             style: TextStyle(
@@ -180,7 +178,9 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
 
                   return ListView.builder(
                     key: const Key('user-search-list'),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppTheme.space12,
+                    ),
                     itemCount: provider.searchResults.length,
                     itemBuilder: (context, index) {
                       final user = provider.searchResults[index];
@@ -190,8 +190,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (_) => UserProfileScreen(userId: user.id),
+                              builder: (_) =>
+                                  UserProfileScreen(userId: user.id),
                             ),
                           );
                         },
@@ -217,7 +217,7 @@ class _UserSearchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppTheme.space8),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -228,30 +228,28 @@ class _UserSearchCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppTheme.space12),
           child: Row(
             children: [
               // Avatar
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppTheme.brass400.withValues(alpha: 0.16),
-                backgroundImage:
-                    user.avatarUrl != null
-                        ? CachedNetworkImageProvider(user.avatarUrl!)
-                        : null,
-                child:
-                    user.avatarUrl == null
-                        ? Text(
-                          user.username[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: AppTheme.brass400,
-                            fontWeight: FontWeight.bold,
-                            fontSize: AppTheme.fontXl,
-                          ),
-                        )
-                        : null,
+                backgroundImage: user.avatarUrl != null
+                    ? CachedNetworkImageProvider(user.avatarUrl!)
+                    : null,
+                child: user.avatarUrl == null
+                    ? Text(
+                        user.username[0].toUpperCase(),
+                        style: const TextStyle(
+                          color: AppTheme.brass400,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.fontXl,
+                        ),
+                      )
+                    : null,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               // Info
               Expanded(
                 child: Column(
@@ -273,7 +271,7 @@ class _UserSearchCard extends StatelessWidget {
                           fontSize: AppTheme.fontSm,
                         ),
                       ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.space4),
                     Row(
                       children: [
                         Icon(
@@ -281,7 +279,7 @@ class _UserSearchCard extends StatelessWidget {
                           size: 13,
                           color: AppTheme.brass400.withValues(alpha: 0.72),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppTheme.space4),
                         Text(
                           '${user.publicDeckCount} decks',
                           style: const TextStyle(
@@ -289,13 +287,13 @@ class _UserSearchCard extends StatelessWidget {
                             fontSize: AppTheme.fontSm,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppTheme.space12),
                         Icon(
                           Icons.people,
                           size: 13,
                           color: AppTheme.brass400.withValues(alpha: 0.72),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppTheme.space4),
                         Text(
                           '${user.followerCount} seguidores',
                           style: const TextStyle(

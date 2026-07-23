@@ -100,6 +100,20 @@ Future<Response> onRequest(RequestContext context) async {
       final nativeSidecarUrl = engineConfig.nativeSidecarUrl;
       final strictXmage = engineConfig.isStrictXmage;
       final strictForge = engineConfig.isStrictForge;
+      if (!engineConfig.isNative &&
+          routeRequest.forceFocusAccessMode != 'none') {
+        return Response.json(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: {
+            'error': 'external_battle_control_unsupported',
+            'control': 'force_focus_access_mode',
+            'requested_value': routeRequest.forceFocusAccessMode,
+            'supported_value': 'none',
+            'details':
+                'Forced card access is available only in the reviewed native engine.',
+          },
+        );
+      }
       final seed =
           routeRequest.seed ??
           DateTime.now().microsecondsSinceEpoch % 2147483647;
@@ -109,10 +123,15 @@ Future<Response> onRequest(RequestContext context) async {
       data['force_focus_access_mode'] = routeRequest.forceFocusAccessMode;
       data['same_lane'] = routeRequest.sameLane;
       data['natural_sample'] = routeRequest.naturalSample;
-      final externalRequest = {
+      final battleRequest = <String, dynamic>{
         'request_id': 'api-${DateTime.now().microsecondsSinceEpoch}',
         'seed': seed,
         'timeout_ms': timeoutMs,
+        'max_turns': routeRequest.maxTurns,
+        'focus_cards': routeRequest.focusCards,
+        'force_focus_access_mode': routeRequest.forceFocusAccessMode,
+        'same_lane': routeRequest.sameLane,
+        'natural_sample': routeRequest.naturalSample,
         'deck_a': _externalDeckPayload(deckId, deckCards),
         'deck_b': _externalDeckPayload(opponentId, opponentCards),
       };
@@ -123,13 +142,15 @@ Future<Response> onRequest(RequestContext context) async {
           result = await _simulateNative(
             nativeSidecarUrl,
             _withNativeRequirements(
-              externalRequest,
-              requiredRuleCards: _allDeckCardRows(externalRequest),
+              battleRequest,
+              requiredRuleCards: _allDeckCardRows(battleRequest),
               data: data,
             ),
             timeoutMs,
           );
-          result['fallback_reason'] = 'native_mode_configured';
+          result['fallback_reason'] = 'none';
+          result['engine_selection_reason'] = 'strict_native_mode';
+          result['fallback_chain'] = const ['native'];
         } on NativeBattleCoverageIncomplete catch (error) {
           return _nativeCoverageFailure(error);
         } on NativeBattleServiceException catch (error) {
@@ -143,17 +164,24 @@ Future<Response> onRequest(RequestContext context) async {
         try {
           result = await _simulateForge(
             forgeSidecarUrl,
-            externalRequest,
+            battleRequest,
             timeoutMs,
+            engineConfig: engineConfig,
           );
           result['engine_contract'] = 'canonical_rules_execution_secondary';
-          result['fallback_reason'] = 'forge_mode_configured';
+          result['fallback_reason'] = 'none';
+          result['engine_selection_reason'] = 'strict_forge_mode';
+          result['fallback_chain'] = const ['forge'];
         } on ForgeCoverageIncomplete catch (error) {
           return Response.json(
             statusCode: HttpStatus.unprocessableEntity,
             body: {
               'error': 'forge_coverage_incomplete',
               'unsupported_cards': error.unsupportedCards,
+              'fallback_allowed': false,
+              'fallback_reason': 'none',
+              'fallback_eligibility_reason': 'strict_mode_coverage_incomplete',
+              'engine_selection_reason': 'strict_forge_mode',
             },
           );
         } on ForgeServiceException catch (error) {
@@ -167,10 +195,15 @@ Future<Response> onRequest(RequestContext context) async {
         try {
           result = await _simulateXmage(
             xmageSidecarUrl,
-            externalRequest,
+            battleRequest,
             timeoutMs,
+            engineConfig: engineConfig,
           );
           result['engine_contract'] = 'canonical_rules_execution';
+          result['fallback_reason'] = 'none';
+          result['engine_selection_reason'] =
+              strictXmage ? 'strict_xmage_mode' : 'auto_primary_xmage';
+          result['fallback_chain'] = const ['xmage'];
         } on XmageCoverageIncomplete catch (error) {
           if (strictXmage) {
             return Response.json(
@@ -178,6 +211,11 @@ Future<Response> onRequest(RequestContext context) async {
               body: {
                 'error': 'xmage_coverage_incomplete',
                 'unsupported_cards': error.unsupportedCards,
+                'fallback_allowed': false,
+                'fallback_reason': 'none',
+                'fallback_eligibility_reason':
+                    'strict_mode_coverage_incomplete',
+                'engine_selection_reason': 'strict_xmage_mode',
               },
             );
           }
@@ -185,25 +223,50 @@ Future<Response> onRequest(RequestContext context) async {
             result = await _forgeOrNativeFallback(
               forgeSidecarUrl: forgeSidecarUrl,
               nativeSidecarUrl: nativeSidecarUrl,
-              externalRequest: externalRequest,
+              battleRequest: battleRequest,
               timeoutMs: timeoutMs,
               fallbackReason: 'xmage_coverage_incomplete',
               xmageUnsupportedCards: error.unsupportedCards,
               data: data,
+              engineConfig: engineConfig,
             );
           } on ForgeServiceException catch (forgeError) {
             return _externalEngineFailure(
               'forge',
               forgeError.message,
               upstreamStatusCode: forgeError.statusCode,
+              fallbackReason: 'xmage_coverage_incomplete',
+              engineSelectionReason: 'auto_secondary_forge_after_coverage_gap',
+              fallbackChain: const [
+                'xmage:coverage_incomplete',
+                'forge:operational_failure',
+              ],
             );
           } on NativeBattleCoverageIncomplete catch (nativeError) {
-            return _nativeCoverageFailure(nativeError);
+            return _nativeCoverageFailure(
+              nativeError,
+              fallbackReason:
+                  'xmage_coverage_incomplete_forge_coverage_incomplete',
+              engineSelectionReason: 'auto_native_after_external_coverage_gaps',
+              fallbackChain: const [
+                'xmage:coverage_incomplete',
+                'forge:coverage_incomplete',
+                'native:coverage_incomplete',
+              ],
+            );
           } on NativeBattleServiceException catch (nativeError) {
             return _externalEngineFailure(
               'native_battle',
               nativeError.message,
               upstreamStatusCode: nativeError.statusCode,
+              fallbackReason:
+                  'xmage_coverage_incomplete_forge_coverage_incomplete',
+              engineSelectionReason: 'auto_native_after_external_coverage_gaps',
+              fallbackChain: const [
+                'xmage:coverage_incomplete',
+                'forge:coverage_incomplete',
+                'native:operational_failure',
+              ],
             );
           }
         } on XmageServiceException catch (error) {
@@ -426,14 +489,21 @@ Map<String, dynamic> _externalDeckPayload(
 Future<Map<String, dynamic>> _simulateXmage(
   String sidecarUrl,
   Map<String, dynamic> request,
-  int timeoutMs,
-) async {
+  int timeoutMs, {
+  required BattleEngineConfig engineConfig,
+}) async {
+  final sidecarRequest = buildExternalBattleRequestEnvelope(
+    request: request,
+    identity: engineConfig.xmageIdentity,
+  );
   final client = XmageBattleClient(
     baseUrl: sidecarUrl,
     timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
+    expectedIdentity: engineConfig.xmageIdentity,
+    allowLegacyIdentity: engineConfig.allowLegacySidecarIdentity,
   );
   try {
-    return await client.simulate(request);
+    return await client.simulate(sidecarRequest);
   } finally {
     client.close();
   }
@@ -442,14 +512,21 @@ Future<Map<String, dynamic>> _simulateXmage(
 Future<Map<String, dynamic>> _simulateForge(
   String sidecarUrl,
   Map<String, dynamic> request,
-  int timeoutMs,
-) async {
+  int timeoutMs, {
+  required BattleEngineConfig engineConfig,
+}) async {
+  final sidecarRequest = buildExternalBattleRequestEnvelope(
+    request: request,
+    identity: engineConfig.forgeIdentity,
+  );
   final client = ForgeBattleClient(
     baseUrl: sidecarUrl,
     timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
+    expectedIdentity: engineConfig.forgeIdentity,
+    allowLegacyIdentity: engineConfig.allowLegacySidecarIdentity,
   );
   try {
-    return await client.simulate(request);
+    return await client.simulate(sidecarRequest);
   } finally {
     client.close();
   }
@@ -474,39 +551,51 @@ Future<Map<String, dynamic>> _simulateNative(
 Future<Map<String, dynamic>> _forgeOrNativeFallback({
   required String forgeSidecarUrl,
   required String nativeSidecarUrl,
-  required Map<String, dynamic> externalRequest,
+  required Map<String, dynamic> battleRequest,
   required int timeoutMs,
   required String fallbackReason,
+  required BattleEngineConfig engineConfig,
   List<Map<String, dynamic>> xmageUnsupportedCards = const [],
   Map<String, dynamic> data = const {},
 }) async {
   try {
     final result = await _simulateForge(
       forgeSidecarUrl,
-      externalRequest,
+      battleRequest,
       timeoutMs,
+      engineConfig: engineConfig,
     );
     result['engine_contract'] = 'canonical_rules_execution_secondary';
     result['fallback_reason'] = fallbackReason;
+    result['engine_selection_reason'] =
+        'auto_secondary_forge_after_coverage_gap';
     if (xmageUnsupportedCards.isNotEmpty) {
       result['xmage_unsupported_cards'] = xmageUnsupportedCards;
     }
+    result['fallback_chain'] = const ['xmage:coverage_incomplete', 'forge'];
     return result;
   } on ForgeCoverageIncomplete catch (error) {
     final result = await _simulateNative(
       nativeSidecarUrl,
       _withNativeRequirements(
-        externalRequest,
-        requiredRuleCards: _allDeckCardRows(externalRequest),
+        battleRequest,
+        requiredRuleCards: _allDeckCardRows(battleRequest),
         data: data,
       ),
       timeoutMs,
     );
     result['fallback_reason'] = '${fallbackReason}_forge_coverage_incomplete';
+    result['engine_selection_reason'] =
+        'auto_native_after_external_coverage_gaps';
     if (xmageUnsupportedCards.isNotEmpty) {
       result['xmage_unsupported_cards'] = xmageUnsupportedCards;
     }
     result['forge_unsupported_cards'] = error.unsupportedCards;
+    result['fallback_chain'] = const [
+      'xmage:coverage_incomplete',
+      'forge:coverage_incomplete',
+      'native',
+    ];
     return result;
   }
 }
@@ -568,6 +657,9 @@ Response _externalEngineFailure(
   String engine,
   String message, {
   int? upstreamStatusCode,
+  String fallbackReason = 'none',
+  String? engineSelectionReason,
+  List<String>? fallbackChain,
 }) {
   final timedOut = upstreamStatusCode == HttpStatus.gatewayTimeout;
   Log.e('$engine battle failed');
@@ -575,6 +667,15 @@ Response _externalEngineFailure(
     statusCode: timedOut ? HttpStatus.gatewayTimeout : HttpStatus.badGateway,
     body: {
       'error': timedOut ? '${engine}_timeout' : '${engine}_unavailable',
+      'fallback_allowed': false,
+      'fallback_reason': fallbackReason,
+      'fallback_eligibility_reason':
+          timedOut
+              ? 'operational_timeout_not_eligible'
+              : 'operational_failure_not_eligible',
+      if (engineSelectionReason != null)
+        'engine_selection_reason': engineSelectionReason,
+      if (fallbackChain != null) 'fallback_chain': fallbackChain,
       'details':
           timedOut
               ? 'The battle engine timed out.'
@@ -583,14 +684,23 @@ Response _externalEngineFailure(
   );
 }
 
-Response _nativeCoverageFailure(NativeBattleCoverageIncomplete error) =>
-    Response.json(
-      statusCode: HttpStatus.unprocessableEntity,
-      body: {
-        'error': 'native_coverage_incomplete',
-        'unsupported_cards': error.unsupportedCards,
-      },
-    );
+Response _nativeCoverageFailure(
+  NativeBattleCoverageIncomplete error, {
+  String fallbackReason = 'none',
+  String engineSelectionReason = 'strict_native_mode',
+  List<String> fallbackChain = const ['native:coverage_incomplete'],
+}) => Response.json(
+  statusCode: HttpStatus.unprocessableEntity,
+  body: {
+    'error': 'native_coverage_incomplete',
+    'unsupported_cards': error.unsupportedCards,
+    'fallback_allowed': false,
+    'fallback_reason': fallbackReason,
+    'fallback_eligibility_reason': 'final_native_coverage_incomplete',
+    'engine_selection_reason': engineSelectionReason,
+    'fallback_chain': fallbackChain,
+  },
+);
 
 Response _simulationPersistenceFailure(
   BattleSimulationPersistenceOutcome persistence,

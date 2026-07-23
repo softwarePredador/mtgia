@@ -61,42 +61,7 @@ Future<void> main(List<String> args) async {
     client.close();
   }
 
-  final modelSummaries = <Map<String, dynamic>>[];
-  for (final model in models) {
-    final modelRows =
-        results.where((row) => row['model_requested'] == model).toList();
-    final successful = modelRows.where((row) => row['status'] == 'ok').toList();
-    final passed =
-        successful
-            .where((row) => (row['evaluation'] as Map)['status'] == 'pass')
-            .length;
-    final scores =
-        successful
-            .map((row) => (row['evaluation'] as Map)['score'] as int)
-            .toList();
-    final totalTokens = successful.fold<int>(
-      0,
-      (sum, row) =>
-          sum +
-          ((((row['usage'] as Map)['total_tokens'] as num?)?.toInt()) ?? 0),
-    );
-    modelSummaries.add({
-      'model': model,
-      'case_count': modelRows.length,
-      'successful_case_count': successful.length,
-      'error_case_count': modelRows.length - successful.length,
-      'passed_case_count': passed,
-      'failed_case_count': successful.length - passed,
-      'average_score':
-          scores.isEmpty
-              ? null
-              : double.parse(
-                (scores.reduce((a, b) => a + b) / scores.length)
-                    .toStringAsFixed(2),
-              ),
-      'total_tokens': totalTokens,
-    });
-  }
+  final summary = summarizeCommanderAiLiveEvalResults(results);
 
   final outputResults =
       options.containsKey('summary-only')
@@ -106,6 +71,7 @@ Future<void> main(List<String> args) async {
                 return <String, dynamic>{
                   'status': row['status'],
                   'case_id': row['case_id'],
+                  'intensity': row['intensity'],
                   'model_requested': row['model_requested'],
                   'model_returned': row['model_returned'],
                   'latency_ms': row['latency_ms'],
@@ -121,8 +87,8 @@ Future<void> main(List<String> args) async {
 
   stdout.writeln(
     const JsonEncoder.withIndent('  ').convert({
-      'schema_version': 'commander_ai_live_model_eval_v1_2026_07_16',
-      'models': modelSummaries,
+      'schema_version': 'commander_ai_live_model_eval_v2_2026_07_22',
+      'summary': summary,
       'results': outputResults,
     }),
   );

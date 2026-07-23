@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:server/ai/commander_deckbuilding_contract_support.dart';
 import 'package:server/ai/commander_learned_deck_support.dart';
 import 'package:server/ai/commander_reference_card_stats_support.dart';
@@ -155,6 +157,12 @@ void main() {
         );
         expect((diagnostics['gates'] as Map)['has_any_reference_lane'], isTrue);
         expect((diagnostics['gates'] as Map)['battle_gate_status'], 'pending');
+        final baselinePolicy = diagnostics['baseline_policy'] as Map;
+        expect(baselinePolicy['baseline_deck_id'], 607);
+        expect(baselinePolicy['status'], 'experimental_blocked');
+        expect(baselinePolicy['seed_pairing_claim'], isFalse);
+        expect(baselinePolicy['definitive_claim_allowed'], isFalse);
+        expect(baselinePolicy['automatic_candidate_apply_allowed'], isFalse);
         final sourceLanes = diagnostics['source_lanes'] as Map;
         expect(sourceLanes['reference_profile_used'], isTrue);
         expect(sourceLanes['reference_card_stats_resolved_count'], 2);
@@ -189,6 +197,16 @@ void main() {
         expect(appSummary['commander_name'], 'Lorehold, the Historian');
         expect((appSummary['battle_gate'] as Map)['status'], 'pending');
         expect((appSummary['gates'] as Map)['has_reference_lane'], isTrue);
+        final publicBaselinePolicy = appSummary['baseline_policy'] as Map;
+        expect(
+          publicBaselinePolicy['label'],
+          'Experimental: candidato bloqueado',
+        );
+        expect(publicBaselinePolicy['baseline_deck_id'], '607');
+        expect(
+          publicBaselinePolicy['automatic_candidate_apply_allowed'],
+          isFalse,
+        );
 
         final appSourceLanes = appSummary['source_lanes'] as List;
         final referenceStats = appSourceLanes.cast<Map>().firstWhere(
@@ -401,6 +419,189 @@ void main() {
         (appSummary['battle_gate'] as Map)['label'],
         'Exposição positiva registrada',
       );
+    });
+
+    test('saved deck analysis does not require a deterministic fallback', () {
+      final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+        format: 'Commander',
+        generatedDeck: const {
+          'commander': {'name': 'Talrand, Sky Summoner'},
+          'cards': [
+            {'name': 'Island', 'quantity': 99},
+          ],
+        },
+        validationSummary: const {
+          'is_valid': true,
+          'invalid_cards': <String>[],
+        },
+        referenceProfile: const {
+          'commander': 'Talrand, Sky Summoner',
+          'confidence': 'high',
+        },
+        deterministicReferenceRequired: false,
+      );
+
+      expect(diagnostics['status'], 'ready_for_battle_gate');
+      expect(
+        diagnostics['blockers'],
+        isNot(contains('deterministic_reference_not_ready')),
+      );
+      final gates = diagnostics['gates'] as Map;
+      expect(gates['deterministic_reference_required'], isFalse);
+
+      final summary = buildCommanderDeckbuildingAppSummary(diagnostics);
+      expect((summary['planning_flow'] as List), hasLength(12));
+      expect(
+        (summary['planning_flow'] as List).cast<Map>().map(
+          (item) => item['label'],
+        ),
+        contains('Staples por impacto e função'),
+      );
+      expect(
+        (summary['overview_fields'] as List).cast<Map>().map(
+          (item) => item['label'],
+        ),
+        contains('Impacto dos staples por função'),
+      );
+    });
+
+    test('public contract redacts learned and replay identifiers', () {
+      final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+        format: 'Commander',
+        generatedDeck: const {
+          'commander': {'name': 'Krenko, Mob Boss'},
+          'cards': [
+            {'name': 'Mountain', 'quantity': 99},
+          ],
+        },
+        validationSummary: const {
+          'is_valid': true,
+          'invalid_cards': <String>[],
+        },
+        activeLearnedDeck: const CommanderLearnedDeckInput(
+          commanderName: 'Krenko, Mob Boss',
+          deckName: 'Reviewed',
+          sourceSystem: 'hermes',
+          sourceRef: '/private/lab/knowledge.db#deck-7',
+          cardList: '99 Mountain',
+          cardCount: 100,
+          legalStatus: 'commander_legal',
+          isActive: true,
+        ),
+        deterministicReferenceRequired: false,
+        battleLearningEvidence: const {
+          'schema_version': 'battle_positive_evidence_v1',
+          'positive_exposure_ready': true,
+          'latest_replay_id': 'secret-replay-id',
+          'deck_id': 'secret-deck-id',
+          'promotion_allowed': false,
+        },
+      );
+
+      final encoded = jsonEncode(diagnostics);
+      expect(encoded, isNot(contains('/private/lab')));
+      expect(encoded, isNot(contains('secret-replay-id')));
+      expect(encoded, isNot(contains('secret-deck-id')));
+      expect(
+        (diagnostics['source_lanes'] as Map).containsKey(
+          'active_learned_deck_source_ref',
+        ),
+        isFalse,
+      );
+
+      final summary = buildCommanderDeckbuildingAppSummary(diagnostics);
+      final publicPayload = jsonEncode(summary);
+      expect(publicPayload, isNot(contains('/private/lab')));
+      expect(publicPayload, isNot(contains('secret-replay-id')));
+      final provenance = summary['provenance'] as Map;
+      final lanes = (provenance['lanes'] as List).cast<Map>();
+      expect(
+        lanes.map((lane) => lane['key']),
+        containsAll([
+          'verified_oracle',
+          'price',
+          'public_popularity',
+          'reference_corpus',
+          'learned_usage',
+          'ai_suggestion',
+          'battle_replay',
+        ]),
+      );
+      expect(provenance['internal_source_references_exposed'], isFalse);
+    });
+
+    test('optimize summary accepts only matched same-lane output swaps', () {
+      final ready = buildCommanderOptimizePlanningSummary(
+        format: 'commander',
+        commanderName: 'Lorehold, the Historian',
+        totalCards: 100,
+        deckStateStatus: 'healthy',
+        prioritySource: 'reference_top_cards:/private/source',
+        priorityCardCount: 20,
+        metaReferencesAvailable: true,
+        roleTargetsAvailable: true,
+        candidateSwaps: const [
+          {
+            'remove': 'Mind Stone',
+            'add': 'Arcane Signet',
+            'remove_role': 'ramp',
+            'add_role': 'ramp',
+            'same_lane': true,
+            'protected_anchor': true,
+            'anchor_reasons': ['commander_priority_card'],
+            'same_lane_hypothesis':
+                'Trocar ramp por ramp preservando a base de mana.',
+          },
+        ],
+        responseBody: const {
+          'strategy_source': 'deterministic_first',
+          'swaps': [
+            {'out': 'Mind Stone', 'in': 'Arcane Signet'},
+          ],
+        },
+        preferCollection: false,
+      );
+      expect((ready['same_lane_gate'] as Map)['gate_ready'], isTrue);
+      expect((ready['anchor_gate'] as Map)['required'], isTrue);
+      expect((ready['anchor_gate'] as Map)['gate_ready'], isTrue);
+      expect(ready['status'], 'same_lane_preview_ready');
+      expect(jsonEncode(ready), isNot(contains('/private/source')));
+
+      final blocked = buildCommanderOptimizePlanningSummary(
+        format: 'commander',
+        commanderName: 'Lorehold, the Historian',
+        totalCards: 100,
+        deckStateStatus: 'healthy',
+        prioritySource: 'none',
+        priorityCardCount: 0,
+        metaReferencesAvailable: false,
+        roleTargetsAvailable: false,
+        candidateSwaps: const [],
+        responseBody: const {
+          'swaps': [
+            {'out': 'Arcane Signet', 'in': 'Storm-Kiln Artist'},
+          ],
+        },
+        preferCollection: false,
+      );
+      expect((blocked['same_lane_gate'] as Map)['gate_ready'], isFalse);
+      expect(blocked['status'], 'blocked_missing_same_lane_evidence');
+
+      final empty = buildCommanderOptimizePlanningSummary(
+        format: 'commander',
+        commanderName: 'Lorehold, the Historian',
+        totalCards: 100,
+        deckStateStatus: 'healthy',
+        prioritySource: 'none',
+        priorityCardCount: 0,
+        metaReferencesAvailable: false,
+        roleTargetsAvailable: false,
+        candidateSwaps: const [],
+        responseBody: const {'swaps': <Map<String, dynamic>>[]},
+        preferCollection: false,
+      );
+      expect((empty['same_lane_gate'] as Map)['gate_ready'], isFalse);
+      expect(empty['status'], 'no_swap_hypothesis');
     });
   });
 }

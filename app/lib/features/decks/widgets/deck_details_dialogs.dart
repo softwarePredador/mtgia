@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck_card_item.dart';
@@ -18,45 +19,54 @@ Future<String?> showDeckDescriptionEditorDialog({
 
   return showDialog<String>(
     context: context,
-    builder:
-        (ctx) => AlertDialog(
-          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-          title: const DialogTitleBlock(
-            icon: Icons.edit_note_rounded,
-            title: 'Descrição do deck',
-            subtitle: 'Registre o plano, tema ou objetivo principal da lista.',
-            accent: AppTheme.frost400,
+    builder: (ctx) => AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space0,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space16,
+        AppTheme.space24,
+        AppTheme.space8,
+      ),
+      title: const DialogTitleBlock(
+        icon: Icons.edit_note_rounded,
+        title: 'Descrição do deck',
+        subtitle: 'Registre o plano, tema ou objetivo principal da lista.',
+        accent: AppTheme.frost400,
+      ),
+      content: TextField(
+        key: const Key('deck-description-editor-field'),
+        controller: controller,
+        maxLines: 5,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText:
+              'Descreva a estratégia, tema ou objetivo do deck...\n\nEx: Deck focado em tokens e sacrifício com sinergia Orzhov.',
+          hintMaxLines: 5,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),
-          content: TextField(
-            key: const Key('deck-description-editor-field'),
-            controller: controller,
-            maxLines: 5,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText:
-                  'Descreva a estratégia, tema ou objetivo do deck...\n\nEx: Deck focado em tokens e sacrifício com sinergia Orzhov.',
-              hintMaxLines: 5,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              ),
-              filled: true,
-              fillColor: theme.colorScheme.surface,
-            ),
-          ),
-          actions: [
-            TextButton(
-              key: const Key('deck-description-editor-cancel-button'),
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              key: const Key('deck-description-editor-save-button'),
-              onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-              child: const Text('Salvar'),
-            ),
-          ],
+          filled: true,
+          fillColor: theme.colorScheme.surface,
         ),
+      ),
+      actions: [
+        TextButton(
+          key: const Key('deck-description-editor-cancel-button'),
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          key: const Key('deck-description-editor-save-button'),
+          onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+          child: const Text('Salvar'),
+        ),
+      ],
+    ),
   );
 }
 
@@ -66,44 +76,52 @@ Future<bool?> showDeckRemoveCardConfirmationDialog({
 }) {
   return showDialog<bool>(
     context: context,
-    builder:
-        (ctx) => AlertDialog(
-          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-          title: const DialogTitleBlock(
-            icon: Icons.remove_circle_outline_rounded,
-            title: 'Remover carta',
-            subtitle:
-                'Confirme antes de alterar a composição estratégica do deck.',
-            accent: AppTheme.error,
+    builder: (ctx) => AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space0,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space16,
+        AppTheme.space24,
+        AppTheme.space8,
+      ),
+      title: const DialogTitleBlock(
+        icon: Icons.remove_circle_outline_rounded,
+        title: 'Remover carta',
+        subtitle: 'Confirme antes de alterar a composição estratégica do deck.',
+        accent: AppTheme.error,
+      ),
+      content: DialogSectionCard(
+        title: card.name,
+        accent: AppTheme.error,
+        icon: Icons.style_outlined,
+        child: Text(
+          'A carta será removida desta lista. Você poderá adicioná-la novamente pela busca.',
+          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+            color: AppTheme.textSecondary,
+            height: 1.4,
           ),
-          content: DialogSectionCard(
-            title: card.name,
-            accent: AppTheme.error,
-            icon: Icons.style_outlined,
-            child: Text(
-              'A carta será removida desta lista. Você poderá adicioná-la novamente pela busca.',
-              style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
-                height: 1.4,
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.error,
-                foregroundColor: AppTheme.textPrimary,
-              ),
-              child: const Text('Remover'),
-            ),
-          ],
         ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.error,
+            foregroundColor: AppTheme.textPrimary,
+          ),
+          child: const Text('Remover'),
+        ),
+      ],
+    ),
   );
 }
 
@@ -115,20 +133,19 @@ Future<void> showDeckAiExplanationFlow({
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder:
-        (ctx) => const Center(
-          child: FlowLoadingDialog(
-            title: 'Analisando a carta...',
-            subtitle:
-                'Relacionando a carta com o plano do deck e o papel dela na lista.',
-            accent: AppTheme.frost400,
-            icon: Icons.auto_awesome_rounded,
-            tips: [
-              'A análise tenta explicar função, sinergia e valor da carta no deck.',
-              'Cartas boas isoladamente podem ter papel diferente dependendo do plano da lista.',
-            ],
-          ),
-        ),
+    builder: (ctx) => const Center(
+      child: FlowLoadingDialog(
+        title: 'Analisando a carta...',
+        subtitle:
+            'Relacionando a carta com o plano do deck e o papel dela na lista.',
+        accent: AppTheme.frost400,
+        icon: Icons.auto_awesome_rounded,
+        tips: [
+          'A análise tenta explicar função, sinergia e valor da carta no deck.',
+          'Cartas boas isoladamente podem ter papel diferente dependendo do plano da lista.',
+        ],
+      ),
+    ),
   );
 
   try {
@@ -143,37 +160,46 @@ Future<void> showDeckAiExplanationFlow({
 
     showDialog(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-            contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            title: DialogTitleBlock(
-              icon: Icons.auto_awesome_rounded,
-              title: 'Análise: ${card.name}',
-              subtitle: 'Leitura contextual da carta dentro do seu deck.',
-              accent: AppTheme.frost400,
-            ),
-            content: SingleChildScrollView(
-              child: DialogSectionCard(
-                title: 'O que essa carta faz aqui',
-                accent: AppTheme.frost400,
-                icon: Icons.psychology_alt_outlined,
-                child: Text(
-                  explanation ?? 'Não foi possível gerar uma explicação.',
-                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textPrimary,
-                    height: 1.4,
-                  ),
-                ),
+      builder: (ctx) => AlertDialog(
+        titlePadding: const EdgeInsets.fromLTRB(
+          AppTheme.space24,
+          AppTheme.space24,
+          AppTheme.space24,
+          AppTheme.space0,
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(
+          AppTheme.space24,
+          AppTheme.space16,
+          AppTheme.space24,
+          AppTheme.space8,
+        ),
+        title: DialogTitleBlock(
+          icon: Icons.auto_awesome_rounded,
+          title: 'Análise: ${card.name}',
+          subtitle: 'Leitura contextual da carta dentro do seu deck.',
+          accent: AppTheme.frost400,
+        ),
+        content: SingleChildScrollView(
+          child: DialogSectionCard(
+            title: 'O que essa carta faz aqui',
+            accent: AppTheme.frost400,
+            icon: Icons.psychology_alt_outlined,
+            child: Text(
+              explanation ?? 'Não foi possível gerar uma explicação.',
+              style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                height: 1.4,
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Entendi'),
-              ),
-            ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Entendi'),
+          ),
+        ],
+      ),
     );
   } catch (e) {
     if (context.mounted) {
@@ -213,7 +239,7 @@ Future<void> showDeckEditionPicker({
       return SafeArea(
         key: Key('deck-edition-picker-sheet-${card.id}'),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.space16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,20 +251,20 @@ Future<void> showDeckEditionPicker({
                     : 'Edições disponíveis',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.space4),
               Text(
                 card.isCommander
                     ? '${card.name} fica no slot de comandante, fora das 99 cartas.'
                     : card.name,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space12),
               FutureBuilder<List<Map<String, dynamic>>>(
                 future: loadPrintings(card.name),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
+                      padding: EdgeInsets.symmetric(vertical: AppTheme.space24),
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
@@ -250,19 +276,20 @@ Future<void> showDeckEditionPicker({
                           'Não foi possível carregar as edições agora. Tente novamente.',
                     );
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppTheme.space12,
+                      ),
                       child: DialogSectionCard(
                         title: 'Edições indisponíveis',
                         accent: AppTheme.error,
                         icon: Icons.error_outline_rounded,
                         child: Text(
                           message,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.textSecondary,
-                            height: 1.35,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: AppTheme.textSecondary,
+                                height: 1.35,
+                              ),
                         ),
                       ),
                     );
@@ -270,7 +297,7 @@ Future<void> showDeckEditionPicker({
                   final list = snapshot.data ?? const [];
                   if (list.isEmpty) {
                     return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.symmetric(vertical: AppTheme.space12),
                       child: Text('Nenhuma edição encontrada no banco.'),
                     );
                   }
@@ -286,22 +313,22 @@ Future<void> showDeckEditionPicker({
                       itemBuilder: (context, index) {
                         final it = list[index];
                         final id = (it['id'] ?? '').toString();
-                        final setCode =
-                            (it['set_code'] ?? '').toString().toUpperCase();
-                        final setName =
-                            (it['set_name'] ?? it['set_code'] ?? '').toString();
-                        final collector =
-                            (it['collector_number'] ?? '').toString();
+                        final setCode = (it['set_code'] ?? '')
+                            .toString()
+                            .toUpperCase();
+                        final setName = (it['set_name'] ?? it['set_code'] ?? '')
+                            .toString();
+                        final collector = (it['collector_number'] ?? '')
+                            .toString();
                         final foil = it['foil'] == true;
                         final date = (it['set_release_date'] ?? '').toString();
                         final rarity = (it['rarity'] ?? '').toString();
                         final price = it['price'];
-                        final priceText =
-                            (price is num)
-                                ? '\$${price.toStringAsFixed(2)}'
-                                : (price is String && price.trim().isNotEmpty)
-                                ? '\$$price'
-                                : '—';
+                        final priceText = (price is num)
+                            ? '\$${price.toStringAsFixed(2)}'
+                            : (price is String && price.trim().isNotEmpty)
+                            ? '\$$price'
+                            : '—';
 
                         final isSelected = id == card.id;
 
@@ -338,13 +365,12 @@ Future<void> showDeckEditionPicker({
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                           selected: isSelected,
-                          onTap:
-                              isSelected
-                                  ? null
-                                  : () async {
-                                    Navigator.of(sheetContext).pop();
-                                    await onReplaceEdition(id);
-                                  },
+                          onTap: isSelected
+                              ? null
+                              : () async {
+                                  Navigator.of(sheetContext).pop();
+                                  await onReplaceEdition(id);
+                                },
                         );
                       },
                     ),
@@ -390,7 +416,7 @@ Future<void> showDeckCardDetailsDialog({
             children: [
               Flexible(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppTheme.space16),
                   child: _DeckCardDetailsDialogBody(
                     card: card,
                     onShowAiExplanation: onShowAiExplanation,
@@ -402,7 +428,7 @@ Future<void> showDeckCardDetailsDialog({
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(AppTheme.space8),
                 child: Wrap(
                   alignment: WrapAlignment.end,
                   spacing: 8,
@@ -444,10 +470,9 @@ class _DeckCardDetailsDialogBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 430;
-        final imageWidth =
-            compact
-                ? constraints.maxWidth.clamp(118.0, 156.0)
-                : constraints.maxWidth.clamp(124.0, 136.0);
+        final imageWidth = compact
+            ? constraints.maxWidth.clamp(118.0, 156.0)
+            : constraints.maxWidth.clamp(124.0, 136.0);
         final info = _DeckCardDetailsInfo(
           card: card,
           onShowAiExplanation: onShowAiExplanation,
@@ -461,7 +486,7 @@ class _DeckCardDetailsDialogBody extends StatelessWidget {
               Center(
                 child: _DeckCardDetailsImage(card: card, width: imageWidth),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppTheme.space14),
               info,
             ],
           );
@@ -471,7 +496,7 @@ class _DeckCardDetailsDialogBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _DeckCardDetailsImage(card: card, width: imageWidth),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppTheme.space16),
             Expanded(child: info),
           ],
         );
@@ -541,10 +566,10 @@ class _DeckCardDetailsInfo extends StatelessWidget {
             color: AppTheme.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         _DeckEditionInfo(card: card),
         if (card.manaCost != null) ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Row(
             children: [
               Text(
@@ -557,7 +582,7 @@ class _DeckCardDetailsInfo extends StatelessWidget {
             ],
           ),
         ],
-        const SizedBox(height: 6),
+        const SizedBox(height: AppTheme.space6),
         Text(
           card.typeLine,
           style: theme.textTheme.bodyMedium?.copyWith(
@@ -565,7 +590,7 @@ class _DeckCardDetailsInfo extends StatelessWidget {
             color: AppTheme.textSecondary,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppTheme.space10),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -609,9 +634,9 @@ class _DeckCardDetailsInfo extends StatelessWidget {
           ],
         ),
         if (card.oracleText != null) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           Divider(color: AppTheme.outlineMuted.withValues(alpha: 0.45)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           OracleTextWidget(card.oracleText!),
         ],
       ],
@@ -667,7 +692,10 @@ class _DeckEditionInfo extends StatelessWidget {
     ].join(' • ');
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space8,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -681,7 +709,7 @@ class _DeckEditionInfo extends StatelessWidget {
             size: 18,
             color: card.isCommander ? AppTheme.mythicGold : AppTheme.frost400,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -694,7 +722,7 @@ class _DeckEditionInfo extends StatelessWidget {
                   ),
                 ),
                 if (editionSubtitle.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.space2),
                   Text(
                     editionSubtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -717,6 +745,16 @@ Future<void> showDeckPricingDetailsSheet({
 }) async {
   final items =
       (pricing['items'] as List?)?.whereType<Map>().toList() ?? const [];
+  final currency = pricing['currency']?.toString() ?? 'USD';
+  final total = pricing['estimated_total_usd'];
+  final missing = pricing['missing_price_cards'];
+  final source = switch (pricing['price_source']?.toString()) {
+    'scryfall' => 'Scryfall',
+    'mtgjson' => 'MTGJSON',
+    'mixed' => 'fontes mistas',
+    'legacy' => 'fonte legada',
+    _ => 'fonte não informada',
+  };
 
   await showModalBottomSheet(
     context: context,
@@ -732,7 +770,7 @@ Future<void> showDeckPricingDetailsSheet({
     builder: (ctx) {
       return SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.space16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -741,12 +779,19 @@ Future<void> showDeckPricingDetailsSheet({
                 'Custo do deck',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               Text(
-                'Total estimado: \$${(pricing['estimated_total_usd'] ?? 0)}',
+                total is num
+                    ? '${missing is num && missing > 0 ? 'Total parcial' : 'Total estimado'}: ${CurrencyFormatter.format(total, currencyCode: currency)}'
+                    : 'Total indisponível',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space4),
+              Text(
+                '${missing is num && missing > 0 ? '${missing.toInt()} carta(s) sem preço • ' : ''}Fonte: $source',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: AppTheme.space12),
               ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.65,
@@ -761,11 +806,21 @@ Future<void> showDeckPricingDetailsSheet({
                     final qty = (it['quantity'] as int?) ?? 0;
                     final setCode = (it['set_code'] ?? '').toString();
                     final unit = it['unit_price_usd'];
-                    final unitText =
-                        (unit is num) ? '\$${unit.toStringAsFixed(2)}' : '—';
+                    final unitText = (unit is num)
+                        ? CurrencyFormatter.format(
+                            unit,
+                            currencyCode:
+                                it['price_currency']?.toString() ?? currency,
+                          )
+                        : 'Sem preço';
                     final line = it['line_total_usd'];
-                    final lineText =
-                        (line is num) ? '\$${line.toStringAsFixed(2)}' : '—';
+                    final lineText = (line is num)
+                        ? CurrencyFormatter.format(
+                            line,
+                            currencyCode:
+                                it['price_currency']?.toString() ?? currency,
+                          )
+                        : '—';
 
                     return ListTile(
                       dense: true,

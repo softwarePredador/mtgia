@@ -15,6 +15,7 @@ void main() {
           'commander_name': ' Lorehold, the Historian ',
           'bracket': ' 4 ',
           'async': true,
+          'request_key': ' generate:request-1 ',
         });
 
         expect(input.prompt, equals('Boros miracle'));
@@ -24,7 +25,29 @@ void main() {
         expect(input.body['format'], equals(input.format));
         expect(input.body['commander_name'], equals(input.commanderName));
         expect(input.body['bracket'], equals(4));
+        expect(input.constraints.isRequested, isFalse);
         expect(isAiGenerateAsyncRequested(input.body), isTrue);
+        expect(input.body['request_key'], 'generate:request-1');
+      });
+
+      test('normalizes hard generation constraints', () {
+        final input = parseAiGenerateRequestInput({
+          'prompt': 'Boros budget',
+          'generation_constraints': {
+            'prefer_collection': false,
+            'collection_only': true,
+            'budget_limit_brl': 250,
+          },
+        });
+
+        expect(input.constraints.preferCollection, isTrue);
+        expect(input.constraints.collectionOnly, isTrue);
+        expect(input.constraints.budgetLimitBrl, 250);
+        expect(input.body['generation_constraints'], {
+          'prefer_collection': true,
+          'collection_only': true,
+          'budget_limit_brl': 250,
+        });
       });
 
       test('uses Commander and removes blank optional commander', () {
@@ -53,6 +76,20 @@ void main() {
             const {'prompt': 'valid', 'bracket': true},
             const {'prompt': 'valid', 'bracket': 0},
             const {'prompt': 'valid', 'bracket': 6},
+            const {'prompt': 'valid', 'request_key': 'contains whitespace'},
+            const {'prompt': 'valid', 'generation_constraints': true},
+            const {
+              'prompt': 'valid',
+              'generation_constraints': {'collection_only': 'yes'},
+            },
+            const {
+              'prompt': 'valid',
+              'generation_constraints': {'budget_limit_brl': -1},
+            },
+            const {
+              'prompt': 'valid',
+              'generation_constraints': {'unknown': true},
+            },
           ]) {
             expect(
               () => parseAiGenerateRequestInput(decoded),
@@ -108,7 +145,7 @@ void main() {
 
         expect(first, equals(second));
         expect(first, isNot(equals(differentBracket)));
-        expect(first, startsWith('ai_generate:v2:'));
+        expect(first, startsWith('ai_generate:v3:'));
         expect(first, isNot(contains('mono red')));
       },
     );
@@ -160,7 +197,35 @@ void main() {
       );
 
       expect(v5, isNot(equals(v4)));
-      expect(v5, startsWith('ai_generate:v2:'));
+      expect(v5, startsWith('ai_generate:v3:'));
+    });
+
+    test('generation constraints participate in the cache key', () {
+      final unrestricted = buildAiGenerateCacheKey(
+        prompt: 'boros artifacts',
+        format: 'commander',
+      );
+      final budget100 = buildAiGenerateCacheKey(
+        prompt: 'boros artifacts',
+        format: 'commander',
+        constraints: const AiGenerateConstraints(
+          preferCollection: true,
+          collectionOnly: false,
+          budgetLimitBrl: 100,
+        ),
+      );
+      final budget200 = buildAiGenerateCacheKey(
+        prompt: 'boros artifacts',
+        format: 'commander',
+        constraints: const AiGenerateConstraints(
+          preferCollection: true,
+          collectionOnly: false,
+          budgetLimitBrl: 200,
+        ),
+      );
+
+      expect(budget100, isNot(unrestricted));
+      expect(budget200, isNot(budget100));
     });
 
     test('returns cache hits as cloned payloads with cache metadata', () {
@@ -219,15 +284,19 @@ void main() {
         'async': true,
         'profile': 'async',
         'response_mode': 'background',
+        'request_key': 'generate:request-1',
         'bracket': 3,
+        'generation_constraints': {'budget_limit_brl': 100},
       });
 
       expect(payload['prompt'], equals('mono blue tempo'));
       expect(payload['format'], equals('commander'));
       expect(payload['bracket'], equals(3));
+      expect(payload['generation_constraints'], {'budget_limit_brl': 100});
       expect(payload.containsKey('async'), isFalse);
       expect(payload.containsKey('profile'), isFalse);
       expect(payload.containsKey('response_mode'), isFalse);
+      expect(payload.containsKey('request_key'), isFalse);
     });
 
     test(

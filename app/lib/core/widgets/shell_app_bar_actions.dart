@@ -68,7 +68,7 @@ class ShellAppBarActions extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppTheme.space8),
       ],
     );
   }

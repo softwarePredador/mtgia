@@ -33,6 +33,8 @@ void main() {
 
       expect(source, contains('deckValidationMarkSuccessSql'));
       expect(source, contains('deckValidationMarkFailureSql'));
+      expect(source, contains('on DeckRulesException catch (error)'));
+      expect(source, isNot(contains('await pool.execute(')));
       expect(source, contains("statusCode: HttpStatus.internalServerError"));
     });
 

@@ -83,35 +83,44 @@ void main() {
       bracket: 2,
       keepTheme: true,
       intensity: OptimizeIntensity.focused,
-      executeRequest: (
-        _,
-        __, {
-        required bracket,
-        required keepTheme,
-        required intensity,
-        required onProgress,
-      }) async {
-        return {
-          'mode': 'optimize',
-          'removals': const ['Mind Stone'],
-          'additions': const ['Arcane Signet'],
-          'removals_detailed': removalsDetailed,
-          'additions_detailed': additionsDetailed,
-          'swap_integrity': {
-            'version': 'v1',
-            'algo': 'sha256',
-            'hash': hash,
-            'deck_signature': deckSignature,
-            'removal_count': 1,
-            'addition_count': 1,
+      executeRequest:
+          (
+            _,
+            __, {
+            required bracket,
+            required keepTheme,
+            required intensity,
+            required onProgress,
+          }) async {
+            return {
+              'mode': 'optimize',
+              'removals': const ['Mind Stone'],
+              'additions': const ['Arcane Signet'],
+              'removals_detailed': removalsDetailed,
+              'additions_detailed': additionsDetailed,
+              'swap_integrity': {
+                'version': 'v1',
+                'algo': 'sha256',
+                'hash': hash,
+                'deck_signature': deckSignature,
+                'removal_count': 1,
+                'addition_count': 1,
+              },
+            };
           },
-        };
-      },
       onProgressUpdate: (_) {},
     );
 
     expect(outcome.preview.swapIntegrity?.deckSignature, deckSignature);
     expect(outcome.applyPlan.expectedDeckSignature, deckSignature);
+    expect(
+      outcome.applyPlan.mutationContext['expected_deck_signature'],
+      deckSignature,
+    );
+    expect(
+      (outcome.applyPlan.mutationContext['swap_integrity'] as Map)['hash'],
+      hash,
+    );
   });
 
   test(
@@ -131,30 +140,31 @@ void main() {
           bracket: 2,
           keepTheme: true,
           intensity: OptimizeIntensity.focused,
-          executeRequest: (
-            _,
-            __, {
-            required bracket,
-            required keepTheme,
-            required intensity,
-            required onProgress,
-          }) async {
-            return {
-              'mode': 'optimize',
-              'removals': const ['Mind Stone'],
-              'additions': const ['Arcane Signet'],
-              'removals_detailed': removalsDetailed,
-              'additions_detailed': additionsDetailed,
-              'swap_integrity': const {
-                'version': 'v1',
-                'algo': 'sha256',
-                'hash': 'bad-hash',
-                'deck_signature': 'cmd-1:1:NM|remove-1:1:NM',
-                'removal_count': 1,
-                'addition_count': 1,
+          executeRequest:
+              (
+                _,
+                __, {
+                required bracket,
+                required keepTheme,
+                required intensity,
+                required onProgress,
+              }) async {
+                return {
+                  'mode': 'optimize',
+                  'removals': const ['Mind Stone'],
+                  'additions': const ['Arcane Signet'],
+                  'removals_detailed': removalsDetailed,
+                  'additions_detailed': additionsDetailed,
+                  'swap_integrity': const {
+                    'version': 'v1',
+                    'algo': 'sha256',
+                    'hash': 'bad-hash',
+                    'deck_signature': 'cmd-1:1:NM|remove-1:1:NM',
+                    'removal_count': 1,
+                    'addition_count': 1,
+                  },
+                };
               },
-            };
-          },
           onProgressUpdate: (_) {},
         ),
         throwsA(
@@ -455,6 +465,10 @@ void main() {
     expect(plan.additionsDetailed.single['card_id'], 'add-1');
     expect(plan.mutationContext['type'], 'optimization_apply');
     expect(plan.mutationContext['selected_change_count'], 2);
+    expect(plan.mutationContext['preview_change_count'], 4);
+    expect(plan.mutationContext['selection_scope'], 'partial_selection');
+    expect(plan.mutationContext.containsKey('preview_post_analysis'), isFalse);
+    expect(plan.mutationContext.containsKey('after_snapshot'), isFalse);
     expect(
       (plan.mutationContext['selection']
           as Map<String, dynamic>)['addition_indexes'],
@@ -518,11 +532,31 @@ void main() {
     expect(plan.mutationContext['source'], 'optimize_preview');
     expect(plan.mutationContext['intensity'], 'focused');
     expect(plan.mutationContext['before_snapshot'], {'average_cmc': 3.2});
-    expect(plan.mutationContext['after_snapshot'], {'average_cmc': 3.0});
+    expect(plan.mutationContext['selection_scope'], 'full_preview');
+    expect(plan.mutationContext['preview_post_analysis'], {'average_cmc': 3.0});
+    expect(plan.mutationContext.containsKey('after_snapshot'), isFalse);
     expect(
       (plan.mutationContext['battle_validation'] as Map)['label'],
       'Battle pendente',
     );
+  });
+
+  test('buildOptimizeApplyPlan refuses a backend-blocked preview', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'optimize',
+      'can_apply': false,
+      'learning_eligible': false,
+      'apply_blockers': const ['commander_same_lane_evidence_required'],
+      'removals': const ['Arcane Signet'],
+      'additions': const ['Storm-Kiln Artist'],
+    });
+
+    expect(preview.canApply, isFalse);
+    expect(
+      preview.applyBlockers,
+      contains('commander_same_lane_evidence_required'),
+    );
+    expect(buildOptimizeApplyPlan(preview).mode, OptimizeApplyMode.none);
   });
 
   test('executeOptimizeApplyPlan dispatches to correct executor', () async {
@@ -544,16 +578,11 @@ void main() {
         calls.add('bulk');
         return true;
       },
-      applyWithIds: (
-        _,
-        __,
-        ___, {
-        expectedDeckSignature,
-        mutationContext,
-      }) async {
-        calls.add('ids:$expectedDeckSignature:${mutationContext?['mode']}');
-        return true;
-      },
+      applyWithIds:
+          (_, __, ___, {expectedDeckSignature, mutationContext}) async {
+            calls.add('ids:$expectedDeckSignature:${mutationContext?['mode']}');
+            return true;
+          },
       applyByNames: (_, __, ___, {mutationContext}) async {
         calls.add('names');
         return true;
@@ -564,7 +593,7 @@ void main() {
   });
 
   test(
-    'executeConfirmedOptimization applies plan and persists strategy',
+    'executeConfirmedOptimization carries strategy in the atomic apply context',
     () async {
       final calls = <String>[];
 
@@ -581,35 +610,20 @@ void main() {
           calls.add('bulk');
           return true;
         },
-        applyWithIds: (
-          _,
-          __,
-          ___, {
-          expectedDeckSignature,
-          mutationContext,
-        }) async {
-          calls.add('ids');
-          return true;
-        },
+        applyWithIds:
+            (_, __, ___, {expectedDeckSignature, mutationContext}) async {
+              calls.add('ids');
+              return true;
+            },
         applyByNames: (_, removals, additions, {mutationContext}) async {
           calls.add(
             'names:${removals.join(",")}:${additions.join(",")}:${mutationContext?['archetype']}:${mutationContext?['bracket']}',
           );
           return true;
         },
-        updateDeckStrategy: ({
-          required deckId,
-          required archetype,
-          required bracket,
-        }) async {
-          calls.add('strategy:$deckId:$archetype:$bracket');
-        },
       );
 
-      expect(calls, [
-        'names:Mind Stone:Arcane Signet:control:2',
-        'strategy:deck-1:control:2',
-      ]);
+      expect(calls, ['names:Mind Stone:Arcane Signet:control:2']);
     },
   );
 
@@ -627,19 +641,20 @@ void main() {
           rebuildScope: 'auto',
           saveMode: 'draft_clone',
         ),
-        rebuildDeck: (
-          _, {
-          required archetype,
-          required theme,
-          required bracket,
-          required rebuildScope,
-          required saveMode,
-        }) async {
-          calls.add(
-            'rebuild:$archetype:$theme:$bracket:$rebuildScope:$saveMode',
-          );
-          return {'draft_deck_id': 'draft-1'};
-        },
+        rebuildDeck:
+            (
+              _, {
+              required archetype,
+              required theme,
+              required bracket,
+              required rebuildScope,
+              required saveMode,
+            }) async {
+              calls.add(
+                'rebuild:$archetype:$theme:$bracket:$rebuildScope:$saveMode',
+              );
+              return {'draft_deck_id': 'draft-1'};
+            },
         refreshDeckDetails: (deckId, {forceRefresh = false}) async {
           calls.add('refresh:$deckId:$forceRefresh');
         },
@@ -711,9 +726,8 @@ void main() {
         reasons: ['Gate'],
       ),
       onNeedsRepair: () async => calls.add('repair'),
-      showInfo:
-          ({required title, required message, required reasons}) async =>
-              calls.add('info:$title:$message:${reasons.join(",")}'),
+      showInfo: ({required title, required message, required reasons}) async =>
+          calls.add('info:$title:$message:${reasons.join(",")}'),
       showError: (message) => calls.add('error:$message'),
     );
 
@@ -731,27 +745,28 @@ void main() {
         bracket: 2,
         keepTheme: true,
         intensity: OptimizeIntensity.focused,
-        executeRequest: (
-          _,
-          __, {
-          required bracket,
-          required keepTheme,
-          required intensity,
-          required onProgress,
-        }) async {
-          onProgress('Gerando sugestões...', 2, 5);
-          return {
-            'mode': 'optimize',
-            'removals': const ['Mind Stone'],
-            'additions': const ['Arcane Signet'],
-            'removals_detailed': const [
-              {'card_id': 'remove-1', 'name': 'Mind Stone'},
-            ],
-            'additions_detailed': const [
-              {'card_id': 'add-1', 'name': 'Arcane Signet'},
-            ],
-          };
-        },
+        executeRequest:
+            (
+              _,
+              __, {
+              required bracket,
+              required keepTheme,
+              required intensity,
+              required onProgress,
+            }) async {
+              onProgress('Gerando sugestões...', 2, 5);
+              return {
+                'mode': 'optimize',
+                'removals': const ['Mind Stone'],
+                'additions': const ['Arcane Signet'],
+                'removals_detailed': const [
+                  {'card_id': 'remove-1', 'name': 'Mind Stone'},
+                ],
+                'additions_detailed': const [
+                  {'card_id': 'add-1', 'name': 'Arcane Signet'},
+                ],
+              };
+            },
         onProgressUpdate: progress.add,
       );
 
@@ -772,21 +787,22 @@ void main() {
       bracket: 2,
       keepTheme: true,
       intensity: OptimizeIntensity.focused,
-      executeRequest: (
-        _,
-        __, {
-        required bracket,
-        required keepTheme,
-        required intensity,
-        required onProgress,
-      }) async {
-        onProgress('Gerando sugestões...', 3, 5);
-        return {
-          'mode': 'optimize',
-          'removals': const ['Mind Stone'],
-          'additions': const ['Arcane Signet'],
-        };
-      },
+      executeRequest:
+          (
+            _,
+            __, {
+            required bracket,
+            required keepTheme,
+            required intensity,
+            required onProgress,
+          }) async {
+            onProgress('Gerando sugestões...', 3, 5);
+            return {
+              'mode': 'optimize',
+              'removals': const ['Mind Stone'],
+              'additions': const ['Arcane Signet'],
+            };
+          },
       onProgressUpdate: progress.add,
       confirmPreview: (outcome) async {
         calls.add('preview:${outcome.preview.mode}');
@@ -801,28 +817,16 @@ void main() {
         calls.add('bulk');
         return true;
       },
-      applyWithIds: (
-        _,
-        __,
-        ___, {
-        expectedDeckSignature,
-        mutationContext,
-      }) async {
-        calls.add('ids');
-        return true;
-      },
+      applyWithIds:
+          (_, __, ___, {expectedDeckSignature, mutationContext}) async {
+            calls.add('ids');
+            return true;
+          },
       applyByNames: (_, removals, additions, {mutationContext}) async {
         calls.add(
           'names:${removals.join(",")}:${additions.join(",")}:${mutationContext?['archetype']}',
         );
         return true;
-      },
-      updateDeckStrategy: ({
-        required deckId,
-        required archetype,
-        required bracket,
-      }) async {
-        calls.add('strategy:$deckId:$archetype:$bracket');
       },
     );
 
@@ -831,10 +835,62 @@ void main() {
       'preview:optimize',
       'apply-start',
       'names:Mind Stone:Arcane Signet:control',
-      'strategy:deck-1:control:2',
       'success',
     ]);
   });
+
+  test(
+    'executeOptimizeFlow cancel leaves every mutation callback untouched',
+    () async {
+      final calls = <String>[];
+
+      await executeOptimizeFlow(
+        deckId: 'deck-1',
+        archetype: 'control',
+        bracket: 2,
+        keepTheme: true,
+        intensity: OptimizeIntensity.focused,
+        executeRequest:
+            (
+              _,
+              __, {
+              required bracket,
+              required keepTheme,
+              required intensity,
+              required onProgress,
+            }) async => {
+              'mode': 'optimize',
+              'removals': const ['Mind Stone'],
+              'additions': const ['Arcane Signet'],
+            },
+        onProgressUpdate: (_) {},
+        confirmPreview: (_) async {
+          calls.add('preview-cancelled');
+          return null;
+        },
+        onApplyStart: () => calls.add('apply-start'),
+        onNoChanges: (_) async => calls.add('no-changes'),
+        onSuccess: () => calls.add('success'),
+        onAiError: (_) async => calls.add('ai-error'),
+        onGenericError: (_) => calls.add('generic-error'),
+        addBulk: (_, __, {mutationContext}) async {
+          calls.add('bulk');
+          return true;
+        },
+        applyWithIds:
+            (_, __, ___, {expectedDeckSignature, mutationContext}) async {
+              calls.add('ids');
+              return true;
+            },
+        applyByNames: (_, __, ___, {mutationContext}) async {
+          calls.add('names');
+          return true;
+        },
+      );
+
+      expect(calls, ['preview-cancelled']);
+    },
+  );
 
   test(
     'executeOptimizeFlow stops strategy and success when apply returns false',
@@ -847,20 +903,21 @@ void main() {
         bracket: 2,
         keepTheme: true,
         intensity: OptimizeIntensity.focused,
-        executeRequest: (
-          _,
-          __, {
-          required bracket,
-          required keepTheme,
-          required intensity,
-          required onProgress,
-        }) async {
-          return {
-            'mode': 'optimize',
-            'removals': const ['Mind Stone'],
-            'additions': const ['Arcane Signet'],
-          };
-        },
+        executeRequest:
+            (
+              _,
+              __, {
+              required bracket,
+              required keepTheme,
+              required intensity,
+              required onProgress,
+            }) async {
+              return {
+                'mode': 'optimize',
+                'removals': const ['Mind Stone'],
+                'additions': const ['Arcane Signet'],
+              };
+            },
         onProgressUpdate: (_) {},
         confirmPreview: (outcome) async {
           calls.add('preview:${outcome.preview.mode}');
@@ -875,28 +932,16 @@ void main() {
           calls.add('bulk');
           return true;
         },
-        applyWithIds: (
-          _,
-          __,
-          ___, {
-          expectedDeckSignature,
-          mutationContext,
-        }) async {
-          calls.add('ids');
-          return true;
-        },
+        applyWithIds:
+            (_, __, ___, {expectedDeckSignature, mutationContext}) async {
+              calls.add('ids');
+              return true;
+            },
         applyByNames: (_, removals, additions, {mutationContext}) async {
           calls.add(
             'names:${removals.join(",")}:${additions.join(",")}:${mutationContext?['archetype']}',
           );
           return false;
-        },
-        updateDeckStrategy: ({
-          required deckId,
-          required archetype,
-          required bracket,
-        }) async {
-          calls.add('strategy:$deckId:$archetype:$bracket');
         },
       );
 
@@ -941,19 +986,20 @@ void main() {
         error: error,
         fallbackArchetype: 'midrange',
         selectedBracket: 2,
-        rebuildDeck: (
-          _, {
-          required archetype,
-          required theme,
-          required bracket,
-          required rebuildScope,
-          required saveMode,
-        }) async {
-          calls.add(
-            'rebuild:$archetype:$theme:$bracket:$rebuildScope:$saveMode',
-          );
-          return {'draft_deck_id': 'draft-1'};
-        },
+        rebuildDeck:
+            (
+              _, {
+              required archetype,
+              required theme,
+              required bracket,
+              required rebuildScope,
+              required saveMode,
+            }) async {
+              calls.add(
+                'rebuild:$archetype:$theme:$bracket:$rebuildScope:$saveMode',
+              );
+              return {'draft_deck_id': 'draft-1'};
+            },
         refreshDeckDetails: (deckId, {forceRefresh = false}) async {
           calls.add('refresh:$deckId:$forceRefresh');
         },

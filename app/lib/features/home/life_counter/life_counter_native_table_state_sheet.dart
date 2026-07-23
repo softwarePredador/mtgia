@@ -72,7 +72,12 @@ class _LifeCounterNativeTableStateSheetState
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.78,
           child: DecoratedBox(
@@ -92,7 +97,12 @@ class _LifeCounterNativeTableStateSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -107,7 +117,7 @@ class _LifeCounterNativeTableStateSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Atribua Monarca e Iniciativa e acompanhe Storm.',
                               style: TextStyle(
@@ -131,7 +141,12 @@ class _LifeCounterNativeTableStateSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       _TableStateCard(
                         title: 'Monarca',
@@ -142,14 +157,13 @@ class _LifeCounterNativeTableStateSheetState
                           selectedPlayer: _monarchPlayer,
                           playerCount: widget.initialSession.playerCount,
                           isPlayerAvailable: _isPlayerAvailable,
-                          onPlayerSelected:
-                              (playerIndex) =>
-                                  setState(() => _monarchPlayer = playerIndex),
-                          onCleared:
-                              () => setState(() => _monarchPlayer = null),
+                          onPlayerSelected: (playerIndex) =>
+                              setState(() => _monarchPlayer = playerIndex),
+                          onCleared: () =>
+                              setState(() => _monarchPlayer = null),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _TableStateCard(
                         title: 'Iniciativa',
                         subtitle:
@@ -160,15 +174,13 @@ class _LifeCounterNativeTableStateSheetState
                           selectedPlayer: _initiativePlayer,
                           playerCount: widget.initialSession.playerCount,
                           isPlayerAvailable: _isPlayerAvailable,
-                          onPlayerSelected:
-                              (playerIndex) => setState(
-                                () => _initiativePlayer = playerIndex,
-                              ),
-                          onCleared:
-                              () => setState(() => _initiativePlayer = null),
+                          onPlayerSelected: (playerIndex) =>
+                              setState(() => _initiativePlayer = playerIndex),
+                          onCleared: () =>
+                              setState(() => _initiativePlayer = null),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _TableStateCard(
                         title: 'Storm',
                         subtitle: 'Acompanhe a contagem atual de Storm.',
@@ -192,7 +204,7 @@ class _LifeCounterNativeTableStateSheetState
                                         fontSize: AppTheme.fontSm,
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: AppTheme.space6),
                                     Text(
                                       '$_stormCount',
                                       key: const Key(
@@ -225,7 +237,12 @@ class _LifeCounterNativeTableStateSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -236,12 +253,14 @@ class _LifeCounterNativeTableStateSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key(
@@ -251,7 +270,9 @@ class _LifeCounterNativeTableStateSheetState
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),
@@ -288,7 +309,7 @@ class _TableStateCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppTheme.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -300,7 +321,7 @@ class _TableStateCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               subtitle,
               style: const TextStyle(
@@ -309,7 +330,7 @@ class _TableStateCard extends StatelessWidget {
                 height: AppTheme.lineHeightCompact,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             child,
           ],
         ),
@@ -357,7 +378,7 @@ class _TokenAssignmentSection extends StatelessWidget {
             );
           }),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         TextButton.icon(
           key: Key('$keyPrefix-clear'),
           onPressed: onCleared,

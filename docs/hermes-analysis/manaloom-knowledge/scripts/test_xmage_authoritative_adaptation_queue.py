@@ -10,6 +10,8 @@ from xmage_authoritative_adaptation_queue import (
     DEFAULT_SCOPE,
     adapter_work_unit,
     compact_queue_row,
+    operational_coverage_lane,
+    prioritize_queue_rows,
     translation_lane,
     unique_identity_cards,
 )
@@ -26,6 +28,10 @@ def card(name: str, **overrides):
         "family": "draw_selection_topdeck",
         "lanes": ["battle_family_mapper_required"],
         "commander_legality_status": "legal",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_slot_count": 0,
     }
     payload.update(overrides)
     return payload
@@ -67,7 +73,7 @@ class XMageAuthoritativeAdaptationQueueTest(unittest.TestCase):
         self.assertEqual(len(rows), 2)
         self.assertEqual({row["oracle_id"] for row in rows}, {"same", "other"})
 
-    def test_translation_lane_treats_resolved_xmage_as_authoritative_adapter_work(self) -> None:
+    def test_translation_lane_retains_historical_native_analysis_shape(self) -> None:
         resolved = ResolvedSource("AlphaDraw", Path("/tmp/AlphaDraw.java"), "class_index_candidate")
         self.assertEqual(
             translation_lane(resolved=resolved, parsed_entry=parsed()),
@@ -88,11 +94,28 @@ class XMageAuthoritativeAdaptationQueueTest(unittest.TestCase):
     def test_compact_row_requires_runtime_catalog_confirmation(self) -> None:
         resolved = ResolvedSource("AlphaDraw", Path("/tmp/AlphaDraw.java"), "class_index_candidate")
         row = compact_queue_row(card("Alpha Draw"), resolved=resolved, parsed_entry=parsed())
-        self.assertEqual(row["source_truth_status"], "xmage_authoritative")
+        self.assertEqual(row["source_truth_status"], "xmage_local_source_candidate")
         self.assertEqual(row["source_resolution_status"], "local_source_candidate")
         self.assertTrue(row["runtime_catalog_confirmation_required"])
+        self.assertEqual(row["runtime_coverage_status"], "unconfirmed")
+        self.assertEqual(
+            row["operational_coverage_lane"],
+            "pinned_xmage_catalog_confirmation_required",
+        )
+        self.assertFalse(row["native_adapter_required"])
         self.assertEqual(row["translation_lane"], "xmage_authoritative_adapter_required")
         self.assertTrue(row["logical_rule_key"].startswith("battle_rule_v1:"))
+
+    def test_operational_lane_routes_only_external_residual_to_native_review(self) -> None:
+        resolved = ResolvedSource("AlphaDraw", Path("/tmp/AlphaDraw.java"), "class_index_candidate")
+        self.assertEqual(
+            operational_coverage_lane(resolved=resolved),
+            "pinned_xmage_catalog_confirmation_required",
+        )
+        self.assertEqual(
+            operational_coverage_lane(resolved=None),
+            "forge_then_native_residual_review",
+        )
 
     def test_manual_model_hint_is_split_by_xmage_java_signature(self) -> None:
         unit = adapter_work_unit(
@@ -144,6 +167,91 @@ class XMageAuthoritativeAdaptationQueueTest(unittest.TestCase):
             unit,
             "token_maker::instant_sorcery_cast_create_1_1_red_elemental_v1",
         )
+
+    def test_priority_combines_product_usage_impact_and_residual(self) -> None:
+        resolved = ResolvedSource("AlphaDraw", Path("/tmp/AlphaDraw.java"), "class_index_candidate")
+        row = compact_queue_row(
+            card(
+                "Alpha Draw",
+                ready_product_deck_count=2,
+                deck_count=7,
+                total_quantity=8,
+                commander_slot_count=1,
+            ),
+            resolved=resolved,
+            parsed_entry=parsed(),
+        )
+
+        prioritized = prioritize_queue_rows(
+            [row],
+            battle_usage_by_name={"alpha draw": 2},
+        )[0]
+
+        self.assertEqual(prioritized["priority_band"], "P0")
+        self.assertGreater(prioritized["priority_score"], 0)
+        self.assertTrue(
+            all(
+                prioritized["priority_components"][component]["score"] > 0
+                for component in ("product", "real_usage", "impact", "residual")
+            )
+        )
+        self.assertEqual(prioritized["owner"], "external_engine_coverage")
+        self.assertEqual(
+            prioritized["next_gate"],
+            "confirm_exact_pinned_xmage_catalog_then_count_external_coverage",
+        )
+
+    def test_registered_decks_do_not_fake_real_usage_or_mutate_owner_intent(self) -> None:
+        row = compact_queue_row(
+            card("Alpha Draw", deck_count=99, total_quantity=120),
+            resolved=None,
+            parsed_entry=None,
+        )
+
+        prioritized = prioritize_queue_rows([row])[0]
+
+        self.assertEqual(
+            prioritized["priority_components"]["real_usage"][
+                "typed_natural_positive_battle_count"
+            ],
+            0,
+        )
+        self.assertEqual(prioritized["priority_components"]["real_usage"]["score"], 0)
+        self.assertEqual(prioritized["registered_deck_count"], 99)
+        self.assertEqual(
+            prioritized["owner_intent_policy"],
+            {
+                "preserve_user_skeleton": True,
+                "allow_auto_fill": False,
+                "allow_auto_delete": False,
+                "allow_deck_mutation": False,
+            },
+        )
+        self.assertFalse(prioritized["promotion_allowed"])
+        self.assertTrue(prioritized["postgresql_is_product_truth"])
+
+    def test_each_operational_lane_has_explicit_owner_and_next_gate(self) -> None:
+        rows = [
+            {
+                "card_id": lane,
+                "card_name": lane,
+                "normalized_name": lane,
+                "adapter_work_unit": lane,
+                "translation_lane": "xmage_authoritative_adapter_required",
+                "operational_coverage_lane": lane,
+            }
+            for lane in (
+                "pinned_xmage_catalog_confirmation_required",
+                "forge_then_native_residual_review",
+            )
+        ]
+
+        prioritized = prioritize_queue_rows(rows)
+
+        self.assertEqual(len(prioritized), 2)
+        self.assertTrue(all(row["owner"] for row in prioritized))
+        self.assertTrue(all(row["next_gate"] for row in prioritized))
+        self.assertEqual(len({row["owner"] for row in prioritized}), 2)
 
 
 if __name__ == "__main__":

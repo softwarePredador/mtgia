@@ -38,21 +38,24 @@ Map<String, dynamic> simulateOptimizePipeline({
       removals.where((n) => deckNamesLower.contains(n.toLowerCase())).toList();
 
   // Step 2b: Never remove commanders
-  removals = removals
-      .where((n) => !commanderNamesLower.contains(n.toLowerCase()))
-      .toList();
+  removals =
+      removals
+          .where((n) => !commanderNamesLower.contains(n.toLowerCase()))
+          .toList();
 
   // Step 2c: If keep_theme, never remove core cards
   if (keepTheme) {
-    removals = removals
-        .where((n) => !coreCardsLower.contains(n.toLowerCase()))
-        .toList();
+    removals =
+        removals
+            .where((n) => !coreCardsLower.contains(n.toLowerCase()))
+            .toList();
   }
 
   // Step 3: In optimize mode, filter additions already in deck
-  additions = additions
-      .where((n) => !deckNamesLower.contains(n.toLowerCase()))
-      .toList();
+  additions =
+      additions
+          .where((n) => !deckNamesLower.contains(n.toLowerCase()))
+          .toList();
 
   // Step 4: Balance — truncate to min length
   final minCount =
@@ -63,13 +66,14 @@ Map<String, dynamic> simulateOptimizePipeline({
   // Step 5: Final validation — no duplicate non-basics in Commander
   if (format == 'commander' || format == 'brawl') {
     final removalSet = removals.map((n) => n.toLowerCase()).toSet();
-    additions = additions.where((n) {
-      final lower = n.toLowerCase();
-      final isBasic = isBasicLandName(lower);
-      final alreadyInDeck = deckNamesLower.contains(lower);
-      final beingRemoved = removalSet.contains(lower);
-      return isBasic || !alreadyInDeck || beingRemoved;
-    }).toList();
+    additions =
+        additions.where((n) {
+          final lower = n.toLowerCase();
+          final isBasic = isBasicLandName(lower);
+          final alreadyInDeck = deckNamesLower.contains(lower);
+          final beingRemoved = removalSet.contains(lower);
+          return isBasic || !alreadyInDeck || beingRemoved;
+        }).toList();
     // Re-balance after filtering
     if (removals.length > additions.length) {
       removals = removals.take(additions.length).toList();
@@ -139,12 +143,12 @@ void main() {
         'removals': [
           'Gilder Bairn',
           'Astral Cornucopia',
-          'Everflowing Chalice'
+          'Everflowing Chalice',
         ],
         'additions': [
           'Luminarch Aspirant',
           'Ozolith, the Shattered Spire',
-          'Grateful Apparition'
+          'Grateful Apparition',
         ],
       };
 
@@ -155,7 +159,7 @@ void main() {
         coreCardsLower: {
           'deepglow skate',
           'evolution sage',
-          'vorinclex, monstrous raider'
+          'vorinclex, monstrous raider',
         },
         format: 'commander',
       );
@@ -224,27 +228,28 @@ void main() {
     });
 
     test(
-        'AI suggesting card already in deck as addition is filtered (Commander)',
-        () {
-      final aiResponse = {
-        'removals': ['Gilder Bairn', 'Astral Cornucopia'],
-        'additions': ['Sol Ring', 'Luminarch Aspirant'],
-      };
+      'AI suggesting card already in deck as addition is filtered (Commander)',
+      () {
+        final aiResponse = {
+          'removals': ['Gilder Bairn', 'Astral Cornucopia'],
+          'additions': ['Sol Ring', 'Luminarch Aspirant'],
+        };
 
-      final result = simulateOptimizePipeline(
-        aiResponse: aiResponse,
-        deckNamesLower: _testCommanderDeck,
-        commanderNamesLower: {'atraxa, praetors\' voice'},
-        coreCardsLower: {},
-        format: 'commander',
-      );
+        final result = simulateOptimizePipeline(
+          aiResponse: aiResponse,
+          deckNamesLower: _testCommanderDeck,
+          commanderNamesLower: {'atraxa, praetors\' voice'},
+          coreCardsLower: {},
+          format: 'commander',
+        );
 
-      // Sol Ring already in deck, filtered out
-      expect(result['additions'], isNot(contains('Sol Ring')));
-      expect(result['balanced'], isTrue);
-      expect(result['removals'], hasLength(1));
-      expect(result['additions'], hasLength(1));
-    });
+        // Sol Ring already in deck, filtered out
+        expect(result['additions'], isNot(contains('Sol Ring')));
+        expect(result['balanced'], isTrue);
+        expect(result['removals'], hasLength(1));
+        expect(result['additions'], hasLength(1));
+      },
+    );
 
     test('empty AI response produces empty output', () {
       final aiResponse = <String, dynamic>{
@@ -264,44 +269,51 @@ void main() {
       expect(result['balanced'], isTrue);
     });
 
-    test('more removals than additions is truncated (not filled with basics)',
-        () {
-      final aiResponse = {
-        'removals': [
-          'Gilder Bairn',
-          'Astral Cornucopia',
-          'Everflowing Chalice',
-          'Crystalline Crawler',
-          'Corpsejack Menace',
-        ],
-        'additions': [
-          'Luminarch Aspirant',
-          'Grateful Apparition',
-        ],
-      };
+    test(
+      'more removals than additions is truncated (not filled with basics)',
+      () {
+        final aiResponse = {
+          'removals': [
+            'Gilder Bairn',
+            'Astral Cornucopia',
+            'Everflowing Chalice',
+            'Crystalline Crawler',
+            'Corpsejack Menace',
+          ],
+          'additions': ['Luminarch Aspirant', 'Grateful Apparition'],
+        };
 
-      final result = simulateOptimizePipeline(
-        aiResponse: aiResponse,
-        deckNamesLower: _testCommanderDeck,
-        commanderNamesLower: {'atraxa, praetors\' voice'},
-        coreCardsLower: {},
-        format: 'commander',
-      );
+        final result = simulateOptimizePipeline(
+          aiResponse: aiResponse,
+          deckNamesLower: _testCommanderDeck,
+          commanderNamesLower: {'atraxa, praetors\' voice'},
+          coreCardsLower: {},
+          format: 'commander',
+        );
 
-      // Should truncate removals to match additions, NOT add basic lands
-      expect(result['balanced'], isTrue);
-      expect(result['removals'], hasLength(2));
-      expect(result['additions'], hasLength(2));
-      // Verify the first 2 removals are retained (deterministic truncation)
-      expect(result['removals'], equals(['Gilder Bairn', 'Astral Cornucopia']));
-      expect(result['additions'],
-          equals(['Luminarch Aspirant', 'Grateful Apparition']));
-      // Verify no basic lands in additions
-      for (final name in result['additions'] as List) {
-        expect(isBasicLandName(name as String), isFalse,
-            reason: 'Optimize should not add basic lands as swaps: $name');
-      }
-    });
+        // Should truncate removals to match additions, NOT add basic lands
+        expect(result['balanced'], isTrue);
+        expect(result['removals'], hasLength(2));
+        expect(result['additions'], hasLength(2));
+        // Verify the first 2 removals are retained (deterministic truncation)
+        expect(
+          result['removals'],
+          equals(['Gilder Bairn', 'Astral Cornucopia']),
+        );
+        expect(
+          result['additions'],
+          equals(['Luminarch Aspirant', 'Grateful Apparition']),
+        );
+        // Verify no basic lands in additions
+        for (final name in result['additions'] as List) {
+          expect(
+            isBasicLandName(name as String),
+            isFalse,
+            reason: 'Optimize should not add basic lands as swaps: $name',
+          );
+        }
+      },
+    );
 
     test('more additions than removals is truncated', () {
       final aiResponse = {
@@ -332,12 +344,12 @@ void main() {
         'removals': [
           'Gilder Bairn',
           'Astral Cornucopia',
-          'Everflowing Chalice'
+          'Everflowing Chalice',
         ],
         'additions': [
           'Luminarch Aspirant',
           'Grateful Apparition',
-          'Ozolith, the Shattered Spire'
+          'Ozolith, the Shattered Spire',
         ],
       };
 
@@ -352,8 +364,11 @@ void main() {
       final removals = result['removals'] as List;
       final additions = result['additions'] as List;
       final resultCount = originalCount - removals.length + additions.length;
-      expect(resultCount, equals(originalCount),
-          reason: 'Deck must remain at exactly 100 cards after optimization');
+      expect(
+        resultCount,
+        equals(originalCount),
+        reason: 'Deck must remain at exactly 100 cards after optimization',
+      );
     });
 
     test('all removals must exist in original deck', () {
@@ -363,11 +378,7 @@ void main() {
           'Lightning Bolt', // NOT in deck
           'Force of Will', // NOT in deck
         ],
-        'additions': [
-          'Card A',
-          'Card B',
-          'Card C',
-        ],
+        'additions': ['Card A', 'Card B', 'Card C'],
       };
 
       final result = simulateOptimizePipeline(
@@ -381,8 +392,10 @@ void main() {
       // Only Gilder Bairn is in the deck
       for (final name in result['removals'] as List) {
         expect(
-            _testCommanderDeck.contains((name as String).toLowerCase()), isTrue,
-            reason: 'Removal "$name" must exist in original deck');
+          _testCommanderDeck.contains((name as String).toLowerCase()),
+          isTrue,
+          reason: 'Removal "$name" must exist in original deck',
+        );
       }
     });
 
@@ -440,7 +453,7 @@ void main() {
           'colors': ['G', 'W', 'U', 'B'],
           'cmc': 4.0,
           'oracle_text': 'Proliferate',
-          'quantity': 1
+          'quantity': 1,
         },
         // Lands
         for (var i = 0; i < 36; i++)
@@ -451,7 +464,7 @@ void main() {
             'colors': <String>[],
             'cmc': 0.0,
             'oracle_text': '',
-            'quantity': 1
+            'quantity': 1,
           },
         // Creatures
         for (var i = 0; i < 25; i++)
@@ -462,7 +475,7 @@ void main() {
             'colors': ['U'],
             'cmc': 3.0,
             'oracle_text': 'Some ability.',
-            'quantity': 1
+            'quantity': 1,
           },
         // Instants
         for (var i = 0; i < 15; i++)
@@ -473,7 +486,7 @@ void main() {
             'colors': ['U'],
             'cmc': 2.0,
             'oracle_text': 'Counter target spell.',
-            'quantity': 1
+            'quantity': 1,
           },
         // Sorceries
         for (var i = 0; i < 10; i++)
@@ -484,7 +497,7 @@ void main() {
             'colors': ['B'],
             'cmc': 4.0,
             'oracle_text': 'Destroy target creature.',
-            'quantity': 1
+            'quantity': 1,
           },
         // Enchantments
         for (var i = 0; i < 8; i++)
@@ -495,7 +508,7 @@ void main() {
             'colors': ['W'],
             'cmc': 3.0,
             'oracle_text': 'Whenever a creature enters...',
-            'quantity': 1
+            'quantity': 1,
           },
         // Artifacts
         for (var i = 0; i < 5; i++)
@@ -506,12 +519,16 @@ void main() {
             'colors': <String>[],
             'cmc': 2.0,
             'oracle_text': '{T}: Add one mana.',
-            'quantity': 1
+            'quantity': 1,
           },
       ];
 
-      final analyzer =
-          optimize_route.DeckArchetypeAnalyzer(cards, ['G', 'W', 'U', 'B']);
+      final analyzer = optimize_route.DeckArchetypeAnalyzer(cards, [
+        'G',
+        'W',
+        'U',
+        'B',
+      ]);
       final analysis = analyzer.generateAnalysis();
 
       expect(analysis, isNotNull);
@@ -520,8 +537,10 @@ void main() {
 
       final types = analysis['type_distribution'] as Map<String, dynamic>;
       expect(types['lands'], equals(36));
-      expect(types['creatures'],
-          greaterThanOrEqualTo(25)); // Commander is also a creature
+      expect(
+        types['creatures'],
+        greaterThanOrEqualTo(25),
+      ); // Commander is also a creature
       expect(types['instants'], equals(15));
       expect(types['sorceries'], equals(10));
       expect(types['enchantments'], equals(8));
@@ -543,7 +562,7 @@ void main() {
             'colors': <String>[],
             'cmc': 0.0,
             'oracle_text': '',
-            'quantity': 1
+            'quantity': 1,
           },
         for (var i = 0; i < 80; i++)
           {
@@ -553,7 +572,7 @@ void main() {
             'colors': ['U'],
             'cmc': 4.0,
             'oracle_text': 'Power.',
-            'quantity': 1
+            'quantity': 1,
           },
       ];
 
@@ -577,7 +596,7 @@ void main() {
             'color_identity': ['U'],
             'cmc': 0.0,
             'oracle_text': '{T}: Add {U}.',
-            'quantity': 1
+            'quantity': 1,
           },
         for (var i = 0; i < 63; i++)
           {
@@ -587,7 +606,7 @@ void main() {
             'colors': ['U'],
             'cmc': 3.0,
             'oracle_text': 'Power.',
-            'quantity': 1
+            'quantity': 1,
           },
       ];
 
@@ -603,213 +622,217 @@ void main() {
 
   group('Virtual deck analysis helpers', () {
     test(
-        'deduplicates printings from card lookup before building post-analysis',
-        () {
-      final additions = optimize_route.buildOptimizeAdditionEntries(
-        requestedAdditions: const ['Brainstorm', 'Counterspell'],
-        additionsData: const [
-          {
-            'name': 'Brainstorm',
-            'type_line': 'Instant',
-            'mana_cost': '{U}',
-            'colors': ['U'],
-            'cmc': 1.0,
-            'oracle_text':
-                'Draw three cards, then put two cards from your hand on top of your library in any order.',
-          },
-          {
-            'name': 'Brainstorm',
-            'type_line': 'Instant',
-            'mana_cost': '{U}',
-            'colors': ['U'],
-            'cmc': 1.0,
-            'oracle_text': 'Alternate printing.',
-          },
-          {
-            'name': 'Counterspell',
-            'type_line': 'Instant',
-            'mana_cost': '{U}{U}',
-            'colors': ['U'],
-            'cmc': 2.0,
-            'oracle_text': 'Counter target spell.',
-          },
-          {
-            'name': 'Counterspell',
-            'type_line': 'Instant',
-            'mana_cost': '{U}{U}',
-            'colors': ['U'],
-            'cmc': 2.0,
-            'oracle_text': 'Alternate printing.',
-          },
-        ],
-      );
+      'deduplicates printings from card lookup before building post-analysis',
+      () {
+        final additions = optimize_route.buildOptimizeAdditionEntries(
+          requestedAdditions: const ['Brainstorm', 'Counterspell'],
+          additionsData: const [
+            {
+              'name': 'Brainstorm',
+              'type_line': 'Instant',
+              'mana_cost': '{U}',
+              'colors': ['U'],
+              'cmc': 1.0,
+              'oracle_text':
+                  'Draw three cards, then put two cards from your hand on top of your library in any order.',
+            },
+            {
+              'name': 'Brainstorm',
+              'type_line': 'Instant',
+              'mana_cost': '{U}',
+              'colors': ['U'],
+              'cmc': 1.0,
+              'oracle_text': 'Alternate printing.',
+            },
+            {
+              'name': 'Counterspell',
+              'type_line': 'Instant',
+              'mana_cost': '{U}{U}',
+              'colors': ['U'],
+              'cmc': 2.0,
+              'oracle_text': 'Counter target spell.',
+            },
+            {
+              'name': 'Counterspell',
+              'type_line': 'Instant',
+              'mana_cost': '{U}{U}',
+              'colors': ['U'],
+              'cmc': 2.0,
+              'oracle_text': 'Alternate printing.',
+            },
+          ],
+        );
 
-      expect(additions, hasLength(2));
-      expect(
-        additions.map((card) => card['name']).toSet(),
-        equals({'Brainstorm', 'Counterspell'}),
-      );
-      expect(
-        additions.every((card) => (card['quantity'] as int?) == 1),
-        isTrue,
-      );
-    });
+        expect(additions, hasLength(2));
+        expect(
+          additions.map((card) => card['name']).toSet(),
+          equals({'Brainstorm', 'Counterspell'}),
+        );
+        expect(
+          additions.every((card) => (card['quantity'] as int?) == 1),
+          isTrue,
+        );
+      },
+    );
 
     test(
-        'preserves 100 cards after swaps even when lookup returns duplicate printings',
-        () {
-      final originalDeck = <Map<String, dynamic>>[
-        {
-          'name': 'Jin-Gitaxias // The Great Synthesis',
-          'type_line': 'Legendary Creature',
-          'mana_cost': '{3}{U}{U}',
-          'colors': ['U'],
-          'cmc': 5.0,
-          'oracle_text': 'Ward {2}.',
-          'quantity': 1,
-          'is_commander': true,
-        },
-        {
-          'name': 'Island',
-          'type_line': 'Basic Land — Island',
-          'mana_cost': '',
-          'colors': <String>[],
-          'cmc': 0.0,
-          'oracle_text': '{T}: Add {U}.',
-          'quantity': 94,
-        },
-        {
-          'name': 'Ponder',
-          'type_line': 'Sorcery',
-          'mana_cost': '{U}',
-          'colors': ['U'],
-          'cmc': 1.0,
-          'oracle_text': 'Look at the top three cards of your library...',
-          'quantity': 1,
-        },
-        {
-          'name': 'Lightning Greaves',
-          'type_line': 'Artifact — Equipment',
-          'mana_cost': '{2}',
-          'colors': <String>[],
-          'cmc': 2.0,
-          'oracle_text': 'Equipped creature has shroud and haste.',
-          'quantity': 1,
-        },
-        {
-          'name': 'All Is Dust',
-          'type_line': 'Tribal Sorcery — Eldrazi',
-          'mana_cost': '{7}',
-          'colors': <String>[],
-          'cmc': 7.0,
-          'oracle_text':
-              'Each player sacrifices all colored permanents they control.',
-          'quantity': 1,
-        },
-        {
-          'name': 'Isochron Scepter',
-          'type_line': 'Artifact',
-          'mana_cost': '{2}',
-          'colors': <String>[],
-          'cmc': 2.0,
-          'oracle_text': 'Imprint.',
-          'quantity': 1,
-        },
-        {
-          'name': 'Arcane Signet',
-          'type_line': 'Artifact',
-          'mana_cost': '{2}',
-          'colors': <String>[],
-          'cmc': 2.0,
-          'oracle_text':
-              '{T}: Add one mana of any color in your commander\'s color identity.',
-          'quantity': 1,
-        },
-      ];
-
-      final additions = optimize_route.buildOptimizeAdditionEntries(
-        requestedAdditions: const [
-          'Jin-Gitaxias, Progress Tyrant',
-          'Counterspell',
-          'Laboratory Maniac',
-          'Brainstorm',
-        ],
-        additionsData: const [
+      'preserves 100 cards after swaps even when lookup returns duplicate printings',
+      () {
+        final originalDeck = <Map<String, dynamic>>[
           {
-            'name': 'Jin-Gitaxias, Progress Tyrant',
+            'name': 'Jin-Gitaxias // The Great Synthesis',
             'type_line': 'Legendary Creature',
-            'mana_cost': '{5}{U}{U}',
+            'mana_cost': '{3}{U}{U}',
             'colors': ['U'],
+            'cmc': 5.0,
+            'oracle_text': 'Ward {2}.',
+            'quantity': 1,
+            'is_commander': true,
+          },
+          {
+            'name': 'Island',
+            'type_line': 'Basic Land — Island',
+            'mana_cost': '',
+            'colors': <String>[],
+            'cmc': 0.0,
+            'oracle_text': '{T}: Add {U}.',
+            'quantity': 94,
+          },
+          {
+            'name': 'Ponder',
+            'type_line': 'Sorcery',
+            'mana_cost': '{U}',
+            'colors': ['U'],
+            'cmc': 1.0,
+            'oracle_text': 'Look at the top three cards of your library...',
+            'quantity': 1,
+          },
+          {
+            'name': 'Lightning Greaves',
+            'type_line': 'Artifact — Equipment',
+            'mana_cost': '{2}',
+            'colors': <String>[],
+            'cmc': 2.0,
+            'oracle_text': 'Equipped creature has shroud and haste.',
+            'quantity': 1,
+          },
+          {
+            'name': 'All Is Dust',
+            'type_line': 'Tribal Sorcery — Eldrazi',
+            'mana_cost': '{7}',
+            'colors': <String>[],
             'cmc': 7.0,
             'oracle_text':
-                'Whenever you cast an artifact, instant, or sorcery spell...',
+                'Each player sacrifices all colored permanents they control.',
+            'quantity': 1,
           },
           {
-            'name': 'Counterspell',
-            'type_line': 'Instant',
-            'mana_cost': '{U}{U}',
-            'colors': ['U'],
+            'name': 'Isochron Scepter',
+            'type_line': 'Artifact',
+            'mana_cost': '{2}',
+            'colors': <String>[],
             'cmc': 2.0,
-            'oracle_text': 'Counter target spell.',
+            'oracle_text': 'Imprint.',
+            'quantity': 1,
           },
           {
-            'name': 'Counterspell',
-            'type_line': 'Instant',
-            'mana_cost': '{U}{U}',
-            'colors': ['U'],
+            'name': 'Arcane Signet',
+            'type_line': 'Artifact',
+            'mana_cost': '{2}',
+            'colors': <String>[],
             'cmc': 2.0,
-            'oracle_text': 'Duplicate printing that must not inflate the deck.',
-          },
-          {
-            'name': 'Laboratory Maniac',
-            'type_line': 'Creature',
-            'mana_cost': '{2}{U}',
-            'colors': ['U'],
-            'cmc': 3.0,
             'oracle_text':
-                'If you would draw a card while your library has no cards in it, you win the game instead.',
+                '{T}: Add one mana of any color in your commander\'s color identity.',
+            'quantity': 1,
           },
-          {
-            'name': 'Brainstorm',
-            'type_line': 'Instant',
-            'mana_cost': '{U}',
-            'colors': ['U'],
-            'cmc': 1.0,
-            'oracle_text':
-                'Draw three cards, then put two cards from your hand on top of your library in any order.',
-          },
-          {
-            'name': 'Brainstorm',
-            'type_line': 'Instant',
-            'mana_cost': '{U}',
-            'colors': ['U'],
-            'cmc': 1.0,
-            'oracle_text': 'Duplicate printing that must not inflate the deck.',
-          },
-        ],
-      );
+        ];
 
-      final virtualDeck = optimize_route.buildVirtualDeckForAnalysis(
-        originalDeck: originalDeck,
-        removals: const [
-          'All Is Dust',
-          'Lightning Greaves',
-          'Isochron Scepter',
-          'Ponder',
-        ],
-        additions: additions,
-      );
-      final analysis = optimize_route.DeckArchetypeAnalyzer(
-        virtualDeck,
-        const ['U'],
-      ).generateAnalysis();
+        final additions = optimize_route.buildOptimizeAdditionEntries(
+          requestedAdditions: const [
+            'Jin-Gitaxias, Progress Tyrant',
+            'Counterspell',
+            'Laboratory Maniac',
+            'Brainstorm',
+          ],
+          additionsData: const [
+            {
+              'name': 'Jin-Gitaxias, Progress Tyrant',
+              'type_line': 'Legendary Creature',
+              'mana_cost': '{5}{U}{U}',
+              'colors': ['U'],
+              'cmc': 7.0,
+              'oracle_text':
+                  'Whenever you cast an artifact, instant, or sorcery spell...',
+            },
+            {
+              'name': 'Counterspell',
+              'type_line': 'Instant',
+              'mana_cost': '{U}{U}',
+              'colors': ['U'],
+              'cmc': 2.0,
+              'oracle_text': 'Counter target spell.',
+            },
+            {
+              'name': 'Counterspell',
+              'type_line': 'Instant',
+              'mana_cost': '{U}{U}',
+              'colors': ['U'],
+              'cmc': 2.0,
+              'oracle_text':
+                  'Duplicate printing that must not inflate the deck.',
+            },
+            {
+              'name': 'Laboratory Maniac',
+              'type_line': 'Creature',
+              'mana_cost': '{2}{U}',
+              'colors': ['U'],
+              'cmc': 3.0,
+              'oracle_text':
+                  'If you would draw a card while your library has no cards in it, you win the game instead.',
+            },
+            {
+              'name': 'Brainstorm',
+              'type_line': 'Instant',
+              'mana_cost': '{U}',
+              'colors': ['U'],
+              'cmc': 1.0,
+              'oracle_text':
+                  'Draw three cards, then put two cards from your hand on top of your library in any order.',
+            },
+            {
+              'name': 'Brainstorm',
+              'type_line': 'Instant',
+              'mana_cost': '{U}',
+              'colors': ['U'],
+              'cmc': 1.0,
+              'oracle_text':
+                  'Duplicate printing that must not inflate the deck.',
+            },
+          ],
+        );
 
-      expect(analysis['total_cards'], equals(100));
-      final types = (analysis['type_distribution'] as Map<String, dynamic>);
-      expect(types['lands'], equals(94));
-      expect(types['instants'], equals(2));
-      expect(types['artifacts'], equals(1));
-    });
+        final virtualDeck = optimize_route.buildVirtualDeckForAnalysis(
+          originalDeck: originalDeck,
+          removals: const [
+            'All Is Dust',
+            'Lightning Greaves',
+            'Isochron Scepter',
+            'Ponder',
+          ],
+          additions: additions,
+        );
+        final analysis =
+            optimize_route.DeckArchetypeAnalyzer(virtualDeck, const [
+              'U',
+            ]).generateAnalysis();
+
+        expect(analysis['total_cards'], equals(100));
+        final types = (analysis['type_distribution'] as Map<String, dynamic>);
+        expect(types['lands'], equals(94));
+        expect(types['instants'], equals(2));
+        expect(types['artifacts'], equals(1));
+      },
+    );
 
     test('state assessment flags degenerate Talrand shell as needs_repair', () {
       final cards = <Map<String, dynamic>>[
@@ -836,10 +859,10 @@ void main() {
         },
       ];
 
-      final analysis = optimize_route.DeckArchetypeAnalyzer(
-        cards,
-        const ['U'],
-      ).generateAnalysis();
+      final analysis =
+          optimize_route.DeckArchetypeAnalyzer(cards, const [
+            'U',
+          ]).generateAnalysis();
       final state = optimize_route.assessDeckOptimizationState(
         cards: cards,
         deckAnalysis: analysis,
@@ -852,6 +875,11 @@ void main() {
       expect(state.recommendedMode, equals('repair'));
       expect(state.suggestedScope, equals('rebuild_core'));
       expect(state.repairPlan['target_land_count'], equals(36));
+      final governance = state.toJson()['governance'] as Map;
+      expect(governance['owner_intent_preserved'], isTrue);
+      expect(governance['core_floors_are_diagnostic_only'], isTrue);
+      expect(governance['automatic_rebuild_allowed'], isFalse);
+      expect(governance['automatic_exclusion_allowed'], isFalse);
     });
 
     test('state assessment keeps healthy spellslinger shell in optimize', () {
@@ -920,10 +948,10 @@ void main() {
         },
       ];
 
-      final analysis = optimize_route.DeckArchetypeAnalyzer(
-        cards,
-        const ['U'],
-      ).generateAnalysis();
+      final analysis =
+          optimize_route.DeckArchetypeAnalyzer(cards, const [
+            'U',
+          ]).generateAnalysis();
       final state = optimize_route.assessDeckOptimizationState(
         cards: cards,
         deckAnalysis: analysis,
@@ -949,9 +977,7 @@ void main() {
       final outcome = optimize_route.deriveOptimizeOutcomeCode(
         statusCode: 422,
         body: const {
-          'quality_error': {
-            'code': 'OPTIMIZE_NO_SAFE_SWAPS',
-          },
+          'quality_error': {'code': 'OPTIMIZE_NO_SAFE_SWAPS'},
         },
         deckState: healthyDeckState,
       );
@@ -973,10 +999,7 @@ void main() {
         body: const {
           'quality_error': {
             'code': 'OPTIMIZE_QUALITY_REJECTED',
-            'validation': {
-              'deck_health_score': 84,
-              'improvement_score': 18,
-            },
+            'validation': {'deck_health_score': 84, 'improvement_score': 18},
           },
         },
         deckState: healthyDeckState,
@@ -985,28 +1008,28 @@ void main() {
       expect(outcome, equals('near_peak'));
     });
 
-    test('derive outcome code maps healthy execution failure to safe preserve',
-        () {
-      const healthyDeckState = optimize_route.DeckOptimizationState(
-        status: 'healthy',
-        recommendedMode: 'optimize',
-        suggestedScope: 'micro_swaps',
-        reasons: <String>[],
-        severityScore: 0,
-      );
+    test(
+      'derive outcome code maps healthy execution failure to safe preserve',
+      () {
+        const healthyDeckState = optimize_route.DeckOptimizationState(
+          status: 'healthy',
+          recommendedMode: 'optimize',
+          suggestedScope: 'micro_swaps',
+          reasons: <String>[],
+          severityScore: 0,
+        );
 
-      final outcome = optimize_route.deriveOptimizeOutcomeCode(
-        statusCode: 422,
-        body: const {
-          'quality_error': {
-            'code': 'OPTIMIZE_EXECUTION_FAILED',
+        final outcome = optimize_route.deriveOptimizeOutcomeCode(
+          statusCode: 422,
+          body: const {
+            'quality_error': {'code': 'OPTIMIZE_EXECUTION_FAILED'},
           },
-        },
-        deckState: healthyDeckState,
-      );
+          deckState: healthyDeckState,
+        );
 
-      expect(outcome, equals('no_safe_upgrade_found'));
-    });
+        expect(outcome, equals('no_safe_upgrade_found'));
+      },
+    );
 
     test('derive outcome code maps structural rejection to needs_repair', () {
       const repairDeckState = optimize_route.DeckOptimizationState(
@@ -1023,10 +1046,7 @@ void main() {
         body: const {
           'quality_error': {
             'code': 'OPTIMIZE_QUALITY_REJECTED',
-            'validation': {
-              'deck_health_score': 22,
-              'improvement_score': 9,
-            },
+            'validation': {'deck_health_score': 22, 'improvement_score': 9},
           },
         },
         deckState: repairDeckState,

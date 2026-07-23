@@ -59,7 +59,12 @@ class AuthVisualShell extends StatelessWidget {
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                const padding = EdgeInsets.fromLTRB(20, 18, 20, 32);
+                const padding = EdgeInsets.fromLTRB(
+                  AppTheme.space20,
+                  AppTheme.space18,
+                  AppTheme.space20,
+                  AppTheme.space32,
+                );
                 return SingleChildScrollView(
                   padding: padding,
                   child: ConstrainedBox(
@@ -76,7 +81,7 @@ class AuthVisualShell extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: leading!,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                         ],
                         Center(
                           child: ConstrainedBox(
@@ -120,7 +125,7 @@ class AuthBrandHeader extends StatelessWidget {
         Container(
           width: logoSize,
           height: logoSize,
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(AppTheme.space4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusLogoOuter),
             border: Border.all(
@@ -145,7 +150,7 @@ class AuthBrandHeader extends StatelessWidget {
           ),
         ),
         if (eyebrow != null) ...[
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           Text(
             eyebrow!,
             textAlign: TextAlign.center,
@@ -156,7 +161,7 @@ class AuthBrandHeader extends StatelessWidget {
             ),
           ),
         ],
-        const SizedBox(height: 14),
+        const SizedBox(height: AppTheme.space14),
         Text(
           title,
           textAlign: TextAlign.center,
@@ -166,7 +171,7 @@ class AuthBrandHeader extends StatelessWidget {
             letterSpacing: 0,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         Text(
           subtitle,
           textAlign: TextAlign.center,
@@ -188,7 +193,7 @@ class AuthFormSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppTheme.space20),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),

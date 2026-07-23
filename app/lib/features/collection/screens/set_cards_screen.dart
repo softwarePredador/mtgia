@@ -87,10 +87,9 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
   }
 
   Future<MtgSet> _fetchSetMetadata() async {
-    final endpoint =
-        widget.loadLatest
-            ? '/sets?limit=1&page=1'
-            : '/sets?code=${Uri.encodeQueryComponent(widget.setCode ?? _set?.code ?? '')}&limit=1&page=1';
+    final endpoint = widget.loadLatest
+        ? '/sets?limit=1&page=1'
+        : '/sets?code=${Uri.encodeQueryComponent(widget.setCode ?? _set?.code ?? '')}&limit=1&page=1';
     final response = await _apiClient.get(endpoint);
     if (response.statusCode != 200) {
       throw Exception(
@@ -250,8 +249,11 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppTheme.brass500),
+      return const AppStatePanel.loading(
+        key: Key('set-cards-loading'),
+        title: 'Carregando cartas',
+        message: 'Buscando as cartas disponíveis nesta coleção.',
+        accent: AppTheme.brass500,
       );
     }
 
@@ -280,58 +282,61 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
       children: [
         _SetHeader(set: set, loadedCards: _cards.length),
         Expanded(
-          child:
-              _cards.isEmpty
-                  ? _EmptySetCardsState(set: set, onRefresh: _loadSetAndCards)
-                  : RefreshIndicator(
-                    color: AppTheme.brass500,
-                    onRefresh: _loadSetAndCards,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final itemCount =
-                            _cards.length + (_isLoadingMore ? 1 : 0);
-                        Widget itemBuilder(BuildContext context, int index) {
-                          if (index >= _cards.length) {
-                            return const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: AppTheme.brass500,
-                                ),
+          child: _cards.isEmpty
+              ? _EmptySetCardsState(set: set, onRefresh: _loadSetAndCards)
+              : RefreshIndicator(
+                  color: AppTheme.brass500,
+                  onRefresh: _loadSetAndCards,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final itemCount =
+                          _cards.length + (_isLoadingMore ? 1 : 0);
+                      Widget itemBuilder(BuildContext context, int index) {
+                        if (index >= _cards.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(AppTheme.space16),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppTheme.brass500,
                               ),
-                            );
-                          }
-                          return _SetCardTile(card: _cards[index]);
-                        }
-
-                        if (constraints.maxWidth >= 960) {
-                          return GridView.builder(
-                            key: const Key('setCardsGrid'),
-                            controller: _scrollController,
-                            padding: const EdgeInsets.only(bottom: 16),
-                            gridDelegate:
-                                const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 620,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  mainAxisExtent: 92,
-                                ),
-                            itemCount: itemCount,
-                            itemBuilder: itemBuilder,
+                            ),
                           );
                         }
-                        return ListView.separated(
-                          key: const Key('setCardsList'),
+                        return _SetCardTile(card: _cards[index]);
+                      }
+
+                      if (constraints.maxWidth >= 960) {
+                        return GridView.builder(
+                          key: const Key('setCardsGrid'),
                           controller: _scrollController,
-                          padding: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.only(
+                            bottom: AppTheme.space16,
+                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 620,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                mainAxisExtent: 92,
+                              ),
                           itemCount: itemCount,
-                          separatorBuilder:
-                              (_, __) => const SizedBox(height: 8),
                           itemBuilder: itemBuilder,
                         );
-                      },
-                    ),
+                      }
+                      return ListView.separated(
+                        key: const Key('setCardsList'),
+                        controller: _scrollController,
+                        padding: const EdgeInsets.only(
+                          bottom: AppTheme.space16,
+                        ),
+                        itemCount: itemCount,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppTheme.space8),
+                        itemBuilder: itemBuilder,
+                      );
+                    },
                   ),
+                ),
         ),
       ],
     );
@@ -347,10 +352,15 @@ class _SetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space0,
+        AppTheme.space12,
+        AppTheme.space0,
+        AppTheme.space8,
+      ),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppTheme.space16),
         decoration: BoxDecoration(
           gradient: AppTheme.cardGradient,
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -379,14 +389,13 @@ class _SetHeader extends StatelessWidget {
                 ),
                 _InfoChip(
                   icon: Icons.style_outlined,
-                  label:
-                      set.cardCount > 0
-                          ? '$loadedCards/${set.cardCount} cartas'
-                          : '$loadedCards cartas locais',
+                  label: set.cardCount > 0
+                      ? '$loadedCards/${set.cardCount} cartas'
+                      : '$loadedCards cartas locais',
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             Text(
               set.name,
               style: const TextStyle(
@@ -395,7 +404,7 @@ class _SetHeader extends StatelessWidget {
                 fontSize: AppTheme.fontXl,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               '${set.type ?? 'tipo indisponível'} • catálogo de cartas da edição',
               style: const TextStyle(
@@ -429,7 +438,10 @@ class _SetCardTile extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: ListTile(
         key: Key('set-card-${card.name}'),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space8,
+        ),
         leading: SizedBox(
           key: Key('set-card-thumbnail-${card.id}'),
           height: 64,
@@ -437,20 +449,19 @@ class _SetCardTile extends StatelessWidget {
             aspectRatio: 488 / 680,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              child:
-                  card.imageUrl == null || card.imageUrl!.isEmpty
-                      ? Container(
-                        color: AppTheme.surfaceElevated,
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          color: AppTheme.textSecondary,
-                          size: 18,
-                        ),
-                      )
-                      : CachedCardImage(
-                        imageUrl: card.imageUrl,
-                        fit: BoxFit.contain,
+              child: card.imageUrl == null || card.imageUrl!.isEmpty
+                  ? Container(
+                      color: AppTheme.surfaceElevated,
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: AppTheme.textSecondary,
+                        size: 18,
                       ),
+                    )
+                  : CachedCardImage(
+                      imageUrl: card.imageUrl,
+                      fit: BoxFit.contain,
+                    ),
             ),
           ),
         ),
@@ -462,7 +473,7 @@ class _SetCardTile extends StatelessWidget {
           ),
         ),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4),
+          padding: const EdgeInsets.only(top: AppTheme.space4),
           child: Text(
             '${card.typeLine.isEmpty ? '-' : card.typeLine} • ${card.rarity}',
             maxLines: 2,
@@ -472,9 +483,7 @@ class _SetCardTile extends StatelessWidget {
         ),
         dense: true,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
-          );
+          openCardDetailRoute(context, card);
         },
       ),
     );
@@ -491,18 +500,15 @@ class _EmptySetCardsState extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppStatePanel(
       key: const Key('setCardsEmptyState'),
-      icon:
-          set.isFuture
-              ? Icons.hourglass_top_rounded
-              : Icons.inventory_2_outlined,
-      title:
-          set.isFuture
-              ? 'Dados parciais de coleção futura'
-              : 'Nenhuma carta local nesta coleção',
-      message:
-          set.isFuture
-              ? 'A coleção ${set.code} já existe no catálogo sincronizado, mas as cartas podem aparecer só após o próximo sync do MTGJSON.'
-              : 'O catálogo conhece a coleção, mas ainda não há cartas locais para ${set.code}. Rode o sync para atualizar a base.',
+      icon: set.isFuture
+          ? Icons.hourglass_top_rounded
+          : Icons.inventory_2_outlined,
+      title: set.isFuture
+          ? 'Dados parciais de coleção futura'
+          : 'Nenhuma carta local nesta coleção',
+      message: set.isFuture
+          ? 'A coleção ${set.code} já existe no catálogo sincronizado, mas as cartas podem aparecer só após o próximo sync do MTGJSON.'
+          : 'O catálogo conhece a coleção, mas ainda não há cartas locais para ${set.code}. Rode o sync para atualizar a base.',
       accent: set.isFuture ? AppTheme.primarySoft : AppTheme.warning,
       actionLabel: 'Recarregar',
       onAction: onRefresh,
@@ -524,7 +530,10 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space6,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -537,7 +546,7 @@ class _InfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: accent),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppTheme.space6),
           Text(
             label,
             style: const TextStyle(

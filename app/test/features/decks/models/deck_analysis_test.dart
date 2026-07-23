@@ -165,8 +165,8 @@ void main() {
           'verified_battle_ratio': 0.62,
         },
         'commander_contract': {
-          'schema_version': 'commander_contract_summary_v1_2026-07-01',
-          'source_version': 'commander_deckbuilding_contract_v2_2026-06-29',
+          'schema_version': 'commander_contract_summary_v2_2026-07-22',
+          'source_version': 'commander_deckbuilding_contract_v5_2026-07-22',
           'status': 'ready_for_battle_gate',
           'status_label': 'Pronto para battle gate',
           'is_commander_applicable': true,
@@ -174,7 +174,7 @@ void main() {
           'total_cards': 100,
           'commander_count': 1,
           'summary':
-              'Estrutura e fontes suficientes; falta validar em battle gate igualado.',
+              'Estrutura e fontes suficientes; falta validar em battle gate.',
           'battle_gate': {
             'required': true,
             'status': 'pending',
@@ -195,6 +195,43 @@ void main() {
               'count': '12',
             },
           ],
+          'provenance': {
+            'schema_version': 'commander_public_provenance_v1_2026-07-22',
+            'lanes': [
+              {
+                'key': 'verified_oracle',
+                'label': 'Oracle verificado',
+                'available': false,
+                'confidence': 'not_provided_to_contract',
+              },
+              {
+                'key': 'public_popularity',
+                'label': 'Popularidade pública',
+                'available': true,
+                'confidence': 'source_backed',
+              },
+              {
+                'key': 'ai_suggestion',
+                'label': 'Sugestão de IA',
+                'available': true,
+                'confidence': 'advisory_only',
+              },
+            ],
+            'internal_source_references_exposed': false,
+          },
+          'planning_coverage': {
+            'required_count': 12,
+            'ready_count': 7,
+            'partial_count': 3,
+            'pending_count': 2,
+            'items': [
+              {
+                'key': 'commander_intent_and_archetype',
+                'label': 'Plano do comandante',
+                'status': 'ready',
+              },
+            ],
+          },
           'planning_flow': [
             {
               'key': 'commander_intent_and_archetype',
@@ -206,7 +243,7 @@ void main() {
           ],
           'blockers': [],
           'warnings': ['reference_profile_missing'],
-          'next_actions': ['Rodar battle gate igualado.'],
+          'next_actions': ['Rodar battle gate com amostras independentes.'],
           'disclaimer': 'Plano conservador.',
         },
         'launch_capabilities': {
@@ -276,6 +313,21 @@ void main() {
       expect(analysis.commanderContract?.battleGate.required, isTrue);
       expect(analysis.commanderContract?.gates.hasReferenceLane, isTrue);
       expect(analysis.commanderContract?.sourceLanes.first.count, 12);
+      expect(analysis.commanderContract?.provenanceLanes, hasLength(3));
+      expect(
+        analysis.commanderContract?.provenanceLanes.first.confidenceLabel,
+        'Não disponível',
+      );
+      expect(
+        analysis.commanderContract?.provenanceLanes[1].confidenceLabel,
+        'Fonte verificada',
+      );
+      expect(analysis.commanderContract?.planningCoverage.requiredCount, 12);
+      expect(analysis.commanderContract?.planningCoverage.readyCount, 7);
+      expect(
+        analysis.commanderContract?.planningCoverage.items.first.status,
+        'ready',
+      );
       expect(
         analysis.commanderContract?.planningFlow.first.label,
         'Plano do comandante',
@@ -285,6 +337,47 @@ void main() {
         analysis.launchCapabilities?.visibleBetaSurfaces.map((s) => s.key),
         ['battle_readiness', 'recommendations'],
       );
+    });
+
+    test('Lorehold baseline policy overrides definitive-looking status', () {
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': '607',
+        'commander_contract': {
+          'schema_version': 'commander_contract_summary_v3_2026-07-22',
+          'source_version': 'commander_deckbuilding_contract_v6_2026-07-22',
+          'status': 'ready_for_battle_gate',
+          'status_label': 'Pronto para battle gate',
+          'is_commander_applicable': true,
+          'commander_name': 'Lorehold, the Historian',
+          'summary': 'Estrutura pronta.',
+          'battle_gate': {
+            'required': true,
+            'status': 'pending',
+            'label': 'Pendente',
+          },
+          'baseline_policy': {
+            'applies': true,
+            'baseline_deck_id': '607',
+            'status': 'experimental_blocked',
+            'label': 'Experimental: candidato bloqueado',
+            'detail': 'O deck 607 permanece como baseline protegido.',
+            'candidate_decision': 'rejected_historical_paired_seed_design',
+            'seed_pairing_claim': false,
+            'definitive_claim_allowed': false,
+            'automatic_candidate_apply_allowed': false,
+            'next_gate': 'Rodar amostras independentes.',
+          },
+        },
+      });
+
+      final contract = analysis.commanderContract!;
+      expect(contract.hasBlockers, isTrue);
+      expect(contract.safeStatusLabel, 'Experimental: candidato bloqueado');
+      expect(contract.primaryDetail, contains('baseline protegido'));
+      expect(contract.baselinePolicy?.baselineDeckId, '607');
+      expect(contract.baselinePolicy?.seedPairingClaim, isFalse);
+      expect(contract.baselinePolicy?.definitiveClaimAllowed, isFalse);
+      expect(contract.baselinePolicy?.automaticCandidateApplyAllowed, isFalse);
     });
 
     test(

@@ -113,18 +113,19 @@ class DeckProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = _getStatusColor(context);
-    final progress =
-        maxCards != null ? (totalCards / maxCards!).clamp(0.0, 1.0) : 0.0;
+    final progress = maxCards != null
+        ? (totalCards / maxCards!).clamp(0.0, 1.0)
+        : 0.0;
     final toneSurface = AppTheme.surfaceElevated.withValues(alpha: 0.95);
     final toneBorder = color.withValues(
       alpha: status == DeckStatus.invalid ? 0.32 : 0.2,
     );
-    final headlineColor =
-        status == DeckStatus.invalid ? AppTheme.textPrimary : color;
-    final supportingColor =
-        status == DeckStatus.invalid
-            ? theme.colorScheme.error.withValues(alpha: 0.86)
-            : AppTheme.textSecondary;
+    final headlineColor = status == DeckStatus.invalid
+        ? AppTheme.textPrimary
+        : color;
+    final supportingColor = status == DeckStatus.invalid
+        ? theme.colorScheme.error.withValues(alpha: 0.86)
+        : AppTheme.textSecondary;
 
     return Semantics(
       button: onTap != null,
@@ -134,7 +135,10 @@ class DeckProgressIndicator extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space16,
+            vertical: AppTheme.space14,
+          ),
           decoration: BoxDecoration(
             color: toneSurface,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -156,7 +160,7 @@ class DeckProgressIndicator extends StatelessWidget {
                     ),
                     child: Icon(_getStatusIcon(), color: color, size: 16),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppTheme.space8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,15 +174,14 @@ class DeckProgressIndicator extends StatelessWidget {
                             color: headlineColor,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: AppTheme.space2),
                         Text(
                           _getStatusText(),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: supportingColor,
-                            fontWeight:
-                                status == DeckStatus.invalid
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
+                            fontWeight: status == DeckStatus.invalid
+                                ? FontWeight.w600
+                                : FontWeight.w500,
                           ),
                         ),
                       ],
@@ -186,7 +189,7 @@ class DeckProgressIndicator extends StatelessWidget {
                   ),
                   if (semanticBadgeLabel != null &&
                       semanticBadgeLabel!.trim().isNotEmpty) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppTheme.space8),
                     _StatusBadge(
                       label: semanticBadgeLabel!,
                       color: semanticBadgeColor ?? color,
@@ -197,8 +200,8 @@ class DeckProgressIndicator extends StatelessWidget {
                   if (status == DeckStatus.complete)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
+                        horizontal: AppTheme.space8,
+                        vertical: AppTheme.space2,
                       ),
                       decoration: BoxDecoration(
                         color: AppTheme.success,
@@ -215,7 +218,7 @@ class DeckProgressIndicator extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               if (maxCards != null) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -253,7 +256,10 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space5,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -264,7 +270,7 @@ class _StatusBadge extends StatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(icon, size: 14, color: color),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppTheme.space4),
           ],
           Text(
             label,

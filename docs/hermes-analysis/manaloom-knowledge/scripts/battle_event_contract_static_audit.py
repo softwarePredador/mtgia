@@ -21,10 +21,6 @@ DEFAULT_ENGINE_SOURCES = [
     SCRIPT_DIR / "battle_replacement_support.py",
     SCRIPT_DIR / "battle_zone_transition_support.py",
 ]
-DEFAULT_LATEST_RUN = Path(
-    "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/"
-    "battle-strategy-audit/latest"
-)
 ACTION_CRITIC_PATH = SCRIPT_DIR / "battle_action_critic.py"
 
 EXPECTED_CONSUMER_BY_CLASS = {
@@ -96,7 +92,7 @@ ACTION_CRITIC = load_action_critic()
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--engine-source", type=Path, action="append", default=None)
-    parser.add_argument("--input-dir", type=Path, default=DEFAULT_LATEST_RUN)
+    parser.add_argument("--input-dir", type=Path, required=True)
     parser.add_argument("--events", type=Path, action="append", default=[])
     parser.add_argument("--output", type=Path)
     parser.add_argument("--json-output", type=Path)
@@ -200,7 +196,7 @@ def fixture_or_waiver(
 
 def build_audit(
     *,
-    input_dir: Path = DEFAULT_LATEST_RUN,
+    input_dir: Path,
     events: list[Path] | None = None,
     engine_source: Path | list[Path] | tuple[Path, ...] | None = None,
 ) -> dict[str, Any]:

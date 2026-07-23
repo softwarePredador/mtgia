@@ -1,0 +1,13 @@
+name: ManaLoom PostgreSQL
+desc: Runtime PostgreSQL schema; PostgreSQL/backend is the product source of truth.
+dsn: ${TBLS_DSN}
+docPath: docs/generated/tbls
+er:
+  format: mermaid
+detectVirtualRelations:
+  enabled: false
+lint:
+  requireTableComment:
+    enabled: false
+  requireColumnComment:
+    enabled: false

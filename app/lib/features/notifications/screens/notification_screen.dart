@@ -73,8 +73,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
               if (!hasUnread) return const SizedBox.shrink();
               return TextButton(
                 key: const Key('notifications-read-all-button'),
-                onPressed:
-                    _isMarkingAll ? null : () => _markAllAsRead(provider),
+                onPressed: _isMarkingAll
+                    ? null
+                    : () => _markAllAsRead(provider),
                 child: Text(
                   _isMarkingAll ? 'Atualizando...' : 'Ler todas',
                   style: const TextStyle(
@@ -92,8 +93,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: EdgeInsets.symmetric(
           horizontal:
               MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
-                  ? 16
-                  : 24,
+              ? AppTheme.space16
+              : AppTheme.space24,
         ),
         child: SizedBox(
           key: const Key('notifications-content'),
@@ -102,9 +103,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           child: Consumer<NotificationProvider>(
             builder: (context, provider, _) {
               if (provider.isLoading && provider.notifications.isEmpty) {
-                return const Center(
+                return const AppStatePanel.loading(
                   key: Key('notifications-loading'),
-                  child: CircularProgressIndicator(color: AppTheme.brass400),
+                  title: 'Carregando notificações',
+                  message: 'Buscando seus avisos mais recentes.',
+                  accent: AppTheme.brass400,
                 );
               }
 
@@ -137,9 +140,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 onRefresh: () => provider.fetchNotifications(),
                 child: ListView.separated(
                   key: const Key('notifications-list'),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppTheme.space12,
+                  ),
                   itemCount: provider.notifications.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(height: AppTheme.space8),
                   itemBuilder: (context, index) {
                     final notif = provider.notifications[index];
                     return _NotificationTile(
@@ -209,20 +215,21 @@ class _NotificationTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Container(
           decoration: BoxDecoration(
-            color:
-                isRead
-                    ? AppTheme.surfaceSlate
-                    : AppTheme.brass500.withValues(alpha: 0.08),
+            color: isRead
+                ? AppTheme.surfaceSlate
+                : AppTheme.brass500.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color:
-                  isRead
-                      ? AppTheme.outlineMuted
-                      : AppTheme.brass400.withValues(alpha: 0.28),
+              color: isRead
+                  ? AppTheme.outlineMuted
+                  : AppTheme.brass400.withValues(alpha: 0.28),
               width: AppTheme.strokeMedium,
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space14,
+            vertical: AppTheme.space12,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -235,7 +242,7 @@ class _NotificationTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
               ],
               CircleAvatar(
                 radius: 20,
@@ -248,7 +255,7 @@ class _NotificationTile extends StatelessWidget {
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +269,7 @@ class _NotificationTile extends StatelessWidget {
                       ),
                     ),
                     if (notification.body != null) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Text(
                         notification.body!,
                         maxLines: 2,
@@ -276,7 +283,7 @@ class _NotificationTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Text(
                 _formatRelative(notification.createdAt),
                 style: const TextStyle(

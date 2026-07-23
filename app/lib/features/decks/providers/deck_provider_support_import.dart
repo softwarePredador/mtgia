@@ -1,4 +1,5 @@
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
 import 'deck_provider_support_common.dart';
@@ -43,13 +44,14 @@ Map<String, dynamic> parseImportDeckResponse(ApiResponse response) {
   final data = asDynamicMap(response.data);
   return {
     'success': false,
-    'error':
-        data['error']?.toString() ??
-        'Erro ao importar deck: ${response.statusCode}',
-    'not_found_lines':
-        (data['not_found'] is List)
-            ? List<String>.from(data['not_found'])
-            : const <String>[],
+    'error': FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckSave,
+      fallback: 'Não foi possível importar este deck agora. Tente novamente.',
+    ),
+    'not_found_lines': (data['not_found'] is List)
+        ? List<String>.from(data['not_found'])
+        : const <String>[],
     'localized_matches': data['localized_matches'] ?? const <dynamic>[],
     'localized_matches_count': data['localized_matches_count'] ?? 0,
   };
@@ -139,10 +141,9 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
     'success': false,
     'error':
         data['error']?.toString() ?? 'Erro ao importar: ${response.statusCode}',
-    'not_found_lines':
-        (data['not_found_lines'] is List)
-            ? List<String>.from(data['not_found_lines'])
-            : const <String>[],
+    'not_found_lines': (data['not_found_lines'] is List)
+        ? List<String>.from(data['not_found_lines'])
+        : const <String>[],
     'localized_matches': data['localized_matches'] ?? const <dynamic>[],
     'localized_matches_count': data['localized_matches_count'] ?? 0,
   };
@@ -192,7 +193,13 @@ Map<String, dynamic> parseDeckExportResponse(ApiResponse response) {
   if (response.statusCode == 200 && response.data is Map) {
     return Map<String, dynamic>.from(response.data as Map);
   }
-  return {'error': 'Falha ao exportar deck: ${response.statusCode}'};
+  return {
+    'error': FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckDetails,
+      fallback: 'Não foi possível exportar este deck agora. Tente novamente.',
+    ),
+  };
 }
 
 Future<bool> togglePublicRequest(
@@ -220,12 +227,13 @@ Map<String, dynamic> parseCopyPublicDeckResponse(ApiResponse response) {
     return {'success': true, 'deck': data['deck']};
   }
 
-  final data = asDynamicMap(response.data);
   return {
     'success': false,
-    'error':
-        data['error']?.toString() ??
-        'Falha ao copiar deck: ${response.statusCode}',
+    'error': FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckSave,
+      fallback: 'Não foi possível copiar este deck agora. Tente novamente.',
+    ),
   };
 }
 

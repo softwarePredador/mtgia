@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'battle_engine_config.dart';
+
 class XmageCoverageIncomplete implements Exception {
   XmageCoverageIncomplete(this.unsupportedCards, this.message);
 
@@ -26,15 +28,21 @@ class XmageServiceException implements Exception {
 class XmageBattleClient {
   XmageBattleClient({
     required String baseUrl,
+    required ExternalBattleEngineIdentity expectedIdentity,
     http.Client? client,
     Duration timeout = const Duration(seconds: 130),
+    bool allowLegacyIdentity = false,
   }) : _baseUri = Uri.parse(baseUrl.replaceFirst(RegExp(r'/+$'), '')),
        _client = client ?? http.Client(),
-       _timeout = timeout;
+       _timeout = timeout,
+       _expectedIdentity = expectedIdentity,
+       _allowLegacyIdentity = allowLegacyIdentity;
 
   final Uri _baseUri;
   final http.Client _client;
   final Duration _timeout;
+  final ExternalBattleEngineIdentity _expectedIdentity;
+  final bool _allowLegacyIdentity;
 
   void close() => _client.close();
 
@@ -58,8 +66,21 @@ class XmageBattleClient {
     }
 
     final body = _decodeBody(response);
+    _validateIdentity(body);
+    if (request['request_schema_version'] == externalBattleRequestSchema) {
+      final correlationError = externalBattleCorrelationValidationError(
+        body,
+        request,
+      );
+      if (correlationError != null) {
+        throw XmageServiceException(
+          'XMage response correlation failed: $correlationError',
+          statusCode: 502,
+        );
+      }
+    }
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      _validateCompletedBattle(body);
+      _validateCompletedBattle(body, request);
       return body;
     }
     if (response.statusCode == 422 &&
@@ -81,7 +102,23 @@ class XmageBattleClient {
     );
   }
 
-  void _validateCompletedBattle(Map<String, dynamic> body) {
+  void _validateCompletedBattle(
+    Map<String, dynamic> body,
+    Map<String, dynamic> request,
+  ) {
+    if (request['request_schema_version'] == externalBattleRequestSchema) {
+      final validationError = externalBattleSuccessValidationError(
+        body,
+        request,
+      );
+      if (validationError != null) {
+        throw XmageServiceException(
+          'XMage returned an invalid v2 battle payload: $validationError',
+          statusCode: 502,
+        );
+      }
+      return;
+    }
     final turns = body['turns'];
     if (body['status'] != 'completed' ||
         body['engine'] != 'xmage' ||
@@ -90,6 +127,20 @@ class XmageBattleClient {
         turns <= 0) {
       throw XmageServiceException(
         'XMage returned an invalid completed battle payload',
+        statusCode: 502,
+      );
+    }
+  }
+
+  void _validateIdentity(Map<String, dynamic> body) {
+    final identityError = externalBattleIdentityValidationError(
+      body,
+      expected: _expectedIdentity,
+      allowLegacy: _allowLegacyIdentity,
+    );
+    if (identityError != null) {
+      throw XmageServiceException(
+        'XMage sidecar identity rejected: $identityError',
         statusCode: 502,
       );
     }

@@ -17,9 +17,11 @@ usage() {
   cat >&2 <<'EOF'
 Uso:
   with_new_server_pg.sh --read-only psql [argumentos]
+  with_new_server_pg.sh --read-only python3 <pg_hermes_sqlite_contract_audit.py> [argumentos]
   with_new_server_pg.sh --write-approved comando [argumentos]
 
-O modo read-only aceita apenas psql e injeta default_transaction_read_only=on.
+O modo read-only aceita psql ou auditores read-only explicitamente permitidos
+e injeta default_transaction_read_only=on.
 O modo write-approved exige as duas aprovacoes canonicas no processo chamador.
 EOF
 }
@@ -44,10 +46,50 @@ if [[ "$MODE" == "write-approved" ]]; then
   require_postgres_write_approval "acesso de escrita ao PostgreSQL ManaLoom"
   readonly MANALOOM_PG_WRITE_APPROVED=1
 else
-  if [[ "$(basename -- "$1")" != "psql" ]]; then
-    echo "with_new_server_pg: modo read-only aceita somente o cliente psql" >&2
-    exit 2
-  fi
+  READ_ONLY_AUDITS=(
+    "$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py"
+    "$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py"
+  )
+  case "$(basename -- "$1")" in
+    psql)
+      ;;
+    python3)
+      if (( $# < 2 )); then
+        echo "with_new_server_pg: auditor read-only nao informado" >&2
+        exit 2
+      fi
+      requested_audit="$($PYTHON_BIN - "$2" <<'PY'
+import sys
+from pathlib import Path
+
+print(Path(sys.argv[1]).resolve())
+PY
+)"
+      allowed_audit=0
+      for audit_path in "${READ_ONLY_AUDITS[@]}"; do
+        expected_audit="$($PYTHON_BIN - "$audit_path" <<'PY'
+import sys
+from pathlib import Path
+
+print(Path(sys.argv[1]).resolve())
+PY
+)"
+        if [[ "$requested_audit" == "$expected_audit" ]]; then
+          allowed_audit=1
+          break
+        fi
+      done
+      if [[ "$allowed_audit" != "1" ]] ||
+         [[ "$(command -v -- "$1" 2>/dev/null || true)" != "$(command -v -- "$PYTHON_BIN" 2>/dev/null || true)" ]]; then
+        echo "with_new_server_pg: comando Python nao permitido no modo read-only" >&2
+        exit 2
+      fi
+      ;;
+    *)
+      echo "with_new_server_pg: comando nao permitido no modo read-only" >&2
+      exit 2
+      ;;
+  esac
 fi
 
 if [[ ! -f "$ENV_FILE" ]]; then

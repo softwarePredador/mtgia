@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "matrix_id": "manaloom-s3-07-authenticated-visual-regression-2026-07-22",
+  "status": "pass",
+  "harness": "../scripts/manaloom_authenticated_visual_qa_isolated.sh",
+  "fixture": {
+    "scope": "disposable_loopback_postgresql_api",
+    "seed_transport": "authenticated_local_api",
+    "capture_flow_contains_signup": false,
+    "production_coordinates_allowed": false,
+    "required_entities": ["user", "card", "deck"],
+    "required_empty_domains": ["collection", "community", "battle_replays"],
+    "cleanup": "kill listeners and drop disposable database"
+  },
+  "platforms": [
+    {
+      "id": "web_mobile",
+      "kind": "web_real_build",
+      "width": 390,
+      "height": 844,
+      "device_pixel_ratio": 1,
+      "capture_count": 20,
+      "human_review": "approved"
+    },
+    {
+      "id": "web_desktop",
+      "kind": "web_real_build",
+      "width": 1440,
+      "height": 900,
+      "device_pixel_ratio": 1,
+      "capture_count": 20,
+      "human_review": "approved"
+    },
+    {
+      "id": "web_wide",
+      "kind": "web_real_build",
+      "width": 1920,
+      "height": 1080,
+      "device_pixel_ratio": 1,
+      "capture_count": 20,
+      "human_review": "approved"
+    },
+    {
+      "id": "android_physical",
+      "kind": "android_physical_profile",
+      "width": 390,
+      "height": 844,
+      "capture_width": 1080,
+      "capture_height": 2408,
+      "capture_count": 20,
+      "device_contract": "Samsung SM-A135M, Android 14",
+      "runner_constraint": "flutter drive does not support non-Web --release; profile keeps kDebugMode=false",
+      "human_review": "approved"
+    }
+  ],
+  "required_states": [
+    "success",
+    "empty",
+    "error",
+    "modal",
+    "above_fold",
+    "below_fold"
+  ],
+  "checkpoints": [
+    {
+      "id": "login_empty",
+      "route": "/login",
+      "auth": "public",
+      "states": ["empty", "above_fold"],
+      "anchor": "login-email-field",
+      "source": "lib/features/auth/screens/login_screen.dart"
+    },
+    {
+      "id": "home_top",
+      "route": "/",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "home-hero-frame",
+      "source": "lib/features/home/home_screen.dart"
+    },
+    {
+      "id": "home_below_fold",
+      "route": "/",
+      "auth": "seeded_user",
+      "states": ["success", "below_fold"],
+      "anchor": "home-recent-decks-rail",
+      "source": "lib/features/home/home_screen.dart"
+    },
+    {
+      "id": "decks_seeded",
+      "route": "/decks",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "deck-list-fab-menu",
+      "source": "lib/features/decks/screens/deck_list_screen.dart"
+    },
+    {
+      "id": "deck_create_modal",
+      "route": "/decks",
+      "auth": "seeded_user",
+      "states": ["modal", "above_fold"],
+      "anchor": "deck-create-dialog",
+      "source": "lib/features/decks/screens/deck_list_screen.dart"
+    },
+    {
+      "id": "deck_detail_top",
+      "route": "/decks/{seed_deck_id}",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "deck-overview-hero",
+      "source": "lib/features/decks/widgets/deck_details_overview_tab.dart"
+    },
+    {
+      "id": "deck_detail_below_fold",
+      "route": "/decks/{seed_deck_id}",
+      "auth": "seeded_user",
+      "states": ["success", "below_fold"],
+      "anchor": "deck-overview-primary-pane",
+      "source": "lib/features/decks/widgets/deck_details_overview_tab.dart"
+    },
+    {
+      "id": "deck_generate_empty",
+      "route": "/decks/generate",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "deck-generate-prompt-field",
+      "source": "lib/features/decks/screens/deck_generate_screen.dart"
+    },
+    {
+      "id": "deck_import_detected",
+      "route": "/decks/import",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "deck-import-screen-list-field",
+      "source": "lib/features/decks/screens/deck_import_screen.dart"
+    },
+    {
+      "id": "collection_empty",
+      "route": "/collection?tab=0",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "collection-hub-tabs",
+      "source": "lib/features/collection/screens/collection_screen.dart"
+    },
+    {
+      "id": "sets_catalog",
+      "route": "/collection?tab=3",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "setsSearchField",
+      "source": "lib/features/collection/screens/sets_catalog_screen.dart"
+    },
+    {
+      "id": "card_detail_success",
+      "route": "/cards/{seed_card_id}",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "card-detail-image-frame",
+      "source": "lib/features/cards/screens/card_detail_screen.dart"
+    },
+    {
+      "id": "card_detail_error",
+      "route": "/cards/00000000-0000-0000-0000-000000000000",
+      "auth": "seeded_user",
+      "states": ["error", "above_fold"],
+      "anchor": "card-detail-route-state",
+      "source": "lib/features/cards/screens/card_detail_screen.dart"
+    },
+    {
+      "id": "community_empty",
+      "route": "/community?tab=0",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "community-tabs",
+      "source": "lib/features/community/screens/community_screen.dart"
+    },
+    {
+      "id": "profile_success",
+      "route": "/profile",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "profile-content",
+      "source": "lib/features/profile/profile_screen.dart"
+    },
+    {
+      "id": "battle_replays_empty",
+      "route": "/decks/{seed_deck_id}/battle-replays",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "battle-replays-empty-state",
+      "source": "lib/features/battle/screens/battle_replays_screen.dart"
+    },
+    {
+      "id": "plans_success",
+      "route": "/plans",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "beta-free-access-panel",
+      "source": "lib/features/commercial/screens/plan_screen.dart"
+    },
+    {
+      "id": "upgrade_success",
+      "route": "/upgrade",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "upgrade-beta-notice",
+      "source": "lib/features/commercial/screens/upgrade_screen.dart"
+    },
+    {
+      "id": "checkout_success",
+      "route": "/checkout",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "checkout-beta-notice",
+      "source": "lib/features/commercial/screens/checkout_screen.dart"
+    },
+    {
+      "id": "legal_success",
+      "route": "/legal",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "legal-content",
+      "source": "lib/features/commercial/screens/legal_screen.dart"
+    }
+  ],
+  "visual_gate": {
+    "runner": "tool/authenticated_visual_diff.dart",
+    "baseline_root": "test/ui/goldens/runtime",
+    "failure_root": "test/ui/failures/runtime",
+    "maximum_changed_pixel_ratio": 0.001,
+    "required_console_levels": ["warning", "error"],
+    "maximum_console_entries": 0,
+    "human_review": "approved",
+    "approved_build_sha256": "160c5cae6ccb046c1df87509c1805a3ee127d17d8b9b834330585db841ba2d3d",
+    "approved_capture_manifest_sha256": "d84119af03c9ee5ba16d921f228c01e1a17e0877a86437640d007f52f5a63100",
+    "baseline_files": 80,
+    "pixel_diff": {
+      "status": "pass",
+      "passed_files": 80,
+      "failed_files": 0,
+      "maximum_observed_changed_pixel_ratio": 0.0
+    },
+    "web_console_observation": {
+      "total_entries": 100,
+      "warning_or_error_entries": 0
+    },
+    "android_run": {
+      "mode": "profile",
+      "device": "Samsung SM-A135M",
+      "android_version": 14,
+      "result": "pass",
+      "tests_passed": 2,
+      "adb_reverse_after_run": 0
+    }
+  }
+}

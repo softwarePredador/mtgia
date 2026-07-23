@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
@@ -226,20 +227,18 @@ class _BinderListViewState extends State<_BinderListView>
         _error = null;
         _retryShouldReset = false;
       } else {
-        _error =
-            _items.isEmpty
-                ? 'Verifique sua conexão e tente novamente.'
-                : 'A atualização falhou. As cartas já carregadas foram mantidas.';
+        _error = _items.isEmpty
+            ? 'Verifique sua conexão e tente novamente.'
+            : 'A atualização falhou. As cartas já carregadas foram mantidas.';
         _hasMore = false;
         _retryShouldReset = reset;
       }
     } catch (e) {
       if (!mounted || generation != _fetchGeneration) return;
       debugPrint('[❌ BinderList] fetchItems (${widget.listType}): $e');
-      _error =
-          _items.isEmpty
-              ? 'Verifique sua conexão e tente novamente.'
-              : 'A atualização falhou. As cartas já carregadas foram mantidas.';
+      _error = _items.isEmpty
+          ? 'Verifique sua conexão e tente novamente.'
+          : 'A atualização falhou. As cartas já carregadas foram mantidas.';
       _hasMore = false;
       _retryShouldReset = reset;
     } finally {
@@ -263,43 +262,41 @@ class _BinderListViewState extends State<_BinderListView>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => CardSearchScreen(
-              deckId: '',
-              mode: 'binder',
-              onCardSelectedForBinder: (card) {
-                if (!mounted) return;
-                final provider = context.read<BinderProvider>();
-                BinderItemEditor.show(
-                  context,
-                  cardId: card['id'] as String,
-                  cardName: card['name'] as String?,
-                  cardImageUrl: card['image_url'] as String?,
-                  initialListType: widget.listType,
-                  onSave: (data) async {
-                    final ok = await provider.addItem(
-                      cardId: data['card_id'] as String,
-                      quantity: data['quantity'] as int? ?? 1,
-                      condition: data['condition'] as String? ?? 'NM',
-                      isFoil: data['is_foil'] as bool? ?? false,
-                      forTrade: data['for_trade'] as bool? ?? false,
-                      forSale: data['for_sale'] as bool? ?? false,
-                      price:
-                          data['price'] != null
-                              ? (data['price'] as num).toDouble()
-                              : null,
-                      notes: data['notes'] as String?,
-                      language: data['language'] as String? ?? 'en',
-                      listType: data['list_type'] as String? ?? widget.listType,
-                    );
-                    if (ok && mounted) {
-                      _fetchItems(reset: true);
-                    }
-                    return ok;
-                  },
+        builder: (_) => CardSearchScreen(
+          deckId: '',
+          mode: 'binder',
+          onCardSelectedForBinder: (card) {
+            if (!mounted) return;
+            final provider = context.read<BinderProvider>();
+            BinderItemEditor.show(
+              context,
+              cardId: card['id'] as String,
+              cardName: card['name'] as String?,
+              cardImageUrl: card['image_url'] as String?,
+              initialListType: widget.listType,
+              onSave: (data) async {
+                final ok = await provider.addItem(
+                  cardId: data['card_id'] as String,
+                  quantity: data['quantity'] as int? ?? 1,
+                  condition: data['condition'] as String? ?? 'NM',
+                  isFoil: data['is_foil'] as bool? ?? false,
+                  forTrade: data['for_trade'] as bool? ?? false,
+                  forSale: data['for_sale'] as bool? ?? false,
+                  price: data['price'] != null
+                      ? (data['price'] as num).toDouble()
+                      : null,
+                  notes: data['notes'] as String?,
+                  language: data['language'] as String? ?? 'en',
+                  listType: data['list_type'] as String? ?? widget.listType,
                 );
+                if (ok && mounted) {
+                  _fetchItems(reset: true);
+                }
+                return ok;
               },
-            ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -308,43 +305,41 @@ class _BinderListViewState extends State<_BinderListView>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => CardScannerScreen(
-              deckId: '',
-              mode: 'binder',
-              onCardScannedForBinder: (card) {
-                if (!mounted) return;
-                final provider = context.read<BinderProvider>();
-                BinderItemEditor.show(
-                  context,
-                  cardId: card['id'] as String,
-                  cardName: card['name'] as String?,
-                  cardImageUrl: card['image_url'] as String?,
-                  initialListType: widget.listType,
-                  onSave: (data) async {
-                    final ok = await provider.addItem(
-                      cardId: data['card_id'] as String,
-                      quantity: data['quantity'] as int? ?? 1,
-                      condition: data['condition'] as String? ?? 'NM',
-                      isFoil: data['is_foil'] as bool? ?? false,
-                      forTrade: data['for_trade'] as bool? ?? false,
-                      forSale: data['for_sale'] as bool? ?? false,
-                      price:
-                          data['price'] != null
-                              ? (data['price'] as num).toDouble()
-                              : null,
-                      notes: data['notes'] as String?,
-                      language: data['language'] as String? ?? 'en',
-                      listType: data['list_type'] as String? ?? widget.listType,
-                    );
-                    if (ok && mounted) {
-                      _fetchItems(reset: true);
-                    }
-                    return ok;
-                  },
+        builder: (_) => CardScannerScreen(
+          deckId: '',
+          mode: 'binder',
+          onCardScannedForBinder: (card) {
+            if (!mounted) return;
+            final provider = context.read<BinderProvider>();
+            BinderItemEditor.show(
+              context,
+              cardId: card['id'] as String,
+              cardName: card['name'] as String?,
+              cardImageUrl: card['image_url'] as String?,
+              initialListType: widget.listType,
+              onSave: (data) async {
+                final ok = await provider.addItem(
+                  cardId: data['card_id'] as String,
+                  quantity: data['quantity'] as int? ?? 1,
+                  condition: data['condition'] as String? ?? 'NM',
+                  isFoil: data['is_foil'] as bool? ?? false,
+                  forTrade: data['for_trade'] as bool? ?? false,
+                  forSale: data['for_sale'] as bool? ?? false,
+                  price: data['price'] != null
+                      ? (data['price'] as num).toDouble()
+                      : null,
+                  notes: data['notes'] as String?,
+                  language: data['language'] as String? ?? 'en',
+                  listType: data['list_type'] as String? ?? widget.listType,
                 );
+                if (ok && mounted) {
+                  _fetchItems(reset: true);
+                }
+                return ok;
               },
-            ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -462,9 +457,8 @@ class _BinderListViewState extends State<_BinderListView>
 
   Widget _buildList(bool isHave) {
     if (_isLoading && _items.isEmpty) {
-      return AppStatePanel(
+      return AppStatePanel.loading(
         key: Key('binder-list-loading-${widget.listType}'),
-        icon: isHave ? Icons.inventory_2_rounded : Icons.favorite_rounded,
         title: isHave ? 'Carregando fichário' : 'Carregando wishlist',
         message: 'Organizando cartas, condições e sinais de coleção.',
         accent: isHave ? AppTheme.frost400 : AppTheme.brass400,
@@ -489,14 +483,14 @@ class _BinderListViewState extends State<_BinderListView>
         key: Key('binder-list-empty-${widget.listType}'),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
-            24,
-            24,
-            24,
-            24 + MediaQuery.of(context).padding.bottom + 88,
+            AppTheme.space24,
+            AppTheme.space24,
+            AppTheme.space24,
+            AppTheme.space24 + MediaQuery.of(context).padding.bottom + 88,
           ),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 420),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppTheme.space16),
             decoration: BoxDecoration(
               color: AppTheme.surfaceElevated,
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -521,7 +515,7 @@ class _BinderListViewState extends State<_BinderListView>
                     color: accent,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
                 Text(
                   isHave
                       ? 'Nenhuma carta em "Tenho"'
@@ -533,7 +527,7 @@ class _BinderListViewState extends State<_BinderListView>
                     fontSize: AppTheme.fontMd,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppTheme.space6),
                 Text(
                   isHave
                       ? 'Adicione cartas que você possui para acompanhar valor, condição e disponibilidade.'
@@ -545,7 +539,7 @@ class _BinderListViewState extends State<_BinderListView>
                     height: 1.28,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: AppTheme.space14),
                 Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 12,
@@ -596,7 +590,9 @@ class _BinderListViewState extends State<_BinderListView>
               if (_error != null) {
                 return Padding(
                   key: Key('binder-pagination-error-${widget.listType}'),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppTheme.space12,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -620,27 +616,28 @@ class _BinderListViewState extends State<_BinderListView>
               }
               if (_isLoading) {
                 return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: AppTheme.space16),
                   child: Center(
                     child: CircularProgressIndicator(color: AppTheme.frost400),
                   ),
                 );
               }
-              return const SizedBox(height: 1);
+              return const SizedBox(height: AppTheme.space1);
             }
             return _BinderItemCard(
               item: _items[index],
-              margin:
-                  useGrid ? EdgeInsets.zero : const EdgeInsets.only(bottom: 8),
+              margin: useGrid
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.only(bottom: AppTheme.space8),
               onTap: () => _editItem(_items[index]),
             );
           }
 
           final padding = EdgeInsets.fromLTRB(
-            0,
-            12,
-            0,
-            12 + MediaQuery.of(context).padding.bottom + 88,
+            AppTheme.space0,
+            AppTheme.space12,
+            AppTheme.space0,
+            AppTheme.space12 + MediaQuery.of(context).padding.bottom + 88,
           );
           if (useGrid) {
             return GridView.builder(
@@ -690,16 +687,20 @@ class _StatsBarState extends State<_StatsBar> {
   @override
   Widget build(BuildContext context) {
     final stats = widget.stats;
-    final duplicateCopies =
-        stats.duplicateCopies > 0
-            ? stats.duplicateCopies
-            : stats.totalItems > stats.uniqueCards
-            ? stats.totalItems - stats.uniqueCards
-            : 0;
+    final duplicateCopies = stats.duplicateCopies > 0
+        ? stats.duplicateCopies
+        : stats.totalItems > stats.uniqueCards
+        ? stats.totalItems - stats.uniqueCards
+        : 0;
     return Container(
       key: const Key('binder-stats-dashboard'),
       constraints: BoxConstraints(maxHeight: _expanded ? 300 : 136),
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space12,
+        AppTheme.space10,
+        AppTheme.space12,
+        AppTheme.space8,
+      ),
       color: AppTheme.surfaceElevated,
       child: SingleChildScrollView(
         child: Column(
@@ -719,10 +720,9 @@ class _StatsBarState extends State<_StatsBar> {
                 ),
                 IconButton(
                   key: const Key('binder-stats-expand-button'),
-                  tooltip:
-                      _expanded
-                          ? 'Ocultar detalhes'
-                          : 'Ver detalhes da coleção',
+                  tooltip: _expanded
+                      ? 'Ocultar detalhes'
+                      : 'Ver detalhes da coleção',
                   visualDensity: VisualDensity.compact,
                   onPressed: () => setState(() => _expanded = !_expanded),
                   icon: Icon(
@@ -732,7 +732,7 @@ class _StatsBarState extends State<_StatsBar> {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -744,6 +744,33 @@ class _StatsBarState extends State<_StatsBar> {
                     value: '${stats.totalItems}',
                     tooltip: 'Cartas cadastradas no fichário',
                   ),
+                  _StatCard(
+                    key: const Key('binder-stat-free'),
+                    icon: Icons.inventory_2_outlined,
+                    label: 'Livres',
+                    value: '${stats.freeQuantity}',
+                    tooltip:
+                        'Cópias possuídas que não estão em decks ou trades',
+                    color: AppTheme.success,
+                  ),
+                  _StatCard(
+                    key: const Key('binder-stat-allocated'),
+                    icon: Icons.style_outlined,
+                    label: 'Alocadas',
+                    value: '${stats.allocatedQuantity}',
+                    tooltip: 'Cópias exigidas pelos seus decks ativos',
+                    color: AppTheme.frost400,
+                  ),
+                  if (stats.deckMissingQuantity > 0)
+                    _StatCard(
+                      key: const Key('binder-stat-missing'),
+                      icon: Icons.warning_amber_rounded,
+                      label: 'Faltam',
+                      value: '${stats.deckMissingQuantity}',
+                      tooltip:
+                          'Cópias ainda necessárias para completar os decks',
+                      color: AppTheme.warning,
+                    ),
                   _StatCard(
                     key: const Key('binder-stat-unique'),
                     icon: Icons.style,
@@ -775,9 +802,11 @@ class _StatsBarState extends State<_StatsBar> {
                   ),
                   _StatCard(
                     icon: Icons.attach_money,
-                    label: 'Valor',
-                    value: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
-                    tooltip: 'Valor estimado',
+                    label: 'Valor conhecido',
+                    value: _binderKnownValueLabel(stats),
+                    tooltip: stats.estimatedValueMixedCurrency
+                        ? 'Totais em BRL e USD, sem conversão cambial implícita'
+                        : 'Soma apenas das cópias com preço conhecido',
                     color: AppTheme.brass400,
                   ),
                   _StatCard(
@@ -820,51 +849,46 @@ class _StatsBarState extends State<_StatsBar> {
               ),
             ),
             if (_expanded && stats.setProgress.isNotEmpty) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               _DashboardSection(
                 title: 'Progresso por coleção',
-                children:
-                    stats.setProgress.take(4).map((set) {
-                      final percent = (set.completionRatio * 100).clamp(0, 100);
-                      final title =
-                          set.setName == null || set.setName!.isEmpty
-                              ? set.setCode
-                              : '${set.setCode} • ${set.setName}';
-                      return _ProgressRow(
-                        title: title,
-                        subtitle:
-                            '${set.uniqueOwned}/${set.totalCards} únicas • ${set.quantityOwned} cópias',
-                        value: set.completionRatio,
-                        trailing: '${percent.toStringAsFixed(0)}%',
-                      );
-                    }).toList(),
+                children: stats.setProgress.take(4).map((set) {
+                  final percent = (set.completionRatio * 100).clamp(0, 100);
+                  final title = set.setName == null || set.setName!.isEmpty
+                      ? set.setCode
+                      : '${set.setCode} • ${set.setName}';
+                  return _ProgressRow(
+                    title: title,
+                    subtitle:
+                        '${set.uniqueOwned}/${set.totalCards} únicas • ${set.quantityOwned} cópias',
+                    value: set.completionRatio,
+                    trailing: '${percent.toStringAsFixed(0)}%',
+                  );
+                }).toList(),
               ),
             ],
             if (_expanded && stats.wishlist.isNotEmpty) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               _DashboardSection(
                 title: 'Wishlist e faltantes',
-                children:
-                    stats.wishlist.take(4).map((wish) {
-                      return _CompactInsightRow(
-                        icon: Icons.favorite_border,
-                        title: wish.cardName,
-                        value:
-                            wish.missingQuantity > 0
-                                ? 'faltam ${wish.missingQuantity}'
-                                : 'já possui',
-                        subtitle:
-                            '${wish.wantQuantity} desejada(s) • ${wish.setCode?.toUpperCase() ?? 'set -'}',
-                        color:
-                            wish.missingQuantity > 0
-                                ? AppTheme.brass400
-                                : AppTheme.success,
-                      );
-                    }).toList(),
+                children: stats.wishlist.take(4).map((wish) {
+                  return _CompactInsightRow(
+                    icon: Icons.favorite_border,
+                    title: wish.cardName,
+                    value: wish.missingQuantity > 0
+                        ? 'faltam ${wish.missingQuantity}'
+                        : 'já possui',
+                    subtitle:
+                        '${wish.wantQuantity} desejada(s) • ${wish.setCode?.toUpperCase() ?? 'set -'}',
+                    color: wish.missingQuantity > 0
+                        ? AppTheme.brass400
+                        : AppTheme.success,
+                  );
+                }).toList(),
               ),
             ],
             if (_expanded && stats.distributions.isNotEmpty) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               _DistributionWrap(distributions: stats.distributions),
             ],
           ],
@@ -872,6 +896,24 @@ class _StatsBarState extends State<_StatsBar> {
       ),
     );
   }
+}
+
+String _binderKnownValueLabel(BinderStats stats) {
+  final parts = <String>[
+    if (stats.estimatedValueBrl != null)
+      CurrencyFormatter.format(
+        stats.estimatedValueBrl!,
+        currencyCode: 'BRL',
+        compact: true,
+      ),
+    if (stats.estimatedValueUsd != null)
+      CurrencyFormatter.format(
+        stats.estimatedValueUsd!,
+        currencyCode: 'USD',
+        compact: true,
+      ),
+  ];
+  return parts.isEmpty ? 'Sem preço' : parts.join(' + ');
 }
 
 class _DashboardSection extends StatelessWidget {
@@ -884,7 +926,7 @@ class _DashboardSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(AppTheme.space10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -904,7 +946,7 @@ class _DashboardSection extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ...children,
         ],
       ),
@@ -928,7 +970,7 @@ class _ProgressRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppTheme.space8),
       child: Column(
         children: [
           Row(
@@ -945,7 +987,7 @@ class _ProgressRow extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Text(
                 trailing,
                 style: const TextStyle(
@@ -956,7 +998,7 @@ class _ProgressRow extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppTheme.radiusXs),
             child: LinearProgressIndicator(
@@ -966,7 +1008,7 @@ class _ProgressRow extends StatelessWidget {
               valueColor: const AlwaysStoppedAnimation(AppTheme.frost400),
             ),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: AppTheme.space3),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -1003,11 +1045,11 @@ class _CompactInsightRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppTheme.space8),
       child: Row(
         children: [
           Icon(icon, size: 16, color: color),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1034,7 +1076,7 @@ class _CompactInsightRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Text(
             value,
             style: TextStyle(
@@ -1069,15 +1111,14 @@ class _DistributionWrap extends StatelessWidget {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children:
-              entries.entries.expand((entry) {
-                return entry.value.take(4).map((item) {
-                  return _DistributionChip(
-                    label: '${entry.key}: ${_humanizeDistribution(item.label)}',
-                    value: item.quantity,
-                  );
-                });
-              }).toList(),
+          children: entries.entries.expand((entry) {
+            return entry.value.take(4).map((item) {
+              return _DistributionChip(
+                label: '${entry.key}: ${_humanizeDistribution(item.label)}',
+                value: item.quantity,
+              );
+            });
+          }).toList(),
         ),
       ],
     );
@@ -1102,7 +1143,10 @@ class _DistributionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space5,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -1145,8 +1189,11 @@ class _StatCard extends StatelessWidget {
       message: tooltip,
       child: Container(
         width: 82,
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        margin: const EdgeInsets.only(right: AppTheme.space8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space10,
+          vertical: AppTheme.space8,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.surfaceSlate,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1160,7 +1207,7 @@ class _StatCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 15, color: color),
-            const SizedBox(height: 5),
+            const SizedBox(height: AppTheme.space5),
             Text(
               value,
               maxLines: 1,
@@ -1204,16 +1251,14 @@ class _ActionIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 2),
-        child: IconButton.filledTonal(
-          onPressed: onPressed,
-          icon: Icon(icon, color: color, size: 18),
-          style: IconButton.styleFrom(
-            backgroundColor: color.withValues(alpha: 0.12),
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(left: AppTheme.space2),
+      child: IconButton.filledTonal(
+        tooltip: tooltip,
+        onPressed: onPressed,
+        icon: Icon(icon, color: color, size: 18),
+        style: IconButton.styleFrom(
+          backgroundColor: color.withValues(alpha: 0.12),
         ),
       ),
     );
@@ -1270,7 +1315,7 @@ class _SearchFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.space8),
       color: AppTheme.backgroundAbyss,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1297,23 +1342,24 @@ class _SearchFilterBar extends StatelessWidget {
                         Icons.search,
                         color: AppTheme.textSecondary,
                       ),
-                      suffixIcon:
-                          searchValue.text.isEmpty
-                              ? null
-                              : IconButton(
-                                tooltip: 'Limpar busca',
-                                icon: const Icon(
-                                  Icons.clear,
-                                  color: AppTheme.textSecondary,
-                                ),
-                                onPressed: () {
-                                  searchController.clear();
-                                  onSearch();
-                                },
+                      suffixIcon: searchValue.text.isEmpty
+                          ? null
+                          : IconButton(
+                              tooltip: 'Limpar busca',
+                              icon: const Icon(
+                                Icons.clear,
+                                color: AppTheme.textSecondary,
                               ),
+                              onPressed: () {
+                                searchController.clear();
+                                onSearch();
+                              },
+                            ),
                       filled: true,
                       fillColor: AppTheme.surfaceSlate,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: AppTheme.space0,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                         borderSide: BorderSide.none,
@@ -1324,7 +1370,7 @@ class _SearchFilterBar extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -1335,26 +1381,26 @@ class _SearchFilterBar extends StatelessWidget {
                   hint: 'Condição',
                   onChanged: onConditionChanged,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 _FilterDropdown(
                   value: rarityFilter,
                   items: const ['common', 'uncommon', 'rare', 'mythic'],
                   hint: 'Raridade',
                   onChanged: onRarityChanged,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 _FilterDropdown(
                   value: languageFilter,
                   items: const ['en', 'pt', 'es', 'ja'],
                   hint: 'Idioma',
                   onChanged: onLanguageChanged,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 _SetCodeFilterField(
                   controller: setController,
                   onSubmitted: onSearch,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 _FilterDropdown(
                   value: sortBy,
                   items: const [
@@ -1371,7 +1417,7 @@ class _SearchFilterBar extends StatelessWidget {
                   hint: 'Ordenar',
                   onChanged: onSortChanged,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 FilterChip(
                   label: Text(sortOrder == 'asc' ? 'A-Z' : 'Z-A'),
                   selected: sortOrder == 'desc',
@@ -1379,30 +1425,27 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color:
-                        sortOrder == 'desc'
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: sortOrder == 'desc'
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color:
-                        sortOrder == 'desc'
-                            ? AppTheme.brass400
-                            : AppTheme.outlineMuted,
+                    color: sortOrder == 'desc'
+                        ? AppTheme.brass400
+                        : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
                     sortOrder == 'asc'
                         ? Icons.arrow_upward
                         : Icons.arrow_downward,
                     size: 14,
-                    color:
-                        sortOrder == 'desc'
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: sortOrder == 'desc'
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 FilterChip(
                   label: const Text('Foil'),
                   selected: foilFilter == true,
@@ -1412,28 +1455,25 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color:
-                        foilFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: foilFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color:
-                        foilFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.outlineMuted,
+                    color: foilFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
                     Icons.flare_rounded,
                     size: 14,
-                    color:
-                        foilFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: foilFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 FilterChip(
                   label: const Text('Normal'),
                   selected: foilFilter == false,
@@ -1443,20 +1483,18 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color:
-                        foilFilter == false
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: foilFilter == false
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color:
-                        foilFilter == false
-                            ? AppTheme.brass400
-                            : AppTheme.outlineMuted,
+                    color: foilFilter == false
+                        ? AppTheme.brass400
+                        : AppTheme.outlineMuted,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 FilterChip(
                   label: const Text('Troca'),
                   selected: tradeFilter == true,
@@ -1464,28 +1502,25 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color:
-                        tradeFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: tradeFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color:
-                        tradeFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.outlineMuted,
+                    color: tradeFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
                     Icons.swap_horiz,
                     size: 14,
-                    color:
-                        tradeFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: tradeFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 FilterChip(
                   label: const Text('Venda'),
                   selected: saleFilter == true,
@@ -1493,25 +1528,22 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color:
-                        saleFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: saleFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color:
-                        saleFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.outlineMuted,
+                    color: saleFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
                     Icons.sell,
                     size: 14,
-                    color:
-                        saleFilter == true
-                            ? AppTheme.brass400
-                            : AppTheme.textSecondary,
+                    color: saleFilter == true
+                        ? AppTheme.brass400
+                        : AppTheme.textSecondary,
                   ),
                 ),
               ],
@@ -1536,7 +1568,7 @@ class _SetCodeFilterField extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 88,
-      height: 34,
+      height: AppTheme.space34,
       child: TextField(
         key: const Key('binderSetFilterField'),
         controller: controller,
@@ -1554,7 +1586,9 @@ class _SetCodeFilterField extends StatelessWidget {
           ),
           filled: true,
           fillColor: AppTheme.surfaceSlate,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space10,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             borderSide: const BorderSide(color: AppTheme.outlineMuted),
@@ -1590,7 +1624,7 @@ class _FilterDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 34,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.space10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1665,7 +1699,7 @@ class _BinderItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(AppTheme.space10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -1675,7 +1709,7 @@ class _BinderItemCard extends StatelessWidget {
                 height: 64,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1691,14 +1725,14 @@ class _BinderItemCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppTheme.space2),
                     Row(
                       children: [
                         _badge('×${item.quantity}', AppTheme.frost400),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: AppTheme.space6),
                         _badge(item.condition, _conditionColor(item.condition)),
                         if (item.isFoil) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(width: AppTheme.space6),
                           Icon(
                             Icons.flare_rounded,
                             size: 14,
@@ -1706,11 +1740,11 @@ class _BinderItemCard extends StatelessWidget {
                           ),
                         ],
                         if (item.cardIsReserved) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(width: AppTheme.space6),
                           _badge('Reserved', AppTheme.brass400),
                         ],
                         if (item.cardSetCode != null) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(width: AppTheme.space6),
                           Text(
                             cardEditionCodeLabel(setCode: item.cardSetCode),
                             style: const TextStyle(
@@ -1719,22 +1753,70 @@ class _BinderItemCard extends StatelessWidget {
                             ),
                           ),
                         ],
+                        if (item.language.trim().isNotEmpty) ...[
+                          const SizedBox(width: AppTheme.space6),
+                          _badge(
+                            item.language.toUpperCase(),
+                            AppTheme.textSecondary,
+                          ),
+                        ],
                       ],
                     ),
+                    if (item.listType == 'have') ...[
+                      const SizedBox(height: AppTheme.space4),
+                      Semantics(
+                        label:
+                            '${item.quantity} nesta entrada, '
+                            '${item.availableQuantity} disponíveis nesta entrada, '
+                            '${item.ownedQuantity} possuídas no total, '
+                            '${item.allocatedQuantity} alocadas, '
+                            '${item.freeQuantity} livres, '
+                            '${item.missingQuantity} faltantes',
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            _badge(
+                              'Disponível ${item.availableQuantity}',
+                              AppTheme.success,
+                            ),
+                            if (item.freeQuantity != item.availableQuantity)
+                              _badge(
+                                'Livre total ${item.freeQuantity}',
+                                AppTheme.success,
+                              ),
+                            if (item.allocatedQuantity > 0)
+                              _badge(
+                                'Alocada ${item.allocatedQuantity}',
+                                AppTheme.frost400,
+                              ),
+                            if (item.committedTradeQuantity > 0)
+                              _badge(
+                                'Em trade ${item.committedTradeQuantity}',
+                                AppTheme.brass400,
+                              ),
+                            if (item.missingQuantity > 0)
+                              _badge(
+                                'Falta ${item.missingQuantity}',
+                                AppTheme.warning,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                     if (item.forTrade ||
                         item.forSale ||
                         item.price != null) ...[
-                      const SizedBox(height: 2),
-                      Row(
+                      const SizedBox(height: AppTheme.space2),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
                         children: [
                           if (item.forTrade)
                             _statusTag('Troca', AppTheme.frost400),
-                          if (item.forSale) ...[
-                            if (item.forTrade) const SizedBox(width: 6),
+                          if (item.forSale)
                             _statusTag('Venda', AppTheme.brass400),
-                          ],
                           if (item.price != null) ...[
-                            const SizedBox(width: 6),
                             Text(
                               'R\$ ${item.price!.toStringAsFixed(2)}',
                               style: const TextStyle(
@@ -1764,7 +1846,10 @@ class _BinderItemCard extends StatelessWidget {
 
   Widget _badge(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space1,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -1782,7 +1867,10 @@ class _BinderItemCard extends StatelessWidget {
 
   Widget _statusTag(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space6,
+        vertical: AppTheme.space2,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: color.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),

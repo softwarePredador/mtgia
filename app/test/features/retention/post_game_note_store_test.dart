@@ -93,6 +93,9 @@ void main() {
         playSessionId: 'session-42',
         sessionStartedAt: startedAt,
         sessionEndedAt: endedAt,
+        deckSnapshotHash:
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        deckVersionAt: DateTime.parse('2026-07-02T11:59:00Z'),
         createdAt: createdAt,
       );
       final remote = PostGameNote.create(
@@ -113,6 +116,8 @@ void main() {
       expect(merged.single.playSessionId, 'session-42');
       expect(merged.single.sessionStartedAt, startedAt);
       expect(merged.single.sessionEndedAt, endedAt);
+      expect(merged.single.deckSnapshotHash, local.deckSnapshotHash);
+      expect(merged.single.deckVersionAt, local.deckVersionAt);
     },
   );
 
@@ -135,6 +140,7 @@ void main() {
       expect((await store.loadNotes('deck-1')).single.id, note.id);
       expect(await store.pendingOperationCount('deck-1'), 0);
       expect(remote.upsertAttempts, 2);
+      expect(remote.saved.where((item) => item.id == note.id), hasLength(1));
     },
   );
 

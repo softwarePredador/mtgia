@@ -18,13 +18,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
+import external_engine_source_contract as engine_source_contract
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
-
-DEFAULT_XMAGE_SOURCE = XMAGE_ROOT / "Mage.Sets/src/mage/cards/b/BrainInAJar.java"
+XMAGE_SOURCE_RELATIVE = Path("Mage.Sets/src/mage/cards/b/BrainInAJar.java")
 DEFAULT_BATTLE_RUNTIME = SCRIPT_DIR / "battle_analyst_v9.py"
 DEFAULT_ROUTE_PLANNER = (
     REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_post_authorized_full_validation.json"
@@ -408,7 +407,7 @@ def write_outputs(payload: Mapping[str, Any], out_prefix: Path) -> tuple[Path, P
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--xmage-source", type=Path, default=DEFAULT_XMAGE_SOURCE)
+    parser.add_argument("--xmage-root", type=Path)
     parser.add_argument("--battle-runtime", type=Path, default=DEFAULT_BATTLE_RUNTIME)
     parser.add_argument("--route-planner", type=Path, default=DEFAULT_ROUTE_PLANNER)
     parser.add_argument("--preflight", type=Path, default=DEFAULT_PREFLIGHT)
@@ -418,14 +417,19 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    xmage_source = xmage_root / XMAGE_SOURCE_RELATIVE
     paths = {
-        "xmage_source": args.xmage_source,
+        "xmage_source": xmage_source,
         "battle_runtime": args.battle_runtime,
         "route_planner": args.route_planner,
         "preflight": args.preflight,
     }
     payload = build_report(
-        xmage_source_text=read_text(args.xmage_source),
+        xmage_source_text=read_text(xmage_source),
         battle_runtime_text=read_text(args.battle_runtime),
         route_planner=read_json(args.route_planner),
         preflight=read_json(args.preflight),

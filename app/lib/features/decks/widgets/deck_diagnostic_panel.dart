@@ -40,8 +40,9 @@ class DeckDiagnosticPanel extends StatelessWidget {
           identical(metric.tone, _DiagnosticTone.danger) ||
           identical(metric.tone, _DiagnosticTone.warn),
     );
-    final summaryTone =
-        hasWarnings ? _DiagnosticTone.warn : _DiagnosticTone.good;
+    final summaryTone = hasWarnings
+        ? _DiagnosticTone.warn
+        : _DiagnosticTone.good;
     final summaryLabel = hasWarnings ? 'Ajustes sugeridos' : 'Base saudável';
     final playerNotice = _PlayerReadinessNotice.fromAnalysis(
       analysis,
@@ -51,7 +52,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
     return Container(
       key: const Key('deck-diagnostic-panel'),
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -84,7 +85,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppTheme.space4),
                             Text(
                               'Priorize o que melhora a partida: mana, compra, respostas e curva.',
                               style: theme.textTheme.bodySmall?.copyWith(
@@ -95,7 +96,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                         ),
                       ),
                       if (!isCompact) ...[
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppTheme.space12),
                         _DiagnosticSummaryBadge(
                           label: summaryLabel,
                           tone: summaryTone,
@@ -103,7 +104,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppTheme.space10),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -137,10 +138,10 @@ class DeckDiagnosticPanel extends StatelessWidget {
             },
           ),
           if (playerNotice != null) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             _PlayerReadinessCard(notice: playerNotice),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           Text(
             'O que melhorar primeiro',
             style: theme.textTheme.titleSmall?.copyWith(
@@ -148,13 +149,12 @@ class DeckDiagnosticPanel extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           LayoutBuilder(
             builder: (context, constraints) {
-              final columns =
-                  constraints.maxWidth < 360
-                      ? 1
-                      : (constraints.maxWidth < 720 ? 2 : 3);
+              final columns = constraints.maxWidth < 360
+                  ? 1
+                  : (constraints.maxWidth < 720 ? 2 : 3);
               final spacing = 12.0;
               final itemWidth =
                   (constraints.maxWidth - ((columns - 1) * spacing)) / columns;
@@ -162,27 +162,25 @@ class DeckDiagnosticPanel extends StatelessWidget {
               return Wrap(
                 spacing: spacing,
                 runSpacing: spacing,
-                children:
-                    snapshot.metrics
-                        .map(
-                          (metric) => SizedBox(
-                            width: itemWidth,
-                            child: _DiagnosticMetricCard(
-                              metric: metric,
-                              onOpenEvidence:
-                                  () => _showDiagnosticEvidenceSheet(
-                                    context,
-                                    metric.evidence,
-                                    onShowCardDetails: onShowCardDetails,
-                                  ),
-                            ),
+                children: snapshot.metrics
+                    .map(
+                      (metric) => SizedBox(
+                        width: itemWidth,
+                        child: _DiagnosticMetricCard(
+                          metric: metric,
+                          onOpenEvidence: () => _showDiagnosticEvidenceSheet(
+                            context,
+                            metric.evidence,
+                            onShowCardDetails: onShowCardDetails,
                           ),
-                        )
-                        .toList(),
+                        ),
+                      ),
+                    )
+                    .toList(),
               );
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppTheme.space18),
           Text(
             'Ver cartas por função',
             style: theme.textTheme.titleSmall?.copyWith(
@@ -190,7 +188,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           Text(
             'Abra um grupo para ver quais cartas sustentam aquela parte do plano.',
             style: theme.textTheme.bodySmall?.copyWith(
@@ -198,17 +196,16 @@ class DeckDiagnosticPanel extends StatelessWidget {
               height: 1.3,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _DiagnosticEvidenceGrid(
             evidence: snapshot.evidence,
-            onOpenEvidence:
-                (evidence) => _showDiagnosticEvidenceSheet(
-                  context,
-                  evidence,
-                  onShowCardDetails: onShowCardDetails,
-                ),
+            onOpenEvidence: (evidence) => _showDiagnosticEvidenceSheet(
+              context,
+              evidence,
+              onShowCardDetails: onShowCardDetails,
+            ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppTheme.space18),
           Text(
             'Resumo em linguagem simples',
             style: theme.textTheme.titleSmall?.copyWith(
@@ -216,7 +213,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           ...snapshot.insights.asMap().entries.map(
             (entry) => _DiagnosticInsightRow(entry.value, index: entry.key),
           ),
@@ -309,7 +306,7 @@ class _PlayerReadinessCard extends StatelessWidget {
 
     return Container(
       key: const Key('deck-player-readiness-card'),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -327,7 +324,7 @@ class _PlayerReadinessCard extends StatelessWidget {
             ),
             child: Icon(notice.icon, color: notice.tone.foreground, size: 17),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +338,7 @@ class _PlayerReadinessCard extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   notice.detail,
                   maxLines: 2,
@@ -388,7 +385,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
               onTap: onOpenEvidence,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               child: Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(AppTheme.space14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceSlate.withValues(alpha: 0.92),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -407,7 +404,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.space8),
                       _MetricToneBadge(label: metric.status, tone: metric.tone),
                     ] else
                       Row(
@@ -421,7 +418,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppTheme.space8),
                           Flexible(
                             child: Align(
                               alignment: Alignment.centerRight,
@@ -433,7 +430,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppTheme.space10),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -446,7 +443,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppTheme.space8),
                         Container(
                           width: 28,
                           height: 28,
@@ -464,7 +461,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppTheme.space8),
                     Text(
                       metric.target,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -504,18 +501,17 @@ class _DiagnosticEvidenceGrid extends StatelessWidget {
         return Wrap(
           spacing: spacing,
           runSpacing: spacing,
-          children:
-              evidence
-                  .map(
-                    (item) => SizedBox(
-                      width: itemWidth,
-                      child: _DiagnosticEvidenceCard(
-                        evidence: item,
-                        onTap: () => onOpenEvidence(item),
-                      ),
-                    ),
-                  )
-                  .toList(),
+          children: evidence
+              .map(
+                (item) => SizedBox(
+                  width: itemWidth,
+                  child: _DiagnosticEvidenceCard(
+                    evidence: item,
+                    onTap: () => onOpenEvidence(item),
+                  ),
+                ),
+              )
+              .toList(),
         );
       },
     );
@@ -545,7 +541,7 @@ class _DiagnosticEvidenceCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppTheme.space12),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate.withValues(alpha: 0.74),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -560,7 +556,7 @@ class _DiagnosticEvidenceCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(evidence.icon, size: 15, color: AppTheme.mythicGold),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: AppTheme.space6),
                     Expanded(
                       child: Text(
                         '${evidence.label} (${evidence.count})',
@@ -577,7 +573,7 @@ class _DiagnosticEvidenceCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 if (preview.isEmpty)
                   Text(
                     'Nenhuma carta detectada.',
@@ -621,11 +617,10 @@ Future<void> _showDiagnosticEvidenceSheet(
         top: Radius.circular(AppTheme.radiusLg),
       ),
     ),
-    builder:
-        (sheetContext) => _DiagnosticEvidenceSheet(
-          evidence: evidence,
-          onShowCardDetails: onShowCardDetails,
-        ),
+    builder: (sheetContext) => _DiagnosticEvidenceSheet(
+      evidence: evidence,
+      onShowCardDetails: onShowCardDetails,
+    ),
   );
 }
 
@@ -657,7 +652,10 @@ class _DiagnosticEvidenceSheet extends StatelessWidget {
               child: Container(
                 width: 42,
                 height: 4,
-                margin: const EdgeInsets.only(top: 10, bottom: 12),
+                margin: const EdgeInsets.only(
+                  top: AppTheme.space10,
+                  bottom: AppTheme.space12,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.outlineMuted.withValues(alpha: 0.78),
                   borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -665,7 +663,12 @@ class _DiagnosticEvidenceSheet extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 12, 12),
+              padding: const EdgeInsets.fromLTRB(
+                AppTheme.space18,
+                AppTheme.space0,
+                AppTheme.space12,
+                AppTheme.space12,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -682,7 +685,7 @@ class _DiagnosticEvidenceSheet extends StatelessWidget {
                       color: AppTheme.mythicGold,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -694,7 +697,7 @@ class _DiagnosticEvidenceSheet extends StatelessWidget {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           evidence.description,
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -719,28 +722,27 @@ class _DiagnosticEvidenceSheet extends StatelessWidget {
               color: AppTheme.outlineMuted.withValues(alpha: 0.48),
             ),
             Flexible(
-              child:
-                  evidence.entries.isEmpty
-                      ? _DiagnosticEvidenceEmpty(evidence: evidence)
-                      : ListView.separated(
-                        padding: const EdgeInsets.all(14),
-                        itemCount: evidence.entries.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, index) {
-                          final entry = evidence.entries[index];
-                          return _DiagnosticEvidenceListTile(
-                            entry: entry,
-                            evidenceLabel: evidence.label,
-                            onTap:
-                                entry.card != null && onShowCardDetails != null
-                                    ? () {
-                                      Navigator.of(context).pop();
-                                      onShowCardDetails!(entry.card!);
-                                    }
-                                    : null,
-                          );
-                        },
-                      ),
+              child: evidence.entries.isEmpty
+                  ? _DiagnosticEvidenceEmpty(evidence: evidence)
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(AppTheme.space14),
+                      itemCount: evidence.entries.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AppTheme.space8),
+                      itemBuilder: (context, index) {
+                        final entry = evidence.entries[index];
+                        return _DiagnosticEvidenceListTile(
+                          entry: entry,
+                          evidenceLabel: evidence.label,
+                          onTap: entry.card != null && onShowCardDetails != null
+                              ? () {
+                                  Navigator.of(context).pop();
+                                  onShowCardDetails!(entry.card!);
+                                }
+                              : null,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -758,7 +760,7 @@ class _DiagnosticEvidenceEmpty extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppTheme.space20),
       child: Text(
         'Nenhuma carta foi detectada para ${evidence.label.toLowerCase()} nesta leitura.',
         style: theme.textTheme.bodyMedium?.copyWith(
@@ -797,7 +799,7 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(AppTheme.space10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -809,7 +811,7 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
                 height: 64,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -829,13 +831,13 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
                           ),
                         ),
                         if (quantity != null && quantity > 1) ...[
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppTheme.space8),
                           _EvidenceQuantityBadge(quantity: quantity),
                         ],
                       ],
                     ),
                     if ((card?.typeLine ?? '').trim().isNotEmpty) ...[
-                      const SizedBox(height: 3),
+                      const SizedBox(height: AppTheme.space3),
                       Text(
                         card!.typeLine,
                         maxLines: 1,
@@ -845,7 +847,7 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
                         ),
                       ),
                     ],
-                    const SizedBox(height: 3),
+                    const SizedBox(height: AppTheme.space3),
                     Text(
                       detail,
                       maxLines: 2,
@@ -860,7 +862,7 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
                 ),
               ),
               if (onTap != null) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 const Icon(
                   Icons.open_in_new_rounded,
                   color: AppTheme.textSecondary,
@@ -883,7 +885,10 @@ class _EvidenceQuantityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space7,
+        vertical: AppTheme.space3,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.mythicGold.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -943,8 +948,8 @@ class _DiagnosticInsightRow extends StatelessWidget {
 
     return Container(
       key: Key('deck-diagnostic-insight-$index'),
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppTheme.space10),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -954,7 +959,7 @@ class _DiagnosticInsightRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.only(top: 2),
+            margin: const EdgeInsets.only(top: AppTheme.space2),
             width: 26,
             height: 26,
             decoration: BoxDecoration(
@@ -963,7 +968,7 @@ class _DiagnosticInsightRow extends StatelessWidget {
             ),
             child: Icon(insight.icon, size: 14, color: insight.tone.foreground),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               insight.text,
@@ -989,7 +994,10 @@ class _DiagnosticSummaryBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('deck-diagnostic-summary-badge'),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space6,
+      ),
       decoration: BoxDecoration(
         color: tone.background,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1016,7 +1024,10 @@ class _MetricToneBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: tone.background,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1488,15 +1499,16 @@ class _DeckDiagnosticSnapshot {
     List<DeckCardItem> cards, {
     bool sortByCmcDescending = false,
   }) {
-    final sorted = [...cards]..sort((a, b) {
-      if (sortByCmcDescending) {
-        final cmcCompare = ManaHelper.calculateCMC(
-          b.manaCost,
-        ).compareTo(ManaHelper.calculateCMC(a.manaCost));
-        if (cmcCompare != 0) return cmcCompare;
-      }
-      return a.name.compareTo(b.name);
-    });
+    final sorted = [...cards]
+      ..sort((a, b) {
+        if (sortByCmcDescending) {
+          final cmcCompare = ManaHelper.calculateCMC(
+            b.manaCost,
+          ).compareTo(ManaHelper.calculateCMC(a.manaCost));
+          if (cmcCompare != 0) return cmcCompare;
+        }
+        return a.name.compareTo(b.name);
+      });
     return sorted
         .map((card) => _DiagnosticEvidenceEntry.fromCard(card))
         .toList(growable: false);
@@ -1604,16 +1616,19 @@ class _DeckDiagnosticSnapshot {
   }
 
   static bool _isLand(DeckCardItem card) {
-    final cardTypes =
-        card.typeLine.toLowerCase().split(RegExp(r'\s+[—–-]\s+')).first;
+    final cardTypes = card.typeLine
+        .toLowerCase()
+        .split(RegExp(r'\s+[—–-]\s+'))
+        .first;
     return RegExp(r'(?:^|\s)land(?:$|\s)').hasMatch(cardTypes);
   }
 
   static bool _isRamp(DeckCardItem card) {
     if (_isLand(card)) return false;
     final name = card.name.trim().toLowerCase();
-    final withoutReminder =
-        _oracleWithoutReminderText(card.oracleText ?? '').toLowerCase();
+    final withoutReminder = _oracleWithoutReminderText(
+      card.oracleText ?? '',
+    ).toLowerCase();
     final direct = _oracleDirectEffectText(withoutReminder);
 
     final createsMana =
@@ -1673,8 +1688,9 @@ class _DeckDiagnosticSnapshot {
   static bool _isRampFloor(DeckCardItem card) {
     if (_isLand(card)) return false;
     final typeLine = card.typeLine.toLowerCase();
-    final withoutReminder =
-        _oracleWithoutReminderText(card.oracleText ?? '').toLowerCase();
+    final withoutReminder = _oracleWithoutReminderText(
+      card.oracleText ?? '',
+    ).toLowerCase();
     final direct = _oracleDirectEffectText(withoutReminder);
 
     if (_putsOwnedLandOntoBattlefield(withoutReminder) ||

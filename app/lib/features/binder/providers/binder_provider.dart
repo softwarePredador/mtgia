@@ -18,10 +18,20 @@ class BinderItem {
   final String? cardTypeLine;
   final bool cardIsReserved;
   final double? cardMarketPrice;
+  final String? cardMarketPriceCurrency;
+  final String? cardMarketPriceSource;
+  final DateTime? cardMarketPriceUpdatedAt;
   final String? createdAt;
   final String? updatedAt;
   final int deckCount;
   final int deckQuantity;
+  final String? playableCardId;
+  final int ownedQuantity;
+  final int allocatedQuantity;
+  final int committedTradeQuantity;
+  final int freeQuantity;
+  final int missingQuantity;
+  final int availableQuantity;
   int quantity;
   String condition; // NM, LP, MP, HP, DMG
   bool isFoil;
@@ -44,10 +54,20 @@ class BinderItem {
     this.cardTypeLine,
     this.cardIsReserved = false,
     this.cardMarketPrice,
+    this.cardMarketPriceCurrency,
+    this.cardMarketPriceSource,
+    this.cardMarketPriceUpdatedAt,
     this.createdAt,
     this.updatedAt,
     this.deckCount = 0,
     this.deckQuantity = 0,
+    this.playableCardId,
+    this.ownedQuantity = 0,
+    this.allocatedQuantity = 0,
+    this.committedTradeQuantity = 0,
+    this.freeQuantity = 0,
+    this.missingQuantity = 0,
+    this.availableQuantity = 0,
     this.quantity = 1,
     this.condition = 'NM',
     this.isFoil = false,
@@ -79,14 +99,26 @@ class BinderItem {
           card?['is_reserved'] as bool? ??
           json['card_is_reserved'] as bool? ??
           false,
-      cardMarketPrice:
-          card?['market_price'] != null
-              ? (card?['market_price'] as num).toDouble()
-              : null,
+      cardMarketPrice: card?['market_price'] != null
+          ? (card?['market_price'] as num).toDouble()
+          : null,
+      cardMarketPriceCurrency: card?['market_price_currency'] as String?,
+      cardMarketPriceSource: card?['market_price_source'] as String?,
+      cardMarketPriceUpdatedAt: DateTime.tryParse(
+        card?['market_price_updated_at']?.toString() ?? '',
+      ),
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
       deckCount: json['deck_count'] as int? ?? 0,
       deckQuantity: json['deck_quantity'] as int? ?? 0,
+      playableCardId: json['playable_card_id']?.toString(),
+      ownedQuantity: json['owned_quantity'] as int? ?? 0,
+      allocatedQuantity: json['allocated_quantity'] as int? ?? 0,
+      committedTradeQuantity: json['committed_trade_quantity'] as int? ?? 0,
+      freeQuantity: json['free_quantity'] as int? ?? 0,
+      missingQuantity: json['missing_quantity'] as int? ?? 0,
+      availableQuantity:
+          json['available_quantity'] as int? ?? json['quantity'] as int? ?? 0,
       quantity: json['quantity'] as int? ?? 1,
       condition: json['condition'] as String? ?? 'NM',
       isFoil: json['is_foil'] as bool? ?? false,
@@ -122,7 +154,12 @@ class BinderSetProgress {
   final int quantityOwned;
   final int totalCards;
   final double completionRatio;
-  final double estimatedValue;
+  final double? estimatedValue;
+  final String? estimatedValueCurrency;
+  final double? estimatedValueBrl;
+  final double? estimatedValueUsd;
+  final bool estimatedValueMixedCurrency;
+  final int pricedCopiesCount;
 
   const BinderSetProgress({
     required this.setCode,
@@ -131,7 +168,12 @@ class BinderSetProgress {
     this.quantityOwned = 0,
     this.totalCards = 0,
     this.completionRatio = 0.0,
-    this.estimatedValue = 0.0,
+    this.estimatedValue,
+    this.estimatedValueCurrency,
+    this.estimatedValueBrl,
+    this.estimatedValueUsd,
+    this.estimatedValueMixedCurrency = false,
+    this.pricedCopiesCount = 0,
   });
 
   factory BinderSetProgress.fromJson(Map<String, dynamic> json) {
@@ -141,14 +183,18 @@ class BinderSetProgress {
       uniqueOwned: json['unique_owned'] as int? ?? 0,
       quantityOwned: json['quantity_owned'] as int? ?? 0,
       totalCards: json['total_cards'] as int? ?? 0,
-      completionRatio:
-          json['completion_ratio'] != null
-              ? (json['completion_ratio'] as num).toDouble()
-              : 0.0,
-      estimatedValue:
-          json['estimated_value'] != null
-              ? (json['estimated_value'] as num).toDouble()
-              : 0.0,
+      completionRatio: json['completion_ratio'] != null
+          ? (json['completion_ratio'] as num).toDouble()
+          : 0.0,
+      estimatedValue: json['estimated_value'] != null
+          ? (json['estimated_value'] as num).toDouble()
+          : null,
+      estimatedValueCurrency: json['estimated_value_currency'] as String?,
+      estimatedValueBrl: _nullableDouble(json['estimated_value_brl']),
+      estimatedValueUsd: _nullableDouble(json['estimated_value_usd']),
+      estimatedValueMixedCurrency:
+          json['estimated_value_mixed_currency'] as bool? ?? false,
+      pricedCopiesCount: json['priced_copies_count'] as int? ?? 0,
     );
   }
 }
@@ -195,13 +241,23 @@ class BinderStats {
   final int duplicateCopies;
   final int forTradeCount;
   final int forSaleCount;
-  final double estimatedValue;
+  final double? estimatedValue;
+  final String? estimatedValueCurrency;
+  final double? estimatedValueBrl;
+  final double? estimatedValueUsd;
+  final bool estimatedValueMixedCurrency;
+  final int pricedCopiesCount;
   final int wishlistCount;
   final int wishlistUniqueCards;
   final int missingCardsCount;
   final int priceMissingCount;
   final int cardsUsedInDecks;
   final int decksUsingBinderCards;
+  final int ownedQuantity;
+  final int allocatedQuantity;
+  final int committedTradeQuantity;
+  final int freeQuantity;
+  final int deckMissingQuantity;
   final List<BinderSetProgress> setProgress;
   final List<BinderWishlistEntry> wishlist;
   final Map<String, List<BinderDistributionEntry>> distributions;
@@ -212,13 +268,23 @@ class BinderStats {
     this.duplicateCopies = 0,
     this.forTradeCount = 0,
     this.forSaleCount = 0,
-    this.estimatedValue = 0.0,
+    this.estimatedValue,
+    this.estimatedValueCurrency,
+    this.estimatedValueBrl,
+    this.estimatedValueUsd,
+    this.estimatedValueMixedCurrency = false,
+    this.pricedCopiesCount = 0,
     this.wishlistCount = 0,
     this.wishlistUniqueCards = 0,
     this.missingCardsCount = 0,
     this.priceMissingCount = 0,
     this.cardsUsedInDecks = 0,
     this.decksUsingBinderCards = 0,
+    this.ownedQuantity = 0,
+    this.allocatedQuantity = 0,
+    this.committedTradeQuantity = 0,
+    this.freeQuantity = 0,
+    this.deckMissingQuantity = 0,
     this.setProgress = const [],
     this.wishlist = const [],
     this.distributions = const {},
@@ -229,11 +295,10 @@ class BinderStats {
         json['distributions'] as Map<String, dynamic>? ?? const {};
     final distributions = <String, List<BinderDistributionEntry>>{};
     for (final entry in distributionsJson.entries) {
-      distributions[entry.key] =
-          (entry.value as List<dynamic>? ?? const [])
-              .whereType<Map>()
-              .map((e) => BinderDistributionEntry.fromJson(e.cast()))
-              .toList();
+      distributions[entry.key] = (entry.value as List<dynamic>? ?? const [])
+          .whereType<Map>()
+          .map((e) => BinderDistributionEntry.fromJson(e.cast()))
+          .toList();
     }
 
     return BinderStats(
@@ -242,26 +307,34 @@ class BinderStats {
       duplicateCopies: json['duplicate_copies'] as int? ?? 0,
       forTradeCount: json['for_trade_count'] as int? ?? 0,
       forSaleCount: json['for_sale_count'] as int? ?? 0,
-      estimatedValue:
-          json['estimated_value'] != null
-              ? (json['estimated_value'] as num).toDouble()
-              : 0.0,
+      estimatedValue: json['estimated_value'] != null
+          ? (json['estimated_value'] as num).toDouble()
+          : null,
+      estimatedValueCurrency: json['estimated_value_currency'] as String?,
+      estimatedValueBrl: _nullableDouble(json['estimated_value_brl']),
+      estimatedValueUsd: _nullableDouble(json['estimated_value_usd']),
+      estimatedValueMixedCurrency:
+          json['estimated_value_mixed_currency'] as bool? ?? false,
+      pricedCopiesCount: json['priced_copies_count'] as int? ?? 0,
       wishlistCount: json['wishlist_count'] as int? ?? 0,
       wishlistUniqueCards: json['wishlist_unique_cards'] as int? ?? 0,
       missingCardsCount: json['missing_cards_count'] as int? ?? 0,
       priceMissingCount: json['price_missing_count'] as int? ?? 0,
       cardsUsedInDecks: json['cards_used_in_decks'] as int? ?? 0,
       decksUsingBinderCards: json['decks_using_binder_cards'] as int? ?? 0,
-      setProgress:
-          (json['set_progress'] as List<dynamic>? ?? const [])
-              .whereType<Map>()
-              .map((e) => BinderSetProgress.fromJson(e.cast()))
-              .toList(),
-      wishlist:
-          (json['wishlist'] as List<dynamic>? ?? const [])
-              .whereType<Map>()
-              .map((e) => BinderWishlistEntry.fromJson(e.cast()))
-              .toList(),
+      ownedQuantity: json['owned_quantity'] as int? ?? 0,
+      allocatedQuantity: json['allocated_quantity'] as int? ?? 0,
+      committedTradeQuantity: json['committed_trade_quantity'] as int? ?? 0,
+      freeQuantity: json['free_quantity'] as int? ?? 0,
+      deckMissingQuantity: json['deck_missing_quantity'] as int? ?? 0,
+      setProgress: (json['set_progress'] as List<dynamic>? ?? const [])
+          .whereType<Map>()
+          .map((e) => BinderSetProgress.fromJson(e.cast()))
+          .toList(),
+      wishlist: (json['wishlist'] as List<dynamic>? ?? const [])
+          .whereType<Map>()
+          .map((e) => BinderWishlistEntry.fromJson(e.cast()))
+          .toList(),
       distributions: distributions,
     );
   }
@@ -293,6 +366,7 @@ class MarketplaceItem extends BinderItem {
     super.cardTypeLine,
     super.cardIsReserved,
     super.quantity,
+    super.availableQuantity,
     super.condition,
     super.isFoil,
     super.forTrade,
@@ -327,6 +401,8 @@ class MarketplaceItem extends BinderItem {
       cardTypeLine: card?['type_line'] as String?,
       cardIsReserved: card?['is_reserved'] as bool? ?? false,
       quantity: json['quantity'] as int? ?? 1,
+      availableQuantity:
+          json['available_quantity'] as int? ?? json['quantity'] as int? ?? 0,
       condition: json['condition'] as String? ?? 'NM',
       isFoil: json['is_foil'] as bool? ?? false,
       forTrade: json['for_trade'] as bool? ?? false,
@@ -367,6 +443,8 @@ class MarketplaceItem extends BinderItem {
 class MarketplacePriceInsight {
   final double? referencePrice;
   final String referenceCurrency;
+  final String? referenceSource;
+  final DateTime? referenceUpdatedAt;
   final int historyPoints;
   final MarketplacePriceTrend trend;
   final MarketplacePriceComparison comparison;
@@ -374,6 +452,8 @@ class MarketplacePriceInsight {
   const MarketplacePriceInsight({
     this.referencePrice,
     this.referenceCurrency = 'USD',
+    this.referenceSource,
+    this.referenceUpdatedAt,
     this.historyPoints = 0,
     this.trend = const MarketplacePriceTrend(),
     this.comparison = const MarketplacePriceComparison(),
@@ -382,11 +462,14 @@ class MarketplacePriceInsight {
   factory MarketplacePriceInsight.fromJson(Map<String, dynamic>? json) {
     if (json == null) return const MarketplacePriceInsight();
     return MarketplacePriceInsight(
-      referencePrice:
-          json['reference_price'] != null
-              ? (json['reference_price'] as num).toDouble()
-              : null,
+      referencePrice: json['reference_price'] != null
+          ? (json['reference_price'] as num).toDouble()
+          : null,
       referenceCurrency: json['reference_currency'] as String? ?? 'USD',
+      referenceSource: json['reference_source'] as String?,
+      referenceUpdatedAt: DateTime.tryParse(
+        json['reference_updated_at']?.toString() ?? '',
+      ),
       historyPoints: json['history_points'] as int? ?? 0,
       trend: MarketplacePriceTrend.fromJson(
         json['trend'] as Map<String, dynamic>?,
@@ -396,6 +479,12 @@ class MarketplacePriceInsight {
       ),
     );
   }
+}
+
+double? _nullableDouble(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
 }
 
 class MarketplacePriceTrend {
@@ -426,22 +515,18 @@ class MarketplacePriceTrend {
     return MarketplacePriceTrend(
       status: json['status'] as String? ?? 'insufficient_data',
       direction: json['direction'] as String? ?? 'flat',
-      latestPrice:
-          json['latest_price'] != null
-              ? (json['latest_price'] as num).toDouble()
-              : null,
-      previousPrice:
-          json['previous_price'] != null
-              ? (json['previous_price'] as num).toDouble()
-              : null,
-      changeAbs:
-          json['change_abs'] != null
-              ? (json['change_abs'] as num).toDouble()
-              : null,
-      changePct:
-          json['change_pct'] != null
-              ? (json['change_pct'] as num).toDouble()
-              : null,
+      latestPrice: json['latest_price'] != null
+          ? (json['latest_price'] as num).toDouble()
+          : null,
+      previousPrice: json['previous_price'] != null
+          ? (json['previous_price'] as num).toDouble()
+          : null,
+      changeAbs: json['change_abs'] != null
+          ? (json['change_abs'] as num).toDouble()
+          : null,
+      changePct: json['change_pct'] != null
+          ? (json['change_pct'] as num).toDouble()
+          : null,
       latestDate: json['latest_date'] as String?,
       previousDate: json['previous_date'] as String?,
       message: json['message'] as String?,
@@ -475,22 +560,18 @@ class MarketplacePriceComparison {
     return MarketplacePriceComparison(
       status: json['status'] as String? ?? 'insufficient_data',
       direction: json['direction'] as String? ?? 'unknown',
-      differenceAbs:
-          json['difference_abs'] != null
-              ? (json['difference_abs'] as num).toDouble()
-              : null,
-      differencePct:
-          json['difference_pct'] != null
-              ? (json['difference_pct'] as num).toDouble()
-              : null,
-      thresholdPct:
-          json['threshold_pct'] != null
-              ? (json['threshold_pct'] as num).toDouble()
-              : 35,
-      thresholdAbs:
-          json['threshold_abs'] != null
-              ? (json['threshold_abs'] as num).toDouble()
-              : 5,
+      differenceAbs: json['difference_abs'] != null
+          ? (json['difference_abs'] as num).toDouble()
+          : null,
+      differencePct: json['difference_pct'] != null
+          ? (json['difference_pct'] as num).toDouble()
+          : null,
+      thresholdPct: json['threshold_pct'] != null
+          ? (json['threshold_pct'] as num).toDouble()
+          : 35,
+      thresholdAbs: json['threshold_abs'] != null
+          ? (json['threshold_abs'] as num).toDouble()
+          : 5,
       message: json['message'] as String?,
     );
   }
@@ -615,10 +696,9 @@ class BinderProvider extends ChangeNotifier {
       if (generation != _binderFetchGeneration) return;
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
-        final list =
-            (data['data'] as List<dynamic>? ?? [])
-                .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
-                .toList();
+        final list = (data['data'] as List<dynamic>? ?? [])
+            .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
+            .toList();
         _items.addAll(list);
         _hasMore = list.length >= 20;
         _page = requestPage + 1;
@@ -686,6 +766,10 @@ class BinderProvider extends ChangeNotifier {
             current.forTradeCount != next.forTradeCount ||
             current.forSaleCount != next.forSaleCount ||
             current.estimatedValue != next.estimatedValue ||
+            current.estimatedValueBrl != next.estimatedValueBrl ||
+            current.estimatedValueUsd != next.estimatedValueUsd ||
+            current.estimatedValueMixedCurrency !=
+                next.estimatedValueMixedCurrency ||
             current.wishlistCount != next.wishlistCount ||
             current.missingCardsCount != next.missingCardsCount ||
             current.priceMissingCount != next.priceMissingCount ||
@@ -780,10 +864,9 @@ class BinderProvider extends ChangeNotifier {
             item.forSale = updates['for_sale'] as bool;
           }
           if (updates.containsKey('price')) {
-            item.price =
-                updates['price'] != null
-                    ? (updates['price'] as num).toDouble()
-                    : null;
+            item.price = updates['price'] != null
+                ? (updates['price'] as num).toDouble()
+                : null;
           }
           if (updates.containsKey('notes')) {
             item.notes = updates['notes'] as String?;
@@ -962,10 +1045,9 @@ class BinderProvider extends ChangeNotifier {
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
         _publicOwner = data['owner'] as Map<String, dynamic>?;
-        final list =
-            (data['data'] as List<dynamic>? ?? [])
-                .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
-                .toList();
+        final list = (data['data'] as List<dynamic>? ?? [])
+            .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
+            .toList();
         _publicItems.addAll(list);
         _hasMorePublic = list.length >= 20;
         _publicPage = requestPage + 1;
@@ -1028,10 +1110,9 @@ class BinderProvider extends ChangeNotifier {
       if (generation != _marketFetchGeneration) return;
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
-        final list =
-            (data['data'] as List<dynamic>? ?? [])
-                .map((e) => MarketplaceItem.fromJson(e as Map<String, dynamic>))
-                .toList();
+        final list = (data['data'] as List<dynamic>? ?? [])
+            .map((e) => MarketplaceItem.fromJson(e as Map<String, dynamic>))
+            .toList();
         _marketItems.addAll(list);
         _hasMoreMarket = list.length >= 20;
         _marketPage = requestPage + 1;

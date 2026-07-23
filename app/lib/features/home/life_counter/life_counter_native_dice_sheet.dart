@@ -77,7 +77,12 @@ class _LifeCounterNativeDiceSheetState
     return SafeArea(
       key: const Key('life-counter-native-dice-sheet'),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.76,
           child: DecoratedBox(
@@ -97,7 +102,12 @@ class _LifeCounterNativeDiceSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -112,7 +122,7 @@ class _LifeCounterNativeDiceSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Role dados, jogue uma moeda ou escolha quem começa.',
                               style: TextStyle(
@@ -136,16 +146,20 @@ class _LifeCounterNativeDiceSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       _DiceSectionCard(
                         title: 'Ações rápidas',
-                        subtitle:
-                            !_hasAnyActivePlayers
-                                ? 'Não há jogadores ativos na mesa. Ações que escolhem um jogador ficam indisponíveis.'
-                                : _hasPendingTieBreak
-                                ? 'A maior rolagem terminou empatada. Role novamente apenas para os jogadores empatados.'
-                                : 'Escolha uma ação rápida para a mesa.',
+                        subtitle: !_hasAnyActivePlayers
+                            ? 'Não há jogadores ativos na mesa. Ações que escolhem um jogador ficam indisponíveis.'
+                            : _hasPendingTieBreak
+                            ? 'A maior rolagem terminou empatada. Role novamente apenas para os jogadores empatados.'
+                            : 'Escolha uma ação rápida para a mesa.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -154,12 +168,11 @@ class _LifeCounterNativeDiceSheetState
                               key: const Key(
                                 'life-counter-native-dice-high-roll',
                               ),
-                              onPressed:
-                                  _hasAnyActivePlayers
-                                      ? () => _applyAction(
-                                        LifeCounterDiceEngine.runHighRoll,
-                                      )
-                                      : null,
+                              onPressed: _hasAnyActivePlayers
+                                  ? () => _applyAction(
+                                      LifeCounterDiceEngine.runHighRoll,
+                                    )
+                                  : null,
                               icon: const Icon(Icons.emoji_events_rounded),
                               label: Text(
                                 _hasPendingTieBreak
@@ -169,19 +182,17 @@ class _LifeCounterNativeDiceSheetState
                             ),
                             OutlinedButton.icon(
                               key: const Key('life-counter-native-dice-d20'),
-                              onPressed:
-                                  () => _applyAction(
-                                    LifeCounterDiceEngine.runTableD20,
-                                  ),
+                              onPressed: () => _applyAction(
+                                LifeCounterDiceEngine.runTableD20,
+                              ),
                               icon: const Icon(Icons.casino_rounded),
                               label: const Text('D20'),
                             ),
                             OutlinedButton.icon(
                               key: const Key('life-counter-native-dice-coin'),
-                              onPressed:
-                                  () => _applyAction(
-                                    LifeCounterDiceEngine.runCoinFlip,
-                                  ),
+                              onPressed: () => _applyAction(
+                                LifeCounterDiceEngine.runCoinFlip,
+                              ),
                               icon: const Icon(Icons.toll_rounded),
                               label: const Text('Moeda'),
                             ),
@@ -189,20 +200,18 @@ class _LifeCounterNativeDiceSheetState
                               key: const Key(
                                 'life-counter-native-dice-first-player',
                               ),
-                              onPressed:
-                                  _hasAnyActivePlayers
-                                      ? () => _applyAction(
-                                        LifeCounterDiceEngine
-                                            .runFirstPlayerRoll,
-                                      )
-                                      : null,
+                              onPressed: _hasAnyActivePlayers
+                                  ? () => _applyAction(
+                                      LifeCounterDiceEngine.runFirstPlayerRoll,
+                                    )
+                                  : null,
                               icon: const Icon(Icons.flag_rounded),
                               label: const Text('Sortear 1º'),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _DiceSectionCard(
                         title: 'Estado atual',
                         subtitle:
@@ -213,17 +222,15 @@ class _LifeCounterNativeDiceSheetState
                           children: [
                             _SummaryChip(
                               label: 'Primeiro jogador',
-                              value:
-                                  _draftSession.firstPlayerIndex == null
-                                      ? 'Não definido'
-                                      : 'Jogador ${_draftSession.firstPlayerIndex! + 1}',
+                              value: _draftSession.firstPlayerIndex == null
+                                  ? 'Não definido'
+                                  : 'Jogador ${_draftSession.firstPlayerIndex! + 1}',
                             ),
                             _SummaryChip(
                               label: 'Último evento',
-                              value:
-                                  _draftSession.lastTableEvent == null
-                                      ? 'Nenhum'
-                                      : _draftSession.lastTableEvent!,
+                              value: _draftSession.lastTableEvent == null
+                                  ? 'Nenhum'
+                                  : _draftSession.lastTableEvent!,
                             ),
                           ],
                         ),
@@ -231,13 +238,12 @@ class _LifeCounterNativeDiceSheetState
                       if (_draftSession.lastHighRolls
                           .whereType<int>()
                           .isNotEmpty) ...[
-                        const SizedBox(height: 18),
+                        const SizedBox(height: AppTheme.space18),
                         _DiceSectionCard(
                           title: 'Quadro da maior rolagem',
-                          subtitle:
-                              _highRollWinners.length == 1
-                                  ? 'O jogador vencedor está destacado abaixo.'
-                                  : 'Empate detectado. Role novamente apenas para os jogadores empatados.',
+                          subtitle: _highRollWinners.length == 1
+                              ? 'O jogador vencedor está destacado abaixo.'
+                              : 'Empate detectado. Role novamente apenas para os jogadores empatados.',
                           child: Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -264,7 +270,12 @@ class _LifeCounterNativeDiceSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       TextButton(
@@ -274,8 +285,8 @@ class _LifeCounterNativeDiceSheetState
                       const Spacer(),
                       FilledButton.icon(
                         key: const Key('life-counter-native-dice-apply'),
-                        onPressed:
-                            () => Navigator.of(context).pop(_draftSession),
+                        onPressed: () =>
+                            Navigator.of(context).pop(_draftSession),
                         icon: const Icon(Icons.check_rounded),
                         label: const Text('Aplicar'),
                       ),
@@ -311,7 +322,7 @@ class _DiceSectionCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppTheme.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -323,7 +334,7 @@ class _DiceSectionCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppTheme.space6),
             Text(
               subtitle,
               style: const TextStyle(
@@ -332,7 +343,7 @@ class _DiceSectionCard extends StatelessWidget {
                 height: AppTheme.lineHeightCompact,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             child,
           ],
         ),
@@ -356,7 +367,10 @@ class _SummaryChip extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space10,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +383,7 @@ class _SummaryChip extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               value,
               style: const TextStyle(
@@ -400,17 +414,19 @@ class _RollChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color:
-            highlighted
-                ? AppTheme.primarySoft.withValues(alpha: 0.18)
-                : AppTheme.surfaceElevated,
+        color: highlighted
+            ? AppTheme.primarySoft.withValues(alpha: 0.18)
+            : AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(
           color: highlighted ? AppTheme.primarySoft : AppTheme.outlineMuted,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space8,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -422,12 +438,13 @@ class _RollChip extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             Text(
               '$value',
               style: TextStyle(
-                color:
-                    highlighted ? AppTheme.primarySoft : AppTheme.textPrimary,
+                color: highlighted
+                    ? AppTheme.primarySoft
+                    : AppTheme.textPrimary,
                 fontSize: AppTheme.fontLg,
                 fontWeight: FontWeight.w800,
               ),

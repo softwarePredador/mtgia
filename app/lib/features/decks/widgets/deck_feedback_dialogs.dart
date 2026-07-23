@@ -30,7 +30,7 @@ class DeckDialogTitleBlock extends StatelessWidget {
           ),
           child: Icon(icon, color: accent, size: 20),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.space12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +43,7 @@ class DeckDialogTitleBlock extends StatelessWidget {
                 ),
               ),
               if (subtitle != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   subtitle!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -78,7 +78,7 @@ class DeckDialogSectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -91,7 +91,7 @@ class DeckDialogSectionCard extends StatelessWidget {
             children: [
               if (icon != null) ...[
                 Icon(icon, size: 16, color: accent),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
               ],
               Expanded(
                 child: Text(
@@ -104,7 +104,7 @@ class DeckDialogSectionCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           child,
         ],
       ),
@@ -132,7 +132,7 @@ class DeckBlockingTaskDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppTheme.space20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -145,7 +145,7 @@ class DeckBlockingTaskDialog extends StatelessWidget {
               ),
               child: Icon(icon, color: accent, size: 24),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             Text(
               title,
               textAlign: TextAlign.center,
@@ -154,7 +154,7 @@ class DeckBlockingTaskDialog extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppTheme.space6),
             Text(
               subtitle,
               textAlign: TextAlign.center,
@@ -163,31 +163,32 @@ class DeckBlockingTaskDialog extends StatelessWidget {
                 height: 1.35,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             LinearProgressIndicator(color: accent),
             if (tips.isNotEmpty) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: AppTheme.space14),
               DeckDialogSectionCard(
                 title: 'Enquanto isso',
                 accent: accent,
                 icon: Icons.tips_and_updates_outlined,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      tips
-                          .map(
-                            (tip) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                '• $tip',
-                                style: const TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  height: 1.35,
-                                ),
-                              ),
+                  children: tips
+                      .map(
+                        (tip) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppTheme.space8,
+                          ),
+                          child: Text(
+                            '• $tip',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: 1.35,
                             ),
-                          )
-                          .toList(),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ],

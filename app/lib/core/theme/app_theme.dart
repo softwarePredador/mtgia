@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/// Canonical responsive ranges. Boundary ownership is intentionally explicit:
+/// 600 starts medium, 840 starts expanded, 1200 starts wide and 1600 starts
+/// the bounded ultra-wide canvas.
+enum AppViewportClass { compact, medium, expanded, wide, ultraWide }
+
 /// ManaLoom Theme: "Obsidian + Brass + Frost Blue"
 /// Dark, premium, low-noise UI — card artwork remains the main visual focus.
 ///
@@ -211,7 +216,16 @@ class AppTheme {
   static const double lineHeightCompact = 1.35;
   static const double lineHeightComfortable = 1.4;
   static const double touchTargetMin = 48;
+  static const double touchTargetCompactPlatformHeight = 52;
   static const double iconSpinnerSm = 20;
+
+  /// Link-style actions stay compact visually while preserving a 48 px hit
+  /// target on desktop platforms whose default visual density is compact.
+  static final ButtonStyle accessibleTextButtonStyle = TextButton.styleFrom(
+    minimumSize: const Size(touchTargetMin, touchTargetCompactPlatformHeight),
+    visualDensity: VisualDensity.standard,
+    tapTargetSize: MaterialTapTargetSize.padded,
+  );
 
   // ── Adaptive layout ───────────────────────────────────────
   // Breakpoints follow window width, never a guessed device category.
@@ -226,6 +240,56 @@ class AppTheme {
   static const double pageGutterCompact = 12;
   static const double pageGutter = 20;
   static const double paneGap = 20;
+
+  // ── Spacing and fixed-layout scale ───────────────────────
+  // Numeric names are intentional: migration can preserve the exact rendered
+  // geometry while moving every call-site to one auditable source. Semantic
+  // aliases (gutter, pane gap, touch target) remain preferred when applicable.
+  static const double space0 = 0;
+  static const double space1 = 1;
+  static const double space2 = 2;
+  static const double space3 = 3;
+  static const double space4 = 4;
+  static const double space5 = 5;
+  static const double space6 = 6;
+  static const double space7 = 7;
+  static const double space8 = 8;
+  static const double space9 = 9;
+  static const double space10 = 10;
+  static const double space11 = 11;
+  static const double space12 = 12;
+  static const double space13 = 13;
+  static const double space14 = 14;
+  static const double space16 = 16;
+  static const double space18 = 18;
+  static const double space20 = 20;
+  static const double space22 = 22;
+  static const double space24 = 24;
+  static const double space28 = 28;
+  static const double space32 = 32;
+  static const double space34 = 34;
+  static const double space36 = 36;
+  static const double space40 = 40;
+  static const double space48 = 48;
+  static const double space52 = 52;
+  static const double space72 = 72;
+  static const double space112 = 112;
+  static const double space150 = 150;
+  static const double space240 = 240;
+
+  static AppViewportClass viewportClassForWidth(double width) {
+    assert(width >= 0, 'Viewport width cannot be negative.');
+    if (width < breakpointCompact) return AppViewportClass.compact;
+    if (width < breakpointMedium) return AppViewportClass.medium;
+    if (width < breakpointExpanded) return AppViewportClass.expanded;
+    if (width < breakpointWide) return AppViewportClass.wide;
+    return AppViewportClass.ultraWide;
+  }
+
+  static double horizontalGutterForWidth(double width) =>
+      viewportClassForWidth(width) == AppViewportClass.compact
+      ? pageGutterCompact
+      : pageGutter;
   static const double radiusLogoOuter = 30;
   static const double radiusLogoInner = 26;
   static const double radiusLifeCounterSm = 10;
@@ -566,7 +630,10 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: brass500,
         foregroundColor: backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space22,
+          vertical: AppTheme.space11,
+        ),
         textStyle: const TextStyle(
           fontFamily: uiFontFamily,
           fontSize: fontMd,
@@ -584,7 +651,10 @@ class AppTheme {
       style: FilledButton.styleFrom(
         backgroundColor: brass500,
         foregroundColor: backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space22,
+          vertical: AppTheme.space11,
+        ),
         textStyle: const TextStyle(
           fontFamily: uiFontFamily,
           fontSize: fontMd,
@@ -600,7 +670,10 @@ class AppTheme {
       style: OutlinedButton.styleFrom(
         foregroundColor: brass400,
         side: const BorderSide(color: outlineMuted, width: 0.7),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space22,
+          vertical: AppTheme.space11,
+        ),
         textStyle: const TextStyle(
           fontFamily: uiFontFamily,
           fontSize: fontMd,
@@ -826,7 +899,10 @@ class AppTheme {
       textColor: textPrimary,
       selectedColor: brass400,
       selectedTileColor: surfaceSlate,
-      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: AppTheme.space16,
+        vertical: AppTheme.space4,
+      ),
       titleTextStyle: TextStyle(
         color: textPrimary,
         fontFamily: uiFontFamily,

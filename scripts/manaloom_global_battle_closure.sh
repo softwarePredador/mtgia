@@ -22,8 +22,9 @@ coverage
   under output_root (default: /tmp/manaloom-global-closure-output).
 
 battle
-  Runs or resumes an external_battle_async_registry_v1 queue. The checkpoint
-  and per-job results persist in state_dir (default: /tmp/manaloom-battle-state).
+  Runs or resumes an external_battle_async_registry_v2 queue with strict
+  engine-specific request v2 identity. Registry/checkpoint v1 artifacts are
+  rejected. Results persist in state_dir (default: /tmp/manaloom-battle-state).
 EOF
 }
 

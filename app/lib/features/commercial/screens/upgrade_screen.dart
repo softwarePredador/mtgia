@@ -25,8 +25,8 @@ class UpgradeScreen extends StatelessWidget {
           final horizontalGutter = isCompact ? 16.0 : 24.0;
           return ListView(
             padding: EdgeInsets.only(
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: AppTheme.space16,
+              bottom: AppTheme.space16 + MediaQuery.of(context).padding.bottom,
             ),
             children: [
               ResponsivePageFrame(
@@ -38,7 +38,7 @@ class UpgradeScreen extends StatelessWidget {
                   children: [
                     Container(
                       key: const Key('upgrade-pro-summary'),
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(AppTheme.space18),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceSlate,
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -53,17 +53,16 @@ class UpgradeScreen extends StatelessWidget {
                             Icons.workspace_premium,
                             color: AppTheme.brass400,
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: AppTheme.space10),
                           Text(
                             'ManaLoom Pro',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.headlineSmall?.copyWith(
-                              color: AppTheme.textPrimary,
-                              fontWeight: FontWeight.w800,
-                            ),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w800,
+                                ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                           const Text(
                             'Pro aumenta o limite mensal de IA de 120 para 2.500 ações. Coleção, fichário, trocas, comunidade e pós-jogo continuam disponíveis no Free.',
                             style: TextStyle(
@@ -71,28 +70,29 @@ class UpgradeScreen extends StatelessWidget {
                               height: 1.4,
                             ),
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: AppTheme.space14),
                           Text(
                             proPlan.priceLabel,
                             key: const Key('upgrade-pro-price'),
-                            style: Theme.of(
-                              context,
-                            ).textTheme.headlineSmall?.copyWith(
-                              color: AppTheme.brass400,
-                              fontWeight: FontWeight.w900,
-                            ),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  color: AppTheme.brass400,
+                                  fontWeight: FontWeight.w900,
+                                ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: AppTheme.space2),
                           Text(
                             proPlan.billingTerms.recurrenceLabel,
                             style: const TextStyle(
                               color: AppTheme.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppTheme.space16),
                           ...proPlan.features.map(
                             (feature) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.only(
+                                bottom: AppTheme.space8,
+                              ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -101,7 +101,7 @@ class UpgradeScreen extends StatelessWidget {
                                     size: 18,
                                     color: AppTheme.success,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppTheme.space8),
                                   Expanded(child: Text(feature)),
                                 ],
                               ),
@@ -110,11 +110,11 @@ class UpgradeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     const _CheckoutReadinessPanel(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppTheme.space12),
                     _BillingTermsPanel(terms: proPlan.billingTerms),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     if (isCompact)
                       SizedBox(
                         width: double.infinity,
@@ -169,8 +169,8 @@ class _FreeBetaUpgradeScreen extends StatelessWidget {
           final horizontalGutter = isCompact ? 16.0 : 24.0;
           return ListView(
             padding: EdgeInsets.only(
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: AppTheme.space16,
+              bottom: AppTheme.space16 + MediaQuery.of(context).padding.bottom,
             ),
             children: [
               ResponsivePageFrame(
@@ -186,7 +186,7 @@ class _FreeBetaUpgradeScreen extends StatelessWidget {
                       description:
                           'Não é necessário fazer upgrade para acessar os recursos liberados nesta fase do ManaLoom.',
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     if (isCompact)
                       _buildBetaAction(context)
                     else
@@ -231,7 +231,7 @@ class _CheckoutReadinessPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -241,7 +241,7 @@ class _CheckoutReadinessPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.receipt_long_outlined, color: AppTheme.frost400),
-          SizedBox(width: 10),
+          SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               'A assinatura é concluída em um ambiente de pagamento seguro. O plano só é ativado após a confirmação do pagamento.',
@@ -263,7 +263,7 @@ class _BillingTermsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('upgrade-billing-terms'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -278,7 +278,7 @@ class _BillingTermsPanel extends StatelessWidget {
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _DisclosureLine(
             icon: Icons.autorenew_rounded,
             text: terms.renewalDisclosure,
@@ -316,12 +316,14 @@ class _DisclosureLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 9),
+      padding: EdgeInsets.only(
+        bottom: isLast ? AppTheme.space0 : AppTheme.space9,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 18, color: AppTheme.frost400),
-          const SizedBox(width: 9),
+          const SizedBox(width: AppTheme.space9),
           Expanded(
             child: Text(
               text,

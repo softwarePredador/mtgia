@@ -52,16 +52,15 @@ Widget manaloomAccessibilityShell({required Widget child}) {
   return MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: AppTheme.darkTheme,
-    builder:
-        (context, appChild) => AccessibilityTools(
-          logLevel: LogLevel.warning,
-          checkFontOverflows: true,
-          enableButtonsDrag: false,
-          testingToolsConfiguration: const TestingToolsConfiguration(
-            enabled: false,
-          ),
-          child: appChild ?? const SizedBox.shrink(),
-        ),
+    builder: (context, appChild) => AccessibilityTools(
+      logLevel: LogLevel.warning,
+      checkFontOverflows: true,
+      enableButtonsDrag: false,
+      testingToolsConfiguration: const TestingToolsConfiguration(
+        enabled: false,
+      ),
+      child: appChild ?? const SizedBox.shrink(),
+    ),
     home: Scaffold(body: manaloomDecoratedAuditSurface(child: child)),
   );
 }
@@ -71,4 +70,5 @@ Future<void> expectManaLoomBaselineAccessibility(WidgetTester tester) async {
   expect(find.byIcon(Icons.build), findsNothing);
   await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
   await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+  await expectLater(tester, meetsGuideline(textContrastGuideline));
 }

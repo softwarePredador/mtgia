@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -9,13 +11,21 @@ import '../../commercial/widgets/ai_usage_gate.dart';
 import '../../commercial/widgets/ai_usage_meter.dart';
 import '../providers/deck_provider.dart';
 import '../models/commander_bracket.dart';
+import '../services/deck_entry_draft_store.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
 /// Tela para gerar decks automaticamente a partir de uma descrição em texto
 class DeckGenerateScreen extends StatefulWidget {
-  const DeckGenerateScreen({super.key, this.initialFormat});
+  const DeckGenerateScreen({
+    super.key,
+    this.initialFormat,
+    this.draftOwnerId = 'local',
+    this.draftStore,
+  });
 
   final String? initialFormat;
+  final String draftOwnerId;
+  final DeckEntryDraftStore? draftStore;
 
   @override
   State<DeckGenerateScreen> createState() => _DeckGenerateScreenState();
@@ -25,25 +35,40 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   final _promptController = TextEditingController();
   final _commanderController = TextEditingController();
   final _deckNameController = TextEditingController();
+  final _budgetController = TextEditingController();
   final _scrollController = ScrollController();
   final _previewKey = GlobalKey();
 
   String _selectedFormat = 'Commander';
   bool _isGenerating = false;
   bool _isLoadingLearnedDeck = false;
+  bool _preferCollection = false;
+  bool _collectionOnly = false;
   Map<String, dynamic>? _generatedDeck;
   final Map<String, Map<String, dynamic>> _learnedDecksByCommander = {};
   GenerateDeckCancellation? _generateCancellation;
+  String? _activeGenerateJobId;
+  String? _activeGenerateRequestKey;
+  bool _isCancellingGeneration = false;
   String _generationProgressMessage = 'Enviando pedido para a IA...';
   int _generationProgressStep = 0;
+  late final DeckEntryDraftStore _draftStore;
+  Timer? _draftSaveTimer;
+  bool _restoringDraft = false;
 
   @override
   void initState() {
     super.initState();
+    _draftStore = widget.draftStore ?? DeckEntryDraftStore();
     _selectedFormat = _normalizeFormat(widget.initialFormat) ?? _selectedFormat;
     _commanderController.addListener(_handleCommanderChanged);
+    _promptController.addListener(_scheduleDraftSave);
+    _deckNameController.addListener(_scheduleDraftSave);
+    _budgetController.addListener(_scheduleDraftSave);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadLearnedDeckAvailability();
+      if (!mounted) return;
+      unawaited(_restoreDraft());
+      unawaited(_loadLearnedDeckAvailability());
     });
   }
 
@@ -101,18 +126,93 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   @override
   void dispose() {
-    _generateCancellation?.cancel();
+    _draftSaveTimer?.cancel();
     _commanderController.removeListener(_handleCommanderChanged);
+    _promptController.removeListener(_scheduleDraftSave);
+    _deckNameController.removeListener(_scheduleDraftSave);
     _promptController.dispose();
     _commanderController.dispose();
     _deckNameController.dispose();
+    _budgetController.removeListener(_scheduleDraftSave);
+    _budgetController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   void _handleCommanderChanged() {
+    _scheduleDraftSave();
     if (!mounted || !_usesCommanderField) return;
     setState(() {});
+  }
+
+  Future<void> _restoreDraft() async {
+    final draft = await _draftStore.loadGenerate(widget.draftOwnerId);
+    if (!mounted) return;
+    if (draft != null) {
+      _restoringDraft = true;
+      try {
+        if (_promptController.text.isEmpty) {
+          _promptController.text = draft['prompt'] ?? '';
+        }
+        if (_commanderController.text.isEmpty) {
+          _commanderController.text = draft['commander'] ?? '';
+        }
+        if (_deckNameController.text.isEmpty) {
+          _deckNameController.text = draft['deck_name'] ?? '';
+        }
+        if (_budgetController.text.isEmpty) {
+          _budgetController.text = draft['budget_limit_brl'] ?? '';
+        }
+        _preferCollection = draft['prefer_collection'] == 'true';
+        _collectionOnly = draft['collection_only'] == 'true';
+        if (_collectionOnly) _preferCollection = true;
+        _activeGenerateJobId = draft['active_job_id']?.trim();
+        _activeGenerateRequestKey = draft['request_key']?.trim();
+        final draftFormat = _normalizeFormat(draft['format']);
+        if (_normalizeFormat(widget.initialFormat) == null &&
+            draftFormat != null) {
+          _selectedFormat = draftFormat;
+        }
+      } finally {
+        _restoringDraft = false;
+      }
+    }
+    if (mounted) setState(() {});
+    if (!mounted) return;
+    final activeJobId = _activeGenerateJobId;
+    if (activeJobId != null && activeJobId.isNotEmpty) {
+      unawaited(_resumeGenerateJob(activeJobId));
+      return;
+    }
+    unawaited(_resumeLatestGenerateJobIfAvailable());
+  }
+
+  void _scheduleDraftSave() {
+    if (_restoringDraft) return;
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = Timer(const Duration(milliseconds: 250), () {
+      _draftSaveTimer = null;
+      unawaited(_saveDraft());
+    });
+  }
+
+  Future<void> _saveDraft() => _draftStore.saveGenerate(
+    widget.draftOwnerId,
+    format: _selectedFormat,
+    commander: _commanderController.text,
+    prompt: _promptController.text,
+    deckName: _deckNameController.text,
+    activeJobId: _activeGenerateJobId,
+    requestKey: _activeGenerateRequestKey,
+    preferCollection: _preferCollection,
+    collectionOnly: _collectionOnly,
+    budgetLimitBrl: _budgetController.text,
+  );
+
+  Future<void> _clearDraft() async {
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = null;
+    await _draftStore.clearGenerate(widget.draftOwnerId);
   }
 
   String _normalizeCommanderLookup(String value) {
@@ -121,8 +221,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   String _learnedDeckButtonHelperText(Map<String, dynamic> deck) {
     final legalStatus = deck['legal_status']?.toString().trim();
-    final legalLabel =
-        legalStatus == 'commander_legal' ? 'legal para Commander' : legalStatus;
+    final legalLabel = legalStatus == 'commander_legal'
+        ? 'legal para Commander'
+        : legalStatus;
     return legalLabel == null || legalLabel.isEmpty
         ? 'Deck aprendido disponível: curado pelo Hermes para este comandante.'
         : 'Deck aprendido disponível: curado pelo Hermes • $legalLabel.';
@@ -130,8 +231,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   Future<void> _loadLearnedDeckAvailability() async {
     try {
-      final decks =
-          await context.read<DeckProvider>().fetchCommanderLearningDecks();
+      final decks = await context
+          .read<DeckProvider>()
+          .fetchCommanderLearningDecks();
       if (!mounted) return;
       setState(() {
         _learnedDecksByCommander
@@ -160,6 +262,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return;
     }
 
+    final budgetRaw = _budgetController.text.trim();
+    final budgetLimit = budgetRaw.isEmpty ? null : int.tryParse(budgetRaw);
+    if (budgetRaw.isNotEmpty &&
+        (budgetLimit == null || budgetLimit < 0 || budgetLimit > 100000)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Informe um orçamento inteiro entre R\$ 0 e R\$ 100.000.',
+          ),
+        ),
+      );
+      return;
+    }
+
     final hasAiQuota = await reserveAiActionOrShowPaywall(
       context,
       kind: AiUsageKind.deckGeneration,
@@ -168,8 +284,14 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     _generateCancellation?.cancel();
     final cancellation = GenerateDeckCancellation();
+    final requestKey =
+        _activeGenerateRequestKey ?? createAiJobRequestKey('generate');
     final feedbackStopwatch = Stopwatch()..start();
     _generateCancellation = cancellation;
+    _activeGenerateRequestKey = requestKey;
+    final deckProvider = context.read<DeckProvider>();
+    await _saveDraft();
+    if (!mounted) return;
 
     setState(() {
       _isGenerating = true;
@@ -179,11 +301,15 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     });
 
     try {
-      final result = await context.read<DeckProvider>().generateDeck(
+      final result = await deckProvider.generateDeck(
         prompt: _promptController.text.trim(),
         format: _selectedFormat,
         commanderName: _selectedCommanderName(),
         cancellation: cancellation,
+        requestKey: requestKey,
+        preferCollection: _preferCollection,
+        collectionOnly: _collectionOnly,
+        budgetLimitBrl: budgetLimit,
         onProgress: (progress) {
           if (!mounted || _generateCancellation != cancellation) return;
           if (progress.step == 1) {
@@ -191,6 +317,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               '[DeckGenerate] initial async feedback after '
               '${feedbackStopwatch.elapsedMilliseconds}ms',
             );
+          }
+          if (progress.jobId != null && progress.jobId!.trim().isNotEmpty) {
+            _activeGenerateJobId = progress.jobId!.trim();
+            unawaited(_saveDraft());
           }
           setState(() {
             _generationProgressStep = progress.step;
@@ -210,6 +340,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (_generateCancellation == cancellation) {
         _generateCancellation = null;
       }
+      _activeGenerateJobId = null;
+      _activeGenerateRequestKey = null;
+      await _saveDraft();
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final ctx = _previewKey.currentContext;
@@ -243,7 +376,110 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
-      await refreshAiUsageAfterAction(context);
+      if (mounted) {
+        await refreshAiUsageAfterAction(context);
+      }
+    }
+  }
+
+  Future<void> _resumeLatestGenerateJobIfAvailable() async {
+    try {
+      final latest = await context
+          .read<DeckProvider>()
+          .fetchLatestGenerateJob();
+      if (!mounted || latest == null) return;
+      final jobId = latest['job_id']?.toString().trim();
+      if (jobId == null || jobId.isEmpty) return;
+      _activeGenerateJobId = jobId;
+      _activeGenerateRequestKey = latest['request_key']?.toString().trim();
+      await _saveDraft();
+      if (!mounted) return;
+      await _resumeGenerateJob(jobId);
+    } catch (_) {
+      return;
+    }
+  }
+
+  Future<void> _resumeGenerateJob(String jobId) async {
+    if (_isGenerating || !mounted) return;
+    final cancellation = GenerateDeckCancellation();
+    _generateCancellation = cancellation;
+    setState(() {
+      _isGenerating = true;
+      _generationProgressStep = 1;
+      _generationProgressMessage = 'Retomando geração em andamento...';
+    });
+    try {
+      final result = await context.read<DeckProvider>().resumeGenerateJob(
+        jobId: jobId,
+        cancellation: cancellation,
+        onProgress: (progress) {
+          if (!mounted || _generateCancellation != cancellation) return;
+          setState(() {
+            _generationProgressStep = progress.step;
+            _generationProgressMessage = progress.message;
+          });
+        },
+      );
+      if (!mounted || _generateCancellation != cancellation) return;
+      setState(() {
+        _generatedDeck = result;
+        _isGenerating = false;
+        _generationProgressStep = 4;
+        _generationProgressMessage = 'Pronto para revisar.';
+      });
+      _generateCancellation = null;
+      _activeGenerateJobId = null;
+      _activeGenerateRequestKey = null;
+      await _saveDraft();
+    } on GenerateDeckCancelledException {
+      return;
+    } catch (error) {
+      if (!mounted || _generateCancellation != cancellation) return;
+      setState(() => _isGenerating = false);
+      _generateCancellation = null;
+      final message = FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.deckGenerate,
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _cancelGeneration() async {
+    if (_isCancellingGeneration) return;
+    final jobId = _activeGenerateJobId;
+    if (jobId == null || jobId.isEmpty) return;
+    setState(() => _isCancellingGeneration = true);
+    try {
+      await context.read<DeckProvider>().cancelGenerateJob(jobId);
+      _generateCancellation?.cancel();
+      _generateCancellation = null;
+      _activeGenerateJobId = null;
+      _activeGenerateRequestKey = null;
+      if (!mounted) return;
+      setState(() {
+        _isGenerating = false;
+        _isCancellingGeneration = false;
+        _generationProgressMessage = 'Geração cancelada.';
+      });
+      await _saveDraft();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Geração cancelada com segurança.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isCancellingGeneration = false);
+      final message = FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.deckGenerate,
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -285,8 +521,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
       final deckName = recommendedDeck['deck_name']?.toString().trim();
       setState(() {
-        _deckNameController.text =
-            deckName == null || deckName.isEmpty ? 'Deck Aprendido' : deckName;
+        _deckNameController.text = deckName == null || deckName.isEmpty
+            ? 'Deck Aprendido'
+            : deckName;
         _generatedDeck = {
           'generated_deck': {'commander': commander, 'cards': cards},
           'validation':
@@ -348,10 +585,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     }
 
     final unresolvedRaw = diagnostics['unresolved_reference_cards'];
-    final unresolvedCount =
-        unresolvedRaw is List
-            ? unresolvedRaw.length
-            : int.tryParse(unresolvedRaw?.toString() ?? '') ?? 0;
+    final unresolvedCount = unresolvedRaw is List
+        ? unresolvedRaw.length
+        : int.tryParse(unresolvedRaw?.toString() ?? '') ?? 0;
 
     AppLogger.info(
       '[DeckGenerate] reference diagnostics '
@@ -364,7 +600,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   }
 
   bool _isGeneratedDeckValid() {
-    return isReviewableGeneratedDeckResult(_generatedDeck);
+    return generatedDeckSaveBlockingReasons(_generatedDeck).isEmpty;
   }
 
   String? _generatedDeckArchetype() {
@@ -400,8 +636,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     ]) {
       if (candidate is! Map) continue;
       final rawBracket = candidate['bracket'];
-      final bracket =
-          rawBracket is int ? rawBracket : int.tryParse('$rawBracket');
+      final bracket = rawBracket is int
+          ? rawBracket
+          : int.tryParse('$rawBracket');
       if (isCommanderBracket(bracket)) {
         return bracket;
       }
@@ -422,30 +659,28 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return;
     }
 
-    final deckName =
-        _deckNameController.text.trim().isEmpty
-            ? 'Deck Gerado'
-            : _deckNameController.text.trim();
+    final deckName = _deckNameController.text.trim().isEmpty
+        ? 'Deck Gerado'
+        : _deckNameController.text.trim();
 
     // Show loading
     if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (ctx) => const Center(
-            child: DeckBlockingTaskDialog(
-              title: 'Salvando deck...',
-              subtitle:
-                  'Criando a lista e preparando o deck para abrir na sua coleção.',
-              accent: AppTheme.success,
-              icon: Icons.save_outlined,
-              tips: [
-                'O deck só aparece na coleção depois que o salvamento termina.',
-                'As cartas geradas estão sendo convertidas para a estrutura final do app.',
-              ],
-            ),
-          ),
+      builder: (ctx) => const Center(
+        child: DeckBlockingTaskDialog(
+          title: 'Salvando deck...',
+          subtitle:
+              'Criando a lista e preparando o deck para abrir na sua coleção.',
+          accent: AppTheme.success,
+          icon: Icons.save_outlined,
+          tips: [
+            'O deck só aparece na coleção depois que o salvamento termina.',
+            'As cartas geradas estão sendo convertidas para a estrutura final do app.',
+          ],
+        ),
+      ),
     );
 
     try {
@@ -455,41 +690,41 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       final cardsList = generatedDeckData['cards'] as List;
       final commander = generatedDeckData['commander'];
       final selectedCommanderName = _selectedCommanderName();
-      final generatedCommanderName =
-          commander is Map ? commander['name']?.toString().trim() : null;
-      final generatedCommanderCardId =
-          commander is Map ? commander['card_id']?.toString().trim() : null;
+      final generatedCommanderName = commander is Map
+          ? commander['name']?.toString().trim()
+          : null;
+      final generatedCommanderCardId = commander is Map
+          ? commander['card_id']?.toString().trim()
+          : null;
       final commanderNameToSave =
           (generatedCommanderName != null && generatedCommanderName.isNotEmpty)
-              ? generatedCommanderName
-              : selectedCommanderName;
+          ? generatedCommanderName
+          : selectedCommanderName;
 
       // Convert to format expected by createDeck API
-      final cardsToAdd =
-          cardsList
-              .where((card) {
-                if (commanderNameToSave == null ||
-                    commanderNameToSave.isEmpty ||
-                    card is! Map) {
-                  return true;
-                }
-                final cardName = card['name']?.toString().trim();
-                return cardName?.toLowerCase() !=
-                    commanderNameToSave.toLowerCase();
-              })
-              .map((card) {
-                final cardId = card['card_id']?.toString().trim();
-                final payload = <String, dynamic>{
-                  'quantity': card['quantity'] ?? 1,
-                };
-                if (cardId != null && cardId.isNotEmpty) {
-                  payload['card_id'] = cardId;
-                } else {
-                  payload['name'] = card['name'];
-                }
-                return payload;
-              })
-              .toList();
+      final cardsToAdd = cardsList
+          .where((card) {
+            if (commanderNameToSave == null ||
+                commanderNameToSave.isEmpty ||
+                card is! Map) {
+              return true;
+            }
+            final cardName = card['name']?.toString().trim();
+            return cardName?.toLowerCase() != commanderNameToSave.toLowerCase();
+          })
+          .map((card) {
+            final cardId = card['card_id']?.toString().trim();
+            final payload = <String, dynamic>{
+              'quantity': card['quantity'] ?? 1,
+            };
+            if (cardId != null && cardId.isNotEmpty) {
+              payload['card_id'] = cardId;
+            } else {
+              payload['name'] = card['name'];
+            }
+            return payload;
+          })
+          .toList();
 
       // Se vier comandante explicitamente, ou se o usuario informou o comandante
       // para Commander/Brawl, salva marcado (is_commander=true) e fora das 99.
@@ -521,6 +756,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       Navigator.of(context, rootNavigator: true).pop(); // Close loading
 
       if (success) {
+        await _clearDraft();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Deck criado com sucesso!'),
@@ -574,9 +811,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             controller: _scrollController,
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
-              24,
+              AppTheme.space24,
               horizontalPadding,
-              MediaQuery.paddingOf(context).bottom + (isDesktop ? 40 : 104),
+              MediaQuery.paddingOf(context).bottom +
+                  (isDesktop ? AppTheme.space40 : 104),
             ),
             child: Center(
               child: ConstrainedBox(
@@ -586,7 +824,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildGenerateHeader(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppTheme.space24),
                     if (isDesktop)
                       Row(
                         key: const Key('deck-generate-desktop-panes'),
@@ -604,7 +842,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 _buildAiTrustSection(),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: AppTheme.space24),
                                 _buildGenerationOutput(theme, isDesktop: true),
                               ],
                             ),
@@ -613,9 +851,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                       )
                     else ...[
                       _buildAiTrustSection(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppTheme.space24),
                       _buildGenerationForm(theme, isDesktop: false),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppTheme.space20),
                       _buildGenerationOutput(theme, isDesktop: false),
                     ],
                   ],
@@ -636,7 +874,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         Row(
           children: [
             const Icon(Icons.auto_awesome, color: AppTheme.brass400, size: 28),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppTheme.space12),
             Expanded(
               child: Text(
                 'Gerar Deck',
@@ -647,7 +885,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         Text(
           'Descreva o deck que você quer. A IA monta uma proposta e você revisa antes de salvar.',
           style: theme.textTheme.bodyMedium?.copyWith(
@@ -663,7 +901,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _AiTrustPanel(),
-        SizedBox(height: 12),
+        SizedBox(height: AppTheme.space12),
         AiUsageMeter(compact: true),
       ],
     );
@@ -679,9 +917,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         Text('Formato:', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         DropdownButtonFormField<String>(
           key: const Key('deck-generate-format-field'),
           initialValue: _selectedFormat,
@@ -692,22 +930,22 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             filled: true,
             fillColor: theme.colorScheme.surface,
           ),
-          items:
-              _formats.map((format) {
-                return DropdownMenuItem(value: format, child: Text(format));
-              }).toList(),
+          items: _formats.map((format) {
+            return DropdownMenuItem(value: format, child: Text(format));
+          }).toList(),
           onChanged: (value) {
             if (value != null) {
               setState(() {
                 _selectedFormat = value;
               });
+              _scheduleDraftSave();
             }
           },
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppTheme.space20),
         if (_usesCommanderField) ...[
           Text('Comandante (opcional):', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           TextField(
             key: const Key('deck-generate-commander-field'),
             controller: _commanderController,
@@ -724,10 +962,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               fillColor: theme.colorScheme.surface,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
         ],
         Text('Descreva seu deck:', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         TextField(
           key: const Key('deck-generate-prompt-field'),
           controller: _promptController,
@@ -744,7 +982,52 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             fillColor: theme.colorScheme.surface,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space20),
+        Text('Coleção e orçamento', style: theme.textTheme.titleMedium),
+        SwitchListTile.adaptive(
+          key: const Key('deck-generate-prefer-collection-switch'),
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Priorizar minha coleção'),
+          value: _preferCollection,
+          onChanged: (value) {
+            setState(() {
+              _preferCollection = value;
+              if (!value) _collectionOnly = false;
+            });
+            _scheduleDraftSave();
+          },
+        ),
+        SwitchListTile.adaptive(
+          key: const Key('deck-generate-collection-only-switch'),
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Somente cartas que possuo'),
+          value: _collectionOnly,
+          onChanged: (value) {
+            setState(() {
+              _collectionOnly = value;
+              if (value) _preferCollection = true;
+            });
+            _scheduleDraftSave();
+          },
+        ),
+        const SizedBox(height: AppTheme.space8),
+        TextField(
+          key: const Key('deck-generate-budget-field'),
+          controller: _budgetController,
+          keyboardType: TextInputType.number,
+          maxLength: 6,
+          decoration: InputDecoration(
+            labelText: 'Orçamento para compras (R\$)',
+            hintText: 'Sem limite',
+            counterText: '',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            ),
+            filled: true,
+            fillColor: theme.colorScheme.surface,
+          ),
+        ),
+        const SizedBox(height: AppTheme.space12),
         Align(
           alignment: isDesktop ? Alignment.centerLeft : Alignment.center,
           child: SizedBox(
@@ -752,16 +1035,16 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             width: isDesktop ? 320 : double.infinity,
             child: ElevatedButton.icon(
               key: const Key('deck-generate-submit-button'),
-              onPressed:
-                  _isGenerating || _isLoadingLearnedDeck ? null : _generateDeck,
-              icon:
-                  _isGenerating
-                      ? const SizedBox(
-                        width: AppTheme.iconSpinnerSm,
-                        height: AppTheme.iconSpinnerSm,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Icon(Icons.auto_awesome),
+              onPressed: _isGenerating || _isLoadingLearnedDeck
+                  ? null
+                  : _generateDeck,
+              icon: _isGenerating
+                  ? const SizedBox(
+                      width: AppTheme.iconSpinnerSm,
+                      height: AppTheme.iconSpinnerSm,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.auto_awesome),
               label: Text(
                 _isGenerating ? 'Gerando proposta...' : 'Gerar proposta',
                 style: const TextStyle(
@@ -770,7 +1053,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: AppTheme.space14),
                 backgroundColor: AppTheme.brass500,
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
@@ -778,13 +1061,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           ),
         ),
         if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           _LearnedDeckCallout(
             calloutKey: const Key('deck-generate-learned-deck-button'),
-            onPressed:
-                _isGenerating || _isLoadingLearnedDeck
-                    ? null
-                    : _loadLearnedCommanderDeck,
+            onPressed: _isGenerating || _isLoadingLearnedDeck
+                ? null
+                : _loadLearnedCommanderDeck,
             loading: _isLoadingLearnedDeck,
             helperText: _learnedDeckButtonHelperText(
               _selectedLearnedDeckSummary!,
@@ -803,8 +1085,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           _GenerateProgressPanel(
             currentStep: _generationProgressStep,
             message: _generationProgressMessage,
+            onCancel: _activeGenerateJobId == null ? null : _cancelGeneration,
+            cancelling: _isCancellingGeneration,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
         ],
         if (_generatedDeck == null)
           _ExamplePromptList(
@@ -820,7 +1104,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             key: _previewKey,
             children: [
               const Icon(Icons.preview, color: AppTheme.frost400),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Expanded(
                 child: Text(
                   'Preview antes de salvar',
@@ -831,7 +1115,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           Text(
             'Confira comandante, quantidade e avisos. Nada entra na sua coleção até você salvar.',
             style: theme.textTheme.bodySmall?.copyWith(
@@ -839,7 +1123,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               height: AppTheme.lineHeightCompact,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppTheme.space18),
           TextField(
             key: const Key('deck-generate-name-field'),
             controller: _deckNameController,
@@ -854,9 +1138,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               prefixIcon: const Icon(Icons.edit),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           _buildDeckPreview(),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppTheme.space24),
           Align(
             alignment: isDesktop ? Alignment.centerRight : Alignment.center,
             child: SizedBox(
@@ -874,7 +1158,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppTheme.space14,
+                  ),
                   backgroundColor: AppTheme.brass500,
                   foregroundColor: AppTheme.backgroundAbyss,
                 ),
@@ -909,8 +1195,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return int.tryParse(raw?.toString() ?? '') ?? 1;
     }
 
-    final String? commanderName =
-        commander is Map ? commander['name']?.toString().trim() : null;
+    final String? commanderName = commander is Map
+        ? commander['name']?.toString().trim()
+        : null;
     final hasCommander = commanderName != null && commanderName.isNotEmpty;
     final totalMain = cardsList.fold<int>(0, (sum, card) {
       return sum + parseQty(card['quantity']);
@@ -933,19 +1220,22 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       warnings: warnings,
     );
 
-    final invalidCards =
-        warnings is Map && warnings['invalid_cards'] is List
-            ? (warnings['invalid_cards'] as List)
-                .map((e) => e.toString())
-                .where((e) => e.trim().isNotEmpty)
-                .toList()
-            : const <String>[];
-    final validationErrors =
-        validation is Map && validation['errors'] is List
-            ? (validation['errors'] as List)
-            : const <dynamic>[];
-    final blockingReasons = generatedDeckReviewBlockingReasons(_generatedDeck);
+    final invalidCards = warnings is Map && warnings['invalid_cards'] is List
+        ? (warnings['invalid_cards'] as List)
+              .map((e) => e.toString())
+              .where((e) => e.trim().isNotEmpty)
+              .toList()
+        : const <String>[];
+    final validationErrors = sanitizeGeneratedDeckValidationErrors(validation);
+    final blockingReasons = generatedDeckSaveBlockingReasons(_generatedDeck);
     final isValid = blockingReasons.isEmpty;
+    final constraintAudit =
+        (_generatedDeck!['generation_constraints'] as Map?)
+            ?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+    final constraintSummary =
+        (constraintAudit['summary'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
 
     return Container(
       decoration: BoxDecoration(
@@ -956,7 +1246,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           width: AppTheme.strokeHairline,
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space14,
+        AppTheme.space14,
+        AppTheme.space14,
+        AppTheme.space16,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -967,7 +1262,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 color: theme.colorScheme.primary,
                 size: 20,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Text(
                 'Total: $totalCards cartas',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -977,10 +1272,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space12,
+              vertical: AppTheme.space10,
+            ),
             decoration: BoxDecoration(
               color: (isValid ? AppTheme.success : AppTheme.warning).withValues(
                 alpha: 0.1,
@@ -1001,7 +1299,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   color: isValid ? AppTheme.success : AppTheme.warning,
                   size: 18,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 Expanded(
                   child: Text(
                     isValid
@@ -1017,17 +1315,48 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
+          if (constraintSummary.isNotEmpty) ...[
+            Wrap(
+              spacing: AppTheme.space12,
+              runSpacing: AppTheme.space6,
+              children: [
+                Text(
+                  'Na coleção: ${constraintSummary['collection_matched_quantity'] ?? 0}',
+                  style: theme.textTheme.bodySmall,
+                ),
+                Text(
+                  'A comprar: ${constraintSummary['purchase_required_quantity'] ?? 0}',
+                  style: theme.textTheme.bodySmall,
+                ),
+                Text(
+                  'Estimativa: R\$ ${constraintSummary['estimated_purchase_total_brl'] ?? 0}',
+                  style: theme.textTheme.bodySmall,
+                ),
+                if ((constraintSummary['missing_price_quantity'] as num?)
+                        ?.toInt() !=
+                    0)
+                  Text(
+                    'Sem preço: ${constraintSummary['missing_price_quantity']}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.warning,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.space14),
+          ],
           if (learnedDeckPreview.isNotEmpty) ...[
             _LearnedDeckPreviewSummary(parts: learnedDeckPreview),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
           ],
           if (hasCommander) ...[
             _PreviewSectionHeader(
               label: 'Comandante',
               color: AppTheme.frost400,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               '1x $commanderName',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -1035,17 +1364,17 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 height: 1.3,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
           ],
           _PreviewSectionHeader(
             label:
                 'Deck principal ($totalMain cartas, ${cardsList.length} linhas)',
             color: AppTheme.frost400,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ...cardsList.take(18).map((card) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: AppTheme.space4),
               child: Text(
                 '${parseQty(card['quantity'])}x ${card['name']}',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1057,7 +1386,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           }),
           if (cardsList.length > 18)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: AppTheme.space4),
               child: Text(
                 '+ ${cardsList.length - 18} linhas no deck principal',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1067,10 +1396,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             ),
           if (!isValid && validationErrors.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppTheme.space12),
               decoration: BoxDecoration(
                 color: theme.colorScheme.errorContainer,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1089,10 +1418,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                       color: theme.colorScheme.onErrorContainer,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.space8),
                   ...validationErrors.map(
-                    (e) => Text(
-                      e.toString(),
+                    (error) => Text(
+                      error,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onErrorContainer,
                       ),
@@ -1103,14 +1432,14 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
           ],
           if (showWarnings) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             DecoratedBox(
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated.withValues(alpha: 0.54),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppTheme.space12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1121,7 +1450,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                         color: theme.colorScheme.secondary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppTheme.space8),
                     if (isMock)
                       const Text(
                         'Este deck foi gerado em modo mock (sem OpenAI configurada).',
@@ -1227,6 +1556,22 @@ bool hasMeaningfulGeneratedDeckWarnings({
   return false;
 }
 
+List<String> sanitizeGeneratedDeckValidationErrors(Object? validation) {
+  if (validation is! Map || validation['errors'] is! List) {
+    return const <String>[];
+  }
+  return (validation['errors'] as List)
+      .map(
+        (error) => FriendlyErrorMapper.fromException(
+          error,
+          context: FriendlyErrorContext.deckGenerate,
+          fallback:
+              'A lista gerada não passou na validação. Revise as cartas e tente novamente.',
+        ),
+      )
+      .toList(growable: false);
+}
+
 class _LearnedDeckCallout extends StatelessWidget {
   final Key calloutKey;
   final VoidCallback? onPressed;
@@ -1257,7 +1602,12 @@ class _LearnedDeckCallout extends StatelessWidget {
           opacity: enabled ? 1 : 0.58,
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.space12,
+              AppTheme.space10,
+              AppTheme.space12,
+              AppTheme.space10,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1277,21 +1627,20 @@ class _LearnedDeckCallout extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                   child: Center(
-                    child:
-                        loading
-                            ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                            : const Icon(
-                              Icons.school_outlined,
-                              size: 17,
-                              color: AppTheme.brass400,
-                            ),
+                    child: loading
+                        ? const SizedBox(
+                            width: AppTheme.space16,
+                            height: AppTheme.space16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(
+                            Icons.school_outlined,
+                            size: 17,
+                            color: AppTheme.brass400,
+                          ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1306,7 +1655,7 @@ class _LearnedDeckCallout extends StatelessWidget {
                           height: 1.15,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Text(
                         helperText,
                         maxLines: 2,
@@ -1348,7 +1697,7 @@ class _ExamplePromptList extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         ...prompts.asMap().entries.map((entry) {
           final index = entry.key;
           final prompt = entry.value;
@@ -1359,8 +1708,10 @@ class _ExamplePromptList extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             child: Padding(
               padding: EdgeInsets.only(
-                top: index == 0 ? 2 : 8,
-                bottom: isLast ? 2 : 8,
+                top: index == AppTheme.space0
+                    ? AppTheme.space2
+                    : AppTheme.space8,
+                bottom: isLast ? AppTheme.space2 : AppTheme.space8,
               ),
               child: Row(
                 children: [
@@ -1369,7 +1720,7 @@ class _ExamplePromptList extends StatelessWidget {
                     size: 14,
                     color: AppTheme.textHint,
                   ),
-                  const SizedBox(width: 9),
+                  const SizedBox(width: AppTheme.space9),
                   Expanded(
                     child: Text(
                       prompt,
@@ -1402,7 +1753,7 @@ class _LearnedDeckPreviewSummary extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(left: 12),
+      padding: const EdgeInsets.only(left: AppTheme.space12),
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
@@ -1421,10 +1772,10 @@ class _LearnedDeckPreviewSummary extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           ...parts.map(
             (part) => Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: AppTheme.space4),
               child: Text(
                 part,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1465,6 +1816,8 @@ class _GenerateProgressPanel extends StatelessWidget {
   const _GenerateProgressPanel({
     required this.currentStep,
     required this.message,
+    required this.onCancel,
+    required this.cancelling,
   });
 
   static const _steps = [
@@ -1477,16 +1830,19 @@ class _GenerateProgressPanel extends StatelessWidget {
 
   final int currentStep;
   final String message;
+  final VoidCallback? onCancel;
+  final bool cancelling;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final clampedStep = currentStep.clamp(0, _steps.length - 1).toInt();
-    final progress =
-        ((clampedStep + 1) / _steps.length).clamp(0.1, 1.0).toDouble();
+    final progress = ((clampedStep + 1) / _steps.length)
+        .clamp(0.1, 1.0)
+        .toDouble();
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1501,11 +1857,11 @@ class _GenerateProgressPanel extends StatelessWidget {
           Row(
             children: [
               const SizedBox(
-                width: 18,
-                height: 18,
+                width: AppTheme.space18,
+                height: AppTheme.space18,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   message,
@@ -1517,9 +1873,27 @@ class _GenerateProgressPanel extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           LinearProgressIndicator(value: progress),
-          const SizedBox(height: 10),
+          if (onCancel != null) ...[
+            const SizedBox(height: AppTheme.space10),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                key: const Key('deck-generate-cancel-job-button'),
+                onPressed: cancelling ? null : onCancel,
+                icon: cancelling
+                    ? const SizedBox(
+                        width: AppTheme.iconSpinnerSm,
+                        height: AppTheme.iconSpinnerSm,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.stop_circle_outlined),
+                label: Text(cancelling ? 'Cancelando...' : 'Cancelar geração'),
+              ),
+            ),
+          ],
+          const SizedBox(height: AppTheme.space10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -1547,20 +1921,21 @@ class _GenerateProgressChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color:
-            isActive
-                ? AppTheme.brass500.withValues(alpha: 0.16)
-                : AppTheme.surfaceSlate,
+        color: isActive
+            ? AppTheme.brass500.withValues(alpha: 0.16)
+            : AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         border: Border.all(
-          color:
-              isActive
-                  ? AppTheme.brass500.withValues(alpha: 0.44)
-                  : AppTheme.outlineMuted.withValues(alpha: 0.6),
+          color: isActive
+              ? AppTheme.brass500.withValues(alpha: 0.44)
+              : AppTheme.outlineMuted.withValues(alpha: 0.6),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space8,
+          vertical: AppTheme.space5,
+        ),
         child: Text(
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -1581,7 +1956,7 @@ class _AiTrustPanel extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1606,7 +1981,7 @@ class _AiTrustPanel extends StatelessWidget {
               size: 20,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1618,7 +1993,7 @@ class _AiTrustPanel extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppTheme.space6),
                 Text(
                   'Gerar cria uma proposta revisável; otimizar depois faz ajuste leve ou rebuild guiado. Meta pode orientar escolhas, mas nunca substitui validação e review.',
                   style: theme.textTheme.bodySmall?.copyWith(

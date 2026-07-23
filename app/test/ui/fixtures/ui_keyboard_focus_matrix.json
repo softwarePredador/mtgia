@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "matrix_id": "manaloom-s3-05-web-keyboard-focus-2026-07-21",
+  "interactions": {
+    "tab_forward": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"login follows forward and reverse form focus order"},
+    "shift_tab": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"login follows forward and reverse form focus order"},
+    "enter": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"Enter and Space activate shell actions"},
+    "space": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"Enter and Space activate shell actions"},
+    "escape": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"deck dialog traps focus and restores it after Escape"},
+    "modal_trap": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"deck dialog traps focus and restores it after Escape"},
+    "focus_restoration": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"deck dialog traps focus and restores it after Escape"},
+    "browser_back": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"browser back closes the modal and restores launcher focus"},
+    "visible_focus": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"theme exposes non-transparent focus feedback"},
+    "reduced_motion": {"test":"test/features/home/home_screen_test.dart","anchor":"reduced motion skips the home entrance animation"}
+  },
+  "modal_sources": [
+    "lib/features/decks/widgets/deck_details_dialogs.dart",
+    "lib/features/decks/widgets/deck_card_edit_dialog.dart",
+    "lib/features/decks/widgets/deck_feedback_dialogs.dart",
+    "lib/features/decks/widgets/deck_import_list_dialog.dart"
+  ],
+  "manual_web": {
+    "status": "pass",
+    "observed_route": "/login,/home,/decks,/collection,/community,/profile,/decks/:id",
+    "passed": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","browser_back","reduced_motion","authenticated_routes"],
+    "console_errors": 0,
+    "remaining": [],
+    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays"]
+  }
+}

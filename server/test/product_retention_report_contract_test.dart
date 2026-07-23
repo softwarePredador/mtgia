@@ -104,6 +104,10 @@ void main() {
       final deckRoute = File('routes/decks/[id]/index.dart').readAsStringSync();
       final bulkRoute =
           File('routes/decks/[id]/cards/bulk/index.dart').readAsStringSync();
+      final rollbackRoute =
+          File(
+            'routes/decks/[id]/optimizations/[eventId]/rollback/index.dart',
+          ).readAsStringSync();
 
       expect(migrations, contains("version: '033'"));
       expect(
@@ -116,10 +120,20 @@ void main() {
       expect(service, contains('optimization_contract'));
       expect(deckRoute, contains('mutation_context'));
       expect(deckRoute, contains('DeckOptimizationHistoryService'));
-      expect(deckRoute, contains('Failed to record deck optimization event'));
+      expect(deckRoute, contains('session: session'));
+      expect(
+        deckRoute,
+        isNot(contains('Failed to record deck optimization event')),
+      );
       expect(bulkRoute, contains('mutation_context'));
       expect(bulkRoute, contains('DeckOptimizationHistoryService'));
-      expect(bulkRoute, contains('Failed to record deck optimization event'));
+      expect(bulkRoute, contains('session: session'));
+      expect(
+        bulkRoute,
+        isNot(contains('Failed to record deck optimization event')),
+      );
+      expect(rollbackRoute, contains('optimization_rollback_conflict'));
+      expect(service, contains('exact_after_snapshot_signature'));
     });
   });
 }

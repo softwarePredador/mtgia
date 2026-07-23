@@ -406,3 +406,10 @@ battle-rule syncs completed after postcheck:
 - `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_postcheck.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_precheck.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_rollback.sql`
+
+The collection-constrained Lorehold candidate report is retained as reviewed
+Sprint 6 input. It now embeds the canonical 100-card list, replaces the former
+duplicate `.decklist.txt`, and remains structural evidence only; it does not
+promote the candidate over protected deck `607`:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_archidekt_collection_20260718_validation.md` — pending-local-sha256: `48941497dfb8aa148765ccd985529df9e41561629f6230f2c076371dd9468f0a`

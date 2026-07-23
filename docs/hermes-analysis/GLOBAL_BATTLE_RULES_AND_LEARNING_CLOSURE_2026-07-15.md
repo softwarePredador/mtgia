@@ -104,39 +104,92 @@ the ManaLoom runtime adapter still define the exact family contract.
 
 ## Async battle registry
 
-The queue schema is `external_battle_async_registry_v1`:
+The queue schema is `external_battle_async_registry_v2`. Version 2 is a
+breaking identity upgrade: the runner rejects registry/checkpoint v1 artifacts
+and builds a fresh engine-specific `external_battle_request_v2` envelope for
+every attempt.
 
 ```json
 {
-  "schema_version": "external_battle_async_registry_v1",
+  "schema_version": "external_battle_async_registry_v2",
   "minimum_completed_per_variant": 3,
+  "comparisons": [
+    {
+      "schema_version": "external_battle_comparison_contract_v1",
+      "comparison_id": "swap-1",
+      "subject_deck_key": "deck_a",
+      "base_deck_hash": "<external_battle_deck_hash_v1>",
+      "candidate_deck_hash": "<external_battle_deck_hash_v1>",
+      "opponent_deck_hash": "<external_battle_deck_hash_v1>",
+      "commander_identity": "<commander>",
+      "opponent_deck_id": "<postgresql deck id>",
+      "opponent_commander_identity": "<opponent commander>",
+      "seed_set": [1001, 1002, 1003],
+      "timeout_policy": {
+        "timeout_ms": 40000,
+        "censoring": "exclude_any_timeout_attempt"
+      },
+      "same_lane_hypothesis": {
+        "schema_version": "battle_same_lane_hypothesis_v1",
+        "status": "reviewed",
+        "owner": "deckbuilder_quality",
+        "removed_lane_key": "<lane>",
+        "added_lane_key": "<same lane>",
+        "removed_cards": ["<removed card>"],
+        "added_cards": ["<added card>"],
+        "evidence_refs": ["<reviewed source>"]
+      },
+      "legality_attestation": {
+        "schema_version": "postgresql_commander_legality_attestation_v1",
+        "source": "postgresql_deck_rules_service",
+        "validation_id": "<validation id>",
+        "decks": []
+      }
+    }
+  ],
   "jobs": [
     {
       "job_id": "swap-1-candidate-seed-1001",
       "comparison_id": "swap-1",
       "variant": "candidate",
-      "same_lane": true,
       "forced_access": false,
       "focus_cards": ["Candidate Card"],
       "request": {
         "request_id": "swap-1-candidate-seed-1001",
         "seed": 1001,
-        "timeout_ms": 120000,
-        "deck_a": {},
-        "deck_b": {}
+        "timeout_ms": 40000,
+        "max_turns": 30,
+        "deck_a": {"id": "<candidate deck id>", "cards": ["<100-card payload>"]},
+        "deck_b": {"id": "<opponent deck id>", "cards": ["<100-card payload>"]},
+        "deck_hashes": {
+          "schema_version": "external_battle_deck_hash_v1",
+          "algorithm": "sha256",
+          "deck_a": "<canonical hash>",
+          "deck_b": "<canonical hash>"
+        }
       }
     }
   ]
 }
 ```
 
-Each `request` must contain complete legal sidecar deck payloads. The sidecars
-remain responsible for exact 100-card/one-commander validation.
+The abbreviated card arrays above are documentation placeholders and are not a
+valid registry. Each real `request` contains complete legal sidecar deck
+payloads, canonical deck hashes, a safe request ID, seed, timeout and max-turn
+policy. The runner validates cardinality/hash/attestation before execution and
+the sidecars independently enforce exact 100-card/one-commander shape. A valid
+attestation proves only that the registry carries the expected PostgreSQL
+validation record; it is not a live database query or a cryptographic proof.
 
 The runner:
 
-- writes `external_battle_async_checkpoint_v1` atomically after every state
+- writes `external_battle_async_checkpoint_v2` atomically after every state
   transition;
+- rejects every registry/checkpoint v1 artifact instead of silently resuming
+  evidence produced without the full execution identity;
+- creates an engine-specific request hash for XMage and Forge and rejects any
+  response whose schema, engine/version/commit, build/process identity,
+  request/seed/timeout, controls or deck hashes do not correlate;
 - resumes `pending` and interrupted `running` jobs;
 - never reruns a completed job;
 - uses Forge only after XMage returns structured HTTP `422` coverage failure;
@@ -151,6 +204,10 @@ The runner:
   duplicate comparison variant/seed samples;
 - never retries a terminal failed, timeout, or coverage-incomplete job on
   resume without a new registry;
+- records equal seed sets only as balanced scheduling/correlation. XMage does
+  not expose server-RNG control and Forge does not promise replay identity, so
+  the gate publishes `seed_pairing_claim=false` and requires a later
+  engine-semantics-aware independent-sample analysis.
 
 ## Positive learning evidence
 
@@ -173,16 +230,17 @@ The comparison gate requires:
 
 - base and candidate variants;
 - the configured minimum completed games for both;
-- the same completed seed set;
+- the same completed seed-label set for balanced scheduling;
 - same-lane replacement declaration;
 - natural samples;
 - positive exposure of removed cards in base games;
 - positive exposure of added cards in candidate games.
 
-The minimum applies to unique paired seeds whose base and candidate jobs both
-have positive focus-card exposure. A single replay, even natural and same-lane,
-can only publish `natural_same_lane_exposure=true`; it cannot publish a ready
-comparison gate.
+The minimum applies to unique seed labels represented in both variants whose
+jobs have positive focus-card exposure. Those labels are not paired RNG samples:
+XMage does not accept per-match RNG control and Forge does not guarantee replay
+identity. A single replay, even natural and same-lane, can only publish
+`natural_same_lane_exposure=true`; it cannot publish a ready comparison gate.
 
 Only `external_battle_comparison_gate_v1` can produce
 `comparison_input_ready=true`. It still publishes:
@@ -191,6 +249,8 @@ Only `external_battle_comparison_gate_v1` can produce
 swap_superiority_proven=false
 promotion_allowed=false
 next_gate=statistical_and_strategy_evaluation
+seed_pairing_claim=false
+statistical_design_required=engine_semantics_aware_independent_samples
 ```
 
 The backend `/ai/simulate` route now writes the same safe evidence summary into

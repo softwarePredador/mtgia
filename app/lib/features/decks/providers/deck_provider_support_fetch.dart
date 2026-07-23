@@ -36,13 +36,12 @@ List<Deck> syncDeckColorIdentityToList(
 }) {
   return decks
       .map(
-        (deck) =>
-            deck.id == deckId && !deck.colorIdentityKnown
-                ? deck.copyWith(
-                  colorIdentity: colorIdentity,
-                  colorIdentityKnown: identityKnown,
-                )
-                : deck,
+        (deck) => deck.id == deckId && !deck.colorIdentityKnown
+            ? deck.copyWith(
+                colorIdentity: colorIdentity,
+                colorIdentityKnown: identityKnown,
+              )
+            : deck,
       )
       .toList();
 }
@@ -93,10 +92,9 @@ DeckDetailsFetchState parseDeckDetailsResponse(ApiResponse response) {
 
   if (response.statusCode == 401) {
     final data = response.data;
-    final message =
-        (data is Map && data['message'] != null)
-            ? data['message'].toString()
-            : 'Sessão expirada. Faça login novamente.';
+    final message = (data is Map && data['message'] != null)
+        ? data['message'].toString()
+        : 'Sessão expirada. Faça login novamente.';
     return DeckDetailsFetchState(
       selectedDeck: null,
       errorMessage: message,
@@ -150,11 +148,11 @@ DeckListFetchState parseDeckListResponse(ApiResponse response) {
   if (response.statusCode == 200) {
     final data = response.data as List<dynamic>;
     return DeckListFetchState(
-      decks:
-          data
-              .map((json) => Deck.fromJson(json as Map<String, dynamic>))
-              .toList(),
+      decks: data
+          .map((json) => Deck.fromJson(json as Map<String, dynamic>))
+          .toList(),
       errorMessage: null,
+      statusCode: 200,
     );
   }
 
@@ -162,6 +160,7 @@ DeckListFetchState parseDeckListResponse(ApiResponse response) {
     return const DeckListFetchState(
       decks: null,
       errorMessage: 'Sessão expirada. Faça login novamente.',
+      statusCode: 401,
     );
   }
 
@@ -171,6 +170,7 @@ DeckListFetchState parseDeckListResponse(ApiResponse response) {
       response,
       context: FriendlyErrorContext.deckDetails,
     ),
+    statusCode: response.statusCode,
   );
 }
 
@@ -255,8 +255,9 @@ DeckDeleteState applyDeckDeletionToState(
 ) {
   return DeckDeleteState(
     decks: decks.where((deck) => deck.id != deckId).toList(),
-    selectedDeck:
-        selectedDeck != null && selectedDeck.id == deckId ? null : selectedDeck,
+    selectedDeck: selectedDeck != null && selectedDeck.id == deckId
+        ? null
+        : selectedDeck,
   );
 }
 
@@ -323,14 +324,13 @@ List<Deck> applyAiAnalysisToDeckList(
 }) {
   return decks
       .map(
-        (deck) =>
-            deck.id == deckId
-                ? deck.copyWith(
-                  synergyScore: synergyScore,
-                  strengths: strengths,
-                  weaknesses: weaknesses,
-                )
-                : deck,
+        (deck) => deck.id == deckId
+            ? deck.copyWith(
+                synergyScore: synergyScore,
+                strengths: strengths,
+                weaknesses: weaknesses,
+              )
+            : deck,
       )
       .toList();
 }

@@ -6,6 +6,7 @@ import 'commander_eligibility.dart';
 import 'commander_pairing.dart' as commander_pairing;
 import 'color_identity.dart';
 import 'deck_section_support.dart';
+import 'deck_format_support.dart';
 
 String normalizePhysicalCardCopyName(String name) {
   return commander_pairing.normalizePhysicalCardCopyName(name);
@@ -22,15 +23,51 @@ class DeckRulesService {
     cards, // {card_id, quantity, is_commander}
     bool strict = false,
   }) async {
-    final normalizedFormat = format.toLowerCase();
+    final normalizedFormat = normalizeSupportedDeckFormat(format);
+    if (normalizedFormat == null) {
+      throw DeckRulesException(unsupportedDeckFormatMessage(format));
+    }
     validateNoUnsupportedDeckSections(cards: cards);
     validateCommanderSlotAllowedForFormat(
       format: normalizedFormat,
       cards: cards,
     );
 
-    final cardIds = cards.map((c) => c['card_id']).whereType<String>().toList();
-    if (cardIds.isEmpty) return;
+    final cardIds = <String>[];
+    for (final item in cards) {
+      final cardId = item['card_id'];
+      if (cardId is! String || cardId.trim().isEmpty) {
+        throw DeckRulesException('Carta sem card_id.');
+      }
+      final quantity = item['quantity'];
+      if (quantity is! int || quantity <= 0) {
+        throw DeckRulesException('Quantidade inválida para card_id=$cardId.');
+      }
+      final rawIsCommander = item['is_commander'];
+      if (rawIsCommander != null && rawIsCommander is! bool) {
+        throw DeckRulesException(
+          'Marcador de comandante inválido para card_id=$cardId.',
+        );
+      }
+      final isCommander = rawIsCommander as bool? ?? false;
+      if (isCommander && quantity != 1) {
+        throw DeckRulesException(
+          'Regra violada: comandante deve ter quantidade 1 (card_id=$cardId).',
+        );
+      }
+      cardIds.add(cardId.trim());
+    }
+    if (cardIds.isEmpty) {
+      if (!strict) return;
+      if (isCommanderStyleFormat(normalizedFormat)) {
+        throw DeckRulesException(
+          'Regra violada: deck $normalizedFormat precisa de 1 comandante selecionado.',
+        );
+      }
+      throw DeckRulesException(
+        'Regra violada: deck $normalizedFormat precisa de pelo menos 60 cartas (atual: 0).',
+      );
+    }
 
     final cardsData = await _loadCardsData(cardIds);
     final legalities = await _loadLegalities(cardIds, normalizedFormat);

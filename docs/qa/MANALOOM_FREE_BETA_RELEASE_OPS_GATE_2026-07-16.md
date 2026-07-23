@@ -191,22 +191,24 @@ the release directory, so the evidence explicitly records
 exact signed APK remains a separate release proof and must not be inferred from
 this gate.
 
-## CI evidence
+## Local release evidence
 
-`.github/workflows/manaloom-guardrails.yml` now has read-only repository
-permissions and, on product changes:
+This historical section is superseded by the free local gate in
+`scripts/manaloom_local_ci.sh`. Hosted GitHub Actions is intentionally absent.
+On product changes, the versioned local release tooling:
 
-- pins every third-party Action to a verified commit and pins Flutter `3.44.6`;
+- pins Flutter `3.44.6` and validates the local toolchain;
 - runs the release/DR contract suite;
 - builds release APK and AAB probes;
 - enforces the Android permission allowlist;
 - proves Gradle-lock/AAB parity, scans the full SBOM with OSV, and generates
   in-toto/SLSA provenance for APK, AAB, SBOM, OSV report and permission report;
-- uploads the evidence bundle with a 30-day retention period.
+- writes the evidence bundle locally under the explicit release command; it is
+  not uploaded by an automatic hosted runner.
 
 The Android dependency graph is also locked and verified by Gradle metadata;
 the wrapper distribution has an expected checksum. Docker build inputs and
-third-party Actions are pinned to reviewed versions/digests. These controls
+third-party build inputs are pinned to reviewed versions/digests. These controls
 reduce drift but do not replace an SBOM, secret scan, or a rebuild from the
 final clean commit.
 

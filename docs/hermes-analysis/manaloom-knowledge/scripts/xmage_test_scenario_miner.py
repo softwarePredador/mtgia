@@ -16,8 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import external_engine_source_contract as engine_source_contract
 
-DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_XMAGE_ROOT: Path | None = None
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
 
 TEST_COMMANDS = [
@@ -307,6 +308,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     cards = list(args.cards)
     if args.cards_json:
         cards.extend(load_cards_from_json(args.cards_json))
@@ -316,7 +321,7 @@ def main() -> int:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     output_json = args.output_json or DEFAULT_REPORT_DIR / f"xmage_test_scenario_miner_{timestamp}.json"
     output_md = args.output_md or output_json.with_suffix(".md")
-    report = build_report(cards, xmage_root=args.xmage_root)
+    report = build_report(cards, xmage_root=xmage_root)
     write_outputs(report, output_json=output_json, output_md=output_md)
     print(f"wrote_json={output_json}")
     print(f"wrote_md={output_md}")

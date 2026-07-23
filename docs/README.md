@@ -6,28 +6,47 @@ as fontes canônicas abaixo.
 
 ## Entrada canônica atual
 
-1. `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`
+1. `docs/generated/CURRENT_SYSTEM.md` e `project_logic_manifest.json`
+   - inventário estrutural e semântico gerado de módulos, símbolos, tipos e
+     chamadas resolvidos, rotas, API, migrations, tabelas, scripts, variáveis
+     (somente nomes), testes — inclusive `integration_test` — e fluxos. Os
+     gates locais bloqueiam drift; intenção e status live continuam nos
+     contratos/evidências manuais abaixo.
+1. `docs/qa/MANALOOM_PROJECT_LOGIC_GOVERNANCE_2026-07-21.md`
+   - implementação e provas do gerador determinístico, Dart MCP, `dart doc`,
+     OpenAPI/ERD/Mermaid, `tbls`, ADR e gates gratuitos locais. GitHub Actions
+     é deliberadamente ausente.
+1. `docs/adr/0001-generated-project-logic.md`
+   - decisão arquitetural, alternativas rejeitadas, consequências e limites do
+     manifesto gerado.
+1. `docs/qa/MANALOOM_E2E_CORE_DOCUMENTATION_AUDIT_2026-07-21.md`
+    - revalidação source-backed do checkout atual: mapa das raízes do core,
+       resultados E2E, lacunas documentais, correções aplicadas e bloqueios que
+       impedem chamar a rodada de concluída ou publicada. No Lorehold, `16/16`
+       valida apenas o mecanismo estatístico; o gate real continua `BLOCKED` e
+       o deck `607` permanece como baseline protegido.
+2. `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`
    - decisão go/no-go da beta gratuita Web + Android: escopo, segurança,
      identidade de mesma SHA, evidências confirmadas, bloqueios, ordem de
      promoção, rollback e checklist final. E2E, resolution, Patrol, builds,
      runtime local, restore isolado e `full` já têm prova; gates externos
      e demais P0 permanecem abertos, portanto o estado continua NO-GO.
-2. `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md`
+3. `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md`
    - auditoria canônica de produto e experiência do app: inventário de rotas e
      telas, necessidades dos jogadores, sistema visual, fluxos interligados,
      correções, riscos P0-P2 e estado verificável dos gates.
-3. `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`
+4. `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`
    - contratos fail-closed de build/publicação, CORS, observabilidade,
      backup off-site, restore isolado, SBOM/provenance e provas externas.
-4. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
+5. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
    - perfis de execução, autorização de mutações, matriz de gates e critérios
      separados de conclusão local e de release.
-5. `docs/CONTEXTO_PRODUTO_ATUAL.md`
+6. `docs/CONTEXTO_PRODUTO_ATUAL.md`
    - prioridade operacional vigente e ponte para a evidência mais recente.
-6. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
+7. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
    - evidência fechada, remoções, resultados, resíduos e bloqueadores de release
      da rodada anterior; não substitui os gates do candidato de 2026-07-16.
-7. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
+8. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
    - auditoria final de battle, deckbuilder, famílias, cargas PostgreSQL,
      cobertura externa e pendências de produto.
 
@@ -38,8 +57,10 @@ quando a área exigir profundidade, mas não use um status antigo para substitui
 o contrato ou a evidência corrente.
 
 1. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
-   - relatório mestre de lógica atual do produto, app, backend, banco, IA,
-     Hermes, crons, battle engine e validações.
+    - snapshot mestre da lógica em 2026-06-11. Continua útil para profundidade,
+       mas foi superado em bootstrap comercial, secure token storage, ownership
+       de schema, runtime Battle e migração Hermes/ops; cruzar com a auditoria de
+       2026-07-21 e o código vivo.
 2. `docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md`
    - validação final source-backed de tabelas, views internas, fanout,
      relações app/backend, PostgreSQL real, Hermes/AWS, EasyPanel e fontes
@@ -148,8 +169,12 @@ o contrato ou a evidência corrente.
 
 ## Scanner
 
-Scanner/camera/OCR seguem fora do escopo da rodada interna atual. Nao use
-documentos antigos de scanner como gate de release non-scanner.
+O Scanner/OCR integra o alvo Android release desde a prova S4-07. O script
+assinado e os probes Android locais passam `ENABLE_SCANNER_RELEASE=true`; Web,
+desenvolvimento comum e iOS sem cadeia física mantêm a rota ausente e recuperam
+deep links para busca manual. A evidência canônica está em
+`docs/qa/MANALOOM_SPRINT4_CORE_EVIDENCE_2026-07-22.md`; documentos antigos de
+scanner continuam históricos e não substituem essa prova.
 
 ## Como tratar documentos historicos
 

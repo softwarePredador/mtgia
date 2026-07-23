@@ -24,9 +24,9 @@ Future<void> main() async {
 
     final result = await connection.execute('''
       INSERT INTO price_history (card_id, price_date, price_usd)
-      SELECT id, CURRENT_DATE, price
+      SELECT id, CURRENT_DATE, COALESCE(price_usd, price)
       FROM cards
-      WHERE price IS NOT NULL AND price > 0
+      WHERE COALESCE(price_usd, price) > 0
       ON CONFLICT (card_id, price_date)
       DO UPDATE SET price_usd = EXCLUDED.price_usd
     ''');

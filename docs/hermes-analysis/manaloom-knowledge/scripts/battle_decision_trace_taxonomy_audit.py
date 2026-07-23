@@ -15,10 +15,6 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 DEFAULT_ENGINE_SOURCE = SCRIPT_DIR / "battle_analyst_v9.py"
-DEFAULT_LATEST_RUN = Path(
-    "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/"
-    "battle-strategy-audit/latest"
-)
 
 GENERIC_REQUIRED_FIELDS = {
     "available_options",
@@ -446,7 +442,7 @@ CONTRACTS.update(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--engine-source", type=Path, default=DEFAULT_ENGINE_SOURCE)
-    parser.add_argument("--input-dir", type=Path, default=DEFAULT_LATEST_RUN)
+    parser.add_argument("--input-dir", type=Path, required=True)
     parser.add_argument("--decision-trace", type=Path, action="append", default=[])
     parser.add_argument("--output", type=Path)
     parser.add_argument("--json-output", type=Path)
@@ -528,7 +524,7 @@ def missing_contract_fields(decision: dict[str, Any], contract: dict[str, Any]) 
 
 def build_audit(
     *,
-    input_dir: Path = DEFAULT_LATEST_RUN,
+    input_dir: Path,
     decision_traces: list[Path] | None = None,
     engine_source: Path = DEFAULT_ENGINE_SOURCE,
 ) -> dict[str, Any]:

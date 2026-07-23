@@ -148,8 +148,9 @@ class _LifeCounterNativePlayerCounterSheetState
   Widget build(BuildContext context) {
     final counterLabel = _counterLabel(_selectedCounterKey);
     final playerLabel = 'Jogador ${_targetPlayerIndex + 1}';
-    final isCustomCounter =
-        !LifeCounterTabletopEngine.isKnownCounterKey(_selectedCounterKey);
+    final isCustomCounter = !LifeCounterTabletopEngine.isKnownCounterKey(
+      _selectedCounterKey,
+    );
     final playerBoardSummary = LifeCounterTabletopEngine.playerBoardSummary(
       _draftSession,
       playerIndex: _targetPlayerIndex,
@@ -161,7 +162,12 @@ class _LifeCounterNativePlayerCounterSheetState
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.76,
           child: DecoratedBox(
@@ -181,7 +187,12 @@ class _LifeCounterNativePlayerCounterSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -196,7 +207,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: AppTheme.space6),
                             Text(
                               '$playerLabel · $counterLabel',
                               style: const TextStyle(
@@ -220,7 +231,12 @@ class _LifeCounterNativePlayerCounterSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space20,
+                      AppTheme.space20,
+                      AppTheme.space20,
+                    ),
                     child: ListView(
                       children: [
                         Text(
@@ -231,7 +247,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             height: AppTheme.lineHeightComfortable,
                           ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: AppTheme.space18),
                         DecoratedBox(
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceElevated,
@@ -241,7 +257,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             border: Border.all(color: AppTheme.outlineMuted),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(AppTheme.space16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -253,7 +269,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: AppTheme.space8),
                                 Text(
                                   playerStatusSummary.label,
                                   key: const Key(
@@ -265,7 +281,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: AppTheme.space6),
                                 Text(
                                   playerStatusSummary.description,
                                   key: const Key(
@@ -281,7 +297,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppTheme.space20),
                         const Text(
                           'Marcadores disponíveis',
                           style: TextStyle(
@@ -290,7 +306,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: AppTheme.space10),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -307,7 +323,7 @@ class _LifeCounterNativePlayerCounterSheetState
                               )
                               .toList(growable: false),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppTheme.space20),
                         DecoratedBox(
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceElevated,
@@ -317,7 +333,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             border: Border.all(color: AppTheme.outlineMuted),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(AppTheme.space16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -329,7 +345,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: AppTheme.space6),
                                 const Text(
                                   'Adicione marcadores para efeitos específicos da partida.',
                                   style: TextStyle(
@@ -338,7 +354,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                     height: AppTheme.lineHeightCompact,
                                   ),
                                 ),
-                                const SizedBox(height: 14),
+                                const SizedBox(height: AppTheme.space14),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -357,7 +373,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: AppTheme.space12),
                                     FilledButton.tonal(
                                       key: const Key(
                                         'life-counter-native-player-counter-custom-add',
@@ -365,8 +381,8 @@ class _LifeCounterNativePlayerCounterSheetState
                                       onPressed: _addCustomCounter,
                                       style: FilledButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 18,
-                                          vertical: 18,
+                                          horizontal: AppTheme.space18,
+                                          vertical: AppTheme.space18,
                                         ),
                                       ),
                                       child: const Text('Adicionar'),
@@ -377,7 +393,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppTheme.space20),
                         DecoratedBox(
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceElevated,
@@ -387,7 +403,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             border: Border.all(color: AppTheme.outlineMuted),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(AppTheme.space16),
                             child: Row(
                               children: [
                                 Expanded(
@@ -406,8 +422,8 @@ class _LifeCounterNativePlayerCounterSheetState
                                       'life-counter-native-player-counter-critical-badge',
                                     ),
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
+                                      horizontal: AppTheme.space10,
+                                      vertical: AppTheme.space6,
                                     ),
                                     decoration: BoxDecoration(
                                       color: AppTheme.error.withValues(
@@ -473,7 +489,7 @@ class _LifeCounterNativePlayerCounterSheetState
                           ),
                         ),
                         if (_isTaxCounter(_selectedCounterKey)) ...[
-                          const SizedBox(height: 14),
+                          const SizedBox(height: AppTheme.space14),
                           const Text(
                             'A taxa de comandante aumenta de 2 em 2, como o custo adicional na mesa.',
                             style: TextStyle(
@@ -484,7 +500,7 @@ class _LifeCounterNativePlayerCounterSheetState
                           ),
                         ],
                         if (isCustomCounter) ...[
-                          const SizedBox(height: 14),
+                          const SizedBox(height: AppTheme.space14),
                           Align(
                             alignment: Alignment.centerLeft,
                             child: TextButton.icon(
@@ -508,7 +524,12 @@ class _LifeCounterNativePlayerCounterSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -519,23 +540,27 @@ class _LifeCounterNativePlayerCounterSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key(
                             'life-counter-native-player-counter-apply',
                           ),
-                          onPressed:
-                              () => Navigator.of(context).pop(_draftSession),
+                          onPressed: () =>
+                              Navigator.of(context).pop(_draftSession),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),

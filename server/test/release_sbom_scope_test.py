@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import json
+import shutil
 import tempfile
 import unittest
 import zipfile
@@ -117,6 +119,128 @@ class ReleaseSbomScopeTest(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "releaseRuntimeClasspath"):
             SBOM._gradle_scope_counts(components)
+
+    def test_battle_sidecar_supply_chain_is_source_proven(self) -> None:
+        git_sha = "f" * 40
+        components, inventory = SBOM._battle_sidecar_components(
+            ROOT / "services", git_sha=git_sha
+        )
+        repeated, repeated_inventory = SBOM._battle_sidecar_components(
+            ROOT / "services", git_sha=git_sha
+        )
+        self.assertEqual(components, repeated)
+        self.assertEqual(inventory, repeated_inventory)
+        self.assertTrue(inventory["included"])
+        self.assertEqual(inventory["sidecar_count"], 2)
+        self.assertEqual(
+            inventory["apt_versions"],
+            "unresolved-until-built-image-inspection",
+        )
+
+        by_name = {component["name"]: component for component in components}
+        xmage_pin = (ROOT / "services/xmage-sidecar/XMAGE_COMMIT").read_text(
+            encoding="utf-8"
+        ).strip()
+        forge_pin = (ROOT / "services/forge-sidecar/FORGE_COMMIT").read_text(
+            encoding="utf-8"
+        ).strip()
+        self.assertEqual(by_name["xmage"]["version"], xmage_pin)
+        self.assertEqual(by_name["forge"]["version"], forge_pin)
+        self.assertEqual(by_name["xmage"]["licenses"][0]["license"]["id"], "MIT")
+        self.assertEqual(
+            by_name["forge"]["licenses"][0]["license"]["id"],
+            "GPL-3.0-only",
+        )
+        self.assertIn(xmage_pin, by_name["xmage"]["externalReferences"][0]["url"])
+        self.assertIn(forge_pin, by_name["forge"]["externalReferences"][0]["url"])
+
+        xmage_sidecar = by_name["manaloom-xmage-sidecar"]
+        forge_sidecar = by_name["manaloom-forge-sidecar"]
+        self.assertEqual(
+            json.loads(
+                _property(xmage_sidecar, "manaloom:apt-package-declarations")
+            ),
+            {"build": ["git", "unzip"], "runtime": ["unzip"]},
+        )
+        self.assertEqual(
+            json.loads(
+                _property(forge_sidecar, "manaloom:apt-package-declarations")
+            ),
+            {
+                "forge-build": ["git"],
+                "runtime": [
+                    "fontconfig",
+                    "libfreetype6",
+                    "libx11-6",
+                    "libxext6",
+                    "libxi6",
+                    "libxrender1",
+                    "libxtst6",
+                    "python3",
+                    "xauth",
+                    "xvfb",
+                ],
+            },
+        )
+        self.assertEqual(
+            _property(xmage_sidecar, "manaloom:apt-version-evidence"),
+            "unresolved-until-built-image-inspection",
+        )
+
+        containers = [
+            component for component in components if component["type"] == "container"
+        ]
+        self.assertEqual(len(containers), 2)
+        self.assertTrue(
+            all(
+                component["hashes"][0]["alg"] == "SHA-256"
+                and len(component["hashes"][0]["content"]) == 64
+                for component in containers
+            )
+        )
+        self.assertTrue(
+            all(
+                _property(component, "manaloom:runtime-family") == "java"
+                for component in containers
+            )
+        )
+
+        direct_maven = {
+            component["name"]
+            for component in components
+            if any(
+                item.get("name") == "manaloom:dependency-scope"
+                and item.get("value") == "xmage-sidecar-direct-runtime"
+                for item in component.get("properties", [])
+            )
+        }
+        self.assertEqual(
+            direct_maven,
+            {"mage-common", "mage-sets", "gson", "sqlite-jdbc", "jsoup"},
+        )
+        self.assertNotIn("junit-jupiter", direct_maven)
+
+    def test_battle_sidecar_pin_mismatch_fails_closed(self) -> None:
+        services = self.temp / "services"
+        required = (
+            "xmage-sidecar/Dockerfile",
+            "xmage-sidecar/XMAGE_COMMIT",
+            "xmage-sidecar/pom.xml",
+            "forge-sidecar/Dockerfile",
+            "forge-sidecar/FORGE_COMMIT",
+            "forge-sidecar/SeededForgeMain.java",
+            "forge-sidecar/sidecar.py",
+        )
+        for relative in required:
+            destination = services / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / "services" / relative, destination)
+        (services / "xmage-sidecar/XMAGE_COMMIT").write_text(
+            "0" * 40 + "\n", encoding="utf-8"
+        )
+
+        with self.assertRaisesRegex(ValueError, "diverge"):
+            SBOM._battle_sidecar_components(services, git_sha="f" * 40)
 
     def test_duplicate_gradle_coordinate_cannot_override_release_scope(self) -> None:
         with self.assertRaisesRegex(ValueError, "coordenada Gradle duplicada"):

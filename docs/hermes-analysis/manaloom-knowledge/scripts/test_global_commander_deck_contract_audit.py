@@ -100,7 +100,7 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
         self.assertEqual(status, "needs_repair")
         self.assertIn("nonbasic_duplicate_quantity", issues)
 
-    def test_summary_marks_action_required_when_product_scope_has_repairs(self) -> None:
+    def test_summary_classifies_repairs_without_mutating_owner_decks(self) -> None:
         payload = summarize(
             [
                 DeckRow(
@@ -124,11 +124,43 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(payload["status"], "action_required")
+        self.assertEqual(payload["status"], "pass")
         self.assertEqual(payload["scope_counts"]["user_product"], 2)
+        self.assertTrue(payload["classification"]["all_postgres_decks_classified"])
+        self.assertEqual(payload["classification"]["user_product_needs_owner_review"], 1)
+        self.assertFalse(payload["promotion"]["allowed"])
+        self.assertFalse(payload["promotion"]["automatic_mutation_performed"])
         self.assertIn(
-            "repair_or_exclude_product_user_decks_before_global_promotion",
+            "offer_owner_reviewed_repair_without_mutation_before_global_promotion",
             payload["action_items"],
+        )
+        self.assertTrue(payload["method"]["core_floors_are_diagnostic_only"])
+        self.assertFalse(payload["method"]["automatic_rebuild_allowed"])
+        self.assertFalse(payload["method"]["automatic_exclusion_allowed"])
+        self.assertNotIn("email", payload["sample_issues"][0])
+
+    def test_missing_postgres_product_truth_fails_closed(self) -> None:
+        payload = summarize(
+            [
+                DeckRow(
+                    source="hermes",
+                    deck_id="607",
+                    name="Lorehold baseline",
+                    format="commander",
+                    total_quantity=100,
+                    commander_count=1,
+                )
+            ],
+            postgres_required=True,
+            postgres_loaded=False,
+        )
+
+        self.assertEqual(payload["status"], "fail")
+        self.assertEqual(
+            payload["source_coverage"]["product_truth_status"], "missing"
+        )
+        self.assertIn(
+            "postgres_product_truth_not_loaded", payload["promotion"]["blockers"]
         )
 
     def test_example_domain_and_probe_names_are_not_product_scope(self) -> None:

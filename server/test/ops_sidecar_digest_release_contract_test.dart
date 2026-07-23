@@ -81,10 +81,32 @@ void main() {
         'wait_for_sidecar_health',
         baseline,
       );
-      final archive = sidecars.indexOf('git archive HEAD --');
+      final archive = sidecars.indexOf(r'git archive "$sha" --');
       expect(baseline, greaterThanOrEqualTo(0));
       expect(baselineHealth, greaterThan(baseline));
       expect(archive, greaterThan(baselineHealth));
+    });
+
+    test('tests and publishes the same immutable source snapshot', () {
+      expect(sidecars, contains('manaloom_release_identity.sh'));
+      expect(sidecars, contains('worktree add --detach'));
+      expect(
+        sidecars,
+        contains(r'"$SOURCE_WORKTREE/scripts/manaloom_battle_product_gate.sh"'),
+      );
+      expect(sidecars, contains(r'git archive "$sha" --'));
+      expect(sidecars, isNot(contains('git archive HEAD --')));
+      expect(sidecars, contains(r'worktree remove --force "$SOURCE_WORKTREE"'));
+      expect(sidecars, contains('readonly sha short_sha'));
+
+      final snapshot = sidecars.indexOf('worktree add --detach');
+      final gate = sidecars.indexOf(
+        r'"$SOURCE_WORKTREE/scripts/manaloom_battle_product_gate.sh"',
+      );
+      final archive = sidecars.indexOf(r'git archive "$sha" --');
+      expect(snapshot, greaterThanOrEqualTo(0));
+      expect(gate, greaterThan(snapshot));
+      expect(archive, greaterThan(gate));
     });
 
     test('resolves both RepoDigests before any release mutation', () {

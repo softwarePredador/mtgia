@@ -91,7 +91,12 @@ class _LifeCounterNativeGameTimerSheetState
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.76,
           child: DecoratedBox(
@@ -111,7 +116,12 @@ class _LifeCounterNativeGameTimerSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -126,7 +136,7 @@ class _LifeCounterNativeGameTimerSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Acompanhe a duração da partida e gerencie as pausas na mesa.',
                               style: TextStyle(
@@ -150,14 +160,18 @@ class _LifeCounterNativeGameTimerSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       _SectionCard(
                         title: 'Ações',
-                        subtitle:
-                            _isActive
-                                ? 'Pause, retome ou reinicie o cronômetro quando necessário.'
-                                : 'Inicie um novo cronômetro a partir de zero.',
+                        subtitle: _isActive
+                            ? 'Pause, retome ou reinicie o cronômetro quando necessário.'
+                            : 'Inicie um novo cronômetro a partir de zero.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -225,7 +239,7 @@ class _LifeCounterNativeGameTimerSheetState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Cronômetro',
                         subtitle:
@@ -236,12 +250,9 @@ class _LifeCounterNativeGameTimerSheetState
                           children: [
                             _SummaryChip(
                               label: 'Status',
-                              value:
-                                  !_isActive
-                                      ? 'Inativo'
-                                      : (_isPaused
-                                          ? 'Pausado'
-                                          : 'Em andamento'),
+                              value: !_isActive
+                                  ? 'Inativo'
+                                  : (_isPaused ? 'Pausado' : 'Em andamento'),
                             ),
                             _SummaryChip(
                               label: 'Tempo decorrido',
@@ -255,7 +266,12 @@ class _LifeCounterNativeGameTimerSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -266,23 +282,27 @@ class _LifeCounterNativeGameTimerSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key(
                             'life-counter-native-game-timer-apply',
                           ),
-                          onPressed:
-                              () => Navigator.of(context).pop(_draftState),
+                          onPressed: () =>
+                              Navigator.of(context).pop(_draftState),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),
@@ -303,8 +323,9 @@ class _LifeCounterNativeGameTimerSheetState
     final minutes = (totalSeconds % 3600) ~/ 60;
     final seconds = totalSeconds % 60;
 
-    final paddedMinutes =
-        hours > 0 ? minutes.toString().padLeft(2, '0') : minutes.toString();
+    final paddedMinutes = hours > 0
+        ? minutes.toString().padLeft(2, '0')
+        : minutes.toString();
     final paddedSeconds = seconds.toString().padLeft(2, '0');
     if (hours > 0) {
       return '$hours:$paddedMinutes:$paddedSeconds';
@@ -328,7 +349,10 @@ class _SummaryChip extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space10,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +365,7 @@ class _SummaryChip extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               value,
               style: const TextStyle(
@@ -377,7 +401,12 @@ class _SectionCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space14,
+          AppTheme.space14,
+          AppTheme.space14,
+          AppTheme.space14,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -389,7 +418,7 @@ class _SectionCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Text(
               subtitle,
               style: const TextStyle(
@@ -398,7 +427,7 @@ class _SectionCard extends StatelessWidget {
                 height: AppTheme.lineHeightCompact,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             child,
           ],
         ),

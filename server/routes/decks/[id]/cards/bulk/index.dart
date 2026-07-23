@@ -5,6 +5,8 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/deck_cards_bulk_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
+import '../../../../../lib/deck_validation_state_support.dart';
+import '../../../../../lib/decks/deck_applied_analysis_support.dart';
 import '../../../../../lib/decks/deck_optimization_history_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -84,12 +86,20 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   }
 
   try {
-    late final List<Map<String, dynamic>> normalizedAfterCards;
     final result = await pool.runTx((session) async {
+      final isOptimizationMutation =
+          DeckOptimizationHistoryService.normalizeMutationContext(
+            mutationContext,
+          ).isNotEmpty;
       final deckResult = await session.execute(
-        Sql.named(
-          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1',
-        ),
+        Sql.named('''
+            SELECT format, validation_state, validation_reasons,
+                   validation_updated_at, archetype, bracket
+            FROM decks
+            WHERE id = @deckId AND user_id = @userId
+            LIMIT 1
+            FOR UPDATE
+          '''),
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
@@ -97,6 +107,15 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       }
 
       final format = (deckResult.first[0] as String).toLowerCase();
+      final beforeValidation = <String, dynamic>{
+        'validation_state': deckResult.first[1]?.toString() ?? 'unknown',
+        'validation_reasons': deckResult.first[2] ?? const <dynamic>[],
+        'validation_updated_at': deckValidationTimestampToJson(
+          deckResult.first[3],
+        ),
+      };
+      final existingArchetype = deckResult.first[4]?.toString();
+      final existingBracket = deckResult.first[5] as int?;
 
       // Carrega estado atual
       final existingResult = await session.execute(
@@ -116,18 +135,40 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           },
       ];
 
+      if (isOptimizationMutation) {
+        final expectedSignature =
+            mutationContext['expected_deck_signature']?.toString().trim() ?? '';
+        final currentSignature =
+            DeckOptimizationHistoryService.buildDeckSignature(current);
+        if (expectedSignature.isEmpty) {
+          return {
+            'error_code': 'optimization_signature_required',
+            'error': 'Optimization apply requires expected_deck_signature.',
+          };
+        }
+        if (expectedSignature != currentSignature) {
+          return {
+            'error_code': 'optimization_preview_stale',
+            'error':
+                'Deck changed after preview. Refresh the analysis and try again.',
+          };
+        }
+      }
+
       final normalized = mergeBulkCardIncrementsPreservingCondition(
         currentCards: current,
         increments: parsed,
       );
-      normalizedAfterCards = normalized
+      final normalizedAfterCards = normalized
           .map((card) => Map<String, dynamic>.from(card))
           .toList(growable: false);
 
       // Valida regras (inclui identidade/banlist/limites)
-      await DeckRulesService(
-        session,
-      ).validateAndThrow(format: format, cards: normalized, strict: false);
+      await DeckRulesService(session).validateAndThrow(
+        format: format,
+        cards: normalized,
+        strict: isOptimizationMutation,
+      );
 
       // Substitui o deck (em lote) – ok para bulk pois é uma operação rara.
       await session.execute(
@@ -161,20 +202,111 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         0,
         (sum, c) => sum + (c['quantity'] as int),
       );
-      return {'total_cards': total};
+      if (!isOptimizationMutation) return {'total_cards': total};
+
+      final stateResult = await session.execute(
+        Sql.named('''
+          UPDATE decks
+          SET validation_state = 'validated',
+              validation_reasons = '[]'::jsonb,
+              validation_updated_at = CURRENT_TIMESTAMP
+          WHERE id = @deckId AND user_id = @userId
+          RETURNING validation_state, validation_reasons,
+                    validation_updated_at
+        '''),
+        parameters: {'deckId': deckId, 'userId': userId},
+      );
+      final persistedState = stateResult.first.toColumnMap();
+      final afterValidation = <String, dynamic>{
+        'validation_state': persistedState['validation_state'],
+        'validation_reasons': persistedState['validation_reasons'],
+        'validation_updated_at': deckValidationTimestampToJson(
+          persistedState['validation_updated_at'],
+        ),
+      };
+      final optimizationArchetype =
+          mutationContext['archetype']?.toString().trim() ?? '';
+      final optimizationBracket = int.tryParse(
+        mutationContext['bracket']?.toString() ?? '',
+      );
+      if (optimizationArchetype.isNotEmpty ||
+          (optimizationBracket != null &&
+              optimizationBracket >= 1 &&
+              optimizationBracket <= 5)) {
+        await session.execute(
+          Sql.named('''
+            UPDATE decks
+            SET archetype = COALESCE(NULLIF(@archetype, ''), archetype),
+                bracket = COALESCE(
+                  CAST(NULLIF(@bracket, '') AS int),
+                  bracket
+                )
+            WHERE id = @deckId AND user_id = @userId
+          '''),
+          parameters: {
+            'deckId': deckId,
+            'userId': userId,
+            'archetype': optimizationArchetype,
+            'bracket':
+                optimizationBracket != null &&
+                        optimizationBracket >= 1 &&
+                        optimizationBracket <= 5
+                    ? optimizationBracket.toString()
+                    : '',
+          },
+        );
+      }
+      final appliedPostAnalysis = await loadAppliedDeckPostAnalysis(
+        session: session,
+        persistedCards: normalizedAfterCards,
+      );
+      final event = await DeckOptimizationHistoryService(
+        pool,
+      ).recordAppliedOptimization(
+        userId: userId,
+        deckId: deckId,
+        context: mutationContext,
+        session: session,
+        beforeCardsPayload: current,
+        afterCardsPayload: normalizedAfterCards,
+        beforeValidation: beforeValidation,
+        afterValidation: afterValidation,
+        beforeDeckMetadata: {
+          'archetype': existingArchetype,
+          'bracket': existingBracket,
+        },
+        afterDeckMetadata: {
+          'archetype':
+              optimizationArchetype.isEmpty
+                  ? existingArchetype
+                  : optimizationArchetype,
+          'bracket':
+              optimizationBracket != null &&
+                      optimizationBracket >= 1 &&
+                      optimizationBracket <= 5
+                  ? optimizationBracket
+                  : existingBracket,
+        },
+        authoritativeAfterAnalysis: appliedPostAnalysis,
+      );
+      return {
+        'total_cards': total,
+        if (event != null) 'optimization_event': event,
+        'post_analysis': appliedPostAnalysis,
+        'validation': {
+          'ok': true,
+          'format': format,
+          'deck_id': deckId,
+          'deck_state': 'validated',
+          'requires_review': false,
+          'review_reasons': const <String>[],
+          'validation_updated_at': afterValidation['validation_updated_at'],
+        },
+      };
     });
 
-    if (mutationContext.isNotEmpty) {
-      try {
-        await DeckOptimizationHistoryService(pool).recordAppliedOptimization(
-          userId: userId,
-          deckId: deckId,
-          context: mutationContext,
-          afterCardsPayload: normalizedAfterCards,
-        );
-      } catch (e) {
-        print('[WARN] Failed to record deck optimization event: $e');
-      }
+    if (result['error_code'] != null) {
+      return Response.json(statusCode: HttpStatus.conflict, body: result);
     }
 
     return Response.json(body: {'ok': true, ...result});

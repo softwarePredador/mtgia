@@ -4,6 +4,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 
 void main() {
+  test('HTTP image URLs stay secure outside an explicit loopback fixture', () {
+    expect(
+      CachedCardImage.sanitizeImageUrlForTesting(
+        'http://images.example.test/card.png',
+      ),
+      'https://images.example.test/card.png',
+    );
+    expect(
+      CachedCardImage.sanitizeImageUrlForTesting(
+        'http://127.0.0.1:8080/card.png',
+      ),
+      'https://127.0.0.1:8080/card.png',
+    );
+    expect(
+      CachedCardImage.sanitizeImageUrlForTesting(
+        'http://127.0.0.1:8080/card.png',
+        allowLoopbackHttp: true,
+      ),
+      'http://127.0.0.1:8080/card.png',
+    );
+    expect(
+      CachedCardImage.sanitizeImageUrlForTesting(
+        'http://images.example.test/card.png',
+        allowLoopbackHttp: true,
+      ),
+      'https://images.example.test/card.png',
+    );
+  });
+
   testWidgets('removes fragile set filter from Scryfall named image URLs', (
     tester,
   ) async {

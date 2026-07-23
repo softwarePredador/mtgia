@@ -6,13 +6,91 @@ void main() {
   test('quality gate honors the explicitly selected Flutter SDK', () {
     final source = File('../scripts/quality_gate.sh').readAsStringSync();
 
-    expect(source, contains(r'FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-flutter}"'));
-    expect(source, contains(r'flutter_bin_dir="$(dirname "$FLUTTER_BIN")"'));
-    expect(source, contains(r'export PATH="$flutter_bin_dir:$PATH"'));
-    expect(source, contains(r'"$FLUTTER_BIN" analyze --no-fatal-infos'));
+    expect(source, contains(r'FLUTTER_BIN="$MANALOOM_FLUTTER_BIN"'));
     expect(
       source,
-      contains(r'"$FLUTTER_BIN" test --no-version-check --reporter compact'),
+      contains(
+        r'PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"',
+      ),
+    );
+    expect(source, contains('resolve_manaloom_dart'));
+    expect(source, contains(r'flutter_bin_dir="$(dirname "$FLUTTER_BIN")"'));
+    expect(
+      source,
+      contains(r'export PATH="$(dirname "$DART_BIN"):$flutter_bin_dir:$PATH"'),
+    );
+    expect(
+      source,
+      contains(r'"$FLUTTER_BIN" analyze --no-pub --no-fatal-infos'),
+    );
+    expect(
+      source,
+      contains(
+        r'"$FLUTTER_BIN" test --no-pub --no-version-check --reporter compact',
+      ),
+    );
+  });
+
+  test('project logic and local gates require the pinned Dart SDK', () async {
+    final helper =
+        File(
+          '../scripts/lib/manaloom_dart_toolchain.sh',
+        ).absolute.resolveSymbolicLinksSync();
+    final fixture = Directory.systemTemp.createTempSync(
+      'manaloom-dart-toolchain-contract.',
+    );
+    try {
+      final fakeDart = File('${fixture.path}/dart')
+        ..writeAsStringSync('''#!/bin/sh
+printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
+''');
+      final chmod = Process.runSync('/bin/chmod', ['+x', fakeDart.path]);
+      expect(chmod.exitCode, 0);
+
+      Future<ProcessResult> resolve(String version) => Process.run(
+        '/bin/bash',
+        [
+          '-c',
+          'set -e; . "\$HELPER"; resolve_manaloom_dart; '
+              'printf "%s\\n" "\$MANALOOM_DART_BIN_RESOLVED"',
+        ],
+        environment: {
+          'PATH': '/usr/bin:/bin',
+          'HELPER': helper,
+          'MANALOOM_DART_BIN': fakeDart.path,
+          'FAKE_DART_VERSION': version,
+        },
+      );
+
+      final approved = await resolve('3.12.2');
+      expect(approved.exitCode, 0);
+      expect(
+        File((approved.stdout as String).trim()).resolveSymbolicLinksSync(),
+        fakeDart.resolveSymbolicLinksSync(),
+      );
+
+      final rejected = await resolve('3.11.4');
+      expect(rejected.exitCode, 2);
+      expect(rejected.stderr, contains('esperado 3.12.2'));
+      expect(rejected.stderr, contains('encontrado 3.11.4'));
+    } finally {
+      fixture.deleteSync(recursive: true);
+    }
+
+    for (final path in [
+      '../scripts/manaloom_project_logic.sh',
+      '../scripts/manaloom_dart_doc.sh',
+      '../scripts/manaloom_dart_mcp_preflight.sh',
+      '../scripts/manaloom_tbls_local_gate.sh',
+      '../scripts/manaloom_local_ci.sh',
+    ]) {
+      expect(File(path).readAsStringSync(), contains('resolve_manaloom_dart'));
+    }
+    final dartDoc = File('../scripts/manaloom_dart_doc.sh').readAsStringSync();
+    expect(dartDoc, contains('resolve_manaloom_flutter_root'));
+    expect(
+      dartDoc,
+      contains(r'export FLUTTER_ROOT="$MANALOOM_FLUTTER_ROOT_RESOLVED"'),
     );
   });
 

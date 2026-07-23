@@ -1,0 +1,16 @@
+name: manaloom_project_logic
+description: Deterministic ManaLoom architecture, contract, and lineage generator.
+publish_to: none
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+
+dependencies:
+  analyzer: ^8.4.0
+  crypto: ^3.0.6
+  path: ^1.9.1
+
+dev_dependencies:
+  dependency_validator: ^5.0.5
+  lints: ^5.1.1
+  test: ^1.25.15

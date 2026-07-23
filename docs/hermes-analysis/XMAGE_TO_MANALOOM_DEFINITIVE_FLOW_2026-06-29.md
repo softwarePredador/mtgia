@@ -1,6 +1,7 @@
 # XMage -> ManaLoom Definitive Flow - 2026-06-29
 
-Status: `current_operating_standard`.
+Status: `historical_native-adaptation_evidence`; superseded for current
+operation by `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`.
 
 Current operational execution and learning closure is centralized in
 `docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`
@@ -9,7 +10,13 @@ source candidate until `xmage_source_catalog_reconciliation.py` confirms the
 exact identity against the pinned runtime catalogs. Historical package records
 below remain evidence, not alternate current runners.
 
-This document supersedes the operational parts of:
+This document preserves the historical native-adaptation program and its
+package evidence. It must not be used as a current handoff, queue owner, or
+instruction to translate every XMage-resolved card into a ManaLoom-native
+adapter. The current runbook above owns execution coverage, residual routing,
+learning evidence, and promotion boundaries.
+
+Historically, this document superseded the operational parts of:
 
 - `XMAGE_ABSORPTION_IMPLEMENTATION_PLAN_2026-06-23.md`
 - `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
@@ -76,11 +83,13 @@ may become a native-success fallback.
 
 External replay observation is deliberately narrower than executable rules
 truth. A typed stack, zone, permanent, combat, or life event is positive
-activity evidence, but a missing event cannot prove non-use. XMage's request
-seed controls the engine random source; it does not guarantee a byte-identical
-asynchronous watcher stream. Deck-learning consumers must preserve the
-`learning_contract`, engine commit, process ID, seed, and timeout outcome rather
-than collapsing a completed battle into a per-card truth label.
+activity evidence, but a missing event cannot prove non-use. In the current
+sidecar topology the XMage request seed is correlation metadata only: the game
+server runs in a separate JVM whose RNG is not controlled by that request.
+Forge seeds its engine RNG, but that is not a replay-determinism guarantee.
+Deck-learning consumers must preserve the `learning_contract`, engine commit,
+process ID, declared seed semantics, seed, and timeout outcome rather than
+collapsing a completed battle into a per-card truth label.
 
 ## Global All-Card Scope
 
@@ -151,12 +160,15 @@ Interpretation:
   they should be scheduled as family/subpattern units, never as a card-by-card
   backlog.
 
-## XMage Authoritative Adaptation Queue
+## Historical XMage Authoritative Adaptation Queue
 
-As of 2026-07-01, the project no longer treats resolved local XMage classes as
-mere review hints. For every target card where local XMage resolves a Java card
-class, XMage is the final card-behavior source and ManaLoom's remaining work is
-adapter/runtime translation.
+As of 2026-07-01, this queue treated resolved local XMage classes as native
+adapter work-unit evidence. That interpretation is historical. Under the
+current launch flow, a local class is only a source candidate until the pinned
+runtime catalog confirms the exact identity. Catalog-confirmed XMage or Forge
+coverage executes externally and does not require a native rule row. Native
+adapter work is opened only for the explicit residual after both external
+coverage lanes fail.
 
 Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
@@ -14617,8 +14629,8 @@ Post-sync queue evidence:
 - final exact-scope recheck `proposal_count=0`
 - final exact-scope recheck `safe_for_batch_pg_package_count=0`
 
-Residual boundary: PG535 does not authorize non-creature tokens such as
-Powerstone, dynamic token counts, devotion/chroma/converge token counts,
+Residual boundary: PG535 does not authorize creation of non-creature game
+objects such as Powerstones, quantities driven by devotion/chroma/converge,
 triggered or activated token makers beyond already modeled scopes, token classes
 with unsupported abilities, `entersWithCounters`, additional costs, or
 `withAdditionalTokens(...)`.

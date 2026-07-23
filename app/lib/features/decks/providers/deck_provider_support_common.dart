@@ -16,20 +16,17 @@ class DeckAiFlowException implements Exception {
   final String? outcomeCode;
   final Map<String, dynamic> payload;
 
-  Map<String, dynamic> get qualityError =>
-      (payload['quality_error'] is Map)
-          ? (payload['quality_error'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+  Map<String, dynamic> get qualityError => (payload['quality_error'] is Map)
+      ? (payload['quality_error'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
 
-  Map<String, dynamic> get nextAction =>
-      (payload['next_action'] is Map)
-          ? (payload['next_action'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+  Map<String, dynamic> get nextAction => (payload['next_action'] is Map)
+      ? (payload['next_action'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
 
-  Map<String, dynamic> get deckState =>
-      (payload['deck_state'] is Map)
-          ? (payload['deck_state'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+  Map<String, dynamic> get deckState => (payload['deck_state'] is Map)
+      ? (payload['deck_state'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
 
   bool get isNeedsRepair =>
       outcomeCode == 'needs_repair' ||
@@ -82,10 +79,15 @@ class DeckDetailsFetchState {
 }
 
 class DeckListFetchState {
-  const DeckListFetchState({required this.decks, required this.errorMessage});
+  const DeckListFetchState({
+    required this.decks,
+    required this.errorMessage,
+    required this.statusCode,
+  });
 
   final List<Deck>? decks;
   final String? errorMessage;
+  final int? statusCode;
 }
 
 class DeckDeleteResult {
@@ -110,10 +112,15 @@ class DeckAddCardResult {
 }
 
 class DeckMutationResult {
-  const DeckMutationResult({required this.isSuccess, this.errorMessage});
+  const DeckMutationResult({
+    required this.isSuccess,
+    this.errorMessage,
+    this.payload = const <String, dynamic>{},
+  });
 
   final bool isSuccess;
   final String? errorMessage;
+  final Map<String, dynamic> payload;
 }
 
 class DeckCreateResult {
@@ -182,6 +189,7 @@ class OptimizeDeckRequestResult {
     this.pollIntervalMs,
     this.pollTimeoutMs,
     this.totalStages,
+    this.requestKey,
   });
 
   const OptimizeDeckRequestResult.completed(Map<String, dynamic> result)
@@ -192,12 +200,14 @@ class OptimizeDeckRequestResult {
     required int pollIntervalMs,
     required int pollTimeoutMs,
     required int totalStages,
+    String? requestKey,
   }) : this._(
          isAsync: true,
          jobId: jobId,
          pollIntervalMs: pollIntervalMs,
          pollTimeoutMs: pollTimeoutMs,
          totalStages: totalStages,
+         requestKey: requestKey,
        );
 
   final bool isAsync;
@@ -206,6 +216,38 @@ class OptimizeDeckRequestResult {
   final int? pollIntervalMs;
   final int? pollTimeoutMs;
   final int? totalStages;
+  final String? requestKey;
+}
+
+class OptimizeJobCancellation {
+  bool _isCancelled = false;
+  String? _jobId;
+
+  bool get isCancelled => _isCancelled;
+  String? get jobId => _jobId;
+
+  void attachJob(String jobId) {
+    _jobId = jobId;
+  }
+
+  void cancel() {
+    _isCancelled = true;
+  }
+}
+
+class OptimizeJobCancelledException implements Exception {
+  const OptimizeJobCancelledException();
+
+  @override
+  String toString() => 'Otimização cancelada.';
+}
+
+class OptimizeJobTimeoutException implements Exception {
+  const OptimizeJobTimeoutException();
+
+  @override
+  String toString() =>
+      'A otimização demorou mais que o esperado. Você pode retomá-la depois.';
 }
 
 class RebuildDeckRequestResult {
@@ -219,10 +261,12 @@ class DeckPersistResult {
   const DeckPersistResult({
     required this.validation,
     required this.elapsedMilliseconds,
+    this.optimizationEvent,
   });
 
   final Map<String, dynamic> validation;
   final int elapsedMilliseconds;
+  final Map<String, dynamic>? optimizationEvent;
 }
 
 class OptimizeJobPollResult {
@@ -289,10 +333,9 @@ Set<String>? getCommanderIdentitySet(DeckDetails? deck) {
   if (deck == null) return null;
   if (deck.commander.isEmpty) return null;
   final commander = deck.commander.first;
-  final identity =
-      commander.colorIdentity.isNotEmpty
-          ? commander.colorIdentity
-          : commander.colors;
+  final identity = commander.colorIdentity.isNotEmpty
+      ? commander.colorIdentity
+      : commander.colors;
   return identity.map((e) => e.toUpperCase()).toSet();
 }
 

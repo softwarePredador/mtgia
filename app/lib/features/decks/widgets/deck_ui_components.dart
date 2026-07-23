@@ -32,7 +32,7 @@ class DialogTitleBlock extends StatelessWidget {
           ),
           child: Icon(icon, color: accent, size: 20),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.space12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +45,7 @@ class DialogTitleBlock extends StatelessWidget {
                 ),
               ),
               if (subtitle != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppTheme.space4),
                 Text(
                   subtitle!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -91,7 +91,7 @@ class DialogSectionCard extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(AppTheme.space14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -99,7 +99,7 @@ class DialogSectionCard extends StatelessWidget {
                 children: [
                   if (icon != null) ...[
                     Icon(icon, size: 16, color: accent),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppTheme.space8),
                   ],
                   Expanded(
                     child: Text(
@@ -112,7 +112,7 @@ class DialogSectionCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               child,
             ],
           ),
@@ -142,10 +142,14 @@ class DeckMetaChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final backgroundAlpha = prominent ? 0.23 : 0.14;
     final borderAlpha = prominent ? 0.64 : 0.28;
-    final borderWidth =
-        prominent ? AppTheme.strokeRegular : AppTheme.strokeThin;
+    final borderWidth = prominent
+        ? AppTheme.strokeRegular
+        : AppTheme.strokeThin;
     final content = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space6,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: backgroundAlpha),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -161,7 +165,7 @@ class DeckMetaChip extends StatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(icon, size: 14, color: color),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppTheme.space6),
           ],
           Flexible(
             child: Text(
@@ -201,6 +205,8 @@ class FlowLoadingDialog extends StatefulWidget {
   final int? stepNumber;
   final int? totalSteps;
   final List<String> tips;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   const FlowLoadingDialog({
     super.key,
@@ -212,6 +218,8 @@ class FlowLoadingDialog extends StatefulWidget {
     this.stepNumber,
     this.totalSteps,
     this.tips = const [],
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -256,14 +264,13 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final currentTip =
-        widget.tips.isEmpty
-            ? null
-            : widget.tips[_tipIndex % widget.tips.length];
+    final currentTip = widget.tips.isEmpty
+        ? null
+        : widget.tips[_tipIndex % widget.tips.length];
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppTheme.space20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -276,7 +283,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
               ),
               child: Icon(widget.icon, color: widget.accent, size: 24),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             Text(
               widget.title,
               textAlign: TextAlign.center,
@@ -286,7 +293,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
               ),
             ),
             if (widget.stepNumber != null && widget.totalSteps != null) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               DeckMetaChip(
                 label: 'Etapa ${widget.stepNumber} de ${widget.totalSteps}',
                 color: widget.accent,
@@ -294,7 +301,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
               ),
             ],
             if (widget.subtitle != null) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: AppTheme.space6),
               Text(
                 widget.subtitle!,
                 textAlign: TextAlign.center,
@@ -304,13 +311,13 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
                 ),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             LinearProgressIndicator(value: widget.progress),
             if (currentTip != null) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: AppTheme.space14),
               Container(
                 width: 320,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppTheme.space12),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceSlate,
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -327,7 +334,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
                       size: 18,
                       color: widget.accent,
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: AppTheme.space10),
                     Expanded(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 220),
@@ -343,6 +350,15 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
                     ),
                   ],
                 ),
+              ),
+            ],
+            if (widget.actionLabel != null && widget.onAction != null) ...[
+              const SizedBox(height: AppTheme.space12),
+              TextButton.icon(
+                key: const Key('flow-loading-action-button'),
+                onPressed: widget.onAction,
+                icon: const Icon(Icons.stop_circle_outlined),
+                label: Text(widget.actionLabel!),
               ),
             ],
           ],

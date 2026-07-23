@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import re
 import unittest
 from pathlib import Path
 
@@ -33,14 +32,14 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
             3,
         )
 
-    def test_ci_and_local_dispatchers_reference_the_canonical_gate(self) -> None:
+    def test_local_dispatchers_reference_the_canonical_gate(self) -> None:
         report = AUDIT.build_report()
         checks_by_path: dict[str, list[dict[str, object]]] = {}
         for check in report["checks"]:
             checks_by_path.setdefault(check["path"], []).append(check)
 
         for path in (
-            ".github/workflows/manaloom-guardrails.yml",
+            "scripts/manaloom_local_ci.sh",
             "melos.yaml",
             "scripts/quality_gate.sh",
             "scripts/manaloom_e2e_suite.sh",
@@ -51,31 +50,26 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
                 path,
             )
 
-    def test_setup_java_uses_a_sha_pin_with_a_version_comment(self) -> None:
+    def test_release_dispatcher_is_local_and_github_actions_is_absent(self) -> None:
         report = AUDIT.build_report()
-        workflow_checks = [
+        local_checks = [
             check
             for check in report["checks"]
-            if check["path"] == ".github/workflows/manaloom-guardrails.yml"
+            if check["path"] == "scripts/manaloom_local_ci.sh"
         ]
-        self.assertGreaterEqual(len(workflow_checks), 2)
+        self.assertGreaterEqual(len(local_checks), 2)
         self.assertTrue(
-            all(check["status"] == "pass" for check in workflow_checks),
-            workflow_checks,
+            all(check["status"] == "pass" for check in local_checks),
+            local_checks,
         )
 
-        workflow = (
-            REPO_ROOT / ".github" / "workflows" / "manaloom-guardrails.yml"
-        ).read_text(encoding="utf-8")
-        self.assertRegex(
-            workflow,
-            re.compile(
-                r"uses:\s*actions/setup-java@[0-9a-f]{40}\s+#\s+v\d+\.\d+\.\d+"
-            ),
+        local_ci = (REPO_ROOT / "scripts" / "manaloom_local_ci.sh").read_text(
+            encoding="utf-8"
         )
-        self.assertNotRegex(
-            workflow,
-            re.compile(r"uses:\s*actions/setup-java@v\d+"),
+        self.assertIn("bootstrap_pinned_xmage_maven.sh", local_ci)
+        self.assertIn('"$ROOT_DIR/scripts/quality_gate.sh" battle', local_ci)
+        self.assertFalse(
+            (REPO_ROOT / ".github" / "workflows" / "manaloom-guardrails.yml").exists()
         )
 
     def test_mutating_battle_contract_is_isolated_and_not_a_static_skip(self) -> None:

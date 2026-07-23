@@ -2,6 +2,16 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-flutter}"
+
+if [[ "$FLUTTER_BIN" == */* ]]; then
+  if [[ ! -x "$FLUTTER_BIN" ]]; then
+    echo "Flutter configurado não é executável: $FLUTTER_BIN" >&2
+    exit 2
+  fi
+  FLUTTER_BIN="$(cd "$(dirname "$FLUTTER_BIN")" && pwd)/$(basename "$FLUTTER_BIN")"
+fi
+readonly FLUTTER_BIN
 
 print_header() {
   echo ""
@@ -13,9 +23,10 @@ print_header() {
 print_header "ManaLoom Patrol critical E2E suite"
 cd "$ROOT_DIR/app"
 if [[ ! -f ".dart_tool/package_config.json" ]]; then
-  flutter pub get
+  "$FLUTTER_BIN" pub get
 fi
-flutter test patrol_test/manaloom_patrol_smoke_test.dart \
+"$FLUTTER_BIN" test patrol_test/manaloom_patrol_smoke_test.dart \
+  --no-pub \
   --no-version-check \
   --dart-define=PATROL_HOT_RESTART=true
 

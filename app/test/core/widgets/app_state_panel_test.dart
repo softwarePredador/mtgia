@@ -4,14 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/app_state_panel.dart';
 
+import '../../ui/support/manaloom_ui_audit_harness.dart';
+
 void main() {
-  Widget createSubject() {
+  Widget createSubject({double width = 280, double height = 180}) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
       home: Scaffold(
         body: SizedBox(
-          width: 280,
-          height: 180,
+          width: width,
+          height: height,
           child: AppStatePanel(
             icon: Icons.info_outline_rounded,
             title: 'Nenhum conteúdo por aqui',
@@ -70,14 +72,13 @@ void main() {
         });
       }
 
-      final root =
-          tester
-              .binding
-              .renderViews
-              .single
-              .owner!
-              .semanticsOwner!
-              .rootSemanticsNode!;
+      final root = tester
+          .binding
+          .renderViews
+          .single
+          .owner!
+          .semanticsOwner!
+          .rootSemanticsNode!;
       collectLabels(root);
 
       expect(
@@ -88,5 +89,51 @@ void main() {
     } finally {
       semanticsHandle.dispose();
     }
+  });
+
+  testWidgets('loading state exposes one live label and a progress indicator', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: const Scaffold(
+          body: AppStatePanel.loading(
+            key: Key('state-loading'),
+            title: 'Carregando coleção',
+            message: 'Buscando suas cartas.',
+            accent: AppTheme.frost400,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('state-loading')), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    final semantics = tester.widget<Semantics>(
+      find.byWidgetPredicate(
+        (widget) => widget is Semantics && widget.properties.liveRegion == true,
+      ),
+    );
+    expect(
+      semantics.properties.label,
+      'Carregando. Carregando coleção. Buscando suas cartas.',
+    );
+  });
+
+  testWidgets('state panel passes labels, 48px targets and WCAG contrast', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(createSubject(width: 390, height: 844));
+    await tester.pumpAndSettle();
+
+    await expectManaLoomBaselineAccessibility(tester);
+    semantics.dispose();
   });
 }

@@ -34,6 +34,7 @@ const _commanderNames = <String>[
   'Jin-Gitaxias',
   'Auntie Ool, Cursewretch',
   'Talrand, Sky Summoner',
+  'Fable of the Mirror-Breaker // Reflection of Kiki-Jiki',
 ];
 
 String? _commanderImageUrl(int index) {
@@ -59,15 +60,20 @@ List<Deck> _decks() => List.generate(10, (index) {
     isPublic: index.isEven,
     createdAt: DateTime(2026, 7, 1 + index),
     cardCount: index.isEven ? 100 : 60,
-    commanderName:
-        index < _commanderNames.length ? _commanderNames[index] : null,
+    commanderName: index < _commanderNames.length
+        ? _commanderNames[index]
+        : null,
     commanderImageUrl: _commanderImageUrl(index),
     colorIdentity: index == 0 ? const [] : const ['U'],
     colorIdentityKnown: index != 9,
   );
 });
 
-Future<void> _pumpDecks(WidgetTester tester, Size size) async {
+Future<void> _pumpDecks(
+  WidgetTester tester,
+  Size size, {
+  List<Deck>? decks,
+}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -76,7 +82,7 @@ Future<void> _pumpDecks(WidgetTester tester, Size size) async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<DeckProvider>(
-          create: (_) => _StaticDeckProvider(_decks()),
+          create: (_) => _StaticDeckProvider(decks ?? _decks()),
         ),
         ChangeNotifierProvider<MessageProvider>(
           create: (_) => MessageProvider(apiClient: _NoopApiClient()),
@@ -106,8 +112,9 @@ void main() {
       10,
       (index) => tester.getRect(find.byKey(Key('deck-list-row-deck-$index'))),
     );
-    final firstRowCount =
-        cardRects.where((rect) => (rect.top - firstRect.top).abs() < 1).length;
+    final firstRowCount = cardRects
+        .where((rect) => (rect.top - firstRect.top).abs() < 1)
+        .length;
 
     expect(firstRowCount, greaterThanOrEqualTo(5));
     // Flutter distributes the remaining grid pixels between columns, so allow
@@ -117,7 +124,7 @@ void main() {
     expect(find.byType(SvgPicture), findsWidgets);
 
     Rect? referenceFrame;
-    for (var index = 0; index < 5; index++) {
+    for (var index = 0; index < 6; index++) {
       final frame = find.byKey(Key('deck-gallery-art-frame-deck-$index'));
       final image = tester.widget<CachedCardImage>(
         find.byKey(Key('deck-gallery-art-deck-$index')),
@@ -141,8 +148,14 @@ void main() {
       expect(image.fallbackImageUrl, isNot(contains('art_crop')));
     }
 
+    final doubleFacedImage = tester.widget<CachedCardImage>(
+      find.byKey(const Key('deck-gallery-art-deck-5')),
+    );
+    expect(doubleFacedImage.imageUrl, contains('Fable+of+the+Mirror-Breaker'));
+    expect(doubleFacedImage.imageUrl, contains('%2F%2F'));
+
     final fallbackFrame = tester.getRect(
-      find.byKey(const Key('deck-gallery-art-frame-deck-5')),
+      find.byKey(const Key('deck-gallery-art-frame-deck-6')),
     );
     expect(
       fallbackFrame.width / fallbackFrame.height,
@@ -150,8 +163,33 @@ void main() {
     );
     expect(fallbackFrame.width, closeTo(referenceFrame!.width, 0.01));
     expect(fallbackFrame.height, closeTo(referenceFrame.height, 0.01));
-    expect(find.byKey(const Key('deck-gallery-art-deck-5')), findsNothing);
+    expect(find.byKey(const Key('deck-gallery-art-deck-6')), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('wide gallery has a deterministic reviewed visual baseline', (
+    tester,
+  ) async {
+    final placeholderDecks = List.generate(6, (index) {
+      return Deck(
+        id: 'golden-deck-$index',
+        name: 'Deck visual $index',
+        format: index.isEven ? 'commander' : 'standard',
+        commanderName: null,
+        commanderImageUrl: null,
+        isPublic: index.isEven,
+        createdAt: DateTime(2026, 7, 1 + index),
+        cardCount: index.isEven ? 100 : 60,
+        colorIdentity: index.isEven ? const ['R', 'W'] : const ['U'],
+      );
+    });
+    await _pumpDecks(tester, const Size(1880, 1000), decks: placeholderDecks);
+    expect(tester.takeException(), isNull);
+
+    await expectLater(
+      find.byKey(const Key('deck-list-row-golden-deck-0')),
+      matchesGoldenFile('goldens/deck_gallery_card_1880.png'),
+    );
   });
 
   testWidgets('compact deck list preserves gutters and single-column cards', (

@@ -63,6 +63,7 @@ The supported quality hierarchy has one battle product gate:
 | --- | --- | --- |
 | `scripts/quality_gate.sh battle` / `dart run melos run battle` | canonical dispatcher | discoverable local and CI aliases |
 | `scripts/manaloom_battle_product_gate.sh` | canonical battle product gate | native, Forge, XMage, manifest, static product contract, and focused Dart checks; no live service or database writes |
+| `scripts/quality_gate.sh engine-capabilities` | engine capability alignment | checks roles, pins, licenses, Java import boundaries, evidence paths, and explicit adoption decisions; optional exact source inventories remain read-only |
 | `scripts/manaloom_e2e_suite.sh` | broader E2E orchestrator | calls the canonical battle gate plus app, server, deckbuilder, and optional live layers |
 | `server/bin/manaloom_battle_product_e2e_audit.py` | component static audit | verifies app-to-engine-to-persistence wiring and this topology; it is not a second E2E runner |
 | `server/test/battle_product_e2e_test.dart` | opt-in live contract | post-deploy proof; creates temporary database rows and cleans them up |
@@ -73,6 +74,45 @@ CI and clean hosts must run
 `services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh`, which fetches the
 exact `services/xmage-sidecar/XMAGE_COMMIT` and installs its modules before the
 canonical gate. A pre-populated developer Maven cache is not CI evidence.
+
+## External Engine Capability Adoption
+
+The machine-readable decision matrix is
+`docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json`. It is enforced
+by
+`docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_capability_alignment_audit.py`
+and by the canonical Battle gate. Every reviewed XMage/Forge capability must be
+classified as adopted, evaluated but not adopted, out of current product scope,
+or explicitly rejected. Unclassified capabilities fail the audit.
+
+Current boundaries:
+
+- complete rules, card implementations, Commander execution, engine action
+  selection, coverage preflight, timeout isolation, replay normalization, pin
+  governance, source diagnostics, focused upstream scenarios, and legality
+  cross-checks are adopted with their stated limitations;
+- Forge deck generation/relation matrices are not product generators because
+  they do not satisfy collection, budget, protected-anchor, provenance, and
+  outcome contracts;
+- XMage debug logs and Forge internal search are not learning evidence because
+  neither sidecar exposes a stable, censored, source-attributed decision trace;
+- Forge bracket data is a comparison source only. Current official Commander
+  policy and versioned ManaLoom data remain authoritative;
+- draft, sealed, tournament, external clients, adventure, ratings, and
+  matchmaking are outside the current release scope;
+- Forge is GPL-3.0-only and remains behind its isolated process/API boundary.
+  The audit rejects `forge.*` Java imports outside `services/forge-sidecar`;
+  XMage Java dependencies are similarly confined to its sidecar.
+
+Operational source analysis resolves XMage only through
+`external_engine_source_contract.py`: callers must pass `--xmage-root` or
+`MANALOOM_XMAGE_SOURCE_ROOT`, the path must be the clean Git top-level at the
+canonical sidecar pin, and the required source modules must exist. No script
+may retain a machine-specific source or battle-artifact default. The historical
+absorption inventory alone retains `--allow-unpinned-source`, as an explicit
+diagnostic-only escape hatch that is never package, promotion or Battle
+evidence. Replay batch analysis also requires an explicit current
+`--battle-artifact-dir`.
 
 The retained `server/test/e2e_general_tests.py`, `e2e_ml_tests.py`, and
 `e2e_trade_tests.py` scripts are legacy manual live suites. They remain for
@@ -122,6 +162,12 @@ Both external sidecars expose:
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
 
+Requests and responses use the versioned `external_battle_request_v2` and
+`external_battle_execution_v2` envelopes. The backend verifies the exact
+engine/version/commit, sidecar protocol/build/process identity, canonical deck
+hashes, request hash, request ID, timeout and seed correlation before accepting
+any result. A response from a different build or request fails closed.
+
 The reviewed native sidecar exposes `GET /health`, `POST /cards/coverage`, and
 `POST /simulate`. It validates the complete submitted deck before running the
 isolated worker; validating only the Forge residual is forbidden because the
@@ -136,7 +182,8 @@ allows eight seconds for sidecar cleanup and HTTP delivery. This keeps the
 worst-case response below the production proxy deadline. Direct sidecar calls
 retain their wider timeout range for controlled offline benchmarks.
 
-XMage runs in-process beside its server, so timeout handling has two layers:
+XMage runs in the same container as its server, but in a separate JVM/process.
+Timeout handling therefore has two layers:
 
 - the sidecar indexes its card catalog before opening the HTTP port, so
   `GET /health` with `catalog_ready=true` is a readiness signal rather than a
@@ -174,6 +221,13 @@ omitting an unsupported card or failing to load a deck:
 - the requested seed is installed before Forge starts;
 - simulations are serialized.
 
+The current XMage remote protocol does not carry a per-match RNG seed into the
+server JVM. Its `seed` is therefore request-correlation metadata, not a claim
+of deterministic execution. Forge installs the seed in the engine process via
+the reviewed bootstrap, but still declares that a seed is not a byte-for-byte
+replay guarantee. Both capabilities are machine-readable; a stronger claim is
+rejected by the backend.
+
 ## Replay And Learning Contract
 
 External results publish `learning_contract.schema_version` as
@@ -196,7 +250,8 @@ have these meanings:
 evidence. It is insufficient for a deck promotion. A swap comparison requires:
 
 1. legal equal-cardinality base and candidate decks;
-2. same commander, opponents, engine version, timeout policy, and seed set;
+2. same commander, opponents, engine version, timeout policy, and balanced
+   seed-label set;
 3. typed exposure of the added and removed lane, or a separately labelled
    forced-access diagnostic;
 4. enough completed natural games to avoid deciding from timeout selection;
@@ -210,7 +265,10 @@ proof that a card was not drawn or used: hidden information is unavailable and
 the asynchronous XMage watcher can coalesce visible transitions. The response
 therefore publishes:
 
-- `seed_semantics=engine_random_seed_not_event_replay`;
+- XMage: `seed_semantics=request_correlation_only_server_rng_uncontrolled` and
+  `deterministic=false`;
+- Forge: `seed_semantics=engine_rng_seeded_not_replay_guarantee` and
+  `deterministic=false`;
 - `event_stream_completeness=best_effort_visible_state_lower_bound` for XMage
   or `best_effort_engine_log_lower_bound` for Forge;
 - `absence_proves_nonuse=false`.
@@ -226,9 +284,12 @@ named positive activity under either approved learning schema, never infers
 non-use from absence, and always keeps `promotion_allowed=false`. Forced-access
 diagnostics are persisted as `natural_sample=false` and are excluded from
 deckbuilder aggregation. Offline mass
-batches use `external_battle_async_registry_v1` and atomic
-`external_battle_async_checkpoint_v1`; full replay payloads are retained as
-compressed `.json.gz` files.
+batches use `external_battle_async_registry_v2` and atomic
+`external_battle_async_checkpoint_v2`; v1 artifacts are rejected, and full
+replay payloads are retained as compressed `.json.gz` files. Equal seed labels
+balance scheduling only. They do not create paired RNG observations, so the
+comparison gate publishes `seed_pairing_claim=false` and delegates to an
+engine-semantics-aware independent-sample statistical design.
 
 ## Measured Catalog Baseline
 
@@ -345,6 +406,7 @@ cd server && dart test \
   test/battle_replay_read_service_test.dart
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py \
   --output-prefix /tmp/manaloom_external_battle_execution_contract
+./scripts/quality_gate.sh engine-capabilities
 ```
 
 Docker images are reproducible from the commits in

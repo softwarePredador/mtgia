@@ -468,27 +468,21 @@ void main() {
     () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/cards?name=Mind+Stone&limit=1':
-              () => ApiResponse(200, {
-                'data': [
-                  {
-                    'id': 'remove-1',
-                    'name': 'Mind Stone',
-                    'type_line': 'Artifact',
-                  },
-                ],
-              }),
-          '/cards?name=Arcane+Signet&limit=1':
-              () => ApiResponse(200, {
-                'data': [
-                  {
-                    'id': 'add-1',
-                    'name': 'Arcane Signet',
-                    'type_line': 'Artifact',
-                    'color_identity': const <String>[],
-                  },
-                ],
-              }),
+          '/cards?name=Mind+Stone&limit=1': () => ApiResponse(200, {
+            'data': [
+              {'id': 'remove-1', 'name': 'Mind Stone', 'type_line': 'Artifact'},
+            ],
+          }),
+          '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
+            'data': [
+              {
+                'id': 'add-1',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'color_identity': const <String>[],
+              },
+            ],
+          }),
         },
       );
 
@@ -583,6 +577,24 @@ void main() {
     );
   });
 
+  test('deck import/export failures never expose raw server errors', () {
+    final importFailure = parseImportDeckResponse(
+      ApiResponse(500, {'error': 'PostgreSqlException: secret_table'}),
+    );
+    final exportFailure = parseDeckExportResponse(
+      ApiResponse(500, {'error': 'Stack trace /srv/app.dart:42'}),
+    );
+
+    expect(
+      importFailure['error'],
+      'Servidor indisponível no momento. Tente novamente em instantes.',
+    );
+    expect(
+      exportFailure['error'],
+      'Servidor indisponível no momento. Tente novamente em instantes.',
+    );
+  });
+
   test('generated deck review fails closed without validation evidence', () {
     expect(
       isReviewableGeneratedDeckResult({
@@ -614,6 +626,37 @@ void main() {
     expect(isReviewableGeneratedDeckResult(payload), isFalse);
     payload['provider_repair'] = {'eligible': true};
     expect(isReviewableGeneratedDeckResult(payload), isTrue);
+  });
+
+  test('legal constrained deck remains reviewable but cannot be saved', () {
+    final payload = <String, dynamic>{
+      'generated_deck': {
+        'cards': const [
+          {'name': 'Island', 'quantity': 60},
+        ],
+      },
+      'validation': {
+        'is_valid': true,
+        'errors': const <String>[],
+        'invalid_cards': const <String>[],
+      },
+      'stats': {'invalid_cards': 0},
+      'can_save': false,
+      'generation_constraints': {
+        'can_save': false,
+        'blockers': const [
+          {
+            'code': 'missing_price',
+            'message': 'Há compras sem preço verificável.',
+          },
+        ],
+      },
+    };
+
+    expect(isReviewableGeneratedDeckResult(payload), isTrue);
+    expect(generatedDeckSaveBlockingReasons(payload), [
+      'Há compras sem preço verificável.',
+    ]);
   });
 
   test('parseImportToDeckResponse maps failure payload', () {
@@ -916,18 +959,17 @@ void main() {
     () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/decks/deck-1':
-              () => ApiResponse(200, {
-                'id': 'deck-1',
-                'name': 'Blue Deck',
-                'format': 'commander',
-                'is_public': false,
-                'created_at': '2026-03-24T00:00:00.000Z',
-                'color_identity': const ['U'],
-                'stats': const <String, dynamic>{},
-                'commander': const <dynamic>[],
-                'main_board': const <String, List<dynamic>>{},
-              }),
+          '/decks/deck-1': () => ApiResponse(200, {
+            'id': 'deck-1',
+            'name': 'Blue Deck',
+            'format': 'commander',
+            'is_public': false,
+            'created_at': '2026-03-24T00:00:00.000Z',
+            'color_identity': const ['U'],
+            'stats': const <String, dynamic>{},
+            'commander': const <dynamic>[],
+            'main_board': const <String, List<dynamic>>{},
+          }),
           '/decks/deck-2': () => ApiResponse(500, {'error': 'boom'}),
         },
       );
@@ -965,6 +1007,7 @@ void main() {
 
     expect(detailsState.statusCode, 401);
     expect(detailsState.errorMessage, 'token expirado');
+    expect(listState.statusCode, 401);
     expect(listState.errorMessage, contains('Sessão expirada'));
   });
 
@@ -1202,12 +1245,15 @@ void main() {
 
       final asyncClient = _FakeApiClient(
         postHandlers: {
-          '/ai/optimize':
-              (_) => ApiResponse(202, {
-                'job_id': 'job-1',
-                'poll_interval_ms': 2500,
-                'total_stages': 7,
-              }),
+          '/ai/optimize': (_) => ApiResponse(202, {
+            'job_id': 'job-1',
+            'poll_interval_ms': 2500,
+            'total_stages': 7,
+            'idempotency': {
+              'request_key': 'optimize:request-1',
+              'reused': false,
+            },
+          }),
         },
       );
       final asyncResult = await requestOptimizeDeck(
@@ -1215,20 +1261,21 @@ void main() {
         deckId: 'deck-1',
         archetype: 'control',
         keepTheme: false,
+        requestKey: 'optimize:request-1',
       );
       expect(asyncResult.isAsync, isTrue);
       expect(asyncResult.jobId, 'job-1');
       expect(asyncResult.pollIntervalMs, 2500);
       expect(asyncResult.totalStages, 7);
+      expect(asyncResult.requestKey, 'optimize:request-1');
 
       final failureClient = _FakeApiClient(
         postHandlers: {
-          '/ai/optimize':
-              (_) => ApiResponse(422, {
-                'error': 'Precisa de reparo',
-                'quality_error': {'code': 'OPTIMIZE_NEEDS_REPAIR'},
-                'outcome_code': 'needs_repair',
-              }),
+          '/ai/optimize': (_) => ApiResponse(422, {
+            'error': 'Precisa de reparo',
+            'quality_error': {'code': 'OPTIMIZE_NEEDS_REPAIR'},
+            'outcome_code': 'needs_repair',
+          }),
         },
       );
       await expectLater(
@@ -1243,13 +1290,12 @@ void main() {
 
       final rebuildClient = _FakeApiClient(
         postHandlers: {
-          '/ai/optimize':
-              (_) => ApiResponse(200, {
-                'mode': 'rebuild_guided',
-                'outcome_code': 'rebuild_guided',
-                'message': 'Reconstrua a estrutura antes de upgrades pontuais.',
-                'next_action': {'type': 'rebuild_guided'},
-              }),
+          '/ai/optimize': (_) => ApiResponse(200, {
+            'mode': 'rebuild_guided',
+            'outcome_code': 'rebuild_guided',
+            'message': 'Reconstrua a estrutura antes de upgrades pontuais.',
+            'next_action': {'type': 'rebuild_guided'},
+          }),
         },
       );
       await expectLater(
@@ -1285,9 +1331,8 @@ void main() {
               'rebuild_scope_selected': 'full_non_commander_rebuild',
             });
           },
-          '/decks/deck-1/validate':
-              (_) =>
-                  ApiResponse(200, {'valid': true, 'errors': const <String>[]}),
+          '/decks/deck-1/validate': (_) =>
+              ApiResponse(200, {'valid': true, 'errors': const <String>[]}),
         },
         putHandlers: {
           '/decks/deck-1': (body) {
@@ -1317,13 +1362,44 @@ void main() {
       expect(persistResult.validation['valid'], isTrue);
       expect(persistResult.elapsedMilliseconds, greaterThanOrEqualTo(0));
 
+      final atomicClient = _FakeApiClient(
+        putHandlers: {
+          '/decks/deck-1': (_) => ApiResponse(200, {
+            'validation': {'ok': true, 'deck_state': 'validated'},
+            'optimization_event': {'id': 'event-1'},
+          }),
+        },
+        postHandlers: {
+          '/decks/deck-1/optimizations/event-1/rollback': (_) =>
+              ApiResponse(200, {'ok': true, 'rolled_back_event_id': 'event-1'}),
+        },
+      );
+      final atomicPersist = await persistDeckCardsPayloadWithValidation(
+        atomicClient,
+        deckId: 'deck-1',
+        cardsPayload: const [
+          {'card_id': 'card-1', 'quantity': 1, 'is_commander': false},
+        ],
+        mutationContext: const {
+          'type': 'optimization_apply',
+          'expected_deck_signature': 'card-1:1:NM',
+        },
+      );
+      expect(atomicPersist.validation['deck_state'], 'validated');
+      expect(atomicPersist.optimizationEvent?['id'], 'event-1');
+      final rollback = await rollbackDeckOptimizationRequest(
+        atomicClient,
+        deckId: 'deck-1',
+        eventId: 'event-1',
+      );
+      expect(rollback['rolled_back_event_id'], 'event-1');
+
       final failureClient = _FakeApiClient(
         postHandlers: {
-          '/ai/rebuild':
-              (_) => ApiResponse(422, {
-                'error': 'Rebuild falhou',
-                'quality_error': {'code': 'REBUILD_FAILED'},
-              }),
+          '/ai/rebuild': (_) => ApiResponse(422, {
+            'error': 'Rebuild falhou',
+            'quality_error': {'code': 'REBUILD_FAILED'},
+          }),
         },
       );
       await expectLater(
@@ -1345,13 +1421,12 @@ void main() {
     () async {
       final pendingClient = _FakeApiClient(
         getHandlers: {
-          '/ai/optimize/jobs/job-1':
-              () => ApiResponse(200, {
-                'status': 'processing',
-                'stage': 'Analisando',
-                'stage_number': 2,
-                'total_stages': 6,
-              }),
+          '/ai/optimize/jobs/job-1': () => ApiResponse(200, {
+            'status': 'processing',
+            'stage': 'Analisando',
+            'stage_number': 2,
+            'total_stages': 6,
+          }),
         },
       );
       final pending = await pollOptimizeJobRequest(pendingClient, 'job-1');
@@ -1361,11 +1436,10 @@ void main() {
 
       final completedClient = _FakeApiClient(
         getHandlers: {
-          '/ai/optimize/jobs/job-2':
-              () => ApiResponse(200, {
-                'status': 'completed',
-                'result': {'mode': 'optimize'},
-              }),
+          '/ai/optimize/jobs/job-2': () => ApiResponse(200, {
+            'status': 'completed',
+            'result': {'mode': 'optimize'},
+          }),
         },
       );
       final completed = await pollOptimizeJobRequest(completedClient, 'job-2');
@@ -1374,12 +1448,11 @@ void main() {
 
       final failedClient = _FakeApiClient(
         getHandlers: {
-          '/ai/optimize/jobs/job-3':
-              () => ApiResponse(200, {
-                'status': 'failed',
-                'error': 'Falhou',
-                'quality_error': {'code': 'OPTIMIZE_JOB_FAILED'},
-              }),
+          '/ai/optimize/jobs/job-3': () => ApiResponse(200, {
+            'status': 'failed',
+            'error': 'Falhou',
+            'quality_error': {'code': 'OPTIMIZE_JOB_FAILED'},
+          }),
         },
       );
       await expectLater(
@@ -1397,6 +1470,91 @@ void main() {
     },
   );
 
+  test(
+    'AI job helpers cancel, resume latest and map cancelled status',
+    () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/ai/optimize/jobs/latest?deck_id=deck-1&active=true': () =>
+              ApiResponse(200, {
+                'job_id': 'optimize-1',
+                'status': 'processing',
+                'can_resume': true,
+              }),
+          '/ai/generate/jobs/latest?active=true': () => ApiResponse(200, {
+            'job_id': 'generate-1',
+            'status': 'processing',
+            'can_resume': true,
+          }),
+          '/ai/optimize/jobs/cancelled-1': () => ApiResponse(200, {
+            'job_id': 'cancelled-1',
+            'status': 'cancelled',
+          }),
+        },
+        deleteHandlers: {
+          '/ai/optimize/jobs/optimize-1': () =>
+              ApiResponse(200, {'job_id': 'optimize-1', 'status': 'cancelled'}),
+          '/ai/generate/jobs/generate-1': () =>
+              ApiResponse(200, {'job_id': 'generate-1', 'status': 'cancelled'}),
+        },
+      );
+
+      final latestOptimize = await fetchLatestOptimizeJobRequest(
+        apiClient,
+        deckId: 'deck-1',
+      );
+      final latestGenerate = await fetchLatestGenerateJobRequest(apiClient);
+      final cancelledOptimize = await cancelOptimizeJobRequest(
+        apiClient,
+        'optimize-1',
+      );
+      final cancelledGenerate = await cancelGenerateJobRequest(
+        apiClient,
+        'generate-1',
+      );
+
+      expect(latestOptimize?['job_id'], 'optimize-1');
+      expect(latestGenerate?['job_id'], 'generate-1');
+      expect(cancelledOptimize['status'], 'cancelled');
+      expect(cancelledGenerate['status'], 'cancelled');
+      await expectLater(
+        () => pollOptimizeJobRequest(apiClient, 'cancelled-1'),
+        throwsA(isA<OptimizeJobCancelledException>()),
+      );
+    },
+  );
+
+  test('generate request forwards the stable request key', () async {
+    Map<String, dynamic>? capturedBody;
+    final apiClient = _FakeApiClient(
+      postHandlers: {
+        '/ai/generate': (body) {
+          capturedBody = body;
+          return ApiResponse(503, {'error': 'temporarily unavailable'});
+        },
+      },
+    );
+
+    await expectLater(
+      () => generateDeckFromPrompt(
+        apiClient,
+        prompt: 'Lorehold artifacts',
+        format: 'Commander',
+        requestKey: 'generate:request-1',
+        preferCollection: true,
+        collectionOnly: true,
+        budgetLimitBrl: 250,
+      ),
+      throwsA(isA<Exception>()),
+    );
+    expect(capturedBody?['request_key'], 'generate:request-1');
+    expect(capturedBody?['generation_constraints'], {
+      'prefer_collection': true,
+      'collection_only': true,
+      'budget_limit_brl': 250,
+    });
+  });
+
   test('parseCopyPublicDeckResponse maps success and failure', () {
     final success = parseCopyPublicDeckResponse(
       ApiResponse(201, {
@@ -1410,7 +1568,10 @@ void main() {
     expect(success['success'], isTrue);
     expect((success['deck'] as Map<String, dynamic>)['id'], 'deck-copy');
     expect(failure['success'], isFalse);
-    expect(failure['error'], 'falhou');
+    expect(
+      failure['error'],
+      'Servidor indisponível no momento. Tente novamente em instantes.',
+    );
   });
 
   test('extractApiError prefers error and falls back safely', () {
@@ -1522,11 +1683,10 @@ void main() {
   test('generateDeckFromPrompt never accepts a synchronous 422 as a deck', () {
     final apiClient = _FakeApiClient(
       postHandlers: {
-        '/ai/generate':
-            (_) => ApiResponse(422, {
-              'error': 'Generated deck failed validation',
-              'generated_deck': {'cards': const <Map<String, dynamic>>[]},
-            }),
+        '/ai/generate': (_) => ApiResponse(422, {
+          'error': 'Generated deck failed validation',
+          'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+        }),
       },
     );
 
@@ -1549,11 +1709,10 @@ void main() {
   test('generateDeckFromPrompt rejects a malformed synchronous 200', () {
     final apiClient = _FakeApiClient(
       postHandlers: {
-        '/ai/generate':
-            (_) => ApiResponse(200, {
-              'generated_deck': {'cards': const <Map<String, dynamic>>[]},
-              'validation': const {'is_valid': true},
-            }),
+        '/ai/generate': (_) => ApiResponse(200, {
+          'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+          'validation': const {'is_valid': true},
+        }),
       },
     );
 
@@ -1578,26 +1737,24 @@ void main() {
     () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/cards?name=Arcane+Signet&limit=1':
-              () => ApiResponse(200, {
-                'data': [
-                  {
-                    'id': 'add-1',
-                    'type_line': 'Artifact',
-                    'color_identity': const <String>[],
-                  },
-                ],
-              }),
-          '/cards?name=Mind+Stone&limit=1':
-              () => ApiResponse(200, {
-                'data': [
-                  {
-                    'id': 'remove-1',
-                    'type_line': 'Artifact',
-                    'color_identity': const <String>[],
-                  },
-                ],
-              }),
+          '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
+            'data': [
+              {
+                'id': 'add-1',
+                'type_line': 'Artifact',
+                'color_identity': const <String>[],
+              },
+            ],
+          }),
+          '/cards?name=Mind+Stone&limit=1': () => ApiResponse(200, {
+            'data': [
+              {
+                'id': 'remove-1',
+                'type_line': 'Artifact',
+                'color_identity': const <String>[],
+              },
+            ],
+          }),
         },
       );
 
@@ -1676,35 +1833,32 @@ void main() {
             expect(body['replace_all'], isTrue);
             return ApiResponse(200, {'cards_imported': 99});
           },
-          '/community/decks/deck-1':
-              (_) => ApiResponse(201, {
-                'deck': {'id': 'copied'},
-              }),
+          '/community/decks/deck-1': (_) => ApiResponse(201, {
+            'deck': {'id': 'copied'},
+          }),
         },
         getHandlers: {
-          '/decks/deck-1':
-              () => ApiResponse(200, {
-                'id': 'deck-1',
-                'name': 'Deck',
-                'format': 'commander',
-                'is_public': false,
-                'created_at': '2026-03-24T00:00:00.000Z',
-                'stats': const <String, dynamic>{},
-                'commander': const <dynamic>[],
-                'main_board': const <String, List<dynamic>>{},
-              }),
-          '/decks':
-              () => ApiResponse(200, [
-                {
-                  'id': 'deck-1',
-                  'name': 'Deck',
-                  'format': 'commander',
-                  'is_public': false,
-                  'created_at': '2026-03-24T00:00:00.000Z',
-                },
-              ]),
-          '/decks/deck-1/export':
-              () => ApiResponse(200, {'text': '1 Sol Ring'}),
+          '/decks/deck-1': () => ApiResponse(200, {
+            'id': 'deck-1',
+            'name': 'Deck',
+            'format': 'commander',
+            'is_public': false,
+            'created_at': '2026-03-24T00:00:00.000Z',
+            'stats': const <String, dynamic>{},
+            'commander': const <dynamic>[],
+            'main_board': const <String, List<dynamic>>{},
+          }),
+          '/decks': () => ApiResponse(200, [
+            {
+              'id': 'deck-1',
+              'name': 'Deck',
+              'format': 'commander',
+              'is_public': false,
+              'created_at': '2026-03-24T00:00:00.000Z',
+            },
+          ]),
+          '/decks/deck-1/export': () =>
+              ApiResponse(200, {'text': '1 Sol Ring'}),
         },
         putHandlers: {
           '/decks/deck-1': (body) {

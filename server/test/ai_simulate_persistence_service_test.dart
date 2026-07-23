@@ -138,6 +138,123 @@ void main() {
       );
     });
 
+    test(
+      'redacts secrets and hidden zones while preserving provenance',
+      () async {
+        final pool = _ScriptedPool([
+          _result(
+            columns: const ['exists'],
+            rows: const [
+              [true],
+            ],
+          ),
+          _result(
+            columns: const ['column_name'],
+            rows: const [
+              ['simulation_type'],
+              ['metrics'],
+              ['winner_deck_id'],
+              ['turns_played'],
+            ],
+          ),
+          _result(
+            columns: const ['id'],
+            rows: const [
+              ['replay-sanitized'],
+            ],
+          ),
+        ]);
+
+        final outcome = await BattleSimulationPersistenceService(pool).save(
+          deckAId: 'deck-a',
+          deckBId: 'deck-b',
+          type: 'battle',
+          result: const {
+            'engine': 'xmage',
+            'engine_commit': 'pinned-xmage-sha',
+            'seed': 42,
+            'authorization': 'Bearer should-not-be-stored',
+            'diagnostic': 'password=prod-secret',
+            'metrics': {'engine': 'xmage', 'api_key': 'provider-secret'},
+            'events': [
+              {
+                'event_type': 'hidden_draw',
+                'hidden': true,
+                'card': 'Secret Card',
+                'card_id': 'secret-card-id',
+              },
+            ],
+            'visual_snapshots': [
+              {
+                'players': [
+                  {
+                    'name': 'Deck A',
+                    'hand_size': 1,
+                    'hand': [
+                      {'name': 'Secret Card'},
+                    ],
+                    'library': [
+                      {'name': 'Library Secret One'},
+                      {'name': 'Library Secret Two'},
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        );
+
+        expect(outcome.isSaved, isTrue);
+        final parameters = pool.parameters.last as Map<String, dynamic>;
+        final gameLog =
+            jsonDecode(parameters['gameLog'] as String) as Map<String, dynamic>;
+        expect(gameLog['engine_commit'], 'pinned-xmage-sha');
+        expect(gameLog['seed'], 42);
+        expect(gameLog, isNot(contains('authorization')));
+        expect(gameLog['diagnostic'], 'password=[REDACTED]');
+        expect(
+          gameLog['replay_security'],
+          containsPair('schema_version', 'battle_replay_security_v1'),
+        );
+
+        final hiddenEvent = (gameLog['events'] as List).single as Map;
+        expect(hiddenEvent['event_type'], 'hidden_draw');
+        expect(hiddenEvent, isNot(contains('card')));
+        expect(hiddenEvent, isNot(contains('card_id')));
+
+        final snapshot = (gameLog['visual_snapshots'] as List).single as Map;
+        final player = (snapshot['players'] as List).single as Map;
+        expect(player['hand_size'], 1);
+        expect(player['library_size'], 2);
+        expect(player, isNot(contains('hand')));
+        expect(player, isNot(contains('library')));
+
+        final metrics =
+            jsonDecode(parameters['metrics'] as String) as Map<String, dynamic>;
+        expect(metrics['engine'], 'xmage');
+        expect(metrics, isNot(contains('api_key')));
+      },
+    );
+
+    test(
+      'fails closed before SQL when the replay payload is invalid',
+      () async {
+        final pool = _ScriptedPool(const []);
+
+        final outcome = await BattleSimulationPersistenceService(pool).save(
+          deckAId: 'deck-a',
+          type: 'battle',
+          result: {
+            'events': [Object()],
+          },
+        );
+
+        expect(outcome.isSaved, isFalse);
+        expect(outcome.errorCode, 'simulation_payload_invalid');
+        expect(pool.calls, 0);
+      },
+    );
+
     test('fails closed when the replay table is unavailable', () async {
       final pool = _ScriptedPool([
         _result(

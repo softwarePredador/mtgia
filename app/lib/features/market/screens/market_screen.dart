@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/market_provider.dart';
 import '../models/card_mover.dart';
@@ -92,8 +93,8 @@ class _MarketScreenState extends State<MarketScreen>
             padding: EdgeInsets.symmetric(
               horizontal:
                   MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
-                      ? 16
-                      : 24,
+                  ? AppTheme.space16
+                  : AppTheme.space24,
             ),
             child: SizedBox(
               key: const Key('market-content'),
@@ -138,18 +139,18 @@ class _MarketScreenState extends State<MarketScreen>
               data.gainers.isEmpty
                   ? _buildEmptyTab('Nenhuma carta valorizou hoje')
                   : _buildMoversList(
-                    data.gainers,
-                    isGainer: true,
-                    provider: provider,
-                  ),
+                      data.gainers,
+                      isGainer: true,
+                      provider: provider,
+                    ),
               // Tab Losers
               data.losers.isEmpty
                   ? _buildEmptyTab('Nenhuma carta desvalorizou hoje')
                   : _buildMoversList(
-                    data.losers,
-                    isGainer: false,
-                    provider: provider,
-                  ),
+                      data.losers,
+                      isGainer: false,
+                      provider: provider,
+                    ),
             ],
           ),
         ),
@@ -159,7 +160,10 @@ class _MarketScreenState extends State<MarketScreen>
 
   Widget _buildDateHeader(MarketMoversData data) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space16,
+        vertical: AppTheme.space10,
+      ),
       color: AppTheme.backgroundAbyss,
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
@@ -203,18 +207,30 @@ class _MarketScreenState extends State<MarketScreen>
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space8,
+              vertical: AppTheme.space3,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.brass400.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
             child: Text(
-              'USD',
+              data.currency,
               style: TextStyle(
                 color: AppTheme.brass400,
                 fontSize: AppTheme.fontSm,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+          ),
+          Text(
+            data.cacheStatus == 'stale_fallback'
+                ? 'Histórico interno • cache anterior'
+                : 'Histórico interno',
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontXs,
             ),
           ),
         ],
@@ -232,13 +248,14 @@ class _MarketScreenState extends State<MarketScreen>
       backgroundColor: AppTheme.surfaceSlate,
       onRefresh: () => provider.refresh(),
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: AppTheme.space8),
         itemCount: movers.length,
         itemBuilder: (context, index) {
           return _MoverCard(
             mover: movers[index],
             rank: index + 1,
             isGainer: isGainer,
+            currency: provider.moversData?.currency ?? 'USD',
           );
         },
       ),
@@ -251,7 +268,7 @@ class _MarketScreenState extends State<MarketScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(color: AppTheme.brass500),
-          SizedBox(height: 16),
+          SizedBox(height: AppTheme.space16),
           Text(
             'Carregando dados do mercado...',
             style: TextStyle(color: AppTheme.textSecondary),
@@ -264,7 +281,7 @@ class _MarketScreenState extends State<MarketScreen>
   Widget _buildError(MarketProvider provider) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.space32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -273,13 +290,13 @@ class _MarketScreenState extends State<MarketScreen>
               size: 48,
               color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             Text(
               provider.errorMessage ?? 'Erro desconhecido',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.space24),
             ElevatedButton.icon(
               onPressed: () => provider.refresh(),
               icon: const Icon(Icons.refresh),
@@ -307,12 +324,12 @@ class _MarketScreenState extends State<MarketScreen>
   Widget _buildNeedsData(String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.space32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.hourglass_top, size: 48, color: AppTheme.brass400),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -321,7 +338,7 @@ class _MarketScreenState extends State<MarketScreen>
                 fontSize: AppTheme.fontMd,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             const Text(
               'Os preços são atualizados diariamente.\nAmanhã teremos dados de variação!',
               textAlign: TextAlign.center,
@@ -346,7 +363,7 @@ class _MarketScreenState extends State<MarketScreen>
             size: 40,
             color: AppTheme.textSecondary,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Text(message, style: const TextStyle(color: AppTheme.textSecondary)),
         ],
       ),
@@ -368,11 +385,13 @@ class _MoverCard extends StatelessWidget {
   final CardMover mover;
   final int rank;
   final bool isGainer;
+  final String currency;
 
   const _MoverCard({
     required this.mover,
     required this.rank,
     required this.isGainer,
+    required this.currency,
   });
 
   @override
@@ -382,19 +401,21 @@ class _MoverCard extends StatelessWidget {
     final changePrefix = isGainer ? '+' : '';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space12,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color:
-              rank <= 3
-                  ? changeColor.withValues(alpha: 0.3)
-                  : AppTheme.outlineMuted.withValues(alpha: 0.3),
+          color: rank <= 3
+              ? changeColor.withValues(alpha: 0.3)
+              : AppTheme.outlineMuted.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppTheme.space12),
         child: Row(
           children: [
             // Rank badge
@@ -402,10 +423,9 @@ class _MoverCard extends StatelessWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color:
-                    rank <= 3
-                        ? changeColor.withValues(alpha: 0.2)
-                        : AppTheme.surfaceElevated,
+                color: rank <= 3
+                    ? changeColor.withValues(alpha: 0.2)
+                    : AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
               alignment: Alignment.center,
@@ -418,39 +438,19 @@ class _MoverCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
 
             // Card image (thumbnail)
             ClipRRect(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               child: SizedBox(
-                width: 36,
+                width: AppTheme.space36,
                 height: 50,
-                child:
-                    mover.imageUrl != null
-                        ? CachedNetworkImage(
-                          imageUrl: mover.imageUrl!,
-                          fit: BoxFit.cover,
-                          placeholder:
-                              (_, __) => Container(
-                                color: AppTheme.surfaceElevated,
-                                child: const Icon(
-                                  Icons.style,
-                                  size: 16,
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ),
-                          errorWidget:
-                              (_, __, ___) => Container(
-                                color: AppTheme.surfaceElevated,
-                                child: const Icon(
-                                  Icons.style,
-                                  size: 16,
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ),
-                        )
-                        : Container(
+                child: mover.imageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: mover.imageUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(
                           color: AppTheme.surfaceElevated,
                           child: const Icon(
                             Icons.style,
@@ -458,9 +458,26 @@ class _MoverCard extends StatelessWidget {
                             color: AppTheme.textSecondary,
                           ),
                         ),
+                        errorWidget: (_, __, ___) => Container(
+                          color: AppTheme.surfaceElevated,
+                          child: const Icon(
+                            Icons.style,
+                            size: 16,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: AppTheme.surfaceElevated,
+                        child: const Icon(
+                          Icons.style,
+                          size: 16,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
 
             // Nome e detalhes
             Expanded(
@@ -477,7 +494,7 @@ class _MoverCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.space2),
                   Wrap(
                     spacing: 4,
                     runSpacing: 2,
@@ -519,19 +536,22 @@ class _MoverCard extends StatelessWidget {
               children: [
                 // Preço atual
                 Text(
-                  '\$${mover.priceToday.toStringAsFixed(2)}',
+                  CurrencyFormatter.format(
+                    mover.priceToday,
+                    currencyCode: currency,
+                  ),
                   style: const TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: AppTheme.fontLg,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.space2),
                 // Variação
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                    horizontal: AppTheme.space6,
+                    vertical: AppTheme.space2,
                   ),
                   decoration: BoxDecoration(
                     color: changeColor.withValues(alpha: 0.15),
@@ -541,7 +561,7 @@ class _MoverCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(changeIcon, size: 12, color: changeColor),
-                      const SizedBox(width: 2),
+                      const SizedBox(width: AppTheme.space2),
                       Text(
                         '$changePrefix${mover.changePct.toStringAsFixed(1)}%',
                         style: TextStyle(
@@ -553,10 +573,10 @@ class _MoverCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 1),
+                const SizedBox(height: AppTheme.space1),
                 // Variação em USD
                 Text(
-                  '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
+                  '$changePrefix${CurrencyFormatter.format(mover.changeUsd.abs(), currencyCode: currency)}',
                   style: TextStyle(
                     color: changeColor.withValues(alpha: 0.7),
                     fontSize: AppTheme.fontXs,

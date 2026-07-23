@@ -1,10 +1,12 @@
 import 'deck_rules_service.dart';
+import 'deck_validation_state_support.dart';
 
 const deckValidationOwnerScopeSql = '''
   SELECT id::text, format
   FROM decks
   WHERE id = @deckId AND user_id = @userId
   LIMIT 1
+  FOR UPDATE
 ''';
 
 const deckValidationCardsSql = '''
@@ -19,6 +21,7 @@ const deckValidationMarkSuccessSql = '''
       validation_reasons = '[]'::jsonb,
       validation_updated_at = CURRENT_TIMESTAMP
   WHERE id = @deckId AND user_id = @userId
+  RETURNING validation_state, validation_reasons, validation_updated_at
 ''';
 
 const deckValidationMarkFailureSql = '''
@@ -33,11 +36,13 @@ const deckValidationMarkFailureSql = '''
       END,
       validation_updated_at = CURRENT_TIMESTAMP
   WHERE id = @deckId AND user_id = @userId
+  RETURNING validation_state, validation_reasons, validation_updated_at
 ''';
 
 Map<String, dynamic> buildDeckValidationSuccessBody({
   required String deckId,
   required String format,
+  required Object? validationUpdatedAt,
 }) {
   return {
     'ok': true,
@@ -46,6 +51,9 @@ Map<String, dynamic> buildDeckValidationSuccessBody({
     'deck_state': 'validated',
     'requires_review': false,
     'review_reasons': const <String>[],
+    'validation_updated_at': deckValidationTimestampToJson(
+      validationUpdatedAt,
+    ),
   };
 }
 
@@ -61,13 +69,26 @@ bool isDeckValidationNotFoundBody(Map<String, dynamic> body) {
   return body['ok'] == false && body['error_code'] == 'deck_not_found';
 }
 
-Map<String, dynamic> buildDeckValidationRuleErrorBody(DeckRulesException e) {
+Map<String, dynamic> buildDeckValidationRuleErrorBody(
+  DeckRulesException e, {
+  required Object? persistedReasons,
+  required Object? validationUpdatedAt,
+}) {
+  final reasons = normalizeDeckValidationReasons(
+    persistedReasons,
+  ).toList(growable: true);
+  if (!reasons.contains(deckValidationReasonStrictFailed)) {
+    reasons.add(deckValidationReasonStrictFailed);
+  }
   return {
     'ok': false,
     'error': e.message,
     'deck_state': 'draft',
     'requires_review': true,
-    'review_reasons': const ['strict_validation_failed'],
+    'review_reasons': List<String>.unmodifiable(reasons),
+    'validation_updated_at': deckValidationTimestampToJson(
+      validationUpdatedAt,
+    ),
     if (e.cardName != null) 'card_name': e.cardName,
   };
 }

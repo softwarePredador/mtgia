@@ -55,7 +55,8 @@ executado.
 
 - checkout, assinatura, cobrança, reembolso ou renovação pagos;
 - escrow, custódia, proteção de pagamento, garantia de entrega, mediação ou disputa de trocas;
-- scanner em produção: `ENABLE_SCANNER_RELEASE=false` até prova física fresca;
+- scanner fora do Android: Web/dev/iOS continuam em busca manual; o pipeline
+  Android release habilita `ENABLE_SCANNER_RELEASE=true` após a prova S4-07;
 - publicação iOS: build no-codesign é uma prova de compilação, não distribuição;
 - expansão de metagame, eventos ou novas áreas sociais antes de estabilizar o ciclo principal.
 
@@ -121,7 +122,7 @@ Esse modo permite validação local sem Sentry, mas seus manifests registram `se
 | FCM | Gate exige foreground e background tap | Fail-closed implementado | Device, credenciais e log com ambas as provas |
 | Backup off-site | Criptografia `age`, S3, hashes e manifest; dry-run por padrão | Contrato local passou; `age 1.3.1` e Docker 28.1.1 estão prontos | Configurar destino/recipient, executar upload criptografado e verificar |
 | Restore isolado | Decripta em diretório efêmero, Postgres 17 sem rede, constraints/contagens e cleanup | Restore local passou com `postgres:17`, rede desabilitada, constraints válidas e zero writes remotos | Repetir a partir da cópia off-site criptografada; a prova atual teve `encryption_chain=false` |
-| Scanner | Desabilitado por padrão | Flag/redirect cobertos | Device/câmera/OCR/correção manual antes de habilitar |
+| Scanner | Android release habilitado; Web/dev/iOS em busca manual | 30/30 focados, 1/1 harness e 2/2 câmera/MLKit no SM A135M; APK release instalado/aberto | Matriz humana normal/foil/baixa luz é calibração P2; runtime iOS segue na sprint Apple |
 | Credenciais versionadas | Secret scanner local impede novo segredo no candidato | O literal existia no snapshot predecessor de `origin/master` e permanece no histórico, mas a senha da conta foi rotacionada; a antiga recebeu HTTP 401 e a nova HTTP 200. Novo segredo e JWT ficam no Keychain, fora do repositório | Publicar o candidato sem o literal; implantar o novo JWT e provar que tokens assinados pelo segredo anterior foram recusados |
 
 ## 6. Evidências locais confirmadas

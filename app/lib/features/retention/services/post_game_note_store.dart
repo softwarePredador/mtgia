@@ -115,23 +115,23 @@ class PostGameNoteStore {
       }
       final pendingUpserts = await _loadPendingUpserts(deckId);
       final pendingDeletes = await _loadPendingDeletes(deckId);
-      final mergedById = <String, PostGameNote>{
-        for (final note in _mergeNotes(
-          remotePage.notes,
-          localNotes
-              .where((note) => !remotePage.deletedNoteIds.contains(note.id))
-              .toList(growable: false),
-        ))
-          note.id: note,
-        for (final note in pendingUpserts) note.id: note,
-      }..removeWhere(
-        (id, _) =>
-            pendingDeletes.contains(id) ||
-            remotePage.deletedNoteIds.contains(id),
-      );
-      final merged =
-          mergedById.values.toList()
-            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final mergedById =
+          <String, PostGameNote>{
+            for (final note in _mergeNotes(
+              remotePage.notes,
+              localNotes
+                  .where((note) => !remotePage.deletedNoteIds.contains(note.id))
+                  .toList(growable: false),
+            ))
+              note.id: note,
+            for (final note in pendingUpserts) note.id: note,
+          }..removeWhere(
+            (id, _) =>
+                pendingDeletes.contains(id) ||
+                remotePage.deletedNoteIds.contains(id),
+          );
+      final merged = mergedById.values.toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       await _saveNotes(deckId, merged);
       return merged;
     } catch (_) {
@@ -150,12 +150,11 @@ class PostGameNoteStore {
       return const <PostGameNote>[];
     }
     if (decoded is! List) return const <PostGameNote>[];
-    final notes =
-        decoded
-            .whereType<Map>()
-            .map((entry) => PostGameNote.fromJson(entry.cast()))
-            .where((note) => note.deckId == deckId)
-            .toList();
+    final notes = decoded
+        .whereType<Map>()
+        .map((entry) => PostGameNote.fromJson(entry.cast()))
+        .where((note) => note.deckId == deckId)
+        .toList();
     notes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return notes;
   }
@@ -359,12 +358,12 @@ class PostGameNoteStore {
     };
     for (final note in primary) {
       final local = byId[note.id];
-      byId[note.id] =
-          local == null ? note : _preserveLocalSessionMetadata(note, local);
+      byId[note.id] = local == null
+          ? note
+          : _preserveLocalSessionMetadata(note, local);
     }
-    final merged =
-        byId.values.toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final merged = byId.values.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return merged;
   }
 
@@ -375,9 +374,13 @@ class PostGameNoteStore {
     final playSessionId = remote.playSessionId ?? local.playSessionId;
     final sessionStartedAt = remote.sessionStartedAt ?? local.sessionStartedAt;
     final sessionEndedAt = remote.sessionEndedAt ?? local.sessionEndedAt;
+    final deckSnapshotHash = remote.deckSnapshotHash ?? local.deckSnapshotHash;
+    final deckVersionAt = remote.deckVersionAt ?? local.deckVersionAt;
     if (playSessionId == remote.playSessionId &&
         sessionStartedAt == remote.sessionStartedAt &&
-        sessionEndedAt == remote.sessionEndedAt) {
+        sessionEndedAt == remote.sessionEndedAt &&
+        deckSnapshotHash == remote.deckSnapshotHash &&
+        deckVersionAt == remote.deckVersionAt) {
       return remote;
     }
     return PostGameNote(
@@ -393,6 +396,8 @@ class PostGameNoteStore {
       playSessionId: playSessionId,
       sessionStartedAt: sessionStartedAt,
       sessionEndedAt: sessionEndedAt,
+      deckSnapshotHash: deckSnapshotHash,
+      deckVersionAt: deckVersionAt,
     );
   }
 }

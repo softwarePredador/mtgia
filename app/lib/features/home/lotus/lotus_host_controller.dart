@@ -362,22 +362,22 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   final derivedSettings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
     snapshot,
   );
-  final normalizedSession =
-      parsedSession == null || derivedSettings == null
-          ? parsedSession
-          : LifeCounterTabletopEngine.normalizeOwnedBoardSession(
-            parsedSession,
-            settings: derivedSettings,
-          );
-  final derivedSession =
-      normalizedSession == null || previousSession == null
-          ? normalizedSession
-          : normalizedSession.copyWith(
-            playSessionId: previousSession.playSessionId,
-            deckId: previousSession.deckId,
-            deckName: previousSession.deckName,
-            startedAtEpochMs: previousSession.startedAtEpochMs,
-          );
+  final normalizedSession = parsedSession == null || derivedSettings == null
+      ? parsedSession
+      : LifeCounterTabletopEngine.normalizeOwnedBoardSession(
+          parsedSession,
+          settings: derivedSettings,
+        );
+  final derivedSession = normalizedSession == null || previousSession == null
+      ? normalizedSession
+      : normalizedSession.copyWith(
+          playSessionId: previousSession.playSessionId,
+          deckId: previousSession.deckId,
+          deckName: previousSession.deckName,
+          deckSnapshotHash: previousSession.deckSnapshotHash,
+          deckVersionAtEpochMs: previousSession.deckVersionAtEpochMs,
+          startedAtEpochMs: previousSession.startedAtEpochMs,
+        );
   final parsedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
     snapshot,
   );
@@ -385,8 +385,9 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   // timer feature is disabled. Do not promote that hidden implementation
   // detail to canonical app state; otherwise merely opening the table starts
   // a timer and races a native reset/start action.
-  final derivedGameTimer =
-      derivedSettings?.gameTimer == false ? null : parsedGameTimer;
+  final derivedGameTimer = derivedSettings?.gameTimer == false
+      ? null
+      : parsedGameTimer;
   final derivedHistory = _reconcilePendingLotusLifeHistory(
     previousSession: previousSession,
     derivedSession: derivedSession,
@@ -450,8 +451,9 @@ LifeCounterHistoryState _reconcilePendingLotusLifeHistory({
     return derivedHistory;
   }
 
-  final derivedMessages =
-      derivedHistory.currentGameEntries.map((entry) => entry.message).toSet();
+  final derivedMessages = derivedHistory.currentGameEntries
+      .map((entry) => entry.message)
+      .toSet();
   final pendingEntries = <LifeCounterHistoryEntry>[];
   for (final entry in previousHistory?.currentGameEntries ?? const []) {
     if (_tryParsePendingLotusLifeEvent(entry) == null ||
@@ -476,10 +478,9 @@ LifeCounterHistoryState _reconcilePendingLotusLifeHistory({
           parsed.finalLife == previousLife;
     });
     if (priorPendingIndex >= 0) {
-      final priorPending =
-          _tryParsePendingLotusLifeEvent(
-            pendingEntries.removeAt(priorPendingIndex),
-          )!;
+      final priorPending = _tryParsePendingLotusLifeEvent(
+        pendingEntries.removeAt(priorPendingIndex),
+      )!;
       totalChange += priorPending.change;
     }
 
@@ -767,8 +768,9 @@ class LotusHostController
       return false;
     }
 
-    final normalizedReason =
-        reason.trim().isEmpty ? 'flutter_exit' : reason.trim();
+    final normalizedReason = reason.trim().isEmpty
+        ? 'flutter_exit'
+        : reason.trim();
     try {
       final rawResult = await webViewController.runJavaScriptReturningResult('''
         (() => {
@@ -892,8 +894,9 @@ class LotusHostController
         }
         return _sendStorageRebaseSnapshot(
           await _loadAuthoritativeStorageState(),
-          reason:
-              reason.trim().isEmpty ? 'native_canonical_sync' : reason.trim(),
+          reason: reason.trim().isEmpty
+              ? 'native_canonical_sync'
+              : reason.trim(),
           reloadRuntime: reloadRuntime,
         );
       });
@@ -982,10 +985,12 @@ class LotusHostController
       return _LotusStorageMessageOutcome.rejected;
     }
 
-    final reason =
-        payload['reason'] is String ? payload['reason'] as String : null;
-    final sessionId =
-        payload['sessionId'] is String ? payload['sessionId'] as String : null;
+    final reason = payload['reason'] is String
+        ? payload['reason'] as String
+        : null;
+    final sessionId = payload['sessionId'] is String
+        ? payload['sessionId'] as String
+        : null;
     if (shouldSuppressLotusReloadLifecycleSnapshot(
       reason: reason,
       sessionId: sessionId,
@@ -996,10 +1001,12 @@ class LotusHostController
       return _LotusStorageMessageOutcome.ignored;
     }
 
-    final sequence =
-        payload['sequence'] is int ? payload['sequence'] as int : null;
-    final baseRevision =
-        payload['baseRevision'] is int ? payload['baseRevision'] as int : null;
+    final sequence = payload['sequence'] is int
+        ? payload['sequence'] as int
+        : null;
+    final baseRevision = payload['baseRevision'] is int
+        ? payload['baseRevision'] as int
+        : null;
     final authoritativeBefore = await _loadAuthoritativeStorageState();
     final persistDecision = _storageBridgeState.evaluatePersist(
       sessionId: sessionId,
@@ -1184,10 +1191,12 @@ class LotusHostController
   Future<void> _sendStorageBootstrapSnapshot(
     Map<String, dynamic> request,
   ) async {
-    final sessionId =
-        request['sessionId'] is String ? request['sessionId'] as String : null;
-    final requestId =
-        request['requestId'] is String ? request['requestId'] as String : null;
+    final sessionId = request['sessionId'] is String
+        ? request['sessionId'] as String
+        : null;
+    final requestId = request['requestId'] is String
+        ? request['requestId'] as String
+        : null;
     if (sessionId == null ||
         sessionId.isEmpty ||
         requestId == null ||
@@ -1225,8 +1234,8 @@ class LotusHostController
           authoritativeState.values.isEmpty
               ? 'storage_bootstrap_missing'
               : (authoritativeState.snapshot == null
-                  ? 'storage_bootstrap_restored_from_canonical'
-                  : 'storage_bootstrap_restored'),
+                    ? 'storage_bootstrap_restored_from_canonical'
+                    : 'storage_bootstrap_restored'),
           category: 'life_counter.storage',
           data: {
             'entry_count': authoritativeState.values.length,
@@ -1241,10 +1250,12 @@ class LotusHostController
   }
 
   Future<void> _recordNativeStoragePatch(Map<String, dynamic> payload) async {
-    final sessionId =
-        payload['sessionId'] is String ? payload['sessionId'] as String : null;
-    final revision =
-        payload['revision'] is int ? payload['revision'] as int : null;
+    final sessionId = payload['sessionId'] is String
+        ? payload['sessionId'] as String
+        : null;
+    final revision = payload['revision'] is int
+        ? payload['revision'] as int
+        : null;
     if (!_storageBridgeState.isActiveSession(sessionId) ||
         revision == null ||
         revision <= 0) {
@@ -1266,8 +1277,9 @@ class LotusHostController
   }
 
   void _recordStorageBootstrapFailure(Map<String, dynamic> payload) {
-    final sessionId =
-        payload['sessionId'] is String ? payload['sessionId'] as String : null;
+    final sessionId = payload['sessionId'] is String
+        ? payload['sessionId'] as String
+        : null;
     if (!_storageBridgeState.isActiveSession(sessionId) || _isDisposed) {
       return;
     }

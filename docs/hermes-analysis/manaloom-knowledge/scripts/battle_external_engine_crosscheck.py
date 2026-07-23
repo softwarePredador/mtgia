@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Registry for external MTG engine crosschecks beyond XMage.
+"""Registry for external MTG engine roles beyond XMage.
 
-This module does not execute third-party engines. It records where ManaLoom can
-look for independent implementation evidence and how that evidence may be used.
+This module does not execute third-party engines. It records the current Forge
+runtime role and the narrower reference-only roles of other projects.
 """
 
 from __future__ import annotations
@@ -35,12 +35,12 @@ ENGINE_REGISTRY: tuple[EngineReference, ...] = (
         id="forge",
         name="Forge",
         url="https://github.com/Card-Forge/forge",
-        role="independent_rules_engine",
-        confidence_role="primary_external_crosscheck_after_xmage",
-        adapter_status="registry_ready_source_lookup_manual_or_api",
-        source_lookup_policy="Search Forge card scripts/source for the card or semantic family, then compare behavior to official rules and ManaLoom tests.",
-        use_for="Independent implementation comparison for card families missing, ambiguous, or contradicted in XMage.",
-        do_not_use_for="Authoritative rules, direct promotion to PostgreSQL, or bypassing ManaLoom runtime fixtures.",
+        role="secondary_executable_rules_engine_and_reference",
+        confidence_role="structured_xmage_coverage_gap_executor",
+        adapter_status="implemented_pinned_sidecar",
+        source_lookup_policy="Use the canonical Forge pin for runtime coverage and source review; upstream branch heads are delta-research inputs only.",
+        use_for="Execute structured XMage catalog gaps and independently review ambiguous card implementations.",
+        do_not_use_for="Automatic native PostgreSQL promotion, official legality, deck quality, or card-level learning without typed natural events.",
         candidate_url_templates=(
             "https://github.com/Card-Forge/forge/search?q={query}&type=code",
             "https://github.com/Card-Forge/forge/search?q={slug}&type=code",
@@ -131,15 +131,16 @@ def build_crosscheck_plan(card_names: list[str]) -> dict[str, Any]:
     return {
         "generated_at_utc": utc_now(),
         "postgres_writes": False,
-        "registry_status": "external_engine_crosscheck_registry_ready",
+        "registry_status": "external_engine_roles_current",
         "engine_count": len(ENGINE_REGISTRY),
         "cards_requested": len(card_names),
         "engines": [asdict(engine) for engine in ENGINE_REGISTRY],
         "cards": cards,
         "promotion_policy": [
-            "External engines provide comparison evidence only.",
-            "Official Wizards rules plus Oracle/rulings remain the semantic authority.",
-            "Any promoted ManaLoom rule still needs local runtime tests and, if PostgreSQL is touched, an explicit reviewed package.",
+            "Pinned XMage is the primary external executor; pinned Forge executes structured XMage coverage gaps.",
+            "External execution does not promote native PostgreSQL rules or prove legality, deck quality, or individual card use.",
+            "Magarena and Cockatrice remain reference-only sources.",
+            "Any native residual rule still needs focused runtime tests and an explicitly reviewed PostgreSQL package.",
         ],
     }
 

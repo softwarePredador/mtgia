@@ -335,6 +335,12 @@ class DeckOptimizationStateResult {
     'suggested_scope': suggestedScope,
     'severity_score': severityScore,
     'reasons': reasons,
+    'governance': const {
+      'owner_intent_preserved': true,
+      'core_floors_are_diagnostic_only': true,
+      'automatic_rebuild_allowed': false,
+      'automatic_exclusion_allowed': false,
+    },
     if (repairPlan.isNotEmpty) 'repair_plan': repairPlan,
   };
 }

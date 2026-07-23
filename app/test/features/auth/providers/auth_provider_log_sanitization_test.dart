@@ -164,6 +164,9 @@ void main() {
         username: 'qa_register_user',
         email: 'qa_register_user@example.com',
         password: 'Password123!',
+        legalAccepted: true,
+        termsVersion: '2026-07-21',
+        privacyVersion: '2026-07-21',
       );
 
       expect(ok, isTrue);

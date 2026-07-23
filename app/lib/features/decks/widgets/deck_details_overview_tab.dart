@@ -92,10 +92,9 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     return AppTheme.brass400;
   }
 
-  IconData get _validationStateIcon =>
-      _effectiveValidationState == 'validated'
-          ? Icons.verified_outlined
-          : Icons.rule_outlined;
+  IconData get _validationStateIcon => _effectiveValidationState == 'validated'
+      ? Icons.verified_outlined
+      : Icons.rule_outlined;
 
   DeckCardItem? get _heroCommander =>
       deck.commander.isNotEmpty ? deck.commander.first : null;
@@ -162,10 +161,9 @@ class DeckDetailsOverviewTab extends StatelessWidget {
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(
-          color:
-              hasArtwork
-                  ? formatAccent.withValues(alpha: 0.46)
-                  : AppTheme.outlineMuted.withValues(alpha: 0.78),
+          color: hasArtwork
+              ? formatAccent.withValues(alpha: 0.46)
+              : AppTheme.outlineMuted.withValues(alpha: 0.78),
           width: AppTheme.strokeRegular,
         ),
       ),
@@ -208,7 +206,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(AppTheme.space22),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Column(
@@ -226,7 +224,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       ),
                     ),
                     if (_heroCommander != null) ...[
-                      const SizedBox(height: 7),
+                      const SizedBox(height: AppTheme.space7),
                       Text(
                         'Comandante: ${_heroCommander!.name}',
                         maxLines: 1,
@@ -237,7 +235,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                         ),
                       ),
                     ],
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppTheme.space6),
                     Text(
                       _heroSummary,
                       maxLines: 1,
@@ -247,7 +245,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.space14),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -279,14 +277,12 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                         DeckMetaChip(
                           onTap: onTogglePublic,
                           label: deck.isPublic ? 'Público' : 'Privado',
-                          color:
-                              deck.isPublic
-                                  ? AppTheme.frost400
-                                  : AppTheme.textPrimary.withValues(
-                                    alpha: 0.86,
-                                  ),
-                          icon:
-                              deck.isPublic ? Icons.public : Icons.lock_outline,
+                          color: deck.isPublic
+                              ? AppTheme.frost400
+                              : AppTheme.textPrimary.withValues(alpha: 0.86),
+                          icon: deck.isPublic
+                              ? Icons.public
+                              : Icons.lock_outline,
                           prominent: true,
                         ),
                       ],
@@ -310,10 +306,9 @@ class DeckDetailsOverviewTab extends StatelessWidget {
       builder: (context, constraints) {
         final useDesktopPanes =
             constraints.maxWidth >= AppTheme.breakpointExpanded;
-        final gutter =
-            constraints.maxWidth < AppTheme.breakpointCompact
-                ? AppTheme.pageGutterCompact
-                : AppTheme.pageGutter;
+        final gutter = constraints.maxWidth < AppTheme.breakpointCompact
+            ? AppTheme.pageGutterCompact
+            : AppTheme.pageGutter;
 
         final strategy = _StrategySummaryCard(
           hasArchetype: _hasArchetype,
@@ -322,16 +317,15 @@ class DeckDetailsOverviewTab extends StatelessWidget {
           bracketLabel: bracketLabel,
           onTap: onShowOptimizationOptions,
         );
-        final commander =
-            deck.commander.isEmpty
-                ? null
-                : _CommanderSection(
-                  commander: deck.commander,
-                  isCardInvalid: isCardInvalid,
-                  onShowCardDetails: onShowCardDetails,
-                  onChangeCommander:
-                      () => context.go('/decks/$deckId/search?mode=commander'),
-                );
+        final commander = deck.commander.isEmpty
+            ? null
+            : _CommanderSection(
+                commander: deck.commander,
+                isCardInvalid: isCardInvalid,
+                onShowCardDetails: onShowCardDetails,
+                onChangeCommander: () =>
+                    context.go('/decks/$deckId/search?mode=commander'),
+              );
         final description = _DescriptionSection(
           description: deck.description,
           onEditDescription: onEditDescription,
@@ -355,7 +349,12 @@ class DeckDetailsOverviewTab extends StatelessWidget {
         );
 
         return SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(gutter, gutter, gutter, 32),
+          padding: EdgeInsets.fromLTRB(
+            gutter,
+            gutter,
+            gutter,
+            AppTheme.space32,
+          ),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(
@@ -365,7 +364,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHero(context, formatAccent: formatAccent),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: AppTheme.space14),
                   if (_isEmptyDeck) ...[
                     _DeckEmptyState(
                       isCommanderFormat: isCommanderFormat,
@@ -373,7 +372,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       onOpenCards: onOpenCards,
                       onImportList: onImportList,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     Text(
                       'Depois que o deck ganhar base, os diagnósticos e recomendações aparecem aqui.',
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -385,7 +384,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       onPlay: onPlay,
                       onOptimize: onShowOptimizationOptions,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.space14),
                     _CommanderDeckSummaryGrid(
                       deck: deck,
                       totalCards: totalCards,
@@ -393,7 +392,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       hasCommander: deck.commander.isNotEmpty,
                       pricing: pricing,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.space14),
                     _LegalityConfidenceCard(
                       isCommanderFormat: isCommanderFormat,
                       isValidating: isValidating,
@@ -407,7 +406,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       onSelectCommander: onSelectCommander,
                     ),
                     if (isCommanderFormat && deck.commander.isEmpty) ...[
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppTheme.space14),
                       _CommanderPrompt(onSelectCommander: onSelectCommander),
                     ],
                     const SizedBox(height: AppTheme.paneGap),
@@ -436,12 +435,12 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                               children: [
                                 strategy,
                                 if (commander != null) ...[
-                                  const SizedBox(height: 14),
+                                  const SizedBox(height: AppTheme.space14),
                                   commander,
                                 ],
-                                const SizedBox(height: 14),
+                                const SizedBox(height: AppTheme.space14),
                                 description,
-                                const SizedBox(height: 14),
+                                const SizedBox(height: AppTheme.space14),
                                 pricingPanel,
                               ],
                             ),
@@ -451,16 +450,16 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                     else ...[
                       strategy,
                       if (commander != null) ...[
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppTheme.space16),
                         commander,
                       ],
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       description,
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       diagnostics,
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       playtest,
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppTheme.space24),
                       pricingPanel,
                     ],
                   ],
@@ -506,21 +505,20 @@ class _CommanderSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         ...commander.map(
           (card) => InkWell(
             onTap: () => onShowCardDetails(card),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppTheme.space12),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border: Border.all(
-                  color:
-                      isCardInvalid(card)
-                          ? theme.colorScheme.error.withValues(alpha: 0.32)
-                          : AppTheme.outlineMuted.withValues(alpha: 0.65),
+                  color: isCardInvalid(card)
+                      ? theme.colorScheme.error.withValues(alpha: 0.32)
+                      : AppTheme.outlineMuted.withValues(alpha: 0.65),
                   width: isCardInvalid(card) ? 1.2 : 0.9,
                 ),
               ),
@@ -536,7 +534,7 @@ class _CommanderSection extends StatelessWidget {
                       height: 72,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,7 +549,7 @@ class _CommanderSection extends StatelessWidget {
                             height: 1.15,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           card.typeLine,
                           maxLines: 2,
@@ -564,7 +562,7 @@ class _CommanderSection extends StatelessWidget {
                           ),
                         ),
                         if (isCardInvalid(card)) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                           _InlineCommanderBadge(
                             label: 'Inválida',
                             color: theme.colorScheme.error,
@@ -658,16 +656,15 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
               child: _SummaryTile(
                 label: 'Identidade',
                 value: _identityLabel,
-                valueWidget:
-                    deck.colorIdentityKnown
-                        ? ColorIdentityPips(
-                          colors: deck.colorIdentity,
-                          symbolSize: 17,
-                          spacing: 3,
-                          decorated: false,
-                          colorlessWhenEmpty: true,
-                        )
-                        : null,
+                valueWidget: deck.colorIdentityKnown
+                    ? ColorIdentityPips(
+                        colors: deck.colorIdentity,
+                        symbolSize: 17,
+                        spacing: 3,
+                        decorated: false,
+                        colorlessWhenEmpty: true,
+                      )
+                    : null,
                 icon: Icons.palette_outlined,
                 accent: AppTheme.identityColor(deck.colorIdentity.toSet()),
               ),
@@ -686,10 +683,9 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
               child: _SummaryTile(
                 label: _priceLabel == 'Pendente' ? 'Curva' : 'Preço',
                 value: _priceLabel == 'Pendente' ? _curveLabel : _priceLabel,
-                icon:
-                    _priceLabel == 'Pendente'
-                        ? Icons.show_chart_rounded
-                        : Icons.attach_money_rounded,
+                icon: _priceLabel == 'Pendente'
+                    ? Icons.show_chart_rounded
+                    : Icons.attach_money_rounded,
                 accent: AppTheme.mythicGold,
               ),
             ),
@@ -724,11 +720,14 @@ class _SummaryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space4,
+        vertical: AppTheme.space6,
+      ),
       child: Row(
         children: [
           Icon(icon, color: accent, size: 18),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,7 +741,7 @@ class _SummaryTile extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 1),
+                const SizedBox(height: AppTheme.space1),
                 if (valueWidget != null)
                   valueWidget!
                 else
@@ -788,6 +787,22 @@ class _LegalityConfidenceCard extends StatelessWidget {
     required this.onOpenCards,
     required this.onSelectCommander,
   });
+
+  String? get _validationUpdatedLabel {
+    final raw = validationResult?['validation_updated_at'];
+    final parsed = raw is DateTime
+        ? raw
+        : raw == null
+        ? null
+        : DateTime.tryParse(raw.toString());
+    if (parsed == null) return null;
+    final local = parsed.toLocal();
+    String twoDigits(int value) => value.toString().padLeft(2, '0');
+    final date =
+        '${twoDigits(local.day)}/${twoDigits(local.month)}/${local.year}';
+    final time = '${twoDigits(local.hour)}:${twoDigits(local.minute)}';
+    return 'Atualizado em $date às $time';
+  }
 
   List<_ValidationIssue> _issues() {
     final issues = <_ValidationIssue>[];
@@ -921,40 +936,43 @@ class _LegalityConfidenceCard extends StatelessWidget {
     final theme = Theme.of(context);
     final ok = validationResult?['ok'] == true;
     final hasResult = validationResult != null && !isValidating;
-    final accent =
-        isValidating
-            ? AppTheme.frost400
-            : hasResult
-            ? (ok ? AppTheme.success : AppTheme.error)
-            : AppTheme.frost400;
-    final title =
-        isValidating
-            ? 'Validando legalidade'
-            : hasResult
-            ? (ok ? 'Deck legal para o formato' : 'Atenção na legalidade')
-            : 'Legalidade ainda não verificada';
-    final target =
-        maxCards == null
-            ? '$totalCards cartas'
-            : '$totalCards/$maxCards cartas';
+    final accent = isValidating
+        ? AppTheme.frost400
+        : hasResult
+        ? (ok ? AppTheme.success : AppTheme.error)
+        : AppTheme.frost400;
+    final title = isValidating
+        ? 'Validando legalidade'
+        : hasResult
+        ? (ok ? 'Deck legal para o formato' : 'Atenção na legalidade')
+        : 'Legalidade ainda não verificada';
+    final target = maxCards == null
+        ? '$totalCards cartas'
+        : '$totalCards/$maxCards cartas';
     final issues = _issues();
-    final message =
-        isValidating
-            ? 'Checando formato, comandante, contagem e identidade de cor.'
-            : hasResult
-            ? (ok
-                ? 'A lista passou nas regras conhecidas do app. Revise preço e estratégia antes da mesa.'
-                : issues.isNotEmpty
-                ? 'Encontramos ${issues.length} ponto${issues.length == 1 ? '' : 's'} para corrigir antes da mesa.'
-                : 'Revise as cartas sinalizadas antes de jogar.')
-            : isCommanderFormat
-            ? 'Commander precisa de 100 cartas, 1 comandante e identidade de cor consistente. Valide antes de otimizar ou jogar.'
-            : 'Valide a lista antes de exportar, compartilhar ou jogar.';
+    final baseMessage = isValidating
+        ? 'Checando formato, comandante, contagem e identidade de cor.'
+        : hasResult
+        ? (ok
+              ? 'A lista passou nas regras conhecidas do app. Revise preço e estratégia antes da mesa.'
+              : issues.isNotEmpty
+              ? 'Encontramos ${issues.length} ponto${issues.length == 1 ? '' : 's'} para corrigir antes da mesa.'
+              : 'Revise as cartas sinalizadas antes de jogar.')
+        : isCommanderFormat
+        ? 'Commander precisa de 100 cartas, 1 comandante e identidade de cor consistente. Valide antes de otimizar ou jogar.'
+        : 'Valide a lista antes de exportar, compartilhar ou jogar.';
+    final updatedLabel = _validationUpdatedLabel;
+    final message = updatedLabel == null
+        ? baseMessage
+        : '$baseMessage $updatedLabel.';
 
     if (hasResult && ok) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space10,
+        ),
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(color: accent.withValues(alpha: 0.32)),
@@ -964,7 +982,7 @@ class _LegalityConfidenceCard extends StatelessWidget {
         child: Row(
           children: [
             Icon(Icons.verified_rounded, color: accent, size: 22),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -976,9 +994,10 @@ class _LegalityConfidenceCard extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.space2),
                   Text(
-                    '$target • Lista aprovada nas regras conhecidas.',
+                    '$target • Lista aprovada nas regras conhecidas.'
+                    '${updatedLabel == null ? '' : ' • $updatedLabel'}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -1000,7 +1019,7 @@ class _LegalityConfidenceCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1019,23 +1038,22 @@ class _LegalityConfidenceCard extends StatelessWidget {
               color: accent.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             ),
-            child:
-                isValidating
-                    ? const Padding(
-                      padding: EdgeInsets.all(9),
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : Icon(
-                      ok
-                          ? Icons.verified_rounded
-                          : hasResult
-                          ? Icons.warning_amber_rounded
-                          : Icons.rule_folder_outlined,
-                      color: accent,
-                      size: 20,
-                    ),
+            child: isValidating
+                ? const Padding(
+                    padding: EdgeInsets.all(AppTheme.space9),
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(
+                    ok
+                        ? Icons.verified_rounded
+                        : hasResult
+                        ? Icons.warning_amber_rounded
+                        : Icons.rule_folder_outlined,
+                    color: accent,
+                    size: 20,
+                  ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1054,7 +1072,7 @@ class _LegalityConfidenceCard extends StatelessWidget {
                     DeckMetaChip(label: target, color: accent),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppTheme.space6),
                 Text(
                   message,
                   maxLines: 3,
@@ -1064,21 +1082,19 @@ class _LegalityConfidenceCard extends StatelessWidget {
                     height: AppTheme.lineHeightCompact,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppTheme.space10),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
                     DeckMetaChip(
-                      label:
-                          hasCommander
-                              ? 'Comandante definido'
-                              : 'Sem comandante',
+                      label: hasCommander
+                          ? 'Comandante definido'
+                          : 'Sem comandante',
                       color: hasCommander ? AppTheme.success : AppTheme.warning,
-                      icon:
-                          hasCommander
-                              ? Icons.workspace_premium
-                              : Icons.person_search_outlined,
+                      icon: hasCommander
+                          ? Icons.workspace_premium
+                          : Icons.person_search_outlined,
                     ),
                     if (hasResult)
                       OutlinedButton.icon(
@@ -1095,12 +1111,14 @@ class _LegalityConfidenceCard extends StatelessWidget {
                   ],
                 ),
                 if (issues.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.space12),
                   ...issues
                       .take(3)
                       .map(
                         (issue) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(
+                            bottom: AppTheme.space8,
+                          ),
                           child: _ValidationIssueRow(issue: issue),
                         ),
                       ),
@@ -1141,7 +1159,7 @@ class _ValidationIssueRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(AppTheme.space10),
       decoration: BoxDecoration(
         color: issue.accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1156,7 +1174,7 @@ class _ValidationIssueRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(issue.icon, color: issue.accent, size: 18),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1168,7 +1186,7 @@ class _ValidationIssueRow extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: AppTheme.space3),
                     Text(
                       issue.message,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -1184,27 +1202,23 @@ class _ValidationIssueRow extends StatelessWidget {
 
           final isPrimaryCommanderAction =
               issue.actionLabel == 'Selecionar comandante';
-          final action =
-              isPrimaryCommanderAction
-                  ? FilledButton.icon(
-                    onPressed: issue.onAction,
-                    icon: const Icon(
-                      Icons.workspace_premium_outlined,
-                      size: 16,
-                    ),
-                    label: Text(issue.actionLabel),
-                  )
-                  : TextButton(
-                    onPressed: issue.onAction,
-                    child: Text(issue.actionLabel),
-                  );
+          final action = isPrimaryCommanderAction
+              ? FilledButton.icon(
+                  onPressed: issue.onAction,
+                  icon: const Icon(Icons.workspace_premium_outlined, size: 16),
+                  label: Text(issue.actionLabel),
+                )
+              : TextButton(
+                  onPressed: issue.onAction,
+                  child: Text(issue.actionLabel),
+                );
 
           if (constraints.maxWidth < 280) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 textBlock,
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Align(alignment: Alignment.centerRight, child: action),
               ],
             );
@@ -1214,7 +1228,7 @@ class _ValidationIssueRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: textBlock),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               action,
             ],
           );
@@ -1238,7 +1252,10 @@ class _InlineCommanderBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1251,7 +1268,7 @@ class _InlineCommanderBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 13, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppTheme.space4),
           Text(
             label,
             style: TextStyle(
@@ -1300,7 +1317,7 @@ class _DescriptionSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1319,7 +1336,7 @@ class _DescriptionSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Descrição', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppTheme.space2),
                     Text(
                       'Resumo curto do plano e da intenção do deck.',
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -1336,14 +1353,14 @@ class _DescriptionSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           if (_hasDescription)
             InkWell(
               onTap: () => onEditDescription(description),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppTheme.space12),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface.withValues(alpha: 0.72),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1366,7 +1383,7 @@ class _DescriptionSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppTheme.space12),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface.withValues(alpha: 0.72),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1402,7 +1419,10 @@ class _OverviewQuickActions extends StatelessWidget {
       onPressed: onPlay,
       style: FilledButton.styleFrom(
         minimumSize: const Size(0, AppTheme.touchTargetMin),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space18,
+          vertical: AppTheme.space12,
+        ),
         backgroundColor: AppTheme.brass400,
         foregroundColor: AppTheme.backgroundAbyss,
         shape: RoundedRectangleBorder(
@@ -1422,7 +1442,10 @@ class _OverviewQuickActions extends StatelessWidget {
       onPressed: onOptimize,
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(0, AppTheme.touchTargetMin),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space18,
+          vertical: AppTheme.space12,
+        ),
         foregroundColor: AppTheme.textPrimary,
         side: BorderSide(color: AppTheme.frost400.withValues(alpha: 0.55)),
         shape: RoundedRectangleBorder(
@@ -1438,7 +1461,11 @@ class _OverviewQuickActions extends StatelessWidget {
         if (constraints.maxWidth < AppTheme.breakpointCompact) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [playButton, const SizedBox(height: 8), optimizeButton],
+            children: [
+              playButton,
+              const SizedBox(height: AppTheme.space8),
+              optimizeButton,
+            ],
           );
         }
         return Align(
@@ -1462,7 +1489,7 @@ class _CommanderPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1471,7 +1498,7 @@ class _CommanderPrompt extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.info_outline, color: AppTheme.warning),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           const Expanded(
             child: Text(
               'Selecione um comandante para aplicar regras e filtros de identidade de cor.',
@@ -1509,7 +1536,7 @@ class _StrategySummaryCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1529,7 +1556,7 @@ class _StrategySummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Estratégia', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppTheme.space2),
                     Text(
                       hasArchetype
                           ? 'Direção principal que orienta análise e otimização.'
@@ -1548,12 +1575,12 @@ class _StrategySummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppTheme.space12),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1580,7 +1607,7 @@ class _StrategySummaryCard extends StatelessWidget {
                       size: 18,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1592,7 +1619,7 @@ class _StrategySummaryCard extends StatelessWidget {
                             color: AppTheme.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           bracket != null
                               ? 'Bracket: $bracket • ${bracketLabel(bracket!)}'
@@ -1604,7 +1631,7 @@ class _StrategySummaryCard extends StatelessWidget {
                           ),
                         ),
                         if (!hasArchetype) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                           Text(
                             'Toque para escolher um plano de jogo antes de otimizar.',
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -1649,7 +1676,7 @@ class _DeckEmptyState extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(AppTheme.space18),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1661,7 +1688,7 @@ class _DeckEmptyState extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(AppTheme.space10),
                 decoration: BoxDecoration(
                   color: AppTheme.frost400.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1671,7 +1698,7 @@ class _DeckEmptyState extends StatelessWidget {
                   color: AppTheme.frost400,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1685,7 +1712,7 @@ class _DeckEmptyState extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.space4),
                     Text(
                       isCommanderFormat
                           ? 'Commander precisa de um comandante antes das 99 cartas para validar identidade de cor e recomendações.'
@@ -1699,7 +1726,7 @@ class _DeckEmptyState extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           if (isCommanderFormat) ...[
             SizedBox(
               width: double.infinity,
@@ -1709,7 +1736,7 @@ class _DeckEmptyState extends StatelessWidget {
                 label: const Text('Selecionar comandante'),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
           ],
           Wrap(
             spacing: 10,

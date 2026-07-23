@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -158,8 +159,16 @@ def validate_commander_shape(row: DeckRow) -> tuple[str, list[str]]:
     return "structure_ready", []
 
 
-def summarize(rows: Iterable[DeckRow]) -> dict[str, Any]:
+def summarize(
+    rows: Iterable[DeckRow],
+    *,
+    postgres_required: bool = True,
+    postgres_loaded: bool | None = None,
+) -> dict[str, Any]:
     rows = list(rows)
+    postgres_rows = [row for row in rows if row.source == "postgres"]
+    if postgres_loaded is None:
+        postgres_loaded = bool(postgres_rows)
     scope_counts: Counter[str] = Counter()
     status_counts: dict[str, Counter[str]] = defaultdict(Counter)
     issue_counts: Counter[str] = Counter()
@@ -191,11 +200,23 @@ def summarize(rows: Iterable[DeckRow]) -> dict[str, Any]:
 
     action_items: list[str] = []
     if product_ready < product_total:
-        action_items.append("repair_or_exclude_product_user_decks_before_global_promotion")
+        action_items.append(
+            "offer_owner_reviewed_repair_without_mutation_before_global_promotion"
+        )
     if registered_ready < registered_total:
         action_items.append("repair_registered_pg_variants_before_using_as_global_baselines")
     if issue_counts:
         action_items.append("use_issue_counts_to_prioritize_card_id_legal_shape_repairs")
+    source_blockers: list[str] = []
+    if postgres_required and not postgres_loaded:
+        source_blockers.append("postgres_product_truth_not_loaded")
+
+    promotion_blockers: list[str] = []
+    if product_ready < product_total:
+        promotion_blockers.append("product_decks_need_owner_reviewed_repair")
+    if registered_ready < registered_total:
+        promotion_blockers.append("registered_pg_variants_need_repair")
+    promotion_blockers.extend(source_blockers)
 
     scope_priority = [
         "user_product",
@@ -215,9 +236,35 @@ def summarize(rows: Iterable[DeckRow]) -> dict[str, Any]:
 
     return {
         "generated_at": utc_now(),
-        "status": "action_required" if action_items else "pass",
+        "status": "fail" if source_blockers else "pass",
         "contract": rel(COMMANDER_CONTRACT),
         "total_decks": len(rows),
+        "source_coverage": {
+            "postgres_required": postgres_required,
+            "postgres_loaded": postgres_loaded,
+            "postgres_deck_count": len(postgres_rows),
+            "hermes_deck_count": sum(row.source == "hermes" for row in rows),
+            "product_truth_status": (
+                "loaded"
+                if postgres_loaded
+                else "not_requested"
+                if not postgres_required
+                else "missing"
+            ),
+        },
+        "classification": {
+            "postgres_deck_count": len(postgres_rows),
+            "postgres_classified_count": len(postgres_rows),
+            "all_postgres_decks_classified": postgres_loaded,
+            "user_product_total": product_total,
+            "user_product_structure_ready": product_ready,
+            "user_product_needs_owner_review": product_total - product_ready,
+        },
+        "promotion": {
+            "allowed": not promotion_blockers,
+            "blockers": promotion_blockers,
+            "automatic_mutation_performed": False,
+        },
         "scope_counts": dict(sorted(scope_counts.items())),
         "status_counts_by_scope": {scope: dict(counter) for scope, counter in sorted(status_counts.items())},
         "issue_counts": dict(sorted(issue_counts.items())),
@@ -232,6 +279,10 @@ def summarize(rows: Iterable[DeckRow]) -> dict[str, Any]:
             "postgres_is_product_truth": True,
             "hermes_is_lab_cache": True,
             "lorehold_607_role": "pilot_and_protected_baseline_not_global_template",
+            "incomplete_deck_policy": "preserve_owner_intent_and_offer_reviewed_repair",
+            "core_floors_are_diagnostic_only": True,
+            "automatic_rebuild_allowed": False,
+            "automatic_exclusion_allowed": False,
             "promotion_requires": [
                 "resolved_card_ids",
                 "commander_shape",
@@ -250,7 +301,6 @@ def _issue_sample(*, row: DeckRow, scope: str, issues: list[str]) -> dict[str, A
         "scope_class": scope,
         "deck_id": row.deck_id,
         "name": row.name,
-        "email": row.user_email,
         "rows": row.row_count,
         "quantity": row.total_quantity,
         "commander_count": row.commander_count,
@@ -282,7 +332,7 @@ def _fetch_pg_rows() -> list[DeckRow]:
         COALESCE(d.archetype, '') AS archetype,
         COUNT(dc.id)::int AS row_count,
         COALESCE(SUM(dc.quantity), 0)::int AS total_quantity,
-        COUNT(*) FILTER (WHERE dc.is_commander)::int AS commander_count,
+        COALESCE(SUM(dc.quantity) FILTER (WHERE dc.is_commander), 0)::int AS commander_count,
         COUNT(*) FILTER (WHERE dc.card_id IS NULL)::int AS null_card_rows,
         COUNT(*) FILTER (
           WHERE dc.quantity > 1
@@ -418,6 +468,17 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         f"- Status: `{payload['status']}`",
         f"- Contract: `{payload['contract']}`",
         f"- Total decks audited: `{payload['total_decks']}`",
+        f"- PostgreSQL product truth: `{payload['source_coverage']['product_truth_status']}`",
+        f"- PostgreSQL decks classified: `{payload['classification']['postgres_classified_count']}/{payload['classification']['postgres_deck_count']}`",
+        f"- Product decks needing owner review: `{payload['classification']['user_product_needs_owner_review']}`",
+        f"- Promotion allowed: `{str(payload['promotion']['allowed']).lower()}`",
+        f"- Automatic mutation performed: `{str(payload['promotion']['automatic_mutation_performed']).lower()}`",
+        "",
+        "## Governance",
+        "",
+        "- Incomplete decks preserve owner intent and only receive reviewed repair suggestions.",
+        "- Core floors are diagnostic only; they do not authorize rebuild or exclusion.",
+        f"- Promotion blockers: `{', '.join(payload['promotion']['blockers']) or 'none'}`",
         "",
         "## Scope Counts",
         "",
@@ -474,19 +535,35 @@ def main() -> int:
     args = parser.parse_args()
 
     rows: list[DeckRow] = []
+    postgres_loaded = False
     if not args.skip_postgres:
+        if os.environ.get("MANALOOM_PG_WRAPPER_MODE") != "read-only":
+            print(
+                json.dumps(
+                    {
+                        "status": "fail",
+                        "error": "postgres_read_requires_new_server_read_only_wrapper",
+                    }
+                )
+            )
+            return 2
         rows.extend(_fetch_pg_rows())
+        postgres_loaded = True
     if not args.skip_hermes:
         rows.extend(_fetch_hermes_rows(args.sqlite_db))
 
-    payload = summarize(rows)
+    payload = summarize(
+        rows,
+        postgres_required=not args.skip_postgres,
+        postgres_loaded=postgres_loaded,
+    )
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
     write_markdown(payload, md_path)
     print(json.dumps({"status": payload["status"], "json": str(json_path), "markdown": str(md_path)}))
-    return 0
+    return 0 if payload["status"] == "pass" else 1
 
 
 if __name__ == "__main__":

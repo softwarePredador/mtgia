@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 import global_card_oracle_battle_readiness as readiness
+import external_engine_source_contract as engine_source_contract
 
 
 REPORT_DIR = readiness.REPORT_DIR
@@ -614,7 +615,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    payload = build_payload(xmage_root=args.xmage_root, xmage_limit=args.xmage_limit)
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    payload = build_payload(xmage_root=xmage_root, xmage_limit=args.xmage_limit)
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")

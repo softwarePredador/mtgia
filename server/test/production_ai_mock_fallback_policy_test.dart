@@ -78,6 +78,17 @@ void main() {
       );
       expect(source, contains('HttpStatus.serviceUnavailable'));
 
+      final providerGuardIndex = source.indexOf(
+        'if (aiProviderMissingInProduction',
+      );
+      final providerGuardEnd = source.indexOf('// 1. Fetch Deck Data');
+      final providerGuard = source.substring(
+        providerGuardIndex,
+        providerGuardEnd,
+      );
+      expect(providerGuard, contains("'can_apply': false"));
+      expect(providerGuard, contains("'learning_eligible': false"));
+
       final mockBranchIndex = source.indexOf('Mock response for development');
       final nextOptimizerBranchIndex = source.indexOf(
         'final optimizer = deckOptimizer',

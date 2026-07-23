@@ -40,15 +40,22 @@ void main() {
       );
 
       expect(
-          payload.keys,
-          containsAll([
-            'date',
-            'previous_date',
-            'gainers',
-            'losers',
-            'total_tracked',
-          ]));
+        payload.keys,
+        containsAll([
+          'currency',
+          'price_source',
+          'cache_status',
+          'date',
+          'previous_date',
+          'gainers',
+          'losers',
+          'total_tracked',
+        ]),
+      );
       expect(payload['date'], '2026-04-29');
+      expect(payload['currency'], 'USD');
+      expect(payload['price_source'], 'price_history');
+      expect(payload['cache_status'], 'fresh');
       expect(payload['previous_date'], '2026-04-28');
       expect(payload['total_tracked'], 30569);
       expect(payload['losers'], isEmpty);
@@ -60,6 +67,25 @@ void main() {
       expect(gainers.single['price_yesterday'], 2.0);
       expect(gainers.single['change_usd'], 0.5);
       expect(gainers.single['change_pct'], 25.0);
+    });
+
+    test('rejects a mover row with missing price instead of emitting zero', () {
+      final row = [
+        'card-1',
+        'Sol Ring',
+        'CMM',
+        null,
+        'uncommon',
+        'Artifact',
+        null,
+        2,
+        null,
+        null,
+      ];
+      expect(
+        () => buildMarketMoverRow((index) => row[index]),
+        throwsA(isA<FormatException>()),
+      );
     });
 
     test('uses bounded query patterns for the hot path', () {
@@ -96,24 +122,26 @@ void main() {
   });
 
   group('MarketMoversCache', () {
-    test('returns fresh entries and allows stale entries for timeout fallback',
-        () async {
-      final cache = MarketMoversCache(ttl: const Duration(milliseconds: 10));
-      final payload = buildMarketMoversPayload(
-        date: '2026-04-29',
-        previousDate: '2026-04-28',
-        gainers: const [],
-        losers: const [],
-        totalTracked: 1,
-      );
+    test(
+      'returns fresh entries and allows stale entries for timeout fallback',
+      () async {
+        final cache = MarketMoversCache(ttl: const Duration(milliseconds: 10));
+        final payload = buildMarketMoversPayload(
+          date: '2026-04-29',
+          previousDate: '2026-04-28',
+          gainers: const [],
+          losers: const [],
+          totalTracked: 1,
+        );
 
-      cache.set(5, 1.0, payload);
-      expect(cache.get(5, 1.0), isNotNull);
+        cache.set(5, 1.0, payload);
+        expect(cache.get(5, 1.0), isNotNull);
 
-      await Future<void>.delayed(const Duration(milliseconds: 20));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
 
-      expect(cache.get(5, 1.0), isNull);
-      expect(cache.get(5, 1.0, allowStale: true), isNotNull);
-    });
+        expect(cache.get(5, 1.0), isNull);
+        expect(cache.get(5, 1.0, allowStale: true), isNotNull);
+      },
+    );
   });
 }

@@ -108,15 +108,19 @@ class _LifeCounterNativeSetLifeSheetState
       playerIndex: _targetPlayerIndex,
       life: int.tryParse(displayValue) ?? 0,
     );
-    final playerStatusSummary =
-        LifeCounterTabletopEngine.playerBoardSummary(
-          previewSession,
-          playerIndex: _targetPlayerIndex,
-        ).statusSummary;
+    final playerStatusSummary = LifeCounterTabletopEngine.playerBoardSummary(
+      previewSession,
+      playerIndex: _targetPlayerIndex,
+    ).statusSummary;
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.84,
           child: DecoratedBox(
@@ -136,7 +140,12 @@ class _LifeCounterNativeSetLifeSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -151,7 +160,7 @@ class _LifeCounterNativeSetLifeSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: AppTheme.space6),
                             Text(
                               'Informe o novo total de vida do Jogador ${_targetPlayerIndex + 1}.',
                               style: const TextStyle(
@@ -174,7 +183,12 @@ class _LifeCounterNativeSetLifeSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space16,
+                    AppTheme.space20,
+                    AppTheme.space14,
+                  ),
                   child: Column(
                     children: [
                       Center(
@@ -190,7 +204,7 @@ class _LifeCounterNativeSetLifeSheetState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.space8),
                       DecoratedBox(
                         key: const Key('life-counter-native-set-life-display'),
                         decoration: BoxDecoration(
@@ -225,7 +239,7 @@ class _LifeCounterNativeSetLifeSheetState
                               fit: BoxFit.scaleDown,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 18,
+                                  horizontal: AppTheme.space18,
                                 ),
                                 child: Text(
                                   displayValue,
@@ -236,7 +250,7 @@ class _LifeCounterNativeSetLifeSheetState
                                         AppTheme.fontLifeCounterInputValue,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 0,
-                                    height: 1,
+                                    height: AppTheme.space1,
                                   ),
                                 ),
                               ),
@@ -249,7 +263,12 @@ class _LifeCounterNativeSetLifeSheetState
                 ),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space0,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       Wrap(
                         alignment: WrapAlignment.center,
@@ -286,7 +305,7 @@ class _LifeCounterNativeSetLifeSheetState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppTheme.space14),
                       DecoratedBox(
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceElevated,
@@ -296,7 +315,7 @@ class _LifeCounterNativeSetLifeSheetState
                           border: Border.all(color: AppTheme.outlineMuted),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(AppTheme.space14),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -308,7 +327,7 @@ class _LifeCounterNativeSetLifeSheetState
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: AppTheme.space8),
                               Text(
                                 playerStatusSummary.label,
                                 key: const Key(
@@ -320,7 +339,7 @@ class _LifeCounterNativeSetLifeSheetState
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: AppTheme.space6),
                               Text(
                                 playerStatusSummary.description,
                                 key: const Key(
@@ -336,7 +355,7 @@ class _LifeCounterNativeSetLifeSheetState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppTheme.space14),
                       SizedBox(
                         width: 250,
                         child: Wrap(
@@ -392,7 +411,12 @@ class _LifeCounterNativeSetLifeSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       TextButton(
@@ -435,15 +459,13 @@ class _SetLifeQuickAdjustButton extends StatelessWidget {
       key: buttonKey,
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        foregroundColor:
-            label.startsWith('-')
-                ? AppTheme.lifeCounterSetLifeDanger
-                : AppTheme.textPrimary,
+        foregroundColor: label.startsWith('-')
+            ? AppTheme.lifeCounterSetLifeDanger
+            : AppTheme.textPrimary,
         side: BorderSide(
-          color:
-              label.startsWith('-')
-                  ? AppTheme.lifeCounterPinkSoft
-                  : AppTheme.outlineMuted,
+          color: label.startsWith('-')
+              ? AppTheme.lifeCounterPinkSoft
+              : AppTheme.outlineMuted,
         ),
       ),
       child: Text(label),
@@ -466,12 +488,11 @@ class _SetLifeKeypadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final semanticLabel =
-        destructive
-            ? 'Limpar valor'
-            : label == 'DEL'
-            ? 'Apagar último dígito'
-            : 'Adicionar dígito $label';
+    final semanticLabel = destructive
+        ? 'Limpar valor'
+        : label == 'DEL'
+        ? 'Apagar último dígito'
+        : 'Adicionar dígito $label';
     return Semantics(
       button: true,
       label: semanticLabel,
@@ -486,21 +507,18 @@ class _SetLifeKeypadButton extends StatelessWidget {
             style: FilledButton.styleFrom(
               minimumSize: Size.zero,
               padding: EdgeInsets.zero,
-              backgroundColor:
-                  destructive
-                      ? AppTheme.lifeCounterPinkSubtle
-                      : AppTheme.surfaceElevated,
-              foregroundColor:
-                  destructive
-                      ? AppTheme.lifeCounterPinkText
-                      : AppTheme.textPrimary,
+              backgroundColor: destructive
+                  ? AppTheme.lifeCounterPinkSubtle
+                  : AppTheme.surfaceElevated,
+              foregroundColor: destructive
+                  ? AppTheme.lifeCounterPinkText
+                  : AppTheme.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusXl),
                 side: BorderSide(
-                  color:
-                      destructive
-                          ? AppTheme.lifeCounterPinkSoft
-                          : AppTheme.outlineMuted,
+                  color: destructive
+                      ? AppTheme.lifeCounterPinkSoft
+                      : AppTheme.outlineMuted,
                 ),
               ),
             ),

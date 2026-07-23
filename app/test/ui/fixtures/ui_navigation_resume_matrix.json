@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "matrix_id": "manaloom-s3-06-navigation-resume-2026-07-21",
+  "required_scenarios": [
+    "protected_redirect",
+    "runtime_session_expiry",
+    "query_tab_history",
+    "battle_deep_link",
+    "card_detail_deep_link",
+    "generate_form_draft",
+    "import_form_draft"
+  ],
+  "scenarios": [
+    {
+      "id": "protected_redirect",
+      "expectation": "Uma rota protegida preserva path e query durante splash/login e retoma somente um destino interno validado.",
+      "sources": {
+        "lib/main.dart": ["state.uri.toString()", "buildAuthLocation"],
+        "lib/features/auth/auth_redirect.dart": ["normalizePostAuthRedirect", "uri.hasAuthority"]
+      },
+      "tests": [
+        "test/features/auth/screens/splash_screen_redirect_test.dart",
+        "test/features/auth/screens/auth_screens_test.dart"
+      ]
+    },
+    {
+      "id": "runtime_session_expiry",
+      "expectation": "401 de sessão inválida limpa credenciais e preserva a URL; invalid_password, 429, 5xx e rede não removem a sessão.",
+      "sources": {
+        "lib/core/api/api_client.dart": ["isSessionInvalidatingUnauthorized", "invalid_password"],
+        "lib/features/auth/providers/auth_provider.dart": ["void expireSession()", "expiredSessionMessage"],
+        "lib/main.dart": ["setSessionExpiredHandler", "state.uri.toString()"]
+      },
+      "tests": [
+        "test/core/api/api_client_request_id_test.dart",
+        "test/features/auth/providers/auth_provider_initialize_test.dart",
+        "test/features/auth/providers/auth_provider_security_test.dart"
+      ]
+    },
+    {
+      "id": "query_tab_history",
+      "expectation": "Collection e Community normalizam tabs inválidas e sincronizam UI/URL para reload, back e forward.",
+      "sources": {
+        "lib/features/collection/screens/collection_screen.dart": ["didUpdateWidget", "path: '/collection'"],
+        "lib/features/community/screens/community_screen.dart": ["didUpdateWidget", "path: '/community'"]
+      },
+      "tests": [
+        "test/features/collection/collection_screen_responsive_test.dart",
+        "test/features/community/screens/community_screen_responsive_test.dart"
+      ]
+    },
+    {
+      "id": "battle_deep_link",
+      "expectation": "Battle/Replays possui URL canônica deck-scoped e recarrega sem objeto transitório.",
+      "sources": {
+        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "BattleReplaysScreen"],
+        "lib/features/battle/screens/battle_replays_screen.dart": ["battleReplaysRouteLocation"],
+        "lib/features/decks/screens/deck_details_screen.dart": ["battleReplaysRouteLocation"]
+      },
+      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart"]
+    },
+    {
+      "id": "card_detail_deep_link",
+      "expectation": "Card Detail usa card_id na URL, extra apenas como fast path e backend/PostgreSQL para reload.",
+      "sources": {
+        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: '/cards/:cardId'", "CardDetailRouteScreen"],
+        "lib/features/cards/screens/card_detail_screen.dart": ["cardDetailRouteLocation", "fetchCardById"],
+        "lib/features/cards/providers/card_provider.dart": ["/cards?id=", "card.id != normalizedId"],
+        "../server/routes/cards/index.dart": ["params['id']?.trim()", "c.id::text = @id"]
+      },
+      "tests": [
+        "test/features/cards/providers/card_provider_search_test.dart",
+        "test/features/cards/screens/card_detail_screen_responsive_test.dart",
+        "../server/test/cards_route_test.dart"
+      ]
+    },
+    {
+      "id": "generate_form_draft",
+      "expectation": "Prompt, comandante, nome e formato não salvos sobrevivem a rebuild/reload somente para o mesmo usuário.",
+      "sources": {
+        "lib/features/decks/screens/deck_generate_screen.dart": ["loadGenerate", "clearGenerate"],
+        "lib/features/decks/services/deck_entry_draft_store.dart": ["saveGenerate", "Uri.encodeComponent"]
+      },
+      "tests": [
+        "test/features/decks/screens/deck_flow_entry_screens_test.dart",
+        "test/features/decks/services/deck_entry_draft_store_test.dart"
+      ]
+    },
+    {
+      "id": "import_form_draft",
+      "expectation": "Metadados e lista de importação sobrevivem a rebuild/reload e são removidos somente após sucesso.",
+      "sources": {
+        "lib/features/decks/screens/deck_import_screen.dart": ["loadImport", "clearImport"],
+        "lib/features/decks/services/deck_entry_draft_store.dart": ["saveImport", "clearImport"]
+      },
+      "tests": [
+        "test/features/decks/screens/deck_flow_entry_screens_test.dart",
+        "test/features/decks/services/deck_entry_draft_store_test.dart"
+      ]
+    }
+  ],
+  "manual_web": {
+    "status": "partial",
+    "build_sha256": "66fdbfcd6b229ea9e4b1dcf554b627afe1bd2fff06d2215dfc9de82f827ed5c3",
+    "required": [
+      "authenticated_refresh",
+      "collection_back_forward",
+      "battle_direct_url",
+      "card_detail_direct_url",
+      "session_expiry_redirect",
+      "draft_restore"
+    ],
+    "passed": [
+      "authenticated_refresh",
+      "collection_back_forward",
+      "battle_direct_url",
+      "card_detail_route_and_safe_reload_state",
+      "draft_restore",
+      "disposable_account_and_deck_cleanup"
+    ],
+    "remaining": [
+      "card_detail_data_reload_after_backend_publish",
+      "live_runtime_401_interception"
+    ],
+    "automated_evidence": [
+      "session_expiry_redirect",
+      "card_detail_exact_id_contract"
+    ]
+  }
+}

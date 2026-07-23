@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "matrix_id": "manaloom-s3-03-viewport-matrix-2026-07-21",
+  "viewports": [
+    {"id":"mobile-min","width":320,"height":568,"orientation":"portrait","class":"compact"},
+    {"id":"mobile-reference","width":390,"height":844,"orientation":"portrait","class":"compact"},
+    {"id":"mobile-large","width":412,"height":915,"orientation":"portrait","class":"compact"},
+    {"id":"tablet-portrait","width":768,"height":1024,"orientation":"portrait","class":"medium"},
+    {"id":"tablet-landscape","width":1024,"height":768,"orientation":"landscape","class":"expanded"},
+    {"id":"boundary-compact-last","width":599,"height":844,"orientation":"portrait","class":"compact"},
+    {"id":"boundary-medium-first","width":600,"height":844,"orientation":"portrait","class":"medium"},
+    {"id":"boundary-medium-last","width":839,"height":1024,"orientation":"portrait","class":"medium"},
+    {"id":"boundary-expanded-first","width":840,"height":1024,"orientation":"portrait","class":"expanded"},
+    {"id":"boundary-expanded-last","width":1199,"height":900,"orientation":"landscape","class":"expanded"},
+    {"id":"boundary-wide-first","width":1200,"height":900,"orientation":"landscape","class":"wide"},
+    {"id":"desktop-reference","width":1280,"height":900,"orientation":"landscape","class":"wide"},
+    {"id":"desktop-wide","width":1440,"height":900,"orientation":"landscape","class":"wide"},
+    {"id":"boundary-wide-last","width":1599,"height":900,"orientation":"landscape","class":"wide"},
+    {"id":"boundary-ultrawide-first","width":1600,"height":900,"orientation":"landscape","class":"ultraWide"},
+    {"id":"desktop-ultrawide","width":1920,"height":1080,"orientation":"landscape","class":"ultraWide"}
+  ],
+  "adaptations": {
+    "virtual_keyboard": {
+      "viewport_id": "mobile-reference",
+      "bottom_inset": 320,
+      "test": "test/features/decks/screens/deck_flow_entry_screens_test.dart",
+      "anchor": "keeps the primary action reachable with keyboard and 200% text"
+    },
+    "text_200_percent": {
+      "viewport_id": "mobile-reference",
+      "scale": 2.0,
+      "test": "test/features/home/home_screen_test.dart",
+      "anchor": "home remains usable with 200% text on compact width"
+    }
+  },
+  "domain_evidence": {
+    "auth": ["test/features/auth/screens/auth_screens_test.dart"],
+    "battle": ["test/features/battle/screens/battle_replays_screen_test.dart"],
+    "binder": ["test/features/binder/screens/binder_screen_overflow_test.dart","test/features/binder/screens/marketplace_screen_overflow_test.dart"],
+    "cards": ["test/features/cards/screens/card_detail_screen_responsive_test.dart","test/features/cards/screens/card_search_screen_test.dart"],
+    "collection": ["test/features/collection/collection_screen_responsive_test.dart","test/features/collection/sets_catalog_screen_test.dart"],
+    "commercial": ["test/features/commercial/commercial_screens_responsive_test.dart"],
+    "community": ["test/features/community/screens/community_screen_responsive_test.dart","test/features/community/screens/community_deck_detail_screen_test.dart"],
+    "decks": ["test/features/decks/screens/deck_flow_entry_screens_test.dart","test/features/decks/screens/deck_list_responsive_test.dart"],
+    "home": ["test/features/home/home_screen_test.dart","test/features/home/lotus_life_counter_overflow_test.dart"],
+    "market": ["test/features/market/screens/market_screen_responsive_test.dart"],
+    "messages": ["test/features/messages/screens/message_inbox_screen_test.dart","test/features/messages/screens/chat_screen_test.dart"],
+    "notifications": ["test/features/notifications/screens/notification_screen_test.dart"],
+    "profile": ["test/features/profile/profile_screen_test.dart"],
+    "retention": ["test/features/retention/post_game_notes_screen_responsive_test.dart"],
+    "scanner": ["test/features/scanner/widgets/scanned_card_preview_test.dart"],
+    "shell": ["test/core/widgets/main_scaffold_test.dart"],
+    "social": ["test/features/social/screens/user_profile_screen_responsive_test.dart","test/features/social/screens/user_search_screen_test.dart"],
+    "trades": ["test/features/trades/screens/create_trade_screen_overflow_test.dart","test/features/trades/screens/trade_detail_screen_overflow_test.dart"]
+  }
+}

@@ -63,7 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (success) {
-      final target = normalizePostAuthRedirect(widget.redirectPath) ?? '/home';
+      final target = resolveAuthenticatedLocation(
+        redirectPath: widget.redirectPath,
+        defaultLocation: authProvider.defaultAuthenticatedLocation,
+      );
       debugPrint('[📱 LoginScreen] ✅ login OK — rota segura resolvida');
       context.go(target);
       return;
@@ -88,13 +91,51 @@ class _LoginScreenState extends State<LoginScreen> {
             title: 'ManaLoom',
             subtitle: 'Acesse decks, coleção, trades e partidas.',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
           AuthFormSurface(
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Consumer<AuthProvider>(
+                    builder: (context, auth, child) {
+                      final message = auth.errorMessage;
+                      if (message == null || message.trim().isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      return Semantics(
+                        liveRegion: true,
+                        container: true,
+                        label: message,
+                        child: Container(
+                          key: const Key('login-auth-notice'),
+                          margin: const EdgeInsets.only(
+                            bottom: AppTheme.space16,
+                          ),
+                          padding: const EdgeInsets.all(AppTheme.space12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
+                            border: Border.all(
+                              color: theme.colorScheme.error.withValues(
+                                alpha: 0.55,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            message,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onErrorContainer,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   // Email
                   TextFormField(
                     key: const Key('login-email-field'),
@@ -121,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
 
                   // Senha
                   TextFormField(
@@ -133,10 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        tooltip:
-                            _obscurePassword
-                                ? 'Mostrar senha'
-                                : 'Ocultar senha',
+                        tooltip: _obscurePassword
+                            ? 'Mostrar senha'
+                            : 'Ocultar senha',
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility_outlined
@@ -164,7 +204,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 22),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      key: const Key('login-forgot-password-button'),
+                      style: AppTheme.accessibleTextButtonStyle,
+                      onPressed: () => context.push('/forgot-password'),
+                      child: const Text('Esqueci minha senha'),
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space10),
 
                   Consumer<AuthProvider>(
                     builder: (context, auth, child) {
@@ -229,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     },
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: AppTheme.space14),
 
                   // Link para registro
                   Wrap(
@@ -242,13 +291,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextButton(
                         key: const Key('login-open-register-button'),
-                        onPressed:
-                            () => context.push(
-                              buildAuthLocation(
-                                '/register',
-                                widget.redirectPath,
-                              ),
-                            ),
+                        style: AppTheme.accessibleTextButtonStyle,
+                        onPressed: () => context.push(
+                          buildAuthLocation('/register', widget.redirectPath),
+                        ),
                         child: const Text(
                           'Criar conta',
                           style: TextStyle(

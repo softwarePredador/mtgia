@@ -40,10 +40,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     // Autenticar com banco de dados
     final authService = AuthService();
-    final result = await authService.login(
-      email: email,
-      password: password,
-    );
+    final result = await authService.login(email: email, password: password);
 
     return Response.json(
       statusCode: HttpStatus.ok,
@@ -53,6 +50,7 @@ Future<Response> onRequest(RequestContext context) async {
           'id': result['userId'],
           'username': result['username'],
           'email': result['email'],
+          'email_verified': result['emailVerified'],
         },
       },
     );

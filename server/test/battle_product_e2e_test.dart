@@ -46,9 +46,19 @@ void main() {
         'password': 'BattleProductE2E123!${runToken.substring(0, 12)}',
         'username': 'battle_product_e2e_$runToken',
       };
+      final intruder = {
+        'email': 'battle.product.e2e.intruder.$runToken@example.invalid',
+        'password': 'BattleProductE2E456!${runToken.substring(0, 12)}',
+        'username': 'battle_product_e2e_intruder_$runToken',
+      };
       final token = await _registerUniqueIdentity(baseUrl, user);
+      final intruderToken = await _registerUniqueIdentity(baseUrl, intruder);
       final headers = {
         'authorization': 'Bearer $token',
+        'content-type': 'application/json',
+      };
+      final intruderHeaders = {
+        'authorization': 'Bearer $intruderToken',
         'content-type': 'application/json',
       };
       final baseline = _loadLoreholdDeck();
@@ -147,6 +157,9 @@ void main() {
       final replayList = _json(replayListResponse);
       final replays = (replayList['data'] as List).whereType<Map>().toList();
       expect(replays, isNotEmpty);
+      final replayIds = replays.map((replay) => replay['id']?.toString()).toSet();
+      expect(replayIds, contains(natural['replay_id'].toString()));
+      expect(replayIds, contains(repeatedNatural['replay_id'].toString()));
       expect(
         (replayList['simulation_contract'] as Map)['status'],
         'per_replay_engine_contract',
@@ -162,7 +175,7 @@ void main() {
             as Map)['reviewed_native_rules_execution'],
         isTrue,
       );
-      final replayId = latestReplay['id'].toString();
+      final replayId = natural['replay_id'].toString();
       final replayDetailResponse = await http.get(
         Uri.parse('$baseUrl/decks/$deckA/battle-replays/$replayId'),
         headers: headers,
@@ -182,6 +195,17 @@ void main() {
       expect(replayContract['reviewed_native_rules_execution'], isTrue);
       expect(replayContract['rules_engine_priority'], 'native_residual');
       _expectReviewedAction(replay);
+
+      final intruderListResponse = await http.get(
+        Uri.parse('$baseUrl/decks/$deckA/battle-replays?limit=5'),
+        headers: intruderHeaders,
+      );
+      _expectSanitizedNotFound(intruderListResponse);
+      final intruderDetailResponse = await http.get(
+        Uri.parse('$baseUrl/decks/$deckA/battle-replays/$replayId'),
+        headers: intruderHeaders,
+      );
+      _expectSanitizedNotFound(intruderDetailResponse);
 
       final analysisResponse = await http.get(
         Uri.parse('$baseUrl/decks/$deckA/analysis'),
@@ -307,6 +331,15 @@ Future<Map<String, dynamic>> _simulate(
 
 Map<String, dynamic> _json(http.Response response) =>
     (jsonDecode(response.body) as Map).cast<String, dynamic>();
+
+void _expectSanitizedNotFound(http.Response response) {
+  expect(response.statusCode, 404, reason: response.body);
+  final normalized = response.body.toLowerCase();
+  expect(normalized, isNot(contains('battle_simulations')));
+  expect(normalized, isNot(contains('select ')));
+  expect(normalized, isNot(contains('postgres')));
+  expect(normalized, isNot(contains('stack trace')));
+}
 
 void _expectReviewedAction(Map<String, dynamic> battle) {
   final actionEvents = (battle['events'] as List)

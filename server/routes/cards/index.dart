@@ -17,6 +17,7 @@ Future<Response> onRequest(RequestContext context) async {
   final hasIdentityColumns = await hasCardIdentityColumns(conn);
 
   final params = context.request.uri.queryParameters;
+  final idFilter = params['id']?.trim();
   final nameFilter = params['name'];
   final setFilter = normalizeCardSetFilter(params['set']);
   final includeTokens = params['include_tokens']?.toLowerCase() == 'true';
@@ -39,6 +40,7 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     final query = _buildQuery(
+      idFilter,
       nameFilter,
       setFilter,
       safeLimit,
@@ -119,6 +121,7 @@ class _QueryBuilder {
 }
 
 _QueryBuilder _buildQuery(
+  String? idFilter,
   String? nameFilter,
   String? setFilter,
   int limit,
@@ -133,6 +136,11 @@ _QueryBuilder _buildQuery(
 
   // Para ordenação: prioriza match exato, depois basic lands, depois alfabético
   String orderExpression = 'c.name ASC';
+
+  if (idFilter != null && idFilter.isNotEmpty) {
+    conditions.add('c.id::text = @id');
+    params['id'] = idFilter;
+  }
 
   if (nameFilter != null && nameFilter.isNotEmpty) {
     conditions.add('c.name ILIKE @name');

@@ -8,11 +8,13 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 import urllib.parse
 import uuid
 import zipfile
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -216,6 +218,386 @@ def _npm_components(package_lock: Path | None) -> list[dict[str, Any]]:
             )
         components.append(component)
     return components
+
+
+_ENGINE_SPECS = {
+    "xmage": {
+        "directory": "xmage-sidecar",
+        "pin_file": "XMAGE_COMMIT",
+        "docker_arg": "XMAGE_COMMIT",
+        "organization": "magefree",
+        "repository": "mage",
+        "license": "MIT",
+        "license_path": "LICENSE.txt",
+    },
+    "forge": {
+        "directory": "forge-sidecar",
+        "pin_file": "FORGE_COMMIT",
+        "docker_arg": "FORGE_COMMIT",
+        "organization": "Card-Forge",
+        "repository": "forge",
+        "license": "GPL-3.0-only",
+        "license_path": "LICENSE",
+    },
+}
+
+
+def _read_engine_pin(path: Path, engine: str) -> str:
+    if not path.is_file():
+        raise ValueError(f"pin {engine} ausente: {path}")
+    value = path.read_text(encoding="utf-8").strip()
+    if not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise ValueError(f"pin {engine} deve ser um commit SHA-1 completo: {path}")
+    return value
+
+
+def _docker_logical_lines(dockerfile: Path) -> list[str]:
+    lines: list[str] = []
+    buffer = ""
+    for raw_line in dockerfile.read_text(encoding="utf-8").splitlines():
+        stripped = raw_line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        continuation = stripped.endswith("\\")
+        part = stripped[:-1].rstrip() if continuation else stripped
+        buffer = f"{buffer} {part}".strip()
+        if not continuation:
+            lines.append(buffer)
+            buffer = ""
+    if buffer:
+        raise ValueError(f"Dockerfile termina com continuacao incompleta: {dockerfile}")
+    return lines
+
+
+def _docker_supply_chain(dockerfile: Path) -> dict[str, Any]:
+    if not dockerfile.is_file():
+        raise ValueError(f"Dockerfile de sidecar ausente: {dockerfile}")
+    stages: list[dict[str, Any]] = []
+    current_stage: dict[str, Any] | None = None
+    for line in _docker_logical_lines(dockerfile):
+        from_match = re.fullmatch(
+            r"FROM\s+(\S+)(?:\s+AS\s+(\S+))?", line, flags=re.IGNORECASE
+        )
+        if from_match:
+            current_stage = {
+                "name": from_match.group(2) or "runtime",
+                "image": from_match.group(1),
+                "apt_packages": [],
+            }
+            stages.append(current_stage)
+            continue
+
+        install_count = len(re.findall(r"\bapt-get\s+install\b", line))
+        if install_count == 0:
+            continue
+        if current_stage is None:
+            raise ValueError(f"apt-get anterior ao primeiro FROM em {dockerfile}")
+        matches = list(
+            re.finditer(
+                r"\bapt-get\s+install\s+-y\s+--no-install-recommends\s+"
+                r"(.+?)(?=\s+&&|$)",
+                line,
+            )
+        )
+        if len(matches) != install_count:
+            raise ValueError(
+                f"declaracao apt nao reconhecida integralmente em {dockerfile}: {line}"
+            )
+        for match in matches:
+            packages = shlex.split(match.group(1))
+            if not packages or any(package.startswith("-") for package in packages):
+                raise ValueError(f"lista apt invalida em {dockerfile}: {line}")
+            current_stage["apt_packages"].extend(packages)
+
+    if not stages:
+        raise ValueError(f"Dockerfile sem FROM: {dockerfile}")
+    for stage in stages:
+        image = str(stage["image"])
+        if not re.fullmatch(r"\S+@sha256:[0-9a-f]{64}", image):
+            raise ValueError(
+                f"imagem base sem digest SHA-256 imutavel em {dockerfile}: {image}"
+            )
+        stage["apt_packages"] = sorted(set(stage["apt_packages"]))
+    return {"stages": stages}
+
+
+def _docker_arg(dockerfile: Path, name: str) -> str:
+    matches = re.findall(
+        rf"^ARG\s+{re.escape(name)}=([^\s]+)\s*$",
+        dockerfile.read_text(encoding="utf-8"),
+        flags=re.MULTILINE,
+    )
+    if len(matches) != 1:
+        raise ValueError(f"Dockerfile deve declarar exatamente um ARG {name}")
+    return matches[0]
+
+
+def _oci_components(
+    supplies: list[tuple[str, dict[str, Any]]],
+) -> list[dict[str, Any]]:
+    usages: dict[str, dict[str, set[str]]] = {}
+    for sidecar, supply in supplies:
+        for stage in supply["stages"]:
+            image = str(stage["image"])
+            usage = usages.setdefault(image, {"sidecars": set(), "stages": set()})
+            usage["sidecars"].add(sidecar)
+            usage["stages"].add(f"{sidecar}:{stage['name']}")
+
+    components: list[dict[str, Any]] = []
+    for image in sorted(usages):
+        image_name, digest = image.rsplit("@sha256:", 1)
+        repository, tag = image_name.rsplit(":", 1)
+        encoded_repository = urllib.parse.quote(repository, safe="./")
+        encoded_tag = urllib.parse.quote(tag, safe=".+_-")
+        usage = usages[image]
+        components.append(
+            {
+                "type": "container",
+                "name": repository,
+                "version": tag,
+                "bom-ref": (
+                    f"pkg:oci/{encoded_repository}@{encoded_tag}"
+                    f"?digest=sha256%3A{digest}"
+                ),
+                "purl": (
+                    f"pkg:oci/{encoded_repository}@{encoded_tag}"
+                    f"?digest=sha256%3A{digest}"
+                ),
+                "hashes": [{"alg": "SHA-256", "content": digest}],
+                "properties": [
+                    {
+                        "name": "manaloom:deployment-units",
+                        "value": ",".join(sorted(usage["sidecars"])),
+                    },
+                    {
+                        "name": "manaloom:docker-stages",
+                        "value": ",".join(sorted(usage["stages"])),
+                    },
+                    {
+                        "name": "manaloom:runtime-family",
+                        "value": (
+                            "java"
+                            if "temurin" in repository or repository == "maven"
+                            else "container"
+                        ),
+                    },
+                ],
+            }
+        )
+    return components
+
+
+def _resolve_maven_value(value: str, properties: dict[str, str]) -> str:
+    resolved = value.strip()
+    for _ in range(10):
+        placeholders = re.findall(r"\$\{([^}]+)\}", resolved)
+        if not placeholders:
+            return resolved
+        for placeholder in placeholders:
+            replacement = properties.get(placeholder)
+            if replacement is None:
+                raise ValueError(f"propriedade Maven nao resolvida: {placeholder}")
+            resolved = resolved.replace(f"${{{placeholder}}}", replacement)
+    raise ValueError(f"resolucao Maven excedeu o limite: {value}")
+
+
+def _direct_maven_runtime_components(pom: Path) -> list[dict[str, Any]]:
+    if not pom.is_file():
+        raise ValueError(f"pom.xml do XMage sidecar ausente: {pom}")
+    root = ET.parse(pom).getroot()
+    namespace = {"m": "http://maven.apache.org/POM/4.0.0"}
+    properties: dict[str, str] = {}
+    properties_node = root.find("m:properties", namespace)
+    if properties_node is not None:
+        for child in properties_node:
+            key = child.tag.rsplit("}", 1)[-1]
+            properties[key] = (child.text or "").strip()
+
+    components: list[dict[str, Any]] = []
+    dependencies = root.findall("m:dependencies/m:dependency", namespace)
+    for dependency in dependencies:
+        text = lambda name: (dependency.findtext(f"m:{name}", "", namespace)).strip()
+        scope = text("scope") or "compile"
+        optional = text("optional").lower() == "true"
+        if scope not in {"compile", "runtime"} or optional:
+            continue
+        group = _resolve_maven_value(text("groupId"), properties)
+        name = _resolve_maven_value(text("artifactId"), properties)
+        version = _resolve_maven_value(text("version"), properties)
+        if not group or not name or not version:
+            raise ValueError(f"dependencia Maven direta incompleta em {pom}")
+        encoded_group = urllib.parse.quote(group, safe=".")
+        encoded_name = urllib.parse.quote(name, safe="")
+        encoded_version = urllib.parse.quote(version, safe=".+_-")
+        purl = f"pkg:maven/{encoded_group}/{encoded_name}@{encoded_version}"
+        components.append(
+            {
+                "type": "library",
+                "group": group,
+                "name": name,
+                "version": version,
+                "scope": "required",
+                "bom-ref": f"{purl}#manaloom-xmage-sidecar",
+                "purl": purl,
+                "properties": [
+                    {
+                        "name": "manaloom:dependency-scope",
+                        "value": "xmage-sidecar-direct-runtime",
+                    },
+                    {
+                        "name": "manaloom:dependency-evidence",
+                        "value": "services/xmage-sidecar/pom.xml",
+                    },
+                ],
+            }
+        )
+    if not components:
+        raise ValueError(f"pom.xml sem dependencias diretas de runtime: {pom}")
+    return components
+
+
+def _battle_sidecar_components(
+    services_root: Path, *, git_sha: str
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    present = {
+        engine: (services_root / str(spec["directory"])).is_dir()
+        for engine, spec in _ENGINE_SPECS.items()
+    }
+    if not any(present.values()):
+        return [], {"included": False}
+    if not all(present.values()):
+        raise ValueError(
+            "inventario de sidecars exige xmage-sidecar e forge-sidecar juntos"
+        )
+
+    components: list[dict[str, Any]] = []
+    supplies: list[tuple[str, dict[str, Any]]] = []
+    total_apt_declarations = 0
+    for engine, spec in _ENGINE_SPECS.items():
+        sidecar_name = f"{engine}-sidecar"
+        sidecar_dir = services_root / str(spec["directory"])
+        dockerfile = sidecar_dir / "Dockerfile"
+        pin_file = sidecar_dir / str(spec["pin_file"])
+        pin = _read_engine_pin(pin_file, engine)
+        docker_pin = _docker_arg(dockerfile, str(spec["docker_arg"]))
+        if docker_pin != pin:
+            raise ValueError(
+                f"pin {engine} diverge entre {pin_file.name} e Dockerfile"
+            )
+        supply = _docker_supply_chain(dockerfile)
+        supplies.append((sidecar_name, supply))
+        apt_by_stage = {
+            str(stage["name"]): stage["apt_packages"]
+            for stage in supply["stages"]
+            if stage["apt_packages"]
+        }
+        total_apt_declarations += sum(len(items) for items in apt_by_stage.values())
+        source_hashes = {
+            "Dockerfile": _sha256(dockerfile),
+            pin_file.name: _sha256(pin_file),
+        }
+        if engine == "xmage":
+            source_hashes["pom.xml"] = _sha256(sidecar_dir / "pom.xml")
+        else:
+            source_hashes["SeededForgeMain.java"] = _sha256(
+                sidecar_dir / "SeededForgeMain.java"
+            )
+            source_hashes["sidecar.py"] = _sha256(sidecar_dir / "sidecar.py")
+
+        components.append(
+            {
+                "type": "application",
+                "name": f"manaloom-{sidecar_name}",
+                "version": git_sha,
+                "bom-ref": f"urn:manaloom:sidecar:{engine}:{git_sha}",
+                "properties": [
+                    {
+                        "name": "manaloom:engine-commit",
+                        "value": pin,
+                    },
+                    {
+                        "name": "manaloom:source-file-sha256",
+                        "value": json.dumps(
+                            source_hashes, sort_keys=True, separators=(",", ":")
+                        ),
+                    },
+                    {
+                        "name": "manaloom:apt-package-declarations",
+                        "value": json.dumps(
+                            apt_by_stage, sort_keys=True, separators=(",", ":")
+                        ),
+                    },
+                    {
+                        "name": "manaloom:apt-version-evidence",
+                        "value": "unresolved-until-built-image-inspection",
+                    },
+                    {
+                        "name": "manaloom:maven-transitive-evidence",
+                        "value": (
+                            "direct-runtime-only-from-local-pom"
+                            if engine == "xmage"
+                            else "unavailable-upstream-pom-not-vendored"
+                        ),
+                    },
+                ],
+            }
+        )
+
+        organization = str(spec["organization"])
+        repository = str(spec["repository"])
+        commit_url = f"https://github.com/{organization}/{repository}/commit/{pin}"
+        license_url = (
+            f"https://github.com/{organization}/{repository}/blob/{pin}/"
+            f"{spec['license_path']}"
+        )
+        components.append(
+            {
+                "type": "application",
+                "group": organization,
+                "name": engine,
+                "version": pin,
+                "bom-ref": f"urn:manaloom:engine:{engine}:{pin}",
+                "licenses": [
+                    {
+                        "license": {
+                            "id": str(spec["license"]),
+                            "url": license_url,
+                        }
+                    }
+                ],
+                "externalReferences": [
+                    {"type": "vcs", "url": commit_url},
+                    {"type": "license", "url": license_url},
+                ],
+                "properties": [
+                    {
+                        "name": "manaloom:pin-file",
+                        "value": f"services/{spec['directory']}/{spec['pin_file']}",
+                    },
+                    {
+                        "name": "manaloom:pin-file-sha256",
+                        "value": _sha256(pin_file),
+                    },
+                    {
+                        "name": "manaloom:execution-boundary",
+                        "value": "isolated-http-sidecar",
+                    },
+                ],
+            }
+        )
+
+    components.extend(_oci_components(supplies))
+    components.extend(
+        _direct_maven_runtime_components(services_root / "xmage-sidecar" / "pom.xml")
+    )
+    return components, {
+        "included": True,
+        "sidecar_count": 2,
+        "apt_declaration_count": total_apt_declarations,
+        "apt_versions": "unresolved-until-built-image-inspection",
+        "xmage_maven": "direct-runtime-only-from-local-pom",
+        "forge_maven": "unavailable-upstream-pom-not-vendored",
+    }
 
 
 _GRADLE_RELEASE_RUNTIME_CONFIGURATION = "releaseRuntimeClasspath"
@@ -529,6 +911,7 @@ def main() -> int:
     parser.add_argument("--package-lock", type=Path)
     parser.add_argument("--gradle-lock", type=Path)
     parser.add_argument("--android-release-artifact", type=Path)
+    parser.add_argument("--battle-sidecars-root", type=Path)
     parser.add_argument("--include-dev", action="store_true")
     parser.add_argument("--git-sha", required=True)
     parser.add_argument("--source-committed-at")
@@ -549,6 +932,20 @@ def main() -> int:
         app_dir, dart_bin=dart_bin, include_dev=args.include_dev
     )
     _validate_dart_components_against_lock(dart_components, pubspec_lock)
+    services_root = (
+        args.battle_sidecars_root.resolve()
+        if args.battle_sidecars_root
+        else app_dir.parent / "services"
+    )
+    sidecar_components, sidecar_inventory = _battle_sidecar_components(
+        services_root, git_sha=args.git_sha
+    )
+    if args.battle_sidecars_root and not sidecar_inventory["included"]:
+        parser.error("battle-sidecars-root nao contem os dois sidecars obrigatorios")
+    if sidecar_inventory["included"] and not re.fullmatch(
+        r"[0-9a-f]{40}", args.git_sha
+    ):
+        parser.error("git-sha deve ser completo quando sidecars entram no SBOM")
     gradle_components = _gradle_components(args.gradle_lock)
     gradle_release_components, gradle_excluded_components = _gradle_scope_counts(
         gradle_components
@@ -564,6 +961,7 @@ def main() -> int:
         dart_components
         + _npm_components(args.package_lock)
         + gradle_components
+        + sidecar_components
     )
     version = _app_version(pubspec)
     serial_seed = f"manaloom:{version}:{args.git_sha}"
@@ -576,12 +974,44 @@ def main() -> int:
         {
             "name": "manaloom:sbom-scope",
             "value": (
-                "flutter-dart-runtime+android-gradle-release-runtime"
-                if gradle_components
-                else "flutter-dart-runtime"
+                (
+                    "flutter-dart-runtime+android-gradle-release-runtime"
+                    if gradle_components
+                    else "flutter-dart-runtime"
+                )
+                + (
+                    "+battle-sidecar-source-supply-chain"
+                    if sidecar_inventory["included"]
+                    else ""
+                )
             ),
         },
     ]
+    if sidecar_inventory["included"]:
+        properties.extend(
+            [
+                {
+                    "name": "manaloom:battle-sidecar-component-count",
+                    "value": str(len(sidecar_components)),
+                },
+                {
+                    "name": "manaloom:battle-sidecar-apt-declaration-count",
+                    "value": str(sidecar_inventory["apt_declaration_count"]),
+                },
+                {
+                    "name": "manaloom:battle-sidecar-apt-version-evidence",
+                    "value": str(sidecar_inventory["apt_versions"]),
+                },
+                {
+                    "name": "manaloom:xmage-maven-evidence",
+                    "value": str(sidecar_inventory["xmage_maven"]),
+                },
+                {
+                    "name": "manaloom:forge-maven-evidence",
+                    "value": str(sidecar_inventory["forge_maven"]),
+                },
+            ]
+        )
     if args.package_lock and args.package_lock.is_file():
         properties.append(
             {
@@ -672,6 +1102,7 @@ def main() -> int:
                 "status": "generated",
                 "output": str(args.output),
                 "components": len(components),
+                "battle_sidecars_included": sidecar_inventory["included"],
                 "git_sha": args.git_sha,
             },
             sort_keys=True,

@@ -25,20 +25,24 @@ Future<void> processOptimizeModeAsync({
   required Map<String, dynamic> syncPayload,
   required String? authorization,
 }) async {
-  await OptimizeJobStore.progress(
+  if (!await OptimizeJobStore.progress(
     pool,
     jobId,
     stage: 'Preparando optimize agressivo...',
     stageNumber: 1,
-  );
+  )) {
+    return;
+  }
 
   final stopwatch = Stopwatch()..start();
-  await OptimizeJobStore.progress(
+  if (!await OptimizeJobStore.progress(
     pool,
     jobId,
     stage: 'Gerando preview seguro...',
     stageNumber: 2,
-  );
+  )) {
+    return;
+  }
 
   final headers = <String, String>{
     'Content-Type': 'application/json',
@@ -65,12 +69,14 @@ Future<void> processOptimizeModeAsync({
     return;
   }
 
-  await OptimizeJobStore.progress(
+  if (!await OptimizeJobStore.progress(
     pool,
     jobId,
     stage: 'Persistindo resultado...',
     stageNumber: 5,
-  );
+  )) {
+    return;
+  }
 
   Map<String, dynamic> resultBody;
   try {
@@ -293,12 +299,14 @@ Future<void> processCompleteModeAsync({
       requestMode: 'complete_async',
       jobId: jobId,
     );
-    await OptimizeJobStore.progress(
+    if (!await OptimizeJobStore.progress(
       pool,
       jobId,
       stage: 'Preparando referências do commander...',
       stageNumber: 1,
-    );
+    )) {
+      return;
+    }
 
     Map<String, dynamic> jsonResponse;
     final state = optimize_complete.CompleteBuildAccumulator.fromDeck(
@@ -319,12 +327,14 @@ Future<void> processCompleteModeAsync({
     );
 
     if (optimizer != null) {
-      await OptimizeJobStore.progress(
+      if (!await OptimizeJobStore.progress(
         pool,
         jobId,
         stage: 'Consultando IA para sugestões...',
         stageNumber: 2,
-      );
+      )) {
+        return;
+      }
       await telemetry.trackAsync(
         'complete.ai_suggestion_loop',
         () => optimize_complete.runCompleteAiSuggestionLoop(
@@ -346,12 +356,14 @@ Future<void> processCompleteModeAsync({
         ),
       );
     } else {
-      await OptimizeJobStore.progress(
+      if (!await OptimizeJobStore.progress(
         pool,
         jobId,
         stage: 'Pulando IA (modo determinístico)...',
         stageNumber: 2,
-      );
+      )) {
+        return;
+      }
     }
 
     telemetry.trackSync(
@@ -362,18 +374,22 @@ Future<void> processCompleteModeAsync({
       ),
     );
 
-    await OptimizeJobStore.progress(
+    if (!await OptimizeJobStore.progress(
       pool,
       jobId,
       stage: 'Preenchendo com cartas sinérgicas...',
       stageNumber: 3,
-    );
-    await OptimizeJobStore.progress(
+    )) {
+      return;
+    }
+    if (!await OptimizeJobStore.progress(
       pool,
       jobId,
       stage: 'Ajustando base de mana...',
       stageNumber: 4,
-    );
+    )) {
+      return;
+    }
 
     await telemetry.trackAsync(
       'complete.fill_remainder',
@@ -402,12 +418,14 @@ Future<void> processCompleteModeAsync({
       ),
     );
 
-    await OptimizeJobStore.progress(
+    if (!await OptimizeJobStore.progress(
       pool,
       jobId,
       stage: 'Processando resultado final...',
       stageNumber: 6,
-    );
+    )) {
+      return;
+    }
 
     // Post-processing: validar qualidade e construir resposta
     if (jsonResponse['mode'] == 'complete' &&
@@ -463,6 +481,14 @@ Future<void> processCompleteModeAsync({
         responseBody,
         recommendationContext,
       );
+      if (!await OptimizeJobStore.progress(
+        pool,
+        jobId,
+        stage: 'Finalizando preview...',
+        stageNumber: 6,
+      )) {
+        return;
+      }
       telemetry.logSummary();
       if (cacheKey != null && cacheKey.isNotEmpty) {
         await saveOptimizeCache(
@@ -497,6 +523,14 @@ Future<void> processCompleteModeAsync({
         jsonResponse,
         recommendationContext,
       );
+      if (!await OptimizeJobStore.progress(
+        pool,
+        jobId,
+        stage: 'Finalizando preview...',
+        stageNumber: 6,
+      )) {
+        return;
+      }
       telemetry.logSummary();
       if (cacheKey != null && cacheKey.isNotEmpty) {
         await saveOptimizeCache(

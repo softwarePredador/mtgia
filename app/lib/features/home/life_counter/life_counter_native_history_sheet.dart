@@ -72,7 +72,12 @@ class _LifeCounterNativeHistorySheetState
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.9,
           child: DecoratedBox(
@@ -92,7 +97,12 @@ class _LifeCounterNativeHistorySheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -107,7 +117,7 @@ class _LifeCounterNativeHistorySheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: AppTheme.space6),
                             Text(
                               history.currentGameName == null
                                   ? 'Revise eventos recentes e partidas concluídas.'
@@ -188,7 +198,12 @@ class _LifeCounterNativeHistorySheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space16,
+                    ),
                     children: [
                       Wrap(
                         spacing: 10,
@@ -208,7 +223,7 @@ class _LifeCounterNativeHistorySheetState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Último evento da mesa',
                         child: Text(
@@ -218,48 +233,45 @@ class _LifeCounterNativeHistorySheetState
                             'life-counter-native-history-last-event',
                           ),
                           style: TextStyle(
-                            color:
-                                history.lastTableEvent == null
-                                    ? AppTheme.textSecondary
-                                    : AppTheme.textPrimary,
+                            color: history.lastTableEvent == null
+                                ? AppTheme.textSecondary
+                                : AppTheme.textPrimary,
                             fontSize: AppTheme.fontMd,
                             height: AppTheme.lineHeightCompact,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       _SectionCard(
                         title: 'Partida atual',
-                        child:
-                            history.currentGameEntries.isEmpty
-                                ? const _EmptyHistoryState(
-                                  message:
-                                      'Nenhum evento da partida atual foi registrado.',
-                                )
-                                : Column(
-                                  children: [
-                                    for (final entry
-                                        in history.currentGameEntries)
-                                      _HistoryEntryTile(entry: entry),
-                                  ],
-                                ),
+                        child: history.currentGameEntries.isEmpty
+                            ? const _EmptyHistoryState(
+                                message:
+                                    'Nenhum evento da partida atual foi registrado.',
+                              )
+                            : Column(
+                                children: [
+                                  for (final entry
+                                      in history.currentGameEntries)
+                                    _HistoryEntryTile(entry: entry),
+                                ],
+                              ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       _SectionCard(
                         title: 'Arquivo',
-                        child:
-                            history.archiveEntries.isEmpty
-                                ? const _EmptyHistoryState(
-                                  message: 'Nenhuma partida arquivada.',
-                                )
-                                : Column(
-                                  children: [
-                                    for (final entry in history.archiveEntries
-                                        .take(12))
-                                      _HistoryEntryTile(entry: entry),
-                                  ],
-                                ),
+                        child: history.archiveEntries.isEmpty
+                            ? const _EmptyHistoryState(
+                                message: 'Nenhuma partida arquivada.',
+                              )
+                            : Column(
+                                children: [
+                                  for (final entry
+                                      in history.archiveEntries.take(12))
+                                    _HistoryEntryTile(entry: entry),
+                                ],
+                              ),
                       ),
                     ],
                   ),
@@ -280,11 +292,10 @@ Future<bool?> _showHistoryImportDialog(
 }) {
   return showDialog<bool>(
     context: context,
-    builder:
-        (dialogContext) => _HistoryImportDialog(
-          onImportSubmitted: onImportSubmitted,
-          requireReplacementConfirmation: requireReplacementConfirmation,
-        ),
+    builder: (dialogContext) => _HistoryImportDialog(
+      onImportSubmitted: onImportSubmitted,
+      requireReplacementConfirmation: requireReplacementConfirmation,
+    ),
   );
 }
 
@@ -381,14 +392,13 @@ class _HistoryImportDialogState extends State<_HistoryImportDialog> {
           FilledButton(
             key: const Key('life-counter-native-history-import-confirm'),
             onPressed: _isSubmitting ? null : _submit,
-            child:
-                _isImportInFlight
-                    ? const SizedBox.square(
-                      key: Key('life-counter-native-history-import-progress'),
-                      dimension: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : const Text('Importar'),
+            child: _isImportInFlight
+                ? const SizedBox.square(
+                    key: Key('life-counter-native-history-import-progress'),
+                    dimension: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Importar'),
           ),
         ],
       ),
@@ -445,7 +455,12 @@ class _SectionCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space14,
+          AppTheme.space14,
+          AppTheme.space14,
+          AppTheme.space12,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -457,7 +472,7 @@ class _SectionCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             child,
           ],
         ),
@@ -481,7 +496,10 @@ class _SummaryPill extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space14,
+          vertical: AppTheme.space10,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,7 +512,7 @@ class _SummaryPill extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: AppTheme.space2),
             Text(
               label,
               style: const TextStyle(
@@ -518,14 +536,14 @@ class _HistoryEntryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppTheme.space12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 8,
             height: 8,
-            margin: const EdgeInsets.only(top: 6),
+            margin: const EdgeInsets.only(top: AppTheme.space6),
             decoration: BoxDecoration(
               color: switch (entry.source) {
                 LifeCounterHistoryEntrySource.archive => AppTheme.mythicGold,
@@ -536,7 +554,7 @@ class _HistoryEntryTile extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,7 +569,7 @@ class _HistoryEntryTile extends StatelessWidget {
                   ),
                 ),
                 if (entry.occurredAt != null) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppTheme.space4),
                   Text(
                     _formatTimestamp(entry.occurredAt!),
                     style: const TextStyle(

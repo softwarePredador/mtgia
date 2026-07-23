@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "measured_at": "2026-07-21",
+  "matcher_contract": "EdgeInsets numeric, SizedBox width/height numeric, Gap numeric",
+  "baseline_total": 0,
+  "classifications": {
+    "lib/core/**": "canonical AppTheme spacing tokens required",
+    "lib/features/**": "canonical AppTheme spacing tokens required"
+  },
+  "files": {}
+}

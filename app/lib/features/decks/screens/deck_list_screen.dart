@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
+import '../../../core/config/visual_fixture.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/app_state_panel.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/mana_symbols.dart';
 import '../models/deck.dart';
 import '../providers/deck_provider.dart';
@@ -80,208 +81,192 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
     return showDialog(
       context: context,
-      builder:
-          (context) => StatefulBuilder(
-            builder:
-                (context, setState) => Dialog(
-                  key: const Key('deck-create-dialog'),
-                  insetPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 24,
-                  ),
-                  backgroundColor: AppTheme.surfaceElevated,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                    side: BorderSide(
-                      color: AppTheme.outlineMuted.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Novo Deck',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleLarge?.copyWith(
-                                    color: AppTheme.textPrimary,
-                                    fontWeight: FontWeight.w800,
-                                    fontFamily: AppTheme.displayFontFamily,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => Navigator.pop(context),
-                                icon: const Icon(Icons.close_rounded),
-                                color: AppTheme.textSecondary,
-                                tooltip: 'Fechar',
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
-                          TextField(
-                            key: const Key('deck-create-name-field'),
-                            controller: nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nome do deck',
-                              hintText: 'Ex.: meu deck lorehold',
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          DropdownButtonFormField<String>(
-                            key: const Key('deck-create-format-field'),
-                            initialValue: selectedFormat,
-                            decoration: const InputDecoration(
-                              labelText: 'Formato',
-                            ),
-                            items:
-                                formats
-                                    .map(
-                                      (f) => DropdownMenuItem(
-                                        value: f,
-                                        child: Text(
-                                          f[0].toUpperCase() + f.substring(1),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() => selectedFormat = value);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 14),
-                          TextField(
-                            key: const Key('deck-create-description-field'),
-                            controller: descriptionController,
-                            decoration: const InputDecoration(
-                              labelText: 'Descrição (opcional)',
-                              hintText: 'Sobre o que é este deck?',
-                            ),
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: 12),
-                          SwitchListTile(
-                            key: const Key('deck-create-public-switch'),
-                            title: const Text('Deck público'),
-                            subtitle: const Text('Visível na comunidade'),
-                            value: isPublic,
-                            onChanged: (v) => setState(() => isPublic = v),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          const SizedBox(height: 18),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  key: const Key('deck-create-cancel-button'),
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancelar'),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ElevatedButton(
-                                  key: const Key('deck-create-submit-button'),
-                                  onPressed: () async {
-                                    if (isSubmitting) return;
-
-                                    final trimmedName =
-                                        nameController.text.trim();
-                                    final trimmedDescription =
-                                        descriptionController.text.trim();
-
-                                    if (trimmedName.isEmpty) {
-                                      ScaffoldMessenger.of(
-                                        parentContext,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Informe o nome do deck.',
-                                          ),
-                                          backgroundColor: AppTheme.error,
-                                        ),
-                                      );
-                                      return;
-                                    }
-
-                                    setState(() => isSubmitting = true);
-
-                                    final success = await context
-                                        .read<DeckProvider>()
-                                        .createDeck(
-                                          name: trimmedName,
-                                          format: selectedFormat,
-                                          description:
-                                              trimmedDescription.isEmpty
-                                                  ? null
-                                                  : trimmedDescription,
-                                          isPublic: isPublic,
-                                        );
-
-                                    if (context.mounted) {
-                                      setState(() => isSubmitting = false);
-                                    }
-
-                                    if (context.mounted) {
-                                      if (success) {
-                                        Navigator.pop(context);
-                                        ScaffoldMessenger.of(
-                                          parentContext,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Deck criado com sucesso!',
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        ScaffoldMessenger.of(
-                                          parentContext,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              parentContext
-                                                      .read<DeckProvider>()
-                                                      .errorMessage ??
-                                                  'Erro ao criar deck',
-                                            ),
-                                            backgroundColor: AppTheme.error,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  child:
-                                      isSubmitting
-                                          ? const SizedBox(
-                                            height: 18,
-                                            width: 18,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: AppTheme.backgroundAbyss,
-                                            ),
-                                          )
-                                          : const Text('Criar deck'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Dialog(
+          key: const Key('deck-create-dialog'),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space20,
+            vertical: AppTheme.space24,
           ),
+          backgroundColor: AppTheme.surfaceElevated,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            side: BorderSide(
+              color: AppTheme.outlineMuted.withValues(alpha: 0.7),
+            ),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.space20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Novo Deck',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: AppTheme.displayFontFamily,
+                              ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close_rounded),
+                        color: AppTheme.textSecondary,
+                        tooltip: 'Fechar',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppTheme.space18),
+                  TextField(
+                    key: const Key('deck-create-name-field'),
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nome do deck',
+                      hintText: 'Ex.: meu deck lorehold',
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space14),
+                  DropdownButtonFormField<String>(
+                    key: const Key('deck-create-format-field'),
+                    initialValue: selectedFormat,
+                    decoration: const InputDecoration(labelText: 'Formato'),
+                    items: formats
+                        .map(
+                          (f) => DropdownMenuItem(
+                            value: f,
+                            child: Text(f[0].toUpperCase() + f.substring(1)),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => selectedFormat = value);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppTheme.space14),
+                  TextField(
+                    key: const Key('deck-create-description-field'),
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Descrição (opcional)',
+                      hintText: 'Sobre o que é este deck?',
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: AppTheme.space12),
+                  SwitchListTile(
+                    key: const Key('deck-create-public-switch'),
+                    title: const Text('Deck público'),
+                    subtitle: const Text('Visível na comunidade'),
+                    value: isPublic,
+                    onChanged: (v) => setState(() => isPublic = v),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  const SizedBox(height: AppTheme.space18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          key: const Key('deck-create-cancel-button'),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancelar'),
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.space12),
+                      Expanded(
+                        child: ElevatedButton(
+                          key: const Key('deck-create-submit-button'),
+                          onPressed: () async {
+                            if (isSubmitting) return;
+
+                            final trimmedName = nameController.text.trim();
+                            final trimmedDescription = descriptionController
+                                .text
+                                .trim();
+
+                            if (trimmedName.isEmpty) {
+                              ScaffoldMessenger.of(parentContext).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Informe o nome do deck.'),
+                                  backgroundColor: AppTheme.error,
+                                ),
+                              );
+                              return;
+                            }
+
+                            setState(() => isSubmitting = true);
+
+                            final success = await context
+                                .read<DeckProvider>()
+                                .createDeck(
+                                  name: trimmedName,
+                                  format: selectedFormat,
+                                  description: trimmedDescription.isEmpty
+                                      ? null
+                                      : trimmedDescription,
+                                  isPublic: isPublic,
+                                );
+
+                            if (context.mounted) {
+                              setState(() => isSubmitting = false);
+                            }
+
+                            if (context.mounted) {
+                              if (success) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(
+                                  parentContext,
+                                ).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Deck criado com sucesso!'),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(
+                                  parentContext,
+                                ).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      parentContext
+                                              .read<DeckProvider>()
+                                              .errorMessage ??
+                                          'Erro ao criar deck',
+                                    ),
+                                    backgroundColor: AppTheme.error,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: isSubmitting
+                              ? const SizedBox(
+                                  height: AppTheme.space18,
+                                  width: AppTheme.space18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppTheme.backgroundAbyss,
+                                  ),
+                                )
+                              : const Text('Criar deck'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -385,9 +370,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
           // Loading (apenas se a lista estiver vazia)
           if (deckIsLoading && decks.isEmpty) {
-            return const AppStatePanel(
+            return const AppStatePanel.loading(
               key: Key('deck-list-loading-state'),
-              icon: Icons.auto_stories_rounded,
               title: 'Carregando decks',
               message:
                   'Organizando suas listas, comandantes e progresso de coleção.',
@@ -421,11 +405,10 @@ class _DeckListScreenState extends State<DeckListScreen> {
           final query = _searchController.text.trim();
           final hasQuery = query.isNotEmpty;
           final incompleteCount = _incompleteCount(decks);
-          final visibleDecks =
-              decks
-                  .where((deck) => _matchesFilter(deck))
-                  .where((deck) => _matchesSearch(deck, query))
-                  .toList();
+          final visibleDecks = decks
+              .where((deck) => _matchesFilter(deck))
+              .where((deck) => _matchesSearch(deck, query))
+              .toList();
 
           return CustomScrollView(
             key: const Key('deck-list'),
@@ -437,7 +420,12 @@ class _DeckListScreenState extends State<DeckListScreen> {
                       maxWidth: AppTheme.pageMaxWidth,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppTheme.space14,
+                        AppTheme.space8,
+                        AppTheme.space14,
+                        AppTheme.space10,
+                      ),
                       child: Column(
                         children: [
                           Row(
@@ -456,13 +444,13 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                         AppTheme.radiusPill,
                                       ),
                                       border: Border.all(
-                                        color:
-                                            hasQuery
-                                                ? AppTheme.brass400.withValues(
-                                                  alpha: 0.7,
-                                                )
-                                                : AppTheme.outlineMuted
-                                                    .withValues(alpha: 0.75),
+                                        color: hasQuery
+                                            ? AppTheme.brass400.withValues(
+                                                alpha: 0.7,
+                                              )
+                                            : AppTheme.outlineMuted.withValues(
+                                                alpha: 0.75,
+                                              ),
                                       ),
                                     ),
                                     child: TextField(
@@ -487,8 +475,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                             ),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
-                                              horizontal: 0,
-                                              vertical: 9,
+                                              horizontal: AppTheme.space0,
+                                              vertical: AppTheme.space9,
                                             ),
                                         hintStyle: const TextStyle(
                                           color: AppTheme.textHint,
@@ -504,7 +492,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: AppTheme.space10),
                               Semantics(
                                 button: true,
                                 label: 'Alternar filtro de decks',
@@ -514,13 +502,11 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                     borderRadius: BorderRadius.circular(
                                       AppTheme.radiusPill,
                                     ),
-                                    onTap:
-                                        () => setState(() {
-                                          _deckFilter =
-                                              _deckFilter == 'todos'
-                                                  ? 'commander'
-                                                  : 'todos';
-                                        }),
+                                    onTap: () => setState(() {
+                                      _deckFilter = _deckFilter == 'todos'
+                                          ? 'commander'
+                                          : 'todos';
+                                    }),
                                     child: Container(
                                       width: 48,
                                       height: 48,
@@ -544,7 +530,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 13),
+                          const SizedBox(height: AppTheme.space13),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -553,40 +539,34 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                   label: 'Todos',
                                   count: decks.length,
                                   selected: _deckFilter == 'todos',
-                                  onTap:
-                                      () =>
-                                          setState(() => _deckFilter = 'todos'),
+                                  onTap: () =>
+                                      setState(() => _deckFilter = 'todos'),
                                 ),
                                 _DeckFilterChip(
                                   label: 'Commander',
                                   count: _countFor(decks, 'commander'),
                                   selected: _deckFilter == 'commander',
-                                  onTap:
-                                      () => setState(
-                                        () => _deckFilter = 'commander',
-                                      ),
+                                  onTap: () =>
+                                      setState(() => _deckFilter = 'commander'),
                                 ),
                                 _DeckFilterChip(
                                   label: 'Padrão',
                                   count: _countFor(decks, 'standard'),
                                   selected: _deckFilter == 'standard',
-                                  onTap:
-                                      () => setState(
-                                        () => _deckFilter = 'standard',
-                                      ),
+                                  onTap: () =>
+                                      setState(() => _deckFilter = 'standard'),
                                 ),
                                 _DeckFilterChip(
                                   label: 'Outros',
                                   count: _countFor(decks, 'other'),
                                   selected: _deckFilter == 'other',
-                                  onTap:
-                                      () =>
-                                          setState(() => _deckFilter = 'other'),
+                                  onTap: () =>
+                                      setState(() => _deckFilter = 'other'),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: AppTheme.space2),
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -612,10 +592,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     key: const Key('deck-list-filter-empty-state'),
                     icon: Icons.filter_alt_off_rounded,
                     title: 'Nenhum deck combina',
-                    message:
-                        hasQuery
-                            ? 'Tente outro nome, comandante ou formato para refinar a busca.'
-                            : 'Ajuste os filtros para voltar a ver suas listas.',
+                    message: hasQuery
+                        ? 'Tente outro nome, comandante ou formato para refinar a busca.'
+                        : 'Ajuste os filtros para voltar a ver suas listas.',
                     accent: AppTheme.frost400,
                   ),
                 )
@@ -631,7 +610,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     );
                     final padding = EdgeInsets.fromLTRB(
                       horizontalInset,
-                      2,
+                      AppTheme.space2,
                       horizontalInset,
                       132,
                     );
@@ -652,7 +631,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
                             }
                             final deck = visibleDecks[index];
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.only(
+                                bottom: AppTheme.space12,
+                              ),
                               child: _DeckSpotlightCard(
                                 key: Key('deck-list-row-${deck.id}'),
                                 deck: deck,
@@ -692,179 +673,169 @@ class _DeckListScreenState extends State<DeckListScreen> {
           );
         },
       ),
-      floatingActionButton:
-          deckCount == 0
-              ? null
-              : PopupMenuButton<String>(
-                key: const Key('deck-list-fab-menu'),
-                onSelected: (value) {
-                  switch (value) {
-                    case 'create':
-                      _showCreateDeckDialog(context);
-                      break;
-                    case 'generate':
-                      context.go('/decks/generate');
-                      break;
-                    case 'import':
-                      context.go('/decks/import');
-                      break;
-                  }
-                },
-                offset: const Offset(0, -160),
-                tooltip: 'Criar ou importar deck',
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                ),
-                itemBuilder:
-                    (context) => [
-                      PopupMenuItem(
-                        key: const Key('deck-list-menu-create'),
-                        value: 'create',
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.add,
-                            color: theme.colorScheme.primary,
-                          ),
-                          title: const Text('Novo Deck'),
-                          subtitle: const Text('Criar do zero'),
-                          contentPadding: EdgeInsets.zero,
-                          dense: true,
-                        ),
-                      ),
-                      PopupMenuItem(
-                        key: const Key('deck-list-menu-generate'),
-                        value: 'generate',
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.auto_awesome,
-                            color: theme.colorScheme.secondary,
-                          ),
-                          title: const Text('Gerar com IA'),
-                          subtitle: const Text('Descreva e a IA monta'),
-                          contentPadding: EdgeInsets.zero,
-                          dense: true,
-                        ),
-                      ),
-                      PopupMenuItem(
-                        key: const Key('deck-list-menu-import'),
-                        value: 'import',
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.content_paste,
-                            color: AppTheme.brass400,
-                          ),
-                          title: const Text('Importar Lista'),
-                          subtitle: const Text('Colar de outro site'),
-                          contentPadding: EdgeInsets.zero,
-                          dense: true,
-                        ),
-                      ),
-                    ],
-                child: IgnorePointer(
-                  child: FloatingActionButton.small(
-                    onPressed: () {},
-                    child: const Icon(Icons.add),
+      floatingActionButton: deckCount == 0
+          ? null
+          : PopupMenuButton<String>(
+              key: const Key('deck-list-fab-menu'),
+              onSelected: (value) {
+                switch (value) {
+                  case 'create':
+                    _showCreateDeckDialog(context);
+                    break;
+                  case 'generate':
+                    context.go('/decks/generate');
+                    break;
+                  case 'import':
+                    context.go('/decks/import');
+                    break;
+                }
+              },
+              offset: const Offset(0, -160),
+              tooltip: 'Criar ou importar deck',
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              ),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  key: const Key('deck-list-menu-create'),
+                  value: 'create',
+                  child: ListTile(
+                    leading: Icon(Icons.add, color: theme.colorScheme.primary),
+                    title: const Text('Novo Deck'),
+                    subtitle: const Text('Criar do zero'),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
                   ),
                 ),
+                PopupMenuItem(
+                  key: const Key('deck-list-menu-generate'),
+                  value: 'generate',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.auto_awesome,
+                      color: theme.colorScheme.secondary,
+                    ),
+                    title: const Text('Gerar com IA'),
+                    subtitle: const Text('Descreva e a IA monta'),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                PopupMenuItem(
+                  key: const Key('deck-list-menu-import'),
+                  value: 'import',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.content_paste,
+                      color: AppTheme.brass400,
+                    ),
+                    title: const Text('Importar Lista'),
+                    subtitle: const Text('Colar de outro site'),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+              ],
+              child: IgnorePointer(
+                child: FloatingActionButton.small(
+                  onPressed: () {},
+                  child: const Icon(Icons.add),
+                ),
               ),
+            ),
     );
   }
 
   Future<bool?> _showDeleteDialog(BuildContext context, Deck deck) {
     return showDialog<bool>(
       context: context,
-      builder:
-          (context) => Dialog(
-            backgroundColor: AppTheme.surfaceElevated,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              side: BorderSide(color: AppTheme.error.withValues(alpha: 0.28)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (context) => Dialog(
+        backgroundColor: AppTheme.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          side: BorderSide(color: AppTheme.error.withValues(alpha: 0.28)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: AppTheme.error.withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusMd,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.delete_forever_rounded,
-                          color: AppTheme.error,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Excluir deck?',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            color: AppTheme.textPrimary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    deck.name,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w800,
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppTheme.error.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    ),
+                    child: const Icon(
+                      Icons.delete_forever_rounded,
+                      color: AppTheme.error,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${_formatDeckLabel(deck.format)} · ${_deckCountLabel(deck)}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Essa ação remove a lista da sua coleção de decks e não pode ser desfeita.',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      height: AppTheme.lineHeightCompact,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Cancelar'),
-                        ),
+                  const SizedBox(width: AppTheme.space12),
+                  Expanded(
+                    child: Text(
+                      'Excluir deck?',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.error,
-                            foregroundColor: AppTheme.textPrimary,
-                          ),
-                          child: const Text('Excluir deck'),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: AppTheme.space14),
+              Text(
+                deck.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space4),
+              Text(
+                '${_formatDeckLabel(deck.format)} · ${_deckCountLabel(deck)}',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+              ),
+              const SizedBox(height: AppTheme.space12),
+              const Text(
+                'Essa ação remove a lista da sua coleção de decks e não pode ser desfeita.',
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  height: AppTheme.lineHeightCompact,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space18),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancelar'),
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.space10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.error,
+                        foregroundColor: AppTheme.textPrimary,
+                      ),
+                      child: const Text('Excluir deck'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -930,6 +901,7 @@ Color _deckStatusColor(Deck deck) {
 }
 
 String _timeAgo(DateTime date) {
+  if (manaloomVisualFixtureMode) return 'agora';
   final diff = DateTime.now().difference(date);
   if (diff.inDays > 365) return '${(diff.inDays / 365).floor()}a';
   if (diff.inDays > 30) return '${(diff.inDays / 30).floor()}m';
@@ -961,8 +933,11 @@ class _SparseDeckActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 2, bottom: 4),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(
+        top: AppTheme.space2,
+        bottom: AppTheme.space4,
+      ),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -982,7 +957,7 @@ class _SparseDeckActions extends StatelessWidget {
               fontSize: AppTheme.fontSm,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -1027,7 +1002,10 @@ class _QuickDeckAction extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppTheme.radiusPill),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space10,
+          vertical: AppTheme.space8,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.backgroundAbyss.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -1040,7 +1018,7 @@ class _QuickDeckAction extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 14, color: AppTheme.brass400),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppTheme.space6),
             Text(
               label,
               style: const TextStyle(
@@ -1111,20 +1089,21 @@ class _DeckSpotlightCard extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(
-                child:
-                    hasArt
-                        ? ImageFiltered(
-                          imageFilter: ui.ImageFilter.blur(
-                            sigmaX: 10,
-                            sigmaY: 10,
-                          ),
-                          child: CachedCardImage(
-                            imageUrl: backgroundUrl ?? thumbnailUrl,
-                            fallbackImageUrl: fallbackBackgroundUrl,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                        : _DeckFallbackArt(accent: AppTheme.brass500),
+                child: hasArt
+                    ? ImageFiltered(
+                        imageFilter: ui.ImageFilter.blur(
+                          sigmaX: 10,
+                          sigmaY: 10,
+                        ),
+                        child: CardArtwork(
+                          variant: CardArtworkVariant.artCrop,
+                          imageUrl: backgroundUrl ?? thumbnailUrl,
+                          fallbackImageUrl: fallbackBackgroundUrl,
+                          semanticLabel: 'Arte de fundo do deck ${deck.name}',
+                          constrainAspectRatio: false,
+                        ),
+                      )
+                    : _DeckFallbackArt(accent: AppTheme.brass500),
               ),
               Positioned.fill(
                 child: DecoratedBox(
@@ -1146,21 +1125,22 @@ class _DeckSpotlightCard extends StatelessWidget {
                 bottom: 20,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  child:
-                      hasArt
-                          ? CachedCardImage(
-                            key: Key('deck-spotlight-art-${deck.id}'),
-                            imageUrl: thumbnailUrl,
-                            fallbackImageUrl: fallbackImageUrl,
-                            width: 92,
-                            height: 128,
-                            fit: BoxFit.contain,
-                          )
-                          : SizedBox(
-                            width: 92,
-                            height: 128,
-                            child: _DeckFallbackArt(accent: AppTheme.brass500),
-                          ),
+                  child: hasArt
+                      ? CardArtwork(
+                          variant: CardArtworkVariant.spotlight,
+                          imageKey: Key('deck-spotlight-art-${deck.id}'),
+                          imageUrl: thumbnailUrl,
+                          fallbackImageUrl: fallbackImageUrl,
+                          semanticLabel:
+                              'Carta do comandante ${deck.commanderName ?? deck.name}',
+                          constrainAspectRatio: false,
+                          width: 92,
+                        )
+                      : SizedBox(
+                          width: 92,
+                          height: 128,
+                          child: _DeckFallbackArt(accent: AppTheme.brass500),
+                        ),
                 ),
               ),
               Positioned(
@@ -1186,7 +1166,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(right: 34),
+                      padding: const EdgeInsets.only(right: AppTheme.space34),
                       child: Text(
                         deck.name,
                         maxLines: 1,
@@ -1200,9 +1180,9 @@ class _DeckSpotlightCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.space4),
                     Padding(
-                      padding: const EdgeInsets.only(right: 34),
+                      padding: const EdgeInsets.only(right: AppTheme.space34),
                       child: Text(
                         (deck.commanderName ?? '').trim().isEmpty
                             ? _formatDeckLabel(deck.format)
@@ -1216,7 +1196,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppTheme.space10),
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
@@ -1242,7 +1222,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                           size: 13,
                           color: AppTheme.textHint.withValues(alpha: 0.9),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppTheme.space4),
                         Text(
                           _timeAgo(deck.createdAt),
                           style: const TextStyle(
@@ -1252,7 +1232,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                           ),
                         ),
                         if (deck.pricingTotal != null) ...[
-                          const SizedBox(width: 10),
+                          const SizedBox(width: AppTheme.space10),
                           const Icon(
                             Icons.attach_money_rounded,
                             size: 13,
@@ -1307,7 +1287,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                 size: 20,
                 color: Theme.of(context).colorScheme.error,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Text(
                 'Excluir',
                 style: Theme.of(
@@ -1334,7 +1314,10 @@ class _DeckInfoBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = color ?? AppTheme.textSecondary;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space7,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.54),
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -1381,7 +1364,10 @@ class _PendingIdentityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space7,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.54),
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -1413,32 +1399,33 @@ class _DeckFilterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = selected ? AppTheme.brass400 : AppTheme.textSecondary;
     return Padding(
-      padding: const EdgeInsets.only(right: 18),
+      padding: const EdgeInsets.only(right: AppTheme.space18),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 7),
+          padding: const EdgeInsets.only(bottom: AppTheme.space7),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space7,
+              vertical: AppTheme.space3,
+            ),
             decoration: BoxDecoration(
-              color:
-                  selected
-                      ? AppTheme.brass500.withValues(alpha: 0.14)
-                      : AppTheme.transparent,
+              color: selected
+                  ? AppTheme.brass500.withValues(alpha: 0.14)
+                  : AppTheme.transparent,
               borderRadius: BorderRadius.circular(AppTheme.radiusXs),
               border: Border(
                 bottom: BorderSide(
-                  color:
-                      selected
-                          ? AppTheme.brass400
-                          : AppTheme.outlineMuted.withValues(alpha: 0.28),
+                  color: selected
+                      ? AppTheme.brass400
+                      : AppTheme.outlineMuted.withValues(alpha: 0.28),
                   width: selected ? 2 : 1,
                 ),
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: AppTheme.space4),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1450,7 +1437,7 @@ class _DeckFilterChip extends StatelessWidget {
                       fontSize: AppTheme.fontSm - 1,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppTheme.space4),
                   Text(
                     '$count',
                     style: TextStyle(
@@ -1529,10 +1516,9 @@ class _DeckGalleryCard extends StatelessWidget {
             color: AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color:
-                  isComplete
-                      ? AppTheme.brass400.withValues(alpha: 0.52)
-                      : AppTheme.outlineMuted.withValues(alpha: 0.54),
+              color: isComplete
+                  ? AppTheme.brass400.withValues(alpha: 0.52)
+                  : AppTheme.outlineMuted.withValues(alpha: 0.54),
               width: isComplete ? AppTheme.strokeThin : AppTheme.strokeHairline,
             ),
           ),
@@ -1556,7 +1542,12 @@ class _DeckGalleryCard extends StatelessWidget {
                           ),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                          padding: const EdgeInsets.fromLTRB(
+                            AppTheme.space14,
+                            AppTheme.space12,
+                            AppTheme.space14,
+                            AppTheme.space10,
+                          ),
                           child: Center(
                             child: _DeckCardFrame(
                               frameKey: Key(
@@ -1588,7 +1579,12 @@ class _DeckGalleryCard extends StatelessWidget {
                           ),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 9),
+                          padding: const EdgeInsets.fromLTRB(
+                            AppTheme.space10,
+                            AppTheme.space10,
+                            AppTheme.space10,
+                            AppTheme.space9,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1604,7 +1600,7 @@ class _DeckGalleryCard extends StatelessWidget {
                                   height: 1.05,
                                 ),
                               ),
-                              const SizedBox(height: 3),
+                              const SizedBox(height: AppTheme.space3),
                               Text(
                                 (deck.commanderName ?? '').trim().isEmpty
                                     ? _formatDeckLabel(deck.format)
@@ -1717,7 +1713,7 @@ class _DeckGalleryCard extends StatelessWidget {
                 size: 20,
                 color: Theme.of(context).colorScheme.error,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Text(
                 'Excluir',
                 style: Theme.of(
@@ -1771,16 +1767,18 @@ class _DeckCardFrame extends StatelessWidget {
             ),
           ],
         ),
-        child:
-            imageUrl == null
-                ? _DeckFallbackArt(accent: accent)
-                : CachedCardImage(
-                  key: imageKey,
-                  imageUrl: imageUrl,
-                  fallbackImageUrl:
-                      fallbackImageUrl == imageUrl ? null : fallbackImageUrl,
-                  fit: BoxFit.contain,
-                ),
+        child: imageUrl == null
+            ? _DeckFallbackArt(accent: accent)
+            : CardArtwork(
+                variant: CardArtworkVariant.gallery,
+                imageKey: imageKey,
+                imageUrl: imageUrl,
+                fallbackImageUrl: fallbackImageUrl == imageUrl
+                    ? null
+                    : fallbackImageUrl,
+                semanticLabel: 'Carta representativa do deck',
+                constrainAspectRatio: false,
+              ),
       ),
     );
   }
@@ -1827,12 +1825,17 @@ class _DeckEmptyState extends StatelessWidget {
       decoration: const BoxDecoration(color: AppTheme.backgroundAbyss),
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(32, 12, 32, 34),
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.space32,
+            AppTheme.space12,
+            AppTheme.space32,
+            AppTheme.space34,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const _EmptyDeckConstellation(),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               Text(
                 'Você ainda não tem decks',
                 style: theme.textTheme.titleSmall?.copyWith(
@@ -1842,7 +1845,7 @@ class _DeckEmptyState extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 7),
+              const SizedBox(height: AppTheme.space7),
               Text(
                 'Crie seu primeiro deck e comece\nsua jornada em Magic.',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1852,7 +1855,7 @@ class _DeckEmptyState extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: AppTheme.space22),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -1862,7 +1865,7 @@ class _DeckEmptyState extends StatelessWidget {
                   label: const Text('Criar novo deck'),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
@@ -2010,11 +2013,10 @@ class _EmptyDeckCard extends StatelessWidget {
 class _EmptyDeckRingsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2
-          ..color = AppTheme.brass400.withValues(alpha: 0.34);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..color = AppTheme.brass400.withValues(alpha: 0.34);
 
     for (var i = 0; i < 3; i++) {
       final inset = i * 13.0;

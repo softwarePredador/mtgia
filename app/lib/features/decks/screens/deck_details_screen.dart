@@ -1,5 +1,6 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
@@ -65,6 +66,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   bool _validationAutoLoaded = false;
   bool _isValidating = false;
   bool _autoOpenedOptimization = false;
+  bool _resumableOptimizationChecked = false;
   Map<String, dynamic>? _validationResult;
   Set<String> _invalidCardNames = {};
   String? _lastValidationDeckSignature;
@@ -100,7 +102,46 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DeckProvider>().fetchDeckDetails(widget.deckId);
       _openInitialOptimizationIntent();
+      unawaited(_offerResumableOptimization());
     });
+  }
+
+  Future<void> _offerResumableOptimization() async {
+    if (_resumableOptimizationChecked || !mounted) return;
+    _resumableOptimizationChecked = true;
+    try {
+      final job = await context.read<DeckProvider>().fetchLatestOptimizeJob(
+        widget.deckId,
+      );
+      if (!mounted || job == null) return;
+      final jobId = job['job_id']?.toString().trim();
+      final archetype = job['archetype']?.toString().trim();
+      if (jobId == null ||
+          jobId.isEmpty ||
+          archetype == null ||
+          archetype.isEmpty) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: const Text('Há uma otimização em andamento.'),
+            action: SnackBarAction(
+              label: 'Retomar',
+              onPressed: () => unawaited(
+                _showOptimizationOptions(
+                  context,
+                  resumeJobId: jobId,
+                  resumeArchetype: archetype,
+                ),
+              ),
+            ),
+          ),
+        );
+    } catch (_) {
+      return;
+    }
   }
 
   void _handleTabChanged() {
@@ -117,11 +158,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }
 
   void _openBattleReplays() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => BattleReplaysScreen(deckId: widget.deckId),
-      ),
-    );
+    context.push(battleReplaysRouteLocation(widget.deckId));
   }
 
   Future<void> _openLifeCounterForDeck(DeckDetails deck) async {
@@ -129,6 +166,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context,
       deckId: deck.id,
       deckName: deck.name,
+      deckSnapshotHash: deck.deckSnapshotHash,
+      deckVersionAtEpochMs: deck.deckVersionAt?.millisecondsSinceEpoch,
     );
     if (!mounted || result == null) return;
 
@@ -143,17 +182,20 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       return;
     }
 
-    final postGameLocation =
-        Uri(
-          path: '/decks/${deck.id}/post-game',
-          queryParameters: <String, String>{
-            if (result.playSessionId != null)
-              'playSessionId': result.playSessionId!,
-            if (result.startedAtEpochMs != null)
-              'startedAt': result.startedAtEpochMs!.toString(),
-            'endedAt': result.endedAtEpochMs.toString(),
-          },
-        ).toString();
+    final postGameLocation = Uri(
+      path: '/decks/${deck.id}/post-game',
+      queryParameters: <String, String>{
+        if (result.playSessionId != null)
+          'playSessionId': result.playSessionId!,
+        if (result.startedAtEpochMs != null)
+          'startedAt': result.startedAtEpochMs!.toString(),
+        if (result.deckSnapshotHash != null)
+          'deckSnapshotHash': result.deckSnapshotHash!,
+        if (result.deckVersionAtEpochMs != null)
+          'deckVersionAt': result.deckVersionAtEpochMs!.toString(),
+        'endedAt': result.endedAtEpochMs.toString(),
+      },
+    ).toString();
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -169,12 +211,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }
 
   Map<String, dynamic>? _pricingFromDeck(DeckDetails deck) {
-    if (deck.pricingTotal == null) return null;
+    if (deck.pricingTotal == null &&
+        deck.pricingMissingCards == null &&
+        deck.pricingUpdatedAt == null) {
+      return null;
+    }
     return {
       'deck_id': deck.id,
       'currency': deck.pricingCurrency ?? 'USD',
       'estimated_total_usd': deck.pricingTotal,
       'missing_price_cards': deck.pricingMissingCards ?? 0,
+      'price_source': deck.pricingSource,
       'items': const [],
       'pricing_updated_at': deck.pricingUpdatedAt?.toIso8601String(),
     };
@@ -334,8 +381,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           ),
         ),
       ),
-      floatingActionButton:
-          _selectedTabIndex == 1 ? _buildAddCardsMenu(context) : null,
+      floatingActionButton: _selectedTabIndex == 1
+          ? _buildAddCardsMenu(context)
+          : null,
       body: Builder(
         builder: (context) {
           final isLoading = context.select<DeckProvider, bool>(
@@ -352,9 +400,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           );
 
           if (isLoading) {
-            return const AppStatePanel(
+            return const AppStatePanel.loading(
               key: Key('deck-details-loading-state'),
-              icon: Icons.auto_awesome_rounded,
               title: 'Carregando grimório',
               message:
                   'Buscando cartas, comandante e sinais de análise do deck.',
@@ -366,28 +413,26 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             final isUnauthorized = detailsStatusCode == 401;
             return AppStatePanel(
               key: const Key('deck-details-error-state'),
-              icon:
-                  isUnauthorized
-                      ? Icons.lock_clock_rounded
-                      : Icons.error_outline_rounded,
-              title:
-                  isUnauthorized
-                      ? 'Sessão expirada'
-                      : 'Não foi possível abrir este deck',
+              icon: isUnauthorized
+                  ? Icons.lock_clock_rounded
+                  : Icons.error_outline_rounded,
+              title: isUnauthorized
+                  ? 'Sessão expirada'
+                  : 'Não foi possível abrir este deck',
               message: detailsError,
               accent: isUnauthorized ? AppTheme.warning : AppTheme.error,
-              actionLabel:
-                  isUnauthorized ? 'Fazer login novamente' : 'Tentar novamente',
-              onAction:
-                  isUnauthorized
-                      ? () async {
-                        await context.read<AuthProvider>().logout();
-                        if (!context.mounted) return;
-                        context.go('/login');
-                      }
-                      : () => context.read<DeckProvider>().fetchDeckDetails(
-                        widget.deckId,
-                      ),
+              actionLabel: isUnauthorized
+                  ? 'Fazer login novamente'
+                  : 'Tentar novamente',
+              onAction: isUnauthorized
+                  ? () async {
+                      await context.read<AuthProvider>().logout();
+                      if (!context.mounted) return;
+                      context.go('/login');
+                    }
+                  : () => context.read<DeckProvider>().fetchDeckDetails(
+                      widget.deckId,
+                    ),
             );
           }
 
@@ -406,8 +451,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
           final format = deck.format.toLowerCase();
           final isCommanderFormat = format == 'commander' || format == 'brawl';
-          final maxCards =
-              format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
+          final maxCards = format == 'commander'
+              ? 100
+              : (format == 'brawl' ? 60 : null);
           final totalCards = _totalCards(deck);
           final isReadyForAutoValidation = _shouldAutoValidateDeck(
             format: deck.format,
@@ -488,11 +534,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 onShowPricingDetails: _showPricingDetails,
                 onTogglePublic: _togglePublic,
                 onPlay: () => _openLifeCounterForDeck(deck),
-                onShowOptimizationOptions:
-                    () => _showOptimizationOptions(context),
+                onShowOptimizationOptions: () =>
+                    _showOptimizationOptions(context),
                 onOpenBattleReplays: _openBattleReplays,
-                onSelectCommander:
-                    () => context.go('/decks/${widget.deckId}/search'),
+                onSelectCommander: () =>
+                    context.go('/decks/${widget.deckId}/search'),
                 onImportList: () => _showImportListDialog(context),
                 onEditDescription: _showEditDescriptionDialog,
                 onShowCardDetails: (card) => _showCardDetails(context, card),
@@ -506,10 +552,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     maxWidth: AppTheme.contentMaxWidth,
                   ),
                   child: CustomScrollView(
-                    scrollCacheExtent: const ScrollCacheExtent.pixels(180),
                     slivers: [
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                        padding: const EdgeInsets.fromLTRB(
+                          AppTheme.space16,
+                          AppTheme.space16,
+                          AppTheme.space16,
+                          AppTheme.space0,
+                        ),
                         sliver: SliverList.list(
                           children: [
                             _DeckCardsSearchHeader(
@@ -517,10 +567,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               totalCards: totalCards,
                               onChanged: () => setState(() {}),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppTheme.space12),
                             if (maxCards != null)
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.only(
+                                  bottom: AppTheme.space12,
+                                ),
                                 child: DeckProgressIndicator(
                                   deck: deck,
                                   totalCards: totalCards,
@@ -530,9 +582,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               ),
                             if (_invalidCardNames.isNotEmpty)
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.only(
+                                  bottom: AppTheme.space12,
+                                ),
                                 child: Container(
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(
+                                    AppTheme.space12,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.error.withValues(
                                       alpha: 0.1,
@@ -554,7 +610,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         color: theme.colorScheme.error,
                                         size: 20,
                                       ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: AppTheme.space8),
                                       Expanded(
                                         child: Text(
                                           '${_invalidCardNames.length} carta(s) com problema: ${_invalidCardNames.join(", ")}',
@@ -594,8 +650,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 28,
+                              horizontal: AppTheme.space16,
+                              vertical: AppTheme.space28,
                             ),
                             child: Text(
                               'Nenhuma carta encontrada nesse deck.',
@@ -606,7 +662,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             ),
                           ),
                         ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 112)),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: AppTheme.space112),
+                      ),
                     ],
                   ),
                 ),
@@ -624,8 +682,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       children: [
                         SampleHandWidget(
                           deck: deck,
-                          onShowCardDetails:
-                              (card) => _showCardDetails(context, card),
+                          onShowCardDetails: (card) =>
+                              _showCardDetails(context, card),
                         ),
                         DeckAnalysisTab(deck: deck),
                       ],
@@ -680,7 +738,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     return [
       SliverToBoxAdapter(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.space20,
+            AppTheme.space10,
+            AppTheme.space20,
+            AppTheme.space8,
+          ),
           child: Row(
             children: [
               if (isCommanderSection) ...[
@@ -689,7 +752,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   size: 16,
                   color: AppTheme.mythicGold,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
               ],
               Expanded(
                 child: Text(
@@ -702,21 +765,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space8,
+                  vertical: AppTheme.space4,
+                ),
                 decoration: BoxDecoration(
-                  color:
-                      isCommanderSection
-                          ? AppTheme.mythicGold.withValues(alpha: 0.12)
-                          : theme.colorScheme.primary.withValues(alpha: 0.1),
+                  color: isCommanderSection
+                      ? AppTheme.mythicGold.withValues(alpha: 0.12)
+                      : theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
                 child: Text(
                   '${cards.length}',
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color:
-                        isCommanderSection
-                            ? AppTheme.mythicGold
-                            : theme.colorScheme.primary,
+                    color: isCommanderSection
+                        ? AppTheme.mythicGold
+                        : theme.colorScheme.primary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -726,7 +790,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         ),
       ),
       SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) => _buildDeckCardTile(
@@ -739,7 +803,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           ),
         ),
       ),
-      const SliverToBoxAdapter(child: SizedBox(height: 8)),
+      const SliverToBoxAdapter(child: SizedBox(height: AppTheme.space8)),
     ];
   }
 
@@ -751,23 +815,21 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }) {
     final theme = Theme.of(context);
     final isCommanderCard = card.isCommander;
-    final borderColor =
-        _isCardInvalid(card)
-            ? theme.colorScheme.error.withValues(alpha: 0.32)
-            : isCommanderCard
-            ? AppTheme.mythicGold.withValues(alpha: 0.34)
-            : AppTheme.outlineMuted.withValues(alpha: 0.58);
-    final fillColor =
-        isCommanderCard
-            ? AppTheme.mythicGold.withValues(alpha: 0.07)
-            : AppTheme.surfaceElevated;
+    final borderColor = _isCardInvalid(card)
+        ? theme.colorScheme.error.withValues(alpha: 0.32)
+        : isCommanderCard
+        ? AppTheme.mythicGold.withValues(alpha: 0.34)
+        : AppTheme.outlineMuted.withValues(alpha: 0.58);
+    final fillColor = isCommanderCard
+        ? AppTheme.mythicGold.withValues(alpha: 0.07)
+        : AppTheme.surfaceElevated;
 
     return Dismissible(
       key: ValueKey('deck-card-${card.id}'),
       direction: DismissDirection.horizontal,
       background: Container(
         alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16),
         decoration: BoxDecoration(
           color: theme.colorScheme.primary,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -776,7 +838,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.edit, color: AppTheme.textPrimary),
-            SizedBox(width: 8),
+            SizedBox(width: AppTheme.space8),
             Text(
               'Editar',
               style: TextStyle(
@@ -789,7 +851,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       ),
       secondaryBackground: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16),
         decoration: BoxDecoration(
           color: theme.colorScheme.error,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -804,7 +866,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(width: 8),
+            SizedBox(width: AppTheme.space8),
             Icon(Icons.delete, color: AppTheme.textPrimary),
           ],
         ),
@@ -859,7 +921,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         return false;
       },
       child: Card(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: AppTheme.space8),
         elevation: 0,
         color: fillColor,
         shape: RoundedRectangleBorder(
@@ -893,7 +955,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   top: 10,
                   right: 10,
                   child: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(AppTheme.space6),
                     decoration: BoxDecoration(
                       color: AppTheme.mythicGold.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -909,7 +971,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(AppTheme.space10),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -922,7 +984,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         height: 62,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppTheme.space12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -942,10 +1004,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppTheme.space8),
                               Padding(
                                 padding: EdgeInsets.only(
-                                  right: isCommanderCard ? 28 : 0,
+                                  right: isCommanderCard
+                                      ? AppTheme.space28
+                                      : AppTheme.space0,
                                 ),
                                 child: _buildDeckCardMetaPill(
                                   label: '${card.quantity}x',
@@ -956,7 +1020,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppTheme.space4),
                           Text(
                             card.typeLine,
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -967,7 +1031,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                           Wrap(
                             spacing: 8,
                             runSpacing: 6,
@@ -1058,21 +1122,23 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     IconData? icon,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space7,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border:
-            borderColor != null
-                ? Border.all(color: borderColor, width: AppTheme.strokeThin)
-                : null,
+        border: borderColor != null
+            ? Border.all(color: borderColor, width: AppTheme.strokeThin)
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
             Icon(icon, size: 12, color: textColor),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppTheme.space4),
           ],
           Text(
             label,
@@ -1100,8 +1166,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       await executeDeckDescriptionUpdate(
         deckId: widget.deckId,
         description: result,
-        updateDeckDescription:
-            context.read<DeckProvider>().updateDeckDescription,
+        updateDeckDescription: context
+            .read<DeckProvider>()
+            .updateDeckDescription,
         showSnackBar: ({required message, required backgroundColor}) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1240,17 +1307,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         if (!mounted) return;
         await showDialog(
           context: context,
-          builder:
-              (dialogContext) => AlertDialog(
-                title: Text(title),
-                content: Text(message),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(),
-                    child: const Text('OK'),
-                  ),
-                ],
+          builder: (dialogContext) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('OK'),
               ),
+            ],
+          ),
         );
       },
     );
@@ -1290,11 +1356,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 list: list,
                 replaceAll: replaceAll,
               ),
-      refreshDeckDetails:
-          (deckId) => context.read<DeckProvider>().fetchDeckDetails(
-            deckId,
-            forceRefresh: true,
-          ),
+      refreshDeckDetails: (deckId) => context
+          .read<DeckProvider>()
+          .fetchDeckDetails(deckId, forceRefresh: true),
       showSnackBar: ({required message, required backgroundColor}) {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1312,10 +1376,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       onShowEditionPicker: () => _showEditionPicker(context, card),
       onOpenFullDetails: () {
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
-        );
+        openCardDetailRoute(context, card);
       },
     );
   }
@@ -1345,11 +1406,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   Future<void> _showOptimizationOptions(
     BuildContext context, {
     String? initialIntent,
+    String? resumeJobId,
+    String? resumeArchetype,
   }) async {
-    final hasAiQuota = await reserveAiActionOrShowPaywall(
-      context,
-      kind: AiUsageKind.deckAnalysis,
-    );
+    final hasAiQuota = resumeJobId != null
+        ? true
+        : await reserveAiActionOrShowPaywall(
+            context,
+            kind: AiUsageKind.deckAnalysis,
+          );
     if (!hasAiQuota || !context.mounted) return;
 
     final startsFromPostGame = initialIntent == 'post_game';
@@ -1365,25 +1430,23 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           top: Radius.circular(AppTheme.radiusXl),
         ),
       ),
-      builder:
-          (context) => DraggableScrollableSheet(
-            initialChildSize: 0.82,
-            minChildSize: 0.55,
-            maxChildSize: 0.96,
-            expand: false,
-            builder:
-                (context, scrollController) => _OptimizationSheet(
-                  deckId: widget.deckId,
-                  scrollController: scrollController,
-                  initialIntensity:
-                      startsFromRebuild
-                          ? OptimizeIntensity.rebuild
-                          : OptimizeIntensity.focused,
-                  initialRebuildIntent:
-                      startsFromRebuild ? 'optimized' : 'upgraded',
-                  startsFromPostGame: startsFromPostGame || startsFromRebuild,
-                ),
-          ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.82,
+        minChildSize: 0.55,
+        maxChildSize: 0.96,
+        expand: false,
+        builder: (context, scrollController) => _OptimizationSheet(
+          deckId: widget.deckId,
+          scrollController: scrollController,
+          initialIntensity: startsFromRebuild
+              ? OptimizeIntensity.rebuild
+              : OptimizeIntensity.focused,
+          initialRebuildIntent: startsFromRebuild ? 'optimized' : 'upgraded',
+          startsFromPostGame: startsFromPostGame || startsFromRebuild,
+          initialResumeJobId: resumeJobId,
+          initialResumeArchetype: resumeArchetype,
+        ),
+      ),
     );
     if (context.mounted) {
       await refreshAiUsageAfterAction(context);
@@ -1398,9 +1461,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       card: card,
       loadPrintings: context.read<CardProvider>().resolveAndFetchPrintings,
-      onReplaceEdition:
-          (newCardId) =>
-              _replaceEdition(oldCardId: card.id, newCardId: newCardId),
+      onReplaceEdition: (newCardId) =>
+          _replaceEdition(oldCardId: card.id, newCardId: newCardId),
     );
   }
 
@@ -1513,7 +1575,7 @@ class _DeckCardsSearchHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1535,7 +1597,7 @@ class _DeckCardsSearchHeader extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(AppTheme.space8),
                 decoration: BoxDecoration(
                   color: AppTheme.backgroundAbyss.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1548,7 +1610,7 @@ class _DeckCardsSearchHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           TextField(
             key: const Key('deck-details-card-search-field'),
             controller: controller,
@@ -1556,17 +1618,16 @@ class _DeckCardsSearchHeader extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Buscar cartas',
               prefixIcon: const Icon(Icons.search_rounded),
-              suffixIcon:
-                  controller.text.isEmpty
-                      ? null
-                      : IconButton(
-                        tooltip: 'Limpar busca',
-                        onPressed: () {
-                          controller.clear();
-                          onChanged();
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                      ),
+              suffixIcon: controller.text.isEmpty
+                  ? null
+                  : IconButton(
+                      tooltip: 'Limpar busca',
+                      onPressed: () {
+                        controller.clear();
+                        onChanged();
+                      },
+                      icon: const Icon(Icons.close_rounded),
+                    ),
             ),
           ),
         ],
@@ -1615,19 +1676,20 @@ Map<String, dynamic> _persistedDeckValidationResult(DeckDetails deck) {
       'deck_state': 'validated',
       'requires_review': false,
       'review_reasons': const <String>[],
+      'validation_updated_at': deck.validationUpdatedAt?.toIso8601String(),
     };
   }
 
-  final reasons =
-      deck.reviewReasons.isEmpty
-          ? const ['validation_not_recorded']
-          : deck.reviewReasons;
+  final reasons = deck.reviewReasons.isEmpty
+      ? const ['validation_not_recorded']
+      : deck.reviewReasons;
   final messages = reasons.map(_deckReviewReasonMessage).toSet().toList();
   return {
     'ok': false,
     'deck_state': deck.validationState,
     'requires_review': true,
     'review_reasons': reasons,
+    'validation_updated_at': deck.validationUpdatedAt?.toIso8601String(),
     'error': messages.join(' '),
   };
 }
@@ -1662,6 +1724,8 @@ class _OptimizationSheet extends StatefulWidget {
   final OptimizeIntensity initialIntensity;
   final String initialRebuildIntent;
   final bool startsFromPostGame;
+  final String? initialResumeJobId;
+  final String? initialResumeArchetype;
 
   const _OptimizationSheet({
     required this.deckId,
@@ -1669,6 +1733,8 @@ class _OptimizationSheet extends StatefulWidget {
     this.initialIntensity = OptimizeIntensity.focused,
     this.initialRebuildIntent = 'upgraded',
     this.startsFromPostGame = false,
+    this.initialResumeJobId,
+    this.initialResumeArchetype,
   });
 
   @override
@@ -1684,6 +1750,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   bool _preferCollection = true;
   double _budgetLimit = 100;
   late String _rebuildIntent;
+  bool _initialResumeStarted = false;
 
   String? get _currentArchetype {
     final deck = context.read<DeckProvider>().selectedDeck;
@@ -1770,36 +1837,37 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       error: error,
       fallbackArchetype: archetype,
       selectedBracket: _selectedBracket,
-      rebuildDeck: (
-        deckId, {
-        required archetype,
-        required theme,
-        required bracket,
-        required rebuildScope,
-        required saveMode,
-      }) async {
-        final hasAiQuota = await reserveAiActionOrShowPaywall(
-          context,
-          kind: AiUsageKind.guidedRebuild,
-        );
-        if (!hasAiQuota) {
-          throw const _GuidedRebuildPaywallBlocked();
-        }
-        try {
-          return await deckProvider.rebuildDeck(
-            deckId,
-            archetype: archetype,
-            theme: theme,
-            bracket: bracket,
-            rebuildScope: rebuildScope,
-            saveMode: saveMode,
-          );
-        } finally {
-          if (context.mounted) {
-            await refreshAiUsageAfterAction(context);
-          }
-        }
-      },
+      rebuildDeck:
+          (
+            deckId, {
+            required archetype,
+            required theme,
+            required bracket,
+            required rebuildScope,
+            required saveMode,
+          }) async {
+            final hasAiQuota = await reserveAiActionOrShowPaywall(
+              context,
+              kind: AiUsageKind.guidedRebuild,
+            );
+            if (!hasAiQuota) {
+              throw const _GuidedRebuildPaywallBlocked();
+            }
+            try {
+              return await deckProvider.rebuildDeck(
+                deckId,
+                archetype: archetype,
+                theme: theme,
+                bracket: bracket,
+                rebuildScope: rebuildScope,
+                saveMode: saveMode,
+              );
+            } finally {
+              if (context.mounted) {
+                await refreshAiUsageAfterAction(context);
+              }
+            }
+          },
       refreshDeckDetails: deckProvider.fetchDeckDetails,
       onLoadingStart: () {
         showGuidedRebuildLoading(context);
@@ -1833,29 +1901,32 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         if (!mounted) return;
         showGuidedRebuildErrorSnackBar(context, rebuildError);
       },
-      showInfo:
-          ({required title, required message, required reasons}) =>
-              showOutcomeInfoDialog(
-                context,
-                title: title,
-                message: message,
-                reasons: reasons,
-              ),
+      showInfo: ({required title, required message, required reasons}) =>
+          showOutcomeInfoDialog(
+            context,
+            title: title,
+            message: message,
+            reasons: reasons,
+          ),
       showError: (message) => showDeckAiErrorSnackBar(context, message),
     );
   }
 
   Future<void> _applyOptimization(
     BuildContext context,
-    String archetype,
-  ) async {
-    final hasAiQuota = await reserveAiActionOrShowPaywall(
-      context,
-      kind: AiUsageKind.deckOptimization,
-    );
+    String archetype, {
+    String? resumeJobId,
+  }) async {
+    final hasAiQuota = resumeJobId != null
+        ? true
+        : await reserveAiActionOrShowPaywall(
+            context,
+            kind: AiUsageKind.deckOptimization,
+          );
     if (!hasAiQuota || !context.mounted) return;
 
     final deckProvider = context.read<DeckProvider>();
+    final cancellation = OptimizeJobCancellation();
     bool isLoadingDialogOpen = false;
 
     void closeLoadingDialog() {
@@ -1869,7 +1940,28 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     final progressState = ValueNotifier<FlowProgressState>(
       buildInitialOptimizeProgressState(),
     );
-    showOptimizeProgressLoading(context, progressState);
+    showOptimizeProgressLoading(
+      context,
+      progressState,
+      onCancel: () {
+        cancellation.cancel();
+        final jobId = cancellation.jobId;
+        if (jobId != null && jobId.isNotEmpty) {
+          unawaited(
+            (() async {
+              try {
+                await deckProvider.cancelOptimizeJob(jobId);
+              } catch (_) {}
+            })(),
+          );
+        }
+        closeLoadingDialog();
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Otimização cancelada com segurança.')),
+        );
+      },
+    );
     isLoadingDialogOpen = true;
 
     try {
@@ -1887,15 +1979,23 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               required keepTheme,
               required intensity,
               required onProgress,
-            }) => deckProvider.optimizeDeck(
-              deckId,
-              archetype,
-              bracket: bracket,
-              keepTheme: keepTheme,
-              intensity: intensity,
-              onProgress: onProgress,
-              recommendationContext: _recommendationContext(),
-            ),
+            }) => resumeJobId == null
+            ? deckProvider.optimizeDeck(
+                deckId,
+                archetype,
+                bracket: bracket,
+                keepTheme: keepTheme,
+                intensity: intensity,
+                onProgress: onProgress,
+                cancellation: cancellation,
+                recommendationContext: _recommendationContext(),
+              )
+            : deckProvider.resumeOptimizeJob(
+                jobId: resumeJobId,
+                deckId: deckId,
+                onProgress: onProgress,
+                cancellation: cancellation,
+              ),
         onProgressUpdate: (state) {
           progressState.value = state;
         },
@@ -1921,22 +2021,23 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             metaReferenceContext: preview.metaReferenceContext,
             optimizationContract: preview.optimizationContract,
             battleValidation: preview.battleValidation,
+            canApply: preview.canApply,
+            applyBlockers: preview.applyBlockers,
             displayRemovals: preview.displayRemovals,
             displayAdditions: preview.displayAdditions,
-            onCopyDebug:
-                kDebugMode
-                    ? () async {
-                      await _copyOptimizeDebug(
-                        deckId: widget.deckId,
-                        archetype: archetype,
-                        bracket: _selectedBracket,
-                        intensity: _selectedIntensity,
-                        result: result,
-                      );
-                      if (!context.mounted) return;
-                      showOptimizeDebugCopiedSnackBar(context);
-                    }
-                    : null,
+            onCopyDebug: kDebugMode
+                ? () async {
+                    await _copyOptimizeDebug(
+                      deckId: widget.deckId,
+                      archetype: archetype,
+                      bracket: _selectedBracket,
+                      intensity: _selectedIntensity,
+                      result: result,
+                    );
+                    if (!context.mounted) return;
+                    showOptimizeDebugCopiedSnackBar(context);
+                  }
+                : null,
             onCreateShareLink: _createOptimizationShareLink,
           );
           if (selection == null) return null;
@@ -1955,7 +2056,29 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         onSuccess: () {
           closeLoadingDialog();
           if (!context.mounted) return;
-          closeOptimizeSheetAndShowSuccess(context);
+          final eventId = deckProvider.lastAppliedOptimizationEventId;
+          closeOptimizeSheetAndShowSuccess(
+            context,
+            onUndo: eventId == null || eventId.isEmpty
+                ? null
+                : () async {
+                    try {
+                      await deckProvider.rollbackOptimization(
+                        deckId: widget.deckId,
+                        eventId: eventId,
+                      );
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Otimização desfeita com segurança.'),
+                        ),
+                      );
+                    } catch (error) {
+                      if (!context.mounted) return;
+                      showOptimizeApplyErrorSnackBar(context, error);
+                    }
+                  },
+          );
         },
         onAiError: (error) async {
           closeLoadingDialog();
@@ -1970,10 +2093,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         onGenericError: (error) {
           closeLoadingDialog();
           if (!context.mounted) return;
+          if (error is OptimizeJobCancelledException) return;
           showOptimizeApplyErrorSnackBar(context, error);
         },
-        addBulk:
-            (deckId, cards, {mutationContext}) => deckProvider.addCardsBulk(
+        addBulk: (deckId, cards, {mutationContext}) =>
+            deckProvider.addCardsBulk(
               deckId: deckId,
               cards: cards,
               mutationContext: mutationContext,
@@ -1992,15 +2116,13 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               expectedDeckSignature: expectedDeckSignature,
               mutationContext: mutationContext,
             ),
-        applyByNames:
-            (deckId, removals, additions, {mutationContext}) =>
-                deckProvider.applyOptimization(
-                  deckId: deckId,
-                  cardsToRemove: removals,
-                  cardsToAdd: additions,
-                  mutationContext: mutationContext,
-                ),
-        updateDeckStrategy: deckProvider.updateDeckStrategy,
+        applyByNames: (deckId, removals, additions, {mutationContext}) =>
+            deckProvider.applyOptimization(
+              deckId: deckId,
+              cardsToRemove: removals,
+              cardsToAdd: additions,
+              mutationContext: mutationContext,
+            ),
       );
     } finally {
       if (context.mounted) {
@@ -2021,6 +2143,19 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(
       widget.deckId,
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _initialResumeStarted) return;
+      final jobId = widget.initialResumeJobId?.trim();
+      final archetype = widget.initialResumeArchetype?.trim();
+      if (jobId == null ||
+          jobId.isEmpty ||
+          archetype == null ||
+          archetype.isEmpty) {
+        return;
+      }
+      _initialResumeStarted = true;
+      unawaited(_applyOptimization(context, archetype, resumeJobId: jobId));
+    });
   }
 
   @override
@@ -2044,12 +2179,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       onBracketChanged: (value) => setState(() => _selectedBracket = value),
       onKeepThemeChanged: (value) => setState(() => _keepTheme = value),
       onIntensityChanged: (value) => setState(() => _selectedIntensity = value),
-      onPreferCollectionChanged:
-          (value) => setState(() => _preferCollection = value),
+      onPreferCollectionChanged: (value) =>
+          setState(() => _preferCollection = value),
       onBudgetLimitChanged: (value) => setState(() => _budgetLimit = value),
       onRebuildIntentChanged: (value) => setState(() => _rebuildIntent = value),
-      onToggleStrategyVisibility:
-          () => setState(() => _showAllStrategies = !_showAllStrategies),
+      onToggleStrategyVisibility: () =>
+          setState(() => _showAllStrategies = !_showAllStrategies),
       onRetryOptions: () {
         setState(() {
           _optionsFuture = context

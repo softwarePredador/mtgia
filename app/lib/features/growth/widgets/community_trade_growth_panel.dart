@@ -13,13 +13,13 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final binderProvider = context.watch<BinderProvider?>();
     final stats = binderProvider?.stats;
-    final summary =
-        stats == null ? null : TradeMatchSummary.fromBinderStats(stats);
-    final subtitle =
-        summary == null
-            ? 'Encontre jogadores para completar sua lista.'
-            : '${summary.missingCards} faltantes • '
-                '${summary.cardsForTrade} para troca';
+    final summary = stats == null
+        ? null
+        : TradeMatchSummary.fromBinderStats(stats);
+    final subtitle = summary == null
+        ? 'Encontre jogadores para completar sua lista.'
+        : '${summary.missingCards} faltantes • '
+              '${summary.cardsForTrade} para troca';
 
     return Material(
       key: const Key('community-trade-growth-panel'),
@@ -28,8 +28,16 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
         onTap: () => context.push('/trades'),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Container(
-          margin: const EdgeInsets.fromLTRB(14, 12, 14, 4),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          margin: const EdgeInsets.fromLTRB(
+            AppTheme.space14,
+            AppTheme.space12,
+            AppTheme.space14,
+            AppTheme.space4,
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space12,
+            vertical: AppTheme.space10,
+          ),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -42,7 +50,7 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
                 color: AppTheme.brass400,
                 size: 22,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +62,7 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppTheme.space2),
                     Text(
                       subtitle,
                       maxLines: 1,
@@ -67,7 +75,7 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               const Icon(
                 Icons.chevron_right_rounded,
                 color: AppTheme.textSecondary,

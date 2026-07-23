@@ -154,6 +154,52 @@ void main() {
       );
     });
 
+    test('usa a face frontal quando a carta dupla não tem imagem raiz', () {
+      final card = DeckCardItem.fromJson({
+        'id': 'dfc-1',
+        'name': 'Fable of the Mirror-Breaker // Reflection of Kiki-Jiki',
+        'layout': 'transform',
+        'card_faces': [
+          {
+            'name': 'Fable of the Mirror-Breaker',
+            'image_uris': {
+              'normal': 'https://cards.scryfall.io/normal/front/dfc-1.jpg',
+              'art_crop': 'https://cards.scryfall.io/art_crop/front/dfc-1.jpg',
+            },
+          },
+          {
+            'name': 'Reflection of Kiki-Jiki',
+            'image_uris': {
+              'normal': 'https://cards.scryfall.io/normal/back/dfc-1.jpg',
+            },
+          },
+        ],
+      });
+
+      expect(card.layout, 'transform');
+      expect(card.isMultiFaced, isTrue);
+      expect(card.cardFaces.map((face) => face.name), [
+        'Fable of the Mirror-Breaker',
+        'Reflection of Kiki-Jiki',
+      ]);
+      expect(
+        card.effectiveImageUrl,
+        'https://cards.scryfall.io/normal/front/dfc-1.jpg',
+      );
+      expect(card.effectiveImageUrl, isNot(contains('art_crop')));
+    });
+
+    test('aceita card_faces JSONB serializado e ignora payload inválido', () {
+      final faces = CardFaceArtwork.fromJsonValue(
+        '[{"name":"Front","image_url":"https://example.test/front.jpg"}]',
+      );
+
+      expect(faces, hasLength(1));
+      expect(faces.single.name, 'Front');
+      expect(faces.single.imageUrl, 'https://example.test/front.jpg');
+      expect(CardFaceArtwork.fromJsonValue('{invalid'), isEmpty);
+    });
+
     test('copyWith deve substituir apenas os campos especificados', () {
       final card = DeckCardItem(
         id: 'card-1',

@@ -23,6 +23,7 @@ class _FakeApiClient extends ApiClient {
   final List<String> getCalls = [];
   final List<String> putCalls = [];
   final List<Map<String, dynamic>> putBodies = [];
+  final List<String> deleteCalls = [];
 
   @override
   Future<ApiResponse> post(
@@ -65,6 +66,7 @@ class _FakeApiClient extends ApiClient {
     String endpoint, {
     Map<String, dynamic>? body,
   }) async {
+    deleteCalls.add(endpoint);
     final handler = _deleteHandlers[endpoint];
     if (handler == null) {
       throw UnimplementedError('No DELETE handler for $endpoint');
@@ -1044,6 +1046,98 @@ void main() {
       },
     );
 
+    test('optimize cancellation reaches server and clears resumable state', () async {
+      final cancellation = OptimizeJobCancellation();
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/optimize': (_) => ApiResponse(202, {
+            'job_id': 'job-cancel-optimize',
+            'poll_interval_ms': 1000,
+            'total_stages': 6,
+            'idempotency': {'request_key': 'optimize:request-cancel'},
+          }),
+        },
+        deleteHandlers: {
+          '/ai/optimize/jobs/job-cancel-optimize': () => ApiResponse(200, {
+            'job_id': 'job-cancel-optimize',
+            'status': 'cancelled',
+          }),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      await expectLater(
+        () => provider.optimizeDeck(
+          'deck-1',
+          'control',
+          cancellation: cancellation,
+          requestKey: 'optimize:request-cancel',
+          onProgress: (stage, stageNumber, _) {
+            if (stageNumber == 1) cancellation.cancel();
+          },
+        ),
+        throwsA(isA<OptimizeJobCancelledException>()),
+      );
+
+      expect(apiClient.getCalls, isEmpty);
+      expect(apiClient.deleteCalls, [
+        '/ai/optimize/jobs/job-cancel-optimize',
+      ]);
+      expect(provider.hasActiveOptimizeJob, isFalse);
+    });
+
+    test('resume optimize polls existing job without creating a new one', () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/ai/optimize/jobs/job-resume': () => ApiResponse(200, {
+            'job_id': 'job-resume',
+            'status': 'completed',
+            'result': {'mode': 'optimize', 'resumed': true},
+          }),
+          '/ai/optimize/jobs/latest?deck_id=deck-1&active=true': () =>
+              ApiResponse(200, {
+                'job_id': 'job-resume',
+                'deck_id': 'deck-1',
+                'archetype': 'control',
+                'status': 'processing',
+              }),
+        },
+      );
+      final provider = DeckProvider(
+        apiClient: apiClient,
+        pollDelay: (_) async {},
+      );
+
+      final latest = await provider.fetchLatestOptimizeJob('deck-1');
+      final result = await provider.resumeOptimizeJob(
+        jobId: 'job-resume',
+        deckId: 'deck-1',
+      );
+
+      expect(latest?['archetype'], 'control');
+      expect(result['resumed'], isTrue);
+      expect(apiClient.postCalls, isEmpty);
+      expect(provider.hasActiveOptimizeJob, isFalse);
+    });
+
+    test('optimize timeout keeps the job resumable', () async {
+      final provider = DeckProvider(
+        apiClient: _FakeApiClient(),
+        pollDelay: (_) async {},
+      );
+
+      await expectLater(
+        () => provider.resumeOptimizeJob(
+          jobId: 'job-timeout-resume',
+          deckId: 'deck-1',
+          maxPollingDuration: Duration.zero,
+        ),
+        throwsA(isA<OptimizeJobTimeoutException>()),
+      );
+      expect(provider.activeOptimizeJobId, 'job-timeout-resume');
+      expect(provider.activeOptimizeDeckId, 'deck-1');
+    });
+
     test('telemetry failure never breaks a successful optimize flow', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {
@@ -1531,6 +1625,79 @@ void main() {
   });
 
   group('DeckProvider incremental mutations', () {
+    test('edition and quantity update use one atomic set request', () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+          ),
+        },
+        postHandlers: {
+          '/decks/deck-1/cards/set': (body) {
+            expect(body, {
+              'card_id': 'spell-new-printing',
+              'quantity': 3,
+              'replace_same_name': true,
+              'condition': 'LP',
+              'is_commander': false,
+            });
+            return ApiResponse(200, {'ok': true});
+          },
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+      await provider.fetchDeckDetails('deck-1');
+
+      await provider.updateDeckCardEntry(
+        deckId: 'deck-1',
+        oldCardId: 'spell-1',
+        newCardId: 'spell-new-printing',
+        quantity: 3,
+        cardName: 'Opt',
+        condition: 'LP',
+      );
+
+      expect(apiClient.postCalls, ['/decks/deck-1/cards/set']);
+      expect(
+        apiClient.postCalls,
+        isNot(contains('/decks/deck-1/cards/replace')),
+      );
+    });
+
+    test(
+      'failed atomic edition update never submits a fallback request',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1': () => ApiResponse(
+              200,
+              _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+            ),
+          },
+          postHandlers: {
+            '/decks/deck-1/cards/set':
+                (_) => ApiResponse(400, {'error': 'regra violada'}),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDeckDetails('deck-1');
+
+        await expectLater(
+          provider.updateDeckCardEntry(
+            deckId: 'deck-1',
+            oldCardId: 'spell-1',
+            newCardId: 'spell-new-printing',
+            quantity: 3,
+          ),
+          throwsA(isA<Exception>()),
+        );
+
+        expect(apiClient.postCalls, ['/decks/deck-1/cards/set']);
+        expect(apiClient.getCalls, ['/decks/deck-1']);
+      },
+    );
+
     test(
       'addCardToDeck increments local count and refreshes details',
       () async {

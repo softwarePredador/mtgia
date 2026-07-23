@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_validation_service.dart';
+import '../../../lib/ai_job_lifecycle.dart';
 import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/runtime_environment.dart';
 import '../../../lib/ai_plan_reservation_handle.dart';
@@ -10,6 +11,7 @@ import '../../../lib/ai/optimize_deck_support.dart' as optimize_deck;
 import '../../../lib/ai/optimize_request_support.dart' as optimize_request;
 import '../../../lib/ai/optimize_state_support.dart' as optimize_state;
 import '../../../lib/ai/optimize_stage_telemetry.dart';
+import '../../../lib/ai/commander_deckbuilding_contract_support.dart';
 import '../../../lib/ai/otimizacao.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
@@ -384,6 +386,26 @@ String deriveOptimizeOutcomeCode({
   validationReport: validationReport,
 );
 
+void _enforceCommanderSameLanePreviewSafety(Map<String, dynamic> responseBody) {
+  final contract = responseBody['commander_contract'];
+  if (contract is! Map || contract['is_commander_applicable'] != true) return;
+  final sameLaneGate = contract['same_lane_gate'];
+  if (sameLaneGate is! Map) return;
+  final swapCount = (sameLaneGate['output_swap_count'] as num?)?.toInt() ?? 0;
+  if (swapCount <= 0 || sameLaneGate['gate_ready'] == true) return;
+
+  responseBody['can_apply'] = false;
+  responseBody['learning_eligible'] = false;
+  responseBody['outcome_code'] = 'commander_same_lane_evidence_required';
+  final existing = responseBody['apply_blockers'];
+  final blockers =
+      existing is Iterable
+          ? existing.map((value) => value.toString()).toSet()
+          : <String>{};
+  blockers.add('commander_same_lane_evidence_required');
+  responseBody['apply_blockers'] = blockers.toList()..sort();
+}
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
@@ -405,6 +427,16 @@ Future<Response> onRequest(RequestContext context) async {
     } catch (_) {
       return badRequest('JSON invalido');
     }
+    late final String requestKey;
+    try {
+      requestKey =
+          normalizeOptionalAiJobRequestKey(body['request_key']) ??
+          createServerAiJobRequestKey('optimize');
+    } on AiJobRequestKeyException catch (error) {
+      return badRequest(error.message);
+    }
+    final requestFingerprint = optimize_route_async
+        .buildOptimizeAsyncRequestDigest(body);
     final routeRequest = optimize_route_request.parseOptimizeRouteRequest(
       body,
       allowForceSync: InternalAiRequestToken.matches(context.request.headers),
@@ -459,9 +491,14 @@ Future<Response> onRequest(RequestContext context) async {
     final authenticatedUserId = userId;
 
     if (aiProviderMissingInProduction && !intensity.isRebuild) {
-      return apiError(
-        HttpStatus.serviceUnavailable,
-        'AI provider is not configured',
+      return Response.json(
+        statusCode: HttpStatus.serviceUnavailable,
+        body: const {
+          'error': 'AI provider is not configured',
+          'outcome_code': 'provider_unavailable',
+          'can_apply': false,
+          'learning_eligible': false,
+        },
       );
     }
 
@@ -490,29 +527,47 @@ Future<Response> onRequest(RequestContext context) async {
         rethrow;
       }
 
-      final jobId = await optimize_route_async.createOptimizeAsyncJob(
-        telemetry: telemetry,
-        pool: pool,
-        deckId: deckId,
-        archetype: archetype,
-        userId: authenticatedUserId,
-      );
-      final planReservation = deferAiPlanReservationIfAvailable(context);
+      late final AiJobCreation creation;
+      try {
+        creation = await optimize_route_async.createOptimizeAsyncJob(
+          telemetry: telemetry,
+          pool: pool,
+          deckId: deckId,
+          archetype: archetype,
+          userId: authenticatedUserId,
+          requestKey: requestKey,
+          requestFingerprint: requestFingerprint,
+        );
+      } on AiJobIdempotencyConflict {
+        return Response.json(
+          statusCode: HttpStatus.conflict,
+          body: {
+            'error': 'request_key ja foi usada com outro pedido.',
+            'error_code': 'ai_job_idempotency_conflict',
+          },
+        );
+      }
+      final jobId = creation.jobId;
+      final planReservation =
+          creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
       final syncPayload =
           Map<String, dynamic>.from(body)
             ..['_force_sync'] = true
-            ..['async'] = false;
+            ..['async'] = false
+            ..remove('request_key');
       final authorization = context.request.headers['Authorization'];
       final internalOptimizeUrl = resolveInternalOptimizeUrl(context.request);
 
-      optimize_route_async.startOptimizeModeAsyncJob(
-        pool: pool,
-        jobId: jobId,
-        internalOptimizeUrl: internalOptimizeUrl,
-        syncPayload: syncPayload,
-        authorization: authorization,
-        planReservation: planReservation,
-      );
+      if (creation.isNew) {
+        optimize_route_async.startOptimizeModeAsyncJob(
+          pool: pool,
+          jobId: jobId,
+          internalOptimizeUrl: internalOptimizeUrl,
+          syncPayload: syncPayload,
+          authorization: authorization,
+          planReservation: planReservation,
+        );
+      }
 
       telemetry.logSummary();
       final responseBody = optimize_route_async
@@ -523,6 +578,8 @@ Future<Response> onRequest(RequestContext context) async {
             elapsedMs: requestStopwatch.elapsedMilliseconds,
             telemetrySnapshot: telemetry.snapshot(),
             intensity: intensity,
+            requestKey: creation.requestKey,
+            reused: !creation.isNew,
           );
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,
@@ -603,6 +660,26 @@ Future<Response> onRequest(RequestContext context) async {
           responseBody,
           recommendationContext,
         );
+        responseBody['commander_contract'] =
+            buildCommanderOptimizePlanningSummary(
+              format: deckContext.deckFormat,
+              commanderName:
+                  deckContext.commanders.isEmpty
+                      ? ''
+                      : deckContext.commanders.first,
+              totalCards: deckContext.currentTotalCards,
+              deckStateStatus: deckContext.deckState.status,
+              prioritySource: 'cached_response',
+              priorityCardCount: 0,
+              metaReferencesAvailable:
+                  responseBody['meta_reference_context'] is Map,
+              roleTargetsAvailable: false,
+              candidateSwaps: const [],
+              responseBody: responseBody,
+              preferCollection: recommendationContext.preferCollection == true,
+              budgetLimitBrl: recommendationContext.budgetLimitBrl,
+            );
+        _enforceCommanderSameLanePreviewSafety(responseBody);
         telemetry.logSummary();
         return Response.json(body: responseBody);
       }
@@ -657,6 +734,7 @@ Future<Response> onRequest(RequestContext context) async {
     var optimizeCommanderPrioritySource = 'none';
     final optimizeCommanderPriorityNames = <String>[];
     Map<String, dynamic>? optimizeCommanderRoleTargets;
+    var optimizeCommanderReferenceProfileAvailable = false;
     String? optimizeMetaEvidenceContext;
     Map<String, dynamic>? optimizeMetaReferenceContext;
     final deterministicSwapCandidates = <Map<String, dynamic>>[];
@@ -707,6 +785,25 @@ Future<Response> onRequest(RequestContext context) async {
           effectiveMode: effectiveMode,
         ),
       );
+      responseBody['commander_contract'] =
+          buildCommanderOptimizePlanningSummary(
+            format: deckFormat,
+            commanderName:
+                commanderNameForLogs == 'unknown' ? '' : commanderNameForLogs,
+            totalCards: currentTotalCards,
+            deckStateStatus: deckState.status,
+            prioritySource: optimizeCommanderPrioritySource,
+            priorityCardCount: optimizeCommanderPriorityNames.length,
+            metaReferencesAvailable:
+                optimizeMetaReferenceContext?.isNotEmpty == true,
+            roleTargetsAvailable:
+                optimizeCommanderReferenceProfileAvailable &&
+                optimizeCommanderRoleTargets?.isNotEmpty == true,
+            candidateSwaps: deterministicSwapCandidates,
+            responseBody: responseBody,
+            preferCollection: recommendationContext.preferCollection == true,
+            budgetLimitBrl: recommendationContext.budgetLimitBrl,
+          );
       if (intensity.selected == 'aggressive') {
         final existingDiagnostics =
             responseBody['optimize_diagnostics'] is Map
@@ -751,7 +848,9 @@ Future<Response> onRequest(RequestContext context) async {
           deckState: deckState,
           validationReport: validationReport,
         );
+        optimize_route_outcome.enforceFailedOptimizeOutcomeSafety(responseBody);
       }
+      _enforceCommanderSameLanePreviewSafety(responseBody);
       responseBody['timings'] ??= telemetry.snapshot();
       responseBody['stage_telemetry'] ??= responseBody['timings'];
       final resolvedRemovals =
@@ -917,6 +1016,8 @@ Future<Response> onRequest(RequestContext context) async {
             metaSelectionFuture,
           ]);
           final commanderReferenceProfile = results[0] as Map<String, dynamic>?;
+          optimizeCommanderReferenceProfileAvailable =
+              commanderReferenceProfile != null;
           final metaSelection = results[1] as MetaDeckReferenceSelectionResult;
           final rawRoleTargets = commanderReferenceProfile?['role_targets'];
           if (rawRoleTargets is Map) {
@@ -1065,52 +1166,71 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      final jobId = await optimize_route_async.createOptimizeAsyncJob(
-        telemetry: telemetry,
-        pool: pool,
-        deckId: deckId,
-        archetype: targetArchetype,
-        userId: authenticatedUserId,
-      );
-      final planReservation = deferAiPlanReservationIfAvailable(context);
+      late final AiJobCreation creation;
+      try {
+        creation = await optimize_route_async.createOptimizeAsyncJob(
+          telemetry: telemetry,
+          pool: pool,
+          deckId: deckId,
+          archetype: targetArchetype,
+          userId: authenticatedUserId,
+          requestKey: requestKey,
+          requestFingerprint: requestFingerprint,
+        );
+      } on AiJobIdempotencyConflict {
+        return Response.json(
+          statusCode: HttpStatus.conflict,
+          body: {
+            'error': 'request_key ja foi usada com outro pedido.',
+            'error_code': 'ai_job_idempotency_conflict',
+          },
+        );
+      }
+      final jobId = creation.jobId;
+      final planReservation =
+          creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
 
       // Fire-and-forget: processamento pesado roda em background.
       // A closure captura todas as variáveis do setup (pool, allCardData, etc.)
       // O Pool é singleton e sobrevive ao ciclo do request.
-      optimize_route_async.startCompleteModeAsyncJob(
-        jobId: jobId,
-        pool: pool,
-        deckId: deckId,
-        deckFormat: deckFormat,
-        maxTotal: maxTotal,
-        currentTotalCards: currentTotalCards,
-        commanders: commanders,
-        allCardData: allCardData,
-        deckColors: deckColors,
-        commanderColorIdentity: commanderColorIdentity,
-        originalCountsById: originalCountsById,
-        optimizer: disableCompleteAi ? null : deckOptimizer,
-        themeProfile: themeProfile,
-        targetArchetype: targetArchetype,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        deckAnalysis: deckAnalysis,
-        userId: authenticatedUserId,
-        deckSignature: deckSignature,
-        cacheKey: cacheKey,
-        intensity: intensity,
-        userPreferences: userPreferences,
-        hasBracketOverride: hasBracketOverride,
-        hasKeepThemeOverride: hasKeepThemeOverride,
-        recommendationContext: recommendationContext,
-        planReservation: planReservation,
-      );
+      if (creation.isNew) {
+        optimize_route_async.startCompleteModeAsyncJob(
+          jobId: jobId,
+          pool: pool,
+          deckId: deckId,
+          deckFormat: deckFormat,
+          maxTotal: maxTotal,
+          currentTotalCards: currentTotalCards,
+          commanders: commanders,
+          allCardData: allCardData,
+          deckColors: deckColors,
+          commanderColorIdentity: commanderColorIdentity,
+          originalCountsById: originalCountsById,
+          optimizer: disableCompleteAi ? null : deckOptimizer,
+          themeProfile: themeProfile,
+          targetArchetype: targetArchetype,
+          bracket: bracket,
+          keepTheme: keepTheme,
+          deckAnalysis: deckAnalysis,
+          userId: authenticatedUserId,
+          deckSignature: deckSignature,
+          cacheKey: cacheKey,
+          intensity: intensity,
+          userPreferences: userPreferences,
+          hasBracketOverride: hasBracketOverride,
+          hasKeepThemeOverride: hasKeepThemeOverride,
+          recommendationContext: recommendationContext,
+          planReservation: planReservation,
+        );
+      }
 
       final responseBody = optimize_route_async
           .buildCompleteModeAsyncAcceptedBody(
             jobId: jobId,
             telemetrySnapshot: telemetry.snapshot(),
             intensity: intensity,
+            requestKey: creation.requestKey,
+            reused: !creation.isNew,
           );
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,
@@ -1274,11 +1394,10 @@ Future<Response> onRequest(RequestContext context) async {
         responseBody['stage_telemetry'] = responseBody['timings'];
         responseBody['strategy_source'] ??=
             jsonResponse['strategy_source'] ?? 'complete_pipeline';
-        optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(
-          responseBody,
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.ok,
+          body: responseBody,
         );
-
-        return Response.json(body: responseBody);
       }
 
       // Validar cartas sugeridas pela IA

@@ -14,7 +14,16 @@ void main() {
       for (final route in const [
         'GET /cards/:id/rulings',
         'GET /binder/stats',
+        'GET /binder/availability?card_ids=',
         'GET /community/decks/following',
+        'GET /community/decks/:id/comments?page=&limit=',
+        'POST /community/decks/:id/comments',
+        'POST /community/decks/:id/reports',
+        'GET /community/trade-matches?deck_id=&limit=',
+        'GET /decks/:id/battle-replays?limit=',
+        'GET /decks/:id/battle-replays/:replayId',
+        'POST /decks/:id/reports',
+        'GET /reports/:id',
         'GET /ready',
       ]) {
         expect(
@@ -36,22 +45,24 @@ void main() {
       );
     });
 
-    test('preserves recently added AI contract rows from source-backed docs',
-        () {
-      for (final route in const [
-        'POST /ai/simulate',
-        'POST /ai/simulate-matchup',
-        'POST /ai/weakness-analysis',
-        'GET /ai/commander-learning?commander=',
-      ]) {
-        expect(
-          contracts,
-          contains('| `$route'),
-          reason:
-              '$route is source-backed and must not be dropped by docs sync.',
-        );
-      }
-    });
+    test(
+      'preserves recently added AI contract rows from source-backed docs',
+      () {
+        for (final route in const [
+          'POST /ai/simulate',
+          'POST /ai/simulate-matchup',
+          'POST /ai/weakness-analysis',
+          'GET /ai/commander-learning?commander=',
+        ]) {
+          expect(
+            contracts,
+            contains('| `$route'),
+            reason:
+                '$route is source-backed and must not be dropped by docs sync.',
+          );
+        }
+      },
+    );
 
     test('documents Commander Learning list/detail metadata boundary', () {
       final row = _contractRowFor(
@@ -67,7 +78,8 @@ void main() {
       expect(
         row,
         contains(
-            'PG ingress metadata may remain stale until approved backfill'),
+          'PG ingress metadata may remain stale until approved backfill',
+        ),
       );
       expect(row, contains('role_summary_source=card_list_canonicalized'));
       expect(row, contains('role_summary_source=persisted_metadata_fallback'));
@@ -76,26 +88,14 @@ void main() {
     });
 
     test('documents advisory AI analysis and simulation response shapes', () {
-      final weakness = _contractRowFor(
-        contracts,
-        'POST /ai/weakness-analysis',
-      );
-      final simulate = _contractRowFor(
-        contracts,
-        'POST /ai/simulate',
-      );
+      final weakness = _contractRowFor(contracts, 'POST /ai/weakness-analysis');
+      final simulate = _contractRowFor(contracts, 'POST /ai/simulate');
       final legacyDeckSimulate = _contractRowFor(
         contracts,
         'GET /decks/:id/simulate',
       );
-      final matchup = _contractRowFor(
-        contracts,
-        'POST /ai/simulate-matchup',
-      );
-      final optimize = _contractRowFor(
-        contracts,
-        'POST /ai/optimize',
-      );
+      final matchup = _contractRowFor(contracts, 'POST /ai/simulate-matchup');
+      final optimize = _contractRowFor(contracts, 'POST /ai/optimize');
 
       expect(weakness, contains('weaknesses[]'));
       expect(weakness, contains('weakness_count'));
@@ -105,8 +105,10 @@ void main() {
       expect(weakness, contains('advisory investigation evidence only'));
 
       expect(simulate, contains('simulations` is clamped to `1..5000`'));
-      expect(simulate,
-          contains('This is a write route when storage tables exist'));
+      expect(
+        simulate,
+        contains('This is a write route when storage tables exist'),
+      );
       expect(simulate, contains('not legal verdict'));
 
       expect(legacyDeckSimulate, contains('optional query params'));
@@ -116,16 +118,22 @@ void main() {
       expect(legacyDeckSimulate, contains('legacy_consistency_only'));
       expect(legacyDeckSimulate, contains('advisory=true'));
       expect(legacyDeckSimulate, contains('not a legality, strategy'));
-      expect(legacyDeckSimulate,
-          contains('deck_simulate_route_adapter_test.dart'));
+      expect(
+        legacyDeckSimulate,
+        contains('deck_simulate_route_adapter_test.dart'),
+      );
 
       expect(matchup, contains('optional `seed`'));
       expect(matchup, contains('color_identity_source'));
       expect(matchup, contains('simulation.{runs,seed,wins,losses'));
       expect(
-          matchup, contains('does not return top-level `win_rate` or `stats`'));
+        matchup,
+        contains('does not return top-level `win_rate` or `stats`'),
+      );
       expect(
-          matchup, contains('card_intelligence_snapshot.function_tag_details'));
+        matchup,
+        contains('card_intelligence_snapshot.function_tag_details'),
+      );
       expect(matchup, contains('resolveCardFunctionalRoles'));
       expect(matchup, contains('commander `color_identity`'));
       expect(matchup, contains('meta-deck opponent stats remain sparse'));
@@ -140,7 +148,7 @@ void main() {
     test('documents deck builder read/write contract boundaries', () {
       final cards = _contractRowFor(
         contracts,
-        'GET /cards?name=&set=&include_tokens=&dedupe=&page=&limit=',
+        'GET /cards?id=&name=&set=&include_tokens=&dedupe=&page=&limit=',
       );
       final printings = _contractRowFor(
         contracts,
@@ -158,30 +166,18 @@ void main() {
       final createDeck = _contractRowFor(contracts, 'POST /decks');
       final deckDetail = _contractRowFor(contracts, 'GET /decks/:id');
       final updateDeck = _contractRowFor(contracts, 'PUT /decks/:id');
-      final addCard = _contractRowFor(
-        contracts,
-        'POST /decks/:id/cards',
-      );
+      final addCard = _contractRowFor(contracts, 'POST /decks/:id/cards');
       final bulkCards = _contractRowFor(
         contracts,
         'POST /decks/:id/cards/bulk',
       );
-      final setCard = _contractRowFor(
-        contracts,
-        'POST /decks/:id/cards/set',
-      );
+      final setCard = _contractRowFor(contracts, 'POST /decks/:id/cards/set');
       final replaceCard = _contractRowFor(
         contracts,
         'POST /decks/:id/cards/replace',
       );
-      final validate = _contractRowFor(
-        contracts,
-        'POST /decks/:id/validate',
-      );
-      final pricing = _contractRowFor(
-        contracts,
-        'POST /decks/:id/pricing',
-      );
+      final validate = _contractRowFor(contracts, 'POST /decks/:id/validate');
+      final pricing = _contractRowFor(contracts, 'POST /decks/:id/pricing');
       final export = _contractRowFor(contracts, 'GET /decks/:id/export');
       final recommendations = _contractRowFor(
         contracts,
@@ -234,16 +230,34 @@ void main() {
 
       expect(deckDetail, contains('Root-level deck fields'));
       expect(deckDetail, contains('there is no nested root `deck` wrapper'));
+      expect(deckDetail, contains('deterministic `deck_snapshot_hash`'));
+      expect(deckDetail, contains('response-capture `deck_version_at`'));
+      expect(
+        deckDetail,
+        contains('carries the returned snapshot identity through Life Counter'),
+      );
       expect(deckDetail, contains('do not expose `oracle_id`, `layout`, or'));
       expect(deckDetail, contains('presentation aggregates'));
       expect(deckDetail, contains('deck_fetch_hydration_contract_test.dart'));
 
+      final postGame = _contractRowFor(
+        contracts,
+        'POST /decks/:id/post-game-notes',
+      );
+      expect(
+        postGame,
+        contains('Snapshot hash/version must be omitted together'),
+      );
+      expect(
+        postGame,
+        contains('preserve the already persisted session identity'),
+      );
+      expect(postGame, contains('post_game_two_client_live_test.dart'));
+      expect(postGame, contains('offline retry without duplicate'));
+
       expect(updateDeck, contains('{success: true, deck}'));
       expect(updateDeck, contains('replaces the full list'));
-      expect(
-        updateDeck,
-        contains('preserve existing saved card `condition`'),
-      );
+      expect(updateDeck, contains('preserve existing saved card `condition`'));
       expect(updateDeck, contains('newly added cards may omit `condition`'));
       expect(updateDeck, contains('card_identity_bridge` first'));
       expect(updateDeck, contains('fallback to `cards`'));
@@ -267,7 +281,9 @@ void main() {
 
       expect(replaceCard, contains('same-name-only'));
       expect(
-          replaceCard, contains('does not use `oracle_id`/`physicalCopyKey`'));
+        replaceCard,
+        contains('does not use `oracle_id`/`physicalCopyKey`'),
+      );
       expect(replaceCard, contains('changed=false'));
 
       expect(validate, contains('{ok: true, format, deck_id}'));
@@ -276,6 +292,9 @@ void main() {
       expect(validate, contains('{ok: false, error, card_name?}'));
       expect(validate, contains('deck_validation_route_support_test.dart'));
       expect(validate, contains('DeckRulesService(... strict:true)'));
+      expect(validate, contains('validation_updated_at'));
+      expect(validate, contains('owner-row-locked'));
+      expect(validate, contains('Migration 047'));
       expect(validate, contains('final legality/shape gate'));
       expect(validate, contains('post-save strict validation failure'));
 
@@ -297,7 +316,9 @@ void main() {
       expect(recommendations, contains('advisory=true'));
       expect(recommendations, contains('recommendation_validation'));
       expect(
-          recommendations, contains('fallback-compatible response scaffold'));
+        recommendations,
+        contains('fallback-compatible response scaffold'),
+      );
       expect(recommendations, contains('HTTP error responses'));
       expect(recommendations, contains('`error`'));
       expect(recommendations, contains('recommendations.add/remove'));
@@ -316,7 +337,9 @@ void main() {
       expect(recommendations, contains('commander_color_identity'));
       expect(recommendations, contains('observed_deck_colors'));
       expect(
-          recommendations, contains('authoritative Commander color identity'));
+        recommendations,
+        contains('authoritative Commander color identity'),
+      );
       expect(recommendations, contains('buildHeuristicRecommendationsForDeck'));
       expect(recommendations, contains('buildHeuristicRecommendationsBody'));
       expect(recommendations, contains('buildDeckRecommendationsRouteResult'));
@@ -329,16 +352,26 @@ void main() {
       expect(recommendations, contains('below `33`'));
       expect(recommendations, contains('target band `33-38`'));
       expect(recommendations, contains('advisory suggestions-for-review'));
-      expect(recommendations,
-          contains('deck_recommendations_route_adapter_test.dart'));
-      expect(recommendations,
-          contains('deck_recommendations_route_support_test.dart'));
-      expect(recommendations,
-          contains('deck_recommendations_advisory_support_test.dart'));
-      expect(recommendations,
-          contains('deck_recommendations_fallback_support_test.dart'));
-      expect(recommendations,
-          contains('deck_recommendations_power_level_support_test.dart'));
+      expect(
+        recommendations,
+        contains('deck_recommendations_route_adapter_test.dart'),
+      );
+      expect(
+        recommendations,
+        contains('deck_recommendations_route_support_test.dart'),
+      );
+      expect(
+        recommendations,
+        contains('deck_recommendations_advisory_support_test.dart'),
+      );
+      expect(
+        recommendations,
+        contains('deck_recommendations_fallback_support_test.dart'),
+      );
+      expect(
+        recommendations,
+        contains('deck_recommendations_power_level_support_test.dart'),
+      );
     });
   });
 }

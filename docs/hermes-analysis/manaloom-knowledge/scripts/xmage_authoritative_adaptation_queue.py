@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Build the authoritative XMage -> ManaLoom adaptation queue.
+"""Build the read-only XMage source-candidate and residual-priority queue.
 
-This read-only queue implements the current acceleration decision: when a card
-has a resolvable local XMage Java implementation, XMage is treated as the final
-behavior source for that card. The remaining work is adapter/runtime translation
-inside ManaLoom, not card-by-card semantic decision making.
+A resolvable local XMage Java implementation is source evidence, not executable
+coverage. The pinned runtime catalog must confirm the exact identity first.
+Catalog-covered cards execute externally; native adapter work starts only for
+the explicit residual after pinned XMage and Forge coverage fail. Historical
+``translation_lane`` and ``adapter_work_unit`` fields are retained solely for
+compatibility with the native-family analysis archive.
 """
 
 from __future__ import annotations
@@ -14,11 +16,12 @@ import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from battle_rule_registry import logical_rule_key
 
 import global_card_oracle_battle_readiness as readiness
+import external_engine_source_contract as engine_source_contract
 import xmage_local_rule_indexer as xmage_indexer
 
 
@@ -29,6 +32,32 @@ CONTRACT = readiness.XMAGE_FLOW
 DEFAULT_SCOPE = "commander_legal_battle_gap"
 SCOPES = {DEFAULT_SCOPE, "all_battle_gap"}
 CARD_SPECIFIC_TOKEN_VARIANT_PREFIX = "xmage_create_token_variant_"
+PRIORITY_SCHEMA = "battle_rule_priority_v1"
+TRUSTED_ENGINE_CONTRACTS = (
+    "canonical_rules_execution",
+    "canonical_rules_execution_secondary",
+    "native_reviewed_rules_execution",
+)
+OWNER_INTENT_POLICY = {
+    "preserve_user_skeleton": True,
+    "allow_auto_fill": False,
+    "allow_auto_delete": False,
+    "allow_deck_mutation": False,
+}
+OPERATIONAL_LANE_ROUTING = {
+    "pinned_xmage_catalog_confirmation_required": (
+        "external_engine_coverage",
+        "confirm_exact_pinned_xmage_catalog_then_count_external_coverage",
+    ),
+    "forge_then_native_residual_review": (
+        "external_rules_residual_review",
+        "reconcile_pinned_forge_then_open_native_work_only_if_unresolved",
+    ),
+}
+OPERATIONAL_RESIDUAL_PRIORITY_WEIGHT = {
+    "pinned_xmage_catalog_confirmation_required": 10,
+    "forge_then_native_residual_review": 30,
+}
 
 
 def utc_now() -> str:
@@ -123,6 +152,12 @@ def translation_lane(
     return "xmage_authoritative_adapter_required"
 
 
+def operational_coverage_lane(*, resolved: xmage_indexer.ResolvedSource | None) -> str:
+    if resolved:
+        return "pinned_xmage_catalog_confirmation_required"
+    return "forge_then_native_residual_review"
+
+
 def compact_queue_row(
     card: dict[str, Any],
     *,
@@ -131,6 +166,7 @@ def compact_queue_row(
 ) -> dict[str, Any]:
     effect_json = primary_effect_json(parsed_entry)
     lane = translation_lane(resolved=resolved, parsed_entry=parsed_entry)
+    operational_lane = operational_coverage_lane(resolved=resolved)
     rule = {"effect_json": effect_json, "deck_role_json": {}}
     logical_key = logical_rule_key(rule) if effect_json else None
     candidate = primary_candidate(parsed_entry)
@@ -141,9 +177,19 @@ def compact_queue_row(
         "oracle_id": card.get("oracle_id"),
         "commander_legality_status": card.get("commander_legality_status"),
         "oracle_family": card.get("family"),
-        "source_truth_status": "xmage_authoritative" if resolved else "xmage_source_missing",
+        "runtime_requirement": card.get("runtime_requirement"),
+        "ready_product_deck_count": int(card.get("ready_product_deck_count") or 0),
+        "registered_deck_count": int(card.get("deck_count") or 0),
+        "registered_total_quantity": int(card.get("total_quantity") or 0),
+        "commander_slot_count": int(card.get("commander_slot_count") or 0),
+        "source_truth_status": "xmage_local_source_candidate" if resolved else "xmage_local_source_missing",
         "source_resolution_status": "local_source_candidate" if resolved else "local_source_missing",
         "runtime_catalog_confirmation_required": bool(resolved),
+        "runtime_coverage_status": "unconfirmed",
+        "operational_coverage_lane": operational_lane,
+        "native_adapter_required": False,
+        "native_adapter_decision": "defer_until_xmage_and_forge_residual_is_proven",
+        "legacy_analysis_fields": ["translation_lane", "adapter_work_unit"],
         "translation_lane": lane,
         "adapter_work_unit": adapter_work_unit(effect_json, parsed_entry),
         "logical_rule_key": logical_key,
@@ -160,12 +206,161 @@ def compact_queue_row(
     }
 
 
+def fetch_typed_battle_usage() -> tuple[dict[str, int], str]:
+    """Read canonical, typed natural card exposure counts from PostgreSQL."""
+
+    from db_helper import connect
+
+    with connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT EXISTS (
+                  SELECT 1
+                  FROM information_schema.tables
+                  WHERE table_schema = 'public'
+                    AND table_name = 'battle_simulations'
+                )
+                """
+            )
+            if not bool(cur.fetchone()[0]):
+                return {}, "postgresql_battle_simulations_missing"
+            cur.execute(
+                """
+                WITH evidence_rows AS (
+                  SELECT
+                    bs.id,
+                    bs.game_log -> 'battle_learning_evidence' AS evidence
+                  FROM battle_simulations bs
+                  WHERE bs.simulation_type = 'battle'
+                    AND jsonb_typeof(bs.game_log) = 'object'
+                    AND COALESCE(
+                      bs.game_log ->> 'engine_contract',
+                      bs.metrics ->> 'engine_contract',
+                      ''
+                    ) = ANY(%s)
+                ), typed_natural_evidence AS (
+                  SELECT id, evidence
+                  FROM evidence_rows
+                  WHERE evidence ->> 'schema_version' = 'battle_positive_evidence_v1'
+                    AND evidence ->> 'natural_sample' = 'true'
+                    AND evidence ->> 'positive_exposure_ready' = 'true'
+                    AND evidence ->> 'positive_evidence_basis' = 'typed_event'
+                    AND COALESCE(evidence ->> 'typed_positive_event_count', '') ~ '^[0-9]+$'
+                    AND (evidence ->> 'typed_positive_event_count')::int > 0
+                ), exposed_names AS (
+                  SELECT
+                    evidence_row.id,
+                    lower(btrim(exposed.value)) AS normalized_name
+                  FROM typed_natural_evidence evidence_row
+                  CROSS JOIN LATERAL jsonb_array_elements_text(
+                    CASE
+                      WHEN jsonb_typeof(
+                        evidence_row.evidence -> 'exposed_card_names_normalized'
+                      ) = 'array'
+                      THEN evidence_row.evidence -> 'exposed_card_names_normalized'
+                      ELSE '[]'::jsonb
+                    END
+                  ) AS exposed(value)
+                  WHERE btrim(exposed.value) <> ''
+                )
+                SELECT normalized_name, count(DISTINCT id)::int AS battle_count
+                FROM exposed_names
+                GROUP BY normalized_name
+                """,
+                (list(TRUSTED_ENGINE_CONTRACTS),),
+            )
+            return (
+                {str(name): int(count) for name, count in cur.fetchall()},
+                "postgresql_typed_natural_positive_battle_evidence",
+            )
+
+
+def prioritize_queue_rows(
+    queue: list[dict[str, Any]],
+    *,
+    battle_usage_by_name: Mapping[str, int] | None = None,
+) -> list[dict[str, Any]]:
+    usage = {
+        readiness.normalize_name(name): max(int(count), 0)
+        for name, count in (battle_usage_by_name or {}).items()
+    }
+    work_unit_counts = Counter(row["adapter_work_unit"] for row in queue)
+    prioritized: list[dict[str, Any]] = []
+    for source_row in queue:
+        row = dict(source_row)
+        normalized_name = readiness.normalize_name(row.get("normalized_name") or row.get("card_name"))
+        product_decks = max(int(row.get("ready_product_deck_count") or 0), 0)
+        typed_battles = usage.get(normalized_name, 0)
+        commander_slots = max(int(row.get("commander_slot_count") or 0), 0)
+        work_unit_card_count = work_unit_counts[row["adapter_work_unit"]]
+        lane = str(row.get("operational_coverage_lane") or "")
+
+        product_score = min(product_decks * 20, 40)
+        usage_score = min(typed_battles * 10, 30)
+        impact_score = min(work_unit_card_count * 2, 20) + min(commander_slots * 10, 10)
+        residual_score = OPERATIONAL_RESIDUAL_PRIORITY_WEIGHT.get(lane, 0)
+        priority_score = product_score + usage_score + impact_score + residual_score
+        if product_decks > 0 or typed_battles > 0:
+            priority_band = "P0"
+        elif priority_score >= 40:
+            priority_band = "P1"
+        else:
+            priority_band = "P2"
+        owner, next_gate = OPERATIONAL_LANE_ROUTING.get(
+            lane,
+            ("battle_rules_triage", "review_unknown_operational_coverage_lane"),
+        )
+        row.update(
+            {
+                "priority_schema": PRIORITY_SCHEMA,
+                "priority_band": priority_band,
+                "priority_score": priority_score,
+                "priority_components": {
+                    "product": {
+                        "ready_product_deck_count": product_decks,
+                        "score": product_score,
+                    },
+                    "real_usage": {
+                        "typed_natural_positive_battle_count": typed_battles,
+                        "score": usage_score,
+                    },
+                    "impact": {
+                        "adapter_work_unit_card_count": work_unit_card_count,
+                        "commander_slot_count": commander_slots,
+                        "score": impact_score,
+                    },
+                    "residual": {
+                        "operational_coverage_lane": lane,
+                        "score": residual_score,
+                    },
+                },
+                "owner": owner,
+                "next_gate": next_gate,
+                "owner_intent_policy": dict(OWNER_INTENT_POLICY),
+                "postgresql_is_product_truth": True,
+                "promotion_allowed": False,
+            }
+        )
+        prioritized.append(row)
+    return sorted(
+        prioritized,
+        key=lambda row: (
+            -int(row["priority_score"]),
+            str(row.get("normalized_name") or ""),
+            str(row.get("card_id") or ""),
+        ),
+    )
+
+
 def build_queue(
     cards: list[dict[str, Any]],
     *,
     xmage_root: Path,
     scope: str = DEFAULT_SCOPE,
     limit: int = 0,
+    battle_usage_by_name: Mapping[str, int] | None = None,
+    battle_usage_source_status: str = "not_loaded",
 ) -> dict[str, Any]:
     if scope not in SCOPES:
         raise ValueError(f"Unsupported scope: {scope}")
@@ -186,6 +381,10 @@ def build_queue(
                 path=resolved.path,
             )
         queue.append(compact_queue_row(card, resolved=resolved, parsed_entry=parsed_entry))
+    queue = prioritize_queue_rows(
+        queue,
+        battle_usage_by_name=battle_usage_by_name,
+    )
     return {
         "generated_at": utc_now(),
         "status": "action_required",
@@ -195,11 +394,18 @@ def build_queue(
             "scope": scope,
             "unit_of_work": "oracle identity / normalized identity",
             "xmage_root": str(xmage_root),
-            "xmage_is_authoritative_for_resolved_sources": True,
+            "local_xmage_source_is_runtime_coverage": False,
             "local_source_resolution_requires_runtime_catalog_confirmation": True,
-            "manaLoom_work": "adapter/runtime translation; not card-by-card semantic rule approval",
+            "manaLoom_work": "confirm external runtime coverage first; open native family work only for proven external residual",
+            "legacy_native_analysis_fields_retained": ["translation_lane", "adapter_work_unit"],
             "limit": limit,
             "xmage_class_index_size": len(class_index),
+            "priority_schema": PRIORITY_SCHEMA,
+            "priority_inputs": ["product", "real_usage", "impact", "residual"],
+            "real_usage_source": battle_usage_source_status,
+            "registered_deck_count_is_diagnostic_only": True,
+            "postgresql_is_product_truth": True,
+            "owner_intent_policy": dict(OWNER_INTENT_POLICY),
         },
         "summary": summarize_queue(queue, total_target_count=len(target_cards)),
         "queue": queue,
@@ -208,26 +414,31 @@ def build_queue(
 
 def summarize_queue(queue: list[dict[str, Any]], *, total_target_count: int) -> dict[str, Any]:
     lane_counts = Counter(row["translation_lane"] for row in queue)
+    operational_lane_counts = Counter(row["operational_coverage_lane"] for row in queue)
     source_counts = Counter(row["source_truth_status"] for row in queue)
     work_unit_counts = Counter(row["adapter_work_unit"] for row in queue)
     effect_counts = Counter((row.get("effect_json") or {}).get("effect") or "unparsed" for row in queue)
     scope_counts = Counter((row.get("effect_json") or {}).get("battle_model_scope") or "unparsed" for row in queue)
     oracle_family_counts = Counter(row.get("oracle_family") or "unknown" for row in queue)
+    priority_band_counts = Counter(row.get("priority_band") or "unprioritized" for row in queue)
+    owner_counts = Counter(row.get("owner") or "unowned" for row in queue)
+    next_gate_counts = Counter(row.get("next_gate") or "missing" for row in queue)
     signal_counts: Counter[str] = Counter()
     for row in queue:
         signal_counts.update(row.get("xmage_signals") or [])
-    authoritative_count = source_counts.get("xmage_authoritative", 0)
+    authoritative_count = source_counts.get("xmage_local_source_candidate", 0)
     parser_gap_count = lane_counts.get("xmage_authoritative_parser_gap", 0)
     missing_count = lane_counts.get("xmage_missing_source_exception", 0)
     return {
         "target_identity_count": total_target_count,
-        "xmage_authoritative_source_count": authoritative_count,
+        "xmage_local_source_candidate_count": authoritative_count,
         "xmage_missing_source_exception_count": missing_count,
         "xmage_authoritative_parser_gap_count": parser_gap_count,
         "xmage_authoritative_adapter_required_count": lane_counts.get("xmage_authoritative_adapter_required", 0),
         "manual_semantic_decision_units_remaining": missing_count + parser_gap_count,
-        "authoritative_source_coverage_ratio": round(authoritative_count / max(total_target_count, 1), 4),
+        "local_source_candidate_ratio": round(authoritative_count / max(total_target_count, 1), 4),
         "adapter_work_unit_count": len(work_unit_counts),
+        "operational_coverage_lane_counts": dict(sorted(operational_lane_counts.items())),
         "translation_lane_counts": dict(sorted(lane_counts.items())),
         "source_truth_status_counts": dict(sorted(source_counts.items())),
         "top_adapter_work_units": dict(work_unit_counts.most_common(30)),
@@ -235,6 +446,9 @@ def summarize_queue(queue: list[dict[str, Any]], *, total_target_count: int) -> 
         "top_battle_model_scopes": dict(scope_counts.most_common(30)),
         "top_oracle_families": dict(oracle_family_counts.most_common(30)),
         "top_xmage_signals": dict(signal_counts.most_common(30)),
+        "priority_band_counts": dict(sorted(priority_band_counts.items())),
+        "owner_counts": dict(sorted(owner_counts.items())),
+        "next_gate_counts": dict(sorted(next_gate_counts.items())),
         "samples": {
             "adapter_required": sample_cards(queue, "xmage_authoritative_adapter_required"),
             "parser_gap": sample_cards(queue, "xmage_authoritative_parser_gap"),
@@ -251,7 +465,15 @@ def build_payload(*, xmage_root: Path, scope: str, limit: int) -> dict[str, Any]
     deck_scope = readiness.fetch_deck_scope()
     rows = readiness.fetch_all_card_rows(deck_scope)
     cards = readiness.build_card_inventory(rows, xmage_root=xmage_root, xmage_limit=0)
-    return build_queue(cards, xmage_root=xmage_root, scope=scope, limit=limit)
+    battle_usage, battle_usage_source_status = fetch_typed_battle_usage()
+    return build_queue(
+        cards,
+        xmage_root=xmage_root,
+        scope=scope,
+        limit=limit,
+        battle_usage_by_name=battle_usage,
+        battle_usage_source_status=battle_usage_source_status,
+    )
 
 
 def write_markdown(payload: dict[str, Any], path: Path) -> None:
@@ -267,10 +489,10 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         "",
         "## Decision",
         "",
-        "For every target card with a resolvable local XMage class, XMage is the authoritative behavior source.",
-        "A local Java class is still a source candidate until the pinned runtime catalog resolves the exact card identity.",
-        "Use `xmage_source_catalog_reconciliation.py` before counting local candidates as executable coverage.",
-        "ManaLoom work is now adapter/runtime translation by family or effect signature, not card-by-card semantic approval.",
+        "A local XMage Java class is source evidence, not executable runtime coverage.",
+        "Use `xmage_source_catalog_reconciliation.py` to confirm the exact identity in the pinned runtime catalog.",
+        "Catalog-confirmed XMage/Forge cards execute externally and do not require a native PostgreSQL rule.",
+        "Open native family work only for the explicit residual after both external coverage lanes fail.",
         "",
         "## Summary",
         "",
@@ -279,17 +501,21 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     ]
     for key in (
         "target_identity_count",
-        "xmage_authoritative_source_count",
+        "xmage_local_source_candidate_count",
         "xmage_missing_source_exception_count",
         "xmage_authoritative_parser_gap_count",
         "xmage_authoritative_adapter_required_count",
         "manual_semantic_decision_units_remaining",
-        "authoritative_source_coverage_ratio",
+        "local_source_candidate_ratio",
         "adapter_work_unit_count",
     ):
         lines.append(f"| `{key}` | {summary[key]} |")
 
-    lines.extend(["", "## Translation Lanes", "", "| Lane | Count |", "| --- | ---: |"])
+    lines.extend(["", "## Operational Coverage Lanes", "", "| Lane | Count |", "| --- | ---: |"])
+    for lane, count in summary["operational_coverage_lane_counts"].items():
+        lines.append(f"| `{lane}` | {count} |")
+
+    lines.extend(["", "## Historical Native-analysis Lanes", "", "| Lane | Count |", "| --- | ---: |"])
     for lane, count in summary["translation_lane_counts"].items():
         lines.append(f"| `{lane}` | {count} |")
 
@@ -317,9 +543,9 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         [
             "## Operational Meaning",
             "",
-            "- `xmage_authoritative_adapter_required`: source truth exists; build/route a ManaLoom adapter for the work unit.",
-            "- `xmage_authoritative_parser_gap`: source truth exists; improve XMage parser/hints before adapter generation.",
-            "- `xmage_missing_source_exception`: local XMage does not resolve the card; this is the residual manual/external-source queue.",
+            "- `pinned_xmage_catalog_confirmation_required`: reconcile the exact pinned runtime identity before counting coverage.",
+            "- `forge_then_native_residual_review`: test pinned Forge; open native work only if the card remains unresolved.",
+            "- `translation_lane` and `adapter_work_unit` are compatibility fields for historical native-family analysis, not current execution instructions.",
             "- This report is read-only and does not mutate PostgreSQL or Hermes.",
             "",
         ]
@@ -342,7 +568,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    payload = build_payload(xmage_root=args.xmage_root, scope=args.scope, limit=args.limit)
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    payload = build_payload(xmage_root=xmage_root, scope=args.scope, limit=args.limit)
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")

@@ -20,10 +20,9 @@ Future<bool> reserveAiActionOrShowPaywall(
   }
 
   await provider.load();
-  final hasQuota =
-      ApiClient.hasAuthenticationToken
-          ? await _checkAuthoritativeQuota(provider)
-          : await provider.consumeAiAction(kind);
+  final hasQuota = ApiClient.hasAuthenticationToken
+      ? await _checkAuthoritativeQuota(provider)
+      : await provider.consumeAiAction(kind);
   if (hasQuota) {
     return true;
   }
@@ -83,7 +82,7 @@ class AiPaywallDialog extends StatelessWidget {
             isFreeBeta ? Icons.hourglass_bottom_rounded : Icons.lock_outline,
             color: AppTheme.brass400,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               isFreeBeta
@@ -104,7 +103,7 @@ class AiPaywallDialog extends StatelessWidget {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Text(
             isFreeBeta
                 ? 'Compras e upgrades não estão disponíveis nesta fase. Seu acesso volta quando o próximo período de uso começar.'

@@ -18,6 +18,245 @@ de animação.
 - Screenshots devem ser capturados nos checkpoints `antes`, `ação aberta` e
   `resultado final` para fluxos P1.
 
+## Inventário executável de rotas e superfícies — S3-01
+
+A fonte estruturada do inventário é
+`app/test/ui/fixtures/ui_surface_inventory.json` e o guard é
+`app/test/ui/ui_surface_inventory_test.dart`. O documento continua descrevendo
+as keys e os contratos de interação; o JSON classifica toda a superfície
+descoberta no código e o teste impede dívida silenciosa.
+
+Baseline da beta Web + Android em 2026-07-21:
+
+| Tipo | Quantidade classificada |
+|---|---:|
+| `GoRoute` | 38 |
+| `ShellRoute` | 1 |
+| `MaterialPageRoute` | 6 |
+| Dialogs | 37 |
+| Bottom sheets | 22 |
+| Menus | 5 |
+| Tabs | 11 |
+| Navegação responsiva | 2 |
+| Transientes (`SnackBar`) | 92 |
+| **Total** | **214** |
+
+Cada ocorrência pertence a um contrato de domínio que declara:
+
+- job da superfície e owner;
+- source of truth;
+- estados relevantes;
+- situação/contrato de stable key;
+- criticidade;
+- ação, sucesso e recuperação;
+- política de deep link.
+
+As 38 rotas também declaram path canônico, tela/destino e escopo
+`active`, `deferred_by_scope` ou `compatibility_redirect`. O Scanner permanece
+explicitamente deferido e `/market` é apenas compatibilidade para
+`/community?tab=3`; nenhum deles é contabilizado como tela ativa própria.
+
+O guard compara a ordem real de todas as `GoRoute`, os arquivos que contêm
+superfícies imperativas e a contagem por tipo. Adicionar, remover ou trocar uma
+dessas superfícies sem atualizar o contrato faz o `ui-audit` falhar. Execute:
+
+```bash
+cd app
+/Users/desenvolvimentomobile/.manaloom/toolchains/flutter-3.44.6/bin/flutter \
+  test test/ui/ui_surface_inventory_test.dart --no-version-check --no-pub
+```
+
+`partial:` em `stable_key` não é crédito de conclusão: registra dívida já
+classificada para S3-02/S3-05. `not_applicable:` só é permitido quando a
+superfície não possui UI própria ativa, como redirect de compatibilidade ou
+feature removida do escopo do artefato.
+
+## Matriz executável de estados — S3-02
+
+`app/test/ui/fixtures/ui_state_matrix.json` classifica, nos mesmos 18 domínios
+do inventário, os 15 estados canônicos: loading, progress, partial, stale,
+loading-more, saving, optimistic, disabled, empty, error, retry, offline,
+session-expired, permission-denied e success. Cada domínio decide todos como
+`covered` ou `not_applicable`; não existe estado omitido implicitamente.
+
+O guard `app/test/ui/ui_state_matrix_test.dart` confirma:
+
+- igualdade entre os domínios da matriz e do inventário de superfícies;
+- partição completa e sem duplicidade dos 15 estados;
+- existência de sources, anchors e testes executáveis declarados;
+- política explícita de preservação de entrada;
+- política sanitizada de erro;
+- carregamentos de página usando `AppStatePanel.loading`, região viva com
+  anúncio único e indicador de progresso;
+- ausência de expressões que renderizam exception/payload técnico diretamente
+  em screens/widgets.
+
+O estado optimistic permanece `not_applicable` nos fluxos atuais: mutations
+visíveis aguardam confirmação do backend ou mostram progresso. Introduzir
+update otimista exige classificar rollback/conflito no JSON e adicionar teste
+antes de o `ui-audit` aceitar a mudança.
+
+## Matriz executável de viewports — S3-03
+
+`app/test/ui/fixtures/ui_viewport_matrix.json` declara 16 casos canônicos:
+mobile 320×568, 390×844 e 412×915; tablet 768×1024 e 1024×768 landscape;
+boundaries 599/600, 839/840, 1199/1200 e 1599/1600; desktop 1280×900,
+1440×900 e 1920×1080. Cada caso possui orientação e classe responsiva
+explícitas.
+
+O guard `app/test/ui/ui_viewport_matrix_test.dart` confirma:
+
+- igualdade dos 18 domínios com o inventário S3-01 e existência dos testes
+  widget declarados;
+- ownership exato de cada breakpoint por `AppTheme.viewportClassForWidth`;
+- gutter, max-width e ausência de overflow de `ResponsivePageFrame` em toda a
+  matriz;
+- stack em 1199 e dois panes em 1200 para `AdaptiveMasterDetail`;
+- evidência obrigatória de texto 200% e teclado virtual de 320 px;
+- Home real em todos os tamanhos e Deck Generate com campo focado e CTA
+  alcançável mesmo com teclado + texto 200%.
+
+Execute a matriz declarada:
+
+```bash
+cd app
+jq -r '"test/ui/ui_viewport_matrix_test.dart", \
+  "test/core/widgets/responsive_page_frame_test.dart", \
+  "test/core/theme/app_theme_test.dart", .domain_evidence[][]' \
+  test/ui/fixtures/ui_viewport_matrix.json | sort -u | \
+  xargs /Users/desenvolvimentomobile/.manaloom/toolchains/flutter-3.44.6/bin/flutter \
+  test --no-version-check --no-pub
+```
+
+## Matriz executável de acessibilidade móvel — S3-04
+
+`app/test/ui/fixtures/ui_accessibility_matrix.json` mantém os mesmos 18
+domínios e exige evidência para labels, roles/state, live-status, alvo 48 px,
+texto 200%, contraste WCAG, redundância além da cor e ordem de leitura.
+
+O guard `app/test/ui/ui_accessibility_matrix_test.dart`:
+
+- rejeita domínio sem teste widget executável;
+- rejeita `IconButton` ativo sem tooltip nativo;
+- calcula contraste dos pares canônicos (4.5:1 para texto normal e 3:1 para
+  texto grande/controle/foco);
+- mantém TalkBack e VoiceOver como `pending_physical` até haver roteiro manual
+  executado de verdade.
+
+O helper `expectManaLoomBaselineAccessibility` executa em conjunto alvo Android
+de 48 px, nome acessível para alvos tocáveis e contraste de texto. Ele já é
+usado por Auth, Commercial, navegação móvel, painel de estado, Binder, Home,
+Card Detail e Deck Generate com teclado + texto 200%.
+
+## Matriz executável de teclado e foco Web — S3-05
+
+`app/test/ui/fixtures/ui_keyboard_focus_matrix.json` mapeia Tab, Shift+Tab,
+Enter, Space, Escape, trap e restauração de foco em modal, browser back, foco
+visível e reduced motion para provas executáveis. O guard
+`app/test/ui/ui_keyboard_focus_matrix_test.dart` usa as telas reais de Login,
+ações do shell e o editor de descrição do deck; ele também impede que a parte
+manual seja confundida com `PASS` enquanto houver itens em `remaining`.
+
+O roteiro no build Web real validou `/login` e as rotas autenticadas críticas
+com Tab/Shift+Tab, Enter/Space, foco visível, Escape, trap/restauração de foco,
+browser back e reduced motion, sem erro de console. O fixture registra `pass`;
+essa prova continua separada da validação manual em leitores de tela físicos.
+
+## Matriz executável de navegação e retomada — S3-06
+
+`app/test/ui/fixtures/ui_navigation_resume_matrix.json` torna explícitos sete
+contratos de continuidade: redirect protegido, expiração de sessão em runtime,
+tabs por query com back/forward, deep links de Battle e Card Detail, além dos
+rascunhos de Generate e Import. O guard
+`app/test/ui/ui_navigation_resume_matrix_test.dart` exige fonte e teste atuais
+para cada cenário.
+
+Battle/Replays agora usa `/decks/:id/battle-replays`. Card Detail usa
+`/cards/:cardId`: o objeto em memória é apenas um fast path e o refresh resolve
+o mesmo `card_id` pela API/backend PostgreSQL. Collection e Community mantêm a
+tab normalizada na URL. Generate e Import persistem somente o formulário não
+salvo, com chave separada pelo id do usuário, e removem o rascunho após sucesso.
+401 de token inválido/expirado encerra a sessão; `invalid_password`, 429, 5xx,
+timeout e rede a preservam.
+
+Execute:
+
+```bash
+cd app
+flutter test --no-pub test/ui/ui_navigation_resume_matrix_test.dart \
+  test/features/collection/collection_screen_responsive_test.dart \
+  test/features/community/screens/community_screen_responsive_test.dart \
+  test/features/decks/screens/deck_flow_entry_screens_test.dart
+```
+
+## Regressão visual autenticada — S3-07
+
+`app/test/ui/fixtures/ui_authenticated_visual_matrix.json` fixa 20
+checkpoints canônicos e os estados sucesso, vazio, erro, modal, acima e abaixo
+da dobra. Cada checkpoint foi capturado no mesmo fixture PostgreSQL/API
+descartável em quatro plataformas:
+
+| Plataforma | Dimensão capturada | Capturas |
+|---|---:|---:|
+| Web mobile | 390×844 | 20 |
+| Web desktop | 1440×900 | 20 |
+| Web wide | 1920×1080 | 20 |
+| Android físico Samsung SM-A135M | 1080×2408 | 20 |
+
+Os 80 PNGs aprovados vivem em `app/test/ui/goldens/runtime`. O comparador
+`app/tool/authenticated_visual_diff.dart` rejeita arquivo ausente/inesperado,
+dimensão diferente e razão de pixels alterados acima de `0.001`; divergências
+são materializadas em `app/test/ui/failures/runtime`.
+
+O harness `scripts/manaloom_authenticated_visual_qa_isolated.sh` cria usuário,
+card, deck e set representativo somente no banco descartável, usa imagem
+same-origin, nunca cadastra durante a captura e remove credencial, banco e
+listeners ao encerrar. Textos relativos a tempo usam
+`MANALOOM_VISUAL_FIXTURE_MODE=true`, mantendo o baseline determinístico sem
+alterar o comportamento normal do app.
+
+No Android, o runner oficial `flutter drive` não aceita `--release` fora da
+Web. A prova física usa `--profile`, com `kDebugMode=false`, e registra esse
+limite explicitamente na matriz; não é apresentada como release.
+
+## Onboarding e primeiro uso — S3-08
+
+O destino autenticado é resolvido por `resolveAuthenticatedLocation`: um deep
+link explícito e seguro tem prioridade; sem ele, `AuthProvider` escolhe Home ou
+`/onboarding` a partir do estado persistido por usuário. O contrato local
+versionado diferencia `pending`, `completed` e `skipped`; storage ausente,
+payload inválido ou versão futura nunca concede conclusão silenciosa.
+
+Keys estáveis do fluxo:
+
+- `onboarding-scroll-view`;
+- `onboarding-format-dropdown`;
+- `onboarding-storage-notice` e `onboarding-storage-retry`;
+- `onboarding-generate-action` e `onboarding-import-action`;
+- `onboarding-complete-action` e `onboarding-skip-action`.
+
+O teste widget `test/features/home/onboarding_core_flow_screen_test.dart` cobre
+320×568, texto 200%, falha/retry de persistência, formato e foco. Ele é parte
+explícita do `quality_gate.sh ui-audit`. O runtime
+`integration_test/onboarding_first_run_runtime_test.dart` usa API/PostgreSQL
+descartáveis e valida retomada após reconstrução, skip, logout/login e ausência
+de repetição do onboarding em Android físico.
+
+Execute o guard e o diff:
+
+```bash
+cd app
+flutter test --no-pub test/ui/ui_authenticated_visual_matrix_test.dart \
+  test/tool/authenticated_visual_diff_test.dart
+
+dart run tool/authenticated_visual_diff.dart \
+  --baseline test/ui/goldens/runtime \
+  --actual <capturas-da-mesma-execucao> \
+  --failure test/ui/failures/runtime \
+  --threshold 0.001 \
+  --summary <pixel-diff.json>
+```
+
 ## Decks / Card Entry / Commander Edition
 
 | Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
@@ -65,6 +304,7 @@ de animação.
 | Salvar perfil | `ProfileScreen` | `profile-save-button` | Persiste perfil. | Tap por key + API. |
 | Atalhos coleção | `ProfileScreen` | `profile-open-binder-button`, `profile-open-marketplace-button` | Abrem fichário/marketplace. | Tap por key. |
 | Busca de usuários | `UserSearchScreen` | `user-search-field`, `user-search-clear-button`, `user-search-list`, `user-search-row-<userId>` | Busca perfis e abre perfil público. | `enterText` e tap por key baseada em `user.id`. |
+| Loading busca de usuários | `UserSearchScreen` | `user-search-loading` | Mantém consulta e anuncia busca em andamento. | `find.byKey` + semantics. |
 
 ## Search / Sets
 
@@ -82,9 +322,11 @@ de animação.
 | Dialog adicionar carta | `CardSearchScreen` | `card-search-add-dialog-<cardId>` | Permite quantidade/comandante quando aplicável. | Screenshot + confirmação por API. |
 | Confirmar adicionar carta | `CardSearchScreen` | `card-search-add-confirm-<cardId>` | Persiste card no deck/binder. | Tap por key. |
 | Lista de coleções | `SetsCatalogScreen` | `setsCatalogList` | Renderiza `/sets`. | `find.byKey`, screenshot. |
+| Loading de coleções | `SetsCatalogScreen` | `sets-catalog-loading` | Região viva anuncia carregamento sem confundir com catálogo vazio. | `find.byKey` + semantics. |
 | Campo de coleções | `SetsCatalogScreen` | `setsSearchField` | Busca por nome/código. | `enterText` por key. |
 | Linha de coleção | `SetsCatalogScreen` | `set-tile-<setCode>` | Abre coleção específica. | Tap por key. |
 | Lista de cards do set | `SetCardsScreen` | `setCardsList` | Renderiza `/cards?set=<code>`. | `find.byKey`. |
+| Loading de cards do set | `SetCardsScreen` | `set-cards-loading` | Região viva anuncia a coleção em carregamento. | `find.byKey` + semantics. |
 | Estado vazio do set | `SetCardsScreen` | `setCardsEmptyState` | Coleção futura/parcial ou sem cartas locais. | `find.byKey` + copy como evidência. |
 | Card do set | `SetCardsScreen` | `set-card-<cardName>` | Abre detalhe ou prova presença. | Preferir key; nomes duplicados exigem API quando necessário. |
 
@@ -129,6 +371,7 @@ de animação.
 | Mensagem da proposta | `CreateTradeScreen` | `create-trade-message-field` | Mensagem opcional. | `enterText` por key. |
 | Review da proposta | `CreateTradeScreen` | `create-trade-review-dialog`, `create-trade-review-back-button`, `create-trade-review-confirm-button` | Usuário revisa antes de enviar. | Screenshot + tap por key. |
 | Ações de trade | `TradeDetailScreen` | `trade-action-accept`, `trade-action-decline`, `trade-action-cancel`, `trade-action-ship`, `trade-action-confirm-delivery`, `trade-action-complete`, `trade-action-dispute` | Mudam status com confirmação quando crítico. | Tap por key + validar status via API. |
+| Loading de trades | `TradeInboxScreen` / `TradeDetailScreen` | `trade-inbox-loading`, `trade-detail-loading-state` | Lista e detalhe anunciam carregamento sem mascarar vazio/erro. | `find.byKey` + semantics. |
 | Dialog de envio | `TradeDetailScreen` | `trade-ship-confirm-dialog` | Coleta rastreio/método antes de marcar enviado. | Screenshot + campos por key. |
 | Campo rastreio | `TradeDetailScreen` | `trade-ship-tracking-field` | Rastreio opcional. | `enterText` por key. |
 | Método de envio | `TradeDetailScreen` | `trade-ship-method-field` | Método seguro. | Selecionar por key. |
@@ -154,6 +397,7 @@ de animação.
 | Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
 |---|---|---|---|---|
 | Campo de chat direto | `ChatScreen` | `chat-message-field` | Preenche mensagem direta. | `enterText` por key. |
+| Loading chat direto | `ChatScreen` | `chat-loading-state` | Carregamento inicial não se confunde com conversa vazia. | `find.byKey` + semantics. |
 | Enviar chat direto | `ChatScreen` | `chat-message-send-button` | Persiste mensagem em `/conversations/:id/messages`. | Tap por key + API. |
 | Lista de conversas | `MessageInboxScreen` | `messages-inbox-list` | Renderiza `/conversations` e atualiza por foreground/polling leve. | `find.byKey` + contagem por API. |
 | Conversa individual | `MessageInboxScreen` | `message-conversation-tile-<conversationId>` | Abre `/messages/:conversationId` com contexto estável para tap de FCM. | Tap por key ou deep link por rota. |

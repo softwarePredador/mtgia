@@ -199,7 +199,7 @@ void main() {
         commanderColorIdentity: const {'U'},
         targetArchetype: 'midrange',
         keepTheme: false,
-        coreCards: const [],
+        coreCards: const ['Arcane Signet'],
         commanderPriorityNames: const [],
         swapLimit: 60,
       );
@@ -217,6 +217,12 @@ void main() {
           (candidate) => candidate['name'] == 'Arcane Signet',
         )['role'],
         equals('ramp'),
+      );
+      expect(
+        removals.firstWhere(
+          (candidate) => candidate['name'] == 'Arcane Signet',
+        )['protected_anchor'],
+        isTrue,
       );
     });
   });

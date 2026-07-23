@@ -591,10 +591,28 @@ def compact_error(exc: Exception) -> str:
     return f"{type(exc).__name__}:{str(exc)[:240]}"
 
 
+def connect_postgres_read_only():
+    """Open a PostgreSQL transaction that is both forced and verified read-only."""
+    conn = connect()
+    try:
+        conn.set_session(readonly=True)
+        with conn.cursor() as cur:
+            cur.execute("SHOW transaction_read_only")
+            transaction_read_only = str(cur.fetchone()[0]).lower()
+        if transaction_read_only not in {"on", "true"}:
+            raise RuntimeError(
+                "PostgreSQL refused the required read-only transaction"
+            )
+        return conn
+    except Exception:
+        conn.close()
+        raise
+
+
 def pg_columns_and_counts() -> tuple[dict[str, set[str]], dict[str, int], str]:
     columns: dict[str, set[str]] = {}
     counts: dict[str, int] = {}
-    with connect() as conn:
+    with connect_postgres_read_only() as conn:
         with conn.cursor() as cur:
             for relation in sorted(PG_REQUIRED_COLUMNS):
                 cur.execute("SELECT to_regclass(%s)", (f"public.{relation}",))
@@ -646,7 +664,7 @@ def pg_schema_checks(columns: dict[str, set[str]], counts: dict[str, int]) -> li
 
 def pg_integrity_checks() -> list[Check]:
     checks: list[Check] = []
-    with connect() as conn:
+    with connect_postgres_read_only() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -804,7 +822,7 @@ def reviewed_runtime_keys() -> set[tuple[str, str]]:
 
 
 def pg_runtime_keys() -> set[tuple[str, str]]:
-    with connect() as conn:
+    with connect_postgres_read_only() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -818,7 +836,7 @@ def pg_runtime_keys() -> set[tuple[str, str]]:
 
 
 def pg_runtime_rule_hashes() -> dict[tuple[str, str], str]:
-    with connect() as conn:
+    with connect_postgres_read_only() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -921,7 +939,7 @@ def pg_sqlite_parity_checks(conn: sqlite3.Connection, *, skip_pg: bool) -> list[
                     ).fetchone()[0]
                     or 0
                 )
-                with connect() as pg_conn:
+                with connect_postgres_read_only() as pg_conn:
                     with pg_conn.cursor() as cur:
                         cur.execute(
                             """
@@ -964,7 +982,7 @@ def build_report(sqlite_db: Path, *, skip_pg: bool = False) -> dict[str, Any]:
         )
     else:
         checks.append(Check("sqlite_db.active", "pass", str(sqlite_db)))
-        conn = sqlite3.connect(sqlite_db)
+        conn = sqlite3.connect(f"{sqlite_db.as_uri()}?mode=ro", uri=True)
         try:
             conn.row_factory = sqlite3.Row
             checks.extend(sqlite_schema_checks(conn))

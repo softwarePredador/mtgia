@@ -35,7 +35,7 @@ class SheetHeroCard extends StatelessWidget {
           ),
           child: Icon(icon, color: accent, size: 21),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.space12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +47,7 @@ class SheetHeroCard extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: AppTheme.space2),
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -95,7 +95,7 @@ class StrategyOptionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.space16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -119,7 +119,7 @@ class StrategyOptionCard extends StatelessWidget {
                 ],
               ),
               if (description.trim().isNotEmpty) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Text(
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -128,7 +128,7 @@ class StrategyOptionCard extends StatelessWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: 14),
+              const SizedBox(height: AppTheme.space14),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -139,7 +139,7 @@ class StrategyOptionCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppTheme.space6),
                   Icon(Icons.arrow_forward_rounded, size: 18, color: accent),
                 ],
               ),
@@ -166,6 +166,8 @@ class OptimizationPreviewDialog extends StatefulWidget {
   final Map<String, dynamic> metaReferenceContext;
   final Map<String, dynamic> optimizationContract;
   final Map<String, dynamic> battleValidation;
+  final bool canApply;
+  final List<String> applyBlockers;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
   final VoidCallback onCancel;
@@ -190,6 +192,8 @@ class OptimizationPreviewDialog extends StatefulWidget {
     required this.metaReferenceContext,
     required this.optimizationContract,
     required this.battleValidation,
+    required this.canApply,
+    required this.applyBlockers,
     required this.displayRemovals,
     required this.displayAdditions,
     required this.onCancel,
@@ -213,8 +217,8 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     if (_pairedSelectionRequired) {
       final pairCount =
           widget.displayRemovals.length < widget.displayAdditions.length
-              ? widget.displayRemovals.length
-              : widget.displayAdditions.length;
+          ? widget.displayRemovals.length
+          : widget.displayAdditions.length;
       _selectedRemovalIndexes = {
         for (var index = 0; index < pairCount; index++) index,
       };
@@ -235,10 +239,9 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
 
   bool get _pairedSelectionRequired {
     final rawDecision = widget.optimizationContract['user_decision'];
-    final decision =
-        rawDecision is Map
-            ? rawDecision.cast<String, dynamic>()
-            : const <String, dynamic>{};
+    final decision = rawDecision is Map
+        ? rawDecision.cast<String, dynamic>()
+        : const <String, dynamic>{};
     return decision['paired_selection_required'] == true ||
         widget.mode == 'optimize';
   }
@@ -393,13 +396,12 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
 
   String _buildShareReport() {
     String names(List<Map<String, dynamic>> items, Set<int> selectedIndexes) {
-      final selected =
-          selectedIndexes
-              .where((index) => index >= 0 && index < items.length)
-              .map((index) => items[index]['name']?.toString() ?? '')
-              .where((name) => name.trim().isNotEmpty)
-              .take(12)
-              .toList();
+      final selected = selectedIndexes
+          .where((index) => index >= 0 && index < items.length)
+          .map((index) => items[index]['name']?.toString() ?? '')
+          .where((name) => name.trim().isNotEmpty)
+          .take(12)
+          .toList();
       return selected.isEmpty ? '-' : selected.join(', ');
     }
 
@@ -470,6 +472,24 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     return raw is Map ? raw.cast<String, dynamic>() : const {};
   }
 
+  List<String> get _applyBlockerMessages {
+    if (widget.applyBlockers.isEmpty) {
+      return const [
+        'A recomendação não atingiu os critérios mínimos para alterar o deck.',
+      ];
+    }
+    return widget.applyBlockers
+        .map(
+          (blocker) => switch (blocker) {
+            'commander_same_lane_evidence_required' =>
+              'Uma ou mais trocas mudam a função da carta sem hipótese comparável.',
+            _ => 'A validação final bloqueou uma ou mais trocas.',
+          },
+        )
+        .toSet()
+        .toList(growable: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final warningLines = _warningLines();
@@ -478,21 +498,35 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
 
     return AlertDialog(
       key: const Key('optimize-preview-dialog'),
-      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      titlePadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space0,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space16,
+        AppTheme.space24,
+        AppTheme.space8,
+      ),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        AppTheme.space16,
+        AppTheme.space0,
+        AppTheme.space16,
+        AppTheme.space16,
+      ),
       title: DialogTitleBlock(
-        icon:
-            widget.mode == 'complete'
-                ? Icons.playlist_add_check_circle_outlined
-                : Icons.auto_awesome_rounded,
-        title:
-            widget.mode == 'complete'
-                ? 'Completar deck (${widget.archetype})'
-                : 'Sugestões para ${widget.archetype}',
+        icon: widget.mode == 'complete'
+            ? Icons.playlist_add_check_circle_outlined
+            : Icons.auto_awesome_rounded,
+        title: widget.mode == 'complete'
+            ? 'Completar deck (${widget.archetype})'
+            : 'Sugestões para ${widget.archetype}',
         subtitle: 'Revise as mudanças antes de aplicar no deck.',
-        accent:
-            widget.mode == 'complete' ? AppTheme.brass400 : AppTheme.frost400,
+        accent: widget.mode == 'complete'
+            ? AppTheme.brass400
+            : AppTheme.frost400,
       ),
       content: SizedBox(
         width: 560,
@@ -506,25 +540,21 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 runSpacing: 8,
                 children: [
                   DeckMetaChip(
-                    label:
-                        widget.mode == 'complete'
-                            ? 'Modo Complete'
-                            : 'Modo Optimize',
-                    color:
-                        widget.mode == 'complete'
-                            ? AppTheme.brass400
-                            : AppTheme.frost400,
-                    icon:
-                        widget.mode == 'complete'
-                            ? Icons.playlist_add_rounded
-                            : Icons.auto_fix_high_rounded,
+                    label: widget.mode == 'complete'
+                        ? 'Modo Complete'
+                        : 'Modo Optimize',
+                    color: widget.mode == 'complete'
+                        ? AppTheme.brass400
+                        : AppTheme.frost400,
+                    icon: widget.mode == 'complete'
+                        ? Icons.playlist_add_rounded
+                        : Icons.auto_fix_high_rounded,
                   ),
                   DeckMetaChip(
                     label: _intensityLabel,
-                    color:
-                        widget.intensity == OptimizeIntensity.aggressive
-                            ? AppTheme.mythicGold
-                            : AppTheme.frost400,
+                    color: widget.intensity == OptimizeIntensity.aggressive
+                        ? AppTheme.mythicGold
+                        : AppTheme.frost400,
                     icon: Icons.speed_rounded,
                   ),
                   if (widget.keepTheme && widget.preservedTheme != null)
@@ -536,7 +566,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 ],
               ),
               if (widget.intensity == OptimizeIntensity.aggressive) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title: 'Atenção ao ajuste agressivo',
                   accent: AppTheme.mythicGold,
@@ -551,7 +581,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 ),
               ],
               if (widget.reasoning.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title: 'Leitura da IA',
                   accent: AppTheme.frost400,
@@ -567,7 +597,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 ),
               ],
               if (widget.qualityWarning != null) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title: 'Aviso de qualidade',
                   accent: AppTheme.brass400,
@@ -582,7 +612,34 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                   ),
                 ),
               ],
-              const SizedBox(height: 16),
+              if (!widget.canApply) ...[
+                const SizedBox(height: AppTheme.space16),
+                DialogSectionCard(
+                  title: 'Aplicação bloqueada',
+                  accent: AppTheme.error,
+                  icon: Icons.block_outlined,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _applyBlockerMessages
+                        .map(
+                          (message) => Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppTheme.space6,
+                            ),
+                            child: Text(
+                              message,
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                height: AppTheme.lineHeightCompact,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppTheme.space16),
               DialogSectionCard(
                 title: 'Controle antes de aplicar',
                 accent: AppTheme.frost400,
@@ -622,15 +679,16 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                     ),
                     _TrustSignal(
                       label: 'Validação',
-                      value:
-                          deckbuilderValidation['label']?.toString() ??
-                          'Preview seguro',
+                      value: !widget.canApply
+                          ? 'Bloqueada'
+                          : deckbuilderValidation['label']?.toString() ??
+                                'Preview seguro',
                       icon: Icons.verified_outlined,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.space16),
               DialogSectionCard(
                 title: 'Validação da recomendação',
                 accent: AppTheme.success,
@@ -641,14 +699,16 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                     _ValidationLine(
                       icon: Icons.fact_check_outlined,
                       color: AppTheme.success,
-                      title:
-                          deckbuilderValidation['label']?.toString() ??
-                          'Preview seguro',
-                      message:
-                          deckbuilderValidation['message']?.toString() ??
-                          'As sugestões passaram pelas regras do deck antes de aparecerem aqui.',
+                      title: !widget.canApply
+                          ? 'Aplicação bloqueada'
+                          : deckbuilderValidation['label']?.toString() ??
+                                'Preview seguro',
+                      message: !widget.canApply
+                          ? _applyBlockerMessages.first
+                          : deckbuilderValidation['message']?.toString() ??
+                                'As sugestões passaram pelas regras do deck antes de aparecerem aqui.',
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppTheme.space10),
                     _ValidationLine(
                       icon: Icons.sports_esports_outlined,
                       color: AppTheme.brass400,
@@ -663,12 +723,12 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 ),
               ),
               if (widget.metaReferenceContext.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 _MetaReferenceSection(contextData: widget.metaReferenceContext),
               ],
               if (widget.deckAnalysis.isNotEmpty &&
                   widget.postAnalysis.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title: 'Antes vs Depois',
                   accent: AppTheme.frost400,
@@ -681,7 +741,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                         before: '${widget.deckAnalysis['average_cmc'] ?? '-'}',
                         after: '${widget.postAnalysis['average_cmc'] ?? '-'}',
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.space8),
                       Text(
                         'Curva: ${widget.deckAnalysis['mana_curve_assessment'] ?? '-'}',
                         style: const TextStyle(color: AppTheme.textSecondary),
@@ -690,7 +750,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                           (widget.postAnalysis['improvements'] as List)
                               .isNotEmpty)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.only(top: AppTheme.space8),
                           child: Text(
                             'Ganhos: ${(widget.postAnalysis['improvements'] as List).take(2).join(' • ')}',
                             style: const TextStyle(
@@ -704,33 +764,34 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 ),
               ],
               if (warningLines.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title: 'Avisos',
                   accent: AppTheme.brass400,
                   icon: Icons.warning_amber_rounded,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        warningLines
-                            .map(
-                              (line) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Text(
-                                  '• $line',
-                                  style: const TextStyle(
-                                    color: AppTheme.textSecondary,
-                                    height: AppTheme.lineHeightCompact,
-                                  ),
-                                ),
+                    children: warningLines
+                        .map(
+                          (line) => Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppTheme.space8,
+                            ),
+                            child: Text(
+                              '• $line',
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                height: AppTheme.lineHeightCompact,
                               ),
-                            )
-                            .toList(),
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               ],
               if (widget.displayRemovals.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title:
                       'Remover (${_selectedRemovalIndexes.length}/${widget.displayRemovals.length})',
@@ -752,7 +813,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 ),
               ],
               if (widget.displayAdditions.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title:
                       'Adicionar (${_selectedAdditionIndexes.length}/${widget.displayAdditions.length})',
@@ -770,7 +831,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                       ),
                       if (widget.displayAdditions.length > 30)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.only(top: AppTheme.space8),
                           child: Text(
                             '+ ${widget.displayAdditions.length - 30} cartas…',
                             style: const TextStyle(
@@ -802,7 +863,9 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
         ),
         ElevatedButton(
           key: const Key('optimize-preview-apply-button'),
-          onPressed: _selectedChangeCount == 0 ? null : _confirmSelected,
+          onPressed: !widget.canApply || _selectedChangeCount == 0
+              ? null
+              : _confirmSelected,
           child: const Text('Aplicar mudanças'),
         ),
       ],
@@ -818,10 +881,9 @@ class _MetaReferenceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final metaScope =
-        (contextData['meta_scope'] is Map)
-            ? (contextData['meta_scope'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
+    final metaScope = (contextData['meta_scope'] is Map)
+        ? (contextData['meta_scope'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
     final references =
         (contextData['references'] as List?)
             ?.whereType<Map>()
@@ -854,7 +916,7 @@ class _MetaReferenceSection extends StatelessWidget {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -880,7 +942,7 @@ class _MetaReferenceSection extends StatelessWidget {
             ],
           ),
           if (references.isNotEmpty) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             Text(
               'Shells de referência',
               style: theme.textTheme.labelLarge?.copyWith(
@@ -888,7 +950,7 @@ class _MetaReferenceSection extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             ...references.take(3).map((reference) {
               final shell =
                   reference['shell_label']?.toString() ?? 'Shell meta';
@@ -903,7 +965,7 @@ class _MetaReferenceSection extends StatelessWidget {
                 if (strategy.isNotEmpty) strategy,
               ];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: AppTheme.space8),
                 child: _MetaReferenceRow(
                   title: rank == null ? shell : '#$rank $shell',
                   subtitle: lineParts.join(' • '),
@@ -912,7 +974,7 @@ class _MetaReferenceSection extends StatelessWidget {
             }),
           ],
           if (influenced.isNotEmpty) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             Text(
               'Sugestões com evidência meta',
               style: theme.textTheme.labelLarge?.copyWith(
@@ -920,16 +982,15 @@ class _MetaReferenceSection extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             ...influenced.take(5).map((entry) {
               final name = entry['name']?.toString() ?? '';
               final count = entry['reference_count']?.toString();
               return _MetaReferenceRow(
                 title: name,
-                subtitle:
-                    count == null
-                        ? 'Aparece nas referências selecionadas.'
-                        : 'Aparece em $count referência(s) selecionada(s).',
+                subtitle: count == null
+                    ? 'Aparece nas referências selecionadas.'
+                    : 'Aparece em $count referência(s) selecionada(s).',
               );
             }),
           ],
@@ -950,7 +1011,7 @@ class _MetaReferenceRow extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(AppTheme.space10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -969,7 +1030,7 @@ class _MetaReferenceRow extends StatelessWidget {
             ),
           ),
           if (subtitle.trim().isNotEmpty) ...[
-            const SizedBox(height: 3),
+            const SizedBox(height: AppTheme.space3),
             Text(
               subtitle,
               maxLines: 2,
@@ -1008,8 +1069,18 @@ class OutcomeInfoDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
         side: BorderSide(color: AppTheme.brass400.withValues(alpha: 0.18)),
       ),
-      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      titlePadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space0,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space16,
+        AppTheme.space24,
+        AppTheme.space8,
+      ),
       title: DialogTitleBlock(
         icon: Icons.info_outline,
         title: title,
@@ -1029,29 +1100,30 @@ class OutcomeInfoDialog extends StatelessWidget {
               ),
             ),
             if (reasons.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.space16),
               DialogSectionCard(
                 title: 'Motivos',
                 accent: AppTheme.frost400,
                 icon: Icons.rule_folder_outlined,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      reasons
-                          .take(6)
-                          .map(
-                            (reason) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                '• $reason',
-                                style: const TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  height: AppTheme.lineHeightCompact,
-                                ),
-                              ),
+                  children: reasons
+                      .take(6)
+                      .map(
+                        (reason) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppTheme.space8,
+                          ),
+                          child: Text(
+                            '• $reason',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: AppTheme.lineHeightCompact,
                             ),
-                          )
-                          .toList(),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ],
@@ -1082,8 +1154,18 @@ class GuidedRebuildActionDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       key: const Key('optimize-rebuild-guided-dialog'),
-      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      titlePadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space24,
+        AppTheme.space0,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppTheme.space24,
+        AppTheme.space16,
+        AppTheme.space24,
+        AppTheme.space8,
+      ),
       title: DialogTitleBlock(
         icon: Icons.construction_rounded,
         title: 'Reconstrução guiada recomendada',
@@ -1103,7 +1185,7 @@ class GuidedRebuildActionDialog extends StatelessWidget {
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             const Text(
               'O ManaLoom pode criar um rascunho reconstruído sem alterar o deck original.',
               style: TextStyle(
@@ -1112,29 +1194,30 @@ class GuidedRebuildActionDialog extends StatelessWidget {
               ),
             ),
             if (reasons.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.space16),
               DialogSectionCard(
                 title: 'Por que rebuild?',
                 accent: AppTheme.mythicGold,
                 icon: Icons.rule_folder_outlined,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      reasons
-                          .take(6)
-                          .map(
-                            (reason) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                '• $reason',
-                                style: const TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  height: AppTheme.lineHeightCompact,
-                                ),
-                              ),
+                  children: reasons
+                      .take(6)
+                      .map(
+                        (reason) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppTheme.space8,
+                          ),
+                          child: Text(
+                            '• $reason',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: AppTheme.lineHeightCompact,
                             ),
-                          )
-                          .toList(),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ],
@@ -1222,7 +1305,7 @@ class _ValidationLine extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: color),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppTheme.space10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1235,7 +1318,7 @@ class _ValidationLine extends StatelessWidget {
                 ),
               ),
               if (message.trim().isNotEmpty) ...[
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.space2),
                 Text(
                   message,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -1274,50 +1357,49 @@ class _TrustSignalGrid extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children:
-          signals
-              .map(
-                (signal) => Container(
-                  width: 118,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceElevated,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(
-                      color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+      children: signals
+          .map(
+            (signal) => Container(
+              width: 118,
+              padding: const EdgeInsets.all(AppTheme.space10),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(signal.icon, size: 16, color: AppTheme.frost400),
+                  const SizedBox(height: AppTheme.space6),
+                  Text(
+                    signal.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontXs,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(signal.icon, size: 16, color: AppTheme.frost400),
-                      const SizedBox(height: 6),
-                      Text(
-                        signal.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: AppTheme.fontXs,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        signal.value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: AppTheme.space2),
+                  Text(
+                    signal.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-              )
-              .toList(),
+                ],
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -1339,18 +1421,15 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = item['name']?.toString() ?? '';
-    final playerFacing =
-        (item['player_facing'] is Map)
-            ? (item['player_facing'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
-    final battleValidation =
-        (item['battle_validation'] is Map)
-            ? (item['battle_validation'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
-    final confidenceMap =
-        (item['confidence'] is Map)
-            ? (item['confidence'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
+    final playerFacing = (item['player_facing'] is Map)
+        ? (item['player_facing'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final battleValidation = (item['battle_validation'] is Map)
+        ? (item['battle_validation'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final confidenceMap = (item['confidence'] is Map)
+        ? (item['confidence'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
     final confidenceLevel = confidenceMap['level']?.toString() ?? '';
     final score = (confidenceMap['score'] as num?)?.toDouble();
     final reason =
@@ -1405,23 +1484,21 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppTheme.space8),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         onTap: () => onChanged(!selected),
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppTheme.space8),
           decoration: BoxDecoration(
-            color:
-                selected
-                    ? accent.withValues(alpha: 0.08)
-                    : AppTheme.surfaceElevated,
+            color: selected
+                ? accent.withValues(alpha: 0.08)
+                : AppTheme.surfaceElevated,
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             border: Border.all(
-              color:
-                  selected
-                      ? accent.withValues(alpha: 0.35)
-                      : AppTheme.outlineMuted.withValues(alpha: 0.45),
+              color: selected
+                  ? accent.withValues(alpha: 0.35)
+                  : AppTheme.outlineMuted.withValues(alpha: 0.45),
             ),
           ),
           child: Row(
@@ -1432,7 +1509,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                 onChanged: (value) => onChanged(value ?? false),
                 visualDensity: VisualDensity.compact,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppTheme.space4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1446,7 +1523,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                     ),
                     if (metadata.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 3),
+                        padding: const EdgeInsets.only(top: AppTheme.space3),
                         child: Text(
                           metadata,
                           maxLines: 2,
@@ -1460,7 +1537,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                       ),
                     if (reason.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 3),
+                        padding: const EdgeInsets.only(top: AppTheme.space3),
                         child: Text(
                           reason,
                           maxLines: 3,
@@ -1572,14 +1649,15 @@ String _friendlyPriceLabel(Object? value) {
 
 String _collectionLabel(Map<String, dynamic> item) {
   final ownedQuantity = item['owned_quantity'];
+  final availableQuantity = item['available_quantity'];
   final collectionMatch = item['collection_match'] == true;
   final purchaseRequired = item['purchase_required'] == true;
   if (collectionMatch) {
-    final qty =
-        ownedQuantity is num && ownedQuantity > 0
-            ? ownedQuantity.toInt().toString()
-            : '';
-    return qty.isEmpty ? 'na coleção' : '$qty na coleção';
+    final effectiveQuantity = availableQuantity ?? ownedQuantity;
+    final qty = effectiveQuantity is num && effectiveQuantity > 0
+        ? effectiveQuantity.toInt().toString()
+        : '';
+    return qty.isEmpty ? 'livre na coleção' : '$qty livre(s) na coleção';
   }
   if (purchaseRequired) return 'precisa comprar';
   return '';

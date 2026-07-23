@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
+import '../../../lib/deck_format_support.dart';
+import '../../../lib/deck_request_support.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/import_list_service.dart';
 import '../../../lib/import_card_lookup_service.dart';
@@ -18,18 +20,32 @@ Future<Response> onRequest(RequestContext context) async {
 Future<Response> _validateList(RequestContext context) async {
   final pool = context.read<Pool>();
 
-  final body = await context.request.json();
-  final format = body['format'] as String?;
-  final rawList = body['list'];
-
-  if (format == null || rawList == null) {
+  late final String normalizedFormat;
+  late final Object rawList;
+  try {
+    final body = requireJsonObject(await context.request.json());
+    final rawFormat = requireNonEmptyString(body, 'format');
+    final supportedFormat = normalizeSupportedDeckFormat(rawFormat);
+    if (supportedFormat == null) {
+      throw DeckRequestException(unsupportedDeckFormatMessage(rawFormat));
+    }
+    normalizedFormat = supportedFormat;
+    final listValue = body['list'];
+    if (listValue == null) {
+      throw const DeckRequestException('Field list is required.');
+    }
+    rawList = listValue;
+  } on FormatException catch (e) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body: {'error': 'Fields format and list are required.'},
+      body: {'error': 'Invalid JSON body: ${e.message}'},
+    );
+  } on DeckRequestException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {'error': e.message},
     );
   }
-
-  final normalizedFormat = format.trim().toLowerCase();
 
   late final List<String> lines;
   try {
@@ -126,15 +142,17 @@ Future<Response> _validateList(RequestContext context) async {
     );
 
     if (isCommander && quantity != 1) {
-      warnings
-          .add('Comandante "$name" deve ter quantidade 1 (atual: $quantity).');
+      warnings.add(
+        'Comandante "$name" deve ter quantidade 1 (atual: $quantity).',
+      );
     }
 
     if (isCommander || isBasicLand) continue;
 
-    final key = oracleId != null && oracleId.isNotEmpty
-        ? 'oracle:$oracleId'
-        : 'name:${normalizePhysicalCardCopyName(name)}';
+    final key =
+        oracleId != null && oracleId.isNotEmpty
+            ? 'oracle:$oracleId'
+            : 'name:${normalizePhysicalCardCopyName(name)}';
     final existing = copiesByPhysicalKey[key];
     if (existing == null) {
       copiesByPhysicalKey[key] = {
@@ -185,11 +203,10 @@ Future<Response> _validateList(RequestContext context) async {
     } on DeckRulesException catch (e) {
       final message = e.message;
       final cardName = e.cardName;
-      final alreadyCovered = cardName != null &&
+      final alreadyCovered =
+          cardName != null &&
           warnings.any(
-            (warning) => warning.toLowerCase().contains(
-                  cardName.toLowerCase(),
-                ),
+            (warning) => warning.toLowerCase().contains(cardName.toLowerCase()),
           );
       if (!alreadyCovered && !warnings.contains(message)) {
         warnings.add(message);
@@ -198,10 +215,11 @@ Future<Response> _validateList(RequestContext context) async {
   }
 
   // 7. Verifica legalidades (banned / restricted / not_legal)
-  final cardIdsToCheck = consolidated
-      .map((c) => c['card_id'] as String)
-      .where((id) => id.isNotEmpty)
-      .toList();
+  final cardIdsToCheck =
+      consolidated
+          .map((c) => c['card_id'] as String)
+          .where((id) => id.isNotEmpty)
+          .toList();
 
   if (cardIdsToCheck.isNotEmpty) {
     final legalityResult = await pool.execute(
@@ -237,10 +255,12 @@ Future<Response> _validateList(RequestContext context) async {
   if (normalizedFormat == 'commander') {
     if (totalCards > 100) {
       warnings.add(
-          'Deck de Commander não pode exceder 100 cartas (encontradas: $totalCards)');
+        'Deck de Commander não pode exceder 100 cartas (encontradas: $totalCards)',
+      );
     } else if (totalCards != 100) {
       warnings.add(
-          'Para validação estrita, Commander deve ter exatamente 100 cartas (encontradas: $totalCards)');
+        'Para validação estrita, Commander deve ter exatamente 100 cartas (encontradas: $totalCards)',
+      );
     }
     final hasCommander = consolidated.any((c) => c['is_commander'] == true);
     if (!hasCommander) {
@@ -251,10 +271,12 @@ Future<Response> _validateList(RequestContext context) async {
   if (normalizedFormat == 'brawl') {
     if (totalCards > 60) {
       warnings.add(
-          'Deck de Brawl não pode exceder 60 cartas (encontradas: $totalCards)');
+        'Deck de Brawl não pode exceder 60 cartas (encontradas: $totalCards)',
+      );
     } else if (totalCards != 60) {
       warnings.add(
-          'Para validação estrita, Brawl deve ter exatamente 60 cartas (encontradas: $totalCards)');
+        'Para validação estrita, Brawl deve ter exatamente 60 cartas (encontradas: $totalCards)',
+      );
     }
     final hasCommander = consolidated.any((c) => c['is_commander'] == true);
     if (!hasCommander) {
@@ -262,13 +284,15 @@ Future<Response> _validateList(RequestContext context) async {
     }
   }
 
-  return Response.json(body: {
-    'found_cards': foundCards,
-    'not_found_lines': notFoundLines,
-    'localized_matches': localizedMatches,
-    'localized_matches_count': localizedMatches.length,
-    'warnings': warnings,
-    'total_cards': totalCards,
-    'total_unique': consolidated.length,
-  });
+  return Response.json(
+    body: {
+      'found_cards': foundCards,
+      'not_found_lines': notFoundLines,
+      'localized_matches': localizedMatches,
+      'localized_matches_count': localizedMatches.length,
+      'warnings': warnings,
+      'total_cards': totalCards,
+      'total_unique': consolidated.length,
+    },
+  );
 }

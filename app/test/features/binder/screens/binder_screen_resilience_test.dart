@@ -109,6 +109,44 @@ BinderItem _item(int index) {
 }
 
 void main() {
+  testWidgets(
+    'binder distinguishes physical entry availability from playable total',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final provider = _SequenceBinderProvider([
+        [
+          BinderItem(
+            id: 'binder-physical',
+            cardId: 'printing-pt',
+            cardName: 'Sol Ring',
+            quantity: 1,
+            language: 'pt-br',
+            availableQuantity: 1,
+            ownedQuantity: 4,
+            allocatedQuantity: 2,
+            committedTradeQuantity: 1,
+            freeQuantity: 2,
+            missingQuantity: 0,
+          ),
+        ],
+      ]);
+
+      await tester.pumpWidget(_subject(provider));
+      await tester.pumpAndSettle();
+
+      expect(find.text('PT-BR'), findsOneWidget);
+      expect(find.text('Disponível 1'), findsOneWidget);
+      expect(find.text('Livre total 2'), findsOneWidget);
+      expect(find.text('Alocada 2'), findsOneWidget);
+      expect(find.text('Em trade 1'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('direct binder distinguishes failure from an empty collection', (
     tester,
   ) async {

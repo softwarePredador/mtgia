@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 from collections import Counter
 from pathlib import Path
 
@@ -15,11 +14,11 @@ ROOT = Path(__file__).resolve().parents[2]
 
 GATE_TOPOLOGY: tuple[dict[str, str], ...] = (
     {
-        "id": "ci_dispatcher",
-        "path": ".github/workflows/manaloom-guardrails.yml",
-        "classification": "canonical_ci_dispatcher",
-        "invocation": "dart run melos run battle",
-        "scope": "change-triggered battle product verification",
+        "id": "local_release_dispatcher",
+        "path": "scripts/manaloom_local_ci.sh",
+        "classification": "canonical_local_release_dispatcher",
+        "invocation": "./scripts/manaloom_local_ci.sh release",
+        "scope": "developer-owned local battle and release verification",
         "external_state": "none",
     },
     {
@@ -83,8 +82,8 @@ GATE_TOPOLOGY: tuple[dict[str, str], ...] = (
         "path": "server/test/battle_product_e2e_test.dart",
         "classification": "isolated_mutating_contract",
         "invocation": "scripts/manaloom_battle_product_gate.sh --isolated-e2e",
-        "scope": "harness-owned IPv4-loopback API battle persistence and learning evidence",
-        "external_state": "unique_temporary_identity_and_battle_rows_with_audited_cleanup",
+        "scope": "harness-owned disposable PostgreSQL and IPv4-loopback API battle persistence, authorization and learning evidence",
+        "external_state": "none_disposable_local_cluster_destroyed_after_run",
     },
     {
         "id": "global_battle_closure",
@@ -190,25 +189,6 @@ def _check_absent(
         "status": "pass" if not target.exists() else "fail",
         "missing": [],
         "forbidden": [forbidden_marker] if target.exists() else [],
-    }
-
-
-def _check_pinned_action(path: str, *, action: str) -> dict[str, object]:
-    target = ROOT / path
-    source = target.read_text(encoding="utf-8") if target.is_file() else ""
-    pinned_pattern = re.compile(
-        rf"uses:\s*{re.escape(action)}@([0-9a-f]{{40}})\s+#\s+v\d+\.\d+\.\d+"
-    )
-    floating_pattern = re.compile(
-        rf"uses:\s*{re.escape(action)}@(?![0-9a-f]{{40}}(?:\s|$))\S+"
-    )
-    pinned = pinned_pattern.findall(source)
-    floating = floating_pattern.findall(source)
-    return {
-        "path": path,
-        "status": "pass" if target.is_file() and pinned and not floating else "fail",
-        "missing": [] if pinned else [f"pinned {action} SHA with version comment"],
-        "forbidden": floating,
     }
 
 
@@ -367,8 +347,16 @@ def build_report() -> dict[str, object]:
                 "BATTLE_E2E_RUN_TOKEN",
                 "BATTLE_E2E_DEFER_CLEANUP_TO_HARNESS",
                 "mutation_audit.json",
-                '"telemetry_deleted": False',
+                "start_disposable_postgres",
+                "initdb",
+                '"database_policy": "fresh_local_cluster_destroyed_after_run"',
+                "VALIDATION_INTRUDER_EMAIL",
+                "MANALOOM_E2E_ISOLATED_RUNTIME=1",
+                "assert_listener_closed \"$POSTGRES_PORT\"",
+                '"telemetry_deleted_with_disposable_cluster": True',
+                '"cluster_destroyed": True',
             ),
+            absent=("with_new_server_pg.sh",),
         ),
         _check(
             "server/test/battle_product_e2e_test.dart",
@@ -377,6 +365,9 @@ def build_report() -> dict[str, object]:
                 "BATTLE_E2E_DEFER_CLEANUP_TO_HARNESS",
                 "127.0.0.1",
                 "_registerUniqueIdentity",
+                "intruderToken",
+                "_expectSanitizedNotFound",
+                "contains(natural['replay_id'].toString())",
                 "Battle Product E2E Candidate $runToken",
             ),
             absent=(
@@ -395,17 +386,13 @@ def build_report() -> dict[str, object]:
             absent=("manaloom_native_legacy",),
         ),
         _check(
-            ".github/workflows/manaloom-guardrails.yml",
+            "scripts/manaloom_local_ci.sh",
             contains=(
-                '- "services/**"',
-                "services/xmage-sidecar/XMAGE_COMMIT",
                 "bootstrap_pinned_xmage_maven.sh",
-                "dart run melos run battle",
+                '"$ROOT_DIR/scripts/quality_gate.sh" battle',
+                "manaloom_build_android_release.sh",
+                "release)",
             ),
-        ),
-        _check_pinned_action(
-            ".github/workflows/manaloom-guardrails.yml",
-            action="actions/setup-java",
         ),
         _check(
             "scripts/quality_gate.sh",

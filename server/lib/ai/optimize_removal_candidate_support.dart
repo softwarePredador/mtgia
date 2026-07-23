@@ -28,6 +28,19 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
             .toSet();
     final preferredNames =
         commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
+    Map<String, dynamic> anchorMetadata(String lowerName, String role) {
+      final reasons = <String>[
+        if (coreLower.contains(lowerName)) 'declared_core_card',
+        if (preferredNames.contains(lowerName)) 'commander_priority_card',
+        if (role == 'engine' || role == 'combo_piece') 'engine_role',
+      ];
+      return {
+        'protected_anchor': reasons.isNotEmpty,
+        'anchor_reasons': reasons,
+        'anchor_cut_policy': 'same_lane_replacement_or_battle_gate',
+      };
+    }
+
     final currentRoleCounts = <String, int>{};
     final roleTargets = buildRoleTargetProfile(targetArchetype);
     final structuralRecoveryScenario = isOptimizeStructuralRecoveryScenario(
@@ -95,6 +108,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         'score': score,
         'type_line': typeLine,
         'oracle_text': (card['oracle_text'] as String?) ?? '',
+        ...anchorMetadata(lower, role),
       });
     }
 
@@ -147,6 +161,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
             'score': score - i,
             'type_line': card['type_line'],
             'oracle_text': (card['oracle_text'] as String?) ?? '',
+            ...anchorMetadata(lower, 'land'),
           });
         }
       }
@@ -201,6 +216,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
           'score': score,
           'type_line': typeLine,
           'oracle_text': (card['oracle_text'] as String?) ?? '',
+          ...anchorMetadata(lower, role),
         });
       }
 

@@ -10,11 +10,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import external_engine_source_contract as engine_source_contract
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-XMAGE_PATH = Path("/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/EntreatTheAngels.java")
+XMAGE_PATH = "Mage.Sets/src/mage/cards/e/EntreatTheAngels.java"
 
 PACKAGE_ID = "pg472_lorehold_entreat_x_token_rule_20260705_current"
 DEFAULT_OUT_PREFIX = REPORT_DIR / PACKAGE_ID
@@ -409,7 +410,11 @@ def build_payload(out_prefix: Path) -> dict[str, Any]:
         "deck_607_mutated": False,
         "proposal": proposal,
         "source_evidence": {
-            "xmage_path": str(XMAGE_PATH),
+            "xmage_commit": engine_source_contract.canonical_xmage_pin(),
+            "xmage_url": (
+                "https://raw.githubusercontent.com/magefree/mage/"
+                f"{engine_source_contract.canonical_xmage_pin()}/{XMAGE_PATH}"
+            ),
             "runtime_preflight_report": rel(PREFLIGHT_REPORT),
             "external_oracle_confirmation": [
                 "Gatherer search result confirms official Entreat card text surface.",

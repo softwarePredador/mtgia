@@ -10,10 +10,15 @@ import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:provider/provider.dart';
 
 class _FixedCardProvider extends CardProvider {
-  _FixedCardProvider(this._results, {this.errorMessageOverride});
+  _FixedCardProvider(
+    this._results, {
+    this.errorMessageOverride,
+    this.availability = const {},
+  });
 
   final List<DeckCardItem> _results;
   final String? errorMessageOverride;
+  final Map<String, CardCollectionAvailability> availability;
 
   @override
   List<DeckCardItem> get searchResults => _results;
@@ -29,6 +34,10 @@ class _FixedCardProvider extends CardProvider {
 
   @override
   String? get errorMessage => errorMessageOverride;
+
+  @override
+  CardCollectionAvailability? collectionAvailabilityFor(String cardId) =>
+      availability[cardId];
 }
 
 class _FakeSetsApiClient extends ApiClient {
@@ -342,6 +351,44 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('search result exposes playable collection availability', (
+    tester,
+  ) async {
+    final card = _sampleCard();
+    final availability = CardCollectionAvailability(
+      cardId: card.id,
+      playableCardId: 'oracle-atraxa',
+      ownedQuantity: 4,
+      allocatedQuantity: 2,
+      committedTradeQuantity: 1,
+      freeQuantity: 1,
+      missingQuantity: 3,
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create: (_) =>
+            _FixedCardProvider([card], availability: {card.id: availability}),
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'deck-1', mode: 'binder'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(Key('card-search-availability-${card.id}')),
+      findsOneWidget,
+    );
+    expect(find.text('Possui 4'), findsOneWidget);
+    expect(find.text('Livre 1'), findsOneWidget);
+    expect(find.text('Alocada 2'), findsOneWidget);
+    expect(find.text('Em troca 1'), findsOneWidget);
+    expect(find.text('Falta 3'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('card search exposes keyed empty and error states', (
     tester,
   ) async {
@@ -364,11 +411,10 @@ void main() {
 
     await tester.pumpWidget(
       ChangeNotifierProvider<CardProvider>(
-        create:
-            (_) => _FixedCardProvider(
-              const [],
-              errorMessageOverride: 'Falha controlada',
-            ),
+        create: (_) => _FixedCardProvider(
+          const [],
+          errorMessageOverride: 'Falha controlada',
+        ),
         child: MaterialApp(
           key: UniqueKey(),
           theme: AppTheme.darkTheme,

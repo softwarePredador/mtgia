@@ -113,6 +113,9 @@ void main() {
         playSessionId: 'play-20260716',
         deckId: 'deck-607',
         deckName: 'Lorehold reconstruído',
+        deckSnapshotHash:
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        deckVersionAtEpochMs: 1784224700000,
         startedAtEpochMs: 1784224800000,
       );
 
@@ -124,6 +127,11 @@ void main() {
       expect(restored.playSessionId, 'play-20260716');
       expect(restored.deckId, 'deck-607');
       expect(restored.deckName, 'Lorehold reconstruído');
+      expect(
+        restored.deckSnapshotHash,
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      );
+      expect(restored.deckVersionAtEpochMs, 1784224700000);
       expect(restored.startedAtEpochMs, 1784224800000);
     });
 
@@ -272,14 +280,13 @@ void main() {
 
     for (var playerCount = 2; playerCount <= 6; playerCount += 1) {
       test('round-trips a $playerCount-player table', () async {
-        final session = LifeCounterSession.initial(
-          playerCount: playerCount,
-        ).copyWith(
-          lives: List<int>.generate(
-            playerCount,
-            (index) => (playerCount == 2 ? 20 : 40) - index,
-          ),
-        );
+        final session = LifeCounterSession.initial(playerCount: playerCount)
+            .copyWith(
+              lives: List<int>.generate(
+                playerCount,
+                (index) => (playerCount == 2 ? 20 : 40) - index,
+              ),
+            );
 
         await store.save(session);
         final restored = await store.load();

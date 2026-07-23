@@ -21,7 +21,17 @@ class _SuccessfulAuthProvider extends AuthProvider {
     required String username,
     required String email,
     required String password,
+    required bool legalAccepted,
+    required String termsVersion,
+    required String privacyVersion,
   }) async => true;
+}
+
+class _AuthProviderWithInvalidSessionNotice extends AuthProvider {
+  _AuthProviderWithInvalidSessionNotice() : super(apiClient: _NoopApiClient());
+
+  @override
+  String? get errorMessage => AuthProvider.invalidSavedSessionMessage;
 }
 
 Widget _buildWithAuth(Widget child) {
@@ -52,6 +62,43 @@ void main() {
     expect(find.byKey(const Key('login-open-register-button')), findsOneWidget);
   });
 
+  testWidgets('login text fields expose native screen-reader labels', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(_buildWithAuth(const LoginScreen()));
+    await tester.pumpAndSettle();
+
+    final email = tester.getSemantics(
+      find.byKey(const Key('login-email-field')),
+    );
+    expect(email.label, 'Email');
+    expect(email.flagsCollection.isTextField, isTrue);
+
+    final password = tester.getSemantics(
+      find.byKey(const Key('login-password-field')),
+    );
+    expect(password.label, 'Senha');
+    expect(password.flagsCollection.isTextField, isTrue);
+    expect(password.flagsCollection.isObscured, isTrue);
+    semantics.dispose();
+  });
+
+  testWidgets('login explains when invalid local session was removed', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AuthProvider>.value(
+        value: _AuthProviderWithInvalidSessionNotice(),
+        child: const MaterialApp(home: LoginScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('login-auth-notice')), findsOneWidget);
+    expect(find.text(AuthProvider.invalidSavedSessionMessage), findsOneWidget);
+  });
+
   testWidgets('register screen shows calmer onboarding header', (tester) async {
     await tester.pumpWidget(_buildWithAuth(const RegisterScreen()));
     await tester.pumpAndSettle();
@@ -71,6 +118,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const Key('register-submit-button')), findsOneWidget);
+    expect(find.byKey(const Key('register-legal-acceptance')), findsOneWidget);
     expect(find.byKey(const Key('register-open-login-button')), findsOneWidget);
   });
 
@@ -78,28 +126,24 @@ void main() {
     tester,
   ) async {
     final router = GoRouter(
-      initialLocation:
-          Uri(
-            path: '/login',
-            queryParameters: {'redirect': '/decks/deck-1?tab=analysis'},
-          ).toString(),
+      initialLocation: Uri(
+        path: '/login',
+        queryParameters: {'redirect': '/decks/deck-1?tab=analysis'},
+      ).toString(),
       routes: [
         GoRoute(
           path: '/login',
-          builder:
-              (context, state) => LoginScreen(
-                redirectPath: state.uri.queryParameters['redirect'],
-              ),
+          builder: (context, state) =>
+              LoginScreen(redirectPath: state.uri.queryParameters['redirect']),
         ),
         GoRoute(
           path: '/decks/:id',
-          builder:
-              (context, state) => Scaffold(
-                body: Text(
-                  'Destino ${state.pathParameters['id']} '
-                  '${state.uri.queryParameters['tab']}',
-                ),
-              ),
+          builder: (context, state) => Scaffold(
+            body: Text(
+              'Destino ${state.pathParameters['id']} '
+              '${state.uri.queryParameters['tab']}',
+            ),
+          ),
         ),
       ],
     );
@@ -132,24 +176,22 @@ void main() {
 
   testWidgets('registration resumes the protected deep link', (tester) async {
     final router = GoRouter(
-      initialLocation:
-          Uri(
-            path: '/register',
-            queryParameters: {'redirect': '/trades/trade-9'},
-          ).toString(),
+      initialLocation: Uri(
+        path: '/register',
+        queryParameters: {'redirect': '/trades/trade-9'},
+      ).toString(),
       routes: [
         GoRoute(
           path: '/register',
-          builder:
-              (context, state) => RegisterScreen(
-                redirectPath: state.uri.queryParameters['redirect'],
-              ),
+          builder: (context, state) => RegisterScreen(
+            redirectPath: state.uri.queryParameters['redirect'],
+          ),
         ),
         GoRoute(
-          path: '/trades/:id',
-          builder:
-              (context, state) =>
-                  Scaffold(body: Text('Trade ${state.pathParameters['id']}')),
+          path: '/verify-email',
+          builder: (context, state) => Scaffold(
+            body: Text('Verify ${state.uri.queryParameters['redirect']}'),
+          ),
         ),
       ],
     );
@@ -182,11 +224,15 @@ void main() {
       find.byKey(const Key('register-confirm-password-field')),
       'BetaQa!2026-Deck',
     );
+    final legalAcceptance = find.byKey(const Key('register-legal-acceptance'));
+    await tester.ensureVisible(legalAcceptance);
+    await tester.tap(legalAcceptance);
+    await tester.pump();
     final submit = find.byKey(const Key('register-submit-button'));
     await tester.ensureVisible(submit);
     await tester.tap(submit);
     await tester.pumpAndSettle();
 
-    expect(find.text('Trade trade-9'), findsOneWidget);
+    expect(find.text('Verify /trades/trade-9'), findsOneWidget);
   });
 }

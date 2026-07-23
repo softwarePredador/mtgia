@@ -6,18 +6,30 @@ import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
 import '../../../core/security/auth_token_store.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../home/services/onboarding_state_store.dart';
 import '../models/user.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
+enum _TokenValidationResult { valid, unauthorized, temporarilyUnavailable }
+
 class AuthProvider extends ChangeNotifier {
+  static const invalidSavedSessionMessage =
+      'A sessão salva neste dispositivo estava inválida e foi removida. '
+      'Entre novamente para continuar.';
+  static const expiredSessionMessage =
+      'Sua sessão expirou. Entre novamente para continuar de onde parou.';
+
   final ApiClient _apiClient;
   final AuthTokenStore _tokenStore;
+  final OnboardingStateRepository _onboardingStateRepository;
 
   User? _user;
   String? _token;
   AuthStatus _status = AuthStatus.initial;
   String? _errorMessage;
+  bool _needsOnboarding = true;
+  bool _onboardingStorageUnavailable = false;
   int _authGeneration = 0;
   Future<void>? _initializeFuture;
 
@@ -26,10 +38,20 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus get status => _status;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
+  bool get needsOnboarding => _needsOnboarding;
+  bool get onboardingStorageUnavailable => _onboardingStorageUnavailable;
+  String get defaultAuthenticatedLocation => _onboardingStorageUnavailable
+      ? '/onboarding/core-flow?storage=unavailable'
+      : (_needsOnboarding ? '/onboarding/core-flow' : '/home');
 
-  AuthProvider({ApiClient? apiClient, AuthTokenStore? tokenStore})
-    : _apiClient = apiClient ?? ApiClient(),
-      _tokenStore = tokenStore ?? AuthTokenStore();
+  AuthProvider({
+    ApiClient? apiClient,
+    AuthTokenStore? tokenStore,
+    OnboardingStateRepository? onboardingStateRepository,
+  }) : _apiClient = apiClient ?? ApiClient(),
+       _tokenStore = tokenStore ?? AuthTokenStore(),
+       _onboardingStateRepository =
+           onboardingStateRepository ?? OnboardingStateStore();
 
   /// Inicializa o provider verificando se há token salvo
   Future<void> initialize() async {
@@ -72,21 +94,33 @@ class AuthProvider extends ChangeNotifier {
         _token = savedToken;
         ApiClient.setToken(savedToken);
         _user = User.fromJson(jsonDecode(savedUserJson));
-        debugPrint('[🔑 Auth] validando token com backend...');
-        final isValid = await _validateTokenWithBackend(generation);
+        await _loadOnboardingDecision(generation, _user!.id);
         if (generation != _authGeneration) return;
-        debugPrint('[🔑 Auth] token válido: $isValid');
-        _status =
-            isValid ? AuthStatus.authenticated : AuthStatus.unauthenticated;
-        if (!isValid) {
-          await _clearStoredCredentials(prefs);
+        debugPrint('[🔑 Auth] validando token com backend...');
+        final validationResult = await _validateTokenWithBackend(generation);
+        if (generation != _authGeneration) return;
+        debugPrint('[🔑 Auth] validação do token: $validationResult');
+        if (validationResult == _TokenValidationResult.unauthorized) {
+          await _clearStoredCredentialsIfMatch(
+            prefs,
+            savedToken,
+            savedUserJson,
+          );
+          if (generation != _authGeneration) return;
           _token = null;
           _user = null;
+          _resetOnboardingDecision();
           ApiClient.setToken(null);
+          _status = AuthStatus.unauthenticated;
+        } else {
+          // A sessão local continua utilizável quando o backend não consegue
+          // confirmar o token temporariamente (rate limit, 5xx, timeout ou rede).
+          _status = AuthStatus.authenticated;
         }
       } else {
         if (savedToken != null || savedUserJson != null) {
           await _clearStoredCredentials(prefs);
+          _errorMessage = invalidSavedSessionMessage;
         }
         _status = AuthStatus.unauthenticated;
       }
@@ -105,7 +139,9 @@ class AuthProvider extends ChangeNotifier {
       await _clearStoredCredentials(prefs);
       _token = null;
       _user = null;
+      _resetOnboardingDecision();
       ApiClient.setToken(null);
+      _errorMessage = invalidSavedSessionMessage;
       _status = AuthStatus.unauthenticated;
     }
 
@@ -156,6 +192,8 @@ class AuthProvider extends ChangeNotifier {
         _token = nextToken;
         _user = nextUser;
         ApiClient.setToken(_token);
+        await _loadOnboardingDecision(generation, nextUser.id);
+        if (generation != _authGeneration) return false;
         debugPrint('[🔑 Auth] credenciais salvas');
 
         _status = AuthStatus.authenticated;
@@ -200,6 +238,9 @@ class AuthProvider extends ChangeNotifier {
     required String username,
     required String email,
     required String password,
+    required bool legalAccepted,
+    required String termsVersion,
+    required String privacyVersion,
   }) async {
     final generation = ++_authGeneration;
     debugPrint(
@@ -215,6 +256,9 @@ class AuthProvider extends ChangeNotifier {
         'username': username,
         'email': email,
         'password': password,
+        'legal_accepted': legalAccepted,
+        'terms_version': termsVersion,
+        'privacy_version': privacyVersion,
       });
       debugPrint(
         '[🔑 Auth] resposta recebida: statusCode=${response.statusCode}',
@@ -240,6 +284,8 @@ class AuthProvider extends ChangeNotifier {
         _token = nextToken;
         _user = nextUser;
         ApiClient.setToken(_token);
+        await _loadOnboardingDecision(generation, nextUser.id);
+        if (generation != _authGeneration) return false;
         debugPrint('[🔑 Auth] credenciais salvas');
 
         _status = AuthStatus.authenticated;
@@ -279,6 +325,83 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) => _rotateAuthenticatedSession(
+    endpoint: '/auth/change-password',
+    body: {'current_password': currentPassword, 'new_password': newPassword},
+    operation: 'changePassword',
+  );
+
+  Future<bool> revokeOtherSessions({required String currentPassword}) =>
+      _rotateAuthenticatedSession(
+        endpoint: '/auth/revoke-sessions',
+        body: {'current_password': currentPassword},
+        operation: 'revokeOtherSessions',
+      );
+
+  Future<bool> _rotateAuthenticatedSession({
+    required String endpoint,
+    required Map<String, dynamic> body,
+    required String operation,
+  }) async {
+    final generation = _authGeneration;
+    final currentUser = _user;
+    if (currentUser == null || _status != AuthStatus.authenticated) {
+      _errorMessage = 'Entre novamente para alterar a segurança da conta.';
+      notifyListeners();
+      return false;
+    }
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final response = await _apiClient.post(endpoint, body);
+      if (generation != _authGeneration) return false;
+      if (response.statusCode != 200 || response.data is! Map) {
+        final data = response.data;
+        _errorMessage = data is Map && data['message'] is String
+            ? data['message'] as String
+            : 'Não foi possível atualizar a segurança da conta.';
+        notifyListeners();
+        return false;
+      }
+      final data = response.data as Map;
+      final nextToken = _readAuthToken(data['token']);
+      final rawUser = data['user'];
+      final nextUser = rawUser is Map<String, dynamic>
+          ? User.fromJson(rawUser)
+          : currentUser;
+      if (!await _saveCredentials(
+        generation,
+        token: nextToken,
+        user: nextUser,
+      )) {
+        _errorMessage = 'Resposta inválida do servidor';
+        notifyListeners();
+        return false;
+      }
+      _token = nextToken;
+      _user = nextUser;
+      ApiClient.setToken(nextToken);
+      notifyListeners();
+      return true;
+    } catch (error, stackTrace) {
+      if (generation != _authGeneration) return false;
+      _errorMessage = 'Não foi possível atualizar a segurança da conta.';
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          error,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: operation,
+        ),
+      );
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Logout
   Future<void> logout() async {
     _authGeneration++;
@@ -288,9 +411,58 @@ class AuthProvider extends ChangeNotifier {
     } finally {
       _token = null;
       _user = null;
+      _resetOnboardingDecision();
       ApiClient.setToken(null);
+      _errorMessage = null;
       _status = AuthStatus.unauthenticated;
       notifyListeners();
+    }
+  }
+
+  /// Ends an already-authenticated session after the backend explicitly
+  /// reports that its token is missing, invalid or expired.
+  ///
+  /// The visible state changes synchronously so GoRouter can capture the
+  /// current protected URI in the login redirect. Credential cleanup is
+  /// guarded by the expired values, preventing a late delete from removing a
+  /// newer login.
+  void expireSession() {
+    if (_status != AuthStatus.authenticated || _token == null) return;
+
+    final expiredToken = _token!;
+    final expiredUserJson = _user == null ? null : jsonEncode(_user!.toJson());
+    _authGeneration++;
+    _token = null;
+    _user = null;
+    _resetOnboardingDecision();
+    ApiClient.setToken(null);
+    _errorMessage = expiredSessionMessage;
+    _status = AuthStatus.unauthenticated;
+    notifyListeners();
+
+    unawaited(_clearExpiredCredentials(expiredToken, expiredUserJson));
+  }
+
+  Future<void> _clearExpiredCredentials(
+    String expiredToken,
+    String? expiredUserJson,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await _tokenStore.deleteIfMatches(expiredToken);
+      if (expiredUserJson != null &&
+          prefs.getString('user_data') == expiredUserJson) {
+        await prefs.remove('user_data');
+      }
+    } catch (error, stackTrace) {
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          error,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'expireSessionCleanup',
+        ),
+      );
     }
   }
 
@@ -363,6 +535,39 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void markOnboardingSettled() {
+    if (!_needsOnboarding && !_onboardingStorageUnavailable) return;
+    _needsOnboarding = false;
+    _onboardingStorageUnavailable = false;
+    notifyListeners();
+  }
+
+  Future<void> _loadOnboardingDecision(int generation, String userId) async {
+    try {
+      final state = await _onboardingStateRepository.load(userId);
+      if (generation != _authGeneration) return;
+      _needsOnboarding = !state.isSettled;
+      _onboardingStorageUnavailable = false;
+    } catch (error, stackTrace) {
+      if (generation != _authGeneration) return;
+      _needsOnboarding = true;
+      _onboardingStorageUnavailable = true;
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          error,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'loadOnboardingDecision',
+        ),
+      );
+    }
+  }
+
+  void _resetOnboardingDecision() {
+    _needsOnboarding = true;
+    _onboardingStorageUnavailable = false;
+  }
+
   String? _readAuthToken(dynamic value) {
     if (value is! String) return null;
     final normalized = value.trim();
@@ -376,24 +581,33 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> _validateTokenWithBackend(int generation) async {
+  Future<_TokenValidationResult> _validateTokenWithBackend(
+    int generation,
+  ) async {
     try {
       final response = await _apiClient.get('/auth/me');
-      if (generation != _authGeneration) return false;
-      if (response.statusCode != 200) return false;
+      if (generation != _authGeneration) {
+        return _TokenValidationResult.temporarilyUnavailable;
+      }
+      if (response.statusCode == 401) {
+        return _TokenValidationResult.unauthorized;
+      }
+      if (response.statusCode != 200) {
+        return _TokenValidationResult.temporarilyUnavailable;
+      }
       if (response.data is Map && (response.data as Map).containsKey('user')) {
         final userJson = (response.data as Map)['user'];
         if (userJson is Map<String, dynamic>) {
           final nextUser = User.fromJson(userJson);
           if (!await _saveCredentials(generation, user: nextUser)) {
-            return false;
+            return _TokenValidationResult.temporarilyUnavailable;
           }
           _user = nextUser;
         }
       }
-      return true;
+      return _TokenValidationResult.valid;
     } catch (_) {
-      return false;
+      return _TokenValidationResult.temporarilyUnavailable;
     }
   }
 

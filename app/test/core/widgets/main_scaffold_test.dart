@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/main_scaffold.dart';
 
+import '../../ui/support/manaloom_ui_audit_harness.dart';
+
 GoRouter _routerFor(String initialLocation) {
   return GoRouter(
     initialLocation: initialLocation,
@@ -18,11 +20,20 @@ GoRouter _routerFor(String initialLocation) {
             '/community',
             '/profile',
           ])
-            GoRoute(path: path, builder: (context, state) => Text(path)),
+            GoRoute(
+              path: path,
+              builder: (context, state) => ColoredBox(
+                color: AppTheme.backgroundAbyss,
+                child: Text(
+                  path,
+                  style: const TextStyle(color: AppTheme.textPrimary),
+                ),
+              ),
+            ),
           GoRoute(
             path: '/decks/:id',
-            builder:
-                (context, state) => Text('deck ${state.pathParameters['id']}'),
+            builder: (context, state) =>
+                Text('deck ${state.pathParameters['id']}'),
           ),
           GoRoute(
             path: '/messages',
@@ -55,10 +66,13 @@ void main() {
   testWidgets('uses bottom navigation on compact primary screens', (
     tester,
   ) async {
+    final semantics = tester.ensureSemantics();
     await _pumpAt(tester, size: const Size(390, 844), location: '/home');
 
     expect(find.byKey(const Key('main-bottom-navigation')), findsOneWidget);
     expect(find.byKey(const Key('main-navigation-rail')), findsNothing);
+    await expectManaLoomBaselineAccessibility(tester);
+    semantics.dispose();
   });
 
   testWidgets('uses navigation rail on wide primary screens', (tester) async {

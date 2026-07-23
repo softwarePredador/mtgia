@@ -6,6 +6,7 @@ import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/community_provider.dart';
@@ -247,7 +248,10 @@ class _ExploreTabState extends State<_ExploreTab>
           key: const Key('community-explore-controls-frame'),
           maxWidth: AppTheme.contentMaxWidth,
           child: Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 10),
+            padding: const EdgeInsets.only(
+              top: AppTheme.space8,
+              bottom: AppTheme.space10,
+            ),
             child: Column(
               children: [
                 TextField(
@@ -261,24 +265,23 @@ class _ExploreTabState extends State<_ExploreTab>
                       Icons.search,
                       color: AppTheme.brass400,
                     ),
-                    suffixIcon:
-                        _searchController.text.isEmpty
-                            ? null
-                            : IconButton(
-                              key: const Key(
-                                'community-explore-search-clear-button',
-                              ),
-                              tooltip: 'Limpar busca',
-                              icon: const Icon(
-                                Icons.clear,
-                                color: AppTheme.textSecondary,
-                                size: 18,
-                              ),
-                              onPressed: () {
-                                setState(_searchController.clear);
-                                _doSearch();
-                              },
+                    suffixIcon: _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                            key: const Key(
+                              'community-explore-search-clear-button',
                             ),
+                            tooltip: 'Limpar busca',
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppTheme.textSecondary,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              setState(_searchController.clear);
+                              _doSearch();
+                            },
+                          ),
                     filled: true,
                     fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
                     border: OutlineInputBorder(
@@ -300,16 +303,16 @@ class _ExploreTabState extends State<_ExploreTab>
                       ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                      horizontal: AppTheme.space16,
+                      vertical: AppTheme.space12,
                     ),
                   ),
                   onChanged: (_) => setState(() {}),
                   onSubmitted: (_) => _doSearch(),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 SizedBox(
-                  height: 36,
+                  height: AppTheme.space36,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
@@ -329,9 +332,11 @@ class _ExploreTabState extends State<_ExploreTab>
           child: Consumer<CommunityProvider>(
             builder: (context, provider, _) {
               if (provider.isLoading && provider.decks.isEmpty) {
-                return const Center(
+                return const AppStatePanel.loading(
                   key: Key('community-explore-loading'),
-                  child: CircularProgressIndicator(color: AppTheme.brass400),
+                  title: 'Carregando comunidade',
+                  message: 'Buscando decks públicos para explorar.',
+                  accent: AppTheme.brass400,
                 );
               }
 
@@ -346,12 +351,12 @@ class _ExploreTabState extends State<_ExploreTab>
                         size: 48,
                         color: AppTheme.textSecondary,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       Text(
                         provider.errorMessage!,
                         style: const TextStyle(color: AppTheme.textSecondary),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       ElevatedButton(
                         key: const Key('community-explore-retry'),
                         onPressed: () => provider.fetchPublicDecks(reset: true),
@@ -373,7 +378,7 @@ class _ExploreTabState extends State<_ExploreTab>
                         size: 64,
                         color: AppTheme.textSecondary.withValues(alpha: 0.5),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       const Text(
                         'Nenhum deck público encontrado',
                         style: TextStyle(
@@ -381,7 +386,7 @@ class _ExploreTabState extends State<_ExploreTab>
                           fontSize: AppTheme.fontLg,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.space8),
                       Text(
                         'Compartilhe seus decks para aparecerem aqui!',
                         style: TextStyle(
@@ -404,7 +409,7 @@ class _ExploreTabState extends State<_ExploreTab>
                   if (index >= provider.decks.length) {
                     return const Center(
                       child: Padding(
-                        padding: EdgeInsets.all(16),
+                        padding: EdgeInsets.all(AppTheme.space16),
                         child: CircularProgressIndicator(
                           color: AppTheme.brass400,
                         ),
@@ -429,7 +434,7 @@ class _ExploreTabState extends State<_ExploreTab>
   Widget _buildFormatChip(String? format, String label) {
     final isSelected = _selectedFormat == format;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.only(right: AppTheme.space8),
       child: FilterChip(
         key: Key('community-explore-format-chip-${format ?? 'all'}'),
         label: Text(
@@ -445,10 +450,9 @@ class _ExploreTabState extends State<_ExploreTab>
         backgroundColor: AppTheme.surfaceSlate,
         checkmarkColor: AppTheme.brass400,
         side: BorderSide(
-          color:
-              isSelected
-                  ? AppTheme.brass400.withValues(alpha: 0.65)
-                  : AppTheme.outlineMuted,
+          color: isSelected
+              ? AppTheme.brass400.withValues(alpha: 0.65)
+              : AppTheme.outlineMuted,
         ),
         onSelected: (_) {
           setState(() => _selectedFormat = format);
@@ -508,9 +512,11 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
     return Consumer<SocialProvider>(
       builder: (context, provider, _) {
         if (provider.isLoadingFeed && provider.followingFeed.isEmpty) {
-          return const Center(
+          return const AppStatePanel.loading(
             key: Key('community-following-loading'),
-            child: CircularProgressIndicator(color: AppTheme.brass400),
+            title: 'Carregando seguidos',
+            message: 'Buscando decks dos jogadores que você acompanha.',
+            accent: AppTheme.brass400,
           );
         }
 
@@ -518,7 +524,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
           return Center(
             key: const Key('community-following-error'),
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppTheme.space32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -527,13 +533,13 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
                     size: 48,
                     color: AppTheme.textSecondary,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.space12),
                   Text(
                     provider.feedError!,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: AppTheme.textSecondary),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.space12),
                   ElevatedButton(
                     key: const Key('community-following-retry'),
                     onPressed: () => provider.fetchFollowingFeed(reset: true),
@@ -549,7 +555,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
           return Center(
             key: const Key('community-following-empty'),
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppTheme.space32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -558,7 +564,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
                     size: 64,
                     color: AppTheme.textSecondary.withValues(alpha: 0.4),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
                   const Text(
                     'Nenhum deck dos seus seguidos',
                     style: TextStyle(
@@ -567,7 +573,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.space8),
                   Text(
                     'Siga outros jogadores na aba "Usuários" para ver os decks públicos deles aqui!',
                     textAlign: TextAlign.center,
@@ -596,7 +602,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
               if (index >= provider.followingFeed.length) {
                 return const Center(
                   child: Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppTheme.space16),
                     child: CircularProgressIndicator(color: AppTheme.brass400),
                   ),
                 );
@@ -658,7 +664,10 @@ class _UserSearchTabState extends State<_UserSearchTab>
           key: const Key('community-users-controls-frame'),
           maxWidth: AppTheme.contentMaxWidth,
           child: Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 10),
+            padding: const EdgeInsets.only(
+              top: AppTheme.space12,
+              bottom: AppTheme.space10,
+            ),
             child: TextField(
               key: const Key('community-users-search-field'),
               controller: _searchController,
@@ -670,22 +679,21 @@ class _UserSearchTabState extends State<_UserSearchTab>
                   Icons.person_search,
                   color: AppTheme.brass400,
                 ),
-                suffixIcon:
-                    _searchController.text.isEmpty
-                        ? null
-                        : IconButton(
-                          key: const Key('community-users-search-clear-button'),
-                          tooltip: 'Limpar busca',
-                          icon: const Icon(
-                            Icons.clear,
-                            color: AppTheme.textSecondary,
-                            size: 18,
-                          ),
-                          onPressed: () {
-                            setState(_searchController.clear);
-                            context.read<SocialProvider>().clearSearch();
-                          },
+                suffixIcon: _searchController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        key: const Key('community-users-search-clear-button'),
+                        tooltip: 'Limpar busca',
+                        icon: const Icon(
+                          Icons.clear,
+                          color: AppTheme.textSecondary,
+                          size: 18,
                         ),
+                        onPressed: () {
+                          setState(_searchController.clear);
+                          context.read<SocialProvider>().clearSearch();
+                        },
+                      ),
                 filled: true,
                 fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
                 border: OutlineInputBorder(
@@ -707,8 +715,8 @@ class _UserSearchTabState extends State<_UserSearchTab>
                   ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: AppTheme.space16,
+                  vertical: AppTheme.space12,
                 ),
               ),
               onChanged: _onSearchChanged,
@@ -720,9 +728,11 @@ class _UserSearchTabState extends State<_UserSearchTab>
           child: Consumer<SocialProvider>(
             builder: (context, provider, _) {
               if (provider.isSearching) {
-                return const Center(
+                return const AppStatePanel.loading(
                   key: Key('community-users-loading'),
-                  child: CircularProgressIndicator(color: AppTheme.brass400),
+                  title: 'Buscando jogadores',
+                  message: 'Consultando perfis públicos da comunidade.',
+                  accent: AppTheme.brass400,
                 );
               }
 
@@ -740,7 +750,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
                 return Center(
                   key: const Key('community-users-empty-query'),
                   child: Padding(
-                    padding: const EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(AppTheme.space32),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -749,7 +759,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
                           size: 64,
                           color: AppTheme.textSecondary.withValues(alpha: 0.4),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppTheme.space16),
                         const Text(
                           'Encontre outros jogadores',
                           style: TextStyle(
@@ -758,7 +768,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppTheme.space8),
                         Text(
                           'Busque pelo nick ou nome de usuário para ver perfis, decks e seguir jogadores.',
                           textAlign: TextAlign.center,
@@ -786,7 +796,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
                         size: 48,
                         color: AppTheme.textSecondary.withValues(alpha: 0.5),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       const Text(
                         'Nenhum usuário encontrado',
                         style: TextStyle(
@@ -851,37 +861,36 @@ class _CommunityResponsiveCollection extends StatelessWidget {
         final isDesktop = boundedWidth >= AppTheme.breakpointMedium;
         final horizontalGutter =
             constraints.maxWidth < AppTheme.breakpointCompact
-                ? AppTheme.pageGutterCompact
-                : AppTheme.pageGutter;
+            ? AppTheme.pageGutterCompact
+            : AppTheme.pageGutter;
         final padding = EdgeInsets.fromLTRB(
           horizontalGutter,
-          12,
+          AppTheme.space12,
           horizontalGutter,
-          12 + bottomPadding,
+          AppTheme.space12 + bottomPadding,
         );
 
-        final collection =
-            isDesktop
-                ? GridView.builder(
-                  key: collectionKey,
-                  controller: controller,
-                  padding: padding,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 0,
-                    mainAxisExtent: desktopItemExtent,
-                  ),
-                  itemCount: itemCount,
-                  itemBuilder: itemBuilder,
-                )
-                : ListView.builder(
-                  key: collectionKey,
-                  controller: controller,
-                  padding: padding,
-                  itemCount: itemCount,
-                  itemBuilder: itemBuilder,
-                );
+        final collection = isDesktop
+            ? GridView.builder(
+                key: collectionKey,
+                controller: controller,
+                padding: padding,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 0,
+                  mainAxisExtent: desktopItemExtent,
+                ),
+                itemCount: itemCount,
+                itemBuilder: itemBuilder,
+              )
+            : ListView.builder(
+                key: collectionKey,
+                controller: controller,
+                padding: padding,
+                itemCount: itemCount,
+                itemBuilder: itemBuilder,
+              );
 
         return Align(
           alignment: Alignment.topCenter,
@@ -906,7 +915,7 @@ class _CommunityDeckCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppTheme.space12),
       child: Material(
         color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -915,7 +924,7 @@ class _CommunityDeckCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppTheme.space12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               gradient: LinearGradient(
@@ -946,7 +955,7 @@ class _CommunityDeckCard extends StatelessWidget {
                   height: 78,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.space12),
                 // Info
                 Expanded(
                   child: Column(
@@ -963,7 +972,7 @@ class _CommunityDeckCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Row(
                         children: [
                           Icon(
@@ -973,48 +982,44 @@ class _CommunityDeckCard extends StatelessWidget {
                               alpha: 0.8,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppTheme.space4),
                           Expanded(
                             child: GestureDetector(
-                              key:
-                                  deck.ownerId != null
-                                      ? Key(
-                                        'community-explore-deck-owner-${deck.ownerId}',
-                                      )
-                                      : null,
-                              onTap:
-                                  deck.ownerId != null
-                                      ? () => context.push(
-                                        '/community/user/${deck.ownerId!}',
-                                      )
-                                      : null,
+                              key: deck.ownerId != null
+                                  ? Key(
+                                      'community-explore-deck-owner-${deck.ownerId}',
+                                    )
+                                  : null,
+                              onTap: deck.ownerId != null
+                                  ? () => context.push(
+                                      '/community/user/${deck.ownerId!}',
+                                    )
+                                  : null,
                               child: Text(
                                 deck.ownerUsername ?? 'Anônimo',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color:
-                                      deck.ownerId != null
-                                          ? AppTheme.textPrimary.withValues(
-                                            alpha: 0.92,
-                                          )
-                                          : AppTheme.textSecondary.withValues(
-                                            alpha: 0.8,
-                                          ),
+                                  color: deck.ownerId != null
+                                      ? AppTheme.textPrimary.withValues(
+                                          alpha: 0.92,
+                                        )
+                                      : AppTheme.textSecondary.withValues(
+                                          alpha: 0.8,
+                                        ),
                                   fontSize: AppTheme.fontSm,
-                                  fontWeight:
-                                      deck.ownerId != null
-                                          ? FontWeight.w500
-                                          : FontWeight.w400,
+                                  fontWeight: deck.ownerId != null
+                                      ? FontWeight.w500
+                                      : FontWeight.w400,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppTheme.space12),
                           _CommunityChip(label: _capitalize(deck.format)),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Row(
                         children: [
                           Text(
@@ -1025,7 +1030,7 @@ class _CommunityDeckCard extends StatelessWidget {
                             ),
                           ),
                           if (deck.synergyScore != null) ...[
-                            const SizedBox(width: 12),
+                            const SizedBox(width: AppTheme.space12),
                             _CommunityChip(
                               label: '${deck.synergyScore}%',
                               icon: Icons.auto_awesome,
@@ -1036,7 +1041,7 @@ class _CommunityDeckCard extends StatelessWidget {
                       ),
                       if (deck.description != null &&
                           deck.description!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           deck.description!,
                           style: TextStyle(
@@ -1079,7 +1084,7 @@ class _FollowingDeckCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppTheme.space12),
       child: Material(
         color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1088,7 +1093,7 @@ class _FollowingDeckCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppTheme.space12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               gradient: LinearGradient(
@@ -1111,7 +1116,7 @@ class _FollowingDeckCard extends StatelessWidget {
                   height: 78,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.space12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1127,11 +1132,11 @@ class _FollowingDeckCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Row(
                         children: [
                           _CommunityChip(label: _capitalize(deck.format)),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppTheme.space8),
                           Text(
                             '${deck.cardCount} cartas',
                             style: const TextStyle(
@@ -1140,7 +1145,7 @@ class _FollowingDeckCard extends StatelessWidget {
                             ),
                           ),
                           if (deck.synergyScore != null) ...[
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppTheme.space8),
                             _CommunityChip(
                               label: '${deck.synergyScore}%',
                               icon: Icons.auto_awesome,
@@ -1183,7 +1188,10 @@ class _CommunityChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space7,
+        vertical: AppTheme.space3,
+      ),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.11),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -1197,7 +1205,7 @@ class _CommunityChip extends StatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(icon, size: 11, color: accent),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppTheme.space4),
           ],
           Text(
             label,
@@ -1223,7 +1231,7 @@ class _UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: AppTheme.space10),
       child: Material(
         color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1232,7 +1240,7 @@ class _UserCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppTheme.space12),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate.withValues(alpha: 0.96),
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1245,23 +1253,21 @@ class _UserCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: AppTheme.brass500.withValues(alpha: 0.14),
-                  backgroundImage:
-                      user.avatarUrl != null
-                          ? CachedNetworkImageProvider(user.avatarUrl!)
-                          : null,
-                  child:
-                      user.avatarUrl == null
-                          ? Text(
-                            user.username[0].toUpperCase(),
-                            style: const TextStyle(
-                              color: AppTheme.brass400,
-                              fontWeight: FontWeight.bold,
-                              fontSize: AppTheme.fontXl,
-                            ),
-                          )
-                          : null,
+                  backgroundImage: user.avatarUrl != null
+                      ? CachedNetworkImageProvider(user.avatarUrl!)
+                      : null,
+                  child: user.avatarUrl == null
+                      ? Text(
+                          user.username[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: AppTheme.brass400,
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppTheme.fontXl,
+                          ),
+                        )
+                      : null,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.space12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1280,7 +1286,7 @@ class _UserCard extends StatelessWidget {
                           label: '@${user.username}',
                           accent: AppTheme.frost400,
                         ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Row(
                         children: [
                           Icon(
@@ -1290,7 +1296,7 @@ class _UserCard extends StatelessWidget {
                               alpha: 0.72,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppTheme.space4),
                           Text(
                             '${user.publicDeckCount} decks',
                             style: const TextStyle(
@@ -1298,7 +1304,7 @@ class _UserCard extends StatelessWidget {
                               fontSize: AppTheme.fontSm,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppTheme.space12),
                           Icon(
                             Icons.people,
                             size: 13,
@@ -1306,7 +1312,7 @@ class _UserCard extends StatelessWidget {
                               alpha: 0.72,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppTheme.space4),
                           Text(
                             '${user.followerCount} seguidores',
                             style: const TextStyle(
@@ -1376,7 +1382,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircularProgressIndicator(color: AppTheme.brass400),
-                SizedBox(height: 16),
+                SizedBox(height: AppTheme.space16),
                 Text(
                   'Carregando cotações...',
                   style: TextStyle(color: AppTheme.textSecondary),
@@ -1389,7 +1395,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
         if (provider.errorMessage != null && provider.moversData == null) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppTheme.space32),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1398,13 +1404,13 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     size: 48,
                     color: AppTheme.textSecondary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
                   Text(
                     provider.errorMessage ?? 'Erro desconhecido',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: AppTheme.textSecondary),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppTheme.space24),
                   ElevatedButton.icon(
                     onPressed: () => provider.refresh(),
                     icon: const Icon(Icons.refresh),
@@ -1433,7 +1439,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
         if (data.needsMoreData) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppTheme.space32),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1442,7 +1448,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     size: 48,
                     color: AppTheme.brass400,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
                   Text(
                     data.message ?? 'Aguardando dados...',
                     textAlign: TextAlign.center,
@@ -1451,7 +1457,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                       fontSize: AppTheme.fontMd,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.space8),
                   const Text(
                     'Os preços são atualizados diariamente.\nAmanhã teremos dados de variação!',
                     textAlign: TextAlign.center,
@@ -1496,28 +1502,28 @@ class _CotacoesTabState extends State<_CotacoesTab>
                 children: [
                   data.gainers.isEmpty
                       ? const Center(
-                        child: Text(
-                          'Nenhuma carta valorizou hoje',
-                          style: TextStyle(color: AppTheme.textSecondary),
-                        ),
-                      )
+                          child: Text(
+                            'Nenhuma carta valorizou hoje',
+                            style: TextStyle(color: AppTheme.textSecondary),
+                          ),
+                        )
                       : _buildMoversList(
-                        data.gainers,
-                        isGainer: true,
-                        provider: provider,
-                      ),
+                          data.gainers,
+                          isGainer: true,
+                          provider: provider,
+                        ),
                   data.losers.isEmpty
                       ? const Center(
-                        child: Text(
-                          'Nenhuma carta desvalorizou hoje',
-                          style: TextStyle(color: AppTheme.textSecondary),
-                        ),
-                      )
+                          child: Text(
+                            'Nenhuma carta desvalorizou hoje',
+                            style: TextStyle(color: AppTheme.textSecondary),
+                          ),
+                        )
                       : _buildMoversList(
-                        data.losers,
-                        isGainer: false,
-                        provider: provider,
-                      ),
+                          data.losers,
+                          isGainer: false,
+                          provider: provider,
+                        ),
                 ],
               ),
             ),
@@ -1529,7 +1535,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
 
   Widget _buildDateHeader(MarketMoversData data, MarketProvider provider) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space16,
+        vertical: AppTheme.space10,
+      ),
       color: AppTheme.surfaceElevated.withValues(alpha: 0.5),
       child: Row(
         children: [
@@ -1538,7 +1547,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
             size: 14,
             color: AppTheme.textSecondary,
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppTheme.space6),
           Text(
             data.date != null ? _formatDate(data.date!) : 'Hoje',
             style: const TextStyle(
@@ -1564,7 +1573,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
           ],
           const Spacer(),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space6,
+              vertical: AppTheme.space2,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1581,7 +1593,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Semantics(
             button: true,
             enabled: !provider.isLoading,
@@ -1589,18 +1601,17 @@ class _CotacoesTabState extends State<_CotacoesTab>
             child: Tooltip(
               message: 'Atualizar cartas em movimento',
               child: SizedBox(
-                width: 48,
-                height: 48,
+                width: AppTheme.space48,
+                height: AppTheme.space48,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                   onTap: provider.isLoading ? null : () => provider.refresh(),
                   child: Icon(
                     Icons.refresh,
                     size: 20,
-                    color:
-                        provider.isLoading
-                            ? AppTheme.outlineMuted
-                            : AppTheme.textSecondary,
+                    color: provider.isLoading
+                        ? AppTheme.outlineMuted
+                        : AppTheme.textSecondary,
                   ),
                 ),
               ),
@@ -1622,33 +1633,36 @@ class _CotacoesTabState extends State<_CotacoesTab>
       onRefresh: () => provider.refresh(),
       child: ListView.builder(
         padding: EdgeInsets.fromLTRB(
-          0,
-          8,
-          0,
-          8 + MediaQuery.of(context).padding.bottom + 88,
+          AppTheme.space0,
+          AppTheme.space8,
+          AppTheme.space0,
+          AppTheme.space8 + MediaQuery.of(context).padding.bottom + 88,
         ),
         itemCount: movers.length,
         itemBuilder: (context, index) {
           final mover = movers[index];
           final changeColor = isGainer ? AppTheme.success : AppTheme.error;
-          final changeIcon =
-              isGainer ? Icons.arrow_upward : Icons.arrow_downward;
+          final changeIcon = isGainer
+              ? Icons.arrow_upward
+              : Icons.arrow_downward;
           final changePrefix = isGainer ? '+' : '';
 
           return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            margin: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space12,
+              vertical: AppTheme.space4,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
-                color:
-                    index < 3
-                        ? AppTheme.outlineMuted.withValues(alpha: 0.45)
-                        : AppTheme.outlineMuted.withValues(alpha: 0.3),
+                color: index < 3
+                    ? AppTheme.outlineMuted.withValues(alpha: 0.45)
+                    : AppTheme.outlineMuted.withValues(alpha: 0.3),
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppTheme.space12),
               child: Row(
                 children: [
                   // Rank badge
@@ -1656,64 +1670,41 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     width: AppTheme.touchTargetMin,
                     height: AppTheme.touchTargetMin,
                     decoration: BoxDecoration(
-                      color:
-                          index < 3
-                              ? AppTheme.surfaceElevated
-                              : AppTheme.surfaceElevated,
+                      color: index < 3
+                          ? AppTheme.surfaceElevated
+                          : AppTheme.surfaceElevated,
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border:
-                          index < 3
-                              ? Border.all(
-                                color: changeColor.withValues(alpha: 0.2),
-                                width: AppTheme.strokeThin,
-                              )
-                              : null,
+                      border: index < 3
+                          ? Border.all(
+                              color: changeColor.withValues(alpha: 0.2),
+                              width: AppTheme.strokeThin,
+                            )
+                          : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '#${index + 1}',
                       style: TextStyle(
-                        color:
-                            index < 3
-                                ? AppTheme.textPrimary.withValues(alpha: 0.9)
-                                : AppTheme.textSecondary,
+                        color: index < 3
+                            ? AppTheme.textPrimary.withValues(alpha: 0.9)
+                            : AppTheme.textSecondary,
                         fontSize: AppTheme.fontSm,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppTheme.space10),
                   // Card image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     child: SizedBox(
-                      width: 36,
+                      width: AppTheme.space36,
                       height: 50,
-                      child:
-                          mover.imageUrl != null
-                              ? CachedNetworkImage(
-                                imageUrl: mover.imageUrl!,
-                                fit: BoxFit.cover,
-                                placeholder:
-                                    (_, __) => Container(
-                                      color: AppTheme.surfaceElevated,
-                                      child: const Icon(
-                                        Icons.style,
-                                        size: 16,
-                                        color: AppTheme.textSecondary,
-                                      ),
-                                    ),
-                                errorWidget:
-                                    (_, __, ___) => Container(
-                                      color: AppTheme.surfaceElevated,
-                                      child: const Icon(
-                                        Icons.style,
-                                        size: 16,
-                                        color: AppTheme.textSecondary,
-                                      ),
-                                    ),
-                              )
-                              : Container(
+                      child: mover.imageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: mover.imageUrl!,
+                              fit: BoxFit.cover,
+                              placeholder: (_, __) => Container(
                                 color: AppTheme.surfaceElevated,
                                 child: const Icon(
                                   Icons.style,
@@ -1721,9 +1712,26 @@ class _CotacoesTabState extends State<_CotacoesTab>
                                   color: AppTheme.textSecondary,
                                 ),
                               ),
+                              errorWidget: (_, __, ___) => Container(
+                                color: AppTheme.surfaceElevated,
+                                child: const Icon(
+                                  Icons.style,
+                                  size: 16,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            )
+                          : Container(
+                              color: AppTheme.surfaceElevated,
+                              child: const Icon(
+                                Icons.style,
+                                size: 16,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppTheme.space10),
                   // Name + details
                   Expanded(
                     child: Column(
@@ -1739,7 +1747,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: AppTheme.space2),
                         Row(
                           children: [
                             if (mover.setCode != null)
@@ -1785,11 +1793,11 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           fontSize: AppTheme.fontLg,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppTheme.space2),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
+                          horizontal: AppTheme.space6,
+                          vertical: AppTheme.space2,
                         ),
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceElevated,
@@ -1805,7 +1813,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(changeIcon, size: 12, color: changeColor),
-                            const SizedBox(width: 2),
+                            const SizedBox(width: AppTheme.space2),
                             Text(
                               '$changePrefix${mover.changePct.toStringAsFixed(1)}%',
                               style: TextStyle(
@@ -1817,7 +1825,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 1),
+                      const SizedBox(height: AppTheme.space1),
                       Text(
                         '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
                         style: TextStyle(

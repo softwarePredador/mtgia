@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "matrix_id": "manaloom-s3-04-mobile-accessibility-2026-07-21",
+  "canonical_checks": [
+    "labels",
+    "roles_and_states",
+    "live_status",
+    "tap_target_48",
+    "text_200_percent",
+    "wcag_contrast",
+    "color_redundancy",
+    "reading_order"
+  ],
+  "automated_evidence": {
+    "auth": ["test/ui/manaloom_auth_ui_audit_test.dart","test/features/auth/screens/auth_screens_test.dart"],
+    "battle": ["test/features/battle/screens/battle_replays_screen_test.dart"],
+    "binder": ["test/features/binder/widgets/binder_item_editor_accessibility_test.dart","test/features/binder/screens/binder_screen_overflow_test.dart"],
+    "cards": ["test/core/widgets/card_artwork_test.dart","test/features/cards/screens/card_detail_screen_responsive_test.dart"],
+    "collection": ["test/features/collection/collection_screen_responsive_test.dart","test/features/collection/sets_catalog_screen_test.dart"],
+    "commercial": ["test/ui/manaloom_commercial_ui_audit_test.dart"],
+    "community": ["test/features/community/screens/community_screen_responsive_test.dart","test/features/community/screens/community_deck_detail_screen_test.dart"],
+    "decks": ["test/features/decks/screens/deck_flow_entry_screens_test.dart","test/features/decks/screens/deck_list_responsive_test.dart"],
+    "home": ["test/features/home/home_screen_test.dart","test/features/home/lotus_life_counter_overflow_test.dart"],
+    "market": ["test/features/market/screens/market_screen_responsive_test.dart"],
+    "messages": ["test/features/messages/screens/message_inbox_screen_test.dart","test/features/messages/screens/chat_screen_test.dart"],
+    "notifications": ["test/features/notifications/screens/notification_screen_test.dart"],
+    "profile": ["test/features/profile/profile_screen_test.dart"],
+    "retention": ["test/features/retention/post_game_notes_screen_responsive_test.dart"],
+    "scanner": ["test/features/scanner/widgets/scanned_card_preview_test.dart"],
+    "shell": ["test/core/widgets/main_scaffold_test.dart"],
+    "social": ["test/features/social/screens/user_profile_screen_responsive_test.dart","test/features/social/screens/user_search_screen_test.dart"],
+    "trades": ["test/features/trades/screens/create_trade_screen_overflow_test.dart","test/features/trades/screens/trade_detail_screen_overflow_test.dart"]
+  },
+  "shared_evidence": [
+    "test/core/theme/app_theme_test.dart",
+    "test/core/widgets/app_state_panel_test.dart",
+    "test/core/widgets/mana_symbols_test.dart",
+    "test/ui/manaloom_field_contract_audit_test.dart",
+    "test/ui/ui_state_matrix_test.dart",
+    "test/ui/ui_viewport_matrix_test.dart"
+  ],
+  "manual_screen_reader": {
+    "android": {
+      "status": "pending_physical",
+      "reader": "TalkBack",
+      "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays"]
+    },
+    "ios": {
+      "status": "pending_physical",
+      "reader": "VoiceOver",
+      "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays"]
+    }
+  }
+}

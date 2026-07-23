@@ -3,7 +3,12 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/ai/commander_deckbuilding_contract_support.dart';
+import '../../../../lib/ai/commander_learned_deck_support.dart';
+import '../../../../lib/ai/commander_reference_card_stats_support.dart';
+import '../../../../lib/ai/commander_reference_deck_corpus_support.dart';
+import '../../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../../lib/ai/deck_battle_learning_evidence.dart';
+import '../../../../lib/ai/deck_learning_event_support.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/ai/optimization_ramp_profile.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
@@ -25,42 +30,52 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 1. Buscar informações do deck (formato)
     final deckResult = await pool.execute(
       Sql.named(
-          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId'),
+        'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId',
+      ),
       parameters: {'deckId': deckId, 'userId': userId},
     );
 
     if (deckResult.isEmpty) {
       return Response.json(
-          statusCode: HttpStatus.notFound, body: {'error': 'Deck not found'});
+        statusCode: HttpStatus.notFound,
+        body: {'error': 'Deck not found'},
+      );
     }
 
     final format = deckResult.first[0] as String;
-    final hasCardIntelligenceSnapshot =
-        await _hasTable(pool, 'card_intelligence_snapshot');
+    final hasCardIntelligenceSnapshot = await _hasTable(
+      pool,
+      'card_intelligence_snapshot',
+    );
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
-    final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.card_id'
-        : 'JOIN cards c ON dc.card_id = c.id';
+    final cardSourceJoin =
+        hasCardIntelligenceSnapshot
+            ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.card_id'
+            : 'JOIN cards c ON dc.card_id = c.id';
     final priceSelect =
         hasCardIntelligenceSnapshot ? 'c.price_usd AS price' : 'c.price';
-    final battleRuleCountSelect = hasCardIntelligenceSnapshot
-        ? 'c.battle_rule_count AS battle_rule_count'
-        : '0::int AS battle_rule_count';
-    final verifiedBattleRuleCountSelect = hasCardIntelligenceSnapshot
-        ? 'c.verified_battle_rule_count AS verified_battle_rule_count'
-        : '0::int AS verified_battle_rule_count';
-    final sourceCoverageSelect = hasCardIntelligenceSnapshot
-        ? 'c.source_coverage AS source_coverage'
-        : '''jsonb_build_object(
+    final battleRuleCountSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.battle_rule_count AS battle_rule_count'
+            : '0::int AS battle_rule_count';
+    final verifiedBattleRuleCountSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.verified_battle_rule_count AS verified_battle_rule_count'
+            : '0::int AS verified_battle_rule_count';
+    final sourceCoverageSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.source_coverage AS source_coverage'
+            : '''jsonb_build_object(
             'has_function_tags', false,
             'has_semantic_v2', false,
             'has_verified_battle_rules', false,
             'has_any_battle_rules', false,
             'has_legalities', false
           ) AS source_coverage''';
-    final functionalTagsSelect = hasCardIntelligenceSnapshot
-        ? 'c.function_tag_details AS functional_tags'
-        : '''
+    final functionalTagsSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.function_tag_details AS functional_tags'
+            : '''
           COALESCE(
             (
               SELECT jsonb_agg(
@@ -78,9 +93,10 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
             '[]'::jsonb
           ) AS functional_tags
         ''';
-    final semanticV2Select = hasCardIntelligenceSnapshot
-        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
-        : hasSemanticV2
+    final semanticV2Select =
+        hasCardIntelligenceSnapshot
+            ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+            : hasSemanticV2
             ? '''
           COALESCE(
             (
@@ -152,7 +168,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       'B': 0,
       'R': 0,
       'G': 0,
-      'C': 0
+      'C': 0,
     };
     var totalCards = 0;
     var totalLands = 0;
@@ -224,7 +240,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       'Snow-Covered Island',
       'Snow-Covered Swamp',
       'Snow-Covered Mountain',
-      'Snow-Covered Forest'
+      'Snow-Covered Forest',
     ];
 
     for (final card in cards) {
@@ -309,7 +325,8 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       if (diff.abs() > 3) {
         issues.add({
           'type': 'warning',
-          'message': 'Land Count Warning: Your deck has an Average CMC of ${avgCmc.toStringAsFixed(2)}. '
+          'message':
+              'Land Count Warning: Your deck has an Average CMC of ${avgCmc.toStringAsFixed(2)}. '
               'We recommend around $recommendedLands lands, but you have $totalLands. '
               '${diff < 0 ? "Consider adding more lands to avoid missing drops." : "Consider removing lands to avoid flooding."}',
         });
@@ -371,20 +388,21 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       final metaFormats = metaDeckFormatCodesForDeckFormat(format);
       final metaScope =
           format.toLowerCase() == 'commander' ? 'commander' : null;
-      final metaDecksResult = metaFormats.isEmpty
-          ? const <dynamic>[]
-          : await pool.execute(
-              Sql.named('''
+      final metaDecksResult =
+          metaFormats.isEmpty
+              ? const <dynamic>[]
+              : await pool.execute(
+                Sql.named('''
                 SELECT format, archetype, card_list, source_url
                 FROM meta_decks
                 WHERE format = ANY(@formats)
                 ORDER BY created_at DESC
                 LIMIT 50
               '''),
-              parameters: {
-                'formats': TypedValue(Type.textArray, metaFormats),
-              },
-            );
+                parameters: {
+                  'formats': TypedValue(Type.textArray, metaFormats),
+                },
+              );
 
       if (metaDecksResult.isNotEmpty) {
         var bestMatchArchetype = '';
@@ -408,9 +426,10 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
             cardList: cardListRaw,
             format: storedFormat,
           );
-          final metaCards = parsedDeck.mainboard.keys
-              .map((name) => name.toLowerCase())
-              .toSet();
+          final metaCards =
+              parsedDeck.mainboard.keys
+                  .map((name) => name.toLowerCase())
+                  .toSet();
 
           // Calcula similaridade (Jaccard Index simplificado: Interseção / União)
           final intersection = userCardNames.intersection(metaCards).length;
@@ -424,10 +443,11 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
             bestMatchSubformat = formatDescriptor.commanderSubformat;
             bestMatchFormatLabel = formatDescriptor.label;
             // Identifica cartas que o meta tem e o usuário não (Staples potenciais)
-            bestMatchMissingCards = metaCards
-                .difference(userCardNames)
-                .take(5)
-                .toList(); // Sugere top 5
+            bestMatchMissingCards =
+                metaCards
+                    .difference(userCardNames)
+                    .take(5)
+                    .toList(); // Sugere top 5
           }
         }
 
@@ -435,8 +455,9 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         if (bestMatchScore > 0.10) {
           metaAnalysis = {
             'archetype': bestMatchArchetype,
-            'similarity':
-                double.parse((bestMatchScore * 100).toStringAsFixed(1)),
+            'similarity': double.parse(
+              (bestMatchScore * 100).toStringAsFixed(1),
+            ),
             'format_code': bestMatchFormatCode,
             'format_label': bestMatchFormatLabel,
             'subformat': bestMatchSubformat,
@@ -458,61 +479,65 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       // Não falha a requisição inteira se o meta falhar
     }
 
-    return Response.json(body: {
-      'deck_id': deckId,
-      'format': format,
-      'stats': {
-        'total_cards': totalCards,
-        'total_lands': totalLands,
-        'total_price': double.parse(totalPrice.toStringAsFixed(2)),
-        'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
-        'composition': {
-          'ramp': rampCount,
-          'ramp_floor': rampFloorCount,
-          'ramp_contextual': rampContextualCount,
-          'draw': drawCount,
-          'removal': removalCount,
-          'board_wipes': boardWipeCount,
-          'protection': protectionCount,
-        }
+    return Response.json(
+      body: {
+        'deck_id': deckId,
+        'format': format,
+        'stats': {
+          'total_cards': totalCards,
+          'total_lands': totalLands,
+          'total_price': double.parse(totalPrice.toStringAsFixed(2)),
+          'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
+          'composition': {
+            'ramp': rampCount,
+            'ramp_floor': rampFloorCount,
+            'ramp_contextual': rampContextualCount,
+            'draw': drawCount,
+            'removal': removalCount,
+            'board_wipes': boardWipeCount,
+            'protection': protectionCount,
+          },
+        },
+        'ramp_profile': rampProfileSummary.toJson(),
+        'functional_tags': functionalSummary.toJson(),
+        'readiness': _buildDeckReadinessSummary(
+          format: format,
+          totalCards: totalCards,
+          cards: cards,
+          issues: issues,
+        ),
+        'battle_readiness': _buildBattleReadinessSummary(cards),
+        'battle_learning_evidence': battleLearningEvidence,
+        'card_battle_readiness': _buildCardBattleReadiness(cards),
+        'understanding_summary': _buildUnderstandingSummary(
+          cards: cards,
+          functionalSummary: functionalSummary,
+          hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
+        ),
+        'commander_contract': await _buildCommanderContractSummary(
+          pool: pool,
+          format: format,
+          totalCards: totalCards,
+          cards: cards,
+          issues: issues,
+          battleLearningEvidence: battleLearningEvidence,
+        ),
+        'launch_capabilities': _buildLaunchCapabilities(
+          format: format,
+          hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
+          hasSemanticV2: hasSemanticV2,
+        ),
+        'meta_analysis': metaAnalysis,
+        'mana_curve': manaCurve.map(
+          (key, value) => MapEntry(key.toString(), value),
+        ),
+        'color_distribution': colorDistribution,
+        'legality': {
+          'is_valid': issues.where((i) => i['type'] == 'error').isEmpty,
+          'issues': issues,
+        },
       },
-      'ramp_profile': rampProfileSummary.toJson(),
-      'functional_tags': functionalSummary.toJson(),
-      'readiness': _buildDeckReadinessSummary(
-        format: format,
-        totalCards: totalCards,
-        cards: cards,
-        issues: issues,
-      ),
-      'battle_readiness': _buildBattleReadinessSummary(cards),
-      'battle_learning_evidence': battleLearningEvidence,
-      'card_battle_readiness': _buildCardBattleReadiness(cards),
-      'understanding_summary': _buildUnderstandingSummary(
-        cards: cards,
-        functionalSummary: functionalSummary,
-        hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
-      ),
-      'commander_contract': _buildCommanderContractSummary(
-        format: format,
-        totalCards: totalCards,
-        cards: cards,
-        issues: issues,
-        battleLearningEvidence: battleLearningEvidence,
-      ),
-      'launch_capabilities': _buildLaunchCapabilities(
-        format: format,
-        hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
-        hasSemanticV2: hasSemanticV2,
-      ),
-      'meta_analysis': metaAnalysis,
-      'mana_curve':
-          manaCurve.map((key, value) => MapEntry(key.toString(), value)),
-      'color_distribution': colorDistribution,
-      'legality': {
-        'is_valid': issues.where((i) => i['type'] == 'error').isEmpty,
-        'issues': issues,
-      }
-    });
+    );
   } catch (e) {
     print('[ERROR] Failed to analyze deck: $e');
     return Response.json(
@@ -582,13 +607,14 @@ Map<String, dynamic> _buildLaunchCapabilities({
   };
 }
 
-Map<String, dynamic> _buildCommanderContractSummary({
+Future<Map<String, dynamic>> _buildCommanderContractSummary({
+  required Pool pool,
   required String format,
   required int totalCards,
   required List<Map<String, dynamic>> cards,
   required List<Map<String, dynamic>> issues,
   required Map<String, dynamic> battleLearningEvidence,
-}) {
+}) async {
   final normalizedFormat = format.toLowerCase().trim();
   final isCommander =
       normalizedFormat == 'commander' || normalizedFormat == 'edh';
@@ -596,10 +622,7 @@ Map<String, dynamic> _buildCommanderContractSummary({
   if (!isCommander) {
     final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
       format: format,
-      generatedDeck: const {
-        'commander': '',
-        'cards': <Map<String, dynamic>>[],
-      },
+      generatedDeck: const {'commander': '', 'cards': <Map<String, dynamic>>[]},
       validationSummary: const {
         'is_valid': true,
         'invalid_cards': <String>[],
@@ -621,19 +644,22 @@ Map<String, dynamic> _buildCommanderContractSummary({
     0,
     (sum, card) => sum + _quantity(card),
   );
-  final commanderName = commanderCards.isEmpty
-      ? ''
-      : commanderCards.first['name']?.toString().trim() ?? '';
-  final errors = issues
-      .where((issue) => issue['type']?.toString() == 'error')
-      .map((issue) => issue['message']?.toString().trim() ?? '')
-      .where((message) => message.isNotEmpty)
-      .toList();
-  final warnings = issues
-      .where((issue) => issue['type']?.toString() == 'warning')
-      .map((issue) => issue['message']?.toString().trim() ?? '')
-      .where((message) => message.isNotEmpty)
-      .toList();
+  final commanderName =
+      commanderCards.isEmpty
+          ? ''
+          : commanderCards.first['name']?.toString().trim() ?? '';
+  final errors =
+      issues
+          .where((issue) => issue['type']?.toString() == 'error')
+          .map((issue) => issue['message']?.toString().trim() ?? '')
+          .where((message) => message.isNotEmpty)
+          .toList();
+  final warnings =
+      issues
+          .where((issue) => issue['type']?.toString() == 'warning')
+          .map((issue) => issue['message']?.toString().trim() ?? '')
+          .where((message) => message.isNotEmpty)
+          .toList();
 
   if (commanderCount <= 0) errors.add('Commander missing.');
   if (totalCards != 100) {
@@ -651,6 +677,42 @@ Map<String, dynamic> _buildCommanderContractSummary({
       .where((card) => card['name']?.toString().trim().isNotEmpty == true)
       .toList(growable: false);
 
+  Map<String, dynamic>? referenceProfile;
+  CommanderReferenceCardStatsLoadResult? referenceStats;
+  CommanderReferenceDeckCorpusGuidance? referenceCorpus;
+  CommanderLearnedDeckInput? activeLearnedDeck;
+  var usageHotCards = const <Map<String, dynamic>>[];
+  try {
+    referenceProfile = await loadUsableCommanderReferenceProfile(
+      pool: pool,
+      commanderName: commanderName,
+    );
+  } catch (_) {}
+  try {
+    referenceStats = await loadUsableCommanderReferenceCardStats(
+      pool: pool,
+      commanderName: commanderName,
+    );
+  } catch (_) {}
+  try {
+    referenceCorpus = await loadCommanderReferenceDeckCorpusGuidance(
+      pool: pool,
+      commanderName: commanderName,
+    );
+  } catch (_) {}
+  try {
+    activeLearnedDeck = await loadActiveCommanderLearnedDeck(
+      pool: pool,
+      commanderName: commanderName,
+    );
+  } catch (_) {}
+  try {
+    usageHotCards = await loadUsageHotCards(
+      pool: pool,
+      commanderName: commanderName,
+    );
+  } catch (_) {}
+
   final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
     format: format,
     generatedDeck: {
@@ -663,8 +725,15 @@ Map<String, dynamic> _buildCommanderContractSummary({
       'errors': errors,
       'warnings': warnings,
     },
+    referenceProfile: referenceProfile,
+    referenceCardStats: referenceStats?.stats ?? const [],
+    unresolvedReferenceCards: referenceStats?.unresolvedCardNames ?? const [],
+    referenceDeckCorpusGuidance: referenceCorpus,
+    activeLearnedDeck: activeLearnedDeck,
+    usageHotCards: usageHotCards,
     battleGateRequired: true,
     battleLearningEvidence: battleLearningEvidence,
+    deterministicReferenceRequired: false,
   );
 
   return buildCommanderDeckbuildingAppSummary(
@@ -708,8 +777,9 @@ Map<String, dynamic> _buildDeckReadinessSummary({
     }
   } else if (totalCards < 60) {
     blockers.add('incomplete_deck');
-    nextActions
-        .add('Completar a lista antes de aplicar diagnosticos avancados.');
+    nextActions.add(
+      'Completar a lista antes de aplicar diagnosticos avancados.',
+    );
   }
 
   if (errorCount > 0) {
@@ -717,13 +787,14 @@ Map<String, dynamic> _buildDeckReadinessSummary({
     nextActions.add('Corrigir erros de legalidade e estrutura.');
   }
 
-  final status = blockers.isNotEmpty
-      ? blockers.first
-      : warningCount > 0
+  final status =
+      blockers.isNotEmpty
+          ? blockers.first
+          : warningCount > 0
           ? 'ready_with_warnings'
           : isCommander
-              ? 'valid_commander_deck'
-              : 'valid_deck';
+          ? 'valid_commander_deck'
+          : 'valid_deck';
 
   return {
     'schema_version': 'deck_readiness_v1_2026-07-01',
@@ -742,41 +813,46 @@ Map<String, dynamic> _buildDeckReadinessSummary({
 List<Map<String, dynamic>> _buildCardBattleReadiness(
   List<Map<String, dynamic>> cards,
 ) {
-  final readiness = cards.map((card) {
-    final name = card['name']?.toString() ?? '';
-    final quantity = _quantity(card);
-    final battleRuleCount = _intValue(card['battle_rule_count']);
-    final verifiedBattleRuleCount =
-        _intValue(card['verified_battle_rule_count']);
-    final status = _cardBattleReadinessStatus(card);
-    final sourceCoverage = card['source_coverage'] is Map
-        ? (card['source_coverage'] as Map).cast<String, dynamic>()
-        : const <String, dynamic>{};
+  final readiness = cards
+      .map((card) {
+        final name = card['name']?.toString() ?? '';
+        final quantity = _quantity(card);
+        final battleRuleCount = _intValue(card['battle_rule_count']);
+        final verifiedBattleRuleCount = _intValue(
+          card['verified_battle_rule_count'],
+        );
+        final status = _cardBattleReadinessStatus(card);
+        final sourceCoverage =
+            card['source_coverage'] is Map
+                ? (card['source_coverage'] as Map).cast<String, dynamic>()
+                : const <String, dynamic>{};
 
-    return {
-      'schema_version': 'card_battle_readiness_v1_2026-07-01',
-      'card_id': card['id']?.toString() ?? '',
-      'name': name,
-      'quantity': quantity,
-      'is_commander': card['is_commander'] == true,
-      'status': status,
-      'status_label': _cardBattleReadinessLabel(status),
-      'battle_rule_count': battleRuleCount,
-      'verified_battle_rule_count': verifiedBattleRuleCount,
-      'source_coverage': sourceCoverage,
-      'detail': _cardBattleReadinessDetail(
-        status: status,
-        verifiedBattleRuleCount: verifiedBattleRuleCount,
-        battleRuleCount: battleRuleCount,
-      ),
-      'disclaimer':
-          'Badge conservador: indica cobertura de regra/battle no backend, nao garantia de simulacao perfeita.',
-    };
-  }).toList(growable: false);
+        return {
+          'schema_version': 'card_battle_readiness_v1_2026-07-01',
+          'card_id': card['id']?.toString() ?? '',
+          'name': name,
+          'quantity': quantity,
+          'is_commander': card['is_commander'] == true,
+          'status': status,
+          'status_label': _cardBattleReadinessLabel(status),
+          'battle_rule_count': battleRuleCount,
+          'verified_battle_rule_count': verifiedBattleRuleCount,
+          'source_coverage': sourceCoverage,
+          'detail': _cardBattleReadinessDetail(
+            status: status,
+            verifiedBattleRuleCount: verifiedBattleRuleCount,
+            battleRuleCount: battleRuleCount,
+          ),
+          'disclaimer':
+              'Badge conservador: indica cobertura de regra/battle no backend, nao garantia de simulacao perfeita.',
+        };
+      })
+      .toList(growable: false);
 
   final sorted = [...readiness];
   sorted.sort((a, b) {
-    final commanderCompare = (b['is_commander'] == true ? 1 : 0) -
+    final commanderCompare =
+        (b['is_commander'] == true ? 1 : 0) -
         (a['is_commander'] == true ? 1 : 0);
     if (commanderCompare != 0) return commanderCompare;
     return (a['name']?.toString() ?? '').compareTo(b['name']?.toString() ?? '');
@@ -810,8 +886,9 @@ Map<String, dynamic> _buildBattleReadinessSummary(
     final name = card['name']?.toString() ?? '';
     final oracleText = card['oracle_text']?.toString().trim() ?? '';
     final battleRuleCount = _intValue(card['battle_rule_count']);
-    final verifiedBattleRuleCount =
-        _intValue(card['verified_battle_rule_count']);
+    final verifiedBattleRuleCount = _intValue(
+      card['verified_battle_rule_count'],
+    );
     totalCopies += quantity;
 
     if (verifiedBattleRuleCount > 0) {
@@ -830,15 +907,16 @@ Map<String, dynamic> _buildBattleReadinessSummary(
   }
 
   final verifiedRatio = totalCopies == 0 ? 0.0 : verifiedCopies / totalCopies;
-  final status = totalCopies == 0
-      ? 'not_available'
-      : verifiedCopies == totalCopies
+  final status =
+      totalCopies == 0
+          ? 'not_available'
+          : verifiedCopies == totalCopies
           ? 'verified_simulation'
           : verifiedCopies > 0 || partialCopies > 0
-              ? 'partial_simulation'
-              : pendingAdapterCopies > 0
-                  ? 'pending_adapter'
-                  : 'rules_text_only';
+          ? 'partial_simulation'
+          : pendingAdapterCopies > 0
+          ? 'pending_adapter'
+          : 'rules_text_only';
 
   return {
     'schema_version': 'deck_battle_readiness_v1_2026-07-01',
@@ -905,10 +983,7 @@ Map<String, dynamic> _buildUnderstandingSummary({
   required FunctionalDeckSummary functionalSummary,
   required bool hasCardIntelligenceSnapshot,
 }) {
-  final totalCopies = cards.fold<int>(
-    0,
-    (sum, card) => sum + _quantity(card),
-  );
+  final totalCopies = cards.fold<int>(0, (sum, card) => sum + _quantity(card));
   final taggedCopies = functionalSummary.taggedCopies;
   var semanticCopies = 0;
   var verifiedRuleCopies = 0;
@@ -916,10 +991,11 @@ Map<String, dynamic> _buildUnderstandingSummary({
   for (final card in cards) {
     final quantity = _quantity(card);
     final semanticTags = card['semantic_tags_v2'];
-    final hasSemantic = semanticTags is Iterable
-        ? semanticTags.isNotEmpty
-        : semanticTags?.toString().trim().isNotEmpty == true &&
-            semanticTags.toString() != '[]';
+    final hasSemantic =
+        semanticTags is Iterable
+            ? semanticTags.isNotEmpty
+            : semanticTags?.toString().trim().isNotEmpty == true &&
+                semanticTags.toString() != '[]';
     if (hasSemantic) semanticCopies += quantity;
     if (_intValue(card['verified_battle_rule_count']) > 0) {
       verifiedRuleCopies += quantity;
@@ -928,19 +1004,24 @@ Map<String, dynamic> _buildUnderstandingSummary({
 
   return {
     'schema_version': 'deck_understanding_summary_v1_2026-07-01',
-    'source': hasCardIntelligenceSnapshot
-        ? 'card_intelligence_snapshot'
-        : 'legacy_aggregated_queries',
+    'source':
+        hasCardIntelligenceSnapshot
+            ? 'card_intelligence_snapshot'
+            : 'legacy_aggregated_queries',
     'total_copies': totalCopies,
     'functional_tagged_copies': taggedCopies,
     'semantic_tagged_copies': semanticCopies,
     'verified_battle_rule_copies': verifiedRuleCopies,
-    'functional_coverage_ratio': totalCopies == 0
-        ? 0.0
-        : double.parse((taggedCopies / totalCopies).toStringAsFixed(4)),
-    'verified_battle_ratio': totalCopies == 0
-        ? 0.0
-        : double.parse((verifiedRuleCopies / totalCopies).toStringAsFixed(4)),
+    'functional_coverage_ratio':
+        totalCopies == 0
+            ? 0.0
+            : double.parse((taggedCopies / totalCopies).toStringAsFixed(4)),
+    'verified_battle_ratio':
+        totalCopies == 0
+            ? 0.0
+            : double.parse(
+              (verifiedRuleCopies / totalCopies).toStringAsFixed(4),
+            ),
   };
 }
 

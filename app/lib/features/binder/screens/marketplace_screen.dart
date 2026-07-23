@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
@@ -89,7 +90,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
             children: [
               // Search bar (local state only — no provider rebuild needed)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: AppTheme.space8),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: ConstrainedBox(
@@ -112,23 +113,24 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                           Icons.search,
                           color: AppTheme.textSecondary,
                         ),
-                        suffixIcon:
-                            _searchController.text.isEmpty
-                                ? null
-                                : IconButton(
-                                  tooltip: 'Limpar busca',
-                                  icon: const Icon(
-                                    Icons.clear,
-                                    color: AppTheme.textSecondary,
-                                  ),
-                                  onPressed: () {
-                                    setState(_searchController.clear);
-                                    _doSearch();
-                                  },
+                        suffixIcon: _searchController.text.isEmpty
+                            ? null
+                            : IconButton(
+                                tooltip: 'Limpar busca',
+                                icon: const Icon(
+                                  Icons.clear,
+                                  color: AppTheme.textSecondary,
                                 ),
+                                onPressed: () {
+                                  setState(_searchController.clear);
+                                  _doSearch();
+                                },
+                              ),
                         filled: true,
                         fillColor: AppTheme.surfaceSlate,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: AppTheme.space0,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusMd,
@@ -155,7 +157,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                           _doSearch();
                         },
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppTheme.space8),
                       FilterChip(
                         label: const Text('Troca'),
                         selected: _onlyTrade,
@@ -168,20 +170,18 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                         ),
                         backgroundColor: AppTheme.surfaceSlate,
                         labelStyle: TextStyle(
-                          color:
-                              _onlyTrade
-                                  ? AppTheme.brass400
-                                  : AppTheme.textSecondary,
+                          color: _onlyTrade
+                              ? AppTheme.brass400
+                              : AppTheme.textSecondary,
                           fontSize: AppTheme.fontSm,
                         ),
                         side: BorderSide(
-                          color:
-                              _onlyTrade
-                                  ? AppTheme.brass400
-                                  : AppTheme.outlineMuted,
+                          color: _onlyTrade
+                              ? AppTheme.brass400
+                              : AppTheme.outlineMuted,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppTheme.space8),
                       FilterChip(
                         label: const Text('Venda'),
                         selected: _onlySale,
@@ -194,24 +194,22 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                         ),
                         backgroundColor: AppTheme.surfaceSlate,
                         labelStyle: TextStyle(
-                          color:
-                              _onlySale
-                                  ? AppTheme.brass400
-                                  : AppTheme.textSecondary,
+                          color: _onlySale
+                              ? AppTheme.brass400
+                              : AppTheme.textSecondary,
                           fontSize: AppTheme.fontSm,
                         ),
                         side: BorderSide(
-                          color:
-                              _onlySale
-                                  ? AppTheme.brass400
-                                  : AppTheme.outlineMuted,
+                          color: _onlySale
+                              ? AppTheme.brass400
+                              : AppTheme.outlineMuted,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.space4),
 
               // List — only this part needs provider data
               Expanded(
@@ -226,9 +224,8 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
 
   Widget _buildMarketList(BinderProvider provider) {
     if (provider.isLoadingMarket && provider.marketItems.isEmpty) {
-      return const AppStatePanel(
+      return const AppStatePanel.loading(
         key: Key('marketplace-list-loading'),
-        icon: Icons.storefront_rounded,
         title: 'Carregando marketplace',
         message: 'Buscando cartas disponiveis, precos e sinais de troca.',
         accent: AppTheme.frost400,
@@ -265,13 +262,16 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
         child: ListView.builder(
           key: const Key('marketplace-list'),
           controller: _scrollController,
-          padding: const EdgeInsets.only(top: 8, bottom: 16),
+          padding: const EdgeInsets.only(
+            top: AppTheme.space8,
+            bottom: AppTheme.space16,
+          ),
           itemCount:
               provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
           itemBuilder: (context, index) {
             if (index >= provider.marketItems.length) {
               return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: AppTheme.space16),
                 child: Center(
                   child: CircularProgressIndicator(color: AppTheme.frost400),
                 ),
@@ -281,12 +281,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
               item: provider.marketItems[index],
               onCardTap: () {
                 final mktItem = provider.marketItems[index];
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder:
-                        (_) => CardDetailScreen(card: _cardFromMarket(mktItem)),
-                  ),
-                );
+                openCardDetailRoute(context, _cardFromMarket(mktItem));
               },
               onOwnerTap: () {
                 final ownerId = provider.marketItems[index].ownerId;
@@ -309,12 +304,11 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                   price: mktItem.price,
                   listType: 'have',
                 );
-                final type =
-                    mktItem.forSale && !mktItem.forTrade
-                        ? 'sale'
-                        : mktItem.forTrade && !mktItem.forSale
-                        ? 'trade'
-                        : 'mixed';
+                final type = mktItem.forSale && !mktItem.forTrade
+                    ? 'sale'
+                    : mktItem.forTrade && !mktItem.forSale
+                    ? 'trade'
+                    : 'mixed';
                 context.push(
                   '/trades/create/${Uri.encodeComponent(mktItem.ownerId)}',
                   extra: CreateTradeRouteArgs(
@@ -335,16 +329,14 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
       id: item.cardId,
       name: item.cardName,
       manaCost: item.cardManaCost,
-      typeLine:
-          (item.cardTypeLine ?? '').trim().isEmpty
-              ? 'Carta'
-              : item.cardTypeLine!.trim(),
+      typeLine: (item.cardTypeLine ?? '').trim().isEmpty
+          ? 'Carta'
+          : item.cardTypeLine!.trim(),
       imageUrl: item.cardImageUrl,
       setCode: item.cardSetCode ?? '',
-      rarity:
-          (item.cardRarity ?? '').trim().isEmpty
-              ? 'unknown'
-              : item.cardRarity!.trim(),
+      rarity: (item.cardRarity ?? '').trim().isEmpty
+          ? 'unknown'
+          : item.cardRarity!.trim(),
       isReserved: item.cardIsReserved,
       quantity: item.quantity,
       isCommander: false,
@@ -364,7 +356,7 @@ class _ConditionDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 34,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.space10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -431,7 +423,7 @@ class _MarketplaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: AppTheme.space10),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -448,7 +440,7 @@ class _MarketplaceCard extends StatelessWidget {
           onTap: onCardTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppTheme.space12),
             child: Row(
               children: [
                 // Card image
@@ -458,7 +450,7 @@ class _MarketplaceCard extends StatelessWidget {
                   height: 70,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.space12),
 
                 // Info
                 Expanded(
@@ -476,7 +468,7 @@ class _MarketplaceCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
 
                       // Badges
                       Wrap(
@@ -505,7 +497,7 @@ class _MarketplaceCard extends StatelessWidget {
                             _badge('Reserved', AppTheme.brass400),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
 
                       // Trade / Sale tags + price
                       Wrap(
@@ -529,10 +521,10 @@ class _MarketplaceCard extends StatelessWidget {
                         ],
                       ),
                       if (item.priceInsight != null) ...[
-                        const SizedBox(height: 6),
+                        const SizedBox(height: AppTheme.space6),
                         _priceInsight(item.priceInsight!),
                       ],
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppTheme.space6),
 
                       // Owner + location
                       GestureDetector(
@@ -545,28 +537,25 @@ class _MarketplaceCard extends StatelessWidget {
                               backgroundColor: AppTheme.frost400.withValues(
                                 alpha: 0.3,
                               ),
-                              backgroundImage:
-                                  item.ownerAvatarUrl != null
-                                      ? CachedNetworkImageProvider(
-                                        item.ownerAvatarUrl!,
-                                      )
-                                      : null,
-                              child:
-                                  item.ownerAvatarUrl == null
-                                      ? Text(
-                                        item.ownerUsername.isNotEmpty
-                                            ? item.ownerUsername[0]
-                                                .toUpperCase()
-                                            : '?',
-                                        style: const TextStyle(
-                                          fontSize: AppTheme.fontXs,
-                                          color: AppTheme.frost400,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      )
-                                      : null,
+                              backgroundImage: item.ownerAvatarUrl != null
+                                  ? CachedNetworkImageProvider(
+                                      item.ownerAvatarUrl!,
+                                    )
+                                  : null,
+                              child: item.ownerAvatarUrl == null
+                                  ? Text(
+                                      item.ownerUsername.isNotEmpty
+                                          ? item.ownerUsername[0].toUpperCase()
+                                          : '?',
+                                      style: const TextStyle(
+                                        fontSize: AppTheme.fontXs,
+                                        color: AppTheme.frost400,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : null,
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: AppTheme.space6),
                             Flexible(
                               child: Text(
                                 item.ownerDisplayLabel,
@@ -578,7 +567,7 @@ class _MarketplaceCard extends StatelessWidget {
                               ),
                             ),
                             if (item.ownerLocationLabel != null) ...[
-                              const SizedBox(width: 6),
+                              const SizedBox(width: AppTheme.space6),
                               Icon(
                                 Icons.location_on,
                                 size: 12,
@@ -586,7 +575,7 @@ class _MarketplaceCard extends StatelessWidget {
                                   alpha: 0.6,
                                 ),
                               ),
-                              const SizedBox(width: 2),
+                              const SizedBox(width: AppTheme.space2),
                               Flexible(
                                 child: Text(
                                   item.ownerLocationLabel!,
@@ -603,12 +592,12 @@ class _MarketplaceCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       _trustSignals(item.ownerTrust),
                       // Trade notes
                       if (item.ownerTradeNotes != null &&
                           item.ownerTradeNotes!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -619,7 +608,7 @@ class _MarketplaceCard extends StatelessWidget {
                                 alpha: 0.6,
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppTheme.space4),
                             Expanded(
                               child: Text(
                                 item.ownerTradeNotes!,
@@ -640,7 +629,7 @@ class _MarketplaceCard extends StatelessWidget {
 
                       // ── Interaction button ──
                       if (onTradeTap != null) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppTheme.space8),
                         SizedBox(
                           width: double.infinity,
                           height: AppTheme.touchTargetMin,
@@ -648,18 +637,18 @@ class _MarketplaceCard extends StatelessWidget {
                             key: Key('marketplace-propose-trade-${item.id}'),
                             onPressed: onTradeTap,
                             style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  item.forSale
-                                      ? AppTheme.brass400
-                                      : AppTheme.frost400,
+                              foregroundColor: item.forSale
+                                  ? AppTheme.brass400
+                                  : AppTheme.frost400,
                               side: BorderSide(
-                                color: (item.forSale
-                                        ? AppTheme.brass400
-                                        : AppTheme.frost400)
-                                    .withValues(alpha: 0.5),
+                                color:
+                                    (item.forSale
+                                            ? AppTheme.brass400
+                                            : AppTheme.frost400)
+                                        .withValues(alpha: 0.5),
                               ),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
+                                horizontal: AppTheme.space10,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
@@ -697,7 +686,10 @@ class _MarketplaceCard extends StatelessWidget {
 
   Widget _badge(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space1,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -715,7 +707,10 @@ class _MarketplaceCard extends StatelessWidget {
 
   Widget _statusTag(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space6,
+        vertical: AppTheme.space2,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: color.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -732,29 +727,40 @@ class _MarketplaceCard extends StatelessWidget {
   }
 
   Widget _priceInsight(MarketplacePriceInsight insight) {
-    final reference =
-        insight.referencePrice != null
-            ? 'Ref. interna ${insight.referenceCurrency} ${insight.referencePrice!.toStringAsFixed(2)}'
-            : 'Ref. interna indisponível';
-    final trend =
-        insight.trend.hasTrend
-            ? '${insight.trend.direction == 'up'
-                ? '↑'
-                : insight.trend.direction == 'down'
-                ? '↓'
-                : '→'} ${insight.trend.changePct!.toStringAsFixed(1)}%'
-            : 'tendência: dados insuficientes';
+    final source = switch (insight.referenceSource) {
+      'scryfall' => 'Scryfall',
+      'mtgjson' => 'MTGJSON',
+      'legacy' => 'fonte legada',
+      _ => null,
+    };
+    final updated = insight.referenceUpdatedAt;
+    final updatedLabel = updated == null
+        ? null
+        : '${updated.toLocal().day.toString().padLeft(2, '0')}/${updated.toLocal().month.toString().padLeft(2, '0')}';
+    final reference = insight.referencePrice != null
+        ? [
+            'Ref. interna ${CurrencyFormatter.format(insight.referencePrice!, currencyCode: insight.referenceCurrency)}',
+            if (source != null) source,
+            if (updatedLabel != null) updatedLabel,
+          ].join(' • ')
+        : 'Ref. interna indisponível';
+    final trend = insight.trend.hasTrend
+        ? '${insight.trend.direction == 'up'
+              ? '↑'
+              : insight.trend.direction == 'down'
+              ? '↓'
+              : '→'} ${insight.trend.changePct!.toStringAsFixed(1)}%'
+        : 'tendência: dados insuficientes';
     final comparison = insight.comparison;
-    final color =
-        comparison.hasAlert
-            ? AppTheme.warning
-            : insight.trend.hasTrend
-            ? AppTheme.frost400
-            : AppTheme.textSecondary;
+    final color = comparison.hasAlert
+        ? AppTheme.warning
+        : insight.trend.hasTrend
+        ? AppTheme.frost400
+        : AppTheme.textSecondary;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppTheme.space8),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -789,20 +795,19 @@ class _MarketplaceCard extends StatelessWidget {
             ],
           ),
           if (comparison.message != null) ...[
-            const SizedBox(height: 3),
+            const SizedBox(height: AppTheme.space3),
             Text(
               comparison.message!,
               style: TextStyle(
-                color:
-                    comparison.hasAlert
-                        ? AppTheme.warning
-                        : AppTheme.textSecondary,
+                color: comparison.hasAlert
+                    ? AppTheme.warning
+                    : AppTheme.textSecondary,
                 fontSize: AppTheme.fontXs,
                 height: 1.25,
               ),
             ),
           ] else if (insight.trend.message != null) ...[
-            const SizedBox(height: 3),
+            const SizedBox(height: AppTheme.space3),
             Text(
               insight.trend.message!,
               style: const TextStyle(
@@ -864,7 +869,10 @@ class _MarketplaceCard extends StatelessWidget {
   Widget _miniTrustChip(IconData icon, String label, Color color) {
     return Container(
       constraints: const BoxConstraints(maxWidth: 150),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space6,
+        vertical: AppTheme.space2,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -873,7 +881,7 @@ class _MarketplaceCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 11, color: color),
-          const SizedBox(width: 3),
+          const SizedBox(width: AppTheme.space3),
           Flexible(
             child: Text(
               label,

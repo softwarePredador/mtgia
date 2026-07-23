@@ -1,4 +1,12 @@
 exclude:
+  # Generated outputs and platform registrants are dependency consumers of the
+  # toolchain/plugins, not source dependencies declared by the ManaLoom app.
+  - .dart_tool/**
+  - build/**
+  - ios/Flutter/ephemeral/**
+  - linux/flutter/ephemeral/**
+  - macos/Flutter/ephemeral/**
+  - windows/flutter/ephemeral/**
   # Patrol creates these entrypoints during device/web runs. They import
   # package:test_api as generated implementation detail, not an app contract.
   - test_bundle.dart
@@ -6,3 +14,6 @@ exclude:
 
 ignore:
   - manaloom_lints
+  # Flutter's Web build resolves the Cupertino icon font through this package;
+  # it is an asset dependency even though app Dart code does not import it.
+  - cupertino_icons

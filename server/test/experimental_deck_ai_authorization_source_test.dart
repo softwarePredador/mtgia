@@ -139,7 +139,7 @@ void main() {
         expect(simulate, contains("'required_rule_cards'"));
         expect(
           simulate,
-          contains('requiredRuleCards: _allDeckCardRows(externalRequest)'),
+          contains('requiredRuleCards: _allDeckCardRows(battleRequest)'),
         );
         expect(simulate, contains('_isNaturalBattleResult(data, result)'));
         expect(simulate, isNot(contains('BattleSimulator(')));

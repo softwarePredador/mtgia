@@ -11,6 +11,8 @@ class LifeCounterExitResult {
     required this.endedAtEpochMs,
     this.playSessionId,
     this.deckId,
+    this.deckSnapshotHash,
+    this.deckVersionAtEpochMs,
     this.startedAtEpochMs,
   });
 
@@ -18,6 +20,8 @@ class LifeCounterExitResult {
   final bool storageFlushed;
   final String? playSessionId;
   final String? deckId;
+  final String? deckSnapshotHash;
+  final int? deckVersionAtEpochMs;
   final int? startedAtEpochMs;
   final int endedAtEpochMs;
 
@@ -28,14 +32,28 @@ class LifeCounterExitResult {
   }
 }
 
-String lifeCounterRouteLocation({String? deckId, String? deckName}) {
+String lifeCounterRouteLocation({
+  String? deckId,
+  String? deckName,
+  String? deckSnapshotHash,
+  int? deckVersionAtEpochMs,
+}) {
   final normalizedDeckId = deckId?.trim();
   final normalizedDeckName = deckName?.trim();
+  final normalizedDeckSnapshotHash = deckSnapshotHash?.trim().toLowerCase();
+  final hasCompleteDeckVersion =
+      normalizedDeckSnapshotHash != null &&
+      RegExp(r'^[0-9a-f]{64}$').hasMatch(normalizedDeckSnapshotHash) &&
+      deckVersionAtEpochMs != null &&
+      deckVersionAtEpochMs >= 0;
   final queryParameters = <String, String>{
     if (normalizedDeckId != null && normalizedDeckId.isNotEmpty)
       'deckId': normalizedDeckId,
     if (normalizedDeckName != null && normalizedDeckName.isNotEmpty)
       'deckName': normalizedDeckName,
+    if (hasCompleteDeckVersion) 'deckSnapshotHash': normalizedDeckSnapshotHash,
+    if (hasCompleteDeckVersion)
+      'deckVersionAt': deckVersionAtEpochMs.toString(),
   };
 
   return Uri(
@@ -65,9 +83,16 @@ Future<T?> openLifeCounterRoute<T extends Object?>(
   BuildContext context, {
   String? deckId,
   String? deckName,
+  String? deckSnapshotHash,
+  int? deckVersionAtEpochMs,
 }) {
   return context.push<T>(
-    lifeCounterRouteLocation(deckId: deckId, deckName: deckName),
+    lifeCounterRouteLocation(
+      deckId: deckId,
+      deckName: deckName,
+      deckSnapshotHash: deckSnapshotHash,
+      deckVersionAtEpochMs: deckVersionAtEpochMs,
+    ),
   );
 }
 

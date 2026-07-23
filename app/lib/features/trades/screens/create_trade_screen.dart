@@ -62,10 +62,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   @override
   void initState() {
     super.initState();
-    _type =
-        _supportedTypes.contains(widget.initialType)
-            ? widget.initialType
-            : 'trade';
+    _type = _supportedTypes.contains(widget.initialType)
+        ? widget.initialType
+        : 'trade';
     if (widget.preselectedItem != null) {
       _requestedItems.add(
         _SelectedItem(binderItem: widget.preselectedItem!, quantity: 1),
@@ -100,20 +99,18 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         });
       } else {
         setState(() {
-          _myBinderError =
-              _myBinderItems.isEmpty
-                  ? 'Não foi possível carregar seus itens para troca.'
-                  : 'A atualização falhou. Seus itens já carregados foram mantidos.';
+          _myBinderError = _myBinderItems.isEmpty
+              ? 'Não foi possível carregar seus itens para troca.'
+              : 'A atualização falhou. Seus itens já carregados foram mantidos.';
         });
       }
     } catch (e) {
       debugPrint('[CreateTrade] Falha ao carregar fichário: $e');
       if (mounted) {
         setState(() {
-          _myBinderError =
-              _myBinderItems.isEmpty
-                  ? 'Não foi possível carregar seus itens para troca.'
-                  : 'A atualização falhou. Seus itens já carregados foram mantidos.';
+          _myBinderError = _myBinderItems.isEmpty
+              ? 'Não foi possível carregar seus itens para troca.'
+              : 'A atualização falhou. Seus itens já carregados foram mantidos.';
         });
       }
     } finally {
@@ -149,47 +146,46 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      final myItemsPayload =
-          _usesOfferedItems
-              ? _myItems
-                  .map(
-                    (s) => {
-                      'binder_item_id': s.binderItem.id,
-                      'quantity': s.quantity,
-                      if (s.binderItem.price != null)
-                        'agreed_price': s.binderItem.price,
-                    },
-                  )
-                  .toList()
-              : <Map<String, dynamic>>[];
+      final myItemsPayload = _usesOfferedItems
+          ? _myItems
+                .map(
+                  (s) => {
+                    'binder_item_id': s.binderItem.id,
+                    'quantity': s.quantity,
+                    if (s.binderItem.price != null)
+                      'agreed_price': s.binderItem.price,
+                  },
+                )
+                .toList()
+          : <Map<String, dynamic>>[];
 
-      final requestedPayload =
-          _requestedItems
-              .map(
-                (s) => {
-                  'binder_item_id': s.binderItem.id,
-                  'quantity': s.quantity,
-                  if (s.binderItem.price != null)
-                    'agreed_price': s.binderItem.price,
-                },
-              )
-              .toList();
+      final requestedPayload = _requestedItems
+          .map(
+            (s) => {
+              'binder_item_id': s.binderItem.id,
+              'quantity': s.quantity,
+              if (s.binderItem.price != null)
+                'agreed_price': s.binderItem.price,
+            },
+          )
+          .toList();
 
-      final paymentAmount =
-          _usesPayment && _effectivePaymentAmount > 0
-              ? _effectivePaymentAmount
-              : null;
+      final paymentAmount = _usesPayment && _effectivePaymentAmount > 0
+          ? _effectivePaymentAmount
+          : null;
 
       final ok = await context.read<TradeProvider>().createTrade(
         receiverId: widget.receiverId,
         type: _type,
-        message:
-            _messageCtrl.text.trim().isEmpty ? null : _messageCtrl.text.trim(),
+        message: _messageCtrl.text.trim().isEmpty
+            ? null
+            : _messageCtrl.text.trim(),
         myItems: myItemsPayload,
         requestedItems: requestedPayload,
         paymentAmount: paymentAmount,
-        paymentMethod:
-            paymentAmount != null && paymentAmount > 0 ? _paymentMethod : null,
+        paymentMethod: paymentAmount != null && paymentAmount > 0
+            ? _paymentMethod
+            : null,
       );
 
       if (!mounted) return;
@@ -215,14 +211,13 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       SnackBar(
         content: Text(msg),
         backgroundColor: isError ? AppTheme.error : AppTheme.success,
-        action:
-            onRetry == null
-                ? null
-                : SnackBarAction(
-                  label: 'Tentar novamente',
-                  textColor: AppTheme.textPrimary,
-                  onPressed: onRetry,
-                ),
+        action: onRetry == null
+            ? null
+            : SnackBarAction(
+                label: 'Tentar novamente',
+                textColor: AppTheme.textPrimary,
+                onPressed: onRetry,
+              ),
       ),
     );
   }
@@ -233,8 +228,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     final paymentAmount = _effectivePaymentAmount;
     final offeredTotal = _itemsTotal(offeredItems) + paymentAmount;
     final difference = offeredTotal - requestedTotal;
-    final biggest =
-        requestedTotal > offeredTotal ? requestedTotal : offeredTotal;
+    final biggest = requestedTotal > offeredTotal
+        ? requestedTotal
+        : offeredTotal;
     final differencePct = biggest > 0 ? (difference / biggest) * 100 : 0.0;
     final relevantDifference =
         biggest > 0 &&
@@ -243,113 +239,110 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            key: const Key('create-trade-review-dialog'),
-            backgroundColor: AppTheme.surfaceSlate,
-            title: const Text(
-              'Revisar proposta',
-              style: TextStyle(color: AppTheme.textPrimary),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Confira itens, quantidades, condições, idioma e valores antes de enviar. O outro jogador receberá esta proposta para aceitar ou recusar.',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: AppTheme.fontMd,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  const TradeSafetyNotice(compact: true),
-                  const SizedBox(height: 14),
-                  _reviewItemsSection(
-                    title: 'Você quer receber',
-                    items: _requestedItems,
-                    emptyText: 'Nenhum item pedido',
-                  ),
-                  const SizedBox(height: 12),
-                  _reviewItemsSection(
-                    title: 'Você oferece',
-                    items: offeredItems,
-                    emptyText:
-                        _type == 'sale'
-                            ? 'Sem cartas oferecidas nesta compra'
-                            : 'Nenhum item oferecido',
-                  ),
-                  if (paymentAmount > 0) ...[
-                    const SizedBox(height: 12),
-                    _reviewLine(
-                      icon: Icons.payments_outlined,
-                      label: 'Pagamento',
-                      value:
-                          'R\$ ${paymentAmount.toStringAsFixed(2)} via ${_paymentMethod.toUpperCase()}',
-                      accent: AppTheme.brass400,
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-                  _reviewLine(
-                    icon: Icons.balance_outlined,
-                    label: 'Resumo de valor',
-                    value:
-                        'Pedido: R\$ ${requestedTotal.toStringAsFixed(2)} • Oferta: R\$ ${offeredTotal.toStringAsFixed(2)}',
-                    accent: AppTheme.frost400,
-                  ),
-                  if (biggest > 0) ...[
-                    const SizedBox(height: 8),
-                    _reviewLine(
-                      icon: Icons.compare_arrows,
-                      label: 'Diferença',
-                      value:
-                          'R\$ ${difference.abs().toStringAsFixed(2)} (${differencePct.abs().toStringAsFixed(1)}%) ${difference >= 0 ? 'a favor da oferta' : 'a favor do pedido'}',
-                      accent:
-                          relevantDifference
-                              ? AppTheme.warning
-                              : AppTheme.textSecondary,
-                    ),
-                  ],
-                  if (relevantDifference) ...[
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppTheme.warning.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                        border: Border.all(
-                          color: AppTheme.warning.withValues(alpha: 0.35),
-                        ),
-                      ),
-                      child: Text(
-                        difference > 0
-                            ? 'A sua oferta parece maior que o valor pedido. Confirme se essa diferença é intencional.'
-                            : 'O valor pedido parece maior que a sua oferta. Explique na mensagem se houver acordo combinado.',
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: AppTheme.fontSm,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
+      builder: (ctx) => AlertDialog(
+        key: const Key('create-trade-review-dialog'),
+        backgroundColor: AppTheme.surfaceSlate,
+        title: const Text(
+          'Revisar proposta',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Confira itens, quantidades, condições, idioma e valores antes de enviar. O outro jogador receberá esta proposta para aceitar ou recusar.',
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: AppTheme.fontMd,
+                ),
               ),
-            ),
-            actions: [
-              TextButton(
-                key: const Key('create-trade-review-back-button'),
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Voltar e editar'),
+              const SizedBox(height: AppTheme.space14),
+              const TradeSafetyNotice(compact: true),
+              const SizedBox(height: AppTheme.space14),
+              _reviewItemsSection(
+                title: 'Você quer receber',
+                items: _requestedItems,
+                emptyText: 'Nenhum item pedido',
               ),
-              ElevatedButton.icon(
-                key: const ValueKey('create-trade-review-confirm-button'),
-                onPressed: () => Navigator.pop(ctx, true),
-                icon: const Icon(Icons.send),
-                label: const Text('Enviar proposta'),
+              const SizedBox(height: AppTheme.space12),
+              _reviewItemsSection(
+                title: 'Você oferece',
+                items: offeredItems,
+                emptyText: _type == 'sale'
+                    ? 'Sem cartas oferecidas nesta compra'
+                    : 'Nenhum item oferecido',
               ),
+              if (paymentAmount > 0) ...[
+                const SizedBox(height: AppTheme.space12),
+                _reviewLine(
+                  icon: Icons.payments_outlined,
+                  label: 'Pagamento',
+                  value:
+                      'R\$ ${paymentAmount.toStringAsFixed(2)} via ${_paymentMethod.toUpperCase()}',
+                  accent: AppTheme.brass400,
+                ),
+              ],
+              const SizedBox(height: AppTheme.space12),
+              _reviewLine(
+                icon: Icons.balance_outlined,
+                label: 'Resumo de valor',
+                value:
+                    'Pedido: R\$ ${requestedTotal.toStringAsFixed(2)} • Oferta: R\$ ${offeredTotal.toStringAsFixed(2)}',
+                accent: AppTheme.frost400,
+              ),
+              if (biggest > 0) ...[
+                const SizedBox(height: AppTheme.space8),
+                _reviewLine(
+                  icon: Icons.compare_arrows,
+                  label: 'Diferença',
+                  value:
+                      'R\$ ${difference.abs().toStringAsFixed(2)} (${differencePct.abs().toStringAsFixed(1)}%) ${difference >= 0 ? 'a favor da oferta' : 'a favor do pedido'}',
+                  accent: relevantDifference
+                      ? AppTheme.warning
+                      : AppTheme.textSecondary,
+                ),
+              ],
+              if (relevantDifference) ...[
+                const SizedBox(height: AppTheme.space10),
+                Container(
+                  padding: const EdgeInsets.all(AppTheme.space10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.warning.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
+                      color: AppTheme.warning.withValues(alpha: 0.35),
+                    ),
+                  ),
+                  child: Text(
+                    difference > 0
+                        ? 'A sua oferta parece maior que o valor pedido. Confirme se essa diferença é intencional.'
+                        : 'O valor pedido parece maior que a sua oferta. Explique na mensagem se houver acordo combinado.',
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            key: const Key('create-trade-review-back-button'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Voltar e editar'),
+          ),
+          ElevatedButton.icon(
+            key: const ValueKey('create-trade-review-confirm-button'),
+            onPressed: () => Navigator.pop(ctx, true),
+            icon: const Icon(Icons.send),
+            label: const Text('Enviar proposta'),
+          ),
+        ],
+      ),
     );
     return confirmed == true;
   }
@@ -361,7 +354,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(AppTheme.space10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -381,7 +374,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               fontSize: AppTheme.fontMd,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           if (items.isEmpty)
             Text(
               emptyText,
@@ -399,14 +392,14 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   Widget _reviewItemLine(_SelectedItem selected) {
     final item = selected.binderItem;
-    final price =
-        item.price != null
-            ? ' • R\$ ${(item.price! * selected.quantity).toStringAsFixed(2)}'
-            : '';
-    final language =
-        item.language.trim().isEmpty ? 'idioma não informado' : item.language;
+    final price = item.price != null
+        ? ' • R\$ ${(item.price! * selected.quantity).toStringAsFixed(2)}'
+        : '';
+    final language = item.language.trim().isEmpty
+        ? 'idioma não informado'
+        : item.language;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: AppTheme.space6),
       child: Text(
         '${selected.quantity}x ${item.cardName} • ${item.condition} • $language$price',
         style: const TextStyle(
@@ -427,7 +420,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, color: accent, size: 18),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppTheme.space8),
         Expanded(
           child: Text(
             '$label: $value',
@@ -524,8 +517,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   void _pickFromMyBinder() {
     final selectedIds = _myItems.map((s) => s.binderItem.id).toSet();
-    final available =
-        _myBinderItems.where((i) => !selectedIds.contains(i.id)).toList();
+    final available = _myBinderItems
+        .where((i) => !selectedIds.contains(i.id))
+        .toList();
 
     if (available.isEmpty) {
       _showSnack(
@@ -573,7 +567,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               children: [
                 // Handle
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  margin: const EdgeInsets.symmetric(vertical: AppTheme.space8),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
@@ -583,8 +577,8 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                    horizontal: AppTheme.space16,
+                    vertical: AppTheme.space8,
                   ),
                   child: Text(
                     title,
@@ -599,7 +593,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 Expanded(
                   child: ListView.builder(
                     controller: scrollCtrl,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.space12,
+                    ),
                     itemCount: items.length,
                     itemBuilder: (ctx3, i) {
                       final item = items[i];
@@ -683,7 +679,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         backgroundColor: AppTheme.backgroundAbyss,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: AppTheme.space16),
         child: ResponsivePageFrame(
           maxWidth: 1120,
           child: LayoutBuilder(
@@ -693,21 +689,20 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _sectionTitle('Tipo de Negociação'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.space8),
                   _buildTypeSelector(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppTheme.space24),
                   _sectionTitle('Itens que você quer'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.space8),
                   _buildItemsList(
                     keyPrefix: 'requested',
                     items: _requestedItems,
                     emptyText: 'Nenhum item selecionado',
                     onAdd: _pickFromOtherUser,
-                    onRemove:
-                        (i) => setState(() => _requestedItems.removeAt(i)),
-                    onQtyChange:
-                        (i, q) =>
-                            setState(() => _requestedItems[i].quantity = q),
+                    onRemove: (i) =>
+                        setState(() => _requestedItems.removeAt(i)),
+                    onQtyChange: (i, q) =>
+                        setState(() => _requestedItems[i].quantity = q),
                     accentColor: AppTheme.brass400,
                   ),
                 ],
@@ -730,10 +725,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     )
                   else ...[
                     requestPane,
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppTheme.space20),
                     termsPane,
                   ],
-                  const SizedBox(height: 40),
+                  const SizedBox(height: AppTheme.space40),
                 ],
               );
             },
@@ -749,10 +744,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       children: [
         if (_type == 'trade' || _type == 'mixed') ...[
           _sectionTitle('Itens que você oferece'),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           if (_loadingMyBinder && _myBinderItems.isEmpty)
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: AppTheme.space12),
               child: Center(
                 child: CircularProgressIndicator(color: AppTheme.brass500),
               ),
@@ -771,20 +766,20 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               accentColor: AppTheme.frost400,
             ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
         ],
         if (_type == 'sale' || _type == 'mixed') ...[
           _sectionTitle('Pagamento'),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           _buildPaymentFields(),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppTheme.space20),
         ],
         _sectionTitle('Mensagem (opcional)'),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         _buildMessageField(),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppTheme.space20),
         const TradeSafetyNotice(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppTheme.space24),
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
@@ -843,17 +838,16 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         ),
       ),
-      icon:
-          _isSubmitting
-              ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: AppTheme.backgroundAbyss,
-                  strokeWidth: 2,
-                ),
-              )
-              : const Icon(Icons.send),
+      icon: _isSubmitting
+          ? const SizedBox(
+              width: AppTheme.space20,
+              height: AppTheme.space20,
+              child: CircularProgressIndicator(
+                color: AppTheme.backgroundAbyss,
+                strokeWidth: 2,
+              ),
+            )
+          : const Icon(Icons.send),
       label: Text(
         _isSubmitting ? 'Enviando...' : 'Enviar Proposta',
         style: const TextStyle(
@@ -937,12 +931,14 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           constraints: const BoxConstraints(minHeight: 88),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          padding: const EdgeInsets.symmetric(
+            vertical: AppTheme.space12,
+            horizontal: AppTheme.space10,
+          ),
           decoration: BoxDecoration(
-            color:
-                selected
-                    ? color.withValues(alpha: 0.15)
-                    : AppTheme.surfaceSlate,
+            color: selected
+                ? color.withValues(alpha: 0.15)
+                : AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
               color: selected ? color : AppTheme.outlineMuted,
@@ -957,7 +953,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 color: selected ? color : AppTheme.textSecondary,
                 size: 22,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.space4),
               Text(
                 label,
                 maxLines: 2,
@@ -980,8 +976,8 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     return Container(
       key: const Key('create-trade-binder-error'),
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppTheme.space8),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.warning.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -994,7 +990,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(Icons.sync_problem_rounded, color: AppTheme.warning),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   _myBinderError!,
@@ -1033,7 +1029,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         if (items.isEmpty)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppTheme.space20),
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1063,7 +1059,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             accentColor,
           );
         }),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         OutlinedButton.icon(
           key: Key('create-trade-add-item-$keyPrefix'),
           onPressed: onAdd,
@@ -1092,7 +1088,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     final item = sel.binderItem;
     return Card(
       key: Key('create-trade-selected-item-$keyPrefix-$index'),
-      margin: const EdgeInsets.only(bottom: 6),
+      margin: const EdgeInsets.only(bottom: AppTheme.space6),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1102,7 +1098,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(AppTheme.space8),
         child: Row(
           children: [
             CachedCardImage(
@@ -1111,7 +1107,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               height: 50,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1126,7 +1122,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.space2),
                   Wrap(
                     spacing: 6,
                     runSpacing: 4,
@@ -1174,8 +1170,8 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     child: Tooltip(
                       message: 'Diminuir quantidade',
                       child: SizedBox(
-                        width: 48,
-                        height: 48,
+                        width: AppTheme.space48,
+                        height: AppTheme.space48,
                         child: InkWell(
                           key: Key(
                             'create-trade-item-decrement-$keyPrefix-$index',
@@ -1183,17 +1179,15 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusSm,
                           ),
-                          onTap:
-                              sel.quantity > 1
-                                  ? () => onQtyChange(index, sel.quantity - 1)
-                                  : null,
+                          onTap: sel.quantity > 1
+                              ? () => onQtyChange(index, sel.quantity - 1)
+                              : null,
                           child: Icon(
                             Icons.remove,
                             size: 16,
-                            color:
-                                sel.quantity > 1
-                                    ? accentColor
-                                    : AppTheme.textSecondary,
+                            color: sel.quantity > 1
+                                ? accentColor
+                                : AppTheme.textSecondary,
                           ),
                         ),
                       ),
@@ -1201,7 +1195,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                   ),
                   Padding(
                     key: Key('create-trade-item-quantity-$keyPrefix-$index'),
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.space4,
+                    ),
                     child: Text(
                       '${sel.quantity}',
                       style: TextStyle(
@@ -1218,8 +1214,8 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     child: Tooltip(
                       message: 'Aumentar quantidade',
                       child: SizedBox(
-                        width: 48,
-                        height: 48,
+                        width: AppTheme.space48,
+                        height: AppTheme.space48,
                         child: InkWell(
                           key: Key(
                             'create-trade-item-increment-$keyPrefix-$index',
@@ -1227,17 +1223,15 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusSm,
                           ),
-                          onTap:
-                              sel.quantity < item.quantity
-                                  ? () => onQtyChange(index, sel.quantity + 1)
-                                  : null,
+                          onTap: sel.quantity < item.quantity
+                              ? () => onQtyChange(index, sel.quantity + 1)
+                              : null,
                           child: Icon(
                             Icons.add,
                             size: 16,
-                            color:
-                                sel.quantity < item.quantity
-                                    ? accentColor
-                                    : AppTheme.textSecondary,
+                            color: sel.quantity < item.quantity
+                                ? accentColor
+                                : AppTheme.textSecondary,
                           ),
                         ),
                       ),
@@ -1246,7 +1240,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 ],
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppTheme.space4),
             // Remove
             Semantics(
               button: true,
@@ -1254,8 +1248,8 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               child: Tooltip(
                 message: 'Remover carta',
                 child: SizedBox(
-                  width: 48,
-                  height: 48,
+                  width: AppTheme.space48,
+                  height: AppTheme.space48,
                   child: InkWell(
                     key: Key('create-trade-item-remove-$keyPrefix-$index'),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1310,7 +1304,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         LayoutBuilder(
           builder: (context, constraints) {
             final chipWidth = _responsiveChipWidth(constraints.maxWidth);
@@ -1344,12 +1338,14 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         onTap: () => setState(() => _paymentMethod = value),
         child: Container(
           constraints: const BoxConstraints(minHeight: AppTheme.touchTargetMin),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          padding: const EdgeInsets.symmetric(
+            vertical: AppTheme.space10,
+            horizontal: AppTheme.space8,
+          ),
           decoration: BoxDecoration(
-            color:
-                selected
-                    ? AppTheme.brass400.withValues(alpha: 0.15)
-                    : AppTheme.surfaceSlate,
+            color: selected
+                ? AppTheme.brass400.withValues(alpha: 0.15)
+                : AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
               color: selected ? AppTheme.brass400 : AppTheme.outlineMuted,

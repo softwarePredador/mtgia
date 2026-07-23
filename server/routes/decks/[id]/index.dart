@@ -4,10 +4,14 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/deck_card_name_resolution_support.dart';
+import '../../../lib/deck_format_support.dart';
+import '../../../lib/deck_request_support.dart';
+import '../../../lib/deck_snapshot_contract.dart';
 import '../../../lib/commander_bracket.dart';
 import '../../../lib/deck_schema_support.dart';
 import '../../../lib/deck_validation_state_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../lib/decks/deck_applied_analysis_support.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/http_responses.dart';
 import '../../../lib/scryfall_image_url.dart';
@@ -77,31 +81,63 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
   final hasMeta = await hasDeckMetaColumns(conn);
   final hasValidationState = await hasDeckValidationStateColumns(conn);
 
-  final body = await context.request.json();
-  final name = body['name'] as String?;
-  final format = body['format'] as String?;
-  final description = body['description'] as String?;
-  final archetype = body['archetype'] as String?;
-  final bracketResult = parseCommanderBracket(body['bracket']);
-  if (bracketResult.error != null) {
-    return badRequest(bracketResult.error!);
-  }
-  final bracket = bracketResult.value;
-  final isPublic = body['is_public'] as bool?;
-  final cards = body['cards'] as List?; // Lista completa e nova de cartas
-  final mutationContext =
-      body['mutation_context'] is Map
-          ? (body['mutation_context'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+  late final String? name;
+  late final String? format;
+  late final String? description;
+  late final String? archetype;
+  late final int? bracket;
+  late final bool? isPublic;
+  late final List<dynamic>? cards;
+  late final List<Map<String, dynamic>>? rawCardObjects;
+  late final Map<String, dynamic> mutationContext;
 
   try {
-    final updatedDeck = await conn.runTx((session) async {
+    final body = requireJsonObject(await context.request.json());
+    name = readOptionalString(body, 'name', trim: true);
+    if (name != null && name.isEmpty) {
+      throw const DeckRequestException('Field name must not be empty.');
+    }
+    final rawFormat = readOptionalString(body, 'format', trim: true);
+    if (rawFormat != null) {
+      final supportedFormat = normalizeSupportedDeckFormat(rawFormat);
+      if (supportedFormat == null) {
+        throw DeckRequestException(unsupportedDeckFormatMessage(rawFormat));
+      }
+      format = supportedFormat;
+    } else {
+      format = null;
+    }
+    description = readOptionalString(body, 'description');
+    archetype = readOptionalString(body, 'archetype', trim: true);
+    final bracketResult = parseCommanderBracket(body['bracket']);
+    if (bracketResult.error != null) {
+      throw DeckRequestException(bracketResult.error!);
+    }
+    bracket = bracketResult.value;
+    isPublic = readOptionalBool(body, 'is_public');
+    cards = readOptionalList(body, 'cards');
+    rawCardObjects = cards == null ? null : requireObjectList(cards);
+    mutationContext =
+        readOptionalObject(body, 'mutation_context') ??
+        const <String, dynamic>{};
+  } on FormatException catch (e) {
+    return badRequest('Invalid JSON body: ${e.message}');
+  } on DeckRequestException catch (e) {
+    return badRequest(e.message);
+  }
+
+  try {
+    final updateResult = await conn.runTx((session) async {
       // 1. Verifica se o deck existe e pertence ao usuário
       final deckCheck = await session.execute(
         Sql.named(
           hasMeta
-              ? 'SELECT id, name, format, description, archetype, bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId'
-              : 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId',
+              ? hasValidationState
+                  ? 'SELECT id, name, format, description, archetype, bracket, is_public, validation_state, validation_reasons, validation_updated_at FROM decks WHERE id = @deckId AND user_id = @userId FOR UPDATE'
+                  : 'SELECT id, name, format, description, archetype, bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId FOR UPDATE'
+              : hasValidationState
+              ? 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket, is_public, validation_state, validation_reasons, validation_updated_at FROM decks WHERE id = @deckId AND user_id = @userId FOR UPDATE'
+              : 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId FOR UPDATE',
         ),
         parameters: {'deckId': deckId, 'userId': userId},
       );
@@ -116,15 +152,34 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       final existingArchetype = deckCheck.first[4] as String?;
       final existingBracket = deckCheck.first[5] as int?;
       final existingIsPublic = deckCheck.first[6] as bool? ?? false;
+      final beforeValidation =
+          hasValidationState
+              ? <String, dynamic>{
+                'validation_state': deckCheck.first[7]?.toString() ?? 'unknown',
+                'validation_reasons': deckCheck.first[8] ?? const <dynamic>[],
+                'validation_updated_at': deckValidationTimestampToJson(
+                  deckCheck.first[9],
+                ),
+              }
+              : const <String, dynamic>{};
 
       final nextName = name ?? existingName;
-      final nextFormat = format ?? existingFormat;
+      final nextFormat = format ?? normalizeSupportedDeckFormat(existingFormat);
+      if (nextFormat == null) {
+        throw DeckRulesException(unsupportedDeckFormatMessage(existingFormat));
+      }
       final nextDescription = description ?? existingDescription;
       final nextArchetype = archetype ?? existingArchetype;
       final nextBracket = bracket ?? existingBracket;
       final nextIsPublic = isPublic ?? existingIsPublic;
 
       final currentFormat = nextFormat.toLowerCase();
+      final isOptimizationMutation =
+          DeckOptimizationHistoryService.normalizeMutationContext(
+            mutationContext,
+          ).isNotEmpty;
+      Map<String, dynamic>? optimizationEvent;
+      Map<String, dynamic>? appliedPostAnalysis;
 
       // 2. Atualiza os dados do deck
       if (name != null ||
@@ -152,32 +207,62 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       }
 
       // 3. Se uma nova lista de cartas for enviada, substitui a antiga
-      if (cards != null) {
-        validateNoUnsupportedDeckSections(
-          cards: cards.whereType<Map>().map(
-            (card) => card.cast<String, dynamic>(),
-          ),
-        );
+      if (rawCardObjects != null) {
+        validateNoUnsupportedDeckSections(cards: rawCardObjects);
+
+        final beforeCardsResult =
+            isOptimizationMutation
+                ? await session.execute(
+                  Sql.named('''
+                  SELECT card_id::text, quantity::int, is_commander, condition
+                  FROM deck_cards
+                  WHERE deck_id = @deckId
+                '''),
+                  parameters: {'deckId': deckId},
+                )
+                : null;
+        final beforeCards =
+            beforeCardsResult == null
+                ? const <Map<String, dynamic>>[]
+                : <Map<String, dynamic>>[
+                  for (final row in beforeCardsResult)
+                    {
+                      'card_id': row[0] as String,
+                      'quantity': row[1] as int,
+                      'is_commander': row[2] as bool? ?? false,
+                      'condition': row[3]?.toString() ?? 'NM',
+                    },
+                ];
+        if (isOptimizationMutation) {
+          final expectedSignature =
+              mutationContext['expected_deck_signature']?.toString().trim() ??
+              '';
+          final currentSignature =
+              DeckOptimizationHistoryService.buildDeckSignature(beforeCards);
+          if (expectedSignature.isEmpty) {
+            throw const DeckRequestException(
+              'Optimization apply requires expected_deck_signature.',
+            );
+          }
+          if (expectedSignature != currentSignature) {
+            throw const DeckRequestException(
+              'Deck changed after preview. Refresh the analysis and try again.',
+            );
+          }
+        }
 
         final normalized = <Map<String, dynamic>>[];
-        for (final rawCard in cards.whereType<Map>()) {
-          final card = rawCard.cast<String, dynamic>();
-
-          var cardId = (card['card_id'] as String?)?.trim();
-          final cardName = (card['name'] as String?)?.trim();
-          final quantityRaw = card['quantity'];
-          final quantity =
-              quantityRaw is int
-                  ? quantityRaw
-                  : int.tryParse('${quantityRaw ?? ''}');
-          final isCommander = card['is_commander'] as bool? ?? false;
+        for (final card in rawCardObjects) {
+          var cardId = readOptionalString(card, 'card_id', trim: true);
+          final cardName = readOptionalString(card, 'name', trim: true);
+          final quantity = requirePositiveInteger(card, 'quantity');
+          final isCommander = readOptionalBool(card, 'is_commander') ?? false;
 
           if ((cardId == null || cardId.isEmpty) &&
               (cardName == null || cardName.isEmpty)) {
-            throw Exception('Each card must have a card_id or name.');
-          }
-          if (quantity == null || quantity <= 0) {
-            throw Exception('Each card must have a positive quantity.');
+            throw const DeckRequestException(
+              'Each card must have a card_id or name.',
+            );
           }
 
           if (cardId == null || cardId.isEmpty) {
@@ -187,7 +272,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
               preferredFormat: currentFormat,
             );
             if (cardId == null || cardId.isEmpty) {
-              throw Exception('Card not found: $cardName');
+              throw DeckRequestException('Card not found: $cardName');
             }
           }
 
@@ -237,7 +322,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
         await DeckRulesService(session).validateAndThrow(
           format: currentFormat,
           cards: dedupedList,
-          strict: false,
+          strict: isOptimizationMutation,
         );
 
         // Apaga as cartas antigas
@@ -272,6 +357,122 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
 
           await session.execute(Sql.named(batchInsertSql), parameters: params);
         }
+
+        if (isOptimizationMutation) {
+          if (!hasValidationState) {
+            throw const DeckRequestException(
+              'Optimization apply requires deck validation state support.',
+            );
+          }
+          final stateResult = await session.execute(
+            Sql.named('''
+              UPDATE decks
+              SET validation_state = 'validated',
+                  validation_reasons = '[]'::jsonb,
+                  validation_updated_at = CURRENT_TIMESTAMP
+              WHERE id = @deckId AND user_id = @userId
+              RETURNING validation_state, validation_reasons,
+                        validation_updated_at
+            '''),
+            parameters: {'deckId': deckId, 'userId': userId},
+          );
+          final persistedState = stateResult.first.toColumnMap();
+          final afterValidation = <String, dynamic>{
+            'validation_state': persistedState['validation_state'],
+            'validation_reasons': persistedState['validation_reasons'],
+            'validation_updated_at': deckValidationTimestampToJson(
+              persistedState['validation_updated_at'],
+            ),
+          };
+          final optimizationArchetype =
+              mutationContext['archetype']?.toString().trim() ?? '';
+          final optimizationBracket = int.tryParse(
+            mutationContext['bracket']?.toString() ?? '',
+          );
+          if (hasMeta &&
+              (optimizationArchetype.isNotEmpty ||
+                  (optimizationBracket != null &&
+                      optimizationBracket >= 1 &&
+                      optimizationBracket <= 5))) {
+            await session.execute(
+              Sql.named('''
+                UPDATE decks
+                SET archetype = COALESCE(NULLIF(@archetype, ''), archetype),
+                    bracket = COALESCE(
+                      CAST(NULLIF(@bracket, '') AS int),
+                      bracket
+                    )
+                WHERE id = @deckId AND user_id = @userId
+              '''),
+              parameters: {
+                'deckId': deckId,
+                'userId': userId,
+                'archetype': optimizationArchetype,
+                'bracket':
+                    optimizationBracket != null &&
+                            optimizationBracket >= 1 &&
+                            optimizationBracket <= 5
+                        ? optimizationBracket.toString()
+                        : '',
+              },
+            );
+          }
+          appliedPostAnalysis = await loadAppliedDeckPostAnalysis(
+            session: session,
+            persistedCards: dedupedList,
+          );
+          optimizationEvent = await DeckOptimizationHistoryService(
+            conn,
+          ).recordAppliedOptimization(
+            userId: userId,
+            deckId: deckId,
+            context: mutationContext,
+            session: session,
+            beforeCardsPayload: beforeCards,
+            afterCardsPayload: dedupedList,
+            beforeValidation: beforeValidation,
+            afterValidation: afterValidation,
+            beforeDeckMetadata: {
+              'archetype': existingArchetype,
+              'bracket': existingBracket,
+            },
+            afterDeckMetadata: {
+              'archetype':
+                  optimizationArchetype.isEmpty
+                      ? existingArchetype
+                      : optimizationArchetype,
+              'bracket':
+                  optimizationBracket != null &&
+                          optimizationBracket >= 1 &&
+                          optimizationBracket <= 5
+                      ? optimizationBracket
+                      : existingBracket,
+            },
+            authoritativeAfterAnalysis: appliedPostAnalysis,
+          );
+        }
+      } else if (format != null && format != existingFormat.toLowerCase()) {
+        final existingCardsResult = await session.execute(
+          Sql.named('''
+            SELECT card_id::text, quantity::int, is_commander
+            FROM deck_cards
+            WHERE deck_id = @deckId
+          '''),
+          parameters: {'deckId': deckId},
+        );
+        final existingCards = <Map<String, dynamic>>[
+          for (final row in existingCardsResult)
+            {
+              'card_id': row[0] as String,
+              'quantity': row[1] as int,
+              'is_commander': row[2] as bool? ?? false,
+            },
+        ];
+        await DeckRulesService(session).validateAndThrow(
+          format: currentFormat,
+          cards: existingCards,
+          strict: false,
+        );
       }
 
       // Retorna o deck atualizado (sem a lista de cartas, para simplicidade)
@@ -291,28 +492,29 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           ..['validation_state'] = deckValidationStateUnknown
           ..['validation_reasons'] = const [deckValidationReasonNotRecorded];
       }
-      return exposeDeckValidationState(deckMap);
+      return {
+        'deck': exposeDeckValidationState(deckMap),
+        if (optimizationEvent != null) 'optimization_event': optimizationEvent,
+        if (appliedPostAnalysis != null) 'post_analysis': appliedPostAnalysis,
+        if (optimizationEvent != null)
+          'validation': {
+            'ok': true,
+            'format': currentFormat,
+            'deck_id': deckId,
+            'deck_state': 'validated',
+            'requires_review': false,
+            'review_reasons': const <String>[],
+            'validation_updated_at': deckMap['validation_updated_at'],
+          },
+      };
     });
 
-    if (cards != null && mutationContext.isNotEmpty) {
-      try {
-        await DeckOptimizationHistoryService(conn).recordAppliedOptimization(
-          userId: userId,
-          deckId: deckId,
-          context: mutationContext,
-          afterCardsPayload: cards
-              .whereType<Map>()
-              .map((card) => card.cast<String, dynamic>())
-              .toList(growable: false),
-        );
-      } catch (e) {
-        print('[WARN] Failed to record deck optimization event: $e');
-      }
-    }
-
-    return Response.json(body: {'success': true, 'deck': updatedDeck});
+    return Response.json(body: {'success': true, ...updateResult});
   } on DeckRulesException catch (e) {
     print('[ERROR] Failed to update deck: $e');
+    return badRequest(e.message);
+  } on DeckRequestException catch (e) {
+    print('[ERROR] Invalid update deck request: $e');
     return badRequest(e.message);
   } on Exception catch (e) {
     print('[ERROR] Failed to update deck: $e');
@@ -329,6 +531,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
   final conn = context.read<Pool>();
   final hasMeta = await hasDeckMetaColumns(conn);
   final hasPricing = await hasDeckPricingColumns(conn);
+  final hasPricingSource = await hasDeckPricingSourceColumn(conn);
   final hasValidationState = await hasDeckValidationStateColumns(conn);
   final hasSets = await _hasTable(conn, 'sets');
 
@@ -347,8 +550,8 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
               ? 'validation_state, validation_reasons, validation_updated_at,'
               : "'unknown'::text as validation_state, '[\"validation_not_recorded\"]'::jsonb as validation_reasons, NULL::timestamptz as validation_updated_at,",
           hasPricing
-              ? 'pricing_currency, pricing_total, pricing_missing_cards, pricing_updated_at,'
-              : "NULL::text as pricing_currency, NULL::numeric as pricing_total, 0::int as pricing_missing_cards, NULL::timestamptz as pricing_updated_at,",
+              ? 'pricing_currency, pricing_total, pricing_missing_cards, ${hasPricingSource ? 'pricing_source' : 'NULL::text AS pricing_source'}, pricing_updated_at,'
+              : "NULL::text as pricing_currency, NULL::numeric as pricing_total, 0::int as pricing_missing_cards, NULL::text as pricing_source, NULL::timestamptz as pricing_updated_at,",
           'created_at',
           'FROM decks WHERE id = @deckId AND user_id = @userId',
         ].join(' '),
@@ -545,6 +748,12 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
 
     final responseBody = {
       ...deckInfo,
+      'deck_snapshot_hash': buildDeckSnapshotHash(
+        name: deckInfo['name']?.toString() ?? '',
+        format: deckInfo['format']?.toString() ?? '',
+        cards: cardsList,
+      ),
+      'deck_version_at': DateTime.now().toUtc().toIso8601String(),
       'color_identity': deckColorIdentity.toList(),
       'color_identity_known': true,
       'stats': {

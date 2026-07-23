@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:dart_frog/dart_frog.dart';
 import 'package:test/test.dart';
 
 import '../lib/auth_runtime_policy.dart';
@@ -161,5 +164,116 @@ void main() {
       expect(headers['X-RateLimit-Window'], equals('60'));
       expect(headers['X-RateLimit-Reset'], equals('45'));
     });
+
+    test(
+      'GET /auth/me neither consumes nor suffers the credential bucket',
+      () async {
+        final limiter = RateLimiter(maxRequests: 5, windowSeconds: 60);
+        final protectedHandler = authRateLimit(
+          limiterOverrideForTesting: limiter,
+        )((_) => Response.json(body: const {'ok': true}));
+        const client = 'rate-limit-test-auth-me';
+
+        for (var index = 0; index < 12; index++) {
+          final response = await protectedHandler(
+            _rateLimitContext(HttpMethod.get, '/auth/me', client: client),
+          );
+          expect(response.statusCode, HttpStatus.ok);
+        }
+
+        for (var index = 0; index < 5; index++) {
+          final response = await protectedHandler(
+            _rateLimitContext(HttpMethod.post, '/auth/login', client: client),
+          );
+          expect(response.statusCode, HttpStatus.ok);
+        }
+
+        final blockedLogin = await protectedHandler(
+          _rateLimitContext(HttpMethod.post, '/auth/login', client: client),
+        );
+        expect(blockedLogin.statusCode, HttpStatus.tooManyRequests);
+
+        final sessionReadAfterBlock = await protectedHandler(
+          _rateLimitContext(HttpMethod.get, '/auth/me', client: client),
+        );
+        expect(sessionReadAfterBlock.statusCode, HttpStatus.ok);
+      },
+    );
+
+    test('POST /auth/register remains protected by the auth bucket', () async {
+      final limiter = RateLimiter(maxRequests: 5, windowSeconds: 60);
+      final protectedHandler = authRateLimit(
+        limiterOverrideForTesting: limiter,
+      )((_) => Response.json(body: const {'ok': true}));
+      const client = 'rate-limit-test-register';
+
+      for (var index = 0; index < 5; index++) {
+        final response = await protectedHandler(
+          _rateLimitContext(HttpMethod.post, '/auth/register', client: client),
+        );
+        expect(response.statusCode, HttpStatus.ok);
+      }
+
+      final blocked = await protectedHandler(
+        _rateLimitContext(HttpMethod.post, '/auth/register', client: client),
+      );
+      final body = jsonDecode(await blocked.body()) as Map<String, dynamic>;
+
+      expect(blocked.statusCode, HttpStatus.tooManyRequests);
+      expect(body['rate_limit_bucket'], 'auth');
+      expect(body['rate_limit_backend'], 'in_memory_fallback');
+    });
+
+    test('account recovery and session rotation share the auth bucket', () {
+      for (final path in const [
+        '/auth/forgot-password',
+        '/auth/reset-password',
+        '/auth/change-password',
+        '/auth/revoke-sessions',
+      ]) {
+        expect(
+          isAuthCredentialAttempt(
+            Request('POST', Uri.parse('http://localhost$path')),
+          ),
+          isTrue,
+          reason: path,
+        );
+      }
+      expect(
+        isAuthCredentialAttempt(
+          Request('GET', Uri.parse('http://localhost/auth/forgot-password')),
+        ),
+        isFalse,
+      );
+    });
   });
+}
+
+RequestContext _rateLimitContext(
+  HttpMethod method,
+  String path, {
+  required String client,
+}) => _RateLimitRequestContext(
+  Request(
+    method.name.toUpperCase(),
+    Uri.parse('http://localhost$path'),
+    headers: {'user-agent': client, 'accept-language': 'pt-BR'},
+  ),
+);
+
+class _RateLimitRequestContext implements RequestContext {
+  const _RateLimitRequestContext(this.request);
+
+  @override
+  final Request request;
+
+  @override
+  Map<String, String> get mountedParams => const {};
+
+  @override
+  RequestContext provide<T extends Object?>(T Function() create) => this;
+
+  @override
+  T read<T>() =>
+      throw StateError('Distributed limiter is disabled in focused tests.');
 }

@@ -18983,6 +18983,38 @@ na command zone, não para validação de deck no servidor.
   - `pg_hermes_sqlite_contract_audit` com wrapper do servidor novo -> `51/51`;
   - `operational_surface_alignment_audit` -> `pass`;
   - `legacy_contamination_audit` -> `pass`.
+
+## 2026-07-21 — Auditoria E2E, core e documentação
+
+- Auditoria canônica criada em
+  `docs/qa/MANALOOM_E2E_CORE_DOCUMENTATION_AUDIT_2026-07-21.md`.
+- Resultado honesto do aggregate determinístico:
+  `8 PASS`, `2 FAIL`, `9 SKIP`; retenção encontrou 18 artefatos locais e o
+  analysis server Dart caiu transitoriamente no gate Battle dentro do
+  aggregate. O gate Battle passou isoladamente antes/depois.
+- Validações verdes:
+  - server `all-local`: `1.589/1.589`;
+  - Flutter decks: `240/240` com Flutter `3.44.6` / Dart `3.12.2`;
+  - Patrol local: `9/9`;
+  - Battle: `46/46` checks e `66` testes Dart;
+  - Web pública: lint, build de 13 rotas, smoke HTTP e 0 vulnerabilidades;
+  - auth/rate-limit: app `6/6`, server `16/16`;
+  - mecanismo do gate estatístico Lorehold: `16/16`; o gate real permanece
+    `BLOCKED` por timeouts e regressão Lumra `9/32→5/32`, portanto o deck `607`
+    continua sendo o baseline protegido.
+- `full` e Flutter completo ficaram bloqueados por falta de espaço temporário
+  (`errno 28`), sem promoção indevida para PASS.
+- Mapa de API atualizado para sessão/rate-limit, Battle replay,
+  comentários/denúncias, trade matches e relatórios compartilháveis.
+- O relatório mestre de 2026-06-11 foi reclassificado no índice como snapshot
+  histórico, porque secure storage, `CommercialProvider`, migrations-only e o
+  runtime Battle/ops já superaram partes daquele texto.
+- Correções de gate:
+  - novos scripts Lorehold classificados como `focused evidence/promotion`;
+  - `brace-expansion` atualizado de `1.1.15` para `1.1.16` no lock Web;
+  - fixture Patrol alinhada à política atual de senha forte;
+  - guard de rollback Flutter Web alinhado ao marcador externo atual.
+- Nenhuma migration, escrita PostgreSQL, chamada live ou deploy foi executado.
   - `legacy_contamination_audit` -> `pass`.
 
 ## 2026-07-08 — PG652 X damage wipe + PG652b oracle_hash backfill

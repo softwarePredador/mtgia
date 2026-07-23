@@ -20,20 +20,18 @@ class AiUsageMeter extends StatelessWidget {
       provider.load();
     }
     final snapshot = provider.usageSnapshot;
-    final planLabel =
-        CommercialLaunchPolicy.isFreeBeta && !snapshot.plan.isPro
-            ? CommercialLaunchPolicy.betaLabel
-            : snapshot.plan.tier.label;
-    final accent =
-        snapshot.isExhausted
-            ? AppTheme.error
-            : snapshot.isNearLimit
-            ? AppTheme.warning
-            : AppTheme.brass400;
+    final planLabel = CommercialLaunchPolicy.isFreeBeta && !snapshot.plan.isPro
+        ? CommercialLaunchPolicy.betaLabel
+        : snapshot.plan.tier.label;
+    final accent = snapshot.isExhausted
+        ? AppTheme.error
+        : snapshot.isNearLimit
+        ? AppTheme.warning
+        : AppTheme.brass400;
 
     return Container(
       key: const Key('ai-usage-meter'),
-      padding: EdgeInsets.all(compact ? 12 : 16),
+      padding: EdgeInsets.all(compact ? AppTheme.space12 : AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -45,7 +43,7 @@ class AiUsageMeter extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.auto_awesome, color: accent, size: 19),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.space8),
               Expanded(
                 child: Text(
                   'Uso de IA · $planLabel',
@@ -62,7 +60,7 @@ class AiUsageMeter extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             child: LinearProgressIndicator(
@@ -72,7 +70,7 @@ class AiUsageMeter extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation<Color>(accent),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Text(
             '${snapshot.remaining} de ${snapshot.limit} ações restantes em ${snapshot.periodKey}.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

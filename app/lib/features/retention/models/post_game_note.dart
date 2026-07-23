@@ -55,6 +55,8 @@ class PostGameNote {
   final String? playSessionId;
   final DateTime? sessionStartedAt;
   final DateTime? sessionEndedAt;
+  final String? deckSnapshotHash;
+  final DateTime? deckVersionAt;
 
   const PostGameNote({
     required this.id,
@@ -69,6 +71,8 @@ class PostGameNote {
     this.playSessionId,
     this.sessionStartedAt,
     this.sessionEndedAt,
+    this.deckSnapshotHash,
+    this.deckVersionAt,
   });
 
   factory PostGameNote.create({
@@ -82,9 +86,15 @@ class PostGameNote {
     String? playSessionId,
     DateTime? sessionStartedAt,
     DateTime? sessionEndedAt,
+    String? deckSnapshotHash,
+    DateTime? deckVersionAt,
     DateTime? createdAt,
   }) {
     final timestamp = createdAt ?? DateTime.now();
+    final normalizedDeckSnapshotHash = _validDeckSnapshotHash(deckSnapshotHash);
+    final normalizedDeckVersionAt = _validSessionDate(deckVersionAt);
+    final hasCompleteDeckVersion =
+        normalizedDeckSnapshotHash != null && normalizedDeckVersionAt != null;
     return PostGameNote(
       id: '${timestamp.microsecondsSinceEpoch}',
       deckId: deckId,
@@ -98,10 +108,20 @@ class PostGameNote {
       playSessionId: _cleanOptional(playSessionId),
       sessionStartedAt: _validSessionDate(sessionStartedAt),
       sessionEndedAt: _validSessionDate(sessionEndedAt),
+      deckSnapshotHash: hasCompleteDeckVersion
+          ? normalizedDeckSnapshotHash
+          : null,
+      deckVersionAt: hasCompleteDeckVersion ? normalizedDeckVersionAt : null,
     );
   }
 
   factory PostGameNote.fromJson(Map<String, dynamic> json) {
+    final normalizedDeckSnapshotHash = _validDeckSnapshotHash(
+      json['deck_snapshot_hash']?.toString(),
+    );
+    final normalizedDeckVersionAt = _readSessionDate(json['deck_version_at']);
+    final hasCompleteDeckVersion =
+        normalizedDeckSnapshotHash != null && normalizedDeckVersionAt != null;
     return PostGameNote(
       id: json['id']?.toString() ?? '',
       deckId: json['deck_id']?.toString() ?? '',
@@ -119,6 +139,10 @@ class PostGameNote {
       playSessionId: _cleanOptional(json['play_session_id']?.toString()),
       sessionStartedAt: _readSessionDate(json['session_started_at']),
       sessionEndedAt: _readSessionDate(json['session_ended_at']),
+      deckSnapshotHash: hasCompleteDeckVersion
+          ? normalizedDeckSnapshotHash
+          : null,
+      deckVersionAt: hasCompleteDeckVersion ? normalizedDeckVersionAt : null,
     );
   }
 
@@ -138,6 +162,9 @@ class PostGameNote {
         'session_started_at': sessionStartedAt!.toIso8601String(),
       if (sessionEndedAt != null)
         'session_ended_at': sessionEndedAt!.toIso8601String(),
+      if (deckSnapshotHash != null) 'deck_snapshot_hash': deckSnapshotHash,
+      if (deckVersionAt != null)
+        'deck_version_at': deckVersionAt!.toIso8601String(),
     };
   }
 
@@ -172,6 +199,14 @@ class PostGameNote {
   static String? _cleanOptional(String? value) {
     final normalized = value?.trim();
     return normalized == null || normalized.isEmpty ? null : normalized;
+  }
+
+  static String? _validDeckSnapshotHash(String? value) {
+    final normalized = _cleanOptional(value)?.toLowerCase();
+    if (normalized == null || !RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
+      return null;
+    }
+    return normalized;
   }
 
   static DateTime? _validSessionDate(DateTime? value) {
@@ -235,12 +270,12 @@ class DeckEvolutionSummary {
   }
 
   static List<String> _topKeys(Map<String, int> counts) {
-    final entries =
-        counts.entries.toList()..sort((a, b) {
-          final byCount = b.value.compareTo(a.value);
-          if (byCount != 0) return byCount;
-          return a.key.compareTo(b.key);
-        });
+    final entries = counts.entries.toList()
+      ..sort((a, b) {
+        final byCount = b.value.compareTo(a.value);
+        if (byCount != 0) return byCount;
+        return a.key.compareTo(b.key);
+      });
     return entries.take(5).map((entry) => entry.key).toList(growable: false);
   }
 }

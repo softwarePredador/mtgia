@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_service.dart';
+import '../../lib/email_verification_delivery_service.dart';
+import '../../lib/email_verification_policy.dart';
+import '../../lib/legal_policy.dart';
 import '../../lib/observability.dart';
 import '../../lib/password_policy.dart';
+import '../../lib/runtime_environment.dart';
 
 /// Registro de novo usuário com gravação no banco de dados
 ///
@@ -23,6 +27,16 @@ Future<Response> onRequest(RequestContext context) async {
     final username = (body['username'] as String?)?.trim();
     final email = (body['email'] as String?)?.trim();
     final password = body['password'] as String?;
+    final runtime = loadRuntimeEnvironment();
+    final environment = <String, String>{
+      if (runtime['ENVIRONMENT'] case final String value) 'ENVIRONMENT': value,
+      if (runtime[requireLegalAcceptanceEnvironment] case final String value)
+        requireLegalAcceptanceEnvironment: value,
+    };
+    final legalAcceptance = LegalAcceptancePolicy.parse(
+      body,
+      required: LegalAcceptancePolicy.isRequired(environment),
+    );
 
     // Validações básicas
     if (username == null || username.isEmpty) {
@@ -74,7 +88,29 @@ Future<Response> onRequest(RequestContext context) async {
       username: username,
       email: email,
       password: password,
+      legalAcceptance: legalAcceptance,
     );
+    final verificationRequest = EmailVerificationRequest(
+      email: result['email'] as String,
+      token: result['emailVerificationToken'] as String,
+      expiresAt: result['emailVerificationExpiresAt'] as DateTime,
+    );
+    var verificationSent = false;
+    try {
+      verificationSent = await EmailVerificationDeliveryService().deliver(
+        email: verificationRequest.email,
+        token: verificationRequest.token,
+        expiresAt: verificationRequest.expiresAt,
+      );
+    } catch (error, stackTrace) {
+      await captureRouteException(
+        context,
+        error,
+        stackTrace: stackTrace,
+        tags: const {'route': 'auth_register_email_verification'},
+      );
+    }
+    final verificationEnvironment = emailVerificationEnvironmentValues();
 
     return Response.json(
       statusCode: HttpStatus.created,
@@ -84,8 +120,17 @@ Future<Response> onRequest(RequestContext context) async {
           'id': result['userId'],
           'username': result['username'],
           'email': result['email'],
+          'email_verified': false,
         },
+        'verification_sent': verificationSent,
+        if (mayExposeEmailVerificationTokenForTesting(verificationEnvironment))
+          'test_verification_token': verificationRequest.token,
       },
+    );
+  } on LegalAcceptanceException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {'error': error.code, 'message': error.message},
     );
   } on Exception catch (e) {
     print('[ERROR] handler: $e');

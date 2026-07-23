@@ -40,8 +40,13 @@ void showGuidedRebuildLoading(BuildContext context) {
 
 class OptimizeProgressDialog extends StatelessWidget {
   final ValueListenable<FlowProgressState> progressState;
+  final VoidCallback? onCancel;
 
-  const OptimizeProgressDialog({super.key, required this.progressState});
+  const OptimizeProgressDialog({
+    super.key,
+    required this.progressState,
+    this.onCancel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +64,8 @@ class OptimizeProgressDialog extends StatelessWidget {
             stepNumber: presentation.stepNumber,
             totalSteps: presentation.totalSteps,
             tips: presentation.tips,
+            actionLabel: onCancel == null ? null : 'Cancelar otimização',
+            onAction: onCancel,
           );
         },
       ),
@@ -89,12 +96,19 @@ class ApplyOptimizationLoadingDialog extends StatelessWidget {
 
 void showOptimizeProgressLoading(
   BuildContext context,
-  ValueListenable<FlowProgressState> progressState,
-) {
+  ValueListenable<FlowProgressState> progressState, {
+  VoidCallback? onCancel,
+}) {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (_) => OptimizeProgressDialog(progressState: progressState),
+    builder: (_) => PopScope(
+      canPop: false,
+      child: OptimizeProgressDialog(
+        progressState: progressState,
+        onCancel: onCancel,
+      ),
+    ),
   );
 }
 
@@ -118,9 +132,8 @@ Future<void> showOutcomeInfoDialog(
 }) {
   return showDialog<void>(
     context: context,
-    builder:
-        (_) =>
-            OutcomeInfoDialog(title: title, message: message, reasons: reasons),
+    builder: (_) =>
+        OutcomeInfoDialog(title: title, message: message, reasons: reasons),
   );
 }
 
@@ -140,6 +153,8 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
   required Map<String, dynamic> metaReferenceContext,
   Map<String, dynamic> optimizationContract = const <String, dynamic>{},
   Map<String, dynamic> battleValidation = const <String, dynamic>{},
+  bool canApply = true,
+  List<String> applyBlockers = const <String>[],
   required List<Map<String, dynamic>> displayRemovals,
   required List<Map<String, dynamic>> displayAdditions,
   Future<void> Function()? onCopyDebug,
@@ -147,29 +162,30 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
 }) {
   return showDialog<OptimizePreviewSelection>(
     context: context,
-    builder:
-        (ctx) => OptimizationPreviewDialog(
-          mode: mode,
-          archetype: archetype,
-          keepTheme: keepTheme,
-          preservedTheme: preservedTheme,
-          reasoning: reasoning,
-          intensity: intensity,
-          optimizeIntensity: optimizeIntensity,
-          qualityWarning: qualityWarning,
-          deckAnalysis: deckAnalysis,
-          postAnalysis: postAnalysis,
-          warnings: warnings,
-          metaReferenceContext: metaReferenceContext,
-          optimizationContract: optimizationContract,
-          battleValidation: battleValidation,
-          displayRemovals: displayRemovals,
-          displayAdditions: displayAdditions,
-          onCancel: () => Navigator.pop(ctx),
-          onConfirm: (selection) => Navigator.pop(ctx, selection),
-          onCopyDebug: onCopyDebug,
-          onCreateShareLink: onCreateShareLink,
-        ),
+    builder: (ctx) => OptimizationPreviewDialog(
+      mode: mode,
+      archetype: archetype,
+      keepTheme: keepTheme,
+      preservedTheme: preservedTheme,
+      reasoning: reasoning,
+      intensity: intensity,
+      optimizeIntensity: optimizeIntensity,
+      qualityWarning: qualityWarning,
+      deckAnalysis: deckAnalysis,
+      postAnalysis: postAnalysis,
+      warnings: warnings,
+      metaReferenceContext: metaReferenceContext,
+      optimizationContract: optimizationContract,
+      battleValidation: battleValidation,
+      canApply: canApply,
+      applyBlockers: applyBlockers,
+      displayRemovals: displayRemovals,
+      displayAdditions: displayAdditions,
+      onCancel: () => Navigator.pop(ctx),
+      onConfirm: (selection) => Navigator.pop(ctx, selection),
+      onCopyDebug: onCopyDebug,
+      onCreateShareLink: onCreateShareLink,
+    ),
   );
 }
 
@@ -183,8 +199,9 @@ Future<void> showOptimizeNoChangesFeedback(
   BuildContext context,
   OptimizeRequestOutcome? outcome,
 ) {
-  final presentation =
-      outcome == null ? null : describeOptimizeNoChanges(outcome);
+  final presentation = outcome == null
+      ? null
+      : describeOptimizeNoChanges(outcome);
   if (presentation == null) {
     showOptimizeNoChangesSnackBar(context);
     return Future<void>.value();
@@ -203,18 +220,24 @@ void showOptimizeDebugCopiedSnackBar(BuildContext context) {
   ).showSnackBar(const SnackBar(content: Text('Dados copiados para suporte.')));
 }
 
-void showOptimizeSuccessSnackBar(BuildContext context) {
+void showOptimizeSuccessSnackBar(BuildContext context, {VoidCallback? onUndo}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: const Text('Otimização aplicada com sucesso!'),
       backgroundColor: Theme.of(context).colorScheme.primary,
+      action: onUndo == null
+          ? null
+          : SnackBarAction(label: 'Desfazer', onPressed: onUndo),
     ),
   );
 }
 
-void closeOptimizeSheetAndShowSuccess(BuildContext context) {
+void closeOptimizeSheetAndShowSuccess(
+  BuildContext context, {
+  VoidCallback? onUndo,
+}) {
   Navigator.pop(context);
-  showOptimizeSuccessSnackBar(context);
+  showOptimizeSuccessSnackBar(context, onUndo: onUndo);
 }
 
 void showOptimizeApplyErrorSnackBar(BuildContext context, Object error) {
@@ -247,8 +270,8 @@ Future<bool> showGuidedRebuildActionDialog(
 }) async {
   final result = await showDialog<bool>(
     context: context,
-    builder:
-        (_) => GuidedRebuildActionDialog(message: message, reasons: reasons),
+    builder: (_) =>
+        GuidedRebuildActionDialog(message: message, reasons: reasons),
   );
   return result == true;
 }

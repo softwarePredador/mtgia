@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import re
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -11,12 +13,6 @@ WRAPPER_NAME = "with_new_server_pg.sh"
 WRAPPER_PATH = REPO_ROOT / "server" / "bin" / WRAPPER_NAME
 
 EXPECTED_SHELL_MODES = {
-    "scripts/manaloom_battle_product_gate.sh": (
-        "--read-only",
-        "--read-only",
-        "--write-approved",
-        "--write-approved",
-    ),
     "scripts/manaloom_deep_ai_alignment_tester.sh": (
         "--read-only",
         "--write-approved",
@@ -35,7 +31,7 @@ EXPECTED_SHELL_MODES = {
         "--write-approved",
     ),
     "scripts/manaloom_pg_hermes_sqlite_contract_audit.sh": (
-        "--write-approved",
+        "--read-only",
     ),
     "scripts/quality_gate_resolution_corpus.sh": (
         "--write-approved",
@@ -92,7 +88,13 @@ def _discover_real_callers() -> set[str]:
                 source = path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
                 continue
-            if WRAPPER_NAME in source:
+            if path.suffix == ".py":
+                # Python callers must use the audited wrapper constant. Plain
+                # string mentions also occur in negative source assertions.
+                is_caller = "NEW_SERVER_PG_WRAPPER" in source
+            else:
+                is_caller = WRAPPER_NAME in source
+            if is_caller:
                 callers.add(str(path.relative_to(REPO_ROOT)))
     return callers
 
@@ -134,6 +136,47 @@ class NewServerPgCallerModeContractTest(unittest.TestCase):
         self.assertIn("_require_pg_runner_approvals()", python_source)
         self.assertIn("MANALOOM_CONFIRM_LIVE_MUTATIONS", python_source)
         self.assertIn("MANALOOM_CONFIRM_POSTGRES_WRITES", python_source)
+
+    def test_read_only_wrapper_rejects_arbitrary_python_before_env_or_network(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = subprocess.run(
+                [str(WRAPPER_PATH), "--read-only", "python3", "-c", "print('unsafe')"],
+                cwd=REPO_ROOT,
+                env={
+                    "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+                    "MANALOOM_NEW_SERVER_ENV": str(Path(tmp) / "missing.env"),
+                },
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("comando Python nao permitido", result.stderr)
+        self.assertNotIn("env file not found", result.stderr)
+
+    def test_read_only_wrapper_accepts_only_approved_contract_auditors(self) -> None:
+        audit_paths = [
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py",
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py",
+        ]
+        for audit_path in audit_paths:
+            with self.subTest(audit=audit_path.name), tempfile.TemporaryDirectory() as tmp:
+                result = subprocess.run(
+                    [str(WRAPPER_PATH), "--read-only", "python3", str(audit_path)],
+                    cwd=REPO_ROOT,
+                    env={
+                        "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+                        "MANALOOM_NEW_SERVER_ENV": str(Path(tmp) / "missing.env"),
+                    },
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("env file not found", result.stderr)
+            self.assertNotIn("comando Python nao permitido", result.stderr)
 
 
 if __name__ == "__main__":

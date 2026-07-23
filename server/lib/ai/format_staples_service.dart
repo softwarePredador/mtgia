@@ -19,7 +19,7 @@ class FormatStaplesService {
 
   /// Busca staples do banco filtrados por cores e arquétipo.
   ///
-  /// [colors] - Identidade de cor do deck (ex: ['U', 'B'])
+  /// [colors] - Identidade de cor do deck (ex.: `['U', 'B']`).
   /// [archetype] - Arquétipo opcional (ramp, control, combo, draw, removal, etc)
   /// [limit] - Número máximo de cartas (default: 50)
   ///
@@ -50,8 +50,7 @@ class FormatStaplesService {
       params['archetype'] = _normalizeArchetype(archetype);
     }
 
-    final sql =
-        '''
+    final sql = '''
       SELECT card_name FROM (
         SELECT DISTINCT ON (LOWER(card_name)) card_name, COALESCE(edhrec_rank, 99999) as rank_order
         FROM format_staples

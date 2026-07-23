@@ -87,10 +87,9 @@ class _CardScannerScreenState extends State<CardScannerScreen>
         setState(() {
           _hasPermission = false;
           _isInitialized = false;
-          _permissionError =
-              status.isPermanentlyDenied
-                  ? 'Permissão negada permanentemente. Abra as configurações do app.'
-                  : 'Permissão de câmera necessária para escanear cartas.';
+          _permissionError = status.isPermanentlyDenied
+              ? 'Permissão negada permanentemente. Abra as configurações do app.'
+              : 'Permissão de câmera necessária para escanear cartas.';
         });
         return;
       }
@@ -127,10 +126,9 @@ class _CardScannerScreenState extends State<CardScannerScreen>
         camera,
         ResolutionPreset.high, // high = boa qualidade OCR sem ser pesado demais
         enableAudio: false,
-        imageFormatGroup:
-            defaultTargetPlatform == TargetPlatform.iOS
-                ? ImageFormatGroup.bgra8888
-                : ImageFormatGroup.nv21,
+        imageFormatGroup: defaultTargetPlatform == TargetPlatform.iOS
+            ? ImageFormatGroup.bgra8888
+            : ImageFormatGroup.nv21,
       );
       await controller.initialize();
 
@@ -432,10 +430,9 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                     scannerProvider.useFoilMode
                         ? Icons.auto_fix_high
                         : Icons.auto_fix_off,
-                    color:
-                        scannerProvider.useFoilMode
-                            ? AppTheme.mythicGold
-                            : Colors.white,
+                    color: scannerProvider.useFoilMode
+                        ? AppTheme.mythicGold
+                        : Colors.white,
                   ),
                   tooltip: 'Modo Foil',
                   onPressed: scannerProvider.toggleFoilMode,
@@ -463,7 +460,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 16),
+            SizedBox(height: AppTheme.space16),
             Text('Iniciando câmera...', style: TextStyle(color: Colors.white)),
           ],
         ),
@@ -503,8 +500,8 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: AppTheme.space16,
+                  vertical: AppTheme.space8,
                 ),
                 decoration: BoxDecoration(
                   color: AppTheme.primarySoft.withValues(alpha: 0.85),
@@ -514,14 +511,14 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(
-                      width: 14,
-                      height: 14,
+                      width: AppTheme.space14,
+                      height: AppTheme.space14,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppTheme.space8),
                     Text(
                       'Detectando: ${scannerProvider.liveDetectedName}',
                       style: const TextStyle(
@@ -546,8 +543,8 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: AppTheme.space16,
+                  vertical: AppTheme.space8,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
@@ -570,7 +567,10 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             top: MediaQuery.of(context).padding.top + 50,
             right: 16,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space10,
+                vertical: AppTheme.space5,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.mythicGold.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -579,7 +579,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.auto_fix_high, size: 14, color: Colors.black),
-                  SizedBox(width: 4),
+                  SizedBox(width: AppTheme.space4),
                   Text(
                     'Foil',
                     style: TextStyle(
@@ -597,7 +597,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
         if (isProcessing)
           Center(
             child: Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppTheme.space24),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -606,7 +606,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(color: Colors.white),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.space16),
                   Text(
                     scannerProvider.state == ScannerState.processing
                         ? 'Analisando imagem...'
@@ -696,7 +696,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                             ],
                           ),
                           child: Container(
-                            margin: const EdgeInsets.all(3),
+                            margin: const EdgeInsets.all(AppTheme.space3),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white.withValues(alpha: 0.9),
@@ -711,7 +711,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppTheme.space6),
                   Text(
                     'Captura manual',
                     style: TextStyle(
@@ -730,7 +730,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
   Widget _buildPermissionError() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.space32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -739,7 +739,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
               size: 80,
               color: AppTheme.textHint,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.space24),
             Text(
               _permissionError ?? 'Permissão necessária',
               style: const TextStyle(
@@ -748,7 +748,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.space24),
             ElevatedButton.icon(
               onPressed: () async {
                 final status = await Permission.camera.status;
@@ -775,7 +775,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                     : 'Permitir Câmera',
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             TextButton(
               onPressed: () => context.pop(),
               child: const Text('Voltar'),

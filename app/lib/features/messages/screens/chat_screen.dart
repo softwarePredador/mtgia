@@ -122,23 +122,21 @@ class _ChatScreenState extends State<ChatScreen> {
             CircleAvatar(
               radius: 16,
               backgroundColor: AppTheme.brass400.withValues(alpha: 0.16),
-              backgroundImage:
-                  avatarUrl != null && avatarUrl.isNotEmpty
-                      ? NetworkImage(avatarUrl)
-                      : null,
-              child:
-                  avatarUrl == null || avatarUrl.isEmpty
-                      ? Text(
-                        label.isNotEmpty ? label[0].toUpperCase() : '?',
-                        style: const TextStyle(
-                          color: AppTheme.brass400,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.fontSm,
-                        ),
-                      )
-                      : null,
+              backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                  ? NetworkImage(avatarUrl)
+                  : null,
+              child: avatarUrl == null || avatarUrl.isEmpty
+                  ? Text(
+                      label.isNotEmpty ? label[0].toUpperCase() : '?',
+                      style: const TextStyle(
+                        color: AppTheme.brass400,
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                    )
+                  : null,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
             Expanded(
               child: Text(
                 label,
@@ -163,10 +161,11 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Consumer<MessageProvider>(
                 builder: (context, provider, _) {
                   if (provider.isLoadingMessages && provider.messages.isEmpty) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppTheme.brass400,
-                      ),
+                    return const AppStatePanel.loading(
+                      key: Key('chat-loading-state'),
+                      title: 'Carregando conversa',
+                      message: 'Buscando as mensagens deste jogador.',
+                      accent: AppTheme.brass400,
                     );
                   }
 
@@ -199,8 +198,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     controller: _scrollController,
                     reverse: true, // mais recente embaixo
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: AppTheme.space12,
+                      vertical: AppTheme.space8,
                     ),
                     itemCount: provider.messages.length,
                     itemBuilder: (context, index) {
@@ -216,10 +215,10 @@ class _ChatScreenState extends State<ChatScreen> {
             // ─── Input de mensagem ────────────────────────
             Container(
               padding: EdgeInsets.only(
-                left: 12,
-                right: 8,
-                top: 8,
-                bottom: 8 + MediaQuery.of(context).padding.bottom,
+                left: AppTheme.space12,
+                right: AppTheme.space8,
+                top: AppTheme.space8,
+                bottom: AppTheme.space8 + MediaQuery.of(context).padding.bottom,
               ),
               decoration: const BoxDecoration(
                 color: AppTheme.surfaceSlate,
@@ -247,8 +246,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         filled: true,
                         fillColor: AppTheme.backgroundAbyss,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
+                          horizontal: AppTheme.space14,
+                          vertical: AppTheme.space10,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(
@@ -260,27 +259,26 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppTheme.space8),
                   Consumer<MessageProvider>(
                     builder: (context, provider, _) {
                       return IconButton(
                         key: const Key('chat-message-send-button'),
                         tooltip: 'Enviar mensagem',
                         onPressed: provider.isSending ? null : _sendMessage,
-                        icon:
-                            provider.isSending
-                                ? const SizedBox(
-                                  width: AppTheme.iconSpinnerSm,
-                                  height: AppTheme.iconSpinnerSm,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.brass400,
-                                  ),
-                                )
-                                : const Icon(
-                                  Icons.send_rounded,
+                        icon: provider.isSending
+                            ? const SizedBox(
+                                width: AppTheme.iconSpinnerSm,
+                                height: AppTheme.iconSpinnerSm,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                   color: AppTheme.brass400,
                                 ),
+                              )
+                            : const Icon(
+                                Icons.send_rounded,
+                                color: AppTheme.brass400,
+                              ),
                       );
                     },
                   ),
@@ -307,22 +305,23 @@ class _MessageBubble extends StatelessWidget {
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: EdgeInsets.only(
-          top: 3,
-          bottom: 3,
-          left: isMe ? 60 : 0,
-          right: isMe ? 0 : 60,
+          top: AppTheme.space3,
+          bottom: AppTheme.space3,
+          left: isMe ? 60 : AppTheme.space0,
+          right: isMe ? AppTheme.space0 : 60,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space14,
+          vertical: AppTheme.space10,
+        ),
         decoration: BoxDecoration(
-          color:
-              isMe
-                  ? AppTheme.brass500.withValues(alpha: 0.22)
-                  : AppTheme.surfaceSlate,
+          color: isMe
+              ? AppTheme.brass500.withValues(alpha: 0.22)
+              : AppTheme.surfaceSlate,
           border: Border.all(
-            color:
-                isMe
-                    ? AppTheme.brass400.withValues(alpha: 0.34)
-                    : AppTheme.outlineMuted.withValues(alpha: 0.55),
+            color: isMe
+                ? AppTheme.brass400.withValues(alpha: 0.34)
+                : AppTheme.outlineMuted.withValues(alpha: 0.55),
             width: AppTheme.strokeThin,
           ),
           borderRadius: BorderRadius.only(
@@ -337,8 +336,9 @@ class _MessageBubble extends StatelessWidget {
           ),
         ),
         child: Column(
-          crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             Text(
               message.message,
@@ -347,7 +347,7 @@ class _MessageBubble extends StatelessWidget {
                 fontSize: AppTheme.fontMd,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               _formatTime(message.createdAt),
               style: TextStyle(

@@ -31,7 +31,7 @@ Future<Response> _getMe(RequestContext context) async {
       Sql.named('''
         SELECT id, username, email, display_name, avatar_url,
                location_state, location_city, trade_notes,
-               created_at, updated_at
+               created_at, updated_at, email_verified_at
         FROM users
         WHERE id = @id
           AND deleted_at IS NULL
@@ -59,6 +59,7 @@ Future<Response> _getMe(RequestContext context) async {
           'location_state': map['location_state'],
           'location_city': map['location_city'],
           'trade_notes': map['trade_notes'],
+          'email_verified': map['email_verified_at'] != null,
           'created_at': (map['created_at'] as DateTime?)?.toIso8601String(),
           'updated_at': (map['updated_at'] as DateTime?)?.toIso8601String(),
         },
@@ -219,7 +220,7 @@ Future<Response> _patchMe(RequestContext context) async {
           AND deleted_at IS NULL
         RETURNING id, username, email, display_name, avatar_url,
                   location_state, location_city, trade_notes,
-                  created_at, updated_at
+                  created_at, updated_at, email_verified_at
       '''),
       parameters: params,
     );
@@ -243,6 +244,7 @@ Future<Response> _patchMe(RequestContext context) async {
           'location_state': map['location_state'],
           'location_city': map['location_city'],
           'trade_notes': map['trade_notes'],
+          'email_verified': map['email_verified_at'] != null,
           'created_at': (map['created_at'] as DateTime?)?.toIso8601String(),
           'updated_at': (map['updated_at'] as DateTime?)?.toIso8601String(),
         },

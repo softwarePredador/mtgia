@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:server/ai/commander_learning_snapshot_support.dart';
+import 'package:server/collection_availability_contract.dart';
 import 'package:server/import_card_lookup_service.dart';
 import 'package:server/runtime_environment.dart';
 import 'package:server/sql_statement_splitter.dart';
@@ -1857,6 +1858,675 @@ final migrations = <Migration>[
       ALTER COLUMN is_reserved DROP NOT NULL;
     ''',
   ),
+  Migration(
+    version: '041',
+    name: 'create_social_trade_messaging_runtime_schema',
+    up: '''
+      CREATE TABLE IF NOT EXISTS user_binder_items (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+        quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+        condition TEXT NOT NULL DEFAULT 'NM'
+          CHECK (condition IN ('NM', 'LP', 'MP', 'HP', 'DMG')),
+        is_foil BOOLEAN NOT NULL DEFAULT FALSE,
+        for_trade BOOLEAN NOT NULL DEFAULT FALSE,
+        for_sale BOOLEAN NOT NULL DEFAULT FALSE,
+        price DECIMAL(10, 2),
+        currency TEXT NOT NULL DEFAULT 'BRL'
+          CHECK (currency IN ('BRL', 'USD')),
+        notes TEXT,
+        language TEXT NOT NULL DEFAULT 'en',
+        list_type TEXT NOT NULL DEFAULT 'have'
+          CHECK (list_type IN ('have', 'want')),
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      ALTER TABLE user_binder_items
+      ADD COLUMN IF NOT EXISTS list_type TEXT NOT NULL DEFAULT 'have';
+      ALTER TABLE user_binder_items
+      DROP CONSTRAINT IF EXISTS user_binder_items_user_id_card_id_condition_is_foil_key;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_user_binder_items_identity
+      ON user_binder_items (
+        user_id, card_id, condition, is_foil, list_type
+      );
+      CREATE INDEX IF NOT EXISTS idx_binder_user
+      ON user_binder_items (user_id);
+      CREATE INDEX IF NOT EXISTS idx_binder_card
+      ON user_binder_items (card_id);
+      CREATE INDEX IF NOT EXISTS idx_binder_for_trade
+      ON user_binder_items (for_trade) WHERE for_trade = TRUE;
+      CREATE INDEX IF NOT EXISTS idx_binder_for_sale
+      ON user_binder_items (for_sale) WHERE for_sale = TRUE;
+
+      CREATE TABLE IF NOT EXISTS trade_offers (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (status IN (
+            'pending', 'accepted', 'declined', 'shipped', 'delivered',
+            'completed', 'cancelled', 'disputed'
+          )),
+        type TEXT NOT NULL DEFAULT 'trade'
+          CHECK (type IN ('trade', 'sale', 'mixed')),
+        delivery_method TEXT
+          CHECK (
+            delivery_method IS NULL
+            OR delivery_method IN (
+              'correios', 'motoboy', 'pessoalmente', 'outro',
+              'mail', 'in_person'
+            )
+          ),
+        payment_method TEXT
+          CHECK (
+            payment_method IS NULL
+            OR payment_method IN ('pix', 'cash', 'transfer', 'other')
+          ),
+        payment_amount DECIMAL(10, 2),
+        payment_currency TEXT NOT NULL DEFAULT 'BRL',
+        tracking_code TEXT,
+        message TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_no_self_trade CHECK (sender_id <> receiver_id)
+      );
+      ALTER TABLE trade_offers
+      DROP CONSTRAINT IF EXISTS trade_offers_delivery_method_check;
+      ALTER TABLE trade_offers
+      DROP CONSTRAINT IF EXISTS chk_trade_offers_delivery_method;
+      ALTER TABLE trade_offers
+      ADD CONSTRAINT chk_trade_offers_delivery_method CHECK (
+        delivery_method IS NULL
+        OR delivery_method IN (
+          'correios', 'motoboy', 'pessoalmente', 'outro',
+          'mail', 'in_person'
+        )
+      );
+      CREATE INDEX IF NOT EXISTS idx_trade_sender ON trade_offers (sender_id);
+      CREATE INDEX IF NOT EXISTS idx_trade_receiver ON trade_offers (receiver_id);
+      CREATE INDEX IF NOT EXISTS idx_trade_status ON trade_offers (status);
+
+      CREATE TABLE IF NOT EXISTS trade_items (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        trade_offer_id UUID NOT NULL
+          REFERENCES trade_offers(id) ON DELETE CASCADE,
+        binder_item_id UUID
+          REFERENCES user_binder_items(id) ON DELETE SET NULL,
+        owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        direction TEXT NOT NULL
+          CHECK (direction IN ('offering', 'requesting')),
+        quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+        agreed_price DECIMAL(10, 2)
+      );
+      ALTER TABLE trade_items ALTER COLUMN binder_item_id DROP NOT NULL;
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_binder_item_id_fkey;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT trade_items_binder_item_id_fkey
+      FOREIGN KEY (binder_item_id)
+      REFERENCES user_binder_items(id) ON DELETE SET NULL;
+      CREATE INDEX IF NOT EXISTS idx_trade_items_offer
+      ON trade_items (trade_offer_id);
+
+      CREATE TABLE IF NOT EXISTS trade_messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        trade_offer_id UUID NOT NULL
+          REFERENCES trade_offers(id) ON DELETE CASCADE,
+        sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+        message TEXT,
+        attachment_url TEXT,
+        attachment_type TEXT
+          CHECK (
+            attachment_type IS NULL
+            OR attachment_type IN ('receipt', 'tracking', 'photo', 'other')
+          ),
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_trade_messages_offer
+      ON trade_messages (trade_offer_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS trade_status_history (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        trade_offer_id UUID NOT NULL
+          REFERENCES trade_offers(id) ON DELETE CASCADE,
+        old_status TEXT,
+        new_status TEXT NOT NULL,
+        changed_by UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+        notes TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_trade_history_offer
+      ON trade_status_history (trade_offer_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS conversations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_a_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        user_b_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        last_message_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_no_self_chat CHECK (user_a_id <> user_b_id)
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_participants
+      ON conversations (
+        LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS direct_messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        conversation_id UUID NOT NULL
+          REFERENCES conversations(id) ON DELETE CASCADE,
+        sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+        message TEXT NOT NULL,
+        read_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_dm_conversation
+      ON direct_messages (conversation_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_dm_unread
+      ON direct_messages (conversation_id) WHERE read_at IS NULL;
+
+      CREATE TABLE IF NOT EXISTS notifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        type TEXT NOT NULL CHECK (type IN (
+          'new_follower', 'trade_offer_received', 'trade_accepted',
+          'trade_declined', 'trade_shipped', 'trade_delivered',
+          'trade_completed', 'trade_message', 'direct_message'
+        )),
+        reference_id UUID,
+        title TEXT NOT NULL,
+        body TEXT,
+        read_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_notifications_user
+      ON notifications (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_notifications_unread
+      ON notifications (user_id) WHERE read_at IS NULL;
+
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS notifications;
+      DROP TABLE IF EXISTS direct_messages;
+      DROP TABLE IF EXISTS conversations;
+      DROP TABLE IF EXISTS trade_status_history;
+      DROP TABLE IF EXISTS trade_messages;
+      DROP TABLE IF EXISTS trade_items;
+      DROP TABLE IF EXISTS trade_offers;
+      DROP TABLE IF EXISTS user_binder_items;
+    ''',
+  ),
+  Migration(
+    version: '042',
+    name: 'create_account_recovery_and_session_revocation',
+    up: '''
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS auth_version INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS password_changed_at TIMESTAMP WITH TIME ZONE;
+
+      UPDATE users SET auth_version = 0 WHERE auth_version IS NULL;
+      ALTER TABLE users ALTER COLUMN auth_version SET DEFAULT 0;
+      ALTER TABLE users ALTER COLUMN auth_version SET NOT NULL;
+
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash CHAR(64) NOT NULL UNIQUE,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        consumed_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_active
+      ON password_reset_tokens (user_id, expires_at DESC)
+      WHERE consumed_at IS NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_password_reset_tokens_user_active;
+      DROP TABLE IF EXISTS password_reset_tokens;
+      ALTER TABLE users DROP COLUMN IF EXISTS password_changed_at;
+      ALTER TABLE users DROP COLUMN IF EXISTS auth_version;
+    ''',
+  ),
+  Migration(
+    version: '043',
+    name: 'record_versioned_legal_acceptance',
+    up: '''
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_version TEXT;
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_version TEXT;
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMP WITH TIME ZONE;
+
+      ALTER TABLE users
+      DROP CONSTRAINT IF EXISTS chk_users_terms_acceptance_pair;
+      ALTER TABLE users
+      ADD CONSTRAINT chk_users_terms_acceptance_pair CHECK (
+        (terms_version IS NULL AND terms_accepted_at IS NULL)
+        OR (terms_version IS NOT NULL AND terms_accepted_at IS NOT NULL)
+      );
+      ALTER TABLE users
+      DROP CONSTRAINT IF EXISTS chk_users_privacy_acceptance_pair;
+      ALTER TABLE users
+      ADD CONSTRAINT chk_users_privacy_acceptance_pair CHECK (
+        (privacy_version IS NULL AND privacy_accepted_at IS NULL)
+        OR (privacy_version IS NOT NULL AND privacy_accepted_at IS NOT NULL)
+      );
+    ''',
+    down: '''
+      ALTER TABLE users
+      DROP CONSTRAINT IF EXISTS chk_users_privacy_acceptance_pair;
+      ALTER TABLE users
+      DROP CONSTRAINT IF EXISTS chk_users_terms_acceptance_pair;
+      ALTER TABLE users DROP COLUMN IF EXISTS privacy_accepted_at;
+      ALTER TABLE users DROP COLUMN IF EXISTS privacy_version;
+      ALTER TABLE users DROP COLUMN IF EXISTS terms_accepted_at;
+      ALTER TABLE users DROP COLUMN IF EXISTS terms_version;
+    ''',
+  ),
+  Migration(
+    version: '044',
+    name: 'create_email_verification_gate',
+    up: '''
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP WITH TIME ZONE;
+
+      CREATE TABLE IF NOT EXISTS email_verification_tokens (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash CHAR(64) NOT NULL UNIQUE,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        consumed_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_user_active
+      ON email_verification_tokens (user_id, expires_at DESC)
+      WHERE consumed_at IS NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_email_verification_tokens_user_active;
+      DROP TABLE IF EXISTS email_verification_tokens;
+      ALTER TABLE users DROP COLUMN IF EXISTS email_verified_at;
+    ''',
+  ),
+  Migration(
+    version: '045',
+    name: 'create_collection_availability_contract',
+    up: collectionAvailabilityViewsSql,
+    down: dropCollectionAvailabilityViewsSql,
+  ),
+  Migration(
+    version: '046',
+    name: 'restore_price_history_runtime_contract',
+    up: '''
+      CREATE TABLE IF NOT EXISTS price_history (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+        price_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        price_usd DECIMAL(10,2),
+        price_usd_foil DECIMAL(10,2),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(card_id, price_date)
+      );
+      CREATE INDEX IF NOT EXISTS idx_price_history_date
+      ON price_history (price_date DESC);
+      CREATE INDEX IF NOT EXISTS idx_price_history_card_date
+      ON price_history (card_id, price_date DESC);
+      CREATE INDEX IF NOT EXISTS idx_price_history_date_card_price
+      ON price_history (price_date DESC, card_id) INCLUDE (price_usd);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_price_history_date_card_price;
+      DROP INDEX IF EXISTS idx_price_history_card_date;
+      DROP INDEX IF EXISTS idx_price_history_date;
+    ''',
+  ),
+  Migration(
+    version: '047',
+    name: 'close_deck_validation_state_transitions',
+    up: '''
+      UPDATE decks
+      SET validation_reasons = CASE validation_state
+            WHEN 'unknown' THEN '["validation_not_recorded"]'::jsonb
+            WHEN 'validated' THEN '[]'::jsonb
+            ELSE CASE
+              WHEN jsonb_array_length(validation_reasons) = 0 THEN
+                '["strict_validation_pending"]'::jsonb
+              ELSE validation_reasons
+            END
+          END,
+          validation_updated_at = CASE validation_state
+            WHEN 'unknown' THEN NULL
+            ELSE COALESCE(validation_updated_at, CURRENT_TIMESTAMP)
+          END;
+
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_validation_state_payload;
+      ALTER TABLE decks
+      ADD CONSTRAINT chk_decks_validation_state_payload CHECK (
+        (
+          validation_state = 'unknown'
+          AND validation_reasons =
+              '["validation_not_recorded"]'::jsonb
+          AND validation_updated_at IS NULL
+        ) OR (
+          validation_state = 'draft'
+          AND jsonb_array_length(validation_reasons) > 0
+          AND validation_updated_at IS NOT NULL
+        ) OR (
+          validation_state = 'validated'
+          AND jsonb_array_length(validation_reasons) = 0
+          AND validation_updated_at IS NOT NULL
+        )
+      );
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_deck_cards_changed()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_cards_changed\$
+      DECLARE
+        affected_deck_ids UUID[];
+      BEGIN
+        IF TG_OP = 'DELETE' THEN
+          affected_deck_ids := ARRAY[OLD.deck_id];
+        ELSIF TG_OP = 'UPDATE'
+              AND NEW.deck_id IS DISTINCT FROM OLD.deck_id THEN
+          affected_deck_ids := ARRAY[OLD.deck_id, NEW.deck_id];
+        ELSE
+          affected_deck_ids := ARRAY[NEW.deck_id];
+        END IF;
+
+        UPDATE decks
+        SET validation_state = 'draft',
+            validation_reasons =
+              '["deck_cards_changed_since_validation"]'::jsonb,
+            validation_updated_at = CURRENT_TIMESTAMP
+        WHERE id = ANY(affected_deck_ids);
+
+        IF TG_OP = 'DELETE' THEN
+          RETURN OLD;
+        END IF;
+        RETURN NEW;
+      END;
+      \$deck_cards_changed\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_deck_format_changed()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_format_changed\$
+      BEGIN
+        IF NEW.format IS DISTINCT FROM OLD.format THEN
+          NEW.validation_state := 'draft';
+          NEW.validation_reasons :=
+            '["deck_format_changed_since_validation"]'::jsonb;
+          NEW.validation_updated_at := CURRENT_TIMESTAMP;
+        END IF;
+        RETURN NEW;
+      END;
+      \$deck_format_changed\$;
+    ''',
+    down: '''
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_validation_state_payload;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_deck_cards_changed()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_cards_changed\$
+      DECLARE
+        affected_deck_ids UUID[];
+      BEGIN
+        IF TG_OP = 'DELETE' THEN
+          affected_deck_ids := ARRAY[OLD.deck_id];
+        ELSIF TG_OP = 'UPDATE'
+              AND NEW.deck_id IS DISTINCT FROM OLD.deck_id THEN
+          affected_deck_ids := ARRAY[OLD.deck_id, NEW.deck_id];
+        ELSE
+          affected_deck_ids := ARRAY[NEW.deck_id];
+        END IF;
+
+        UPDATE decks
+        SET validation_state = 'draft',
+            validation_reasons = CASE
+              WHEN validation_state = 'validated' THEN
+                '["deck_cards_changed_since_validation"]'::jsonb
+              WHEN validation_reasons @>
+                   '["deck_cards_changed_since_validation"]'::jsonb THEN
+                validation_reasons
+              ELSE validation_reasons ||
+                   '["deck_cards_changed_since_validation"]'::jsonb
+            END,
+            validation_updated_at = CURRENT_TIMESTAMP
+        WHERE id = ANY(affected_deck_ids);
+
+        IF TG_OP = 'DELETE' THEN
+          RETURN OLD;
+        END IF;
+        RETURN NEW;
+      END;
+      \$deck_cards_changed\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_deck_format_changed()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_format_changed\$
+      BEGIN
+        IF NEW.format IS DISTINCT FROM OLD.format THEN
+          NEW.validation_state := 'draft';
+          NEW.validation_reasons := CASE
+            WHEN OLD.validation_state = 'validated' THEN
+              '["deck_format_changed_since_validation"]'::jsonb
+            WHEN OLD.validation_reasons @>
+                 '["deck_format_changed_since_validation"]'::jsonb THEN
+              OLD.validation_reasons
+            ELSE OLD.validation_reasons ||
+                 '["deck_format_changed_since_validation"]'::jsonb
+          END;
+          NEW.validation_updated_at := CURRENT_TIMESTAMP;
+        END IF;
+        RETURN NEW;
+      END;
+      \$deck_format_changed\$;
+    ''',
+  ),
+  Migration(
+    version: '048',
+    name: 'close_ai_job_lifecycle',
+    up: '''
+      ALTER TABLE ai_generate_jobs
+      ADD COLUMN IF NOT EXISTS request_key TEXT;
+      ALTER TABLE ai_generate_jobs
+      ADD COLUMN IF NOT EXISTS request_fingerprint TEXT;
+      ALTER TABLE ai_generate_jobs
+      ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP WITH TIME ZONE;
+
+      ALTER TABLE ai_optimize_jobs
+      ADD COLUMN IF NOT EXISTS request_key TEXT;
+      ALTER TABLE ai_optimize_jobs
+      ADD COLUMN IF NOT EXISTS request_fingerprint TEXT;
+      ALTER TABLE ai_optimize_jobs
+      ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP WITH TIME ZONE;
+
+      ALTER TABLE ai_generate_jobs
+      DROP CONSTRAINT IF EXISTS chk_ai_generate_jobs_status;
+      ALTER TABLE ai_generate_jobs
+      ADD CONSTRAINT chk_ai_generate_jobs_status CHECK (
+        status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')
+      );
+
+      ALTER TABLE ai_optimize_jobs
+      DROP CONSTRAINT IF EXISTS chk_ai_optimize_jobs_status;
+      ALTER TABLE ai_optimize_jobs
+      ADD CONSTRAINT chk_ai_optimize_jobs_status CHECK (
+        status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS
+        idx_ai_generate_jobs_user_request_key
+      ON ai_generate_jobs (user_id, request_key)
+      WHERE user_id IS NOT NULL AND request_key IS NOT NULL;
+
+      CREATE UNIQUE INDEX IF NOT EXISTS
+        idx_ai_optimize_jobs_user_request_key
+      ON ai_optimize_jobs (user_id, request_key)
+      WHERE user_id IS NOT NULL AND request_key IS NOT NULL;
+    ''',
+    down: '''
+      UPDATE ai_generate_jobs
+      SET status = 'failed',
+          stage = 'Erro',
+          error = COALESCE(error, 'Job cancelado antes do rollback do schema.'),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE status = 'cancelled';
+
+      UPDATE ai_optimize_jobs
+      SET status = 'failed',
+          stage = 'Erro',
+          error = COALESCE(error, 'Job cancelado antes do rollback do schema.'),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE status = 'cancelled';
+
+      DROP INDEX IF EXISTS idx_ai_generate_jobs_user_request_key;
+      DROP INDEX IF EXISTS idx_ai_optimize_jobs_user_request_key;
+
+      ALTER TABLE ai_generate_jobs
+      DROP CONSTRAINT IF EXISTS chk_ai_generate_jobs_status;
+      ALTER TABLE ai_generate_jobs
+      ADD CONSTRAINT chk_ai_generate_jobs_status CHECK (
+        status IN ('pending', 'processing', 'completed', 'failed')
+      );
+
+      ALTER TABLE ai_optimize_jobs
+      DROP CONSTRAINT IF EXISTS chk_ai_optimize_jobs_status;
+      ALTER TABLE ai_optimize_jobs
+      ADD CONSTRAINT chk_ai_optimize_jobs_status CHECK (
+        status IN ('pending', 'processing', 'completed', 'failed')
+      );
+
+      ALTER TABLE ai_generate_jobs DROP COLUMN IF EXISTS cancelled_at;
+      ALTER TABLE ai_generate_jobs DROP COLUMN IF EXISTS request_fingerprint;
+      ALTER TABLE ai_generate_jobs DROP COLUMN IF EXISTS request_key;
+      ALTER TABLE ai_optimize_jobs DROP COLUMN IF EXISTS cancelled_at;
+      ALTER TABLE ai_optimize_jobs DROP COLUMN IF EXISTS request_fingerprint;
+      ALTER TABLE ai_optimize_jobs DROP COLUMN IF EXISTS request_key;
+    ''',
+  ),
+  Migration(
+    version: '049',
+    name: 'preserve_binder_physical_identity',
+    up: '''
+      UPDATE user_binder_items
+      SET language = LOWER(REPLACE(TRIM(language), '_', '-'))
+      WHERE language IS DISTINCT FROM
+        LOWER(REPLACE(TRIM(language), '_', '-'));
+
+      UPDATE user_binder_items
+      SET language = 'en'
+      WHERE language = '';
+
+      DROP INDEX IF EXISTS uq_user_binder_items_identity;
+      CREATE UNIQUE INDEX IF NOT EXISTS
+        uq_user_binder_items_physical_identity
+      ON user_binder_items (
+        user_id, card_id, condition, is_foil, language, list_type
+      );
+
+      ALTER TABLE user_binder_items
+      DROP CONSTRAINT IF EXISTS chk_user_binder_items_language;
+      ALTER TABLE user_binder_items
+      ADD CONSTRAINT chk_user_binder_items_language CHECK (
+        language ~ '^[a-z]{2,3}(-[a-z0-9]{2,8})*\$'
+      );
+    ''',
+    // A reversão poderia colapsar linhas físicas de idiomas diferentes.
+    // A policy manualOnly bloqueia execução automática deste marcador.
+    down: 'SELECT 1;',
+  ),
+  Migration(
+    version: '050',
+    name: 'canonicalize_pricing_provenance',
+    up: '''
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_usd DECIMAL(10, 2);
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_usd_foil DECIMAL(10, 2);
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_source TEXT;
+
+      UPDATE cards
+      SET price_usd = price
+      WHERE price_usd IS NULL AND price IS NOT NULL AND price > 0;
+
+      UPDATE cards
+      SET price = price_usd
+      WHERE price_usd IS NOT NULL
+        AND price IS DISTINCT FROM price_usd;
+
+      UPDATE cards
+      SET price_source = 'legacy'
+      WHERE price_source IS NULL AND price_usd IS NOT NULL;
+
+      ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_price_source;
+      ALTER TABLE cards ADD CONSTRAINT chk_cards_price_source CHECK (
+        price_source IS NULL OR
+        price_source IN ('scryfall', 'mtgjson', 'legacy')
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_cards_price_usd
+      ON cards (price_usd) WHERE price_usd IS NOT NULL;
+
+      ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_source TEXT;
+      UPDATE decks
+      SET pricing_source = 'legacy'
+      WHERE pricing_total IS NOT NULL AND pricing_source IS NULL;
+    ''',
+    down: '''
+      ALTER TABLE decks DROP COLUMN IF EXISTS pricing_source;
+      DROP INDEX IF EXISTS idx_cards_price_usd;
+      ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_price_source;
+      ALTER TABLE cards DROP COLUMN IF EXISTS price_source;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -1935,7 +2605,16 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '037' ||
       '038' ||
       '039' ||
-      '040' => MigrationRollbackPolicy.manualOnly,
+      '040' ||
+      '041' ||
+      '042' ||
+      '043' ||
+      '044' ||
+      '046' ||
+      '047' ||
+      '048' ||
+      '049' ||
+      '050' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

@@ -116,8 +116,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       body: Consumer<SocialProvider>(
         builder: (context, provider, _) {
           if (provider.isLoadingProfile) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppTheme.brass500),
+            return const AppStatePanel.loading(
+              key: Key('user-profile-loading'),
+              title: 'Carregando perfil',
+              message: 'Buscando dados públicos deste jogador.',
+              accent: AppTheme.brass500,
             );
           }
 
@@ -131,12 +134,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     size: 48,
                     color: AppTheme.textSecondary,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.space12),
                   Text(
                     provider.profileError!,
                     style: const TextStyle(color: AppTheme.textSecondary),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.space12),
                   ElevatedButton(
                     onPressed: () => provider.fetchUserProfile(widget.userId),
                     child: const Text('Tentar novamente'),
@@ -153,13 +156,15 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact;
           return ResponsivePageFrame(
             maxWidth: 1120,
-            padding: EdgeInsets.symmetric(horizontal: compactTabs ? 16 : 24),
+            padding: EdgeInsets.symmetric(
+              horizontal: compactTabs ? AppTheme.space16 : AppTheme.space24,
+            ),
             child: Column(
               key: const Key('user-profile-content'),
               children: [
                 // === Header do perfil ===
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppTheme.space20),
                   color: AppTheme.surfaceElevated,
                   child: Column(
                     children: [
@@ -169,23 +174,21 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         backgroundColor: AppTheme.brass400.withValues(
                           alpha: 0.16,
                         ),
-                        backgroundImage:
-                            user.avatarUrl != null
-                                ? CachedNetworkImageProvider(user.avatarUrl!)
-                                : null,
-                        child:
-                            user.avatarUrl == null
-                                ? Text(
-                                  user.username[0].toUpperCase(),
-                                  style: const TextStyle(
-                                    color: AppTheme.brass400,
-                                    fontSize: AppTheme.fontDisplay,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                                : null,
+                        backgroundImage: user.avatarUrl != null
+                            ? CachedNetworkImageProvider(user.avatarUrl!)
+                            : null,
+                        child: user.avatarUrl == null
+                            ? Text(
+                                user.username[0].toUpperCase(),
+                                style: const TextStyle(
+                                  color: AppTheme.brass400,
+                                  fontSize: AppTheme.fontDisplay,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            : null,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       // Display name
                       Text(
                         user.displayName ?? user.username,
@@ -197,7 +200,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       ),
                       if (user.displayName != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.only(top: AppTheme.space4),
                           child: Text(
                             '@${user.username}',
                             style: const TextStyle(
@@ -206,7 +209,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                             ),
                           ),
                         ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       // Stats row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -242,7 +245,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       // Follow button (only if not own profile)
                       if (provider.isOwnProfile != true)
                         Wrap(
@@ -256,42 +259,38 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                               child: ElevatedButton.icon(
                                 onPressed: _isToggling ? null : _toggleFollow,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      provider.isFollowingVisited
-                                          ? AppTheme.surfaceSlate
-                                          : AppTheme.brass500,
-                                  foregroundColor:
-                                      provider.isFollowingVisited
-                                          ? AppTheme.brass400
-                                          : AppTheme.backgroundAbyss,
+                                  backgroundColor: provider.isFollowingVisited
+                                      ? AppTheme.surfaceSlate
+                                      : AppTheme.brass500,
+                                  foregroundColor: provider.isFollowingVisited
+                                      ? AppTheme.brass400
+                                      : AppTheme.backgroundAbyss,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
                                       AppTheme.radiusXl,
                                     ),
-                                    side:
-                                        provider.isFollowingVisited
-                                            ? const BorderSide(
-                                              color: AppTheme.outlineMuted,
-                                            )
-                                            : BorderSide.none,
+                                    side: provider.isFollowingVisited
+                                        ? const BorderSide(
+                                            color: AppTheme.outlineMuted,
+                                          )
+                                        : BorderSide.none,
                                   ),
                                 ),
-                                icon:
-                                    _isToggling
-                                        ? const SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppTheme.textPrimary,
-                                          ),
-                                        )
-                                        : Icon(
-                                          provider.isFollowingVisited
-                                              ? Icons.person_remove
-                                              : Icons.person_add,
-                                          size: 18,
+                                icon: _isToggling
+                                    ? const SizedBox(
+                                        width: AppTheme.space16,
+                                        height: AppTheme.space16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppTheme.textPrimary,
                                         ),
+                                      )
+                                    : Icon(
+                                        provider.isFollowingVisited
+                                            ? Icons.person_remove
+                                            : Icons.person_add,
+                                        size: 18,
+                                      ),
                                 label: Text(
                                   provider.isFollowingVisited
                                       ? 'Deixar de seguir'
@@ -339,8 +338,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     key: const Key('user-profile-tabs'),
                     controller: _tabController,
                     isScrollable: compactTabs,
-                    tabAlignment:
-                        compactTabs ? TabAlignment.start : TabAlignment.fill,
+                    tabAlignment: compactTabs
+                        ? TabAlignment.start
+                        : TabAlignment.fill,
                     indicatorColor: AppTheme.brass400,
                     labelColor: AppTheme.brass400,
                     unselectedLabelColor: AppTheme.textSecondary,
@@ -364,8 +364,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         errorMessage: provider.followersError,
                         emptyMessage: 'Nenhum seguidor ainda',
                         hasMore: provider.hasMoreFollowers,
-                        onLoadMore:
-                            () => provider.fetchFollowers(widget.userId),
+                        onLoadMore: () =>
+                            provider.fetchFollowers(widget.userId),
                       ),
                       _UsersListTab(
                         users: provider.following,
@@ -373,8 +373,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         errorMessage: provider.followingError,
                         emptyMessage: 'Não segue ninguém ainda',
                         hasMore: provider.hasMoreFollowing,
-                        onLoadMore:
-                            () => provider.fetchFollowing(widget.userId),
+                        onLoadMore: () =>
+                            provider.fetchFollowing(widget.userId),
                       ),
                       Consumer<BinderProvider>(
                         builder: (context, binder, _) {
@@ -419,7 +419,7 @@ class _StatItem extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: AppTheme.primarySoft, size: 20),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           Text(
             '$value',
             style: const TextStyle(
@@ -462,7 +462,7 @@ class _DecksTab extends StatelessWidget {
               size: 48,
               color: AppTheme.textSecondary.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             const Text(
               'Nenhum deck público',
               style: TextStyle(
@@ -476,12 +476,12 @@ class _DecksTab extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       itemCount: decks.length,
       itemBuilder: (context, index) {
         final deck = decks[index];
         return Card(
-          margin: const EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: AppTheme.space10),
           color: AppTheme.surfaceSlate,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -496,7 +496,7 @@ class _DecksTab extends StatelessWidget {
               context.push('/community/decks/${deck.id}');
             },
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppTheme.space12),
               child: Row(
                 children: [
                   // Commander image
@@ -506,7 +506,7 @@ class _DecksTab extends StatelessWidget {
                     height: 70,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,13 +521,13 @@ class _DecksTab extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
+                                horizontal: AppTheme.space6,
+                                vertical: AppTheme.space2,
                               ),
                               decoration: BoxDecoration(
                                 color: AppTheme.manaViolet.withValues(
@@ -546,7 +546,7 @@ class _DecksTab extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppTheme.space8),
                             Text(
                               '${deck.cardCount} cartas',
                               style: const TextStyle(
@@ -555,7 +555,7 @@ class _DecksTab extends StatelessWidget {
                               ),
                             ),
                             if (deck.synergyScore != null) ...[
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppTheme.space8),
                               Icon(
                                 Icons.auto_awesome,
                                 size: 12,
@@ -563,7 +563,7 @@ class _DecksTab extends StatelessWidget {
                                   alpha: 0.8,
                                 ),
                               ),
-                              const SizedBox(width: 2),
+                              const SizedBox(width: AppTheme.space2),
                               Text(
                                 '${deck.synergyScore}%',
                                 style: TextStyle(
@@ -665,13 +665,13 @@ class _UsersListTabState extends State<_UsersListTab> {
               size: 48,
               color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Text(
               widget.errorMessage!,
               style: const TextStyle(color: AppTheme.textSecondary),
             ),
             if (widget.onLoadMore != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.space12),
               ElevatedButton(
                 onPressed: widget.onLoadMore,
                 child: const Text('Tentar novamente'),
@@ -692,7 +692,7 @@ class _UsersListTabState extends State<_UsersListTab> {
               size: 48,
               color: AppTheme.textSecondary.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Text(
               widget.emptyMessage,
               style: const TextStyle(
@@ -707,12 +707,12 @@ class _UsersListTabState extends State<_UsersListTab> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       itemCount: widget.users.length + (widget.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= widget.users.length) {
           return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: AppTheme.space16),
             child: Center(
               child: CircularProgressIndicator(color: AppTheme.manaViolet),
             ),
@@ -720,7 +720,7 @@ class _UsersListTabState extends State<_UsersListTab> {
         }
         final user = widget.users[index];
         return Card(
-          margin: const EdgeInsets.only(bottom: 8),
+          margin: const EdgeInsets.only(bottom: AppTheme.space8),
           color: AppTheme.surfaceSlate,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -733,20 +733,18 @@ class _UsersListTabState extends State<_UsersListTab> {
             leading: CircleAvatar(
               radius: 20,
               backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
-              backgroundImage:
-                  user.avatarUrl != null
-                      ? CachedNetworkImageProvider(user.avatarUrl!)
-                      : null,
-              child:
-                  user.avatarUrl == null
-                      ? Text(
-                        user.username[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: AppTheme.manaViolet,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                      : null,
+              backgroundImage: user.avatarUrl != null
+                  ? CachedNetworkImageProvider(user.avatarUrl!)
+                  : null,
+              child: user.avatarUrl == null
+                  ? Text(
+                      user.username[0].toUpperCase(),
+                      style: const TextStyle(
+                        color: AppTheme.manaViolet,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
             ),
             title: Text(
               user.displayName ?? user.username,
@@ -926,19 +924,17 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
         _error = null;
         _retryShouldReset = false;
       } else {
-        _error =
-            _items.isEmpty
-                ? 'Não foi possível carregar esta lista. Verifique sua conexão.'
-                : 'A atualização falhou. Os itens já carregados foram mantidos.';
+        _error = _items.isEmpty
+            ? 'Não foi possível carregar esta lista. Verifique sua conexão.'
+            : 'A atualização falhou. Os itens já carregados foram mantidos.';
         _hasMore = false;
         _retryShouldReset = reset;
       }
     } catch (e) {
       debugPrint('[PublicBinder] Falha ao carregar ${widget.listType}: $e');
-      _error =
-          _items.isEmpty
-              ? 'Não foi possível carregar esta lista. Verifique sua conexão.'
-              : 'A atualização falhou. Os itens já carregados foram mantidos.';
+      _error = _items.isEmpty
+          ? 'Não foi possível carregar esta lista. Verifique sua conexão.'
+          : 'A atualização falhou. Os itens já carregados foram mantidos.';
       _hasMore = false;
       _retryShouldReset = reset;
     } finally {
@@ -965,7 +961,7 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
       builder: (ctx) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppTheme.space20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -979,7 +975,7 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                       height: 56,
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppTheme.space12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -992,16 +988,15 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                               fontSize: AppTheme.fontLg,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: AppTheme.space2),
                           Text(
                             isHave
                                 ? 'Este jogador TEM esta carta'
                                 : 'Este jogador QUER esta carta',
                             style: TextStyle(
-                              color:
-                                  isHave
-                                      ? AppTheme.primarySoft
-                                      : AppTheme.mythicGold,
+                              color: isHave
+                                  ? AppTheme.primarySoft
+                                  : AppTheme.mythicGold,
                               fontSize: AppTheme.fontSm,
                             ),
                           ),
@@ -1010,11 +1005,11 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 // Info badges
                 if (item.price != null || item.forTrade || item.forSale)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: AppTheme.space12),
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -1037,7 +1032,7 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                     ),
                   ),
                 const Divider(color: AppTheme.outlineMuted),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 // Actions
                 if (isHave && (item.forSale || item.forTrade)) ...[
                   // User HAS this card → I can propose to buy/trade for it
@@ -1094,7 +1089,10 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
 
   Widget _interactTag(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1117,9 +1115,9 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: AppTheme.space6),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppTheme.space4),
         leading: Icon(icon, color: color, size: 22),
         title: Text(
           label,
@@ -1206,7 +1204,7 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
               size: 48,
               color: AppTheme.textSecondary.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Text(
               isHave
                   ? 'Nenhuma carta disponível para troca/venda'
@@ -1227,14 +1225,14 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
       color: AppTheme.manaViolet,
       child: ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppTheme.space12),
         itemCount: _items.length + ((_hasMore || _error != null) ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= _items.length) {
             if (_error != null) {
               return Padding(
                 key: Key('public-binder-pagination-error-${widget.listType}'),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: AppTheme.space12),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -1260,13 +1258,13 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
             }
             if (_isLoading) {
               return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: AppTheme.space16),
                 child: Center(
                   child: CircularProgressIndicator(color: AppTheme.manaViolet),
                 ),
               );
             }
-            return const SizedBox(height: 1);
+            return const SizedBox(height: AppTheme.space1);
           }
           final item = _items[index];
           return _PublicBinderItemCard(
@@ -1298,7 +1296,7 @@ class _PublicBinderItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppTheme.space8),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1311,7 +1309,7 @@ class _PublicBinderItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(AppTheme.space10),
           child: Row(
             children: [
               CachedCardImage(
@@ -1320,7 +1318,7 @@ class _PublicBinderItemCard extends StatelessWidget {
                 height: 58,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1335,17 +1333,17 @@ class _PublicBinderItemCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.space4),
                     Row(
                       children: [
                         _binderBadge('×${item.quantity}', AppTheme.manaViolet),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppTheme.space4),
                         _binderBadge(
                           item.condition,
                           AppTheme.conditionColor(item.condition),
                         ),
                         if (item.isFoil) ...[
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppTheme.space4),
                           Icon(
                             Icons.auto_awesome,
                             size: 12,
@@ -1353,18 +1351,18 @@ class _PublicBinderItemCard extends StatelessWidget {
                           ),
                         ],
                         if (item.forTrade) ...[
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppTheme.space4),
                           _binderStatusTag('Troca', AppTheme.primarySoft),
                         ],
                         if (item.forSale) ...[
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppTheme.space4),
                           _binderStatusTag('Venda', AppTheme.mythicGold),
                         ],
                       ],
                     ),
                     if (item.price != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 2),
+                        padding: const EdgeInsets.only(top: AppTheme.space2),
                         child: Text(
                           'R\$ ${item.price!.toStringAsFixed(2)}',
                           style: const TextStyle(
@@ -1379,7 +1377,7 @@ class _PublicBinderItemCard extends StatelessWidget {
               ),
               // Interaction hint icon
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(AppTheme.space6),
                 decoration: BoxDecoration(
                   color: (isHave ? AppTheme.primarySoft : AppTheme.mythicGold)
                       .withValues(alpha: 0.1),
@@ -1400,7 +1398,10 @@ class _PublicBinderItemCard extends StatelessWidget {
 
   Widget _binderBadge(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space1,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -1418,7 +1419,10 @@ class _PublicBinderItemCard extends StatelessWidget {
 
   Widget _binderStatusTag(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space1,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: color.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),

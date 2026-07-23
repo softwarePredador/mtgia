@@ -48,6 +48,18 @@ for command_name in npm node curl python3; do
   fi
 done
 
+if ! node -e '
+  const [major, minor] = process.versions.node.split(".").map(Number);
+  process.exit(
+    major >= 24 || major === 22 && minor >= 13 || major === 20 && minor >= 19
+      ? 0
+      : 1,
+  );
+'; then
+  echo "Unsupported Node $(node --version): use ^20.19, ^22.13 or >=24." >&2
+  exit 2
+fi
+
 mkdir -p "$RUN_DIR"
 
 python3 - "$WEB_DIR" "$WORK_DIR" <<'PY'

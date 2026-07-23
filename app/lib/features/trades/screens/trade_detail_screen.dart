@@ -61,16 +61,17 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tradeData = context.select<
-      TradeProvider,
-      ({bool isLoading, TradeOffer? trade, String? error})
-    >(
-      (p) => (
-        isLoading: p.isLoading,
-        trade: p.selectedTrade,
-        error: p.errorMessage,
-      ),
-    );
+    final tradeData = context
+        .select<
+          TradeProvider,
+          ({bool isLoading, TradeOffer? trade, String? error})
+        >(
+          (p) => (
+            isLoading: p.isLoading,
+            trade: p.selectedTrade,
+            error: p.errorMessage,
+          ),
+        );
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
@@ -78,7 +79,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       body: Builder(
         builder: (context) {
           if (tradeData.isLoading && tradeData.trade == null) {
-            return const Center(child: CircularProgressIndicator());
+            return const AppStatePanel.loading(
+              key: Key('trade-detail-loading-state'),
+              title: 'Carregando trade',
+              message: 'Buscando proposta, participantes e histórico.',
+              accent: AppTheme.brass400,
+            );
           }
           if (tradeData.trade == null) {
             return AppStatePanel(
@@ -91,10 +97,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                       'indisponível.',
               accent: AppTheme.error,
               actionLabel: 'Tentar novamente',
-              onAction:
-                  () => context.read<TradeProvider>().fetchTradeDetail(
-                    widget.tradeId,
-                  ),
+              onAction: () => context.read<TradeProvider>().fetchTradeDetail(
+                widget.tradeId,
+              ),
             );
           }
 
@@ -113,42 +118,42 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 Expanded(
                   child: ListView(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppTheme.space16),
                     children: [
                       _buildStatusHeader(trade),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       const TradeSafetyNotice(compact: true),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       _buildParticipants(trade, isSender),
                       if (trade.valueSummary?.hasValues == true) ...[
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppTheme.space12),
                         _buildValueSummary(trade.valueSummary!),
                       ],
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       _buildActions(trade, isSender, isReceiver, provider),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       _buildItems(
                         'Itens oferecidos',
                         trade.myItems,
                         Icons.upload,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       _buildItems(
                         'Itens pedidos',
                         trade.theirItems,
                         Icons.download,
                       ),
                       if (trade.paymentAmount != null) ...[
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppTheme.space12),
                         _buildPayment(trade),
                       ],
                       if (trade.trackingCode != null) ...[
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppTheme.space12),
                         _buildTracking(trade),
                       ],
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       _buildTimeline(trade),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.space16),
                       // Chat section — isolated rebuild via its own Selector
                       _TradeChat(tradeId: widget.tradeId),
                     ],
@@ -172,7 +177,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     final label = TradeStatusHelper.label(trade.status);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -184,7 +189,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       child: Row(
         children: [
           Icon(icon, color: color, size: 32),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +232,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       children: [
         _userChip(trade.sender, isSender ? 'Você' : 'Remetente'),
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: AppTheme.space12),
           child: Icon(Icons.swap_horiz, color: AppTheme.textSecondary),
         ),
         _userChip(trade.receiver, !isSender ? 'Você' : 'Destinatário'),
@@ -239,7 +244,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     final name = user.label;
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(AppTheme.space10),
         decoration: BoxDecoration(
           color: AppTheme.surfaceSlate,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -257,7 +262,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               name,
               style: const TextStyle(
@@ -273,7 +278,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 fontSize: AppTheme.fontSm,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             _compactTrust(user.trust),
           ],
         ),
@@ -301,7 +306,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
   Widget _trustPill(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space1,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -327,7 +335,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -342,7 +350,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           Row(
             children: [
               Icon(Icons.balance_outlined, color: color, size: 18),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppTheme.space6),
               const Text(
                 'Equilíbrio de valor',
                 style: TextStyle(
@@ -352,7 +360,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Text(
             'Oferta: R\$ ${summary.totalOfferedValue.toStringAsFixed(2)}'
             ' • Pedido: R\$ ${summary.requestedValue.toStringAsFixed(2)}',
@@ -361,7 +369,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               fontSize: AppTheme.fontSm,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           Text(
             'Diferença: R\$ ${summary.differenceAbs.toStringAsFixed(2)}'
             ' (${summary.differencePct.toStringAsFixed(1)}%) • $directionText',
@@ -372,7 +380,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             ),
           ),
           if (summary.message != null) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: AppTheme.space6),
             Text(
               summary.message!,
               style: const TextStyle(
@@ -392,7 +400,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -403,7 +411,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           Row(
             children: [
               Icon(icon, size: 16, color: AppTheme.frost400),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppTheme.space6),
               Text(
                 '$title (${items.length})',
                 style: const TextStyle(
@@ -416,7 +424,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           const Divider(color: AppTheme.outlineMuted),
           ...items.map(
             (item) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
               child: Row(
                 children: [
                   CachedCardImage(
@@ -425,7 +433,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                     height: 40,
                     borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppTheme.space8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,7 +476,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   // ─── Pagamento ──────────────────────────────────────────────
   Widget _buildPayment(TradeOffer trade) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.brass400.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -477,7 +485,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       child: Row(
         children: [
           const Icon(Icons.attach_money, color: AppTheme.brass400),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,7 +517,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   // ─── Rastreio ───────────────────────────────────────────────
   Widget _buildTracking(TradeOffer trade) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -517,7 +525,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       child: Row(
         children: [
           const Icon(Icons.local_shipping, color: AppTheme.frost400, size: 20),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,7 +589,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -592,7 +600,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           const Row(
             children: [
               Icon(Icons.timeline, size: 16, color: AppTheme.textSecondary),
-              SizedBox(width: 6),
+              SizedBox(width: AppTheme.space6),
               Text(
                 'Histórico',
                 style: TextStyle(
@@ -606,47 +614,46 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children:
-                steps.map((step) {
-                  final isCurrent = step.status == trade.status;
-                  final isDone = completedStatuses.contains(step.status);
-                  final color =
-                      isCurrent || isDone
-                          ? TradeStatusHelper.color(step.status)
-                          : AppTheme.textSecondary;
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: isDone ? 0.14 : 0.06),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(
-                        color: color.withValues(alpha: 0.25),
-                        width: AppTheme.strokeThin,
+            children: steps.map((step) {
+              final isCurrent = step.status == trade.status;
+              final isDone = completedStatuses.contains(step.status);
+              final color = isCurrent || isDone
+                  ? TradeStatusHelper.color(step.status)
+                  : AppTheme.textSecondary;
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space8,
+                  vertical: AppTheme.space5,
+                ),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: isDone ? 0.14 : 0.06),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.25),
+                    width: AppTheme.strokeThin,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(step.icon, size: 13, color: color),
+                    const SizedBox(width: AppTheme.space4),
+                    Text(
+                      step.label,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: AppTheme.fontXs,
+                        fontWeight: isCurrent
+                            ? FontWeight.w800
+                            : FontWeight.w600,
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(step.icon, size: 13, color: color),
-                        const SizedBox(width: 4),
-                        Text(
-                          step.label,
-                          style: TextStyle(
-                            color: color,
-                            fontSize: AppTheme.fontXs,
-                            fontWeight:
-                                isCurrent ? FontWeight.w800 : FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           ...history.asMap().entries.map((entry) {
             final idx = entry.key;
             final h = entry.value;
@@ -659,12 +666,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 children: [
                   // Timeline line + dot
                   SizedBox(
-                    width: 24,
+                    width: AppTheme.space24,
                     child: Column(
                       children: [
                         Container(
-                          width: 10,
-                          height: 10,
+                          width: AppTheme.space10,
+                          height: AppTheme.space10,
                           decoration: BoxDecoration(
                             color: color,
                             shape: BoxShape.circle,
@@ -680,10 +687,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppTheme.space8),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.only(bottom: AppTheme.space12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -767,8 +774,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
       case 'accepted':
         // Em venda: receiver (vendedor) envia; em troca: qualquer participante
-        final canShip =
-            trade.type == 'sale' ? isReceiver : (isSender || isReceiver);
+        final canShip = trade.type == 'sale'
+            ? isReceiver
+            : (isSender || isReceiver);
         if (canShip) {
           actions.add(
             _actionButton(
@@ -793,8 +801,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
       case 'shipped':
         // Em venda: sender (comprador) confirma recebimento; em troca: qualquer participante
-        final canConfirm =
-            trade.type == 'sale' ? isSender : (isSender || isReceiver);
+        final canConfirm = trade.type == 'sale'
+            ? isSender
+            : (isSender || isReceiver);
         if (canConfirm) {
           actions.add(
             _actionButton(
@@ -865,7 +874,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: color.withValues(alpha: 0.15),
           foregroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: AppTheme.space10),
           minimumSize: const Size(0, 44),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -893,8 +902,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           content: Text(
             action == 'accept' ? 'Trade aceito!' : 'Trade recusado.',
           ),
-          backgroundColor:
-              action == 'accept' ? AppTheme.success : AppTheme.error,
+          backgroundColor: action == 'accept'
+              ? AppTheme.success
+              : AppTheme.error,
         ),
       );
       return;
@@ -932,57 +942,56 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            backgroundColor: AppTheme.surfaceSlate,
-            title: Text(
-              spec.title,
-              style: const TextStyle(color: AppTheme.textPrimary),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTradeDialogSummary(trade),
-                  const SizedBox(height: 12),
-                  Text(
-                    spec.consequence,
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: AppTheme.fontMd,
-                    ),
-                  ),
-                  if (spec.isDestructive) ...[
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Confirme apenas se você revisou a proposta e conversou com a outra pessoa quando necessário.',
-                      style: TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontSize: AppTheme.fontSm,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Voltar'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () => Navigator.pop(ctx, true),
-                icon: Icon(spec.icon),
-                label: Text(spec.cta),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: spec.color.withValues(alpha: 0.16),
-                  foregroundColor: spec.color,
-                  side: BorderSide(color: spec.color.withValues(alpha: 0.45)),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surfaceSlate,
+        title: Text(
+          spec.title,
+          style: const TextStyle(color: AppTheme.textPrimary),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTradeDialogSummary(trade),
+              const SizedBox(height: AppTheme.space12),
+              Text(
+                spec.consequence,
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: AppTheme.fontMd,
                 ),
               ),
+              if (spec.isDestructive) ...[
+                const SizedBox(height: AppTheme.space10),
+                const Text(
+                  'Confirme apenas se você revisou a proposta e conversou com a outra pessoa quando necessário.',
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
+              ],
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Voltar'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(ctx, true),
+            icon: Icon(spec.icon),
+            label: Text(spec.cta),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: spec.color.withValues(alpha: 0.16),
+              foregroundColor: spec.color,
+              side: BorderSide(color: spec.color.withValues(alpha: 0.45)),
+            ),
+          ),
+        ],
+      ),
     );
     return confirmed == true;
   }
@@ -990,10 +999,8 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   Future<void> _showShipDialog(TradeProvider provider, TradeOffer trade) async {
     final shipment = await showDialog<_ShipmentConfirmation>(
       context: context,
-      builder:
-          (_) => _ShipmentConfirmationDialog(
-            summary: _buildTradeDialogSummary(trade),
-          ),
+      builder: (_) =>
+          _ShipmentConfirmationDialog(summary: _buildTradeDialogSummary(trade)),
     );
 
     if (shipment == null || !mounted) return;
@@ -1018,7 +1025,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     final requestedValue = _itemsValue(trade.theirItems);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(AppTheme.space10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1037,7 +1044,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           Text(
             'Oferecidos: ${_compactItems(trade.myItems)}',
             style: const TextStyle(
@@ -1104,7 +1111,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space12,
+        vertical: AppTheme.space8,
+      ),
       color: AppTheme.surfaceSlate,
       child: SafeArea(
         child: Row(
@@ -1122,8 +1132,8 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                   filled: true,
                   fillColor: AppTheme.surfaceSlate,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                    horizontal: AppTheme.space14,
+                    vertical: AppTheme.space10,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -1132,7 +1142,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.space8),
             IconButton(
               key: const ValueKey('trade-message-send-button'),
               tooltip: 'Enviar mensagem',
@@ -1214,7 +1224,7 @@ class _ShipmentConfirmationDialogState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             widget.summary,
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             const Text(
               'Ao confirmar, o trade passa para “Enviado” e a outra pessoa poderá acompanhar a entrega.',
               style: TextStyle(
@@ -1222,7 +1232,7 @@ class _ShipmentConfirmationDialogState
                 fontSize: AppTheme.fontMd,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             TextField(
               key: const Key('trade-ship-tracking-field'),
               controller: _trackingController,
@@ -1231,7 +1241,7 @@ class _ShipmentConfirmationDialogState
                 labelText: 'Código de rastreio (opcional)',
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             DropdownButtonFormField<String>(
               key: const Key('trade-ship-method-field'),
               initialValue: _method,
@@ -1389,7 +1399,7 @@ class _TradeChat extends StatelessWidget {
     );
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1400,7 +1410,7 @@ class _TradeChat extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.chat, size: 16, color: AppTheme.textSecondary),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppTheme.space6),
               Text(
                 'Mensagens deste trade (${messages.length})',
                 style: const TextStyle(
@@ -1410,7 +1420,7 @@ class _TradeChat extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           const Text(
             'Use este espaço para combinar envio, entrega, comprovantes e dúvidas do acordo.',
             style: TextStyle(
@@ -1431,23 +1441,21 @@ class _TradeChat extends StatelessWidget {
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.65,
                   ),
-                  margin: const EdgeInsets.symmetric(vertical: 3),
+                  margin: const EdgeInsets.symmetric(vertical: AppTheme.space3),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 7,
+                    horizontal: AppTheme.space10,
+                    vertical: AppTheme.space7,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        isMe
-                            ? AppTheme.frost400.withValues(alpha: 0.18)
-                            : AppTheme.outlineMuted,
+                    color: isMe
+                        ? AppTheme.frost400.withValues(alpha: 0.18)
+                        : AppTheme.outlineMuted,
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   ),
                   child: Column(
-                    crossAxisAlignment:
-                        isMe
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
+                    crossAxisAlignment: isMe
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
                     children: [
                       if (!isMe)
                         Text(
@@ -1468,7 +1476,7 @@ class _TradeChat extends StatelessWidget {
                         ),
                       if (msg.attachmentUrl != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.only(top: AppTheme.space4),
                           child: Text(
                             '📎 ${msg.attachmentType ?? "anexo"}',
                             style: const TextStyle(
@@ -1491,7 +1499,7 @@ class _TradeChat extends StatelessWidget {
             }),
           ] else
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.symmetric(vertical: AppTheme.space8),
               child: Text(
                 'Nenhuma mensagem ainda',
                 style: TextStyle(

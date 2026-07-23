@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
+import '../lib/battle/battle_replay_payload_sanitizer.dart';
 import '../lib/battle/battle_replay_read_service.dart';
 
 void main() {
@@ -20,6 +21,16 @@ void main() {
       expect(
         RegExp(r'AND da\.user_id = CAST\(@userId AS uuid\)').allMatches(source),
         hasLength(1),
+      );
+      expect(
+        RegExp(
+          r'AND requested\.user_id = CAST\(@userId AS uuid\)',
+        ).allMatches(source),
+        hasLength(2),
+      );
+      expect(
+        RegExp(r'bs\.deck_b_id = CAST\(@deckId AS uuid\)').allMatches(source),
+        hasLength(2),
       );
     });
 
@@ -90,6 +101,112 @@ void main() {
       );
     });
 
+    test('maps an authorized same-owner replay through deck B', () async {
+      final pool = _ScriptedPool([
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
+        _result(
+          columns: const [
+            'id',
+            'deck_a_id',
+            'deck_b_id',
+            'simulation_type',
+            'winner_deck_id',
+            'turns_played',
+            'metrics',
+            'created_at',
+            'deck_a_name',
+            'deck_b_name',
+            'event_count',
+            'game_log_type',
+            'winner_label',
+          ],
+          rows: [
+            [
+              'sim-through-b',
+              'deck-1',
+              'deck-2',
+              'battle',
+              'deck-1',
+              5,
+              const {'engine': 'xmage'},
+              DateTime.utc(2026, 7, 22, 12),
+              'Deck A',
+              'Deck B',
+              4,
+              'battle',
+              null,
+            ],
+          ],
+        ),
+      ]);
+
+      final replays = await BattleReplayReadService(
+        pool,
+      ).listReplays(userId: 'same-owner', deckId: 'deck-2');
+
+      expect(replays.single['id'], 'sim-through-b');
+      expect(replays.single['deck_id'], 'deck-2');
+      expect(replays.single['opponent_deck_id'], 'deck-1');
+      expect(replays.single['opponent_name'], 'Deck A');
+      expect(replays.single['winner_name'], 'Deck A');
+    });
+
+    test('sanitizes legacy labels selected outside the full payload', () async {
+      final pool = _ScriptedPool([
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
+        _result(
+          columns: const [
+            'id',
+            'deck_a_id',
+            'deck_b_id',
+            'simulation_type',
+            'winner_deck_id',
+            'turns_played',
+            'metrics',
+            'created_at',
+            'deck_a_name',
+            'deck_b_name',
+            'event_count',
+            'game_log_type',
+            'winner_label',
+          ],
+          rows: [
+            [
+              'sim-legacy-label',
+              'deck-1',
+              null,
+              'legacy',
+              null,
+              2,
+              const {},
+              DateTime.utc(2026, 7, 22, 12),
+              'Deck A',
+              null,
+              1,
+              'password=type-secret',
+              'api_key=winner-secret',
+            ],
+          ],
+        ),
+      ]);
+
+      final replay =
+          (await BattleReplayReadService(
+            pool,
+          ).listReplays(userId: 'user-1', deckId: 'deck-1')).single;
+
+      expect(replay['type'], 'password=[REDACTED]');
+      expect(replay['winner_name'], 'api_key=[REDACTED]');
+    });
+
     test('maps replay detail with events and decision trace', () async {
       final pool = _ScriptedPool([
         _result(
@@ -123,6 +240,12 @@ void main() {
                 'type': 'battle',
                 'winner': 'Player A',
                 'turns': 4,
+                'engine': 'xmage',
+                'engine_version': '1.4.60',
+                'engine_commit': 'pinned-xmage-sha',
+                'seed': 42,
+                'authorization': 'Bearer replay-secret',
+                'diagnostic': 'password=prod-secret',
                 'game_log': [
                   {'turn': 1, 'player': 'Player A', 'action': 'draws'},
                 ],
@@ -147,6 +270,9 @@ void main() {
                             'name': 'Arcane Signet',
                             'image_url': 'https://cards.example/signet.jpg',
                           },
+                        ],
+                        'library': [
+                          {'name': 'Hidden Library Card'},
                         ],
                         'battlefield': [],
                         'graveyard': [],
@@ -176,11 +302,78 @@ void main() {
       expect(replay['events'], hasLength(1));
       expect(replay['decision_trace'], hasLength(1));
       expect(replay['visual_snapshots'], hasLength(1));
+      expect(replay['engine_commit'], 'pinned-xmage-sha');
+      final gameLog = replay['game_log'] as Map;
+      expect(gameLog['seed'], 42);
+      expect(gameLog, isNot(contains('authorization')));
+      expect(gameLog['diagnostic'], 'password=[REDACTED]');
+      final snapshot = (replay['visual_snapshots'] as List).single as Map;
+      final player = (snapshot['players'] as List).single as Map;
+      expect(player['hand_size'], 1);
+      expect(player['library_size'], 1);
+      expect(player, isNot(contains('hand')));
+      expect(player, isNot(contains('library')));
+      expect(
+        replay['replay_security'],
+        containsPair('hidden_zone_policy', 'counts_only'),
+      );
       expect(
         replay['simulation_contract'],
         containsPair('advisory_only', true),
       );
     });
+
+    test(
+      'rejects a corrupt persisted replay payload without echoing it',
+      () async {
+        final pool = _ScriptedPool([
+          _result(
+            rows: const [
+              [true],
+            ],
+          ),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'winner_deck_id',
+              'turns_played',
+              'game_log',
+              'metrics',
+              'created_at',
+              'deck_a_name',
+              'deck_b_name',
+            ],
+            rows: [
+              [
+                'sim-corrupt',
+                'deck-1',
+                'deck-2',
+                'battle',
+                null,
+                null,
+                'password=must-not-leak',
+                const {},
+                DateTime.utc(2026, 7, 22, 12),
+                'Lorehold',
+                'Atraxa',
+              ],
+            ],
+          ),
+        ]);
+
+        expect(
+          () => BattleReplayReadService(pool).fetchReplay(
+            userId: 'user-1',
+            deckId: 'deck-1',
+            replayId: 'sim-corrupt',
+          ),
+          throwsA(isA<BattleReplayPayloadException>()),
+        );
+      },
+    );
 
     test('marks pinned XMage execution as canonical rules evidence', () async {
       final pool = _ScriptedPool([

@@ -26,6 +26,7 @@ run_dependency_validator() {
 run_dependency_validator app "Flutter app" flutter
 run_dependency_validator server "Dart Frog server" dart
 run_dependency_validator tools/manaloom_lints "ManaLoom custom lint package" dart
+run_dependency_validator tools/project_logic "ManaLoom project logic generator" dart
 
 print_header "Dependency audit concluído"
 echo "Todos os pacotes auditados declaram apenas dependências coerentes com o uso atual."

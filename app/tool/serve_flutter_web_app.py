@@ -12,8 +12,10 @@ import argparse
 import http.server
 import mimetypes
 import posixpath
+import ssl
 import sys
 from pathlib import Path
+from urllib import error, request
 from urllib.parse import unquote, urlparse
 
 
@@ -23,6 +25,9 @@ DEFAULT_PREFIX = "/app/"
 class FlutterWebAppHandler(http.server.BaseHTTPRequestHandler):
     build_dir: Path
     prefix: str
+    api_upstream: str | None = None
+    api_ssl_context: ssl.SSLContext | None = None
+    api_prefix = "/api"
 
     server_version = "ManaLoomFlutterWebQA/1.0"
 
@@ -32,9 +37,30 @@ class FlutterWebAppHandler(http.server.BaseHTTPRequestHandler):
     def do_HEAD(self) -> None:
         self._handle_request(head_only=True)
 
+    def do_POST(self) -> None:
+        self._handle_request()
+
+    def do_PUT(self) -> None:
+        self._handle_request()
+
+    def do_PATCH(self) -> None:
+        self._handle_request()
+
+    def do_DELETE(self) -> None:
+        self._handle_request()
+
+    def do_OPTIONS(self) -> None:
+        self._handle_request()
+
     def _handle_request(self, *, head_only: bool = False) -> None:
         parsed = urlparse(self.path)
         path = parsed.path
+
+        if self.api_upstream and (
+            path == self.api_prefix or path.startswith(f"{self.api_prefix}/")
+        ):
+            self._proxy_api(head_only=head_only)
+            return
 
         if path == "/":
             self._redirect(self.prefix)
@@ -88,6 +114,56 @@ class FlutterWebAppHandler(http.server.BaseHTTPRequestHandler):
         if not head_only:
             self.wfile.write(data)
 
+    def _proxy_api(self, *, head_only: bool) -> None:
+        parsed = urlparse(self.path)
+        upstream_path = parsed.path[len(self.api_prefix) :] or "/"
+        target = f"{self.api_upstream}{upstream_path}"
+        if parsed.query:
+            target = f"{target}?{parsed.query}"
+
+        content_length = int(self.headers.get("Content-Length", "0") or "0")
+        if content_length > 10 * 1024 * 1024:
+            self.send_error(413, "QA proxy request body is too large")
+            return
+        body = self.rfile.read(content_length) if content_length else None
+        forwarded_headers = {
+            header: value
+            for header, value in self.headers.items()
+            if header.lower()
+            in {"accept", "authorization", "content-type", "x-request-id"}
+        }
+        upstream_request = request.Request(
+            target,
+            data=body,
+            headers=forwarded_headers,
+            method=self.command,
+        )
+
+        try:
+            response = request.urlopen(
+                upstream_request,
+                context=self.api_ssl_context,
+                timeout=60,
+            )
+        except error.HTTPError as upstream_error:
+            response = upstream_error
+        except error.URLError:
+            self.send_error(502, "QA API upstream is unavailable")
+            return
+
+        with response:
+            response_body = response.read()
+            self.send_response(response.status)
+            for header in ("Content-Type", "X-Request-Id", "Retry-After"):
+                value = response.headers.get(header)
+                if value:
+                    self.send_header(header, value)
+            self.send_header("Content-Length", str(len(response_body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            if not head_only:
+                self.wfile.write(response_body)
+
     def _redirect(self, location: str) -> None:
         self.send_response(302)
         self.send_header("Location", location)
@@ -105,6 +181,27 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--build-dir",
         default=str(Path(__file__).resolve().parents[1] / "build" / "web"),
+    )
+    parser.add_argument(
+        "--api-upstream",
+        help=(
+            "Optional API origin proxied under /api for loopback-only "
+            "authenticated QA. HTTPS is required unless the explicit "
+            "disposable loopback fixture flag is enabled."
+        ),
+    )
+    parser.add_argument(
+        "--allow-loopback-http-api",
+        action="store_true",
+        help=(
+            "Allow an HTTP API only when its hostname is loopback. Intended "
+            "exclusively for disposable local PostgreSQL/API fixtures."
+        ),
+    )
+    parser.add_argument(
+        "--ca-file",
+        default="/etc/ssl/cert.pem",
+        help="Trusted CA bundle for the HTTPS QA proxy (never disables TLS verification).",
     )
     return parser.parse_args()
 
@@ -131,6 +228,44 @@ def main() -> int:
 
     FlutterWebAppHandler.build_dir = build_dir
     FlutterWebAppHandler.prefix = normalize_prefix(args.prefix)
+    if args.api_upstream:
+        parsed_upstream = urlparse(args.api_upstream)
+        is_origin_only = (
+            parsed_upstream.path in ("", "/")
+            and not parsed_upstream.query
+            and not parsed_upstream.fragment
+            and parsed_upstream.username is None
+            and parsed_upstream.password is None
+        )
+        is_https_origin = parsed_upstream.scheme == "https"
+        is_explicit_loopback_http = (
+            args.allow_loopback_http_api
+            and parsed_upstream.scheme == "http"
+            and parsed_upstream.hostname in {"127.0.0.1", "::1", "localhost"}
+        )
+        if not parsed_upstream.netloc or not is_origin_only or not (
+            is_https_origin or is_explicit_loopback_http
+        ):
+            print(
+                "--api-upstream must be an absolute HTTPS origin, or an "
+                "explicitly allowed loopback HTTP fixture",
+                file=sys.stderr,
+            )
+            return 2
+        if args.host not in {"127.0.0.1", "::1", "localhost"}:
+            print("--api-upstream requires a loopback --host", file=sys.stderr)
+            return 2
+        FlutterWebAppHandler.api_upstream = args.api_upstream.rstrip("/")
+        if is_https_origin:
+            ca_file = Path(args.ca_file).expanduser()
+            if not ca_file.is_file():
+                print(f"trusted CA bundle not found: {ca_file}", file=sys.stderr)
+                return 2
+            FlutterWebAppHandler.api_ssl_context = ssl.create_default_context(
+                cafile=str(ca_file)
+            )
+        else:
+            FlutterWebAppHandler.api_ssl_context = None
 
     server = http.server.ThreadingHTTPServer(
         (args.host, args.port),
@@ -138,6 +273,8 @@ def main() -> int:
     )
     url = f"http://{args.host}:{args.port}{FlutterWebAppHandler.prefix}"
     print(f"Serving ManaLoom Flutter Web at {url}")
+    if FlutterWebAppHandler.api_upstream:
+        print("Loopback QA API proxy enabled under /api")
     print("Press Ctrl+C to stop.")
 
     try:

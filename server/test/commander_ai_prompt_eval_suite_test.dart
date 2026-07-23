@@ -23,9 +23,59 @@ void main() {
 
       expect(report['schema_version'], commanderAiPromptEvalSchemaVersion);
       expect(report['status'], 'pass');
-      expect(report['case_count'], 3);
+      expect(report['case_count'], 6);
       expect(report['failed_case_count'], 0);
       expect(report['score'], greaterThanOrEqualTo(90));
+      final coverage = report['coverage'] as Map<String, dynamic>;
+      expect(coverage['status'], 'pass');
+      expect(coverage['brackets'], [1, 2, 3, 4, 5]);
+      expect(coverage['color_buckets'], [
+        'colorless',
+        'mono',
+        'three_plus',
+        'two',
+      ]);
+      expect(coverage['archetype_family_count'], 6);
+    });
+
+    test('fails closed when a held-out coverage bucket is removed', () {
+      final incomplete =
+          jsonDecode(jsonEncode(fixture)) as Map<String, dynamic>;
+      (incomplete['cases'] as List).removeWhere(
+        (entry) =>
+            (entry as Map<String, dynamic>)['id'] ==
+            'kozilek_colorless_fast_mana_bracket5',
+      );
+
+      final report = evaluateCommanderAiPromptSuite(incomplete);
+      final coverage = report['coverage'] as Map<String, dynamic>;
+      final failureCodes =
+          (coverage['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(report['status'], 'fail');
+      expect(coverage['status'], 'fail');
+      expect(failureCodes, contains('minimum_case_count'));
+      expect(failureCodes, contains('required_brackets'));
+      expect(failureCodes, contains('required_color_buckets'));
+    });
+
+    test('fails closed when fixture schema is stale', () {
+      final stale = jsonDecode(jsonEncode(fixture)) as Map<String, dynamic>;
+      stale['schema_version'] = 'commander_ai_prompt_eval_v1_2026-07-06';
+
+      final report = evaluateCommanderAiPromptSuite(stale);
+      final coverage = report['coverage'] as Map<String, dynamic>;
+      final failureCodes =
+          (coverage['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(report['status'], 'fail');
+      expect(failureCodes, contains('fixture_schema_current'));
     });
 
     test('blocks exact add/cut pairs rejected by battle feedback', () {
@@ -125,6 +175,7 @@ void main() {
       final markdown = commanderAiPromptEvalMarkdown(report);
 
       expect(markdown, contains('# Commander AI Prompt Eval'));
+      expect(markdown, contains('## Held-out coverage'));
       expect(markdown, contains('kaalia_collection_budget_bracket3'));
       expect(markdown, contains('No failures.'));
     });

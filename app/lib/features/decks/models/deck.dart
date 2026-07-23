@@ -19,6 +19,7 @@ class Deck {
   final String? pricingCurrency;
   final double? pricingTotal;
   final int? pricingMissingCards;
+  final String? pricingSource;
   final DateTime? pricingUpdatedAt;
   final bool isPublic;
   final DateTime createdAt;
@@ -47,6 +48,7 @@ class Deck {
     this.pricingCurrency,
     this.pricingTotal,
     this.pricingMissingCards,
+    this.pricingSource,
     this.pricingUpdatedAt,
     required this.isPublic,
     required this.createdAt,
@@ -75,10 +77,10 @@ class Deck {
       pricingCurrency: json['pricing_currency'] as String?,
       pricingTotal: (json['pricing_total'] as num?)?.toDouble(),
       pricingMissingCards: json['pricing_missing_cards'] as int?,
-      pricingUpdatedAt:
-          (json['pricing_updated_at'] != null)
-              ? DateTime.tryParse(json['pricing_updated_at'] as String)
-              : null,
+      pricingSource: json['pricing_source'] as String?,
+      pricingUpdatedAt: (json['pricing_updated_at'] != null)
+          ? DateTime.tryParse(json['pricing_updated_at'] as String)
+          : null,
       isPublic: json['is_public'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       cardCount: json['card_count'] as int? ?? 0,
@@ -113,6 +115,7 @@ class Deck {
       'pricing_currency': pricingCurrency,
       'pricing_total': pricingTotal,
       'pricing_missing_cards': pricingMissingCards,
+      'pricing_source': pricingSource,
       'pricing_updated_at': pricingUpdatedAt?.toIso8601String(),
       'is_public': isPublic,
       'created_at': createdAt.toIso8601String(),
@@ -141,6 +144,7 @@ class Deck {
     String? pricingCurrency,
     double? pricingTotal,
     int? pricingMissingCards,
+    String? pricingSource,
     DateTime? pricingUpdatedAt,
     bool? isPublic,
     DateTime? createdAt,
@@ -166,6 +170,7 @@ class Deck {
       pricingCurrency: pricingCurrency ?? this.pricingCurrency,
       pricingTotal: pricingTotal ?? this.pricingTotal,
       pricingMissingCards: pricingMissingCards ?? this.pricingMissingCards,
+      pricingSource: pricingSource ?? this.pricingSource,
       pricingUpdatedAt: pricingUpdatedAt ?? this.pricingUpdatedAt,
       isPublic: isPublic ?? this.isPublic,
       createdAt: createdAt ?? this.createdAt,

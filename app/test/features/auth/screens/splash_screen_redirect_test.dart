@@ -29,5 +29,22 @@ void main() {
         '/register',
       );
     });
+
+    test('safe deep link wins while first-run landing is the fallback', () {
+      expect(
+        resolveAuthenticatedLocation(
+          redirectPath: '/decks/deck-1?tab=analysis',
+          defaultLocation: '/onboarding/core-flow',
+        ),
+        '/decks/deck-1?tab=analysis',
+      );
+      expect(
+        resolveAuthenticatedLocation(
+          redirectPath: 'https://example.com',
+          defaultLocation: '/onboarding/core-flow',
+        ),
+        '/onboarding/core-flow',
+      );
+    });
   });
 }

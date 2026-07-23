@@ -11,28 +11,33 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import external_engine_source_contract as engine_source_contract
 
-DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_XMAGE_ROOT: Path | None = None
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
+REPO_ROOT = Path(__file__).resolve().parents[4]
+CANONICAL_XMAGE_PIN_FILE = REPO_ROOT / "services/xmage-sidecar/XMAGE_COMMIT"
+SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
 
 FACETS: dict[str, dict[str, Any]] = {
     "card_implementations": {
         "paths": ["Mage.Sets/src/mage/cards"],
         "why": "Per-card implementation classes are the fastest exact reference for card behavior.",
-        "manaloom_use": "Resolve card -> XMage class, extract effect/cost/target signals, then gate with ManaLoom tests and PG precheck.",
-        "adoption": "keep_current_fast_path_and_batch_by_semantic_family",
+        "manaloom_use": "Reconcile against the pinned runtime catalog; externally covered cards execute in XMage, while source extraction diagnoses only focused tests or the explicit external residual.",
+        "adoption": "diagnostic_after_pinned_catalog_reconciliation",
     },
     "effect_library": {
         "paths": ["Mage/src/main/java/mage/abilities/effects"],
         "why": "XMage's effect classes are reusable vocabulary for destroy, exile, copy, token, draw, prevention, replacement, and continuous effects.",
-        "manaloom_use": "Build an effect-class taxonomy and map frequent classes to ManaLoom effect_json templates.",
-        "adoption": "high_impact_immediate",
+        "manaloom_use": "Use the taxonomy for replay conformance, focused residual tests, and native work only after XMage plus Forge coverage fails.",
+        "adoption": "diagnostic_for_external_residual",
     },
     "ability_timing": {
         "paths": [
@@ -42,8 +47,8 @@ FACETS: dict[str, dict[str, Any]] = {
             "Mage/src/main/java/mage/abilities/mana",
         ],
         "why": "Ability classes encode static/triggered/activated/mana/timing semantics.",
-        "manaloom_use": "Use ability classes to classify runtime executor families and focused test setup.",
-        "adoption": "high_impact_immediate",
+        "manaloom_use": "Use ability classes to classify focused conformance scenarios without creating native rows for externally covered cards.",
+        "adoption": "diagnostic_for_external_residual",
     },
     "costs_and_cost_adjusters": {
         "paths": [
@@ -51,8 +56,8 @@ FACETS: dict[str, dict[str, Any]] = {
             "Mage/src/main/java/mage/abilities/effects/common/cost",
         ],
         "why": "Cost reducers, alternate costs, additional costs, X costs, and payment restrictions are common high-severity blockers.",
-        "manaloom_use": "Map XMage cost adjusters/effects to explicit ManaLoom cost contracts instead of one-off card patches.",
-        "adoption": "high_impact_immediate",
+        "manaloom_use": "Use cost classes as focused conformance references and for the explicit native residual only.",
+        "adoption": "diagnostic_for_external_residual",
     },
     "targets_filters_predicates": {
         "paths": [
@@ -60,8 +65,8 @@ FACETS: dict[str, dict[str, Any]] = {
             "Mage/src/main/java/mage/filter",
         ],
         "why": "Target and filter classes encode legality and scope, which are frequent sources of false confidence.",
-        "manaloom_use": "Generate target constraints, legality checks, and focused target revalidation tests.",
-        "adoption": "high_impact_immediate",
+        "manaloom_use": "Generate focused target-legality assertions; do not mirror target classes into PostgreSQL for catalog-covered cards.",
+        "adoption": "diagnostic_for_external_residual",
     },
     "dynamic_values_conditions": {
         "paths": [
@@ -70,7 +75,7 @@ FACETS: dict[str, dict[str, Any]] = {
         ],
         "why": "Dynamic values and conditions explain variable damage, counts, controller choices, thresholds, and conditional modes.",
         "manaloom_use": "Attach conditional fields to effect_json and generate edge-case assertions.",
-        "adoption": "medium_high_impact",
+        "adoption": "diagnostic_for_external_residual",
     },
     "watchers_replacement_prevention": {
         "paths": [
@@ -80,7 +85,7 @@ FACETS: dict[str, dict[str, Any]] = {
         ],
         "why": "Watchers, replacement, prevention, and continuous rule-modifying effects are where many battle-runtime lineage gaps originate.",
         "manaloom_use": "Use as an event-contract and state-memory reference, especially for first spell, damage, draw, discard, replacement, and prevention.",
-        "adoption": "high_impact_after_effect_taxonomy",
+        "adoption": "replay_and_residual_conformance_reference",
     },
     "game_events_state": {
         "paths": [
@@ -89,8 +94,8 @@ FACETS: dict[str, dict[str, Any]] = {
             "Mage/src/main/java/mage/game/GameImpl.java",
         ],
         "why": "Game events and state application define what a replay/audit should be able to observe.",
-        "manaloom_use": "Compare ManaLoom event contracts to XMage event taxonomy and close static event-contract gaps in batches.",
-        "adoption": "high_impact_for_battle_gate",
+        "manaloom_use": "Compare normalized replay events to XMage observables while keeping hidden and unattributed actions unknown.",
+        "adoption": "replay_conformance_reference",
     },
     "priority_stack_turn_engine": {
         "paths": [
@@ -100,8 +105,8 @@ FACETS: dict[str, dict[str, Any]] = {
             "Mage/src/main/java/mage/players/PlayerImpl.java",
         ],
         "why": "Priority, phase/step order, stack resolution, passed-priority flags, and SBA loops define correctness of non-goldfish tests.",
-        "manaloom_use": "Use as conformance spec for stack/priority tests; do not port the whole engine blindly.",
-        "adoption": "contract_reference_not_full_port",
+        "manaloom_use": "Execute these semantics in the pinned sidecar and use source only as a conformance reference.",
+        "adoption": "external_runtime_and_conformance_reference",
     },
     "commander_legality": {
         "paths": [
@@ -115,8 +120,8 @@ FACETS: dict[str, dict[str, Any]] = {
     "test_scenario_corpus": {
         "paths": ["Mage.Tests/src/test/java"],
         "why": "XMage tests contain a mature scenario grammar for addCard/castSpell/activateAbility/setChoice/waitStackResolved/check* assertions.",
-        "manaloom_use": "Mine matching card tests and convert their scenario shape into focused ManaLoom replay/unit tests.",
-        "adoption": "very_high_impact_for_scaling",
+        "manaloom_use": "Mine matching tests for focused residual/conformance scenarios and future pin qualification, not wholesale native promotion.",
+        "adoption": "focused_residual_and_pin_qualification",
     },
     "ai_heuristics": {
         "paths": [
@@ -125,8 +130,8 @@ FACETS: dict[str, dict[str, Any]] = {
             "Mage.Server.Plugins/Mage.Player.AI.Minimax",
         ],
         "why": "XMage AI can inform targeting/play-priority heuristics but is less directly portable than rules/tests.",
-        "manaloom_use": "Reference after rules correctness improves; avoid blocking card-rule work on AI parity.",
-        "adoption": "later_reference",
+        "manaloom_use": "The engine AI may select runtime actions, but opaque/debug logs cannot become product learning without a stable censored trace contract.",
+        "adoption": "runtime_action_policy_only_no_learning_without_trace",
     },
 }
 
@@ -168,6 +173,41 @@ KEYWORD_CATEGORIES: dict[str, list[str]] = {
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def canonical_xmage_pin() -> str:
+    try:
+        pin = CANONICAL_XMAGE_PIN_FILE.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise RuntimeError("cannot read canonical XMage pin") from exc
+    if not SHA_PATTERN.fullmatch(pin):
+        raise RuntimeError("canonical XMage pin is not a lowercase 40-character SHA")
+    return pin
+
+
+def validate_source_pin(xmage_root: Path, expected_commit: str) -> dict[str, Any]:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(xmage_root), "rev-parse", "HEAD"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {
+            "status": "fail",
+            "expected_commit": expected_commit,
+            "observed_commit": None,
+            "error": f"git_revision_check_failed:{exc.__class__.__name__}",
+        }
+    observed = completed.stdout.strip() if completed.returncode == 0 else ""
+    return {
+        "status": "pass" if observed == expected_commit else "fail",
+        "expected_commit": expected_commit,
+        "observed_commit": observed or None,
+        "error": None if observed == expected_commit else "source_root_is_not_at_runtime_pin",
+    }
 
 
 def rel(path: Path, root: Path) -> str:
@@ -445,39 +485,33 @@ def recommendations() -> list[dict[str, str]]:
     return [
         {
             "priority": "P0",
-            "item": "Do not port XMage wholesale.",
-            "reason": "ManaLoom battle is Python/Hermes/PostgreSQL driven; wholesale Java engine integration would be slower than absorbing contracts and test cases.",
-            "next_action": "Keep XMage as reference corpus and mine stable contracts into ManaLoom runtime/tests.",
+            "item": "Execute catalog-covered cards in the pinned XMage sidecar.",
+            "reason": "The external engine already owns complete stack, priority, state-based, replacement and card behavior for its exact catalog.",
+            "next_action": "Keep coverage and runtime provenance fail-closed; do not create native PostgreSQL rules for externally covered cards.",
         },
         {
             "priority": "P0",
-            "item": "Promote effect-class taxonomy before more card-by-card work.",
-            "reason": "Most remaining high/medium cards are instances of reusable effect/cost/target families.",
-            "next_action": "Extend xmage_to_manaloom_effect_hints.py using the inventory's effect packages and suffix counts.",
+            "item": "Require exact source/runtime pin identity.",
+            "reason": "An unversioned source tree can disagree with the jars that execute product battles.",
+            "next_action": "Reject source inventories whose Git revision differs from services/xmage-sidecar/XMAGE_COMMIT.",
         },
         {
             "priority": "P0",
-            "item": "Mine XMage tests into focused ManaLoom scenarios.",
-            "reason": "XMage tests already encode setup/action/assertion flow for stack, choices, costs, replacement, and timing.",
-            "next_action": "Add a local test-miner that finds card-name tests and emits ManaLoom scenario candidates.",
+            "item": "Use effect and ability taxonomies only for diagnosis and explicit residual work.",
+            "reason": "Broad taxonomy extraction is useful, but it does not justify duplicating externally executable rules.",
+            "next_action": "Route only proven XMage plus Forge coverage gaps to native family implementation.",
         },
         {
             "priority": "P1",
-            "item": "Use priority/stack/turn classes as conformance reference.",
-            "reason": "Current battle gates are sensitive to cast permission, stack timing, and event-contract gaps.",
-            "next_action": "Create ManaLoom stack/priority contract tests for pass priority, response windows, stack copies, and SBA loops.",
+            "item": "Mine XMage tests into focused conformance scenarios.",
+            "reason": "The test corpus encodes setup, action and assertion flows for stack, choices, costs, replacement and timing.",
+            "next_action": "Use matching scenarios for residual adapters and future pin qualification, without treating them as PostgreSQL promotion evidence by themselves.",
         },
         {
             "priority": "P1",
             "item": "Use GameEvent/Watcher taxonomy for event-contract coverage.",
-            "reason": "Latest battle review_required state still points at static event-contract style gaps, not deck-list incoherence.",
-            "next_action": "Compare ManaLoom event_contract_static taxonomy against XMage GameEvent.EventType and watcher families.",
-        },
-        {
-            "priority": "P1",
-            "item": "Use target/filter/predicate classes to harden effect_json target constraints.",
-            "reason": "Target legality mistakes produce false positives in battle and poor AI choices.",
-            "next_action": "Map common Target*/Filter*/Predicate* classes to explicit target_scope and valid_zone fields.",
+            "reason": "Product learning depends on observable, source-attributed events rather than an aggregate game result.",
+            "next_action": "Compare normalized replay events against XMage observables and keep hidden or unattributed actions unknown.",
         },
         {
             "priority": "P2",
@@ -487,20 +521,35 @@ def recommendations() -> list[dict[str, str]]:
         },
         {
             "priority": "P3",
-            "item": "Defer XMage AI heuristic absorption.",
-            "reason": "Rule correctness and test scaling have better return right now than porting AI decision code.",
-            "next_action": "Reference AI packages only after runtime rule gates stabilize.",
+            "item": "Do not learn from opaque XMage AI debug logs.",
+            "reason": "The current sidecar exposes no stable, censored, source-attributed decision trace and debug output can include hidden information.",
+            "next_action": "Keep strategy_or_swap_proof false unless a structured trace contract is implemented and tested.",
         },
     ]
 
 
-def build_inventory(xmage_root: Path) -> dict[str, Any]:
+def build_inventory(
+    xmage_root: Path,
+    *,
+    expected_commit: str | None = None,
+) -> dict[str, Any]:
     all_java = iter_java(xmage_root)
+    source_pin = (
+        validate_source_pin(xmage_root, expected_commit)
+        if expected_commit is not None
+        else {
+            "status": "not_requested",
+            "expected_commit": None,
+            "observed_commit": None,
+            "error": None,
+        }
+    )
     return {
         "generated_at": utc_now(),
-        "status": "ready",
+        "status": "ready" if source_pin["status"] != "fail" else "blocked_unpinned_source",
         "mutations_performed": [],
         "xmage_root": str(xmage_root),
+        "source_pin": source_pin,
         "summary": {
             "java_files_total": len(all_java),
             "card_implementation_files": path_count(xmage_root, "Mage.Sets/src/mage/cards"),
@@ -528,6 +577,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Generated at: `{report.get('generated_at')}`",
         f"- Status: `{report.get('status')}`",
         f"- XMage root: `{report.get('xmage_root')}`",
+        f"- Source pin: `{report.get('source_pin')}`",
         f"- Mutations performed: `{report.get('mutations_performed')}`",
         "",
         "## Summary",
@@ -604,21 +654,34 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--xmage-root", type=Path, default=DEFAULT_XMAGE_ROOT)
     parser.add_argument("--output-json", type=Path)
     parser.add_argument("--output-md", type=Path)
+    parser.add_argument(
+        "--allow-unpinned-source",
+        action="store_true",
+        help="Diagnostic research only; omits runtime pin validation.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(
+            args.xmage_root,
+            allow_unpinned=args.allow_unpinned_source,
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     output_json = args.output_json or DEFAULT_REPORT_DIR / f"xmage_engine_absorption_inventory_{timestamp}.json"
     output_md = args.output_md or output_json.with_suffix(".md")
-    report = build_inventory(args.xmage_root)
+    expected_commit = None if args.allow_unpinned_source else canonical_xmage_pin()
+    report = build_inventory(xmage_root, expected_commit=expected_commit)
     write_outputs(report, output_json=output_json, output_md=output_md)
     print(f"wrote_json={output_json}")
     print(f"wrote_md={output_md}")
     print(f"java_files_total={report['summary']['java_files_total']}")
     print(f"test_files={report['summary']['test_files']}")
-    return 0
+    return 0 if report["status"] == "ready" else 1
 
 
 if __name__ == "__main__":

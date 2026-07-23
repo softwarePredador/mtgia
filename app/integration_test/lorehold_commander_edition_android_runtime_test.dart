@@ -157,6 +157,7 @@ void main() {
       ApiClient.setToken(token);
       await prefs.setString('auth_token', token);
       await prefs.setString('user_data', jsonEncode(user));
+      await markRuntimeOnboardingSettled(user['id']?.toString() ?? '');
 
       final printings = await _fetchLoreholdPickerPrintings(api);
       final firstPrinting = printings.first;
@@ -168,8 +169,8 @@ void main() {
         'description': 'Android runtime proof for Lorehold edition picker.',
       });
       expect(deckResponse.statusCode, anyOf(200, 201));
-      final deckId =
-          (deckResponse.data as Map<String, dynamic>)['id'].toString();
+      final deckId = (deckResponse.data as Map<String, dynamic>)['id']
+          .toString();
 
       final addCommanderResponse = await api.post('/decks/$deckId/cards', {
         'card_id': firstId,
@@ -247,9 +248,8 @@ void main() {
         final deckAfterResponse = await api.get('/decks/$deckId');
         expect(deckAfterResponse.statusCode, 200);
         final deckAfter = deckAfterResponse.data as Map<String, dynamic>;
-        final commanders =
-            ((deckAfter['commander'] as List?) ?? const [])
-                .cast<Map<String, dynamic>>();
+        final commanders = ((deckAfter['commander'] as List?) ?? const [])
+            .cast<Map<String, dynamic>>();
         expect(commanders, hasLength(1));
         expect(commanders.single['id'], targetId);
         expect(commanders.single['name'], _commanderName);

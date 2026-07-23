@@ -5,24 +5,33 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-quick}"
 FLUTTER_TEST_TIMEOUT_SECONDS="${FLUTTER_TEST_TIMEOUT_SECONDS:-1200}"
 BACKEND_TEST_JWT_SECRET="${JWT_SECRET:-local_quality_gate_jwt_secret_not_for_production_20260706}"
-FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-flutter}"
+PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
 
+source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
+resolve_manaloom_dart
+DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
+
+if [[ -n "${MANALOOM_FLUTTER_BIN:-}" ]]; then
+  FLUTTER_BIN="$MANALOOM_FLUTTER_BIN"
+elif [[ -x "$PINNED_FLUTTER" ]]; then
+  FLUTTER_BIN="$PINNED_FLUTTER"
+else
+  FLUTTER_BIN="$(command -v flutter 2>/dev/null || true)"
+fi
+
+if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]]; then
+  echo "❌ Flutter configurado não é executável: $FLUTTER_BIN" >&2
+  exit 2
+fi
 if [[ "$FLUTTER_BIN" == */* ]]; then
-  if [[ ! -x "$FLUTTER_BIN" ]]; then
-    echo "❌ Flutter configurado não é executável: $FLUTTER_BIN" >&2
-    exit 2
-  fi
   FLUTTER_BIN="$(cd "$(dirname "$FLUTTER_BIN")" && pwd)/$(basename "$FLUTTER_BIN")"
 fi
 readonly FLUTTER_BIN
 
-# Nested app gates that still resolve `flutter` from PATH must inherit the
-# explicitly selected SDK. This prevents `pub get` from rewriting SDK-owned
-# lock entries with a different local Flutter installation.
-if [[ -n "${MANALOOM_FLUTTER_BIN:-}" ]]; then
-  flutter_bin_dir="$(dirname "$FLUTTER_BIN")"
-  export PATH="$flutter_bin_dir:$PATH"
-fi
+# Nested gates inherit the same Dart and Flutter SDKs selected above.
+flutter_bin_dir="$(dirname "$FLUTTER_BIN")"
+export MANALOOM_DART_BIN="$DART_BIN"
+export PATH="$(dirname "$DART_BIN"):$flutter_bin_dir:$PATH"
 
 trap 'echo "❌ Quality gate interrompido." >&2; exit 130' INT
 trap 'echo "❌ Quality gate encerrado." >&2; exit 143' TERM
@@ -50,7 +59,7 @@ run_backend_full() {
 run_frontend_quick() {
   print_header "Frontend quick checks"
   cd "$ROOT_DIR/app"
-  "$FLUTTER_BIN" analyze --no-fatal-infos
+  "$FLUTTER_BIN" analyze --no-pub --no-fatal-infos
 }
 
 run_flutter_tests_with_proof() {
@@ -64,7 +73,7 @@ run_flutter_tests_with_proof() {
   set +e
   perl -e 'alarm shift; exec @ARGV' \
     "$FLUTTER_TEST_TIMEOUT_SECONDS" \
-    "$FLUTTER_BIN" test --no-version-check --reporter compact --timeout 2m \
+    "$FLUTTER_BIN" test --no-pub --no-version-check --reporter compact --timeout 2m \
     2>&1 | tee "$output_file"
   local pipeline_status=("${PIPESTATUS[@]}")
   status="${pipeline_status[0]}"
@@ -93,7 +102,7 @@ run_flutter_tests_with_proof() {
 run_frontend_full() {
   print_header "Frontend full checks"
   cd "$ROOT_DIR/app"
-  "$FLUTTER_BIN" analyze --no-fatal-infos
+  "$FLUTTER_BIN" analyze --no-pub --no-fatal-infos
   run_flutter_tests_with_proof
 }
 
@@ -105,8 +114,11 @@ run_public_web_full() {
 run_ui_audit() {
   print_header "ManaLoom Flutter UI audit"
   cd "$ROOT_DIR/app"
-  "$FLUTTER_BIN" analyze lib test --no-version-check --no-fatal-infos
-  "$FLUTTER_BIN" test test/ui test/core/widgets/debug_accessibility_tools_test.dart --no-version-check
+  "$FLUTTER_BIN" analyze lib test --no-pub --no-version-check --no-fatal-infos
+  "$FLUTTER_BIN" test test/ui \
+    test/core/widgets/debug_accessibility_tools_test.dart \
+    test/features/home/onboarding_core_flow_screen_test.dart \
+    --no-pub --no-version-check
 }
 
 run_dependency_audit() {
@@ -171,6 +183,19 @@ run_external_engine_delta_audit() {
   "$ROOT_DIR/scripts/manaloom_external_engine_delta_audit.sh"
 }
 
+run_external_engine_capability_audit() {
+  print_header "ManaLoom XMage/Forge capability alignment audit"
+  "$ROOT_DIR/scripts/manaloom_external_engine_capability_audit.sh"
+}
+
+run_project_logic_docs() {
+  print_header "ManaLoom generated project logic and documentation drift"
+  "$ROOT_DIR/scripts/manaloom_project_logic.sh" --check
+  cd "$ROOT_DIR/tools/project_logic"
+  "$DART_BIN" test
+  "$ROOT_DIR/scripts/manaloom_dart_doc.sh" --check
+}
+
 run_e2e_suite() {
   print_header "ManaLoom E2E suite"
   "$ROOT_DIR/scripts/manaloom_e2e_suite.sh"
@@ -184,7 +209,7 @@ ensure_cmd() {
 }
 
 ensure_prerequisites() {
-  ensure_cmd dart
+  ensure_cmd "$DART_BIN"
   ensure_cmd "$FLUTTER_BIN"
   ensure_cmd perl
 }
@@ -207,7 +232,9 @@ Uso:
   ./scripts/quality_gate.sh pg-contract # valida PG/Hermes/SQLite pelo wrapper do servidor novo
   ./scripts/quality_gate.sh deep-ai # tester profundo IA + dados + battle/deckbuilder
   ./scripts/quality_gate.sh battle # gate canônico battle: native, Forge, XMage, Python e Dart
+  ./scripts/quality_gate.sh engine-capabilities # uso, limites e evidencias XMage/Forge
   ./scripts/quality_gate.sh engine-delta # auditoria manual/read-only dos pins contra upstream oficial
+  ./scripts/quality_gate.sh project-logic # manifesto, Mermaid, OpenAPI, ERD e drift documental
   ./scripts/quality_gate.sh e2e # suite E2E local: app, deckbuilder, battle, IA, contratos e logs
 
 Dica:
@@ -220,7 +247,9 @@ Dica:
   Use 'custom-lint' para bloquear regressões específicas do ManaLoom em Dart.
   Use 'patrol-smoke' para validar login, cadastro, paywall, planos, legal, upgrade e checkout no Patrol; exporte MANALOOM_RUN_PATROL_DEVICE_TESTS=1 para rodar no device/emulador.
   Use 'battle' para validar o contrato do produto battle sem chamar serviços live nem escrever em PostgreSQL/SQLite.
+  Use 'engine-capabilities' para bloquear drift de papeis, pins, licencas, imports e evidencias XMage/Forge.
   Use 'engine-delta' para consultar explicitamente o GitHub oficial e gerar JSON de revisão; nunca avança pins nem executa deploy/promoção.
+  Use 'project-logic' para bloquear drift entre código, rotas, migrations, manifesto e documentação gerada.
   Use 'e2e' para varredura completa local de deckbuilder, battle, IA, logs e contratos; exporte MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 ou MANALOOM_RUN_LIVE_PRODUCT_E2E=1 para camadas vivas opcionais.
 
 Exemplos:
@@ -238,7 +267,9 @@ Exemplos:
   ./scripts/quality_gate.sh pg-contract
   ./scripts/quality_gate.sh deep-ai
   ./scripts/quality_gate.sh battle
+  ./scripts/quality_gate.sh engine-capabilities
   ./scripts/quality_gate.sh engine-delta
+  ./scripts/quality_gate.sh project-logic
   ./scripts/quality_gate.sh e2e
 EOF
 }
@@ -295,8 +326,14 @@ main() {
     battle)
       run_battle_product_gate
       ;;
+    engine-capabilities)
+      run_external_engine_capability_audit
+      ;;
     engine-delta)
       run_external_engine_delta_audit
+      ;;
+    project-logic)
+      run_project_logic_docs
       ;;
     e2e)
       run_e2e_suite

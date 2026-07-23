@@ -15,6 +15,12 @@ def test_source_matrix_separates_authority_by_need() -> None:
     assert "oracle_identity_faces" in by_id["scryfall_bulk_oracle"].best_for
     assert "turn_rules" in by_id["wotc_comprehensive_rules"].best_for
     assert "battle_family_mapping" in by_id["xmage_local_source"].best_for
+    assert by_id["xmage_local_source"].authority == (
+        "primary_pinned_external_rules_executor_and_reference"
+    )
+    assert by_id["forge_engine"].authority == (
+        "secondary_external_rules_executor_for_structured_xmage_gaps"
+    )
     assert "combo_detection" in by_id["commander_spellbook"].best_for
     assert "commander_roles" in by_id["edhrec_json"].best_for
     assert "oracle_text" in by_id["seventeenlands_public_data"].not_for

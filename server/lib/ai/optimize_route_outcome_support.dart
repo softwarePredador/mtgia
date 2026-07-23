@@ -177,6 +177,13 @@ void enforceSuccessfulOptimizeOutcomeSafety(Map<String, dynamic> body) {
   }
 }
 
+/// Failed optimize responses are diagnostic only. They must never become an
+/// apply preview or enter the learned-deck feedback path.
+void enforceFailedOptimizeOutcomeSafety(Map<String, dynamic> body) {
+  body['can_apply'] = false;
+  body['learning_eligible'] = false;
+}
+
 /// Cached optimize payloads must already carry explicit outcome/provenance.
 /// This deliberately rejects legacy empty payloads instead of promoting them
 /// to `optimized` during cache hydration.

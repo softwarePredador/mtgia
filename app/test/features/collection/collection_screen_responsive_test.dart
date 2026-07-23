@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
@@ -113,7 +114,7 @@ void main() {
       ],
       child: MaterialApp(
         theme: AppTheme.darkTheme,
-        home: const CollectionScreen(),
+        home: CollectionScreen(setsApiClient: _LatestSetApiClient()),
       ),
     );
   }
@@ -158,4 +159,81 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('keeps collection query tab canonical across route changes', (
+    tester,
+  ) async {
+    setViewport(tester, const Size(390, 844));
+    final router = GoRouter(
+      initialLocation: '/collection?tab=99',
+      routes: [
+        GoRoute(
+          path: '/collection',
+          builder: (context, state) => CollectionScreen(
+            initialTab:
+                int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0,
+            setsApiClient: _LatestSetApiClient(),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _CollectionBinderProvider(),
+          ),
+          ChangeNotifierProvider<TradeProvider>(
+            create: (_) => _CollectionTradeProvider(),
+          ),
+          ChangeNotifierProvider<MessageProvider>(
+            create: (_) => MessageProvider(),
+          ),
+          ChangeNotifierProvider<NotificationProvider>(
+            create: (_) => NotificationProvider(),
+          ),
+        ],
+        child: MaterialApp.router(
+          theme: AppTheme.darkTheme,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    TabBar tabs = tester.widget(find.byKey(const Key('collection-hub-tabs')));
+    expect(tabs.controller?.index, 3);
+    expect(
+      router.routeInformationProvider.value.uri.toString(),
+      '/collection?tab=3',
+    );
+
+    router.go('/collection?tab=1');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    tabs = tester.widget(find.byKey(const Key('collection-hub-tabs')));
+    expect(tabs.controller?.index, 1);
+
+    tabs.controller!.animateTo(2, duration: Duration.zero);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(
+      router.routeInformationProvider.value.uri.toString(),
+      '/collection?tab=2',
+    );
+
+    router.go('/collection?tab=-4');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    tabs = tester.widget(find.byKey(const Key('collection-hub-tabs')));
+    expect(tabs.controller?.index, 0);
+    expect(
+      router.routeInformationProvider.value.uri.toString(),
+      '/collection?tab=0',
+    );
+    expect(tester.takeException(), isNull);
+  });
 }

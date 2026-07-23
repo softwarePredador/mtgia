@@ -24,7 +24,15 @@ REFERENCE_PROFILE_SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_reference_
 STAPLE_POLICY_FILE = REPO_ROOT / "server/lib/ai/commander_staple_impact_policy.dart"
 REBUILD_GUIDED_SERVICE = REPO_ROOT / "server/lib/ai/rebuild_guided_service.dart"
 GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
+OPTIMIZE_ROUTE = REPO_ROOT / "server/routes/ai/optimize/index.dart"
+ANALYSIS_ROUTE = REPO_ROOT / "server/routes/decks/[id]/analysis/index.dart"
+OPTIMIZE_SWAP_SUPPORT = REPO_ROOT / "server/lib/ai/optimize_swap_candidate_support.dart"
+OPTIMIZE_STATE_SUPPORT = REPO_ROOT / "server/lib/ai/optimize_state_support.dart"
+APP_ANALYSIS_MODEL = REPO_ROOT / "app/lib/features/decks/models/deck_analysis.dart"
+APP_ANALYSIS_WIDGET = REPO_ROOT / "app/lib/features/decks/widgets/deck_analysis_tab.dart"
 SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_test.dart"
+ROUTE_WIRING_TEST = REPO_ROOT / "server/test/commander_deckbuilding_route_wiring_test.dart"
+APP_ANALYSIS_WIDGET_TEST = REPO_ROOT / "app/test/features/decks/widgets/deck_analysis_tab_test.dart"
 EXTERNAL_BATTLE_RUNNER = SCRIPT_DIR / "external_battle_async_runner.py"
 BATTLE_ANALYST = SCRIPT_DIR / "battle_analyst_v9.py"
 GLOBAL_COMMANDER_FORCE_FOCUS_ACCESS_SCOPE_TEST = (
@@ -1282,6 +1290,17 @@ def check_contains(path: Path, patterns: list[str]) -> dict[str, Any]:
     }
 
 
+def check_not_contains(path: Path, patterns: list[str]) -> dict[str, Any]:
+    text = read(path)
+    present = [pattern for pattern in patterns if pattern in text]
+    return {
+        "path": rel(path),
+        "exists": path.exists(),
+        "status": "pass" if path.exists() and not present else "fail",
+        "forbidden_present": present,
+    }
+
+
 def check_volatile_historical_report(path: Path, spec: dict[str, Any]) -> dict[str, Any]:
     text = read(path)
     patterns = spec["patterns"]
@@ -1737,6 +1756,24 @@ def build_audit() -> dict[str, Any]:
                 "battleComparisonGate",
                 "battle_comparison_input_ready",
                 "battle_swap_superiority_proven': false",
+                "commander_deckbuilding_contract_v6_2026-07-22",
+                "commander_contract_summary_v3_2026-07-22",
+                "buildCommanderOptimizePlanningSummary",
+                "engine_semantics_aware_independent_samples",
+                "experimental_blocked",
+                "automatic_candidate_apply_allowed",
+                "all_hypotheses_explicit",
+                "'gate_ready': sameLaneGateReady",
+                "internal_source_references_exposed': false",
+            ],
+        )
+    )
+    checks.append(
+        check_not_contains(
+            SUPPORT_FILE,
+            [
+                "active_learned_deck_source_ref",
+                "'seed_pairing_claim': true",
             ],
         )
     )
@@ -1744,7 +1781,7 @@ def build_audit() -> dict[str, Any]:
         check_contains(
             GLOBAL_BATTLE_CLOSURE_DOC,
             [
-                "external_battle_async_registry_v1",
+                "external_battle_async_registry_v2",
                 "battle_positive_evidence_v1",
                 "comparison_input_ready=true",
                 "promotion_allowed=false",
@@ -1768,8 +1805,8 @@ def build_audit() -> dict[str, Any]:
         check_contains(
             EXTERNAL_BATTLE_RUNNER,
             [
-                "external_battle_async_registry_v1",
-                "external_battle_async_checkpoint_v1",
+                "external_battle_async_registry_v2",
+                "external_battle_async_checkpoint_v2",
                 "absence_proves_nonuse",
                 "swap_superiority_proven",
                 "promotion_allowed",
@@ -1821,6 +1858,87 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            OPTIMIZE_ROUTE,
+            [
+                "responseBody['commander_contract']",
+                "buildCommanderOptimizePlanningSummary",
+                "_enforceCommanderSameLanePreviewSafety",
+                "commander_same_lane_evidence_required",
+                "return respondWithOptimizeTelemetry(",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            ANALYSIS_ROUTE,
+            [
+                "'commander_contract': await _buildCommanderContractSummary",
+                "loadUsableCommanderReferenceProfile",
+                "loadUsableCommanderReferenceCardStats",
+                "loadCommanderReferenceDeckCorpusGuidance",
+                "loadActiveCommanderLearnedDeck",
+                "loadUsageHotCards",
+                "deterministicReferenceRequired: false",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            OPTIMIZE_SWAP_SUPPORT,
+            [
+                "buildSameLaneOptimizeSwapPairs",
+                "isOptimizeCandidateWithinBudget",
+                "estimatedPriceBrl == null || estimatedPriceBrl <= 0",
+                "usedReplacementIndexes",
+                "same_lane_hypothesis",
+            ],
+        )
+    )
+    checks.append(
+        check_not_contains(
+            OPTIMIZE_SWAP_SUPPORT,
+            ["loadDeterministicSlotFillers("],
+        )
+    )
+    checks.append(
+        check_contains(
+            OPTIMIZE_STATE_SUPPORT,
+            [
+                "owner_intent_preserved",
+                "core_floors_are_diagnostic_only",
+                "automatic_rebuild_allowed': false",
+                "automatic_exclusion_allowed': false",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            APP_ANALYSIS_MODEL,
+            [
+                "commanderContract",
+                "json['commander_contract']",
+                "DeckCommanderContractSummary.fromJson",
+                "provenanceLanes",
+                "planningCoverage",
+                "DeckCommanderProvenanceLane.fromJson",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            APP_ANALYSIS_WIDGET,
+            [
+                "functionalAnalysis?.commanderContract?.shouldDisplay",
+                "title: 'Plano Commander'",
+                "deck-analysis-commander-plan-flow",
+                "deck-analysis-commander-provenance",
+                "Fontes e confiança",
+                "lane.confidenceLabel",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             SUPPORT_TEST,
             [
                 "ready_for_battle_gate",
@@ -1829,6 +1947,27 @@ def build_audit() -> dict[str, Any]:
                 "staple_impact_and_role_policy",
                 "staple_impact_by_role",
                 "lane_balanced_cuts_and_anchor_protection",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            ROUTE_WIRING_TEST,
+            [
+                "common response path",
+                "loads every Commander evidence lane",
+                "commander_same_lane_evidence_required",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            APP_ANALYSIS_WIDGET_TEST,
+            [
+                "renders the Commander planning contract and all flow steps",
+                "Staples por impacto e função",
+                "Fonte verificada",
+                "Uso observado",
             ],
         )
     )
@@ -2228,6 +2367,13 @@ def build_audit() -> dict[str, Any]:
                 "registered_pg_variant",
                 "test_or_fixture",
                 "partner_or_multi_commander_requires_profile",
+                "postgres_read_requires_new_server_read_only_wrapper",
+                "postgres_product_truth_not_loaded",
+                "all_postgres_decks_classified",
+                "preserve_owner_intent_and_offer_reviewed_repair",
+                "core_floors_are_diagnostic_only",
+                "automatic_rebuild_allowed",
+                "automatic_exclusion_allowed",
             ],
         )
     )

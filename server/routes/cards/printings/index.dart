@@ -64,27 +64,29 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   return Response.json(
-    body: {
-      'name': name,
-      'total_returned': data.length,
-      'data': data,
-    },
+    body: {'name': name, 'total_returned': data.length, 'data': data},
   );
 }
 
 /// Faz a query de printings no banco local
 /// Usa DISTINCT ON para retornar apenas uma carta por set_code (deduplica variantes)
 Future<List<Map<String, dynamic>>> _queryPrintings(
-    Pool pool, String name, int limit, bool hasSets, bool hasIdentityColumns,
-    {required bool deduplicate}) async {
+  Pool pool,
+  String name,
+  int limit,
+  bool hasSets,
+  bool hasIdentityColumns, {
+  required bool deduplicate,
+}) async {
   // Usamos DISTINCT ON (LOWER(c.set_code)) para deduplicar variantes do mesmo set
   // Isso garante que cada edição apareça apenas uma vez no seletor
   final String sql;
   final identityColumns = cardIdentitySelectSql('c', hasIdentityColumns);
 
   if (!deduplicate) {
-    sql = hasSets
-        ? '''
+    sql =
+        hasSets
+            ? '''
       SELECT
         c.id::text,
         c.scryfall_id::text,
@@ -101,7 +103,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         s.release_date AS set_release_date,
         c.rarity,
         c.is_reserved,
-        c.price,
+        COALESCE(c.price_usd, c.price) AS price,
+        c.price_source,
         c.price_updated_at,
         c.collector_number,
         c.foil
@@ -114,7 +117,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         c.foil DESC NULLS LAST
       LIMIT @limit
     '''
-        : '''
+            : '''
       SELECT
         c.id::text,
         c.scryfall_id::text,
@@ -129,7 +132,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         LOWER(c.set_code) AS set_code,
         c.rarity,
         c.is_reserved,
-        c.price,
+        COALESCE(c.price_usd, c.price) AS price,
+        c.price_source,
         c.price_updated_at,
         c.collector_number,
         c.foil
@@ -159,7 +163,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           s.release_date AS set_release_date,
           c.rarity,
           c.is_reserved,
-          c.price,
+          COALESCE(c.price_usd, c.price) AS price,
+          c.price_source,
           c.price_updated_at,
           c.collector_number,
           c.foil
@@ -188,7 +193,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           LOWER(c.set_code) AS set_code,
           c.rarity,
           c.is_reserved,
-          c.price,
+          COALESCE(c.price_usd, c.price) AS price,
+          c.price_source,
           c.price_updated_at,
           c.collector_number,
           c.foil
@@ -206,38 +212,43 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
     parameters: {'name': name, 'limit': limit},
   );
 
-  final data = result.map((row) {
-    final m = row.toColumnMap();
-    final imageUrl = normalizeScryfallImageUrl(m['image_url']?.toString());
-    return <String, dynamic>{
-      'id': m['id'],
-      'scryfall_id': m['scryfall_id'],
-      'oracle_id': m['oracle_id'],
-      'layout': m['layout'],
-      'card_faces': m['card_faces_json'],
-      'name': m['name'],
-      'mana_cost': m['mana_cost'],
-      'type_line': m['type_line'],
-      'oracle_text': m['oracle_text'],
-      'colors': m['colors'],
-      'color_identity': m['color_identity'],
-      'image_url': imageUrl,
-      'set_code': m['set_code'],
-      if (hasSets) 'set_name': m['set_name'],
-      if (hasSets)
-        'set_release_date': (m['set_release_date'] as DateTime?)
-            ?.toIso8601String()
-            .split('T')
-            .first,
-      'rarity': m['rarity'],
-      'is_reserved': m['is_reserved'] == true,
-      'price': m['price'],
-      'price_updated_at':
-          (m['price_updated_at'] as DateTime?)?.toIso8601String(),
-      'collector_number': m['collector_number'],
-      'foil': m['foil'],
-    };
-  }).toList();
+  final data =
+      result.map((row) {
+        final m = row.toColumnMap();
+        final imageUrl = normalizeScryfallImageUrl(m['image_url']?.toString());
+        return <String, dynamic>{
+          'id': m['id'],
+          'scryfall_id': m['scryfall_id'],
+          'oracle_id': m['oracle_id'],
+          'layout': m['layout'],
+          'card_faces': m['card_faces_json'],
+          'name': m['name'],
+          'mana_cost': m['mana_cost'],
+          'type_line': m['type_line'],
+          'oracle_text': m['oracle_text'],
+          'colors': m['colors'],
+          'color_identity': m['color_identity'],
+          'image_url': imageUrl,
+          'set_code': m['set_code'],
+          if (hasSets) 'set_name': m['set_name'],
+          if (hasSets)
+            'set_release_date':
+                (m['set_release_date'] as DateTime?)
+                    ?.toIso8601String()
+                    .split('T')
+                    .first,
+          'rarity': m['rarity'],
+          'is_reserved': m['is_reserved'] == true,
+          'price': m['price'],
+          'price_currency': 'USD',
+          'price_source':
+              m['price_source'] ?? (m['price'] == null ? null : 'legacy'),
+          'price_updated_at':
+              (m['price_updated_at'] as DateTime?)?.toIso8601String(),
+          'collector_number': m['collector_number'],
+          'foil': m['foil'],
+        };
+      }).toList();
 
   return data;
 }
@@ -250,14 +261,12 @@ Future<int> _syncPrintingsFromScryfall(
 ) async {
   // 1. Buscar a carta principal no Scryfall
   final encoded = Uri.encodeQueryComponent(name.trim());
-  final uri = Uri.parse(
-    'https://api.scryfall.com/cards/named?fuzzy=$encoded',
-  );
+  final uri = Uri.parse('https://api.scryfall.com/cards/named?fuzzy=$encoded');
 
-  final response = await http.get(uri, headers: {
-    'Accept': 'application/json',
-    'User-Agent': 'MTGDeckBuilder/1.0',
-  });
+  final response = await http.get(
+    uri,
+    headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
+  );
 
   if (response.statusCode != 200) return 0;
 
@@ -268,10 +277,7 @@ Future<int> _syncPrintingsFromScryfall(
   // 2. Buscar todas as printings
   final printsResponse = await http.get(
     Uri.parse(printsUri),
-    headers: {
-      'Accept': 'application/json',
-      'User-Agent': 'MTGDeckBuilder/1.0',
-    },
+    headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
   );
 
   if (printsResponse.statusCode != 200) return 0;
@@ -280,15 +286,16 @@ Future<int> _syncPrintingsFromScryfall(
   final printings =
       (body['data'] as List?)?.whereType<Map<String, dynamic>>() ?? [];
   // Filtrar: só paper, sem art_series, sem tokens
-  final filtered = printings
-      .where((p) {
-        final games = p['games'] as List?;
-        final isPaper = games?.contains('paper') ?? false;
-        final layout = p['layout']?.toString() ?? '';
-        return isPaper && layout != 'art_series' && layout != 'token';
-      })
-      .take(30)
-      .toList();
+  final filtered =
+      printings
+          .where((p) {
+            final games = p['games'] as List?;
+            final isPaper = games?.contains('paper') ?? false;
+            final layout = p['layout']?.toString() ?? '';
+            return isPaper && layout != 'art_series' && layout != 'token';
+          })
+          .take(30)
+          .toList();
 
   var imported = 0;
 
@@ -358,16 +365,18 @@ Future<int> _syncPrintingsFromScryfall(
     try {
       final identityInsertColumns =
           hasIdentityColumns ? ', oracle_id, layout, card_faces_json' : '';
-      final identityInsertValues = hasIdentityColumns
-          ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
-          : '';
-      final identityUpdates = hasIdentityColumns
-          ? '''
+      final identityInsertValues =
+          hasIdentityColumns
+              ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
+              : '';
+      final identityUpdates =
+          hasIdentityColumns
+              ? '''
             oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
             layout = COALESCE(EXCLUDED.layout, cards.layout),
             card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
 '''
-          : '';
+              : '';
 
       await pool.execute(
         Sql.named('''

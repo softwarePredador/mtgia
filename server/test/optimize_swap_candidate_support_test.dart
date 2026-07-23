@@ -178,5 +178,88 @@ void main() {
         greaterThan(90),
       );
     });
+
+    test('pairs replacements by functional lane instead of list position', () {
+      final pairs = buildSameLaneOptimizeSwapPairs(
+        removalCandidates: const [
+          {
+            'name': 'Mind Stone',
+            'role': 'ramp',
+            'score': 20,
+            'protected_anchor': true,
+            'anchor_reasons': ['commander_priority_card'],
+          },
+          {'name': 'Divination', 'role': 'draw', 'score': 18},
+        ],
+        replacements: const [
+          {
+            'name': 'Faithless Looting',
+            'functional_need': 'draw',
+            'purchase_required': false,
+          },
+          {
+            'name': 'Arcane Signet',
+            'functional_need': 'ramp',
+            'purchase_required': false,
+          },
+        ],
+      );
+
+      expect(pairs, hasLength(2));
+      expect(pairs[0]['remove'], 'Mind Stone');
+      expect(pairs[0]['add'], 'Arcane Signet');
+      expect(pairs[0]['remove_role'], 'ramp');
+      expect(pairs[0]['add_role'], 'ramp');
+      expect(pairs[0]['same_lane'], isTrue);
+      expect(pairs[0]['protected_anchor'], isTrue);
+      expect(pairs[0]['anchor_policy_satisfied'], isTrue);
+      expect(pairs[0]['anchor_reasons'], contains('commander_priority_card'));
+      expect(pairs[1]['remove'], 'Divination');
+      expect(pairs[1]['add'], 'Faithless Looting');
+    });
+
+    test('rejects cross-lane and unclassified replacement fillers', () {
+      final pairs = buildSameLaneOptimizeSwapPairs(
+        removalCandidates: const [
+          {'name': 'Arcane Signet', 'role': 'ramp'},
+        ],
+        replacements: const [
+          {'name': 'Storm-Kiln Artist', 'functional_need': 'engine'},
+          {'name': 'Generic Filler'},
+        ],
+      );
+
+      expect(pairs, isEmpty);
+    });
+
+    test('budget gate fails closed for unknown prices', () {
+      expect(
+        isOptimizeCandidateWithinBudget(
+          budgetLimitBrl: 100,
+          budgetUsedBrl: 0,
+          availableQuantity: 0,
+          estimatedPriceBrl: null,
+        ),
+        isFalse,
+      );
+      expect(
+        isOptimizeCandidateWithinBudget(
+          budgetLimitBrl: 100,
+          budgetUsedBrl: 90,
+          availableQuantity: 0,
+          estimatedPriceBrl: 15,
+        ),
+        isFalse,
+      );
+      expect(
+        isOptimizeCandidateWithinBudget(
+          budgetLimitBrl: 100,
+          budgetUsedBrl: 90,
+          availableQuantity: 1,
+          estimatedPriceBrl: null,
+        ),
+        isTrue,
+      );
+    });
   });
 }

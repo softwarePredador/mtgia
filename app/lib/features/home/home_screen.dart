@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/config/visual_fixture.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/scryfall_image_helper.dart';
-import '../../core/widgets/cached_card_image.dart';
+import '../../core/widgets/card_artwork.dart';
 import '../../core/widgets/mana_symbols.dart';
 import 'life_counter_route.dart';
 import '../decks/models/deck.dart';
@@ -25,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   bool _requestedDeckBootstrap = false;
+  bool _introStarted = false;
   late final AnimationController _introController;
 
   @override
@@ -33,12 +35,20 @@ class _HomeScreenState extends State<HomeScreen>
     _introController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 320),
-    )..forward();
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (!_introStarted) {
+      _introStarted = true;
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _introController.value = 1;
+      } else {
+        _introController.forward();
+      }
+    }
     if (_requestedDeckBootstrap) {
       return;
     }
@@ -70,6 +80,9 @@ class _HomeScreenState extends State<HomeScreen>
     final deckError = context.select<DeckProvider, String?>(
       (dp) => dp.errorMessage,
     );
+    final deckStatusCode = context.select<DeckProvider, int?>(
+      (dp) => dp.listStatusCode,
+    );
     final recentDecks = decks.take(4).toList();
     final lifeCounterAvailable = widget.lifeCounterAvailable ?? true;
 
@@ -85,9 +98,9 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
-              16,
+              AppTheme.space16,
               26,
-              16,
+              AppTheme.space16,
               MediaQuery.of(context).padding.bottom + 96,
             ),
             child: Center(
@@ -97,13 +110,13 @@ class _HomeScreenState extends State<HomeScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const _HomeHeader(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppTheme.space12),
                     _HomeHero(lifeCounterAvailable: lifeCounterAvailable),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     const _SectionHeader(label: 'Acesso rápido'),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppTheme.space10),
                     _QuickActions(lifeCounterAvailable: lifeCounterAvailable),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: AppTheme.space18),
                     _SectionHeader(
                       label: 'Decks recentes',
                       trailing: TextButton(
@@ -111,9 +124,28 @@ class _HomeScreenState extends State<HomeScreen>
                         child: const Text('Ver todos'),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    if (recentDecks.isNotEmpty)
-                      _RecentDecksRail(decks: recentDecks)
+                    const SizedBox(height: AppTheme.space10),
+                    if (deckStatusCode == 401)
+                      const _DecksSessionExpiredState()
+                    else if (recentDecks.isNotEmpty)
+                      Column(
+                        children: [
+                          if (isDeckLoading) ...[
+                            const _CachedDecksStatus(
+                              isLoading: true,
+                              message: 'Atualizando seus decks...',
+                            ),
+                            const SizedBox(height: AppTheme.space8),
+                          ] else if (deckError != null) ...[
+                            _CachedDecksStatus(
+                              isLoading: false,
+                              message: deckError,
+                            ),
+                            const SizedBox(height: AppTheme.space8),
+                          ],
+                          _RecentDecksRail(decks: recentDecks),
+                        ],
+                      )
                     else if (isDeckLoading)
                       const _DecksLoadingState()
                     else if (deckError != null)
@@ -138,11 +170,11 @@ class _HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      height: 48,
+      height: AppTheme.space48,
       child: Row(
         children: [
           SizedBox(
-            width: 48,
+            width: AppTheme.space48,
             child: IconButton(
               onPressed: () => context.go('/profile'),
               icon: const Icon(Icons.account_circle_outlined),
@@ -162,7 +194,7 @@ class _HomeHeader extends StatelessWidget {
                       color: AppTheme.brass400,
                       size: 22,
                     ),
-                    const SizedBox(width: 7),
+                    const SizedBox(width: AppTheme.space7),
                     Text(
                       'ManaLoom',
                       style: theme.textTheme.headlineSmall?.copyWith(
@@ -178,7 +210,7 @@ class _HomeHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            width: 112,
+            width: AppTheme.space112,
             child: Align(
               alignment: Alignment.centerRight,
               child: ShellAppBarActions(),
@@ -200,13 +232,15 @@ class _HomeHero extends StatelessWidget {
     final theme = Theme.of(context);
     final actionLabel = lifeCounterAvailable ? 'Jogar agora' : 'Montar deck';
     final wideArtwork = MediaQuery.sizeOf(context).width >= 840;
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
+    final heroHeight = textScale >= 1.5 ? 280.0 : 190.0;
     final artworkSize = wideArtwork ? 680.0 : 430.0;
-    final artworkOverflow = (artworkSize - 190) / 2;
+    final artworkOverflow = (artworkSize - heroHeight) / 2;
     return RepaintBoundary(
       key: const Key('home-hero-frame'),
       child: Container(
         key: const Key('home-hero-surface'),
-        height: 190,
+        height: heroHeight,
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -299,7 +333,7 @@ class _HomeHero extends StatelessWidget {
                       letterSpacing: 0,
                     ),
                   ),
-                  const SizedBox(height: 9),
+                  const SizedBox(height: AppTheme.space9),
                   Text(
                     'Sua próxima jogada começa aqui.',
                     maxLines: 2,
@@ -315,19 +349,21 @@ class _HomeHero extends StatelessWidget {
                     width: 122,
                     height: AppTheme.touchTargetMin,
                     child: FilledButton(
+                      key: const Key('home-primary-action'),
                       style: FilledButton.styleFrom(
                         backgroundColor: AppTheme.brass400,
                         foregroundColor: AppTheme.backgroundAbyss,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.space18,
+                        ),
                         textStyle: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w900,
                           fontSize: AppTheme.fontSm,
                         ),
                       ),
-                      onPressed:
-                          lifeCounterAvailable
-                              ? () => openLifeCounterRoute(context)
-                              : () => context.go('/onboarding/core-flow'),
+                      onPressed: lifeCounterAvailable
+                          ? () => openLifeCounterRoute(context)
+                          : () => context.go('/onboarding/core-flow'),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -338,7 +374,7 @@ class _HomeHero extends StatelessWidget {
                               child: Text(actionLabel),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppTheme.space8),
                           const Icon(Icons.arrow_forward_rounded, size: 17),
                         ],
                       ),
@@ -373,7 +409,7 @@ class _SectionHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppTheme.radiusPill),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.space12),
         Expanded(
           child: Text(
             label,
@@ -448,7 +484,7 @@ class _QuickActions extends StatelessWidget {
             key: const Key('home-quick-actions-list'),
             children: [
               for (var index = 0; index < actions.length; index++) ...[
-                if (index > 0) const SizedBox(width: 10),
+                if (index > 0) const SizedBox(width: AppTheme.space10),
                 Expanded(child: _QuickActionCard(data: actions[index])),
               ],
             ],
@@ -456,18 +492,17 @@ class _QuickActions extends StatelessWidget {
         }
 
         return SizedBox(
-          height: 72,
+          height: AppTheme.space72,
           child: ListView.separated(
             key: const Key('home-quick-actions-list'),
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: actions.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 10),
-            itemBuilder:
-                (context, index) => SizedBox(
-                  width: 136,
-                  child: _QuickActionCard(data: actions[index]),
-                ),
+            separatorBuilder: (_, _) => const SizedBox(width: AppTheme.space10),
+            itemBuilder: (context, index) => SizedBox(
+              width: 136,
+              child: _QuickActionCard(data: actions[index]),
+            ),
           ),
         );
       },
@@ -505,7 +540,10 @@ class _QuickActionCard extends StatelessWidget {
         splashColor: data.accent.withValues(alpha: 0.08),
         highlightColor: data.accent.withValues(alpha: 0.04),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space12,
+            vertical: AppTheme.space10,
+          ),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -517,7 +555,7 @@ class _QuickActionCard extends StatelessWidget {
           child: Row(
             children: [
               Icon(data.icon, color: data.accent, size: 21),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   data.title,
@@ -550,11 +588,16 @@ class _RecentDecksRail extends StatelessWidget {
       height: 144,
       child: ListView.separated(
         key: const Key('home-recent-decks-rail'),
-        padding: const EdgeInsets.fromLTRB(2, 4, 2, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space2,
+          AppTheme.space4,
+          AppTheme.space2,
+          AppTheme.space12,
+        ),
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: decks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: AppTheme.space12),
         itemBuilder: (context, index) => _RecentDeckCard(deck: decks[index]),
       ),
     );
@@ -572,7 +615,7 @@ class _RecentDeckCard extends StatelessWidget {
     final target = _deckTarget(deck.format);
     final ratio = (deck.cardCount / target).clamp(0.0, 1.0);
     final frameColor = ratio >= 1 ? AppTheme.brass500 : AppTheme.outlineMuted;
-    final age = _relativeTime(deck.createdAt);
+    final age = _createdTime(deck.createdAt);
     final commanderName = deck.commanderName?.trim();
 
     return SizedBox(
@@ -594,22 +637,27 @@ class _RecentDeckCard extends StatelessWidget {
           splashColor: AppTheme.brass400.withValues(alpha: 0.08),
           highlightColor: AppTheme.brass400.withValues(alpha: 0.04),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppTheme.space8),
             child: Row(
               children: [
                 ClipRRect(
                   key: Key('home-recent-deck-art-${deck.id}'),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   child: SizedBox(
-                    width: 72,
+                    width: AppTheme.space72,
                     height: 102,
                     child: _DeckArtwork(deck: deck),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 3, 3, 2),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space0,
+                      AppTheme.space3,
+                      AppTheme.space3,
+                      AppTheme.space2,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -624,7 +672,7 @@ class _RecentDeckCard extends StatelessWidget {
                             height: 1.12,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: AppTheme.space3),
                         Text(
                           commanderName == null || commanderName.isEmpty
                               ? _formatLabel(deck.format)
@@ -656,7 +704,7 @@ class _RecentDeckCard extends StatelessWidget {
                               identity: deck.colorIdentity,
                               identityKnown: deck.colorIdentityKnown,
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: AppTheme.space6),
                             Text(
                               '${deck.cardCount}/$target',
                               style: theme.textTheme.labelSmall?.copyWith(
@@ -667,7 +715,7 @@ class _RecentDeckCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusPill,
@@ -683,7 +731,7 @@ class _RecentDeckCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: AppTheme.space5),
                         Text(
                           age,
                           maxLines: 1,
@@ -716,10 +764,12 @@ class _DeckArtwork extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = deck.commanderImageUrl;
     if (imageUrl != null && imageUrl.trim().isNotEmpty) {
-      return CachedCardImage(
+      return CardArtwork(
+        variant: CardArtworkVariant.recentDeck,
         imageUrl: imageUrl,
         fallbackImageUrl: ScryfallImageHelper.namedImageUrl(deck.commanderName),
-        fit: BoxFit.contain,
+        semanticLabel: 'Carta do comandante ${deck.commanderName ?? deck.name}',
+        constrainAspectRatio: false,
       );
     }
     return _DeckFallback(deck: deck);
@@ -796,8 +846,14 @@ class _EmptyDecksState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
+      key: const Key('home-decks-empty-state'),
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space14,
+        AppTheme.space14,
+        AppTheme.space14,
+        AppTheme.space14,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -828,7 +884,7 @@ class _EmptyDecksState extends StatelessWidget {
               size: 28,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Text(
             'Você ainda não tem decks',
             textAlign: TextAlign.center,
@@ -837,7 +893,7 @@ class _EmptyDecksState extends StatelessWidget {
               fontSize: AppTheme.fontLg,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           Text(
             'Crie seu primeiro deck e comece sua jornada em Magic.',
             textAlign: TextAlign.center,
@@ -846,7 +902,7 @@ class _EmptyDecksState extends StatelessWidget {
               height: 1.25,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
@@ -872,7 +928,7 @@ class _DecksErrorState extends StatelessWidget {
     return Container(
       key: const Key('home-decks-error-state'),
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.errorContainer.withValues(alpha: 0.54),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -881,7 +937,7 @@ class _DecksErrorState extends StatelessWidget {
       child: Column(
         children: [
           const Icon(Icons.cloud_off_rounded, color: AppTheme.error, size: 28),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           Text(
             'Não foi possível carregar seus decks',
             textAlign: TextAlign.center,
@@ -890,7 +946,7 @@ class _DecksErrorState extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.space4),
           Text(
             message,
             textAlign: TextAlign.center,
@@ -898,7 +954,7 @@ class _DecksErrorState extends StatelessWidget {
               color: AppTheme.textSecondary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           OutlinedButton.icon(
             key: const Key('home-decks-retry'),
             onPressed: () => context.read<DeckProvider>().fetchDecks(),
@@ -911,14 +967,131 @@ class _DecksErrorState extends StatelessWidget {
   }
 }
 
+class _DecksSessionExpiredState extends StatelessWidget {
+  const _DecksSessionExpiredState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('home-decks-session-expired-state'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.space16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppTheme.brass500.withValues(alpha: 0.52)),
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.lock_clock_outlined,
+            color: AppTheme.brass400,
+            size: 28,
+          ),
+          const SizedBox(height: AppTheme.space8),
+          Text(
+            'Sua sessão expirou',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppTheme.space4),
+          Text(
+            'Entre novamente para recarregar seus decks com segurança.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppTheme.space12),
+          FilledButton.icon(
+            key: const Key('home-decks-login-again'),
+            onPressed: () => context.go('/login'),
+            icon: const Icon(Icons.login_rounded),
+            label: const Text('Entrar novamente'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CachedDecksStatus extends StatelessWidget {
+  const _CachedDecksStatus({required this.isLoading, required this.message});
+
+  final bool isLoading;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      key: Key(
+        isLoading
+            ? 'home-decks-cache-refreshing-state'
+            : 'home-decks-offline-cache-state',
+      ),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space12,
+        vertical: AppTheme.space8,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted),
+      ),
+      child: Row(
+        children: [
+          if (isLoading)
+            const SizedBox(
+              width: AppTheme.space18,
+              height: AppTheme.space18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: AppTheme.space18,
+              color: AppTheme.brass400,
+            ),
+          const SizedBox(width: AppTheme.space10),
+          Expanded(
+            child: Text(
+              isLoading ? message : 'Mostrando decks salvos. $message',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
+            ),
+          ),
+          if (!isLoading)
+            IconButton(
+              key: const Key('home-decks-cache-retry'),
+              onPressed: () => context.read<DeckProvider>().fetchDecks(),
+              icon: const Icon(Icons.refresh_rounded),
+              tooltip: 'Tentar novamente',
+              color: AppTheme.brass400,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DecksLoadingState extends StatelessWidget {
   const _DecksLoadingState();
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('home-decks-loading-state'),
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(AppTheme.space22),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -927,11 +1100,11 @@ class _DecksLoadingState extends StatelessWidget {
       child: const Row(
         children: [
           SizedBox(
-            width: 24,
-            height: 24,
+            width: AppTheme.space24,
+            height: AppTheme.space24,
             child: CircularProgressIndicator(strokeWidth: 2.4),
           ),
-          SizedBox(width: 16),
+          SizedBox(width: AppTheme.space16),
           Expanded(
             child: Text(
               'Carregando seus decks...',
@@ -962,13 +1135,14 @@ String _formatLabel(String format) {
   return format[0].toUpperCase() + format.substring(1);
 }
 
-String _relativeTime(DateTime date) {
+String _createdTime(DateTime date) {
+  if (manaloomVisualFixtureMode) return 'Criado agora';
   final now = DateTime.now();
   final difference = now.difference(date);
-  if (difference.inMinutes < 1) return 'Atualizado agora';
+  if (difference.inMinutes < 1) return 'Criado agora';
   if (difference.inHours < 1) {
-    return 'Atualizado há ${math.max(1, difference.inMinutes)}min';
+    return 'Criado há ${math.max(1, difference.inMinutes)}min';
   }
-  if (difference.inDays < 1) return 'Atualizado há ${difference.inHours}h';
-  return 'Atualizado há ${difference.inDays}d';
+  if (difference.inDays < 1) return 'Criado há ${difference.inHours}h';
+  return 'Criado há ${difference.inDays}d';
 }

@@ -110,10 +110,9 @@ class _CardSearchScreenState extends State<CardSearchScreen>
     }
     if (!mounted) return;
 
-    final deck =
-        deckProvider.selectedDeck?.id == widget.deckId
-            ? deckProvider.selectedDeck
-            : null;
+    final deck = deckProvider.selectedDeck?.id == widget.deckId
+        ? deckProvider.selectedDeck
+        : null;
 
     if (!widget.isBinderMode && deck == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,12 +139,11 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         _isSubset(card.colorIdentity, commanderIdentity);
 
     final isCommanderMode = (widget.mode ?? '').toLowerCase() == 'commander';
-    final canOpenAddDialog =
-        isCommanderMode
-            ? isCommanderEligible
-            : (!mustPickCommanderFirst
-                ? isAllowedByCommander
-                : isCommanderEligible);
+    final canOpenAddDialog = isCommanderMode
+        ? isCommanderEligible
+        : (!mustPickCommanderFirst
+              ? isAllowedByCommander
+              : isCommanderEligible);
 
     // Verifica se é basic land
     final isBasicLand = card.typeLine.toLowerCase().contains('basic land');
@@ -197,52 +195,50 @@ class _CardSearchScreenState extends State<CardSearchScreen>
     // Para outros casos (basic land, outros formatos, modo commander), mostra dialog
     showDialog(
       context: context,
-      builder:
-          (dialogContext) => _AddCardDialog(
-            card: card,
-            deckFormat: format,
-            hasCommanderSelected: (deck?.commander.isNotEmpty ?? false),
-            preferCommander: mustPickCommanderFirst || isCommanderMode,
-            requireCommander: isCommanderMode,
-            canAddByCommanderIdentity: canOpenAddDialog,
-            onConfirm: (quantity, isCommander) async {
-              Navigator.pop(dialogContext);
+      builder: (dialogContext) => _AddCardDialog(
+        card: card,
+        deckFormat: format,
+        hasCommanderSelected: (deck?.commander.isNotEmpty ?? false),
+        preferCommander: mustPickCommanderFirst || isCommanderMode,
+        requireCommander: isCommanderMode,
+        canAddByCommanderIdentity: canOpenAddDialog,
+        onConfirm: (quantity, isCommander) async {
+          Navigator.pop(dialogContext);
 
-              final provider = context.read<DeckProvider>();
-              final success = await provider.addCardToDeck(
-                widget.deckId,
-                card,
-                quantity,
-                isCommander: isCommander,
-              );
+          final provider = context.read<DeckProvider>();
+          final success = await provider.addCardToDeck(
+            widget.deckId,
+            card,
+            quantity,
+            isCommander: isCommander,
+          );
 
-              if (!mounted) return;
+          if (!mounted) return;
 
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${card.name} adicionada ao deck!')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      provider.errorMessage ?? 'Erro ao adicionar carta',
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                  ),
-                );
-              }
-            },
-          ),
+          if (success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${card.name} adicionada ao deck!')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  provider.errorMessage ?? 'Erro ao adicionar carta',
+                ),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final deck =
-        widget.isBinderMode
-            ? null
-            : context.select<DeckProvider, DeckDetails?>((p) => p.selectedDeck);
+    final deck = widget.isBinderMode
+        ? null
+        : context.select<DeckProvider, DeckDetails?>((p) => p.selectedDeck);
     final format = deck?.format.toLowerCase();
     final isCommanderFormat =
         !widget.isBinderMode && (format == 'commander' || format == 'brawl');
@@ -289,33 +285,31 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                 autofocus: true,
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
-                  hintText:
-                      widget.isBinderMode
-                          ? 'Buscar carta'
-                          : isCommanderMode
-                          ? 'Buscar comandante'
-                          : 'Buscar cartas',
+                  hintText: widget.isBinderMode
+                      ? 'Buscar carta'
+                      : isCommanderMode
+                      ? 'Buscar comandante'
+                      : 'Buscar cartas',
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 9,
+                    horizontal: AppTheme.space14,
+                    vertical: AppTheme.space9,
                   ),
-                  suffixIcon:
-                      _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                            tooltip: 'Limpar busca',
-                            padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
-                            icon: const Icon(Icons.close_rounded, size: 16),
-                            color: AppTheme.textSecondary,
-                            onPressed: () {
-                              _searchController.clear();
-                              context.read<CardProvider>().clearSearch();
-                              setState(() {});
-                            },
-                          ),
+                  suffixIcon: _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: 'Limpar busca',
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(Icons.close_rounded, size: 16),
+                          color: AppTheme.textSecondary,
+                          onPressed: () {
+                            _searchController.clear();
+                            context.read<CardProvider>().clearSearch();
+                            setState(() {});
+                          },
+                        ),
                   hintStyle: const TextStyle(
                     color: AppTheme.textHint,
                     fontSize: AppTheme.fontSm,
@@ -357,7 +351,10 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                       fontSize: AppTheme.fontSm,
                       fontWeight: FontWeight.w600,
                     ),
-                    tabs: const [Tab(text: 'Cartas'), Tab(text: 'Coleções')],
+                    tabs: const [
+                      Tab(text: 'Cartas'),
+                      Tab(text: 'Coleções'),
+                    ],
                   ),
                 ),
               ),
@@ -404,9 +401,11 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         final query = _searchController.text.trim();
 
         if (provider.isLoading) {
-          return const Center(
+          return const AppStatePanel.loading(
             key: Key('card-search-loading'),
-            child: CircularProgressIndicator(color: AppTheme.brass400),
+            title: 'Buscando cartas',
+            message: 'Consultando nomes, edições e identidade de cor.',
+            accent: AppTheme.brass400,
           );
         }
 
@@ -419,8 +418,9 @@ class _CardSearchScreenState extends State<CardSearchScreen>
               message: provider.errorMessage!,
               accent: AppTheme.error,
               actionLabel: query.length >= 3 ? 'Tentar novamente' : null,
-              onAction:
-                  query.length >= 3 ? () => _onSearchChanged(query) : null,
+              onAction: query.length >= 3
+                  ? () => _onSearchChanged(query)
+                  : null,
             ),
           );
         }
@@ -429,20 +429,17 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           return _SearchStateFrame(
             child: AppStatePanel(
               key: const Key('card-search-empty-state'),
-              icon:
-                  query.length >= 3
-                      ? Icons.search_off_rounded
-                      : Icons.search_rounded,
-              title:
-                  query.length >= 3
-                      ? 'Nenhuma carta encontrada'
-                      : 'Busque uma carta',
-              message:
-                  query.length >= 3
-                      ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
-                      : widget.isBinderMode
-                      ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
-                      : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
+              icon: query.length >= 3
+                  ? Icons.search_off_rounded
+                  : Icons.search_rounded,
+              title: query.length >= 3
+                  ? 'Nenhuma carta encontrada'
+                  : 'Busque uma carta',
+              message: query.length >= 3
+                  ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
+                  : widget.isBinderMode
+                  ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
+                  : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
               accent: query.length >= 3 ? AppTheme.warning : AppTheme.brass400,
             ),
           );
@@ -450,69 +447,64 @@ class _CardSearchScreenState extends State<CardSearchScreen>
 
         Widget buildResultTile(int resultIndex, {required bool inGrid}) {
           final card = provider.searchResults[resultIndex];
+          final availability = provider.collectionAvailabilityFor(card.id);
           final isCommanderEligible = _isCommanderEligible(card);
           final allowedByIdentity =
               !isCommanderFormat ||
               commanderIdentity == null ||
               _isSubset(card.colorIdentity, commanderIdentity);
-          final canAdd =
-              widget.isBinderMode
-                  ? true
-                  : isCommanderMode
-                  ? isCommanderEligible
-                  : (mustPickCommanderFirst
-                      ? isCommanderEligible
-                      : allowedByIdentity);
+          final canAdd = widget.isBinderMode
+              ? true
+              : isCommanderMode
+              ? isCommanderEligible
+              : (mustPickCommanderFirst
+                    ? isCommanderEligible
+                    : allowedByIdentity);
           return _CardSearchResultTile(
             key: Key('card-search-result-${card.id}'),
             inGrid: inGrid,
             card: card,
+            availability: availability,
             showTypeLine: !widget.isBinderMode,
-            warning:
-                mustPickCommanderFirst && !isCommanderEligible
-                    ? 'Selecione um comandante primeiro'
-                    : !mustPickCommanderFirst &&
-                        isCommanderFormat &&
-                        commanderIdentity != null &&
-                        !allowedByIdentity
-                    ? 'Fora da identidade do comandante'
-                    : null,
+            warning: mustPickCommanderFirst && !isCommanderEligible
+                ? 'Selecione um comandante primeiro'
+                : !mustPickCommanderFirst &&
+                      isCommanderFormat &&
+                      commanderIdentity != null &&
+                      !allowedByIdentity
+                ? 'Fora da identidade do comandante'
+                : null,
             canAdd: canAdd,
             onOpen: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
-              );
+              openCardDetailRoute(context, card);
             },
-            onAdd:
-                canAdd
-                    ? () {
-                      if (widget.isBinderMode) {
-                        final cardData = {
-                          'id': card.id,
-                          'name': card.name,
-                          'image_url': card.imageUrl,
-                          'set_code': card.setCode,
-                          'mana_cost': card.manaCost,
-                          'rarity': card.rarity,
-                        };
-                        Navigator.pop(context);
-                        widget.onCardSelectedForBinder?.call(cardData);
-                      } else {
-                        _addCardToDeck(card);
-                      }
+            onAdd: canAdd
+                ? () {
+                    if (widget.isBinderMode) {
+                      final cardData = {
+                        'id': card.id,
+                        'name': card.name,
+                        'image_url': card.imageUrl,
+                        'set_code': card.setCode,
+                        'mana_cost': card.manaCost,
+                        'rarity': card.rarity,
+                      };
+                      Navigator.pop(context);
+                      widget.onCardSelectedForBinder?.call(cardData);
+                    } else {
+                      _addCardToDeck(card);
                     }
-                    : null,
+                  }
+                : null,
           );
         }
 
         return LayoutBuilder(
           builder: (context, constraints) {
             final useGrid = constraints.maxWidth >= AppTheme.breakpointExpanded;
-            final pageGutter =
-                constraints.maxWidth < AppTheme.breakpointCompact
-                    ? AppTheme.pageGutterCompact
-                    : AppTheme.pageGutter;
+            final pageGutter = constraints.maxWidth < AppTheme.breakpointCompact
+                ? AppTheme.pageGutterCompact
+                : AppTheme.pageGutter;
 
             return Center(
               child: ConstrainedBox(
@@ -537,16 +529,16 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                         SliverPadding(
                           padding: EdgeInsets.fromLTRB(
                             pageGutter,
-                            2,
+                            AppTheme.space2,
                             pageGutter,
-                            12,
+                            AppTheme.space12,
                           ),
                           sliver: SliverGrid(
                             key: const Key('card-search-results-grid'),
                             gridDelegate:
                                 const SliverGridDelegateWithMaxCrossAxisExtent(
                                   maxCrossAxisExtent: 580,
-                                  mainAxisExtent: 104,
+                                  mainAxisExtent: 124,
                                   mainAxisSpacing: 12,
                                   crossAxisSpacing: 12,
                                 ),
@@ -561,9 +553,9 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                         SliverPadding(
                           padding: EdgeInsets.fromLTRB(
                             pageGutter,
-                            0,
+                            AppTheme.space0,
                             pageGutter,
-                            12,
+                            AppTheme.space12,
                           ),
                           sliver: SliverList(
                             key: const Key('card-search-results-list'),
@@ -577,7 +569,9 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                       if (provider.hasMore)
                         const SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                              vertical: AppTheme.space16,
+                            ),
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: AppTheme.brass400,
@@ -634,9 +628,9 @@ class _SearchResultsHeader extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
-        16,
+        AppTheme.space16,
         horizontalPadding,
-        10,
+        AppTheme.space10,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -644,7 +638,7 @@ class _SearchResultsHeader extends StatelessWidget {
           Container(
             width: 3,
             height: 34,
-            margin: const EdgeInsets.only(right: 10),
+            margin: const EdgeInsets.only(right: AppTheme.space10),
             decoration: BoxDecoration(
               color: AppTheme.frost400,
               borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -662,7 +656,7 @@ class _SearchResultsHeader extends StatelessWidget {
                     fontSize: AppTheme.fontMd,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.space2),
                 Text(
                   '$count cartas encontradas',
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -684,6 +678,7 @@ class _CardSearchResultTile extends StatelessWidget {
     super.key,
     required this.inGrid,
     required this.card,
+    required this.availability,
     required this.showTypeLine,
     required this.warning,
     required this.canAdd,
@@ -693,6 +688,7 @@ class _CardSearchResultTile extends StatelessWidget {
 
   final bool inGrid;
   final DeckCardItem card;
+  final CardCollectionAvailability? availability;
   final bool showTypeLine;
   final String? warning;
   final bool canAdd;
@@ -703,8 +699,9 @@ class _CardSearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding:
-          inGrid ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 5),
+      padding: inGrid
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(vertical: AppTheme.space5),
       child: Material(
         color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -713,7 +710,12 @@ class _CardSearchResultTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Container(
             constraints: const BoxConstraints(minHeight: 86),
-            padding: const EdgeInsets.fromLTRB(10, 9, 8, 9),
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.space10,
+              AppTheme.space9,
+              AppTheme.space8,
+              AppTheme.space9,
+            ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               gradient: LinearGradient(
@@ -725,10 +727,9 @@ class _CardSearchResultTile extends StatelessWidget {
                 ],
               ),
               border: Border.all(
-                color:
-                    canAdd
-                        ? AppTheme.brass400.withValues(alpha: 0.20)
-                        : AppTheme.outlineMuted.withValues(alpha: 0.52),
+                color: canAdd
+                    ? AppTheme.brass400.withValues(alpha: 0.20)
+                    : AppTheme.outlineMuted.withValues(alpha: 0.52),
               ),
               boxShadow: [
                 BoxShadow(
@@ -749,7 +750,7 @@ class _CardSearchResultTile extends StatelessWidget {
                     height: 74,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.space12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -766,7 +767,7 @@ class _CardSearchResultTile extends StatelessWidget {
                           letterSpacing: -0.1,
                         ),
                       ),
-                      const SizedBox(height: 1),
+                      const SizedBox(height: AppTheme.space1),
                       if (showTypeLine && card.typeLine.trim().isNotEmpty)
                         Text(
                           card.typeLine,
@@ -778,7 +779,7 @@ class _CardSearchResultTile extends StatelessWidget {
                             height: 1.1,
                           ),
                         ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.space4),
                       Wrap(
                         spacing: 5,
                         runSpacing: 3,
@@ -795,6 +796,10 @@ class _CardSearchResultTile extends StatelessWidget {
                             _SearchIdentityPips(identity: card.colorIdentity),
                           if ((card.manaCost ?? '').trim().isNotEmpty)
                             ManaCostRow(cost: card.manaCost),
+                          if (availability != null)
+                            _SearchCollectionAvailabilityPills(
+                              availability: availability!,
+                            ),
                           if ((warning ?? '').isNotEmpty)
                             _SearchWarningPill(label: warning!),
                         ],
@@ -802,19 +807,17 @@ class _CardSearchResultTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.space8),
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    color:
-                        canAdd
-                            ? AppTheme.brass500.withValues(alpha: 0.16)
-                            : AppTheme.surfaceElevated.withValues(alpha: 0.72),
+                    color: canAdd
+                        ? AppTheme.brass500.withValues(alpha: 0.16)
+                        : AppTheme.surfaceElevated.withValues(alpha: 0.72),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color:
-                          canAdd
-                              ? AppTheme.brass400.withValues(alpha: 0.62)
-                              : AppTheme.outlineMuted,
+                      color: canAdd
+                          ? AppTheme.brass400.withValues(alpha: 0.62)
+                          : AppTheme.outlineMuted,
                     ),
                   ),
                   child: SizedBox(
@@ -837,6 +840,64 @@ class _CardSearchResultTile extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchCollectionAvailabilityPills extends StatelessWidget {
+  const _SearchCollectionAvailabilityPills({required this.availability});
+
+  final CardCollectionAvailability availability;
+
+  @override
+  Widget build(BuildContext context) {
+    final owned = availability.ownedQuantity;
+    final free = availability.freeQuantity;
+    final allocated = availability.allocatedQuantity;
+    final committed = availability.committedTradeQuantity;
+    final missing = availability.missingQuantity;
+
+    return Semantics(
+      label:
+          '$owned possuídas, $free livres, $allocated alocadas, '
+          '$committed em troca e $missing faltantes',
+      child: Wrap(
+        key: Key('card-search-availability-${availability.cardId}'),
+        spacing: 4,
+        runSpacing: 3,
+        children: [
+          _pill(
+            owned > 0 ? 'Possui $owned' : 'Não possui',
+            owned > 0 ? AppTheme.success : AppTheme.textSecondary,
+          ),
+          if (owned > 0) _pill('Livre $free', AppTheme.success),
+          if (allocated > 0) _pill('Alocada $allocated', AppTheme.frost400),
+          if (committed > 0) _pill('Em troca $committed', AppTheme.brass400),
+          if (missing > 0) _pill('Falta $missing', AppTheme.warning),
+        ],
+      ),
+    );
+  }
+
+  Widget _pill(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space1,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        border: Border.all(color: color.withValues(alpha: 0.28)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: AppTheme.fontTiny,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -867,7 +928,10 @@ class _SearchSetPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space5,
+        vertical: AppTheme.space2,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.frost400.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -894,7 +958,10 @@ class _SearchWarningPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space6,
+        vertical: AppTheme.space2,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.warning.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -964,20 +1031,22 @@ class _AddCardDialogState extends State<_AddCardDialog> {
         isCommanderFormat &&
         isCommanderEligible &&
         (!widget.hasCommanderSelected || widget.requireCommander);
-    final commanderGuidanceMessage =
-        isCommanderFormat && !isCommanderEligible
-            ? 'Esta carta não pode ser comandante. Ela pode entrar apenas como carta comum se respeitar a identidade de cor.'
-            : widget.requireCommander
-            ? 'Você está escolhendo o comandante do deck. Esta carta será definida como comandante.'
-            : widget.preferCommander && showCommanderChoice
-            ? 'Este deck precisa de um comandante. Defina esta carta agora ou adicione como carta comum se preferir escolher outro comandante.'
-            : widget.preferCommander
-            ? 'Este deck precisa de um comandante. Esta carta será definida como comandante.'
-            : null;
+    final commanderGuidanceMessage = isCommanderFormat && !isCommanderEligible
+        ? 'Esta carta não pode ser comandante. Ela pode entrar apenas como carta comum se respeitar a identidade de cor.'
+        : widget.requireCommander
+        ? 'Você está escolhendo o comandante do deck. Esta carta será definida como comandante.'
+        : widget.preferCommander && showCommanderChoice
+        ? 'Este deck precisa de um comandante. Defina esta carta agora ou adicione como carta comum se preferir escolher outro comandante.'
+        : widget.preferCommander
+        ? 'Este deck precisa de um comandante. Esta carta será definida como comandante.'
+        : null;
 
     return Dialog(
       key: Key('card-search-add-dialog-${widget.card.id}'),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space18,
+        vertical: AppTheme.space24,
+      ),
       backgroundColor: AppTheme.surfaceElevated,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -986,7 +1055,12 @@ class _AddCardDialogState extends State<_AddCardDialog> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.space22,
+            AppTheme.space22,
+            AppTheme.space22,
+            AppTheme.space20,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1004,20 +1078,21 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                     ),
                   ),
                   IconButton(
-                    onPressed:
-                        _isSubmitting ? null : () => Navigator.pop(context),
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => Navigator.pop(context),
                     icon: const Icon(Icons.close_rounded),
                     color: AppTheme.textSecondary,
                     tooltip: 'Fechar',
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.space16),
               if (!widget.canAddByCommanderIdentity)
                 Container(
                   width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: AppTheme.space12),
+                  padding: const EdgeInsets.all(AppTheme.space12),
                   decoration: BoxDecoration(
                     color: AppTheme.error.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1041,36 +1116,34 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                       height: 114,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppTheme.space16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           widget.card.name,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            color: AppTheme.textPrimary,
-                            fontWeight: FontWeight.w800,
-                            height: 1.05,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w800,
+                                height: 1.05,
+                              ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         _CardSearchEditionSubtitle(
                           card: widget.card,
                           showTypeLine: true,
-                          warning:
-                              _isCommander
-                                  ? 'Será definido como comandante'
-                                  : null,
+                          warning: _isCommander
+                              ? 'Será definido como comandante'
+                              : null,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: AppTheme.space18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1091,42 +1164,44 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppTheme.space14),
               if (commanderGuidanceMessage != null) ...[
                 _CommanderGuidanceCard(message: commanderGuidanceMessage),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
               ],
               if (showCommanderChoice)
                 _CommanderChoiceCard(
                   isCommander: _isCommander,
                   requireCommander: widget.requireCommander,
-                  onChanged:
-                      _isSubmitting
-                          ? null
-                          : (val) => setState(() {
-                            _isCommander = val;
-                            if (_isCommander) _quantity = 1;
-                          }),
+                  onChanged: _isSubmitting
+                      ? null
+                      : (val) => setState(() {
+                          _isCommander = val;
+                          if (_isCommander) _quantity = 1;
+                        }),
                 ),
               if (_isSubmitting) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.space12),
                 const Center(
                   child: SizedBox(
-                    height: 22,
-                    width: 22,
+                    height: AppTheme.space22,
+                    width: AppTheme.space22,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 ),
               ],
-              const SizedBox(height: 22),
+              const SizedBox(height: AppTheme.space22),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed:
-                          _isSubmitting ? null : () => Navigator.pop(context),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppTheme.space14,
+                        ),
                         side: BorderSide(
                           color: AppTheme.outlineMuted.withValues(alpha: 0.75),
                         ),
@@ -1139,22 +1214,24 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                       child: const Text('Cancelar'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: ElevatedButton(
                       key: Key('card-search-add-confirm-${widget.card.id}'),
                       onPressed:
                           _isSubmitting || !widget.canAddByCommanderIdentity
-                              ? null
-                              : () async {
-                                setState(() => _isSubmitting = true);
-                                await widget.onConfirm(_quantity, _isCommander);
-                                if (mounted) {
-                                  setState(() => _isSubmitting = false);
-                                }
-                              },
+                          ? null
+                          : () async {
+                              setState(() => _isSubmitting = true);
+                              await widget.onConfirm(_quantity, _isCommander);
+                              if (mounted) {
+                                setState(() => _isSubmitting = false);
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppTheme.space14,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusSm,
@@ -1197,7 +1274,10 @@ class _QuantityStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('card-search-add-quantity-stepper'),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space4,
+        vertical: AppTheme.space4,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.38),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1214,7 +1294,7 @@ class _QuantityStepper extends StatelessWidget {
             onTap: onDecrease,
           ),
           SizedBox(
-            width: 36,
+            width: AppTheme.space36,
             child: Text(
               '$quantity',
               textAlign: TextAlign.center,
@@ -1249,8 +1329,9 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final semanticLabel =
-        icon == Icons.remove ? 'Diminuir quantidade' : 'Aumentar quantidade';
+    final semanticLabel = icon == Icons.remove
+        ? 'Diminuir quantidade'
+        : 'Aumentar quantidade';
     return Semantics(
       button: true,
       enabled: enabled,
@@ -1265,10 +1346,9 @@ class _StepperButton extends StatelessWidget {
             height: 48,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color:
-                  enabled
-                      ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
-                      : AppTheme.surfaceSlate.withValues(alpha: 0.35),
+              color: enabled
+                  ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
+                  : AppTheme.surfaceSlate.withValues(alpha: 0.35),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
             child: Icon(
@@ -1292,7 +1372,7 @@ class _CommanderGuidanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.brass500.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1321,7 +1401,7 @@ class _CommanderChoiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('card-search-commander-choice-card'),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppTheme.space8),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1335,15 +1415,14 @@ class _CommanderChoiceCard extends StatelessWidget {
             subtitle: 'Esta carta será o comandante do deck.',
             onTap: onChanged == null ? null : () => onChanged!(true),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.space8),
           _CommanderChoiceRow(
             selected: !isCommander,
             title: 'Adicionar como carta comum',
             subtitle: 'Adicionar ao deck sem definir como comandante.',
-            onTap:
-                onChanged == null || requireCommander
-                    ? null
-                    : () => onChanged!(false),
+            onTap: onChanged == null || requireCommander
+                ? null
+                : () => onChanged!(false),
           ),
         ],
       ),
@@ -1371,29 +1450,29 @@ class _CommanderChoiceRow extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space10,
+          vertical: AppTheme.space10,
+        ),
         decoration: BoxDecoration(
-          color:
-              selected
-                  ? AppTheme.brass400.withValues(alpha: 0.08)
-                  : AppTheme.transparent,
+          color: selected
+              ? AppTheme.brass400.withValues(alpha: 0.08)
+              : AppTheme.transparent,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           border: Border.all(
-            color:
-                selected
-                    ? AppTheme.brass400.withValues(alpha: 0.48)
-                    : AppTheme.outlineMuted.withValues(alpha: 0.18),
+            color: selected
+                ? AppTheme.brass400.withValues(alpha: 0.48)
+                : AppTheme.outlineMuted.withValues(alpha: 0.18),
           ),
-          boxShadow:
-              selected
-                  ? [
-                    BoxShadow(
-                      color: AppTheme.brass400.withValues(alpha: 0.1),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    ),
-                  ]
-                  : null,
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.brass400.withValues(alpha: 0.1),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
@@ -1404,7 +1483,7 @@ class _CommanderChoiceRow extends StatelessWidget {
               color: selected ? AppTheme.brass400 : AppTheme.textHint,
               size: 22,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppTheme.space10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1416,7 +1495,7 @@ class _CommanderChoiceRow extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: AppTheme.space3),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -1438,10 +1517,9 @@ Set<String>? _computeCommanderIdentity(DeckDetails? deck) {
   if (deck == null) return null;
   if (deck.commander.isEmpty) return null;
   final commander = deck.commander.first;
-  final identity =
-      commander.colorIdentity.isNotEmpty
-          ? commander.colorIdentity
-          : commander.colors;
+  final identity = commander.colorIdentity.isNotEmpty
+      ? commander.colorIdentity
+      : commander.colors;
   return identity.map((e) => e.toUpperCase()).toSet();
 }
 
@@ -1486,7 +1564,7 @@ class _CardSearchEditionSubtitle extends StatelessWidget {
               fontSize: AppTheme.fontSm,
             ),
           ),
-        const SizedBox(height: 3),
+        const SizedBox(height: AppTheme.space3),
         CardEditionMetadataLine(
           setCode: card.setCode,
           collectorNumber: card.collectorNumber,

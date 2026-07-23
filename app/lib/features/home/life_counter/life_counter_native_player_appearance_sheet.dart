@@ -380,7 +380,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.space12),
               FilledButton.tonal(
                 key: const Key(
                   'life-counter-native-player-appearance-save-profile',
@@ -388,15 +388,15 @@ class _LifeCounterNativePlayerAppearanceSheetState
                 onPressed: _handleSaveProfilePressed,
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 18,
+                    horizontal: AppTheme.space16,
+                    vertical: AppTheme.space18,
                   ),
                 ),
                 child: const Text('Salvar'),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           if (_profiles.isEmpty)
             const Text(
               'Nenhum perfil de aparência salvo.',
@@ -413,10 +413,9 @@ class _LifeCounterNativePlayerAppearanceSheetState
                     (profile) => _AppearanceProfileTile(
                       profile: profile,
                       onApply: () => _applyProfile(profile),
-                      onDelete:
-                          widget.onDeleteProfilePressed == null
-                              ? null
-                              : () => _handleDeleteProfilePressed(profile.id),
+                      onDelete: widget.onDeleteProfilePressed == null
+                          ? null
+                          : () => _handleDeleteProfilePressed(profile.id),
                     ),
                   )
                   .toList(growable: false),
@@ -433,10 +432,10 @@ class _LifeCounterNativePlayerAppearanceSheetState
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          12,
-          12,
-          12,
-          12 + MediaQuery.viewInsetsOf(context).bottom,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12 + MediaQuery.viewInsetsOf(context).bottom,
         ),
         child: FractionallySizedBox(
           heightFactor: 0.84,
@@ -457,7 +456,12 @@ class _LifeCounterNativePlayerAppearanceSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -472,7 +476,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Personalize nomes e fundos de cada jogador.',
                               style: TextStyle(
@@ -495,13 +499,23 @@ class _LifeCounterNativePlayerAppearanceSheetState
                 ),
                 if (_supportsTransfer)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space0,
+                      AppTheme.space20,
+                      AppTheme.space8,
+                    ),
                     child: _buildTransferActions(),
                   ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       _SectionCard(
                         title: 'Jogador alvo',
@@ -523,7 +537,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Apelido',
                         subtitle: 'Defina um nome opcional para este jogador.',
@@ -540,10 +554,10 @@ class _LifeCounterNativePlayerAppearanceSheetState
                         ),
                       ),
                       if (_supportsProfiles) ...[
-                        const SizedBox(height: 18),
+                        const SizedBox(height: AppTheme.space18),
                         _buildProfilesSection(),
                       ],
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Fundo',
                         subtitle:
@@ -557,7 +571,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                               hasMainImage: _appearance.backgroundImage != null,
                               hasPartnerImage: _hasPartnerImage,
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppTheme.space16),
                             Wrap(
                               spacing: 10,
                               runSpacing: 10,
@@ -579,7 +593,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                                 },
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppTheme.space16),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -599,7 +613,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: AppTheme.space12),
                                 FilledButton.tonal(
                                   key: const Key(
                                     'life-counter-native-player-appearance-apply-background',
@@ -607,8 +621,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                                   onPressed: _applyCustomBackground,
                                   style: FilledButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 18,
+                                      horizontal: AppTheme.space16,
+                                      vertical: AppTheme.space18,
                                     ),
                                   ),
                                   child: const Text('Usar'),
@@ -618,7 +632,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Imagens de fundo',
                         subtitle:
@@ -629,20 +643,20 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             _ImageStatusRow(
                               title: 'Imagem de fundo principal',
                               hasValue: _appearance.backgroundImage != null,
-                              onClear:
-                                  _appearance.backgroundImage == null
-                                      ? null
-                                      : _clearMainImage,
+                              onClear: _appearance.backgroundImage == null
+                                  ? null
+                                  : _clearMainImage,
                               clearKey: const Key(
                                 'life-counter-native-player-appearance-clear-main-image',
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppTheme.space12),
                             _ImageStatusRow(
                               title: 'Imagem de fundo do parceiro',
                               hasValue: _hasPartnerImage,
-                              onClear:
-                                  _hasPartnerImage ? _clearPartnerImage : null,
+                              onClear: _hasPartnerImage
+                                  ? _clearPartnerImage
+                                  : null,
                               clearKey: const Key(
                                 'life-counter-native-player-appearance-clear-partner-image',
                               ),
@@ -655,7 +669,12 @@ class _LifeCounterNativePlayerAppearanceSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -666,12 +685,14 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key(
@@ -686,7 +707,9 @@ class _LifeCounterNativePlayerAppearanceSheetState
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),
@@ -774,7 +797,7 @@ class _SectionCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppTheme.space16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -786,7 +809,7 @@ class _SectionCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppTheme.space6),
             Text(
               subtitle,
               style: const TextStyle(
@@ -795,7 +818,7 @@ class _SectionCard extends StatelessWidget {
                 height: AppTheme.lineHeightComfortable,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.space16),
             child,
           ],
         ),
@@ -820,14 +843,13 @@ class _BackgroundPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _parseColor(background);
-    final foreground =
-        color.computeLuminance() > 0.55
-            ? AppTheme.lifeCounterBlack
-            : AppTheme.lifeCounterWhite;
+    final foreground = color.computeLuminance() > 0.55
+        ? AppTheme.lifeCounterBlack
+        : AppTheme.lifeCounterWhite;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -846,7 +868,7 @@ class _BackgroundPreview extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -887,7 +909,10 @@ class _PreviewBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space10,
+          vertical: AppTheme.space6,
+        ),
         child: Text(
           label,
           style: TextStyle(
@@ -916,10 +941,9 @@ class _BackgroundChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _parseColor(colorValue);
-    final foreground =
-        color.computeLuminance() > 0.55
-            ? AppTheme.lifeCounterBlack
-            : AppTheme.lifeCounterWhite;
+    final foreground = color.computeLuminance() > 0.55
+        ? AppTheme.lifeCounterBlack
+        : AppTheme.lifeCounterWhite;
 
     final semanticLabel = 'Selecionar cor $colorValue';
     return Semantics(
@@ -934,7 +958,7 @@ class _BackgroundChip extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             width: 72,
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.space12),
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -942,16 +966,15 @@ class _BackgroundChip extends StatelessWidget {
                 color: selected ? AppTheme.textPrimary : AppTheme.transparent,
                 width: AppTheme.strokeStrong,
               ),
-              boxShadow:
-                  selected
-                      ? const [
-                        BoxShadow(
-                          color: AppTheme.overlayBlack20,
-                          blurRadius: 12,
-                          offset: Offset(0, 6),
-                        ),
-                      ]
-                      : null,
+              boxShadow: selected
+                  ? const [
+                      BoxShadow(
+                        color: AppTheme.overlayBlack20,
+                        blurRadius: 12,
+                        offset: Offset(0, 6),
+                      ),
+                    ]
+                  : null,
             ),
             child: Center(
               child: Text(
@@ -984,7 +1007,7 @@ class _AppearanceProfileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: AppTheme.space10),
       child: Material(
         color: AppTheme.surfaceSlate,
         shape: RoundedRectangleBorder(
@@ -997,8 +1020,8 @@ class _AppearanceProfileTile extends StatelessWidget {
             'life-counter-native-player-appearance-profile-${profile.id}',
           ),
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 4,
+            horizontal: AppTheme.space14,
+            vertical: AppTheme.space4,
           ),
           title: Text(
             profile.name,
@@ -1072,7 +1095,7 @@ class _ImageStatusRow extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.space4),
               Text(
                 hasValue ? 'Imagem mantida' : 'Nenhuma imagem salva',
                 style: const TextStyle(
@@ -1083,7 +1106,7 @@ class _ImageStatusRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.space12),
         OutlinedButton(
           key: clearKey,
           onPressed: onClear,

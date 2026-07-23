@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/visual_fixture.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 export '../../../core/widgets/mana_symbols.dart';
@@ -22,6 +23,7 @@ class DeckPricingRow extends StatelessWidget {
     if (iso == null) return '';
     final dt = DateTime.tryParse(iso);
     if (dt == null) return '';
+    if (manaloomVisualFixtureMode) return 'agora';
     final local = dt.toLocal();
     final now = DateTime.now();
     final diff = now.difference(local);
@@ -39,13 +41,15 @@ class DeckPricingRow extends StatelessWidget {
     final total = pricing?['estimated_total_usd'];
     final missing = pricing?['missing_price_cards'];
     final updatedAt = pricing?['pricing_updated_at']?.toString();
+    final source = _pricingSourceLabel(pricing?['price_source']);
 
     String subtitle;
     if (isLoading && total == null) {
       subtitle = 'Calculando...';
     } else if (total is num) {
+      final partial = missing is num && missing > 0;
       subtitle =
-          'Estimado: ${CurrencyFormatter.format(total, currencyCode: pricing?['currency']?.toString() ?? 'USD')}';
+          '${partial ? 'Parcial' : 'Estimado'}: ${CurrencyFormatter.format(total, currencyCode: pricing?['currency']?.toString() ?? 'USD')}';
       if (missing is num && missing > 0) {
         subtitle += ' • ${missing.toInt()} sem preço';
       }
@@ -53,12 +57,17 @@ class DeckPricingRow extends StatelessWidget {
       if (ago.isNotEmpty) {
         subtitle += ' • $ago';
       }
+      if (source.isNotEmpty) subtitle += ' • $source';
+    } else if (missing is num && missing > 0) {
+      subtitle = 'Nenhum preço disponível • ${missing.toInt()} sem preço';
+      final ago = _formatUpdatedAt(updatedAt);
+      if (ago.isNotEmpty) subtitle += ' • $ago';
     } else {
       subtitle = 'Atualize quando quiser calcular o custo';
     }
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withValues(
           alpha: 0.35,
@@ -72,23 +81,24 @@ class DeckPricingRow extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.attach_money),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Custo', style: theme.textTheme.titleSmall),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.space2),
                 Text(subtitle, style: theme.textTheme.bodySmall),
                 if (isLoading) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.space8),
                   const LinearProgressIndicator(),
                 ],
               ],
             ),
           ),
-          const SizedBox(width: 8),
-          if (onShowDetails != null && total is num)
+          const SizedBox(width: AppTheme.space8),
+          if (onShowDetails != null &&
+              ((pricing?['items'] as List?)?.isNotEmpty ?? false))
             TextButton(
               onPressed: isLoading ? null : onShowDetails,
               child: const Text('Detalhes'),
@@ -102,4 +112,14 @@ class DeckPricingRow extends StatelessWidget {
       ),
     );
   }
+}
+
+String _pricingSourceLabel(Object? raw) {
+  return switch (raw?.toString().trim().toLowerCase()) {
+    'scryfall' => 'Fonte Scryfall',
+    'mtgjson' => 'Fonte MTGJSON',
+    'mixed' => 'Fontes mistas',
+    'legacy' => 'Fonte legada',
+    _ => '',
+  };
 }

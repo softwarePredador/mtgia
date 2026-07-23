@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -47,7 +48,7 @@ def connect():
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         return psycopg2.connect(database_url)
-    required = ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASS"]
+    required = ["DB_HOST", "DB_NAME", "DB_USER"]
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
         raise RuntimeError("Missing DB config: " + ", ".join(missing))
@@ -56,7 +57,7 @@ def connect():
         port=os.environ.get("DB_PORT", "5432"),
         dbname=os.environ["DB_NAME"],
         user=os.environ["DB_USER"],
-        password=os.environ["DB_PASS"],
+        password=os.environ.get("DB_PASS", ""),
     )
 
 
@@ -99,6 +100,16 @@ def list_of_strings(value: Any) -> list[str]:
     return []
 
 
+def normalized_cmc(value: Any) -> float | None:
+    try:
+        cmc = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(cmc) or cmc < 0 or cmc >= 1000:
+        return None
+    return cmc
+
+
 def parse_atomic_cards(path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]]]:
     decoded = json.loads(path.read_text(encoding="utf-8"))
     cards_map = decoded.get("data")
@@ -127,6 +138,7 @@ def parse_atomic_cards(path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[An
         )
         cards_by_oracle[oracle_id] = (
             oracle_id,
+            oracle_id,
             name,
             chosen.get("manaCost"),
             chosen.get("type"),
@@ -139,7 +151,8 @@ def parse_atomic_cards(path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[An
             scryfall_image_url(name, identifiers, set_code),
             set_code,
             chosen.get("rarity"),
-            chosen.get("isReserved") if isinstance(chosen.get("isReserved"), bool) else None,
+            normalized_cmc(chosen.get("manaValue", chosen.get("convertedManaCost"))),
+            chosen.get("isReserved") is True,
         )
 
         legalities = chosen.get("legalities")
@@ -161,6 +174,8 @@ def ensure_schema(conn) -> None:
         cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT")
         cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]")
         cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN")
+        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID")
+        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS cmc DECIMAL(4, 1) DEFAULT 0")
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)"
         )
@@ -179,11 +194,12 @@ def upsert_cards(conn, rows: list[tuple[Any, ...]], batch_size: int) -> int:
                 cur,
                 """
                 INSERT INTO cards (
-                  scryfall_id, name, mana_cost, type_line, oracle_text,
+                  scryfall_id, oracle_id, name, mana_cost, type_line, oracle_text,
                   colors, color_identity, power, toughness, keywords,
-                  image_url, set_code, rarity, is_reserved
+                  image_url, set_code, rarity, cmc, is_reserved
                 ) VALUES %s
                 ON CONFLICT (scryfall_id) DO UPDATE SET
+                  oracle_id = EXCLUDED.oracle_id,
                   name = EXCLUDED.name,
                   mana_cost = EXCLUDED.mana_cost,
                   type_line = EXCLUDED.type_line,
@@ -196,17 +212,17 @@ def upsert_cards(conn, rows: list[tuple[Any, ...]], batch_size: int) -> int:
                   image_url = EXCLUDED.image_url,
                   set_code = EXCLUDED.set_code,
                   rarity = EXCLUDED.rarity,
+                  cmc = EXCLUDED.cmc,
                   is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved)
                 """,
                 batch,
                 template=(
-                    "(%s::uuid, %s::text, %s::text, %s::text, %s::text, "
+                    "(%s::uuid, %s::uuid, %s::text, %s::text, %s::text, %s::text, "
                     "%s::text[], %s::text[], %s::text, %s::text, %s::text[], "
-                    "%s::text, %s::text, %s::text, %s::boolean)"
+                    "%s::text, %s::text, %s::text, %s::numeric, %s::boolean)"
                 ),
                 page_size=len(batch),
             )
-            conn.commit()
             total += len(batch)
             print(f"cards {total}/{len(rows)}", file=sys.stderr, flush=True)
     return total
@@ -246,7 +262,6 @@ def upsert_legalities(
                 template="(%s::uuid, %s::text, %s::text)",
                 page_size=len(batch),
             )
-            conn.commit()
             total += len(batch)
             print(f"legalities {total}/{len(resolved)}", file=sys.stderr, flush=True)
     return total
@@ -270,6 +285,10 @@ def main() -> None:
             card_ids,
             args.batch_size,
         )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
 

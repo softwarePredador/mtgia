@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Run an equal battle gate for registered Lorehold decks.
+"""Run a native diagnostic battle probe for registered Lorehold decks.
 
 The gate compares deck 6, Lorehold variants, and the strategy-first candidate
-with the same opponent sample and simulation seed. It is read-only: no
-PostgreSQL writes, no source SQLite mutation, and no deck swaps.
+inside the deterministic Python laboratory. Its schedule seed does not control
+XMage or Forge RNG and cannot authorize deck promotion. The probe is read-only:
+no PostgreSQL writes, no source SQLite mutation, and no deck swaps.
 """
 
 from __future__ import annotations
@@ -39,6 +40,7 @@ DEFAULT_MATRIX = (
 )
 DEFAULT_CANDIDATE_DB = None
 DEFAULT_DECK_IDS = (6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616)
+INDEPENDENT_PROMOTION_GATE = "lorehold_independent_battle_statistical_gate.py"
 CARD_EXPOSURE_EVENTS = {
     "activated_ability",
     "board_wipe_resolved",
@@ -106,6 +108,18 @@ FOCUS_TRACE_EVENTS = {
     "utility_artifact_activated",
 } | LOREHOLD_RUNTIME_EFFECT_EVENTS
 FOCUS_ACCESS_ZONES = {"hand", "battlefield", "graveyard", "exile", "stack"}
+
+
+def native_probe_safety_contract() -> dict[str, Any]:
+    return {
+        "engine_scope": "native_python_battle_analyst_v9",
+        "evidence_scope": "diagnostic_native_only",
+        "seed_schedule_scope": "native_python_simulator_only",
+        "external_engine_seed_pairing_claim": False,
+        "promotion_allowed": False,
+        "automatic_mutation_performed": False,
+        "promotion_gate": INDEPENDENT_PROMOTION_GATE,
+    }
 
 
 def focus_trace_cards() -> set[str]:
@@ -958,8 +972,9 @@ class GateTelemetry:
             return
         trace = self._focus_trace_payload(event, data, cards=cards)
         traces = self.focus_card_game_traces.setdefault(self.current_game, [])
-        # Exact runtime events are promotion evidence. Preserve them even when a
-        # noisy game has already filled the ordinary diagnostic trace budget.
+        # Preserve exact runtime events after the ordinary trace budget. They
+        # remain native diagnostic evidence until the independent external
+        # engine gate and product promotion contract are satisfied.
         if len(traces) < 160 or event in LOREHOLD_RUNTIME_EFFECT_EVENTS:
             traces.append(trace)
         for card in cards:
@@ -1414,6 +1429,7 @@ def run_deck_gate(
     removal = sum(1 for card in deck if battle.card_has_functional_tag(card, "removal", "board_wipe"))
     return {
         **dict(spec),
+        **native_probe_safety_contract(),
         "status": "pass",
         "commander": commander.get("name", "?"),
         "deck_size": len(deck) + 1,
@@ -1800,8 +1816,9 @@ def main() -> int:
         "--paired-game-seeds",
         action="store_true",
         help=(
-            "Derive an independent deterministic seed for each opponent/game index. "
-            "Compared decks then receive the same seed and picked-opponent schedule."
+            "Derive a deterministic schedule for each opponent/game index inside "
+            "the native Python simulator only. It does not pair XMage/Forge outcomes "
+            "and never authorizes promotion."
         ),
     )
     parser.add_argument("--game-timeout-seconds", type=float, default=0.0)
@@ -1866,6 +1883,7 @@ def main() -> int:
         recent_events = checkpoint_events[-max(1, int(args.checkpoint_history_limit)) :]
         latest = recent_events[-1] if recent_events else {}
         payload = {
+            **native_probe_safety_contract(),
             "generated_at": utc_now(),
             "status": "running",
             "stem": checkpoint_stem,
@@ -1930,6 +1948,7 @@ def main() -> int:
             }
         results.append(result)
         partial_report = {
+            **native_probe_safety_contract(),
             "generated_at": utc_now(),
             "status": "partial",
             "source_db": str(args.db),
@@ -1952,6 +1971,7 @@ def main() -> int:
         write_report(partial_report, partial_stem)
 
     report = {
+        **native_probe_safety_contract(),
         "generated_at": utc_now(),
         "status": "ready",
         "source_db": str(args.db),
@@ -1977,6 +1997,7 @@ def main() -> int:
         recent_events = checkpoint_events[-max(1, int(args.checkpoint_history_limit)) :]
         write_game_checkpoint(
             {
+                **native_probe_safety_contract(),
                 "generated_at": utc_now(),
                 "status": "ready",
                 "stem": checkpoint_stem,

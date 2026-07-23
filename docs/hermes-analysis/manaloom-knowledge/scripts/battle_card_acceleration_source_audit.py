@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import external_engine_source_contract as engine_source_contract
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_REPO_ROOT = SCRIPT_DIR.parents[3]
@@ -78,23 +79,31 @@ SOURCE_CAPABILITIES: tuple[SourceCapability, ...] = (
     ),
     SourceCapability(
         id="xmage_local_source",
-        name="Local XMage source tree",
-        url="file:///Users/desenvolvimentomobile/Downloads/mage-master",
-        authority="implementation_reference_not_authority",
-        best_for=("battle_family_mapping", "card_implementation_examples", "test_scenarios"),
+        name="Pinned XMage source checkout",
+        url=(
+            "https://github.com/magefree/mage/tree/"
+            f"{engine_source_contract.canonical_xmage_pin()}"
+        ),
+        authority="primary_pinned_external_rules_executor_and_reference",
+        best_for=(
+            "battle_execution",
+            "coverage_preflight",
+            "battle_family_mapping",
+            "focused_source_and_test_diagnostics",
+        ),
         not_for=("official_rules_override", "direct_pg_promotion_without_tests"),
-        access_model="local_java_source",
-        cache_policy="index locally and map by semantic family",
+        access_model="explicit_clean_pinned_git_checkout",
+        cache_policy="require the runtime pin; never use a hidden machine-specific default",
     ),
     SourceCapability(
         id="forge_engine",
-        name="Forge rules engine",
+        name="Pinned Forge rules sidecar",
         url="https://github.com/Card-Forge/forge",
-        authority="independent_engine_crosscheck",
-        best_for=("battle_family_crosscheck", "implementation_disagreement_detection"),
+        authority="secondary_external_rules_executor_for_structured_xmage_gaps",
+        best_for=("structured_xmage_gap_execution", "independent_disagreement_detection"),
         not_for=("official_rules_override", "deckbuilding_meta"),
-        access_model="open_source",
-        cache_policy="use as optional crosscheck when XMage is missing or ambiguous",
+        access_model="isolated_pinned_process_api",
+        cache_policy="execute only after a structured XMage coverage gap; preserve exact pin provenance",
     ),
     SourceCapability(
         id="seventeenlands_public_data",
@@ -241,7 +250,10 @@ PROJECT_NEEDS: tuple[ProjectNeed, ...] = (
             ("semantic", "family", "battle_model_scope"),
             ("package_ready", "runtime_family"),
         ),
-        implementation_rule="Use XMage to propose families, then require ManaLoom focused runtime tests.",
+        implementation_rule=(
+            "Reconcile exact pinned catalog coverage, execute XMage then structured Forge fallback, "
+            "and open native family work only for the explicit residual with focused tests."
+        ),
         acceleration_value=95,
         risk_if_missing="The queue falls back to slow per-card manual implementation.",
     ),
@@ -343,7 +355,10 @@ PROJECT_NEEDS: tuple[ProjectNeed, ...] = (
             ("authoritative", "non-authoritative"),
             ("crosscheck", "promotion_policy"),
         ),
-        implementation_rule="Official rules and Oracle win; engines generate candidates and tests.",
+        implementation_rule=(
+            "Official rules and Oracle resolve disagreements; pinned engines execute supported cards, "
+            "while structured gaps or conflicts route to review without direct PostgreSQL promotion."
+        ),
         acceleration_value=84,
         risk_if_missing="A simulator disagreement can be promoted as truth without evidence.",
     ),

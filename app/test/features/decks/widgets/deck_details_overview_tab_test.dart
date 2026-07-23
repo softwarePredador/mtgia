@@ -449,4 +449,43 @@ void main() {
     expect(find.byKey(const Key('deck-review-state-chip')), findsOneWidget);
     expect(find.text('Rascunho'), findsOneWidget);
   });
+
+  testWidgets('status de legalidade mostra o timestamp persistido', (
+    tester,
+  ) async {
+    final timestamp = DateTime.parse('2026-07-22T12:34:00Z');
+    final local = timestamp.toLocal();
+    String twoDigits(int value) => value.toString().padLeft(2, '0');
+    final expected =
+        'Atualizado em ${twoDigits(local.day)}/${twoDigits(local.month)}/${local.year} às ${twoDigits(local.hour)}:${twoDigits(local.minute)}';
+
+    await tester.pumpWidget(
+      createSubject(
+        deck: makeCommanderDeck().copyWith(
+          validationState: 'validated',
+          reviewReasons: const <String>[],
+          validationUpdatedAt: timestamp,
+        ),
+        totalCards: 100,
+        validationResult: {
+          'ok': true,
+          'deck_state': 'validated',
+          'review_reasons': const <String>[],
+          'validation_updated_at': timestamp.toIso8601String(),
+        },
+        onValidationTap: () {},
+        onOpenCards: () {},
+        onForcePricingRefresh: () {},
+        onShowPricingDetails: () {},
+        onTogglePublic: () {},
+        onShowOptimizationOptions: () {},
+        onSelectCommander: () {},
+        onImportList: () {},
+        onEditDescription: (_) {},
+      ),
+    );
+    await tester.pump();
+
+    expect(find.textContaining(expected), findsOneWidget);
+  });
 }

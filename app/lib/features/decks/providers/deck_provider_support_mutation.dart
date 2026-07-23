@@ -103,7 +103,10 @@ DeckMutationResult parseDeckMutationResponse(
   required String fallbackMessage,
 }) {
   if (response.statusCode == 200) {
-    return const DeckMutationResult(isSuccess: true);
+    final payload = response.data is Map
+        ? (response.data as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    return DeckMutationResult(isSuccess: true, payload: payload);
   }
 
   final message = FriendlyErrorMapper.fromApiResponse(
@@ -157,10 +160,9 @@ List<Deck> incrementDeckCardCount(
 }) {
   return decks
       .map(
-        (deck) =>
-            deck.id == deckId
-                ? deck.copyWith(cardCount: deck.cardCount + delta)
-                : deck,
+        (deck) => deck.id == deckId
+            ? deck.copyWith(cardCount: deck.cardCount + delta)
+            : deck,
       )
       .toList();
 }
@@ -230,17 +232,22 @@ Future<DeckPersistResult> persistDeckCardsPayloadWithValidation(
   Map<String, dynamic>? mutationContext,
 }) async {
   final stopwatch = Stopwatch()..start();
-  await persistDeckCardsPayloadRequest(
+  final persisted = await persistDeckCardsPayloadRequest(
     apiClient,
     deckId: deckId,
     cardsPayload: cardsPayload,
     mutationContext: mutationContext,
   );
   stopwatch.stop();
-  final validation = await validateDeckRequest(apiClient, deckId);
+  final embeddedValidation = persisted['validation'];
+  final validation = embeddedValidation is Map
+      ? embeddedValidation.cast<String, dynamic>()
+      : await validateDeckRequest(apiClient, deckId);
+  final event = persisted['optimization_event'];
   return DeckPersistResult(
     validation: validation,
     elapsedMilliseconds: stopwatch.elapsedMilliseconds,
+    optimizationEvent: event is Map ? event.cast<String, dynamic>() : null,
   );
 }
 
@@ -249,10 +256,9 @@ Map<String, dynamic> parseDeckPricingResponse(ApiResponse response) {
     return (response.data as Map).cast<String, dynamic>();
   }
   final data = response.data;
-  final msg =
-      (data is Map && data['error'] != null)
-          ? data['error'].toString()
-          : 'Falha ao calcular custo: ${response.statusCode}';
+  final msg = (data is Map && data['error'] != null)
+      ? data['error'].toString()
+      : 'Falha ao calcular custo: ${response.statusCode}';
   throw Exception(msg);
 }
 
@@ -267,7 +273,7 @@ Future<Map<String, dynamic>> fetchDeckPricingRequest(
   return parseDeckPricingResponse(response);
 }
 
-Future<void> persistDeckCardsPayloadRequest(
+Future<Map<String, dynamic>> persistDeckCardsPayloadRequest(
   ApiClient apiClient, {
   required String deckId,
   required List<Map<String, dynamic>> cardsPayload,
@@ -283,6 +289,25 @@ Future<void> persistDeckCardsPayloadRequest(
     response,
     fallbackMessage: 'Falha ao atualizar deck',
   );
+  final data = response.data;
+  return data is Map ? data.cast<String, dynamic>() : const <String, dynamic>{};
+}
+
+Future<Map<String, dynamic>> rollbackDeckOptimizationRequest(
+  ApiClient apiClient, {
+  required String deckId,
+  required String eventId,
+}) async {
+  final response = await apiClient.post(
+    '/decks/$deckId/optimizations/$eventId/rollback',
+    const <String, dynamic>{},
+  );
+  ensureSuccessfulDeckMutationResponse(
+    response,
+    fallbackMessage: 'Falha ao desfazer otimização',
+  );
+  final data = response.data;
+  return data is Map ? data.cast<String, dynamic>() : const <String, dynamic>{};
 }
 
 Future<void> updateDeckDescriptionRequest(
@@ -546,18 +571,16 @@ NamedOptimizationApplyResult buildNamedOptimizationApplyResult({
       normalizedFormat == 'commander' || normalizedFormat == 'brawl';
   final commanderIdentity = isCommander ? getCommanderIdentitySet(deck) : null;
 
-  final skippedForIdentity =
-      cardsToAddIds
-          .where(
-            (card) =>
-                !isCardWithinCommanderIdentity(
-                  card,
-                  commanderIdentity: commanderIdentity,
-                ),
-          )
-          .map((card) => card['card_id'])
-          .whereType<String>()
-          .toList();
+  final skippedForIdentity = cardsToAddIds
+      .where(
+        (card) => !isCardWithinCommanderIdentity(
+          card,
+          commanderIdentity: commanderIdentity,
+        ),
+      )
+      .map((card) => card['card_id'])
+      .whereType<String>()
+      .toList();
 
   applyAdditionsToCurrentCards(
     currentCards: currentCards,

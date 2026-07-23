@@ -141,7 +141,15 @@ arquivo explícita e não pode inflar a contagem de consumidores ativos.
 
 ## Evidência da rodada corrente
 
-O resultado e os resíduos da varredura de 2026-07-15 ficam em
+A revalidação mais recente do checkout local está em
+`docs/qa/MANALOOM_E2E_CORE_DOCUMENTATION_AUDIT_2026-07-21.md`. O aggregate
+determinístico daquela rodada terminou `FAIL` com 8 etapas aprovadas, 2 falhas
+e 9 skips explícitos. O Battle passou isoladamente antes/depois, mas o analysis
+server caiu dentro do aggregate; retenção permaneceu vermelha por 18 artefatos
+locais e o host ficou sem espaço durante `full`/Flutter completo. Portanto, a
+evidência de 2026-07-21 não declara conclusão local nem release.
+
+O resultado e os resíduos da varredura anterior de 2026-07-15 ficam em
 `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`. Naquela execução, o perfil
 determinístico ficou sem falhas e as 35 migrations estavam executadas, mas não
 havia release implantada. O follow-up operacional do mesmo dia publicou a API,

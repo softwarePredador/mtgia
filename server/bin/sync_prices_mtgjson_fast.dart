@@ -230,7 +230,9 @@ Notas:
     final updateResult = await connection.execute('''
       UPDATE cards c
       SET
+        price_usd = t.price,
         price = t.price,
+        price_source = 'mtgjson',
         price_updated_at = NOW()
       FROM tmp_mtgjson_prices t
       WHERE c.id = t.card_id
@@ -243,9 +245,9 @@ Notas:
     try {
       final historyResult = await connection.execute('''
         INSERT INTO price_history (card_id, price_date, price_usd)
-        SELECT id, CURRENT_DATE, price
+        SELECT id, CURRENT_DATE, COALESCE(price_usd, price)
         FROM cards
-        WHERE price IS NOT NULL AND price > 0
+        WHERE COALESCE(price_usd, price) > 0
         ON CONFLICT (card_id, price_date)
         DO UPDATE SET price_usd = EXCLUDED.price_usd
       ''');

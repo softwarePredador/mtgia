@@ -11,11 +11,6 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_LATEST_COVERAGE = Path(
-    "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/"
-    "battle-strategy-audit/latest/effect_coverage.json"
-)
-
 WAIVER_POLICIES: dict[str, dict[str, Any]] = {
     "cast_permission_not_explicit": {
         "status": "accepted_residual_contract",
@@ -107,7 +102,7 @@ BLOCKING_FLAGS = {"unknown_effect"}
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--coverage-json", type=Path, default=DEFAULT_LATEST_COVERAGE)
+    parser.add_argument("--coverage-json", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--json-output", type=Path)
     parser.add_argument("--fail-on-unaccepted", action="store_true")

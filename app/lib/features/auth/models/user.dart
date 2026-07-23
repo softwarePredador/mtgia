@@ -8,6 +8,7 @@ class User {
   final String? locationState;
   final String? locationCity;
   final String? tradeNotes;
+  final bool emailVerified;
 
   User({
     required this.id,
@@ -18,6 +19,7 @@ class User {
     this.locationState,
     this.locationCity,
     this.tradeNotes,
+    this.emailVerified = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class User {
       locationState: json['location_state'] as String?,
       locationCity: json['location_city'] as String?,
       tradeNotes: json['trade_notes'] as String?,
+      emailVerified: json['email_verified'] == true,
     );
   }
 
@@ -43,6 +46,7 @@ class User {
       'location_state': locationState,
       'location_city': locationCity,
       'trade_notes': tradeNotes,
+      'email_verified': emailVerified,
     };
   }
 
@@ -61,6 +65,7 @@ class User {
     String? locationState,
     String? locationCity,
     String? tradeNotes,
+    bool? emailVerified,
   }) {
     return User(
       id: id,
@@ -71,6 +76,7 @@ class User {
       locationState: locationState ?? this.locationState,
       locationCity: locationCity ?? this.locationCity,
       tradeNotes: tradeNotes ?? this.tradeNotes,
+      emailVerified: emailVerified ?? this.emailVerified,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/collection_availability_contract.dart';
 import '../../lib/notification_service.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
@@ -180,10 +181,12 @@ Future<Response> _createTrade(RequestContext context) async {
     }
 
     // Criar trade, itens e histórico em um único round-trip ao PostgreSQL remoto.
-    final tradeResult = await pool.runTx((session) async {
-      final participantIds = <String>[userId, receiverId]..sort();
-      final activeUsers = await session.execute(
-        Sql.named('''
+    late final Map<String, dynamic>? tradeResult;
+    try {
+      tradeResult = await pool.runTx((session) async {
+        final participantIds = <String>[userId, receiverId]..sort();
+        final activeUsers = await session.execute(
+          Sql.named('''
           SELECT id
           FROM users
           WHERE id = ANY(@participantIds::uuid[])
@@ -191,12 +194,39 @@ Future<Response> _createTrade(RequestContext context) async {
           ORDER BY id
           FOR UPDATE
         '''),
-        parameters: {'participantIds': participantIds},
-      );
-      if (activeUsers.length != 2) return null;
+          parameters: {'participantIds': participantIds},
+        );
+        if (activeUsers.length != 2) return null;
 
-      final result = await session.execute(
-        Sql.named('''
+        final binderItemIds =
+            <String>{
+                ...parsedMyItems.uniqueIds,
+                ...parsedRequestedItems.uniqueIds,
+              }.toList()
+              ..sort();
+        await session.execute(
+          Sql.named('''
+            SELECT id
+            FROM user_binder_items
+            WHERE id = ANY(@binderItemIds::uuid[])
+            ORDER BY id
+            FOR UPDATE
+          '''),
+          parameters: {'binderItemIds': binderItemIds},
+        );
+        await _requireTradeItemsAvailable(
+          session,
+          parsedMyItems.rows,
+          expectedOwnerId: userId,
+        );
+        await _requireTradeItemsAvailable(
+          session,
+          parsedRequestedItems.rows,
+          expectedOwnerId: receiverId,
+        );
+
+        final result = await session.execute(
+          Sql.named('''
         WITH offer AS (
           INSERT INTO trade_offers (
             sender_id,
@@ -288,43 +318,49 @@ Future<Response> _createTrade(RequestContext context) async {
           (SELECT COUNT(*)::int FROM requesting_items) AS requested_items_count
         FROM offer, history
       '''),
-        parameters: {
-          'senderId': userId,
-          'receiverId': receiverId,
-          'type': type,
-          'message': message,
-          'paymentAmount':
-              paymentAmount != null
-                  ? double.tryParse(paymentAmount.toString())
+          parameters: {
+            'senderId': userId,
+            'receiverId': receiverId,
+            'type': type,
+            'message': message,
+            'paymentAmount':
+                paymentAmount != null
+                    ? double.tryParse(paymentAmount.toString())
+                    : null,
+            'paymentMethod': paymentMethod,
+            'myItems': jsonEncode(parsedMyItems.rows),
+            'requestedItems': jsonEncode(parsedRequestedItems.rows),
+          },
+        );
+        final offer = result.first.toColumnMap();
+        final tradeId = offer['id'] as String;
+
+        if (offer['created_at'] is DateTime) {
+          offer['created_at'] =
+              (offer['created_at'] as DateTime).toIso8601String();
+        }
+
+        return {
+          'id': tradeId,
+          'status': offer['status'],
+          'type': offer['type'],
+          'message': offer['message'],
+          'payment_amount':
+              offer['payment_amount'] != null
+                  ? double.tryParse(offer['payment_amount'].toString())
                   : null,
-          'paymentMethod': paymentMethod,
-          'myItems': jsonEncode(parsedMyItems.rows),
-          'requestedItems': jsonEncode(parsedRequestedItems.rows),
-        },
+          'payment_currency': offer['payment_currency'],
+          'my_items_count': offer['my_items_count'],
+          'requested_items_count': offer['requested_items_count'],
+          'created_at': offer['created_at'],
+        };
+      });
+    } on _TradeAvailabilityFailure catch (failure) {
+      return Response.json(
+        statusCode: failure.statusCode,
+        body: {'error': failure.message, 'code': failure.code},
       );
-      final offer = result.first.toColumnMap();
-      final tradeId = offer['id'] as String;
-
-      if (offer['created_at'] is DateTime) {
-        offer['created_at'] =
-            (offer['created_at'] as DateTime).toIso8601String();
-      }
-
-      return {
-        'id': tradeId,
-        'status': offer['status'],
-        'type': offer['type'],
-        'message': offer['message'],
-        'payment_amount':
-            offer['payment_amount'] != null
-                ? double.tryParse(offer['payment_amount'].toString())
-                : null,
-        'payment_currency': offer['payment_currency'],
-        'my_items_count': offer['my_items_count'],
-        'requested_items_count': offer['requested_items_count'],
-        'created_at': offer['created_at'],
-      };
-    });
+    }
     if (tradeResult == null) {
       return Response.json(
         statusCode: HttpStatus.notFound,
@@ -393,6 +429,7 @@ _ParsedTradeItems _parseTradeItems(
 ) {
   final rows = <Map<String, dynamic>>[];
   final ids = <String>[];
+  final seenIds = <String>{};
 
   for (final item in items) {
     final binderItemId = item['binder_item_id'] as String?;
@@ -400,6 +437,9 @@ _ParsedTradeItems _parseTradeItems(
       return _ParsedTradeItems.error(
         'binder_item_id obrigatório em $fieldName',
       );
+    }
+    if (!seenIds.add(binderItemId)) {
+      return _ParsedTradeItems.error('binder_item_id duplicado em $fieldName');
     }
 
     final quantityRaw = item['quantity'];
@@ -429,6 +469,72 @@ _ParsedTradeItems _parseTradeItems(
   }
 
   return _ParsedTradeItems(rows: rows, uniqueIds: ids.toSet().toList());
+}
+
+Future<void> _requireTradeItemsAvailable(
+  Session session,
+  List<Map<String, dynamic>> requestedItems, {
+  required String expectedOwnerId,
+}) async {
+  if (requestedItems.isEmpty) return;
+  final ids =
+      requestedItems.map((item) => item['binder_item_id'] as String).toList();
+  final result = await session.execute(
+    Sql.named('''
+      SELECT
+        bi.id,
+        bi.user_id,
+        bi.for_trade,
+        bi.for_sale,
+        COALESCE(availability.available_quantity, 0)::int
+          AS available_quantity
+      FROM user_binder_items bi
+      LEFT JOIN binder_item_availability availability
+        ON availability.binder_item_id = bi.id
+      WHERE bi.id = ANY(@ids::uuid[])
+    '''),
+    parameters: {'ids': ids},
+  );
+  final availabilityById = <String, Map<String, dynamic>>{
+    for (final row in result)
+      row.toColumnMap()['id'].toString(): row.toColumnMap(),
+  };
+
+  for (final requested in requestedItems) {
+    final id = requested['binder_item_id'] as String;
+    final item = availabilityById[id];
+    if (item == null || item['user_id'].toString() != expectedOwnerId) {
+      throw const _TradeAvailabilityFailure(
+        HttpStatus.conflict,
+        'trade_inventory_changed',
+        'A coleção mudou; atualize os itens antes de criar a proposta',
+      );
+    }
+    if (item['for_trade'] != true && item['for_sale'] != true) {
+      throw const _TradeAvailabilityFailure(
+        HttpStatus.conflict,
+        'trade_item_not_listed',
+        'Um ou mais itens deixaram de estar disponíveis para troca/venda',
+      );
+    }
+    final requestedQuantity = collectionQuantity(requested['quantity']);
+    final availableQuantity = collectionQuantity(item['available_quantity']);
+    if (requestedQuantity > availableQuantity) {
+      throw const _TradeAvailabilityFailure(
+        HttpStatus.conflict,
+        'trade_quantity_unavailable',
+        'A quantidade livre mudou; atualize a proposta e tente novamente',
+      );
+    }
+  }
+}
+
+class _TradeAvailabilityFailure implements Exception {
+  const _TradeAvailabilityFailure(this.statusCode, this.code, this.message);
+
+  final int statusCode;
+  final String code;
+  final String message;
 }
 
 class _ParsedTradeItems {

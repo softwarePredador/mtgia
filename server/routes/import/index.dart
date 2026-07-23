@@ -3,7 +3,9 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_rules_service.dart';
+import '../../lib/deck_format_support.dart';
 import '../../lib/deck_import_review_contract.dart';
+import '../../lib/deck_request_support.dart';
 import '../../lib/deck_validation_state_support.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/import_card_lookup_service.dart';
@@ -44,18 +46,32 @@ Future<Response> _importDeck(RequestContext context) async {
   final userId = context.read<String>();
   final pool = context.read<Pool>();
 
-  final body = await context.request.json();
-  final name = body['name'] as String?;
-  final format = body['format'] as String?;
-  final description = body['description'] as String?;
-  final commanderName = body['commander'] as String?;
-  final rawList = body['list'];
-
-  if (name == null || format == null || rawList == null) {
-    return badRequest('Fields name, format, and list are required.');
+  late final String name;
+  late final String normalizedFormat;
+  late final String? description;
+  late final String? commanderName;
+  late final Object rawList;
+  try {
+    final body = requireJsonObject(await context.request.json());
+    name = requireNonEmptyString(body, 'name');
+    final rawFormat = requireNonEmptyString(body, 'format');
+    final supportedFormat = normalizeSupportedDeckFormat(rawFormat);
+    if (supportedFormat == null) {
+      throw DeckRequestException(unsupportedDeckFormatMessage(rawFormat));
+    }
+    normalizedFormat = supportedFormat;
+    description = readOptionalString(body, 'description');
+    commanderName = readOptionalString(body, 'commander', trim: true);
+    final listValue = body['list'];
+    if (listValue == null) {
+      throw const DeckRequestException('Field list is required.');
+    }
+    rawList = listValue;
+  } on FormatException catch (e) {
+    return badRequest('Invalid JSON body: ${e.message}');
+  } on DeckRequestException catch (e) {
+    return badRequest(e.message);
   }
-
-  final normalizedFormat = format.trim().toLowerCase();
 
   late final List<String> lines;
   try {

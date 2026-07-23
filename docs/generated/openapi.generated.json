@@ -1,0 +1,3839 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ManaLoom structural API contract",
+    "version": "1.0.0",
+    "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
+  },
+  "x-manaloom-source-digest-sha256": "9f8256311fc4d7e8d1d61c0a7b0875cfef2cba6f6124e641d3db610d55473cca",
+  "x-manaloom-unresolved-method-paths": [],
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "get",
+        "summary": "GET /",
+        "tags": [
+          "root"
+        ],
+        "x-manaloom-source": "server/routes/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/archetypes": {
+      "post": {
+        "operationId": "postAiArchetypes",
+        "summary": "POST /ai/archetypes",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/archetypes/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/commander-learning": {
+      "get": {
+        "operationId": "getAiCommanderLearning",
+        "summary": "GET /ai/commander-learning",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/commander-learning/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/commander-reference": {
+      "get": {
+        "operationId": "getAiCommanderReference",
+        "summary": "GET /ai/commander-reference",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/commander-reference/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/explain": {
+      "post": {
+        "operationId": "postAiExplain",
+        "summary": "POST /ai/explain",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/explain/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/generate": {
+      "post": {
+        "operationId": "postAiGenerate",
+        "summary": "POST /ai/generate",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/generate/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/generate/jobs/{id}": {
+      "delete": {
+        "operationId": "deleteAiGenerateJobsId",
+        "summary": "DELETE /ai/generate/jobs/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/generate/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getAiGenerateJobsId",
+        "summary": "GET /ai/generate/jobs/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/generate/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/ml-status": {
+      "get": {
+        "operationId": "getAiMlStatus",
+        "summary": "GET /ai/ml-status",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/ml-status/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/optimize": {
+      "post": {
+        "operationId": "postAiOptimize",
+        "summary": "POST /ai/optimize",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/optimize/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/optimize/jobs/{id}": {
+      "delete": {
+        "operationId": "deleteAiOptimizeJobsId",
+        "summary": "DELETE /ai/optimize/jobs/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/optimize/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getAiOptimizeJobsId",
+        "summary": "GET /ai/optimize/jobs/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/optimize/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/optimize/telemetry": {
+      "get": {
+        "operationId": "getAiOptimizeTelemetry",
+        "summary": "GET /ai/optimize/telemetry",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/optimize/telemetry/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/rebuild": {
+      "post": {
+        "operationId": "postAiRebuild",
+        "summary": "POST /ai/rebuild",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/rebuild/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/simulate": {
+      "post": {
+        "operationId": "postAiSimulate",
+        "summary": "POST /ai/simulate",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/simulate/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/simulate-matchup": {
+      "post": {
+        "operationId": "postAiSimulateMatchup",
+        "summary": "POST /ai/simulate-matchup",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/simulate-matchup/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/weakness-analysis": {
+      "post": {
+        "operationId": "postAiWeaknessAnalysis",
+        "summary": "POST /ai/weakness-analysis",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/weakness-analysis/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/core/widgets/platform_unavailable_screen_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "operationId": "postAuthChangePassword",
+        "summary": "POST /auth/change-password",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/change-password.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "postAuthForgotPassword",
+        "summary": "POST /auth/forgot-password",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/forgot-password.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "postAuthLogin",
+        "summary": "POST /auth/login",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/login.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "getAuthMe",
+        "summary": "GET /auth/me",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/me.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "postAuthRegister",
+        "summary": "POST /auth/register",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/register.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/resend-verification": {
+      "post": {
+        "operationId": "postAuthResendVerification",
+        "summary": "POST /auth/resend-verification",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/resend-verification.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "operationId": "postAuthResetPassword",
+        "summary": "POST /auth/reset-password",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/reset-password.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/revoke-sessions": {
+      "post": {
+        "operationId": "postAuthRevokeSessions",
+        "summary": "POST /auth/revoke-sessions",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/revoke-sessions.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "operationId": "postAuthVerifyEmail",
+        "summary": "POST /auth/verify-email",
+        "tags": [
+          "auth"
+        ],
+        "x-manaloom-source": "server/routes/auth/verify-email.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+          "app/test/core/security/auth_token_store_test.dart",
+          "app/test/features/auth/providers/auth_provider_initialize_test.dart",
+          "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
+          "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_security_test.dart",
+          "app/test/features/auth/screens/auth_screens_test.dart",
+          "app/test/tool/authenticated_visual_diff_test.dart",
+          "app/test/ui/manaloom_auth_ui_audit_test.dart",
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/billing/webhook": {
+      "post": {
+        "operationId": "postBillingWebhook",
+        "summary": "POST /billing/webhook",
+        "tags": [
+          "billing"
+        ],
+        "x-manaloom-source": "server/routes/billing/webhook/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/binder": {
+      "get": {
+        "operationId": "getBinder",
+        "summary": "GET /binder",
+        "tags": [
+          "binder"
+        ],
+        "x-manaloom-source": "server/routes/binder/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_dashboard_runtime_test.dart",
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/providers/binder_provider_test.dart",
+          "app/test/features/binder/screens/binder_screen_overflow_test.dart",
+          "app/test/features/binder/screens/binder_screen_resilience_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "server/test/binder_item_contract_test.dart",
+          "server/test/binder_route_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postBinder",
+        "summary": "POST /binder",
+        "tags": [
+          "binder"
+        ],
+        "x-manaloom-source": "server/routes/binder/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_dashboard_runtime_test.dart",
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/providers/binder_provider_test.dart",
+          "app/test/features/binder/screens/binder_screen_overflow_test.dart",
+          "app/test/features/binder/screens/binder_screen_resilience_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "server/test/binder_item_contract_test.dart",
+          "server/test/binder_route_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/binder/{id}": {
+      "delete": {
+        "operationId": "deleteBinderId",
+        "summary": "DELETE /binder/{id}",
+        "tags": [
+          "binder"
+        ],
+        "x-manaloom-source": "server/routes/binder/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_dashboard_runtime_test.dart",
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/providers/binder_provider_test.dart",
+          "app/test/features/binder/screens/binder_screen_overflow_test.dart",
+          "app/test/features/binder/screens/binder_screen_resilience_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "server/test/binder_item_contract_test.dart",
+          "server/test/binder_route_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getBinderId",
+        "summary": "GET /binder/{id}",
+        "tags": [
+          "binder"
+        ],
+        "x-manaloom-source": "server/routes/binder/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_dashboard_runtime_test.dart",
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/providers/binder_provider_test.dart",
+          "app/test/features/binder/screens/binder_screen_overflow_test.dart",
+          "app/test/features/binder/screens/binder_screen_resilience_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "server/test/binder_item_contract_test.dart",
+          "server/test/binder_route_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "put": {
+        "operationId": "putBinderId",
+        "summary": "PUT /binder/{id}",
+        "tags": [
+          "binder"
+        ],
+        "x-manaloom-source": "server/routes/binder/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_dashboard_runtime_test.dart",
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/providers/binder_provider_test.dart",
+          "app/test/features/binder/screens/binder_screen_overflow_test.dart",
+          "app/test/features/binder/screens/binder_screen_resilience_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "server/test/binder_item_contract_test.dart",
+          "server/test/binder_route_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/cards": {
+      "get": {
+        "operationId": "getCards",
+        "summary": "GET /cards",
+        "tags": [
+          "cards"
+        ],
+        "x-manaloom-source": "server/routes/cards/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_add_cards_menu_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_environment.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_fallback.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/cards/printings": {
+      "get": {
+        "operationId": "getCardsPrintings",
+        "summary": "GET /cards/printings",
+        "tags": [
+          "cards"
+        ],
+        "x-manaloom-source": "server/routes/cards/printings/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_add_cards_menu_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_environment.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_fallback.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/cards/resolve": {
+      "post": {
+        "operationId": "postCardsResolve",
+        "summary": "POST /cards/resolve",
+        "tags": [
+          "cards"
+        ],
+        "x-manaloom-source": "server/routes/cards/resolve/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_add_cards_menu_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_environment.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_fallback.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/cards/resolve/batch": {
+      "post": {
+        "operationId": "postCardsResolveBatch",
+        "summary": "POST /cards/resolve/batch",
+        "tags": [
+          "cards"
+        ],
+        "x-manaloom-source": "server/routes/cards/resolve/batch/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_add_cards_menu_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_environment.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_fallback.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/cards/{id}/rulings": {
+      "get": {
+        "operationId": "getCardsIdRulings",
+        "summary": "GET /cards/{id}/rulings",
+        "tags": [
+          "cards"
+        ],
+        "x-manaloom-source": "server/routes/cards/[id]/rulings/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_native_player_state_hidden_counter_visible_cards_autokill_fallback_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_hidden_counter_visible_cards_live_smoke_test.dart",
+          "app/integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_add_cards_menu_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_environment.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_known_cards_runtime_fallback.py"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/binders/{userId}": {
+      "get": {
+        "operationId": "getCommunityBindersUserId",
+        "summary": "GET /community/binders/{userId}",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/binders/[userId].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/decks": {
+      "get": {
+        "operationId": "getCommunityDecks",
+        "summary": "GET /community/decks",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/decks/{id}": {
+      "get": {
+        "operationId": "getCommunityDecksId",
+        "summary": "GET /community/decks/{id}",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postCommunityDecksId",
+        "summary": "POST /community/decks/{id}",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/decks/{id}/comments": {
+      "get": {
+        "operationId": "getCommunityDecksIdComments",
+        "summary": "GET /community/decks/{id}/comments",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/[id]/comments/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postCommunityDecksIdComments",
+        "summary": "POST /community/decks/{id}/comments",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/[id]/comments/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/decks/{id}/reports": {
+      "post": {
+        "operationId": "postCommunityDecksIdReports",
+        "summary": "POST /community/decks/{id}/reports",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/decks/[id]/reports/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/marketplace": {
+      "get": {
+        "operationId": "getCommunityMarketplace",
+        "summary": "GET /community/marketplace",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/marketplace/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/trade-matches": {
+      "get": {
+        "operationId": "getCommunityTradeMatches",
+        "summary": "GET /community/trade-matches",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/trade-matches/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/users": {
+      "get": {
+        "operationId": "getCommunityUsers",
+        "summary": "GET /community/users",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/users/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/community/users/{id}": {
+      "get": {
+        "operationId": "getCommunityUsersId",
+        "summary": "GET /community/users/{id}",
+        "tags": [
+          "community"
+        ],
+        "x-manaloom-source": "server/routes/community/users/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/profile_community_runtime_test.dart",
+          "app/test/features/community/providers/community_provider_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/community/screens/community_screen_responsive_test.dart",
+          "server/test/community_engagement_contract_test.dart",
+          "server/test/deck_pricing_export_community_contract_test.dart",
+          "server/test/profile_community_live_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/conversations": {
+      "get": {
+        "operationId": "getConversations",
+        "summary": "GET /conversations",
+        "tags": [
+          "conversations"
+        ],
+        "x-manaloom-source": "server/routes/conversations/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postConversations",
+        "summary": "POST /conversations",
+        "tags": [
+          "conversations"
+        ],
+        "x-manaloom-source": "server/routes/conversations/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/conversations/unread-count": {
+      "get": {
+        "operationId": "getConversationsUnreadCount",
+        "summary": "GET /conversations/unread-count",
+        "tags": [
+          "conversations"
+        ],
+        "x-manaloom-source": "server/routes/conversations/unread-count.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/conversations/{id}/messages": {
+      "get": {
+        "operationId": "getConversationsIdMessages",
+        "summary": "GET /conversations/{id}/messages",
+        "tags": [
+          "conversations"
+        ],
+        "x-manaloom-source": "server/routes/conversations/[id]/messages.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postConversationsIdMessages",
+        "summary": "POST /conversations/{id}/messages",
+        "tags": [
+          "conversations"
+        ],
+        "x-manaloom-source": "server/routes/conversations/[id]/messages.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/conversations/{id}/read": {
+      "put": {
+        "operationId": "putConversationsIdRead",
+        "summary": "PUT /conversations/{id}/read",
+        "tags": [
+          "conversations"
+        ],
+        "x-manaloom-source": "server/routes/conversations/[id]/read.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks": {
+      "get": {
+        "operationId": "getDecks",
+        "summary": "GET /decks",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postDecks",
+        "summary": "POST /decks",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}": {
+      "delete": {
+        "operationId": "deleteDecksId",
+        "summary": "DELETE /decks/{id}",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getDecksId",
+        "summary": "GET /decks/{id}",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "put": {
+        "operationId": "putDecksId",
+        "summary": "PUT /decks/{id}",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/ai-analysis": {
+      "post": {
+        "operationId": "postDecksIdAiAnalysis",
+        "summary": "POST /decks/{id}/ai-analysis",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/ai-analysis/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/analysis": {
+      "get": {
+        "operationId": "getDecksIdAnalysis",
+        "summary": "GET /decks/{id}/analysis",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/analysis/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/battle-replays": {
+      "get": {
+        "operationId": "getDecksIdBattleReplays",
+        "summary": "GET /decks/{id}/battle-replays",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/battle-replays/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/battle-replays/{replayId}": {
+      "get": {
+        "operationId": "getDecksIdBattleReplaysReplayId",
+        "summary": "GET /decks/{id}/battle-replays/{replayId}",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/battle-replays/[replayId]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "replayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/cards": {
+      "post": {
+        "operationId": "postDecksIdCards",
+        "summary": "POST /decks/{id}/cards",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/cards/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/cards/bulk": {
+      "post": {
+        "operationId": "postDecksIdCardsBulk",
+        "summary": "POST /decks/{id}/cards/bulk",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/cards/bulk/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/cards/replace": {
+      "post": {
+        "operationId": "postDecksIdCardsReplace",
+        "summary": "POST /decks/{id}/cards/replace",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/cards/replace/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/cards/set": {
+      "post": {
+        "operationId": "postDecksIdCardsSet",
+        "summary": "POST /decks/{id}/cards/set",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/cards/set/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/export": {
+      "get": {
+        "operationId": "getDecksIdExport",
+        "summary": "GET /decks/{id}/export",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/export/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/optimizations/{eventId}/rollback": {
+      "post": {
+        "operationId": "postDecksIdOptimizationsEventIdRollback",
+        "summary": "POST /decks/{id}/optimizations/{eventId}/rollback",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/post-game-notes": {
+      "get": {
+        "operationId": "getDecksIdPostGameNotes",
+        "summary": "GET /decks/{id}/post-game-notes",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/post-game-notes/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postDecksIdPostGameNotes",
+        "summary": "POST /decks/{id}/post-game-notes",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/post-game-notes/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/post-game-notes/{noteId}": {
+      "delete": {
+        "operationId": "deleteDecksIdPostGameNotesNoteId",
+        "summary": "DELETE /decks/{id}/post-game-notes/{noteId}",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/post-game-timeline": {
+      "get": {
+        "operationId": "getDecksIdPostGameTimeline",
+        "summary": "GET /decks/{id}/post-game-timeline",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/post-game-timeline/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/pricing": {
+      "post": {
+        "operationId": "postDecksIdPricing",
+        "summary": "POST /decks/{id}/pricing",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/pricing/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/recommendations": {
+      "post": {
+        "operationId": "postDecksIdRecommendations",
+        "summary": "POST /decks/{id}/recommendations",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/recommendations/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/reports": {
+      "post": {
+        "operationId": "postDecksIdReports",
+        "summary": "POST /decks/{id}/reports",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/reports/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/simulate": {
+      "get": {
+        "operationId": "getDecksIdSimulate",
+        "summary": "GET /decks/{id}/simulate",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/simulate/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/validate": {
+      "post": {
+        "operationId": "postDecksIdValidate",
+        "summary": "POST /decks/{id}/validate",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/validate/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "summary": "GET /health",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health/ai-history": {
+      "get": {
+        "operationId": "getHealthAiHistory",
+        "summary": "GET /health/ai-history",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/ai-history/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health/commercial": {
+      "get": {
+        "operationId": "getHealthCommercial",
+        "summary": "GET /health/commercial",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/commercial/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health/dashboard": {
+      "get": {
+        "operationId": "getHealthDashboard",
+        "summary": "GET /health/dashboard",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/dashboard/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health/live": {
+      "get": {
+        "operationId": "getHealthLive",
+        "summary": "GET /health/live",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/live/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health/metrics": {
+      "get": {
+        "operationId": "getHealthMetrics",
+        "summary": "GET /health/metrics",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/metrics/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "getHealthReady",
+        "summary": "GET /health/ready",
+        "tags": [
+          "health"
+        ],
+        "x-manaloom-source": "server/routes/health/ready/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "server/test/health_readiness_support_test.dart",
+          "server/test/hermes_lab_healthcheck_test.py"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/import": {
+      "post": {
+        "operationId": "postImport",
+        "summary": "POST /import",
+        "tags": [
+          "import"
+        ],
+        "x-manaloom-source": "server/routes/import/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/localized_import_runtime_test.dart",
+          "app/test/features/decks/screens/deck_import_screen_test.dart",
+          "app/test/features/decks/widgets/deck_import_list_dialog_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_external_candidate_identity_import_preflight.py",
+          "server/test/deck_import_review_contract_test.dart",
+          "server/test/external_commander_meta_import_support_test.dart",
+          "server/test/import_list_service_test.dart",
+          "server/test/import_parser_test.dart",
+          "server/test/import_to_deck_flow_test.dart",
+          "server/test/import_to_deck_merge_support_test.dart",
+          "server/test/run_import_resolution_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/import/to-deck": {
+      "post": {
+        "operationId": "postImportToDeck",
+        "summary": "POST /import/to-deck",
+        "tags": [
+          "import"
+        ],
+        "x-manaloom-source": "server/routes/import/to-deck/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/localized_import_runtime_test.dart",
+          "app/test/features/decks/screens/deck_import_screen_test.dart",
+          "app/test/features/decks/widgets/deck_import_list_dialog_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_external_candidate_identity_import_preflight.py",
+          "server/test/deck_import_review_contract_test.dart",
+          "server/test/external_commander_meta_import_support_test.dart",
+          "server/test/import_list_service_test.dart",
+          "server/test/import_parser_test.dart",
+          "server/test/import_to_deck_flow_test.dart",
+          "server/test/import_to_deck_merge_support_test.dart",
+          "server/test/run_import_resolution_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/import/validate": {
+      "post": {
+        "operationId": "postImportValidate",
+        "summary": "POST /import/validate",
+        "tags": [
+          "import"
+        ],
+        "x-manaloom-source": "server/routes/import/validate/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/localized_import_runtime_test.dart",
+          "app/test/features/decks/screens/deck_import_screen_test.dart",
+          "app/test/features/decks/widgets/deck_import_list_dialog_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_external_candidate_identity_import_preflight.py",
+          "server/test/deck_import_review_contract_test.dart",
+          "server/test/external_commander_meta_import_support_test.dart",
+          "server/test/import_list_service_test.dart",
+          "server/test/import_parser_test.dart",
+          "server/test/import_to_deck_flow_test.dart",
+          "server/test/import_to_deck_merge_support_test.dart",
+          "server/test/run_import_resolution_test.py"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/market/card/{cardId}": {
+      "get": {
+        "operationId": "getMarketCardCardId",
+        "summary": "GET /market/card/{cardId}",
+        "tags": [
+          "market"
+        ],
+        "x-manaloom-source": "server/routes/market/card/[cardId].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
+          "app/test/features/market/screens/market_screen_responsive_test.dart",
+          "server/test/market_movers_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/market/movers": {
+      "get": {
+        "operationId": "getMarketMovers",
+        "summary": "GET /market/movers",
+        "tags": [
+          "market"
+        ],
+        "x-manaloom-source": "server/routes/market/movers/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+          "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
+          "app/test/features/market/screens/market_screen_responsive_test.dart",
+          "server/test/market_movers_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "operationId": "getNotifications",
+        "summary": "GET /notifications",
+        "tags": [
+          "notifications"
+        ],
+        "x-manaloom-source": "server/routes/notifications/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/realtime_notifications_runtime_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/notifications/count": {
+      "get": {
+        "operationId": "getNotificationsCount",
+        "summary": "GET /notifications/count",
+        "tags": [
+          "notifications"
+        ],
+        "x-manaloom-source": "server/routes/notifications/count.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/realtime_notifications_runtime_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/notifications/read-all": {
+      "put": {
+        "operationId": "putNotificationsReadAll",
+        "summary": "PUT /notifications/read-all",
+        "tags": [
+          "notifications"
+        ],
+        "x-manaloom-source": "server/routes/notifications/read-all.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/realtime_notifications_runtime_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/notifications/{id}/read": {
+      "put": {
+        "operationId": "putNotificationsIdRead",
+        "summary": "PUT /notifications/{id}/read",
+        "tags": [
+          "notifications"
+        ],
+        "x-manaloom-source": "server/routes/notifications/[id]/read.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/realtime_notifications_runtime_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "getReady",
+        "summary": "GET /ready",
+        "tags": [
+          "ready"
+        ],
+        "x-manaloom-source": "server/routes/ready/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/reports/{id}": {
+      "get": {
+        "operationId": "getReportsId",
+        "summary": "GET /reports/{id}",
+        "tags": [
+          "reports"
+        ],
+        "x-manaloom-source": "server/routes/reports/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/rules": {
+      "get": {
+        "operationId": "getRules",
+        "summary": "GET /rules",
+        "tags": [
+          "rules"
+        ],
+        "x-manaloom-source": "server/routes/rules/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_manual_preserve.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py",
+          "server/bin/test_auto_promote_battle_rules.py",
+          "server/test/deck_rules_service_identity_test.dart",
+          "server/test/deck_rules_service_test.dart",
+          "server/test/magic_rules_source_test.dart",
+          "server/test/mtg_rules_validation_test.dart",
+          "server/test/optimization_rules_test.dart",
+          "server/test/sync_rules_safety_test.dart",
+          "server/test/theme_contextual_rules_service_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/sets": {
+      "get": {
+        "operationId": "getSets",
+        "summary": "GET /sets",
+        "tags": [
+          "sets"
+        ],
+        "x-manaloom-source": "server/routes/sets/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/sets_catalog_runtime_test.dart",
+          "app/integration_test/sets_search_catalog_runtime_test.dart",
+          "app/test/features/collection/sets_catalog_screen_test.dart",
+          "server/test/sets_route_test.dart"
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/trades": {
+      "get": {
+        "operationId": "getTrades",
+        "summary": "GET /trades",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postTrades",
+        "summary": "POST /trades",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/trades/{id}": {
+      "get": {
+        "operationId": "getTradesId",
+        "summary": "GET /trades/{id}",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/trades/{id}/messages": {
+      "get": {
+        "operationId": "getTradesIdMessages",
+        "summary": "GET /trades/{id}/messages",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/[id]/messages.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postTradesIdMessages",
+        "summary": "POST /trades/{id}/messages",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/[id]/messages.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/trades/{id}/respond": {
+      "put": {
+        "operationId": "putTradesIdRespond",
+        "summary": "PUT /trades/{id}/respond",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/[id]/respond.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/trades/{id}/status": {
+      "put": {
+        "operationId": "putTradesIdStatus",
+        "summary": "PUT /trades/{id}/status",
+        "tags": [
+          "trades"
+        ],
+        "x-manaloom-source": "server/routes/trades/[id]/status.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "delete": {
+        "operationId": "deleteUsersMe",
+        "summary": "DELETE /users/me",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getUsersMe",
+        "summary": "GET /users/me",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchUsersMe",
+        "summary": "PATCH /users/me",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/me/activation-events": {
+      "get": {
+        "operationId": "getUsersMeActivationEvents",
+        "summary": "GET /users/me/activation-events",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/activation-events/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postUsersMeActivationEvents",
+        "summary": "POST /users/me/activation-events",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/activation-events/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/me/export": {
+      "get": {
+        "operationId": "getUsersMeExport",
+        "summary": "GET /users/me/export",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/export/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/me/fcm-token": {
+      "delete": {
+        "operationId": "deleteUsersMeFcmToken",
+        "summary": "DELETE /users/me/fcm-token",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/fcm-token/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "put": {
+        "operationId": "putUsersMeFcmToken",
+        "summary": "PUT /users/me/fcm-token",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/fcm-token/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/me/plan": {
+      "get": {
+        "operationId": "getUsersMePlan",
+        "summary": "GET /users/me/plan",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/plan/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/me/plan/checkout": {
+      "post": {
+        "operationId": "postUsersMePlanCheckout",
+        "summary": "POST /users/me/plan/checkout",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/me/plan/checkout/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/{id}/follow": {
+      "delete": {
+        "operationId": "deleteUsersIdFollow",
+        "summary": "DELETE /users/{id}/follow",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/follow/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getUsersIdFollow",
+        "summary": "GET /users/{id}/follow",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/follow/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postUsersIdFollow",
+        "summary": "POST /users/{id}/follow",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/follow/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/{id}/followers": {
+      "get": {
+        "operationId": "getUsersIdFollowers",
+        "summary": "GET /users/{id}/followers",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/followers/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/users/{id}/following": {
+      "get": {
+        "operationId": "getUsersIdFollowing",
+        "summary": "GET /users/{id}/following",
+        "tags": [
+          "users"
+        ],
+        "x-manaloom-source": "server/routes/users/[id]/following/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    }
+  }
+}

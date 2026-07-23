@@ -41,7 +41,12 @@ class _LifeCounterNativeDayNightSheetState
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: AppTheme.backgroundAbyss,
@@ -60,7 +65,12 @@ class _LifeCounterNativeDayNightSheetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  AppTheme.space20,
+                  AppTheme.space18,
+                  AppTheme.space20,
+                  AppTheme.space8,
+                ),
                 child: Row(
                   children: [
                     const Expanded(
@@ -75,7 +85,7 @@ class _LifeCounterNativeDayNightSheetState
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SizedBox(height: 6),
+                          SizedBox(height: AppTheme.space6),
                           Text(
                             'Defina o estado atual de dia ou noite.',
                             style: TextStyle(
@@ -98,7 +108,12 @@ class _LifeCounterNativeDayNightSheetState
               ),
               const Divider(height: 1, color: AppTheme.outlineMuted),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                padding: const EdgeInsets.fromLTRB(
+                  AppTheme.space20,
+                  AppTheme.space18,
+                  AppTheme.space20,
+                  AppTheme.space18,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -122,7 +137,7 @@ class _LifeCounterNativeDayNightSheetState
                         });
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     Text(
                       _isNight
                           ? 'Noite está ativa na mesa.'
@@ -140,7 +155,12 @@ class _LifeCounterNativeDayNightSheetState
               ),
               const Divider(height: 1, color: AppTheme.outlineMuted),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                padding: const EdgeInsets.fromLTRB(
+                  AppTheme.space20,
+                  AppTheme.space14,
+                  AppTheme.space20,
+                  AppTheme.space18,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -149,23 +169,26 @@ class _LifeCounterNativeDayNightSheetState
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.textSecondary,
                           side: const BorderSide(color: AppTheme.outlineMuted),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppTheme.space14,
+                          ),
                         ),
                         child: const Text('Cancelar'),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppTheme.space12),
                     Expanded(
                       child: FilledButton(
                         key: const Key('life-counter-native-day-night-apply'),
-                        onPressed:
-                            () => Navigator.of(
-                              context,
-                            ).pop(LifeCounterDayNightState(isNight: _isNight)),
+                        onPressed: () => Navigator.of(
+                          context,
+                        ).pop(LifeCounterDayNightState(isNight: _isNight)),
                         style: FilledButton.styleFrom(
                           backgroundColor: AppTheme.brass500,
                           foregroundColor: AppTheme.backgroundAbyss,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppTheme.space14,
+                          ),
                         ),
                         child: const Text('Aplicar'),
                       ),

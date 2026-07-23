@@ -16,9 +16,13 @@ import 'core/widgets/debug_accessibility_tools.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
 import 'features/decks/providers/deck_provider.dart';
+import 'features/decks/models/deck_card_item.dart';
 import 'features/auth/screens/splash_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
+import 'features/auth/screens/forgot_password_screen.dart';
+import 'features/auth/screens/reset_password_screen.dart';
+import 'features/auth/screens/verify_email_screen.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/auth_redirect.dart';
 
@@ -30,6 +34,8 @@ import 'features/decks/screens/deck_import_screen.dart';
 
 import 'features/cards/providers/card_provider.dart';
 import 'features/cards/screens/card_search_screen.dart';
+import 'features/cards/screens/card_detail_screen.dart';
+import 'features/battle/screens/battle_replays_screen.dart';
 import 'features/market/providers/market_provider.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/scanner/screens/card_scanner_screen.dart';
@@ -227,7 +233,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // go_router keeps imperative pushes out of the browser URL by default.
+    // ManaLoom uses push for drill-down screens, so reflecting those pushes is
+    // required for reload, browser back/forward, bookmarks, and shared links.
+    GoRouter.optionURLReflectsImperativeAPIs = true;
     _authProvider = AuthProvider();
+    ApiClient.setSessionExpiredHandler(_authProvider.expireSession);
     _deckProvider = DeckProvider();
     _cardProvider = CardProvider();
     _marketProvider = MarketProvider();
@@ -268,10 +279,15 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
           return null;
         }
 
-        final isAuthRoute = location == '/login' || location == '/register';
+        final isAuthRoute =
+            location == '/login' ||
+            location == '/register' ||
+            location == '/forgot-password' ||
+            location == '/reset-password';
         final isProtectedRoute =
             location.startsWith('/home') ||
             location.startsWith('/decks') ||
+            location.startsWith('/cards') ||
             location.startsWith('/market') ||
             location.startsWith('/collection') ||
             location.startsWith('/profile') ||
@@ -282,7 +298,6 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             location.startsWith('/plans') ||
             location.startsWith('/upgrade') ||
             location.startsWith('/checkout') ||
-            location.startsWith('/legal') ||
             location.startsWith('/onboarding') ||
             location.startsWith(lifeCounterRoutePath);
 
@@ -293,15 +308,19 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
               location == '/' ||
               location == '/login' ||
               location == '/register' ||
+              location == '/forgot-password' ||
+              location == '/reset-password' ||
+              location == '/verify-email' ||
+              location == '/legal' ||
               (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
           if (!isBootSafeRoute) {
             final redirectTarget = state.uri.toString();
-            final splashUri =
-                Uri(
-                  path: '/',
-                  queryParameters:
-                      isProtectedRoute ? {'redirect': redirectTarget} : null,
-                ).toString();
+            final splashUri = Uri(
+              path: '/',
+              queryParameters: isProtectedRoute
+                  ? {'redirect': redirectTarget}
+                  : null,
+            ).toString();
             debugPrint(
               '[🧭 Router] → splash de autenticação '
               '(status=$status, aguardando auth)',
@@ -322,11 +341,30 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
           return loginLocation;
         }
 
+        if (location == '/register' &&
+            _authProvider.isAuthenticated &&
+            _authProvider.user?.emailVerified == false) {
+          final redirectPath = normalizePostAuthRedirect(
+            state.uri.queryParameters['redirect'],
+          );
+          final verifyLocation = Uri(
+            path: '/verify-email',
+            queryParameters: redirectPath == null
+                ? null
+                : {'redirect': redirectPath},
+          ).toString();
+          debugPrint('[🧭 Router] → verificar email após cadastro');
+          return verifyLocation;
+        }
+
         if (isAuthRoute && _authProvider.isAuthenticated) {
           final postAuthRedirect = normalizePostAuthRedirect(
             state.uri.queryParameters['redirect'],
           );
-          final target = postAuthRedirect ?? '/home';
+          final target = resolveAuthenticatedLocation(
+            redirectPath: postAuthRedirect,
+            defaultLocation: _authProvider.defaultAuthenticatedLocation,
+          );
           debugPrint('[🧭 Router] → rota autenticada resolvida');
           return target;
         }
@@ -347,34 +385,53 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       routes: [
         GoRoute(
           path: '/',
-          builder:
-              (context, state) => SplashScreen(
-                redirectPath: state.uri.queryParameters['redirect'],
-              ),
+          builder: (context, state) =>
+              SplashScreen(redirectPath: state.uri.queryParameters['redirect']),
         ),
 
         GoRoute(
           path: '/login',
-          builder:
-              (context, state) => LoginScreen(
-                redirectPath: state.uri.queryParameters['redirect'],
-              ),
+          builder: (context, state) =>
+              LoginScreen(redirectPath: state.uri.queryParameters['redirect']),
         ),
         GoRoute(
           path: '/register',
-          builder:
-              (context, state) => RegisterScreen(
-                redirectPath: state.uri.queryParameters['redirect'],
-              ),
+          builder: (context, state) => RegisterScreen(
+            redirectPath: state.uri.queryParameters['redirect'],
+          ),
+        ),
+        GoRoute(
+          path: '/forgot-password',
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+        GoRoute(
+          path: '/reset-password',
+          builder: (context, state) => ResetPasswordScreen(
+            token: state.uri.queryParameters['token'] ?? '',
+          ),
+        ),
+        GoRoute(
+          path: '/legal',
+          builder: (context, state) => const CommercialLegalScreen(),
+        ),
+        GoRoute(
+          path: '/verify-email',
+          builder: (context, state) => VerifyEmailScreen(
+            token: state.uri.queryParameters['token'] ?? '',
+            redirectPath: state.uri.queryParameters['redirect'],
+          ),
         ),
 
         GoRoute(
           path: lifeCounterRoutePath,
-          builder:
-              (context, state) => LotusLifeCounterScreen(
-                deckId: state.uri.queryParameters['deckId'],
-                deckName: state.uri.queryParameters['deckName'],
-              ),
+          builder: (context, state) => LotusLifeCounterScreen(
+            deckId: state.uri.queryParameters['deckId'],
+            deckName: state.uri.queryParameters['deckName'],
+            deckSnapshotHash: state.uri.queryParameters['deckSnapshotHash'],
+            deckVersionAtEpochMs: int.tryParse(
+              state.uri.queryParameters['deckVersionAt'] ?? '',
+            ),
+          ),
         ),
 
         ShellRoute(
@@ -388,7 +445,15 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             ),
             GoRoute(
               path: '/onboarding/core-flow',
-              builder: (context, state) => const OnboardingCoreFlowScreen(),
+              builder: (context, state) {
+                final auth = context.read<AuthProvider>();
+                return OnboardingCoreFlowScreen(
+                  userId: auth.user?.id ?? '',
+                  initialStorageWarning:
+                      state.uri.queryParameters['storage'] == 'unavailable',
+                  onSettled: auth.markOnboardingSettled,
+                );
+              },
             ),
             GoRoute(
               path: '/decks',
@@ -398,14 +463,20 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                   path: 'generate',
                   builder: (context, state) {
                     final initialFormat = state.uri.queryParameters['format'];
-                    return DeckGenerateScreen(initialFormat: initialFormat);
+                    return DeckGenerateScreen(
+                      initialFormat: initialFormat,
+                      draftOwnerId: context.read<AuthProvider>().user?.id ?? '',
+                    );
                   },
                 ),
                 GoRoute(
                   path: 'import',
                   builder: (context, state) {
                     final initialFormat = state.uri.queryParameters['format'];
-                    return DeckImportScreen(initialFormat: initialFormat);
+                    return DeckImportScreen(
+                      initialFormat: initialFormat,
+                      draftOwnerId: context.read<AuthProvider>().user?.id ?? '',
+                    );
                   },
                 ),
                 GoRoute(
@@ -427,13 +498,14 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                         return CardSearchScreen(deckId: id, mode: mode);
                       },
                     ),
-                    GoRoute(
-                      path: 'scan',
-                      builder: (context, state) {
-                        final id = state.pathParameters['id']!;
-                        return CardScannerScreen(deckId: id);
-                      },
-                    ),
+                    if (LaunchFeatures.scannerEnabled)
+                      GoRoute(
+                        path: 'scan',
+                        builder: (context, state) {
+                          final id = state.pathParameters['id']!;
+                          return CardScannerScreen(deckId: id);
+                        },
+                      ),
                     GoRoute(
                       path: 'post-game',
                       builder: (context, state) {
@@ -444,24 +516,36 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                         final endedAtMs = int.tryParse(
                           state.uri.queryParameters['endedAt'] ?? '',
                         );
+                        final deckVersionAtMs = int.tryParse(
+                          state.uri.queryParameters['deckVersionAt'] ?? '',
+                        );
                         return PostGameNotesScreen(
                           deckId: id,
                           playSessionId:
                               state.uri.queryParameters['playSessionId'],
-                          sessionStartedAt:
-                              startedAtMs == null
-                                  ? null
-                                  : DateTime.fromMillisecondsSinceEpoch(
-                                    startedAtMs,
-                                  ),
-                          sessionEndedAt:
-                              endedAtMs == null
-                                  ? null
-                                  : DateTime.fromMillisecondsSinceEpoch(
-                                    endedAtMs,
-                                  ),
+                          sessionStartedAt: startedAtMs == null
+                              ? null
+                              : DateTime.fromMillisecondsSinceEpoch(
+                                  startedAtMs,
+                                ),
+                          sessionEndedAt: endedAtMs == null
+                              ? null
+                              : DateTime.fromMillisecondsSinceEpoch(endedAtMs),
+                          deckSnapshotHash:
+                              state.uri.queryParameters['deckSnapshotHash'],
+                          deckVersionAt: deckVersionAtMs == null
+                              ? null
+                              : DateTime.fromMillisecondsSinceEpoch(
+                                  deckVersionAtMs,
+                                ),
                         );
                       },
+                    ),
+                    GoRoute(
+                      path: 'battle-replays',
+                      builder: (context, state) => BattleReplaysScreen(
+                        deckId: state.pathParameters['id']!,
+                      ),
                     ),
                   ],
                 ),
@@ -472,16 +556,21 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
               builder: (context, state) => const PlanScreen(),
             ),
             GoRoute(
+              path: '/cards/:cardId',
+              builder: (context, state) => CardDetailRouteScreen(
+                cardId: state.pathParameters['cardId']!,
+                initialCard: state.extra is DeckCardItem
+                    ? state.extra as DeckCardItem
+                    : null,
+              ),
+            ),
+            GoRoute(
               path: '/upgrade',
               builder: (context, state) => const UpgradeScreen(),
             ),
             GoRoute(
               path: '/checkout',
               builder: (context, state) => const CheckoutScreen(),
-            ),
-            GoRoute(
-              path: '/legal',
-              builder: (context, state) => const CommercialLegalScreen(),
             ),
             GoRoute(
               path: '/collection',
@@ -554,10 +643,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                   builder: (context, state) {
                     final conversationId =
                         state.pathParameters['conversationId']!;
-                    final otherUser =
-                        state.extra is ConversationUser
-                            ? state.extra as ConversationUser
-                            : null;
+                    final otherUser = state.extra is ConversationUser
+                        ? state.extra as ConversationUser
+                        : null;
                     return ChatScreen(
                       conversationId: conversationId,
                       otherUser: otherUser,
@@ -581,14 +669,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                     final args = state.extra;
                     return CreateTradeScreen(
                       receiverId: receiverId,
-                      initialType:
-                          args is CreateTradeRouteArgs
-                              ? args.initialType
-                              : 'trade',
-                      preselectedItem:
-                          args is CreateTradeRouteArgs
-                              ? args.preselectedItem
-                              : null,
+                      initialType: args is CreateTradeRouteArgs
+                          ? args.initialType
+                          : 'trade',
+                      preselectedItem: args is CreateTradeRouteArgs
+                          ? args.preselectedItem
+                          : null,
                     );
                   },
                 ),
@@ -722,6 +808,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _authenticatedWarmupTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _authProvider.removeListener(_onAuthChanged);
+    ApiClient.setSessionExpiredHandler(null);
     _notificationProvider.stopPolling();
     _messageProvider.stopPolling();
     final pushService = PushNotificationService();

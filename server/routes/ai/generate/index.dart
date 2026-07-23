@@ -7,8 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai_generate_job.dart';
+import '../../../lib/ai_job_lifecycle.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
+import '../../../lib/ai_generate_constraints_support.dart';
 import '../../../lib/ai_plan_reservation_handle.dart';
 import '../../../lib/ai_plan_reservation_settlement.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
@@ -70,6 +72,7 @@ Future<Response> onRequest(RequestContext context) async {
         body: body,
         prompt: prompt,
         format: format,
+        constraints: input.constraints,
       );
     }
 
@@ -78,6 +81,36 @@ Future<Response> onRequest(RequestContext context) async {
     final bracket = body['bracket'];
     final requestedCommanderName = input.commanderName;
     final pool = context.read<Pool>();
+    final generationConstraints = input.constraints;
+    if (generationConstraints.isRequested &&
+        (userId == null || userId.isEmpty)) {
+      return unauthorized('Authentication required for generation constraints');
+    }
+    final generationConstraintGuidance =
+        generationConstraints.isRequested
+            ? await loadAiGenerateConstraintGuidance(
+              pool: pool,
+              userId: userId!,
+              constraints: generationConstraints,
+            )
+            : const AiGenerateConstraintGuidance.empty();
+
+    Future<Map<String, dynamic>> enforceGenerationConstraints(
+      Map<String, dynamic> payload,
+    ) async {
+      final constrained = await enforceAiGenerateConstraints(
+        pool: pool,
+        userId: userId ?? '',
+        responseBody: payload,
+        constraints: generationConstraints,
+      );
+      if (generationConstraintGuidance.diagnostics.isEmpty) return constrained;
+      return {
+        ...constrained,
+        'generation_constraint_guidance':
+            generationConstraintGuidance.diagnostics,
+      };
+    }
 
     Map<String, dynamic>? referenceProfile;
     var referenceCardStats = const <CommanderReferenceCardStat>[];
@@ -163,10 +196,14 @@ Future<Response> onRequest(RequestContext context) async {
       bracket: bracket,
       commanderName: referenceGuidanceEnabled ? requestedCommanderName : null,
       referenceProfileVersion: referenceProfileVersion,
+      constraints: generationConstraints,
     );
 
     final cacheLookupStopwatch = Stopwatch()..start();
-    final cachedBody = readAiGenerateCache(cacheKey);
+    final cachedBody =
+        generationConstraints.isRequested
+            ? null
+            : readAiGenerateCache(cacheKey);
     timings['cache_lookup_ms'] = cacheLookupStopwatch.elapsedMilliseconds;
     if (cachedBody != null) {
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
@@ -202,24 +239,26 @@ Future<Response> onRequest(RequestContext context) async {
           'AI provider is not configured',
         );
       }
-      final mockBody = await _buildMockGenerateResponse(
-        pool: pool,
-        prompt: prompt,
-        format: format,
-        requestedCommanderName: requestedCommanderName,
-        referenceProfile: referenceProfile,
-        referenceCardStats: referenceCardStats,
-        unresolvedReferenceCards: unresolvedReferenceCards,
-        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-        activeLearnedDeck: activeLearnedDeck,
-        promotedLearnedCardNames: promotedLearnedCardNames,
-        archetypeReferenceStats: archetypeReferenceStats,
-        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
-        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-        usageHotCards: usageHotCards,
-        warningCode: 'openai_api_key_missing',
-        warningMessage:
-            'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
+      final mockBody = await enforceGenerationConstraints(
+        await _buildMockGenerateResponse(
+          pool: pool,
+          prompt: prompt,
+          format: format,
+          requestedCommanderName: requestedCommanderName,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          promotedLearnedCardNames: promotedLearnedCardNames,
+          archetypeReferenceStats: archetypeReferenceStats,
+          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+          usageHotCards: usageHotCards,
+          warningCode: 'openai_api_key_missing',
+          warningMessage:
+              'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
+        ),
       );
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       final responseBody = withAiGenerateRuntimeMetadata(
@@ -228,7 +267,8 @@ Future<Response> onRequest(RequestContext context) async {
         cacheHit: false,
         timings: timings,
       );
-      if (_aiGenerateBodyIsValidWithoutInvalidCards(mockBody)) {
+      if (!generationConstraints.isRequested &&
+          _aiGenerateBodyIsValidWithoutInvalidCards(mockBody)) {
         writeAiGenerateCache(
           cacheKey: cacheKey,
           payload: responseBody,
@@ -239,29 +279,32 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     Map<String, dynamic>? validatedReferenceDeterministicDeckDiagnostics;
-    if (_shouldUseReferenceGuidedDeterministicFastPath(
-      format: format,
-      referenceProfile: referenceProfile,
-      referenceCardStats: referenceCardStats,
-      referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-    )) {
+    if (!generationConstraints.isRequested &&
+        _shouldUseReferenceGuidedDeterministicFastPath(
+          format: format,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        )) {
       final fastPathStopwatch = Stopwatch()..start();
-      final deterministicBody = await _buildMockGenerateResponse(
-        pool: pool,
-        prompt: prompt,
-        format: format,
-        requestedCommanderName: requestedCommanderName,
-        referenceProfile: referenceProfile,
-        referenceCardStats: referenceCardStats,
-        unresolvedReferenceCards: unresolvedReferenceCards,
-        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-        activeLearnedDeck: activeLearnedDeck,
-        archetypeReferenceStats: archetypeReferenceStats,
-        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
-        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-        usageHotCards: usageHotCards,
-        isMock: false,
-        generationMode: 'reference_deterministic',
+      final deterministicBody = await enforceGenerationConstraints(
+        await _buildMockGenerateResponse(
+          pool: pool,
+          prompt: prompt,
+          format: format,
+          requestedCommanderName: requestedCommanderName,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          archetypeReferenceStats: archetypeReferenceStats,
+          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+          usageHotCards: usageHotCards,
+          isMock: false,
+          generationMode: 'reference_deterministic',
+        ),
       );
       validatedReferenceDeterministicDeckDiagnostics =
           _extractReferenceDeterministicDeckDiagnostics(deterministicBody);
@@ -439,6 +482,8 @@ Format: $format.
 
 $referenceProfilePrompt
 
+${generationConstraintGuidance.prompt}
+
 $metaContext
 ''';
 
@@ -514,25 +559,27 @@ $metaContext
         'timeout_key=${openAiTimeoutSelection.envKey} '
         'reference_guidance=${openAiTimeoutSelection.referenceGuidanceBudget}',
       );
-      final fallbackBody = await _buildMockGenerateResponse(
-        pool: pool,
-        prompt: prompt,
-        format: format,
-        requestedCommanderName: requestedCommanderName,
-        referenceProfile: referenceProfile,
-        referenceCardStats: referenceCardStats,
-        unresolvedReferenceCards: unresolvedReferenceCards,
-        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-        activeLearnedDeck: activeLearnedDeck,
-        archetypeReferenceStats: archetypeReferenceStats,
-        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
-        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-        usageHotCards: usageHotCards,
-        isMock: false,
-        generationMode: 'openai_timeout_deterministic_fallback',
-        warningCode: 'openai_timeout_deterministic_fallback',
-        warningMessage:
-            'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
+      final fallbackBody = await enforceGenerationConstraints(
+        await _buildMockGenerateResponse(
+          pool: pool,
+          prompt: prompt,
+          format: format,
+          requestedCommanderName: requestedCommanderName,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          archetypeReferenceStats: archetypeReferenceStats,
+          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+          usageHotCards: usageHotCards,
+          isMock: false,
+          generationMode: 'openai_timeout_deterministic_fallback',
+          warningCode: 'openai_timeout_deterministic_fallback',
+          warningMessage:
+              'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
+        ),
       );
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       final responseBody = withAiGenerateRuntimeMetadata(
@@ -542,7 +589,8 @@ $metaContext
         timings: timings,
       );
 
-      if (_aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
+      if (!generationConstraints.isRequested &&
+          _aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
         writeAiGenerateCache(
           cacheKey: cacheKey,
           payload: responseBody,
@@ -589,23 +637,25 @@ $metaContext
         statusCode: response.statusCode,
         responseBody: response.body,
       )) {
-        final mockBody = await _buildMockGenerateResponse(
-          pool: pool,
-          prompt: prompt,
-          format: format,
-          requestedCommanderName: requestedCommanderName,
-          referenceProfile: referenceProfile,
-          referenceCardStats: referenceCardStats,
-          unresolvedReferenceCards: unresolvedReferenceCards,
-          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-          activeLearnedDeck: activeLearnedDeck,
-          archetypeReferenceStats: archetypeReferenceStats,
-          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
-          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-          usageHotCards: usageHotCards,
-          warningCode: 'openai_api_key_invalid_dev_fallback',
-          warningMessage:
-              'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
+        final mockBody = await enforceGenerationConstraints(
+          await _buildMockGenerateResponse(
+            pool: pool,
+            prompt: prompt,
+            format: format,
+            requestedCommanderName: requestedCommanderName,
+            referenceProfile: referenceProfile,
+            referenceCardStats: referenceCardStats,
+            unresolvedReferenceCards: unresolvedReferenceCards,
+            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+            activeLearnedDeck: activeLearnedDeck,
+            archetypeReferenceStats: archetypeReferenceStats,
+            archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+            archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+            usageHotCards: usageHotCards,
+            warningCode: 'openai_api_key_invalid_dev_fallback',
+            warningMessage:
+                'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
+          ),
         );
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
         final responseBody = withAiGenerateRuntimeMetadata(
@@ -614,7 +664,8 @@ $metaContext
           cacheHit: false,
           timings: timings,
         );
-        if (_aiGenerateBodyIsValidWithoutInvalidCards(mockBody)) {
+        if (!generationConstraints.isRequested &&
+            _aiGenerateBodyIsValidWithoutInvalidCards(mockBody)) {
           writeAiGenerateCache(
             cacheKey: cacheKey,
             payload: responseBody,
@@ -784,7 +835,7 @@ $metaContext
           generationMode: generationMode,
         );
 
-    final responseBody = <String, dynamic>{
+    var responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
       'generated_deck': validation.generatedDeck,
@@ -835,11 +886,13 @@ $metaContext
               outputCardNames: generatedCardNames,
             ),
     };
+    responseBody = await enforceGenerationConstraints(responseBody);
 
     // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
     if (format.toLowerCase() == 'commander' &&
         validation.isValid &&
-        validation.invalidCards.isEmpty) {
+        validation.invalidCards.isEmpty &&
+        responseBody['can_save'] != false) {
       unawaited(
         logGeneratedDeckForLearning(
           pool: pool,
@@ -895,22 +948,24 @@ $metaContext
           validation.isValid
               ? 'A geracao principal retornou cartas nao resolvidas. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.'
               : 'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.';
-      final fallbackBody = await _buildMockGenerateResponse(
-        pool: pool,
-        prompt: prompt,
-        format: format,
-        requestedCommanderName: requestedCommanderName,
-        referenceProfile: referenceProfile,
-        referenceCardStats: referenceCardStats,
-        unresolvedReferenceCards: unresolvedReferenceCards,
-        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-        activeLearnedDeck: activeLearnedDeck,
-        archetypeReferenceStats: archetypeReferenceStats,
-        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
-        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-        usageHotCards: usageHotCards,
-        warningCode: fallbackWarningCode,
-        warningMessage: fallbackWarningMessage,
+      final fallbackBody = await enforceGenerationConstraints(
+        await _buildMockGenerateResponse(
+          pool: pool,
+          prompt: prompt,
+          format: format,
+          requestedCommanderName: requestedCommanderName,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          archetypeReferenceStats: archetypeReferenceStats,
+          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+          usageHotCards: usageHotCards,
+          warningCode: fallbackWarningCode,
+          warningMessage: fallbackWarningMessage,
+        ),
       );
 
       if (_aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
@@ -929,11 +984,13 @@ $metaContext
           cacheHit: false,
           timings: timings,
         );
-        writeAiGenerateCache(
-          cacheKey: cacheKey,
-          payload: validFallbackBody,
-          ttl: const Duration(seconds: 120),
-        );
+        if (!generationConstraints.isRequested) {
+          writeAiGenerateCache(
+            cacheKey: cacheKey,
+            payload: validFallbackBody,
+            ttl: const Duration(seconds: 120),
+          );
+        }
         return Response.json(body: validFallbackBody);
       }
 
@@ -959,14 +1016,16 @@ $metaContext
       cacheHit: false,
       timings: timings,
     );
-    writeAiGenerateCache(
-      cacheKey: cacheKey,
-      payload: finalBody,
-      ttl:
-          providerRepairDecision.eligible
-              ? const Duration(seconds: 120)
-              : cacheTtl,
-    );
+    if (!generationConstraints.isRequested) {
+      writeAiGenerateCache(
+        cacheKey: cacheKey,
+        payload: finalBody,
+        ttl:
+            providerRepairDecision.eligible
+                ? const Duration(seconds: 120)
+                : cacheTtl,
+      );
+    }
     return Response.json(body: finalBody);
   } catch (error, stackTrace) {
     Log.e('[ai-generate] request failed type=${error.runtimeType}');
@@ -985,6 +1044,7 @@ Future<Response> _startAiGenerateAsyncJob({
   required Map<String, dynamic> body,
   required String prompt,
   required String format,
+  required AiGenerateConstraints constraints,
 }) async {
   final pool = context.read<Pool>();
   String? userId;
@@ -1013,59 +1073,80 @@ Future<Response> _startAiGenerateAsyncJob({
             ? null
             : body['commander_name']?.toString(),
     referenceProfileVersion: referenceCacheVersion,
+    constraints: constraints,
   );
-  final jobId = await AiGenerateJobStore.create(
-    pool: pool,
-    cacheKey: cacheKey,
-    format: format,
-    userId: authenticatedUserId,
-  );
-  final planReservation = deferAiPlanReservationIfAvailable(context);
+  final requestKey =
+      body['request_key']?.toString() ??
+      createServerAiJobRequestKey('generate');
+  late final AiJobCreation creation;
+  try {
+    creation = await AiGenerateJobStore.createOrReuse(
+      pool: pool,
+      cacheKey: cacheKey,
+      format: format,
+      userId: authenticatedUserId,
+      requestKey: requestKey,
+      requestFingerprint: cacheKey,
+    );
+  } on AiJobIdempotencyConflict {
+    return Response.json(
+      statusCode: HttpStatus.conflict,
+      body: {
+        'error': 'request_key ja foi usada com outro pedido.',
+        'error_code': 'ai_job_idempotency_conflict',
+      },
+    );
+  }
+  final jobId = creation.jobId;
+  final planReservation =
+      creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
 
   final syncPayload = buildAiGenerateSyncPayloadForAsyncJob(body);
   final authorization = context.request.headers['authorization'];
   final internalGenerateUrl = _resolveInternalGenerateUrl(context.request);
 
-  unawaited(
-    runZonedGuarded(
-      () async {
-        final successful = await _processAiGenerateAsyncJob(
-          pool: pool,
-          jobId: jobId,
-          internalGenerateUrl: internalGenerateUrl,
-          syncPayload: syncPayload,
-          authorization: authorization,
-        );
-        if (planReservation != null) {
-          try {
-            await settleDeferredAiPlanReservation(
-              pool: pool,
-              handle: planReservation,
-              successful: successful,
-            );
-          } catch (error) {
-            Log.w(
-              'AI generate quota settlement failed '
-              'type=${error.runtimeType}',
-            );
-          }
-        }
-      },
-      (error, stackTrace) {
-        Log.e(
-          'Background ai_generate job $jobId crashed '
-          'type=${error.runtimeType}',
-        );
-        unawaited(
-          _failGenerateJobAndReleaseQuota(
+  if (creation.isNew) {
+    unawaited(
+      runZonedGuarded(
+        () async {
+          final successful = await _processAiGenerateAsyncJob(
             pool: pool,
             jobId: jobId,
-            planReservation: planReservation,
-          ),
-        );
-      },
-    ),
-  );
+            internalGenerateUrl: internalGenerateUrl,
+            syncPayload: syncPayload,
+            authorization: authorization,
+          );
+          if (planReservation != null) {
+            try {
+              await settleDeferredAiPlanReservation(
+                pool: pool,
+                handle: planReservation,
+                successful: successful,
+              );
+            } catch (error) {
+              Log.w(
+                'AI generate quota settlement failed '
+                'type=${error.runtimeType}',
+              );
+            }
+          }
+        },
+        (error, stackTrace) {
+          Log.e(
+            'Background ai_generate job $jobId crashed '
+            'type=${error.runtimeType}',
+          );
+          unawaited(
+            _failGenerateJobAndReleaseQuota(
+              pool: pool,
+              jobId: jobId,
+              planReservation: planReservation,
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   return Response.json(
     statusCode: HttpStatus.accepted,
@@ -1075,10 +1156,16 @@ Future<Response> _startAiGenerateAsyncJob({
       'message':
           'Geracao iniciada em background. Consulte o progresso via polling.',
       'poll_url': '/ai/generate/jobs/$jobId',
+      'cancel_url': '/ai/generate/jobs/$jobId',
+      'resume_url': '/ai/generate/jobs/$jobId',
       'poll_interval_ms': 1000,
       'job_timeout_ms': const Duration(minutes: 3).inMilliseconds,
       'total_stages': 4,
       'cache': {'hit': false, 'cache_key': cacheKey},
+      'idempotency': {
+        'request_key': creation.requestKey,
+        'reused': !creation.isNew,
+      },
       'timings': {'accepted_ms': requestStopwatch.elapsedMilliseconds},
     },
   );
@@ -1168,20 +1255,24 @@ Future<bool> _processAiGenerateAsyncJob({
   required Map<String, dynamic> syncPayload,
   required String? authorization,
 }) async {
-  await AiGenerateJobStore.progress(
+  if (!await AiGenerateJobStore.progress(
     pool,
     jobId,
     stage: 'Preparando geracao',
     stageNumber: 1,
-  );
+  )) {
+    return false;
+  }
 
   final stopwatch = Stopwatch()..start();
-  await AiGenerateJobStore.progress(
+  if (!await AiGenerateJobStore.progress(
     pool,
     jobId,
     stage: 'Gerando e validando deck',
     stageNumber: 2,
-  );
+  )) {
+    return false;
+  }
 
   final headers = <String, String>{
     'Content-Type': 'application/json',
@@ -1208,12 +1299,14 @@ Future<bool> _processAiGenerateAsyncJob({
     return false;
   }
 
-  await AiGenerateJobStore.progress(
+  if (!await AiGenerateJobStore.progress(
     pool,
     jobId,
     stage: 'Persistindo resultado',
     stageNumber: 3,
-  );
+  )) {
+    return false;
+  }
 
   Map<String, dynamic> resultBody;
   try {
@@ -1241,13 +1334,13 @@ Future<bool> _processAiGenerateAsyncJob({
 
   if (response.statusCode == HttpStatus.ok ||
       response.statusCode == HttpStatus.unprocessableEntity) {
-    await AiGenerateJobStore.complete(
+    final completed = await AiGenerateJobStore.complete(
       pool,
       jobId,
       statusCode: response.statusCode,
       result: resultBody,
     );
-    return response.statusCode == HttpStatus.ok;
+    return completed && response.statusCode == HttpStatus.ok;
   }
 
   await AiGenerateJobStore.fail(
@@ -1325,6 +1418,7 @@ bool _shouldUseReferenceGuidedDeterministicFastPath({
 }
 
 bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
+  if (body['can_save'] == false) return false;
   final validation = body['validation'];
   if (validation is! Map || validation['is_valid'] != true) return false;
 

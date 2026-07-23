@@ -20,7 +20,7 @@ class TradeSafetyNotice extends StatelessWidget {
       child: Container(
         key: const Key('trade-safety-notice'),
         width: double.infinity,
-        padding: EdgeInsets.all(compact ? 10 : 12),
+        padding: EdgeInsets.all(compact ? AppTheme.space10 : AppTheme.space12),
         decoration: BoxDecoration(
           color: AppTheme.frost400.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -37,7 +37,7 @@ class TradeSafetyNotice extends StatelessWidget {
               color: AppTheme.frost400,
               size: 20,
             ),
-            const SizedBox(width: 9),
+            const SizedBox(width: AppTheme.space9),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +50,7 @@ class TradeSafetyNotice extends StatelessWidget {
                       fontSize: AppTheme.fontMd,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppTheme.space4),
                   Text(
                     message,
                     style: TextStyle(

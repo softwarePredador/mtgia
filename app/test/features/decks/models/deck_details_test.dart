@@ -16,6 +16,9 @@ void main() {
         'weaknesses': 'Fraco contra board wipes',
         'is_public': true,
         'created_at': '2025-01-30T10:00:00Z',
+        'deck_snapshot_hash':
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        'deck_version_at': '2026-07-22T10:00:00Z',
         'commander': [
           {
             'id': 'card-krenko',
@@ -72,6 +75,12 @@ void main() {
       expect(details.bracket, 2);
       expect(details.synergyScore, 85);
       expect(details.isPublic, true);
+      expect(
+        details.deckSnapshotHash,
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      );
+      expect(details.deckVersionAt, DateTime.parse('2026-07-22T10:00:00Z'));
+      expect(details.copyWith().deckSnapshotHash, details.deckSnapshotHash);
 
       // Commander
       expect(details.commander, hasLength(1));
@@ -156,6 +165,7 @@ void main() {
         'pricing_currency': 'USD',
         'pricing_total': 350.50,
         'pricing_missing_cards': 3,
+        'pricing_source': 'mtgjson',
         'pricing_updated_at': '2025-01-29T12:00:00Z',
       };
 
@@ -164,6 +174,7 @@ void main() {
       expect(details.pricingCurrency, 'USD');
       expect(details.pricingTotal, 350.50);
       expect(details.pricingMissingCards, 3);
+      expect(details.pricingSource, 'mtgjson');
       expect(details.pricingUpdatedAt, isNotNull);
     });
 

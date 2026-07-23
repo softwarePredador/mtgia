@@ -15,6 +15,13 @@ CREATE TABLE IF NOT EXISTS users (
     location_city TEXT,
     trade_notes TEXT,
     fcm_token TEXT,
+    auth_version INTEGER NOT NULL DEFAULT 0,
+    password_changed_at TIMESTAMP WITH TIME ZONE,
+    terms_version TEXT,
+    terms_accepted_at TIMESTAMP WITH TIME ZONE,
+    privacy_version TEXT,
+    privacy_accepted_at TIMESTAMP WITH TIME ZONE,
+    email_verified_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP WITH TIME ZONE
@@ -41,10 +48,43 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS location_state TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS location_city TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_notes TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_version INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_changed_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_version TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_version TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
 CREATE INDEX IF NOT EXISTS idx_users_active_identity
     ON users (LOWER(email), LOWER(username)) WHERE deleted_at IS NULL;
+
+-- Tokens de recuperação nunca são persistidos em texto puro. Alterar ou
+-- recuperar a senha incrementa users.auth_version e invalida JWTs anteriores.
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    consumed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_active
+    ON password_reset_tokens (user_id, expires_at DESC)
+    WHERE consumed_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    consumed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_user_active
+    ON email_verification_tokens (user_id, expires_at DESC)
+    WHERE consumed_at IS NULL;
 
 -- 2. Tabela de Cartas (Otimizada para busca e dados do MTGJSON)
 	CREATE TABLE IF NOT EXISTS cards (
@@ -67,7 +107,10 @@ CREATE INDEX IF NOT EXISTS idx_users_active_identity
 	    layout TEXT,
 	    card_faces_json JSONB,
 	    ai_description TEXT, -- Cache de explicações da IA
-	    price DECIMAL(10,2), -- Preço da carta (integração Scryfall)
+	    price DECIMAL(10,2), -- Compatibilidade legada; espelho do preço USD
+	    price_usd DECIMAL(10,2), -- Fonte canônica de preço de mercado
+	    price_usd_foil DECIMAL(10,2),
+	    price_source TEXT,
 	    price_updated_at TIMESTAMP WITH TIME ZONE,
 	    collector_number TEXT, -- Número de colecionador (ex: "157")
 	    foil BOOLEAN, -- true=foil, false=non-foil, null=desconhecido
@@ -77,6 +120,9 @@ CREATE INDEX IF NOT EXISTS idx_users_active_identity
 -- Para bancos existentes (idempotente)
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS ai_description TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS price DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_usd DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_usd_foil DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_source TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_updated_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS collector_number TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS foil BOOLEAN;
@@ -101,6 +147,29 @@ CREATE INDEX IF NOT EXISTS idx_cards_layout ON cards (layout);
 -- Índice GIN para buscas por identidade (Commander/Brawl)
 CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity);
 CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords);
+CREATE INDEX IF NOT EXISTS idx_cards_price_usd
+ON cards (price_usd) WHERE price_usd IS NOT NULL;
+ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_price_source;
+ALTER TABLE cards ADD CONSTRAINT chk_cards_price_source
+CHECK (price_source IS NULL OR price_source IN ('scryfall', 'mtgjson', 'legacy'));
+
+-- Histórico de preços é dependência de runtime de Marketplace e Market.
+-- A ausência de pontos é um estado válido; a ausência da relação não é.
+CREATE TABLE IF NOT EXISTS price_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+    price_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    price_usd DECIMAL(10,2),
+    price_usd_foil DECIMAL(10,2),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(card_id, price_date)
+);
+CREATE INDEX IF NOT EXISTS idx_price_history_date
+ON price_history (price_date DESC);
+CREATE INDEX IF NOT EXISTS idx_price_history_card_date
+ON price_history (card_id, price_date DESC);
+CREATE INDEX IF NOT EXISTS idx_price_history_date_card_price
+ON price_history (price_date DESC, card_id) INCLUDE (price_usd);
 
 -- 2.1. Tabela de Sets/Edições (para exibir nome e data da edição)
 -- Fonte: MTGJSON SetList.json
@@ -231,6 +300,7 @@ CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
 	    pricing_currency TEXT DEFAULT 'USD',
 	    pricing_total NUMERIC(10,2),
 	    pricing_missing_cards INTEGER DEFAULT 0,
+	    pricing_source TEXT,
 	    pricing_updated_at TIMESTAMP WITH TIME ZONE,
 	    
 	    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -243,6 +313,7 @@ CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_currency TEXT DEFAULT 'USD';
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_total NUMERIC(10,2);
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_missing_cards INTEGER DEFAULT 0;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_source TEXT;
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_updated_at TIMESTAMP WITH TIME ZONE;
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_state TEXT NOT NULL DEFAULT 'unknown';
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_reasons JSONB NOT NULL DEFAULT '["validation_not_recorded"]'::jsonb;
@@ -260,6 +331,37 @@ CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
 	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_reasons_array;
 	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_reasons_array
 	CHECK (jsonb_typeof(validation_reasons) = 'array');
+	UPDATE decks
+	SET validation_reasons = CASE validation_state
+	        WHEN 'unknown' THEN '["validation_not_recorded"]'::jsonb
+	        WHEN 'validated' THEN '[]'::jsonb
+	        ELSE CASE
+	            WHEN jsonb_array_length(validation_reasons) = 0 THEN
+	                '["strict_validation_pending"]'::jsonb
+	            ELSE validation_reasons
+	        END
+	    END,
+	    validation_updated_at = CASE validation_state
+	        WHEN 'unknown' THEN NULL
+	        ELSE COALESCE(validation_updated_at, CURRENT_TIMESTAMP)
+	    END;
+	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_state_payload;
+	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_state_payload
+	CHECK (
+	    (
+	        validation_state = 'unknown'
+	        AND validation_reasons = '["validation_not_recorded"]'::jsonb
+	        AND validation_updated_at IS NULL
+	    ) OR (
+	        validation_state = 'draft'
+	        AND jsonb_array_length(validation_reasons) > 0
+	        AND validation_updated_at IS NOT NULL
+	    ) OR (
+	        validation_state = 'validated'
+	        AND jsonb_array_length(validation_reasons) = 0
+	        AND validation_updated_at IS NOT NULL
+	    )
+	);
 	CREATE INDEX IF NOT EXISTS idx_decks_user_validation_state
 	ON decks (user_id, validation_state, created_at DESC)
 	WHERE deleted_at IS NULL;
@@ -296,15 +398,8 @@ BEGIN
 
     UPDATE decks
     SET validation_state = 'draft',
-        validation_reasons = CASE
-            WHEN validation_state = 'validated' THEN
-                '["deck_cards_changed_since_validation"]'::jsonb
-            WHEN validation_reasons @>
-                 '["deck_cards_changed_since_validation"]'::jsonb THEN
-                validation_reasons
-            ELSE validation_reasons ||
-                 '["deck_cards_changed_since_validation"]'::jsonb
-        END,
+        validation_reasons =
+            '["deck_cards_changed_since_validation"]'::jsonb,
         validation_updated_at = CURRENT_TIMESTAMP
     WHERE id = ANY(affected_deck_ids);
 
@@ -329,15 +424,8 @@ AS $deck_format_changed$
 BEGIN
     IF NEW.format IS DISTINCT FROM OLD.format THEN
         NEW.validation_state := 'draft';
-        NEW.validation_reasons := CASE
-            WHEN OLD.validation_state = 'validated' THEN
-                '["deck_format_changed_since_validation"]'::jsonb
-            WHEN OLD.validation_reasons @>
-                 '["deck_format_changed_since_validation"]'::jsonb THEN
-                OLD.validation_reasons
-            ELSE OLD.validation_reasons ||
-                 '["deck_format_changed_since_validation"]'::jsonb
-        END;
+        NEW.validation_reasons :=
+            '["deck_format_changed_since_validation"]'::jsonb;
         NEW.validation_updated_at := CURRENT_TIMESTAMP;
     END IF;
     RETURN NEW;
@@ -717,10 +805,13 @@ CREATE TABLE IF NOT EXISTS ai_optimize_jobs (
     result JSONB,
     error TEXT,
     quality_error JSONB,
+    request_key TEXT,
+    request_fingerprint TEXT,
+    cancelled_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_ai_optimize_jobs_status
-        CHECK (status IN ('pending', 'processing', 'completed', 'failed'))
+        CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_ai_optimize_jobs_user_updated
@@ -728,6 +819,42 @@ CREATE INDEX IF NOT EXISTS idx_ai_optimize_jobs_user_updated
 
 CREATE INDEX IF NOT EXISTS idx_ai_optimize_jobs_created
     ON ai_optimize_jobs (created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_optimize_jobs_user_request_key
+    ON ai_optimize_jobs (user_id, request_key)
+    WHERE user_id IS NOT NULL AND request_key IS NOT NULL;
+
+-- Jobs assíncronos de /ai/generate persistidos e retomáveis.
+CREATE TABLE IF NOT EXISTS ai_generate_jobs (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    cache_key TEXT NOT NULL,
+    format TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    stage TEXT NOT NULL DEFAULT 'Iniciando...',
+    stage_number INTEGER NOT NULL DEFAULT 0,
+    total_stages INTEGER NOT NULL DEFAULT 4,
+    result_status_code INTEGER,
+    result JSONB,
+    error TEXT,
+    request_key TEXT,
+    request_fingerprint TEXT,
+    cancelled_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_ai_generate_jobs_status
+        CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_user_updated
+    ON ai_generate_jobs (user_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_created
+    ON ai_generate_jobs (created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_generate_jobs_user_request_key
+    ON ai_generate_jobs (user_id, request_key)
+    WHERE user_id IS NOT NULL AND request_key IS NOT NULL;
 
 -- 14.2 Memória de preferências de otimização por usuário
 CREATE TABLE IF NOT EXISTS ai_user_preferences (
@@ -780,6 +907,286 @@ CREATE TABLE IF NOT EXISTS user_follows (
 
 CREATE INDEX IF NOT EXISTS idx_user_follows_follower ON user_follows (follower_id);
 CREATE INDEX IF NOT EXISTS idx_user_follows_following ON user_follows (following_id);
+
+-- ============================================================
+-- COLLECTION/TRADES: binder, negociação, mensagens e notificações
+-- ============================================================
+CREATE TABLE IF NOT EXISTS user_binder_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    condition TEXT NOT NULL DEFAULT 'NM'
+        CHECK (condition IN ('NM', 'LP', 'MP', 'HP', 'DMG')),
+    is_foil BOOLEAN NOT NULL DEFAULT FALSE,
+    for_trade BOOLEAN NOT NULL DEFAULT FALSE,
+    for_sale BOOLEAN NOT NULL DEFAULT FALSE,
+    price DECIMAL(10,2),
+    currency TEXT NOT NULL DEFAULT 'BRL'
+        CHECK (currency IN ('BRL', 'USD')),
+    notes TEXT,
+    language TEXT NOT NULL DEFAULT 'en',
+    list_type TEXT NOT NULL DEFAULT 'have'
+        CHECK (list_type IN ('have', 'want')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE user_binder_items
+ADD COLUMN IF NOT EXISTS list_type TEXT NOT NULL DEFAULT 'have';
+ALTER TABLE user_binder_items
+DROP CONSTRAINT IF EXISTS user_binder_items_user_id_card_id_condition_is_foil_key;
+UPDATE user_binder_items
+SET language = LOWER(REPLACE(TRIM(language), '_', '-'))
+WHERE language IS DISTINCT FROM LOWER(REPLACE(TRIM(language), '_', '-'));
+UPDATE user_binder_items SET language = 'en' WHERE language = '';
+DROP INDEX IF EXISTS uq_user_binder_items_identity;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_user_binder_items_physical_identity
+ON user_binder_items (
+    user_id, card_id, condition, is_foil, language, list_type
+);
+ALTER TABLE user_binder_items
+DROP CONSTRAINT IF EXISTS chk_user_binder_items_language;
+ALTER TABLE user_binder_items
+ADD CONSTRAINT chk_user_binder_items_language CHECK (
+    language ~ '^[a-z]{2,3}(-[a-z0-9]{2,8})*$'
+);
+CREATE INDEX IF NOT EXISTS idx_binder_user ON user_binder_items (user_id);
+CREATE INDEX IF NOT EXISTS idx_binder_card ON user_binder_items (card_id);
+CREATE INDEX IF NOT EXISTS idx_binder_for_trade
+ON user_binder_items (for_trade) WHERE for_trade = TRUE;
+CREATE INDEX IF NOT EXISTS idx_binder_for_sale
+ON user_binder_items (for_sale) WHERE for_sale = TRUE;
+
+CREATE TABLE IF NOT EXISTS trade_offers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN (
+            'pending', 'accepted', 'declined', 'shipped', 'delivered',
+            'completed', 'cancelled', 'disputed'
+        )),
+    type TEXT NOT NULL DEFAULT 'trade'
+        CHECK (type IN ('trade', 'sale', 'mixed')),
+    delivery_method TEXT
+        CHECK (delivery_method IS NULL OR delivery_method IN (
+            'correios', 'motoboy', 'pessoalmente', 'outro',
+            'mail', 'in_person'
+        )),
+    payment_method TEXT
+        CHECK (payment_method IS NULL OR payment_method IN ('pix', 'cash', 'transfer', 'other')),
+    payment_amount DECIMAL(10,2),
+    payment_currency TEXT NOT NULL DEFAULT 'BRL',
+    tracking_code TEXT,
+    message TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_no_self_trade CHECK (sender_id <> receiver_id)
+);
+ALTER TABLE trade_offers
+DROP CONSTRAINT IF EXISTS trade_offers_delivery_method_check;
+ALTER TABLE trade_offers
+DROP CONSTRAINT IF EXISTS chk_trade_offers_delivery_method;
+ALTER TABLE trade_offers
+ADD CONSTRAINT chk_trade_offers_delivery_method CHECK (
+    delivery_method IS NULL OR delivery_method IN (
+        'correios', 'motoboy', 'pessoalmente', 'outro',
+        'mail', 'in_person'
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_trade_sender ON trade_offers (sender_id);
+CREATE INDEX IF NOT EXISTS idx_trade_receiver ON trade_offers (receiver_id);
+CREATE INDEX IF NOT EXISTS idx_trade_status ON trade_offers (status);
+
+CREATE TABLE IF NOT EXISTS trade_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
+    binder_item_id UUID REFERENCES user_binder_items(id) ON DELETE SET NULL,
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    direction TEXT NOT NULL CHECK (direction IN ('offering', 'requesting')),
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    agreed_price DECIMAL(10,2)
+);
+ALTER TABLE trade_items ALTER COLUMN binder_item_id DROP NOT NULL;
+ALTER TABLE trade_items DROP CONSTRAINT IF EXISTS trade_items_binder_item_id_fkey;
+ALTER TABLE trade_items
+ADD CONSTRAINT trade_items_binder_item_id_fkey
+FOREIGN KEY (binder_item_id) REFERENCES user_binder_items(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_trade_items_offer
+ON trade_items (trade_offer_id);
+
+CREATE TABLE IF NOT EXISTS trade_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    message TEXT,
+    attachment_url TEXT,
+    attachment_type TEXT
+        CHECK (attachment_type IS NULL OR attachment_type IN ('receipt', 'tracking', 'photo', 'other')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_trade_messages_offer
+ON trade_messages (trade_offer_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS trade_status_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
+    old_status TEXT,
+    new_status TEXT NOT NULL,
+    changed_by UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_trade_history_offer
+ON trade_status_history (trade_offer_id, created_at DESC);
+
+-- Canonical playable-card availability shared by Collection, Deckbuilder and
+-- Trade. Printing/language/foil/condition remain binder-item attributes, while
+-- owned/allocated/free/missing are aggregated by Oracle identity.
+CREATE OR REPLACE VIEW collection_availability_snapshot AS
+WITH owned AS (
+  SELECT bi.user_id, COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'have'
+  GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+),
+allocated AS (
+  SELECT d.user_id, COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(dc.quantity), 0)::int AS allocated_quantity
+  FROM decks d
+  JOIN deck_cards dc ON dc.deck_id = d.id
+  JOIN cards c ON c.id = dc.card_id
+  WHERE d.deleted_at IS NULL
+  GROUP BY d.user_id, COALESCE(c.oracle_id, c.id)
+),
+committed AS (
+  SELECT ti.owner_id AS user_id,
+         COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(ti.quantity), 0)::int AS committed_trade_quantity
+  FROM trade_items ti
+  JOIN trade_offers trade ON trade.id = ti.trade_offer_id
+  JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+  JOIN cards c ON c.id = bi.card_id
+  WHERE trade.status IN (
+    'pending', 'accepted', 'shipped', 'delivered', 'disputed'
+  )
+    AND bi.list_type = 'have'
+  GROUP BY ti.owner_id, COALESCE(c.oracle_id, c.id)
+),
+wanted AS (
+  SELECT bi.user_id, COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(bi.quantity), 0)::int AS wanted_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'want'
+  GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+),
+identities AS (
+  SELECT user_id, playable_card_id FROM owned
+  UNION SELECT user_id, playable_card_id FROM allocated
+  UNION SELECT user_id, playable_card_id FROM committed
+  UNION SELECT user_id, playable_card_id FROM wanted
+)
+SELECT identity.user_id, identity.playable_card_id,
+       COALESCE(owned.canonical_name, allocated.canonical_name,
+                committed.canonical_name, wanted.canonical_name)
+         AS canonical_name,
+       COALESCE(owned.owned_quantity, 0)::int AS owned_quantity,
+       COALESCE(allocated.allocated_quantity, 0)::int AS allocated_quantity,
+       COALESCE(committed.committed_trade_quantity, 0)::int
+         AS committed_trade_quantity,
+       GREATEST(COALESCE(owned.owned_quantity, 0)
+         - COALESCE(allocated.allocated_quantity, 0)
+         - COALESCE(committed.committed_trade_quantity, 0), 0)::int
+         AS free_quantity,
+       GREATEST(COALESCE(allocated.allocated_quantity, 0)
+         - COALESCE(owned.owned_quantity, 0), 0)::int AS missing_quantity,
+       COALESCE(wanted.wanted_quantity, 0)::int AS wanted_quantity,
+       GREATEST(COALESCE(wanted.wanted_quantity, 0)
+         - COALESCE(owned.owned_quantity, 0), 0)::int
+         AS wanted_missing_quantity
+FROM identities identity
+LEFT JOIN owned USING (user_id, playable_card_id)
+LEFT JOIN allocated USING (user_id, playable_card_id)
+LEFT JOIN committed USING (user_id, playable_card_id)
+LEFT JOIN wanted USING (user_id, playable_card_id);
+
+CREATE OR REPLACE VIEW binder_item_availability AS
+WITH item_priority AS (
+  SELECT bi.id AS binder_item_id, bi.user_id, bi.card_id,
+         COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         bi.quantity AS item_quantity,
+         COALESCE(SUM(bi.quantity) OVER (
+           PARTITION BY bi.user_id, COALESCE(c.oracle_id, c.id)
+           ORDER BY CASE WHEN bi.for_trade OR bi.for_sale THEN 0 ELSE 1 END,
+                    bi.updated_at, bi.id
+           ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+         ), 0)::int AS prior_item_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'have'
+)
+SELECT item.binder_item_id, item.user_id, item.card_id,
+       item.playable_card_id, item.item_quantity,
+       availability.owned_quantity, availability.allocated_quantity,
+       availability.committed_trade_quantity, availability.free_quantity,
+       availability.missing_quantity,
+       GREATEST(LEAST(item.item_quantity,
+         availability.free_quantity - item.prior_item_quantity), 0)::int
+         AS available_quantity
+FROM item_priority item
+JOIN collection_availability_snapshot availability
+  ON availability.user_id = item.user_id
+ AND availability.playable_card_id = item.playable_card_id;
+
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_a_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_b_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    last_message_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_no_self_chat CHECK (user_a_id <> user_b_id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_participants
+ON conversations (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id));
+
+CREATE TABLE IF NOT EXISTS direct_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    message TEXT NOT NULL,
+    read_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_dm_conversation
+ON direct_messages (conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dm_unread
+ON direct_messages (conversation_id) WHERE read_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL CHECK (type IN (
+        'new_follower', 'trade_offer_received', 'trade_accepted',
+        'trade_declined', 'trade_shipped', 'trade_delivered',
+        'trade_completed', 'trade_message', 'direct_message'
+    )),
+    reference_id UUID,
+    title TEXT NOT NULL,
+    body TEXT,
+    read_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user
+ON notifications (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread
+ON notifications (user_id) WHERE read_at IS NULL;
 
 -- ============================================================
 -- RETENTION: Historico pos-jogo por deck

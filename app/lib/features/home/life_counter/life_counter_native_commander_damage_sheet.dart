@@ -88,7 +88,12 @@ class _LifeCounterNativeCommanderDamageSheetState
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: FractionallySizedBox(
           heightFactor: 0.82,
           child: DecoratedBox(
@@ -108,7 +113,12 @@ class _LifeCounterNativeCommanderDamageSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -123,7 +133,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: AppTheme.space6),
                             Text(
                               'Registre o dano de comandante causado por cada oponente.',
                               style: const TextStyle(
@@ -147,7 +157,12 @@ class _LifeCounterNativeCommanderDamageSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     children: [
                       _SectionCard(
                         title: 'Jogador alvo',
@@ -164,22 +179,20 @@ class _LifeCounterNativeCommanderDamageSheetState
                               ),
                               label: Text(_playerLabel(index)),
                               selected: _targetPlayerIndex == index,
-                              onSelected:
-                                  (_) => setState(
-                                    () => _targetPlayerIndex = index,
-                                  ),
+                              onSelected: (_) =>
+                                  setState(() => _targetPlayerIndex = index),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       if (lethalSources.isNotEmpty) ...[
                         _SectionCard(
                           title: 'Dano letal de comandante',
                           subtitle: lethalSummary ?? '',
                           child: const SizedBox.shrink(),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: AppTheme.space18),
                       ],
                       _SectionCard(
                         title: 'Status do alvo',
@@ -198,7 +211,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: AppTheme.space6),
                             Text(
                               playerStatusSummary.description,
                               key: const Key(
@@ -213,7 +226,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: AppTheme.space18),
                       _SectionCard(
                         title: 'Dano por fonte',
                         subtitle:
@@ -227,43 +240,43 @@ class _LifeCounterNativeCommanderDamageSheetState
                             )
                               if (sourceIndex != _targetPlayerIndex)
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppTheme.space12,
+                                  ),
                                   child: _CommanderDamageSourceCard(
                                     sourceIndex: sourceIndex,
                                     sourceLabel: _playerLabel(sourceIndex),
-                                    detail:
-                                        _draftSession
-                                            .resolvedCommanderDamageDetails[_targetPlayerIndex][sourceIndex],
-                                    hasPartnerCommander:
-                                        widget
-                                            .initialSession
-                                            .partnerCommanders[sourceIndex],
+                                    detail: _draftSession
+                                        .resolvedCommanderDamageDetails[_targetPlayerIndex][sourceIndex],
+                                    hasPartnerCommander: widget
+                                        .initialSession
+                                        .partnerCommanders[sourceIndex],
                                     isLethal:
                                         LifeCounterTabletopEngine.isCommanderDamageSourceLethal(
                                           _draftSession,
                                           targetPlayerIndex: _targetPlayerIndex,
                                           sourcePlayerIndex: sourceIndex,
                                         ),
-                                    onCommanderOneIncrement:
-                                        () => _updateCommanderDamage(
+                                    onCommanderOneIncrement: () =>
+                                        _updateCommanderDamage(
                                           sourceIndex: sourceIndex,
                                           secondCommander: false,
                                           delta: 1,
                                         ),
-                                    onCommanderOneDecrement:
-                                        () => _updateCommanderDamage(
+                                    onCommanderOneDecrement: () =>
+                                        _updateCommanderDamage(
                                           sourceIndex: sourceIndex,
                                           secondCommander: false,
                                           delta: -1,
                                         ),
-                                    onCommanderTwoIncrement:
-                                        () => _updateCommanderDamage(
+                                    onCommanderTwoIncrement: () =>
+                                        _updateCommanderDamage(
                                           sourceIndex: sourceIndex,
                                           secondCommander: true,
                                           delta: 1,
                                         ),
-                                    onCommanderTwoDecrement:
-                                        () => _updateCommanderDamage(
+                                    onCommanderTwoDecrement: () =>
+                                        _updateCommanderDamage(
                                           sourceIndex: sourceIndex,
                                           secondCommander: true,
                                           delta: -1,
@@ -278,7 +291,12 @@ class _LifeCounterNativeCommanderDamageSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -289,25 +307,27 @@ class _LifeCounterNativeCommanderDamageSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key(
                             'life-counter-native-commander-damage-apply',
                           ),
-                          onPressed:
-                              () => Navigator.of(
-                                context,
-                              ).pop(_buildUpdatedSession()),
+                          onPressed: () =>
+                              Navigator.of(context).pop(_buildUpdatedSession()),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),
@@ -351,20 +371,18 @@ class _CommanderDamageSourceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color:
-            isLethal
-                ? AppTheme.error.withValues(alpha: 0.1)
-                : AppTheme.surfaceElevated,
+        color: isLethal
+            ? AppTheme.error.withValues(alpha: 0.1)
+            : AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color:
-              isLethal
-                  ? AppTheme.error.withValues(alpha: 0.35)
-                  : AppTheme.outlineMuted,
+          color: isLethal
+              ? AppTheme.error.withValues(alpha: 0.35)
+              : AppTheme.outlineMuted,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppTheme.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -389,7 +407,7 @@ class _CommanderDamageSourceCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             _CommanderDamageStepper(
               label: hasPartnerCommander ? 'Commander 1' : 'Commander',
               value: detail.commanderOneDamage,
@@ -406,7 +424,7 @@ class _CommanderDamageSourceCard extends StatelessWidget {
               onDecrement: onCommanderOneDecrement,
             ),
             if (hasPartnerCommander) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               _CommanderDamageStepper(
                 label: 'Commander 2',
                 value: detail.commanderTwoDamage,
@@ -514,7 +532,7 @@ class _SectionCard extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppTheme.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -526,7 +544,7 @@ class _SectionCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.space4),
             Text(
               subtitle,
               style: const TextStyle(
@@ -535,7 +553,7 @@ class _SectionCard extends StatelessWidget {
                 height: AppTheme.lineHeightCompact,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.space14),
             child,
           ],
         ),

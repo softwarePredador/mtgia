@@ -77,12 +77,11 @@ Future<LifeCounterGameModesAction?> showLifeCounterNativeGameModesSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: AppTheme.transparent,
-    builder:
-        (context) => _LifeCounterNativeGameModesSheet(
-          availability: availability,
-          preferredAction: preferredAction,
-          preferredIntent: preferredIntent,
-        ),
+    builder: (context) => _LifeCounterNativeGameModesSheet(
+      availability: availability,
+      preferredAction: preferredAction,
+      preferredIntent: preferredIntent,
+    ),
   );
 }
 
@@ -102,7 +101,12 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
     final activeModeLabels = availability.activeModeLabels;
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: AppTheme.backgroundAbyss,
@@ -122,7 +126,12 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -137,7 +146,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Escolha uma variante ou gerencie um modo ativo.',
                               style: TextStyle(
@@ -161,14 +170,21 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space16,
+                    AppTheme.space12,
+                    AppTheme.space16,
+                    AppTheme.space16,
+                  ),
                   child: Column(
                     children: [
                       if (availability.maxActiveModesReached) ...[
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(
+                            bottom: AppTheme.space10,
+                          ),
+                          padding: const EdgeInsets.all(AppTheme.space12),
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceElevated,
                             borderRadius: BorderRadius.circular(
@@ -224,7 +240,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             LifeCounterGameModesAction.closePlanechaseCardPool,
                         closeAction: LifeCounterGameModesAction.closePlanechase,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppTheme.space10),
                       _GameModeStatusCard(
                         keyName: 'archenemy',
                         modeKind: LifeCounterGameModeKind.archenemy,
@@ -256,7 +272,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             LifeCounterGameModesAction.closeArchenemyCardPool,
                         closeAction: LifeCounterGameModesAction.closeArchenemy,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppTheme.space10),
                       _GameModeStatusCard(
                         keyName: 'bounty',
                         modeKind: LifeCounterGameModeKind.bounty,
@@ -353,14 +369,14 @@ class _GameModeStatusCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppTheme.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(icon, color: AppTheme.textPrimary),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
                 Expanded(
                   child: Text(
                     title,
@@ -373,7 +389,7 @@ class _GameModeStatusCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -401,7 +417,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             Text(
               summary,
               style: const TextStyle(
@@ -411,7 +427,7 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ),
             if (active) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               const Text(
                 'Este modo já está aberto na partida atual.',
                 style: TextStyle(
@@ -423,7 +439,7 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ],
             if (cardPoolActive) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               const Text(
                 'O conjunto de cartas já está aberto para este modo.',
                 style: TextStyle(
@@ -435,7 +451,7 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ],
             if (blockedByActiveModeLimit) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               Text(
                 activeModeLabels.isEmpty
                     ? 'Apenas $maxActiveModes modos de jogo podem ficar ativos ao mesmo tempo. Encerre um antes de iniciar $title ou abrir seu conjunto de cartas.'
@@ -451,7 +467,7 @@ class _GameModeStatusCard extends StatelessWidget {
             if (preferred &&
                 preferredIntent ==
                     LifeCounterGameModesEntryIntent.editCards) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.space10),
               Text(
                 'Continue para o conjunto de cartas de $title.',
                 style: const TextStyle(
@@ -462,18 +478,17 @@ class _GameModeStatusCard extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             FilledButton.tonalIcon(
               key: Key('life-counter-native-game-modes-$keyName-open'),
-              onPressed:
-                  available && !blockedByActiveModeLimit
-                      ? () => Navigator.of(context).pop(
-                        preferredIntent ==
-                                LifeCounterGameModesEntryIntent.editCards
-                            ? editAction
-                            : openAction,
-                      )
-                      : null,
+              onPressed: available && !blockedByActiveModeLimit
+                  ? () => Navigator.of(context).pop(
+                      preferredIntent ==
+                              LifeCounterGameModesEntryIntent.editCards
+                          ? editAction
+                          : openAction,
+                    )
+                  : null,
               icon: const Icon(Icons.launch_rounded),
               label: Text(
                 !available
@@ -484,9 +499,9 @@ class _GameModeStatusCard extends StatelessWidget {
                     ? 'Voltar ao conjunto de cartas'
                     : preferred
                     ? preferredIntent ==
-                            LifeCounterGameModesEntryIntent.editCards
-                        ? 'Continuar para o conjunto'
-                        : 'Continuar com $title'
+                              LifeCounterGameModesEntryIntent.editCards
+                          ? 'Continuar para o conjunto'
+                          : 'Continuar com $title'
                     : active
                     ? 'Voltar para $title'
                     : 'Abrir $title',
@@ -496,7 +511,7 @@ class _GameModeStatusCard extends StatelessWidget {
                 !blockedByActiveModeLimit &&
                 preferredIntent ==
                     LifeCounterGameModesEntryIntent.openMode) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
@@ -510,22 +525,22 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ],
             if (cardPoolActive) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   key: Key(
                     'life-counter-native-game-modes-$keyName-close-card-pool',
                   ),
-                  onPressed:
-                      () => Navigator.of(context).pop(closeCardPoolAction),
+                  onPressed: () =>
+                      Navigator.of(context).pop(closeCardPoolAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
                   label: const Text('Fechar conjunto de cartas'),
                 ),
               ),
             ],
             if (active) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
@@ -539,21 +554,20 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ],
             if (!available) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.space8),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   key: Key('life-counter-native-game-modes-$keyName-settings'),
-                  onPressed:
-                      () => Navigator.of(
-                        context,
-                      ).pop(LifeCounterGameModesAction.openSettings),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pop(LifeCounterGameModesAction.openSettings),
                   icon: const Icon(Icons.settings_outlined),
                   label: const Text('Abrir configurações'),
                 ),
               ),
             ],
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.space8),
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
@@ -584,7 +598,10 @@ class _GameModeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space6,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -611,109 +628,118 @@ Future<void> _showGameModeInfoSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: AppTheme.transparent,
-    builder:
-        (context) => SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppTheme.backgroundAbyss,
-                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                border: Border.all(color: AppTheme.outlineMuted),
+    builder: (context) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+          AppTheme.space12,
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundAbyss,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            border: Border.all(color: AppTheme.outlineMuted),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTheme.space20,
+                AppTheme.space18,
+                AppTheme.space20,
+                AppTheme.space20,
               ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              info.title,
-                              style: const TextStyle(
-                                color: AppTheme.textPrimary,
-                                fontSize: AppTheme.fontXxl,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                      Expanded(
+                        child: Text(
+                          info.title,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: AppTheme.fontXxl,
+                            fontWeight: FontWeight.w700,
                           ),
-                          IconButton(
-                            key: Key(
-                              'life-counter-native-game-modes-${info.keyName}-info-close',
-                            ),
-                            tooltip: 'Fechar detalhes',
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.close_rounded),
-                            color: AppTheme.textSecondary,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        info.summary,
-                        style: const TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: AppTheme.fontMd,
-                          height: AppTheme.lineHeightComfortable,
                         ),
                       ),
-                      const SizedBox(height: 14),
-                      const Text(
-                        'Regras rápidas',
-                        style: TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: AppTheme.fontLg,
-                          fontWeight: FontWeight.w700,
+                      IconButton(
+                        key: Key(
+                          'life-counter-native-game-modes-${info.keyName}-info-close',
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      for (final bullet in info.rules) ...[
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(top: 7),
-                              child: Icon(
-                                Icons.circle,
-                                size: 6,
-                                color: AppTheme.primarySoft,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                bullet,
-                                style: const TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  fontSize: AppTheme.fontMd,
-                                  height: AppTheme.lineHeightComfortable,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                      const SizedBox(height: 6),
-                      Text(
-                        info.tip,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w600,
-                          height: AppTheme.lineHeightComfortable,
-                        ),
+                        tooltip: 'Fechar detalhes',
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close_rounded),
+                        color: AppTheme.textSecondary,
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: AppTheme.space8),
+                  Text(
+                    info.summary,
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontMd,
+                      height: AppTheme.lineHeightComfortable,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space14),
+                  const Text(
+                    'Regras rápidas',
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontLg,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space8),
+                  for (final bullet in info.rules) ...[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: AppTheme.space7),
+                          child: Icon(
+                            Icons.circle,
+                            size: 6,
+                            color: AppTheme.primarySoft,
+                          ),
+                        ),
+                        const SizedBox(width: AppTheme.space10),
+                        Expanded(
+                          child: Text(
+                            bullet,
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: AppTheme.fontMd,
+                              height: AppTheme.lineHeightComfortable,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.space8),
+                  ],
+                  const SizedBox(height: AppTheme.space6),
+                  Text(
+                    info.tip,
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w600,
+                      height: AppTheme.lineHeightComfortable,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
+    ),
   );
 }
 

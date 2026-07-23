@@ -121,29 +121,28 @@ void main() {
                     await showDeckEditionPicker(
                       context: context,
                       card: card,
-                      loadPrintings:
-                          (_) async => [
-                            {
-                              'id': 'card-1',
-                              'set_code': 'TST',
-                              'set_name': 'Test Set',
-                              'set_release_date': '2026-01-01',
-                              'collector_number': '42',
-                              'rarity': 'common',
-                              'image_url': null,
-                            },
-                            {
-                              'id': 'card-2',
-                              'set_code': 'OTH',
-                              'set_name': 'Other Set',
-                              'set_release_date': '2025-01-01',
-                              'collector_number': '7',
-                              'foil': true,
-                              'rarity': 'rare',
-                              'price': 1.5,
-                              'image_url': null,
-                            },
-                          ],
+                      loadPrintings: (_) async => [
+                        {
+                          'id': 'card-1',
+                          'set_code': 'TST',
+                          'set_name': 'Test Set',
+                          'set_release_date': '2026-01-01',
+                          'collector_number': '42',
+                          'rarity': 'common',
+                          'image_url': null,
+                        },
+                        {
+                          'id': 'card-2',
+                          'set_code': 'OTH',
+                          'set_name': 'Other Set',
+                          'set_release_date': '2025-01-01',
+                          'collector_number': '7',
+                          'foil': true,
+                          'rarity': 'rare',
+                          'price': 1.5,
+                          'image_url': null,
+                        },
+                      ],
                       onReplaceEdition: (newCardId) async {
                         replacedId = newCardId;
                       },
@@ -371,11 +370,9 @@ void main() {
                       await showDeckAiExplanationFlow(
                         context: context,
                         card: card,
-                        explainCard:
-                            (_) async =>
-                                throw Exception(
-                                  'SocketException: failed host lookup',
-                                ),
+                        explainCard: (_) async => throw Exception(
+                          'SocketException: failed host lookup',
+                        ),
                       );
                     },
                     child: const Text('abrir'),
@@ -417,6 +414,8 @@ void main() {
                       context: context,
                       pricing: {
                         'estimated_total_usd': 42.5,
+                        'currency': 'USD',
+                        'price_source': 'scryfall',
                         'items': const [
                           {
                             'name': 'Arcane Signet',
@@ -442,8 +441,41 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Custo do deck'), findsOneWidget);
-    expect(find.text('Total estimado: \$42.5'), findsOneWidget);
+    expect(find.text('Total estimado: US\$ 42,50'), findsOneWidget);
+    expect(find.text('Fonte: Scryfall'), findsOneWidget);
     expect(find.text('1× Arcane Signet'), findsOneWidget);
-    expect(find.text('\$2.50'), findsWidgets);
+    expect(find.text('US\$ 2,50'), findsWidgets);
+  });
+
+  testWidgets('pricing sheet keeps an unavailable total explicit', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: ElevatedButton(
+              onPressed: () => showDeckPricingDetailsSheet(
+                context: context,
+                pricing: const {
+                  'estimated_total_usd': null,
+                  'currency': 'USD',
+                  'missing_price_cards': 100,
+                  'items': [],
+                },
+              ),
+              child: const Text('abrir sem preço'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('abrir sem preço'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Total indisponível'), findsOneWidget);
+    expect(find.textContaining('100 carta(s) sem preço'), findsOneWidget);
+    expect(find.textContaining('0,00'), findsNothing);
   });
 }

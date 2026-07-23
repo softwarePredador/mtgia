@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../binder/screens/binder_screen.dart' show BinderTabContent;
 import '../../binder/screens/marketplace_screen.dart'
@@ -12,8 +14,9 @@ import 'sets_catalog_screen.dart';
 class CollectionScreen extends StatefulWidget {
   /// Tab inicial: 0 = Fichário, 1 = Marketplace, 2 = Trades, 3 = Coleções
   final int initialTab;
+  final ApiClient? setsApiClient;
 
-  const CollectionScreen({super.key, this.initialTab = 0});
+  const CollectionScreen({super.key, this.initialTab = 0, this.setsApiClient});
 
   @override
   State<CollectionScreen> createState() => _CollectionScreenState();
@@ -22,6 +25,9 @@ class CollectionScreen extends StatefulWidget {
 class _CollectionScreenState extends State<CollectionScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _applyingRouteTab = false;
+
+  int get _routeTab => widget.initialTab.clamp(0, 3).toInt();
 
   @override
   void initState() {
@@ -29,14 +35,52 @@ class _CollectionScreenState extends State<CollectionScreen>
     _tabController = TabController(
       length: 4,
       vsync: this,
-      initialIndex: widget.initialTab.clamp(0, 3),
+      initialIndex: _routeTab,
     );
+    _tabController.addListener(_onTabChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _syncCanonicalLocation(_tabController.index);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant CollectionScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final targetTab = _routeTab;
+    if (_tabController.index != targetTab) {
+      _applyingRouteTab = true;
+      _tabController.index = targetTab;
+      _applyingRouteTab = false;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _tabController.index == targetTab) {
+        _syncCanonicalLocation(targetTab);
+      }
+    });
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (_applyingRouteTab || _tabController.indexIsChanging) return;
+    _syncCanonicalLocation(_tabController.index);
+  }
+
+  void _syncCanonicalLocation(int tab) {
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return;
+
+    final canonicalUri = Uri(
+      path: '/collection',
+      queryParameters: {'tab': '$tab'},
+    );
+    if (GoRouterState.of(context).uri == canonicalUri) return;
+    router.go(canonicalUri.toString());
   }
 
   @override
@@ -121,11 +165,11 @@ class _CollectionScreenState extends State<CollectionScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          BinderTabContent(),
-          MarketplaceTabContent(),
-          TradeInboxTabContent(),
-          SetsCatalogScreen(showAppBar: false),
+        children: [
+          const BinderTabContent(),
+          const MarketplaceTabContent(),
+          const TradeInboxTabContent(),
+          SetsCatalogScreen(apiClient: widget.setsApiClient, showAppBar: false),
         ],
       ),
     );

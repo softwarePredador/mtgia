@@ -10,6 +10,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method != HttpMethod.get) {
     return methodNotAllowed();
   }
+  if (!isBattleReplayUuid(deckId)) {
+    return notFound('Deck nao encontrado.');
+  }
 
   final userId = context.read<String>();
   final service = BattleReplayReadService(context.read<Pool>());
@@ -49,9 +52,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     Log.e('[battle-replays] list failed type=${error.runtimeType}');
     await captureRouteException(
       context,
-      error,
+      StateError('Battle replay list failed'),
       stackTrace: stackTrace,
-      tags: const {'route': 'battle_replays_list'},
+      tags: {
+        'route': 'battle_replays_list',
+        'error_type': '${error.runtimeType}',
+      },
     );
     return internalServerError('Falha ao carregar replays de battle');
   }

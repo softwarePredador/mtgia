@@ -1,9 +1,19 @@
 {
-  "schema_version": "commander_ai_prompt_eval_v1_2026-07-06",
+  "schema_version": "commander_ai_prompt_eval_v2_2026-07-22",
   "minimum_score": 90,
+  "coverage_requirements": {
+    "split": "held_out",
+    "minimum_case_count": 6,
+    "required_brackets": [1, 2, 3, 4, 5],
+    "required_color_buckets": ["colorless", "mono", "two", "three_plus"],
+    "minimum_archetype_family_count": 6
+  },
   "cases": [
     {
       "id": "kaalia_collection_budget_bracket3",
+      "split": "held_out",
+      "archetype_family": "attack_midrange",
+      "intensity": "focused",
       "commander": "Kaalia of the Vast",
       "archetype": "mardu attack-window midrange",
       "bracket": 3,
@@ -188,6 +198,9 @@
     },
     {
       "id": "lorehold_protected_anchor_bracket2",
+      "split": "held_out",
+      "archetype_family": "spells_recursion",
+      "intensity": "aggressive",
       "commander": "Velomachus Lorehold",
       "archetype": "boros spells recursion",
       "bracket": 2,
@@ -338,6 +351,9 @@
     },
     {
       "id": "atraxa_budget_curve_no_cedh",
+      "split": "held_out",
+      "archetype_family": "counters_value",
+      "intensity": "light",
       "commander": "Atraxa, Praetors' Voice",
       "archetype": "counters value",
       "bracket": 3,
@@ -494,6 +510,249 @@
             "in": "Assassin's Trophy",
             "category": "Removal",
             "reasoning": "Funcao: removal universal instantaneo. Risco: da land ao oponente, entao usar em ameacas decisivas. Curva: reduz de 3 para 2. Preco: BRL 55 dentro do budget. Bracket: adequado para mesa upgraded bracket 3.",
+            "priority": "High"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ezuri_mono_green_aggro_bracket1",
+      "split": "held_out",
+      "archetype_family": "elf_aggro",
+      "intensity": "light",
+      "commander": "Ezuri, Renegade Leader",
+      "archetype": "mono-green elf combat",
+      "bracket": 1,
+      "color_identity": ["G"],
+      "recommendation_context": {
+        "prefer_collection": true,
+        "budget_limit_brl": 0,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Ezuri, Renegade Leader",
+        "Explosive Vegetation",
+        "Elvish Archdruid",
+        "Forest"
+      ],
+      "protected_cards": [
+        "Ezuri, Renegade Leader",
+        "Elvish Archdruid"
+      ],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 1,
+        "role_count_after_at_least": {"ramp": 1, "engine": 1},
+        "role_delta_at_least": {"ramp": 0, "engine": 0}
+      },
+      "card_catalog": {
+        "Ezuri, Renegade Leader": {
+          "roles": ["commander", "payoff"],
+          "color_identity": ["G"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Explosive Vegetation": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Rampant Growth": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 3,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Elvish Archdruid": {
+          "roles": ["engine", "ramp", "payoff"],
+          "color_identity": ["G"],
+          "price_brl": 12,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Forest": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Ezuri preserva o motor de elfos e antecipa o desenvolvimento de mana.",
+        "swaps": [
+          {
+            "out": "Explosive Vegetation",
+            "in": "Rampant Growth",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: mantem ramp verde. Risco: busca uma land a menos, mas abre a curva cedo. Curva: reduz de 4 para 2 manas. Preco: owned/colecao, BRL 0. Bracket: troca simples adequada ao bracket 1.",
+            "priority": "High"
+          }
+        ]
+      }
+    },
+    {
+      "id": "urza_mono_blue_combo_bracket4",
+      "split": "held_out",
+      "archetype_family": "artifact_combo_control",
+      "intensity": "aggressive",
+      "commander": "Urza, Lord High Artificer",
+      "archetype": "mono-blue artifact combo control",
+      "bracket": 4,
+      "color_identity": ["U"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 150,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Urza, Lord High Artificer",
+        "Cancel",
+        "Isochron Scepter",
+        "Island"
+      ],
+      "protected_cards": [
+        "Urza, Lord High Artificer",
+        "Isochron Scepter"
+      ],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"interaction": 1, "engine": 1},
+        "role_delta_at_least": {"interaction": 0, "engine": 0}
+      },
+      "card_catalog": {
+        "Urza, Lord High Artificer": {
+          "roles": ["commander", "engine", "payoff"],
+          "color_identity": ["U"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 4
+        },
+        "Cancel": {
+          "roles": ["interaction"],
+          "color_identity": ["U"],
+          "price_brl": 1,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Force of Negation": {
+          "roles": ["interaction"],
+          "color_identity": ["U"],
+          "price_brl": 140,
+          "owned": false,
+          "min_bracket": 4
+        },
+        "Isochron Scepter": {
+          "roles": ["engine", "combo"],
+          "color_identity": [],
+          "price_brl": 25,
+          "owned": true,
+          "min_bracket": 3
+        },
+        "Island": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Urza preserva o motor de artefatos e melhora a interação no turno dos oponentes.",
+        "swaps": [
+          {
+            "out": "Cancel",
+            "in": "Force of Negation",
+            "category": "Interaction",
+            "reasoning": "Funcao: mantem a lane de interaction. Risco: o custo alternativo perde uma carta. Curva: reduz a dependencia de mana aberta. Preco: BRL 140 dentro do budget. Bracket: poder compatível com bracket 4.",
+            "priority": "High"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kozilek_colorless_fast_mana_bracket5",
+      "split": "held_out",
+      "archetype_family": "colorless_fast_mana",
+      "intensity": "rebuild",
+      "commander": "Kozilek, the Great Distortion",
+      "archetype": "colorless fast mana combo",
+      "bracket": 5,
+      "color_identity": [],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 500,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Kozilek, the Great Distortion",
+        "Worn Powerstone",
+        "The One Ring",
+        "Wastes"
+      ],
+      "protected_cards": [
+        "Kozilek, the Great Distortion",
+        "The One Ring"
+      ],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"ramp": 1, "draw": 1},
+        "role_delta_at_least": {"ramp": 0, "draw": 0}
+      },
+      "card_catalog": {
+        "Kozilek, the Great Distortion": {
+          "roles": ["commander", "payoff", "draw"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 4
+        },
+        "Worn Powerstone": {
+          "roles": ["ramp"],
+          "color_identity": [],
+          "price_brl": 4,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Mana Vault": {
+          "roles": ["ramp"],
+          "color_identity": [],
+          "price_brl": 480,
+          "owned": false,
+          "min_bracket": 4
+        },
+        "The One Ring": {
+          "roles": ["draw", "protection"],
+          "color_identity": [],
+          "price_brl": 400,
+          "owned": true,
+          "min_bracket": 4
+        },
+        "Wastes": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Kozilek preserva compra e proteção enquanto acelera o comandante.",
+        "swaps": [
+          {
+            "out": "Worn Powerstone",
+            "in": "Mana Vault",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: mantem ramp incolor. Risco: exige pagar para desvirar e pode causar dano. Curva: reduz de 3 para 1 mana. Preco: BRL 480 dentro do budget. Bracket: fast mana coerente com bracket 5.",
             "priority": "High"
           }
         ]

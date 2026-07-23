@@ -151,6 +151,9 @@ void main() {
           playSessionId: 'play-607',
           deckId: 'deck-607',
           deckName: 'Lorehold',
+          deckSnapshotHash:
+              'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          deckVersionAtEpochMs: 1200,
           startedAtEpochMs: 1234,
         );
         await sessionStore.save(previous);
@@ -159,6 +162,8 @@ void main() {
           clearPlaySessionId: true,
           clearDeckId: true,
           clearDeckName: true,
+          clearDeckSnapshotHash: true,
+          clearDeckVersionAtEpochMs: true,
           clearStartedAtEpochMs: true,
         );
 
@@ -179,6 +184,11 @@ void main() {
         expect(result.session?.playSessionId, 'play-607');
         expect(result.session?.deckId, 'deck-607');
         expect(result.session?.deckName, 'Lorehold');
+        expect(
+          result.session?.deckSnapshotHash,
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        );
+        expect(result.session?.deckVersionAtEpochMs, 1200);
         expect(result.session?.startedAtEpochMs, 1234);
       },
     );

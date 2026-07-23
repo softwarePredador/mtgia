@@ -61,7 +61,10 @@ class _SplashScreenState extends State<SplashScreen>
     final postAuthRedirect = normalizePostAuthRedirect(widget.redirectPath);
     context.go(
       authProvider.isAuthenticated
-          ? postAuthRedirect ?? '/home'
+          ? resolveAuthenticatedLocation(
+              redirectPath: postAuthRedirect,
+              defaultLocation: authProvider.defaultAuthenticatedLocation,
+            )
           : buildAuthLocation('/login', postAuthRedirect),
     );
   }
@@ -100,7 +103,12 @@ class _SplashScreenState extends State<SplashScreen>
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(28, 72, 28, 52),
+              padding: const EdgeInsets.fromLTRB(
+                AppTheme.space28,
+                AppTheme.space72,
+                AppTheme.space28,
+                AppTheme.space52,
+              ),
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Column(
@@ -114,7 +122,7 @@ class _SplashScreenState extends State<SplashScreen>
                           Container(
                             width: 116,
                             height: 116,
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(AppTheme.space10),
                             decoration: BoxDecoration(
                               color: AppTheme.backgroundAbyss.withValues(
                                 alpha: 0.34,
@@ -140,40 +148,38 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: AppTheme.space22),
                           Text(
                             'ManaLoom',
                             textAlign: TextAlign.center,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.headlineLarge?.copyWith(
-                              color: AppTheme.textPrimary,
-                              fontFamily: AppTheme.displayFontFamily,
-                              fontWeight: FontWeight.w900,
-                              fontSize: AppTheme.fontDisplay + 2,
-                              letterSpacing: 0,
-                              height: 1.03,
-                            ),
+                            style: Theme.of(context).textTheme.headlineLarge
+                                ?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontFamily: AppTheme.displayFontFamily,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: AppTheme.fontDisplay + 2,
+                                  letterSpacing: 0,
+                                  height: 1.03,
+                                ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                           Text(
                             'Tecendo estratégias lendárias',
                             textAlign: TextAlign.center,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.textSecondary,
-                              fontWeight: FontWeight.w600,
-                              height: 1.28,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.28,
+                                ),
                           ),
                         ],
                       ),
                     ),
                     const Spacer(flex: 4),
                     const SizedBox(
-                      width: 32,
-                      height: 32,
+                      width: AppTheme.space32,
+                      height: AppTheme.space32,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.6,
                         valueColor: AlwaysStoppedAnimation<Color>(

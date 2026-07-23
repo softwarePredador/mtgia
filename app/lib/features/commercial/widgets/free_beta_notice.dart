@@ -25,7 +25,7 @@ class FreeBetaNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppTheme.space20),
       decoration: BoxDecoration(
         gradient: AppTheme.heroGradient,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -36,7 +36,10 @@ class FreeBetaNotice extends StatelessWidget {
         children: [
           Container(
             key: const Key('free-beta-status-badge'),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space10,
+              vertical: AppTheme.space6,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.brass400.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -52,7 +55,7 @@ class FreeBetaNotice extends StatelessWidget {
                   size: 17,
                   color: AppTheme.brass400,
                 ),
-                SizedBox(width: 7),
+                SizedBox(width: AppTheme.space7),
                 Text(
                   CommercialLaunchPolicy.betaLabel,
                   style: TextStyle(
@@ -63,7 +66,7 @@ class FreeBetaNotice extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
           Text(
             title,
             style: theme.textTheme.headlineSmall?.copyWith(
@@ -72,7 +75,7 @@ class FreeBetaNotice extends StatelessWidget {
               height: 1.15,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Text(
             description,
             style: theme.textTheme.bodyLarge?.copyWith(
@@ -80,7 +83,7 @@ class FreeBetaNotice extends StatelessWidget {
               height: 1.45,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppTheme.space18),
           Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -89,9 +92,9 @@ class FreeBetaNotice extends StatelessWidget {
                 _BetaCapability(icon: capability.$1, label: capability.$2),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppTheme.space18),
           const Divider(color: AppTheme.outlineMuted, height: 1),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppTheme.space14),
           const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -100,7 +103,7 @@ class FreeBetaNotice extends StatelessWidget {
                 size: 20,
                 color: AppTheme.frost400,
               ),
-              SizedBox(width: 10),
+              SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   'Não há assinatura, checkout ou cobrança nesta beta. Qualquer oferta futura será apresentada separadamente e exigirá confirmação explícita.',
@@ -124,7 +127,10 @@ class _BetaCapability extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space11,
+        vertical: AppTheme.space9,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -134,7 +140,7 @@ class _BetaCapability extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 18, color: AppTheme.frost400),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.space8),
           Flexible(
             child: Text(
               label,

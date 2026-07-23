@@ -238,8 +238,8 @@ class CardRecognitionService {
   Future<CardRecognitionResult> _processNameRegion(img.Image original) async {
     // Calcula região do nome (primeiros ~12% da altura, excluindo mana cost à direita)
     final nameHeight = (original.height * 0.12).round().clamp(40, 250);
-    final nameWidth =
-        (original.width * 0.70).round(); // Exclui área de mana cost
+    final nameWidth = (original.width * 0.70)
+        .round(); // Exclui área de mana cost
 
     var cropped = img.copyCrop(
       original,
@@ -389,10 +389,9 @@ class CardRecognitionService {
         }
 
         // Recalcula bounding box relativa ao guia (ou usa original)
-        final relBox =
-            cardGuideRect != null
-                ? _relativizeToGuide(line.boundingBox, cardGuideRect)
-                : line.boundingBox;
+        final relBox = cardGuideRect != null
+            ? _relativizeToGuide(line.boundingBox, cardGuideRect)
+            : line.boundingBox;
 
         final candidate = _evaluateCandidate(
           line.text,
@@ -404,10 +403,9 @@ class CardRecognitionService {
       }
 
       // Avalia bloco completo (pode pegar nome com quebra de linha)
-      final blockBox =
-          cardGuideRect != null
-              ? _relativizeToGuide(block.boundingBox, cardGuideRect)
-              : block.boundingBox;
+      final blockBox = cardGuideRect != null
+          ? _relativizeToGuide(block.boundingBox, cardGuideRect)
+          : block.boundingBox;
 
       final blockCandidate = _evaluateCandidate(
         block.text,
@@ -453,13 +451,12 @@ class CardRecognitionService {
 
     return CardRecognitionResult.success(
       primaryName: unique.first.text,
-      alternatives:
-          unique
-              .skip(1)
-              .take(5)
-              .map((c) => c.text)
-              .where((t) => t != unique.first.text)
-              .toList(),
+      alternatives: unique
+          .skip(1)
+          .take(5)
+          .map((c) => c.text)
+          .where((t) => t != unique.first.text)
+          .toList(),
       setCodeCandidates: setCodeCandidates,
       confidence: confidence,
       allCandidates: unique,
@@ -761,8 +758,9 @@ class CardRecognitionService {
 
     // Múltiplas palavras capitalizadas
     final words = cleaned.split(RegExp(r'\s+'));
-    final capCount =
-        words.where((w) => w.isNotEmpty && _isUpperCase(w[0])).length;
+    final capCount = words
+        .where((w) => w.isNotEmpty && _isUpperCase(w[0]))
+        .length;
     if (capCount >= 2 && capCount <= 6) {
       score += capCount * 7;
     }
@@ -1034,6 +1032,7 @@ class CardRecognitionService {
     CameraImage cameraImage,
     CameraDescription camera, {
     Rect? cardGuideRect,
+    void Function(Object error)? onError,
   }) async {
     if (_isProcessingStream) return null;
     _isProcessingStream = true;
@@ -1059,6 +1058,7 @@ class CardRecognitionService {
       }
       return null;
     } catch (e) {
+      onError?.call(e);
       debugPrint('[OCR Stream] Erro: $e');
       return null;
     } finally {
@@ -1086,15 +1086,14 @@ class CardRecognitionService {
     if (format == null) return null;
 
     // Monta os planes
-    final planes =
-        image.planes.map((plane) {
-          return InputImageMetadata(
-            size: Size(image.width.toDouble(), image.height.toDouble()),
-            rotation: rotation!,
-            format: format,
-            bytesPerRow: plane.bytesPerRow,
-          );
-        }).toList();
+    final planes = image.planes.map((plane) {
+      return InputImageMetadata(
+        size: Size(image.width.toDouble(), image.height.toDouble()),
+        rotation: rotation!,
+        format: format,
+        bytesPerRow: plane.bytesPerRow,
+      );
+    }).toList();
 
     if (planes.isEmpty) return null;
 

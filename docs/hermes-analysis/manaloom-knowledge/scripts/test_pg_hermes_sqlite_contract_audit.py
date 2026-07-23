@@ -106,6 +106,10 @@ class PgHermesSqliteContractAuditTests(unittest.TestCase):
         failures = [check for check in report["checks"] if check["status"] == "fail"]
         self.assertEqual(failures, [])
         self.assertEqual(report["status"], "pass")
+        self.assertEqual(
+            sum(report["summary"]["status_counts"].values()),
+            report["summary"]["check_count"],
+        )
 
     def test_competing_verified_executable_scope_fails_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

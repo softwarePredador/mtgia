@@ -5,6 +5,8 @@ class DeckDetails extends Deck {
   final Map<String, dynamic> stats;
   final List<DeckCardItem> commander;
   final Map<String, List<DeckCardItem>> mainBoard;
+  final String? deckSnapshotHash;
+  final DateTime? deckVersionAt;
 
   DeckDetails({
     required super.id,
@@ -21,6 +23,7 @@ class DeckDetails extends Deck {
     super.pricingCurrency,
     super.pricingTotal,
     super.pricingMissingCards,
+    super.pricingSource,
     super.pricingUpdatedAt,
     super.colorIdentity,
     super.colorIdentityKnown,
@@ -33,6 +36,8 @@ class DeckDetails extends Deck {
     required this.stats,
     required this.commander,
     required this.mainBoard,
+    this.deckSnapshotHash,
+    this.deckVersionAt,
   });
 
   factory DeckDetails.fromJson(Map<String, dynamic> json) {
@@ -47,17 +52,18 @@ class DeckDetails extends Deck {
     final mainBoardMap = <String, List<DeckCardItem>>{};
     if (json['main_board'] != null) {
       (json['main_board'] as Map<String, dynamic>).forEach((key, value) {
-        mainBoardMap[key] =
-            (value as List)
-                .map((e) => DeckCardItem.fromJson(e as Map<String, dynamic>))
-                .toList();
+        mainBoardMap[key] = (value as List)
+            .map((e) => DeckCardItem.fromJson(e as Map<String, dynamic>))
+            .toList();
       });
     }
 
-    final inferredCommanderName =
-        commanderList.isNotEmpty ? commanderList.first.name : null;
-    final inferredCommanderImageUrl =
-        commanderList.isNotEmpty ? commanderList.first.imageUrl : null;
+    final inferredCommanderName = commanderList.isNotEmpty
+        ? commanderList.first.name
+        : null;
+    final inferredCommanderImageUrl = commanderList.isNotEmpty
+        ? commanderList.first.imageUrl
+        : null;
 
     // Parse color_identity from API, or compute from cards as fallback
     var colorIdentity =
@@ -102,10 +108,10 @@ class DeckDetails extends Deck {
       pricingCurrency: json['pricing_currency'] as String?,
       pricingTotal: (json['pricing_total'] as num?)?.toDouble(),
       pricingMissingCards: json['pricing_missing_cards'] as int?,
-      pricingUpdatedAt:
-          (json['pricing_updated_at'] != null)
-              ? DateTime.tryParse(json['pricing_updated_at'] as String)
-              : null,
+      pricingSource: json['pricing_source'] as String?,
+      pricingUpdatedAt: (json['pricing_updated_at'] != null)
+          ? DateTime.tryParse(json['pricing_updated_at'] as String)
+          : null,
       colorIdentity: colorIdentity,
       colorIdentityKnown:
           json['color_identity_known'] as bool? ??
@@ -119,6 +125,8 @@ class DeckDetails extends Deck {
       stats: json['stats'] as Map<String, dynamic>? ?? {},
       commander: commanderList,
       mainBoard: mainBoardMap,
+      deckSnapshotHash: json['deck_snapshot_hash']?.toString(),
+      deckVersionAt: _dateTimeFromJson(json['deck_version_at']),
     );
   }
 
@@ -138,6 +146,7 @@ class DeckDetails extends Deck {
     String? pricingCurrency,
     double? pricingTotal,
     int? pricingMissingCards,
+    String? pricingSource,
     DateTime? pricingUpdatedAt,
     List<String>? colorIdentity,
     bool? colorIdentityKnown,
@@ -150,6 +159,8 @@ class DeckDetails extends Deck {
     Map<String, dynamic>? stats,
     List<DeckCardItem>? commander,
     Map<String, List<DeckCardItem>>? mainBoard,
+    String? deckSnapshotHash,
+    DateTime? deckVersionAt,
   }) {
     return DeckDetails(
       id: id ?? this.id,
@@ -166,6 +177,7 @@ class DeckDetails extends Deck {
       pricingCurrency: pricingCurrency ?? this.pricingCurrency,
       pricingTotal: pricingTotal ?? this.pricingTotal,
       pricingMissingCards: pricingMissingCards ?? this.pricingMissingCards,
+      pricingSource: pricingSource ?? this.pricingSource,
       pricingUpdatedAt: pricingUpdatedAt ?? this.pricingUpdatedAt,
       colorIdentity: colorIdentity ?? this.colorIdentity,
       colorIdentityKnown: colorIdentityKnown ?? this.colorIdentityKnown,
@@ -178,6 +190,8 @@ class DeckDetails extends Deck {
       stats: stats ?? this.stats,
       commander: commander ?? this.commander,
       mainBoard: mainBoard ?? this.mainBoard,
+      deckSnapshotHash: deckSnapshotHash ?? this.deckSnapshotHash,
+      deckVersionAt: deckVersionAt ?? this.deckVersionAt,
     );
   }
 }

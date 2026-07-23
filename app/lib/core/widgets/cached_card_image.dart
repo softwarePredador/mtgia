@@ -20,6 +20,10 @@ import '../theme/app_theme.dart';
 /// )
 /// ```
 class CachedCardImage extends StatelessWidget {
+  static const bool _allowLoopbackHttpImages = bool.fromEnvironment(
+    'MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES',
+    defaultValue: false,
+  );
   static const _scryfallHeaders = <String, String>{
     'User-Agent': 'ManaLoom/1.0',
     'Accept': 'image/*',
@@ -27,22 +31,39 @@ class CachedCardImage extends StatelessWidget {
 
   final String? imageUrl;
   final String? fallbackImageUrl;
+  final Key? networkImageKey;
   final double? width;
   final double? height;
   final BoxFit fit;
+  final Alignment alignment;
   final BorderRadius? borderRadius;
+  final Widget? loadingPlaceholder;
+  final Widget? errorPlaceholder;
 
   const CachedCardImage({
     super.key,
     required this.imageUrl,
     this.fallbackImageUrl,
+    this.networkImageKey,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
+    this.alignment = Alignment.center,
     this.borderRadius,
+    this.loadingPlaceholder,
+    this.errorPlaceholder,
   });
 
-  String? _sanitizeImageUrl(String? rawUrl) {
+  @visibleForTesting
+  static String? sanitizeImageUrlForTesting(
+    String? rawUrl, {
+    bool allowLoopbackHttp = false,
+  }) => _sanitizeImageUrl(rawUrl, allowLoopbackHttp: allowLoopbackHttp);
+
+  static String? _sanitizeImageUrl(
+    String? rawUrl, {
+    bool allowLoopbackHttp = _allowLoopbackHttpImages,
+  }) {
     final trimmed = rawUrl?.trim();
     if (trimmed == null || trimmed.isEmpty) {
       return null;
@@ -58,7 +79,13 @@ class CachedCardImage extends StatelessWidget {
     }
 
     if (normalized.startsWith('http://')) {
-      normalized = 'https://${normalized.substring('http://'.length)}';
+      final httpUri = Uri.tryParse(normalized);
+      final isLoopback =
+          httpUri != null &&
+          const {'127.0.0.1', '::1', 'localhost'}.contains(httpUri.host);
+      if (!allowLoopbackHttp || !isLoopback) {
+        normalized = 'https://${normalized.substring('http://'.length)}';
+      }
     }
 
     var uri = Uri.tryParse(normalized);
@@ -89,8 +116,8 @@ class CachedCardImage extends StatelessWidget {
     final primaryUrl = effectiveImageUrl ?? effectiveFallbackUrl;
     final fallbackUrl =
         effectiveFallbackUrl != null && effectiveFallbackUrl != primaryUrl
-            ? effectiveFallbackUrl
-            : null;
+        ? effectiveFallbackUrl
+        : null;
 
     if (primaryUrl == null) {
       return _placeholder();
@@ -107,10 +134,12 @@ class CachedCardImage extends StatelessWidget {
 
   Widget _networkImage(String effectiveImageUrl, {String? fallbackUrl}) {
     final image = CachedNetworkImage(
+      key: networkImageKey,
       imageUrl: effectiveImageUrl,
       width: width,
       height: height,
       fit: fit,
+      alignment: alignment,
       httpHeaders: _scryfallHeaders,
       fadeInDuration: const Duration(milliseconds: 200),
       placeholder: (_, __) => _loadingWidget(),
@@ -124,6 +153,7 @@ class CachedCardImage extends StatelessWidget {
             width: width,
             height: height,
             fit: fit,
+            alignment: alignment,
             httpHeaders: _scryfallHeaders,
             fadeInDuration: const Duration(milliseconds: 120),
             placeholder: (_, __) => _loadingWidget(),
@@ -141,6 +171,9 @@ class CachedCardImage extends StatelessWidget {
 
   /// Placeholder estático quando não há URL (sem imagem para carregar)
   Widget _placeholder() {
+    if (errorPlaceholder != null) {
+      return SizedBox(width: width, height: height, child: errorPlaceholder);
+    }
     return Container(
       width: width,
       height: height,
@@ -160,6 +193,9 @@ class CachedCardImage extends StatelessWidget {
 
   /// Placeholder enquanto a imagem está baixando (sem spinner para não parecer "loading" permanente)
   Widget _loadingWidget() {
+    if (loadingPlaceholder != null) {
+      return SizedBox(width: width, height: height, child: loadingPlaceholder);
+    }
     return Container(
       width: width,
       height: height,
@@ -174,6 +210,9 @@ class CachedCardImage extends StatelessWidget {
   }
 
   Widget _errorWidget() {
+    if (errorPlaceholder != null) {
+      return SizedBox(width: width, height: height, child: errorPlaceholder);
+    }
     return Container(
       width: width,
       height: height,

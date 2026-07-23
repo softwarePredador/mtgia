@@ -55,12 +55,12 @@ class DeckAddCardsMenu extends StatelessWidget {
         child: SizedBox(
           height: 56,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.space20),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.add),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppTheme.space10),
                 Text(
                   'Adicionar Cartas',
                   style: Theme.of(

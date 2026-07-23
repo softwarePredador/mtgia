@@ -22,10 +22,9 @@ String cardEditionDescription({
   bool releaseYearOnly = false,
 }) {
   final release = (setReleaseDate ?? '').trim();
-  final releaseLabel =
-      releaseYearOnly && release.length >= 4
-          ? release.substring(0, 4)
-          : release;
+  final releaseLabel = releaseYearOnly && release.length >= 4
+      ? release.substring(0, 4)
+      : release;
   final parts = [
     if ((setName ?? '').trim().isNotEmpty) setName!.trim(),
     if (releaseLabel.isNotEmpty) releaseLabel,
@@ -36,20 +35,19 @@ String cardEditionDescription({
 }
 
 String cardEditionFullLabel(Map<String, dynamic> printing) {
-  final parts =
-      [
-        cardEditionCodeLabel(
-          setCode: printing['set_code']?.toString(),
-          collectorNumber: printing['collector_number']?.toString(),
-        ),
-        cardFoilLabel(printing['foil'] as bool?),
-        if ((printing['set_name'] ?? '').toString().trim().isNotEmpty)
-          printing['set_name'].toString().trim(),
-        if ((printing['rarity'] ?? '').toString().trim().isNotEmpty)
-          _capitalize(printing['rarity'].toString().trim()),
-        if ((printing['set_release_date'] ?? '').toString().trim().isNotEmpty)
-          printing['set_release_date'].toString().trim(),
-      ].where((part) => part.trim().isNotEmpty).toList();
+  final parts = [
+    cardEditionCodeLabel(
+      setCode: printing['set_code']?.toString(),
+      collectorNumber: printing['collector_number']?.toString(),
+    ),
+    cardFoilLabel(printing['foil'] as bool?),
+    if ((printing['set_name'] ?? '').toString().trim().isNotEmpty)
+      printing['set_name'].toString().trim(),
+    if ((printing['rarity'] ?? '').toString().trim().isNotEmpty)
+      _capitalize(printing['rarity'].toString().trim()),
+    if ((printing['set_release_date'] ?? '').toString().trim().isNotEmpty)
+      printing['set_release_date'].toString().trim(),
+  ].where((part) => part.trim().isNotEmpty).toList();
   return parts.join(' • ');
 }
 
@@ -95,8 +93,11 @@ class CardEditionMetadataLine extends StatelessWidget {
           children: [
             if (codeLabel.isNotEmpty)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                margin: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space6,
+                  vertical: AppTheme.space2,
+                ),
+                margin: const EdgeInsets.only(right: AppTheme.space6),
                 decoration: BoxDecoration(
                   color: AppTheme.frost400.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(AppTheme.radiusXs),
@@ -128,7 +129,7 @@ class CardEditionMetadataLine extends StatelessWidget {
           ],
         ),
         if ((warning ?? '').isNotEmpty) ...[
-          const SizedBox(height: 3),
+          const SizedBox(height: AppTheme.space3),
           Text(
             warning!,
             maxLines: 1,

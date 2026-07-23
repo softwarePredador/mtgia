@@ -191,6 +191,13 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
 }
 
 void main() {
+  test('battle replay location is canonical and URL-safe', () {
+    expect(
+      battleReplaysRouteLocation('deck id/with slash'),
+      '/decks/deck%20id%2Fwith%20slash/battle-replays',
+    );
+  });
+
   testWidgets('renders replay list and opens structured replay detail', (
     tester,
   ) async {
@@ -343,8 +350,9 @@ void main() {
         closeTo(tester.getTopLeft(playerB).dy, 0.1),
       );
 
-      final carousel =
-          find.byKey(const Key('battle-visual-card-carousel')).first;
+      final carousel = find
+          .byKey(const Key('battle-visual-card-carousel'))
+          .first;
       final pageView = tester.widget<PageView>(carousel);
       final renderedItemExtent =
           tester.getSize(carousel).width *

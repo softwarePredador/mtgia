@@ -5,6 +5,7 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_import_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _NoopApiClient extends ApiClient {}
 
@@ -68,6 +69,10 @@ Widget _buildSubject({DeckProvider? provider}) {
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   test('detected count sums quantities and ignores invalid lines', () {
     expect(
       detectedImportCardCount('1 Sol Ring\n4 Island\n2x Mountain\nSideboard'),
@@ -121,6 +126,31 @@ void main() {
     expect(frameSize.width, lessThanOrEqualTo(1120));
     expect(metadataSize.width, closeTo(460, 0.1));
     expect(ctaSize.width, lessThanOrEqualTo(320));
+  });
+
+  testWidgets('filled desktop list keeps an accessible text-field label', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(_buildSubject());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('deck-import-screen-list-field')),
+      '1 Sol Ring',
+    );
+    await tester.pump();
+
+    expect(
+      find.bySemanticsLabel('Lista de cartas para importar'),
+      findsOneWidget,
+    );
+    semantics.dispose();
   });
 
   testWidgets('shows calmer initial import state and example updates count', (

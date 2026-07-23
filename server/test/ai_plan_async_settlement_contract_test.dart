@@ -26,7 +26,10 @@ void main() {
     expect(middleware, contains('reservationHandle.settlementDeferred'));
     expect(middleware, contains('response.statusCode == HttpStatus.accepted'));
     expect(generate, contains('deferAiPlanReservationIfAvailable(context)'));
-    expect(generate, contains('return response.statusCode == HttpStatus.ok'));
+    expect(
+      generate,
+      contains('return completed && response.statusCode == HttpStatus.ok'),
+    );
     expect(generate, contains('settleDeferredAiPlanReservation('));
     expect(optimize, contains("successful: job?.status == 'completed'"));
     expect(optimize, contains('_failOptimizeJobAndReleaseQuota('));

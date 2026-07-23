@@ -62,10 +62,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _isProcessing = false;
       _statusMessage =
           result.requiresExternalPayment &&
-                  result.checkoutUrl != null &&
-                  checkoutUri == null
-              ? 'O link de pagamento recebido não é seguro. Tente novamente.'
-              : result.message;
+              result.checkoutUrl != null &&
+              checkoutUri == null
+          ? 'O link de pagamento recebido não é seguro. Tente novamente.'
+          : result.message;
       _requiresExternalPayment = result.requiresExternalPayment;
       _checkoutUri = checkoutUri;
     });
@@ -73,10 +73,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.message),
-          backgroundColor:
-              result.requiresExternalPayment
-                  ? AppTheme.warning
-                  : AppTheme.error,
+          backgroundColor: result.requiresExternalPayment
+              ? AppTheme.warning
+              : AppTheme.error,
         ),
       );
       return;
@@ -130,8 +129,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           final horizontalGutter = isCompact ? 16.0 : 24.0;
           return ListView(
             padding: EdgeInsets.only(
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: AppTheme.space16,
+              bottom: AppTheme.space16 + MediaQuery.of(context).padding.bottom,
             ),
             children: [
               ResponsivePageFrame(
@@ -143,7 +142,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   children: [
                     Container(
                       key: const Key('checkout-order-summary'),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppTheme.space16),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceSlate,
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -159,7 +158,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppTheme.space12),
                           const _CheckoutLine(
                             label: 'Plano',
                             value: 'ManaLoom Pro',
@@ -182,7 +181,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             label: 'Ativação',
                             value: 'Após confirmação',
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppTheme.space12),
                           const Text(
                             'Seu plano será ativado após a confirmação do pagamento.',
                             style: TextStyle(
@@ -193,10 +192,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppTheme.space12),
                     _CheckoutTermsPanel(terms: proPlan.billingTerms),
                     if (_statusMessage != null) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.space12),
                       _CheckoutStatusPanel(
                         message: _statusMessage!,
                         requiresExternalPayment: _requiresExternalPayment,
@@ -206,7 +205,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         contentSizedAction: !isCompact,
                       ),
                     ],
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     if (isCompact)
                       SizedBox(
                         width: double.infinity,
@@ -223,8 +222,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed:
-                            _isProcessing ? null : () => context.go('/plans'),
+                        onPressed: _isProcessing
+                            ? null
+                            : () => context.go('/plans'),
                         child: const Text('Voltar aos planos'),
                       ),
                     ),
@@ -242,14 +242,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return ElevatedButton.icon(
       key: const Key('checkout-confirm-button'),
       onPressed: _isProcessing ? null : _confirm,
-      icon:
-          _isProcessing
-              ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-              : const Icon(Icons.lock_outline_rounded),
+      icon: _isProcessing
+          ? const SizedBox(
+              width: AppTheme.space18,
+              height: AppTheme.space18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.lock_outline_rounded),
       label: Text(_isProcessing ? 'Processando...' : 'Continuar com segurança'),
     );
   }
@@ -268,8 +267,8 @@ class _FreeBetaCheckoutScreen extends StatelessWidget {
           final horizontalGutter = isCompact ? 16.0 : 24.0;
           return ListView(
             padding: EdgeInsets.only(
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: AppTheme.space16,
+              bottom: AppTheme.space16 + MediaQuery.of(context).padding.bottom,
             ),
             children: [
               ResponsivePageFrame(
@@ -285,7 +284,7 @@ class _FreeBetaCheckoutScreen extends StatelessWidget {
                       description:
                           'A versão pública atual é gratuita. Você pode voltar ao app sem informar pagamento ou iniciar uma assinatura.',
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.space16),
                     if (isCompact)
                       _buildBetaAction(context)
                     else
@@ -332,7 +331,7 @@ class _CheckoutTermsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('checkout-billing-terms'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -347,7 +346,7 @@ class _CheckoutTermsPanel extends StatelessWidget {
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           _CheckoutTermLine(terms.renewalDisclosure),
           _CheckoutTermLine(terms.cancellationDisclosure),
           _CheckoutTermLine(terms.refundDisclosure),
@@ -367,15 +366,17 @@ class _CheckoutTermLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 8),
+      padding: EdgeInsets.only(
+        bottom: isLast ? AppTheme.space0 : AppTheme.space8,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
-            padding: EdgeInsets.only(top: 6),
+            padding: EdgeInsets.only(top: AppTheme.space6),
             child: Icon(Icons.circle, size: 6, color: AppTheme.frost400),
           ),
-          const SizedBox(width: 9),
+          const SizedBox(width: AppTheme.space9),
           Expanded(
             child: Text(
               text,
@@ -413,7 +414,7 @@ class _CheckoutStatusPanel extends StatelessWidget {
     final color = requiresExternalPayment ? AppTheme.warning : AppTheme.error;
     return Container(
       key: const Key('checkout-status-panel'),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppTheme.space14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -431,7 +432,7 @@ class _CheckoutStatusPanel extends StatelessWidget {
                     : Icons.error_outline,
                 color: color,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   message,
@@ -444,7 +445,7 @@ class _CheckoutStatusPanel extends StatelessWidget {
             ],
           ),
           if (checkoutUri != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.space12),
             Align(
               alignment: Alignment.centerRight,
               child: SizedBox(
@@ -452,13 +453,12 @@ class _CheckoutStatusPanel extends StatelessWidget {
                 child: FilledButton.icon(
                   key: const Key('checkout-open-payment-button'),
                   onPressed: isOpeningCheckout ? null : onOpenCheckout,
-                  icon:
-                      isOpeningCheckout
-                          ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Icon(Icons.open_in_new_rounded),
+                  icon: isOpeningCheckout
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.open_in_new_rounded),
                   label: Text(
                     isOpeningCheckout
                         ? 'Abrindo pagamento...'
@@ -483,7 +483,7 @@ class _CheckoutLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppTheme.space8),
       child: Row(
         children: [
           Expanded(
@@ -493,7 +493,7 @@ class _CheckoutLine extends StatelessWidget {
               style: const TextStyle(color: AppTheme.textSecondary),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             flex: 3,
             child: Text(

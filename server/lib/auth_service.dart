@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:bcrypt/bcrypt.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -6,8 +7,8 @@ import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'auth_runtime_policy.dart';
 import 'database.dart';
+import 'legal_policy.dart';
 import 'password_policy.dart';
-import 'plan_service.dart';
 import 'runtime_environment.dart';
 
 /// Serviço centralizado de autenticação
@@ -89,10 +90,11 @@ class AuthService {
   /// - username: Nome de usuário
   /// - iat: Timestamp de emissão
   /// - exp: Timestamp de expiração
-  String generateToken(String userId, String username) {
+  String generateToken(String userId, String username, {int authVersion = 0}) {
     final jwt = JWT({
       'userId': userId,
       'username': username,
+      'authVersion': authVersion,
       'iat': DateTime.now().millisecondsSinceEpoch,
     });
 
@@ -132,6 +134,7 @@ class AuthService {
     required String username,
     required String email,
     required String password,
+    LegalAcceptance? legalAcceptance,
   }) async {
     final db = Database();
     final conn = db.connection;
@@ -147,64 +150,102 @@ class AuthService {
       throw Exception(passwordValidation.message);
     }
 
-    // Verificar se username já existe
-    final usernameCheck = await conn.execute(
-      Sql.named(
-        'SELECT id FROM users WHERE LOWER(username) = @username '
-        'AND deleted_at IS NULL',
-      ),
-      parameters: {'username': normalizedUsername},
-    );
-
-    if (usernameCheck.isNotEmpty) {
-      throw Exception('Username já está em uso');
-    }
-
-    // Verificar se email já existe
-    final emailCheck = await conn.execute(
-      Sql.named(
-        'SELECT id FROM users WHERE LOWER(email) = @email '
-        'AND deleted_at IS NULL',
-      ),
-      parameters: {'email': normalizedEmail},
-    );
-
-    if (emailCheck.isNotEmpty) {
-      throw Exception('Email já está em uso');
-    }
-
-    // Hash da senha
     final hashedPassword = hashPassword(password);
-
-    // Inserir novo usuário
-    final result = await conn.execute(
-      Sql.named('''
-        INSERT INTO users (username, email, password_hash)
-        VALUES (@username, @email, @password_hash)
-        RETURNING id, username, email
-      '''),
-      parameters: {
-        'username': normalizedUsername,
-        'email': normalizedEmail,
-        'password_hash': hashedPassword,
-      },
+    final emailVerificationToken = _newOpaqueToken();
+    final emailVerificationExpiresAt = DateTime.now().toUtc().add(
+      const Duration(hours: 24),
     );
+    final account = await conn.runTx((session) async {
+      final usernameCheck = await session.execute(
+        Sql.named(
+          'SELECT id FROM users WHERE LOWER(username) = @username '
+          'AND deleted_at IS NULL',
+        ),
+        parameters: {'username': normalizedUsername},
+      );
+      if (usernameCheck.isNotEmpty) {
+        throw Exception('Username já está em uso');
+      }
 
-    final row = result.first;
-    final userId = row[0] as String;
-    final returnedUsername = row[1] as String;
-    final returnedEmail = row[2] as String;
+      final emailCheck = await session.execute(
+        Sql.named(
+          'SELECT id FROM users WHERE LOWER(email) = @email '
+          'AND deleted_at IS NULL',
+        ),
+        parameters: {'email': normalizedEmail},
+      );
+      if (emailCheck.isNotEmpty) {
+        throw Exception('Email já está em uso');
+      }
+
+      final result = await session.execute(
+        Sql.named('''
+          INSERT INTO users (
+            username, email, password_hash,
+            terms_version, terms_accepted_at,
+            privacy_version, privacy_accepted_at
+          )
+          VALUES (
+            @username, @email, @passwordHash,
+            CAST(@termsVersion AS text),
+            CASE WHEN CAST(@termsVersion AS text) IS NULL
+              THEN NULL ELSE CURRENT_TIMESTAMP END,
+            CAST(@privacyVersion AS text),
+            CASE WHEN CAST(@privacyVersion AS text) IS NULL
+              THEN NULL ELSE CURRENT_TIMESTAMP END
+          )
+          RETURNING id, username, email
+        '''),
+        parameters: {
+          'username': normalizedUsername,
+          'email': normalizedEmail,
+          'passwordHash': hashedPassword,
+          'termsVersion': legalAcceptance?.termsVersion,
+          'privacyVersion': legalAcceptance?.privacyVersion,
+        },
+      );
+      final row = result.first;
+      final userId = row[0] as String;
+      await session.execute(
+        Sql.named('''
+          INSERT INTO user_plans (user_id, plan_name, status)
+          VALUES (CAST(@userId AS uuid), 'free', 'active')
+          ON CONFLICT (user_id) DO NOTHING
+        '''),
+        parameters: {'userId': userId},
+      );
+      await session.execute(
+        Sql.named('''
+          INSERT INTO email_verification_tokens (
+            user_id, token_hash, expires_at
+          ) VALUES (
+            CAST(@userId AS uuid), @tokenHash, @expiresAt
+          )
+        '''),
+        parameters: {
+          'userId': userId,
+          'tokenHash': _hashOpaqueToken(emailVerificationToken),
+          'expiresAt': emailVerificationExpiresAt,
+        },
+      );
+      return (
+        userId: userId,
+        username: row[1] as String,
+        email: row[2] as String,
+      );
+    });
 
     // Gerar token
-    final token = generateToken(userId, returnedUsername);
-
-    await PlanService(conn).ensureFreePlan(userId);
+    final token = generateToken(account.userId, account.username);
 
     return {
-      'userId': userId,
-      'username': returnedUsername,
-      'email': returnedEmail,
+      'userId': account.userId,
+      'username': account.username,
+      'email': account.email,
       'token': token,
+      'emailVerified': false,
+      'emailVerificationToken': emailVerificationToken,
+      'emailVerificationExpiresAt': emailVerificationExpiresAt,
     };
   }
 
@@ -227,7 +268,8 @@ class AuthService {
     // Buscar usuário por email
     final result = await conn.execute(
       Sql.named('''
-        SELECT id, username, email, password_hash
+        SELECT id, username, email, password_hash, auth_version,
+               email_verified_at
         FROM users
         WHERE (email = @email OR LOWER(email) = @email)
           AND deleted_at IS NULL
@@ -246,6 +288,7 @@ class AuthService {
     final username = row[1] as String;
     final userEmail = row[2] as String;
     final passwordHash = row[3] as String;
+    final authVersion = _readInteger(row[4]);
 
     // Verificar senha
     if (!verifyPassword(password, passwordHash)) {
@@ -253,13 +296,14 @@ class AuthService {
     }
 
     // Gerar token
-    final token = generateToken(userId, username);
+    final token = generateToken(userId, username, authVersion: authVersion);
 
     return {
       'userId': userId,
       'username': username,
       'email': userEmail,
       'token': token,
+      'emailVerified': row[5] != null,
     };
   }
 
@@ -279,7 +323,9 @@ class AuthService {
 
     final result = await conn.execute(
       Sql.named(
-        'SELECT id, username, email, display_name, avatar_url FROM users '
+        'SELECT id, username, email, display_name, avatar_url, auth_version, '
+        'email_verified_at '
+        'FROM users '
         'WHERE id = @userId AND deleted_at IS NULL',
       ),
       parameters: {'userId': userId},
@@ -288,14 +334,385 @@ class AuthService {
     if (result.isEmpty) return null;
 
     final row = result.first;
+    final tokenAuthVersion = _readInteger(payload['authVersion']);
+    final currentAuthVersion = _readInteger(row[5]);
+    if (tokenAuthVersion != currentAuthVersion) return null;
     return {
       'id': row[0] as String,
       'username': row[1] as String,
       'email': row[2] as String,
       'display_name': row[3] as String?,
       'avatar_url': row[4] as String?,
+      'email_verified': row[6] != null,
     };
   }
+
+  Future<EmailVerificationRequest?> createEmailVerificationRequest({
+    required String userId,
+    Duration validFor = const Duration(hours: 24),
+  }) async {
+    final token = _newOpaqueToken();
+    final expiresAt = DateTime.now().toUtc().add(validFor);
+    final conn = Database().connection;
+    return conn.runTx((session) async {
+      final users = await session.execute(
+        Sql.named('''
+          SELECT email, email_verified_at
+          FROM users
+          WHERE id = CAST(@userId AS uuid) AND deleted_at IS NULL
+          FOR UPDATE
+        '''),
+        parameters: {'userId': userId},
+      );
+      if (users.isEmpty || users.first[1] != null) return null;
+      await session.execute(
+        Sql.named('''
+          UPDATE email_verification_tokens
+          SET consumed_at = CURRENT_TIMESTAMP
+          WHERE user_id = CAST(@userId AS uuid) AND consumed_at IS NULL
+        '''),
+        parameters: {'userId': userId},
+      );
+      await session.execute(
+        Sql.named('''
+          INSERT INTO email_verification_tokens (
+            user_id, token_hash, expires_at
+          ) VALUES (
+            CAST(@userId AS uuid), @tokenHash, @expiresAt
+          )
+        '''),
+        parameters: {
+          'userId': userId,
+          'tokenHash': _hashOpaqueToken(token),
+          'expiresAt': expiresAt,
+        },
+      );
+      return EmailVerificationRequest(
+        email: users.first[0] as String,
+        token: token,
+        expiresAt: expiresAt,
+      );
+    });
+  }
+
+  Future<void> verifyEmail(String token) async {
+    final normalizedToken = token.trim();
+    if (normalizedToken.isEmpty || normalizedToken.length > 512) {
+      throw const AccountSecurityException(
+        'email_verification_token_invalid',
+        'Link de verificação inválido ou expirado.',
+      );
+    }
+    final conn = Database().connection;
+    await conn.runTx((session) async {
+      final rows = await session.execute(
+        Sql.named('''
+          SELECT t.user_id, t.expires_at, t.consumed_at
+          FROM email_verification_tokens t
+          JOIN users u ON u.id = t.user_id
+          WHERE t.token_hash = @tokenHash AND u.deleted_at IS NULL
+          FOR UPDATE OF t, u
+        '''),
+        parameters: {'tokenHash': _hashOpaqueToken(normalizedToken)},
+      );
+      if (rows.isEmpty ||
+          rows.first[2] != null ||
+          !(rows.first[1] as DateTime).isAfter(DateTime.now().toUtc())) {
+        throw const AccountSecurityException(
+          'email_verification_token_invalid',
+          'Link de verificação inválido ou expirado.',
+        );
+      }
+      final userId = rows.first[0] as String;
+      await session.execute(
+        Sql.named('''
+          UPDATE users
+          SET email_verified_at = COALESCE(
+                email_verified_at, CURRENT_TIMESTAMP
+              ),
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = CAST(@userId AS uuid)
+        '''),
+        parameters: {'userId': userId},
+      );
+      await session.execute(
+        Sql.named('''
+          UPDATE email_verification_tokens
+          SET consumed_at = CURRENT_TIMESTAMP
+          WHERE user_id = CAST(@userId AS uuid) AND consumed_at IS NULL
+        '''),
+        parameters: {'userId': userId},
+      );
+    });
+  }
+
+  /// Creates a single-use reset credential. Only its SHA-256 digest is stored.
+  /// A null result deliberately means either "unknown" or "inactive" account;
+  /// routes must keep the public response identical to prevent enumeration.
+  Future<PasswordResetRequest?> createPasswordResetRequest({
+    required String email,
+    Duration validFor = const Duration(minutes: 20),
+  }) async {
+    final normalizedEmail = normalizeEmail(email);
+    final rawToken = _newOpaqueToken();
+    final tokenHash = _hashOpaqueToken(rawToken);
+    final conn = Database().connection;
+    final users = await conn.execute(
+      Sql.named('''
+        SELECT id, email
+        FROM users
+        WHERE LOWER(email) = @email AND deleted_at IS NULL
+        LIMIT 1
+      '''),
+      parameters: {'email': normalizedEmail},
+    );
+    if (users.isEmpty) return null;
+
+    final userId = users.first[0] as String;
+    final deliveryEmail = users.first[1] as String;
+    final expiresAt = DateTime.now().toUtc().add(validFor);
+    await conn.runTx((session) async {
+      await session.execute(
+        Sql.named('''
+          UPDATE password_reset_tokens
+          SET consumed_at = CURRENT_TIMESTAMP
+          WHERE user_id = CAST(@userId AS uuid) AND consumed_at IS NULL
+        '''),
+        parameters: {'userId': userId},
+      );
+      await session.execute(
+        Sql.named('''
+          INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
+          VALUES (CAST(@userId AS uuid), @tokenHash, @expiresAt)
+        '''),
+        parameters: {
+          'userId': userId,
+          'tokenHash': tokenHash,
+          'expiresAt': expiresAt,
+        },
+      );
+    });
+    return PasswordResetRequest(
+      email: deliveryEmail,
+      token: rawToken,
+      expiresAt: expiresAt,
+    );
+  }
+
+  /// Consumes a reset credential atomically and invalidates every older JWT.
+  Future<void> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    final normalizedToken = token.trim();
+    if (normalizedToken.isEmpty || normalizedToken.length > 512) {
+      throw const AccountSecurityException(
+        'reset_token_invalid',
+        'Link de recuperação inválido ou expirado.',
+      );
+    }
+    final tokenHash = _hashOpaqueToken(normalizedToken);
+    final conn = Database().connection;
+    await conn.runTx((session) async {
+      final rows = await session.execute(
+        Sql.named('''
+          SELECT t.user_id, t.expires_at, t.consumed_at,
+                 u.username, u.email, u.password_hash
+          FROM password_reset_tokens t
+          JOIN users u ON u.id = t.user_id
+          WHERE t.token_hash = @tokenHash AND u.deleted_at IS NULL
+          FOR UPDATE OF t, u
+        '''),
+        parameters: {'tokenHash': tokenHash},
+      );
+      if (rows.isEmpty) {
+        throw const AccountSecurityException(
+          'reset_token_invalid',
+          'Link de recuperação inválido ou expirado.',
+        );
+      }
+      final row = rows.first;
+      final expiresAt = row[1] as DateTime;
+      final consumedAt = row[2] as DateTime?;
+      if (consumedAt != null || !expiresAt.isAfter(DateTime.now().toUtc())) {
+        throw const AccountSecurityException(
+          'reset_token_invalid',
+          'Link de recuperação inválido ou expirado.',
+        );
+      }
+      final username = row[3] as String;
+      final email = row[4] as String;
+      final currentHash = row[5] as String;
+      _validateReplacementPassword(
+        newPassword,
+        username: username,
+        email: email,
+        currentHash: currentHash,
+      );
+
+      await session.execute(
+        Sql.named('''
+          UPDATE users
+          SET password_hash = @passwordHash,
+              password_changed_at = CURRENT_TIMESTAMP,
+              auth_version = auth_version + 1,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = CAST(@userId AS uuid)
+        '''),
+        parameters: {
+          'userId': row[0] as String,
+          'passwordHash': hashPassword(newPassword),
+        },
+      );
+      await session.execute(
+        Sql.named('''
+          UPDATE password_reset_tokens
+          SET consumed_at = CURRENT_TIMESTAMP
+          WHERE user_id = CAST(@userId AS uuid) AND consumed_at IS NULL
+        '''),
+        parameters: {'userId': row[0] as String},
+      );
+    });
+  }
+
+  /// Changes the password and returns a replacement token for this client.
+  /// Every token issued before the transaction becomes invalid immediately.
+  Future<AccountSecurityResult> changePassword({
+    required String userId,
+    required String currentPassword,
+    required String newPassword,
+  }) {
+    return _rotateAuthenticationVersion(
+      userId: userId,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+  }
+
+  /// Revokes every existing session and returns one fresh token for the caller.
+  Future<AccountSecurityResult> revokeSessions({
+    required String userId,
+    required String currentPassword,
+  }) {
+    return _rotateAuthenticationVersion(
+      userId: userId,
+      currentPassword: currentPassword,
+    );
+  }
+
+  Future<AccountSecurityResult> _rotateAuthenticationVersion({
+    required String userId,
+    required String currentPassword,
+    String? newPassword,
+  }) async {
+    final conn = Database().connection;
+    return conn.runTx((session) async {
+      final rows = await session.execute(
+        Sql.named('''
+          SELECT username, email, password_hash, auth_version
+          FROM users
+          WHERE id = CAST(@userId AS uuid) AND deleted_at IS NULL
+          FOR UPDATE
+        '''),
+        parameters: {'userId': userId},
+      );
+      if (rows.isEmpty ||
+          !verifyPassword(currentPassword, rows.first[2] as String)) {
+        throw const AccountSecurityException(
+          'current_password_invalid',
+          'Senha atual incorreta.',
+        );
+      }
+      final row = rows.first;
+      final username = row[0] as String;
+      final email = row[1] as String;
+      if (newPassword != null) {
+        _validateReplacementPassword(
+          newPassword,
+          username: username,
+          email: email,
+          currentHash: row[2] as String,
+        );
+      }
+      final nextVersion = _readInteger(row[3]) + 1;
+      await session.execute(
+        Sql.named('''
+          UPDATE users
+          SET auth_version = @authVersion,
+              password_hash = COALESCE(@passwordHash, password_hash),
+              password_changed_at = CASE
+                WHEN @passwordHash IS NULL THEN password_changed_at
+                ELSE CURRENT_TIMESTAMP
+              END,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = CAST(@userId AS uuid)
+        '''),
+        parameters: {
+          'userId': userId,
+          'authVersion': nextVersion,
+          'passwordHash':
+              newPassword == null ? null : hashPassword(newPassword),
+        },
+      );
+      if (newPassword != null) {
+        await session.execute(
+          Sql.named('''
+            UPDATE password_reset_tokens
+            SET consumed_at = CURRENT_TIMESTAMP
+            WHERE user_id = CAST(@userId AS uuid) AND consumed_at IS NULL
+          '''),
+          parameters: {'userId': userId},
+        );
+      }
+      return AccountSecurityResult(
+        token: generateToken(userId, username, authVersion: nextVersion),
+        userId: userId,
+        username: username,
+        email: email,
+      );
+    });
+  }
+
+  void _validateReplacementPassword(
+    String password, {
+    required String username,
+    required String email,
+    required String currentHash,
+  }) {
+    final validation = PasswordPolicy.validate(
+      password,
+      username: username,
+      email: email,
+    );
+    if (!validation.isValid) {
+      throw AccountSecurityException(
+        validation.code ?? 'password_policy_failed',
+        validation.message ?? 'A nova senha não atende aos requisitos.',
+      );
+    }
+    if (verifyPassword(password, currentHash)) {
+      throw const AccountSecurityException(
+        'password_unchanged',
+        'A nova senha deve ser diferente da senha atual.',
+      );
+    }
+  }
+
+  String _newOpaqueToken() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return base64Url.encode(bytes).replaceAll('=', '');
+  }
+
+  String _hashOpaqueToken(String token) =>
+      sha256.convert(utf8.encode(token)).toString();
+
+  int _readInteger(Object? value) => switch (value) {
+    int number => number,
+    num number => number.toInt(),
+    String text => int.tryParse(text) ?? 0,
+    _ => 0,
+  };
 
   _PasswordPreparation _normalizePasswordForStorage(String password) {
     final normalized = _preparePassword(password);
@@ -319,4 +736,57 @@ class _PasswordPreparation {
 
   final String value;
   final bool preHashed;
+}
+
+class PasswordResetRequest {
+  const PasswordResetRequest({
+    required this.email,
+    required this.token,
+    required this.expiresAt,
+  });
+
+  final String email;
+  final String token;
+  final DateTime expiresAt;
+}
+
+class EmailVerificationRequest {
+  const EmailVerificationRequest({
+    required this.email,
+    required this.token,
+    required this.expiresAt,
+  });
+
+  final String email;
+  final String token;
+  final DateTime expiresAt;
+}
+
+class AccountSecurityResult {
+  const AccountSecurityResult({
+    required this.token,
+    required this.userId,
+    required this.username,
+    required this.email,
+  });
+
+  final String token;
+  final String userId;
+  final String username;
+  final String email;
+
+  Map<String, dynamic> toJson() => {
+    'token': token,
+    'user': {'id': userId, 'username': username, 'email': email},
+  };
+}
+
+class AccountSecurityException implements Exception {
+  const AccountSecurityException(this.code, this.message);
+
+  final String code;
+  final String message;
+
+  @override
+  String toString() => message;
 }

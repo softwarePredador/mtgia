@@ -10,10 +10,10 @@ import 'mtg_data_integrity_support.dart';
 /// Retorna uma lista de parâmetros prontos para prepared statement,
 /// ou `null` se a carta não tiver oracleId válido.
 ///
-/// Índices do retorno:
-/// [0] oracleId, [1] name, [2] manaCost, [3] typeLine, [4] oracleText,
-/// [5] colors, [6] colorIdentity, [7] imageUrl, [8] setCode, [9] rarity,
-/// [10] isReserved
+/// Posições do retorno:
+/// `0`: oracleId, `1`: name, `2`: manaCost, `3`: typeLine,
+/// `4`: oracleText, `5`: colors, `6`: colorIdentity, `7`: imageUrl,
+/// `8`: setCode, `9`: rarity, `10`: isReserved.
 List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
   Map<String, dynamic>? chosen;
   for (final p in printings) {
@@ -37,10 +37,10 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
   final oracleText = chosen['text']?.toString();
   final colors =
       (chosen['colors'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
+      const <String>[];
   final colorIdentity =
       (chosen['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
+      const <String>[];
   final setCode = normalizeMtgSetCode(
     (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString(),
   );
@@ -84,7 +84,9 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
 /// [since] é a data de corte (último sync).
 /// Retorna lista de set codes ordenada.
 List<String> getNewSetCodesSinceFromData(
-    List<dynamic> setListData, DateTime since) {
+  List<dynamic> setListData,
+  DateTime since,
+) {
   final cutoff = since.subtract(const Duration(days: 2));
   final codes = <String>{};
   for (final item in setListData) {
@@ -118,10 +120,10 @@ int? parseSinceDays(List<String> args) {
 /// Diferente de [extractCardRow], recebe o JSON direto do set
 /// (não do AtomicCards).
 ///
-/// Índices do retorno:
-/// [0] oracleId, [1] name, [2] manaCost, [3] typeLine, [4] oracleText,
-/// [5] colors, [6] colorIdentity, [7] imageUrl, [8] setCode, [9] rarity,
-/// [10] collectorNumber, [11] foil
+/// Posições do retorno:
+/// `0`: oracleId, `1`: name, `2`: manaCost, `3`: typeLine,
+/// `4`: oracleText, `5`: colors, `6`: colorIdentity, `7`: imageUrl,
+/// `8`: setCode, `9`: rarity, `10`: collectorNumber, `11`: foil.
 List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
   final syncRow = extractSetCardSyncRow(card, setCode);
   if (syncRow == null) return null;
@@ -143,14 +145,16 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
 
 /// Extrai dados completos de uma carta de Set.json para o sync operacional.
 ///
-/// Índices do retorno:
-/// [0] scryfallPrintingId, [1] oracleId, [2] name, [3] manaCost,
-/// [4] typeLine, [5] oracleText, [6] colors, [7] colorIdentity, [8] power,
-/// [9] toughness, [10] keywords, [11] imageUrl, [12] setCode, [13] rarity,
-/// [14] isReserved, [15] collectorNumber, [16] foil, [17] layout,
-/// [18] cardFacesJson
+/// Posições do retorno:
+/// `0`: scryfallPrintingId, `1`: oracleId, `2`: name, `3`: manaCost,
+/// `4`: typeLine, `5`: oracleText, `6`: colors, `7`: colorIdentity,
+/// `8`: power, `9`: toughness, `10`: keywords, `11`: imageUrl,
+/// `12`: setCode, `13`: rarity, `14`: isReserved, `15`: collectorNumber,
+/// `16`: foil, `17`: layout, `18`: cardFacesJson.
 List<Object?>? extractSetCardSyncRow(
-    Map<String, dynamic> card, String setCode) {
+  Map<String, dynamic> card,
+  String setCode,
+) {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   final ids = card['identifiers'] as Map<String, dynamic>?;
   final oracleId = ids?['scryfallOracleId']?.toString();
@@ -162,14 +166,15 @@ List<Object?>? extractSetCardSyncRow(
   final name = card['name']?.toString();
   if (name == null || name.isEmpty) return null;
 
-  final colors = (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
+  final colors =
+      (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
       const <String>[];
   final colorIdentity =
       (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
+      const <String>[];
   final keywords =
       (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
+      const <String>[];
 
   String imageUrl;
   if (scryfallId != null && scryfallId.isNotEmpty) {

@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "source_policy": {
+    "product_data": "PostgreSQL plus backend services and versioned migrations",
+    "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
+    "card_runtime": "Pinned XMage first, pinned Forge for structured gaps, native ManaLoom adapters for native execution",
+    "human_decisions": "ADRs and current canonical contracts; generated files never infer architectural intent"
+  },
+  "canonical_documents": [
+    "docs/CONTEXTO_PRODUTO_ATUAL.md",
+    "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
+    "docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md",
+    "docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md",
+    "docs/adr/0001-generated-project-logic.md",
+    "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
+    "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+    "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+    "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+    "app/doc/UI_TEST_SURFACE_MAP.md"
+  ],
+  "api_method_overrides": {
+    "/health/live": ["GET"],
+    "/ready": ["GET"]
+  },
+  "public_api_paths": [
+    "/",
+    "/ready",
+    "/health",
+    "/health/live",
+    "/health/ready",
+    "/auth/login",
+    "/auth/register",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+    "/auth/verify-email",
+    "/auth/resend-verification",
+    "/sets",
+    "/reports/{id}",
+    "/billing/webhook"
+  ],
+  "flows": [
+    {
+      "id": "auth_session",
+      "name": "Autenticação, recuperação e sessão",
+      "status": "active_release_scope",
+      "source_of_truth": "users/auth_version and backend auth policies",
+      "entrypoints": ["/login", "/register", "/forgot-password", "/verify-email"],
+      "implementation": [
+        "app/lib/features/auth/providers/auth_provider.dart",
+        "app/lib/core/security/auth_token_store.dart",
+        "server/lib/auth_service.dart",
+        "server/lib/auth_runtime_policy.dart",
+        "server/routes/auth/login.dart",
+        "server/routes/auth/register.dart"
+      ],
+      "storage": ["users", "password_reset_tokens", "email_verification_tokens"],
+      "tests": [
+        "app/test/features/auth/providers/auth_provider_security_test.dart",
+        "server/test/auth_flow_integration_test.dart",
+        "server/test/auth_runtime_policy_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "credencial ou token"},
+        {"from": "Flutter", "to": "Auth API", "message": "request sanitizada"},
+        {"from": "Auth API", "to": "PostgreSQL", "message": "validar identidade e auth_version"},
+        {"from": "Auth API", "to": "Flutter", "message": "sessão ou erro seguro"}
+      ]
+    },
+    {
+      "id": "card_collection",
+      "name": "Descoberta de cartas e coleção",
+      "status": "active_release_scope",
+      "source_of_truth": "cards, sets, card_legalities and collection availability in PostgreSQL",
+      "entrypoints": ["/collection", "/collection/sets", "/cards", "/sets"],
+      "implementation": [
+        "app/lib/features/cards/providers/card_provider.dart",
+        "app/lib/features/collection/screens/sets_catalog_screen.dart",
+        "server/routes/cards/index.dart",
+        "server/routes/sets/index.dart",
+        "server/lib/collection_availability_contract.dart"
+      ],
+      "storage": ["cards", "sets", "card_legalities", "user_binder_items"],
+      "tests": [
+        "app/test/features/cards/providers/card_provider_search_test.dart",
+        "app/test/features/collection/sets_catalog_screen_test.dart",
+        "server/test/collection_availability_contract_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "buscar carta ou coleção"},
+        {"from": "Flutter", "to": "Cards API", "message": "filtros normalizados"},
+        {"from": "Cards API", "to": "PostgreSQL", "message": "resolver printing e identidade"},
+        {"from": "Cards API", "to": "Flutter", "message": "cards, disponibilidade e fallback"}
+      ]
+    },
+    {
+      "id": "deck_lifecycle",
+      "name": "Criar, importar, editar e validar deck",
+      "status": "active_release_scope",
+      "source_of_truth": "decks and deck_cards under DeckRulesService validation",
+      "entrypoints": ["/decks", "/decks/generate", "/decks/import", "/import"],
+      "implementation": [
+        "app/lib/features/decks/providers/deck_provider.dart",
+        "app/lib/features/decks/screens/deck_details_screen.dart",
+        "server/lib/deck_rules_service.dart",
+        "server/routes/decks/index.dart",
+        "server/routes/import/to-deck/index.dart"
+      ],
+      "storage": ["decks", "deck_cards", "card_legalities"],
+      "tests": [
+        "app/test/features/decks/screens/deck_runtime_widget_flow_test.dart",
+        "server/test/deck_rules_service_test.dart",
+        "server/test/import_to_deck_flow_test.dart",
+        "server/test/deck_validation_state_route_contract_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_e2e_suite.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "criar/importar/editar"},
+        {"from": "Flutter", "to": "Deck API", "message": "mutation autenticada"},
+        {"from": "Deck API", "to": "DeckRulesService", "message": "legalidade, singleton e Commander"},
+        {"from": "DeckRulesService", "to": "PostgreSQL", "message": "transação deck e cards"},
+        {"from": "Deck API", "to": "Flutter", "message": "draft, validated ou erro recuperável"}
+      ]
+    },
+    {
+      "id": "deck_ai",
+      "name": "Gerar, analisar e otimizar deck com IA",
+      "status": "experimental_guarded",
+      "source_of_truth": "Commander deckbuilding contract plus backend deterministic and quality gates",
+      "entrypoints": ["/ai/generate", "/ai/optimize", "/ai/rebuild", "/decks/{id}/analysis"],
+      "implementation": [
+        "server/routes/ai/generate/index.dart",
+        "server/routes/ai/optimize/index.dart",
+        "server/lib/ai/commander_deckbuilding_contract_support.dart",
+        "server/lib/ai/optimization_quality_gate.dart",
+        "app/lib/features/decks/providers/deck_provider_support_ai.dart"
+      ],
+      "storage": ["decks", "deck_cards", "ai_generate_jobs", "ai_optimize_jobs", "ai_optimize_cache", "commander_learned_decks", "commander_card_usage"],
+      "tests": [
+        "server/test/ai_generate_create_optimize_flow_test.dart",
+        "server/test/ai_optimize_flow_test.dart",
+        "server/test/optimization_quality_gate_test.dart",
+        "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
+      ],
+      "gates": ["scripts/manaloom_deep_ai_alignment_tester.sh", "scripts/manaloom_ai_prompt_eval.sh"],
+      "sequence": [
+        {"from": "Flutter", "to": "AI API", "message": "objetivo, deck e intenção"},
+        {"from": "AI API", "to": "PostgreSQL", "message": "estado, legalidade e intelligence snapshot"},
+        {"from": "AI API", "to": "Deterministic Gates", "message": "shell, candidates e quality"},
+        {"from": "AI API", "to": "Provider", "message": "somente quando permitido"},
+        {"from": "AI API", "to": "Flutter", "message": "preview, diagnóstico e diff; sem auto-apply"}
+      ]
+    },
+    {
+      "id": "battle_replay",
+      "name": "Battle, evidência de carta e replay",
+      "status": "active_guarded",
+      "source_of_truth": "battle request plus persisted battle_simulations; external pins do not promote native rules",
+      "entrypoints": ["/ai/simulate", "/ai/simulate-matchup", "/decks/{id}/battle-replays"],
+      "implementation": [
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/ai/battle_simulator.dart",
+        "server/routes/ai/simulate/index.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/forge-sidecar/sidecar.py",
+        "app/lib/features/battle/screens/battle_replays_screen.dart"
+      ],
+      "storage": ["battle_simulations", "card_battle_rules", "deck_matchups"],
+      "tests": [
+        "server/test/battle_product_e2e_test.dart",
+        "server/test/battle_replay_routes_security_test.dart",
+        "server/test/deck_battle_learning_evidence_test.dart",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_battle_async_runner.py",
+        "services/xmage-sidecar/src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java",
+        "services/forge-sidecar/test_sidecar.py",
+        "app/test/features/battle/screens/battle_replays_screen_test.dart"
+      ],
+      "gates": ["scripts/manaloom_battle_product_gate.sh", "scripts/manaloom_external_engine_delta_audit.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Battle API", "message": "deck, oponente, seed e engine"},
+        {"from": "Battle API", "to": "Battle Router", "message": "selecionar native/XMage/Forge"},
+        {"from": "Battle Router", "to": "Engine", "message": "request canônico com identidade, controles, hashes e semântica de seed declarada"},
+        {"from": "Engine", "to": "Battle API", "message": "resultado correlacionado, censura, timeout e fallback explícitos"},
+        {"from": "Battle API", "to": "PostgreSQL", "message": "sanitizar e persistir replay e métricas"},
+        {"from": "Battle API", "to": "Flutter", "message": "resultado com proveniência"}
+      ]
+    },
+    {
+      "id": "life_counter_post_game",
+      "name": "Life Counter, sessão e pós-jogo",
+      "status": "active_release_scope",
+      "source_of_truth": "local game session stores plus PostgreSQL post_game_notes after sync",
+      "entrypoints": ["/life-counter", "/decks/{id}/post-game"],
+      "implementation": [
+        "app/lib/features/home/lotus_life_counter_screen.dart",
+        "app/lib/features/home/life_counter/life_counter_session_store.dart",
+        "app/lib/features/retention/services/post_game_note_store.dart",
+        "server/lib/retention/post_game_note_service.dart",
+        "server/routes/decks/[id]/post-game-notes/index.dart"
+      ],
+      "storage": ["local:life_counter_session", "local:post_game_outbox", "post_game_notes", "post_game_sync_state"],
+      "tests": [
+        "app/test/features/home/lotus_life_counter_screen_test.dart",
+        "app/test/features/retention/post_game_note_store_test.dart",
+        "server/test/post_game_note_sync_contract_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_e2e_suite.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Life Counter", "message": "iniciar e jogar sessão"},
+        {"from": "Life Counter", "to": "Local Store", "message": "checkpoint idempotente"},
+        {"from": "Life Counter", "to": "Post-game", "message": "contexto quando houve atividade"},
+        {"from": "Post-game", "to": "PostgreSQL", "message": "sync com tombstone e watermark"}
+      ]
+    },
+    {
+      "id": "social_trade",
+      "name": "Comunidade, mensagens, binder e trades",
+      "status": "active_requires_release_e2e",
+      "source_of_truth": "PostgreSQL ownership and transition services",
+      "entrypoints": ["/community", "/messages", "/trades", "/collection"],
+      "implementation": [
+        "server/routes/community/_middleware.dart",
+        "server/routes/conversations/_middleware.dart",
+        "server/routes/trades/index.dart",
+        "server/routes/binder/index.dart",
+        "app/lib/features/trades/providers/trade_provider.dart"
+      ],
+      "storage": ["user_binder_items", "trade_offers", "trade_items", "trade_messages", "trade_status_history", "conversations", "direct_messages", "deck_comments", "content_reports"],
+      "tests": [
+        "server/test/e2e_trade_tests.py",
+        "server/test/community_engagement_contract_test.dart",
+        "app/test/features/trades/providers/trade_provider_test.dart"
+      ],
+      "gates": ["scripts/manaloom_e2e_suite.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "publicar, conversar ou propor troca"},
+        {"from": "Flutter", "to": "Social API", "message": "ação autenticada"},
+        {"from": "Social API", "to": "PostgreSQL", "message": "ownership, lock e transição"},
+        {"from": "Social API", "to": "Flutter", "message": "estado convergente e seguro"}
+      ]
+    },
+    {
+      "id": "release_operations",
+      "name": "Build, migração, deploy, observabilidade e rollback",
+      "status": "guarded_no_implicit_live_write",
+      "source_of_truth": "same-SHA release contract, artifact digests, migration ledger and health/readiness",
+      "entrypoints": ["quality gates", "release scripts", "/health", "/ready"],
+      "implementation": [
+        "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_deploy_backend_image.sh",
+        "scripts/manaloom_deploy_battle_sidecars.sh",
+        "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_generate_release_sbom.py",
+        "server/bin/migrate.dart",
+        "server/lib/health_readiness_support.dart"
+      ],
+      "storage": ["schema_migrations", "sync_log"],
+      "tests": [
+        "server/test/deploy_rollback_convergence_contract_test.dart",
+        "server/test/ops_sidecar_digest_release_contract_test.dart",
+        "server/test/release_sbom_scope_test.py",
+        "server/test/flutter_web_deploy_contract_test.dart",
+        "server/test/data_model_migration_test.dart"
+      ],
+      "gates": ["scripts/manaloom_release_ops_contract_test.sh", "scripts/manaloom_e2e_suite.sh"],
+      "sequence": [
+        {"from": "Git", "to": "Build", "message": "SHA congelada e SDK pinado"},
+        {"from": "Build", "to": "Artifact", "message": "digest, SBOM e identidade"},
+        {"from": "Operator", "to": "Migration", "message": "aprovação explícita e backup"},
+        {"from": "Artifact", "to": "Runtime", "message": "deploy controlado"},
+        {"from": "Runtime", "to": "Operator", "message": "health, smoke, observabilidade ou rollback"}
+      ]
+    }
+  ],
+  "traceability": [
+    {
+      "rule": "Somente 401 remove a sessão local; 429, 5xx, timeout e rede preservam credenciais.",
+      "implementation": ["app/lib/features/auth/providers/auth_provider.dart"],
+      "tests": ["app/test/features/auth/providers/auth_provider_initialize_test.dart"],
+      "tables": ["users"],
+      "canonical_source": "server/doc/API_CONTRACTS_AND_DATA_MAP.md"
+    },
+    {
+      "rule": "Deck Commander precisa de tamanho, singleton, identidade de cor e comandante válidos.",
+      "implementation": ["server/lib/deck_rules_service.dart"],
+      "tests": ["server/test/deck_rules_service_test.dart"],
+      "tables": ["decks", "deck_cards", "card_legalities"],
+      "canonical_source": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
+    },
+    {
+      "rule": "Optimize apresenta diff e passa pelo quality gate antes de qualquer aplicação.",
+      "implementation": ["server/lib/ai/optimization_quality_gate.dart", "server/routes/ai/optimize/index.dart"],
+      "tests": ["server/test/optimization_quality_gate_test.dart", "server/test/ai_optimize_flow_test.dart"],
+      "tables": ["decks", "deck_cards", "ai_optimize_jobs"],
+      "canonical_source": "server/doc/API_CONTRACTS_AND_DATA_MAP.md"
+    },
+    {
+      "rule": "Hermes/SQLite é cache ou laboratório e nunca substitui PostgreSQL.",
+      "implementation": ["docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py"],
+      "tests": ["docs/hermes-analysis/manaloom-knowledge/scripts/test_pg_hermes_sqlite_contract_audit.py"],
+      "tables": ["cards", "deck_cards", "card_battle_rules"],
+      "canonical_source": "docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md"
+    },
+    {
+      "rule": "Join de deck com inteligência multirrow precisa agregar por card_id antes.",
+      "implementation": ["server/lib/ai/candidate_quality_data_support.dart"],
+      "tests": ["server/test/candidate_quality_data_support_test.dart"],
+      "tables": ["deck_cards", "card_battle_rules", "card_meta_insights"],
+      "canonical_source": "docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md"
+    },
+    {
+      "rule": "Battle externo não promove regra nativa nem prova uso individual sem evento.",
+      "implementation": ["server/lib/ai/battle_engine_config.dart", "server/lib/ai/battle_learning_evidence_support.dart"],
+      "tests": ["server/test/battle_learning_evidence_support_test.dart"],
+      "tables": ["battle_simulations", "card_battle_rules"],
+      "canonical_source": "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
+    },
+    {
+      "rule": "Replay pertence ao usuário/deck autorizado e precisa ter persistência válida.",
+      "implementation": ["server/lib/battle/battle_replay_read_service.dart"],
+      "tests": ["server/test/battle_replay_routes_security_test.dart"],
+      "tables": ["battle_simulations", "decks"],
+      "canonical_source": "server/doc/API_CONTRACTS_AND_DATA_MAP.md"
+    },
+    {
+      "rule": "Pós-jogo offline converge por id, tombstone e watermark sem ressuscitar nota.",
+      "implementation": ["server/lib/retention/post_game_note_service.dart", "app/lib/features/retention/services/post_game_note_store.dart"],
+      "tests": ["server/test/post_game_note_sync_contract_test.dart", "app/test/features/retention/post_game_note_store_test.dart"],
+      "tables": ["post_game_notes", "post_game_sync_state", "privacy_deleted_deck_tombstones"],
+      "canonical_source": "docs/MANALOOM_E2E_RELEASE_CONTRACT.md"
+    },
+    {
+      "rule": "Trade usa ownership, locks e transições válidas; confirmação crítica não é implícita.",
+      "implementation": ["server/routes/trades/[id]/status.dart", "server/routes/trades/index.dart"],
+      "tests": ["server/test/e2e_trade_tests.py", "app/test/features/trades/screens/trade_confirmation_flow_test.dart"],
+      "tables": ["trade_offers", "trade_items", "trade_status_history"],
+      "canonical_source": "server/doc/API_CONTRACTS_AND_DATA_MAP.md"
+    },
+    {
+      "rule": "Migrations live exigem aprovação explícita, backup, status e rollback conhecido.",
+      "implementation": ["server/bin/migrate.dart", "scripts/manaloom_validate_restore.sh"],
+      "tests": ["server/test/data_model_migration_test.dart", "server/test/deploy_rollback_convergence_contract_test.dart"],
+      "tables": ["schema_migrations"],
+      "canonical_source": "docs/MANALOOM_E2E_RELEASE_CONTRACT.md"
+    },
+    {
+      "rule": "Sidecars de battle são testados e publicados do mesmo SHA; pins, imagens base, dependências comprováveis e licenças entram no inventário de release.",
+      "implementation": [
+        "scripts/manaloom_deploy_battle_sidecars.sh",
+        "scripts/manaloom_generate_release_sbom.py",
+        "tools/project_logic/lib/project_logic_generator.dart"
+      ],
+      "tests": [
+        "server/test/ops_sidecar_digest_release_contract_test.dart",
+        "server/test/release_sbom_scope_test.py",
+        "tools/project_logic/test/project_logic_generator_test.dart"
+      ],
+      "tables": [],
+      "canonical_source": "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+    }
+  ],
+  "runtime_introspection": {
+    "dart_flutter_mcp": {
+      "status": "supported_by_local_sdk",
+      "minimum_dart": "3.9",
+      "server_command": "dart mcp-server --force-roots-fallback",
+      "codex_setup": "codex mcp add dart -- dart mcp-server --force-roots-fallback",
+      "purpose": "symbols, tests, analyzer diagnostics, DTD and running Flutter widget/runtime state"
+    },
+    "tbls": {
+      "status": "required_local_disposable_schema_gate",
+      "config": ".tbls.yml",
+      "command": "scripts/manaloom_local_ci.sh schema",
+      "purpose": "apply repository DDL and migrations to an isolated loopback PostgreSQL, generate tbls Mermaid documentation, and compare tables, views, columns, foreign keys, and migration count with the manifest"
+    },
+    "local_gates": {
+      "status": "required_no_remote_ci",
+      "hooks": [".githooks/pre-commit", ".githooks/pre-push"],
+      "commands": [
+        "scripts/manaloom_local_ci.sh quick",
+        "scripts/manaloom_local_ci.sh full",
+        "scripts/manaloom_local_ci.sh e2e",
+        "scripts/manaloom_local_ci.sh release"
+      ],
+      "policy": "GitHub Actions is intentionally absent; checks run on developer-owned local hardware without hosted-runner cost"
+    }
+  },
+  "known_limits": [
+    "Generated OpenAPI is structural: inline request/response Maps are not inferred as authoritative schemas.",
+    "Resolved AST, call graph, type references, and SQL extraction cannot explain product intent, architectural reasons, accepted risk or rollout decisions.",
+    "The repository ERD is checked against a freshly applied disposable PostgreSQL; a production database still requires its own read-only migration/status evidence.",
+    "Flutter Web finder commands are not exposed by Flutter Driver; use DTD for runtime state and a browser tool for interaction.",
+    "A green drift gate proves synchronization, not product correctness or production readiness."
+  ]
+}

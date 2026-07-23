@@ -17,12 +17,17 @@ export 'deck_provider_support.dart'
     show
         DeckAiFlowException,
         OptimizeIntensity,
+        OptimizeJobCancellation,
+        OptimizeJobCancelledException,
+        OptimizeJobTimeoutException,
+        createAiJobRequestKey,
         GenerateDeckCancellation,
         GenerateDeckCancelledException,
         GenerateDeckProgressCallback,
         GenerateDeckProgressSnapshot,
         GenerateDeckTimeoutException,
         generatedDeckReviewBlockingReasons,
+        generatedDeckSaveBlockingReasons,
         isReviewableGeneratedDeckResult,
         maxAiGenerateCommanderNameLength,
         maxAiGeneratePromptLength;
@@ -48,8 +53,13 @@ class DeckProvider extends ChangeNotifier {
   DeckDetails? _selectedDeck;
   bool _isLoading = false;
   String? _errorMessage; // Erro geral ou de lista
+  int? _listStatusCode;
   String? _detailsErrorMessage; // Erro específico de detalhes
   int? _detailsStatusCode;
+  String? _lastAppliedOptimizationEventId;
+  String? _activeOptimizeJobId;
+  String? _activeOptimizeDeckId;
+  String? _activeOptimizeRequestKey;
 
   // Cache de detalhes do deck (evita recarregar se já temos os dados)
   final Map<String, DeckDetails> _deckDetailsCache = {};
@@ -64,8 +74,13 @@ class DeckProvider extends ChangeNotifier {
   DeckDetails? get selectedDeck => _selectedDeck;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  int? get listStatusCode => _listStatusCode;
   String? get detailsErrorMessage => _detailsErrorMessage;
   int? get detailsStatusCode => _detailsStatusCode;
+  String? get lastAppliedOptimizationEventId => _lastAppliedOptimizationEventId;
+  String? get activeOptimizeJobId => _activeOptimizeJobId;
+  String? get activeOptimizeDeckId => _activeOptimizeDeckId;
+  bool get hasActiveOptimizeJob => _activeOptimizeJobId != null;
   bool get hasError => _errorMessage != null;
   DeckAnalysisData? deckAnalysisFor(String deckId) =>
       _deckAnalysisCache[deckId];
@@ -164,45 +179,22 @@ class DeckProvider extends ChangeNotifier {
       throw Exception('Comandante deve ter exatamente 1 cópia');
     }
 
-    // Commander/Brawl (ou quando explicitamente pedido): resolve duplicatas por NOME no backend.
-    // Isso garante que, se o deck já estiver com 2 edições da mesma carta, o usuário consegue corrigir.
-    if (consolidateSameName || isCommander) {
-      final result = await setDeckCardQuantityRequest(
-        _apiClient,
-        deckId: deckId,
-        cardId: newCardId,
-        quantity: isCommander ? 1 : quantity,
-        replaceSameName: true,
-        condition: condition,
-        isCommander: isCommander,
-      );
+    // Edition, quantity, condition and commander role must change in one
+    // backend transaction. Splitting edition replacement from quantity could
+    // leave a partially-applied edit when the second request failed.
+    final result = await setDeckCardQuantityRequest(
+      _apiClient,
+      deckId: deckId,
+      cardId: newCardId,
+      quantity: isCommander ? 1 : quantity,
+      replaceSameName:
+          consolidateSameName || isCommander || oldCardId != newCardId,
+      condition: condition,
+      isCommander: isCommander,
+    );
 
-      if (!result.isSuccess) {
-        throw Exception(result.errorMessage);
-      }
-    } else {
-      // Outros formatos: se trocou a edição, troca primeiro; depois faz SET absoluto.
-      if (oldCardId != newCardId) {
-        await replaceCardEdition(
-          deckId: deckId,
-          oldCardId: oldCardId,
-          newCardId: newCardId,
-        );
-      }
-
-      final result = await setDeckCardQuantityRequest(
-        _apiClient,
-        deckId: deckId,
-        cardId: newCardId,
-        quantity: quantity,
-        replaceSameName: false,
-        condition: condition,
-        isCommander: false,
-      );
-
-      if (!result.isSuccess) {
-        throw Exception(result.errorMessage);
-      }
+    if (!result.isSuccess) {
+      throw Exception(result.errorMessage);
     }
 
     await _refreshDeckDetailsAfterMutation(deckId);
@@ -368,6 +360,7 @@ class DeckProvider extends ChangeNotifier {
     if (!silent) {
       _isLoading = true;
       _errorMessage = null;
+      _listStatusCode = null;
       notifyListeners();
     }
 
@@ -380,11 +373,13 @@ class DeckProvider extends ChangeNotifier {
         );
         _decks = hydration.decks;
         _errorMessage = null;
+        _listStatusCode = state.statusCode;
         // Busca color identity em background para decks que ainda não a possuem.
         fetchMissingColorIdentities(hydration.missingColorIdentityDecks);
       } else {
         if (!silent) {
           _errorMessage = state.errorMessage;
+          _listStatusCode = state.statusCode;
         }
       }
     } catch (e, stackTrace) {
@@ -393,6 +388,7 @@ class DeckProvider extends ChangeNotifier {
           e,
           context: FriendlyErrorContext.deckDetails,
         );
+        _listStatusCode = null;
       }
       _captureProviderException(
         e,
@@ -423,8 +419,8 @@ class DeckProvider extends ChangeNotifier {
       final normalizedArchetype = archetype?.trim();
       final effectiveArchetype =
           (normalizedArchetype == null || normalizedArchetype.isEmpty)
-              ? null
-              : normalizedArchetype;
+          ? null
+          : normalizedArchetype;
       final normalizedCards = await normalizeCreateDeckCards(
         _apiClient,
         cards ?? [],
@@ -441,14 +437,13 @@ class DeckProvider extends ChangeNotifier {
       );
 
       if (result.isSuccess) {
-        final created =
-            (result.deck != null)
-                ? result.deck!.copyWith(
-                  description: description,
-                  archetype: effectiveArchetype,
-                  bracket: bracket,
-                )
-                : null;
+        final created = (result.deck != null)
+            ? result.deck!.copyWith(
+                description: description,
+                archetype: effectiveArchetype,
+                bracket: bracket,
+              )
+            : null;
 
         if (created != null) {
           // Update otimista: evita depender do GET /decks (que pode time-outar no emulador).
@@ -595,8 +590,20 @@ class DeckProvider extends ChangeNotifier {
     OptimizeIntensity intensity = OptimizeIntensity.focused,
     Map<String, dynamic>? recommendationContext,
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
+    OptimizeJobCancellation? cancellation,
+    String? requestKey,
+    bool preferCollection = false,
+    bool collectionOnly = false,
+    int? budgetLimitBrl,
   }) async {
     onProgress?.call('Preparando análise do deck...', 0, 5);
+
+    final effectiveRequestKey =
+        requestKey ??
+        (_activeOptimizeDeckId == deckId ? _activeOptimizeRequestKey : null) ??
+        createAiJobRequestKey('optimize');
+    _activeOptimizeRequestKey = effectiveRequestKey;
+    _activeOptimizeDeckId = deckId;
 
     final requestResult = await requestOptimizeDeck(
       _apiClient,
@@ -606,10 +613,22 @@ class DeckProvider extends ChangeNotifier {
       keepTheme: keepTheme,
       intensity: intensity,
       recommendationContext: recommendationContext,
+      requestKey: effectiveRequestKey,
     );
 
     late final Map<String, dynamic> result;
     if (requestResult.isAsync) {
+      final jobId = requestResult.jobId!;
+      cancellation?.attachJob(jobId);
+      _activeOptimizeJobId = jobId;
+      _activeOptimizeRequestKey =
+          requestResult.requestKey ?? effectiveRequestKey;
+      notifyListeners();
+      if (cancellation?.isCancelled == true) {
+        await _cancelOptimizeJobBestEffort(jobId);
+        _clearActiveOptimizeJob(jobId);
+        throw const OptimizeJobCancelledException();
+      }
       onProgress?.call(
         intensity == OptimizeIntensity.aggressive
             ? 'Optimize agressivo em background...'
@@ -617,15 +636,24 @@ class DeckProvider extends ChangeNotifier {
         1,
         requestResult.totalStages ?? 6,
       );
-      result = await _pollOptimizeJob(
-        requestResult.jobId!,
-        pollInterval: requestResult.pollIntervalMs ?? 2000,
-        maxPollingDuration: Duration(
-          milliseconds:
-              requestResult.pollTimeoutMs ?? defaultOptimizePollTimeoutMs,
-        ),
-        onProgress: onProgress,
-      );
+      try {
+        result = await _pollOptimizeJob(
+          jobId,
+          pollInterval: requestResult.pollIntervalMs ?? 2000,
+          maxPollingDuration: Duration(
+            milliseconds:
+                requestResult.pollTimeoutMs ?? defaultOptimizePollTimeoutMs,
+          ),
+          onProgress: onProgress,
+          cancellation: cancellation,
+        );
+        _clearActiveOptimizeJob(jobId);
+      } on OptimizeJobTimeoutException {
+        rethrow;
+      } catch (_) {
+        _clearActiveOptimizeJob(jobId);
+        rethrow;
+      }
     } else {
       result = requestResult.result!;
     }
@@ -644,6 +672,65 @@ class DeckProvider extends ChangeNotifier {
       },
     );
     return result;
+  }
+
+  Future<Map<String, dynamic>> resumeOptimizeJob({
+    required String jobId,
+    required String deckId,
+    int pollInterval = 2000,
+    Duration maxPollingDuration = const Duration(minutes: 7),
+    void Function(String stage, int stageNumber, int totalStages)? onProgress,
+    OptimizeJobCancellation? cancellation,
+  }) async {
+    cancellation?.attachJob(jobId);
+    _activeOptimizeJobId = jobId;
+    _activeOptimizeDeckId = deckId;
+    notifyListeners();
+    try {
+      final result = await _pollOptimizeJob(
+        jobId,
+        pollInterval: pollInterval,
+        maxPollingDuration: maxPollingDuration,
+        onProgress: onProgress,
+        cancellation: cancellation,
+      );
+      _clearActiveOptimizeJob(jobId);
+      return result;
+    } on OptimizeJobTimeoutException {
+      rethrow;
+    } catch (_) {
+      _clearActiveOptimizeJob(jobId);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchLatestOptimizeJob(
+    String deckId, {
+    bool activeOnly = true,
+  }) => fetchLatestOptimizeJobRequest(
+    _apiClient,
+    deckId: deckId,
+    activeOnly: activeOnly,
+  );
+
+  Future<Map<String, dynamic>> cancelOptimizeJob(String jobId) async {
+    final result = await cancelOptimizeJobRequest(_apiClient, jobId);
+    _clearActiveOptimizeJob(jobId);
+    return result;
+  }
+
+  Future<void> _cancelOptimizeJobBestEffort(String jobId) async {
+    try {
+      await cancelOptimizeJobRequest(_apiClient, jobId);
+    } catch (_) {}
+  }
+
+  void _clearActiveOptimizeJob(String jobId) {
+    if (_activeOptimizeJobId != jobId) return;
+    _activeOptimizeJobId = null;
+    _activeOptimizeDeckId = null;
+    _activeOptimizeRequestKey = null;
+    notifyListeners();
   }
 
   Future<Map<String, dynamic>> rebuildDeck(
@@ -691,12 +778,21 @@ class DeckProvider extends ChangeNotifier {
     int pollInterval = 5000,
     Duration maxPollingDuration = const Duration(minutes: 5),
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
+    OptimizeJobCancellation? cancellation,
   }) async {
     final safePollInterval = normalizeOptimizePollIntervalMs(pollInterval);
     final elapsed = Stopwatch()..start();
     var pollCount = 0;
     while (elapsed.elapsed < maxPollingDuration) {
+      if (cancellation?.isCancelled == true) {
+        await _cancelOptimizeJobBestEffort(jobId);
+        throw const OptimizeJobCancelledException();
+      }
       await _pollDelay(Duration(milliseconds: safePollInterval));
+      if (cancellation?.isCancelled == true) {
+        await _cancelOptimizeJobBestEffort(jobId);
+        throw const OptimizeJobCancelledException();
+      }
       final result = await pollOptimizeJobRequest(_apiClient, jobId);
       pollCount += 1;
       if (result.isCompleted) {
@@ -711,7 +807,7 @@ class DeckProvider extends ChangeNotifier {
         result.totalStages ?? 6,
       );
     }
-    throw Exception('Timeout: a otimização demorou mais de 5 minutos.');
+    throw const OptimizeJobTimeoutException();
   }
 
   Future<bool> addCardsBulk({
@@ -719,6 +815,9 @@ class DeckProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> cards,
     Map<String, dynamic>? mutationContext,
   }) async {
+    if (mutationContext?['type'] == 'optimization_apply') {
+      _lastAppliedOptimizationEventId = null;
+    }
     final result = await addCardsBulkRequest(
       _apiClient,
       deckId: deckId,
@@ -726,6 +825,10 @@ class DeckProvider extends ChangeNotifier {
       mutationContext: mutationContext,
     );
     if (result.isSuccess) {
+      final event = result.payload['optimization_event'];
+      if (event is Map) {
+        _lastAppliedOptimizationEventId = event['id']?.toString();
+      }
       await _refreshDeckDetailsAfterMutation(deckId);
       return true;
     }
@@ -835,6 +938,10 @@ class DeckProvider extends ChangeNotifier {
     GenerateDeckCancellation? cancellation,
     Duration? pollTimeout,
     Duration? pollInterval,
+    String? requestKey,
+    bool preferCollection = false,
+    bool collectionOnly = false,
+    int? budgetLimitBrl,
   }) async {
     final result = await generateDeckFromPrompt(
       _apiClient,
@@ -845,6 +952,10 @@ class DeckProvider extends ChangeNotifier {
       cancellation: cancellation,
       pollTimeout: pollTimeout,
       pollInterval: pollInterval,
+      requestKey: requestKey,
+      preferCollection: preferCollection,
+      collectionOnly: collectionOnly,
+      budgetLimitBrl: budgetLimitBrl,
     );
     _trackActivationInBackground(
       'deck_generated',
@@ -853,10 +964,35 @@ class DeckProvider extends ChangeNotifier {
       metadata: {
         'prompt_length': prompt.trim().length,
         'commander_selected': commanderName?.trim().isNotEmpty == true,
+        'prefer_collection': preferCollection || collectionOnly,
+        'collection_only': collectionOnly,
+        'budget_requested': budgetLimitBrl != null,
       },
     );
     return result;
   }
+
+  Future<Map<String, dynamic>> resumeGenerateJob({
+    required String jobId,
+    GenerateDeckProgressCallback? onProgress,
+    GenerateDeckCancellation? cancellation,
+    Duration? pollTimeout,
+    Duration? pollInterval,
+  }) => resumeGeneratedDeckJob(
+    _apiClient,
+    jobId: jobId,
+    onProgress: onProgress,
+    cancellation: cancellation,
+    pollTimeout: pollTimeout,
+    pollInterval: pollInterval,
+  );
+
+  Future<Map<String, dynamic>> cancelGenerateJob(String jobId) =>
+      cancelGenerateJobRequest(_apiClient, jobId);
+
+  Future<Map<String, dynamic>?> fetchLatestGenerateJob({
+    bool activeOnly = true,
+  }) => fetchLatestGenerateJobRequest(_apiClient, activeOnly: activeOnly);
 
   Future<Map<String, dynamic>> fetchCommanderLearningDeck({
     required String commanderName,
@@ -866,11 +1002,10 @@ class DeckProvider extends ChangeNotifier {
       throw Exception('Informe um comandante para buscar o deck aprendido.');
     }
 
-    final endpoint =
-        Uri(
-          path: '/ai/commander-learning',
-          queryParameters: {'commander': commander},
-        ).toString();
+    final endpoint = Uri(
+      path: '/ai/commander-learning',
+      queryParameters: {'commander': commander},
+    ).toString();
     final response = await _apiClient.get(endpoint);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(
@@ -903,12 +1038,11 @@ class DeckProvider extends ChangeNotifier {
     }
 
     final data = response.data;
-    final map =
-        data is Map<String, dynamic>
-            ? data
-            : data is Map
-            ? data.cast<String, dynamic>()
-            : null;
+    final map = data is Map<String, dynamic>
+        ? data
+        : data is Map
+        ? data.cast<String, dynamic>()
+        : null;
     final commanders = map?['commanders'];
     if (commanders is! List) return const <Map<String, dynamic>>[];
     return commanders
@@ -931,6 +1065,9 @@ class DeckProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> cardsPayload,
     Map<String, dynamic>? mutationContext,
   }) async {
+    if (mutationContext?['type'] == 'optimization_apply') {
+      _lastAppliedOptimizationEventId = null;
+    }
     AppLogger.debug('💾 [DeckProvider] Salvando alterações no servidor...');
     final result = await persistDeckCardsPayloadWithValidation(
       _apiClient,
@@ -943,6 +1080,8 @@ class DeckProvider extends ChangeNotifier {
     );
 
     AppLogger.debug('✅ [DeckProvider] Deck atualizado com sucesso!');
+    _lastAppliedOptimizationEventId = result.optimizationEvent?['id']
+        ?.toString();
 
     try {
       final isValid = isDeckValidationOk(result.validation);
@@ -960,6 +1099,20 @@ class DeckProvider extends ChangeNotifier {
       );
     }
 
+    await _refreshDeckDetailsAfterMutation(deckId);
+    return true;
+  }
+
+  Future<bool> rollbackOptimization({
+    required String deckId,
+    required String eventId,
+  }) async {
+    await rollbackDeckOptimizationRequest(
+      _apiClient,
+      deckId: deckId,
+      eventId: eventId,
+    );
+    _lastAppliedOptimizationEventId = null;
     await _refreshDeckDetailsAfterMutation(deckId);
     return true;
   }
@@ -994,7 +1147,12 @@ class DeckProvider extends ChangeNotifier {
       return _persistDeckCardsPayload(
         deckId: deckId,
         cardsPayload: payloadResult.cardsPayload,
-        mutationContext: mutationContext,
+        mutationContext: {
+          ...?mutationContext,
+          'expected_deck_signature':
+              mutationContext?['expected_deck_signature'] ??
+              buildDeckOptimizationSignature(deck),
+        },
       );
     } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] Erro fatal na otimização', e);
@@ -1136,7 +1294,14 @@ class DeckProvider extends ChangeNotifier {
       return await _persistDeckCardsPayload(
         deckId: deckId,
         cardsPayload: cardsPayload,
-        mutationContext: mutationContext,
+        mutationContext: {
+          ...?mutationContext,
+          'expected_deck_signature':
+              expectedDeckSignature?.trim().isNotEmpty == true
+              ? expectedDeckSignature!.trim()
+              : mutationContext?['expected_deck_signature'] ??
+                    buildDeckOptimizationSignature(deck),
+        },
       );
     } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] Erro na otimização rápida', e);

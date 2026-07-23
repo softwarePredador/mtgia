@@ -41,7 +41,10 @@ Future<Response> onRequest(RequestContext context, String cardId) async {
     // Busca dados da carta
     final cardResult = await pool.execute(
       Sql.named('''
-        SELECT name, set_code, image_url, price, rarity, type_line
+        SELECT name, set_code, image_url,
+               COALESCE(price_usd, price) AS current_price,
+               price_source, price_updated_at,
+               rarity, type_line
         FROM cards 
         WHERE id = @card_id::uuid
       '''),
@@ -63,16 +66,38 @@ Future<Response> onRequest(RequestContext context, String cardId) async {
         'name': card[0],
         'set_code': card[1],
         'image_url': card[2],
-        'current_price': card[3] != null ? (card[3] is num ? (card[3] as num).toDouble() : double.tryParse(card[3].toString())) : null,
-        'rarity': card[4],
-        'type_line': card[5],
-        'history': historyResult.map((row) {
-          return {
-            'date': row[0].toString().substring(0, 10),
-            'price_usd': row[1] != null ? (row[1] is num ? (row[1] as num).toDouble() : double.tryParse(row[1].toString())) : null,
-            'price_usd_foil': row[2] != null ? (row[2] is num ? (row[2] as num).toDouble() : double.tryParse(row[2].toString())) : null,
-          };
-        }).toList(),
+        'current_price':
+            card[3] != null
+                ? (card[3] is num
+                    ? (card[3] as num).toDouble()
+                    : double.tryParse(card[3].toString()))
+                : null,
+        'currency': 'USD',
+        'price_source': card[4] ?? (card[3] == null ? null : 'legacy'),
+        'price_updated_at':
+            card[5] is DateTime
+                ? (card[5] as DateTime).toUtc().toIso8601String()
+                : card[5]?.toString(),
+        'rarity': card[6],
+        'type_line': card[7],
+        'history':
+            historyResult.map((row) {
+              return {
+                'date': row[0].toString().substring(0, 10),
+                'price_usd':
+                    row[1] != null
+                        ? (row[1] is num
+                            ? (row[1] as num).toDouble()
+                            : double.tryParse(row[1].toString()))
+                        : null,
+                'price_usd_foil':
+                    row[2] != null
+                        ? (row[2] is num
+                            ? (row[2] as num).toDouble()
+                            : double.tryParse(row[2].toString()))
+                        : null,
+              };
+            }).toList(),
       },
     );
   } catch (e) {

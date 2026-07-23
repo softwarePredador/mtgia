@@ -31,10 +31,11 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     } else if (listType == 'have') {
       whereClauses.add("bi.list_type = 'have'");
       whereClauses.add('(bi.for_trade = TRUE OR bi.for_sale = TRUE)');
+      whereClauses.add('item_availability.available_quantity > 0');
     } else {
       // Sem filtro de list_type: mostrar disponíveis (have com flag) ou wants
       whereClauses.add(
-        "(bi.list_type = 'want' OR bi.for_trade = TRUE OR bi.for_sale = TRUE)",
+        "(bi.list_type = 'want' OR ((bi.for_trade = TRUE OR bi.for_sale = TRUE) AND item_availability.available_quantity > 0))",
       );
     }
 
@@ -72,6 +73,8 @@ Future<Response> onRequest(RequestContext context, String userId) async {
       Sql.named('''
       SELECT COUNT(*) as cnt FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN binder_item_availability item_availability
+        ON item_availability.binder_item_id = bi.id
       WHERE $where
     '''),
       parameters: sqlParams,
@@ -81,7 +84,12 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     // Items
     final result = await pool.execute(
       Sql.named('''
-      SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
+      SELECT bi.id, bi.card_id,
+             CASE WHEN bi.list_type = 'have'
+               THEN COALESCE(item_availability.available_quantity, 0)
+               ELSE bi.quantity
+             END::int AS public_quantity,
+             bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency, bi.notes,
              bi.list_type,
              c.name AS card_name, c.image_url AS card_image_url,
@@ -90,6 +98,8 @@ Future<Response> onRequest(RequestContext context, String userId) async {
              c.is_reserved AS card_is_reserved
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN binder_item_availability item_availability
+        ON item_availability.binder_item_id = bi.id
       WHERE $where
       ORDER BY c.name ASC
       LIMIT @limit OFFSET @offset
@@ -111,7 +121,8 @@ Future<Response> onRequest(RequestContext context, String userId) async {
               'rarity': cols['card_rarity'],
               'is_reserved': cols['card_is_reserved'] == true,
             },
-            'quantity': cols['quantity'],
+            'quantity': cols['public_quantity'],
+            'available_quantity': cols['public_quantity'],
             'condition': cols['condition'],
             'is_foil': cols['is_foil'],
             'for_trade': cols['for_trade'],

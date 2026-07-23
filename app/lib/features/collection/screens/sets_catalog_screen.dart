@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +10,10 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/mtg_set.dart';
+import '../set_icon_svg_cache.dart';
 import 'set_cards_screen.dart';
 
 class SetsCatalogScreen extends StatefulWidget {
@@ -185,8 +186,8 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     // is mounted. Production navigation remains URL-addressable above.
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder:
-            (_) => SetCardsScreen(initialSet: set, apiClient: widget.apiClient),
+        builder: (_) =>
+            SetCardsScreen(initialSet: set, apiClient: widget.apiClient),
       ),
     );
   }
@@ -242,8 +243,11 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppTheme.brass400),
+      return const AppStatePanel.loading(
+        key: Key('sets-catalog-loading'),
+        title: 'Carregando coleções',
+        message: 'Organizando edições atuais, futuras e históricas.',
+        accent: AppTheme.brass400,
       );
     }
 
@@ -263,10 +267,9 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
       return AppStatePanel(
         icon: Icons.search_off_rounded,
         title: 'Nenhuma coleção encontrada',
-        message:
-            _query.isEmpty
-                ? 'Tente outro filtro de status ou role a lista geral para carregar mais coleções antigas.'
-                : 'Não encontramos coleções locais para "$_query". Busque por nome ou código, como ECC, SOC ou Marvel.',
+        message: _query.isEmpty
+            ? 'Tente outro filtro de status ou role a lista geral para carregar mais coleções antigas.'
+            : 'Não encontramos coleções locais para "$_query". Busque por nome ou código, como ECC, SOC ou Marvel.',
         accent: AppTheme.warning,
         actionLabel: 'Limpar busca',
         onAction: () {
@@ -287,7 +290,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
           Widget itemBuilder(BuildContext context, int index) {
             if (index >= visibleSets.length) {
               return const Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(AppTheme.space16),
                 child: Center(
                   child: CircularProgressIndicator(color: AppTheme.brass400),
                 ),
@@ -301,7 +304,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
             return GridView.builder(
               key: const Key('setsCatalogGrid'),
               controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.only(bottom: AppTheme.space16),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 620,
                 crossAxisSpacing: 10,
@@ -315,9 +318,10 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
           return ListView.separated(
             key: const Key('setsCatalogList'),
             controller: _scrollController,
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: AppTheme.space16),
             itemCount: itemCount,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: AppTheme.space10),
             itemBuilder: itemBuilder,
           );
         },
@@ -343,7 +347,12 @@ class _CatalogHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       key: const Key('sets-catalog-header'),
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 10),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space0,
+        AppTheme.space12,
+        AppTheme.space0,
+        AppTheme.space10,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -354,7 +363,7 @@ class _CatalogHeader extends StatelessWidget {
               child: Container(
                 key: const Key('sets-catalog-hero'),
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppTheme.space16),
                 decoration: BoxDecoration(
                   gradient: AppTheme.heroGradient,
                   borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -371,7 +380,7 @@ class _CatalogHeader extends StatelessWidget {
                         fontSize: AppTheme.fontXxl,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppTheme.space6),
                     const Text(
                       'Futuras, novas, atuais e antigas em uma lista local e rápida.',
                       style: TextStyle(
@@ -379,7 +388,7 @@ class _CatalogHeader extends StatelessWidget {
                         fontSize: AppTheme.fontSm,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.space14),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 760),
                       child: TextField(
@@ -390,17 +399,16 @@ class _CatalogHeader extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: 'Buscar por nome ou código da coleção...',
                           prefixIcon: const Icon(Icons.search),
-                          suffixIcon:
-                              controller.text.isEmpty
-                                  ? null
-                                  : IconButton(
-                                    tooltip: 'Limpar busca',
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      controller.clear();
-                                      onChanged('');
-                                    },
-                                  ),
+                          suffixIcon: controller.text.isEmpty
+                              ? null
+                              : IconButton(
+                                  tooltip: 'Limpar busca',
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    controller.clear();
+                                    onChanged('');
+                                  },
+                                ),
                           filled: true,
                           fillColor: AppTheme.surfaceSlate,
                           border: OutlineInputBorder(
@@ -435,7 +443,7 @@ class _CatalogHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -488,7 +496,7 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.only(right: AppTheme.space8),
       child: ChoiceChip(
         label: Text(label),
         selected: selected,
@@ -527,8 +535,8 @@ class _SetCatalogTile extends StatelessWidget {
         onTap: onTap,
         isThreeLine: true,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 10,
+          horizontal: AppTheme.space14,
+          vertical: AppTheme.space10,
         ),
         leading: _SetCatalogArtwork(set: set),
         title: Text(
@@ -541,7 +549,7 @@ class _SetCatalogTile extends StatelessWidget {
           ),
         ),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.only(top: AppTheme.space6),
           child: Wrap(
             spacing: 8,
             runSpacing: 6,
@@ -569,11 +577,6 @@ class _SetCatalogTile extends StatelessWidget {
 }
 
 class _SetCatalogArtwork extends StatelessWidget {
-  static const _imageHeaders = <String, String>{
-    'User-Agent': 'ManaLoom/1.0',
-    'Accept': 'image/*',
-  };
-
   final MtgSet set;
 
   const _SetCatalogArtwork({required this.set});
@@ -591,10 +594,9 @@ class _SetCatalogArtwork extends StatelessWidget {
     return Semantics(
       container: true,
       image: true,
-      label:
-          artworkUrl == null
-              ? 'Símbolo da coleção ${set.name}'
-              : 'Arte representativa da coleção ${set.name}',
+      label: artworkUrl == null
+          ? 'Símbolo da coleção ${set.name}'
+          : 'Arte representativa da coleção ${set.name}',
       child: SizedBox(
         key: Key('set-artwork-frame-${set.code}'),
         width: 84,
@@ -605,14 +607,14 @@ class _SetCatalogArtwork extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               if (artworkUrl != null)
-                CachedNetworkImage(
-                  key: Key('set-artwork-image-${set.code}'),
+                CardArtwork(
+                  variant: CardArtworkVariant.setArt,
+                  networkImageKey: Key('set-artwork-image-${set.code}'),
                   imageUrl: artworkUrl,
-                  fit: BoxFit.cover,
-                  httpHeaders: _imageHeaders,
-                  fadeInDuration: const Duration(milliseconds: 180),
-                  placeholder: (_, __) => const _SetArtworkLoading(),
-                  errorWidget: (_, __, ___) => _SetIconArtwork(set: set),
+                  semanticLabel: 'Arte representativa da coleção ${set.name}',
+                  constrainAspectRatio: false,
+                  loadingPlaceholder: const _SetArtworkLoading(),
+                  errorPlaceholder: _SetIconArtwork(set: set),
                 )
               else
                 _SetIconArtwork(set: set),
@@ -632,8 +634,8 @@ class _SetCatalogArtwork extends StatelessWidget {
                 child: Container(
                   key: Key('set-code-badge-${set.code}'),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 7,
-                    vertical: 3,
+                    horizontal: AppTheme.space7,
+                    vertical: AppTheme.space3,
                   ),
                   decoration: BoxDecoration(
                     color: AppTheme.backgroundAbyss.withValues(alpha: 0.86),
@@ -663,7 +665,7 @@ class _SetCatalogArtwork extends StatelessWidget {
 }
 
 class _SetIconArtwork extends StatelessWidget {
-  static final Map<String, Future<String?>> _svgCache = {};
+  static final SetIconSvgCache _svgCache = SetIconSvgCache();
 
   final MtgSet set;
 
@@ -676,34 +678,35 @@ class _SetIconArtwork extends StatelessWidget {
       key: Key('set-icon-fallback-${set.code}'),
       decoration: const BoxDecoration(gradient: AppTheme.goldAccentGradient),
       child: Center(
-        child:
-            iconUrl == null
-                ? const _SetIconTerminalFallback()
-                : Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 9, 18, 20),
-                  child: FutureBuilder<String?>(
-                    key: Key('set-icon-request-${set.code}'),
-                    future: _svgCache.putIfAbsent(
-                      iconUrl,
-                      () => _loadSvg(iconUrl),
-                    ),
-                    builder: (context, snapshot) {
-                      final svg = snapshot.data;
-                      if (svg == null) {
-                        return const _SetIconTerminalFallback();
-                      }
-                      return SvgPicture.string(
-                        svg,
-                        key: Key('set-icon-image-${set.code}'),
-                        fit: BoxFit.contain,
-                        colorFilter: const ColorFilter.mode(
-                          AppTheme.backgroundAbyss,
-                          BlendMode.srcIn,
-                        ),
-                      );
-                    },
-                  ),
+        child: iconUrl == null
+            ? const _SetIconTerminalFallback()
+            : Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppTheme.space18,
+                  AppTheme.space9,
+                  AppTheme.space18,
+                  AppTheme.space20,
                 ),
+                child: FutureBuilder<String?>(
+                  key: Key('set-icon-request-${set.code}'),
+                  future: _svgCache.resolve(iconUrl, _loadSvg),
+                  builder: (context, snapshot) {
+                    final svg = snapshot.data;
+                    if (svg == null) {
+                      return const _SetIconTerminalFallback();
+                    }
+                    return SvgPicture.string(
+                      svg,
+                      key: Key('set-icon-image-${set.code}'),
+                      fit: BoxFit.contain,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.backgroundAbyss,
+                        BlendMode.srcIn,
+                      ),
+                    );
+                  },
+                ),
+              ),
       ),
     );
   }
@@ -769,7 +772,7 @@ class _MiniMeta extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 13, color: AppTheme.frost400),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppTheme.space4),
         Text(
           label,
           style: const TextStyle(
@@ -796,7 +799,10 @@ class _StatusPill extends StatelessWidget {
       _ => AppTheme.textSecondary,
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space8,
+        vertical: AppTheme.space3,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),

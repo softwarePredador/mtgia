@@ -1,6 +1,13 @@
-import 'dart:convert';
-
 import 'package:postgres/postgres.dart';
+
+import 'battle_replay_payload_sanitizer.dart';
+
+final RegExp _battleReplayUuidPattern = RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+);
+
+bool isBattleReplayUuid(String value) =>
+    _battleReplayUuidPattern.hasMatch(value.trim());
 
 class BattleReplayReadService {
   BattleReplayReadService(this._pool);
@@ -73,6 +80,9 @@ class BattleReplayReadService {
             ELSE NULL
           END AS winner_label
         FROM battle_simulations bs
+        JOIN decks requested
+          ON requested.id = CAST(@deckId AS uuid)
+         AND requested.user_id = CAST(@userId AS uuid)
         LEFT JOIN decks da ON da.id = bs.deck_a_id
         LEFT JOIN decks db ON db.id = bs.deck_b_id
         WHERE da.user_id = CAST(@userId AS uuid)
@@ -127,6 +137,9 @@ class BattleReplayReadService {
             ELSE NULL
           END AS deck_b_name
         FROM battle_simulations bs
+        JOIN decks requested
+          ON requested.id = CAST(@deckId AS uuid)
+         AND requested.user_id = CAST(@userId AS uuid)
         LEFT JOIN decks da ON da.id = bs.deck_a_id
         LEFT JOIN decks db ON db.id = bs.deck_b_id
         WHERE bs.id = CAST(@replayId AS uuid)
@@ -149,6 +162,7 @@ class BattleReplayReadService {
       SELECT EXISTS (
         SELECT FROM information_schema.tables
         WHERE table_name = 'battle_simulations'
+          AND table_schema = current_schema()
       )
     ''');
     return result.isNotEmpty && result.first[0] == true;
@@ -169,12 +183,11 @@ class BattleReplayReadService {
     final winnerDeckId = row['winner_deck_id']?.toString();
     final winnerName =
         winnerDeckId == null
-            ? row['winner_label']?.toString()
+            ? sanitizeBattleReplayText(row['winner_label'])
             : _winnerNameForRow(row, winnerDeckId);
-    final metrics = _jsonValue(row['metrics']);
-    final metricsMap = metrics is Map ? metrics : const <String, dynamic>{};
-    final engine = metricsMap['engine']?.toString();
-    final engineContract = metricsMap['engine_contract']?.toString();
+    final metrics = sanitizePersistedBattleMetrics(row['metrics']);
+    final engine = metrics['engine']?.toString();
+    final engineContract = metrics['engine_contract']?.toString();
 
     return {
       'id': row['id']?.toString(),
@@ -185,7 +198,7 @@ class BattleReplayReadService {
       if (opponentName != null && opponentName.trim().isNotEmpty)
         'opponent_name': opponentName,
       'type':
-          row['game_log_type']?.toString() ??
+          sanitizeBattleReplayText(row['game_log_type']) ??
           row['simulation_type']?.toString(),
       'simulation_type': row['simulation_type']?.toString(),
       'winner_deck_id': winnerDeckId,
@@ -210,7 +223,7 @@ class BattleReplayReadService {
     required String deckId,
   }) {
     final summary = _summaryFromRow(row, deckId: deckId);
-    final gameLog = _jsonValue(row['game_log']);
+    final gameLog = sanitizePersistedBattleReplay(row['game_log']);
     final events = _eventsFromGameLog(gameLog);
     final decisions = _decisionsFromGameLog(gameLog);
     final visualSnapshots = _visualSnapshotsFromGameLog(gameLog);
@@ -246,6 +259,7 @@ class BattleReplayReadService {
       if (gameLogMap['engine_commit'] != null)
         'engine_commit': gameLogMap['engine_commit'],
       if (learningContract.isNotEmpty) 'learning_contract': learningContract,
+      'replay_security': battleReplaySecurityContract,
       'simulation_contract': _simulationContract(
         engine: engine,
         engineContract: engineContract,
@@ -295,17 +309,6 @@ class BattleReplayReadService {
       'ai_decision_rationale_available':
           learningContract['ai_decision_rationale_available'] == true,
     };
-  }
-
-  Object? _jsonValue(Object? value) {
-    if (value is String) {
-      try {
-        return jsonDecode(value);
-      } catch (_) {
-        return value;
-      }
-    }
-    return value;
   }
 
   List<dynamic> _eventsFromGameLog(Object? gameLog) {

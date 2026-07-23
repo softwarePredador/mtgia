@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 final class ReplayNormalizer {
+    static final String VERSION = "xmage_replay_normalizer_v2";
     private static final Set<String> SEMANTIC_ACTIONS = new HashSet<>();
 
     static {

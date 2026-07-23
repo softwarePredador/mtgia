@@ -32,6 +32,7 @@ case "$MODE" in
         --log-level error \
         --redact \
         "$file"; then
+        echo "secret scan encontrou conteúdo suspeito em: $file" >&2
         status=1
       fi
     done < <(

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/binder_item_contract.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
 
@@ -77,13 +78,11 @@ Future<Response> _listBinder(RequestContext context) async {
       sqlParams['isFoil'] = foil == 'true';
     }
     if (minPrice != null) {
-      whereClauses
-          .add('COALESCE(bi.price, c.price_usd, c.price, 0) >= @minPrice');
+      whereClauses.add('COALESCE(bi.price, c.price_usd, c.price) >= @minPrice');
       sqlParams['minPrice'] = minPrice;
     }
     if (maxPrice != null) {
-      whereClauses
-          .add('COALESCE(bi.price, c.price_usd, c.price, 0) <= @maxPrice');
+      whereClauses.add('COALESCE(bi.price, c.price_usd, c.price) <= @maxPrice');
       sqlParams['maxPrice'] = maxPrice;
     }
 
@@ -91,25 +90,30 @@ Future<Response> _listBinder(RequestContext context) async {
     final orderBy = _orderBySql(sort, direction);
 
     // Count total
-    final countFuture = pool.execute(Sql.named('''
+    final countFuture = pool.execute(
+      Sql.named('''
       SELECT COUNT(*) as cnt
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
       WHERE $where
-    '''), parameters: sqlParams);
+    '''),
+      parameters: sqlParams,
+    );
 
     // Fetch items
-    final itemsFuture = pool.execute(Sql.named('''
+    final itemsFuture = pool.execute(
+      Sql.named('''
       WITH deck_usage AS (
         SELECT
-          dc.card_id,
+          COALESCE(deck_card.oracle_id, deck_card.id) AS playable_card_id,
           COUNT(DISTINCT d.id)::int AS deck_count,
           COALESCE(SUM(dc.quantity), 0)::int AS deck_quantity
         FROM deck_cards dc
         JOIN decks d ON d.id = dc.deck_id
+        JOIN cards deck_card ON deck_card.id = dc.card_id
         WHERE d.user_id = @userId
           AND d.deleted_at IS NULL
-        GROUP BY dc.card_id
+        GROUP BY COALESCE(deck_card.oracle_id, deck_card.id)
       )
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
               bi.for_trade, bi.for_sale, bi.price, bi.currency,
@@ -118,65 +122,99 @@ Future<Response> _listBinder(RequestContext context) async {
               c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
               c.type_line AS card_type_line, c.rarity AS card_rarity,
               c.is_reserved AS card_is_reserved,
-              c.price_usd AS card_market_price,
+              COALESCE(c.price_usd, c.price) AS card_market_price,
+              c.price_source AS card_market_price_source,
+              c.price_updated_at AS card_market_price_updated_at,
               COALESCE(du.deck_count, 0)::int AS deck_count,
-              COALESCE(du.deck_quantity, 0)::int AS deck_quantity
+              COALESCE(du.deck_quantity, 0)::int AS deck_quantity,
+              availability.playable_card_id,
+              COALESCE(availability.owned_quantity, 0)::int AS owned_quantity,
+              COALESCE(availability.allocated_quantity, 0)::int AS allocated_quantity,
+              COALESCE(availability.committed_trade_quantity, 0)::int AS committed_trade_quantity,
+              COALESCE(availability.free_quantity, 0)::int AS free_quantity,
+              COALESCE(availability.missing_quantity, 0)::int AS missing_quantity,
+              COALESCE(item_availability.available_quantity, 0)::int AS available_quantity
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
-      LEFT JOIN deck_usage du ON du.card_id = bi.card_id
+      LEFT JOIN deck_usage du
+        ON du.playable_card_id = COALESCE(c.oracle_id, c.id)
+      LEFT JOIN collection_availability_snapshot availability
+        ON availability.user_id = bi.user_id
+       AND availability.playable_card_id = COALESCE(c.oracle_id, c.id)
+      LEFT JOIN binder_item_availability item_availability
+        ON item_availability.binder_item_id = bi.id
       WHERE $where
       ORDER BY $orderBy
       LIMIT @limit OFFSET @offset
-    '''), parameters: {...sqlParams, 'limit': limit, 'offset': offset});
+    '''),
+      parameters: {...sqlParams, 'limit': limit, 'offset': offset},
+    );
 
     final queryResults = await Future.wait([countFuture, itemsFuture]);
     final countResult = queryResults[0];
     final result = queryResults[1];
     final total = countResult.first[0] as int? ?? 0;
 
-    final items = result.map((row) {
-      final cols = row.toColumnMap();
-      return {
-        'id': cols['id'],
-        'card': {
-          'id': cols['card_id'],
-          'name': cols['card_name'],
-          'image_url': cols['card_image_url'],
-          'set_code': cols['card_set_code'],
-          'mana_cost': cols['card_mana_cost'],
-          'type_line': cols['card_type_line'],
-          'rarity': cols['card_rarity'],
-          'is_reserved': cols['card_is_reserved'] == true,
-          'market_price': cols['card_market_price'] != null
-              ? double.tryParse(cols['card_market_price'].toString())
-              : null,
-        },
-        'quantity': cols['quantity'],
-        'condition': cols['condition'],
-        'is_foil': cols['is_foil'],
-        'for_trade': cols['for_trade'],
-        'for_sale': cols['for_sale'],
-        'price': cols['price'] != null
-            ? double.tryParse(cols['price'].toString())
-            : null,
-        'currency': cols['currency'],
-        'notes': cols['notes'],
-        'language': cols['language'],
-        'list_type': cols['list_type'] ?? 'have',
-        'created_at': cols['created_at']?.toString(),
-        'updated_at': cols['updated_at']?.toString(),
-        'deck_count': cols['deck_count'] ?? 0,
-        'deck_quantity': cols['deck_quantity'] ?? 0,
-        'used_in_decks': (cols['deck_count'] as int? ?? 0) > 0,
-      };
-    }).toList();
+    final items =
+        result.map((row) {
+          final cols = row.toColumnMap();
+          return {
+            'id': cols['id'],
+            'card': {
+              'id': cols['card_id'],
+              'name': cols['card_name'],
+              'image_url': cols['card_image_url'],
+              'set_code': cols['card_set_code'],
+              'mana_cost': cols['card_mana_cost'],
+              'type_line': cols['card_type_line'],
+              'rarity': cols['card_rarity'],
+              'is_reserved': cols['card_is_reserved'] == true,
+              'market_price':
+                  cols['card_market_price'] != null
+                      ? double.tryParse(cols['card_market_price'].toString())
+                      : null,
+              'market_price_currency': 'USD',
+              'market_price_source':
+                  cols['card_market_price_source'] ??
+                  (cols['card_market_price'] == null ? null : 'legacy'),
+              'market_price_updated_at':
+                  cols['card_market_price_updated_at'] is DateTime
+                      ? (cols['card_market_price_updated_at'] as DateTime)
+                          .toUtc()
+                          .toIso8601String()
+                      : cols['card_market_price_updated_at']?.toString(),
+            },
+            'quantity': cols['quantity'],
+            'condition': cols['condition'],
+            'is_foil': cols['is_foil'],
+            'for_trade': cols['for_trade'],
+            'for_sale': cols['for_sale'],
+            'price':
+                cols['price'] != null
+                    ? double.tryParse(cols['price'].toString())
+                    : null,
+            'currency': cols['currency'],
+            'notes': cols['notes'],
+            'language': cols['language'],
+            'list_type': cols['list_type'] ?? 'have',
+            'created_at': cols['created_at']?.toString(),
+            'updated_at': cols['updated_at']?.toString(),
+            'deck_count': cols['deck_count'] ?? 0,
+            'deck_quantity': cols['deck_quantity'] ?? 0,
+            'used_in_decks': (cols['deck_count'] as int? ?? 0) > 0,
+            'playable_card_id': cols['playable_card_id'],
+            'owned_quantity': cols['owned_quantity'] ?? 0,
+            'allocated_quantity': cols['allocated_quantity'] ?? 0,
+            'committed_trade_quantity': cols['committed_trade_quantity'] ?? 0,
+            'free_quantity': cols['free_quantity'] ?? 0,
+            'missing_quantity': cols['missing_quantity'] ?? 0,
+            'available_quantity': cols['available_quantity'] ?? 0,
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'data': items,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': items, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -222,11 +260,11 @@ String _orderBySql(String sort, String direction) {
     'language' => 'LOWER(bi.language)',
     'foil' => 'bi.is_foil',
     'quantity' => 'bi.quantity',
-    'price' => 'COALESCE(bi.price, c.price_usd, c.price, 0)',
+    'price' => 'COALESCE(bi.price, c.price_usd, c.price)',
     'updated_at' => 'bi.updated_at',
     _ => 'LOWER(c.name)',
   };
-  return '$expression $direction, LOWER(c.name) ASC, bi.condition ASC';
+  return '$expression $direction NULLS LAST, LOWER(c.name) ASC, bi.condition ASC';
 }
 
 /// POST /binder
@@ -235,20 +273,21 @@ Future<Response> _addToBinder(RequestContext context) async {
   try {
     final userId = context.read<String>();
     final pool = context.read<Pool>();
-    final body = await context.request.json() as Map<String, dynamic>;
-
-    final cardId = body['card_id'] as String?;
-    if (cardId == null || cardId.isEmpty) {
-      return Response.json(
-        statusCode: HttpStatus.badRequest,
-        body: {'error': 'card_id é obrigatório'},
+    final decoded = await context.request.json();
+    if (decoded is! Map<String, dynamic>) {
+      throw const BinderItemInputException(
+        'binder_body_invalid',
+        'Corpo da requisição inválido.',
       );
     }
+    final body = decoded;
+    final cardId = readBinderCardId(body['card_id']);
 
     // Verifica que a carta existe
     final cardCheck = await pool.execute(
-        Sql.named('SELECT id FROM cards WHERE id = @cardId'),
-        parameters: {'cardId': cardId});
+      Sql.named('SELECT id FROM cards WHERE id = @cardId'),
+      parameters: {'cardId': cardId},
+    );
     if (cardCheck.isEmpty) {
       return Response.json(
         statusCode: HttpStatus.notFound,
@@ -256,84 +295,74 @@ Future<Response> _addToBinder(RequestContext context) async {
       );
     }
 
-    final quantity = body['quantity'] as int? ?? 1;
-    final condition = body['condition'] as String? ?? 'NM';
-    final isFoil = body['is_foil'] as bool? ?? false;
-    final forTrade = body['for_trade'] as bool? ?? false;
-    final forSale = body['for_sale'] as bool? ?? false;
-    final price = body['price'];
-    final notes = body['notes'] as String?;
-    final language = body['language'] as String? ?? 'en';
-    final listType = body['list_type'] as String? ?? 'have';
-
-    // Valida list_type
-    if (listType != 'have' && listType != 'want') {
-      return Response.json(
-        statusCode: HttpStatus.badRequest,
-        body: {'error': 'list_type inválido. Use: have, want'},
-      );
-    }
-
-    // Valida condition
-    if (!['NM', 'LP', 'MP', 'HP', 'DMG'].contains(condition)) {
-      return Response.json(
-        statusCode: HttpStatus.badRequest,
-        body: {'error': 'Condição inválida. Use: NM, LP, MP, HP, DMG'},
-      );
-    }
-
-    if (quantity < 1) {
-      return Response.json(
-        statusCode: HttpStatus.badRequest,
-        body: {'error': 'Quantidade deve ser >= 1'},
-      );
-    }
-
-    // Verifica duplicata
-    final dupCheck = await pool.execute(Sql.named('''
-      SELECT id FROM user_binder_items
-      WHERE user_id = @userId AND card_id = @cardId
-        AND condition = @condition AND is_foil = @isFoil
-        AND list_type = @listType
-    '''), parameters: {
-      'userId': userId,
-      'cardId': cardId,
-      'condition': condition,
-      'isFoil': isFoil,
-      'listType': listType,
-    });
-
-    if (dupCheck.isNotEmpty) {
-      return Response.json(
-        statusCode: HttpStatus.conflict,
-        body: {
-          'error':
-              'Item já existe no binder com mesma condição e foil. Use PUT para atualizar.',
-          'existing_id': dupCheck.first[0],
-        },
-      );
-    }
+    final quantity = readBinderQuantity(body['quantity']);
+    final condition = readBinderCondition(body['condition']);
+    final isFoil = readBinderBoolean(body['is_foil']);
+    final forTrade = readBinderBoolean(body['for_trade']);
+    final forSale = readBinderBoolean(body['for_sale']);
+    final price = readBinderPrice(body['price']);
+    final notes = readBinderNotes(body['notes']);
+    final language = readBinderLanguage(body['language']);
+    final listType = readBinderListType(body['list_type']);
 
     // Insere
-    final insertResult = await pool.execute(Sql.named('''
+    final insertResult = await pool.execute(
+      Sql.named('''
       INSERT INTO user_binder_items
         (user_id, card_id, quantity, condition, is_foil, for_trade, for_sale, price, notes, language, list_type)
       VALUES
         (@userId, @cardId, @quantity, @condition, @isFoil, @forTrade, @forSale, @price, @notes, @language, @listType)
+      ON CONFLICT (
+        user_id, card_id, condition, is_foil, language, list_type
+      ) DO NOTHING
       RETURNING id
-    '''), parameters: {
-      'userId': userId,
-      'cardId': cardId,
-      'quantity': quantity,
-      'condition': condition,
-      'isFoil': isFoil,
-      'forTrade': forTrade,
-      'forSale': forSale,
-      'price': price != null ? double.tryParse(price.toString()) : null,
-      'notes': notes,
-      'language': language,
-      'listType': listType,
-    });
+    '''),
+      parameters: {
+        'userId': userId,
+        'cardId': cardId,
+        'quantity': quantity,
+        'condition': condition,
+        'isFoil': isFoil,
+        'forTrade': forTrade,
+        'forSale': forSale,
+        'price': price,
+        'notes': notes,
+        'language': language,
+        'listType': listType,
+      },
+    );
+
+    if (insertResult.isEmpty) {
+      final existing = await pool.execute(
+        Sql.named('''
+          SELECT id
+          FROM user_binder_items
+          WHERE user_id = @userId
+            AND card_id = @cardId
+            AND condition = @condition
+            AND is_foil = @isFoil
+            AND language = @language
+            AND list_type = @listType
+          LIMIT 1
+        '''),
+        parameters: {
+          'userId': userId,
+          'cardId': cardId,
+          'condition': condition,
+          'isFoil': isFoil,
+          'language': language,
+          'listType': listType,
+        },
+      );
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'Esta cópia física já existe no fichário.',
+          'code': 'binder_item_identity_conflict',
+          if (existing.isNotEmpty) 'existing_id': existing.first[0],
+        },
+      );
+    }
 
     final newId = insertResult.first[0];
 
@@ -347,8 +376,15 @@ Future<Response> _addToBinder(RequestContext context) async {
         'is_foil': isFoil,
         'for_trade': forTrade,
         'for_sale': forSale,
+        'language': language,
+        'list_type': listType,
         'message': 'Carta adicionada ao fichário',
       },
+    );
+  } on BinderItemInputException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {'error': error.message, 'code': error.code},
     );
   } catch (e, st) {
     await captureRouteException(

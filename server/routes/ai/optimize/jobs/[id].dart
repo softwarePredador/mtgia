@@ -18,7 +18,14 @@ import '../../../../lib/observability.dart';
 ///   200 + status=failed     → job falhou (com error)
 ///   404                     → job_id inválido ou expirado
 Future<Response> onRequest(RequestContext context, String id) async {
-  if (context.request.method != HttpMethod.get) {
+  if (context.request.method != HttpMethod.get &&
+      context.request.method != HttpMethod.delete) {
+    return Response.json(
+      statusCode: HttpStatus.methodNotAllowed,
+      body: {'error': 'Method not allowed'},
+    );
+  }
+  if (id == 'latest' && context.request.method != HttpMethod.get) {
     return Response.json(
       statusCode: HttpStatus.methodNotAllowed,
       body: {'error': 'Method not allowed'},
@@ -28,7 +35,18 @@ Future<Response> onRequest(RequestContext context, String id) async {
   try {
     final userId = context.read<String>();
     final pool = context.read<Pool>();
-    final job = await OptimizeJobStore.get(pool, id);
+    final job =
+        id == 'latest'
+            ? await OptimizeJobStore.latestForUser(
+              pool,
+              userId,
+              deckId: context.request.uri.queryParameters['deck_id'],
+              activeOnly:
+                  context.request.uri.queryParameters['active'] == 'true',
+            )
+            : context.request.method == HttpMethod.delete
+            ? await OptimizeJobStore.cancel(pool, id, userId: userId)
+            : await OptimizeJobStore.get(pool, id);
     if (job == null) {
       return Response.json(
         statusCode: HttpStatus.notFound,
@@ -40,6 +58,18 @@ Future<Response> onRequest(RequestContext context, String id) async {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {'error': 'Job não encontrado ou expirado.', 'job_id': id},
+      );
+    }
+
+    if (context.request.method == HttpMethod.delete &&
+        job.status != 'cancelled') {
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'Este job ja terminou e nao pode mais ser cancelado.',
+          'error_code': 'ai_job_not_cancellable',
+          'job': job.toJson(),
+        },
       );
     }
 

@@ -25,10 +25,9 @@ class ResponsivePageFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final horizontal =
-            constraints.maxWidth < AppTheme.breakpointCompact
-                ? AppTheme.pageGutterCompact
-                : AppTheme.pageGutter;
+        final horizontal = AppTheme.horizontalGutterForWidth(
+          constraints.maxWidth,
+        );
         return Align(
           alignment: alignment,
           child: ConstrainedBox(
@@ -70,7 +69,11 @@ class AdaptiveMasterDetail extends StatelessWidget {
         if (constraints.maxWidth < breakpoint) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [master, SizedBox(height: gap), detail],
+            children: [
+              master,
+              SizedBox(height: gap),
+              detail,
+            ],
           );
         }
         return Row(

@@ -195,6 +195,12 @@ void main() {
       final liveApproval = isolatedSource.indexOf(
         'require_live_mutation_approval "Battle product isolated mutating E2E"',
       );
+      final externalUrlGuard = isolatedSource.indexOf(
+        'external or reused API URLs are forbidden for isolated Battle E2E',
+      );
+      final disposablePostgres = isolatedSource.indexOf(
+        'start_disposable_postgres "\$RUN_DIR" "\$knowledge_db" "\$deck_file"',
+      );
       final mutationArmed = isolatedSource.indexOf('MUTATION_ARMED=1');
       final runner = isolatedSource.indexOf(
         'dart test --reporter compact -j 1 test/battle_product_e2e_test.dart',
@@ -221,11 +227,16 @@ void main() {
       );
       expect(liveApproval, greaterThanOrEqualTo(0));
       expect(approval, greaterThan(liveApproval));
-      expect(mutationArmed, greaterThan(approval));
-      expect(
-        isolatedSource,
-        contains('with_new_server_pg.sh" --write-approved env'),
-      );
+      expect(externalUrlGuard, greaterThan(approval));
+      expect(disposablePostgres, greaterThan(externalUrlGuard));
+      expect(mutationArmed, greaterThan(disposablePostgres));
+      expect(isolatedSource, isNot(contains('with_new_server_pg.sh')));
+      expect(source, contains('start_disposable_postgres()'));
+      expect(source, contains('initdb \\'));
+      expect(source, contains('-h 127.0.0.1'));
+      expect(source, contains('stop_disposable_postgres'));
+      expect(source, contains('POSTGRES_LISTENER_PIDS='));
+      expect(source, contains(r'rm -rf "$POSTGRES_DATA_DIR"'));
       expect(runner, greaterThan(mutationArmed));
       expect(runnerStatus, greaterThan(runner));
       expect(listenerCheck, greaterThan(runnerStatus));
@@ -249,7 +260,11 @@ void main() {
       expect(isolatedSource, contains('BATTLE_E2E_RUN_TOKEN'));
       expect(isolatedSource, contains('BATTLE_E2E_DEFER_CLEANUP_TO_HARNESS'));
       expect(source, contains('mutation_audit.json'));
-      expect(source, contains('"telemetry_deleted": False'));
+      expect(source, contains('"product_learning_writes_suppressed": True'));
+      expect(
+        source,
+        contains('"telemetry_deleted_with_disposable_cluster": True'),
+      );
       expect(source, contains('DELETE FROM battle_simulations'));
       expect(source, contains('DELETE FROM users'));
       expect(source, contains('identity_collision_count()'));

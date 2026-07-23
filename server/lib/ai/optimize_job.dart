@@ -6,6 +6,7 @@ import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
 import '../e2e_validation_policy.dart';
+import '../ai_job_lifecycle.dart';
 import '../logger.dart';
 
 /// Gerenciador de jobs assíncronos de otimização de deck.
@@ -37,6 +38,8 @@ class OptimizeJobStore {
     required String deckId,
     required String archetype,
     required String userId,
+    String? requestKey,
+    String? requestFingerprint,
   }) async {
     unawaited(
       _cleanupIfDue(pool).catchError(
@@ -55,12 +58,14 @@ class OptimizeJobStore {
       Sql.named('''
         INSERT INTO ai_optimize_jobs (
           id, deck_id, archetype, user_id, status, stage, stage_number,
-          total_stages, result, error, quality_error, created_at, updated_at
+          total_stages, result, error, quality_error,
+          request_key, request_fingerprint, created_at, updated_at
         )
         VALUES (
           @id, CAST(@deck_id AS uuid), @archetype, CAST(@user_id AS uuid),
           @status, @stage, @stage_number, @total_stages,
-          @result::jsonb, @error, @quality_error::jsonb, NOW(), NOW()
+          @result::jsonb, @error, @quality_error::jsonb,
+          @request_key, @request_fingerprint, NOW(), NOW()
         )
       '''),
       parameters: {
@@ -76,10 +81,84 @@ class OptimizeJobStore {
         'error': job.error,
         'quality_error':
             job.qualityError == null ? null : jsonEncode(job.qualityError),
+        'request_key': requestKey,
+        'request_fingerprint': requestFingerprint,
       },
     );
     _memoryJobs[id] = job;
     return id;
+  }
+
+  static Future<AiJobCreation> createOrReuse({
+    required Pool pool,
+    required String deckId,
+    required String archetype,
+    required String userId,
+    required String requestKey,
+    required String requestFingerprint,
+  }) async {
+    unawaited(
+      _cleanupIfDue(pool).catchError(
+        (Object error) =>
+            Log.w('Optimize job cleanup failed type=${error.runtimeType}'),
+      ),
+    );
+    final id = _generateId();
+    final inserted = await pool.execute(
+      Sql.named('''
+        INSERT INTO ai_optimize_jobs (
+          id, deck_id, archetype, user_id, status, stage, stage_number,
+          total_stages, request_key, request_fingerprint,
+          created_at, updated_at
+        )
+        VALUES (
+          @id, CAST(@deck_id AS uuid), @archetype, CAST(@user_id AS uuid),
+          'pending', 'Iniciando...', 0, 6, @request_key,
+          @request_fingerprint, NOW(), NOW()
+        )
+        ON CONFLICT (user_id, request_key)
+          WHERE user_id IS NOT NULL AND request_key IS NOT NULL
+        DO NOTHING
+        RETURNING id
+      '''),
+      parameters: {
+        'id': id,
+        'deck_id': deckId,
+        'archetype': archetype,
+        'user_id': userId,
+        'request_key': requestKey,
+        'request_fingerprint': requestFingerprint,
+      },
+    );
+    if (inserted.isNotEmpty) {
+      return AiJobCreation(jobId: id, requestKey: requestKey, isNew: true);
+    }
+
+    final existing = await pool.execute(
+      Sql.named('''
+        SELECT id, request_fingerprint
+        FROM ai_optimize_jobs
+        WHERE user_id = CAST(@user_id AS uuid)
+          AND request_key = @request_key
+        LIMIT 1
+      '''),
+      parameters: {'user_id': userId, 'request_key': requestKey},
+    );
+    if (existing.isEmpty) {
+      throw StateError('Optimize idempotency conflict without persisted job.');
+    }
+    final row = existing.first.toColumnMap();
+    if (row['request_fingerprint']?.toString() != requestFingerprint) {
+      throw const AiJobIdempotencyConflict();
+    }
+    final existingId = row['id']!.toString();
+    final persisted = await get(pool, existingId);
+    if (persisted != null) _memoryJobs[existingId] = persisted;
+    return AiJobCreation(
+      jobId: existingId,
+      requestKey: requestKey,
+      isNew: false,
+    );
   }
 
   /// Busca um job pelo ID.
@@ -114,6 +193,9 @@ class OptimizeJobStore {
           result,
           error,
           quality_error,
+          request_key,
+          request_fingerprint,
+          cancelled_at,
           created_at,
           updated_at
         FROM ai_optimize_jobs
@@ -128,8 +210,77 @@ class OptimizeJobStore {
     return persistedJob;
   }
 
+  static Future<OptimizeJob?> latestForUser(
+    Pool pool,
+    String userId, {
+    String? deckId,
+    bool activeOnly = false,
+  }) async {
+    await _cleanupIfDue(pool);
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          id, deck_id::text AS deck_id, archetype,
+          user_id::text AS user_id, status, stage, stage_number,
+          total_stages, result, error, quality_error,
+          request_key, request_fingerprint, cancelled_at,
+          created_at, updated_at
+        FROM ai_optimize_jobs
+        WHERE user_id = CAST(@user_id AS uuid)
+          AND (
+            CAST(@deck_id AS text) IS NULL
+            OR deck_id = CAST(@deck_id AS uuid)
+          )
+          AND created_at >=
+            NOW() - (CAST(@ttl_seconds AS int) * INTERVAL '1 second')
+          AND (
+            CAST(@active_only AS boolean) = FALSE
+            OR status IN ('pending', 'processing')
+          )
+        ORDER BY updated_at DESC, created_at DESC
+        LIMIT 1
+      '''),
+      parameters: {
+        'user_id': userId,
+        'deck_id': deckId,
+        'ttl_seconds': _jobTtl.inSeconds,
+        'active_only': activeOnly,
+      },
+    );
+    if (result.isEmpty) return null;
+    final job = OptimizeJob.fromRow(result.first.toColumnMap());
+    _memoryJobs[job.id] = job;
+    return job;
+  }
+
+  static Future<OptimizeJob?> cancel(
+    Pool pool,
+    String id, {
+    required String userId,
+  }) async {
+    await pool.execute(
+      Sql.named('''
+        UPDATE ai_optimize_jobs
+        SET status = 'cancelled',
+            stage = 'Cancelado',
+            error = NULL,
+            quality_error = NULL,
+            cancelled_at = NOW(),
+            updated_at = NOW()
+        WHERE id = @id
+          AND user_id = CAST(@user_id AS uuid)
+          AND status IN ('pending', 'processing')
+      '''),
+      parameters: {'id': id, 'user_id': userId},
+    );
+    final job = await get(pool, id);
+    if (job == null || job.userId != userId) return null;
+    _memoryJobs[id] = job;
+    return job;
+  }
+
   /// Atualiza o progresso de um job.
-  static Future<void> progress(
+  static Future<bool> progress(
     Pool pool,
     String id, {
     required String stage,
@@ -144,13 +295,12 @@ class OptimizeJobStore {
           stage_number = @stage_number,
           updated_at = NOW()
         WHERE id = @id
+          AND status IN ('pending', 'processing')
         RETURNING id
       '''),
       parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
     );
-    if (updated.isEmpty) {
-      throw StateError('Optimize job $id was not persisted before progress.');
-    }
+    if (updated.isEmpty) return false;
     final memoryJob = _memoryJobs[id];
     if (memoryJob != null) {
       memoryJob
@@ -159,10 +309,11 @@ class OptimizeJobStore {
         ..stageNumber = stageNumber
         ..updatedAt = DateTime.now();
     }
+    return true;
   }
 
   /// Marca o job como concluído com o resultado.
-  static Future<void> complete(
+  static Future<bool> complete(
     Pool pool,
     String id, {
     required Map<String, dynamic> result,
@@ -178,13 +329,12 @@ class OptimizeJobStore {
           quality_error = NULL,
           updated_at = NOW()
         WHERE id = @id
+          AND status IN ('pending', 'processing')
         RETURNING id
       '''),
       parameters: {'id': id, 'result': jsonEncode(result)},
     );
-    if (updated.isEmpty) {
-      throw StateError('Optimize job $id was not persisted before completion.');
-    }
+    if (updated.isEmpty) return false;
     final memoryJob = _memoryJobs[id];
     if (memoryJob != null) {
       memoryJob
@@ -195,10 +345,11 @@ class OptimizeJobStore {
         ..qualityError = null
         ..updatedAt = DateTime.now();
     }
+    return true;
   }
 
   /// Marca o job como falho.
-  static Future<void> fail(
+  static Future<bool> fail(
     Pool pool,
     String id, {
     required String error,
@@ -214,6 +365,7 @@ class OptimizeJobStore {
           quality_error = @quality_error::jsonb,
           updated_at = NOW()
         WHERE id = @id
+          AND status IN ('pending', 'processing')
         RETURNING id
       '''),
       parameters: {
@@ -222,9 +374,7 @@ class OptimizeJobStore {
         'quality_error': qualityError == null ? null : jsonEncode(qualityError),
       },
     );
-    if (updated.isEmpty) {
-      throw StateError('Optimize job $id was not persisted before failure.');
-    }
+    if (updated.isEmpty) return false;
     final memoryJob = _memoryJobs[id];
     if (memoryJob != null) {
       memoryJob
@@ -234,6 +384,7 @@ class OptimizeJobStore {
         ..qualityError = qualityError
         ..updatedAt = DateTime.now();
     }
+    return true;
   }
 
   /// Remove jobs com mais de 30 minutos para não vazar memória.
@@ -286,6 +437,9 @@ class OptimizeJob {
   Map<String, dynamic>? result;
   String? error;
   Map<String, dynamic>? qualityError;
+  String? requestKey;
+  String? requestFingerprint;
+  DateTime? cancelledAt;
 
   final DateTime createdAt;
   DateTime updatedAt;
@@ -302,6 +456,9 @@ class OptimizeJob {
     this.result,
     this.error,
     this.qualityError,
+    this.requestKey,
+    this.requestFingerprint,
+    this.cancelledAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : createdAt = createdAt ?? DateTime.now(),
@@ -320,12 +477,16 @@ class OptimizeJob {
       result: _decodeJsonMap(row['result']),
       error: row['error'] as String?,
       qualityError: _decodeJsonMap(row['quality_error']),
+      requestKey: row['request_key'] as String?,
+      requestFingerprint: row['request_fingerprint'] as String?,
+      cancelledAt: row['cancelled_at'] as DateTime?,
       createdAt: row['created_at'] as DateTime?,
       updatedAt: row['updated_at'] as DateTime?,
     );
   }
 
-  bool get isTerminal => status == 'completed' || status == 'failed';
+  bool get isTerminal =>
+      status == 'completed' || status == 'failed' || status == 'cancelled';
 
   Map<String, dynamic> toJson() => {
     'job_id': id,
@@ -338,6 +499,17 @@ class OptimizeJob {
     if (result != null) 'result': result,
     if (error != null) 'error': error,
     if (qualityError != null) 'quality_error': qualityError,
+    if (requestKey != null) 'request_key': requestKey,
+    if (cancelledAt != null) 'cancelled_at': cancelledAt!.toIso8601String(),
+    'progress': {
+      'current': stageNumber,
+      'total': totalStages,
+      'ratio': totalStages <= 0 ? 0 : stageNumber / totalStages,
+    },
+    'can_cancel': status == 'pending' || status == 'processing',
+    'can_resume': !isTerminal,
+    'poll_url': '/ai/optimize/jobs/$id',
+    'cancel_url': '/ai/optimize/jobs/$id',
     'created_at': createdAt.toIso8601String(),
     'updated_at': updatedAt.toIso8601String(),
   };

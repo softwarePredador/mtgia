@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Condições de carta no padrão TCGPlayer.
 /// NM = Near Mint, LP = Lightly Played, MP = Moderately Played,
 /// HP = Heavily Played, DMG = Damaged.
@@ -22,6 +24,59 @@ enum CardCondition {
   }
 }
 
+/// Artwork coordinates for one printed face of a split/transform/MDFC card.
+class CardFaceArtwork {
+  const CardFaceArtwork({required this.name, this.imageUrl});
+
+  final String name;
+  final String? imageUrl;
+
+  factory CardFaceArtwork.fromJson(Map<String, dynamic> json) {
+    final imageUris = json['image_uris'];
+    final uriMap = imageUris is Map
+        ? imageUris.map((key, value) => MapEntry(key.toString(), value))
+        : const <String, dynamic>{};
+    final imageUrl =
+        _nonEmpty(json['image_url']) ??
+        _nonEmpty(uriMap['normal']) ??
+        _nonEmpty(uriMap['large']) ??
+        _nonEmpty(uriMap['small']) ??
+        _nonEmpty(uriMap['png']);
+
+    return CardFaceArtwork(
+      name: _nonEmpty(json['name']) ?? '',
+      imageUrl: imageUrl,
+    );
+  }
+
+  static List<CardFaceArtwork> fromJsonValue(Object? value) {
+    Object? decoded = value;
+    if (value is String && value.trim().isNotEmpty) {
+      try {
+        decoded = jsonDecode(value);
+      } on FormatException {
+        return const [];
+      }
+    }
+    if (decoded is! List) return const [];
+
+    return decoded
+        .whereType<Map>()
+        .map(
+          (face) => CardFaceArtwork.fromJson(
+            face.map((key, value) => MapEntry(key.toString(), value)),
+          ),
+        )
+        .where((face) => face.name.isNotEmpty || face.imageUrl != null)
+        .toList(growable: false);
+  }
+
+  static String? _nonEmpty(Object? value) {
+    final text = value?.toString().trim();
+    return text == null || text.isEmpty ? null : text;
+  }
+}
+
 class DeckCardItem {
   final String id;
   final String name;
@@ -31,6 +86,8 @@ class DeckCardItem {
   final List<String> colors;
   final List<String> colorIdentity;
   final String? imageUrl;
+  final String? layout;
+  final List<CardFaceArtwork> cardFaces;
   final String setCode;
   final String? setName;
   final String? setReleaseDate; // yyyy-mm-dd
@@ -58,8 +115,15 @@ class DeckCardItem {
       return explicit;
     }
 
+    for (final face in cardFaces) {
+      final faceImage = face.imageUrl?.trim();
+      if (faceImage != null && faceImage.isNotEmpty) return faceImage;
+    }
+
     return fallbackImageUrl;
   }
+
+  bool get isMultiFaced => cardFaces.length > 1;
 
   /// Imagem pública por nome, sem prender a UI a uma edição específica.
   ///
@@ -86,6 +150,8 @@ class DeckCardItem {
     this.colors = const [],
     this.colorIdentity = const [],
     this.imageUrl,
+    this.layout,
+    this.cardFaces = const [],
     required this.setCode,
     this.setName,
     this.setReleaseDate,
@@ -108,6 +174,8 @@ class DeckCardItem {
     List<String>? colors,
     List<String>? colorIdentity,
     String? imageUrl,
+    String? layout,
+    List<CardFaceArtwork>? cardFaces,
     String? setCode,
     String? setName,
     String? setReleaseDate,
@@ -128,6 +196,8 @@ class DeckCardItem {
       colors: colors ?? this.colors,
       colorIdentity: colorIdentity ?? this.colorIdentity,
       imageUrl: imageUrl ?? this.imageUrl,
+      layout: layout ?? this.layout,
+      cardFaces: cardFaces ?? this.cardFaces,
       setCode: setCode ?? this.setCode,
       setName: setName ?? this.setName,
       setReleaseDate: setReleaseDate ?? this.setReleaseDate,
@@ -153,6 +223,8 @@ class DeckCardItem {
           (json['color_identity'] as List?)?.map((e) => e as String).toList() ??
           [],
       imageUrl: json['image_url'] as String?,
+      layout: json['layout']?.toString(),
+      cardFaces: CardFaceArtwork.fromJsonValue(json['card_faces']),
       setCode: json['set_code'] as String? ?? '',
       setName: json['set_name'] as String?,
       setReleaseDate: json['set_release_date'] as String?,

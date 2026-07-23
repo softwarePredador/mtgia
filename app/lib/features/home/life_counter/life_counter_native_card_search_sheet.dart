@@ -65,10 +65,11 @@ class _LifeCounterNativeCardSearchSheetState
             key: const Key('life-counter-native-card-search-sheet'),
             child: Padding(
               padding: EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 12,
-                bottom: MediaQuery.viewInsetsOf(context).bottom + 12,
+                left: AppTheme.space12,
+                right: AppTheme.space12,
+                top: AppTheme.space12,
+                bottom:
+                    MediaQuery.viewInsetsOf(context).bottom + AppTheme.space12,
               ),
               child: FractionallySizedBox(
                 heightFactor: 0.92,
@@ -89,7 +90,12 @@ class _LifeCounterNativeCardSearchSheetState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                        padding: const EdgeInsets.fromLTRB(
+                          AppTheme.space20,
+                          AppTheme.space18,
+                          AppTheme.space20,
+                          AppTheme.space8,
+                        ),
                         child: Row(
                           children: [
                             const Expanded(
@@ -104,7 +110,7 @@ class _LifeCounterNativeCardSearchSheetState
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  SizedBox(height: 6),
+                                  SizedBox(height: AppTheme.space6),
                                   Text(
                                     'Consulte detalhes das cartas sem sair da partida.',
                                     style: TextStyle(
@@ -133,10 +139,10 @@ class _LifeCounterNativeCardSearchSheetState
                                 _controller.text.trim().length >= 3;
                             return ListView(
                               padding: const EdgeInsets.fromLTRB(
-                                20,
-                                18,
-                                20,
-                                16,
+                                AppTheme.space20,
+                                AppTheme.space18,
+                                AppTheme.space20,
+                                AppTheme.space16,
                               ),
                               children: [
                                 TextField(
@@ -153,8 +159,8 @@ class _LifeCounterNativeCardSearchSheetState
                                       provider.clearSearch();
                                     }
                                   },
-                                  onSubmitted:
-                                      (value) => _runSearch(context, value),
+                                  onSubmitted: (value) =>
+                                      _runSearch(context, value),
                                   style: const TextStyle(
                                     color: AppTheme.textPrimary,
                                     fontWeight: FontWeight.w700,
@@ -165,27 +171,26 @@ class _LifeCounterNativeCardSearchSheetState
                                       Icons.search_rounded,
                                       color: AppTheme.textSecondary,
                                     ),
-                                    suffixIcon:
-                                        _controller.text.isEmpty
-                                            ? null
-                                            : IconButton(
-                                              key: const Key(
-                                                'life-counter-native-card-search-clear',
-                                              ),
-                                              tooltip: 'Limpar busca',
-                                              onPressed: () {
-                                                _controller.clear();
-                                                provider.clearSearch();
-                                                setState(() {});
-                                              },
-                                              icon: const Icon(
-                                                Icons.close_rounded,
-                                                color: AppTheme.textSecondary,
-                                              ),
+                                    suffixIcon: _controller.text.isEmpty
+                                        ? null
+                                        : IconButton(
+                                            key: const Key(
+                                              'life-counter-native-card-search-clear',
                                             ),
+                                            tooltip: 'Limpar busca',
+                                            onPressed: () {
+                                              _controller.clear();
+                                              provider.clearSearch();
+                                              setState(() {});
+                                            },
+                                            icon: const Icon(
+                                              Icons.close_rounded,
+                                              color: AppTheme.textSecondary,
+                                            ),
+                                          ),
                                   ),
                                 ),
-                                const SizedBox(height: 14),
+                                const SizedBox(height: AppTheme.space14),
                                 Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
@@ -204,7 +209,7 @@ class _LifeCounterNativeCardSearchSheetState
                                       ),
                                   ],
                                 ),
-                                const SizedBox(height: 18),
+                                const SizedBox(height: AppTheme.space18),
                                 if (!hasQuery)
                                   const Text(
                                     'Digite pelo menos 3 letras ou use uma sugestão rápida.',
@@ -217,7 +222,9 @@ class _LifeCounterNativeCardSearchSheetState
                                   )
                                 else if (provider.isLoading)
                                   const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 18),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: AppTheme.space18,
+                                    ),
                                     child: Center(
                                       child: CircularProgressIndicator(),
                                     ),
@@ -258,7 +265,7 @@ class _LifeCounterNativeCardSearchSheetState
                                       )
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                            bottom: 10,
+                                            bottom: AppTheme.space10,
                                           ),
                                           child: _CardSearchResultTile(
                                             tileKey: Key(
@@ -311,7 +318,10 @@ class _CardSearchSuggestionChip extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: Ink(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space12,
+                vertical: AppTheme.space8,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -354,12 +364,13 @@ class _CardSearchResultTile extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterLg),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
-              );
+              openCardDetailRoute(context, card);
             },
             child: Ink(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space14,
+                vertical: AppTheme.space12,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -382,7 +393,7 @@ class _CardSearchResultTile extends StatelessWidget {
                       size: 18,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,7 +408,7 @@ class _CardSearchResultTile extends StatelessWidget {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Text(
                           [
                             if (card.typeLine.trim().isNotEmpty) card.typeLine,
@@ -416,7 +427,7 @@ class _CardSearchResultTile extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppTheme.space10),
                   const Icon(
                     Icons.open_in_new_rounded,
                     color: AppTheme.textSecondary,

@@ -28,6 +28,16 @@ class CardMover {
   bool get isLoser => changeUsd < 0;
 
   factory CardMover.fromJson(Map<String, dynamic> json) {
+    double requiredPrice(String key) {
+      final value = json[key];
+      if (value is num && value.toDouble().isFinite) return value.toDouble();
+      final parsed = double.tryParse(value?.toString() ?? '');
+      if (parsed == null || !parsed.isFinite) {
+        throw FormatException('Missing market price field: $key');
+      }
+      return parsed;
+    }
+
     return CardMover(
       cardId: json['card_id'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -35,16 +45,19 @@ class CardMover {
       imageUrl: json['image_url'] as String?,
       rarity: json['rarity'] as String?,
       typeLine: json['type_line'] as String?,
-      priceToday: (json['price_today'] as num?)?.toDouble() ?? 0.0,
-      priceYesterday: (json['price_yesterday'] as num?)?.toDouble() ?? 0.0,
-      changeUsd: (json['change_usd'] as num?)?.toDouble() ?? 0.0,
-      changePct: (json['change_pct'] as num?)?.toDouble() ?? 0.0,
+      priceToday: requiredPrice('price_today'),
+      priceYesterday: requiredPrice('price_yesterday'),
+      changeUsd: requiredPrice('change_usd'),
+      changePct: requiredPrice('change_pct'),
     );
   }
 }
 
 /// Resposta do endpoint /market/movers
 class MarketMoversData {
+  final String currency;
+  final String priceSource;
+  final String cacheStatus;
   final String? date;
   final String? previousDate;
   final List<CardMover> gainers;
@@ -53,6 +66,9 @@ class MarketMoversData {
   final String? message;
 
   MarketMoversData({
+    this.currency = 'USD',
+    this.priceSource = 'price_history',
+    this.cacheStatus = 'fresh',
     this.date,
     this.previousDate,
     required this.gainers,
@@ -66,13 +82,18 @@ class MarketMoversData {
 
   factory MarketMoversData.fromJson(Map<String, dynamic> json) {
     return MarketMoversData(
+      currency: json['currency'] as String? ?? 'USD',
+      priceSource: json['price_source'] as String? ?? 'price_history',
+      cacheStatus: json['cache_status'] as String? ?? 'fresh',
       date: json['date'] as String?,
       previousDate: json['previous_date'] as String?,
-      gainers: (json['gainers'] as List<dynamic>?)
+      gainers:
+          (json['gainers'] as List<dynamic>?)
               ?.map((e) => CardMover.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      losers: (json['losers'] as List<dynamic>?)
+      losers:
+          (json['losers'] as List<dynamic>?)
               ?.map((e) => CardMover.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

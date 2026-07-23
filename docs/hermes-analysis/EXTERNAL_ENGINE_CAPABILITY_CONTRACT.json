@@ -1,0 +1,370 @@
+{
+  "schema_version": "manaloom_external_engine_capabilities_v1_2026-07-22",
+  "policy": {
+    "product_source_of_truth": "postgresql_backend",
+    "rules_execution_order": [
+      "xmage",
+      "forge",
+      "native_explicit_residual"
+    ],
+    "card_level_learning_requires_typed_natural_event": true,
+    "external_source_code_is_never_direct_postgresql_truth": true,
+    "unclassified_capabilities_allowed": false,
+    "local_source_checkout_policy": {
+      "root_argument": "--xmage-root",
+      "environment_fallback": "MANALOOM_XMAGE_SOURCE_ROOT",
+      "requires_canonical_pin": true,
+      "requires_clean_checkout": true,
+      "forbid_machine_specific_defaults": true,
+      "shared_resolver": "docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_source_contract.py"
+    }
+  },
+  "engines": [
+    {
+      "id": "xmage",
+      "official_repository": "https://github.com/magefree/mage",
+      "canonical_pin_file": "services/xmage-sidecar/XMAGE_COMMIT",
+      "license": "MIT",
+      "runtime_role": "primary_external_rules_executor",
+      "integration_boundary": "isolated_sidecar_api",
+      "allowed_java_root": "services/xmage-sidecar",
+      "source_inventory_minimums": {
+        "card_implementations": 30000,
+        "java_tests": 1900
+      }
+    },
+    {
+      "id": "forge",
+      "official_repository": "https://github.com/Card-Forge/forge",
+      "canonical_pin_file": "services/forge-sidecar/FORGE_COMMIT",
+      "license": "GPL-3.0-only",
+      "runtime_role": "secondary_external_rules_executor_for_structured_xmage_gaps",
+      "integration_boundary": "isolated_process_api_only_no_backend_source_copy",
+      "allowed_java_root": "services/forge-sidecar",
+      "source_inventory_minimums": {
+        "card_scripts": 33000,
+        "java_tests": 90
+      }
+    }
+  ],
+  "required_capability_ids": [
+    "rules_execution",
+    "catalog_coverage_preflight",
+    "commander_multiplayer_execution",
+    "priority_stack_sba_replacement",
+    "engine_ai_action_selection",
+    "timeout_process_isolation",
+    "replay_event_normalization",
+    "engine_provenance_and_pin_drift",
+    "structured_xmage_gap_fallback",
+    "exact_card_source_reference",
+    "semantic_family_taxonomy",
+    "upstream_scenario_corpus",
+    "commander_legality_crosscheck",
+    "deck_generation_and_relation_matrix",
+    "ai_internal_search_and_decision_rationale",
+    "commander_bracket_calculator",
+    "draft_sealed_tournament_modes",
+    "client_editor_network_and_adventure",
+    "ratings_and_matchmaking",
+    "source_code_copy_into_backend"
+  ],
+  "capabilities": [
+    {
+      "id": "rules_execution",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_runtime",
+      "source_surfaces": [
+        "XMage Mage game/ability/card implementations",
+        "Forge forge-game and card scripts"
+      ],
+      "rationale": "Use each pinned engine to execute its covered cards instead of reproducing tens of thousands of rules natively.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/forge-sidecar/SeededForgeMain.java",
+        "server/lib/ai/battle_engine_config.dart"
+      ],
+      "test_evidence": [
+        "services/xmage-sidecar/src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java",
+        "services/forge-sidecar/test_sidecar.py",
+        "server/test/battle_engine_config_test.dart"
+      ]
+    },
+    {
+      "id": "catalog_coverage_preflight",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_runtime",
+      "source_surfaces": ["XMage CardRepository", "Forge CardDb/card scripts"],
+      "rationale": "A battle must fail before execution when either deck contains unresolved identities.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/forge-sidecar/sidecar.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_card_coverage_closure.py"
+      ],
+      "test_evidence": [
+        "services/forge-sidecar/test_sidecar.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_coverage_closure.py"
+      ]
+    },
+    {
+      "id": "commander_multiplayer_execution",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_runtime",
+      "source_surfaces": ["XMage GameCommanderImpl", "Forge DeckFormat.Commander and HostedMatch"],
+      "rationale": "Commander decks are executed by the engines with command-zone and multiplayer rules rather than by a goldfish-only approximation.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/forge-sidecar/SeededForgeMain.java"
+      ],
+      "test_evidence": [
+        "server/test/battle_product_e2e_test.dart",
+        "server/test/xmage_battle_client_test.dart",
+        "server/test/forge_battle_client_test.dart"
+      ]
+    },
+    {
+      "id": "priority_stack_sba_replacement",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_runtime",
+      "source_surfaces": [
+        "XMage GameImpl/GameState/stack/turn/replacement",
+        "Forge game phase/trigger/replacement/staticability"
+      ],
+      "rationale": "These rule families remain inside the pinned engines; ManaLoom validates their observable contract instead of maintaining a second complete implementation.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/forge-sidecar/SeededForgeMain.java",
+        "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+      ],
+      "test_evidence": [
+        "services/xmage-sidecar/src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java",
+        "services/forge-sidecar/test_sidecar.py"
+      ]
+    },
+    {
+      "id": "engine_ai_action_selection",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_runtime_limited",
+      "source_surfaces": ["XMage ComputerPlayer", "Forge forge-ai"],
+      "rationale": "Engine AIs choose game actions during simulations, but their opaque choices are not treated as deckbuilding truth or card-level learning evidence.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/forge-sidecar/SeededForgeMain.java",
+        "server/lib/ai/battle_learning_evidence_support.dart"
+      ],
+      "test_evidence": [
+        "server/test/battle_learning_evidence_support_test.dart",
+        "server/test/battle_product_e2e_test.dart"
+      ]
+    },
+    {
+      "id": "timeout_process_isolation",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_adapter",
+      "source_surfaces": ["XMage remote process", "Forge per-game Java process"],
+      "rationale": "A timeout contaminates engine state and must terminate or replace the process without a silent fallback.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/forge-sidecar/sidecar.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py"
+      ],
+      "test_evidence": [
+        "services/forge-sidecar/test_sidecar.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_battle_async_runner.py"
+      ]
+    },
+    {
+      "id": "replay_event_normalization",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_adapter_limited",
+      "source_surfaces": ["XMage GameView/watchers", "Forge GameLog"],
+      "rationale": "ManaLoom normalizes only observable events; hidden draws, rejected choices and missing source-card identities remain unknown.",
+      "product_evidence": [
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/ReplayNormalizer.java",
+        "services/forge-sidecar/sidecar.py",
+        "server/lib/battle/battle_simulation_persistence_service.dart"
+      ],
+      "test_evidence": [
+        "server/test/battle_replay_routes_security_test.dart",
+        "server/test/ai_simulate_persistence_service_test.dart"
+      ]
+    },
+    {
+      "id": "engine_provenance_and_pin_drift",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_governance",
+      "source_surfaces": ["Official GitHub compare APIs", "canonical commit files"],
+      "rationale": "Runtime identity and upstream deltas are reviewed explicitly; no branch head is promoted automatically.",
+      "product_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_upstream_delta_audit.py",
+        "scripts/manaloom_external_engine_delta_audit.sh"
+      ],
+      "test_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_upstream_delta_audit.py",
+        "server/test/ops_sidecar_digest_release_contract_test.dart"
+      ]
+    },
+    {
+      "id": "structured_xmage_gap_fallback",
+      "engines": ["xmage", "forge"],
+      "relevance": "required",
+      "disposition": "adopted_runtime",
+      "source_surfaces": ["XMage coverage response", "Forge coverage response"],
+      "rationale": "Forge is attempted only for structured XMage coverage gaps; operational failures and timeouts never authorize fallback.",
+      "product_evidence": [
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/ai/xmage_battle_client.dart",
+        "server/lib/ai/forge_battle_client.dart"
+      ],
+      "test_evidence": [
+        "server/test/battle_engine_config_test.dart",
+        "server/test/xmage_battle_client_test.dart",
+        "server/test/forge_battle_client_test.dart"
+      ]
+    },
+    {
+      "id": "exact_card_source_reference",
+      "engines": ["xmage", "forge"],
+      "relevance": "useful",
+      "disposition": "adopted_diagnostic",
+      "source_surfaces": ["XMage per-card Java", "Forge per-card DSL script"],
+      "rationale": "Pinned source is harvested for review packets and residual diagnosis, never promoted directly to executable PostgreSQL rows.",
+      "product_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_local_rule_indexer.py"
+      ],
+      "test_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_rule_reference_harvester.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_local_rule_indexer.py"
+      ]
+    },
+    {
+      "id": "semantic_family_taxonomy",
+      "engines": ["xmage", "forge"],
+      "relevance": "useful",
+      "disposition": "adopted_diagnostic",
+      "source_surfaces": ["XMage effects/targets/filters/costs/watchers", "Forge A/S/T/R/K/SVar fields"],
+      "rationale": "Taxonomies batch diagnostics and native residual work, while externally covered cards remain external execution rather than native adapter tickets.",
+      "product_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_semantic_family_classifier.py"
+      ],
+      "test_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_semantic_family_batch_pipeline.py"
+      ]
+    },
+    {
+      "id": "upstream_scenario_corpus",
+      "engines": ["xmage", "forge"],
+      "relevance": "useful",
+      "disposition": "adopted_focused_reference",
+      "source_surfaces": ["XMage Mage.Tests", "Forge gamesimulation/AI/network tests"],
+      "rationale": "XMage scenarios are mined for focused residual tests; Forge tests qualify future pins but are not copied into the product suite wholesale.",
+      "product_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_test_scenario_miner.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_reference_test_scenario_builder.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_upstream_delta_audit.py"
+      ],
+      "test_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_reference_test_scenario_builder.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_upstream_delta_audit.py"
+      ]
+    },
+    {
+      "id": "commander_legality_crosscheck",
+      "engines": ["xmage", "forge"],
+      "relevance": "useful",
+      "disposition": "adopted_reference_only",
+      "source_surfaces": ["XMage Commander/Partner validators", "Forge DeckFormat predicates"],
+      "rationale": "Engine validators detect drift, but official rules, normalized card data and PostgreSQL remain authoritative.",
+      "product_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_commander_legality_reference_audit.py",
+        "server/lib/deck_rules_service.dart"
+      ],
+      "test_evidence": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_commander_legality_reference_audit.py",
+        "server/test/deck_rules_service_test.dart"
+      ]
+    },
+    {
+      "id": "deck_generation_and_relation_matrix",
+      "engines": ["xmage", "forge"],
+      "relevance": "useful_but_not_product_safe",
+      "disposition": "evaluated_not_adopted",
+      "source_surfaces": ["XMage deck plugins", "Forge CommanderDeckGenerator/CardRelationMatrixGenerator"],
+      "rationale": "The generators are random/fixed-ratio or corpus-matrix builders without ManaLoom collection, budget, protected-anchor, provenance and outcome contracts; they are weaker than the current held-out Commander pipeline.",
+      "product_evidence": [],
+      "test_evidence": []
+    },
+    {
+      "id": "ai_internal_search_and_decision_rationale",
+      "engines": ["xmage", "forge"],
+      "relevance": "useful_but_not_product_safe",
+      "disposition": "evaluated_not_adopted",
+      "source_surfaces": ["XMage AI debug logs", "Forge GameSimulator/AiController"],
+      "rationale": "Neither sidecar exposes a stable, source-attributed, censored decision contract. Parsing debug logs would couple learning to unstable internals and could leak hidden information.",
+      "product_evidence": [],
+      "test_evidence": []
+    },
+    {
+      "id": "commander_bracket_calculator",
+      "engines": ["forge"],
+      "relevance": "useful_but_secondary",
+      "disposition": "evaluated_not_adopted",
+      "source_surfaces": ["Forge CommanderBracketCalculator and bundled lists"],
+      "rationale": "Forge is a useful comparison, but ManaLoom must use current official Commander bracket policy and its own versioned card data rather than silently importing a pinned engine snapshot.",
+      "product_evidence": [],
+      "test_evidence": []
+    },
+    {
+      "id": "draft_sealed_tournament_modes",
+      "engines": ["xmage", "forge"],
+      "relevance": "out_of_current_product_scope",
+      "disposition": "evaluated_out_of_scope",
+      "source_surfaces": ["XMage tournament/draft", "Forge limited/gauntlet"],
+      "rationale": "ManaLoom's current release contract targets Commander deckbuilding and battle evidence, not draft, sealed or tournament orchestration.",
+      "product_evidence": [],
+      "test_evidence": []
+    },
+    {
+      "id": "client_editor_network_and_adventure",
+      "engines": ["xmage", "forge"],
+      "relevance": "out_of_current_product_scope",
+      "disposition": "evaluated_out_of_scope",
+      "source_surfaces": ["XMage desktop/client/server UI", "Forge desktop/mobile/adventure/quest"],
+      "rationale": "ManaLoom already owns its Flutter UX, backend contracts and social product; adopting another client would replace rather than improve those surfaces.",
+      "product_evidence": [],
+      "test_evidence": []
+    },
+    {
+      "id": "ratings_and_matchmaking",
+      "engines": ["xmage"],
+      "relevance": "out_of_current_product_scope",
+      "disposition": "evaluated_out_of_scope",
+      "source_surfaces": ["XMage Glicko and tournament matchmaking"],
+      "rationale": "Current ManaLoom battle simulations are evaluation jobs, not a competitive matchmaking service.",
+      "product_evidence": [],
+      "test_evidence": []
+    },
+    {
+      "id": "source_code_copy_into_backend",
+      "engines": ["xmage", "forge"],
+      "relevance": "prohibited_architecture",
+      "disposition": "explicitly_rejected",
+      "source_surfaces": ["External Java engine internals"],
+      "rationale": "Copying engines into Dart/Python would duplicate rule ownership; Forge is GPL-3.0-only and must remain behind the isolated process/API boundary.",
+      "product_evidence": [],
+      "test_evidence": []
+    }
+  ]
+}

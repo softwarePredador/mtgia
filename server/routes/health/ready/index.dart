@@ -61,6 +61,22 @@ Future<Response> onRequest(RequestContext context) async {
     allHealthy = false;
   }
 
+  final aiJobSchema = await evaluateAiJobSchemaReadiness(context.read<Pool>());
+  checks['ai_job_schema'] = aiJobSchema.check;
+  if (!aiJobSchema.healthy) {
+    allHealthy = false;
+  }
+
+  final collectionAvailabilitySchema =
+      await evaluateCollectionAvailabilitySchemaReadiness(
+        context.read<Pool>(),
+      );
+  checks['collection_availability_schema'] =
+      collectionAvailabilitySchema.check;
+  if (!collectionAvailabilitySchema.healthy) {
+    allHealthy = false;
+  }
+
   // Check 2: Cards table has data
   final cardsStopwatch = Stopwatch()..start();
   try {

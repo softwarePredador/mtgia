@@ -58,7 +58,8 @@ mvn test -B
 mvn package -DskipTests -B
 ```
 
-CI runs the same bootstrap before the canonical battle gate. Set
+The free local release gate runs the same bootstrap before the canonical Battle
+gate. Set
 `MAVEN_REPO_LOCAL` to an absolute path to prove a clean repository or to
 isolate the cache; the canonical gate honors the same variable:
 
@@ -70,7 +71,8 @@ services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh
 
 The bootstrap records a fingerprint containing `XMAGE_COMMIT`, the XMage
 version, and the patched SQLite JDBC version. Cached jars without the matching
-fingerprint are rebuilt. CI also includes `XMAGE_COMMIT` in its Maven cache key.
+fingerprint are rebuilt. The local gate validates `XMAGE_COMMIT` before reusing
+the Maven cache.
 
 The Docker image clones and verifies the pinned XMage commit, upgrades only the
 SQLite JDBC runtime for arm64 compatibility, builds the XMage server, and runs

@@ -68,11 +68,10 @@ class ManaSymbol extends StatelessWidget {
             'assets/symbols/${assetFilename(normalized)}.svg',
             fit: BoxFit.contain,
             excludeFromSemantics: true,
-            placeholderBuilder:
-                (_) => FallbackManaSymbol(symbol: normalized, size: size),
-            errorBuilder:
-                (_, __, ___) =>
-                    FallbackManaSymbol(symbol: normalized, size: size),
+            placeholderBuilder: (_) =>
+                FallbackManaSymbol(symbol: normalized, size: size),
+            errorBuilder: (_, __, ___) =>
+                FallbackManaSymbol(symbol: normalized, size: size),
           ),
         ),
       ),
@@ -210,8 +209,12 @@ class ColorIdentityPips extends StatelessWidget {
     if (!decorated) return row;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: symbolSize <= 14 ? 6 : 7,
-        vertical: symbolSize <= 14 ? 4 : 5,
+        horizontal: symbolSize <= AppTheme.space14
+            ? AppTheme.space6
+            : AppTheme.space7,
+        vertical: symbolSize <= AppTheme.space14
+            ? AppTheme.space4
+            : AppTheme.space5,
       ),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
@@ -244,7 +247,7 @@ class OracleTextWidget extends StatelessWidget {
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1),
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.space1),
               child: ManaSymbol(symbol: symbol, size: 16),
             ),
           ),

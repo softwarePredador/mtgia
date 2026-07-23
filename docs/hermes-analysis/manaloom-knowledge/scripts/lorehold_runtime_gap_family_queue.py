@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import xmage_batch_validity_audit as validity_audit
+import external_engine_source_contract as engine_source_contract
 import xmage_local_rule_indexer as local_indexer
 import xmage_semantic_family_classifier as family_classifier
 from master_optimizer_common import resolve_default_knowledge_db
@@ -30,7 +31,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
-DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_XMAGE_ROOT: Path | None = None
 DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 
 
@@ -666,11 +667,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    try:
+        xmage_root = engine_source_contract.resolve_xmage_source_root(args.xmage_root)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     miner_report = read_json(args.miner_report)
     miner_report["_source_path"] = str(args.miner_report)
     report = build_queue_report(
         miner_report=miner_report,
-        xmage_root=args.xmage_root,
+        xmage_root=xmage_root,
         sqlite_db=args.sqlite_db,
     )
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")

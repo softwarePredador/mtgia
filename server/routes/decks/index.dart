@@ -6,6 +6,9 @@ import 'package:postgres/postgres.dart';
 import '../../lib/deck_schema_support.dart';
 import '../../lib/deck_validation_state_support.dart';
 import '../../lib/deck_card_name_resolution_support.dart';
+import '../../lib/deck_format_support.dart';
+import '../../lib/deck_readiness_contract.dart';
+import '../../lib/deck_request_support.dart';
 import '../../lib/commander_bracket.dart';
 import '../../lib/deck_rules_service.dart';
 import '../../lib/http_responses.dart';
@@ -42,6 +45,7 @@ Future<Response> _listDecks(RequestContext context) async {
     Log.d('🔍 Executando query SELECT...');
     final hasMeta = await hasDeckMetaColumns(conn);
     final hasPricing = await hasDeckPricingColumns(conn);
+    final hasPricingSource = await hasDeckPricingSourceColumn(conn);
     final hasValidationState = await hasDeckValidationStateColumns(conn);
     final baseSql =
         hasMeta
@@ -59,6 +63,7 @@ Future<Response> _listDecks(RequestContext context) async {
           d.pricing_currency,
           d.pricing_total,
           d.pricing_missing_cards,
+          ${hasPricingSource ? 'd.pricing_source' : 'NULL::text AS pricing_source'},
           d.pricing_updated_at,
           d.created_at,
           cmd.commander_name,
@@ -93,6 +98,7 @@ Future<Response> _listDecks(RequestContext context) async {
           NULL::text as pricing_currency,
           NULL::numeric as pricing_total,
           0::int as pricing_missing_cards,
+          NULL::text as pricing_source,
           NULL::timestamptz as pricing_updated_at,
           d.created_at,
           cmd.commander_name,
@@ -128,6 +134,7 @@ Future<Response> _listDecks(RequestContext context) async {
           d.pricing_currency,
           d.pricing_total,
           d.pricing_missing_cards,
+          ${hasPricingSource ? 'd.pricing_source' : 'NULL::text AS pricing_source'},
           d.pricing_updated_at,
           d.created_at,
           cmd.commander_name,
@@ -162,6 +169,7 @@ Future<Response> _listDecks(RequestContext context) async {
           NULL::text as pricing_currency,
           NULL::numeric as pricing_total,
           0::int as pricing_missing_cards,
+          NULL::text as pricing_source,
           NULL::timestamptz as pricing_updated_at,
           d.created_at,
           cmd.commander_name,
@@ -297,32 +305,39 @@ Future<Response> _createDeck(RequestContext context) async {
   // 1. Obter o ID do usuário (injetado pelo middleware de autenticação)
   final userId = context.read<String>();
 
-  // 2. Ler e validar o corpo da requisição
-  final body = await context.request.json();
-  final name = body['name'] as String?;
-  final format = body['format'] as String?;
-  final archetype = body['archetype'] as String?;
-  final bracketResult = parseCommanderBracket(body['bracket']);
-  if (bracketResult.error != null) {
-    return badRequest(bracketResult.error!);
-  }
-  final bracket = bracketResult.value;
-  final isPublic = body['is_public'] == true;
-  final cards =
-      body['cards'] as List? ??
-      []; // Ex: [{'card_id': 'uuid', 'quantity': 2, 'is_commander': false}]
-
-  if (name == null || format == null) {
-    return badRequest('Fields name and format are required.');
-  }
-
-  final rawCardObjects =
-      cards
-          .whereType<Map>()
-          .map((card) => card.cast<String, dynamic>())
-          .toList();
+  late final Map<String, dynamic> body;
+  late final String name;
+  late final String format;
+  late final String? description;
+  late final String? archetype;
+  late final int? bracket;
+  late final bool isPublic;
+  late final List<dynamic> cards;
+  late final List<Map<String, dynamic>> rawCardObjects;
   try {
+    body = requireJsonObject(await context.request.json());
+    name = requireNonEmptyString(body, 'name');
+    final rawFormat = requireNonEmptyString(body, 'format');
+    final supportedFormat = normalizeSupportedDeckFormat(rawFormat);
+    if (supportedFormat == null) {
+      throw DeckRequestException(unsupportedDeckFormatMessage(rawFormat));
+    }
+    format = supportedFormat;
+    description = readOptionalString(body, 'description');
+    archetype = readOptionalString(body, 'archetype', trim: true);
+    final bracketResult = parseCommanderBracket(body['bracket']);
+    if (bracketResult.error != null) {
+      throw DeckRequestException(bracketResult.error!);
+    }
+    bracket = bracketResult.value;
+    isPublic = readOptionalBool(body, 'is_public') ?? false;
+    cards = readOptionalList(body, 'cards') ?? const <dynamic>[];
+    rawCardObjects = requireObjectList(cards);
     validateNoUnsupportedDeckSections(cards: rawCardObjects);
+  } on FormatException catch (e) {
+    return badRequest('Invalid JSON body: ${e.message}');
+  } on DeckRequestException catch (e) {
+    return badRequest(e.message);
   } on DeckRulesException catch (e) {
     return badRequest(e.message);
   }
@@ -345,7 +360,7 @@ Future<Response> _createDeck(RequestContext context) async {
           'userId': userId,
           'name': name,
           'format': format,
-          'desc': body['description'] as String?,
+          'desc': description,
           'isPublic': isPublic,
           if (hasMeta) 'archetype': archetype,
           if (hasMeta) 'bracket': bracket,
@@ -365,10 +380,9 @@ Future<Response> _createDeck(RequestContext context) async {
       final newDeckId = deckMap['id'];
 
       // Resolver card_id quando veio "name" e agregar num formato único
-      final normalizedCards = <Map<String, dynamic>>[];
+      final parsedCards = <Map<String, dynamic>>[];
       final unresolvedNames =
-          cards
-              .whereType<Map>()
+          rawCardObjects
               .where(
                 (card) => (card['card_id']?.toString().trim() ?? '').isEmpty,
               )
@@ -381,46 +395,85 @@ Future<Response> _createDeck(RequestContext context) async {
         preferredFormat: format,
       );
 
-      for (final card in cards) {
-        if (card is! Map) {
-          throw Exception('Each card must be an object.');
-        }
-
-        String? cardId = card['card_id'] as String?;
-        final cardName = card['name'] as String?;
-        final quantity = card['quantity'] as int?;
-        final isCommander = card['is_commander'] as bool? ?? false;
+      for (final card in rawCardObjects) {
+        var cardId = readOptionalString(card, 'card_id', trim: true);
+        final cardName = readOptionalString(card, 'name', trim: true);
+        final quantity = requirePositiveInteger(card, 'quantity');
+        final isCommander = readOptionalBool(card, 'is_commander') ?? false;
 
         if ((cardId == null || cardId.isEmpty) &&
-            (cardName == null || cardName.trim().isEmpty)) {
-          throw Exception('Each card must have a card_id or name.');
-        }
-        if (quantity == null || quantity <= 0) {
-          throw Exception('Each card must have a positive quantity.');
+            (cardName == null || cardName.isEmpty)) {
+          throw const DeckRequestException(
+            'Each card must have a card_id or name.',
+          );
         }
 
         if (cardId == null || cardId.isEmpty) {
-          cardId = resolvedCardIds[cardName!.trim()];
+          cardId = resolvedCardIds[cardName!];
           if (cardId == null || cardId.isEmpty) {
-            throw Exception('Card not found: ${cardName.trim()}');
+            throw DeckRequestException('Card not found: $cardName');
           }
         }
 
-        normalizedCards.add({
+        parsedCards.add({
           'card_id': cardId,
           'quantity': quantity,
           'is_commander': isCommander,
         });
       }
 
+      final cardsById = <String, Map<String, dynamic>>{};
+      for (final card in parsedCards) {
+        final cardId = card['card_id'] as String;
+        final existing = cardsById[cardId];
+        if (existing == null) {
+          cardsById[cardId] = Map<String, dynamic>.from(card);
+          continue;
+        }
+
+        final mergedIsCommander =
+            existing['is_commander'] == true || card['is_commander'] == true;
+        cardsById[cardId] = {
+          'card_id': cardId,
+          'quantity':
+              mergedIsCommander
+                  ? 1
+                  : (existing['quantity'] as int) + (card['quantity'] as int),
+          'is_commander': mergedIsCommander,
+        };
+      }
+      final normalizedCards = cardsById.values.toList(growable: false);
+
       print(
         '[DECK_CREATE_TIMING] normalized_cards=${normalizedCards.length} elapsed_ms=${stopwatch.elapsedMilliseconds}',
       );
 
-      await DeckRulesService(session).validateAndThrow(
-        format: format.toLowerCase(),
-        cards: normalizedCards,
-        strict: false,
+      await DeckRulesService(
+        session,
+      ).validateAndThrow(format: format, cards: normalizedCards, strict: false);
+      String? strictValidationError;
+      var strictValidationPassed = false;
+      try {
+        await DeckRulesService(session).validateAndThrow(
+          format: format,
+          cards: normalizedCards,
+          strict: true,
+        );
+        strictValidationPassed = true;
+      } on DeckRulesException catch (error) {
+        strictValidationError = error.message;
+      }
+      final readiness = buildDeckReadinessContract(
+        format: format,
+        cardCount: normalizedCards.fold<int>(
+          0,
+          (sum, card) => sum + (card['quantity'] as int),
+        ),
+        hasCommander: normalizedCards.any(
+          (card) => card['is_commander'] == true,
+        ),
+        strictValidationPassed: strictValidationPassed,
+        strictValidationError: strictValidationError,
       );
       print(
         '[DECK_CREATE_TIMING] validate_rules_done elapsed_ms=${stopwatch.elapsedMilliseconds}',
@@ -456,13 +509,22 @@ Future<Response> _createDeck(RequestContext context) async {
       if (hasValidationState) {
         final validationResult = await session.execute(
           Sql.named('''
-            SELECT validation_state,
-                   validation_reasons,
-                   validation_updated_at
-            FROM decks
+            UPDATE decks
+            SET validation_state = @validationState,
+                validation_reasons = CAST(@validationReasons AS jsonb),
+                validation_updated_at = CURRENT_TIMESTAMP
             WHERE id = @deckId
+            RETURNING validation_state,
+                      validation_reasons,
+                      validation_updated_at
           '''),
-          parameters: {'deckId': newDeckId},
+          parameters: {
+            'deckId': newDeckId,
+            'validationState': readiness['state'],
+            'validationReasons': encodeDeckValidationReasons(
+              readiness['review_reasons'] as List<String>,
+            ),
+          },
         );
         deckMap.addAll(validationResult.first.toColumnMap());
         if (deckMap['validation_updated_at'] is DateTime) {
@@ -503,6 +565,9 @@ Future<Response> _createDeck(RequestContext context) async {
     return Response.json(body: newDeck);
   } on DeckRulesException catch (e) {
     print('[ERROR] Failed to create deck: $e');
+    return badRequest(e.message);
+  } on DeckRequestException catch (e) {
+    print('[ERROR] Invalid create deck request: $e');
     return badRequest(e.message);
   } catch (e, stackTrace) {
     print('[ERROR] Failed to create deck: $e');

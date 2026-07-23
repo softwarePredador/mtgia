@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/security/auth_token_store.dart';
@@ -202,6 +203,19 @@ void main() {
         find.byKey(const Key('profile-delete-account-dialog')),
         findsOneWidget,
       );
+      await tester.tap(
+        find.byKey(const Key('profile-delete-confirmation-field')),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('profile-delete-account-dialog')),
+        findsNothing,
+      );
+
+      await tester.tap(find.byKey(const Key('profile-delete-account-button')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('profile-delete-confirm-button')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));

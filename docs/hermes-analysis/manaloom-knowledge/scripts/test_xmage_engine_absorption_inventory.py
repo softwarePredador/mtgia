@@ -4,6 +4,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import xmage_engine_absorption_inventory as inventory
 
@@ -59,8 +60,24 @@ class XMageEngineAbsorptionInventoryTests(unittest.TestCase):
         markdown = inventory.render_markdown(report)
 
         self.assertIn("XMage Engine Absorption Inventory", markdown)
-        self.assertIn("Do not port XMage wholesale", markdown)
+        self.assertIn("Execute catalog-covered cards", markdown)
         self.assertIn("priority_stack_turn_engine", markdown)
+
+    @mock.patch.object(inventory.subprocess, "run")
+    def test_source_pin_mismatch_blocks_inventory(self, run: mock.Mock) -> None:
+        run.return_value = mock.Mock(
+            returncode=0,
+            stdout="0" * 40 + "\n",
+            stderr="",
+        )
+
+        report = inventory.build_inventory(
+            self._root(),
+            expected_commit="1" * 40,
+        )
+
+        self.assertEqual(report["status"], "blocked_unpinned_source")
+        self.assertEqual(report["source_pin"]["error"], "source_root_is_not_at_runtime_pin")
 
 
 if __name__ == "__main__":

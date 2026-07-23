@@ -65,12 +65,14 @@ Future<Response> onRequest(RequestContext context) async {
       hasIdentityColumns: hasIdentityColumns,
     );
     if (localExact.isNotEmpty) {
-      return Response.json(body: {
-        'source': 'local',
-        'name': localExact.first['name'],
-        'total_returned': localExact.length,
-        'data': localExact,
-      });
+      return Response.json(
+        body: {
+          'source': 'local',
+          'name': localExact.first['name'],
+          'total_returned': localExact.length,
+          'data': localExact,
+        },
+      );
     }
 
     // Token OCR must not resolve to a normal card with a similar name.
@@ -101,12 +103,14 @@ Future<Response> onRequest(RequestContext context) async {
         hasIdentityColumns: hasIdentityColumns,
       );
 
-      return Response.json(body: {
-        'source': 'scryfall',
-        'name': scryfallToken['name'],
-        'total_returned': freshData.length,
-        'data': freshData,
-      });
+      return Response.json(
+        body: {
+          'source': 'scryfall',
+          'name': scryfallToken['name'],
+          'total_returned': freshData.length,
+          'data': freshData,
+        },
+      );
     }
 
     // ─── 2) Busca local com resolução controlada (prefix/contains únicos) ───
@@ -118,17 +122,19 @@ Future<Response> onRequest(RequestContext context) async {
         exact: true,
         hasIdentityColumns: hasIdentityColumns,
       );
-      return Response.json(body: {
-        'source': 'local',
-        'name': localFuzzy.first['name'],
-        'total_returned': localFuzzy.length,
-        'resolution': {
-          'input_name': name,
-          'matched_name': localDecision.matchedName,
-          'strategy': localDecision.strategy,
+      return Response.json(
+        body: {
+          'source': 'local',
+          'name': localFuzzy.first['name'],
+          'total_returned': localFuzzy.length,
+          'resolution': {
+            'input_name': name,
+            'matched_name': localDecision.matchedName,
+            'strategy': localDecision.strategy,
+          },
+          'data': localFuzzy,
         },
-        'data': localFuzzy,
-      });
+      );
     }
 
     if (localDecision.isAmbiguous) {
@@ -175,12 +181,14 @@ Future<Response> onRequest(RequestContext context) async {
       hasIdentityColumns: hasIdentityColumns,
     );
 
-    return Response.json(body: {
-      'source': 'scryfall',
-      'name': scryfallCard['name'],
-      'total_returned': freshData.length,
-      'data': freshData,
-    });
+    return Response.json(
+      body: {
+        'source': 'scryfall',
+        'name': scryfallCard['name'],
+        'total_returned': freshData.length,
+        'data': freshData,
+      },
+    );
   } catch (e) {
     print('[ERROR] Erro ao resolver carta: $e');
     return Response.json(
@@ -210,14 +218,16 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       includeTokens ? " AND c.type_line ILIKE '%Token%'" : '';
   final paramValue = exact ? name : '%$name%';
 
-  final sql = hasSets
-      ? '''
+  final sql =
+      hasSets
+          ? '''
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
       $identityColumns
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
       s.name AS set_name, s.release_date AS set_release_date,
-      c.rarity, c.is_reserved, c.price, c.price_updated_at,
+      c.rarity, c.is_reserved, COALESCE(c.price_usd, c.price) AS price,
+      c.price_source, c.price_updated_at,
       c.collector_number, c.foil
     FROM cards c
     LEFT JOIN sets s ON s.code = c.set_code
@@ -225,12 +235,13 @@ Future<List<Map<String, dynamic>>> _searchLocal(
     ORDER BY s.release_date DESC NULLS LAST, c.set_code ASC
     LIMIT 50
   '''
-      : '''
+          : '''
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
       $identityColumns
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
-      c.rarity, c.is_reserved, c.price, c.price_updated_at,
+      c.rarity, c.is_reserved, COALESCE(c.price_usd, c.price) AS price,
+      c.price_source, c.price_updated_at,
       c.collector_number, c.foil
     FROM cards c
     WHERE $condition$tokenCondition
@@ -261,13 +272,17 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       'set_code': m['set_code'],
       if (m.containsKey('set_name')) 'set_name': m['set_name'],
       if (m.containsKey('set_release_date'))
-        'set_release_date': (m['set_release_date'] as DateTime?)
-            ?.toIso8601String()
-            .split('T')
-            .first,
+        'set_release_date':
+            (m['set_release_date'] as DateTime?)
+                ?.toIso8601String()
+                .split('T')
+                .first,
       'rarity': m['rarity'],
       'is_reserved': m['is_reserved'] == true,
       'price': m['price'],
+      'price_currency': 'USD',
+      'price_source':
+          m['price_source'] ?? (m['price'] == null ? null : 'legacy'),
       'price_updated_at':
           (m['price_updated_at'] as DateTime?)?.toIso8601String(),
       'collector_number': m['collector_number'],
@@ -301,10 +316,11 @@ Future<CardResolutionDecision> _resolveLocalCandidate(
     parameters: {'name': inputName},
   );
 
-  final candidateNames = result
-      .map((row) => (row[0] as String?)?.trim() ?? '')
-      .where((name) => name.isNotEmpty)
-      .toList();
+  final candidateNames =
+      result
+          .map((row) => (row[0] as String?)?.trim() ?? '')
+          .where((name) => name.isNotEmpty)
+          .toList();
 
   return resolveCardCandidateNames(inputName, candidateNames);
 }
@@ -332,7 +348,7 @@ Future<Map<String, dynamic>?> _fetchFromScryfall(
       Uri.parse(url),
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0'
+        'User-Agent': 'MTGDeckBuilder/1.0',
       },
     );
 
@@ -364,7 +380,7 @@ Future<Map<String, dynamic>?> _fetchTokenFromScryfallSearch(String name) async {
       Uri.parse(url),
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0'
+        'User-Agent': 'MTGDeckBuilder/1.0',
       },
     );
 
@@ -402,7 +418,7 @@ Future<Map<String, dynamic>?> _fetchFromScryfallSearch(String name) async {
       Uri.parse(url),
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0'
+        'User-Agent': 'MTGDeckBuilder/1.0',
       },
     );
 
@@ -429,8 +445,11 @@ Future<Map<String, dynamic>?> _fetchFromScryfallSearch(String name) async {
 /// A Scryfall retorna UMA printing específica. Também busca todas as
 /// printings da mesma carta (via prints_search_uri) para importar todas.
 Future<List<Map<String, dynamic>>> _insertScryfallCard(
-    Pool pool, Map<String, dynamic> scryfallCard,
-    {required bool includeTokens, required bool hasIdentityColumns}) async {
+  Pool pool,
+  Map<String, dynamic> scryfallCard, {
+  required bool includeTokens,
+  required bool hasIdentityColumns,
+}) async {
   final oracleId = scryfallCard['oracle_id'] as String?;
   if (oracleId == null || oracleId.isEmpty) return [];
 
@@ -514,16 +533,18 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
     try {
       final identityInsertColumns =
           hasIdentityColumns ? ', oracle_id, layout, card_faces_json' : '';
-      final identityInsertValues = hasIdentityColumns
-          ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
-          : '';
-      final identityUpdates = hasIdentityColumns
-          ? '''
+      final identityInsertValues =
+          hasIdentityColumns
+              ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
+              : '';
+      final identityUpdates =
+          hasIdentityColumns
+              ? '''
             oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
             layout = COALESCE(EXCLUDED.layout, cards.layout),
             card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
 '''
-          : '';
+              : '';
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
@@ -581,8 +602,9 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
 /// Busca todas as printings de uma carta via Scryfall (prints_search_uri).
 /// Retorna no máximo 20 printings para não sobrecarregar.
 Future<List<Map<String, dynamic>>> _fetchAllPrintings(
-    Map<String, dynamic> scryfallCard,
-    {required bool includeTokens}) async {
+  Map<String, dynamic> scryfallCard, {
+  required bool includeTokens,
+}) async {
   final printsUri = scryfallCard['prints_search_uri'] as String?;
   if (printsUri == null) return [scryfallCard];
 
@@ -591,7 +613,7 @@ Future<List<Map<String, dynamic>>> _fetchAllPrintings(
       Uri.parse(printsUri),
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0'
+        'User-Agent': 'MTGDeckBuilder/1.0',
       },
     );
 
@@ -602,20 +624,21 @@ Future<List<Map<String, dynamic>>> _fetchAllPrintings(
     if (data == null || data.isEmpty) return [scryfallCard];
 
     // Filtra: apenas paper, não digital-only, não art-series
-    final filtered = data
-        .whereType<Map<String, dynamic>>()
-        .where((card) {
-          final games = card['games'] as List?;
-          final isPaper = games?.contains('paper') ?? false;
-          final layout = card['layout']?.toString() ?? '';
-          final isArtSeries = layout == 'art_series';
-          final isToken = layout == 'token';
-          return isPaper &&
-              !isArtSeries &&
-              (includeTokens ? isToken : !isToken);
-        })
-        .take(30)
-        .toList();
+    final filtered =
+        data
+            .whereType<Map<String, dynamic>>()
+            .where((card) {
+              final games = card['games'] as List?;
+              final isPaper = games?.contains('paper') ?? false;
+              final layout = card['layout']?.toString() ?? '';
+              final isArtSeries = layout == 'art_series';
+              final isToken = layout == 'token';
+              return isPaper &&
+                  !isArtSeries &&
+                  (includeTokens ? isToken : !isToken);
+            })
+            .take(30)
+            .toList();
 
     return filtered.isEmpty ? [scryfallCard] : filtered;
   } catch (_) {
@@ -645,7 +668,8 @@ Future<void> _insertLegalities(
   // Busca o card_id principal (primeiro match pelo nome)
   final cardResult = await pool.execute(
     Sql.named(
-        'SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1'),
+      'SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1',
+    ),
     parameters: {'name': cardName},
   );
   if (cardResult.isEmpty) return;
@@ -666,11 +690,7 @@ Future<void> _insertLegalities(
           VALUES (@card_id::uuid, @format, @status)
           ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status
         '''),
-        parameters: {
-          'card_id': cardId,
-          'format': format,
-          'status': status,
-        },
+        parameters: {'card_id': cardId, 'format': format, 'status': status},
       );
     } catch (_) {
       // Ignora erros em legalities individuais

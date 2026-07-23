@@ -27,10 +27,9 @@ class DeckAnalysisData {
     final stats = _asStringMap(json['stats']);
     final composition = _parseIntMap(_asStringMap(stats['composition']));
     final functionalTagsPayload = _asStringMap(json['functional_tags']);
-    final functionalTags =
-        functionalTagsPayload.isEmpty
-            ? null
-            : DeckFunctionalTags.fromJson(functionalTagsPayload);
+    final functionalTags = functionalTagsPayload.isEmpty
+        ? null
+        : DeckFunctionalTags.fromJson(functionalTagsPayload);
     final readinessPayload = _asStringMap(json['readiness']);
     final battleReadinessPayload = _asStringMap(json['battle_readiness']);
     final cardBattleReadiness = _parseMapList(
@@ -45,27 +44,22 @@ class DeckAnalysisData {
       format: json['format']?.toString(),
       composition: composition,
       functionalTags: functionalTags,
-      readiness:
-          readinessPayload.isEmpty
-              ? null
-              : DeckReadinessSummary.fromJson(readinessPayload),
-      battleReadiness:
-          battleReadinessPayload.isEmpty
-              ? null
-              : DeckBattleReadinessSummary.fromJson(battleReadinessPayload),
+      readiness: readinessPayload.isEmpty
+          ? null
+          : DeckReadinessSummary.fromJson(readinessPayload),
+      battleReadiness: battleReadinessPayload.isEmpty
+          ? null
+          : DeckBattleReadinessSummary.fromJson(battleReadinessPayload),
       cardBattleReadiness: cardBattleReadiness,
-      understandingSummary:
-          understandingPayload.isEmpty
-              ? null
-              : DeckUnderstandingSummary.fromJson(understandingPayload),
-      commanderContract:
-          commanderContractPayload.isEmpty
-              ? null
-              : DeckCommanderContractSummary.fromJson(commanderContractPayload),
-      launchCapabilities:
-          launchCapabilitiesPayload.isEmpty
-              ? null
-              : DeckLaunchCapabilities.fromJson(launchCapabilitiesPayload),
+      understandingSummary: understandingPayload.isEmpty
+          ? null
+          : DeckUnderstandingSummary.fromJson(understandingPayload),
+      commanderContract: commanderContractPayload.isEmpty
+          ? null
+          : DeckCommanderContractSummary.fromJson(commanderContractPayload),
+      launchCapabilities: launchCapabilitiesPayload.isEmpty
+          ? null
+          : DeckLaunchCapabilities.fromJson(launchCapabilitiesPayload),
     );
   }
 
@@ -242,8 +236,11 @@ class DeckCommanderContractSummary {
     required this.commanderCount,
     required this.summary,
     required this.battleGate,
+    this.baselinePolicy,
     required this.gates,
     required this.sourceLanes,
+    required this.provenanceLanes,
+    required this.planningCoverage,
     required this.planningFlow,
     required this.overviewFields,
     required this.blockers,
@@ -262,8 +259,11 @@ class DeckCommanderContractSummary {
   final int commanderCount;
   final String summary;
   final DeckCommanderBattleGate battleGate;
+  final DeckCommanderBaselinePolicy? baselinePolicy;
   final DeckCommanderGateFlags gates;
   final List<DeckCommanderSourceLane> sourceLanes;
+  final List<DeckCommanderProvenanceLane> provenanceLanes;
+  final DeckCommanderPlanningCoverage planningCoverage;
   final List<DeckCommanderLabelItem> planningFlow;
   final List<DeckCommanderLabelItem> overviewFields;
   final List<String> blockers;
@@ -285,10 +285,21 @@ class DeckCommanderContractSummary {
       battleGate: DeckCommanderBattleGate.fromJson(
         _asStringMap(json['battle_gate']),
       ),
+      baselinePolicy: _asStringMap(json['baseline_policy']).isEmpty
+          ? null
+          : DeckCommanderBaselinePolicy.fromJson(
+              _asStringMap(json['baseline_policy']),
+            ),
       gates: DeckCommanderGateFlags.fromJson(_asStringMap(json['gates'])),
       sourceLanes: _parseMapList(
         json['source_lanes'],
       ).map(DeckCommanderSourceLane.fromJson).toList(growable: false),
+      provenanceLanes: _parseMapList(
+        _asStringMap(json['provenance'])['lanes'],
+      ).map(DeckCommanderProvenanceLane.fromJson).toList(growable: false),
+      planningCoverage: DeckCommanderPlanningCoverage.fromJson(
+        _asStringMap(json['planning_coverage']),
+      ),
       planningFlow: _parseMapList(
         json['planning_flow'],
       ).map(DeckCommanderLabelItem.fromJson).toList(growable: false),
@@ -304,15 +315,22 @@ class DeckCommanderContractSummary {
 
   bool get shouldDisplay => isCommanderApplicable;
 
-  bool get hasBlockers => status == 'blocked' || blockers.isNotEmpty;
+  bool get hasBlockers =>
+      status == 'blocked' ||
+      blockers.isNotEmpty ||
+      baselinePolicy?.status == 'experimental_blocked';
 
   String get safeStatusLabel {
+    final baselineLabel = baselinePolicy?.label.trim() ?? '';
+    if (baselineLabel.isNotEmpty) return baselineLabel;
     final label = statusLabel.trim();
     if (label.isNotEmpty) return label;
     return status.trim().isEmpty ? 'Sem leitura' : status;
   }
 
   String get primaryDetail {
+    final baselineDetail = baselinePolicy?.detail.trim() ?? '';
+    if (baselineDetail.isNotEmpty) return baselineDetail;
     final text = summary.trim();
     if (text.isNotEmpty) return text;
     if (nextActions.isNotEmpty) return nextActions.first;
@@ -325,6 +343,49 @@ class DeckCommanderContractSummary {
     if (sourceLanes.isEmpty) return null;
     final available = sourceLanes.where((lane) => lane.available).length;
     return '$available/${sourceLanes.length} fontes ativas';
+  }
+}
+
+class DeckCommanderBaselinePolicy {
+  const DeckCommanderBaselinePolicy({
+    required this.applies,
+    required this.baselineDeckId,
+    required this.status,
+    required this.label,
+    required this.detail,
+    required this.candidateDecision,
+    required this.seedPairingClaim,
+    required this.definitiveClaimAllowed,
+    required this.automaticCandidateApplyAllowed,
+    required this.nextGate,
+  });
+
+  final bool applies;
+  final String baselineDeckId;
+  final String status;
+  final String label;
+  final String detail;
+  final String candidateDecision;
+  final bool seedPairingClaim;
+  final bool definitiveClaimAllowed;
+  final bool automaticCandidateApplyAllowed;
+  final String nextGate;
+
+  factory DeckCommanderBaselinePolicy.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderBaselinePolicy(
+      applies: _parseBool(json['applies']),
+      baselineDeckId: json['baseline_deck_id']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      detail: json['detail']?.toString() ?? '',
+      candidateDecision: json['candidate_decision']?.toString() ?? '',
+      seedPairingClaim: _parseBool(json['seed_pairing_claim']),
+      definitiveClaimAllowed: _parseBool(json['definitive_claim_allowed']),
+      automaticCandidateApplyAllowed: _parseBool(
+        json['automatic_candidate_apply_allowed'],
+      ),
+      nextGate: json['next_gate']?.toString() ?? '',
+    );
   }
 }
 
@@ -398,6 +459,99 @@ class DeckCommanderSourceLane {
       available: _parseBool(json['available']),
       count: _parseInt(json['count']),
       detail: _optionalTrimmedString(json['detail']),
+    );
+  }
+}
+
+class DeckCommanderProvenanceLane {
+  const DeckCommanderProvenanceLane({
+    required this.key,
+    required this.label,
+    required this.available,
+    required this.confidence,
+  });
+
+  final String key;
+  final String label;
+  final bool available;
+  final String confidence;
+
+  factory DeckCommanderProvenanceLane.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderProvenanceLane(
+      key: json['key']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      available: _parseBool(json['available']),
+      confidence: json['confidence']?.toString() ?? '',
+    );
+  }
+
+  String get safeLabel {
+    final text = label.trim();
+    return text.isEmpty ? 'Fonte da decisão' : text;
+  }
+
+  String get confidenceLabel {
+    if (!available) return 'Não disponível';
+    return switch (confidence.trim().toLowerCase()) {
+      'source_backed' => 'Fonte verificada',
+      'aggregate_only' => 'Dado agregado',
+      'advisory_aggregate' => 'Referência agregada',
+      'observed_usage' => 'Uso observado',
+      'reviewed_snapshot' => 'Lista revisada',
+      'advisory_only' => 'Sugestão consultiva',
+      'natural_exposure_only' => 'Exposição natural',
+      'comparison_input_only' => 'Entrada de comparação',
+      _ => 'Disponível',
+    };
+  }
+}
+
+class DeckCommanderPlanningCoverage {
+  const DeckCommanderPlanningCoverage({
+    required this.requiredCount,
+    required this.readyCount,
+    required this.partialCount,
+    required this.pendingCount,
+    required this.items,
+  });
+
+  final int requiredCount;
+  final int readyCount;
+  final int partialCount;
+  final int pendingCount;
+  final List<DeckCommanderPlanningCoverageItem> items;
+
+  factory DeckCommanderPlanningCoverage.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderPlanningCoverage(
+      requiredCount: _parseInt(json['required_count']),
+      readyCount: _parseInt(json['ready_count']),
+      partialCount: _parseInt(json['partial_count']),
+      pendingCount: _parseInt(json['pending_count']),
+      items: _parseMapList(
+        json['items'],
+      ).map(DeckCommanderPlanningCoverageItem.fromJson).toList(growable: false),
+    );
+  }
+}
+
+class DeckCommanderPlanningCoverageItem {
+  const DeckCommanderPlanningCoverageItem({
+    required this.key,
+    required this.label,
+    required this.status,
+  });
+
+  final String key;
+  final String label;
+  final String status;
+
+  factory DeckCommanderPlanningCoverageItem.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DeckCommanderPlanningCoverageItem(
+      key: json['key']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'pending',
     );
   }
 }

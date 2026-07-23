@@ -31,6 +31,44 @@ void validateAuthRuntimeEnvironment(
     environment,
     production: runtimeMode == 'production',
   );
+  if (runtimeMode == 'production') {
+    AccountEmailDeliveryPolicy.validate(environment);
+  }
+}
+
+class AccountEmailDeliveryPolicy {
+  const AccountEmailDeliveryPolicy._();
+
+  static void validate(Map<String, String> environment) {
+    for (final key in const [
+      'PASSWORD_RESET_WEBHOOK_URL',
+      'PASSWORD_RESET_APP_URL',
+      'EMAIL_VERIFICATION_WEBHOOK_URL',
+      'EMAIL_VERIFICATION_APP_URL',
+    ]) {
+      final value = environment[key]?.trim();
+      final uri = value == null ? null : Uri.tryParse(value);
+      if (uri == null ||
+          uri.scheme.toLowerCase() != 'https' ||
+          uri.host.isEmpty ||
+          uri.userInfo.isNotEmpty) {
+        throw StateError('$key deve ser uma URL HTTPS sem credenciais.');
+      }
+    }
+    for (final key in const [
+      'PASSWORD_RESET_WEBHOOK_TOKEN',
+      'EMAIL_VERIFICATION_WEBHOOK_TOKEN',
+    ]) {
+      final value = environment[key];
+      if (value == null || value.trim() != value || value.length < 16) {
+        throw StateError('$key não atende ao contrato de produção.');
+      }
+    }
+    if (environment['MANALOOM_PASSWORD_RESET_TEST_RESPONSE'] != null ||
+        environment['MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE'] != null) {
+      throw StateError('Exposição de tokens de teste é proibida em produção.');
+    }
+  }
 }
 
 class JwtSecretPolicy {

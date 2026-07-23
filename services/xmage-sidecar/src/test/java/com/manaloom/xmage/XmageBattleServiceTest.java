@@ -1,6 +1,7 @@
 package com.manaloom.xmage;
 
 import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +64,62 @@ final class XmageBattleServiceTest {
         assertFalse(XmageBattleService.shouldFinishBattle(true, false, false));
         assertTrue(XmageBattleService.shouldFinishBattle(false, true, true));
         assertTrue(XmageBattleService.shouldFinishBattle(true, false, true));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void v2ContractValidatesIdentityHashesAndCorrelationOnlySeed() {
+        XmageBattleService service = new XmageBattleService("127.0.0.1", 17171);
+        JsonObject request = strictRequest(service, 30);
+
+        Map<String, Object> metadata = service.requestMetadata(request, "completed");
+
+        assertEquals(42L, metadata.get("seed"));
+        assertEquals(request.get("request_hash").getAsString(), metadata.get("request_hash"));
+        assertEquals(
+                "100fc3b88a03428527c22c037f7b62905e272a8ecec100eb0b385b3cc7d09e7c",
+                ((Map<String, Object>) metadata.get("deck_hashes")).get("deck_a")
+        );
+        assertEquals(
+                "ad93b5dd41231adc7c9c1a25772aca16a4cc0e418081d6897962edf1153539b6",
+                metadata.get("request_hash")
+        );
+        assertEquals(
+                "request_correlation_only_server_rng_uncontrolled",
+                SidecarMain.SEED_SEMANTICS
+        );
+        assertFalse((Boolean) ((Map<String, Object>) metadata.get("execution_outcome")).get("timed_out"));
+
+        JsonObject broken = request.deepCopy();
+        broken.addProperty("request_hash", "wrong");
+        assertThrows(IllegalArgumentException.class, () -> service.requestMetadata(broken, "completed"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void censoringAndTimeoutCannotPublishAComparisonWinner() {
+        XmageBattleService service = new XmageBattleService("127.0.0.1", 17171);
+        JsonObject request = strictRequest(service, 3);
+
+        Map<String, Object> censored = service.requestMetadata(request, "censored");
+        Map<String, Object> censoredOutcome =
+                (Map<String, Object>) censored.get("execution_outcome");
+        assertTrue((Boolean) censoredOutcome.get("censored"));
+        assertEquals("max_turns_exceeded", censoredOutcome.get("censor_reason"));
+        assertFalse(XmageBattleService.winnerEligibleForComparison("censored"));
+
+        Map<String, Object> timeout = service.requestMetadata(request, "timeout");
+        Map<String, Object> timeoutOutcome =
+                (Map<String, Object>) timeout.get("execution_outcome");
+        assertTrue((Boolean) timeoutOutcome.get("timed_out"));
+        assertFalse((Boolean) timeout.get("fallback_allowed"));
+        assertEquals("none", timeout.get("fallback_reason"));
+        assertEquals("operational_timeout_not_eligible", timeout.get("fallback_eligibility_reason"));
+
+        Map<String, Object> coverage = service.requestMetadata(request, "coverage_incomplete");
+        assertTrue((Boolean) coverage.get("fallback_allowed"));
+        assertEquals("none", coverage.get("fallback_reason"));
+        assertEquals("coverage_incomplete_eligible", coverage.get("fallback_eligibility_reason"));
     }
 
     @Test
@@ -232,6 +289,40 @@ final class XmageBattleServiceTest {
         card.addProperty("quantity", quantity);
         card.addProperty("is_commander", commander);
         return card;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static JsonObject strictRequest(XmageBattleService service, int maxTurns) {
+        JsonObject request = new JsonObject();
+        request.addProperty("request_id", "request-42");
+        request.addProperty("seed", 42L);
+        request.addProperty("timeout_ms", 40000L);
+        request.addProperty("max_turns", maxTurns);
+        JsonArray focusCards = new JsonArray();
+        focusCards.add("Sol Ring");
+        request.add("focus_cards", focusCards);
+        request.addProperty("force_focus_access_mode", "none");
+        request.addProperty("same_lane", true);
+        request.addProperty("natural_sample", true);
+        request.add("deck_a", deck(
+                "deck-a",
+                card("Commander", 1, true),
+                card("Plains", 99, false)
+        ));
+        request.add("deck_b", deck(
+                "deck-b",
+                card("Commander", 1, true),
+                card("Plains", 99, false)
+        ));
+        Map<String, Object> legacy = service.requestMetadata(request, "completed");
+        request.addProperty("request_schema_version", SidecarMain.REQUEST_SCHEMA);
+        request.addProperty("expected_engine", "xmage");
+        request.addProperty("expected_engine_version", SidecarMain.XMAGE_VERSION);
+        request.addProperty("expected_engine_commit", SidecarMain.XMAGE_COMMIT);
+        request.addProperty("ai_profile", SidecarMain.AI_PROFILE);
+        request.add("deck_hashes", new Gson().toJsonTree(legacy.get("deck_hashes")));
+        request.addProperty("request_hash", String.valueOf(legacy.get("request_hash")));
+        return request;
     }
 
     private static Map<String, Object> replayCard(String id, String name, boolean tapped) {

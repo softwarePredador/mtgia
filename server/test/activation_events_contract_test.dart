@@ -22,6 +22,15 @@ void main() {
 
       expect(deckProviderSource, contains("'deck_rebuild_created'"));
       expect(routeSource, contains("'deck_rebuild_created'"));
+
+      final onboardingSource =
+          File(
+            '../app/lib/features/home/onboarding_core_flow_screen.dart',
+          ).readAsStringSync();
+      expect(onboardingSource, contains("'onboarding_completed'"));
+      expect(onboardingSource, contains("'onboarding_skipped'"));
+      expect(routeSource, contains("'onboarding_completed'"));
+      expect(routeSource, contains("'onboarding_skipped'"));
     });
 
     test('activation route keeps rejecting unknown event names', () {

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../../ai_provider_runtime_support.dart';
 import '../../openai_structured_output_support.dart';
+import '../../plan_service.dart';
 import 'commander_ai_prompt_eval_suite.dart';
 
 String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
@@ -30,6 +31,7 @@ String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
         'Recommend safe one-for-one Commander deck swaps using only the supplied catalog.',
     'commander': testCase['commander'],
     'archetype': testCase['archetype'],
+    'intensity': testCase['intensity'],
     'bracket': testCase['bracket'],
     'color_identity': testCase['color_identity'],
     'current_decklist': testCase['deck'],
@@ -199,6 +201,7 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
     return _liveEvalError(
       model: model,
       caseId: testCase['id']?.toString(),
+      intensity: testCase['intensity']?.toString(),
       code: 'provider_timeout',
       latencyMs: started.elapsedMilliseconds,
     );
@@ -206,6 +209,7 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
     return _liveEvalError(
       model: model,
       caseId: testCase['id']?.toString(),
+      intensity: testCase['intensity']?.toString(),
       code: 'provider_transport_error',
       latencyMs: started.elapsedMilliseconds,
       errorType: error.runtimeType.toString(),
@@ -216,6 +220,7 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
     return _liveEvalError(
       model: model,
       caseId: testCase['id']?.toString(),
+      intensity: testCase['intensity']?.toString(),
       code: 'provider_http_error',
       providerStatus: response.statusCode,
       latencyMs: started.elapsedMilliseconds,
@@ -243,6 +248,7 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
     return {
       'status': 'ok',
       'case_id': testCase['id'],
+      'intensity': testCase['intensity']?.toString() ?? 'unspecified',
       'model_requested': model,
       'model_returned': outer['model'],
       'latency_ms': started.elapsedMilliseconds,
@@ -258,6 +264,7 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
     return _liveEvalError(
       model: model,
       caseId: testCase['id']?.toString(),
+      intensity: testCase['intensity']?.toString(),
       code: 'provider_response_invalid',
       latencyMs: started.elapsedMilliseconds,
       errorType: error.runtimeType.toString(),
@@ -268,6 +275,7 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
 Map<String, dynamic> _liveEvalError({
   required String model,
   required String? caseId,
+  required String? intensity,
   required String code,
   required int latencyMs,
   int? providerStatus,
@@ -276,6 +284,7 @@ Map<String, dynamic> _liveEvalError({
   return {
     'status': 'error',
     'case_id': caseId,
+    'intensity': intensity ?? 'unspecified',
     'model_requested': model,
     'error_code': code,
     if (providerStatus != null) 'provider_status': providerStatus,
@@ -295,4 +304,142 @@ bool commanderAiLiveEvalShouldFail(
     if (evaluation is! Map || evaluation['status'] != 'pass') return true;
   }
   return false;
+}
+
+Map<String, dynamic> summarizeCommanderAiLiveEvalResults(
+  List<Map<String, dynamic>> results,
+) {
+  final models =
+      results
+          .map((row) => row['model_requested']?.toString() ?? '')
+          .where((model) => model.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
+  const intensityOrder = <String>['light', 'focused', 'aggressive', 'rebuild'];
+  final observedIntensities =
+      results
+          .map((row) => row['intensity']?.toString() ?? 'unspecified')
+          .toSet();
+  final intensities = <String>[
+    ...intensityOrder.where(observedIntensities.contains),
+    ...(observedIntensities.difference(intensityOrder.toSet()).toList()
+      ..sort()),
+  ];
+
+  return {
+    'pricing_version': PlanService.estimatedCostPricingVersion,
+    'global': _summarizeCommanderAiLiveEvalGroup(results),
+    'models': [
+      for (final model in models)
+        {
+          'model': model,
+          ..._summarizeCommanderAiLiveEvalGroup(
+            results
+                .where((row) => row['model_requested']?.toString() == model)
+                .toList(growable: false),
+          ),
+        },
+    ],
+    'intensities': [
+      for (final intensity in intensities)
+        {
+          'intensity': intensity,
+          ..._summarizeCommanderAiLiveEvalGroup(
+            results
+                .where(
+                  (row) =>
+                      (row['intensity']?.toString() ?? 'unspecified') ==
+                      intensity,
+                )
+                .toList(growable: false),
+          ),
+        },
+    ],
+  };
+}
+
+Map<String, dynamic> _summarizeCommanderAiLiveEvalGroup(
+  List<Map<String, dynamic>> rows,
+) {
+  final successful = rows.where((row) => row['status'] == 'ok').toList();
+  final passed =
+      successful
+          .where((row) => (row['evaluation'] as Map?)?['status'] == 'pass')
+          .length;
+  final scores =
+      successful
+          .map((row) => _asInt((row['evaluation'] as Map?)?['score']))
+          .whereType<int>()
+          .toList();
+  final latencies =
+      rows.map((row) => _asInt(row['latency_ms'])).whereType<int>().toList()
+        ..sort();
+  final usage = <AiProviderUsageTotals>[];
+  var inputTokens = 0;
+  var outputTokens = 0;
+  for (final row in successful) {
+    final rowUsage = row['usage'] as Map? ?? const <String, dynamic>{};
+    final rowInput = _asInt(rowUsage['prompt_tokens']) ?? 0;
+    final rowOutput = _asInt(rowUsage['completion_tokens']) ?? 0;
+    inputTokens += rowInput;
+    outputTokens += rowOutput;
+    usage.add(
+      AiProviderUsageTotals(
+        model:
+            row['model_returned']?.toString() ??
+            row['model_requested']?.toString() ??
+            '',
+        inputTokens: rowInput,
+        outputTokens: rowOutput,
+      ),
+    );
+  }
+  final cost = estimateAiProviderCost(usage);
+
+  return {
+    'case_count': rows.length,
+    'successful_case_count': successful.length,
+    'error_case_count': rows.length - successful.length,
+    'passed_case_count': passed,
+    'failed_case_count': successful.length - passed,
+    'average_score':
+        scores.isEmpty
+            ? null
+            : double.parse(
+              (scores.reduce((a, b) => a + b) / scores.length).toStringAsFixed(
+                2,
+              ),
+            ),
+    'latency_ms': {
+      'p50': _nearestRankPercentile(latencies, 0.50),
+      'p95': _nearestRankPercentile(latencies, 0.95),
+      'max': latencies.isEmpty ? null : latencies.last,
+    },
+    'usage': {
+      'input_tokens': inputTokens,
+      'output_tokens': outputTokens,
+      'total_tokens': inputTokens + outputTokens,
+    },
+    'estimated_cost_usd': double.parse(cost.usd.toStringAsFixed(6)),
+    'estimated_cost_coverage_ratio': double.parse(
+      cost.coverageRatio.toStringAsFixed(4),
+    ),
+  };
+}
+
+int? _nearestRankPercentile(List<int> sortedValues, double percentile) {
+  if (sortedValues.isEmpty) return null;
+  final rank = (percentile * sortedValues.length).ceil().clamp(
+    1,
+    sortedValues.length,
+  );
+  return sortedValues[rank - 1];
+}
+
+int? _asInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.round();
+  if (value is String) return int.tryParse(value.trim());
+  return null;
 }

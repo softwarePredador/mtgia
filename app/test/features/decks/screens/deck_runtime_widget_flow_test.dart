@@ -5,6 +5,7 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/login_screen.dart';
 import 'package:manaloom/features/auth/screens/register_screen.dart';
+import 'package:manaloom/features/auth/screens/verify_email_screen.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_details_screen.dart';
@@ -191,6 +192,11 @@ GoRouter _buildRouter(AuthProvider authProvider) {
         builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
+        path: '/verify-email',
+        builder: (context, state) =>
+            VerifyEmailScreen(token: state.uri.queryParameters['token'] ?? ''),
+      ),
+      GoRoute(
         path: '/home',
         builder: (context, state) => const DeckListScreen(),
       ),
@@ -251,37 +257,34 @@ void main() {
               },
             ]);
           },
-          '/decks/deck-1':
-              () => ApiResponse(
-                200,
-                _buildDeckDetailsJson(
-                  currentCards,
-                  deckId: 'deck-1',
-                  name: 'Runtime Talrand',
-                ),
-              ),
-          '/cards?name=Arcane%20Signet&limit=1':
-              () => ApiResponse(200, {
-                'data': const [
-                  {
-                    'id': 'add-1',
-                    'name': 'Arcane Signet',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-              }),
-          '/cards?name=Arcane+Signet&limit=1':
-              () => ApiResponse(200, {
-                'data': const [
-                  {
-                    'id': 'add-1',
-                    'name': 'Arcane Signet',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-              }),
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              currentCards,
+              deckId: 'deck-1',
+              name: 'Runtime Talrand',
+            ),
+          ),
+          '/cards?name=Arcane%20Signet&limit=1': () => ApiResponse(200, {
+            'data': const [
+              {
+                'id': 'add-1',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+          }),
+          '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
+            'data': const [
+              {
+                'id': 'add-1',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+          }),
           '/ai/generate/jobs/runtime-generate-job': () {
             generatePollCount += 1;
             if (generatePollCount == 1) {
@@ -394,63 +397,59 @@ void main() {
               'color_identity': const <String>[],
             });
           },
-          '/decks/deck-1/pricing':
-              (_) => ApiResponse(200, {
-                'currency': 'USD',
-                'estimated_total_usd': 120.0,
-                'missing_price_cards': 0,
-                'items': const [],
-              }),
-          '/ai/archetypes':
-              (_) => ApiResponse(200, {
-                'options': const [
-                  {
-                    'title': 'control',
-                    'description': 'Controle e valor.',
-                    'difficulty': 'mid',
-                  },
-                ],
-              }),
-          '/ai/optimize':
-              (_) => ApiResponse(200, {
-                'mode': 'optimize',
-                'removals': const ['Mind Stone'],
-                'additions': const ['Arcane Signet'],
-                'removals_detailed': const [
-                  {
-                    'card_id': 'remove-1',
-                    'name': 'Mind Stone',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-                'additions_detailed': const [
-                  {
-                    'card_id': 'add-1',
-                    'name': 'Arcane Signet',
-                    'type_line': 'Artifact',
-                    'color_identity': <String>[],
-                  },
-                ],
-                'reasoning': 'Mais aceleração e menos peça lenta.',
-                'constraints': const {'keep_theme': true},
-                'theme_info': const {'theme': 'spellslinger'},
-                'warnings': const <String, dynamic>{},
-                'deck_analysis': const {
-                  'average_cmc': 3.1,
-                  'mana_curve_assessment': 'ok',
-                },
-                'post_analysis': const {
-                  'average_cmc': 2.9,
-                  'improvements': <String>['Mais ramp'],
-                },
-              }),
-          '/decks/deck-1/validate':
-              (_) => ApiResponse(200, {
-                'ok': true,
-                'valid': true,
-                'errors': const <String>[],
-              }),
+          '/decks/deck-1/pricing': (_) => ApiResponse(200, {
+            'currency': 'USD',
+            'estimated_total_usd': 120.0,
+            'missing_price_cards': 0,
+            'items': const [],
+          }),
+          '/ai/archetypes': (_) => ApiResponse(200, {
+            'options': const [
+              {
+                'title': 'control',
+                'description': 'Controle e valor.',
+                'difficulty': 'mid',
+              },
+            ],
+          }),
+          '/ai/optimize': (_) => ApiResponse(200, {
+            'mode': 'optimize',
+            'removals': const ['Mind Stone'],
+            'additions': const ['Arcane Signet'],
+            'removals_detailed': const [
+              {
+                'card_id': 'remove-1',
+                'name': 'Mind Stone',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+            'additions_detailed': const [
+              {
+                'card_id': 'add-1',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'color_identity': <String>[],
+              },
+            ],
+            'reasoning': 'Mais aceleração e menos peça lenta.',
+            'constraints': const {'keep_theme': true},
+            'theme_info': const {'theme': 'spellslinger'},
+            'warnings': const <String, dynamic>{},
+            'deck_analysis': const {
+              'average_cmc': 3.1,
+              'mana_curve_assessment': 'ok',
+            },
+            'post_analysis': const {
+              'average_cmc': 2.9,
+              'improvements': <String>['Mais ramp'],
+            },
+          }),
+          '/decks/deck-1/validate': (_) => ApiResponse(200, {
+            'ok': true,
+            'valid': true,
+            'errors': const <String>[],
+          }),
         },
         putHandlers: {
           '/decks/deck-1': (body) {
@@ -525,14 +524,28 @@ void main() {
         find.widgetWithText(TextFormField, 'Confirmar senha'),
         'BetaQa!2026-Deck',
       );
+      final legalAcceptance = find.byKey(
+        const Key('register-legal-acceptance'),
+      );
+      await tester.ensureVisible(legalAcceptance);
+      await tester.tap(legalAcceptance);
       final registerSubmit = find.widgetWithText(InkWell, 'Criar conta');
       await tester.ensureVisible(registerSubmit);
       await tester.tap(registerSubmit);
       await tester.pumpAndSettle();
 
+      expect(find.text('Verifique seu email'), findsOneWidget);
+      // This scenario validates the established-user deck runtime. First-run
+      // onboarding has its own dedicated widget and physical E2E coverage.
+      authProvider.markOnboardingSettled();
+      await tester.tap(find.text('Voltar ao app'));
+      await tester.pumpAndSettle();
+
       expect(find.text('Gerar com IA'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Gerar com IA'));
+      await tester.tap(
+        find.byKey(const Key('deck-list-empty-generate-button')),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Gerar Deck'), findsOneWidget);

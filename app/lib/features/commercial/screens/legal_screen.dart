@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
+import '../legal_policy.dart';
 
 class CommercialLegalScreen extends StatelessWidget {
   const CommercialLegalScreen({super.key});
@@ -16,8 +17,8 @@ class CommercialLegalScreen extends StatelessWidget {
               viewport.maxWidth < AppTheme.breakpointCompact ? 16.0 : 24.0;
           return ListView(
             padding: EdgeInsets.only(
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: AppTheme.space16,
+              bottom: AppTheme.space16 + MediaQuery.of(context).padding.bottom,
             ),
             children: [
               ResponsivePageFrame(
@@ -32,6 +33,12 @@ class CommercialLegalScreen extends StatelessWidget {
                       icon: Icons.description_outlined,
                       body:
                           'ManaLoom ajuda a criar, analisar, otimizar e acompanhar decks de Magic. O usuário continua responsável por revisar legalidade, preços, recomendações, compras, trades e decisões de mesa antes de agir.',
+                    ),
+                    _LegalSection(
+                      title: 'Versões vigentes',
+                      icon: Icons.verified_outlined,
+                      body:
+                          'Termos: $currentTermsVersion • Privacidade: $currentPrivacyVersion. O cadastro registra as versões aceitas e a data do consentimento.',
                     ),
                     _LegalSection(
                       title: 'Privacidade',
@@ -88,8 +95,8 @@ class _LegalSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: AppTheme.space12),
+      padding: const EdgeInsets.all(AppTheme.space16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -99,7 +106,7 @@ class _LegalSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: AppTheme.frost400),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.space12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +117,7 @@ class _LegalSection extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.space8),
                 Text(
                   body,
                   style: const TextStyle(

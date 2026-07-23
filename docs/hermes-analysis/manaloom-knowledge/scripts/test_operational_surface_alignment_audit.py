@@ -50,6 +50,10 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
             check_names,
         )
         self.assertIn(
+            "scripts.lorehold_variant_gate_is_native_diagnostic_and_non_promoting",
+            check_names,
+        )
+        self.assertIn(
             "server.easypanel_runtime_audit_uses_new_server_pg_tunnel",
             check_names,
         )

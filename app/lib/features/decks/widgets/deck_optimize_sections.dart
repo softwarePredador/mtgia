@@ -59,12 +59,12 @@ class OptimizationConfigSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           _OptimizationIntensitySelector(
             selected: selectedIntensity,
             onChanged: onIntensityChanged,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           Material(
             color: AppTheme.surfaceSlate,
             shape: RoundedRectangleBorder(
@@ -78,8 +78,8 @@ class OptimizationConfigSection extends StatelessWidget {
             child: SwitchListTile.adaptive(
               key: const Key('optimize-keep-theme-switch'),
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 2,
+                horizontal: AppTheme.space12,
+                vertical: AppTheme.space2,
               ),
               title: const Text('Manter tema do deck'),
               subtitle: const Text(
@@ -89,7 +89,7 @@ class OptimizationConfigSection extends StatelessWidget {
               onChanged: onKeepThemeChanged,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           _OptimizationModeGuide(selectedBracket: selectedBracket),
         ],
       ),
@@ -134,7 +134,7 @@ class RecommendationContextSection extends StatelessWidget {
             value: preferCollection,
             onChanged: onPreferCollectionChanged,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           Text(
             'Orçamento: R\$ ${budgetLimit.round()}',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -149,11 +149,11 @@ class RecommendationContextSection extends StatelessWidget {
             max: 500,
             divisions: 20,
             label: 'R\$ ${budgetLimit.round()}',
-            semanticFormatterCallback:
-                (value) => 'Orçamento de R\$ ${value.round()}',
+            semanticFormatterCallback: (value) =>
+                'Orçamento de R\$ ${value.round()}',
             onChanged: onBudgetLimitChanged,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppTheme.space6),
           InputDecorator(
             decoration: const InputDecoration(labelText: 'Intenção do rebuild'),
             child: DropdownButtonHideUnderline(
@@ -176,13 +176,13 @@ class RecommendationContextSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           _RecommendationContextSummary(
             preferCollection: preferCollection,
             budgetLimit: budgetLimit,
             rebuildIntent: rebuildIntent,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.space12),
           const _RecommendationTrustNote(),
         ],
       ),
@@ -225,7 +225,7 @@ class _RecommendationContextSummary extends StatelessWidget {
     return Container(
       key: const Key('optimize-recommendation-context-summary'),
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -241,7 +241,7 @@ class _RecommendationContextSummary extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppTheme.space10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -282,7 +282,10 @@ class _RecommendationConstraintChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space10,
+        vertical: AppTheme.space7,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -294,7 +297,7 @@ class _RecommendationConstraintChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16, color: AppTheme.frost400),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppTheme.space6),
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -315,7 +318,7 @@ class _RecommendationTrustNote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -325,7 +328,7 @@ class _RecommendationTrustNote extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.fact_check_outlined, color: AppTheme.frost400, size: 20),
-          SizedBox(width: 10),
+          SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               'O preview explica função, risco, curva, preço e bracket quando esses dados vierem da IA. O relatório antes/depois pode ser compartilhado antes de aplicar.',
@@ -389,33 +392,31 @@ class _OptimizationIntensitySelector extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children:
-              OptimizeIntensity.values.map((intensity) {
-                final isSelected = selected == intensity;
-                final accent = _accent(intensity);
-                return ChoiceChip(
-                  key: Key('optimize-intensity-${intensity.name}'),
-                  label: Text(_title(intensity)),
-                  selected: isSelected,
-                  onSelected: (_) => onChanged(intensity),
-                  selectedColor: accent.withValues(alpha: 0.22),
-                  side: BorderSide(
-                    color:
-                        isSelected
-                            ? accent
-                            : AppTheme.outlineMuted.withValues(alpha: 0.7),
-                  ),
-                );
-              }).toList(),
+          children: OptimizeIntensity.values.map((intensity) {
+            final isSelected = selected == intensity;
+            final accent = _accent(intensity);
+            return ChoiceChip(
+              key: Key('optimize-intensity-${intensity.name}'),
+              label: Text(_title(intensity)),
+              selected: isSelected,
+              onSelected: (_) => onChanged(intensity),
+              selectedColor: accent.withValues(alpha: 0.22),
+              side: BorderSide(
+                color: isSelected
+                    ? accent
+                    : AppTheme.outlineMuted.withValues(alpha: 0.7),
+              ),
+            );
+          }).toList(),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.space8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppTheme.space12),
           decoration: BoxDecoration(
             color: _accent(selected).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -433,7 +434,7 @@ class _OptimizationIntensitySelector extends StatelessWidget {
                 color: _accent(selected),
                 size: 20,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
                   _description(selected),
@@ -462,7 +463,7 @@ class _OptimizationModeGuide extends StatelessWidget {
     final accent = isHighPower ? AppTheme.mythicGold : AppTheme.frost400;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -476,7 +477,7 @@ class _OptimizationModeGuide extends StatelessWidget {
             color: accent,
             size: 20,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               commanderBracketGuidance(selectedBracket),
@@ -536,7 +537,7 @@ class CurrentStrategySection extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.space12),
         FilledButton.icon(
           key: const Key('optimize-apply-current-strategy-button'),
           onPressed: onApply,
@@ -573,11 +574,11 @@ class OptimizationOptionsSection extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 32,
-              height: 32,
+              width: AppTheme.space32,
+              height: AppTheme.space32,
               child: CircularProgressIndicator(strokeWidth: 3),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: AppTheme.space12),
             Text('Analisando estratégias...'),
           ],
         ),
@@ -596,9 +597,9 @@ class OptimizationOptionsSection extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.error_outline, size: 48, color: AppTheme.error),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.space16),
               Text(message, textAlign: TextAlign.center),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.space16),
               ElevatedButton(
                 onPressed: onRetry,
                 child: const Text('Tentar Novamente'),
@@ -610,8 +611,9 @@ class OptimizationOptionsSection extends StatelessWidget {
     }
 
     final options = snapshot.data ?? const <Map<String, dynamic>>[];
-    final visibleOptions =
-        showAllStrategies ? options : const <Map<String, dynamic>>[];
+    final visibleOptions = showAllStrategies
+        ? options
+        : const <Map<String, dynamic>>[];
 
     if (visibleOptions.isEmpty) {
       if (!showAllStrategies) {
@@ -639,7 +641,7 @@ class OptimizationOptionsSection extends StatelessWidget {
     return Column(
       children: [
         for (var index = 0; index < visibleOptions.length; index++) ...[
-          if (index > 0) const SizedBox(height: 12),
+          if (index > 0) const SizedBox(height: AppTheme.space12),
           Builder(
             builder: (context) {
               final option = visibleOptions[index];
@@ -714,7 +716,7 @@ class OptimizationSheetBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       controller: scrollController,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(AppTheme.space16),
       children: [
         SheetHeroCard(
           icon: Icons.tune_rounded,
@@ -722,10 +724,10 @@ class OptimizationSheetBody extends StatelessWidget {
           subtitle: 'Estratégia, potência, coleção e orçamento.',
           accent: accent,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.space16),
         if (startsFromPostGame) ...[
           const _PostGameOptimizationNotice(),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
         ],
         if (savedArchetype != null && savedArchetype!.trim().isNotEmpty) ...[
           CurrentStrategySection(
@@ -734,20 +736,19 @@ class OptimizationSheetBody extends StatelessWidget {
             onToggleVisibility: onToggleStrategyVisibility,
             onApply: () => onApplyArchetype(savedArchetype!),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.space16),
         ],
         FutureBuilder<List<Map<String, dynamic>>>(
           future: optionsFuture,
-          builder:
-              (context, snapshot) => OptimizationOptionsSection(
-                snapshot: snapshot,
-                showAllStrategies: showAllStrategies,
-                accent: accent,
-                onRetry: onRetryOptions,
-                onSelectArchetype: onApplyArchetype,
-              ),
+          builder: (context, snapshot) => OptimizationOptionsSection(
+            snapshot: snapshot,
+            showAllStrategies: showAllStrategies,
+            accent: accent,
+            onRetry: onRetryOptions,
+            onSelectArchetype: onApplyArchetype,
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.space16),
         OptimizationConfigSection(
           selectedBracket: selectedBracket,
           keepTheme: keepTheme,
@@ -757,7 +758,7 @@ class OptimizationSheetBody extends StatelessWidget {
           onKeepThemeChanged: onKeepThemeChanged,
           onIntensityChanged: onIntensityChanged,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.space16),
         RecommendationContextSection(
           preferCollection: preferCollection,
           budgetLimit: budgetLimit,
@@ -778,7 +779,7 @@ class _PostGameOptimizationNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('optimize-post-game-notice'),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.space12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -788,7 +789,7 @@ class _PostGameOptimizationNotice extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.sports_score_outlined, color: AppTheme.brass400),
-          SizedBox(width: 10),
+          SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
               'Fluxo iniciado pelo pós-jogo. Use coleção, orçamento e intensidade para transformar os problemas recorrentes da mesa em um ajuste revisável.',

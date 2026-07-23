@@ -43,7 +43,7 @@ scripts/manaloom_global_battle_closure.sh battle <registry.json> [state_dir]
 `coverage` is read-only and resolves every PostgreSQL card through exact live
 XMage, exact Forge fallback, and verified native coverage. Local Java source
 matches remain candidates until catalog reconciliation. `battle` accepts only
-`external_battle_async_registry_v1`, persists its checkpoint in `state_dir`,
+`external_battle_async_registry_v2`, persists its v2 checkpoint in `state_dir`,
 and never turns exposure into promotion.
 
 ## Canonical Database Lookup
@@ -125,11 +125,13 @@ operational work queue and the planner trace review, not from a promotion gate.
 | Script/flow | Required safe parameter rule |
 | --- | --- |
 | `manaloom_global_battle_closure.sh coverage` | optional `output_root`; defaults to compact `/tmp` evidence and never mutates PostgreSQL/Hermes |
-| `manaloom_global_battle_closure.sh battle` | requires an `external_battle_async_registry_v1` file; optional persistent `state_dir`; every job needs unique `job_id` and integer `request.seed` |
-| `xmage_current_replay_batch_pipeline.py` | use `--xmage-root /Users/desenvolvimentomobile/Downloads/mage-master`; include deck `6` and Lorehold `607-616` only when the scope requires Lorehold plus historical baseline comparison |
+| `manaloom_global_battle_closure.sh battle` | requires an `external_battle_async_registry_v2` file; v1 registry/checkpoint artifacts are rejected; optional persistent `state_dir`; every job needs unique `job_id`, safe `request_id`, integer seed, timeout/max-turn policy, complete decks and canonical hashes |
+| XMage source-analysis scripts | pass `--xmage-root <clean exact pinned checkout>` or set `MANALOOM_XMAGE_SOURCE_ROOT`; the shared resolver requires the Git top-level, the SHA from `services/xmage-sidecar/XMAGE_COMMIT`, complete source modules and a clean worktree; no machine-specific default is allowed |
+| `xmage_current_replay_batch_pipeline.py` | additionally requires `--battle-artifact-dir <current explicit run>`; it cannot fall back to `.manaloom-agents` or another historical artifact tree |
+| `xmage_engine_absorption_inventory.py --allow-unpinned-source` | diagnostic inventory only; never valid for package generation, rule/deck promotion or Battle evidence |
 | Lorehold strategy/cut models | protected baseline is `607`; do not use historical deck `6` as current candidate shell |
-| `lorehold_variant_battle_gate.py` | when testing a modified `607` candidate DB, pass `--candidate-deck-id 607` |
-| natural promotion battle gates | forced access must be `none`; compare equal opponents and seed windows |
+| `lorehold_variant_battle_gate.py` | native Python diagnostic only; when testing a modified `607` candidate DB, pass `--candidate-deck-id 607`; output must keep `promotion_allowed=false` and `external_engine_seed_pairing_claim=false` |
+| natural promotion battle gates | forced access must be `none`; use `lorehold_independent_battle_statistical_gate.py` with balanced independent XMage/Forge samples; equal seed labels are schedule metadata, not paired outcomes |
 | forced-exposure probes | `--forced-access-mode opening_hand` is diagnostic only; `promotion_allowed=false` until natural confirmation |
 | `lorehold_registry_candidate_runner.py` | blocked by default; historical replay requires `--allow-legacy-registry-runner`; never use it as current handoff |
 | `xmage_strategy_consistency_audit.py` | uses `--output-prefix`, not `--out-prefix` |

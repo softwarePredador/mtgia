@@ -11,7 +11,8 @@ import '../lib/runtime_environment.dart';
 /// Importante:
 /// - No nosso schema, `cards.scryfall_id` guarda o `oracle_id` da Scryfall.
 /// - A API `/cards/collection` aceita `oracle_id` e retorna `oracle_id`+`prices`.
-/// - Salvamos em `cards.price` + `cards.price_updated_at`.
+/// - Salvamos em `cards.price_usd` e espelhamos `cards.price` para clientes
+///   legados; a proveniência fica em `cards.price_source`.
 ///
 /// Uso:
 ///   dart run bin/sync_prices.dart
@@ -118,9 +119,9 @@ Opções:
       try {
         final historyResult = await connection.execute('''
           INSERT INTO price_history (card_id, price_date, price_usd)
-          SELECT id, CURRENT_DATE, price
+          SELECT id, CURRENT_DATE, COALESCE(price_usd, price)
           FROM cards
-          WHERE price IS NOT NULL AND price > 0
+          WHERE COALESCE(price_usd, price) > 0
           ON CONFLICT (card_id, price_date)
           DO UPDATE SET price_usd = EXCLUDED.price_usd
         ''');
@@ -229,7 +230,10 @@ Future<_BatchStats?> _updateBatch({
   await connection.execute(
     Sql.named('''
       UPDATE cards c
-      SET price = v.price, price_updated_at = NOW()
+      SET price_usd = v.price,
+          price = v.price,
+          price_source = 'scryfall',
+          price_updated_at = NOW()
       FROM (VALUES ${values.join(', ')}) AS v(oracle_id, price)
       WHERE c.scryfall_id::text = v.oracle_id
     '''),

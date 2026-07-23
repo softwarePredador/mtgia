@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
+
+import '../deck_snapshot_contract.dart';
 
 class PostGameNotePage {
   const PostGameNotePage({required this.notes, required this.syncCursor});
@@ -182,12 +183,25 @@ class PostGameNoteService {
         'session_ended_at deve ser posterior a session_started_at.',
       );
     }
+    final requestedDeckSnapshotHash = _optionalDeckSnapshotHash(
+      note['deck_snapshot_hash'],
+    );
+    final requestedDeckVersionAt = _optionalDate(
+      note['deck_version_at'],
+      'deck_version_at',
+    );
+    if ((requestedDeckSnapshotHash == null) !=
+        (requestedDeckVersionAt == null)) {
+      throw const PostGameValidationException(
+        'deck_snapshot_hash e deck_version_at devem ser enviados juntos.',
+      );
+    }
     final baseRevision = _optionalRevision(note['base_revision']);
 
     try {
       return await pool.runTx((session) async {
         final mutationAt = await _reserveSyncWatermark(session);
-        final snapshot = await _captureDeckSnapshot(
+        final currentDeckSnapshot = await _captureDeckSnapshot(
           session,
           userId: userId,
           deckId: deckId,
@@ -201,6 +215,32 @@ class PostGameNoteService {
           '''),
           parameters: {'id': resolvedId},
         );
+        var snapshot = currentDeckSnapshot;
+        if (current.isNotEmpty) {
+          final currentMap = current.first.toColumnMap();
+          final persistedHash = _nullableString(
+            currentMap['deck_snapshot_hash'],
+          );
+          final persistedAt = currentMap['deck_version_at'];
+          if (persistedHash != null && persistedAt is DateTime) {
+            snapshot = DeckSnapshotIdentity(
+              hash: persistedHash,
+              capturedAt: persistedAt.toUtc(),
+            );
+          } else if (requestedDeckSnapshotHash != null &&
+              requestedDeckVersionAt != null) {
+            snapshot = DeckSnapshotIdentity(
+              hash: requestedDeckSnapshotHash,
+              capturedAt: requestedDeckVersionAt,
+            );
+          }
+        } else if (requestedDeckSnapshotHash != null &&
+            requestedDeckVersionAt != null) {
+          snapshot = DeckSnapshotIdentity(
+            hash: requestedDeckSnapshotHash,
+            capturedAt: requestedDeckVersionAt,
+          );
+        }
 
         if (current.isEmpty) {
           if (baseRevision != null && baseRevision != 0) {
@@ -401,7 +441,7 @@ class PostGameNoteService {
     return (result.first[0] as DateTime).toUtc();
   }
 
-  Future<_DeckSnapshot> _captureDeckSnapshot(
+  Future<DeckSnapshotIdentity> _captureDeckSnapshot(
     Session session, {
     required String userId,
     required String deckId,
@@ -421,20 +461,13 @@ class PostGameNoteService {
     );
     if (rows.isEmpty) throw PostGameNoteNotFoundException();
 
-    final canonical = rows
-        .map((row) {
-          final map = row.toColumnMap();
-          return [
-            map['name']?.toString() ?? '',
-            map['format']?.toString() ?? '',
-            map['card_id']?.toString() ?? '',
-            map['quantity']?.toString() ?? '0',
-            map['is_commander'] == true ? '1' : '0',
-          ].join('|');
-        })
-        .join('\n');
-    return _DeckSnapshot(
-      hash: sha256.convert(utf8.encode(canonical)).toString(),
+    final first = rows.first.toColumnMap();
+    return DeckSnapshotIdentity(
+      hash: buildDeckSnapshotHash(
+        name: first['name']?.toString() ?? '',
+        format: first['format']?.toString() ?? '',
+        cards: rows.map((row) => row.toColumnMap()),
+      ),
       capturedAt: DateTime.now().toUtc(),
     );
   }
@@ -513,6 +546,17 @@ class PostGameNoteService {
       );
     }
     return revision;
+  }
+
+  static String? _optionalDeckSnapshotHash(Object? value) {
+    final normalized = value?.toString().trim().toLowerCase() ?? '';
+    if (normalized.isEmpty) return null;
+    if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
+      throw const PostGameValidationException(
+        'deck_snapshot_hash deve ser um SHA-256 hexadecimal.',
+      );
+    }
+    return normalized;
   }
 
   static List<String> _boundedList(Object? value, String field) {
@@ -644,11 +688,4 @@ class PostGameNoteService {
     final day = monday.day.toString().padLeft(2, '0');
     return '$year-$month-$day';
   }
-}
-
-class _DeckSnapshot {
-  const _DeckSnapshot({required this.hash, required this.capturedAt});
-
-  final String hash;
-  final DateTime capturedAt;
 }

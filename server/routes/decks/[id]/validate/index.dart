@@ -43,40 +43,43 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
               )
               .toList();
 
-      await DeckRulesService(
-        session,
-      ).validateAndThrow(format: format, cards: cards, strict: true);
+      try {
+        await DeckRulesService(
+          session,
+        ).validateAndThrow(format: format, cards: cards, strict: true);
 
-      await session.execute(
-        Sql.named(deckValidationMarkSuccessSql),
-        parameters: {'deckId': deckId, 'userId': userId},
-      );
+        final stateResult = await session.execute(
+          Sql.named(deckValidationMarkSuccessSql),
+          parameters: {'deckId': deckId, 'userId': userId},
+        );
+        final state = stateResult.first.toColumnMap();
 
-      return buildDeckValidationSuccessBody(deckId: deckId, format: format);
+        return buildDeckValidationSuccessBody(
+          deckId: deckId,
+          format: format,
+          validationUpdatedAt: state['validation_updated_at'],
+        );
+      } on DeckRulesException catch (error) {
+        final stateResult = await session.execute(
+          Sql.named(deckValidationMarkFailureSql),
+          parameters: {'deckId': deckId, 'userId': userId},
+        );
+        final state = stateResult.first.toColumnMap();
+        return buildDeckValidationRuleErrorBody(
+          error,
+          persistedReasons: state['validation_reasons'],
+          validationUpdatedAt: state['validation_updated_at'],
+        );
+      }
     });
 
     if (isDeckValidationNotFoundBody(result)) {
       return Response.json(statusCode: HttpStatus.notFound, body: result);
     }
-    return Response.json(body: result);
-  } on DeckRulesException catch (e) {
-    print('[ERROR] handler: $e');
-    try {
-      await pool.execute(
-        Sql.named(deckValidationMarkFailureSql),
-        parameters: {'deckId': deckId, 'userId': userId},
-      );
-    } catch (stateError) {
-      print('[ERROR] Failed to persist deck validation failure: $stateError');
-      return Response.json(
-        statusCode: HttpStatus.internalServerError,
-        body: buildDeckValidationHandlerErrorBody(stateError),
-      );
+    if (result['ok'] == false) {
+      return Response.json(statusCode: HttpStatus.badRequest, body: result);
     }
-    return Response.json(
-      statusCode: HttpStatus.badRequest,
-      body: buildDeckValidationRuleErrorBody(e),
-    );
+    return Response.json(body: result);
   } catch (e) {
     print('[ERROR] handler: $e');
     return Response.json(

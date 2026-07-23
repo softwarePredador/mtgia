@@ -273,5 +273,60 @@ void main() {
       expect(response.data, containsPair('status', 'ready'));
       expect(attempts, 2);
     });
+
+    test(
+      'dispatches session expiry once for an invalid authenticated token',
+      () async {
+        var expiryCalls = 0;
+        ApiClient.resetForTesting(
+          performanceUnavailable: true,
+          token: 'expired-token',
+          httpClient: MockClient(
+            (request) async => http.Response(
+              jsonEncode({
+                'error': 'Token inválido ou expirado',
+                'message': 'Faça login novamente para obter um novo token',
+              }),
+              401,
+              headers: const {'content-type': 'application/json'},
+            ),
+          ),
+        );
+        ApiClient.setSessionExpiredHandler(() => expiryCalls++);
+
+        await ApiClient().get('/decks');
+        await ApiClient().get('/profile');
+
+        expect(expiryCalls, 1);
+      },
+    );
+
+    test('does not expire a session for a domain-level password 401', () async {
+      var expiryCalls = 0;
+      ApiClient.resetForTesting(
+        performanceUnavailable: true,
+        token: 'valid-token',
+        httpClient: MockClient(
+          (request) async => http.Response(
+            jsonEncode({
+              'error': 'invalid_password',
+              'message': 'Senha atual inválida.',
+            }),
+            401,
+            headers: const {'content-type': 'application/json'},
+          ),
+        ),
+      );
+      ApiClient.setSessionExpiredHandler(() => expiryCalls++);
+
+      final response = await ApiClient().delete(
+        '/users/me',
+        body: const {'password': 'wrong'},
+      );
+
+      expect(response.statusCode, 401);
+      expect(expiryCalls, 0);
+      expect(ApiClient.hasAuthenticationToken, isTrue);
+    });
   });
 }

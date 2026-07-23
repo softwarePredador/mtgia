@@ -8,6 +8,21 @@ import lorehold_variant_battle_gate as gate
 
 
 class LoreholdVariantBattleGateTest(unittest.TestCase):
+    def test_native_seed_schedule_cannot_claim_external_pairing_or_promotion(self):
+        contract = gate.native_probe_safety_contract()
+
+        self.assertEqual(contract["evidence_scope"], "diagnostic_native_only")
+        self.assertEqual(
+            contract["seed_schedule_scope"],
+            "native_python_simulator_only",
+        )
+        self.assertFalse(contract["external_engine_seed_pairing_claim"])
+        self.assertFalse(contract["promotion_allowed"])
+        self.assertEqual(
+            contract["promotion_gate"],
+            "lorehold_independent_battle_statistical_gate.py",
+        )
+
     def test_isolated_runner_accepts_paired_game_seed_mode(self):
         parameters = inspect.signature(gate.run_deck_gate_in_process).parameters
 

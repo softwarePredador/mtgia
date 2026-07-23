@@ -252,6 +252,78 @@ class ForgeSidecarTest(unittest.TestCase):
 
             self.assertEqual(6, run.call_args.kwargs["timeout"])
 
+    def test_v2_contract_validates_hash_identity_and_seed_semantics(self):
+        forge_commit = Path(__file__).with_name("FORGE_COMMIT").read_text(
+            encoding="utf-8"
+        ).strip()
+        request, contract = _strict_request(forge_commit)
+        self.assertEqual(request["request_hash"], contract["request_hash"])
+        self.assertEqual(
+            "100fc3b88a03428527c22c037f7b62905e272a8ecec100eb0b385b3cc7d09e7c",
+            contract["deck_hashes"]["deck_a"],
+        )
+        self.assertEqual(
+            "4f9ee996b548e718547b58d0dfcf8765e7751c143fd273cc50821a4cb4d17469",
+            contract["request_hash"],
+        )
+        self.assertEqual(42, contract["seed"])
+        identity = forge_sidecar.sidecar_identity(forge_commit)
+        self.assertEqual(
+            "engine_rng_seeded_not_replay_guarantee",
+            identity["seed_semantics"],
+        )
+        self.assertFalse(identity["deterministic"])
+
+        broken = dict(request)
+        broken["request_hash"] = "wrong"
+        with self.assertRaisesRegex(forge_sidecar.InvalidRequest, "request_hash"):
+            forge_sidecar.parse_request_contract(
+                broken,
+                deck_a=forge_sidecar.DeckInput.parse(broken["deck_a"], "deck_a"),
+                deck_b=forge_sidecar.DeckInput.parse(broken["deck_b"], "deck_b"),
+                forge_commit=forge_commit,
+            )
+
+    def test_v2_censoring_removes_post_cutoff_winner_and_timeout_is_explicit(self):
+        _, contract = _strict_request("abc", max_turns=3)
+        result = forge_sidecar.parse_simulation_output(
+            "\n".join(
+                [
+                    "Ai(1)-Deck A vs Ai(2)-Deck B - one game of Commander",
+                    "Game Outcome: Turn 7",
+                    "Game Result: Game 1 ended in 1000 ms. Ai(1)-Deck A has won!",
+                ]
+            ),
+            request_id="request-42",
+            seed=42,
+            deck_a=_deck("deck-a", "Deck A"),
+            deck_b=_deck("deck-b", "Deck B"),
+            duration_ms=1200,
+            started_at="2026-07-14T00:00:00Z",
+            forge_commit="abc",
+            request_contract=contract,
+        )
+        self.assertEqual("censored", result["status"])
+        self.assertIsNone(result["winner"])
+        self.assertIsNone(result["winner_deck_id"])
+        timeout = forge_sidecar.request_metadata(contract, status="timeout")
+        self.assertTrue(timeout["execution_outcome"]["timed_out"])
+        self.assertFalse(timeout["fallback_allowed"])
+        self.assertEqual("none", timeout["fallback_reason"])
+        self.assertEqual(
+            "operational_timeout_not_eligible",
+            timeout["fallback_eligibility_reason"],
+        )
+        coverage = forge_sidecar.request_metadata(
+            contract, status="coverage_incomplete"
+        )
+        self.assertTrue(coverage["fallback_allowed"])
+        self.assertEqual("none", coverage["fallback_reason"])
+        self.assertEqual(
+            "coverage_incomplete_eligible",
+            coverage["fallback_eligibility_reason"],
+        )
+
     def test_send_ignores_disconnected_client(self):
         handler = forge_sidecar.ForgeHandler.__new__(forge_sidecar.ForgeHandler)
         handler.send_response = mock.Mock()
@@ -259,6 +331,7 @@ class ForgeSidecarTest(unittest.TestCase):
         handler.end_headers = mock.Mock()
         handler.wfile = mock.Mock()
         handler.wfile.write.side_effect = BrokenPipeError
+        handler.service = mock.Mock(forge_commit="abc")
 
         handler._send(504, {"error": "simulation_timeout"})
 
@@ -287,6 +360,46 @@ def _deck_payload(deck_id, name):
             {"name": "Plains", "quantity": 99, "is_commander": False},
         ],
     }
+
+
+def _strict_request(forge_commit, max_turns=30):
+    request = {
+        "request_id": "request-42",
+        "seed": 42,
+        "timeout_ms": 40000,
+        "max_turns": max_turns,
+        "focus_cards": ["Sol Ring"],
+        "force_focus_access_mode": "none",
+        "same_lane": True,
+        "natural_sample": True,
+        "deck_a": _deck_payload("deck-a", "Deck A"),
+        "deck_b": _deck_payload("deck-b", "Deck B"),
+    }
+    deck_a = forge_sidecar.DeckInput.parse(request["deck_a"], "deck_a")
+    deck_b = forge_sidecar.DeckInput.parse(request["deck_b"], "deck_b")
+    legacy = forge_sidecar.parse_request_contract(
+        request,
+        deck_a=deck_a,
+        deck_b=deck_b,
+        forge_commit=forge_commit,
+    )
+    request.update(
+        {
+            "request_schema_version": forge_sidecar.REQUEST_SCHEMA,
+            "expected_engine": "forge",
+            "expected_engine_version": forge_sidecar.FORGE_VERSION,
+            "expected_engine_commit": forge_commit,
+            "ai_profile": forge_sidecar.AI_PROFILE,
+            "deck_hashes": legacy["deck_hashes"],
+            "request_hash": legacy["request_hash"],
+        }
+    )
+    return request, forge_sidecar.parse_request_contract(
+        request,
+        deck_a=deck_a,
+        deck_b=deck_b,
+        forge_commit=forge_commit,
+    )
 
 
 if __name__ == "__main__":

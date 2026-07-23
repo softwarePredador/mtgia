@@ -56,10 +56,10 @@ class _LifeCounterNativeSettingsSheetState
       key: const Key('life-counter-native-settings-sheet'),
       child: Padding(
         padding: EdgeInsets.only(
-          left: 12,
-          right: 12,
-          top: 12,
-          bottom: MediaQuery.viewInsetsOf(context).bottom + 12,
+          left: AppTheme.space12,
+          right: AppTheme.space12,
+          top: AppTheme.space12,
+          bottom: MediaQuery.viewInsetsOf(context).bottom + AppTheme.space12,
         ),
         child: FractionallySizedBox(
           heightFactor: 0.92,
@@ -80,7 +80,12 @@ class _LifeCounterNativeSettingsSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space18,
+                    AppTheme.space20,
+                    AppTheme.space8,
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -95,7 +100,7 @@ class _LifeCounterNativeSettingsSheetState
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppTheme.space6),
                             Text(
                               'Personalize regras, marcadores e controles da mesa.',
                               style: TextStyle(
@@ -119,9 +124,15 @@ class _LifeCounterNativeSettingsSheetState
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppTheme.space20,
+                      AppTheme.space18,
+                      AppTheme.space20,
+                      AppTheme.space12,
+                    ),
                     itemCount: sections.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 18),
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: AppTheme.space18),
                     itemBuilder: (context, index) {
                       final section = sections[index];
                       return _SettingsSection(
@@ -135,7 +146,12 @@ class _LifeCounterNativeSettingsSheetState
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space20,
+                    AppTheme.space14,
+                    AppTheme.space20,
+                    AppTheme.space18,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -146,12 +162,14 @@ class _LifeCounterNativeSettingsSheetState
                             side: const BorderSide(
                               color: AppTheme.outlineMuted,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.space12),
                       Expanded(
                         child: FilledButton(
                           key: const Key('life-counter-native-settings-save'),
@@ -159,7 +177,9 @@ class _LifeCounterNativeSettingsSheetState
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppTheme.space14,
+                            ),
                           ),
                           child: const Text('Aplicar'),
                         ),
@@ -269,7 +289,12 @@ class _SettingsSection extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 6),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space14,
+          AppTheme.space14,
+          AppTheme.space14,
+          AppTheme.space6,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -281,7 +306,7 @@ class _SettingsSection extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppTheme.space10),
             for (final entry in section.entries)
               _SettingEntryTile(
                 entry: entry,
@@ -334,14 +359,13 @@ class _SettingEntryTile extends StatelessWidget {
             ),
           ),
           value: entry.toggleValue ?? false,
-          onChanged:
-              entry.enabled
-                  ? (value) => onToggleChanged(entry.id, value)
-                  : null,
+          onChanged: entry.enabled
+              ? (value) => onToggleChanged(entry.id, value)
+              : null,
         );
       case LifeCounterSettingValueKind.number:
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.only(bottom: AppTheme.space12),
           child: TextField(
             key: Key('life-counter-setting-${entry.id.name}'),
             controller: customLongTapController,

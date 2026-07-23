@@ -1,6 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
+import '../../../lib/deck_format_support.dart';
+import '../../../lib/deck_request_support.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/import_card_lookup_service.dart';
 import '../../../lib/import_list_service.dart';
@@ -19,19 +21,29 @@ Future<Response> _importToDeck(RequestContext context) async {
   final userId = context.read<String>();
   final pool = context.read<Pool>();
 
-  final body = await context.request.json();
-  final deckId = body['deck_id'] as String?;
-  final rawList = body['list'];
-  final replaceAll = body['replace_all'] == true;
-
-  if (deckId == null || rawList == null) {
-    return badRequest('Fields deck_id and list are required.');
+  late final String deckId;
+  late final Object rawList;
+  late final bool replaceAll;
+  try {
+    final body = requireJsonObject(await context.request.json());
+    deckId = requireNonEmptyString(body, 'deck_id');
+    final listValue = body['list'];
+    if (listValue == null) {
+      throw const DeckRequestException('Field list is required.');
+    }
+    rawList = listValue;
+    replaceAll = readOptionalBool(body, 'replace_all') ?? false;
+  } on FormatException catch (e) {
+    return badRequest('Invalid JSON body: ${e.message}');
+  } on DeckRequestException catch (e) {
+    return badRequest(e.message);
   }
 
   // Verifica se o deck pertence ao usuário
   final deckCheck = await pool.execute(
     Sql.named(
-        'SELECT id, format FROM decks WHERE id = @id AND user_id = @userId'),
+      'SELECT id, format FROM decks WHERE id = @id AND user_id = @userId',
+    ),
     parameters: {'id': deckId, 'userId': userId},
   );
 
@@ -40,7 +52,10 @@ Future<Response> _importToDeck(RequestContext context) async {
   }
 
   final format = deckCheck.first[1] as String;
-  final normalizedFormat = format.trim().toLowerCase();
+  final normalizedFormat = normalizeSupportedDeckFormat(format);
+  if (normalizedFormat == null) {
+    return badRequest(unsupportedDeckFormatMessage(format));
+  }
 
   final unsupportedRawSections = unsupportedRawDeckSectionLabels(rawList);
   if (unsupportedRawSections.isNotEmpty) {
@@ -113,13 +128,16 @@ Future<Response> _importToDeck(RequestContext context) async {
   }
 
   if (cardsToInsert.isEmpty) {
-    return badRequest('No valid cards found in the list.', details: {
-      'not_found_lines': notFoundCards,
-      'localized_matches': localizedMatches,
-      'localized_matches_count': localizedMatches.length,
-      'hint':
-          'Confira formato das linhas (ex: "1 Sol Ring"). Nomes localizados dependem da tabela card_localized_names sincronizada.',
-    });
+    return badRequest(
+      'No valid cards found in the list.',
+      details: {
+        'not_found_lines': notFoundCards,
+        'localized_matches': localizedMatches,
+        'localized_matches_count': localizedMatches.length,
+        'hint':
+            'Confira formato das linhas (ex: "1 Sol Ring"). Nomes localizados dependem da tabela card_localized_names sincronizada.',
+      },
+    );
   }
 
   // 6. Validação de regras
@@ -184,8 +202,9 @@ Future<Response> _importToDeck(RequestContext context) async {
 
   try {
     var commanderPreserved = false;
-    var commanderDetected =
-        consolidatedCards.any((card) => card['is_commander'] == true);
+    var commanderDetected = consolidatedCards.any(
+      (card) => card['is_commander'] == true,
+    );
     var finalTotalCards = sumImportToDeckQuantities(consolidatedCards);
     await pool.runTx((session) async {
       final existingCards = <Map<String, dynamic>>[];

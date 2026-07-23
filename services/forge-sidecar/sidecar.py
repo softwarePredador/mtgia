@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import math
 import os
@@ -28,6 +30,13 @@ MAX_LOG_EVENTS = 20_000
 PROCESS_TIMEOUT_GRACE_SECONDS = 5
 FORGE_VERSION = "2.0.14-SNAPSHOT"
 SIMULATION_LOCK = threading.Lock()
+EXECUTION_SCHEMA = "external_battle_execution_v2"
+REQUEST_SCHEMA = "external_battle_request_v2"
+DECK_HASH_SCHEMA = "external_battle_deck_hash_v1"
+SIDECAR_PROTOCOL = "external_battle_sidecar_v2"
+AI_PROFILE = "forge_default_ai"
+PARSER_VERSION = "forge_log_parser_v2"
+SEED_SEMANTICS = "engine_rng_seeded_not_replay_guarantee"
 
 GAME_RESULT_WIN = re.compile(
     r"Game Result: Game \d+ ended in (?P<duration>\d+) ms\. "
@@ -252,6 +261,221 @@ class DeckInput:
         )
 
 
+def canonical_deck_hash(deck: DeckInput) -> str:
+    records = sorted(
+        "|".join(
+            (
+                "1" if card.is_commander else "0",
+                str(card.quantity),
+                _base64_field(card.name),
+                _base64_field(card.set_code or ""),
+                _base64_field(card.collector_number or ""),
+            )
+        )
+        for card in deck.cards
+    )
+    material = f"{DECK_HASH_SCHEMA}\n" + "\n".join(records) + "\n"
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()
+
+
+def canonical_request_hash(contract: dict[str, Any]) -> str:
+    material = "\n".join(
+        (
+            REQUEST_SCHEMA,
+            f"request_id={_base64_field(contract['request_id'])}",
+            f"seed={contract['seed']}",
+            f"timeout_ms={contract['timeout_ms']}",
+            f"max_turns={contract['max_turns']}",
+            "focus_cards=" + ",".join(_base64_field(card) for card in contract["focus_cards"]),
+            f"force_focus_access_mode={contract['force_focus_access_mode']}",
+            f"same_lane={1 if contract['same_lane'] else 0}",
+            f"natural_sample={1 if contract['natural_sample'] else 0}",
+            f"deck_a_id={_base64_field(contract['deck_a_id'])}",
+            f"deck_b_id={_base64_field(contract['deck_b_id'])}",
+            f"deck_a_hash={contract['deck_hashes']['deck_a']}",
+            f"deck_b_hash={contract['deck_hashes']['deck_b']}",
+            "engine=forge",
+            f"engine_version={_base64_field(FORGE_VERSION)}",
+            f"engine_commit={contract['forge_commit']}",
+            f"ai_profile={_base64_field(AI_PROFILE)}",
+        )
+    )
+    return hashlib.sha256(f"{material}\n".encode("utf-8")).hexdigest()
+
+
+def parse_request_contract(
+    request: dict[str, Any],
+    *,
+    deck_a: DeckInput,
+    deck_b: DeckInput,
+    forge_commit: str,
+) -> dict[str, Any]:
+    strict = request.get("request_schema_version") is not None
+    if strict and request.get("request_schema_version") != REQUEST_SCHEMA:
+        raise InvalidRequest("unsupported request_schema_version")
+
+    request_id_raw = str(request.get("request_id") or uuid.uuid4())
+    if strict and re.fullmatch(r"[A-Za-z0-9_-]{1,80}", request_id_raw) is None:
+        raise InvalidRequest("request_id must use 1-80 safe characters")
+    request_id = request_id_raw if strict else _safe_request_id(request_id_raw)
+    seed = request.get("seed", int(time.time() * 1000))
+    timeout_ms = request.get("timeout_ms", 120_000)
+    max_turns = request.get("max_turns", 30)
+    for key, value, minimum, maximum in (
+        ("seed", seed, -(2**63), 2**63 - 1),
+        ("timeout_ms", timeout_ms, 1_000, 900_000),
+        ("max_turns", max_turns, 1, 100),
+    ):
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise InvalidRequest(f"{key} must be an integer")
+        if value < minimum or value > maximum:
+            raise InvalidRequest(f"{key} is outside the supported range")
+
+    raw_focus = request.get("focus_cards", [])
+    if not isinstance(raw_focus, list) or len(raw_focus) > 20:
+        raise InvalidRequest("focus_cards must be a list with at most 20 entries")
+    focus_cards: list[str] = []
+    for value in raw_focus:
+        if not isinstance(value, str) or len(value.strip()) > 300:
+            raise InvalidRequest("focus_cards must contain bounded strings")
+        if value.strip():
+            focus_cards.append(value.strip())
+    force_mode = str(request.get("force_focus_access_mode") or "none").lower()
+    if force_mode != "none":
+        raise InvalidRequest("Forge does not support forced card access")
+    same_lane = request.get("same_lane", False)
+    natural_sample = request.get("natural_sample", True)
+    if not isinstance(same_lane, bool) or not isinstance(natural_sample, bool):
+        raise InvalidRequest("same_lane and natural_sample must be booleans")
+
+    deck_hashes = {
+        "schema_version": DECK_HASH_SCHEMA,
+        "algorithm": "sha256",
+        "deck_a": canonical_deck_hash(deck_a),
+        "deck_b": canonical_deck_hash(deck_b),
+    }
+    contract: dict[str, Any] = {
+        "request_id": request_id,
+        "seed": seed,
+        "timeout_ms": timeout_ms,
+        "max_turns": max_turns,
+        "focus_cards": focus_cards,
+        "force_focus_access_mode": force_mode,
+        "same_lane": same_lane,
+        "natural_sample": natural_sample,
+        "deck_a_id": deck_a.deck_id,
+        "deck_b_id": deck_b.deck_id,
+        "deck_hashes": deck_hashes,
+        "forge_commit": forge_commit,
+        "legacy_compatibility": not strict,
+    }
+    contract["request_hash"] = canonical_request_hash(contract)
+    if strict:
+        expected_identity = {
+            "expected_engine": "forge",
+            "expected_engine_version": FORGE_VERSION,
+            "expected_engine_commit": forge_commit,
+            "ai_profile": AI_PROFILE,
+        }
+        for key, expected in expected_identity.items():
+            if request.get(key) != expected:
+                raise InvalidRequest(f"{key} does not match the running Forge identity")
+        if request.get("deck_hashes") != deck_hashes:
+            raise InvalidRequest("deck_hashes do not match the submitted decks")
+        if request.get("request_hash") != contract["request_hash"]:
+            raise InvalidRequest("request_hash does not match the canonical request")
+    return contract
+
+
+def request_metadata(
+    contract: dict[str, Any],
+    *,
+    status: str,
+    turns: int | None = None,
+) -> dict[str, Any]:
+    timed_out = status == "timeout"
+    censored = timed_out or status == "censored"
+    censor_reason = (
+        "wall_clock_timeout"
+        if timed_out
+        else "max_turns_exceeded" if status == "censored" else None
+    )
+    return {
+        "request_id": contract["request_id"],
+        "seed": contract["seed"],
+        "timeout_ms": contract["timeout_ms"],
+        "max_turns": contract["max_turns"],
+        "request_hash": contract["request_hash"],
+        "deck_hashes": contract["deck_hashes"],
+        "ai_profile": AI_PROFILE,
+        "fallback_allowed": status == "coverage_incomplete",
+        "fallback_reason": "none",
+        "fallback_eligibility_reason": (
+            "coverage_incomplete_eligible"
+            if status == "coverage_incomplete"
+            else (
+                "operational_timeout_not_eligible"
+                if timed_out
+                else "operational_failure_not_eligible"
+                if status == "failed"
+                else "none"
+            )
+        ),
+        "request_contract": {
+            "schema_version": REQUEST_SCHEMA,
+            "legacy_compatibility": contract["legacy_compatibility"],
+            "controls": {
+                "max_turns": {
+                    "value": contract["max_turns"],
+                    "semantics": "post_completion_right_censoring",
+                    "engine_enforced": False,
+                },
+                "focus_cards": {
+                    "value": contract["focus_cards"],
+                    "semantics": "positive_evidence_observation_only",
+                },
+                "force_focus_access_mode": {
+                    "value": contract["force_focus_access_mode"],
+                    "semantics": "none_only_non_none_rejected",
+                },
+                "same_lane": {
+                    "value": contract["same_lane"],
+                    "semantics": "comparison_metadata_only",
+                },
+                "natural_sample": {
+                    "value": contract["natural_sample"],
+                    "semantics": "sample_provenance_metadata",
+                },
+            },
+        },
+        "execution_outcome": {
+            "status": status,
+            "timed_out": timed_out,
+            "censored": censored,
+            "censor_reason": censor_reason,
+            "timeout_ms": contract["timeout_ms"],
+            **({"turns": turns} if turns is not None else {}),
+        },
+    }
+
+
+def sidecar_identity(forge_commit: str) -> dict[str, Any]:
+    return {
+        "schema_version": EXECUTION_SCHEMA,
+        "engine": "forge",
+        "engine_version": FORGE_VERSION,
+        "engine_commit": forge_commit,
+        "sidecar_protocol_version": SIDECAR_PROTOCOL,
+        "sidecar_build_identity": f"forge-sidecar-v2@{forge_commit}",
+        "sidecar_process_id": PROCESS_ID,
+        "sidecar_started_at": STARTED_AT,
+        "ai_profile": AI_PROFILE,
+        "parser_version": PARSER_VERSION,
+        "seed_semantics": SEED_SEMANTICS,
+        "deterministic": False,
+    }
+
+
 class ForgeService:
     def __init__(
         self,
@@ -299,13 +523,9 @@ class ForgeService:
 
     def health(self) -> dict[str, Any]:
         return {
+            **sidecar_identity(self.forge_commit),
             "status": "ok",
-            "engine": "forge",
-            "engine_version": FORGE_VERSION,
-            "engine_commit": self.forge_commit,
             "indexed_cards": len(self.card_index),
-            "sidecar_process_id": PROCESS_ID,
-            "sidecar_started_at": STARTED_AT,
         }
 
     def coverage(self, request: dict[str, Any]) -> dict[str, Any]:
@@ -347,13 +567,19 @@ class ForgeService:
     def simulate(self, request: dict[str, Any]) -> dict[str, Any]:
         deck_a = DeckInput.parse(request.get("deck_a"), "deck_a")
         deck_b = DeckInput.parse(request.get("deck_b"), "deck_b")
+        contract = parse_request_contract(
+            request,
+            deck_a=deck_a,
+            deck_b=deck_b,
+            forge_commit=self.forge_commit,
+        )
         coverage = self.coverage(request)
         if coverage["unsupported_cards"]:
             raise CoverageIncomplete(coverage["unsupported_cards"])
 
-        timeout_ms = _clamp(_integer(request.get("timeout_ms"), 120_000), 1_000, 900_000)
-        seed = _integer(request.get("seed"), int(time.time() * 1000))
-        request_id = _safe_request_id(str(request.get("request_id") or uuid.uuid4()))
+        timeout_ms = contract["timeout_ms"]
+        seed = contract["seed"]
+        request_id = contract["request_id"]
         deck_a_file = self.deck_dir / f"{request_id}-a.dck"
         deck_b_file = self.deck_dir / f"{request_id}-b.dck"
         deck_a_file.write_text(deck_a.render(self.card_index), encoding="utf-8")
@@ -427,6 +653,7 @@ class ForgeService:
             duration_ms=duration_ms,
             started_at=started_at,
             forge_commit=self.forge_commit,
+            request_contract=contract,
         )
 
 
@@ -440,7 +667,15 @@ def parse_simulation_output(
     duration_ms: int,
     started_at: str,
     forge_commit: str,
+    request_contract: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if request_contract is None:
+        request_contract = parse_request_contract(
+            {"request_id": request_id, "seed": seed},
+            deck_a=deck_a,
+            deck_b=deck_b,
+            forge_commit=forge_commit,
+        )
     result_match = GAME_RESULT_WIN.search(output)
     draw_match = GAME_RESULT_DRAW.search(output)
     if result_match is None and draw_match is None:
@@ -473,21 +708,23 @@ def parse_simulation_output(
     )
     if errors:
         raise SimulationFailed(f"Forge completed with {errors} engine errors")
+    status = (
+        "censored" if turns > request_contract["max_turns"] else "completed"
+    )
     return {
+        **sidecar_identity(forge_commit),
+        **request_metadata(request_contract, status=status, turns=turns),
         "type": "battle",
-        "status": "completed",
-        "request_id": request_id,
-        "engine": "forge",
-        "engine_version": FORGE_VERSION,
-        "engine_commit": forge_commit,
-        "seed": seed,
+        "status": status,
         "started_at": started_at,
         "duration_ms": duration_ms,
         "engine_duration_ms": engine_duration_ms,
         "turns": turns,
-        "winner": winner_deck.name if winner_deck else None,
-        "winner_deck_key": winner_key,
-        "winner_deck_id": winner_deck.deck_id if winner_deck else None,
+        "winner": winner_deck.name if winner_deck and status == "completed" else None,
+        "winner_deck_key": winner_key if status == "completed" else None,
+        "winner_deck_id": (
+            winner_deck.deck_id if winner_deck and status == "completed" else None
+        ),
         "game_log": events,
         "events": events,
         "visual_snapshots": snapshots,
@@ -500,7 +737,8 @@ def parse_simulation_output(
             "visible_stack_activity_available": True,
             "combat_activity_available": False,
             "ai_decision_rationale_available": False,
-            "seed_semantics": "engine_random_seed_not_event_replay",
+            "seed_semantics": SEED_SEMANTICS,
+            "deterministic": False,
             "event_stream_completeness": "best_effort_engine_log_lower_bound",
             "absence_proves_nonuse": False,
             "strategy_or_swap_proof": False,
@@ -586,6 +824,10 @@ def _optional_string(value: Any) -> str | None:
     return result or None
 
 
+def _base64_field(value: str) -> str:
+    return base64.urlsafe_b64encode(value.encode("utf-8")).decode("ascii").rstrip("=")
+
+
 def _integer(value: Any, fallback: int) -> int:
     return value if isinstance(value, int) and not isinstance(value, bool) else fallback
 
@@ -617,6 +859,7 @@ class ForgeHandler(BaseHTTPRequestHandler):
             self._send(404, {"error": "not_found"})
 
     def do_POST(self) -> None:  # noqa: N802
+        request: dict[str, Any] | None = None
         try:
             request = self._read_json()
             if self.path == "/coverage":
@@ -634,14 +877,29 @@ class ForgeHandler(BaseHTTPRequestHandler):
                     "error": "forge_coverage_incomplete",
                     "message": str(error),
                     "unsupported_cards": error.unsupported_cards,
+                    **self._request_metadata(request, "coverage_incomplete"),
                 },
             )
         except InvalidRequest as error:
             self._send(400, {"error": "invalid_request", "message": str(error)})
         except SimulationTimeout as error:
-            self._send(504, {"error": "simulation_timeout", "message": str(error)})
+            self._send(
+                504,
+                {
+                    "error": "simulation_timeout",
+                    "message": str(error),
+                    **self._request_metadata(request, "timeout"),
+                },
+            )
         except SimulationFailed as error:
-            self._send(500, {"error": "simulation_failed", "message": str(error)})
+            self._send(
+                500,
+                {
+                    "error": "simulation_failed",
+                    "message": str(error),
+                    **self._request_metadata(request, "failed"),
+                },
+            )
         except Exception as error:  # pragma: no cover - final process boundary
             self._send(500, {"error": "internal_error", "message": str(error)})
 
@@ -663,8 +921,8 @@ class ForgeHandler(BaseHTTPRequestHandler):
     def _send(self, status: int, body: dict[str, Any]) -> None:
         response = {
             **body,
-            "sidecar_process_id": body.get("sidecar_process_id", PROCESS_ID),
-            "sidecar_started_at": body.get("sidecar_started_at", STARTED_AT),
+            **sidecar_identity(self.service.forge_commit),
+            "fallback_reason": body.get("fallback_reason", "none"),
         }
         payload = json.dumps(response, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
         try:
@@ -675,6 +933,26 @@ class ForgeHandler(BaseHTTPRequestHandler):
             self.wfile.write(payload)
         except (BrokenPipeError, ConnectionResetError):
             return
+
+    def _request_metadata(
+        self,
+        request: dict[str, Any] | None,
+        status: str,
+    ) -> dict[str, Any]:
+        if request is None or self.path != "/simulate":
+            return {}
+        try:
+            deck_a = DeckInput.parse(request.get("deck_a"), "deck_a")
+            deck_b = DeckInput.parse(request.get("deck_b"), "deck_b")
+            contract = parse_request_contract(
+                request,
+                deck_a=deck_a,
+                deck_b=deck_b,
+                forge_commit=self.service.forge_commit,
+            )
+            return request_metadata(contract, status=status)
+        except InvalidRequest:
+            return {}
 
     def log_message(self, format: str, *args: Any) -> None:
         print(f"forge-sidecar {self.address_string()} {format % args}")

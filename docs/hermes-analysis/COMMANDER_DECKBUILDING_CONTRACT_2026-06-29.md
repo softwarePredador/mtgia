@@ -2508,6 +2508,16 @@ Package-gate correction generated on 2026-06-30:
   Use the fixed gate only:
   `lorehold_electro_waterskin_gate_20260630_fixed_20260630_042339`.
 
+Execution-scope correction generated on 2026-07-22:
+
+- `lorehold_variant_battle_gate.py` is a native Python diagnostic probe. Its
+  deterministic schedule can reproduce only that simulator; it does not pair
+  XMage or Forge RNG and always emits `promotion_allowed=false`.
+- Promotion review must use
+  `lorehold_independent_battle_statistical_gate.py` over balanced independent
+  external-engine samples. The retired paired statistical entrypoint fails
+  closed and preserves deck `607` as the protected baseline.
+
 Cut-model baseline correction generated on 2026-06-30:
 
 - `lorehold_access_cut_model.py`, `lorehold_hand_filter_cut_model.py`,

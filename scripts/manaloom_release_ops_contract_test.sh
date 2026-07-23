@@ -321,6 +321,11 @@ grep -Fq 'artifact_installation: "confirmed"' "$ROOT_DIR/scripts/manaloom_releas
 grep -Fq 'MANALOOM_RELEASE_STARTUP_PROOF status=captured' "$ROOT_DIR/scripts/manaloom_release_observability_gate.sh"
 grep -Fq 'scope: "exact_signed_apk"' "$ROOT_DIR/scripts/manaloom_release_observability_gate.sh"
 grep -Fq -- '--dart-define="RELEASE_STARTUP_PROOF=true"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq -- '--dart-define="ENABLE_SCANNER_RELEASE=true"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'manaloom_build_android_release.sh' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
+grep -Fq 'run_battle_gate' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
+[[ ! -e "$ROOT_DIR/.github/workflows/manaloom-guardrails.yml" ]]
 grep -Fq -- "--env-add MANALOOM_ALLOWED_ORIGINS='\$ALLOWED_ORIGINS_CANONICAL'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'spec_allowed_origins_sha256' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'runtime_allowed_origins_sha256' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

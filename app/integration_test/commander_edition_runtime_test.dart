@@ -86,6 +86,7 @@ void main() {
       ApiClient.setToken(token);
       await prefs.setString('auth_token', token);
       await prefs.setString('user_data', jsonEncode(user));
+      await markRuntimeOnboardingSettled(user['id']?.toString() ?? '');
 
       final commanderFixture = await _findCommanderWithMultiplePrintings(api);
       final commanderName = commanderFixture.name;
@@ -123,8 +124,8 @@ void main() {
         'description': 'Runtime proof for commander edition metadata.',
       });
       expect(deckResponse.statusCode, anyOf(200, 201));
-      final deckId =
-          (deckResponse.data as Map<String, dynamic>)['id'].toString();
+      final deckId = (deckResponse.data as Map<String, dynamic>)['id']
+          .toString();
 
       final addCommander = await api.post('/decks/$deckId/cards', {
         'card_id': firstId,
@@ -209,11 +210,10 @@ void main() {
       );
       await pumpUntil(
         tester,
-        () =>
-            find
-                .byKey(ValueKey('deck-edition-option-$secondId'))
-                .evaluate()
-                .isNotEmpty,
+        () => find
+            .byKey(ValueKey('deck-edition-option-$secondId'))
+            .evaluate()
+            .isNotEmpty,
         description: 'at least two edition rows',
         attempts: 40,
       );
@@ -244,18 +244,16 @@ void main() {
       final deckAfterResponse = await api.get('/decks/$deckId');
       expect(deckAfterResponse.statusCode, 200);
       final deckAfter = deckAfterResponse.data as Map<String, dynamic>;
-      final commanders =
-          ((deckAfter['commander'] as List?) ?? const [])
-              .cast<Map<String, dynamic>>();
+      final commanders = ((deckAfter['commander'] as List?) ?? const [])
+          .cast<Map<String, dynamic>>();
       expect(commanders, hasLength(1));
       expect(commanders.single['id'], secondId);
 
       final mainBoard = (deckAfter['main_board'] as Map?) ?? const {};
-      final mainCards =
-          mainBoard.values
-              .whereType<List>()
-              .expand((items) => items)
-              .whereType<Map>();
+      final mainCards = mainBoard.values
+          .whereType<List>()
+          .expand((items) => items)
+          .whereType<Map>();
       expect(mainCards.any((card) => card['id'] == secondId), isFalse);
       expect(mainCards.any((card) => card['name'] == commanderName), isFalse);
 

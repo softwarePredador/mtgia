@@ -17,7 +17,6 @@ import mage.players.PlayerType;
 import mage.remote.Connection;
 import mage.remote.Session;
 import mage.remote.SessionImpl;
-import mage.util.RandomUtil;
 import mage.view.GameTypeView;
 import mage.view.GameView;
 import mage.view.PlayerView;
@@ -25,8 +24,11 @@ import mage.view.TableView;
 
 import java.time.Instant;
 import java.text.Normalizer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -134,11 +136,9 @@ final class XmageBattleService {
     private Map<String, Object> simulateLocked(JsonObject request) throws Exception {
         DeckInput deckA = DeckInput.parse(requireObject(request, "deck_a"), "deck_a");
         DeckInput deckB = DeckInput.parse(requireObject(request, "deck_b"), "deck_b");
-        long seed = longValue(request, "seed", System.currentTimeMillis());
-        long timeoutMs = clamp(longValue(request, "timeout_ms", 120000L), 1000L, 900000L);
-        String requestId = stringValue(request, "request_id", UUID.randomUUID().toString());
-        RandomUtil.setSeed(seed);
-
+        BattleRequestContract contract = BattleRequestContract.parse(request, deckA, deckB);
+        long timeoutMs = contract.timeoutMs;
+        String requestId = contract.requestId;
         TrackingMageClient client = new TrackingMageClient();
         Session session = new SessionImpl(client);
         UUID roomId = null;
@@ -211,8 +211,7 @@ final class XmageBattleService {
             }
             Thread.sleep(250L);
             return result(
-                    requestId,
-                    seed,
+                    contract,
                     deckA,
                     deckB,
                     client,
@@ -235,8 +234,7 @@ final class XmageBattleService {
     }
 
     private Map<String, Object> result(
-            String requestId,
-            long seed,
+            BattleRequestContract contract,
             DeckInput deckA,
             DeckInput deckB,
             TrackingMageClient client,
@@ -262,21 +260,23 @@ final class XmageBattleService {
         }
         String winnerKey = winner == null ? null : winner.getName();
         DeckInput winnerDeck = "deck_a".equals(winnerKey) ? deckA : "deck_b".equals(winnerKey) ? deckB : null;
+        int turns = finalView == null ? 0 : finalView.getTurn();
+        String status = turns > contract.maxTurns ? "censored" : "completed";
+        boolean publishWinner = winnerEligibleForComparison(status);
 
         Map<String, Object> result = new LinkedHashMap<>();
+        result.putAll(contract.metadata(status, turns));
         result.put("type", "battle");
-        result.put("status", "completed");
-        result.put("request_id", requestId);
+        result.put("status", status);
         result.put("engine", "xmage");
         result.put("engine_version", SidecarMain.XMAGE_VERSION);
         result.put("engine_commit", SidecarMain.XMAGE_COMMIT);
-        result.put("seed", seed);
         result.put("started_at", Instant.ofEpochMilli(System.currentTimeMillis() - durationMs).toString());
         result.put("duration_ms", durationMs);
-        result.put("turns", finalView == null ? 0 : finalView.getTurn());
-        result.put("winner", winnerDeck == null ? null : winnerDeck.name);
-        result.put("winner_deck_key", winnerKey);
-        result.put("winner_deck_id", winnerDeck == null ? null : winnerDeck.id);
+        result.put("turns", turns);
+        result.put("winner", winnerDeck == null || !publishWinner ? null : winnerDeck.name);
+        result.put("winner_deck_key", publishWinner ? winnerKey : null);
+        result.put("winner_deck_id", winnerDeck == null || !publishWinner ? null : winnerDeck.id);
         result.put("game_log", events);
         result.put("events", events);
         result.put("visual_snapshots", snapshots);
@@ -291,7 +291,8 @@ final class XmageBattleService {
         learningContract.put("visible_battlefield_entries_available", true);
         learningContract.put("combat_activity_available", true);
         learningContract.put("ai_decision_rationale_available", false);
-        learningContract.put("seed_semantics", "engine_random_seed_not_event_replay");
+        learningContract.put("seed_semantics", SidecarMain.SEED_SEMANTICS);
+        learningContract.put("deterministic", false);
         learningContract.put("event_stream_completeness", "best_effort_visible_state_lower_bound");
         learningContract.put("absence_proves_nonuse", false);
         learningContract.put("strategy_or_swap_proof", false);
@@ -326,6 +327,10 @@ final class XmageBattleService {
 
     static boolean shouldFinishBattle(boolean gameOver, boolean tableFinished, boolean gameViewObserved) {
         return gameViewObserved && (gameOver || tableFinished);
+    }
+
+    static boolean winnerEligibleForComparison(String status) {
+        return "completed".equals(status);
     }
 
     private int countEvents(List<Map<String, Object>> events, String action) {
@@ -457,6 +462,313 @@ final class XmageBattleService {
 
     private static long clamp(long value, long minimum, long maximum) {
         return Math.max(minimum, Math.min(maximum, value));
+    }
+
+    Map<String, Object> requestMetadata(JsonObject request, String status) {
+        DeckInput deckA = DeckInput.parse(requireObject(request, "deck_a"), "deck_a");
+        DeckInput deckB = DeckInput.parse(requireObject(request, "deck_b"), "deck_b");
+        return BattleRequestContract.parse(request, deckA, deckB).metadata(status, null);
+    }
+
+    private static final class BattleRequestContract {
+        final String requestId;
+        final long seed;
+        final long timeoutMs;
+        final int maxTurns;
+        final List<String> focusCards;
+        final String forceFocusAccessMode;
+        final boolean sameLane;
+        final boolean naturalSample;
+        final Map<String, Object> deckHashes;
+        final String requestHash;
+        final boolean legacyCompatibility;
+
+        private BattleRequestContract(
+                String requestId,
+                long seed,
+                long timeoutMs,
+                int maxTurns,
+                List<String> focusCards,
+                String forceFocusAccessMode,
+                boolean sameLane,
+                boolean naturalSample,
+                Map<String, Object> deckHashes,
+                String requestHash,
+                boolean legacyCompatibility
+        ) {
+            this.requestId = requestId;
+            this.seed = seed;
+            this.timeoutMs = timeoutMs;
+            this.maxTurns = maxTurns;
+            this.focusCards = focusCards;
+            this.forceFocusAccessMode = forceFocusAccessMode;
+            this.sameLane = sameLane;
+            this.naturalSample = naturalSample;
+            this.deckHashes = deckHashes;
+            this.requestHash = requestHash;
+            this.legacyCompatibility = legacyCompatibility;
+        }
+
+        static BattleRequestContract parse(JsonObject request, DeckInput deckA, DeckInput deckB) {
+            boolean strict = request.has("request_schema_version")
+                    && !request.get("request_schema_version").isJsonNull();
+            if (strict && !SidecarMain.REQUEST_SCHEMA.equals(request.get("request_schema_version").getAsString())) {
+                throw new IllegalArgumentException("unsupported request_schema_version");
+            }
+            String requestId = stringValue(request, "request_id", UUID.randomUUID().toString());
+            if (strict && !requestId.matches("[A-Za-z0-9_-]{1,80}")) {
+                throw new IllegalArgumentException("request_id must use 1-80 safe characters");
+            }
+            if (!strict) {
+                requestId = safeRequestId(requestId);
+            }
+            long seed = strictLong(request, "seed", System.currentTimeMillis(), Long.MIN_VALUE, Long.MAX_VALUE);
+            long timeoutMs = strictLong(request, "timeout_ms", 120000L, 1000L, 900000L);
+            int maxTurns = (int) strictLong(request, "max_turns", 30L, 1L, 100L);
+            List<String> focusCards = stringList(request, "focus_cards", 20, 300);
+            String forceMode = stringValue(request, "force_focus_access_mode", "none").toLowerCase(java.util.Locale.ROOT);
+            if (!"none".equals(forceMode)) {
+                throw new IllegalArgumentException("XMage does not support forced card access");
+            }
+            boolean sameLane = strictBoolean(request, "same_lane", false);
+            boolean naturalSample = strictBoolean(request, "natural_sample", true);
+
+            Map<String, Object> deckHashes = new LinkedHashMap<>();
+            deckHashes.put("schema_version", SidecarMain.DECK_HASH_SCHEMA);
+            deckHashes.put("algorithm", "sha256");
+            deckHashes.put("deck_a", canonicalDeckHash(deckA));
+            deckHashes.put("deck_b", canonicalDeckHash(deckB));
+            BattleRequestContract provisional = new BattleRequestContract(
+                    requestId,
+                    seed,
+                    timeoutMs,
+                    maxTurns,
+                    Collections.unmodifiableList(new ArrayList<>(focusCards)),
+                    forceMode,
+                    sameLane,
+                    naturalSample,
+                    Collections.unmodifiableMap(deckHashes),
+                    "",
+                    !strict
+            );
+            String requestHash = canonicalRequestHash(provisional, deckA.id, deckB.id);
+            BattleRequestContract contract = new BattleRequestContract(
+                    requestId,
+                    seed,
+                    timeoutMs,
+                    maxTurns,
+                    provisional.focusCards,
+                    forceMode,
+                    sameLane,
+                    naturalSample,
+                    provisional.deckHashes,
+                    requestHash,
+                    !strict
+            );
+            if (strict) {
+                requireExact(request, "expected_engine", "xmage");
+                requireExact(request, "expected_engine_version", SidecarMain.XMAGE_VERSION);
+                requireExact(request, "expected_engine_commit", SidecarMain.XMAGE_COMMIT);
+                requireExact(request, "ai_profile", SidecarMain.AI_PROFILE);
+                JsonObject suppliedHashes = requireObject(request, "deck_hashes");
+                requireExact(suppliedHashes, "schema_version", SidecarMain.DECK_HASH_SCHEMA);
+                requireExact(suppliedHashes, "algorithm", "sha256");
+                requireExact(suppliedHashes, "deck_a", String.valueOf(deckHashes.get("deck_a")));
+                requireExact(suppliedHashes, "deck_b", String.valueOf(deckHashes.get("deck_b")));
+                requireExact(request, "request_hash", requestHash);
+            }
+            return contract;
+        }
+
+        Map<String, Object> metadata(String status, Integer turns) {
+            boolean timedOut = "timeout".equals(status);
+            boolean censored = timedOut || "censored".equals(status);
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("request_id", requestId);
+            result.put("seed", seed);
+            result.put("timeout_ms", timeoutMs);
+            result.put("max_turns", maxTurns);
+            result.put("request_hash", requestHash);
+            result.put("deck_hashes", deckHashes);
+            result.put("ai_profile", SidecarMain.AI_PROFILE);
+            result.put("fallback_allowed", "coverage_incomplete".equals(status));
+            result.put("fallback_reason", "none");
+            result.put("fallback_eligibility_reason", "coverage_incomplete".equals(status)
+                    ? "coverage_incomplete_eligible"
+                    : timedOut
+                    ? "operational_timeout_not_eligible"
+                    : "failed".equals(status)
+                    ? "operational_failure_not_eligible"
+                    : "none");
+
+            Map<String, Object> controls = new LinkedHashMap<>();
+            controls.put("max_turns", control(maxTurns, "post_completion_right_censoring", "engine_enforced", false));
+            controls.put("focus_cards", control(focusCards, "positive_evidence_observation_only", null, null));
+            controls.put("force_focus_access_mode", control(forceFocusAccessMode, "none_only_non_none_rejected", null, null));
+            controls.put("same_lane", control(sameLane, "comparison_metadata_only", null, null));
+            controls.put("natural_sample", control(naturalSample, "sample_provenance_metadata", null, null));
+            Map<String, Object> requestContract = new LinkedHashMap<>();
+            requestContract.put("schema_version", SidecarMain.REQUEST_SCHEMA);
+            requestContract.put("legacy_compatibility", legacyCompatibility);
+            requestContract.put("controls", controls);
+            result.put("request_contract", requestContract);
+
+            Map<String, Object> outcome = new LinkedHashMap<>();
+            outcome.put("status", status);
+            outcome.put("timed_out", timedOut);
+            outcome.put("censored", censored);
+            outcome.put("censor_reason", timedOut
+                    ? "wall_clock_timeout"
+                    : "censored".equals(status) ? "max_turns_exceeded" : null);
+            outcome.put("timeout_ms", timeoutMs);
+            if (turns != null) {
+                outcome.put("turns", turns);
+            }
+            result.put("execution_outcome", outcome);
+            return result;
+        }
+
+        private static Map<String, Object> control(
+                Object value,
+                String semantics,
+                String extraKey,
+                Object extraValue
+        ) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("value", value);
+            result.put("semantics", semantics);
+            if (extraKey != null) {
+                result.put(extraKey, extraValue);
+            }
+            return result;
+        }
+
+        private static String canonicalDeckHash(DeckInput deck) {
+            List<String> records = new ArrayList<>();
+            for (CardInput card : deck.cards) {
+                records.add(String.join("|",
+                        card.commander ? "1" : "0",
+                        Integer.toString(card.quantity),
+                        base64Field(card.name),
+                        base64Field(card.setCode),
+                        base64Field(card.number)
+                ));
+            }
+            Collections.sort(records);
+            return sha256(SidecarMain.DECK_HASH_SCHEMA + "\n" + String.join("\n", records) + "\n");
+        }
+
+        private static String canonicalRequestHash(BattleRequestContract contract, String deckAId, String deckBId) {
+            List<String> encodedFocus = new ArrayList<>();
+            for (String card : contract.focusCards) {
+                encodedFocus.add(base64Field(card));
+            }
+            String material = String.join("\n",
+                    SidecarMain.REQUEST_SCHEMA,
+                    "request_id=" + base64Field(contract.requestId),
+                    "seed=" + contract.seed,
+                    "timeout_ms=" + contract.timeoutMs,
+                    "max_turns=" + contract.maxTurns,
+                    "focus_cards=" + String.join(",", encodedFocus),
+                    "force_focus_access_mode=" + contract.forceFocusAccessMode,
+                    "same_lane=" + (contract.sameLane ? "1" : "0"),
+                    "natural_sample=" + (contract.naturalSample ? "1" : "0"),
+                    "deck_a_id=" + base64Field(deckAId),
+                    "deck_b_id=" + base64Field(deckBId),
+                    "deck_a_hash=" + contract.deckHashes.get("deck_a"),
+                    "deck_b_hash=" + contract.deckHashes.get("deck_b"),
+                    "engine=xmage",
+                    "engine_version=" + base64Field(SidecarMain.XMAGE_VERSION),
+                    "engine_commit=" + SidecarMain.XMAGE_COMMIT,
+                    "ai_profile=" + base64Field(SidecarMain.AI_PROFILE)
+            );
+            return sha256(material + "\n");
+        }
+
+        private static String base64Field(String value) {
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+        }
+
+        private static String sha256(String value) {
+            try {
+                byte[] digest = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
+                StringBuilder result = new StringBuilder(digest.length * 2);
+                for (byte item : digest) {
+                    result.append(String.format("%02x", item & 0xff));
+                }
+                return result.toString();
+            } catch (java.security.NoSuchAlgorithmException error) {
+                throw new IllegalStateException("SHA-256 is unavailable", error);
+            }
+        }
+
+        private static void requireExact(JsonObject input, String key, String expected) {
+            if (!input.has(key) || input.get(key).isJsonNull() || !expected.equals(input.get(key).getAsString())) {
+                throw new IllegalArgumentException(key + " does not match the running XMage identity/request");
+            }
+        }
+
+        private static long strictLong(JsonObject input, String key, long fallback, long minimum, long maximum) {
+            if (!input.has(key) || input.get(key).isJsonNull()) {
+                return fallback;
+            }
+            JsonElement value = input.get(key);
+            if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isNumber()) {
+                throw new IllegalArgumentException(key + " must be an integer");
+            }
+            long result;
+            try {
+                result = value.getAsLong();
+            } catch (NumberFormatException error) {
+                throw new IllegalArgumentException(key + " must be an integer", error);
+            }
+            if (result < minimum || result > maximum) {
+                throw new IllegalArgumentException(key + " is outside the supported range");
+            }
+            return result;
+        }
+
+        private static boolean strictBoolean(JsonObject input, String key, boolean fallback) {
+            if (!input.has(key) || input.get(key).isJsonNull()) {
+                return fallback;
+            }
+            JsonElement value = input.get(key);
+            if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isBoolean()) {
+                throw new IllegalArgumentException(key + " must be a boolean");
+            }
+            return value.getAsBoolean();
+        }
+
+        private static List<String> stringList(JsonObject input, String key, int maxItems, int maxLength) {
+            if (!input.has(key) || input.get(key).isJsonNull()) {
+                return new ArrayList<>();
+            }
+            if (!input.get(key).isJsonArray() || input.getAsJsonArray(key).size() > maxItems) {
+                throw new IllegalArgumentException(key + " must be a bounded list");
+            }
+            List<String> result = new ArrayList<>();
+            for (JsonElement value : input.getAsJsonArray(key)) {
+                if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isString()) {
+                    throw new IllegalArgumentException(key + " must contain strings");
+                }
+                String item = value.getAsString().trim();
+                if (item.length() > maxLength) {
+                    throw new IllegalArgumentException(key + " contains an oversized value");
+                }
+                if (!item.isEmpty()) {
+                    result.add(item);
+                }
+            }
+            return result;
+        }
+
+        private static String safeRequestId(String value) {
+            String sanitized = value.replaceAll("[^A-Za-z0-9_-]", "");
+            if (sanitized.isEmpty()) {
+                return UUID.randomUUID().toString();
+            }
+            return sanitized.substring(0, Math.min(80, sanitized.length()));
+        }
     }
 
     private static final class DeckInput {

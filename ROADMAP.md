@@ -5,6 +5,8 @@ Este documento é **estratégico**, não operacional.
 Para prioridade diária, sequência de execução e decisões de escopo, usar:
 
 - [docs/CONTEXTO_PRODUTO_ATUAL.md](docs/CONTEXTO_PRODUTO_ATUAL.md)
+- [docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md](docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md)
+- [docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md](docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md)
 - [docs/MANALOOM_E2E_RELEASE_CONTRACT.md](docs/MANALOOM_E2E_RELEASE_CONTRACT.md)
 
 ## Posição atual

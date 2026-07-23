@@ -17,6 +17,7 @@ const _allowedEvents = <String>{
   'deck_optimized',
   'deck_rebuild_created',
   'onboarding_completed',
+  'onboarding_skipped',
 };
 
 Future<Response> onRequest(RequestContext context) async {

@@ -49,9 +49,11 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
       body: Consumer<MessageProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading && provider.conversations.isEmpty) {
-            return const Center(
+            return const AppStatePanel.loading(
               key: Key('messages-inbox-loading'),
-              child: CircularProgressIndicator(color: AppTheme.brass400),
+              title: 'Carregando mensagens',
+              message: 'Buscando suas conversas mais recentes.',
+              accent: AppTheme.brass400,
             );
           }
 
@@ -86,9 +88,10 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
               onRefresh: () => provider.fetchConversations(),
               child: ListView.separated(
                 key: const Key('messages-inbox-list'),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: AppTheme.space12),
                 itemCount: provider.conversations.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                separatorBuilder: (_, __) =>
+                    const SizedBox(height: AppTheme.space8),
                 itemBuilder: (context, index) {
                   final conv = provider.conversations[index];
                   return _ConversationTile(
@@ -127,17 +130,15 @@ class _ConversationTile extends StatelessWidget {
     final hasUnread = conversation.unreadCount > 0;
 
     return Material(
-      color:
-          hasUnread
-              ? AppTheme.brass500.withValues(alpha: 0.08)
-              : AppTheme.surfaceSlate,
+      color: hasUnread
+          ? AppTheme.brass500.withValues(alpha: 0.08)
+          : AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         side: BorderSide(
-          color:
-              hasUnread
-                  ? AppTheme.brass400.withValues(alpha: 0.3)
-                  : AppTheme.outlineMuted,
+          color: hasUnread
+              ? AppTheme.brass400.withValues(alpha: 0.3)
+              : AppTheme.outlineMuted,
           width: AppTheme.strokeMedium,
         ),
       ),
@@ -146,7 +147,12 @@ class _ConversationTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 8, 10, 8),
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.space0,
+            AppTheme.space8,
+            AppTheme.space10,
+            AppTheme.space8,
+          ),
           child: Row(
             children: [
               Container(
@@ -159,27 +165,26 @@ class _ConversationTile extends StatelessWidget {
               ),
               Expanded(
                 child: ListTile(
-                  contentPadding: const EdgeInsets.only(left: 12),
+                  contentPadding: const EdgeInsets.only(left: AppTheme.space12),
                   leading: CircleAvatar(
                     radius: 24,
                     backgroundColor: AppTheme.brass400.withValues(alpha: 0.16),
                     backgroundImage:
                         user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                            ? NetworkImage(user.avatarUrl!)
-                            : null,
-                    child:
-                        user.avatarUrl == null || user.avatarUrl!.isEmpty
-                            ? Text(
-                              user.label.isNotEmpty
-                                  ? user.label[0].toUpperCase()
-                                  : '?',
-                              style: const TextStyle(
-                                color: AppTheme.brass400,
-                                fontWeight: FontWeight.bold,
-                                fontSize: AppTheme.fontLg,
-                              ),
-                            )
-                            : null,
+                        ? NetworkImage(user.avatarUrl!)
+                        : null,
+                    child: user.avatarUrl == null || user.avatarUrl!.isEmpty
+                        ? Text(
+                            user.label.isNotEmpty
+                                ? user.label[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                              color: AppTheme.brass400,
+                              fontWeight: FontWeight.bold,
+                              fontSize: AppTheme.fontLg,
+                            ),
+                          )
+                        : null,
                   ),
                   title: Text(
                     user.label,
@@ -189,21 +194,19 @@ class _ConversationTile extends StatelessWidget {
                       fontSize: AppTheme.fontMd,
                     ),
                   ),
-                  subtitle:
-                      conversation.lastMessage != null
-                          ? Text(
-                            conversation.lastMessage!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color:
-                                  hasUnread
-                                      ? AppTheme.textPrimary
-                                      : AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
-                            ),
-                          )
-                          : null,
+                  subtitle: conversation.lastMessage != null
+                      ? Text(
+                          conversation.lastMessage!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: hasUnread
+                                ? AppTheme.textPrimary
+                                : AppTheme.textSecondary,
+                            fontSize: AppTheme.fontSm,
+                          ),
+                        )
+                      : null,
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -212,19 +215,18 @@ class _ConversationTile extends StatelessWidget {
                         Text(
                           _formatTime(conversation.lastMessageAt!),
                           style: TextStyle(
-                            color:
-                                hasUnread
-                                    ? AppTheme.brass400
-                                    : AppTheme.textSecondary,
+                            color: hasUnread
+                                ? AppTheme.brass400
+                                : AppTheme.textSecondary,
                             fontSize: AppTheme.fontXs,
                           ),
                         ),
                       if (hasUnread) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.space4),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
+                            horizontal: AppTheme.space6,
+                            vertical: AppTheme.space2,
                           ),
                           decoration: BoxDecoration(
                             color: AppTheme.brass400,

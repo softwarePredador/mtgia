@@ -12,6 +12,12 @@ void main() {
           'JWT_SECRET': productionSecret,
           'MANALOOM_TRUSTED_PROXY_HOPS': '1',
           'MANALOOM_TRUSTED_PROXY_PEERS': '10.0.0.0/8',
+          'PASSWORD_RESET_WEBHOOK_URL': 'https://email.example/reset',
+          'PASSWORD_RESET_WEBHOOK_TOKEN': 'reset-webhook-token-safe',
+          'PASSWORD_RESET_APP_URL': 'https://app.example/#/reset-password',
+          'EMAIL_VERIFICATION_WEBHOOK_URL': 'https://email.example/verify',
+          'EMAIL_VERIFICATION_WEBHOOK_TOKEN': 'verify-webhook-token-safe',
+          'EMAIL_VERIFICATION_APP_URL': 'https://app.example/#/verify-email',
         }),
         returnsNormally,
       );
@@ -63,6 +69,38 @@ void main() {
           'JWT_SECRET': 'local_test_jwt_secret_not_for_production_20260717',
         }),
         returnsNormally,
+      );
+    });
+  });
+
+  group('account email delivery policy', () {
+    const valid = {
+      'PASSWORD_RESET_WEBHOOK_URL': 'https://email.example/reset',
+      'PASSWORD_RESET_WEBHOOK_TOKEN': 'reset-webhook-token-safe',
+      'PASSWORD_RESET_APP_URL': 'https://app.example/#/reset-password',
+      'EMAIL_VERIFICATION_WEBHOOK_URL': 'https://email.example/verify',
+      'EMAIL_VERIFICATION_WEBHOOK_TOKEN': 'verify-webhook-token-safe',
+      'EMAIL_VERIFICATION_APP_URL': 'https://app.example/#/verify-email',
+    };
+
+    test('accepts complete HTTPS delivery coordinates', () {
+      expect(() => AccountEmailDeliveryPolicy.validate(valid), returnsNormally);
+    });
+
+    test('rejects absent, insecure or test-token configuration', () {
+      expect(
+        () => AccountEmailDeliveryPolicy.validate({
+          ...valid,
+          'PASSWORD_RESET_WEBHOOK_URL': 'http://email.example/reset',
+        }),
+        throwsStateError,
+      );
+      expect(
+        () => AccountEmailDeliveryPolicy.validate({
+          ...valid,
+          'MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE': 'anything',
+        }),
+        throwsStateError,
       );
     });
   });

@@ -57,12 +57,12 @@ class LifeCounterPlayerAppearance {
     return LifeCounterPlayerAppearance(
       background: background ?? this.background,
       nickname: nickname ?? this.nickname,
-      backgroundImage:
-          clearBackgroundImage ? null : backgroundImage ?? this.backgroundImage,
-      backgroundImagePartner:
-          clearBackgroundImagePartner
-              ? null
-              : backgroundImagePartner ?? this.backgroundImagePartner,
+      backgroundImage: clearBackgroundImage
+          ? null
+          : backgroundImage ?? this.backgroundImage,
+      backgroundImagePartner: clearBackgroundImagePartner
+          ? null
+          : backgroundImagePartner ?? this.backgroundImagePartner,
     );
   }
 
@@ -163,10 +163,10 @@ class LifeCounterCommanderDamageDetail {
     }
 
     final payload = raw.cast<String, dynamic>();
-    final commanderOneDamage =
-        (payload['commander_one_damage'] as num?)?.toInt();
-    final commanderTwoDamage =
-        (payload['commander_two_damage'] as num?)?.toInt();
+    final commanderOneDamage = (payload['commander_one_damage'] as num?)
+        ?.toInt();
+    final commanderTwoDamage = (payload['commander_two_damage'] as num?)
+        ?.toInt();
     if (commanderOneDamage == null || commanderTwoDamage == null) {
       return null;
     }
@@ -269,6 +269,8 @@ class LifeCounterSession {
     this.playSessionId,
     this.deckId,
     this.deckName,
+    this.deckSnapshotHash,
+    this.deckVersionAtEpochMs,
     this.startedAtEpochMs,
   });
 
@@ -279,16 +281,17 @@ class LifeCounterSession {
     String? playSessionId,
     String? deckId,
     String? deckName,
+    String? deckSnapshotHash,
+    int? deckVersionAtEpochMs,
     int? startedAtEpochMs,
   }) {
     final normalizedPlayerCount = playerCount.clamp(
       lifeCounterMinPlayers,
       lifeCounterMaxPlayers,
     );
-    final startingLife =
-        normalizedPlayerCount == 2
-            ? startingLifeTwoPlayer
-            : startingLifeMultiPlayer;
+    final startingLife = normalizedPlayerCount == 2
+        ? startingLifeTwoPlayer
+        : startingLifeMultiPlayer;
 
     return LifeCounterSession(
       playerCount: normalizedPlayerCount,
@@ -345,6 +348,8 @@ class LifeCounterSession {
       playSessionId: playSessionId,
       deckId: deckId,
       deckName: deckName,
+      deckSnapshotHash: deckSnapshotHash,
+      deckVersionAtEpochMs: deckVersionAtEpochMs,
       startedAtEpochMs: startedAtEpochMs,
     );
   }
@@ -387,6 +392,8 @@ class LifeCounterSession {
   final String? playSessionId;
   final String? deckId;
   final String? deckName;
+  final String? deckSnapshotHash;
+  final int? deckVersionAtEpochMs;
   final int? startedAtEpochMs;
 
   int get startingLife =>
@@ -514,6 +521,10 @@ class LifeCounterSession {
     bool clearDeckId = false,
     String? deckName,
     bool clearDeckName = false,
+    String? deckSnapshotHash,
+    bool clearDeckSnapshotHash = false,
+    int? deckVersionAtEpochMs,
+    bool clearDeckVersionAtEpochMs = false,
     int? startedAtEpochMs,
     bool clearStartedAtEpochMs = false,
   }) {
@@ -543,38 +554,43 @@ class LifeCounterSession {
       commanderDamageDetails:
           commanderDamageDetails ?? this.commanderDamageDetails,
       stormCount: stormCount ?? this.stormCount,
-      monarchPlayer:
-          clearMonarchPlayer ? null : monarchPlayer ?? this.monarchPlayer,
-      initiativePlayer:
-          clearInitiativePlayer
-              ? null
-              : initiativePlayer ?? this.initiativePlayer,
-      firstPlayerIndex:
-          clearFirstPlayerIndex
-              ? null
-              : firstPlayerIndex ?? this.firstPlayerIndex,
+      monarchPlayer: clearMonarchPlayer
+          ? null
+          : monarchPlayer ?? this.monarchPlayer,
+      initiativePlayer: clearInitiativePlayer
+          ? null
+          : initiativePlayer ?? this.initiativePlayer,
+      firstPlayerIndex: clearFirstPlayerIndex
+          ? null
+          : firstPlayerIndex ?? this.firstPlayerIndex,
       turnTrackerActive: turnTrackerActive ?? this.turnTrackerActive,
       turnTrackerOngoingGame:
           turnTrackerOngoingGame ?? this.turnTrackerOngoingGame,
       turnTrackerAutoHighRoll:
           turnTrackerAutoHighRoll ?? this.turnTrackerAutoHighRoll,
-      currentTurnPlayerIndex:
-          clearCurrentTurnPlayerIndex
-              ? null
-              : currentTurnPlayerIndex ?? this.currentTurnPlayerIndex,
+      currentTurnPlayerIndex: clearCurrentTurnPlayerIndex
+          ? null
+          : currentTurnPlayerIndex ?? this.currentTurnPlayerIndex,
       currentTurnNumber: currentTurnNumber ?? this.currentTurnNumber,
       turnTimerActive: turnTimerActive ?? this.turnTimerActive,
       turnTimerSeconds: turnTimerSeconds ?? this.turnTimerSeconds,
-      lastTableEvent:
-          clearLastTableEvent ? null : lastTableEvent ?? this.lastTableEvent,
-      playSessionId:
-          clearPlaySessionId ? null : playSessionId ?? this.playSessionId,
+      lastTableEvent: clearLastTableEvent
+          ? null
+          : lastTableEvent ?? this.lastTableEvent,
+      playSessionId: clearPlaySessionId
+          ? null
+          : playSessionId ?? this.playSessionId,
       deckId: clearDeckId ? null : deckId ?? this.deckId,
       deckName: clearDeckName ? null : deckName ?? this.deckName,
-      startedAtEpochMs:
-          clearStartedAtEpochMs
-              ? null
-              : startedAtEpochMs ?? this.startedAtEpochMs,
+      deckSnapshotHash: clearDeckSnapshotHash
+          ? null
+          : deckSnapshotHash ?? this.deckSnapshotHash,
+      deckVersionAtEpochMs: clearDeckVersionAtEpochMs
+          ? null
+          : deckVersionAtEpochMs ?? this.deckVersionAtEpochMs,
+      startedAtEpochMs: clearStartedAtEpochMs
+          ? null
+          : startedAtEpochMs ?? this.startedAtEpochMs,
     );
   }
 
@@ -589,26 +605,27 @@ class LifeCounterSession {
       'energy': energy,
       'experience': experience,
       'commander_casts': commanderCasts,
-      'commander_cast_details':
-          resolvedCommanderCastDetails.map((entry) => entry.toJson()).toList(),
+      'commander_cast_details': resolvedCommanderCastDetails
+          .map((entry) => entry.toJson())
+          .toList(),
       'player_extra_counters': resolvedPlayerExtraCounters,
       'player_counter_presence': resolvedPlayerCounterPresence,
-      'player_appearances':
-          resolvedPlayerAppearances.map((entry) => entry.toJson()).toList(),
+      'player_appearances': resolvedPlayerAppearances
+          .map((entry) => entry.toJson())
+          .toList(),
       'partner_commanders': partnerCommanders,
-      'player_special_states':
-          playerSpecialStates.map(_encodePlayerSpecialState).toList(),
-      'player_elimination_reasons':
-          resolvedPlayerEliminationReasons
-              .map(_encodePlayerEliminationReason)
-              .toList(),
+      'player_special_states': playerSpecialStates
+          .map(_encodePlayerSpecialState)
+          .toList(),
+      'player_elimination_reasons': resolvedPlayerEliminationReasons
+          .map(_encodePlayerEliminationReason)
+          .toList(),
       'last_player_rolls': lastPlayerRolls,
       'last_high_rolls': lastHighRolls,
       'commander_damage': commanderDamage,
-      'commander_damage_details':
-          resolvedCommanderDamageDetails
-              .map((row) => row.map((entry) => entry.toJson()).toList())
-              .toList(),
+      'commander_damage_details': resolvedCommanderDamageDetails
+          .map((row) => row.map((entry) => entry.toJson()).toList())
+          .toList(),
       'storm_count': stormCount,
       'monarch_player': monarchPlayer,
       'initiative_player': initiativePlayer,
@@ -624,6 +641,9 @@ class LifeCounterSession {
       if (playSessionId != null) 'play_session_id': playSessionId,
       if (deckId != null) 'deck_id': deckId,
       if (deckName != null) 'deck_name': deckName,
+      if (deckSnapshotHash != null) 'deck_snapshot_hash': deckSnapshotHash,
+      if (deckVersionAtEpochMs != null)
+        'deck_version_at_epoch_ms': deckVersionAtEpochMs,
       if (startedAtEpochMs != null) 'started_at_epoch_ms': startedAtEpochMs,
     };
   }
@@ -650,8 +670,8 @@ class LifeCounterSession {
   static LifeCounterSession? tryFromJson(Map<String, dynamic> payload) {
     final playerCount = (payload['player_count'] as num?)?.toInt();
     final startingLife = (payload['starting_life'] as num?)?.toInt();
-    final startingLifeTwoPlayer =
-        (payload['starting_life_two_player'] as num?)?.toInt();
+    final startingLifeTwoPlayer = (payload['starting_life_two_player'] as num?)
+        ?.toInt();
     final startingLifeMultiPlayer =
         (payload['starting_life_multi_player'] as num?)?.toInt();
 
@@ -739,28 +759,25 @@ class LifeCounterSession {
       payload['first_player_index'],
       playerCount,
     );
-    final turnTrackerActive =
-        payload['turn_tracker_active'] is bool
-            ? payload['turn_tracker_active'] as bool
-            : false;
-    final turnTrackerOngoingGame =
-        payload['turn_tracker_ongoing_game'] is bool
-            ? payload['turn_tracker_ongoing_game'] as bool
-            : false;
+    final turnTrackerActive = payload['turn_tracker_active'] is bool
+        ? payload['turn_tracker_active'] as bool
+        : false;
+    final turnTrackerOngoingGame = payload['turn_tracker_ongoing_game'] is bool
+        ? payload['turn_tracker_ongoing_game'] as bool
+        : false;
     final turnTrackerAutoHighRoll =
         payload['turn_tracker_auto_high_roll'] is bool
-            ? payload['turn_tracker_auto_high_roll'] as bool
-            : false;
+        ? payload['turn_tracker_auto_high_roll'] as bool
+        : false;
     final currentTurnPlayerIndex = _readOptionalPlayerIndex(
       payload['current_turn_player_index'],
       playerCount,
     );
     final currentTurnNumber =
         ((payload['current_turn_number'] as num?)?.toInt() ?? 1).clamp(1, 9999);
-    final turnTimerActive =
-        payload['turn_timer_active'] is bool
-            ? payload['turn_timer_active'] as bool
-            : false;
+    final turnTimerActive = payload['turn_timer_active'] is bool
+        ? payload['turn_timer_active'] as bool
+        : false;
     final turnTimerSeconds =
         ((payload['turn_timer_seconds'] as num?)?.toInt() ?? 0).clamp(
           0,
@@ -775,9 +792,21 @@ class LifeCounterSession {
     );
     final deckId = _readContextString(payload['deck_id'], maxLength: 160);
     final deckName = _readContextString(payload['deck_name'], maxLength: 240);
+    final deckSnapshotHash = _readDeckSnapshotHash(
+      payload['deck_snapshot_hash'],
+    );
+    final rawDeckVersionAt = (payload['deck_version_at_epoch_ms'] as num?)
+        ?.toInt();
+    final deckVersionAtEpochMs =
+        deckSnapshotHash != null &&
+            rawDeckVersionAt != null &&
+            rawDeckVersionAt >= 0
+        ? rawDeckVersionAt
+        : null;
     final rawStartedAt = (payload['started_at_epoch_ms'] as num?)?.toInt();
-    final startedAtEpochMs =
-        rawStartedAt != null && rawStartedAt >= 0 ? rawStartedAt : null;
+    final startedAtEpochMs = rawStartedAt != null && rawStartedAt >= 0
+        ? rawStartedAt
+        : null;
 
     if (lives == null ||
         poison == null ||
@@ -833,6 +862,8 @@ class LifeCounterSession {
       playSessionId: playSessionId,
       deckId: deckId,
       deckName: deckName,
+      deckSnapshotHash: deckVersionAtEpochMs == null ? null : deckSnapshotHash,
+      deckVersionAtEpochMs: deckVersionAtEpochMs,
       startedAtEpochMs: startedAtEpochMs,
     );
   }
@@ -844,6 +875,14 @@ class LifeCounterSession {
     return normalized.length <= maxLength
         ? normalized
         : normalized.substring(0, maxLength);
+  }
+
+  static String? _readDeckSnapshotHash(dynamic value) {
+    final normalized = _readContextString(value, maxLength: 64)?.toLowerCase();
+    if (normalized == null || !RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
+      return null;
+    }
+    return normalized;
   }
 
   static String _encodePlayerSpecialState(LifeCounterPlayerSpecialState state) {
@@ -1242,12 +1281,12 @@ String lifeCounterGameplayFingerprint(LifeCounterSession session) {
     'extra_counters': session.resolvedPlayerExtraCounters,
     'counter_presence': session.resolvedPlayerCounterPresence,
     'partner_commanders': session.partnerCommanders,
-    'special_states':
-        session.playerSpecialStates.map((entry) => entry.name).toList(),
-    'elimination_reasons':
-        session.resolvedPlayerEliminationReasons
-            .map((entry) => entry.name)
-            .toList(),
+    'special_states': session.playerSpecialStates
+        .map((entry) => entry.name)
+        .toList(),
+    'elimination_reasons': session.resolvedPlayerEliminationReasons
+        .map((entry) => entry.name)
+        .toList(),
     'last_player_rolls': session.lastPlayerRolls,
     'last_high_rolls': session.lastHighRolls,
     'commander_damage': session.commanderDamage,

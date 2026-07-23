@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
+import '../ai_job_lifecycle.dart';
 import '../ai_plan_reservation_handle.dart';
 import '../ai_plan_reservation_settlement.dart';
 import '../logger.dart';
@@ -13,22 +16,47 @@ import 'optimize_stage_telemetry.dart';
 import 'optimize_state_support.dart' as optimize_state;
 import 'otimizacao.dart';
 
-Future<String> createOptimizeAsyncJob({
+Future<AiJobCreation> createOptimizeAsyncJob({
   required OptimizeStageTelemetry telemetry,
   required Pool pool,
   required String deckId,
   required String archetype,
   required String userId,
+  required String requestKey,
+  required String requestFingerprint,
 }) {
   return telemetry.trackAsync(
     'request.async_job_create',
-    () => OptimizeJobStore.create(
+    () => OptimizeJobStore.createOrReuse(
       pool: pool,
       deckId: deckId,
       archetype: archetype,
       userId: userId,
+      requestKey: requestKey,
+      requestFingerprint: requestFingerprint,
     ),
   );
+}
+
+String buildOptimizeAsyncRequestDigest(Map<String, dynamic> body) {
+  final payload =
+      Map<String, dynamic>.from(body)
+        ..remove('request_key')
+        ..remove('async')
+        ..remove('_force_sync');
+  final canonical = _canonicalizeJobInput(payload);
+  return sha256.convert(utf8.encode(jsonEncode(canonical))).toString();
+}
+
+Object? _canonicalizeJobInput(Object? value) {
+  if (value is Map) {
+    final keys = value.keys.map((key) => key.toString()).toList()..sort();
+    return <String, Object?>{
+      for (final key in keys) key: _canonicalizeJobInput(value[key]),
+    };
+  }
+  if (value is List) return value.map(_canonicalizeJobInput).toList();
+  return value;
 }
 
 Map<String, dynamic> buildOptimizeModeAsyncAcceptedBody({
@@ -38,6 +66,8 @@ Map<String, dynamic> buildOptimizeModeAsyncAcceptedBody({
   required int elapsedMs,
   required Map<String, dynamic> telemetrySnapshot,
   required OptimizeIntensityConfig intensity,
+  String requestKey = 'server-generated',
+  bool reused = false,
 }) {
   final timings = {
     'deck_id': deckId,
@@ -54,12 +84,15 @@ Map<String, dynamic> buildOptimizeModeAsyncAcceptedBody({
     'message':
         'Optimize agressivo iniciado em background. Acompanhe o progresso via polling.',
     'poll_url': '/ai/optimize/jobs/$jobId',
+    'cancel_url': '/ai/optimize/jobs/$jobId',
+    'resume_url': '/ai/optimize/jobs/$jobId',
     'poll_interval_ms': 1000,
     'job_timeout_ms': OptimizeJobStore.executionTimeout.inMilliseconds,
     'total_stages': 6,
     'intensity': intensity.selected,
     'optimize_intensity': intensity.toJson(returnedSwaps: 0),
     'async': {'accepted_ms': elapsedMs, 'executor': 'optimize_async_job'},
+    'idempotency': {'request_key': requestKey, 'reused': reused},
     'timings': timings,
     'stage_telemetry': timings,
   };
@@ -111,6 +144,8 @@ Map<String, dynamic> buildCompleteModeAsyncAcceptedBody({
   required String jobId,
   required Map<String, dynamic> telemetrySnapshot,
   required OptimizeIntensityConfig intensity,
+  String requestKey = 'server-generated',
+  bool reused = false,
 }) {
   return {
     'job_id': jobId,
@@ -118,9 +153,12 @@ Map<String, dynamic> buildCompleteModeAsyncAcceptedBody({
     'message':
         'Otimização iniciada em background. Consulte o progresso via polling.',
     'poll_url': '/ai/optimize/jobs/$jobId',
+    'cancel_url': '/ai/optimize/jobs/$jobId',
+    'resume_url': '/ai/optimize/jobs/$jobId',
     'poll_interval_ms': 2000,
     'job_timeout_ms': OptimizeJobStore.executionTimeout.inMilliseconds,
     'total_stages': 6,
+    'idempotency': {'request_key': requestKey, 'reused': reused},
     'intensity': intensity.selected,
     'optimize_intensity': intensity.toJson(returnedSwaps: 0),
     'timings': telemetrySnapshot,

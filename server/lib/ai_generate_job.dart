@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:postgres/postgres.dart';
 
 import 'e2e_validation_policy.dart';
+import 'ai_job_lifecycle.dart';
 
 class AiGenerateJobStore {
   AiGenerateJobStore._();
@@ -12,22 +13,27 @@ class AiGenerateJobStore {
   static const _cleanupInterval = Duration(minutes: 5);
   static const _executionTimeout = Duration(minutes: 4);
   static DateTime? _lastCleanupAt;
+
   static Future<String> create({
     required Pool pool,
     required String cacheKey,
     required String format,
     required String userId,
+    String? requestKey,
+    String? requestFingerprint,
   }) async {
     final id = _generateId();
     await pool.execute(
       Sql.named('''
         INSERT INTO ai_generate_jobs (
           id, user_id, cache_key, format, status, stage, stage_number,
-          total_stages, created_at, updated_at
+          total_stages, request_key, request_fingerprint,
+          created_at, updated_at
         )
         VALUES (
           @id, CAST(@user_id AS uuid), @cache_key, @format, @status, @stage,
-          @stage_number, @total_stages, NOW(), NOW()
+          @stage_number, @total_stages, @request_key, @request_fingerprint,
+          NOW(), NOW()
         )
       '''),
       parameters: {
@@ -39,9 +45,74 @@ class AiGenerateJobStore {
         'stage': 'Iniciando...',
         'stage_number': 0,
         'total_stages': 4,
+        'request_key': requestKey,
+        'request_fingerprint': requestFingerprint ?? cacheKey,
       },
     );
     return id;
+  }
+
+  static Future<AiJobCreation> createOrReuse({
+    required Pool pool,
+    required String cacheKey,
+    required String format,
+    required String userId,
+    required String requestKey,
+    required String requestFingerprint,
+  }) async {
+    final id = _generateId();
+    final inserted = await pool.execute(
+      Sql.named('''
+        INSERT INTO ai_generate_jobs (
+          id, user_id, cache_key, format, status, stage, stage_number,
+          total_stages, request_key, request_fingerprint,
+          created_at, updated_at
+        )
+        VALUES (
+          @id, CAST(@user_id AS uuid), @cache_key, @format, 'pending',
+          'Iniciando...', 0, 4, @request_key, @request_fingerprint,
+          NOW(), NOW()
+        )
+        ON CONFLICT (user_id, request_key)
+          WHERE user_id IS NOT NULL AND request_key IS NOT NULL
+        DO NOTHING
+        RETURNING id
+      '''),
+      parameters: {
+        'id': id,
+        'user_id': userId,
+        'cache_key': cacheKey,
+        'format': format,
+        'request_key': requestKey,
+        'request_fingerprint': requestFingerprint,
+      },
+    );
+    if (inserted.isNotEmpty) {
+      return AiJobCreation(jobId: id, requestKey: requestKey, isNew: true);
+    }
+
+    final existing = await pool.execute(
+      Sql.named('''
+        SELECT id, request_fingerprint
+        FROM ai_generate_jobs
+        WHERE user_id = CAST(@user_id AS uuid)
+          AND request_key = @request_key
+        LIMIT 1
+      '''),
+      parameters: {'user_id': userId, 'request_key': requestKey},
+    );
+    if (existing.isEmpty) {
+      throw StateError('Generate idempotency conflict without persisted job.');
+    }
+    final row = existing.first.toColumnMap();
+    if (row['request_fingerprint']?.toString() != requestFingerprint) {
+      throw const AiJobIdempotencyConflict();
+    }
+    return AiJobCreation(
+      jobId: row['id']!.toString(),
+      requestKey: requestKey,
+      isNew: false,
+    );
   }
 
   static Future<AiGenerateJob?> get(Pool pool, String id) async {
@@ -75,6 +146,9 @@ class AiGenerateJobStore {
           result_status_code,
           result,
           error,
+          request_key,
+          request_fingerprint,
+          cancelled_at,
           created_at,
           updated_at
         FROM ai_generate_jobs
@@ -87,13 +161,71 @@ class AiGenerateJobStore {
     return AiGenerateJob.fromRow(result.first.toColumnMap());
   }
 
-  static Future<void> progress(
+  static Future<AiGenerateJob?> latestForUser(
+    Pool pool,
+    String userId, {
+    bool activeOnly = false,
+  }) async {
+    await _cleanupIfDue(pool);
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          id, user_id::text AS user_id, cache_key, format, status, stage,
+          stage_number, total_stages, result_status_code, result, error,
+          request_key, request_fingerprint, cancelled_at,
+          created_at, updated_at
+        FROM ai_generate_jobs
+        WHERE user_id = CAST(@user_id AS uuid)
+          AND created_at >=
+            NOW() - (CAST(@ttl_seconds AS int) * INTERVAL '1 second')
+          AND (
+            CAST(@active_only AS boolean) = FALSE
+            OR status IN ('pending', 'processing')
+          )
+        ORDER BY updated_at DESC, created_at DESC
+        LIMIT 1
+      '''),
+      parameters: {
+        'user_id': userId,
+        'ttl_seconds': _jobTtl.inSeconds,
+        'active_only': activeOnly,
+      },
+    );
+    if (result.isEmpty) return null;
+    return AiGenerateJob.fromRow(result.first.toColumnMap());
+  }
+
+  static Future<AiGenerateJob?> cancel(
+    Pool pool,
+    String id, {
+    required String userId,
+  }) async {
+    await pool.execute(
+      Sql.named('''
+        UPDATE ai_generate_jobs
+        SET status = 'cancelled',
+            stage = 'Cancelado',
+            error = NULL,
+            cancelled_at = NOW(),
+            updated_at = NOW()
+        WHERE id = @id
+          AND user_id = CAST(@user_id AS uuid)
+          AND status IN ('pending', 'processing')
+      '''),
+      parameters: {'id': id, 'user_id': userId},
+    );
+    final job = await get(pool, id);
+    if (job == null || job.userId != userId) return null;
+    return job;
+  }
+
+  static Future<bool> progress(
     Pool pool,
     String id, {
     required String stage,
     required int stageNumber,
   }) async {
-    await pool.execute(
+    final updated = await pool.execute(
       Sql.named('''
         UPDATE ai_generate_jobs
         SET
@@ -102,18 +234,21 @@ class AiGenerateJobStore {
           stage_number = @stage_number,
           updated_at = NOW()
         WHERE id = @id
+          AND status IN ('pending', 'processing')
+        RETURNING id
       '''),
       parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
     );
+    return updated.isNotEmpty;
   }
 
-  static Future<void> complete(
+  static Future<bool> complete(
     Pool pool,
     String id, {
     required int statusCode,
     required Map<String, dynamic> result,
   }) async {
-    await pool.execute(
+    final updated = await pool.execute(
       Sql.named('''
         UPDATE ai_generate_jobs
         SET
@@ -125,6 +260,8 @@ class AiGenerateJobStore {
           error = NULL,
           updated_at = NOW()
         WHERE id = @id
+          AND status IN ('pending', 'processing')
+        RETURNING id
       '''),
       parameters: {
         'id': id,
@@ -132,14 +269,15 @@ class AiGenerateJobStore {
         'result': jsonEncode(result),
       },
     );
+    return updated.isNotEmpty;
   }
 
-  static Future<void> fail(
+  static Future<bool> fail(
     Pool pool,
     String id, {
     required String error,
   }) async {
-    await pool.execute(
+    final updated = await pool.execute(
       Sql.named('''
         UPDATE ai_generate_jobs
         SET
@@ -148,9 +286,12 @@ class AiGenerateJobStore {
           error = @error,
           updated_at = NOW()
         WHERE id = @id
+          AND status IN ('pending', 'processing')
+        RETURNING id
       '''),
       parameters: {'id': id, 'error': error},
     );
+    return updated.isNotEmpty;
   }
 
   static Future<void> _cleanup(Pool pool) async {
@@ -195,6 +336,9 @@ class AiGenerateJob {
     this.resultStatusCode,
     this.result,
     this.error,
+    this.requestKey,
+    this.requestFingerprint,
+    this.cancelledAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : createdAt = createdAt ?? DateTime.now(),
@@ -211,6 +355,9 @@ class AiGenerateJob {
   final int? resultStatusCode;
   final Map<String, dynamic>? result;
   final String? error;
+  final String? requestKey;
+  final String? requestFingerprint;
+  final DateTime? cancelledAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -227,10 +374,16 @@ class AiGenerateJob {
       resultStatusCode: row['result_status_code'] as int?,
       result: _decodeJsonMap(row['result']),
       error: row['error'] as String?,
+      requestKey: row['request_key'] as String?,
+      requestFingerprint: row['request_fingerprint'] as String?,
+      cancelledAt: row['cancelled_at'] as DateTime?,
       createdAt: row['created_at'] as DateTime?,
       updatedAt: row['updated_at'] as DateTime?,
     );
   }
+
+  bool get isTerminal =>
+      status == 'completed' || status == 'failed' || status == 'cancelled';
 
   Map<String, dynamic> toJson() => {
     'job_id': id,
@@ -243,6 +396,17 @@ class AiGenerateJob {
     if (resultStatusCode != null) 'result_status_code': resultStatusCode,
     if (result != null) 'result': result,
     if (error != null) 'error': error,
+    if (requestKey != null) 'request_key': requestKey,
+    if (cancelledAt != null) 'cancelled_at': cancelledAt!.toIso8601String(),
+    'progress': {
+      'current': stageNumber,
+      'total': totalStages,
+      'ratio': totalStages <= 0 ? 0 : stageNumber / totalStages,
+    },
+    'can_cancel': status == 'pending' || status == 'processing',
+    'can_resume': !isTerminal,
+    'poll_url': '/ai/generate/jobs/$id',
+    'cancel_url': '/ai/generate/jobs/$id',
     'created_at': createdAt.toIso8601String(),
     'updated_at': updatedAt.toIso8601String(),
   };

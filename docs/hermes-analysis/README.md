@@ -116,10 +116,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/xmage_execution_contract_audit.py`.
 
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
-  - Status: `frozen_operating_contract`.
-  - Contrato congelado de seguimento: rode um checkpoint curto de invariantes e
-    siga para family mapping/subpadroes; nao reabra a estrategia inteira quando
-    o checkpoint passar.
+  - Status: `frozen_operating_contract` para o residual nativo.
+  - Contrato congelado de seguimento somente quando XMage e Forge nao cobrem a
+    identidade: rode um checkpoint curto de invariantes e siga para family
+    mapping/subpadroes nativos.
   - Define a ordem padrao: pacote exato nao-generico pronto, `ramp_permanent`,
     `targeted_interaction`, `tutor`, `free_cast`, depois familias residuais por
     evidencia de replay/deck.
@@ -128,21 +128,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     comprada/usada ou focused test.
 
 - `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
-  - Status: `current_operating_standard`.
-  - Fluxo operacional atual para absorver XMage/Oracle/Fonte externa em
-    ManaLoom por familias e subpadroes, tratando XMage local resolvido como
-    fonte autoritativa de comportamento e bloqueando apenas a promocao
-    executavel sem adaptador runtime.
-  - Define a hierarquia de fontes: regras oficiais + Scryfall/MTGJSON para
-    identidade/oracle/rulings, XMage local como verdade de engine para cartas
-    com classe resolvida,
-    Forge pinado como executor secundario para gaps estruturados XMage e como
-    comparacao de implementacao quando necessario; Magarena/Cockatrice seguem
-    apenas como referencia comparativa,
-    PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
+  - Status: `historical_native-adaptation_evidence`.
+  - Preserva o historico de pacotes/familias nativas; nao e handoff atual e nao
+    autoriza traduzir toda classe Java local em regra PostgreSQL.
+  - Classe local e apenas candidata ate reconciliacao exata com o catalogo
+    pinado. Cobertura confirmada executa externamente; adapter nativo abre
+    somente para o residual comprovado apos XMage e Forge.
   - Evidencia atual:
     `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`.
-  - Manifesto de replay corrente para o checkpoint operacional:
+  - Manifesto de replay historico preservado como evidencia:
     `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.

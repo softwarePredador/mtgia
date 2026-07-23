@@ -3,6 +3,30 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
+## Revalidação técnica — 2026-07-21
+
+- auditoria vigente: `docs/qa/MANALOOM_E2E_CORE_DOCUMENTATION_AUDIT_2026-07-21.md`;
+- backend determinístico passou `1.589/1.589`; deckbuilder Flutter passou
+  `240/240`; Patrol local passou `9/9`; Web pública e Battle canônico passaram
+  em gates isolados com o Flutter pinado `3.44.6`;
+- no Lorehold, somente o mecanismo do novo gate estatístico passou `16/16`
+  testes. O gate real de promoção permanece **BLOCKED**: o agregado do
+  candidato foi `138/384` contra `95/384` do baseline, mas houve timeouts e
+  regressão contra `Lumra, Bellow of the Woods` de `9/32` para `5/32`; deck
+  `607` continua sendo o baseline protegido;
+- o aggregate E2E mais recente continua **FAIL**, com `8 PASS`, `2 FAIL` e
+  `9 SKIP`: retenção encontrou 18 arquivos locais ignorados e o gate Battle
+  sofreu um crash transitório do analysis server durante o aggregate, embora
+  tenha passado imediatamente em execução isolada;
+- `quality_gate.sh full` e a suíte Flutter completa não concluíram porque o
+  volume temporário do host ficou sem espaço (`errno 28`); isso é `BLOCKED`,
+  não `PASS`;
+- o mapa de API foi atualizado para cobrir sessão/rate-limit, Battle replays,
+  engagement da comunidade, trade matches e relatórios compartilháveis;
+- o estado de release permanece **NO-GO**: checkout dirty/não congelado,
+  migrations live, mesma SHA publicada, E2E live, device/observabilidade e
+  backup off-site continuam pendentes.
+
 ## Estado operacional vigente — candidato de beta gratuita, atualizado em 2026-07-17
 
 - alvo da rodada final: beta gratuita para Web + Android; checkout pago fica
@@ -52,7 +76,9 @@
   live ainda reporta migration máxima 037;
 - trocas são coordenação P2P: ManaLoom não processa, protege nem garante
   pagamento ou entrega; o aviso de segurança foi incorporado à interface;
-- scanner permanece desabilitado por padrão até prova física fresca;
+- scanner está habilitado no pipeline Android release após prova física fresca
+  de permissão, câmera, frame NV21, MLKit e OCR controlado; Web, builds comuns
+  sem opt-in e iOS ainda usam busca manual;
 - build iOS sem codesign passou com baseline mínimo 15.5 e dependências
   CocoaPods/SwiftPM fixadas, mas publicação iOS segue fora do alvo e bloqueada
   pela cadeia Apple;
@@ -543,7 +569,10 @@ Essas areas aumentam utilidade e retencao, mas nao podem consumir a prioridade d
 - `server/routes/ai/optimize/index.dart`: reduzido de 3.589 para 3.075 linhas — ainda acima do ideal mas menor
 - `server/lib/ai/optimize_runtime_support.dart`: reduzido de 4.028 para 2.718 linhas — avancou significativamente
 - cobertura automatizada do app ainda esta abaixo do ideal; 25 telas, ~592 testes widget/unit, 103 smoke integration tests
-- validacao manual em device real ainda e necessaria para `scanner`, permissao de camera, push notifications e compartilhamento
+- a prova física automatizada de câmera/permissão/MLKit do scanner passou no
+  Android; a matriz humana de precisão com cartas normal, foil e baixa luz
+  continua como calibração P2, sem remover a correção/busca manual; push
+  notifications e compartilhamento ainda exigem validação própria em device
 - 29/53 Game Changers oficiais nao eram detectados pelo bracket policy (RESOLVIDO em 2026-05-30)
 - `card_deck_profiles` (670 perfis) nao era consultado pelo optimize (INTEGRADO em 2026-05-30)
 

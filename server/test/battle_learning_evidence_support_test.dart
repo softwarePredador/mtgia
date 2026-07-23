@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 
+import '../lib/ai/battle_engine_config.dart';
 import '../lib/ai/battle_learning_evidence_support.dart';
 
 Map<String, dynamic> completedResult(List<Map<String, dynamic>> events) => {
@@ -14,6 +15,40 @@ Map<String, dynamic> completedResult(List<Map<String, dynamic>> events) => {
 };
 
 void main() {
+  test('deck hash v1 matches the shared cross-language golden vector', () {
+    final cards = <Map<String, dynamic>>[
+      {
+        'name': 'Lorehold, the Historian',
+        'quantity': 1,
+        'is_commander': true,
+        'set_code': 'STX',
+        'collector_number': '268',
+      },
+      {
+        'name': 'The Mind Stone',
+        'quantity': 1,
+        'is_commander': false,
+        'set_code': 'PIP',
+        'collector_number': '145',
+      },
+      {
+        'name': 'Mountain',
+        'quantity': 98,
+        'is_commander': false,
+        'set_code': '',
+        'collector_number': '',
+      },
+    ];
+    const golden =
+        '926d4864af12aa6d6bd9b57758df6249a3fbc49fdb2818ed5941a58f0c35e25b';
+
+    expect(canonicalExternalBattleDeckHash({'cards': cards}), golden);
+    expect(
+      canonicalExternalBattleDeckHash({'cards': cards.reversed.toList()}),
+      golden,
+    );
+  });
+
   test('generic waiting rows do not prove named card exposure', () {
     final evidence = buildBattleLearningEvidence(
       completedResult([
@@ -43,8 +78,50 @@ void main() {
 
     expect(evidence['positive_exposure_ready'], isTrue);
     expect(evidence['natural_same_lane_exposure'], isTrue);
+    expect(evidence['typed_positive_event_count'], 1);
+    expect(evidence['focus_cards'], [
+      {
+        'card_name': 'Krenko, Mob Boss',
+        'normalized_name': 'krenko, mob boss',
+        'positive_exposure': true,
+        'exposure_state': 'positive',
+        'evidence_kind': 'typed_event',
+        'event_types': ['ability_activated'],
+      },
+    ]);
     expect(evidence['comparison_input_ready'], isFalse);
     expect(evidence['swap_superiority_proven'], isFalse);
+  });
+
+  test('text visibility and target-only rows leave exposure unknown', () {
+    final evidence = buildBattleLearningEvidence(
+      completedResult([
+        {
+          'type': 'add_to_stack',
+          'message': 'Ai(1) cast Candidate',
+          'card_name': 'Candidate',
+        },
+        {'action': 'visible_zone_entry', 'card_name': 'Candidate'},
+        {'event_type': 'damage', 'target_card': 'Candidate'},
+      ]),
+      focusCards: const ['Candidate'],
+      sameLane: true,
+    );
+
+    expect(evidence['positive_exposure_ready'], isFalse);
+    expect(evidence['typed_positive_event_count'], 0);
+    expect(evidence['unknown_focus_card_count'], 1);
+    expect(evidence['focus_cards'], [
+      {
+        'card_name': 'Candidate',
+        'normalized_name': 'candidate',
+        'positive_exposure': false,
+        'exposure_state': 'unknown',
+        'evidence_kind': null,
+        'event_types': <String>[],
+      },
+    ]);
+    expect(evidence['comparison_input_ready'], isFalse);
   });
 
   test('missing learning contract cannot become learning evidence', () {

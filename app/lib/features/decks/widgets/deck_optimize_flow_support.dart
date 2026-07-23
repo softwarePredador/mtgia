@@ -57,9 +57,8 @@ class AggressiveCandidateQualityDiagnostics {
 
   String? get primaryRejectedBucket {
     if (rejectedReasonBuckets.isEmpty) return null;
-    final entries =
-        rejectedReasonBuckets.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
+    final entries = rejectedReasonBuckets.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
     return entries.first.key;
   }
 
@@ -114,10 +113,9 @@ class AggressiveCandidateQualityDiagnostics {
     sources.add(asDynamicMap(result['optimize_diagnostics']));
 
     for (final source in sources) {
-      final direct =
-          source.containsKey('aggressive_candidate_quality')
-              ? asDynamicMap(source['aggressive_candidate_quality'])
-              : source;
+      final direct = source.containsKey('aggressive_candidate_quality')
+          ? asDynamicMap(source['aggressive_candidate_quality'])
+          : source;
       final parsed = fromMap(direct);
       if (parsed != null) return parsed;
     }
@@ -261,12 +259,6 @@ typedef OptimizeRequestExecutor =
       required OptimizeIntensity intensity,
       required void Function(String, int?, int?) onProgress,
     });
-typedef DeckStrategyUpdateExecutor =
-    Future<void> Function({
-      required String deckId,
-      required String archetype,
-      required int bracket,
-    });
 typedef GuidedRebuildPreviewHandler = Future<void> Function();
 typedef GuidedRebuildDraftHandler = Future<void> Function(String draftDeckId);
 typedef GuidedRebuildAiErrorHandler =
@@ -306,6 +298,9 @@ class OptimizePreviewData {
   final OptimizeSwapIntegrityPayload? swapIntegrity;
   final Map<String, dynamic> optimizationContract;
   final Map<String, dynamic> battleValidation;
+  final Map<String, dynamic> commanderContract;
+  final bool canApply;
+  final List<String> applyBlockers;
 
   const OptimizePreviewData({
     required this.removals,
@@ -329,15 +324,18 @@ class OptimizePreviewData {
     required this.swapIntegrity,
     required this.optimizationContract,
     required this.battleValidation,
+    required this.commanderContract,
+    required this.canApply,
+    required this.applyBlockers,
   });
 
   bool get hasChanges => removals.isNotEmpty || additions.isNotEmpty;
+  bool get hasActionableChanges => hasChanges && canApply;
 
   factory OptimizePreviewData.fromResult(Map<String, dynamic> result) {
-    final optimizeIntensity =
-        (result['optimize_intensity'] is Map)
-            ? (result['optimize_intensity'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
+    final optimizeIntensity = (result['optimize_intensity'] is Map)
+        ? (result['optimize_intensity'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
     final selectedIntensity =
         result['intensity']?.toString() ??
         optimizeIntensity['selected']?.toString();
@@ -363,29 +361,25 @@ class OptimizePreviewData {
             .map((m) => m.cast<String, dynamic>())
             .toList() ??
         const <Map<String, dynamic>>[];
-    final swapIntegrity =
-        result['swap_integrity'] is Map
-            ? OptimizeSwapIntegrityPayload.fromJson(
-              (result['swap_integrity'] as Map).cast<String, dynamic>(),
-            )
-            : null;
+    final swapIntegrity = result['swap_integrity'] is Map
+        ? OptimizeSwapIntegrityPayload.fromJson(
+            (result['swap_integrity'] as Map).cast<String, dynamic>(),
+          )
+        : null;
 
     return OptimizePreviewData(
       removals: removals,
       additions: additions,
       reasoning: result['reasoning'] as String? ?? '',
-      warnings:
-          (result['warnings'] is Map)
-              ? (result['warnings'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{},
-      themeInfo:
-          (result['theme'] is Map)
-              ? (result['theme'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{},
-      constraints:
-          (result['constraints'] is Map)
-              ? (result['constraints'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{},
+      warnings: (result['warnings'] is Map)
+          ? (result['warnings'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      themeInfo: (result['theme'] is Map)
+          ? (result['theme'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      constraints: (result['constraints'] is Map)
+          ? (result['constraints'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
       mode: (result['mode'] as String?) ?? 'optimize',
       additionsDetailed: additionsDetailed,
       removalsDetailed: removalsDetailed,
@@ -395,35 +389,41 @@ class OptimizePreviewData {
       postAnalysis:
           (result['post_analysis'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{},
-      qualityWarning:
-          (result['quality_warning'] is Map)
-              ? (result['quality_warning'] as Map).cast<String, dynamic>()
-              : null,
-      metaReferenceContext:
-          (result['meta_reference_context'] is Map)
-              ? (result['meta_reference_context'] as Map)
-                  .cast<String, dynamic>()
-              : const <String, dynamic>{},
-      displayRemovals:
-          removalsDetailed.isNotEmpty
-              ? removalsDetailed
-              : removals.map((name) => {'name': name}).toList(),
-      displayAdditions:
-          additionsDetailed.isNotEmpty
-              ? additionsDetailed
-              : additions.map((name) => {'name': name}).toList(),
+      qualityWarning: (result['quality_warning'] is Map)
+          ? (result['quality_warning'] as Map).cast<String, dynamic>()
+          : null,
+      metaReferenceContext: (result['meta_reference_context'] is Map)
+          ? (result['meta_reference_context'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      displayRemovals: removalsDetailed.isNotEmpty
+          ? removalsDetailed
+          : removals.map((name) => {'name': name}).toList(),
+      displayAdditions: additionsDetailed.isNotEmpty
+          ? additionsDetailed
+          : additions.map((name) => {'name': name}).toList(),
       intensity: OptimizeIntensity.fromApiValue(selectedIntensity),
       optimizeIntensity: optimizeIntensity,
       outcomeCode: result['outcome_code']?.toString(),
       swapIntegrity: swapIntegrity,
-      optimizationContract:
-          (result['optimization_contract'] is Map)
-              ? (result['optimization_contract'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{},
-      battleValidation:
-          (result['battle_validation'] is Map)
-              ? (result['battle_validation'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{},
+      optimizationContract: (result['optimization_contract'] is Map)
+          ? (result['optimization_contract'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      battleValidation: (result['battle_validation'] is Map)
+          ? (result['battle_validation'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      commanderContract: (result['commander_contract'] is Map)
+          ? (result['commander_contract'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      canApply:
+          result['can_apply'] != false &&
+          result['learning_eligible'] != false &&
+          result['quality_error'] is! Map,
+      applyBlockers:
+          (result['apply_blockers'] as List?)
+              ?.map((value) => value.toString())
+              .where((value) => value.trim().isNotEmpty)
+              .toList(growable: false) ??
+          const <String>[],
     );
   }
 }
@@ -502,17 +502,16 @@ String computeOptimizeSwapIntegrityHash({
   required List<Map<String, dynamic>> removalsDetailed,
   required List<Map<String, dynamic>> additionsDetailed,
 }) {
-  final canonical =
-      StringBuffer()
-        ..write('v1')
-        ..write('|deck=')
-        ..write(deckId)
-        ..write('|sig=')
-        ..write(deckSignature)
-        ..write('|R=')
-        ..write(_canonicalOptimizeSwapEntries(removalsDetailed).join(','))
-        ..write('|A=')
-        ..write(_canonicalOptimizeSwapEntries(additionsDetailed).join(','));
+  final canonical = StringBuffer()
+    ..write('v1')
+    ..write('|deck=')
+    ..write(deckId)
+    ..write('|sig=')
+    ..write(deckSignature)
+    ..write('|R=')
+    ..write(_canonicalOptimizeSwapEntries(removalsDetailed).join(','))
+    ..write('|A=')
+    ..write(_canonicalOptimizeSwapEntries(additionsDetailed).join(','));
   return sha256.convert(utf8.encode(canonical.toString())).toString();
 }
 
@@ -714,10 +713,9 @@ DeckAiFailurePresentation describeDeckAiFailure(
     return DeckAiFailurePresentation(
       kind: DeckAiFailureKind.nearPeak,
       title: 'Deck já está bem ajustado',
-      message:
-          error.message.isNotEmpty
-              ? error.message
-              : 'O deck já está perto do pico atual e não houve upgrade seguro suficiente.',
+      message: error.message.isNotEmpty
+          ? error.message
+          : 'O deck já está perto do pico atual e não houve upgrade seguro suficiente.',
       reasons: reasons,
     );
   }
@@ -731,12 +729,11 @@ DeckAiFailurePresentation describeDeckAiFailure(
     return DeckAiFailurePresentation(
       kind: DeckAiFailureKind.noSafeUpgradeFound,
       title: 'Nenhuma melhoria segura encontrada',
-      message:
-          diagnostics == null
-              ? (error.message.isNotEmpty
-                  ? error.message
-                  : 'As sugestões geradas não passaram pelo gate de segurança.')
-              : 'A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.',
+      message: diagnostics == null
+          ? (error.message.isNotEmpty
+                ? error.message
+                : 'As sugestões geradas não passaram pelo gate de segurança.')
+          : 'A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.',
       reasons: diagnosticReasons.isNotEmpty ? diagnosticReasons : reasons,
     );
   }
@@ -755,14 +752,12 @@ GuidedRebuildRequest buildGuidedRebuildRequest({
   required int selectedBracket,
 }) {
   final nextAction = error.nextAction;
-  final nextPayload =
-      (nextAction['payload'] is Map)
-          ? (nextAction['payload'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
-  final themeInfo =
-      (error.payload['theme'] is Map)
-          ? (error.payload['theme'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+  final nextPayload = (nextAction['payload'] is Map)
+      ? (nextAction['payload'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
+  final themeInfo = (error.payload['theme'] is Map)
+      ? (error.payload['theme'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
 
   return GuidedRebuildRequest(
     archetype: nextPayload['archetype']?.toString() ?? fallbackArchetype,
@@ -823,12 +818,21 @@ Map<String, dynamic> buildOptimizeMutationContext(
       selectedRemovalsDetailed.length + selectedAdditionsDetailed.length;
   final namedSelectedChangeCount =
       selectedRemovals.length + selectedAdditions.length;
-  final selectedChangeCount =
-      (selection == null)
-          ? (detailedSelectedChangeCount > 0
-              ? detailedSelectedChangeCount
-              : namedSelectedChangeCount)
-          : selection.selectedCount;
+  final selectedChangeCount = (selection == null)
+      ? (detailedSelectedChangeCount > 0
+            ? detailedSelectedChangeCount
+            : namedSelectedChangeCount)
+      : selection.selectedCount;
+  final detailedPreviewChangeCount =
+      preview.removalsDetailed.length + preview.additionsDetailed.length;
+  final namedPreviewChangeCount =
+      preview.removals.length + preview.additions.length;
+  final previewChangeCount = detailedPreviewChangeCount > 0
+      ? detailedPreviewChangeCount
+      : namedPreviewChangeCount;
+  final selectionScope = selectedChangeCount < previewChangeCount
+      ? 'partial_selection'
+      : 'full_preview';
 
   return {
     'type': 'optimization_apply',
@@ -838,26 +842,41 @@ Map<String, dynamic> buildOptimizeMutationContext(
     'intensity': preview.intensity.apiValue,
     'optimize_intensity': preview.optimizeIntensity,
     if (preview.outcomeCode != null) 'outcome_code': preview.outcomeCode,
+    'can_apply': preview.canApply,
+    'apply_blockers': preview.applyBlockers,
+    'preview_change_count': previewChangeCount,
     'selected_change_count': selectedChangeCount,
+    'selection_scope': selectionScope,
+    'recompute_post_analysis_required': true,
     'selection': {
       'removal_indexes': removalIndexes,
       'addition_indexes': additionIndexes,
       'selected_change_count': selectedChangeCount,
     },
-    'removals':
-        selectedRemovalsDetailed.isNotEmpty
-            ? selectedRemovalsDetailed
-            : selectedRemovals,
-    'additions':
-        selectedAdditionsDetailed.isNotEmpty
-            ? selectedAdditionsDetailed
-            : selectedAdditions,
+    'removals': selectedRemovalsDetailed.isNotEmpty
+        ? selectedRemovalsDetailed
+        : selectedRemovals,
+    'additions': selectedAdditionsDetailed.isNotEmpty
+        ? selectedAdditionsDetailed
+        : selectedAdditions,
     'before_snapshot': preview.deckAnalysis,
-    'after_snapshot': preview.postAnalysis,
+    if (selectionScope == 'full_preview' && preview.postAnalysis.isNotEmpty)
+      'preview_post_analysis': preview.postAnalysis,
     'warnings': preview.warnings,
     'meta_reference_context': preview.metaReferenceContext,
     'optimization_contract': preview.optimizationContract,
+    'commander_contract': preview.commanderContract,
     'battle_validation': preview.battleValidation,
+    if (preview.swapIntegrity?.deckSignature.trim().isNotEmpty == true)
+      'expected_deck_signature': preview.swapIntegrity!.deckSignature.trim(),
+    if (preview.swapIntegrity != null)
+      'swap_integrity': {
+        'version': preview.swapIntegrity!.version,
+        'algo': preview.swapIntegrity!.algo,
+        'hash': preview.swapIntegrity!.hash,
+        'removal_count': preview.swapIntegrity!.removalCount,
+        'addition_count': preview.swapIntegrity!.additionCount,
+      },
   };
 }
 
@@ -865,7 +884,7 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
   OptimizePreviewData preview, {
   OptimizePreviewSelection? selection,
 }) {
-  if (!preview.hasChanges) {
+  if (!preview.hasActionableChanges) {
     return const OptimizeApplyPlan(mode: OptimizeApplyMode.none);
   }
 
@@ -905,17 +924,16 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
   if (preview.mode == 'complete' && selectedAdditionsDetailed.isNotEmpty) {
     return OptimizeApplyPlan(
       mode: OptimizeApplyMode.addBulk,
-      bulkCards:
-          selectedAdditionsDetailed
-              .where((m) => m['card_id'] != null)
-              .map(
-                (m) => {
-                  'card_id': m['card_id'],
-                  'quantity': (m['quantity'] as int?) ?? 1,
-                  'is_commander': false,
-                },
-              )
-              .toList(),
+      bulkCards: selectedAdditionsDetailed
+          .where((m) => m['card_id'] != null)
+          .map(
+            (m) => {
+              'card_id': m['card_id'],
+              'quantity': (m['quantity'] as int?) ?? 1,
+              'is_commander': false,
+            },
+          )
+          .toList(),
       mutationContext: mutationContext,
     );
   }
@@ -948,12 +966,12 @@ void _validatePairedOptimizeSelection(
   final usesDetailed =
       preview.removalsDetailed.isNotEmpty ||
       preview.additionsDetailed.isNotEmpty;
-  final removalCount =
-      usesDetailed ? preview.removalsDetailed.length : preview.removals.length;
-  final additionCount =
-      usesDetailed
-          ? preview.additionsDetailed.length
-          : preview.additions.length;
+  final removalCount = usesDetailed
+      ? preview.removalsDetailed.length
+      : preview.removals.length;
+  final additionCount = usesDetailed
+      ? preview.additionsDetailed.length
+      : preview.additions.length;
   if (removalCount != additionCount) {
     throw StateError(
       'Preview de optimize inválido: entradas e saídas precisam formar pares.',
@@ -1017,7 +1035,6 @@ Future<void> executeConfirmedOptimization({
   required OptimizeAddBulkExecutor addBulk,
   required OptimizeApplyWithIdsExecutor applyWithIds,
   required OptimizeApplyByNamesExecutor applyByNames,
-  required DeckStrategyUpdateExecutor updateDeckStrategy,
 }) async {
   final contextualPlan = plan.withMutationContext({
     ...plan.mutationContext,
@@ -1036,12 +1053,6 @@ Future<void> executeConfirmedOptimization({
       'A otimização foi recusada pela validação final. Revise o deck antes de continuar.',
     );
   }
-
-  await updateDeckStrategy(
-    deckId: deckId,
-    archetype: archetype,
-    bracket: bracket,
-  );
 }
 
 Future<void> executeOptimizeFlow({
@@ -1061,7 +1072,6 @@ Future<void> executeOptimizeFlow({
   required OptimizeAddBulkExecutor addBulk,
   required OptimizeApplyWithIdsExecutor applyWithIds,
   required OptimizeApplyByNamesExecutor applyByNames,
-  required DeckStrategyUpdateExecutor updateDeckStrategy,
 }) async {
   try {
     final optimizeOutcome = await requestOptimizePreview(
@@ -1096,7 +1106,6 @@ Future<void> executeOptimizeFlow({
       addBulk: addBulk,
       applyWithIds: applyWithIds,
       applyByNames: applyByNames,
-      updateDeckStrategy: updateDeckStrategy,
     );
 
     onSuccess();
@@ -1254,21 +1263,20 @@ Future<void> executeOptimizeFailureFlow({
 
   await executeDeckAiFailureAction(
     presentation: presentation,
-    onNeedsRepair:
-        () => executeOptimizeNeedsRepairFlow(
-          deckId: deckId,
-          error: error,
-          fallbackArchetype: fallbackArchetype,
-          selectedBracket: selectedBracket,
-          rebuildDeck: rebuildDeck,
-          refreshDeckDetails: refreshDeckDetails,
-          onLoadingStart: onLoadingStart,
-          onLoadingClose: onLoadingClose,
-          onPreviewOnly: onPreviewOnly,
-          onDraftReady: onDraftReady,
-          onAiError: onRebuildAiError,
-          onGenericError: onRebuildGenericError,
-        ),
+    onNeedsRepair: () => executeOptimizeNeedsRepairFlow(
+      deckId: deckId,
+      error: error,
+      fallbackArchetype: fallbackArchetype,
+      selectedBracket: selectedBracket,
+      rebuildDeck: rebuildDeck,
+      refreshDeckDetails: refreshDeckDetails,
+      onLoadingStart: onLoadingStart,
+      onLoadingClose: onLoadingClose,
+      onPreviewOnly: onPreviewOnly,
+      onDraftReady: onDraftReady,
+      onAiError: onRebuildAiError,
+      onGenericError: onRebuildGenericError,
+    ),
     showInfo: showInfo,
     showError: showError,
   );

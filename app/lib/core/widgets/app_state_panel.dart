@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
+enum AppStateStatus { information, loading }
+
 class AppStatePanel extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -9,6 +11,7 @@ class AppStatePanel extends StatelessWidget {
   final Color accent;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final AppStateStatus status;
 
   const AppStatePanel({
     super.key,
@@ -18,12 +21,24 @@ class AppStatePanel extends StatelessWidget {
     this.message,
     this.actionLabel,
     this.onAction,
+    this.status = AppStateStatus.information,
   });
+
+  const AppStatePanel.loading({
+    super.key,
+    required this.title,
+    required this.accent,
+    this.message,
+  }) : icon = Icons.hourglass_empty_rounded,
+       actionLabel = null,
+       onAction = null,
+       status = AppStateStatus.loading;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final statusLabel = [
+    final statusLabel = <String>[
+      if (status == AppStateStatus.loading) 'Carregando',
       title.trim(),
       if (message != null && message!.trim().isNotEmpty) message!.trim(),
     ].join('. ');
@@ -34,18 +49,19 @@ class AppStatePanel extends StatelessWidget {
       label: statusLabel,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final minHeight =
-              constraints.hasBoundedHeight ? constraints.maxHeight : 0.0;
+          final minHeight = constraints.hasBoundedHeight
+              ? constraints.maxHeight
+              : 0.0;
 
           return SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: minHeight),
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppTheme.space24),
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 420),
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(AppTheme.space18),
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
                       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -67,10 +83,20 @@ class AppStatePanel extends StatelessWidget {
                             ),
                           ),
                           child: ExcludeSemantics(
-                            child: Icon(icon, color: accent, size: 26),
+                            child: status == AppStateStatus.loading
+                                ? Padding(
+                                    padding: const EdgeInsets.all(
+                                      AppTheme.space13,
+                                    ),
+                                    child: CircularProgressIndicator(
+                                      color: accent,
+                                      strokeWidth: 2.4,
+                                    ),
+                                  )
+                                : Icon(icon, color: accent, size: 26),
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: AppTheme.space14),
                         ExcludeSemantics(
                           child: Text(
                             title,
@@ -82,7 +108,7 @@ class AppStatePanel extends StatelessWidget {
                           ),
                         ),
                         if (message != null && message!.trim().isNotEmpty) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppTheme.space8),
                           ExcludeSemantics(
                             child: Text(
                               message!,
@@ -95,7 +121,7 @@ class AppStatePanel extends StatelessWidget {
                           ),
                         ],
                         if (actionLabel != null && onAction != null) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppTheme.space16),
                           ElevatedButton(
                             onPressed: onAction,
                             style: ElevatedButton.styleFrom(

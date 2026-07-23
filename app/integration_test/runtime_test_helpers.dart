@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/features/home/services/onboarding_state_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'visual_capture_helpers.dart';
@@ -98,6 +99,14 @@ Future<void> clearRuntimeAuth() async {
   ApiClient.setToken(null);
 }
 
+Future<void> markRuntimeOnboardingSettled(String userId) {
+  return OnboardingStateStore().settle(
+    userId,
+    selectedFormat: 'commander',
+    disposition: OnboardingDisposition.completed,
+  );
+}
+
 Future<RuntimeAuthSession> seedAuthenticatedSession(
   ApiClient api, {
   String usernamePrefix = 'runtime_qa',
@@ -124,10 +133,11 @@ Future<RuntimeAuthSession> seedAuthenticatedSession(
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('auth_token', token!);
   await prefs.setString('user_data', jsonEncode(user));
+  await markRuntimeOnboardingSettled(user!['id']?.toString() ?? '');
 
   return RuntimeAuthSession(
     token: token,
-    user: user!,
+    user: user,
     email: email,
     username: username,
     password: password,
