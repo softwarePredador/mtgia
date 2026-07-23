@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import '../lib/ai_generate_performance_support.dart';
+import '../lib/ai_generate_provider_abort.dart';
 import '../routes/ai/generate/index.dart' as generate_route;
 
 void main() {
@@ -14,8 +15,18 @@ void main() {
       final pendingResponse = Completer<http.Response>();
 
       await expectLater(
-        generate_route.executeAiGenerateProviderRequest(
-          send: () => pendingResponse.future,
+        executeAiGenerateProviderRequest(
+          send: (abortTrigger) async {
+            await abortTrigger;
+            if (!pendingResponse.isCompleted) {
+              pendingResponse.completeError(
+                http.RequestAbortedException(
+                  Uri.parse('https://api.openai.com/v1/chat/completions'),
+                ),
+              );
+            }
+            return pendingResponse.future;
+          },
           timeout: const Duration(milliseconds: 1),
         ),
         throwsA(isA<TimeoutException>()),
@@ -72,6 +83,8 @@ void main() {
 
     test('timeout route branch cannot build or cache a mock success', () {
       final source = File('routes/ai/generate/index.dart').readAsStringSync();
+      final abortSource =
+          File('lib/ai_generate_provider_abort.dart').readAsStringSync();
       final timeoutStart = source.indexOf('} on TimeoutException {');
       final timeoutEnd = source.indexOf('} catch (error) {', timeoutStart);
 
@@ -88,6 +101,8 @@ void main() {
       expect(timeoutBranch, isNot(contains('writeAiGenerateCache(')));
       expect(timeoutBranch, isNot(contains('isMock: false')));
       expect(timeoutBranch, isNot(contains('return Response.json(body:')));
+      expect(abortSource, contains("http.AbortableRequest('POST'"));
+      expect(abortSource, isNot(contains('client.close()')));
     });
   });
 }

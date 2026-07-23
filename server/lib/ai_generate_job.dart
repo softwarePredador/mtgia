@@ -213,6 +213,20 @@ class AiGenerateJobStore {
     return AiGenerateJob.fromRow(result.first.toColumnMap());
   }
 
+  static Future<bool> isActive(Pool pool, String id) async {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT 1
+        FROM ai_generate_jobs
+        WHERE id = @id
+          AND status IN ('pending', 'processing')
+        LIMIT 1
+      '''),
+      parameters: {'id': id},
+    );
+    return result.isNotEmpty;
+  }
+
   static Future<AiGenerateJob?> cancel(
     Pool pool,
     String id, {

@@ -6,7 +6,7 @@
 flowchart LR
     UI["Flutter app (20 módulos)"] --> API["Dart Frog routes"]
     WEB["Next.js público (14 rotas)"] --> API
-    API --> DOMAIN["Backend services (123 módulos)"]
+    API --> DOMAIN["Backend services (124 módulos)"]
     DOMAIN --> PG[("PostgreSQL — fonte de verdade")]
     DOMAIN --> AI["Deckbuilder / Optimize"]
     DOMAIN --> BATTLE["Battle router"]

@@ -10,6 +10,7 @@ import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_job_lifecycle.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
+import '../../../lib/ai_generate_provider_abort.dart';
 import '../../../lib/ai_generate_constraints_support.dart';
 import '../../../lib/ai_plan_reservation_handle.dart';
 import '../../../lib/ai_plan_reservation_settlement.dart';
@@ -506,13 +507,33 @@ $metaContext
     );
     final model = aiConfig.generateModel;
 
+    final internalJobId =
+        InternalAiRequestToken.matches(context.request.headers)
+            ? normalizeInternalAiGenerateJobId(
+              context.request.headers[aiGenerateInternalJobIdHeader],
+            )
+            : null;
+    final cancellationMonitor =
+        internalJobId == null
+            ? null
+            : AiGenerateJobCancellationMonitor(
+              isActive: () => AiGenerateJobStore.isActive(pool, internalJobId),
+              onCheckError:
+                  (error) => Log.w(
+                    'AI generate cancellation monitor failed '
+                    'type=${error.runtimeType}',
+                  ),
+            );
+    cancellationMonitor?.start();
+    final providerClient = http.Client();
     http.Response response;
     final openAiStopwatch = Stopwatch()..start();
     try {
       response = await executeAiGenerateProviderRequest(
         send:
-            () => http.post(
-              Uri.parse('https://api.openai.com/v1/chat/completions'),
+            (abortTrigger) => sendAiGenerateProviderHttpRequest(
+              client: providerClient,
+              uri: Uri.parse('https://api.openai.com/v1/chat/completions'),
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer $apiKey',
@@ -541,8 +562,26 @@ $metaContext
                   schema: openAiDeckGenerationSchema,
                 ),
               }),
+              abortTrigger: abortTrigger,
             ),
         timeout: openAiTimeout,
+        cancellationTrigger: cancellationMonitor?.cancelled,
+      );
+    } on AiGenerateProviderCancelledException {
+      timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
+      await recordAiProviderCall(
+        db: pool,
+        endpoint: 'generate',
+        model: model,
+        latencyMs: timings['openai_ms']!,
+        success: false,
+        userId: userId,
+        failureCode: 'provider_cancelled',
+      );
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      return buildAiGenerateProviderCancelledResponse(
+        cacheKey: cacheKey,
+        timings: timings,
       );
     } on TimeoutException {
       timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
@@ -581,6 +620,8 @@ $metaContext
       );
       rethrow;
     } finally {
+      cancellationMonitor?.stop();
+      providerClient.close();
       timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
     }
 
@@ -1002,11 +1043,6 @@ $metaContext
   }
 }
 
-Future<http.Response> executeAiGenerateProviderRequest({
-  required Future<http.Response> Function() send,
-  required Duration timeout,
-}) => send().timeout(timeout);
-
 Response buildAiGenerateProviderTimeoutResponse({
   required String cacheKey,
   required Map<String, int> timings,
@@ -1034,6 +1070,35 @@ Response buildAiGenerateProviderTimeoutResponse({
           'timeout_ms': timeout.inMilliseconds,
           'timeout_key': timeoutKey,
           'reference_guidance_budget': referenceGuidanceBudget,
+        },
+      },
+      cacheKey: cacheKey,
+      cacheHit: false,
+      timings: timings,
+    ),
+  );
+}
+
+Response buildAiGenerateProviderCancelledResponse({
+  required String cacheKey,
+  required Map<String, int> timings,
+}) {
+  return Response.json(
+    statusCode: HttpStatus.conflict,
+    headers: const {'Cache-Control': 'no-store'},
+    body: withAiGenerateRuntimeMetadata(
+      payload: {
+        'error': 'A geração foi cancelada.',
+        'error_code': 'ai_generation_cancelled',
+        'outcome_code': 'cancelled',
+        'retryable': true,
+        'can_save': false,
+        'learning_eligible': false,
+        'generated_deck': null,
+        'provider': {
+          'name': 'openai',
+          'operation': 'generate',
+          'status': 'cancelled',
         },
       },
       cacheKey: cacheKey,
@@ -1286,6 +1351,7 @@ Future<bool> _processAiGenerateAsyncJob({
   final headers = <String, String>{
     'Content-Type': 'application/json',
     'X-Internal-AI-Request-Token': InternalAiRequestToken.value,
+    aiGenerateInternalJobIdHeader: jobId,
     if (authorization != null && authorization.trim().isNotEmpty)
       'Authorization': authorization,
   };
