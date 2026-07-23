@@ -87,6 +87,16 @@ HISTORICAL_REFERENCE_FILES = (
     DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
 )
 
+ARCHIVED_EVIDENCE_REFERENCE_FILES = (
+    DOCS_DIR / "archive" / "HERMES_ANALYSIS_README_SNAPSHOT_2026-07-23.md",
+    DOCS_DIR
+    / "archive"
+    / "COMMANDER_DECKBUILDING_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md",
+    DOCS_DIR
+    / "archive"
+    / "XMAGE_NATIVE_ADAPTATION_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md",
+)
+
 
 @dataclass(frozen=True)
 class Check:
@@ -899,7 +909,11 @@ def active_reference_files() -> list[Path]:
                 files.add(path)
     # Historical evidence remains a retention-reference surface without being
     # promoted back into the set of current operational contracts.
-    for path in (*CURRENT_CONTRACT_FILES, *HISTORICAL_REFERENCE_FILES):
+    for path in (
+        *CURRENT_CONTRACT_FILES,
+        *HISTORICAL_REFERENCE_FILES,
+        *ARCHIVED_EVIDENCE_REFERENCE_FILES,
+    ):
         if path.exists() and path.is_file():
             files.add(path)
     return sorted(files)

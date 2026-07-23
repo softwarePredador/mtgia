@@ -76,6 +76,13 @@ class _FakeApiClient extends ApiClient {
         'total_stages': 4,
       });
     }
+    if (endpoint == '/ai/generate/jobs/job-terminal') {
+      return ApiResponse(200, {
+        'job_id': 'job-terminal',
+        'status': 'failed',
+        'error': 'provider timeout',
+      });
+    }
     throw UnimplementedError('No GET handler for $endpoint');
   }
 
@@ -527,6 +534,40 @@ void main() {
     expect(restored?.containsKey('request_key'), isFalse);
     await tester.pump(const Duration(seconds: 1));
   });
+
+  testWidgets(
+    'DeckGenerateScreen clears a terminal job before the next retry',
+    (tester) async {
+      const owner = 'draft-owner-terminal-job';
+      final store = DeckEntryDraftStore();
+      await store.saveGenerate(
+        owner,
+        format: 'Commander',
+        commander: 'Lorehold, the Historian',
+        prompt: 'Mágicas históricas e artefatos',
+        deckName: 'Lorehold terminal',
+        activeJobId: 'job-terminal',
+        requestKey: 'generate:request-terminal',
+      );
+      final apiClient = _FakeApiClient();
+
+      await tester.pumpWidget(
+        wrapSimple(
+          DeckGenerateScreen(draftOwnerId: owner, draftStore: store),
+          deckProvider: DeckProvider(apiClient: apiClient),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1100));
+      await tester.pump();
+
+      expect(apiClient.getCalls, contains('/ai/generate/jobs/job-terminal'));
+      final restored = await store.loadGenerate(owner);
+      expect(restored?.containsKey('active_job_id'), isFalse);
+      expect(restored?.containsKey('request_key'), isFalse);
+      expect(find.textContaining('provider timeout'), findsNothing);
+    },
+  );
 
   testWidgets(
     'DeckImportScreen restores metadata and card list after rebuild',

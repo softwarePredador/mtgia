@@ -15,6 +15,10 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 CONTRACT_DOC = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
+CONTRACT_EVIDENCE_LOG = (
+    REPO_ROOT
+    / "docs/hermes-analysis/archive/COMMANDER_DECKBUILDING_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md"
+)
 GLOBAL_BATTLE_CLOSURE_DOC = (
     REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 )
@@ -538,6 +542,9 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_FOLLOWUP_SOURCE_CANDIDATE_EXPANDER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_followup_source_candidate_expander.py"
 )
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
+README_EVIDENCE_LOG = (
+    REPO_ROOT / "docs/hermes-analysis/archive/HERMES_ANALYSIS_README_SNAPSHOT_2026-07-23.md"
+)
 
 CONTRACT_MATRIX_JSON = (
     REPO_ROOT
@@ -1322,6 +1329,38 @@ def build_audit() -> dict[str, Any]:
             CONTRACT_DOC,
             [
                 "Status: `frozen_operating_contract`",
+                "archive/COMMANDER_DECKBUILDING_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md",
+                "Research-Backed Deck Planning Flow",
+                "format_legality_and_power_bracket",
+                "staple_impact_and_role_policy",
+                "lane_balanced_cuts_and_anchor_protection",
+                "goldfish_battle_replay_iteration",
+                "Lane Order And Deck Overview Contract",
+                "legal_identity",
+                "battle_and_replay_validation",
+                "commander_plan_sentence",
+                "protected_anchors_and_cut_rules",
+                "Global Commander Rollout - 2026-07-01",
+                "Global Commander Core Pivot - 2026-07-05",
+                "Source Hierarchy",
+                "Staple Impact Policy",
+                "Required Contract Per Commander",
+                "Lorehold Current Contract",
+                "deck `607` is the current protected structural",
+                "keep `607` as protected baseline",
+                "General Deckbuilding Gate",
+                "Lorehold Promotion Gate",
+                "Current Validation Commands",
+                "Stop Rules",
+                "Next Product Step",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            CONTRACT_EVIDENCE_LOG,
+            [
+                "Status: `frozen_operating_contract`",
                 "Source Hierarchy",
                 "Lorehold Promotion Gate",
                 "Research-Backed Deck Planning Flow",
@@ -2010,6 +2049,23 @@ def build_audit() -> dict[str, Any]:
     checks.append(
         check_contains(
             README,
+            [
+                "Status atual: canonico",
+                "Fonte de verdade e ordem de leitura",
+                "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+                "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+                "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+                "deckbuilding_contract_surface_audit.py",
+                "global_commander_deck_contract_audit.py",
+                "Retenção e drift",
+                "Arquivo histórico",
+                "archive/README.md",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            README_EVIDENCE_LOG,
             [
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
                 "deckbuilding_contract_surface_audit.py",

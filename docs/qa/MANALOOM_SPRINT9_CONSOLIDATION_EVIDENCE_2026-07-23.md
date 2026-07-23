@@ -4,6 +4,8 @@ Data: 2026-07-23
 Branch: `codex/free-beta-release-candidate-2026-07-17`
 Commit de implementação validado/publicado:
 `2139ec9f6f902a8b266fbb852db6e834b25bceff`
+Base limpa da disposição residual:
+`9deb607e4c09f8d8e6cd94241a61f2960262c6fe`
 
 Esta evidência identifica o commit atômico de implementação e retenção
 publicado na branch. Ela não autoriza remoção remota de histórico, promoção,
@@ -13,13 +15,13 @@ deploy, migration ou escrita live.
 
 Resultado da sprint: `IMPLEMENTED_UNPROVEN`
 
-O auditor de retenção foi ampliado de 5 para 12 checks e agora valida inventário,
-hashes, recuperação, referências, índices, conteúdo canônico e arquivos locais
-pendentes. A suíte possui 16 testes e passou integralmente.
+O auditor de retenção foi ampliado de 5 para 12 checks e agora valida
+inventário, hashes, recuperação, referências, índices, conteúdo canônico e
+arquivos locais pendentes. A suíte possui 17 testes e passou integralmente.
 
 ```text
 ./scripts/quality_gate.sh report-retention
-  testes                         16/16 PASS
+  testes                         17/17 PASS
   checks do auditor              12/12 PASS
   fontes brutas rastreadas       942
   active_consumer                657
@@ -60,6 +62,36 @@ Foram corrigidos o link PG848, referências residuais PG499/PG578, repetição n
 índice de reports e a distinção entre o contrato XMage histórico de junho e o
 contrato corrente.
 
+## Disposição S9-03 dos contratos gigantes
+
+Os três entrypoints que ainda misturavam norma corrente e diário histórico
+receberam disposição explícita. Os bytes anteriores foram preservados sem
+alteração em `docs/hermes-analysis/archive/`, com tamanho e SHA-256 selados no
+índice desse diretório:
+
+```text
+entrypoints antes             26.263 linhas / 1.584.706 bytes
+entrypoints compactos            496 linhas /    19.840 bytes
+snapshots históricos          26.263 linhas / 1.584.706 bytes
+```
+
+- `README.md`: 1.640 → 134 linhas;
+- `COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`: 3.904 → 283 linhas;
+- `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`: 20.719 → 79 linhas.
+
+Os entrypoints compactos retêm somente regra vigente, limites de autoridade,
+handoff e links para evidência. Os snapshots são `historical_evidence_archive`
+e não viram input de runtime, fonte de produto, autorização de PostgreSQL,
+promoção ou deploy. O auditor de retenção inclui os três snapshots no conjunto
+de referências ativas para preservar a recuperação dos links históricos.
+
+Passaram as regressões de superfície Commander, ponte app/IA, alinhamento
+operacional, estratégia XMage, retenção e seus testes. Os demais Markdown
+acima de 100 KiB foram classificados como registros correntes, checkpoints
+históricos ou background técnico; nenhum deles continua sendo um entrypoint
+canônico que acumula diário e norma. S9-03 está concluída localmente, sem
+deleção de evidência.
+
 ## Atomicidade e recuperação
 
 - recovery commit registrado:
@@ -86,12 +118,13 @@ os hashes, a recuperação de 473/473 originais e 6/6 artefatos grandes, além d
   aberta;
 - S9-02: contexto corrente, project logic e auditoria final de 7.378 links
   estão sincronizados; permanece dependente de S9-01;
-- S9-03: índices e auditor estão verdes; contratos gigantes restantes ainda
-  precisam de disposição explícita, sem apagar norma canônica;
+- S9-03: os três contratos gigantes receberam entrypoints compactos e
+  snapshots byte-identical selados; regressões canônicas e retenção estão
+  verdes; permanece `IMPLEMENTED_UNPROVEN` apenas pela dependência S9-01;
 - S9-04: consumidores de rota/import, gates focados e agregados locais passaram
   depois da regeneração e foram repetidos na identidade limpa; permanece
   dependente de S9-01;
 - S9-05: duplicatas, artefatos governados e atomicidade estão verdes e
   rastreados; permanece dependente de S9-01;
 - S9-06: secret scan, project logic, links, diff congelado e gate local
-  completo passaram; o fechamento aguarda S9-03 e a cadeia de dependências.
+  completo passaram; o fechamento aguarda somente a cadeia de dependências.

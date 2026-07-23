@@ -86,6 +86,23 @@ class GenerateDeckTimeoutException implements Exception {
   }
 }
 
+class GenerateDeckTerminalFailureException implements Exception {
+  const GenerateDeckTerminalFailureException({
+    required this.message,
+    required this.jobId,
+    required this.status,
+    this.resultStatusCode,
+  });
+
+  final String message;
+  final String jobId;
+  final String status;
+  final int? resultStatusCode;
+
+  @override
+  String toString() => message;
+}
+
 Future<List<Map<String, dynamic>>> normalizeCreateDeckCards(
   ApiClient apiClient,
   List<Map<String, dynamic>> cards,
@@ -569,7 +586,15 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
           'attempt': attempt,
           'reason': 'completed_with_error_status',
         });
-        throw _generateFriendlyException(ApiResponse(resultStatusCode, result));
+        final friendly = _generateFriendlyException(
+          ApiResponse(resultStatusCode, result),
+        );
+        throw GenerateDeckTerminalFailureException(
+          message: _exceptionMessage(friendly),
+          jobId: jobId,
+          status: status,
+          resultStatusCode: resultStatusCode,
+        );
       }
 
       if (result.isEmpty) {
@@ -579,12 +604,26 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
           'attempt': attempt,
           'reason': 'completed_without_result',
         });
-        throw Exception(
-          'A IA terminou, mas não devolveu uma lista revisável. Tente novamente.',
+        throw GenerateDeckTerminalFailureException(
+          message:
+              'A IA terminou, mas não devolveu uma lista revisável. Tente novamente.',
+          jobId: jobId,
+          status: status,
+          resultStatusCode: resultStatusCode,
         );
       }
 
-      final reviewableResult = _requireReviewableGenerateResult(result);
+      late final Map<String, dynamic> reviewableResult;
+      try {
+        reviewableResult = _requireReviewableGenerateResult(result);
+      } catch (error) {
+        throw GenerateDeckTerminalFailureException(
+          message: _exceptionMessage(error),
+          jobId: jobId,
+          status: status,
+          resultStatusCode: resultStatusCode,
+        );
+      }
 
       AppLogger.info(
         '[DeckGenerate] async completed job_id=$jobId '
@@ -614,9 +653,10 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
         'attempt': attempt,
         'job_status': status,
       });
-      throw Exception(
-        _friendlyMessageForJobFailure(payload) ??
-            'Não conseguimos concluir a geração agora. Tente novamente em instantes.',
+      throw GenerateDeckTerminalFailureException(
+        message: _friendlyMessageForJobFailure(payload),
+        jobId: jobId,
+        status: status,
       );
     }
   }
@@ -626,6 +666,10 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
     'timeout_ms': timeout.inMilliseconds,
   });
   throw const GenerateDeckTimeoutException();
+}
+
+String _exceptionMessage(Object error) {
+  return error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
 }
 
 Future<void> _cancelGeneratedJobIfRequested(
@@ -926,9 +970,16 @@ String? _friendlyBackendMessage(dynamic data) {
   return looksTechnical ? null : text;
 }
 
-String? _friendlyMessageForJobFailure(Map<String, dynamic> payload) {
-  return _friendlyBackendMessage(payload['error']) ??
-      _friendlyBackendMessage(payload);
+String _friendlyMessageForJobFailure(Map<String, dynamic> payload) {
+  final statusCode =
+      int.tryParse(payload['result_status_code']?.toString() ?? '') ??
+      int.tryParse(payload['status_code']?.toString() ?? '');
+  if (statusCode != null && statusCode >= 400) {
+    return _exceptionMessage(
+      _generateFriendlyException(ApiResponse(statusCode, const {})),
+    );
+  }
+  return 'Não conseguimos concluir a geração agora. Tente novamente em instantes.';
 }
 
 void _throwIfGenerateCancelled(GenerateDeckCancellation? cancellation) {

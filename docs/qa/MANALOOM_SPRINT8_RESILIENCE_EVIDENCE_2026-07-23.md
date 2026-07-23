@@ -5,6 +5,8 @@ Branch: `codex/free-beta-release-candidate-2026-07-17`
 Base das medições runtime: `4700fc38317aae0d3c1955176b32c18ac3b34339`
 Commit de implementação validado/publicado:
 `2139ec9f6f902a8b266fbb852db6e834b25bceff`
+Base limpa da revalidação residual:
+`9deb607e4c09f8d8e6cd94241a61f2960262c6fe`
 SDK: Flutter `3.44.6`, Dart `3.12.2`
 
 Este relatório registra somente provas executadas na revisão corrente. Provas
@@ -61,28 +63,31 @@ optimize e Battle ainda não tem p50/p95 da mesma revisão nos dois alvos.
 Fechamento exige a fixture real autorizada e uma execução sem checkout
 concorrente.
 
-Foi possível fechar a parcela de startup Web sem mutação de produto:
+Uma reexecução limpa fechou novamente a parcela de startup Web sem mutação de
+produto:
 
 ```text
 Chrome 150 / 1440×757 / 7 amostras
-  cold start  valores 518, 500, 459, 425, 528, 490, 433 ms
-              p50/p95/max 490/528/528 <= orçamento 3000 ms
-  warm start  valores 143, 144, 146, 141, 146, 139, 141 ms
-              p50/p95/max 143/146/146 <= orçamento 1500 ms
+  cold start  valores 631, 622, 618, 619, 614, 660, 623 ms
+              p50/p95/max 622/660/660 <= orçamento 3000 ms
+  warm start  valores 219, 238, 220, 222, 228, 227, 219 ms
+              p50/p95/max 222/238/238 <= orçamento 1500 ms
 ```
 
 O relatório canônico `manaloom_runtime_startup_v1` terminou `result=pass`.
-O startup Android não foi executado porque o aparelho não estava conectado.
-As oito superfícies autenticadas ainda exigem a fixture PostgreSQL/API
-loopback descartável; o runner falha fechado sem as aprovações explícitas de
-escrita PostgreSQL e mutação exigidas pelo contrato.
+Também passaram 4/4 testes Python do harness, 13/13 testes Flutter de
+performance/cache/imagens e 19/19 de layout/fallback, com análise estática sem
+erros. O startup Android não foi executado porque o aparelho não estava
+conectado. As oito superfícies autenticadas ainda exigem PostgreSQL/API
+loopback descartáveis levantados na mesma revisão, e o harness ainda precisa
+entrar no gate de qualidade.
 
 ## S8-03 — Memória e imagens
 
 Resultado: `IN_PROGRESS`
 
-O teste `app/integration_test/image_memory_runtime_test.dart` carregou 180
-imagens da fixture exata do HEAD e passou nos dois alvos disponíveis:
+O teste `app/integration_test/image_memory_runtime_test.dart` preserva uma
+prova física anterior válida com 180 imagens no Android:
 
 ```text
 Android Samsung SM-A135M / R58T300SREH
@@ -92,17 +97,20 @@ Android Samsung SM-A135M / R58T300SREH
   crescimento RSS       103.141.376 <= 201.326.592 bytes
   crescimento repetido  16.039.936 <= 33.554.432 bytes
   passos                19 + 19
-
-Chrome 150 + ChromeDriver compatível
-  cache peak/final       31.457.280 bytes, 5 entradas
-  orçamento de cache    33.554.432 bytes, 96 entradas
-  passos                65 + 65
-  RSS                    indisponível no runtime Web
 ```
 
-O app de teste e o `adb reverse` foram removidos do aparelho; o ChromeDriver
-foi encerrado. A prova fecha o cenário de scroll/cache observado, mas a task
-permanece aberta até ser incorporada ao perfil completo S8-02.
+A revalidação Web corrigiu uma falsa equivalência de métrica: profile e
+release executaram 78 + 78 passos de scroll, porém
+`PaintingBinding.imageCache` permaneceu com 0 entradas/0 bytes e o guard
+falhou fechado como amostra inválida. Nesse alvo, `cached_network_image_web`
+usa `HtmlImage`; portanto o cache Flutter não mede a memória efetiva das
+imagens do navegador e o antigo número de Chrome não serve como aceite atual.
+
+O app de teste e o `adb reverse` da prova física foram removidos do aparelho;
+o ChromeDriver da revalidação foi encerrado. Permanecem necessários um probe
+Web específico de heap/rede (por exemplo CDP) ou uma decisão explícita de
+loader/CORS, a repetição Android da SHA final e a incorporação ao perfil
+completo S8-02.
 
 ## S8-04 — IA longa, indisponibilidade e cancelamento
 
@@ -117,10 +125,18 @@ Resultado: `IN_PROGRESS`
 - o worker assíncrono trata 504 como job falho, não como conclusão;
 - `server/test/ai_generate_provider_timeout_test.dart` cobre o contrato e a
   suíte focada passou `26/26`; análise dos alvos alterados passou sem issues.
+- falha terminal persistida agora lança
+  `GenerateDeckTerminalFailureException`, limpa `job_id` e `request_key` no
+  rascunho e permite uma nova submissão; timeout/transiente preserva a chave
+  resumível;
+- a mensagem terminal é sanitizada e não expõe o erro bruto do provedor;
+  provider + fluxo widget real de retomada passaram `57/57`.
 
-A task não recebe `PASS`: `Future.timeout` não comprova cancelamento físico da
-requisição HTTP subjacente, e ainda falta a matriz integral de cancelamento,
-indisponibilidade externa e retry idempotente.
+A task não recebe `PASS`: `Future.timeout` ainda não aborta fisicamente a
+requisição HTTP subjacente no provider, o `DELETE` do job não comprova a
+propagação até esse request e ainda falta a matriz integral de cancelamento e
+indisponibilidade externa. O loop de retry terminal foi corrigido, mas o
+cancelamento físico continua aberto.
 
 ## S8-05 — Observabilidade acionável
 
@@ -161,9 +177,26 @@ Resultado: `BLOCKED`
 gitleaks                                 PASS, 8.30.1
 ```
 
-O fechamento depende de S8-05 e do SBOM/OSV do APK/AAB construído a partir da
-SHA limpa, além da rejeição de token antigo após o backend correspondente ser
-publicado. Nenhum deploy ou mutação live foi executado nesta rodada.
+O preflight source-lock da base limpa foi determinístico em duas execuções
+(SHA-256
+`452ab8f4314d35e0da5a8bd024327bb0feab35062968a0b3b921930f6668cc3b`):
+
+```text
+Android source-lock       539 componentes, 533 consultados no OSV,
+                          226 excluídos, 0 vulnerabilidades de release
+Web público combinado     954 componentes, 948 consultados no OSV,
+                          0 vulnerabilidades de release
+achados fora do release   78, mantidos como não-release/excluded
+```
+
+Isso é prova de fonte, não de artefato. Não existe APK/AAB release corrente;
+o checkout só contém APKs debug/profile. O guard de identidade rejeita a
+base medida porque ela estava dez commits à frente de `origin/master`
+(`72bd76da8372c1b2188ee86d0d8bb55c98d590fc`), e `version: 1.0.0+2` ainda
+precisa de disposição/bump antes de upload. O SBOM também não cobre pacotes
+APT da futura imagem OCI. O fechamento continua dependente de S8-05, do
+SBOM/OSV do APK/AAB exato e da rejeição de token antigo após publicação do
+backend correspondente. Nenhum deploy ou mutação live foi executado.
 
 ## Validação determinística relacionada
 

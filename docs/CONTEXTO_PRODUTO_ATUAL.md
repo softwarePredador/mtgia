@@ -9,25 +9,31 @@
   `codex/free-beta-release-candidate-2026-07-17`; o commit de implementação
   `2139ec9f6f902a8b266fbb852db6e834b25bceff` foi validado, publicado no
   `origin` e confirmado com checkout limpo. Ele é uma identidade revisável,
-  mas ainda não recebeu GO de release;
+  mas ainda não recebeu GO de release. A rodada residual partiu da base limpa
+  `9deb607e4c09f8d8e6cd94241a61f2960262c6fe`;
 - o alvo S10 está congelado como beta gratuita Web + Android. Scanner/câmera
   ficam desabilitados e inacessíveis no artefato de release; iOS e VoiceOver
   ficam `DEFERRED_BY_SCOPE`. TalkBack no Android alvo continua obrigatório;
 - o timeout do provider de geração passou a falhar fechado com HTTP 504,
   `no-store`, `can_save=false`, `learning_eligible=false` e sem deck/mock.
-  A matriz completa de indisponibilidade/cancelamento ainda está aberta;
-- o perfil de imagens com 180 itens passou no Samsung SM-A135M e no Chrome:
-  cache abaixo de 32 MiB, crescimento de RSS Android abaixo de 192 MiB e
-  repetição abaixo de 32 MiB. O orçamento completo de desempenho S8-02 e o
-  fechamento integral de S8-03 ainda não foram emitidos;
-- o startup Web em Chrome 150 passou 7 amostras: cold p50/p95 490/528 ms
-  contra 3000 ms e warm 143/146 ms contra 1500 ms. Ainda faltam startup
-  Android e a matriz autenticada das superfícies core nos dois alvos;
+  Falha terminal agora limpa job/request key e libera uma submissão nova,
+  mantendo retomada somente para timeout/transiente; 57/57 testes focados,
+  incluindo widget real, passaram. Abort HTTP físico e a matriz completa de
+  indisponibilidade/cancelamento continuam abertos;
+- a prova física anterior de 180 imagens no Samsung SM-A135M permanece
+  válida: cache abaixo de 32 MiB, crescimento de RSS abaixo de 192 MiB e
+  repetição abaixo de 32 MiB. A revalidação Chrome falhou fechado como amostra
+  inválida: `HtmlImage` não popula `PaintingBinding.imageCache`, que ficou em
+  zero. S8-03 precisa de métrica Web específica e repetição Android final;
+- o startup Web em Chrome 150 passou nova rodada de 7 amostras: cold p50/p95
+  622/660 ms contra 3000 ms e warm 222/238 ms contra 1500 ms. Ainda faltam
+  startup Android, matriz autenticada das superfícies core nos dois alvos e
+  integração do harness no gate;
 - `manaloom_local_ci.sh full` passou com backend 1736/1736, Flutter 1157
   testes + 1 skip Web-only conhecido, Web pública, Patrol, dependências e
   schema descartável. Também passaram `ai-eval`, `ai-bridge`, Battle 2×,
   `web`, `deps`, `custom-lint`, `ui-audit` (48/48), `server-target`,
-  `report-retention` (12/12 checks e 16 testes), secret scan, project logic e
+  `report-retention` (12/12 checks e 17 testes), secret scan, project logic e
   os 25 contratos de release, com Flutter 3.44.6/Dart 3.12.2 pinados;
 - o E2E determinístico terminou `PARTIAL`: 10 etapas passaram, 9 skips
   protegidos foram inventariados e não houve falha nem bloqueio. O
@@ -45,8 +51,10 @@
   HEAD de origem. Manifesto, índices, conteúdos canônicos, referências
   corrigidas e deleções entraram atomicamente em `2139ec9f6`; o auditor
   confirmou 7.378 referências válidas, zero duplicata/resíduo e recuperação
-  integral. S9 continua aberta por sua dependência em S8 e pela disposição
-  final dos contratos gigantes remanescentes;
+  integral. Os três entrypoints gigantes residuais foram reduzidos de 26.263
+  para 496 linhas, com os 1.584.706 bytes anteriores preservados e selados em
+  snapshots históricos. S9-03 está concluída localmente; S9 continua aberta
+  somente por sua cadeia de dependências iniciada em S8;
 - o estado de release permanece **NO-GO**: apesar da SHA de implementação
   limpa/publicada e do gate completo repetido nessa identidade, faltam o
   fechamento de S8/S9, migrations e jornadas publicadas da mesma SHA final,
@@ -73,9 +81,10 @@
 
 ## Próxima ação oficial
 
-1. concluir a matriz p50/p95 e falhas/cancelamento da Sprint 8 e a disposição
-   dos contratos grandes restantes da Sprint 9; a decisão dos engines é manter
-   os pins atuais;
+1. concluir startup Android, matriz autenticada p50/p95, métrica Web de
+   imagens e abort físico/falhas da Sprint 8; a disposição dos contratos
+   grandes da Sprint 9 está concluída e a decisão dos engines é manter os pins
+   atuais;
 2. fechar somente as tasks realmente provadas, mantendo bloqueadas as
    dependências humanas, externas ou live; a atomicidade, os links e o diff de
    retenção já estão registrados em `2139ec9f6`;

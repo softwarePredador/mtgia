@@ -68,6 +68,9 @@ AI_PROMPT_EVAL_SCRIPT = REPO_ROOT / "scripts" / "manaloom_ai_prompt_eval.sh"
 QUALITY_GATE = REPO_ROOT / "scripts" / "quality_gate.sh"
 APP_AI_BRIDGE_DOC = DOCS_DIR / "APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md"
 XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
+EXTERNAL_BATTLE_EXECUTION_CONTRACT = (
+    DOCS_DIR / "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+)
 DECKBUILDING_CONTRACT_DOC = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 
 ACTIVE_FILES = [
@@ -89,6 +92,7 @@ ACTIVE_FILES = [
     QUALITY_GATE,
     APP_AI_BRIDGE_DOC,
     XMAGE_FLOW,
+    EXTERNAL_BATTLE_EXECUTION_CONTRACT,
     DECKBUILDING_CONTRACT_DOC,
 ]
 
@@ -211,10 +215,18 @@ LEARNING_SNAPSHOT_REQUIRED = [
 
 DOC_CONTRACT_REQUIRED = {
     XMAGE_FLOW: [
-        "resolved local XMage source is final behavior truth",
-        "candidate becomes executable ManaLoom battle truth",
-        "matching runtime adapter exists",
+        "Status: `historical_native-adaptation_evidence`",
+        "must not be used as a current handoff",
+        "source candidate",
+        "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
         "server/bin/with_new_server_pg.sh",
+    ],
+    EXTERNAL_BATTLE_EXECUTION_CONTRACT: [
+        "Status: `current_operating_standard`",
+        "pinned XMage is the primary rules executor",
+        "pinned Forge is tried only when XMage returns a structured coverage gap",
+        "does not create `card_battle_rules` rows",
+        "Hermes remains cache/laboratory/audit evidence",
     ],
     DECKBUILDING_CONTRACT_DOC: [
         "Research-Backed Deck Planning Flow",

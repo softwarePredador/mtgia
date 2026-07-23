@@ -297,6 +297,40 @@ class ReportRetentionAuditTests(unittest.TestCase):
         self.assertIn(superseded, audit.HISTORICAL_REFERENCE_FILES)
         self.assertTrue(current_contracts.issubset(audit.CURRENT_CONTRACT_FILES))
 
+    def test_large_contract_archives_are_sealed_and_entrypoints_are_compact(self) -> None:
+        expected_archives = {
+            "HERMES_ANALYSIS_README_SNAPSHOT_2026-07-23.md": (
+                105627,
+                "d6f592010e67ad410ad37f3f65f1a8e9b824e06fa8bf9fdb6ecbf4012b5f0a64",
+            ),
+            "COMMANDER_DECKBUILDING_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md": (
+                250108,
+                "cbc6941a004649fcb688d1b0bcb63adb752a78fbd6bbb16f2e397e0029a9d38a",
+            ),
+            "XMAGE_NATIVE_ADAPTATION_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md": (
+                1228971,
+                "65cb926682c3bd75c48d14d78d76b9155c68263377b7190e02d570021ed83cb2",
+            ),
+        }
+        archived_paths = set(audit.ARCHIVED_EVIDENCE_REFERENCE_FILES)
+
+        for name, (expected_bytes, expected_sha256) in expected_archives.items():
+            path = audit.DOCS_DIR / "archive" / name
+            payload = path.read_bytes()
+            self.assertIn(path, archived_paths)
+            self.assertEqual(len(payload), expected_bytes)
+            self.assertEqual(hashlib.sha256(payload).hexdigest(), expected_sha256)
+
+        compact_limits = {
+            audit.DOCS_DIR / "README.md": 20000,
+            audit.DOCS_DIR
+            / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md": 40000,
+            audit.DOCS_DIR
+            / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md": 20000,
+        }
+        for path, byte_limit in compact_limits.items():
+            self.assertLess(path.stat().st_size, byte_limit)
+
 
 if __name__ == "__main__":
     unittest.main()

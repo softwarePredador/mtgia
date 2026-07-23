@@ -25,6 +25,7 @@ export 'deck_provider_support.dart'
         GenerateDeckCancelledException,
         GenerateDeckProgressCallback,
         GenerateDeckProgressSnapshot,
+        GenerateDeckTerminalFailureException,
         GenerateDeckTimeoutException,
         generatedDeckReviewBlockingReasons,
         generatedDeckSaveBlockingReasons,

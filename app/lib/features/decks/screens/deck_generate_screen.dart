@@ -365,6 +365,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (_generateCancellation == cancellation) {
         _generateCancellation = null;
       }
+      if (e is GenerateDeckTerminalFailureException) {
+        _activeGenerateJobId = null;
+        _activeGenerateRequestKey = null;
+        await _saveDraft();
+        if (!mounted) return;
+      }
 
       if (mounted) {
         final message = FriendlyErrorMapper.fromException(
@@ -438,6 +444,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (!mounted || _generateCancellation != cancellation) return;
       setState(() => _isGenerating = false);
       _generateCancellation = null;
+      if (error is GenerateDeckTerminalFailureException) {
+        _activeGenerateJobId = null;
+        _activeGenerateRequestKey = null;
+        await _saveDraft();
+        if (!mounted) return;
+      }
       final message = FriendlyErrorMapper.fromException(
         error,
         context: FriendlyErrorContext.deckGenerate,

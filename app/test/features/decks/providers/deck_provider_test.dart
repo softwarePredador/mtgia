@@ -656,15 +656,65 @@ void main() {
           onProgress: (progress) => progressMessages.add(progress.message),
         ),
         throwsA(
-          isA<Exception>().having(
-            (error) => error.toString(),
-            'message',
-            contains('Não conseguimos gerar um deck válido'),
-          ),
+          isA<GenerateDeckTerminalFailureException>()
+              .having((error) => error.jobId, 'job id', 'job-invalid-deck')
+              .having((error) => error.status, 'status', 'completed')
+              .having((error) => error.resultStatusCode, 'result status', 422)
+              .having(
+                (error) => error.toString(),
+                'message',
+                contains('Não conseguimos gerar um deck válido'),
+              ),
         ),
       );
       expect(progressMessages, isNot(contains('Pronto para revisar.')));
     });
+
+    test(
+      'generateDeck marks a persisted failed async job as terminal for a fresh retry',
+      () async {
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/generate': (_) => ApiResponse(202, {
+              'job_id': 'job-terminal-failure',
+              'status': 'pending',
+              'poll_url': '/ai/generate/jobs/job-terminal-failure',
+              'poll_interval_ms': 1,
+            }),
+          },
+          getHandlers: {
+            '/ai/generate/jobs/job-terminal-failure': () => ApiResponse(200, {
+              'job_id': 'job-terminal-failure',
+              'status': 'failed',
+              'error': 'provider timeout',
+            }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        await expectLater(
+          provider.generateDeck(
+            prompt: 'retry after terminal failure',
+            format: 'Commander',
+            pollInterval: Duration.zero,
+          ),
+          throwsA(
+            isA<GenerateDeckTerminalFailureException>()
+                .having(
+                  (error) => error.jobId,
+                  'job id',
+                  'job-terminal-failure',
+                )
+                .having((error) => error.status, 'status', 'failed')
+                .having(
+                  (error) => error.toString(),
+                  'sanitized message',
+                  isNot(contains('provider timeout')),
+                ),
+          ),
+        );
+      },
+    );
 
     test('generateDeck rejects a malformed async success payload', () async {
       final progressMessages = <String>[];
