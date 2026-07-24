@@ -323,6 +323,13 @@ reproduzível e honesta.
 Battle isolado guardado passam; persistência/autorização/replay têm cleanup e o
 aggregate não contém falha ou promoção indevida.
 
+S5 fecha a baseline técnica de execução e replay; ela não afirma que o Battle
+já seja um jogo controlável pelo usuário. A evolução posterior de integridade
+analítica, experiência Battle Lab, acompanhamento ao vivo e Coach Mode está
+separada em `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md`. Esse programa não
+reabre S5; por padrão começa somente depois de `S10-11=GO` e não amplia a
+Sprint 10 atual sem recongelamento explícito do escopo e da SHA.
+
 ### Sprint 6 — Deckbuilder e qualidade real da IA
 
 **Objetivo:** separar deck legal, deck estruturalmente pronto e deck realmente

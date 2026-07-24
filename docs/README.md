@@ -49,6 +49,13 @@ as fontes canônicas abaixo.
 8. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
    - auditoria final de battle, deckbuilder, famílias, cargas PostgreSQL,
      cobertura externa e pendências de produto.
+9. `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md`
+   - programa posterior à baseline da Sprint 5: integridade dos logs, entrada
+     pela Análise, replay visual, insights, acompanhamento ao vivo, spike XMage
+     e Coach Mode, com dependências, critérios de aceite, gates e estimativas.
+10. `docs/MANALOOM_BATTLE_LAB_TRACKER.md`
+    - estado operacional do programa pós-S10, dependências, owners, gates e
+      evidências por sprint, sem reabrir a prova histórica de S5.
 
 ## Referências técnicas e históricas
 

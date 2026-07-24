@@ -79,6 +79,10 @@
 - o plano executável é
   `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` e o estado por task fica em
   `docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md`;
+- a evolução Battle Lab/Live Spectator/Coach está planejada em
+  `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md` e
+  `docs/MANALOOM_BATTLE_LAB_TRACKER.md`; é backlog pós-`S10-11=GO`, não
+  próxima ação da release corrente e não reabre a Sprint 5;
 - Battle, Deckbuilder e Life Counter mantêm suas provas locais anteriores,
   mas nenhuma delas autoriza promoção, migration ou escrita live;
 - migrations 038–051 compõem o schema exigido pelo candidato atual. O estado
