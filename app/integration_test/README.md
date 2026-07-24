@@ -34,6 +34,31 @@ Some runtime tests use a public API or mutate an authenticated test account.
 Do not run the whole directory without first reviewing its dart-defines and
 target environment.
 
+## Web image memory runtime
+
+`image_memory_runtime_test.dart` keeps the Android image-cache/RSS lane and
+also exposes explicit Web checkpoints. The Web measurement attaches CDP to the
+same ChromeDriver session, samples the Chrome process tree and heap, and
+correlates Resource Timing with a deterministic cacheable loopback fixture.
+It fails closed when a checkpoint, browser PID, image sample, runtime sample,
+or cache-reuse signal is missing.
+
+Run the deterministic Python contract (also included in `full`) separately
+from the real browser profile:
+
+```bash
+./scripts/quality_gate.sh performance
+
+MANALOOM_CHROMEDRIVER_BIN=/absolute/path/to/matching/chromedriver \
+./scripts/quality_gate.sh web-image-memory
+```
+
+The Chrome and ChromeDriver major versions must match. The real profile writes
+its detailed ignored artifact to `app/build/manaloom_web_image_memory.json`,
+starts only a loopback fixture, and does not mutate product data. A red runtime
+result is release evidence and must not be converted into a deterministic
+`PASS`.
+
 ## Patrol critical journeys
 
 - `patrol_test/manaloom_patrol_smoke_test.dart`: deterministic critical product

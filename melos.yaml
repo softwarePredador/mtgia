@@ -45,6 +45,10 @@ scripts:
     description: Validate the deterministic p50/p95 runtime harness contract.
     run: ./scripts/quality_gate.sh performance
 
+  web-image-memory:
+    description: Measure Web image memory and cache with loopback Chrome/CDP.
+    run: ./scripts/quality_gate.sh web-image-memory
+
   ai-bridge:
     description: Run app/AI bridge checks and Commander prompt eval.
     run: ./scripts/quality_gate.sh ai-bridge

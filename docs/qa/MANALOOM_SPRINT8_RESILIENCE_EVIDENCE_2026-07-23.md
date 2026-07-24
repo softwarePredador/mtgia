@@ -85,12 +85,12 @@ erros. O startup Android não foi executado porque o aparelho não estava
 conectado. As oito superfícies autenticadas ainda exigem PostgreSQL/API
 loopback descartáveis levantados na mesma revisão.
 
-O contrato determinístico do harness agora é um modo próprio,
+O contrato determinístico dos harnesses agora é um modo próprio,
 `./scripts/quality_gate.sh performance`, e também participa de
-`quality_gate.sh full`. Ele compila os dois módulos Python e executa os 4/4
-testes de percentil, parser Android, orçamento e resultado agregado sem abrir
-browser/device nem acessar fixture. Isso fecha a integração no gate sem
-transformar ausência de runtime em `PASS`.
+`quality_gate.sh full`. Ele compila os seis módulos Python e executa 15/15
+testes de startup, percentil, parser Android, orçamento, processo/RSS, recurso
+Web e fixture sem abrir browser/device nem acessar fixture runtime. Isso fecha
+a integração no gate sem transformar ausência de runtime em `PASS`.
 
 ## S8-03 — Memória e imagens
 
@@ -109,17 +109,42 @@ Android Samsung SM-A135M / R58T300SREH
   passos                19 + 19
 ```
 
-A revalidação Web corrigiu uma falsa equivalência de métrica: profile e
-release executaram 78 + 78 passos de scroll, porém
-`PaintingBinding.imageCache` permaneceu com 0 entradas/0 bytes e o guard
-falhou fechado como amostra inválida. Nesse alvo, `cached_network_image_web`
-usa `HtmlImage`; portanto o cache Flutter não mede a memória efetiva das
-imagens do navegador e o antigo número de Chrome não serve como aceite atual.
+A falsa equivalência de métrica Web foi eliminada. Como `HtmlImage` não popula
+`PaintingBinding.imageCache`, o novo modo
+`./scripts/quality_gate.sh web-image-memory` conecta um monitor ao mesmo Chrome
+aberto por `flutter drive` e mede árvore de processos/RSS, heap/CDP, DOM,
+Resource Timing e contadores da fixture. O contrato usa uma imagem PNG RGBA
+determinística de 488×680 e 85.668 bytes, servida somente em loopback com
+cache imutável, e falha fechado quando faltam PID, amostras, checkpoints,
+imagens ou reutilização. O código do harness participa do gate determinístico
+`performance`/`full`; a execução real permanece separada porque requer
+ChromeDriver compatível com o Chrome local.
 
-O app de teste e o `adb reverse` da prova física foram removidos do aparelho;
-o ChromeDriver da revalidação foi encerrado. Permanecem necessários um probe
-Web específico de heap/rede (por exemplo CDP) ou uma decisão explícita de
-loader/CORS, a repetição Android da SHA final e a incorporação ao perfil
+A execução profile em Chrome 150 percorreu 180 imagens em 78 + 78 passos e
+coletou 314 amostras runtime:
+
+```text
+Chrome 150.0.7871.184 / ChromeDriver 150.0.7871.124
+  crescimento RSS peak       161.546.240 <= 268.435.456 bytes  PASS
+  crescimento RSS repetido             0 <=  67.108.864 bytes  PASS
+  crescimento RSS settled              0 <= 201.326.592 bytes  PASS
+  crescimento heap             26.585.411 <= 134.217.728 bytes  PASS
+  crescimento heap repetido     6.843.516 <=  33.554.432 bytes  PASS
+  transferência inicial        15.677.244 <=  67.108.864 bytes  PASS
+  transferência repetida       15.677.244 <=   1.048.576 bytes  FAIL
+  fallback visível máximo               6                         FAIL
+  timeout de carregamento               0
+```
+
+O servidor registrou 180 amostras únicas, mas 366 requests/31.354.488 bytes
+ao fim do segundo percurso: houve redownload integral. O console começou a
+registrar `EncodingError: The source image cannot be decoded` por volta da
+amostra 82. Assim, a medição Web agora existe e produz evidência útil, porém o
+resultado correto continua vermelho. O JSON detalhado é artefato ignorado em
+`app/build/`, e fixture/ChromeDriver são encerrados ao final.
+
+Permanecem necessários corrigir o comportamento de renderer/cache Web e obter
+uma reexecução verde, repetir Android na SHA final e incorporar ambos ao perfil
 completo S8-02.
 
 ## S8-04 — IA longa, indisponibilidade e cancelamento

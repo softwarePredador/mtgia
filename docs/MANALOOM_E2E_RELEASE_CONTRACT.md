@@ -49,7 +49,8 @@ válidos são:
 | Área | Comando canônico | Mutação de produto |
 | --- | --- | --- |
 | Server + app completos | `./scripts/quality_gate.sh full` | não; tags live são excluídas |
-| Contrato do harness p50/p95 | `./scripts/quality_gate.sh performance` (também incluído em `full`) | não; valida código/orçamentos sem abrir browser, device ou fixture |
+| Contratos dos harnesses runtime | `./scripts/quality_gate.sh performance` (também incluído em `full`) | não; valida código/orçamentos sem abrir browser, device ou fixture |
+| Memória/imagens Web runtime | `./scripts/quality_gate.sh web-image-memory` | não; fixture loopback e Chrome/CDP locais, exige ChromeDriver do mesmo major e falha fechado |
 | Dependências | `./scripts/quality_gate.sh deps` | não |
 | Regras ManaLoom | `./scripts/quality_gate.sh custom-lint` | não |
 | UI/goldens/acessibilidade | `./scripts/quality_gate.sh ui-audit` | não |
