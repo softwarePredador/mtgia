@@ -254,6 +254,9 @@ Future<({int fallbackCount, bool timedOut})> _settleVisibleImages(
   await tester.pump(const Duration(milliseconds: 300));
   const attempts = 20;
   for (var attempt = 0; attempt < attempts; attempt++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 25)),
+    );
     await tester.pump(const Duration(milliseconds: 50));
     if (find.byKey(_loadingPlaceholderKey).evaluate().isEmpty) {
       return (

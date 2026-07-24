@@ -148,7 +148,11 @@ def read_fixture_stats(url: str) -> dict[str, int]:
     }
     if not required.issubset(value):
         raise RuntimeError("The image fixture stats endpoint omitted required fields.")
-    return {key: int(value[key]) for key in required}
+    result = {key: int(value[key]) for key in required}
+    for key in ("attempted_request_count", "attempted_unique_sample_count"):
+        if key in value:
+            result[key] = int(value[key])
+    return result
 
 
 def maximum_sample_value(
@@ -594,7 +598,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--expected-image-count", type=positive_int, default=180)
     parser.add_argument("--minimum-runtime-samples", type=positive_int, default=6)
-    parser.add_argument("--timeout-seconds", type=float, default=60.0)
+    parser.add_argument("--timeout-seconds", type=float, default=180.0)
     parser.add_argument("--poll-seconds", type=float, default=0.20)
     parser.add_argument(
         "--rss-growth-budget-bytes",

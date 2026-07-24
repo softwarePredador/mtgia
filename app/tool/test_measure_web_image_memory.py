@@ -1,9 +1,13 @@
+import io
+import json
 import unittest
+from unittest.mock import patch
 
 from measure_web_image_memory import (
     build_result,
     parse_process_rows,
     process_tree_rss,
+    read_fixture_stats,
     resource_summary,
     tracked_heap_bytes,
 )
@@ -42,6 +46,30 @@ def checkpoint(
 
 
 class WebImageMemoryMeasurementTest(unittest.TestCase):
+    @patch("measure_web_image_memory.urllib.request.urlopen")
+    def test_fixture_stats_preserve_attempt_and_completion_counts(
+        self,
+        urlopen,
+    ) -> None:
+        urlopen.return_value = io.BytesIO(
+            json.dumps(
+                {
+                    "attempted_request_count": 9,
+                    "attempted_unique_sample_count": 8,
+                    "request_count": 7,
+                    "bytes_sent": 700,
+                    "unique_sample_count": 6,
+                    "duplicate_request_count": 1,
+                }
+            ).encode()
+        )
+
+        stats = read_fixture_stats("http://127.0.0.1:8091/stats")
+
+        self.assertEqual(stats["attempted_request_count"], 9)
+        self.assertEqual(stats["attempted_unique_sample_count"], 8)
+        self.assertEqual(stats["request_count"], 7)
+
     def test_process_tree_rss_ignores_unrelated_processes(self) -> None:
         rows = parse_process_rows(
             """100 1 1000

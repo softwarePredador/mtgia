@@ -87,7 +87,7 @@ loopback descartáveis levantados na mesma revisão.
 
 O contrato determinístico dos harnesses agora é um modo próprio,
 `./scripts/quality_gate.sh performance`, e também participa de
-`quality_gate.sh full`. Ele compila os seis módulos Python e executa 15/15
+`quality_gate.sh full`. Ele compila os seis módulos Python e executa 17/17
 testes de startup, percentil, parser Android, orçamento, processo/RSS, recurso
 Web e fixture sem abrir browser/device nem acessar fixture runtime. Isso fecha
 a integração no gate sem transformar ausência de runtime em `PASS`.
@@ -120,32 +120,40 @@ imagens ou reutilização. O código do harness participa do gate determinístic
 `performance`/`full`; a execução real permanece separada porque requer
 ChromeDriver compatível com o Chrome local.
 
-A execução profile em Chrome 150 percorreu 180 imagens em 78 + 78 passos e
-coletou 314 amostras runtime:
+A primeira execução revelou que a fixture atribuía os cabeçalhos de resposta
+ao campo `headers`, reservado por `BaseHTTPRequestHandler` para os cabeçalhos
+da requisição. O `200` resultante não continha CORS, cache nem
+`Content-Length`, deixava o corpo sem término explícito e produzia
+`EncodingError`/redownload artificiais. O servidor agora usa
+`response_headers`, diferencia tentativas de corpos completamente enviados e
+possui teste HTTP vivo para corpo, CORS, cache, timing e tamanho.
+
+Com o loader de produto original, a reexecução profile em Chrome 150 percorreu
+180 imagens em 78 + 78 passos, coletou 633 amostras runtime e passou:
 
 ```text
 Chrome 150.0.7871.184 / ChromeDriver 150.0.7871.124
-  crescimento RSS peak       161.546.240 <= 268.435.456 bytes  PASS
+  cache Flutter             33.184.000 <=  33.554.432 bytes  PASS
+  entradas de cache                 25 <=          96         PASS
+  crescimento RSS peak       216.956.928 <= 268.435.456 bytes  PASS
   crescimento RSS repetido             0 <=  67.108.864 bytes  PASS
-  crescimento RSS settled              0 <= 201.326.592 bytes  PASS
-  crescimento heap             26.585.411 <= 134.217.728 bytes  PASS
-  crescimento heap repetido     6.843.516 <=  33.554.432 bytes  PASS
-  transferência inicial        15.677.244 <=  67.108.864 bytes  PASS
-  transferência repetida       15.677.244 <=   1.048.576 bytes  FAIL
-  fallback visível máximo               6                         FAIL
+  crescimento RSS settled    192.921.600 <= 201.326.592 bytes  PASS
+  crescimento heap             23.892.917 <= 134.217.728 bytes  PASS
+  crescimento heap repetido     7.015.364 <=  33.554.432 bytes  PASS
+  transferência inicial        15.420.240 <=  67.108.864 bytes  PASS
+  transferência repetida                0 <=   1.048.576 bytes  PASS
+  fallback visível máximo               0                         PASS
   timeout de carregamento               0
 ```
 
-O servidor registrou 180 amostras únicas, mas 366 requests/31.354.488 bytes
-ao fim do segundo percurso: houve redownload integral. O console começou a
-registrar `EncodingError: The source image cannot be decoded` por volta da
-amostra 82. Assim, a medição Web agora existe e produz evidência útil, porém o
-resultado correto continua vermelho. O JSON detalhado é artefato ignorado em
-`app/build/`, e fixture/ChromeDriver são encerrados ao final.
+O servidor registrou exatamente 180 tentativas concluídas, 180 amostras únicas,
+zero duplicata e 15.420.240 bytes no primeiro percurso. O segundo percurso
+gerou 180 entradas Resource Timing com transferência zero e nenhuma nova
+requisição ao servidor. O console ficou sem erro. O JSON detalhado é artefato
+ignorado em `app/build/`, e fixture/ChromeDriver são encerrados ao final.
 
-Permanecem necessários corrigir o comportamento de renderer/cache Web e obter
-uma reexecução verde, repetir Android na SHA final e incorporar ambos ao perfil
-completo S8-02.
+Permanecem necessários repetir Android na SHA final e incorporar as provas Web
+e Android ao perfil completo S8-02.
 
 ## S8-04 — IA longa, indisponibilidade e cancelamento
 

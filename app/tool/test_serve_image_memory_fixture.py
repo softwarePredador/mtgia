@@ -1,11 +1,14 @@
-import unittest
 import struct
+import threading
+import unittest
+import urllib.request
 
 from serve_image_memory_fixture import (
     ConcurrentFixtureServer,
     FIXTURE_HEIGHT,
     FIXTURE_WIDTH,
     FixtureStats,
+    ImageMemoryFixtureHandler,
     fixture_headers,
     generate_fixture_png,
     is_loopback_host,
@@ -13,6 +16,36 @@ from serve_image_memory_fixture import (
 
 
 class ImageMemoryFixtureTest(unittest.TestCase):
+    def test_live_fixture_response_sends_declared_headers_and_complete_body(
+        self,
+    ) -> None:
+        data = generate_fixture_png(width=8, height=8)
+        ImageMemoryFixtureHandler.fixture_data = data
+        ImageMemoryFixtureHandler.response_headers = fixture_headers(data)
+        ImageMemoryFixtureHandler.stats = FixtureStats(len(data))
+        server = ConcurrentFixtureServer(
+            ("127.0.0.1", 0),
+            ImageMemoryFixtureHandler,
+        )
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(thread.join, 2)
+        self.addCleanup(server.shutdown)
+
+        host, port = server.server_address
+        with urllib.request.urlopen(
+            f"http://{host}:{port}/assets/symbols/logo.png?memory_sample=7",
+            timeout=2,
+        ) as response:
+            body = response.read()
+
+        self.assertEqual(body, data)
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response.headers["Timing-Allow-Origin"], "*")
+        self.assertEqual(response.headers["Content-Length"], str(len(data)))
+        self.assertIn("immutable", response.headers["Cache-Control"])
+
     def test_listener_is_restricted_to_loopback(self) -> None:
         self.assertTrue(is_loopback_host("127.0.0.1"))
         self.assertTrue(is_loopback_host("::1"))
@@ -53,6 +86,10 @@ class ImageMemoryFixtureTest(unittest.TestCase):
 
     def test_stats_distinguish_unique_samples_from_duplicate_requests(self) -> None:
         stats = FixtureStats(payload_bytes=7)
+        stats.record_attempt(0)
+        stats.record_attempt(1)
+        stats.record_attempt(1)
+        stats.record_attempt(2)
         stats.record(0)
         stats.record(1)
         stats.record(1)
@@ -60,6 +97,8 @@ class ImageMemoryFixtureTest(unittest.TestCase):
         self.assertEqual(
             stats.snapshot(),
             {
+                "attempted_request_count": 4,
+                "attempted_unique_sample_count": 3,
                 "request_count": 3,
                 "bytes_sent": 21,
                 "unique_sample_count": 2,

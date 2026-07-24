@@ -26,16 +26,18 @@
 - a prova física anterior de 180 imagens no Samsung SM-A135M permanece
   válida: cache abaixo de 32 MiB, crescimento de RSS abaixo de 192 MiB e
   repetição abaixo de 32 MiB. O probe Web específico de CDP, árvore de
-  processos/RSS, Resource Timing e fixture loopback agora existe e percorreu
-  180 imagens/78 + 78 passos no Chrome 150. RSS/heap ficaram nos orçamentos,
-  mas o gate falhou corretamente por seis fallbacks/`EncodingError` e
-  redownload integral de 15.677.244 bytes no percurso repetido. S8-03 precisa
-  da correção Web com reexecução verde e da repetição Android final;
+  processos/RSS, Resource Timing e fixture loopback passou em Chrome 150:
+  180 imagens/78 + 78 passos, zero fallback/timeout e nenhuma transferência
+  adicional na repetição. A fixture deixou de colidir seus cabeçalhos de
+  resposta com `BaseHTTPRequestHandler.headers`; um teste HTTP vivo protege
+  CORS, cache, `Content-Length` e corpo completo. RSS, heap e cache ficaram
+  dentro dos orçamentos. S8-03 precisa somente da repetição Android na SHA
+  final e da incorporação dos dois alvos ao perfil completo;
 - o startup Web em Chrome 150 passou nova rodada de 7 amostras: cold p50/p95
   622/660 ms contra 3000 ms e warm 222/238 ms contra 1500 ms. Ainda faltam
   startup Android e a matriz autenticada das superfícies core nos dois alvos.
   Os contratos determinísticos dos harnesses agora possuem
-  `quality_gate.sh performance`, passam 15/15 e integram o gate `full`; a
+  `quality_gate.sh performance`, passam 17/17 e integram o gate `full`; a
   medição Chrome/CDP real fica no modo explícito `web-image-memory`;
 - `manaloom_local_ci.sh full` passou em `b84302e1e` com backend 1742/1742,
   Flutter 1159 testes + 1 skip Web-only conhecido, Web pública, Patrol,

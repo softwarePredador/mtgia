@@ -85,9 +85,19 @@ def fixture_headers(data: bytes) -> dict[str, str]:
 class FixtureStats:
     def __init__(self, payload_bytes: int) -> None:
         self.payload_bytes = payload_bytes
+        self._attempted_request_count = 0
+        self._attempted_sample_counts: dict[int, int] = {}
         self._request_count = 0
         self._sample_counts: dict[int, int] = {}
         self._lock = threading.Lock()
+
+    def record_attempt(self, sample_index: int | None) -> None:
+        with self._lock:
+            self._attempted_request_count += 1
+            if sample_index is not None:
+                self._attempted_sample_counts[sample_index] = (
+                    self._attempted_sample_counts.get(sample_index, 0) + 1
+                )
 
     def record(self, sample_index: int | None) -> None:
         with self._lock:
@@ -100,7 +110,10 @@ class FixtureStats:
     def snapshot(self) -> dict[str, int | None]:
         with self._lock:
             indices = set(self._sample_counts)
+            attempted_indices = set(self._attempted_sample_counts)
             return {
+                "attempted_request_count": self._attempted_request_count,
+                "attempted_unique_sample_count": len(attempted_indices),
                 "request_count": self._request_count,
                 "bytes_sent": self._request_count * self.payload_bytes,
                 "unique_sample_count": len(indices),
@@ -114,7 +127,7 @@ class FixtureStats:
 
 class ImageMemoryFixtureHandler(http.server.BaseHTTPRequestHandler):
     fixture_data: bytes
-    headers: dict[str, str]
+    response_headers: dict[str, str]
     stats: FixtureStats
 
     server_version = "ManaLoomImageMemoryFixture/1.0"
@@ -125,6 +138,12 @@ class ImageMemoryFixtureHandler(http.server.BaseHTTPRequestHandler):
 
     def do_HEAD(self) -> None:
         self._serve(head_only=True)
+
+    def handle(self) -> None:
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError):
+            return
 
     def _serve(self, *, head_only: bool) -> None:
         path = urlparse(self.path).path
@@ -167,14 +186,19 @@ class ImageMemoryFixtureHandler(http.server.BaseHTTPRequestHandler):
                     sample_index = None
                 break
         if not head_only:
-            self.stats.record(sample_index)
+            self.stats.record_attempt(sample_index)
 
         self.send_response(200)
-        for name, value in self.headers.items():
+        for name, value in self.response_headers.items():
             self.send_header(name, value)
         self.end_headers()
         if not head_only:
-            self.wfile.write(self.fixture_data)
+            try:
+                self.wfile.write(self.fixture_data)
+                self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                return
+            self.stats.record(sample_index)
 
     def log_message(self, format: str, *args: object) -> None:
         return
@@ -220,7 +244,7 @@ def main() -> int:
         fixture_source = str(image_path)
 
     ImageMemoryFixtureHandler.fixture_data = data
-    ImageMemoryFixtureHandler.headers = fixture_headers(data)
+    ImageMemoryFixtureHandler.response_headers = fixture_headers(data)
     ImageMemoryFixtureHandler.stats = FixtureStats(len(data))
     server = ConcurrentFixtureServer(
         (args.host, args.port),
