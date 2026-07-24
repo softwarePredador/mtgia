@@ -1,8 +1,23 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/sync_cards_utils.dart';
 
 void main() {
+  test('incremental upsert never downgrades a direct CDN image', () {
+    final source = File('bin/sync_cards.dart').readAsStringSync();
+
+    expect(
+      source,
+      contains("WHEN EXCLUDED.image_url LIKE 'https://cards.scryfall.io/%'"),
+    );
+    expect(
+      source,
+      contains("WHEN cards.image_url LIKE 'https://cards.scryfall.io/%'"),
+    );
+  });
+
   // ════════════════════════════════════════════════════════════════════════
   // extractCardRow (AtomicCards)
   // ════════════════════════════════════════════════════════════════════════
@@ -20,9 +35,7 @@ void main() {
           'printings': ['LEA', 'M10', 'A25'],
           'rarity': 'common',
           'isReserved': true,
-          'identifiers': {
-            'scryfallOracleId': 'abc-123-def',
-          },
+          'identifiers': {'scryfallOracleId': 'abc-123-def'},
         },
       ];
 
@@ -36,11 +49,55 @@ void main() {
       expect(row[4], 'Lightning Bolt deals 3 damage to any target.'); // text
       expect(row[5], ['R']); // colors
       expect(row[6], ['R']); // colorIdentity
-      expect(row[7], contains('Lightning+Bolt')); // imageUrl encoded
-      expect(row[7], contains('set=LEA')); // primeiro set
+      expect(row[7], contains('Lightning%20Bolt')); // imageUrl encoded
+      expect(row[7], contains('set=lea')); // primeiro set
       expect(row[8], 'LEA'); // setCode
       expect(row[9], 'common'); // rarity
       expect(row[10], isTrue); // isReserved
+    });
+
+    test('usa CDN direta quando AtomicCards traz printing Scryfall válida', () {
+      const printingId = '00000000-0000-4000-8000-000000000011';
+      final row = extractCardRow('Direct Art', [
+        {
+          'name': 'Direct Art',
+          'identifiers': {
+            'scryfallOracleId': '00000000-0000-4000-8000-000000000010',
+            'scryfallId': printingId,
+          },
+        },
+      ]);
+
+      expect(row, isNotNull);
+      expect(
+        row![7],
+        'https://cards.scryfall.io/normal/front/0/0/$printingId.jpg',
+      );
+    });
+
+    test('prefere variante posterior com printing concreta para a imagem', () {
+      const printingId = '00000000-0000-4000-8000-000000000021';
+      final row = extractCardRow('Preferred Art', [
+        {
+          'name': 'Preferred Art',
+          'identifiers': {
+            'scryfallOracleId': '00000000-0000-4000-8000-000000000020',
+          },
+        },
+        {
+          'name': 'Preferred Art',
+          'identifiers': {
+            'scryfallOracleId': '00000000-0000-4000-8000-000000000020',
+            'scryfallId': printingId,
+          },
+        },
+      ]);
+
+      expect(row, isNotNull);
+      expect(
+        row![7],
+        'https://cards.scryfall.io/normal/front/0/0/$printingId.jpg',
+      );
     });
 
     test('retorna null quando não tem scryfallOracleId', () {
@@ -92,9 +149,7 @@ void main() {
           'colorIdentity': <String>[],
           'printings': ['CMR'],
           'rarity': 'uncommon',
-          'identifiers': {
-            'scryfallOracleId': 'sol-ring-id',
-          },
+          'identifiers': {'scryfallOracleId': 'sol-ring-id'},
         },
       ];
 
@@ -145,7 +200,7 @@ void main() {
       final row = extractCardRow('Case Test', printings);
       expect(row, isNotNull);
       expect(row![8], 'SOC');
-      expect(row[7], contains('set=SOC'));
+      expect(row[7], contains('set=soc'));
     });
 
     test('campos opcionais são null quando ausentes', () {
@@ -228,7 +283,7 @@ void main() {
       expect(row[8], 'DSK');
       expect(row[10], '123');
       expect(row[11], isTrue);
-      expect(row[7], contains('set=DSK'));
+      expect(row[7], contains('set=dsk'));
     });
 
     test('marca foil false quando set tem apenas non-foil', () {
@@ -289,62 +344,68 @@ void main() {
       final row = extractSetCardRow(card, 'ecc');
       expect(row, isNotNull);
       expect(row![8], 'ECC');
-      expect(row[7], contains('set=ECC'));
+      expect(row[7], contains('set=ecc'));
     });
 
-    test('linha operacional preserva metadados de combate usados pelo sync',
-        () {
-      final card = {
-        'name': 'Operational Creature',
-        'manaCost': '{2}{G}',
-        'type': 'Creature — Beast',
-        'text': 'Trample',
-        'colors': ['G'],
-        'colorIdentity': ['G'],
-        'power': '4',
-        'toughness': '4',
-        'keywords': ['Trample'],
-        'isReserved': true,
-        'number': '42',
-        'hasFoil': true,
-        'hasNonFoil': false,
-        'identifiers': {
-          'scryfallOracleId': 'operational-creature-id',
-          'scryfallId': 'scryfall-printing-id',
-        },
-      };
+    test(
+      'linha operacional preserva metadados de combate usados pelo sync',
+      () {
+        final card = {
+          'name': 'Operational Creature',
+          'manaCost': '{2}{G}',
+          'type': 'Creature — Beast',
+          'text': 'Trample',
+          'colors': ['G'],
+          'colorIdentity': ['G'],
+          'power': '4',
+          'toughness': '4',
+          'keywords': ['Trample'],
+          'isReserved': true,
+          'number': '42',
+          'hasFoil': true,
+          'hasNonFoil': false,
+          'identifiers': {
+            'scryfallOracleId': '00000000-0000-4000-8000-000000000010',
+            'scryfallId': '00000000-0000-4000-8000-000000000011',
+          },
+        };
 
-      final row = extractSetCardSyncRow(card, 'tst');
+        final row = extractSetCardSyncRow(card, 'tst');
 
-      expect(row, isNotNull);
-      expect(row, hasLength(19));
-      expect(row![0], 'scryfall-printing-id');
-      expect(row[1], 'operational-creature-id');
-      expect(row[8], '4');
-      expect(row[9], '4');
-      expect(row[10], equals(['Trample']));
-      expect(row[11], contains('/scryfall-printing-id?format=image'));
-      expect(row[12], 'TST');
-      expect(row[14], isTrue);
-      expect(row[15], '42');
-      expect(row[16], isTrue);
-    });
+        expect(row, isNotNull);
+        expect(row, hasLength(19));
+        expect(row![0], '00000000-0000-4000-8000-000000000011');
+        expect(row[1], '00000000-0000-4000-8000-000000000010');
+        expect(row[8], '4');
+        expect(row[9], '4');
+        expect(row[10], equals(['Trample']));
+        expect(
+          row[11],
+          'https://cards.scryfall.io/normal/front/0/0/'
+          '00000000-0000-4000-8000-000000000011.jpg',
+        );
+        expect(row[12], 'TST');
+        expect(row[14], isTrue);
+        expect(row[15], '42');
+        expect(row[16], isTrue);
+      },
+    );
 
-    test('sync operacional cai para oracle id quando printing id esta ausente',
-        () {
-      final card = {
-        'name': 'Oracle Fallback',
-        'identifiers': {
-          'scryfallOracleId': 'oracle-only-id',
-        },
-      };
+    test(
+      'sync operacional cai para oracle id quando printing id esta ausente',
+      () {
+        final card = {
+          'name': 'Oracle Fallback',
+          'identifiers': {'scryfallOracleId': 'oracle-only-id'},
+        };
 
-      final row = extractSetCardSyncRow(card, 'tst');
+        final row = extractSetCardSyncRow(card, 'tst');
 
-      expect(row, isNotNull);
-      expect(row![0], 'oracle-only-id');
-      expect(row[1], 'oracle-only-id');
-    });
+        expect(row, isNotNull);
+        expect(row![0], 'oracle-only-id');
+        expect(row[1], 'oracle-only-id');
+      },
+    );
   });
 
   // ════════════════════════════════════════════════════════════════════════
@@ -471,17 +532,11 @@ void main() {
     });
 
     test('funciona com outros args antes e depois', () {
-      expect(
-        parseSinceDays(['--full', '--since-days=30', '--force']),
-        30,
-      );
+      expect(parseSinceDays(['--full', '--since-days=30', '--force']), 30);
     });
 
     test('usa primeiro match quando há múltiplos', () {
-      expect(
-        parseSinceDays(['--since-days=10', '--since-days=20']),
-        10,
-      );
+      expect(parseSinceDays(['--since-days=10', '--since-days=20']), 10);
     });
 
     test('ignora espaços ao redor do valor', () {
@@ -497,13 +552,13 @@ void main() {
     test('extrai oracle IDs únicos', () {
       final cards = [
         {
-          'identifiers': {'scryfallOracleId': 'id-1'}
+          'identifiers': {'scryfallOracleId': 'id-1'},
         },
         {
-          'identifiers': {'scryfallOracleId': 'id-2'}
+          'identifiers': {'scryfallOracleId': 'id-2'},
         },
         {
-          'identifiers': {'scryfallOracleId': 'id-1'}
+          'identifiers': {'scryfallOracleId': 'id-1'},
         }, // duplicata
       ];
       final ids = extractOracleIds(cards);
@@ -515,7 +570,7 @@ void main() {
       final cards = <Map<String, dynamic>>[
         {'name': 'No Ids'},
         {
-          'identifiers': {'scryfallOracleId': 'ok-id'}
+          'identifiers': {'scryfallOracleId': 'ok-id'},
         },
       ];
       final ids = extractOracleIds(cards);
@@ -525,10 +580,10 @@ void main() {
     test('ignora oracleId vazio', () {
       final cards = [
         {
-          'identifiers': {'scryfallOracleId': ''}
+          'identifiers': {'scryfallOracleId': ''},
         },
         {
-          'identifiers': {'scryfallOracleId': 'valid'}
+          'identifiers': {'scryfallOracleId': 'valid'},
         },
       ];
       final ids = extractOracleIds(cards);
@@ -594,18 +649,20 @@ void main() {
       expect(url, contains('format=image'));
     });
 
-    test('oracleId (row[0]) é sempre string não-vazia quando row não é null',
-        () {
-      final printings = [
-        {
-          'identifiers': {'scryfallOracleId': 'valid'},
-        },
-      ];
-      final row = extractCardRow('X', printings);
-      expect(row, isNotNull);
-      expect(row![0], isA<String>());
-      expect((row[0] as String).isNotEmpty, isTrue);
-    });
+    test(
+      'oracleId (row[0]) é sempre string não-vazia quando row não é null',
+      () {
+        final printings = [
+          {
+            'identifiers': {'scryfallOracleId': 'valid'},
+          },
+        ];
+        final row = extractCardRow('X', printings);
+        expect(row, isNotNull);
+        expect(row![0], isA<String>());
+        expect((row[0] as String).isNotEmpty, isTrue);
+      },
+    );
 
     test('colors e colorIdentity são sempre List<String> não-null', () {
       final printings = [
@@ -654,8 +711,8 @@ void main() {
       final urlSet = rowSet![7] as String;
       expect(urlAtomic, contains('Consistency'));
       expect(urlSet, contains('Consistency'));
-      expect(urlAtomic, contains('set=ABC'));
-      expect(urlSet, contains('set=ABC'));
+      expect(urlAtomic, contains('set=abc'));
+      expect(urlSet, contains('set=abc'));
     });
   });
 
@@ -704,21 +761,27 @@ void main() {
       expect(row![1], 'Fire // Ice');
     });
 
-    test('getNewSetCodesSinceFromData com centenas de sets não causa problema',
-        () {
-      final bigList = List.generate(
+    test(
+      'getNewSetCodesSinceFromData com centenas de sets não causa problema',
+      () {
+        final bigList = List.generate(
           1000,
           (i) => {
-                'code': 'S${i.toString().padLeft(4, '0')}',
-                'releaseDate': '2025-06-01',
-              });
-      final codes = getNewSetCodesSinceFromData(bigList, DateTime(2024));
-      expect(codes, hasLength(1000));
-      // Deve estar ordenado
-      for (var i = 1; i < codes.length; i++) {
-        expect(codes[i].compareTo(codes[i - 1]) >= 0, isTrue,
-            reason: 'Lista deve estar ordenada');
-      }
-    });
+            'code': 'S${i.toString().padLeft(4, '0')}',
+            'releaseDate': '2025-06-01',
+          },
+        );
+        final codes = getNewSetCodesSinceFromData(bigList, DateTime(2024));
+        expect(codes, hasLength(1000));
+        // Deve estar ordenado
+        for (var i = 1; i < codes.length; i++) {
+          expect(
+            codes[i].compareTo(codes[i - 1]) >= 0,
+            isTrue,
+            reason: 'Lista deve estar ordenada',
+          );
+        }
+      },
+    );
   });
 }

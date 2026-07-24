@@ -16,8 +16,10 @@ import json
 import math
 import os
 import sys
+import uuid
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote, urlparse
 
 import psycopg2
 import psycopg2.extras
@@ -69,6 +71,7 @@ def normalize_set_code(value: Any) -> str | None:
 
 
 def selected_printing(card_name: str, printings: list[Any]) -> dict[str, Any] | None:
+    oracle_fallback: dict[str, Any] | None = None
     for printing in printings:
         if not isinstance(printing, dict):
             continue
@@ -76,16 +79,74 @@ def selected_printing(card_name: str, printings: list[Any]) -> dict[str, Any] | 
         if not isinstance(identifiers, dict):
             continue
         oracle_id = str(identifiers.get("scryfallOracleId") or "").strip()
-        if oracle_id:
+        if oracle_id and oracle_fallback is None:
+            oracle_fallback = printing
+        printing_id = normalized_scryfall_printing_id(
+            identifiers.get("scryfallId")
+        )
+        if oracle_id and printing_id:
             return printing
-    return None
+    return oracle_fallback
 
 
-def scryfall_image_url(name: str, identifiers: dict[str, Any], set_code: str | None) -> str:
-    scryfall_id = str(identifiers.get("scryfallId") or "").strip()
-    if scryfall_id:
-        return f"https://api.scryfall.com/cards/{scryfall_id}?format=image&version=normal"
-    from urllib.parse import quote
+def normalized_scryfall_printing_id(value: Any) -> str | None:
+    candidate = str(value or "").strip().lower()
+    try:
+        parsed = uuid.UUID(candidate)
+    except (ValueError, AttributeError):
+        return None
+    normalized = str(parsed)
+    return normalized if normalized == candidate else None
+
+
+def scryfall_normal_cdn_url(printing_id: str) -> str:
+    return (
+        "https://cards.scryfall.io/normal/front/"
+        f"{printing_id[0]}/{printing_id[1]}/{printing_id}.jpg"
+    )
+
+
+def _payload_normal_image_candidates(card: dict[str, Any]) -> list[Any]:
+    candidates: list[Any] = []
+    image_uris = card.get("image_uris")
+    if isinstance(image_uris, dict):
+        candidates.append(image_uris.get("normal"))
+    card_faces = card.get("card_faces")
+    if isinstance(card_faces, list):
+        for face in card_faces:
+            if not isinstance(face, dict):
+                continue
+            face_image_uris = face.get("image_uris")
+            if isinstance(face_image_uris, dict):
+                candidates.append(face_image_uris.get("normal"))
+    return candidates
+
+
+def _is_direct_normal_image_for_printing(value: Any, printing_id: str) -> bool:
+    candidate = str(value or "").strip()
+    parsed = urlparse(candidate)
+    return (
+        parsed.scheme == "https"
+        and parsed.hostname == "cards.scryfall.io"
+        and parsed.path.startswith("/normal/")
+        and parsed.path.lower().endswith(f"/{printing_id}.jpg")
+    )
+
+
+def scryfall_image_url(
+    name: str, card: dict[str, Any], set_code: str | None
+) -> str:
+    identifiers = card.get("identifiers")
+    printing_id = (
+        normalized_scryfall_printing_id(identifiers.get("scryfallId"))
+        if isinstance(identifiers, dict)
+        else None
+    )
+    if printing_id:
+        for candidate in _payload_normal_image_candidates(card):
+            if _is_direct_normal_image_for_printing(candidate, printing_id):
+                return str(candidate).strip()
+        return scryfall_normal_cdn_url(printing_id)
 
     set_param = f"&set={set_code}" if set_code else ""
     return (
@@ -148,7 +209,7 @@ def parse_atomic_cards(path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[An
             str(chosen["power"]) if chosen.get("power") is not None else None,
             str(chosen["toughness"]) if chosen.get("toughness") is not None else None,
             list_of_strings(chosen.get("keywords")),
-            scryfall_image_url(name, identifiers, set_code),
+            scryfall_image_url(name, chosen, set_code),
             set_code,
             chosen.get("rarity"),
             normalized_cmc(chosen.get("manaValue", chosen.get("convertedManaCost"))),
@@ -209,7 +270,13 @@ def upsert_cards(conn, rows: list[tuple[Any, ...]], batch_size: int) -> int:
                   power = EXCLUDED.power,
                   toughness = EXCLUDED.toughness,
                   keywords = EXCLUDED.keywords,
-                  image_url = EXCLUDED.image_url,
+                  image_url = CASE
+                    WHEN EXCLUDED.image_url LIKE 'https://cards.scryfall.io/%'
+                      THEN EXCLUDED.image_url
+                    WHEN cards.image_url LIKE 'https://cards.scryfall.io/%'
+                      THEN cards.image_url
+                    ELSE EXCLUDED.image_url
+                  END,
                   set_code = EXCLUDED.set_code,
                   rarity = EXCLUDED.rarity,
                   cmc = EXCLUDED.cmc,

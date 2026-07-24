@@ -268,7 +268,11 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       'oracle_text': m['oracle_text'],
       'colors': m['colors'],
       'color_identity': m['color_identity'],
-      'image_url': normalizeScryfallImageUrl(m['image_url']?.toString()),
+      'image_url': normalizeScryfallImageUrl(
+        m['image_url']?.toString(),
+        printingId: m['scryfall_id']?.toString(),
+        oracleId: m['oracle_id']?.toString(),
+      ),
       'set_code': m['set_code'],
       if (m.containsKey('set_name')) 'set_name': m['set_name'],
       if (m.containsKey('set_release_date'))
@@ -493,37 +497,9 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
       }
     }
 
-    // Image URL: preferir URL direta do Scryfall (image_uris.normal)
-    // Fallback para card_faces[0] em cartas double-faced
-    String? imageUrl;
-    final imageUris = card['image_uris'] as Map<String, dynamic>?;
-    if (imageUris != null && imageUris['normal'] != null) {
-      imageUrl = imageUris['normal'].toString();
-    } else {
-      final cardFaces = card['card_faces'] as List?;
-      if (cardFaces != null && cardFaces.isNotEmpty) {
-        final firstFace = cardFaces[0] as Map<String, dynamic>?;
-        final faceImageUris = firstFace?['image_uris'] as Map<String, dynamic>?;
-        if (faceImageUris != null && faceImageUris['normal'] != null) {
-          imageUrl = faceImageUris['normal'].toString();
-        }
-      }
-    }
-    // Se ainda não temos URL, usa ID-based redirect
-    if (imageUrl == null || imageUrl.isEmpty) {
-      final cardId = card['id']?.toString();
-      if (cardId != null && cardId.isNotEmpty) {
-        imageUrl =
-            'https://api.scryfall.com/cards/$cardId?format=image&version=normal';
-      } else {
-        // Último fallback: name-based (menos confiável)
-        final encodedName = Uri.encodeQueryComponent(cardName);
-        final setParam =
-            setCode != null && setCode.isNotEmpty ? '&set=$setCode' : '';
-        imageUrl =
-            'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
-      }
-    }
+    final imageUrl =
+        scryfallNormalImageUrlFromPayload(card) ??
+        scryfallNamedImageFallback(cardName, setCode: setCode);
 
     // CMC
     final cmc = card['cmc']?.toString();
@@ -556,6 +532,7 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
             @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
+            image_url = COALESCE(EXCLUDED.image_url, cards.image_url),
             is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
             foil = COALESCE(cards.foil, EXCLUDED.foil),

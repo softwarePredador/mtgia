@@ -60,7 +60,7 @@ void main() {
     );
 
     test(
-      'GET /decks/:id card rows expose display fields, not identity payloads',
+      'GET /decks/:id uses identity only to normalize display image URLs',
       () {
         final source = File('routes/decks/[id]/index.dart').readAsStringSync();
         final cardsSelectStart = source.indexOf(
@@ -80,10 +80,18 @@ void main() {
         expect(cardsSelect, contains('c.color_identity'));
         expect(cardsSelect, contains('AS set_name'));
         expect(cardsSelect, contains('AS set_release_date'));
-        expect(cardsSelect, isNot(contains('oracle_id')));
+        expect(cardsSelect, contains('c.scryfall_id::text AS scryfall_id'));
+        expect(cardsSelect, contains('AS oracle_id'));
+        expect(
+          cardsSelect,
+          contains("printingId: m.remove('scryfall_id')?.toString()"),
+        );
+        expect(
+          cardsSelect,
+          contains("oracleId: m.remove('oracle_id')?.toString()"),
+        );
         expect(cardsSelect, isNot(contains('layout')));
         expect(cardsSelect, isNot(contains('card_faces')));
-        expect(cardsSelect, isNot(contains('scryfall_id')));
       },
     );
   });

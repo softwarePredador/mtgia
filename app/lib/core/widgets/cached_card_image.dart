@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/image_cache_policy.dart';
+import '../services/scryfall_image_request_policy.dart';
 import '../theme/app_theme.dart';
 
 /// Widget centralizado para exibir imagens de cartas MTG com cache local.
@@ -167,6 +171,25 @@ class CachedCardImage extends StatelessWidget {
     String? fallbackUrl,
     required ImageDecodeTarget decodeTarget,
   }) {
+    final needsScryfallWebResilience =
+        kIsWeb &&
+        (isScryfallApiImageUrl(effectiveImageUrl) ||
+            (fallbackUrl != null && isScryfallApiImageUrl(fallbackUrl)));
+    if (needsScryfallWebResilience) {
+      return _ScryfallWebCardImage(
+        key: networkImageKey,
+        primaryUrl: effectiveImageUrl,
+        fallbackUrl: fallbackUrl,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        decodeTarget: decodeTarget,
+        loadingWidget: _loadingWidget,
+        errorWidget: _errorWidget,
+      );
+    }
+
     final image = CachedNetworkImage(
       key: networkImageKey,
       imageUrl: effectiveImageUrl,
@@ -282,6 +305,204 @@ class CachedCardImage extends StatelessWidget {
         Icons.image_not_supported,
         color: AppTheme.outlineMuted,
       ),
+    );
+  }
+}
+
+class _ScryfallWebCardImage extends StatefulWidget {
+  const _ScryfallWebCardImage({
+    super.key,
+    required this.primaryUrl,
+    required this.fallbackUrl,
+    required this.width,
+    required this.height,
+    required this.fit,
+    required this.alignment,
+    required this.decodeTarget,
+    required this.loadingWidget,
+    required this.errorWidget,
+  });
+
+  final String primaryUrl;
+  final String? fallbackUrl;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+  final Alignment alignment;
+  final ImageDecodeTarget decodeTarget;
+  final Widget Function() loadingWidget;
+  final Widget Function() errorWidget;
+
+  @override
+  State<_ScryfallWebCardImage> createState() => _ScryfallWebCardImageState();
+}
+
+class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
+  late String _currentUrl;
+  String? _remainingFallbackUrl;
+  Timer? _retryTimer;
+  var _retryIndex = 0;
+  var _requestSequence = 0;
+  var _requestGeneration = 0;
+  var _requestReady = false;
+  var _errorRecoveryPending = false;
+  var _terminalError = false;
+
+  bool get _currentRequestNeedsGate => isScryfallApiImageUrl(_currentUrl);
+
+  bool get _canRecover =>
+      (_currentRequestNeedsGate &&
+          scryfallImageRetryPolicy.delayForRetry(_retryIndex) != null) ||
+      _remainingFallbackUrl != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetUrls();
+    _prepareCurrentRequest();
+  }
+
+  @override
+  void didUpdateWidget(_ScryfallWebCardImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.primaryUrl == oldWidget.primaryUrl &&
+        widget.fallbackUrl == oldWidget.fallbackUrl) {
+      return;
+    }
+    _retryTimer?.cancel();
+    _requestGeneration += 1;
+    _resetUrls();
+    _prepareCurrentRequest();
+  }
+
+  @override
+  void dispose() {
+    _retryTimer?.cancel();
+    _requestGeneration += 1;
+    super.dispose();
+  }
+
+  void _resetUrls() {
+    _currentUrl = widget.primaryUrl;
+    _remainingFallbackUrl = widget.fallbackUrl;
+    _retryIndex = 0;
+    _requestSequence = 0;
+    _requestReady = false;
+    _errorRecoveryPending = false;
+    _terminalError = false;
+  }
+
+  void _prepareCurrentRequest() {
+    final generation = ++_requestGeneration;
+    if (!_currentRequestNeedsGate) {
+      _markRequestReady(generation);
+      return;
+    }
+
+    _requestReady = false;
+    unawaited(_waitForScryfallPermit(generation));
+  }
+
+  Future<void> _waitForScryfallPermit(int generation) async {
+    try {
+      await scryfallImageRequestGate.acquire();
+    } catch (error) {
+      // The production gate only uses DateTime/Future.delayed, but a permit
+      // failure must never leave card artwork stuck on its placeholder.
+      debugPrint('[🖼️ CachedCardImage] falha no gate Scryfall -> $error');
+    }
+    _markRequestReady(generation);
+  }
+
+  void _markRequestReady(int generation) {
+    if (!mounted || generation != _requestGeneration) {
+      return;
+    }
+    setState(() {
+      _requestSequence += 1;
+      _requestReady = true;
+      _errorRecoveryPending = false;
+    });
+  }
+
+  void _queueErrorRecovery(Object error) {
+    if (_errorRecoveryPending || _terminalError || !_requestReady) {
+      return;
+    }
+    _errorRecoveryPending = true;
+    final failedSequence = _requestSequence;
+    debugPrint(
+      '[🖼️ CachedCardImage] falha ao carregar $_currentUrl '
+      '(tentativa ${_retryIndex + 1}) -> $error',
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || failedSequence != _requestSequence || _terminalError) {
+        return;
+      }
+      _recoverFromError();
+    });
+  }
+
+  void _recoverFromError() {
+    final retryDelay = _currentRequestNeedsGate
+        ? scryfallImageRetryPolicy.delayForRetry(_retryIndex)
+        : null;
+    if (retryDelay != null) {
+      _retryIndex += 1;
+      setState(() {
+        _requestReady = false;
+        _errorRecoveryPending = false;
+      });
+      _retryTimer = Timer(retryDelay, _prepareCurrentRequest);
+      return;
+    }
+
+    final fallbackUrl = _remainingFallbackUrl;
+    if (fallbackUrl != null) {
+      setState(() {
+        _currentUrl = fallbackUrl;
+        _remainingFallbackUrl = null;
+        _retryIndex = 0;
+        _requestReady = false;
+        _errorRecoveryPending = false;
+      });
+      _prepareCurrentRequest();
+      return;
+    }
+
+    setState(() {
+      _requestReady = false;
+      _errorRecoveryPending = false;
+      _terminalError = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_terminalError) {
+      return widget.errorWidget();
+    }
+    if (!_requestReady) {
+      return widget.loadingWidget();
+    }
+
+    return CachedNetworkImage(
+      key: ValueKey('$_currentUrl#$_requestSequence'),
+      imageUrl: _currentUrl,
+      width: widget.width,
+      height: widget.height,
+      fit: widget.fit,
+      alignment: widget.alignment,
+      httpHeaders: CachedCardImage._scryfallHeaders,
+      memCacheWidth: widget.decodeTarget.width,
+      memCacheHeight: widget.decodeTarget.height,
+      fadeInDuration: const Duration(milliseconds: 200),
+      placeholder: (_, __) => widget.loadingWidget(),
+      errorWidget: (_, __, error) {
+        _queueErrorRecovery(error);
+        return _canRecover ? widget.loadingWidget() : widget.errorWidget();
+      },
     );
   }
 }

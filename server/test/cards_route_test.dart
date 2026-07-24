@@ -47,6 +47,11 @@ void main() {
       expect(source, contains('is_reserved'));
       expect(source, contains("p['reserved']"));
       expect(source, contains('ON CONFLICT (scryfall_id) DO UPDATE SET'));
+      expect(source, contains('scryfallNormalImageUrlFromPayload(p)'));
+      expect(
+        source,
+        contains('image_url = COALESCE(EXCLUDED.image_url, cards.image_url)'),
+      );
       expect(source, contains('INSERT INTO sets'));
     });
 
@@ -56,6 +61,29 @@ void main() {
       expect(source, contains("'is_reserved': m['is_reserved'] == true"));
       expect(source, contains("card['reserved']"));
       expect(source, contains('is_reserved = COALESCE'));
+      expect(source, contains('scryfallNormalImageUrlFromPayload(card)'));
+      expect(
+        source,
+        contains('image_url = COALESCE(EXCLUDED.image_url, cards.image_url)'),
+      );
     });
+
+    test(
+      'legacy seed uses direct printing art without rekeying oracle rows',
+      () {
+        final source = File('bin/seed_database.dart').readAsStringSync();
+
+        expect(
+          source,
+          contains('scryfallNormalImageUrlFromPayload(cardPayload)'),
+        );
+        expect(source, contains('scryfallNamedImageFallback'));
+        expect(source, contains('oracleId,'));
+        expect(
+          source,
+          contains("WHEN cards.image_url LIKE 'https://cards.scryfall.io/%'"),
+        );
+      },
+    );
   });
 }

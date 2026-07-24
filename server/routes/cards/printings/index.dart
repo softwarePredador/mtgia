@@ -215,7 +215,11 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
   final data =
       result.map((row) {
         final m = row.toColumnMap();
-        final imageUrl = normalizeScryfallImageUrl(m['image_url']?.toString());
+        final imageUrl = normalizeScryfallImageUrl(
+          m['image_url']?.toString(),
+          printingId: m['scryfall_id']?.toString(),
+          oracleId: m['oracle_id']?.toString(),
+        );
         return <String, dynamic>{
           'id': m['id'],
           'scryfall_id': m['scryfall_id'],
@@ -331,36 +335,9 @@ Future<int> _syncPrintingsFromScryfall(
       }
     }
 
-    // Image URL: preferir URL direta do Scryfall (image_uris.normal)
-    // Fallback para card_faces[0] em cartas double-faced
-    String? imageUrl;
-    final imageUris = p['image_uris'] as Map<String, dynamic>?;
-    if (imageUris != null && imageUris['normal'] != null) {
-      imageUrl = imageUris['normal'].toString();
-    } else {
-      final cardFaces = p['card_faces'] as List?;
-      if (cardFaces != null && cardFaces.isNotEmpty) {
-        final firstFace = cardFaces[0] as Map<String, dynamic>?;
-        final faceImageUris = firstFace?['image_uris'] as Map<String, dynamic>?;
-        if (faceImageUris != null && faceImageUris['normal'] != null) {
-          imageUrl = faceImageUris['normal'].toString();
-        }
-      }
-    }
-    // Se ainda não temos URL, usa ID-based redirect
-    if (imageUrl == null || imageUrl.isEmpty) {
-      if (scryfallId.isNotEmpty) {
-        imageUrl =
-            'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
-      } else {
-        // Último fallback: name-based (menos confiável)
-        final encodedCardName = Uri.encodeQueryComponent(cardName);
-        final setParam =
-            setCode != null && setCode.isNotEmpty ? '&set=$setCode' : '';
-        imageUrl =
-            'https://api.scryfall.com/cards/named?exact=$encodedCardName$setParam&format=image';
-      }
-    }
+    final imageUrl =
+        scryfallNormalImageUrlFromPayload(p) ??
+        scryfallNamedImageFallback(cardName, setCode: setCode);
 
     try {
       final identityInsertColumns =
@@ -389,6 +366,7 @@ Future<int> _syncPrintingsFromScryfall(
             @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
+            image_url = COALESCE(EXCLUDED.image_url, cards.image_url),
             is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
             foil = COALESCE(cards.foil, EXCLUDED.foil),

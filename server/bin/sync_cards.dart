@@ -709,7 +709,13 @@ Future<void> _upsertCardRowsBatch(
       power = EXCLUDED.power,
       toughness = EXCLUDED.toughness,
       keywords = EXCLUDED.keywords,
-      image_url = EXCLUDED.image_url,
+      image_url = CASE
+        WHEN EXCLUDED.image_url LIKE 'https://cards.scryfall.io/%'
+          THEN EXCLUDED.image_url
+        WHEN cards.image_url LIKE 'https://cards.scryfall.io/%'
+          THEN cards.image_url
+        ELSE EXCLUDED.image_url
+      END,
       set_code = EXCLUDED.set_code,
       rarity = EXCLUDED.rarity,
       is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),

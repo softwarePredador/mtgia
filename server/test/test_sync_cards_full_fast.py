@@ -58,7 +58,45 @@ def test_atomic_parser_preserves_oracle_identity_and_mana_value(tmp_path: Path) 
     assert row[0] == oracle_id
     assert row[1] == oracle_id
     assert row[2] == "Test Card"
+    assert row[11] == (
+        "https://cards.scryfall.io/normal/front/0/0/"
+        f"{printing_id}.jpg"
+    )
     assert row[14] == 3.0
     assert row[15] is False
     assert cards[1][14] is None
+    assert cards[1][11].startswith(
+        "https://api.scryfall.com/cards/named?"
+    )
+    assert "00000000-0000-4000-8000-000000000012" not in cards[1][11]
     assert legalities == [(oracle_id, "commander", "legal")]
+
+
+def test_image_url_prefers_matching_payload_normal_uri() -> None:
+    printing_id = "00000000-0000-4000-8000-000000000021"
+    direct = (
+        "https://cards.scryfall.io/normal/front/0/0/"
+        f"{printing_id}.jpg?123"
+    )
+    card = {
+        "identifiers": {
+            "scryfallId": printing_id,
+            "scryfallOracleId": "00000000-0000-4000-8000-000000000020",
+        },
+        "image_uris": {"normal": direct},
+    }
+
+    assert MODULE.scryfall_image_url("Direct Art", card, "tst") == direct
+
+
+def test_upsert_never_downgrades_a_direct_cdn_image() -> None:
+    source = MODULE_PATH.read_text(encoding="utf-8")
+
+    assert (
+        "WHEN EXCLUDED.image_url LIKE 'https://cards.scryfall.io/%'"
+        in source
+    )
+    assert (
+        "WHEN cards.image_url LIKE 'https://cards.scryfall.io/%'"
+        in source
+    )

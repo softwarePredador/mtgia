@@ -62,6 +62,8 @@ Future<Response> onRequest(RequestContext context) async {
           final map = row.toColumnMap();
           final imageUrl = normalizeScryfallImageUrl(
             map['image_url']?.toString(),
+            printingId: map['scryfall_id']?.toString(),
+            oracleId: map['oracle_id']?.toString(),
           );
           return {
             'id': map['id'],

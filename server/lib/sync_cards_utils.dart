@@ -3,6 +3,7 @@
 /// Extraídas do sync_cards.dart para serem testáveis independentemente
 /// do Postgres e HTTP.
 import 'mtg_data_integrity_support.dart';
+import 'scryfall_image_url.dart';
 
 /// Extrai dados de uma carta do AtomicCards para upsert no banco.
 ///
@@ -21,8 +22,11 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
     final ids = p['identifiers'] as Map<String, dynamic>?;
     if (ids?['scryfallOracleId'] != null &&
         (ids!['scryfallOracleId'] as String).isNotEmpty) {
-      chosen = p;
-      break;
+      chosen ??= p;
+      if (scryfallPrintingIdFromPayload(p) != null) {
+        chosen = p;
+        break;
+      }
     }
   }
   if (chosen == null) return null;
@@ -48,20 +52,9 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
   final isReserved =
       chosen['isReserved'] is bool ? chosen['isReserved'] as bool : null;
 
-  // Use scryfallId for direct image URL (more reliable than name-based)
-  final scryfallId = ids?['scryfallId']?.toString();
-  String imageUrl;
-  if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl =
-        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
-  } else {
-    // Fallback to name-based URL (less reliable)
-    final encodedName = Uri.encodeQueryComponent(name);
-    final setParam =
-        setCode != null && setCode.isNotEmpty ? '&set=$setCode' : '';
-    imageUrl =
-        'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
-  }
+  final imageUrl =
+      scryfallNormalImageUrlFromPayload(chosen) ??
+      scryfallNamedImageFallback(name, setCode: setCode);
 
   return [
     oracleId,
@@ -159,9 +152,11 @@ List<Object?>? extractSetCardSyncRow(
   final ids = card['identifiers'] as Map<String, dynamic>?;
   final oracleId = ids?['scryfallOracleId']?.toString();
   if (oracleId == null || oracleId.isEmpty) return null;
-  final scryfallId = ids?['scryfallId']?.toString();
-  final printingId =
-      scryfallId != null && scryfallId.isNotEmpty ? scryfallId : oracleId;
+  final printingId = scryfallPrintingIdFromPayload(card);
+  // Compatibilidade com linhas MTGJSON antigas sem printing id: a chave
+  // histórica pode continuar usando oracleId, mas a URL nunca é fabricada
+  // como se oracleId fosse uma printing.
+  final persistedId = printingId ?? oracleId;
 
   final name = card['name']?.toString();
   if (name == null || name.isEmpty) return null;
@@ -176,18 +171,9 @@ List<Object?>? extractSetCardSyncRow(
       (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
       const <String>[];
 
-  String imageUrl;
-  if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl =
-        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
-  } else {
-    // Fallback to name-based URL (less reliable)
-    final encodedName = Uri.encodeQueryComponent(name);
-    final setParam =
-        canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
-    imageUrl =
-        'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
-  }
+  final imageUrl =
+      scryfallNormalImageUrlFromPayload(card) ??
+      scryfallNamedImageFallback(name, setCode: canonicalSetCode);
 
   final collectorNumber = card['number']?.toString();
   final hasFoil = card['hasFoil'] as bool?;
@@ -200,7 +186,7 @@ List<Object?>? extractSetCardSyncRow(
   }
 
   return [
-    printingId,
+    persistedId,
     oracleId,
     name,
     card['manaCost']?.toString(),

@@ -13,6 +13,7 @@ import '../../../lib/deck_validation_state_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
 import '../../../lib/decks/deck_applied_analysis_support.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
+import '../../../lib/card_identity_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/scryfall_image_url.dart';
 
@@ -534,6 +535,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
   final hasPricingSource = await hasDeckPricingSourceColumn(conn);
   final hasValidationState = await hasDeckValidationStateColumns(conn);
   final hasSets = await _hasTable(conn, 'sets');
+  final hasCardIdentity = await hasCardIdentityColumns(conn);
 
   try {
     // 1. Buscar os detalhes do deck e verificar se pertence ao usuário
@@ -602,6 +604,8 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           c.colors,
           c.color_identity,
           c.image_url,
+          c.scryfall_id::text AS scryfall_id,
+          ${hasCardIdentity ? 'c.oracle_id::text' : 'NULL::text'} AS oracle_id,
           c.set_code,
           c.rarity,
           c.is_reserved,
@@ -631,6 +635,8 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           final m = row.toColumnMap();
           m['image_url'] = normalizeScryfallImageUrl(
             m['image_url']?.toString(),
+            printingId: m.remove('scryfall_id')?.toString(),
+            oracleId: m.remove('oracle_id')?.toString(),
           );
           if (m['set_release_date'] is DateTime) {
             m['set_release_date'] =
