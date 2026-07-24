@@ -145,6 +145,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('runtime_profile'), findsOneWidget);
       expect(find.text('Initial notes'), findsOneWidget);
+      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
       expect(
         find.byKey(const Key('profile-display-name-field')),
         findsOneWidget,

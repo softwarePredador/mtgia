@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_native_game_modes_sheet.dart';
 
@@ -61,6 +62,102 @@ class _GameModesHost extends StatelessWidget {
 }
 
 void main() {
+  testWidgets(
+    'renders thematic game mode symbols with accessible Material fallbacks',
+    (tester) async {
+      final semanticsHandle = tester.ensureSemantics();
+      const symbols = <String, ({String assetPath, IconData fallbackIcon})>{
+        'planechase': (
+          assetPath: 'assets/lotus/images/planechase.svg',
+          fallbackIcon: Icons.public_rounded,
+        ),
+        'archenemy': (
+          assetPath: 'assets/lotus/images/archenemy.svg',
+          fallbackIcon: Icons.shield_moon_outlined,
+        ),
+        'bounty': (
+          assetPath: 'assets/lotus/images/bounty.svg',
+          fallbackIcon: Icons.workspace_premium_outlined,
+        ),
+      };
+
+      final fallbackWidgets = <Widget>[];
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(splashFactory: InkRipple.splashFactory),
+            home: _GameModesHost(onResult: (_) {}),
+          ),
+        );
+
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        for (final entry in symbols.entries) {
+          final symbolFinder = find.byKey(
+            Key('life-counter-native-game-modes-${entry.key}-symbol'),
+          );
+          expect(symbolFinder, findsOneWidget);
+
+          final picture = tester.widget<SvgPicture>(symbolFinder);
+          final loader = picture.bytesLoader as SvgAssetLoader;
+          expect(loader.assetName, entry.value.assetPath);
+          expect(picture.width, 24);
+          expect(picture.height, 24);
+          expect(picture.colorFilter, isNotNull);
+          expect(picture.excludeFromSemantics, isTrue);
+          expect(picture.placeholderBuilder, isNotNull);
+          expect(picture.errorBuilder, isNotNull);
+
+          final title = switch (entry.key) {
+            'planechase' => 'Planechase',
+            'archenemy' => 'Archenemy',
+            _ => 'Bounty',
+          };
+          final semanticLabel = 'Símbolo do modo $title';
+          expect(find.byTooltip(semanticLabel), findsOneWidget);
+          expect(
+            tester
+                .getSemantics(
+                  find.byKey(
+                    Key(
+                      'life-counter-native-game-modes-${entry.key}-symbol-semantics',
+                    ),
+                  ),
+                )
+                .label,
+            semanticLabel,
+          );
+
+          fallbackWidgets.add(
+            picture.errorBuilder!(
+              tester.element(symbolFinder),
+              StateError('asset indisponível'),
+              StackTrace.empty,
+            ),
+          );
+        }
+      } finally {
+        semanticsHandle.dispose();
+      }
+
+      await tester.pumpWidget(
+        MaterialApp(home: Row(children: fallbackWidgets)),
+      );
+
+      for (final entry in symbols.entries) {
+        final fallbackFinder = find.byKey(
+          Key('life-counter-native-game-modes-${entry.key}-symbol-fallback'),
+        );
+        expect(fallbackFinder, findsOneWidget);
+        expect(
+          tester.widget<Icon>(fallbackFinder).icon,
+          entry.value.fallbackIcon,
+        );
+      }
+    },
+  );
+
   testWidgets('shows the owned game modes sheet', (tester) async {
     LifeCounterGameModesAction? result;
 

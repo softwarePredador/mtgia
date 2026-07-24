@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
@@ -382,6 +383,24 @@ void main() {
       expect(find.text('Inválido'), findsNothing);
       expect(find.text('Estratégia'), findsNothing);
       expect(apiClient.postCalls, isEmpty);
+
+      await tester.tap(find.byKey(const Key('deck-details-menu')));
+      await tester.pumpAndSettle();
+      final battleReplayMenuItem = find.ancestor(
+        of: find.text('Battle / replays'),
+        matching: find.byType(ListTile),
+      );
+      expect(
+        find.descendant(
+          of: battleReplayMenuItem,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is ManaLoomGlyph &&
+                widget.kind == ManaLoomGlyphKind.battleReplay,
+          ),
+        ),
+        findsOneWidget,
+      );
     },
   );
 
@@ -411,7 +430,14 @@ void main() {
 
     expect(find.text('Adicionar Cartas'), findsOneWidget);
     expect(find.text('Comandante'), findsOneWidget);
-    expect(find.byIcon(Icons.workspace_premium_rounded), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph &&
+            widget.kind == ManaLoomGlyphKind.commander,
+      ),
+      findsWidgets,
+    );
     expect(
       find.text('Carta que define identidade e regras do deck.'),
       findsNothing,

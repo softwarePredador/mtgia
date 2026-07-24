@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 
@@ -246,7 +247,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
               child: ElevatedButton.icon(
                 key: const Key('sample-hand-draw'),
                 onPressed: _newHand,
-                icon: const Icon(Icons.casino, size: 20),
+                icon: const ManaLoomGlyph(ManaLoomGlyphKind.shuffle, size: 20),
                 label: const Text('Comprar 7 cartas'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.brass500,
@@ -417,7 +418,10 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 final newHand = ElevatedButton.icon(
                   key: const Key('sample-hand-new-hand'),
                   onPressed: _newHand,
-                  icon: const Icon(Icons.casino, size: 18),
+                  icon: const ManaLoomGlyph(
+                    ManaLoomGlyphKind.shuffle,
+                    size: 18,
+                  ),
                   label: const Text('Nova Mão'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.brass500,

@@ -656,7 +656,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: AppTheme.space18),
                       _ProfileSectionPanel(
                         title: 'Configurações',
-                        icon: Icons.auto_awesome_rounded,
+                        icon: Icons.settings_outlined,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [

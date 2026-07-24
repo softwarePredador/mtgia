@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
@@ -647,7 +648,7 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
               child: _SummaryTile(
                 label: 'Commander',
                 value: hasCommander ? 'Definido' : 'Ausente',
-                icon: Icons.workspace_premium_outlined,
+                iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.commander),
                 accent: commanderOk ? AppTheme.success : AppTheme.warning,
               ),
             ),
@@ -705,16 +706,18 @@ class _SummaryTile extends StatelessWidget {
   final String label;
   final String value;
   final Widget? valueWidget;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? iconWidget;
   final Color accent;
 
   const _SummaryTile({
     required this.label,
     required this.value,
     this.valueWidget,
-    required this.icon,
+    this.icon,
+    this.iconWidget,
     required this.accent,
-  });
+  }) : assert(icon != null || iconWidget != null);
 
   @override
   Widget build(BuildContext context) {
@@ -726,7 +729,10 @@ class _SummaryTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: accent, size: 18),
+          IconTheme(
+            data: IconThemeData(color: accent, size: 18),
+            child: iconWidget ?? Icon(icon),
+          ),
           const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Column(

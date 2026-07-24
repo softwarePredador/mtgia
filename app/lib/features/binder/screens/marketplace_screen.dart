@@ -8,6 +8,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../decks/models/deck_card_item.dart';
@@ -248,7 +249,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     if (provider.marketItems.isEmpty) {
       return const AppStatePanel(
         key: Key('marketplace-list-empty'),
-        icon: Icons.storefront_rounded,
+        iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.trade),
         title: 'Nenhuma carta encontrada',
         message: 'Tente outro nome, condição ou tipo de negociação.',
         accent: AppTheme.brass400,

@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../decks/models/deck_card_item.dart';
@@ -500,9 +501,10 @@ class _EmptySetCardsState extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppStatePanel(
       key: const Key('setCardsEmptyState'),
-      icon: set.isFuture
-          ? Icons.hourglass_top_rounded
-          : Icons.inventory_2_outlined,
+      icon: set.isFuture ? Icons.hourglass_top_rounded : null,
+      iconWidget: set.isFuture
+          ? null
+          : const ManaLoomGlyph(ManaLoomGlyphKind.collection),
       title: set.isFuture
           ? 'Dados parciais de coleção futura'
           : 'Nenhuma carta local nesta coleção',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/widgets/sample_hand_widget.dart';
@@ -136,23 +137,52 @@ void main() {
       await tester.pumpWidget(createSubject());
       await tester.pumpAndSettle();
 
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('sample-hand-draw')),
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is ManaLoomGlyph &&
+                widget.kind == ManaLoomGlyphKind.shuffle,
+          ),
+        ),
+        findsOneWidget,
+      );
+
       await tester.tap(find.byKey(const Key('sample-hand-draw')));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('sample-hand-assessment')), findsOneWidget);
       expect(find.textContaining('cartas'), findsOneWidget);
       expect(find.text('Talrand, Sky Summoner'), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('sample-hand-mulligan')),
+          matching: find.byIcon(Icons.refresh),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('sample-hand-new-hand')),
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is ManaLoomGlyph &&
+                widget.kind == ManaLoomGlyphKind.shuffle,
+          ),
+        ),
+        findsOneWidget,
+      );
 
-      final assessmentTexts =
-          tester
-              .widgetList<Text>(
-                find.descendant(
-                  of: find.byKey(const Key('sample-hand-assessment')),
-                  matching: find.byType(Text),
-                ),
-              )
-              .map((text) => text.data ?? '')
-              .toList();
+      final assessmentTexts = tester
+          .widgetList<Text>(
+            find.descendant(
+              of: find.byKey(const Key('sample-hand-assessment')),
+              matching: find.byType(Text),
+            ),
+          )
+          .map((text) => text.data ?? '')
+          .toList();
       expect(
         assessmentTexts.any(
           (text) => {

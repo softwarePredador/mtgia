@@ -102,6 +102,7 @@ flutter:
   assets:
     - assets/fonts/
     - assets/branding/
+    - assets/icons/
     - assets/release/
     - assets/symbols/
     - assets/lotus/

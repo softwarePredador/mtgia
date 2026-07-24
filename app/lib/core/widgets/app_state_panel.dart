@@ -5,7 +5,8 @@ import '../theme/app_theme.dart';
 enum AppStateStatus { information, loading }
 
 class AppStatePanel extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
+  final Widget? iconWidget;
   final String title;
   final String? message;
   final Color accent;
@@ -15,14 +16,18 @@ class AppStatePanel extends StatelessWidget {
 
   const AppStatePanel({
     super.key,
-    required this.icon,
+    this.icon,
+    this.iconWidget,
     required this.title,
     required this.accent,
     this.message,
     this.actionLabel,
     this.onAction,
     this.status = AppStateStatus.information,
-  });
+  }) : assert(
+         (icon == null) != (iconWidget == null),
+         'Provide exactly one of icon or iconWidget.',
+       );
 
   const AppStatePanel.loading({
     super.key,
@@ -30,6 +35,7 @@ class AppStatePanel extends StatelessWidget {
     required this.accent,
     this.message,
   }) : icon = Icons.hourglass_empty_rounded,
+       iconWidget = null,
        actionLabel = null,
        onAction = null,
        status = AppStateStatus.loading;
@@ -93,7 +99,13 @@ class AppStatePanel extends StatelessWidget {
                                       strokeWidth: 2.4,
                                     ),
                                   )
-                                : Icon(icon, color: accent, size: 26),
+                                : IconTheme(
+                                    data: IconThemeData(
+                                      color: accent,
+                                      size: 26,
+                                    ),
+                                    child: iconWidget ?? Icon(icon),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: AppTheme.space14),

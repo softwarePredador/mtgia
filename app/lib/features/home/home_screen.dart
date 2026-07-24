@@ -10,6 +10,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/scryfall_image_helper.dart';
 import '../../core/widgets/card_artwork.dart';
 import '../../core/widgets/mana_symbols.dart';
+import '../../core/widgets/manaloom_glyph.dart';
 import 'life_counter_route.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
@@ -189,8 +190,8 @@ class _HomeHeader extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.auto_awesome_rounded,
+                    const ManaLoomGlyph(
+                      ManaLoomGlyphKind.brand,
                       color: AppTheme.brass400,
                       size: 22,
                     ),
@@ -439,38 +440,38 @@ class _QuickActions extends StatelessWidget {
     final actions = [
       if (lifeCounterAvailable)
         _QuickActionData(
-          icon: Icons.favorite_rounded,
+          glyph: ManaLoomGlyphKind.lifeCounter,
           title: 'Jogar agora',
           accent: AppTheme.brass400,
           onTap: () => openLifeCounterRoute(context),
         )
       else
         _QuickActionData(
-          icon: Icons.groups_rounded,
+          icon: Icons.groups_outlined,
           title: 'Comunidade',
           accent: AppTheme.brass400,
           onTap: () => context.go('/community'),
         ),
       _QuickActionData(
-        icon: Icons.construction_rounded,
+        glyph: ManaLoomGlyphKind.deck,
         title: 'Construir deck',
         accent: AppTheme.brass500,
         onTap: () => context.go('/onboarding/core-flow'),
       ),
       _QuickActionData(
-        icon: Icons.collections_bookmark_rounded,
+        glyph: ManaLoomGlyphKind.deck,
         title: 'Meus Decks',
         accent: AppTheme.textSecondary,
         onTap: () => context.go('/decks'),
       ),
       _QuickActionData(
-        icon: Icons.public_rounded,
+        glyph: ManaLoomGlyphKind.collection,
         title: 'Coleção',
         accent: AppTheme.textSecondary,
         onTap: () => context.go('/collection'),
       ),
       _QuickActionData(
-        icon: Icons.storefront_rounded,
+        glyph: ManaLoomGlyphKind.trade,
         title: 'Trocas',
         accent: AppTheme.brass500,
         onTap: () => context.go('/collection?tab=2'),
@@ -511,17 +512,22 @@ class _QuickActions extends StatelessWidget {
 }
 
 class _QuickActionData {
-  final IconData icon;
+  final ManaLoomGlyphKind? glyph;
+  final IconData? icon;
   final String title;
   final Color accent;
   final VoidCallback onTap;
 
   const _QuickActionData({
-    required this.icon,
+    this.glyph,
+    this.icon,
     required this.title,
     required this.accent,
     required this.onTap,
-  });
+  }) : assert(
+         (glyph == null) != (icon == null),
+         'Provide exactly one of glyph or icon.',
+       );
 }
 
 class _QuickActionCard extends StatelessWidget {
@@ -554,7 +560,10 @@ class _QuickActionCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(data.icon, color: data.accent, size: 21),
+              if (data.glyph != null)
+                ManaLoomGlyph(data.glyph!, color: data.accent, size: 21)
+              else
+                Icon(data.icon, color: data.accent, size: 21),
               const SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
@@ -801,8 +810,8 @@ class _DeckFallback extends StatelessWidget {
             ),
           ),
         ),
-        Icon(
-          Icons.style_rounded,
+        ManaLoomGlyph(
+          ManaLoomGlyphKind.deck,
           color: AppTheme.textPrimary.withValues(alpha: 0.26),
           size: 34,
         ),
@@ -878,8 +887,8 @@ class _EmptyDecksState extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.auto_awesome_rounded,
+            child: const ManaLoomGlyph(
+              ManaLoomGlyphKind.deck,
               color: AppTheme.brass400,
               size: 28,
             ),

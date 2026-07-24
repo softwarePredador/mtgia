@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/app_theme.dart';
+
+const _planechaseIconAsset = 'assets/lotus/images/planechase.svg';
+const _archenemyIconAsset = 'assets/lotus/images/archenemy.svg';
+const _bountyIconAsset = 'assets/lotus/images/bounty.svg';
 
 enum LifeCounterGameModesAction {
   openPlanechase,
@@ -212,7 +217,8 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         keyName: 'planechase',
                         modeKind: LifeCounterGameModeKind.planechase,
                         title: 'Planechase',
-                        icon: Icons.public_rounded,
+                        iconAssetPath: _planechaseIconAsset,
+                        fallbackIcon: Icons.public_rounded,
                         summary:
                             'Jogue com um deck planar e um dado planar compartilhados.',
                         available: availability.planechaseAvailable,
@@ -245,7 +251,8 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         keyName: 'archenemy',
                         modeKind: LifeCounterGameModeKind.archenemy,
                         title: 'Archenemy',
-                        icon: Icons.shield_moon_outlined,
+                        iconAssetPath: _archenemyIconAsset,
+                        fallbackIcon: Icons.shield_moon_outlined,
                         summary:
                             'Enfrente um jogador fortalecido e seu deck de esquemas.',
                         available: availability.archenemyAvailable,
@@ -277,7 +284,8 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         keyName: 'bounty',
                         modeKind: LifeCounterGameModeKind.bounty,
                         title: 'Bounty',
-                        icon: Icons.workspace_premium_outlined,
+                        iconAssetPath: _bountyIconAsset,
+                        fallbackIcon: Icons.workspace_premium_outlined,
                         summary:
                             'Cumpra objetivos rotativos para receber recompensas crescentes.',
                         available: availability.bountyAvailable,
@@ -320,7 +328,8 @@ class _GameModeStatusCard extends StatelessWidget {
     required this.keyName,
     required this.modeKind,
     required this.title,
-    required this.icon,
+    required this.iconAssetPath,
+    required this.fallbackIcon,
     required this.summary,
     required this.available,
     required this.active,
@@ -339,7 +348,8 @@ class _GameModeStatusCard extends StatelessWidget {
   final String keyName;
   final LifeCounterGameModeKind modeKind;
   final String title;
-  final IconData icon;
+  final String iconAssetPath;
+  final IconData fallbackIcon;
   final String summary;
   final bool available;
   final bool active;
@@ -375,7 +385,12 @@ class _GameModeStatusCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: AppTheme.textPrimary),
+                _GameModeIcon(
+                  keyName: keyName,
+                  title: title,
+                  assetPath: iconAssetPath,
+                  fallbackIcon: fallbackIcon,
+                ),
                 const SizedBox(width: AppTheme.space10),
                 Expanded(
                   child: Text(
@@ -578,6 +593,60 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GameModeIcon extends StatelessWidget {
+  const _GameModeIcon({
+    required this.keyName,
+    required this.title,
+    required this.assetPath,
+    required this.fallbackIcon,
+  });
+
+  static const double _size = 24;
+
+  final String keyName;
+  final String title;
+  final String assetPath;
+  final IconData fallbackIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final semanticLabel = 'Símbolo do modo $title';
+
+    Widget buildFallback(BuildContext context) {
+      return Icon(
+        fallbackIcon,
+        key: Key('life-counter-native-game-modes-$keyName-symbol-fallback'),
+        size: _size,
+        color: AppTheme.textPrimary,
+      );
+    }
+
+    return Semantics(
+      key: Key('life-counter-native-game-modes-$keyName-symbol-semantics'),
+      label: semanticLabel,
+      image: true,
+      child: Tooltip(
+        message: semanticLabel,
+        excludeFromSemantics: true,
+        child: SvgPicture.asset(
+          assetPath,
+          key: Key('life-counter-native-game-modes-$keyName-symbol'),
+          width: _size,
+          height: _size,
+          fit: BoxFit.contain,
+          colorFilter: const ColorFilter.mode(
+            AppTheme.textPrimary,
+            BlendMode.srcIn,
+          ),
+          excludeFromSemantics: true,
+          placeholderBuilder: buildFallback,
+          errorBuilder: (context, error, stackTrace) => buildFallback(context),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/main_scaffold.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 
 import '../../ui/support/manaloom_ui_audit_harness.dart';
 
@@ -71,6 +72,21 @@ void main() {
 
     expect(find.byKey(const Key('main-bottom-navigation')), findsOneWidget);
     expect(find.byKey(const Key('main-navigation-rail')), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph && widget.kind == ManaLoomGlyphKind.deck,
+      ),
+      findsWidgets,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph &&
+            widget.kind == ManaLoomGlyphKind.collection,
+      ),
+      findsWidgets,
+    );
     await expectManaLoomBaselineAccessibility(tester);
     semantics.dispose();
   });

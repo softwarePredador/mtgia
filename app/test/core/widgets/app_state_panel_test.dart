@@ -3,6 +3,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/app_state_panel.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 
 import '../../ui/support/manaloom_ui_audit_harness.dart';
 
@@ -119,6 +120,49 @@ void main() {
       semantics.properties.label,
       'Carregando. Carregando coleção. Buscando suas cartas.',
     );
+  });
+
+  testWidgets('supports a themed domain glyph without duplicating semantics', (
+    tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const Scaffold(
+            body: AppStatePanel(
+              iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.collection),
+              title: 'Coleção vazia',
+              message: 'Adicione sua primeira carta.',
+              accent: AppTheme.brass400,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is ManaLoomGlyph &&
+              widget.kind == ManaLoomGlyphKind.collection,
+        ),
+        findsOneWidget,
+      );
+      final stateSemantics = tester.widget<Semantics>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics && widget.properties.liveRegion == true,
+        ),
+      );
+      expect(
+        stateSemantics.properties.label,
+        'Coleção vazia. Adicione sua primeira carta.',
+      );
+    } finally {
+      semanticsHandle.dispose();
+    }
   });
 
   testWidgets('state panel passes labels, 48px targets and WCAG contrast', (

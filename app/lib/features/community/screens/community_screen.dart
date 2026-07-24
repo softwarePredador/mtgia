@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/community_provider.dart';
 import '../../market/models/card_mover.dart';
@@ -373,8 +374,8 @@ class _ExploreTabState extends State<_ExploreTab>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.public_off,
+                      ManaLoomGlyph(
+                        ManaLoomGlyphKind.deck,
                         size: 64,
                         color: AppTheme.textSecondary.withValues(alpha: 0.5),
                       ),

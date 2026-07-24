@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/decks/models/deck.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
@@ -222,6 +223,23 @@ void main() {
     expect(find.text('Construir deck'), findsOneWidget);
     expect(find.byTooltip('Perfil'), findsOneWidget);
     expect(find.byTooltip('Menu'), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph && widget.kind == ManaLoomGlyphKind.brand,
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph &&
+            widget.kind == ManaLoomGlyphKind.lifeCounter,
+      ),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.construction_rounded), findsNothing);
+    expect(find.byIcon(Icons.public_rounded), findsNothing);
 
     expect(find.text('Decks recentes'), findsOneWidget);
     expect(find.text('Você ainda não tem decks'), findsOneWidget);

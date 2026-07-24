@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/mana_symbols.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/battle_replay.dart';
 import '../services/battle_replay_service.dart';
 
@@ -750,7 +751,10 @@ class _BattleReplayActions extends StatelessWidget {
               OutlinedButton.icon(
                 key: const Key('battle-run-battle-button'),
                 onPressed: isRunning ? null : onRunBattle,
-                icon: const Icon(Icons.sports_martial_arts_rounded),
+                icon: const ManaLoomGlyph(
+                  ManaLoomGlyphKind.battleReplay,
+                  size: 20,
+                ),
                 label: const Text('Battle'),
               ),
             ],
@@ -807,8 +811,8 @@ class _BattleReplaySummaryTile extends StatelessWidget {
                       color: AppTheme.frost400.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
-                    child: const Icon(
-                      Icons.psychology_alt_outlined,
+                    child: const ManaLoomGlyph(
+                      ManaLoomGlyphKind.battleReplay,
                       color: AppTheme.frost400,
                       size: 20,
                     ),
@@ -880,8 +884,8 @@ class _ReplaySelectionEmpty extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.sports_esports_outlined,
+              const ManaLoomGlyph(
+                ManaLoomGlyphKind.battleReplay,
                 size: 36,
                 color: AppTheme.frost400,
               ),

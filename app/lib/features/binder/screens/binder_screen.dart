@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/binder_provider.dart';
 import '../widgets/binder_item_editor.dart';
@@ -509,11 +510,13 @@ class _BinderListViewState extends State<_BinderListView>
                     color: accent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                   ),
-                  child: Icon(
-                    isHave ? Icons.inventory_2_rounded : Icons.favorite_border,
-                    size: 24,
-                    color: accent,
-                  ),
+                  child: isHave
+                      ? ManaLoomGlyph(
+                          ManaLoomGlyphKind.collection,
+                          size: 24,
+                          color: accent,
+                        )
+                      : Icon(Icons.favorite_border, size: 24, color: accent),
                 ),
                 const SizedBox(height: AppTheme.space12),
                 Text(

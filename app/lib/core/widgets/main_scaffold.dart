@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../theme/app_theme.dart';
+import 'manaloom_glyph.dart';
 
 class MainScaffold extends StatelessWidget {
   final Widget child;
@@ -78,10 +80,11 @@ class MainScaffold extends StatelessWidget {
                     selectedIndex: currentIndex,
                     extended: extended,
                     minExtendedWidth: 204,
-                    labelType:
-                        extended ? null : NavigationRailLabelType.selected,
-                    onDestinationSelected:
-                        (index) => _selectDestination(context, index),
+                    labelType: extended
+                        ? null
+                        : NavigationRailLabelType.selected,
+                    onDestinationSelected: (index) =>
+                        _selectDestination(context, index),
                     destinations: const [
                       NavigationRailDestination(
                         icon: Icon(Icons.home_outlined),
@@ -89,13 +92,15 @@ class MainScaffold extends StatelessWidget {
                         label: Text('Início'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.style_outlined),
-                        selectedIcon: Icon(Icons.style),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
+                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
                         label: Text('Decks'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.collections_bookmark_outlined),
-                        selectedIcon: Icon(Icons.collections_bookmark),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.collection),
+                        selectedIcon: ManaLoomGlyph(
+                          ManaLoomGlyphKind.collection,
+                        ),
                         label: Text('Coleção'),
                       ),
                       NavigationRailDestination(
@@ -121,52 +126,50 @@ class MainScaffold extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppTheme.backgroundAbyss,
           body: content,
-          bottomNavigationBar:
-              isPrimaryRoot
-                  ? Container(
-                    key: const Key('main-bottom-navigation'),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: AppTheme.outlineMuted,
-                          width: 0.5,
-                        ),
+          bottomNavigationBar: isPrimaryRoot
+              ? Container(
+                  key: const Key('main-bottom-navigation'),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+                    ),
+                  ),
+                  child: NavigationBar(
+                    selectedIndex: currentIndex ?? 0,
+                    onDestinationSelected: (index) =>
+                        _selectDestination(context, index),
+                    destinations: const [
+                      NavigationDestination(
+                        icon: Icon(Icons.home_outlined),
+                        selectedIcon: Icon(Icons.home),
+                        label: 'Início',
                       ),
-                    ),
-                    child: NavigationBar(
-                      selectedIndex: currentIndex ?? 0,
-                      onDestinationSelected:
-                          (index) => _selectDestination(context, index),
-                      destinations: const [
-                        NavigationDestination(
-                          icon: Icon(Icons.home_outlined),
-                          selectedIcon: Icon(Icons.home),
-                          label: 'Início',
+                      NavigationDestination(
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
+                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
+                        label: 'Decks',
+                      ),
+                      NavigationDestination(
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.collection),
+                        selectedIcon: ManaLoomGlyph(
+                          ManaLoomGlyphKind.collection,
                         ),
-                        NavigationDestination(
-                          icon: Icon(Icons.style_outlined),
-                          selectedIcon: Icon(Icons.style),
-                          label: 'Decks',
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.collections_bookmark_outlined),
-                          selectedIcon: Icon(Icons.collections_bookmark),
-                          label: 'Coleção',
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.public_outlined),
-                          selectedIcon: Icon(Icons.public),
-                          label: 'Comunidade',
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.person_outline),
-                          selectedIcon: Icon(Icons.person),
-                          label: 'Perfil',
-                        ),
-                      ],
-                    ),
-                  )
-                  : null,
+                        label: 'Coleção',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.public_outlined),
+                        selectedIcon: Icon(Icons.public),
+                        label: 'Comunidade',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.person_outline),
+                        selectedIcon: Icon(Icons.person),
+                        label: 'Perfil',
+                      ),
+                    ],
+                  ),
+                )
+              : null,
         );
       },
     );

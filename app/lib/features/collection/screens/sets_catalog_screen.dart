@@ -11,6 +11,7 @@ import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/card_artwork.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/mtg_set.dart';
 import '../set_icon_svg_cache.dart';
@@ -752,8 +753,8 @@ class _SetIconTerminalFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(
-      Icons.auto_awesome_mosaic_outlined,
+    return const ManaLoomGlyph(
+      ManaLoomGlyphKind.collection,
       size: 28,
       color: AppTheme.backgroundAbyss,
     );

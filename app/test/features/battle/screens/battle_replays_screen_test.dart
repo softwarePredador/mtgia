@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/battle/models/battle_replay.dart';
 import 'package:manaloom/features/battle/screens/battle_replays_screen.dart';
 import 'package:manaloom/features/battle/services/battle_replay_service.dart';
@@ -215,6 +216,14 @@ void main() {
     expect(find.text('Battle contra Atraxa Superfriends'), findsOneWidget);
     expect(find.text('Vencedor: Player A'), findsOneWidget);
     expect(find.text('2 eventos'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph &&
+            widget.kind == ManaLoomGlyphKind.battleReplay,
+      ),
+      findsNWidgets(2),
+    );
     expect(gateway.listCalls, 1);
 
     await tester.tap(find.text('Battle contra Atraxa Superfriends'));

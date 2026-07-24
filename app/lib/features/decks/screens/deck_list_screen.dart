@@ -12,6 +12,7 @@ import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/mana_symbols.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/deck.dart';
 import '../providers/deck_provider.dart';
 
@@ -1655,8 +1656,8 @@ class _DeckGalleryCard extends StatelessWidget {
                       width: AppTheme.strokeHairline,
                     ),
                   ),
-                  child: const Icon(
-                    Icons.auto_awesome_rounded,
+                  child: const ManaLoomGlyph(
+                    ManaLoomGlyphKind.brand,
                     size: 11,
                     color: AppTheme.brass400,
                   ),
@@ -1803,8 +1804,8 @@ class _DeckFallbackArt extends StatelessWidget {
           ],
         ),
       ),
-      child: Icon(
-        Icons.style_rounded,
+      child: ManaLoomGlyph(
+        ManaLoomGlyphKind.deck,
         color: AppTheme.textPrimary.withValues(alpha: 0.16),
         size: 72,
       ),
@@ -1949,8 +1950,8 @@ class _EmptyDeckConstellation extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.auto_awesome_rounded,
+              child: const ManaLoomGlyph(
+                ManaLoomGlyphKind.deck,
                 size: 34,
                 color: AppTheme.brass400,
               ),

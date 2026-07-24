@@ -10,6 +10,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../providers/deck_provider.dart';
 import '../services/deck_entry_draft_store.dart';
 import '../models/deck_analysis.dart';
@@ -340,7 +341,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 const PopupMenuItem(
                   value: 'battle_replays',
                   child: ListTile(
-                    leading: Icon(Icons.psychology_alt_outlined),
+                    leading: ManaLoomGlyph(ManaLoomGlyphKind.battleReplay),
                     title: Text('Battle / replays'),
                     contentPadding: EdgeInsets.zero,
                     dense: true,
@@ -762,8 +763,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           child: Row(
             children: [
               if (isCommanderSection) ...[
-                Icon(
-                  Icons.workspace_premium_outlined,
+                const ManaLoomGlyph(
+                  ManaLoomGlyphKind.commander,
                   size: 16,
                   color: AppTheme.mythicGold,
                 ),
@@ -978,8 +979,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         color: AppTheme.mythicGold.withValues(alpha: 0.28),
                       ),
                     ),
-                    child: const Icon(
-                      Icons.workspace_premium_rounded,
+                    child: const ManaLoomGlyph(
+                      ManaLoomGlyphKind.commander,
                       size: 14,
                       color: AppTheme.mythicGold,
                     ),
