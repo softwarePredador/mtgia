@@ -75,6 +75,14 @@ Future<Response> onRequest(RequestContext context) async {
     allHealthy = false;
   }
 
+  final battleJobSchema = await evaluateBattleJobSchemaReadiness(
+    context.read<Pool>(),
+  );
+  checks['battle_job_schema'] = battleJobSchema.check;
+  if (!battleJobSchema.healthy) {
+    allHealthy = false;
+  }
+
   final collectionAvailabilitySchema =
       await evaluateCollectionAvailabilitySchemaReadiness(context.read<Pool>());
   checks['collection_availability_schema'] = collectionAvailabilitySchema.check;
@@ -113,6 +121,12 @@ Future<Response> onRequest(RequestContext context) async {
 
   // Check 3: production AI contract is fail-closed and provider-backed.
   final env = loadRuntimeEnvironment();
+  final battleJobWorker = evaluateBattleJobWorkerReadiness(env);
+  checks['battle_job_worker'] = battleJobWorker.check;
+  if (!battleJobWorker.healthy) {
+    allHealthy = false;
+  }
+
   final aiRuntime = evaluateAiRuntimeReadiness(env);
   checks['ai_runtime'] = aiRuntime.check;
   if (!aiRuntime.healthy) {
@@ -123,6 +137,15 @@ Future<Response> onRequest(RequestContext context) async {
   final battleRuntime = await evaluateBattleRuntimeReadiness(env);
   checks['battle_runtime'] = battleRuntime.check;
   if (!battleRuntime.healthy) {
+    allHealthy = false;
+  }
+
+  final battleLiveSpectator = await evaluateBattleLiveSpectatorReadiness(
+    env,
+    context.read<Pool>(),
+  );
+  checks['battle_live_spectator'] = battleLiveSpectator.check;
+  if (!battleLiveSpectator.healthy) {
     allHealthy = false;
   }
 

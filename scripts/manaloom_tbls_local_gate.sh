@@ -110,6 +110,23 @@ psql -X -v ON_ERROR_STOP=1 \
     "$DART_BIN" run bin/migrate.dart
 ) >"$RUN_DIR/migrate.log" 2>&1
 
+if ! (
+  cd "$ROOT_DIR/server"
+  DB_HOST=127.0.0.1 \
+  DB_PORT="$PORT" \
+  DB_USER=postgres \
+  DB_PASS='' \
+  DB_NAME=manaloom_tbls \
+  RUN_BATTLE_JOB_DB_TESTS=1 \
+  RUN_BATTLE_LIVE_DB_TESTS=1 \
+    "$DART_BIN" test --reporter compact -j 1 \
+      test/battle_job_store_live_test.dart \
+      test/battle_live_store_live_test.dart
+) >"$RUN_DIR/battle-db-tests.log" 2>&1; then
+  tail -200 "$RUN_DIR/battle-db-tests.log" >&2
+  exit 1
+fi
+
 DSN="postgres://postgres@127.0.0.1:$PORT/manaloom_tbls?sslmode=disable"
 tbls out "$DSN" \
   --config "$ROOT_DIR/.tbls.yml" \
@@ -197,9 +214,15 @@ live_relations = {
 manifest_relations = {
     (
         relation["from_table"],
-        (relation["from_column"],),
+        tuple(
+            relation.get("from_columns")
+            or [relation["from_column"]]
+        ),
         relation["to_table"],
-        (relation["to_column"],),
+        tuple(
+            relation.get("to_columns")
+            or [relation["to_column"]]
+        ),
     )
     for relation in database["relations"]
 }
@@ -226,4 +249,5 @@ print(
 )
 PY
 
+printf 'PASS: Battle jobs/Live exercitados no PostgreSQL descartável.\n'
 printf 'PASS: PostgreSQL/tbls local descartável, sem conexão externa.\n'

@@ -8,6 +8,21 @@ void main() {
     expect(LaunchFeatures.scannerEnabled, isFalse);
   });
 
+  test('Battle live spectator stays fail-closed by default', () {
+    expect(LaunchFeatures.battleLiveSpectatorEnabled, isFalse);
+
+    final source = File(
+      'lib/core/config/launch_features.dart',
+    ).readAsStringSync();
+    expect(source, contains("'ENABLE_BATTLE_LIVE_SPECTATOR'"));
+    expect(
+      source,
+      matches(
+        RegExp(r'battleLiveSpectatorEnabled[\s\S]*?defaultValue:\s*false'),
+      ),
+    );
+  });
+
   test('disabled scanner route is absent and deep links recover to search', () {
     final source = File('lib/main.dart').readAsStringSync();
 

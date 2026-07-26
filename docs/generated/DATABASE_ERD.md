@@ -16,6 +16,21 @@ erDiagram
     decks ||--o{ ai_optimize_jobs : "deck_id -> id"
     users ||--o{ ai_optimize_jobs : "user_id -> id"
     users ||--o{ ai_user_preferences : "user_id -> id"
+    battle_jobs ||--o{ battle_job_live_records : "job_id -> id"
+    battle_simulation_attempts ||--o{ battle_jobs : "attempt_id, replay_id -> id, replay_id"
+    battle_simulation_attempts ||--o{ battle_jobs : "attempt_id -> id"
+    decks ||--o{ battle_jobs : "deck_a_id -> id"
+    decks ||--o{ battle_jobs : "deck_b_id -> id"
+    battle_simulations ||--o{ battle_jobs : "replay_id -> id"
+    users ||--o{ battle_jobs : "user_id -> id"
+    battle_simulation_attempts ||--o{ battle_replay_annotations : "attempt_id, replay_id -> id, replay_id"
+    battle_simulations ||--o{ battle_replay_annotations : "replay_id -> id"
+    decks ||--o{ battle_replay_annotations : "subject_deck_id -> id"
+    users ||--o{ battle_replay_annotations : "user_id -> id"
+    decks ||--o{ battle_simulation_attempts : "deck_a_id -> id"
+    decks ||--o{ battle_simulation_attempts : "deck_b_id -> id"
+    battle_simulations ||--o{ battle_simulation_attempts : "replay_id -> id"
+    users ||--o{ battle_simulation_attempts : "user_id -> id"
     decks ||--o{ battle_simulations : "deck_a_id -> id"
     decks ||--o{ battle_simulations : "deck_b_id -> id"
     decks ||--o{ battle_simulations : "winner_deck_id -> id"
@@ -196,6 +211,95 @@ erDiagram
         datetime last_synced_at
         string notes
         number priority
+    }
+    battle_job_live_records {
+        boolean content_truncated
+        datetime created_at
+        string fingerprint
+        uuid id PK
+        uuid job_id
+        string kind
+        json payload
+        boolean public_visible
+        string record_id
+        string schema_version
+        number sequence
+        string source_kind
+        string source_process_id
+        string source_record_id
+        number source_sequence
+        boolean source_truncated
+    }
+    battle_jobs {
+        number attempt_count
+        uuid attempt_id
+        datetime cancel_requested_at
+        datetime claimed_at
+        datetime created_at
+        string deck_a_hash
+        uuid deck_a_id
+        string deck_b_hash
+        uuid deck_b_id
+        string deck_hash_schema
+        string engine
+        string engine_build
+        string engine_commit
+        string engine_lane
+        string engine_process_id
+        datetime engine_process_started_at
+        string engine_request_correlation_source
+        string engine_request_hash
+        string engine_request_schema_version
+        string engine_version
+        string error_code
+        datetime finished_at
+        datetime heartbeat_at
+        uuid id PK
+    }
+    battle_replay_annotations {
+        uuid attempt_id
+        datetime created_at
+        string deck_hash_schema
+        string event_ref
+        uuid id PK
+        string idempotency_key
+        string kind
+        json payload
+        uuid replay_id
+        string request_fingerprint
+        string snapshot_ref
+        string subject_deck_hash
+        uuid subject_deck_id
+        string subject_deck_key
+        string subject_deck_revision
+        datetime updated_at
+        uuid user_id
+    }
+    battle_simulation_attempts {
+        string deck_a_hash
+        uuid deck_a_id
+        string deck_b_hash
+        uuid deck_b_id
+        string deck_hash_schema
+        string engine
+        string engine_build
+        string engine_commit
+        string engine_process_id
+        string engine_request_correlation_source
+        string engine_version
+        string error_code
+        boolean events_truncated
+        datetime finished_at
+        uuid id PK
+        string job_request_hash
+        string job_request_schema_version
+        string outcome
+        string outcome_reason
+        json provenance
+        uuid replay_id
+        string request_hash
+        string request_id
+        string request_schema_version
     }
     battle_simulations {
         datetime created_at
@@ -963,4 +1067,4 @@ erDiagram
     }
 ```
 
-Tabelas: 73; views: 6; migrations: 51 (latest `051`).
+Tabelas: 77; views: 6; migrations: 55 (latest `055`).

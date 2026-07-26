@@ -23,11 +23,13 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     }
 
     final limit = _limitFromQuery(context.request.uri.queryParameters['limit']);
-    final replays = await service.listReplays(
+    final page = await service.listReplayPage(
       userId: userId,
       deckId: deckId,
       limit: limit,
+      cursor: context.request.uri.queryParameters['cursor'],
     );
+    final replays = page.items;
     final hasAdvisoryReplay = replays.any(
       (replay) =>
           (replay['simulation_contract'] as Map?)?['advisory_only'] == true,
@@ -36,6 +38,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       body: {
         'data': replays,
         'source': 'battle_simulations',
+        'pagination': {
+          'schema_version': battleReplayCursorSchema,
+          'limit': limit,
+          'has_more': page.hasMore,
+          if (page.nextCursor != null) 'next_cursor': page.nextCursor,
+        },
         'advisory': hasAdvisoryReplay,
         'simulation_contract': const {
           'status': 'per_replay_engine_contract',
@@ -48,6 +56,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         },
       },
     );
+  } on BattleReplayCursorException {
+    return badRequest('Cursor de replay invalido.');
   } catch (error, stackTrace) {
     Log.e('[battle-replays] list failed type=${error.runtimeType}');
     await captureRouteException(

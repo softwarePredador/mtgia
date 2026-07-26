@@ -19,6 +19,39 @@ const _identity = ExternalBattleEngineIdentity(
 );
 
 void main() {
+  test('checks XMage deck coverage without starting a battle', () async {
+    final client = XmageBattleClient(
+      baseUrl: 'http://xmage.internal:8080/',
+      expectedIdentity: _identity,
+      client: MockClient((request) async {
+        expect(request.url.toString(), 'http://xmage.internal:8080/coverage');
+        expect(jsonDecode(request.body), containsPair('deck_a', isA<Map>()));
+        return http.Response(
+          jsonEncode({
+            'status': 'unsupported',
+            'ready': false,
+            'engine': 'xmage',
+            'engine_version': pinnedXmageVersion,
+            'engine_commit': pinnedXmageCommit,
+            'unsupported_cards': [
+              {'deck_key': 'deck_b', 'name': 'Unknown Card'},
+            ],
+          }),
+          200,
+        );
+      }),
+    );
+
+    final result = await client.coverage({
+      'deck_a': const <String, dynamic>{},
+      'deck_b': const <String, dynamic>{},
+    });
+
+    expect(result['ready'], isFalse);
+    expect((result['unsupported_cards'] as List), hasLength(1));
+    client.close();
+  });
+
   test('returns a successful XMage battle payload', () async {
     final client = XmageBattleClient(
       baseUrl: 'http://xmage.internal:8080/',

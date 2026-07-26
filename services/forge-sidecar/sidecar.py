@@ -775,6 +775,14 @@ def _events_from_output(output: str) -> list[dict[str, Any]]:
             "type": event_type,
             "message": line,
         }
+        actor = re.search(r"\bAi\s*\(\s*(?P<slot>[12])\s*\)", line, re.IGNORECASE)
+        if actor:
+            subject_deck_key = (
+                "deck_a" if actor.group("slot") == "1" else "deck_b"
+            )
+            event["actor"] = actor.group(0)
+            event["actor_side"] = subject_deck_key
+            event["subject_deck_key"] = subject_deck_key
         turn = re.search(r"Turn (?P<turn>\d+)", line)
         if turn:
             event["turn"] = int(turn.group("turn"))

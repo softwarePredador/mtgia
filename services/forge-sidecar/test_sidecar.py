@@ -142,6 +142,8 @@ class ForgeSidecarTest(unittest.TestCase):
         self.assertEqual("deck-a", result["winner_deck_id"])
         self.assertEqual(7, result["turns"])
         self.assertEqual("Sol Ring", result["events"][1]["card_name"])
+        self.assertEqual("deck_a", result["events"][1]["subject_deck_key"])
+        self.assertEqual("deck_a", result["events"][1]["actor_side"])
         self.assertEqual(1, result["metrics"]["cards_cast"])
         self.assertEqual([], result["decision_trace"])
         self.assertEqual(

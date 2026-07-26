@@ -51,6 +51,26 @@ def source_absence_check(name: str, path: Path, forbidden: list[str]) -> Check:
     return Check(name, "pass", str(path.relative_to(REPO_ROOT)))
 
 
+def multi_source_check(
+    name: str, requirements: list[tuple[Path, list[str]]]
+) -> Check:
+    missing: list[str] = []
+    sources: list[str] = []
+    for path, required in requirements:
+        relative = str(path.relative_to(REPO_ROOT))
+        sources.append(relative)
+        if not path.exists():
+            missing.append(f"{relative}:missing_file")
+            continue
+        text = path.read_text(encoding="utf-8")
+        missing.extend(
+            f"{relative}:{marker}" for marker in required if marker not in text
+        )
+    if missing:
+        return Check(name, "fail", f"missing_markers={missing}")
+    return Check(name, "pass", ",".join(sources))
+
+
 def build_report() -> dict[str, object]:
     pin_file = SIDECAR / "XMAGE_COMMIT"
     pin_value = pin_file.read_text(encoding="utf-8").strip() if pin_file.exists() else ""
@@ -73,7 +93,9 @@ def build_report() -> dict[str, object]:
                 XMAGE_PIN,
                 'createContext("/cards/coverage"',
                 'createContext("/coverage"',
-                'createContext("/simulate"',
+                '"/simulate",',
+                "exchange -> handleSimulation(",
+                'createContext("/live/"',
                 '"xmage_coverage_incomplete"',
                 "send(exchange, 422",
                 "send(exchange, 504",
@@ -336,29 +358,40 @@ def build_report() -> dict[str, object]:
                 "mode == 'native'",
             ],
         ),
-        source_check(
+        multi_source_check(
             "server.engine_router",
-            SERVER / "routes/ai/simulate/index.dart",
             [
-                "BattleEngineConfig.fromEnvironment",
-                "_engineConfigurationFailure",
-                "canonical_rules_execution",
-                "canonical_rules_execution_secondary",
-                "xmage_coverage_incomplete",
-                "forge_coverage_incomplete",
-                "NativeBattleClient",
-                "requiredRuleCards: _allDeckCardRows(battleRequest)",
-                "_isNaturalBattleResult(data, result)",
-                "return _externalEngineFailure(",
-                "_externalClientGraceMs = 8000",
-                "upstreamStatusCode == HttpStatus.gatewayTimeout",
-                "'${engine}_timeout'",
-                "winner_deck_id",
-                "BattleSimulationPersistenceService(pool).save",
-                "canonicalBattleWinnerDeckId(",
-                "'replay_id': persistence.replayId",
-                "_simulationPersistenceFailure(",
-                "buildBattleLearningEvidence(",
+                (
+                    SERVER / "lib/battle/battle_execution_runtime.dart",
+                    [
+                        "BattleEngineConfig.fromEnvironment",
+                        "canonical_rules_execution",
+                        "canonical_rules_execution_secondary",
+                        "xmage_coverage_incomplete",
+                        "forge_coverage_incomplete",
+                        "NativeBattleClient",
+                        "'required_rule_cards': _allDeckCardRows(request)",
+                        "throw _operationalFailure(",
+                        "battleExternalClientGrace = Duration(seconds: 8)",
+                        "statusCode == HttpStatus.gatewayTimeout",
+                        "'${prefix}_timeout'",
+                    ],
+                ),
+                (
+                    SERVER / "routes/ai/simulate/index.dart",
+                    [
+                        "BattleExecutionRuntime.fromEnvironment",
+                        "_engineConfigurationFailure",
+                        "_battleRuntimeFailure",
+                        "_isNaturalBattleResult(data, result)",
+                        "winner_deck_id",
+                        "BattleSimulationPersistenceService(pool).save",
+                        "canonicalBattleWinnerDeckId(",
+                        "'replay_id': persistence.replayId",
+                        "_simulationPersistenceFailure(",
+                        "buildBattleLearningEvidence(",
+                    ],
+                ),
             ],
         ),
         source_check(

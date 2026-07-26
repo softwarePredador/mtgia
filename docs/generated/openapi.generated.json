@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "c652e8443d2b3887c539d76f6649ab1f1a6fa3a241040b9e382748fffda3dc30",
+  "x-manaloom-source-digest-sha256": "b730bbe1dea53a1a7f6634e94f0e7b219f65923b82a06169e5feda7611df42c9",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -60,6 +60,207 @@
           "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
           "app/test/features/decks/widgets/deck_details_actions_test.dart",
           "app/test/features/decks/widgets/deck_details_dialogs_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/battle/jobs": {
+      "get": {
+        "operationId": "getAiBattleJobs",
+        "summary": "GET /ai/battle/jobs",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/battle/jobs/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart",
+          "app/test/features/decks/widgets/deck_details_dialogs_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postAiBattleJobs",
+        "summary": "POST /ai/battle/jobs",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/battle/jobs/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart",
+          "app/test/features/decks/widgets/deck_details_dialogs_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/battle/jobs/{id}": {
+      "delete": {
+        "operationId": "deleteAiBattleJobsId",
+        "summary": "DELETE /ai/battle/jobs/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/battle/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart",
+          "app/test/features/decks/widgets/deck_details_dialogs_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getAiBattleJobsId",
+        "summary": "GET /ai/battle/jobs/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/battle/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart",
+          "app/test/features/decks/widgets/deck_details_dialogs_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/battle/jobs/{id}/live": {
+      "get": {
+        "operationId": "getAiBattleJobsIdLive",
+        "summary": "GET /ai/battle/jobs/{id}/live",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/battle/jobs/[id]/live/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart",
+          "app/test/features/decks/widgets/deck_details_actions_test.dart",
+          "app/test/features/decks/widgets/deck_details_dialogs_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "security": [
           {
@@ -2217,6 +2418,44 @@
         }
       }
     },
+    "/decks/{id}/battle-preflight": {
+      "get": {
+        "operationId": "getDecksIdBattlePreflight",
+        "summary": "GET /decks/{id}/battle-preflight",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/battle-preflight/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
     "/decks/{id}/battle-replays": {
       "get": {
         "operationId": "getDecksIdBattleReplays",
@@ -2282,6 +2521,150 @@
           },
           {
             "name": "replayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/battle-replays/{replayId}/annotations": {
+      "get": {
+        "operationId": "getDecksIdBattleReplaysReplayIdAnnotations",
+        "summary": "GET /decks/{id}/battle-replays/{replayId}/annotations",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "replayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      },
+      "post": {
+        "operationId": "postDecksIdBattleReplaysReplayIdAnnotations",
+        "summary": "POST /decks/{id}/battle-replays/{replayId}/annotations",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "replayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/battle-replays/{replayId}/annotations/{annotationId}": {
+      "delete": {
+        "operationId": "deleteDecksIdBattleReplaysReplayIdAnnotationsAnnotationId",
+        "summary": "DELETE /decks/{id}/battle-replays/{replayId}/annotations/{annotationId}",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/battle-replays/[replayId]/annotations/[annotationId].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "replayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "annotationId",
             "in": "path",
             "required": true,
             "schema": {

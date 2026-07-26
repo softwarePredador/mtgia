@@ -26,20 +26,20 @@ A fonte estruturada do inventário é
 as keys e os contratos de interação; o JSON classifica toda a superfície
 descoberta no código e o teste impede dívida silenciosa.
 
-Baseline da beta Web + Android em 2026-07-21:
+Baseline ampliada da beta Web + Android em 2026-07-26:
 
 | Tipo | Quantidade classificada |
 |---|---:|
-| `GoRoute` | 38 |
+| `GoRoute` | 39 |
 | `ShellRoute` | 1 |
 | `MaterialPageRoute` | 6 |
-| Dialogs | 37 |
+| Dialogs | 46 |
 | Bottom sheets | 22 |
-| Menus | 5 |
-| Tabs | 11 |
+| Menus | 9 |
+| Tabs | 10 |
 | Navegação responsiva | 2 |
-| Transientes (`SnackBar`) | 92 |
-| **Total** | **214** |
+| Transientes (`SnackBar`) | 109 |
+| **Total** | **244** |
 
 Cada ocorrência pertence a um contrato de domínio que declara:
 
@@ -51,7 +51,7 @@ Cada ocorrência pertence a um contrato de domínio que declara:
 - ação, sucesso e recuperação;
 - política de deep link.
 
-As 38 rotas também declaram path canônico, tela/destino e escopo
+As 39 rotas também declaram path canônico, tela/destino e escopo
 `active`, `deferred_by_scope` ou `compatibility_redirect`. O Scanner permanece
 explicitamente deferido e `/market` é apenas compatibilidade para
 `/community?tab=3`; nenhum deles é contabilizado como tela ativa própria.
@@ -70,6 +70,46 @@ cd app
 classificada para S3-02/S3-05. `not_applicable:` só é permitido quando a
 superfície não possui UI própria ativa, como redirect de compatibilidade ou
 feature removida do escopo do artefato.
+
+## Battle Lab e Live Spectator — BL1–BL6
+
+As entradas canônicas são:
+
+- Análise do deck → `Testar este deck`;
+- menu do deck ou Visão Geral → `/decks/:id/battle-replays`;
+- job Live opt-in → `/decks/:id/battle-live/:jobId`;
+- detalhe direto → `/decks/:id/battle-replays?replay=:replayId`.
+
+O setup exige oponente, preflight e objetivo; cartas de foco são observação,
+não compra forçada. O histórico aceita paginação e filtros por status, engine,
+oponente e revisão. O detalhe oferece mesa responsiva, playback, timeline
+limitada, relatório, comparação e anotações privadas.
+
+Anotações são salvas por API em `battle_replay_annotations`; jobs e Live usam
+`battle_jobs` e `battle_job_live_records`. Nenhuma dessas leituras usa
+`shared_preferences` como fonte durável. O replay é imutável e a anotação não
+altera nem retoma o estado do engine.
+
+Keys principais:
+
+- `battle-history-filters`, `battle-opponent-picker-dialog`,
+  `battle-preflight-ready|blocked` e `battle-test-objective-field`;
+- `battle-post-report`, `battle-annotations-panel`,
+  `battle-replay-keyboard-focus` e `battle-replay-event-action-filter`;
+- `battle-live-screen`, `battle-live-status-header`, `battle-live-progress`,
+  `battle-live-table`, `battle-live-timeline` e
+  `battle-live-reconnect-banner`.
+
+Com Live desabilitado, app e backend falham fechados e não fazem polling. Com
+Live habilitado, `Space` pausa apenas o playback local, `R` tenta reconectar e
+`End` salta para o estado mais recente; o engine continua executando. Cursor,
+registros recebidos e estado visual são preservados durante erro recuperável.
+Cancelamento exige confirmação e continua cooperativo no backend.
+
+Os testes widget cobrem 390 px, fronteira 1199/1200, texto 200%, reduced
+motion, teclado, offline/retry, cursor sem duplicação, ID do replay final e
+feature flag. Android físico/TalkBack permanece evidência de release separada
+e não recebe crédito dos testes widget/Web.
 
 ## Matriz executável de estados — S3-02
 

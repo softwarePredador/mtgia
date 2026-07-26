@@ -45,9 +45,9 @@ void main() {
 
         expect(requiredReleaseSchemaMigrations, migrationsFromSource);
         expect(requiredReleaseSchemaMigrations.keys.first, '038');
-        expect(requiredReleaseSchemaMigrations.keys.last, '051');
+        expect(requiredReleaseSchemaMigrations.keys.last, '055');
         expect(releaseSchemaReadinessSql, contains("MAX(version)"));
-        expect(releaseSchemaReadinessSql, contains(") = '051'"));
+        expect(releaseSchemaReadinessSql, contains(") = '055'"));
         for (final entry in requiredReleaseSchemaMigrations.entries) {
           expect(
             releaseSchemaReadinessSql,
@@ -64,6 +64,31 @@ void main() {
           'user_blocks',
           'content_report_appeals',
           'chk_content_reports_resolution_action',
+          'battle_simulation_attempts',
+          'chk_battle_attempt_outcome',
+          'chk_battle_attempt_test_objective',
+          'chk_battle_attempt_lifecycle',
+          'chk_battle_attempt_job_request_hash',
+          'chk_battle_attempt_request_correlation',
+          'battle_replay_annotations',
+          'fk_battle_annotation_attempt_replay',
+          'chk_battle_annotation_kind',
+          'chk_battle_annotation_payload',
+          'chk_battle_annotation_kind_refs',
+          'chk_battle_annotation_payload_shape',
+          'uq_battle_annotation_reflection',
+          'uq_battle_annotation_mulligan',
+          'uq_battle_annotation_helpful',
+          'battle_jobs',
+          'fk_battle_job_attempt_replay',
+          'chk_battle_job_status',
+          'chk_battle_job_lease',
+          'chk_battle_job_completed_replay',
+          'chk_battle_job_engine_request',
+          'uq_battle_jobs_user_idempotency',
+          'idx_battle_jobs_user_active',
+          'idx_battle_jobs_claim',
+          'idx_battle_jobs_lease',
         ]) {
           expect(releaseSchemaReadinessSql, contains(anchor), reason: anchor);
         }
@@ -105,6 +130,54 @@ void main() {
         contains('idx_ai_optimize_jobs_user_request_key'),
       );
       expect(aiJobSchemaReadinessSql, contains("LIKE '%cancelled%'"));
+    });
+
+    test('Battle job readiness requires lease, replay, and idempotency', () {
+      expect(battleJobSchemaReadinessSql, contains("version = '054'"));
+      expect(battleJobSchemaReadinessSql, contains("'request_hash'"));
+      expect(battleJobSchemaReadinessSql, contains("'engine_request_hash'"));
+      expect(battleJobSchemaReadinessSql, contains("'job_request_hash'"));
+      expect(battleJobSchemaReadinessSql, contains("'request_fingerprint'"));
+      expect(battleJobSchemaReadinessSql, contains("'lease_token'"));
+      expect(battleJobSchemaReadinessSql, contains("'lease_expires_at'"));
+      expect(battleJobSchemaReadinessSql, contains("'heartbeat_at'"));
+      expect(battleJobSchemaReadinessSql, contains("'attempt_id'"));
+      expect(battleJobSchemaReadinessSql, contains("'replay_id'"));
+      expect(
+        battleJobSchemaReadinessSql,
+        contains('chk_battle_job_completed_replay'),
+      );
+      expect(
+        battleJobSchemaReadinessSql,
+        contains('chk_battle_job_engine_request'),
+      );
+      expect(
+        battleJobSchemaReadinessSql,
+        contains('uq_battle_jobs_user_idempotency'),
+      );
+      expect(battleJobSchemaReadinessSql, contains('idx_battle_jobs_claim'));
+      expect(battleJobSchemaReadinessSql, contains('idx_battle_jobs_lease'));
+    });
+
+    test('Battle worker readiness requires every dispatch target', () {
+      final healthy = evaluateBattleJobWorkerReadiness(
+        DotEnv(quiet: true)..addAll({
+          'XMAGE_SIDECAR_URL': 'http://xmage',
+          'FORGE_SIDECAR_URL': 'http://forge',
+          'NATIVE_BATTLE_SIDECAR_URL': 'http://native',
+        }),
+      );
+      expect(healthy.healthy, isTrue);
+      expect(healthy.check['supervision'], 'container_fail_closed');
+
+      final missing = evaluateBattleJobWorkerReadiness(
+        DotEnv(quiet: true)..addAll({'BATTLE_JOB_WORKER_ENABLED': 'true'}),
+      );
+      expect(missing.healthy, isFalse);
+      expect(
+        missing.check['missing_configuration'],
+        contains('XMAGE_SIDECAR_URL'),
+      );
     });
 
     test(
@@ -243,6 +316,70 @@ void main() {
         expect(readiness.check, isNot(contains('XMAGE_SIDECAR_URL')));
       },
     );
+
+    test('Live Spectator is disabled and non-blocking by default', () async {
+      final disabled = await evaluateBattleLiveSpectatorReadiness(
+        DotEnv(),
+        null,
+        schemaProbe: (_) async => throw StateError('must not query schema'),
+        probe: (_, __) async => throw StateError('must not probe sidecar'),
+      );
+      final invalidFlag = await evaluateBattleLiveSpectatorReadiness(
+        DotEnv()..addAll({'BATTLE_LIVE_SPECTATOR_ENABLED': 'yes'}),
+        null,
+        schemaProbe: (_) async => throw StateError('must not query schema'),
+        probe: (_, __) async => throw StateError('must not probe sidecar'),
+      );
+
+      expect(disabled.healthy, isTrue);
+      expect(disabled.check['status'], 'disabled');
+      expect(disabled.check['enabled'], isFalse);
+      expect(disabled.check['configuration_status'], 'valid');
+      expect(invalidFlag.healthy, isTrue);
+      expect(invalidFlag.check['configuration_status'], 'invalid_fail_closed');
+    });
+
+    test(
+      'enabled Live Spectator validates migration and bounded capability',
+      () async {
+        final probed = <String>[];
+        final readiness = await evaluateBattleLiveSpectatorReadiness(
+          DotEnv()..addAll({
+            'BATTLE_LIVE_SPECTATOR_ENABLED': 'true',
+            'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+          }),
+          null,
+          schemaProbe: (_) async => true,
+          probe: (engine, uri) async {
+            probed.add('$engine:${uri.path}');
+            return _battleHealth(engine)..['battle_live'] = _battleLiveHealth();
+          },
+        );
+
+        expect(readiness.healthy, isTrue);
+        expect(readiness.check['status'], 'ready');
+        expect(readiness.check['database'], 'ready');
+        expect(readiness.check['source'], 'ready');
+        expect(readiness.check, isNot(contains('stream_count')));
+        expect(probed, ['xmage:/health']);
+      },
+    );
+
+    test('enabled Live Spectator fails closed on missing capability', () async {
+      final readiness = await evaluateBattleLiveSpectatorReadiness(
+        DotEnv()..addAll({
+          'BATTLE_LIVE_SPECTATOR_ENABLED': 'true',
+          'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+        }),
+        null,
+        schemaProbe: (_) async => true,
+        probe: (engine, uri) async => _battleHealth(engine),
+      );
+
+      expect(readiness.healthy, isFalse);
+      expect(readiness.check['source'], 'unhealthy');
+      expect(readiness.check['error_code'], 'battle_live_spectator_not_ready');
+    });
   });
 
   group('ready route contract', () {
@@ -275,6 +412,14 @@ void main() {
       expect(route, contains('isManaloomE2eIsolatedRuntime()'));
       expect(route, contains("checks['ai_runtime'] = aiRuntime.check"));
       expect(route, contains("checks['battle_runtime'] = battleRuntime.check"));
+      expect(
+        route,
+        contains("checks['battle_live_spectator'] = battleLiveSpectator.check"),
+      );
+      expect(
+        route,
+        contains("checks['battle_job_schema'] = battleJobSchema.check"),
+      );
       expect(
         route,
         contains(
@@ -313,3 +458,13 @@ Map<String, dynamic> _battleHealth(String engine) {
     'deterministic': false,
   };
 }
+
+Map<String, dynamic> _battleLiveHealth() => {
+  'schema_version': 'external_battle_live_source_v1',
+  'stream_count': 0,
+  'record_count': 0,
+  'truncated_stream_count': 0,
+  'max_streams': 64,
+  'max_records_per_stream': 20000,
+  'retention_ms': 900000,
+};

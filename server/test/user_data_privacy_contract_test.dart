@@ -19,6 +19,23 @@ void main() {
       expect(service, contains("'decks': decks"));
       expect(service, contains("'deck_learning_events': deckLearningEvents"));
       expect(service, contains("'battle_simulations': battleSimulations"));
+      expect(service, contains("'battle_jobs': battleJobs"));
+      expect(service, contains("'battle_live_records': battleLiveRecords"));
+      expect(service, contains("- 'request_payload'"));
+      expect(service, contains("- 'lease_token'"));
+      expect(
+        service,
+        contains("'battle_simulation_attempts': battleSimulationAttempts"),
+      );
+      expect(
+        service,
+        contains("'battle_replay_annotations': battleReplayAnnotations"),
+      );
+      expect(service, contains('FROM battle_simulation_attempts attempt'));
+      expect(service, contains('FROM battle_job_live_records record'));
+      expect(service, contains('AND record.public_visible'));
+      expect(service, contains('FROM battle_replay_annotations annotation'));
+      expect(service, isNot(contains("'request_fingerprint'")));
       expect(service, contains("'binder_items': binderItems"));
       expect(service, contains("'post_game_notes': postGameNotes"));
       expect(service, contains("'direct_messages_sent': directMessagesSent"));
@@ -58,6 +75,12 @@ void main() {
         contains('DELETE FROM deck_learning_events learning_event'),
       );
       expect(service, contains('DELETE FROM battle_simulations simulation'));
+      expect(service, contains('DELETE FROM battle_jobs'));
+      expect(
+        service,
+        contains('DELETE FROM battle_simulation_attempts attempt'),
+      );
+      expect(service, contains('DELETE FROM battle_replay_annotations'));
       expect(service, contains('INSERT INTO privacy_deleted_deck_tombstones'));
       expect(service, contains('FROM privacy_keyring'));
       expect(service, contains('hmac('));

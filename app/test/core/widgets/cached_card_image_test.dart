@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
@@ -69,15 +70,48 @@ void main() {
       ),
     );
 
-    final image = tester.widget<CachedNetworkImage>(
-      find.byType(CachedNetworkImage),
+    if (kIsWeb) {
+      await tester.pump(const Duration(milliseconds: 200));
+      final image = tester.widget<Image>(find.byType(Image));
+      final provider = image.image as NetworkImage;
+      final uri = Uri.parse(provider.url);
+      expect(uri.queryParameters['exact'], 'Jin-Gitaxias');
+      expect(uri.queryParameters.containsKey('set'), isFalse);
+      expect(uri.queryParameters['version'], 'normal');
+      expect(provider.headers, isNull);
+      expect(provider.webHtmlElementStrategy, WebHtmlElementStrategy.prefer);
+    } else {
+      final image = tester.widget<CachedNetworkImage>(
+        find.byType(CachedNetworkImage),
+      );
+      final uri = Uri.parse(image.imageUrl);
+      expect(uri.queryParameters['exact'], 'Jin-Gitaxias');
+      expect(uri.queryParameters.containsKey('set'), isFalse);
+      expect(uri.queryParameters['version'], 'normal');
+      expect(image.httpHeaders?['User-Agent'], 'ManaLoom/1.0');
+      expect(image.httpHeaders?['Accept'], 'image/*');
+    }
+  });
+
+  testWidgets('uses the HTML element strategy for direct Scryfall CDN art', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CachedCardImage(
+          imageUrl: 'https://cards.scryfall.io/normal/front/a/b/card.jpg',
+        ),
+      ),
     );
-    final uri = Uri.parse(image.imageUrl);
-    expect(uri.queryParameters['exact'], 'Jin-Gitaxias');
-    expect(uri.queryParameters.containsKey('set'), isFalse);
-    expect(uri.queryParameters['version'], 'normal');
-    expect(image.httpHeaders?['User-Agent'], 'ManaLoom/1.0');
-    expect(image.httpHeaders?['Accept'], 'image/*');
+
+    if (kIsWeb) {
+      final image = tester.widget<Image>(find.byType(Image));
+      final provider = image.image as NetworkImage;
+      expect(provider.headers, isNull);
+      expect(provider.webHtmlElementStrategy, WebHtmlElementStrategy.prefer);
+    } else {
+      expect(find.byType(CachedNetworkImage), findsOneWidget);
+    }
   });
 
   testWidgets('bounds thumbnail decode without a second disk resize', (
@@ -102,12 +136,19 @@ void main() {
       ),
     );
 
-    final image = tester.widget<CachedNetworkImage>(
-      find.byType(CachedNetworkImage),
-    );
-    expect(image.memCacheWidth, 256);
-    expect(image.memCacheHeight, isNull);
-    expect(image.maxWidthDiskCache, isNull);
-    expect(image.maxHeightDiskCache, isNull);
+    if (kIsWeb) {
+      final image = tester.widget<Image>(find.byType(Image));
+      final provider = image.image as NetworkImage;
+      expect(provider.webHtmlElementStrategy, WebHtmlElementStrategy.prefer);
+      expect(provider.headers, isNull);
+    } else {
+      final image = tester.widget<CachedNetworkImage>(
+        find.byType(CachedNetworkImage),
+      );
+      expect(image.memCacheWidth, 256);
+      expect(image.memCacheHeight, isNull);
+      expect(image.maxWidthDiskCache, isNull);
+      expect(image.maxHeightDiskCache, isNull);
+    }
   });
 }

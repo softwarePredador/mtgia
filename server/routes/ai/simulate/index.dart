@@ -6,18 +6,17 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/battle_engine_config.dart';
 import '../../../lib/ai/battle_learning_evidence_support.dart';
+import '../../../lib/ai/battle_replay_event_support.dart';
 import '../../../lib/ai/battle_simulation_request_support.dart';
-import '../../../lib/ai/forge_battle_client.dart';
 import '../../../lib/ai/goldfish_simulator.dart';
-import '../../../lib/ai/native_battle_client.dart';
-import '../../../lib/ai/xmage_battle_client.dart';
+import '../../../lib/battle/battle_execution_runtime.dart';
 import '../../../lib/battle/battle_simulation_persistence_service.dart';
+import '../../../lib/battle/battle_simulation_attempt_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
-const _externalClientGraceMs = 8000;
 final _uuidPattern = RegExp(
   r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
 );
@@ -44,6 +43,8 @@ Future<Response> onRequest(RequestContext context) async {
 
   final pool = context.read<Pool>();
   final userId = context.read<String>();
+  final attemptService = BattleSimulationAttemptService(pool);
+  _RouteBattleAttempt? activeAttempt;
 
   try {
     final body = await context.request.body();
@@ -89,201 +90,131 @@ Future<Response> onRequest(RequestContext context) async {
         return notFound('Opponent deck not found or empty');
       }
 
-      late final BattleEngineConfig engineConfig;
-      try {
-        engineConfig = BattleEngineConfig.fromEnvironment(Platform.environment);
-      } on BattleEngineConfigurationException catch (error) {
-        return _engineConfigurationFailure(error);
-      }
-      final xmageSidecarUrl = engineConfig.xmageSidecarUrl;
-      final forgeSidecarUrl = engineConfig.forgeSidecarUrl;
-      final nativeSidecarUrl = engineConfig.nativeSidecarUrl;
-      final strictXmage = engineConfig.isStrictXmage;
-      final strictForge = engineConfig.isStrictForge;
-      if (!engineConfig.isNative &&
-          routeRequest.forceFocusAccessMode != 'none') {
-        return Response.json(
-          statusCode: HttpStatus.unprocessableEntity,
-          body: {
-            'error': 'external_battle_control_unsupported',
-            'control': 'force_focus_access_mode',
-            'requested_value': routeRequest.forceFocusAccessMode,
-            'supported_value': 'none',
-            'details':
-                'Forced card access is available only in the reviewed native engine.',
-          },
-        );
-      }
       final seed =
           routeRequest.seed ??
           DateTime.now().microsecondsSinceEpoch % 2147483647;
       final timeoutMs = routeRequest.timeoutMs;
+      final requestId = 'api-${DateTime.now().microsecondsSinceEpoch}';
+      final deckAPayload = _externalDeckPayload(deckId, deckCards);
+      final deckBPayload = _externalDeckPayload(opponentId, opponentCards);
       data['max_turns'] = routeRequest.maxTurns;
+      data['test_objective'] = routeRequest.testObjective;
       data['focus_cards'] = routeRequest.focusCards;
       data['force_focus_access_mode'] = routeRequest.forceFocusAccessMode;
       data['same_lane'] = routeRequest.sameLane;
       data['natural_sample'] = routeRequest.naturalSample;
       final battleRequest = <String, dynamic>{
-        'request_id': 'api-${DateTime.now().microsecondsSinceEpoch}',
+        'request_id': requestId,
         'seed': seed,
         'timeout_ms': timeoutMs,
         'max_turns': routeRequest.maxTurns,
+        'test_objective': routeRequest.testObjective,
         'focus_cards': routeRequest.focusCards,
         'force_focus_access_mode': routeRequest.forceFocusAccessMode,
         'same_lane': routeRequest.sameLane,
         'natural_sample': routeRequest.naturalSample,
-        'deck_a': _externalDeckPayload(deckId, deckCards),
-        'deck_b': _externalDeckPayload(opponentId, opponentCards),
+        'deck_a': deckAPayload,
+        'deck_b': deckBPayload,
       };
-      Map<String, dynamic> result;
-
-      if (engineConfig.isNative) {
-        try {
-          result = await _simulateNative(
-            nativeSidecarUrl,
-            _withNativeRequirements(
-              battleRequest,
-              requiredRuleCards: _allDeckCardRows(battleRequest),
-              data: data,
-            ),
-            timeoutMs,
-          );
-          result['fallback_reason'] = 'none';
-          result['engine_selection_reason'] = 'strict_native_mode';
-          result['fallback_chain'] = const ['native'];
-        } on NativeBattleCoverageIncomplete catch (error) {
-          return _nativeCoverageFailure(error);
-        } on NativeBattleServiceException catch (error) {
-          return _externalEngineFailure(
-            'native_battle',
-            error.message,
-            upstreamStatusCode: error.statusCode,
-          );
-        }
-      } else if (strictForge) {
-        try {
-          result = await _simulateForge(
-            forgeSidecarUrl,
-            battleRequest,
-            timeoutMs,
-            engineConfig: engineConfig,
-          );
-          result['engine_contract'] = 'canonical_rules_execution_secondary';
-          result['fallback_reason'] = 'none';
-          result['engine_selection_reason'] = 'strict_forge_mode';
-          result['fallback_chain'] = const ['forge'];
-        } on ForgeCoverageIncomplete catch (error) {
-          return Response.json(
-            statusCode: HttpStatus.unprocessableEntity,
-            body: {
-              'error': 'forge_coverage_incomplete',
-              'unsupported_cards': error.unsupportedCards,
-              'fallback_allowed': false,
-              'fallback_reason': 'none',
-              'fallback_eligibility_reason': 'strict_mode_coverage_incomplete',
-              'engine_selection_reason': 'strict_forge_mode',
-            },
-          );
-        } on ForgeServiceException catch (error) {
-          return _externalEngineFailure(
-            'forge',
-            error.message,
-            upstreamStatusCode: error.statusCode,
-          );
-        }
-      } else {
-        try {
-          result = await _simulateXmage(
-            xmageSidecarUrl,
-            battleRequest,
-            timeoutMs,
-            engineConfig: engineConfig,
-          );
-          result['engine_contract'] = 'canonical_rules_execution';
-          result['fallback_reason'] = 'none';
-          result['engine_selection_reason'] =
-              strictXmage ? 'strict_xmage_mode' : 'auto_primary_xmage';
-          result['fallback_chain'] = const ['xmage'];
-        } on XmageCoverageIncomplete catch (error) {
-          if (strictXmage) {
-            return Response.json(
-              statusCode: HttpStatus.unprocessableEntity,
-              body: {
-                'error': 'xmage_coverage_incomplete',
-                'unsupported_cards': error.unsupportedCards,
-                'fallback_allowed': false,
-                'fallback_reason': 'none',
-                'fallback_eligibility_reason':
-                    'strict_mode_coverage_incomplete',
-                'engine_selection_reason': 'strict_xmage_mode',
-              },
-            );
-          }
-          try {
-            result = await _forgeOrNativeFallback(
-              forgeSidecarUrl: forgeSidecarUrl,
-              nativeSidecarUrl: nativeSidecarUrl,
-              battleRequest: battleRequest,
-              timeoutMs: timeoutMs,
-              fallbackReason: 'xmage_coverage_incomplete',
-              xmageUnsupportedCards: error.unsupportedCards,
-              data: data,
-              engineConfig: engineConfig,
-            );
-          } on ForgeServiceException catch (forgeError) {
-            return _externalEngineFailure(
-              'forge',
-              forgeError.message,
-              upstreamStatusCode: forgeError.statusCode,
-              fallbackReason: 'xmage_coverage_incomplete',
-              engineSelectionReason: 'auto_secondary_forge_after_coverage_gap',
-              fallbackChain: const [
-                'xmage:coverage_incomplete',
-                'forge:operational_failure',
-              ],
-            );
-          } on NativeBattleCoverageIncomplete catch (nativeError) {
-            return _nativeCoverageFailure(
-              nativeError,
-              fallbackReason:
-                  'xmage_coverage_incomplete_forge_coverage_incomplete',
-              engineSelectionReason: 'auto_native_after_external_coverage_gaps',
-              fallbackChain: const [
-                'xmage:coverage_incomplete',
-                'forge:coverage_incomplete',
-                'native:coverage_incomplete',
-              ],
-            );
-          } on NativeBattleServiceException catch (nativeError) {
-            return _externalEngineFailure(
-              'native_battle',
-              nativeError.message,
-              upstreamStatusCode: nativeError.statusCode,
-              fallbackReason:
-                  'xmage_coverage_incomplete_forge_coverage_incomplete',
-              engineSelectionReason: 'auto_native_after_external_coverage_gaps',
-              fallbackChain: const [
-                'xmage:coverage_incomplete',
-                'forge:coverage_incomplete',
-                'native:operational_failure',
-              ],
-            );
-          }
-        } on XmageServiceException catch (error) {
-          return _externalEngineFailure(
-            'xmage',
-            error.message,
-            upstreamStatusCode: error.statusCode,
-          );
-        }
+      final attemptStart = await attemptService.start(
+        userId: userId,
+        deckAId: deckId,
+        deckBId: opponentId,
+        simulationType: 'battle',
+        testObjective: routeRequest.testObjective,
+        requestId: requestId,
+        deckAHash: canonicalExternalBattleDeckHash(deckAPayload),
+        deckBHash: canonicalExternalBattleDeckHash(deckBPayload),
+        deckHashSchema: externalBattleDeckHashSchema,
+        timeoutMs: timeoutMs,
+        engine: (Platform.environment['BATTLE_ENGINE'] ?? 'auto').trim(),
+        provenance: {
+          'seed': seed,
+          'max_turns': routeRequest.maxTurns,
+          'test_objective': routeRequest.testObjective,
+          'focus_card_count': routeRequest.focusCards.length,
+          'same_lane': routeRequest.sameLane,
+          'natural_sample': routeRequest.naturalSample,
+          'force_focus_access_mode': routeRequest.forceFocusAccessMode,
+        },
+      );
+      if (!attemptStart.isStarted) {
+        return _attemptPersistenceFailure(attemptStart.errorCode);
       }
+      activeAttempt = _RouteBattleAttempt(attemptService, attemptStart.handle!);
 
-      result['battle_learning_evidence'] = buildBattleLearningEvidence(
+      final requestedEngine =
+          (Platform.environment['BATTLE_ENGINE'] ?? 'auto')
+              .trim()
+              .toLowerCase();
+      late final BattleExecutionRuntime runtime;
+      try {
+        runtime = BattleExecutionRuntime.fromEnvironment(
+          Platform.environment,
+          requestedEngine: requestedEngine,
+        );
+      } on BattleEngineConfigurationException catch (error) {
+        return _finishFailedAttemptAndReturn(
+          activeAttempt,
+          outcome: BattleSimulationAttemptOutcome.engineError,
+          reason: 'engine_configuration_rejected',
+          errorCode: error.code,
+          response: _engineConfigurationFailure(error),
+        );
+      }
+      late final BattleExecutionRuntimeResult runtimeResult;
+      try {
+        runtimeResult = await runtime.execute(
+          request: battleRequest,
+          requestedEngine: requestedEngine,
+        );
+      } on BattleExecutionRuntimeFailure catch (error) {
+        return _finishFailedAttemptAndReturn(
+          activeAttempt,
+          outcome: error.outcome,
+          reason: error.reason,
+          errorCode: error.code,
+          response: _battleRuntimeFailure(error),
+          result: error.partialResult,
+          engineRequestSchemaVersion:
+              error.correlation?.engineRequestSchemaVersion,
+          engineRequestHash: error.correlation?.engineRequestHash,
+          engineRequestCorrelationSource: error.correlation?.correlationSource,
+          provenance: {
+            'dispatch_trace': error.dispatchTrace
+                .map((record) => record.toJson())
+                .toList(growable: false),
+          },
+        );
+      }
+      Map<String, dynamic> result = runtimeResult.result;
+
+      result = normalizeBattleReplayResultEvents(
+        result: result,
+        deckAId: deckId,
+        deckAName: deckAPayload['name']?.toString() ?? deckId,
+        deckBId: opponentId,
+        deckBName: deckBPayload['name']?.toString() ?? opponentId,
+      );
+      result['test_objective'] = routeRequest.testObjective;
+      final deckAEvidence = buildBattleLearningEvidence(
         result,
+        subjectDeckKey: 'deck_a',
         focusCards: _stringList(data['focus_cards']),
         sameLane: data['same_lane'] == true,
         naturalSample: _isNaturalBattleResult(data, result),
       );
+      final deckBEvidence = buildBattleLearningEvidence(
+        result,
+        subjectDeckKey: 'deck_b',
+        sameLane: data['same_lane'] == true,
+        naturalSample: _isNaturalBattleResult(data, result),
+      );
+      result['battle_learning_evidence'] = deckAEvidence;
+      result['battle_learning_evidence_by_subject'] = {
+        'deck_a': deckAEvidence,
+        'deck_b': deckBEvidence,
+      };
       final winnerDeckId = canonicalBattleWinnerDeckId(
         result: result,
         deckAId: deckId,
@@ -297,7 +228,35 @@ Future<Response> onRequest(RequestContext context) async {
         result: result,
       );
       if (!persistence.isSaved) {
-        return _simulationPersistenceFailure(persistence);
+        return _finishFailedAttemptAndReturn(
+          activeAttempt,
+          outcome: BattleSimulationAttemptOutcome.persistenceError,
+          reason: 'replay_persistence_failed',
+          errorCode: persistence.errorCode,
+          response: _simulationPersistenceFailure(persistence),
+          result: result,
+        );
+      }
+      final attemptOutcome =
+          result['status'] == 'censored'
+              ? BattleSimulationAttemptOutcome.censored
+              : BattleSimulationAttemptOutcome.completed;
+      final attemptFinish = await activeAttempt.finish(
+        outcome: attemptOutcome,
+        replayId: persistence.replayId,
+        reason:
+            attemptOutcome == BattleSimulationAttemptOutcome.censored
+                ? 'engine_max_turns_censored'
+                : 'engine_completed',
+        result: result,
+        engineRequestSchemaVersion:
+            runtimeResult.correlation.engineRequestSchemaVersion,
+        engineRequestHash: runtimeResult.correlation.engineRequestHash,
+        engineRequestCorrelationSource:
+            runtimeResult.correlation.correlationSource,
+      );
+      if (!attemptFinish.isFinished) {
+        return _attemptPersistenceFailure(attemptFinish.errorCode);
       }
 
       return Response.json(
@@ -307,6 +266,8 @@ Future<Response> onRequest(RequestContext context) async {
           'deck_a_id': deckId,
           'deck_b_id': opponentId,
           'winner_deck_id': winnerDeckId,
+          'attempt_id': activeAttempt.handle.id,
+          'outcome': attemptOutcome.value,
           'replay_id': persistence.replayId,
           'persistence': persistence.toJson(),
         },
@@ -333,47 +294,124 @@ Future<Response> onRequest(RequestContext context) async {
         return notFound('Opponent deck not found or empty');
       }
 
+      final deckAPayload = _externalDeckPayload(deckId, deckCards);
+      final deckBPayload = _externalDeckPayload(opponentId, opponentCards);
+      final attemptStart = await attemptService.start(
+        userId: userId,
+        deckAId: deckId,
+        deckBId: opponentId,
+        simulationType: 'matchup',
+        testObjective: routeRequest.testObjective,
+        requestId: 'api-${DateTime.now().microsecondsSinceEpoch}',
+        deckAHash: canonicalExternalBattleDeckHash(deckAPayload),
+        deckBHash: canonicalExternalBattleDeckHash(deckBPayload),
+        deckHashSchema: externalBattleDeckHashSchema,
+        timeoutMs: routeRequest.timeoutMs,
+        engine: 'matchup_heuristic',
+        provenance: {'simulation_count': simCount},
+      );
+      if (!attemptStart.isStarted) {
+        return _attemptPersistenceFailure(attemptStart.errorCode);
+      }
+      activeAttempt = _RouteBattleAttempt(attemptService, attemptStart.handle!);
       final result = MatchupAnalyzer.analyze(deckCards, opponentCards);
+      final resultJson = result.toJson();
+      resultJson['test_objective'] = routeRequest.testObjective;
 
       // Salva resultado para treinamento futuro
       final persistence = await BattleSimulationPersistenceService(pool).save(
         deckAId: deckId,
         deckBId: opponentId,
         type: 'matchup',
-        result: result.toJson(),
+        result: resultJson,
       );
       if (!persistence.isSaved) {
-        return _simulationPersistenceFailure(persistence);
+        return _finishFailedAttemptAndReturn(
+          activeAttempt,
+          outcome: BattleSimulationAttemptOutcome.persistenceError,
+          reason: 'replay_persistence_failed',
+          errorCode: persistence.errorCode,
+          response: _simulationPersistenceFailure(persistence),
+          result: resultJson,
+        );
+      }
+      final attemptFinish = await activeAttempt.finish(
+        outcome: BattleSimulationAttemptOutcome.completed,
+        replayId: persistence.replayId,
+        reason: 'matchup_completed',
+        result: resultJson,
+      );
+      if (!attemptFinish.isFinished) {
+        return _attemptPersistenceFailure(attemptFinish.errorCode);
       }
 
       return Response.json(
         body: {
-          ...result.toJson(),
+          ...resultJson,
           'type': 'matchup',
           'deck_a_id': deckId,
           'deck_b_id': opponentId,
+          'attempt_id': activeAttempt.handle.id,
+          'outcome': BattleSimulationAttemptOutcome.completed.value,
           'replay_id': persistence.replayId,
           'persistence': persistence.toJson(),
         },
       );
     } else {
       // Simulação goldfish (padrão)
+      final deckAPayload = _externalDeckPayload(deckId, deckCards);
+      final attemptStart = await attemptService.start(
+        userId: userId,
+        deckAId: deckId,
+        simulationType: 'goldfish',
+        testObjective: routeRequest.testObjective,
+        requestId: 'api-${DateTime.now().microsecondsSinceEpoch}',
+        deckAHash: canonicalExternalBattleDeckHash(deckAPayload),
+        deckHashSchema: externalBattleDeckHashSchema,
+        timeoutMs: routeRequest.timeoutMs,
+        engine: 'goldfish_monte_carlo',
+        provenance: {'simulation_count': simCount},
+      );
+      if (!attemptStart.isStarted) {
+        return _attemptPersistenceFailure(attemptStart.errorCode);
+      }
+      activeAttempt = _RouteBattleAttempt(attemptService, attemptStart.handle!);
       final simulator = GoldfishSimulator(deckCards, simulations: simCount);
       final result = simulator.simulate();
+      final resultJson = result.toJson();
+      resultJson['test_objective'] = routeRequest.testObjective;
 
       // Salva resultado para treinamento futuro
       final persistence = await BattleSimulationPersistenceService(
         pool,
-      ).save(deckAId: deckId, type: 'goldfish', result: result.toJson());
+      ).save(deckAId: deckId, type: 'goldfish', result: resultJson);
       if (!persistence.isSaved) {
-        return _simulationPersistenceFailure(persistence);
+        return _finishFailedAttemptAndReturn(
+          activeAttempt,
+          outcome: BattleSimulationAttemptOutcome.persistenceError,
+          reason: 'replay_persistence_failed',
+          errorCode: persistence.errorCode,
+          response: _simulationPersistenceFailure(persistence),
+          result: resultJson,
+        );
+      }
+      final attemptFinish = await activeAttempt.finish(
+        outcome: BattleSimulationAttemptOutcome.completed,
+        replayId: persistence.replayId,
+        reason: 'goldfish_completed',
+        result: resultJson,
+      );
+      if (!attemptFinish.isFinished) {
+        return _attemptPersistenceFailure(attemptFinish.errorCode);
       }
 
       return Response.json(
         body: {
-          ...result.toJson(),
+          ...resultJson,
           'type': 'goldfish',
           'deck_id': deckId,
+          'attempt_id': activeAttempt.handle.id,
+          'outcome': BattleSimulationAttemptOutcome.completed.value,
           'replay_id': persistence.replayId,
           'persistence': persistence.toJson(),
         },
@@ -386,6 +424,13 @@ Future<Response> onRequest(RequestContext context) async {
     Log.w('[ai-simulate] invalid JSON type=${e.runtimeType}');
     return badRequest('Invalid JSON: ${e.message}');
   } catch (e, st) {
+    if (activeAttempt != null && !activeAttempt.isFinished) {
+      await activeAttempt.finish(
+        outcome: BattleSimulationAttemptOutcome.engineError,
+        reason: 'unhandled_route_exception',
+        errorCode: 'internal_server_error',
+      );
+    }
     Log.e('[ai-simulate] request failed type=${e.runtimeType}');
     await captureRouteException(
       context,
@@ -427,6 +472,7 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
       JOIN decks d ON d.id = dc.deck_id
       JOIN cards c ON c.id = dc.card_id
       WHERE dc.deck_id = CAST(@deckId AS uuid)
+        AND d.deleted_at IS NULL
         AND (
           d.user_id = CAST(@userId AS uuid)
           OR (CAST(@allowPublic AS boolean) AND d.is_public = true)
@@ -486,134 +532,6 @@ Map<String, dynamic> _externalDeckPayload(
       .toList(growable: false),
 };
 
-Future<Map<String, dynamic>> _simulateXmage(
-  String sidecarUrl,
-  Map<String, dynamic> request,
-  int timeoutMs, {
-  required BattleEngineConfig engineConfig,
-}) async {
-  final sidecarRequest = buildExternalBattleRequestEnvelope(
-    request: request,
-    identity: engineConfig.xmageIdentity,
-  );
-  final client = XmageBattleClient(
-    baseUrl: sidecarUrl,
-    timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
-    expectedIdentity: engineConfig.xmageIdentity,
-    allowLegacyIdentity: engineConfig.allowLegacySidecarIdentity,
-  );
-  try {
-    return await client.simulate(sidecarRequest);
-  } finally {
-    client.close();
-  }
-}
-
-Future<Map<String, dynamic>> _simulateForge(
-  String sidecarUrl,
-  Map<String, dynamic> request,
-  int timeoutMs, {
-  required BattleEngineConfig engineConfig,
-}) async {
-  final sidecarRequest = buildExternalBattleRequestEnvelope(
-    request: request,
-    identity: engineConfig.forgeIdentity,
-  );
-  final client = ForgeBattleClient(
-    baseUrl: sidecarUrl,
-    timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
-    expectedIdentity: engineConfig.forgeIdentity,
-    allowLegacyIdentity: engineConfig.allowLegacySidecarIdentity,
-  );
-  try {
-    return await client.simulate(sidecarRequest);
-  } finally {
-    client.close();
-  }
-}
-
-Future<Map<String, dynamic>> _simulateNative(
-  String sidecarUrl,
-  Map<String, dynamic> request,
-  int timeoutMs,
-) async {
-  final client = NativeBattleClient(
-    baseUrl: sidecarUrl,
-    timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
-  );
-  try {
-    return await client.simulate(request);
-  } finally {
-    client.close();
-  }
-}
-
-Future<Map<String, dynamic>> _forgeOrNativeFallback({
-  required String forgeSidecarUrl,
-  required String nativeSidecarUrl,
-  required Map<String, dynamic> battleRequest,
-  required int timeoutMs,
-  required String fallbackReason,
-  required BattleEngineConfig engineConfig,
-  List<Map<String, dynamic>> xmageUnsupportedCards = const [],
-  Map<String, dynamic> data = const {},
-}) async {
-  try {
-    final result = await _simulateForge(
-      forgeSidecarUrl,
-      battleRequest,
-      timeoutMs,
-      engineConfig: engineConfig,
-    );
-    result['engine_contract'] = 'canonical_rules_execution_secondary';
-    result['fallback_reason'] = fallbackReason;
-    result['engine_selection_reason'] =
-        'auto_secondary_forge_after_coverage_gap';
-    if (xmageUnsupportedCards.isNotEmpty) {
-      result['xmage_unsupported_cards'] = xmageUnsupportedCards;
-    }
-    result['fallback_chain'] = const ['xmage:coverage_incomplete', 'forge'];
-    return result;
-  } on ForgeCoverageIncomplete catch (error) {
-    final result = await _simulateNative(
-      nativeSidecarUrl,
-      _withNativeRequirements(
-        battleRequest,
-        requiredRuleCards: _allDeckCardRows(battleRequest),
-        data: data,
-      ),
-      timeoutMs,
-    );
-    result['fallback_reason'] = '${fallbackReason}_forge_coverage_incomplete';
-    result['engine_selection_reason'] =
-        'auto_native_after_external_coverage_gaps';
-    if (xmageUnsupportedCards.isNotEmpty) {
-      result['xmage_unsupported_cards'] = xmageUnsupportedCards;
-    }
-    result['forge_unsupported_cards'] = error.unsupportedCards;
-    result['fallback_chain'] = const [
-      'xmage:coverage_incomplete',
-      'forge:coverage_incomplete',
-      'native',
-    ];
-    return result;
-  }
-}
-
-Map<String, dynamic> _withNativeRequirements(
-  Map<String, dynamic> request, {
-  required List<Map<String, dynamic>> requiredRuleCards,
-  required Map<String, dynamic> data,
-}) => {
-  ...request,
-  'required_rule_cards': requiredRuleCards,
-  'max_turns': (data['max_turns'] as int?) ?? 30,
-  if (data['focus_cards'] is List) 'focus_cards': data['focus_cards'],
-  if (data['force_focus_access_mode'] is String)
-    'force_focus_access_mode': data['force_focus_access_mode'],
-  'natural_sample': data['natural_sample'] != false,
-};
-
 bool _isNaturalBattleResult(
   Map<String, dynamic> request,
   Map<String, dynamic> result,
@@ -622,20 +540,6 @@ bool _isNaturalBattleResult(
   final forcedMode =
       result['forced_access_mode']?.toString().trim().toLowerCase();
   return forcedMode == null || forcedMode.isEmpty || forcedMode == 'none';
-}
-
-List<Map<String, dynamic>> _allDeckCardRows(Map<String, dynamic> request) {
-  final rows = <Map<String, dynamic>>[];
-  for (final deckKey in const ['deck_a', 'deck_b']) {
-    final deck = request[deckKey];
-    if (deck is! Map || deck['cards'] is! List) continue;
-    rows.addAll(
-      (deck['cards'] as List).whereType<Map>().map(
-        (row) => row.cast<String, dynamic>(),
-      ),
-    );
-  }
-  return rows;
 }
 
 List<String> _stringList(Object? value) =>
@@ -653,54 +557,37 @@ Response _engineConfigurationFailure(
   body: {'error': error.code, 'details': error.message},
 );
 
-Response _externalEngineFailure(
-  String engine,
-  String message, {
-  int? upstreamStatusCode,
-  String fallbackReason = 'none',
-  String? engineSelectionReason,
-  List<String>? fallbackChain,
-}) {
-  final timedOut = upstreamStatusCode == HttpStatus.gatewayTimeout;
-  Log.e('$engine battle failed');
+Response _battleRuntimeFailure(BattleExecutionRuntimeFailure error) {
+  final coverage =
+      error.outcome == BattleSimulationAttemptOutcome.coverageError;
+  final cancelled = error.outcome == BattleSimulationAttemptOutcome.cancelled;
+  Log.e('${error.engine} battle failed code=${error.code}');
   return Response.json(
-    statusCode: timedOut ? HttpStatus.gatewayTimeout : HttpStatus.badGateway,
+    statusCode:
+        coverage || cancelled
+            ? HttpStatus.unprocessableEntity
+            : error.timedOut
+            ? HttpStatus.gatewayTimeout
+            : HttpStatus.badGateway,
     body: {
-      'error': timedOut ? '${engine}_timeout' : '${engine}_unavailable',
+      'error': error.code,
+      if (error.unsupportedCards.isNotEmpty)
+        'unsupported_cards': error.unsupportedCards,
       'fallback_allowed': false,
-      'fallback_reason': fallbackReason,
+      'fallback_reason': error.fallbackReason,
       'fallback_eligibility_reason':
-          timedOut
+          coverage
+              ? 'coverage_fallback_exhausted_or_strict'
+              : error.timedOut
               ? 'operational_timeout_not_eligible'
               : 'operational_failure_not_eligible',
-      if (engineSelectionReason != null)
-        'engine_selection_reason': engineSelectionReason,
-      if (fallbackChain != null) 'fallback_chain': fallbackChain,
-      'details':
-          timedOut
-              ? 'The battle engine timed out.'
-              : 'The battle engine is temporarily unavailable.',
+      if (error.engineSelectionReason != null)
+        'engine_selection_reason': error.engineSelectionReason,
+      if (error.fallbackChain.isNotEmpty) 'fallback_chain': error.fallbackChain,
+      'details': error.message,
     },
   );
 }
-
-Response _nativeCoverageFailure(
-  NativeBattleCoverageIncomplete error, {
-  String fallbackReason = 'none',
-  String engineSelectionReason = 'strict_native_mode',
-  List<String> fallbackChain = const ['native:coverage_incomplete'],
-}) => Response.json(
-  statusCode: HttpStatus.unprocessableEntity,
-  body: {
-    'error': 'native_coverage_incomplete',
-    'unsupported_cards': error.unsupportedCards,
-    'fallback_allowed': false,
-    'fallback_reason': fallbackReason,
-    'fallback_eligibility_reason': 'final_native_coverage_incomplete',
-    'engine_selection_reason': engineSelectionReason,
-    'fallback_chain': fallbackChain,
-  },
-);
 
 Response _simulationPersistenceFailure(
   BattleSimulationPersistenceOutcome persistence,
@@ -715,6 +602,89 @@ Response _simulationPersistenceFailure(
       'message':
           'A simulacao terminou, mas o replay nao pode ser salvo. Tente novamente.',
       'persistence': persistence.toJson(),
+    },
+  );
+}
+
+class _RouteBattleAttempt {
+  _RouteBattleAttempt(this._service, this.handle);
+
+  final BattleSimulationAttemptService _service;
+  final BattleSimulationAttemptHandle handle;
+  bool isFinished = false;
+
+  Future<BattleSimulationAttemptFinishResult> finish({
+    required BattleSimulationAttemptOutcome outcome,
+    String? replayId,
+    String? reason,
+    String? errorCode,
+    String? engineRequestSchemaVersion,
+    String? engineRequestHash,
+    String? engineRequestCorrelationSource,
+    Map<String, dynamic> result = const {},
+    Map<String, dynamic> provenance = const {},
+  }) async {
+    if (isFinished) {
+      return const BattleSimulationAttemptFinishResult.failed(
+        'battle_attempt_not_open',
+      );
+    }
+    final finish = await _service.finish(
+      attempt: handle,
+      outcome: outcome,
+      replayId: replayId,
+      reason: reason,
+      errorCode: errorCode,
+      engineRequestSchemaVersion: engineRequestSchemaVersion,
+      engineRequestHash: engineRequestHash,
+      engineRequestCorrelationSource: engineRequestCorrelationSource,
+      result: result,
+      provenance: provenance,
+    );
+    if (finish.isFinished) isFinished = true;
+    return finish;
+  }
+}
+
+Future<Response> _finishFailedAttemptAndReturn(
+  _RouteBattleAttempt? attempt, {
+  required BattleSimulationAttemptOutcome outcome,
+  required String reason,
+  required String? errorCode,
+  required Response response,
+  Map<String, dynamic> result = const {},
+  Map<String, dynamic> provenance = const {},
+  String? engineRequestSchemaVersion,
+  String? engineRequestHash,
+  String? engineRequestCorrelationSource,
+}) async {
+  if (attempt != null && !attempt.isFinished) {
+    await attempt.finish(
+      outcome: outcome,
+      reason: reason,
+      errorCode: errorCode,
+      engineRequestSchemaVersion: engineRequestSchemaVersion,
+      engineRequestHash: engineRequestHash,
+      engineRequestCorrelationSource: engineRequestCorrelationSource,
+      result: result,
+      provenance: provenance,
+    );
+  }
+  return response;
+}
+
+Response _attemptPersistenceFailure(String? errorCode) {
+  Log.w(
+    '[ai-simulate] attempt persistence failed '
+    'code=${errorCode ?? 'unknown'}',
+  );
+  return Response.json(
+    statusCode: HttpStatus.serviceUnavailable,
+    body: {
+      'error': 'battle_attempt_persistence_failed',
+      'message':
+          'A tentativa nao pode ser registrada com seguranca. Tente novamente.',
+      if (errorCode != null) 'persistence_code': errorCode,
     },
   );
 }

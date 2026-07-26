@@ -11,10 +11,10 @@ class BattleReplaySummary {
     this.winnerDeckId,
     this.winnerName,
     this.createdAt,
-    this.turnCount = 0,
-    this.eventCount = 0,
-    this.issueCount = 0,
-    this.simulations = 0,
+    this.turnCount,
+    this.eventCount,
+    this.issueCount,
+    this.simulations,
     this.winRate,
     this.raw = const <String, dynamic>{},
   });
@@ -30,10 +30,10 @@ class BattleReplaySummary {
   final String? winnerDeckId;
   final String? winnerName;
   final DateTime? createdAt;
-  final int turnCount;
-  final int eventCount;
-  final int issueCount;
-  final int simulations;
+  final int? turnCount;
+  final int? eventCount;
+  final int? issueCount;
+  final int? simulations;
   final double? winRate;
   final Map<String, dynamic> raw;
 
@@ -65,7 +65,7 @@ class BattleReplaySummary {
     final rawStatus =
         _optionalString(merged['status']) ??
         _optionalString(contract['status']) ??
-        'completed';
+        'legacy_unknown';
 
     return BattleReplaySummary(
       id:
@@ -89,18 +89,14 @@ class BattleReplaySummary {
       turnCount:
           _parseInt(merged['turns_played']) ??
           _parseInt(merged['turns']) ??
-          _parseInt(metrics['turns']) ??
-          0,
+          _parseInt(metrics['turns']),
       eventCount:
-          _parseInt(merged['event_count']) ?? _extractEvents(merged).length,
+          _parseInt(merged['event_count']) ??
+          (_declaresEvents(merged) ? _extractEvents(merged).length : null),
       issueCount:
-          _parseInt(merged['issue_count']) ??
-          _parseInt(metrics['issue_count']) ??
-          0,
+          _parseInt(merged['issue_count']) ?? _parseInt(metrics['issue_count']),
       simulations:
-          _parseInt(merged['simulations']) ??
-          _parseInt(metrics['simulations']) ??
-          0,
+          _parseInt(merged['simulations']) ?? _parseInt(metrics['simulations']),
       winRate:
           _parseDouble(merged['win_rate']) ??
           _parseDouble(metrics['win_rate']) ??
@@ -129,6 +125,20 @@ class BattleReplaySummary {
       case 'completed':
       case 'success':
         return 'Concluido';
+      case 'censored':
+        return 'Censurado';
+      case 'timeout':
+        return 'Timeout';
+      case 'coverage_error':
+        return 'Sem cobertura';
+      case 'engine_error':
+        return 'Falha do motor';
+      case 'cancelled':
+        return 'Cancelado';
+      case 'persistence_error':
+        return 'Falha ao salvar';
+      case 'legacy_unknown':
+        return 'Legado · outcome desconhecido';
       case 'failed':
         return 'Falhou';
       default:
@@ -175,12 +185,13 @@ class BattleReplaySummary {
   }
 
   String get turnLabel {
-    if (turnCount <= 0) return 'Turnos nao informados';
+    if (turnCount == null) return 'Turnos nao informados';
     return turnCount == 1 ? '1 turno' : '$turnCount turnos';
   }
 
   String get eventLabel {
-    if (eventCount <= 0) return 'Sem eventos estruturados';
+    if (eventCount == null) return 'Eventos nao informados';
+    if (eventCount == 0) return 'Sem eventos estruturados';
     return eventCount == 1 ? '1 evento' : '$eventCount eventos';
   }
 }
@@ -191,6 +202,7 @@ class BattleReplayDetail {
     required this.events,
     required this.decisions,
     this.visualSnapshots = const <BattleReplayVisualSnapshot>[],
+    this.nativeDecisionTraceAvailable = false,
     this.replayText,
     this.raw = const <String, dynamic>{},
   });
@@ -199,6 +211,7 @@ class BattleReplayDetail {
   final List<BattleReplayEvent> events;
   final List<BattleReplayDecision> decisions;
   final List<BattleReplayVisualSnapshot> visualSnapshots;
+  final bool nativeDecisionTraceAvailable;
   final String? replayText;
   final Map<String, dynamic> raw;
 
@@ -213,6 +226,7 @@ class BattleReplayDetail {
       ...payload,
       if (source != null) 'source': source,
     };
+    final declaresEvents = _declaresEvents(merged);
     final events = _extractEvents(merged)
         .asMap()
         .entries
@@ -223,16 +237,21 @@ class BattleReplayDetail {
           ),
         )
         .toList(growable: false);
-    final decisions = _extractDecisions(merged)
-        .asMap()
-        .entries
-        .map(
-          (entry) => BattleReplayDecision.fromJson(
-            entry.value,
-            fallbackId: 'decision-${entry.key + 1}',
-          ),
-        )
-        .toList(growable: false);
+    final nativeDecisionTraceAvailable = _nativeDecisionTraceAvailable(merged);
+    final decisions =
+        (nativeDecisionTraceAvailable
+                ? _extractDecisions(merged)
+                : const <Map<String, dynamic>>[])
+            .asMap()
+            .entries
+            .map(
+              (entry) => BattleReplayDecision.fromJson(
+                entry.value,
+                fallbackId: 'decision-${entry.key + 1}',
+                isNativeHeuristic: true,
+              ),
+            )
+            .toList(growable: false);
     final visualSnapshots = _extractVisualSnapshots(merged)
         .asMap()
         .entries
@@ -247,13 +266,14 @@ class BattleReplayDetail {
 
     return BattleReplayDetail(
       summary: BattleReplaySummary.fromJson(
-        {...merged, 'event_count': events.length},
+        {...merged, if (declaresEvents) 'event_count': events.length},
         fallbackDeckId: fallbackDeckId,
         fallbackId: fallbackId,
       ),
       events: events,
       decisions: decisions,
       visualSnapshots: visualSnapshots,
+      nativeDecisionTraceAvailable: nativeDecisionTraceAvailable,
       replayText: _extractReplayText(merged),
       raw: Map<String, dynamic>.unmodifiable(merged),
     );
@@ -339,45 +359,88 @@ class BattleReplayDecision {
     required this.id,
     required this.choice,
     required this.reason,
+    required this.isNativeHeuristic,
+    this.decisionType,
     this.turn,
+    this.phase,
     this.actor,
     this.score,
+    this.chosenOption = const <String, dynamic>{},
+    this.alternatives = const <Map<String, dynamic>>[],
+    this.scoreComponents = const <String, dynamic>{},
+    this.heuristicVersion,
+    this.ruleSource,
+    this.ruleStatus,
+    this.confidence,
     this.raw = const <String, dynamic>{},
   });
 
   final String id;
   final String choice;
   final String reason;
+  final bool isNativeHeuristic;
+  final String? decisionType;
   final int? turn;
+  final String? phase;
   final String? actor;
   final double? score;
+  final Map<String, dynamic> chosenOption;
+  final List<Map<String, dynamic>> alternatives;
+  final Map<String, dynamic> scoreComponents;
+  final String? heuristicVersion;
+  final String? ruleSource;
+  final String? ruleStatus;
+  final String? confidence;
   final Map<String, dynamic> raw;
 
   factory BattleReplayDecision.fromJson(
     Map<String, dynamic> json, {
     required String fallbackId,
+    required bool isNativeHeuristic,
   }) {
     final data = _asStringMap(json['data']);
     final merged = <String, dynamic>{...json, ...data};
+    final chosenOption = _asStringMap(merged['chosen_option']);
+    final alternatives = _decisionAlternatives(merged);
+    final scoreComponents = _asStringMap(merged['score_components']);
+    final decisionType = _optionalString(merged['decision_type']);
     return BattleReplayDecision(
       id:
           _optionalString(merged['id']) ??
           _optionalString(merged['decision_id']) ??
           fallbackId,
       choice:
+          _decisionOptionLabel(chosenOption) ??
           _optionalString(merged['choice']) ??
           _optionalString(merged['decision']) ??
           _optionalString(merged['action']) ??
+          decisionType ??
           'Decisao registrada',
       reason:
           _optionalString(merged['reason']) ??
           _optionalString(merged['rationale']) ??
           _optionalString(merged['explanation']) ??
-          'Sem justificativa estruturada.',
+          _optionalString(merged['expected_payoff_reason']) ??
+          _optionalString(merged['strategic_principle']) ??
+          'Justificativa nao disponivel.',
+      isNativeHeuristic: isNativeHeuristic,
+      decisionType: decisionType,
       turn: _parseInt(merged['turn']),
+      phase: _optionalString(merged['phase']),
       actor:
           _optionalString(merged['actor']) ?? _optionalString(merged['player']),
-      score: _parseDouble(merged['score']),
+      score:
+          _parseDouble(merged['chosen_option_score']) ??
+          _parseDouble(chosenOption['score']) ??
+          _parseDouble(merged['expected_benefit_score']) ??
+          _parseDouble(merged['score']),
+      chosenOption: Map<String, dynamic>.unmodifiable(chosenOption),
+      alternatives: List<Map<String, dynamic>>.unmodifiable(alternatives),
+      scoreComponents: Map<String, dynamic>.unmodifiable(scoreComponents),
+      heuristicVersion: _optionalString(merged['heuristic_version']),
+      ruleSource: _optionalString(merged['rule_source']),
+      ruleStatus: _optionalString(merged['rule_status']),
+      confidence: _optionalString(merged['confidence']),
       raw: Map<String, dynamic>.unmodifiable(merged),
     );
   }
@@ -390,19 +453,29 @@ class BattleReplayVisualSnapshot {
     required this.index,
     required this.action,
     required this.players,
+    this.stack = const <BattleReplayVisualCard>[],
+    this.combat = const <BattleReplayCombatGroup>[],
     this.turn,
     this.phase,
+    this.step,
     this.activePlayer,
+    this.priorityPlayer,
+    this.isFinal,
     this.event = const <String, dynamic>{},
   });
 
   final int index;
   final int? turn;
   final String? phase;
+  final String? step;
   final String action;
   final String? activePlayer;
+  final String? priorityPlayer;
+  final bool? isFinal;
   final Map<String, dynamic> event;
   final List<BattleReplayPlayerSnapshot> players;
+  final List<BattleReplayVisualCard> stack;
+  final List<BattleReplayCombatGroup> combat;
 
   factory BattleReplayVisualSnapshot.fromJson(
     Map<String, dynamic> json, {
@@ -411,6 +484,8 @@ class BattleReplayVisualSnapshot {
     final event = _asStringMap(json['event']);
     final phase =
         _optionalString(json['phase']) ?? _optionalString(event['phase']);
+    final step =
+        _optionalString(json['step']) ?? _optionalString(event['step']);
     final action =
         _optionalString(json['action']) ??
         _optionalString(event['action']) ??
@@ -419,22 +494,41 @@ class BattleReplayVisualSnapshot {
       index: _parseInt(json['index']) ?? fallbackIndex,
       turn: _parseInt(json['turn']) ?? _parseInt(event['turn']),
       phase: phase,
+      step: step,
       action: action,
       activePlayer:
           _optionalString(json['active_player']) ??
           _optionalString(event['player']),
+      priorityPlayer:
+          _optionalString(json['priority_player']) ??
+          _optionalString(event['priority_player']),
+      isFinal: _parseOptionalBool(json['final']),
       event: Map<String, dynamic>.unmodifiable(event),
       players: _extractSnapshotPlayers(
         json,
       ).map(BattleReplayPlayerSnapshot.fromJson).toList(growable: false),
+      stack: _parseVisualCards(json['stack']),
+      combat: _asMapList(
+        json['combat'],
+      ).map(BattleReplayCombatGroup.fromJson).toList(growable: false),
     );
   }
 
-  String get turnLabel => turn == null || turn == 0 ? 'Setup' : 'T$turn';
+  String get turnLabel {
+    if (turn == null) return 'Turno nao disponivel';
+    return turn == 0 ? 'Setup' : 'T$turn';
+  }
 
   String get phaseLabel {
     final value = phase?.trim();
-    return value == null || value.isEmpty ? action : value;
+    if (value != null && value.isNotEmpty) {
+      final stepValue = step?.trim();
+      return stepValue == null || stepValue.isEmpty
+          ? value
+          : '$value · $stepValue';
+    }
+    final stepValue = step?.trim();
+    return stepValue == null || stepValue.isEmpty ? action : stepValue;
   }
 
   String get message {
@@ -455,51 +549,111 @@ class BattleReplayVisualSnapshot {
   }
 }
 
+class BattleReplayCombatGroup {
+  const BattleReplayCombatGroup({
+    required this.attackers,
+    required this.blockers,
+    this.defenderId,
+    this.defenderName,
+    this.blocked,
+    this.raw = const <String, dynamic>{},
+  });
+
+  final String? defenderId;
+  final String? defenderName;
+  final bool? blocked;
+  final List<BattleReplayVisualCard> attackers;
+  final List<BattleReplayVisualCard> blockers;
+  final Map<String, dynamic> raw;
+
+  factory BattleReplayCombatGroup.fromJson(Map<String, dynamic> json) {
+    return BattleReplayCombatGroup(
+      defenderId: _optionalString(json['defender_id']),
+      defenderName: _optionalString(json['defender_name']),
+      blocked: _parseOptionalBool(json['blocked']),
+      attackers: _parseVisualCards(json['attackers']),
+      blockers: _parseVisualCards(json['blockers']),
+      raw: Map<String, dynamic>.unmodifiable(json),
+    );
+  }
+}
+
 class BattleReplayPlayerSnapshot {
   const BattleReplayPlayerSnapshot({
     required this.name,
     required this.hand,
     required this.battlefield,
     required this.graveyard,
-    this.life = 0,
-    this.mana = 0,
-    this.handSize = 0,
-    this.librarySize = 0,
-    this.lands = 0,
-    this.graveyardSize = 0,
+    this.exile = const <BattleReplayVisualCard>[],
+    this.command = const <BattleReplayVisualCard>[],
+    this.deckKey,
+    this.life,
+    this.mana,
+    this.handSize,
+    this.librarySize,
+    this.lands,
+    this.graveyardSize,
+    this.hasLeft,
+    this.raw = const <String, dynamic>{},
   });
 
   final String name;
-  final int life;
-  final int mana;
-  final int handSize;
-  final int librarySize;
-  final int lands;
-  final int graveyardSize;
+  final String? deckKey;
+  final int? life;
+  final int? mana;
+  final int? handSize;
+  final int? librarySize;
+  final int? lands;
+  final int? graveyardSize;
+  final bool? hasLeft;
   final List<BattleReplayVisualCard> hand;
   final List<BattleReplayVisualCard> battlefield;
   final List<BattleReplayVisualCard> graveyard;
+  final List<BattleReplayVisualCard> exile;
+  final List<BattleReplayVisualCard> command;
+  final Map<String, dynamic> raw;
 
   factory BattleReplayPlayerSnapshot.fromJson(Map<String, dynamic> json) {
     final hand = _parseVisualCards(json['hand']);
     final battlefield = _parseVisualCards(json['battlefield']);
     final creatures = _parseVisualCards(json['creatures']);
     final graveyard = _parseVisualCards(json['graveyard']);
+    final exile = _parseVisualCards(json['exile']);
+    final command = _parseVisualCards(
+      json.containsKey('command') ? json['command'] : json['command_zone'],
+    );
 
     return BattleReplayPlayerSnapshot(
       name:
           _optionalString(json['name']) ??
           _optionalString(json['player']) ??
           'Player',
-      life: _parseInt(json['life']) ?? 0,
-      mana: _parseInt(json['mana']) ?? _parseInt(json['mana_available']) ?? 0,
-      handSize: _parseInt(json['hand_size']) ?? hand.length,
-      librarySize: _parseInt(json['library_size']) ?? 0,
-      lands: _parseInt(json['lands']) ?? 0,
-      graveyardSize: _parseInt(json['graveyard_size']) ?? graveyard.length,
+      deckKey: _optionalString(json['deck_key']),
+      life: _parseInt(json['life']),
+      mana: _parseInt(json['mana']) ?? _parseInt(json['mana_available']),
+      handSize: _observedZoneCount(
+        json,
+        countKeys: const ['hand_size', 'hand_count'],
+        zoneKeys: const ['hand'],
+      ),
+      librarySize: _observedZoneCount(
+        json,
+        countKeys: const ['library_size', 'library_count'],
+        zoneKeys: const ['library'],
+      ),
+      lands: _parseInt(json['lands']),
+      graveyardSize: _observedZoneCount(
+        json,
+        countKeys: const ['graveyard_size', 'graveyard_count'],
+        zoneKeys: const ['graveyard'],
+      ),
+      hasLeft: _parseOptionalBool(json['has_left']),
       hand: hand,
       battlefield: battlefield.isNotEmpty ? battlefield : creatures,
       graveyard: graveyard,
+      exile: exile,
+      command: command,
+      raw: Map<String, dynamic>.unmodifiable(json),
     );
   }
 }
@@ -513,7 +667,10 @@ class BattleReplayVisualCard {
     this.manaCost,
     this.power,
     this.toughness,
-    this.isTapped = false,
+    this.isTapped,
+    this.damage,
+    this.controllerName,
+    this.raw = const <String, dynamic>{},
   });
 
   final String? id;
@@ -523,7 +680,10 @@ class BattleReplayVisualCard {
   final String? manaCost;
   final String? power;
   final String? toughness;
-  final bool isTapped;
+  final bool? isTapped;
+  final int? damage;
+  final String? controllerName;
+  final Map<String, dynamic> raw;
 
   factory BattleReplayVisualCard.fromJson(Map<String, dynamic> json) {
     return BattleReplayVisualCard(
@@ -539,7 +699,12 @@ class BattleReplayVisualCard {
       manaCost: _optionalString(json['mana_cost']),
       power: _optionalString(json['power']),
       toughness: _optionalString(json['toughness']),
-      isTapped: _parseBool(json['tapped']) || _parseBool(json['is_tapped']),
+      isTapped:
+          _parseOptionalBool(json['tapped']) ??
+          _parseOptionalBool(json['is_tapped']),
+      damage: _parseInt(json['damage']),
+      controllerName: _optionalString(json['controller_name']),
+      raw: Map<String, dynamic>.unmodifiable(json),
     );
   }
 
@@ -575,6 +740,20 @@ List<Map<String, dynamic>> _extractEvents(Map<String, dynamic> json) {
   return _asMapList(gameLogMap['events']);
 }
 
+bool _declaresEvents(Map<String, dynamic> json) {
+  for (final key in const ['events', 'replay_events', 'turn_events']) {
+    if (json.containsKey(key) && json[key] is List) return true;
+  }
+
+  final gameLog = json['game_log'];
+  if (gameLog is List) return true;
+  final gameLogMap = _asStringMap(gameLog);
+  for (final key in const ['game_log', 'events']) {
+    if (gameLogMap.containsKey(key) && gameLogMap[key] is List) return true;
+  }
+  return false;
+}
+
 List<Map<String, dynamic>> _extractDecisions(Map<String, dynamic> json) {
   final direct = _asMapList(json['decision_trace']);
   if (direct.isNotEmpty) return direct;
@@ -582,6 +761,42 @@ List<Map<String, dynamic>> _extractDecisions(Map<String, dynamic> json) {
   if (decisions.isNotEmpty) return decisions;
   final gameLog = _asStringMap(json['game_log']);
   return _asMapList(gameLog['decision_trace']);
+}
+
+bool _nativeDecisionTraceAvailable(Map<String, dynamic> json) {
+  if (_optionalString(json['engine']) != 'manaloom_native_reviewed') {
+    return false;
+  }
+  final learningContract = _asStringMap(json['learning_contract']);
+  return _optionalString(learningContract['schema_version']) ==
+          'native_battle_learning_v1' &&
+      learningContract['decision_trace_available'] == true;
+}
+
+List<Map<String, dynamic>> _decisionAlternatives(
+  Map<String, dynamic> decision,
+) {
+  for (final key in const [
+    'alternatives_considered',
+    'rejected_options',
+    'available_options',
+  ]) {
+    if (decision[key] is List) return _asMapList(decision[key]);
+  }
+  return const <Map<String, dynamic>>[];
+}
+
+String? _decisionOptionLabel(Map<String, dynamic> option) {
+  if (option.isEmpty) return null;
+  final action = _optionalString(option['action']);
+  final card =
+      _optionalString(option['card']) ??
+      _optionalString(option['name']) ??
+      _optionalString(option['option']);
+  if (action != null && card != null && action != card) {
+    return '$action · $card';
+  }
+  return card ?? action;
 }
 
 List<Map<String, dynamic>> _extractVisualSnapshots(Map<String, dynamic> json) {
@@ -604,35 +819,44 @@ List<Map<String, dynamic>> _extractVisualSnapshots(Map<String, dynamic> json) {
     if (nested.isNotEmpty) return nested;
   }
 
-  final finalState =
-      _asStringMap(json['final_state']).isNotEmpty
-          ? _asStringMap(json['final_state'])
-          : _asStringMap(gameLog['final_state']);
+  final finalState = _asStringMap(json['final_state']).isNotEmpty
+      ? _asStringMap(json['final_state'])
+      : _asStringMap(gameLog['final_state']);
   if (finalState.isNotEmpty) {
-    return [
-      <String, dynamic>{
-        'index': 0,
-        'turn': _parseInt(json['turns']) ?? _parseInt(gameLog['turns']),
+    final finalSnapshot = <String, dynamic>{...finalState};
+    finalSnapshot.putIfAbsent('index', () => 0);
+    finalSnapshot.putIfAbsent(
+      'turn',
+      () => _parseInt(json['turns']) ?? _parseInt(gameLog['turns']),
+    );
+    finalSnapshot.putIfAbsent('phase', () => 'final');
+    finalSnapshot.putIfAbsent('action', () => 'final_state');
+    finalSnapshot.putIfAbsent(
+      'active_player',
+      () =>
+          _optionalString(json['winner']) ?? _optionalString(gameLog['winner']),
+    );
+    finalSnapshot.putIfAbsent('final', () => true);
+    finalSnapshot.putIfAbsent(
+      'event',
+      () => <String, dynamic>{
+        'turn': finalSnapshot['turn'],
         'phase': 'final',
         'action': 'final_state',
-        'active_player':
-            _optionalString(json['winner']) ??
-            _optionalString(gameLog['winner']),
-        'event': {
-          'turn': _parseInt(json['turns']) ?? _parseInt(gameLog['turns']),
-          'phase': 'final',
-          'action': 'final_state',
-          if (_optionalString(json['winner']) != null)
-            'player': _optionalString(json['winner']),
-        },
-        'players': [
-          if (_asStringMap(finalState['player_a']).isNotEmpty)
-            _asStringMap(finalState['player_a']),
-          if (_asStringMap(finalState['player_b']).isNotEmpty)
-            _asStringMap(finalState['player_b']),
-        ],
+        if (finalSnapshot['active_player'] != null)
+          'player': finalSnapshot['active_player'],
       },
-    ];
+    );
+    finalSnapshot.putIfAbsent(
+      'players',
+      () => <Map<String, dynamic>>[
+        if (_asStringMap(finalState['player_a']).isNotEmpty)
+          _asStringMap(finalState['player_a']),
+        if (_asStringMap(finalState['player_b']).isNotEmpty)
+          _asStringMap(finalState['player_b']),
+      ],
+    );
+    return [finalSnapshot];
   }
 
   return const <Map<String, dynamic>>[];
@@ -693,9 +917,11 @@ List<Map<String, dynamic>> _asMapList(Object? value) {
 }
 
 List<Map<String, dynamic>> _extractSnapshotPlayers(Map<String, dynamic> json) {
-  final direct = _asMapList(json['players']);
+  final direct = _playersFromValue(json['players']);
   if (direct.isNotEmpty) return direct;
   final state = _asStringMap(json['state']);
+  final nestedStatePlayers = _playersFromValue(state['players']);
+  if (nestedStatePlayers.isNotEmpty) return nestedStatePlayers;
   final fromState = _playersFromMap(state);
   if (fromState.isNotEmpty) return fromState;
   return _playersFromMap(json);
@@ -703,17 +929,52 @@ List<Map<String, dynamic>> _extractSnapshotPlayers(Map<String, dynamic> json) {
 
 List<Map<String, dynamic>> _playersFromMap(Map<String, dynamic> value) {
   final players = <Map<String, dynamic>>[];
-  for (final key in const ['player_a', 'player_b', 'playerA', 'playerB']) {
+  for (final key in const [
+    'player_a',
+    'player_b',
+    'playerA',
+    'playerB',
+    'deck_a',
+    'deck_b',
+  ]) {
     final player = _asStringMap(value[key]);
-    if (player.isNotEmpty) players.add(player);
+    if (player.isNotEmpty) {
+      players.add(<String, dynamic>{
+        ...player,
+        'name': _optionalString(player['name']) ?? key,
+        'deck_key': _optionalString(player['deck_key']) ?? key,
+      });
+    }
   }
   return players;
+}
+
+List<Map<String, dynamic>> _playersFromValue(Object? value) {
+  final listed = _asMapList(value);
+  if (listed.isNotEmpty) return listed;
+  return _playersFromMap(_asStringMap(value));
 }
 
 List<BattleReplayVisualCard> _parseVisualCards(Object? value) {
   return _asMapList(
     value,
   ).map(BattleReplayVisualCard.fromJson).toList(growable: false);
+}
+
+int? _observedZoneCount(
+  Map<String, dynamic> json, {
+  required List<String> countKeys,
+  required List<String> zoneKeys,
+}) {
+  for (final key in countKeys) {
+    final parsed = _parseInt(json[key]);
+    if (parsed != null) return parsed;
+  }
+  for (final key in zoneKeys) {
+    final value = json[key];
+    if (json.containsKey(key) && value is List) return value.length;
+  }
+  return null;
 }
 
 String? _optionalString(Object? value) {
@@ -736,14 +997,20 @@ double? _parseDouble(Object? value) {
   return null;
 }
 
-bool _parseBool(Object? value) {
+bool? _parseOptionalBool(Object? value) {
+  if (value == null) return null;
   if (value is bool) return value;
   if (value is num) return value != 0;
   if (value is String) {
     final normalized = value.trim().toLowerCase();
-    return normalized == 'true' || normalized == '1' || normalized == 'yes';
+    if (normalized == 'true' || normalized == '1' || normalized == 'yes') {
+      return true;
+    }
+    if (normalized == 'false' || normalized == '0' || normalized == 'no') {
+      return false;
+    }
   }
-  return false;
+  return null;
 }
 
 DateTime? _parseDateTime(Object? value) {

@@ -151,6 +151,7 @@ void main() {
       'seed': 42,
       'timeout_ms': 40000,
       'max_turns': 30,
+      'test_objective': 'interaction',
       'focus_cards': const ['Sol Ring'],
       'force_focus_access_mode': 'none',
       'same_lane': true,
@@ -172,6 +173,7 @@ void main() {
       (xmage['deck_hashes'] as Map)['deck_a'],
       (xmage['deck_hashes'] as Map)['deck_b'],
     );
+    expect(xmage['test_objective'], 'interaction');
     expect(
       (xmage['deck_hashes'] as Map)['deck_a'],
       '100fc3b88a03428527c22c037f7b62905e272a8ecec100eb0b385b3cc7d09e7c',
@@ -188,15 +190,19 @@ void main() {
 
   test('route permits fallback only on structured coverage exceptions', () {
     final route = File('routes/ai/simulate/index.dart').readAsStringSync();
+    final runtime =
+        File('lib/battle/battle_execution_runtime.dart').readAsStringSync();
 
-    expect(route, contains('on XmageCoverageIncomplete catch'));
-    expect(route, contains('on ForgeCoverageIncomplete catch'));
-    expect(route, contains('on XmageServiceException catch'));
-    expect(route, contains('on ForgeServiceException catch'));
+    expect(route, contains('BattleExecutionRuntime.fromEnvironment'));
+    expect(route, contains('on BattleExecutionRuntimeFailure catch'));
+    expect(runtime, contains('on XmageCoverageIncomplete catch'));
+    expect(runtime, contains('on ForgeCoverageIncomplete catch'));
+    expect(runtime, contains('on XmageServiceException catch'));
+    expect(runtime, contains('on ForgeServiceException catch'));
     expect(route, contains("'operational_timeout_not_eligible'"));
     expect(route, contains("'fallback_allowed': false"));
-    expect(route, contains("result['fallback_reason'] = 'none'"));
-    expect(route, contains("result['engine_selection_reason']"));
+    expect(runtime, contains("result['fallback_reason'] = 'none'"));
+    expect(runtime, contains("result['engine_selection_reason']"));
     expect(route, contains("'fallback_eligibility_reason':"));
     expect(
       route,
@@ -223,8 +229,8 @@ void main() {
       isNot(contains("result['fallback_reason'] = 'native_mode_configured'")),
     );
     expect(
-      route.indexOf('_forgeOrNativeFallback('),
-      lessThan(route.lastIndexOf('on XmageServiceException catch')),
+      runtime.indexOf('on XmageCoverageIncomplete catch'),
+      lessThan(runtime.indexOf('on XmageServiceException catch')),
     );
   });
 }

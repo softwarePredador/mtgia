@@ -15,15 +15,15 @@
     "deep_link"
   ],
   "expected_totals": {
-    "go_route": 38,
+    "go_route": 39,
     "shell_route": 1,
     "material_page_route": 6,
-    "dialog": 43,
+    "dialog": 46,
     "bottom_sheet": 22,
-    "menu": 8,
+    "menu": 9,
     "tabs": 10,
     "navigation": 2,
-    "transient": 107
+    "transient": 109
   },
   "domain_contracts": {
     "auth": {
@@ -39,16 +39,16 @@
       "deep_link": "Rotas públicas aceitam redirect/token sanitizados; segredo nunca entra em evidência."
     },
     "battle": {
-      "job": "Consultar replays e seus detalhes sem inventar resultado ou expor dado de outro usuário.",
+      "job": "Executar Battle homologado, acompanhar jobs assíncronos habilitados e consultar replays sem inventar resultado ou expor dado privado.",
       "owner": "Battle",
       "source_of_truth": "PostgreSQL via API de battle/replays.",
-      "states": ["loading", "empty", "error", "retry", "success", "permission_denied"],
-      "stable_key": "battle replay list/detail anchors plus canonical deck-scoped route",
+      "states": ["loading", "progress", "disabled", "offline", "empty", "error", "retry", "success", "permission_denied"],
+      "stable_key": "battle replay list/detail and battle-live status/timeline anchors plus canonical deck-scoped routes",
       "criticality": "P0",
-      "action": "Abrir, filtrar ou excluir replay autorizado.",
-      "success": "Replay correto e persistido é exibido com identidade de engine.",
-      "recovery": "Erro sanitizado, retry seguro e retorno para a lista.",
-      "deep_link": "Rota canônica /decks/:id/battle-replays, recarregável sem state.extra."
+      "action": "Executar teste, acompanhar/pausar localmente/cancelar job autorizado ou abrir replay persistido.",
+      "success": "Cursor retoma sem duplicar registros e o replay correto é exibido com identidade de engine.",
+      "recovery": "Feature gate falha fechado; erro offline preserva cursor/registros e oferece reconexão segura.",
+      "deep_link": "Rotas canônicas /decks/:id/battle-replays e /decks/:id/battle-live/:jobId, recarregáveis sem state.extra."
     },
     "binder": {
       "job": "Consultar e editar posse, desejo e disponibilidade de cartas.",
@@ -262,6 +262,7 @@
     {"id":"route.deck_scan","declared_path":"scan","canonical_path":"/decks/:id/scan","screen":"CardScannerScreen","domain":"scanner","scope":"deferred_by_scope"},
     {"id":"route.deck_post_game","declared_path":"post-game","canonical_path":"/decks/:id/post-game","screen":"PostGameNotesScreen","domain":"retention","scope":"active"},
     {"id":"route.deck_battle_replays","declared_path":"battle-replays","canonical_path":"/decks/:id/battle-replays","screen":"BattleReplaysScreen","domain":"battle","scope":"active"},
+    {"id":"route.deck_battle_live","declared_path":"battle-live/:jobId","canonical_path":"/decks/:id/battle-live/:jobId","screen":"BattleLiveSpectatorScreen","domain":"battle","scope":"active"},
     {"id":"route.plans","declared_path":"/plans","canonical_path":"/plans","screen":"PlanScreen","domain":"commercial","scope":"active"},
     {"id":"route.card_detail","declared_path":"/cards/:cardId","canonical_path":"/cards/:cardId","screen":"CardDetailRouteScreen","domain":"cards","scope":"active"},
     {"id":"route.upgrade","declared_path":"/upgrade","canonical_path":"/upgrade","screen":"UpgradeScreen","domain":"commercial","scope":"active"},
@@ -289,7 +290,7 @@
     {"source":"lib/features/auth/screens/login_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/register_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/reset_password_screen.dart","domain":"auth","occurrences":{"transient":1}},
-    {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":2,"transient":2}},
+    {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":5,"menu":1,"transient":4}},
     {"source":"lib/features/binder/screens/binder_screen.dart","domain":"binder","occurrences":{"material_page_route":2,"tabs":1}},
     {"source":"lib/features/binder/widgets/binder_item_editor.dart","domain":"binder","occurrences":{"dialog":1,"bottom_sheet":1,"transient":3}},
     {"source":"lib/features/cards/screens/card_detail_screen.dart","domain":"cards","occurrences":{"material_page_route":1,"dialog":1}},

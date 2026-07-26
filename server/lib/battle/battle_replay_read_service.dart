@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:postgres/postgres.dart';
 
 import 'battle_replay_payload_sanitizer.dart';
@@ -8,6 +10,24 @@ final RegExp _battleReplayUuidPattern = RegExp(
 
 bool isBattleReplayUuid(String value) =>
     _battleReplayUuidPattern.hasMatch(value.trim());
+
+const battleReplayCursorSchema = 'battle_replay_cursor_v1';
+
+class BattleReplayCursorException implements Exception {
+  const BattleReplayCursorException();
+}
+
+class BattleReplayPage {
+  const BattleReplayPage({
+    required this.items,
+    required this.hasMore,
+    required this.nextCursor,
+  });
+
+  final List<Map<String, dynamic>> items;
+  final bool hasMore;
+  final String? nextCursor;
+}
 
 class BattleReplayReadService {
   BattleReplayReadService(this._pool);
@@ -36,9 +56,29 @@ class BattleReplayReadService {
     required String deckId,
     int limit = 30,
   }) async {
+    final page = await listReplayPage(
+      userId: userId,
+      deckId: deckId,
+      limit: limit,
+    );
+    return page.items;
+  }
+
+  Future<BattleReplayPage> listReplayPage({
+    required String userId,
+    required String deckId,
+    int limit = 30,
+    String? cursor,
+  }) async {
     if (!await _hasBattleSimulationTable()) {
-      return const <Map<String, dynamic>>[];
+      return const BattleReplayPage(
+        items: <Map<String, dynamic>>[],
+        hasMore: false,
+        nextCursor: null,
+      );
     }
+    final pageLimit = limit.clamp(1, 100);
+    final marker = _decodeBattleReplayCursor(cursor);
 
     final result = await _pool.execute(
       Sql.named('''
@@ -51,6 +91,25 @@ class BattleReplayReadService {
           bs.turns_played AS turns_played,
           bs.metrics AS metrics,
           bs.created_at AS created_at,
+          attempt.id::text AS attempt_id,
+          attempt.outcome AS attempt_outcome,
+          attempt.test_objective AS test_objective,
+          attempt.request_schema_version AS request_schema_version,
+          attempt.request_hash AS request_hash,
+          attempt.deck_hash_schema AS deck_hash_schema,
+          attempt.deck_a_hash AS deck_a_hash,
+          attempt.deck_b_hash AS deck_b_hash,
+          attempt.engine AS attempt_engine,
+          attempt.engine_version AS attempt_engine_version,
+          attempt.engine_commit AS attempt_engine_commit,
+          attempt.engine_build AS attempt_engine_build,
+          attempt.engine_process_id AS attempt_engine_process_id,
+          attempt.timeout_ms AS timeout_ms,
+          attempt.events_truncated AS events_truncated,
+          attempt.snapshots_truncated AS snapshots_truncated,
+          attempt.outcome_reason AS outcome_reason,
+          attempt.error_code AS attempt_error_code,
+          attempt.provenance AS attempt_provenance,
           CASE
             WHEN da.user_id = CAST(@userId AS uuid) OR da.is_public = true
             THEN da.name
@@ -78,31 +137,58 @@ class BattleReplayReadService {
             WHEN jsonb_typeof(bs.game_log) = 'object'
             THEN bs.game_log->>'winner'
             ELSE NULL
-          END AS winner_label
+          END AS winner_label,
+          CASE
+            WHEN jsonb_typeof(bs.game_log) = 'object'
+            THEN bs.game_log->>'status'
+            ELSE NULL
+          END AS game_log_status
         FROM battle_simulations bs
+        LEFT JOIN battle_simulation_attempts attempt
+          ON attempt.replay_id = bs.id
         JOIN decks requested
           ON requested.id = CAST(@deckId AS uuid)
          AND requested.user_id = CAST(@userId AS uuid)
         LEFT JOIN decks da ON da.id = bs.deck_a_id
         LEFT JOIN decks db ON db.id = bs.deck_b_id
-        WHERE da.user_id = CAST(@userId AS uuid)
-          AND (
-            bs.deck_a_id = CAST(@deckId AS uuid)
-            OR bs.deck_b_id = CAST(@deckId AS uuid)
+        WHERE (
+          bs.deck_a_id = CAST(@deckId AS uuid)
+          OR bs.deck_b_id = CAST(@deckId AS uuid)
+        )
+        AND (
+          CAST(@beforeCreatedAt AS timestamptz) IS NULL
+          OR (bs.created_at, bs.id) < (
+            CAST(@beforeCreatedAt AS timestamptz),
+            CAST(@beforeId AS uuid)
           )
-        ORDER BY bs.created_at DESC
-        LIMIT @limit
+        )
+        ORDER BY bs.created_at DESC, bs.id DESC
+        LIMIT @queryLimit
       '''),
       parameters: {
         'deckId': deckId,
         'userId': userId,
-        'limit': limit.clamp(1, 100),
+        'beforeCreatedAt': marker?.createdAt.toIso8601String(),
+        'beforeId': marker?.id,
+        'queryLimit': pageLimit + 1,
       },
     );
 
-    return result
-        .map((row) => _summaryFromRow(row.toColumnMap(), deckId: deckId))
+    final rows = result.map((row) => row.toColumnMap()).toList(growable: false);
+    final hasMore = rows.length > pageLimit;
+    final visibleRows = rows.take(pageLimit).toList(growable: false);
+    final items = visibleRows
+        .map((row) => _summaryFromRow(row, deckId: deckId))
         .toList(growable: false);
+    final nextCursor =
+        hasMore && visibleRows.isNotEmpty
+            ? _encodeBattleReplayCursor(visibleRows.last)
+            : null;
+    return BattleReplayPage(
+      items: items,
+      hasMore: hasMore,
+      nextCursor: nextCursor,
+    );
   }
 
   Future<Map<String, dynamic>?> fetchReplay({
@@ -126,6 +212,25 @@ class BattleReplayReadService {
           bs.game_log AS game_log,
           bs.metrics AS metrics,
           bs.created_at AS created_at,
+          attempt.id::text AS attempt_id,
+          attempt.outcome AS attempt_outcome,
+          attempt.test_objective AS test_objective,
+          attempt.request_schema_version AS request_schema_version,
+          attempt.request_hash AS request_hash,
+          attempt.deck_hash_schema AS deck_hash_schema,
+          attempt.deck_a_hash AS deck_a_hash,
+          attempt.deck_b_hash AS deck_b_hash,
+          attempt.engine AS attempt_engine,
+          attempt.engine_version AS attempt_engine_version,
+          attempt.engine_commit AS attempt_engine_commit,
+          attempt.engine_build AS attempt_engine_build,
+          attempt.engine_process_id AS attempt_engine_process_id,
+          attempt.timeout_ms AS timeout_ms,
+          attempt.events_truncated AS events_truncated,
+          attempt.snapshots_truncated AS snapshots_truncated,
+          attempt.outcome_reason AS outcome_reason,
+          attempt.error_code AS attempt_error_code,
+          attempt.provenance AS attempt_provenance,
           CASE
             WHEN da.user_id = CAST(@userId AS uuid) OR da.is_public = true
             THEN da.name
@@ -137,13 +242,14 @@ class BattleReplayReadService {
             ELSE NULL
           END AS deck_b_name
         FROM battle_simulations bs
+        LEFT JOIN battle_simulation_attempts attempt
+          ON attempt.replay_id = bs.id
         JOIN decks requested
           ON requested.id = CAST(@deckId AS uuid)
          AND requested.user_id = CAST(@userId AS uuid)
         LEFT JOIN decks da ON da.id = bs.deck_a_id
         LEFT JOIN decks db ON db.id = bs.deck_b_id
         WHERE bs.id = CAST(@replayId AS uuid)
-          AND da.user_id = CAST(@userId AS uuid)
           AND (
             bs.deck_a_id = CAST(@deckId AS uuid)
             OR bs.deck_b_id = CAST(@deckId AS uuid)
@@ -186,8 +292,20 @@ class BattleReplayReadService {
             ? sanitizeBattleReplayText(row['winner_label'])
             : _winnerNameForRow(row, winnerDeckId);
     final metrics = sanitizePersistedBattleMetrics(row['metrics']);
-    final engine = metrics['engine']?.toString();
+    final attemptProvenance = sanitizePersistedBattleMetrics(
+      row['attempt_provenance'],
+    );
+    final engine =
+        row['attempt_engine']?.toString() ?? metrics['engine']?.toString();
     final engineContract = metrics['engine_contract']?.toString();
+    final outcome = _battleOutcome(
+      row['attempt_outcome'],
+      hasVersionedAttempt: row['attempt_id'] != null,
+    );
+    final subjectDeckHash =
+        isDeckA
+            ? row['deck_a_hash']?.toString()
+            : row['deck_b_hash']?.toString();
 
     return {
       'id': row['id']?.toString(),
@@ -208,13 +326,47 @@ class BattleReplayReadService {
       'event_count': _toInt(row['event_count']),
       'metrics': metrics,
       if (engine != null && engine.isNotEmpty) 'engine': engine,
+      if (row['attempt_id'] != null)
+        'attempt_id': row['attempt_id']?.toString(),
+      'outcome': outcome,
+      'test_objective':
+          row['test_objective']?.toString() ??
+          metrics['test_objective']?.toString() ??
+          'general',
+      if (row['outcome_reason'] != null)
+        'outcome_reason': sanitizeBattleReplayText(row['outcome_reason']),
+      if (row['attempt_error_code'] != null)
+        'error_code': sanitizeBattleReplayText(row['attempt_error_code']),
+      if (row['attempt_engine_version'] != null)
+        'engine_version': row['attempt_engine_version'],
+      if (row['attempt_engine_commit'] != null)
+        'engine_commit': row['attempt_engine_commit'],
+      if (row['attempt_engine_build'] != null)
+        'engine_build': row['attempt_engine_build'],
+      if (row['attempt_engine_process_id'] != null)
+        'engine_process_id': row['attempt_engine_process_id'],
+      if (row['request_schema_version'] != null)
+        'request_schema_version': row['request_schema_version'],
+      if (row['request_hash'] != null) 'request_hash': row['request_hash'],
+      if (row['timeout_ms'] != null) 'timeout_ms': _toInt(row['timeout_ms']),
+      'events_truncated': row['events_truncated'] == true,
+      'snapshots_truncated': row['snapshots_truncated'] == true,
+      if (attemptProvenance.isNotEmpty) 'attempt_provenance': attemptProvenance,
+      'deck_revision': {
+        'schema_version': row['deck_hash_schema'],
+        'deck_a_hash': row['deck_a_hash'],
+        'deck_b_hash': row['deck_b_hash'],
+        'subject_deck_hash': subjectDeckHash,
+        'compatibility':
+            subjectDeckHash == null ? 'legacy_unknown' : 'recorded',
+      },
       'simulation_contract': _simulationContract(
         engine: engine,
         engineContract: engineContract,
       ),
       'created_at': _timestamp(row['created_at']),
       'source': 'battle_simulations',
-      'status': 'completed',
+      'status': outcome,
     };
   }
 
@@ -233,6 +385,10 @@ class BattleReplayReadService {
     final gameLogTurns = _toInt(gameLogMap['turns']);
     final engine = gameLogMap['engine']?.toString();
     final engineContract = gameLogMap['engine_contract']?.toString();
+    final outcome = _battleOutcome(
+      row['attempt_outcome'],
+      hasVersionedAttempt: row['attempt_id'] != null,
+    );
     final rawLearningContract = gameLogMap['learning_contract'];
     final learningContract =
         rawLearningContract is Map
@@ -241,6 +397,8 @@ class BattleReplayReadService {
 
     return {
       ...summary,
+      'outcome': outcome,
+      'status': outcome,
       if (gameLogType != null && gameLogType.trim().isNotEmpty)
         'type': gameLogType,
       if (!summary.containsKey('winner_name') &&
@@ -266,6 +424,22 @@ class BattleReplayReadService {
         learningContract: learningContract,
       ),
     };
+  }
+
+  String _battleOutcome(Object? value, {required bool hasVersionedAttempt}) {
+    if (!hasVersionedAttempt) return 'legacy_unknown';
+    final normalized = value?.toString().trim().toLowerCase();
+    return const {
+          'completed',
+          'censored',
+          'timeout',
+          'coverage_error',
+          'engine_error',
+          'cancelled',
+          'persistence_error',
+        }.contains(normalized)
+        ? normalized!
+        : 'legacy_unknown';
   }
 
   Map<String, dynamic> _simulationContract({
@@ -397,4 +571,60 @@ class BattleReplayReadService {
     if (value is DateTime) return value.toIso8601String();
     return value?.toString();
   }
+}
+
+class _BattleReplayCursorMarker {
+  const _BattleReplayCursorMarker({required this.createdAt, required this.id});
+
+  final DateTime createdAt;
+  final String id;
+}
+
+_BattleReplayCursorMarker? _decodeBattleReplayCursor(String? cursor) {
+  final normalized = cursor?.trim();
+  if (normalized == null || normalized.isEmpty) return null;
+  if (normalized.length > 512 ||
+      !RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(normalized)) {
+    throw const BattleReplayCursorException();
+  }
+  try {
+    final decoded = utf8.decode(
+      base64Url.decode(base64Url.normalize(normalized)),
+    );
+    final payload = jsonDecode(decoded);
+    if (payload is! Map ||
+        payload.length != 3 ||
+        payload['schema_version'] != battleReplayCursorSchema) {
+      throw const BattleReplayCursorException();
+    }
+    final createdAt =
+        DateTime.tryParse(payload['created_at']?.toString() ?? '')?.toUtc();
+    final id = payload['id']?.toString() ?? '';
+    if (createdAt == null || !isBattleReplayUuid(id)) {
+      throw const BattleReplayCursorException();
+    }
+    return _BattleReplayCursorMarker(createdAt: createdAt, id: id);
+  } on BattleReplayCursorException {
+    rethrow;
+  } catch (_) {
+    throw const BattleReplayCursorException();
+  }
+}
+
+String _encodeBattleReplayCursor(Map<String, dynamic> row) {
+  final createdAtValue = row['created_at'];
+  final createdAt =
+      createdAtValue is DateTime
+          ? createdAtValue.toUtc()
+          : DateTime.tryParse(createdAtValue?.toString() ?? '')?.toUtc();
+  final id = row['id']?.toString() ?? '';
+  if (createdAt == null || !isBattleReplayUuid(id)) {
+    throw StateError('Battle replay page marker is invalid.');
+  }
+  final payload = jsonEncode({
+    'schema_version': battleReplayCursorSchema,
+    'created_at': createdAt.toIso8601String(),
+    'id': id,
+  });
+  return base64Url.encode(utf8.encode(payload)).replaceAll('=', '');
 }

@@ -11,7 +11,9 @@ Map<String, dynamic> completedResult(List<Map<String, dynamic>> events) => {
     'schema_version': externalBattleLearningSchema,
     'absence_proves_nonuse': false,
   },
-  'events': events,
+  'events': [
+    for (final event in events) {'subject_deck_key': 'deck_a', ...event},
+  ],
 };
 
 void main() {
@@ -97,8 +99,8 @@ void main() {
     final evidence = buildBattleLearningEvidence(
       completedResult([
         {
-          'type': 'add_to_stack',
-          'message': 'Ai(1) cast Candidate',
+          'type': 'message',
+          'message': 'Candidate is visible',
           'card_name': 'Candidate',
         },
         {'action': 'visible_zone_entry', 'card_name': 'Candidate'},
@@ -122,6 +124,40 @@ void main() {
       },
     ]);
     expect(evidence['comparison_input_ready'], isFalse);
+  });
+
+  test('Forge type field is consumed as typed positive evidence', () {
+    final evidence = buildBattleLearningEvidence(
+      completedResult([
+        {
+          'type': 'add_to_stack',
+          'message': 'Ai(1) cast Candidate',
+          'card_name': 'Candidate',
+        },
+      ]),
+      focusCards: const ['Candidate'],
+    );
+
+    expect(evidence['positive_exposure_ready'], isTrue);
+    expect(evidence['event_counts'], containsPair('add_to_stack', 1));
+  });
+
+  test('opponent action never validates the analyzed deck', () {
+    final evidence = buildBattleLearningEvidence(
+      completedResult([
+        {
+          'subject_deck_key': 'deck_b',
+          'event_type': 'spell_cast',
+          'card_name': 'Candidate',
+        },
+      ]),
+      focusCards: const ['Candidate'],
+      subjectDeckKey: 'deck_a',
+    );
+
+    expect(evidence['positive_exposure_ready'], isFalse);
+    expect(evidence['ignored_other_subject_event_count'], 1);
+    expect(evidence['unknown_focus_card_count'], 1);
   });
 
   test('missing learning contract cannot become learning evidence', () {

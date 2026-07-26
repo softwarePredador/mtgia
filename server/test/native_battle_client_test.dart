@@ -7,6 +7,35 @@ import 'package:test/test.dart';
 import '../lib/ai/native_battle_client.dart';
 
 void main() {
+  test('checks reviewed native card coverage without simulating', () async {
+    final client = NativeBattleClient(
+      baseUrl: 'http://native:8080',
+      client: MockClient((request) async {
+        expect(request.url.toString(), 'http://native:8080/cards/coverage');
+        expect(jsonDecode(request.body), {
+          'cards': [
+            {'name': 'Sol Ring'},
+          ],
+        });
+        return http.Response(
+          jsonEncode({
+            'status': 'ready',
+            'engine': 'manaloom_native_reviewed',
+            'engine_contract': 'native_reviewed_rules_execution',
+            'unsupported_cards': const <dynamic>[],
+          }),
+          200,
+        );
+      }),
+    );
+
+    final result = await client.cardCoverage(const [
+      {'name': 'Sol Ring'},
+    ]);
+    expect(result['status'], 'ready');
+    client.close();
+  });
+
   test('returns a reviewed native battle result', () async {
     final client = NativeBattleClient(
       baseUrl: 'http://native:8080',

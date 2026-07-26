@@ -29,7 +29,9 @@ const rateLimitedAuxiliaryAiPaths = <String>{
 
 AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
   if (path.startsWith('/ai/generate/jobs/') ||
-      path.startsWith('/ai/optimize/jobs/')) {
+      path.startsWith('/ai/optimize/jobs/') ||
+      path == '/ai/battle/jobs' ||
+      path.startsWith('/ai/battle/jobs/')) {
     return AiEndpointAccessPolicy.polling;
   }
   if (path == '/ai/commander-learning') {

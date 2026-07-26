@@ -31,6 +31,25 @@ void main() {
     );
   });
 
+  test('full backend gate batches the complete deterministic file list', () {
+    final source = File('../scripts/quality_gate.sh').readAsStringSync();
+
+    expect(source, contains("find test -type f -name '*_test.dart' -print"));
+    expect(source, contains('LC_ALL=C sort'));
+    expect(
+      source,
+      contains(r'"${test_files[@]:batch_start:BACKEND_TEST_BATCH_SIZE}"'),
+    );
+    expect(
+      source,
+      contains(
+        '--exclude-tags "live || live_backend || live_db_write || live_external || historical_external_snapshot"',
+      ),
+    );
+    expect(source, isNot(contains('dart test -P all-local')));
+    expect(source, isNot(contains('--total-shards')));
+  });
+
   test('project logic and local gates require the pinned Dart SDK', () async {
     final helper =
         File(

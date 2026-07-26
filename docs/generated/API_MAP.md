@@ -6,6 +6,9 @@
 |---|---|---|---|---|
 | `/` | `GET` | `server/routes/index.dart` | 1 | `source` |
 | `/ai/archetypes` | `POST` | `server/routes/ai/archetypes/index.dart` | 2 | `source` |
+| `/ai/battle/jobs` | `GET, POST` | `server/routes/ai/battle/jobs/index.dart` | 2 | `source` |
+| `/ai/battle/jobs/{id}` | `DELETE, GET` | `server/routes/ai/battle/jobs/[id].dart` | 2 | `source` |
+| `/ai/battle/jobs/{id}/live` | `GET` | `server/routes/ai/battle/jobs/[id]/live/index.dart` | 2 | `source` |
 | `/ai/commander-learning` | `GET` | `server/routes/ai/commander-learning/index.dart` | 2 | `source` |
 | `/ai/commander-reference` | `GET` | `server/routes/ai/commander-reference/index.dart` | 2 | `source` |
 | `/ai/explain` | `POST` | `server/routes/ai/explain/index.dart` | 2 | `source` |
@@ -57,8 +60,11 @@
 | `/decks/{id}` | `DELETE, GET, PUT` | `server/routes/decks/[id]/index.dart` | 2 | `source` |
 | `/decks/{id}/ai-analysis` | `POST` | `server/routes/decks/[id]/ai-analysis/index.dart` | 3 | `source` |
 | `/decks/{id}/analysis` | `GET` | `server/routes/decks/[id]/analysis/index.dart` | 2 | `source` |
+| `/decks/{id}/battle-preflight` | `GET` | `server/routes/decks/[id]/battle-preflight/index.dart` | 2 | `source` |
 | `/decks/{id}/battle-replays` | `GET` | `server/routes/decks/[id]/battle-replays/index.dart` | 2 | `source` |
 | `/decks/{id}/battle-replays/{replayId}` | `GET` | `server/routes/decks/[id]/battle-replays/[replayId]/index.dart` | 2 | `source` |
+| `/decks/{id}/battle-replays/{replayId}/annotations` | `GET, POST` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart` | 2 | `source` |
+| `/decks/{id}/battle-replays/{replayId}/annotations/{annotationId}` | `DELETE` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/[annotationId].dart` | 2 | `source` |
 | `/decks/{id}/cards` | `POST` | `server/routes/decks/[id]/cards/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/bulk` | `POST` | `server/routes/decks/[id]/cards/bulk/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/replace` | `POST` | `server/routes/decks/[id]/cards/replace/index.dart` | 2 | `source` |

@@ -11,6 +11,7 @@ void main() {
       'timeout_ms': 90000,
       'max_turns': 250,
       'seed': 42,
+      'test_objective': 'FOCUS_CARDS',
       'focus_cards': [' Sol Ring ', 'sol ring', 'The One Ring'],
       'force_focus_access_mode': 'OPENING_HAND',
       'same_lane': true,
@@ -25,6 +26,7 @@ void main() {
     expect(request.timeoutMs, 40000);
     expect(request.maxTurns, 100);
     expect(request.seed, 42);
+    expect(request.testObjective, 'focus_cards');
     expect(request.focusCards, ['Sol Ring', 'The One Ring']);
     expect(request.forceFocusAccessMode, 'opening_hand');
     expect(request.sameLane, isTrue);
@@ -41,6 +43,10 @@ void main() {
       'type': 'battle',
       'max_turns': '30',
     });
+    final unknownObjective = parseBattleSimulationRequest({
+      'type': 'battle',
+      'test_objective': 'win_at_all_costs',
+    });
 
     expect(
       unknownType.validationError,
@@ -51,5 +57,10 @@ void main() {
       'focus_cards must contain only strings',
     );
     expect(malformedTurns.validationError, 'max_turns must be an integer');
+    expect(
+      unknownObjective.validationError,
+      'test_objective must be general, commander, mana_curve, '
+      'interaction, combo or focus_cards',
+    );
   });
 }

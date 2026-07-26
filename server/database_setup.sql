@@ -494,6 +494,607 @@ CREATE TABLE IF NOT EXISTS battle_simulations (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS battle_simulation_attempts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    replay_id UUID UNIQUE REFERENCES battle_simulations(id) ON DELETE SET NULL,
+    simulation_type TEXT NOT NULL,
+    test_objective TEXT NOT NULL DEFAULT 'general',
+    outcome TEXT,
+    request_id TEXT NOT NULL,
+    request_schema_version TEXT NOT NULL,
+    request_hash TEXT,
+    job_request_schema_version TEXT,
+    job_request_hash TEXT,
+    deck_hash_schema TEXT,
+    deck_a_hash TEXT,
+    deck_b_hash TEXT,
+    engine TEXT,
+    engine_version TEXT,
+    engine_commit TEXT,
+    engine_build TEXT,
+    engine_process_id TEXT,
+    engine_request_correlation_source TEXT,
+    timeout_ms INTEGER NOT NULL,
+    events_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    snapshots_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    outcome_reason TEXT,
+    error_code TEXT,
+    provenance JSONB NOT NULL DEFAULT '{}'::jsonb,
+    started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_battle_attempt_simulation_type
+        CHECK (char_length(trim(simulation_type)) BETWEEN 1 AND 32),
+    CONSTRAINT chk_battle_attempt_test_objective
+        CHECK (
+            test_objective IN (
+                'general',
+                'commander',
+                'mana_curve',
+                'interaction',
+                'combo',
+                'focus_cards'
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_outcome
+        CHECK (
+            outcome IS NULL OR outcome IN (
+                'completed',
+                'censored',
+                'timeout',
+                'coverage_error',
+                'engine_error',
+                'cancelled',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_timeout
+        CHECK (timeout_ms BETWEEN 1 AND 600000),
+    CONSTRAINT chk_battle_attempt_deck_a_hash
+        CHECK (deck_a_hash IS NULL OR char_length(deck_a_hash) = 64),
+    CONSTRAINT chk_battle_attempt_deck_b_hash
+        CHECK (deck_b_hash IS NULL OR char_length(deck_b_hash) = 64),
+    CONSTRAINT chk_battle_attempt_request_hash
+        CHECK (request_hash IS NULL OR char_length(request_hash) = 64),
+    CONSTRAINT chk_battle_attempt_job_request_hash
+        CHECK (
+            job_request_hash IS NULL
+            OR (
+                char_length(job_request_schema_version) BETWEEN 1 AND 64
+                AND job_request_hash ~ '^[0-9a-f]{64}$'
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_request_correlation
+        CHECK (
+            engine_request_correlation_source IS NULL
+            OR (
+                request_hash IS NOT NULL
+                AND engine_request_correlation_source IN (
+                    'sidecar_echo_validated',
+                    'server_dispatch_recorded'
+                )
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_lifecycle
+        CHECK (
+            (outcome IS NULL AND finished_at IS NULL) OR
+            (outcome IS NOT NULL AND finished_at IS NOT NULL)
+        )
+);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_user_created
+    ON battle_simulation_attempts (user_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_a_created
+    ON battle_simulation_attempts (deck_a_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_b_created
+    ON battle_simulation_attempts (deck_b_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_outcome_created
+    ON battle_simulation_attempts (outcome, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_a_hash
+    ON battle_simulation_attempts (deck_a_hash)
+    WHERE deck_a_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_b_hash
+    ON battle_simulation_attempts (deck_b_hash)
+    WHERE deck_b_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_request_hash
+    ON battle_simulation_attempts (request_hash)
+    WHERE request_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_job_request_hash
+    ON battle_simulation_attempts (job_request_hash)
+    WHERE job_request_hash IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_attempt_id_replay
+    ON battle_simulation_attempts (id, replay_id);
+
+CREATE TABLE IF NOT EXISTS battle_replay_annotations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    replay_id UUID NOT NULL
+        REFERENCES battle_simulations(id) ON DELETE CASCADE,
+    attempt_id UUID NOT NULL,
+    subject_deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+    subject_deck_key TEXT NOT NULL,
+    deck_hash_schema TEXT NOT NULL,
+    subject_deck_hash TEXT NOT NULL,
+    subject_deck_revision TEXT NOT NULL,
+    event_ref TEXT,
+    snapshot_ref TEXT,
+    kind TEXT NOT NULL,
+    payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    idempotency_key TEXT NOT NULL,
+    request_fingerprint TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_battle_annotation_attempt_replay
+        FOREIGN KEY (attempt_id, replay_id)
+        REFERENCES battle_simulation_attempts (id, replay_id)
+        ON DELETE CASCADE,
+    CONSTRAINT chk_battle_annotation_subject
+        CHECK (subject_deck_key IN ('deck_a', 'deck_b')),
+    CONSTRAINT chk_battle_annotation_hash
+        CHECK (char_length(subject_deck_hash) = 64),
+    CONSTRAINT chk_battle_annotation_revision
+        CHECK (
+            char_length(trim(subject_deck_revision)) BETWEEN 1 AND 128
+        ),
+    CONSTRAINT chk_battle_annotation_kind
+        CHECK (
+            kind IN (
+                'bookmark',
+                'note',
+                'would_do_differently',
+                'mulligan_decision',
+                'helpful_feedback',
+                'event_report'
+            )
+        ),
+    CONSTRAINT chk_battle_annotation_event_ref
+        CHECK (
+            event_ref IS NULL
+            OR event_ref ~ '^event:[0-9]{1,6}$'
+        ),
+    CONSTRAINT chk_battle_annotation_snapshot_ref
+        CHECK (
+            snapshot_ref IS NULL
+            OR snapshot_ref ~ '^snapshot:[0-9]{1,6}$'
+        ),
+    CONSTRAINT chk_battle_annotation_payload
+        CHECK (
+            jsonb_typeof(payload) = 'object'
+            AND octet_length(payload::text) <= 8192
+        ),
+    CONSTRAINT chk_battle_annotation_kind_refs
+        CHECK (
+            kind IN ('bookmark', 'note')
+            OR (
+                kind = 'would_do_differently'
+                AND event_ref IS NOT NULL
+                AND snapshot_ref IS NULL
+            )
+            OR (
+                kind = 'mulligan_decision'
+                AND event_ref IS NULL
+                AND snapshot_ref IS NOT NULL
+            )
+            OR (
+                kind = 'helpful_feedback'
+                AND event_ref IS NULL
+                AND snapshot_ref IS NULL
+            )
+            OR (
+                kind = 'event_report'
+                AND event_ref IS NOT NULL
+                AND snapshot_ref IS NULL
+            )
+        ),
+    CONSTRAINT chk_battle_annotation_payload_shape
+        CHECK (
+            COALESCE(
+                CASE kind
+                    WHEN 'bookmark' THEN TRUE
+                    WHEN 'note' THEN
+                        jsonb_typeof(payload->'text') = 'string'
+                        AND char_length(trim(payload->>'text'))
+                            BETWEEN 1 AND 2000
+                    WHEN 'would_do_differently' THEN
+                        payload->>'stance' IN (
+                            'would_change',
+                            'would_repeat',
+                            'unsure'
+                        )
+                        AND payload->>'capture_contract' =
+                            'before_next_event_reveal'
+                    WHEN 'mulligan_decision' THEN
+                        payload->>'choice' IN ('keep', 'mulligan')
+                        AND jsonb_typeof(payload->'hand_size') = 'number'
+                        AND payload->>'hand_size' IN (
+                            '0', '1', '2', '3', '4', '5', '6', '7'
+                        )
+                        AND jsonb_typeof(payload->'mulligan_number') = 'number'
+                        AND payload->>'mulligan_number' IN (
+                            '0', '1', '2', '3', '4', '5', '6', '7'
+                        )
+                        AND payload->>'capture_contract' =
+                            'human_choice_before_heuristic_reveal'
+                        AND payload->'claims_correct_answer' = 'false'::jsonb
+                    WHEN 'helpful_feedback' THEN
+                        jsonb_typeof(payload->'helpful') = 'boolean'
+                        AND payload->>'surface' IN (
+                            'post_battle_report',
+                            'replay_timeline',
+                            'battle_insight'
+                        )
+                    WHEN 'event_report' THEN
+                        payload->>'reason_code' IN (
+                            'incorrect_event',
+                            'wrong_attribution',
+                            'hidden_information',
+                            'missing_context',
+                            'other'
+                        )
+                    ELSE FALSE
+                END,
+                FALSE
+            )
+        ),
+    CONSTRAINT chk_battle_annotation_idempotency
+        CHECK (
+            idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}$'
+            AND char_length(request_fingerprint) = 64
+        ),
+    CONSTRAINT chk_battle_annotation_timestamps
+        CHECK (updated_at >= created_at),
+    UNIQUE (user_id, idempotency_key)
+);
+CREATE INDEX IF NOT EXISTS idx_battle_annotation_user_replay_created
+    ON battle_replay_annotations (
+        user_id,
+        replay_id,
+        created_at DESC,
+        id DESC
+    );
+CREATE INDEX IF NOT EXISTS idx_battle_annotation_subject_created
+    ON battle_replay_annotations (
+        subject_deck_id,
+        created_at DESC,
+        id DESC
+    );
+CREATE INDEX IF NOT EXISTS idx_battle_annotation_kind_created
+    ON battle_replay_annotations (kind, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_annotation_reflection
+    ON battle_replay_annotations (
+        user_id,
+        replay_id,
+        subject_deck_id,
+        event_ref
+    )
+    WHERE kind = 'would_do_differently';
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_annotation_mulligan
+    ON battle_replay_annotations (
+        user_id,
+        replay_id,
+        subject_deck_id,
+        snapshot_ref
+    )
+    WHERE kind = 'mulligan_decision';
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_annotation_helpful
+    ON battle_replay_annotations (user_id, replay_id)
+    WHERE kind = 'helpful_feedback';
+
+CREATE TABLE IF NOT EXISTS battle_jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    schema_version TEXT NOT NULL DEFAULT 'battle_job_v1',
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_hash_schema TEXT NOT NULL,
+    deck_a_hash TEXT NOT NULL,
+    deck_b_hash TEXT NOT NULL,
+    request_schema_version TEXT NOT NULL,
+    request_hash TEXT NOT NULL,
+    request_payload JSONB NOT NULL,
+    requested_engine TEXT NOT NULL,
+    engine_lane TEXT NOT NULL,
+    engine TEXT,
+    engine_version TEXT,
+    engine_commit TEXT,
+    engine_build TEXT,
+    engine_process_id TEXT,
+    engine_process_started_at TIMESTAMP WITH TIME ZONE,
+    engine_request_schema_version TEXT,
+    engine_request_hash TEXT,
+    engine_request_correlation_source TEXT,
+    status TEXT NOT NULL DEFAULT 'queued',
+    stage TEXT NOT NULL DEFAULT 'queued',
+    progress_current INTEGER NOT NULL DEFAULT 0,
+    progress_total INTEGER NOT NULL DEFAULT 100,
+    timeout_ms INTEGER NOT NULL,
+    attempt_count INTEGER NOT NULL DEFAULT 0,
+    attempt_id UUID UNIQUE
+        REFERENCES battle_simulation_attempts(id) ON DELETE SET NULL,
+    replay_id UUID UNIQUE
+        REFERENCES battle_simulations(id) ON DELETE SET NULL,
+    idempotency_key TEXT NOT NULL,
+    request_fingerprint TEXT NOT NULL,
+    quota_user_limit INTEGER NOT NULL,
+    quota_global_limit INTEGER NOT NULL,
+    lease_owner TEXT,
+    lease_token UUID,
+    lease_expires_at TIMESTAMP WITH TIME ZONE,
+    heartbeat_at TIMESTAMP WITH TIME ZONE,
+    claimed_at TIMESTAMP WITH TIME ZONE,
+    started_at TIMESTAMP WITH TIME ZONE,
+    cancel_requested_at TIMESTAMP WITH TIME ZONE,
+    finished_at TIMESTAMP WITH TIME ZONE,
+    terminal_reason TEXT,
+    error_code TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_battle_job_attempt_replay
+        FOREIGN KEY (attempt_id, replay_id)
+        REFERENCES battle_simulation_attempts (id, replay_id)
+        ON DELETE SET NULL,
+    CONSTRAINT chk_battle_job_schema
+        CHECK (schema_version = 'battle_job_v1'),
+    CONSTRAINT chk_battle_job_status
+        CHECK (
+            status IN (
+                'queued',
+                'claimed',
+                'running',
+                'cancel_pending',
+                'completed',
+                'censored',
+                'timeout',
+                'coverage_error',
+                'engine_error',
+                'cancelled',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_battle_job_stage
+        CHECK (
+            stage IN (
+                'queued',
+                'claimed',
+                'starting_engine',
+                'running',
+                'persisting_replay',
+                'cancel_pending',
+                'completed',
+                'censored',
+                'timeout',
+                'coverage_error',
+                'engine_error',
+                'cancelled',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_battle_job_requested_engine
+        CHECK (requested_engine IN ('auto', 'xmage', 'forge', 'native')),
+    CONSTRAINT chk_battle_job_engine_lane
+        CHECK (engine_lane IN ('auto', 'xmage', 'forge', 'native')),
+    CONSTRAINT chk_battle_job_hashes
+        CHECK (
+            deck_hash_schema = 'external_battle_deck_hash_v1'
+            AND deck_a_hash ~ '^[0-9a-f]{64}$'
+            AND deck_b_hash ~ '^[0-9a-f]{64}$'
+            AND request_hash ~ '^[0-9a-f]{64}$'
+            AND request_fingerprint ~ '^[0-9a-f]{64}$'
+        ),
+    CONSTRAINT chk_battle_job_request
+        CHECK (
+            request_schema_version = 'battle_job_request_v1'
+            AND jsonb_typeof(request_payload) = 'object'
+            AND octet_length(request_payload::text) <= 1048576
+        ),
+    CONSTRAINT chk_battle_job_engine_request
+        CHECK (
+            (
+                engine_request_hash IS NULL
+                AND engine_request_schema_version IS NULL
+                AND engine_request_correlation_source IS NULL
+            )
+            OR (
+                engine_request_hash ~ '^[0-9a-f]{64}$'
+                AND char_length(engine_request_schema_version)
+                    BETWEEN 1 AND 64
+                AND engine_request_correlation_source IN (
+                    'sidecar_echo_validated',
+                    'server_dispatch_recorded'
+                )
+            )
+        ),
+    CONSTRAINT chk_battle_job_progress
+        CHECK (
+            progress_total BETWEEN 1 AND 10000
+            AND progress_current BETWEEN 0 AND progress_total
+        ),
+    CONSTRAINT chk_battle_job_timeout
+        CHECK (timeout_ms BETWEEN 1000 AND 40000),
+    CONSTRAINT chk_battle_job_attempt_count
+        CHECK (attempt_count BETWEEN 0 AND 100),
+    CONSTRAINT chk_battle_job_idempotency
+        CHECK (idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}$'),
+    CONSTRAINT chk_battle_job_quota
+        CHECK (
+            quota_user_limit BETWEEN 1 AND 100
+            AND quota_global_limit BETWEEN 1 AND 1000
+            AND quota_user_limit <= quota_global_limit
+        ),
+    CONSTRAINT chk_battle_job_identity_lengths
+        CHECK (
+            char_length(request_schema_version) BETWEEN 1 AND 64
+            AND char_length(deck_hash_schema) BETWEEN 1 AND 64
+            AND (
+                engine_process_id IS NULL
+                OR char_length(engine_process_id) BETWEEN 1 AND 256
+            )
+        ),
+    CONSTRAINT chk_battle_job_lease
+        CHECK (
+            (
+                status = 'queued'
+                AND lease_owner IS NULL
+                AND lease_token IS NULL
+                AND lease_expires_at IS NULL
+                AND finished_at IS NULL
+            )
+            OR (
+                status IN ('claimed', 'running', 'cancel_pending')
+                AND lease_owner IS NOT NULL
+                AND lease_token IS NOT NULL
+                AND lease_expires_at IS NOT NULL
+                AND finished_at IS NULL
+            )
+            OR (
+                status IN (
+                    'completed',
+                    'censored',
+                    'timeout',
+                    'coverage_error',
+                    'engine_error',
+                    'cancelled',
+                    'persistence_error'
+                )
+                AND lease_owner IS NULL
+                AND lease_token IS NULL
+                AND lease_expires_at IS NULL
+                AND finished_at IS NOT NULL
+            )
+        ),
+    CONSTRAINT chk_battle_job_cancel_pending
+        CHECK (
+            status <> 'cancel_pending'
+            OR cancel_requested_at IS NOT NULL
+        ),
+    CONSTRAINT chk_battle_job_completed_replay
+        CHECK (
+            status NOT IN ('completed', 'censored')
+            OR (
+                attempt_id IS NOT NULL
+                AND replay_id IS NOT NULL
+                AND engine IS NOT NULL
+                AND engine_process_id IS NOT NULL
+                AND engine_request_hash IS NOT NULL
+            )
+        ),
+    CONSTRAINT chk_battle_job_timestamps
+        CHECK (
+            updated_at >= created_at
+            AND (claimed_at IS NULL OR claimed_at >= created_at)
+            AND (started_at IS NULL OR started_at >= created_at)
+            AND (finished_at IS NULL OR finished_at >= created_at)
+        )
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_jobs_user_idempotency
+    ON battle_jobs (user_id, idempotency_key);
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_user_created
+    ON battle_jobs (user_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_user_active
+    ON battle_jobs (user_id, status, created_at)
+    WHERE status IN ('queued', 'claimed', 'running', 'cancel_pending');
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_claim
+    ON battle_jobs (engine_lane, created_at, id)
+    WHERE status = 'queued';
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_lease
+    ON battle_jobs (lease_expires_at, status)
+    WHERE status IN ('claimed', 'running', 'cancel_pending');
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_request_hash
+    ON battle_jobs (request_hash);
+
+CREATE TABLE IF NOT EXISTS battle_job_live_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    schema_version TEXT NOT NULL DEFAULT 'battle_live_record_v1',
+    job_id UUID NOT NULL
+        REFERENCES battle_jobs(id) ON DELETE CASCADE,
+    sequence BIGINT NOT NULL,
+    record_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    content_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    fingerprint TEXT NOT NULL,
+    source_kind TEXT NOT NULL,
+    public_visible BOOLEAN NOT NULL DEFAULT TRUE,
+    source_process_id TEXT,
+    source_sequence BIGINT,
+    source_record_id TEXT,
+    source_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_battle_live_record_schema
+        CHECK (schema_version = 'battle_live_record_v1'),
+    CONSTRAINT chk_battle_live_record_sequence
+        CHECK (sequence BETWEEN 0 AND 1000000),
+    CONSTRAINT chk_battle_live_record_id
+        CHECK (record_id ~ '^blr-[0-9a-f]{40}$'),
+    CONSTRAINT chk_battle_live_record_kind
+        CHECK (kind IN ('event', 'snapshot')),
+    CONSTRAINT chk_battle_live_record_payload
+        CHECK (
+            jsonb_typeof(payload) = 'object'
+            AND octet_length(payload::text) <= 131072
+        ),
+    CONSTRAINT chk_battle_live_record_fingerprint
+        CHECK (fingerprint ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT chk_battle_live_record_source
+        CHECK (
+            (
+                source_kind = 'xmage_live'
+                AND public_visible
+                AND source_process_id IS NOT NULL
+                AND source_sequence BETWEEN 0 AND 20000000
+                AND source_record_id IS NOT NULL
+            )
+            OR (
+                source_kind = 'xmage_checkpoint'
+                AND NOT public_visible
+                AND kind = 'event'
+                AND payload = '{}'::jsonb
+                AND source_process_id IS NOT NULL
+                AND source_sequence BETWEEN -1 AND 20000000
+                AND source_record_id IS NULL
+            )
+            OR (
+                source_kind = 'terminal_replay'
+                AND public_visible
+                AND source_process_id IS NULL
+                AND source_sequence IS NULL
+                AND source_record_id IS NULL
+            )
+        ),
+    CONSTRAINT chk_battle_live_record_source_identity
+        CHECK (
+            (
+                source_process_id IS NULL
+                OR char_length(source_process_id) BETWEEN 1 AND 256
+            )
+            AND (
+                source_record_id IS NULL
+                OR char_length(source_record_id) BETWEEN 1 AND 128
+            )
+        ),
+    CONSTRAINT uq_battle_live_record_job_sequence
+        UNIQUE (job_id, sequence),
+    CONSTRAINT uq_battle_live_record_job_fingerprint
+        UNIQUE (job_id, fingerprint)
+);
+
+CREATE INDEX IF NOT EXISTS idx_battle_live_record_job_public_sequence
+    ON battle_job_live_records (job_id, sequence)
+    WHERE public_visible;
+CREATE INDEX IF NOT EXISTS idx_battle_live_record_checkpoint
+    ON battle_job_live_records (job_id, sequence DESC)
+    WHERE source_kind = 'xmage_checkpoint';
+CREATE INDEX IF NOT EXISTS idx_battle_live_record_source_identity
+    ON battle_job_live_records (
+        job_id,
+        source_process_id,
+        source_sequence
+    )
+    WHERE source_kind = 'xmage_live';
+
 -- 9. Tabela de Decks do Meta (Crawler)
 -- Armazena decks competitivos importados de sites externos (MTGTop8, MTGO)
 CREATE TABLE IF NOT EXISTS meta_decks (

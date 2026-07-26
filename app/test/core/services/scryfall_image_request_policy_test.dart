@@ -34,6 +34,33 @@ void main() {
     );
   });
 
+  test('recognizes Scryfall artwork hosts without accepting lookalikes', () {
+    expect(
+      isScryfallArtworkImageUrl(
+        'https://cards.scryfall.io/normal/front/a/b/card.jpg',
+      ),
+      isTrue,
+    );
+    expect(
+      isScryfallArtworkImageUrl(
+        'https://api.scryfall.com/cards/named?exact=Island&format=image',
+      ),
+      isTrue,
+    );
+    expect(
+      isScryfallArtworkImageUrl(
+        'https://cards.scryfall.io.example.test/normal/card.jpg',
+      ),
+      isFalse,
+    );
+    expect(
+      isScryfallArtworkImageUrl(
+        'https://api.scryfall.com/cards/search?q=Island',
+      ),
+      isFalse,
+    );
+  });
+
   test('serializes concurrent permits with a minimum start interval', () async {
     var now = DateTime.utc(2026, 7, 24);
     final waits = <Duration>[];

@@ -22,6 +22,31 @@ def _load_module():
 
 
 class NativeBattleWorkerTest(unittest.TestCase):
+    def test_replay_events_are_attributed_to_the_correct_deck_side(self) -> None:
+        module = _load_module()
+        deck_a = module._native_replay_event(
+            "spell_cast",
+            {"player": "Lorehold", "card": "Sol Ring"},
+            deck_a_player="Lorehold",
+            deck_b_player="Atraxa",
+        )
+        deck_b = module._native_replay_event(
+            "spell_cast",
+            {"player": "Atraxa", "card": "Arcane Signet"},
+            deck_a_player="Lorehold",
+            deck_b_player="Atraxa",
+        )
+        unknown = module._native_replay_event(
+            "spell_cast",
+            {"player": "Unknown", "card": "Candidate"},
+            deck_a_player="Lorehold",
+            deck_b_player="Atraxa",
+        )
+
+        self.assertEqual(deck_a["subject_deck_key"], "deck_a")
+        self.assertEqual(deck_b["subject_deck_key"], "deck_b")
+        self.assertNotIn("subject_deck_key", unknown)
+
     def test_runtime_max_turns_reads_worker_environment(self) -> None:
         module = _load_module()
         with mock.patch.dict(os.environ, {"MANALOOM_BATTLE_MAX_TURNS": "9"}):

@@ -29,13 +29,13 @@
       "raw_error_policy": "sanitized: AuthProvider expõe copy amigável e testes rejeitam payload/exception crua"
     },
     "battle": {
-      "covered": ["loading","progress","saving","disabled","empty","error","retry","permission_denied","success"],
-      "not_applicable": ["partial","stale","loading_more","optimistic","offline","session_expired"],
-      "sources": ["lib/features/battle/screens/battle_replays_screen.dart"],
-      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/services/battle_replay_service_test.dart"],
-      "anchors": ["battle-replays-loading-state","battle-replays-error-state","battle-replays-empty-state","battle-opponent-retry-button"],
-      "input_policy": "tested: seleção do oponente permanece até retry/cancelamento",
-      "raw_error_policy": "sanitized: _friendlyError converte falha operacional em mensagem de produto"
+      "covered": ["loading","progress","saving","disabled","empty","error","retry","offline","permission_denied","success"],
+      "not_applicable": ["partial","stale","loading_more","optimistic","session_expired"],
+      "sources": ["lib/features/battle/screens/battle_replays_screen.dart","lib/features/battle/screens/battle_live_spectator_screen.dart"],
+      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart","test/features/battle/services/battle_replay_service_test.dart","test/features/battle/services/battle_job_gateway_test.dart"],
+      "anchors": ["battle-replays-loading-state","battle-replays-error-state","battle-replays-empty-state","battle-opponent-retry-button","battle-live-disabled-state","battle-live-reconnect-banner","battle-live-terminal-state"],
+      "input_policy": "tested: seleção do oponente permanece até retry/cancelamento e pausa local não interrompe polling/cursor",
+      "raw_error_policy": "sanitized: _friendlyError/_friendlyLiveError convertem falha operacional em mensagem de produto"
     },
     "binder": {
       "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","permission_denied","success"],

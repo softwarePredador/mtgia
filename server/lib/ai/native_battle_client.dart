@@ -38,6 +38,49 @@ class NativeBattleClient {
 
   void close() => _client.close();
 
+  Future<Map<String, dynamic>> cardCoverage(
+    List<Map<String, dynamic>> cards,
+  ) async {
+    late http.Response response;
+    try {
+      response = await _client
+          .post(
+            _baseUri.resolve('/cards/coverage'),
+            headers: const {'content-type': 'application/json'},
+            body: jsonEncode({'cards': cards}),
+          )
+          .timeout(_timeout);
+    } on TimeoutException {
+      throw NativeBattleServiceException(
+        'Native battle coverage check exceeded ${_timeout.inSeconds} seconds',
+        statusCode: 504,
+      );
+    } on http.ClientException catch (error) {
+      throw NativeBattleServiceException(
+        'Native battle coverage request failed: ${error.message}',
+      );
+    }
+
+    final body = _decodeBody(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw NativeBattleServiceException(
+        body['message']?.toString() ??
+            body['error']?.toString() ??
+            'Native battle returned an invalid coverage response',
+        statusCode: response.statusCode,
+      );
+    }
+    if (body['engine'] != 'manaloom_native_reviewed' ||
+        body['engine_contract'] != 'native_reviewed_rules_execution' ||
+        !const {'ready', 'unsupported'}.contains(body['status'])) {
+      throw NativeBattleServiceException(
+        'Native battle returned an untrusted coverage contract',
+        statusCode: 502,
+      );
+    }
+    return body;
+  }
+
   Future<Map<String, dynamic>> simulate(Map<String, dynamic> request) async {
     late http.Response response;
     try {

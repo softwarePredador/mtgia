@@ -383,6 +383,12 @@ void main() {
       expect(shellSource, isNot(contains('_is_backend_api_ready')));
       expect(shellSource, isNot(contains('RUN_INTEGRATION_TESTS=1')));
       expect(shellSource, contains('RUN_INTEGRATION_TESTS=0 JWT_SECRET='));
+      expect(
+        shellSource,
+        contains(
+          '--exclude-tags "live || live_backend || live_db_write || live_external || historical_external_snapshot"',
+        ),
+      );
       expect(powershellSource, isNot(contains('Test-BackendApiReady')));
       expect(powershellSource, contains(r'$env:RUN_INTEGRATION_TESTS = "0"'));
       expect(powershellSource, contains('dart test -P all-local'));

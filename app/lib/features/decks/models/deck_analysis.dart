@@ -10,6 +10,7 @@ class DeckAnalysisData {
     this.understandingSummary,
     this.commanderContract,
     this.launchCapabilities,
+    this.battleLearningEvidence,
   });
 
   final String deckId;
@@ -22,6 +23,7 @@ class DeckAnalysisData {
   final DeckUnderstandingSummary? understandingSummary;
   final DeckCommanderContractSummary? commanderContract;
   final DeckLaunchCapabilities? launchCapabilities;
+  final DeckBattleLearningEvidence? battleLearningEvidence;
 
   factory DeckAnalysisData.fromJson(Map<String, dynamic> json) {
     final stats = _asStringMap(json['stats']);
@@ -38,6 +40,9 @@ class DeckAnalysisData {
     final understandingPayload = _asStringMap(json['understanding_summary']);
     final commanderContractPayload = _asStringMap(json['commander_contract']);
     final launchCapabilitiesPayload = _asStringMap(json['launch_capabilities']);
+    final battleLearningEvidencePayload = _asStringMap(
+      json['battle_learning_evidence'],
+    );
 
     return DeckAnalysisData(
       deckId: json['deck_id']?.toString() ?? '',
@@ -60,6 +65,9 @@ class DeckAnalysisData {
       launchCapabilities: launchCapabilitiesPayload.isEmpty
           ? null
           : DeckLaunchCapabilities.fromJson(launchCapabilitiesPayload),
+      battleLearningEvidence: battleLearningEvidencePayload.isEmpty
+          ? null
+          : DeckBattleLearningEvidence.fromJson(battleLearningEvidencePayload),
     );
   }
 
@@ -99,6 +107,101 @@ class DeckAnalysisData {
       return 'functional_tags do backend';
     }
     return 'functional_tags ($version)';
+  }
+}
+
+class DeckBattleLearningEvidence {
+  const DeckBattleLearningEvidence({
+    required this.schemaVersion,
+    required this.aggregateSchemaVersion,
+    required this.battleCount,
+    required this.trustedBattleCount,
+    required this.compatibleRevisionBattleCount,
+    required this.reliableCompatibleBattleCount,
+    required this.staleRevisionBattleCount,
+    required this.censoredBattleCount,
+    required this.timeoutBattleCount,
+    required this.positiveExposureBattleCount,
+    required this.positiveExposureReady,
+    required this.promotionAllowed,
+    this.latestReplayId,
+    this.latestCreatedAt,
+  });
+
+  final String schemaVersion;
+  final String aggregateSchemaVersion;
+  final int battleCount;
+  final int trustedBattleCount;
+  final int compatibleRevisionBattleCount;
+  final int reliableCompatibleBattleCount;
+  final int staleRevisionBattleCount;
+  final int censoredBattleCount;
+  final int timeoutBattleCount;
+  final int positiveExposureBattleCount;
+  final bool positiveExposureReady;
+  final bool promotionAllowed;
+  final String? latestReplayId;
+  final DateTime? latestCreatedAt;
+
+  factory DeckBattleLearningEvidence.fromJson(Map<String, dynamic> json) {
+    final latestCreatedAtText = _optionalTrimmedString(
+      json['latest_created_at'],
+    );
+    return DeckBattleLearningEvidence(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      aggregateSchemaVersion:
+          json['aggregate_schema_version']?.toString() ?? '',
+      battleCount: _parseInt(json['battle_count']),
+      trustedBattleCount: _parseInt(json['trusted_battle_count']),
+      compatibleRevisionBattleCount: _parseInt(
+        json['compatible_revision_battle_count'],
+      ),
+      reliableCompatibleBattleCount: _parseInt(
+        json['reliable_compatible_battle_count'],
+      ),
+      staleRevisionBattleCount: _parseInt(json['stale_revision_battle_count']),
+      censoredBattleCount: _parseInt(json['censored_battle_count']),
+      timeoutBattleCount: _parseInt(json['timeout_battle_count']),
+      positiveExposureBattleCount: _parseInt(
+        json['positive_exposure_battle_count'],
+      ),
+      positiveExposureReady: _parseBool(json['positive_exposure_ready']),
+      promotionAllowed: _parseBool(json['promotion_allowed']),
+      latestReplayId: _optionalTrimmedString(json['latest_replay_id']),
+      latestCreatedAt: latestCreatedAtText == null
+          ? null
+          : DateTime.tryParse(latestCreatedAtText)?.toLocal(),
+    );
+  }
+
+  bool get hasHistory => battleCount > 0;
+
+  String get reliableSampleLabel {
+    final count = reliableCompatibleBattleCount;
+    return '$count ${count == 1 ? 'amostra confiável' : 'amostras confiáveis'} '
+        'da revisão atual';
+  }
+
+  String get statusDetail {
+    if (!hasHistory) {
+      return 'Nenhum Battle salvo para esta revisão ainda.';
+    }
+    final excluded = battleCount - reliableCompatibleBattleCount;
+    if (excluded <= 0) {
+      return 'As amostras concluídas usam motor confiável e a mesma revisão.';
+    }
+    return '$excluded ${excluded == 1 ? 'execução não entra' : 'execuções não entram'} '
+        'na leitura atual por revisão, outcome ou contrato do motor.';
+  }
+
+  String? get outcomeCaveat {
+    final parts = <String>[
+      if (censoredBattleCount > 0) '$censoredBattleCount censurada(s)',
+      if (timeoutBattleCount > 0) '$timeoutBattleCount timeout(s)',
+      if (staleRevisionBattleCount > 0)
+        '$staleRevisionBattleCount de revisão anterior',
+    ];
+    return parts.isEmpty ? null : parts.join(' · ');
   }
 }
 

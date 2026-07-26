@@ -14,20 +14,15 @@ void main() {
 
       expect(
         RegExp(
-          r'WHERE da\.user_id = CAST\(@userId AS uuid\)',
-        ).allMatches(source),
-        hasLength(1),
-      );
-      expect(
-        RegExp(r'AND da\.user_id = CAST\(@userId AS uuid\)').allMatches(source),
-        hasLength(1),
-      );
-      expect(
-        RegExp(
           r'AND requested\.user_id = CAST\(@userId AS uuid\)',
         ).allMatches(source),
         hasLength(2),
       );
+      expect(
+        source,
+        isNot(contains('WHERE da.user_id = CAST(@userId AS uuid)')),
+      );
+      expect(source, isNot(contains('AND da.user_id = CAST(@userId AS uuid)')));
       expect(
         RegExp(r'bs\.deck_b_id = CAST\(@deckId AS uuid\)').allMatches(source),
         hasLength(2),
@@ -95,9 +90,184 @@ void main() {
       expect(replays.single['event_count'], 12);
       expect(replays.single['created_at'], createdAt.toIso8601String());
       expect(replays.single['engine'], 'manaloom_native_reviewed');
+      expect(replays.single['status'], 'legacy_unknown');
+      expect(replays.single['outcome'], 'legacy_unknown');
       expect(
         replays.single['simulation_contract'],
         containsPair('reviewed_native_rules_execution', true),
+      );
+    });
+
+    test(
+      'uses a stable keyset cursor instead of a rigid history limit',
+      () async {
+        const firstId = '11111111-1111-4111-8111-111111111111';
+        const secondId = '22222222-2222-4222-8222-222222222222';
+        const thirdId = '33333333-3333-4333-8333-333333333333';
+        final firstCreatedAt = DateTime.utc(2026, 7, 26, 13);
+        final secondCreatedAt = DateTime.utc(2026, 7, 26, 12);
+        final thirdCreatedAt = DateTime.utc(2026, 7, 26, 11);
+        final firstPool = _ScriptedPool([
+          _result(
+            rows: const [
+              [true],
+            ],
+          ),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'created_at',
+            ],
+            rows: [
+              [firstId, 'deck-1', 'deck-2', 'battle', firstCreatedAt],
+              [secondId, 'deck-1', 'deck-2', 'battle', secondCreatedAt],
+              [thirdId, 'deck-1', 'deck-2', 'battle', thirdCreatedAt],
+            ],
+          ),
+        ]);
+
+        final firstPage = await BattleReplayReadService(
+          firstPool,
+        ).listReplayPage(userId: 'user-1', deckId: 'deck-1', limit: 2);
+
+        expect(firstPage.items.map((item) => item['id']), [firstId, secondId]);
+        expect(firstPage.hasMore, isTrue);
+        expect(firstPage.nextCursor, isNotEmpty);
+        expect(firstPool.parameters.last, containsPair('queryLimit', 3));
+
+        final secondPool = _ScriptedPool([
+          _result(
+            rows: const [
+              [true],
+            ],
+          ),
+          _result(rows: const []),
+        ]);
+        final secondPage = await BattleReplayReadService(
+          secondPool,
+        ).listReplayPage(
+          userId: 'user-1',
+          deckId: 'deck-1',
+          limit: 2,
+          cursor: firstPage.nextCursor,
+        );
+
+        expect(secondPage.items, isEmpty);
+        expect(
+          secondPool.parameters.last,
+          containsPair('beforeCreatedAt', secondCreatedAt.toIso8601String()),
+        );
+        expect(secondPool.parameters.last, containsPair('beforeId', secondId));
+      },
+    );
+
+    test('rejects malformed history cursors before the page query', () async {
+      final pool = _ScriptedPool([
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
+      ]);
+
+      await expectLater(
+        BattleReplayReadService(pool).listReplayPage(
+          userId: 'user-1',
+          deckId: 'deck-1',
+          cursor: 'not+a+cursor',
+        ),
+        throwsA(isA<BattleReplayCursorException>()),
+      );
+      expect(pool.calls, 1);
+    });
+
+    test('uses the durable attempt outcome instead of forcing completed', () async {
+      final pool = _ScriptedPool([
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
+        _result(
+          columns: const [
+            'id',
+            'deck_a_id',
+            'deck_b_id',
+            'simulation_type',
+            'winner_deck_id',
+            'turns_played',
+            'metrics',
+            'created_at',
+            'deck_a_name',
+            'deck_b_name',
+            'event_count',
+            'game_log_type',
+            'winner_label',
+            'attempt_id',
+            'attempt_outcome',
+            'test_objective',
+            'attempt_engine',
+            'attempt_engine_version',
+            'attempt_engine_commit',
+            'request_schema_version',
+            'request_hash',
+            'deck_hash_schema',
+            'deck_a_hash',
+            'deck_b_hash',
+            'events_truncated',
+          ],
+          rows: [
+            [
+              'sim-censored',
+              'deck-1',
+              'deck-2',
+              'battle',
+              null,
+              30,
+              const {'engine_contract': 'canonical_rules_execution'},
+              DateTime.utc(2026, 7, 25),
+              'Deck A',
+              'Deck B',
+              100,
+              'battle',
+              null,
+              'attempt-1',
+              'censored',
+              'interaction',
+              'xmage',
+              '1.4.60',
+              'commit',
+              'external_battle_request_v2',
+              'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              'external_battle_deck_hash_v1',
+              'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+              'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+              true,
+            ],
+          ],
+        ),
+      ]);
+
+      final replay =
+          (await BattleReplayReadService(
+            pool,
+          ).listReplays(userId: 'user-1', deckId: 'deck-1')).single;
+
+      expect(replay['status'], 'censored');
+      expect(replay['outcome'], 'censored');
+      expect(replay['attempt_id'], 'attempt-1');
+      expect(replay['test_objective'], 'interaction');
+      expect(replay['engine_version'], '1.4.60');
+      expect(replay['events_truncated'], isTrue);
+      expect(
+        replay['deck_revision'],
+        containsPair(
+          'subject_deck_hash',
+          'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+        ),
       );
     });
 
@@ -639,6 +809,8 @@ class _ScriptedPool implements Pool {
 
   final List<Result> _results;
   int calls = 0;
+  final List<String> queries = [];
+  final List<Map<String, dynamic>> parameters = [];
 
   @override
   bool get isOpen => true;
@@ -665,6 +837,12 @@ class _ScriptedPool implements Pool {
     if (calls >= _results.length) {
       throw StateError('Unexpected query #${calls + 1}: $query');
     }
+    queries.add(query.toString());
+    final normalizedParameters =
+        parameters is Map
+            ? parameters.map((key, value) => MapEntry(key.toString(), value))
+            : const <String, dynamic>{};
+    this.parameters.add(normalizedParameters);
     return _results[calls++];
   }
 

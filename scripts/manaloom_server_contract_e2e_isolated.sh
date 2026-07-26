@@ -325,7 +325,7 @@ fi
   printf 'server_environment=%s\n' "$ISOLATED_ENVIRONMENT"
   printf 'openai_profile=%s\n' "${OPENAI_PROFILE:-default}"
   printf 'full_card_catalog_enabled=%s\n' "${MANALOOM_ISOLATED_FULL_CARD_CATALOG:-0}"
-  printf 'latest_migration=051\n'
+  printf 'latest_migration=054\n'
   printf 'email_delivery_count=%s\n' "$email_delivery_count"
   printf 'email_delivery_templates=%s\n' "$email_delivery_templates"
   printf 'email_delivery_log=sanitized_without_links_or_tokens\n'

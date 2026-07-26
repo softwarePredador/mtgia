@@ -352,6 +352,105 @@ class UserDataPrivacyService {
           ''',
           userId: userId,
         );
+        final battleSimulationAttempts = await _optionalJsonRows(
+          session,
+          relation: 'battle_simulation_attempts',
+          query: '''
+          SELECT jsonb_build_object(
+            'id', attempt.id,
+            'deck_a_id', attempt.deck_a_id,
+            'deck_b_id', attempt.deck_b_id,
+            'replay_id', attempt.replay_id,
+            'simulation_type', attempt.simulation_type,
+            'test_objective', attempt.test_objective,
+            'outcome', attempt.outcome,
+            'request_schema_version', attempt.request_schema_version,
+            'deck_hash_schema', attempt.deck_hash_schema,
+            'deck_a_hash', attempt.deck_a_hash,
+            'deck_b_hash', attempt.deck_b_hash,
+            'engine', attempt.engine,
+            'engine_version', attempt.engine_version,
+            'engine_commit', attempt.engine_commit,
+            'engine_build', attempt.engine_build,
+            'timeout_ms', attempt.timeout_ms,
+            'events_truncated', attempt.events_truncated,
+            'snapshots_truncated', attempt.snapshots_truncated,
+            'outcome_reason', attempt.outcome_reason,
+            'error_code', attempt.error_code,
+            'provenance', attempt.provenance,
+            'started_at', attempt.started_at,
+            'finished_at', attempt.finished_at,
+            'updated_at', attempt.updated_at
+          )
+          FROM battle_simulation_attempts attempt
+          WHERE attempt.user_id = CAST(@userId AS uuid)
+          ORDER BY attempt.started_at, attempt.id
+        ''',
+          userId: userId,
+        );
+        final battleJobs = await _optionalJsonRows(
+          session,
+          relation: 'battle_jobs',
+          query: '''
+          SELECT
+            to_jsonb(job)
+              - 'request_payload'
+              - 'lease_owner'
+              - 'lease_token'
+          FROM battle_jobs job
+          WHERE job.user_id = CAST(@userId AS uuid)
+          ORDER BY job.created_at, job.id
+        ''',
+          userId: userId,
+        );
+        final battleLiveRecords = await _optionalJsonRows(
+          session,
+          relation: 'battle_job_live_records',
+          query: '''
+          SELECT jsonb_build_object(
+            'job_id', record.job_id,
+            'sequence', record.sequence,
+            'record_id', record.record_id,
+            'kind', record.kind,
+            'payload', record.payload,
+            'content_truncated', record.content_truncated,
+            'source_truncated', record.source_truncated,
+            'created_at', record.created_at
+          )
+          FROM battle_job_live_records record
+          JOIN battle_jobs job ON job.id = record.job_id
+          WHERE job.user_id = CAST(@userId AS uuid)
+            AND record.public_visible
+          ORDER BY record.job_id, record.sequence
+        ''',
+          userId: userId,
+        );
+        final battleReplayAnnotations = await _optionalJsonRows(
+          session,
+          relation: 'battle_replay_annotations',
+          query: '''
+          SELECT jsonb_build_object(
+            'id', annotation.id,
+            'replay_id', annotation.replay_id,
+            'attempt_id', annotation.attempt_id,
+            'subject_deck_id', annotation.subject_deck_id,
+            'subject_deck_key', annotation.subject_deck_key,
+            'deck_hash_schema', annotation.deck_hash_schema,
+            'subject_deck_hash', annotation.subject_deck_hash,
+            'subject_deck_revision', annotation.subject_deck_revision,
+            'event_ref', annotation.event_ref,
+            'snapshot_ref', annotation.snapshot_ref,
+            'kind', annotation.kind,
+            'payload', annotation.payload,
+            'created_at', annotation.created_at,
+            'updated_at', annotation.updated_at
+          )
+          FROM battle_replay_annotations annotation
+          WHERE annotation.user_id = CAST(@userId AS uuid)
+          ORDER BY annotation.created_at, annotation.id
+        ''',
+          userId: userId,
+        );
         final contentReports = await _optionalJsonRows(
           session,
           relation: 'content_reports',
@@ -372,6 +471,10 @@ class UserDataPrivacyService {
             'deck_cards': deckCards,
             'deck_learning_events': deckLearningEvents,
             'battle_simulations': battleSimulations,
+            'battle_simulation_attempts': battleSimulationAttempts,
+            'battle_jobs': battleJobs,
+            'battle_live_records': battleLiveRecords,
+            'battle_replay_annotations': battleReplayAnnotations,
             'binder_items': binderItems,
             'post_game_notes': postGameNotes,
             'shared_deck_reports': sharedDeckReports,
@@ -408,6 +511,8 @@ class UserDataPrivacyService {
               'server_credentials',
               'messages_authored_by_other_users',
               'notification_message_bodies',
+              'battle_job_internal_request_payload',
+              'battle_job_lease_credentials',
             ],
           },
         };
@@ -486,6 +591,12 @@ class UserDataPrivacyService {
         session,
         'ai_generate_jobs',
         'DELETE FROM ai_generate_jobs WHERE user_id = CAST(@userId AS uuid)',
+        userId,
+      );
+      await _deleteIfPresent(
+        session,
+        'battle_jobs',
+        'DELETE FROM battle_jobs WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
       await _deleteIfPresent(
@@ -673,6 +784,28 @@ class UserDataPrivacyService {
           USING decks deck
           WHERE learning_event.deck_id = deck.id
             AND deck.user_id = CAST(@userId AS uuid)
+        ''',
+        userId,
+      );
+      await _deleteIfPresent(
+        session,
+        'battle_replay_annotations',
+        'DELETE FROM battle_replay_annotations '
+            'WHERE user_id = CAST(@userId AS uuid)',
+        userId,
+      );
+      await _executeIfAllPresent(
+        session,
+        const ['battle_simulation_attempts', 'decks'],
+        '''
+          DELETE FROM battle_simulation_attempts attempt
+          WHERE attempt.user_id = CAST(@userId AS uuid)
+             OR EXISTS (
+               SELECT 1
+               FROM decks deck
+               WHERE deck.user_id = CAST(@userId AS uuid)
+                 AND deck.id IN (attempt.deck_a_id, attempt.deck_b_id)
+             )
         ''',
         userId,
       );

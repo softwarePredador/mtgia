@@ -91,7 +91,9 @@ cd "$WORK_DIR"
 npm ci --no-fund --no-audit
 npm run lint
 npm run build
-npm audit --audit-level=moderate
+# The standalone artifact contains production dependencies only. Lint tooling
+# is still installed and executed above, but it is not shipped in the image.
+npm audit --omit=dev --audit-level=moderate
 
 mkdir -p "$SERVER_DIR/.next"
 cp -R .next/standalone/. "$SERVER_DIR/"

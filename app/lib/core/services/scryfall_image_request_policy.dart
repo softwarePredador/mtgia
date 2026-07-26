@@ -76,5 +76,17 @@ bool isScryfallApiImageUrl(String imageUrl) {
       uri.queryParameters['format']?.toLowerCase() == 'image';
 }
 
+/// Returns whether [imageUrl] is artwork served by Scryfall.
+///
+/// The card CDN does not guarantee CORS response headers. Flutter Web must
+/// therefore render these URLs through an HTML image element instead of
+/// fetching their bytes through XHR.
+bool isScryfallArtworkImageUrl(String imageUrl) {
+  final uri = Uri.tryParse(imageUrl);
+  if (uri == null || uri.scheme != 'https') return false;
+  final host = uri.host.toLowerCase();
+  return host == 'cards.scryfall.io' || isScryfallApiImageUrl(imageUrl);
+}
+
 final scryfallImageRequestGate = ScryfallImageRequestGate();
 const scryfallImageRetryPolicy = ScryfallImageRetryPolicy();

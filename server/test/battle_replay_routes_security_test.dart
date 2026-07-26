@@ -8,6 +8,8 @@ import 'package:test/test.dart';
 import '../routes/decks/[id]/battle-replays/[replayId]/index.dart'
     as replay_detail_route;
 import '../routes/decks/[id]/battle-replays/index.dart' as replay_list_route;
+import '../routes/decks/[id]/battle-preflight/index.dart'
+    as battle_preflight_route;
 import '../routes/decks/_middleware.dart' as decks_middleware;
 
 const _deckAId = '11111111-1111-4111-8111-111111111111';
@@ -52,6 +54,38 @@ void main() {
     });
 
     test(
+      'malformed history cursor is rejected without running the page query',
+      () async {
+        final pool = _ScriptedPool([
+          _result(
+            rows: const [
+              [1],
+            ],
+          ),
+          _result(
+            rows: const [
+              [true],
+            ],
+          ),
+        ]);
+
+        final response = await replay_list_route.onRequest(
+          _context(
+            '/decks/$_deckAId/battle-replays?cursor=not%2Ba%2Bcursor',
+            pool: pool,
+          ),
+          _deckAId,
+        );
+
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await _jsonBody(response), {
+          'error': 'Cursor de replay invalido.',
+        });
+        expect(pool.calls, 2);
+      },
+    );
+
+    test(
       'invalid replay id is a not-found without a database lookup',
       () async {
         final pool = _ThrowingPool();
@@ -67,6 +101,66 @@ void main() {
         expect(pool.calls, 0);
       },
     );
+  });
+
+  group('battle preflight authentication and identifiers', () {
+    test('invalid deck id does not query the database', () async {
+      final pool = _ThrowingPool();
+
+      final response = await battle_preflight_route.onRequest(
+        _context(
+          '/decks/not-a-uuid/battle-preflight'
+          '?opponent_deck_id=$_deckBId',
+          pool: pool,
+        ),
+        'not-a-uuid',
+      );
+
+      expect(response.statusCode, HttpStatus.notFound);
+      expect(await _jsonBody(response), {'error': 'Deck nao encontrado.'});
+      expect(pool.calls, 0);
+    });
+
+    test('invalid opponent id does not query the database', () async {
+      final pool = _ThrowingPool();
+
+      final response = await battle_preflight_route.onRequest(
+        _context(
+          '/decks/$_deckAId/battle-preflight'
+          '?opponent_deck_id=not-a-uuid',
+          pool: pool,
+        ),
+        _deckAId,
+      );
+
+      expect(response.statusCode, HttpStatus.badRequest);
+      expect(await _jsonBody(response), {
+        'error': 'opponent_deck_id must be a valid UUID',
+      });
+      expect(pool.calls, 0);
+    });
+
+    test('owner scope hides missing and inaccessible source decks', () async {
+      final pool = _ScriptedPool([_result(rows: const [])]);
+
+      final response = await battle_preflight_route.onRequest(
+        _context(
+          '/decks/$_deckAId/battle-preflight'
+          '?opponent_deck_id=$_deckBId',
+          pool: pool,
+        ),
+        _deckAId,
+      );
+
+      expect(response.statusCode, HttpStatus.notFound);
+      expect(await _jsonBody(response), {'error': 'Deck nao encontrado.'});
+      expect(pool.calls, 1);
+      expect(pool.parameters.single, {
+        'deckId': _deckAId,
+        'userId': _userId,
+        'allowPublic': false,
+      });
+    });
   });
 
   group('battle replay authorization', () {
@@ -118,8 +212,9 @@ void main() {
     });
 
     test(
-      'owner of deck B cannot read a replay initiated by another owner',
+      'owner of deck B can read its replay without a private opponent name',
       () async {
+        final createdAt = DateTime.utc(2026, 7, 25, 12);
         final listPool = _ScriptedPool([
           _result(
             rows: const [
@@ -131,7 +226,40 @@ void main() {
               [true],
             ],
           ),
-          _result(rows: const []),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'winner_deck_id',
+              'turns_played',
+              'metrics',
+              'created_at',
+              'deck_a_name',
+              'deck_b_name',
+              'event_count',
+              'game_log_type',
+              'winner_label',
+            ],
+            rows: [
+              [
+                _replayId,
+                _deckAId,
+                _deckBId,
+                'battle',
+                _deckAId,
+                7,
+                const {'engine': 'xmage'},
+                createdAt,
+                null,
+                'Deck B',
+                3,
+                'battle',
+                null,
+              ],
+            ],
+          ),
         ]);
         final detailPool = _ScriptedPool([
           _result(
@@ -144,7 +272,36 @@ void main() {
               [true],
             ],
           ),
-          _result(rows: const []),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'winner_deck_id',
+              'turns_played',
+              'game_log',
+              'metrics',
+              'created_at',
+              'deck_a_name',
+              'deck_b_name',
+            ],
+            rows: [
+              [
+                _replayId,
+                _deckAId,
+                _deckBId,
+                'battle',
+                _deckAId,
+                7,
+                const {'type': 'battle', 'engine': 'xmage', 'game_log': []},
+                const {'engine': 'xmage'},
+                createdAt,
+                null,
+                'Deck B',
+              ],
+            ],
+          ),
         ]);
 
         final listResponse = await replay_list_route.onRequest(
@@ -161,11 +318,16 @@ void main() {
         );
 
         expect(listResponse.statusCode, HttpStatus.ok);
-        expect((await _jsonBody(listResponse))['data'], isEmpty);
-        expect(detailResponse.statusCode, HttpStatus.notFound);
-        expect(await _jsonBody(detailResponse), {
-          'error': 'Replay nao encontrado.',
-        });
+        final listBody = await _jsonBody(listResponse);
+        final detailBody = await _jsonBody(detailResponse);
+        expect(listResponse.statusCode, HttpStatus.ok);
+        expect((listBody['data'] as List), hasLength(1));
+        expect(
+          ((listBody['data'] as List).single as Map),
+          isNot(contains('opponent_name')),
+        );
+        expect(detailResponse.statusCode, HttpStatus.ok);
+        expect(detailBody['replay'] as Map, isNot(contains('opponent_name')));
       },
     );
 

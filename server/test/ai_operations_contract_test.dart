@@ -58,7 +58,7 @@ void main() {
     );
   });
 
-  test('backend deploy proves migrations 038-051 before remote mutation', () {
+  test('backend deploy proves migrations 038-055 before remote mutation', () {
     final source =
         File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
     final guard =
@@ -84,12 +84,12 @@ void main() {
       '\nrequire_migration_040_contract\n',
       migration040Definition + 1,
     );
-    final migration041To051Definition = source.indexOf(
-      'require_migrations_041_051_contract() {',
+    final migration041To055Definition = source.indexOf(
+      'require_migrations_041_055_contract() {',
     );
-    final migration041To051Call = source.indexOf(
-      '\nrequire_migrations_041_051_contract\n',
-      migration041To051Definition + 1,
+    final migration041To055Call = source.indexOf(
+      '\nrequire_migrations_041_055_contract\n',
+      migration041To055Definition + 1,
     );
     final environmentSource = source.indexOf(
       r'load_manaloom_env_keys "$ENV_FILE"',
@@ -113,8 +113,8 @@ void main() {
     expect(migration040Call, greaterThan(migration040Definition));
     expect(migration039Call, greaterThan(preflightCall));
     expect(migration040Call, greaterThan(migration039Call));
-    expect(migration041To051Call, greaterThan(migration041To051Definition));
-    expect(migration041To051Call, greaterThan(migration040Call));
+    expect(migration041To055Call, greaterThan(migration041To055Definition));
+    expect(migration041To055Call, greaterThan(migration040Call));
     expect(approval, greaterThan(guardSource));
     expect(
       source.lastIndexOf(
@@ -129,9 +129,9 @@ void main() {
     );
     expect(source, isNot(contains(r'. "$ENV_FILE"')));
     expect(preflightCall, greaterThan(environmentSource));
-    expect(mutationStart, greaterThan(migration041To051Call));
-    expect(firstServiceUpdate, greaterThan(migration041To051Call));
-    expect(firstRemoteFilesystemMutation, greaterThan(migration041To051Call));
+    expect(mutationStart, greaterThan(migration041To055Call));
+    expect(firstServiceUpdate, greaterThan(migration041To055Call));
+    expect(firstRemoteFilesystemMutation, greaterThan(migration041To055Call));
     expect(
       source,
       contains('source "\$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"'),
@@ -177,7 +177,7 @@ void main() {
       'migration_038_ready',
       'migration_039_ready',
       'migration_040_ready',
-      'migrations_041_051_ready',
+      'migrations_041_055_ready',
       'manaloom_deck_cards_require_review',
       'manaloom_deck_format_require_review',
       'idx_decks_user_validation_state',
@@ -193,7 +193,16 @@ void main() {
     expect(source, contains('.checks.release_schema.status == "healthy"'));
     expect(
       source,
-      contains('.checks.release_schema.latest_migration == "051"'),
+      contains('.checks.release_schema.required_range == "038-055"'),
+    );
+    expect(
+      source,
+      contains('.checks.release_schema.latest_migration == "055"'),
+    );
+    expect(source, contains('.checks.battle_job_schema.status == "healthy"'));
+    expect(
+      source,
+      contains('.checks.battle_live_spectator.status == "disabled"'),
     );
   });
 

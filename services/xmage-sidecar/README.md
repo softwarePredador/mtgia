@@ -7,8 +7,8 @@ reported and are never removed from a deck.
 ## HTTP contract
 
 - `GET /health`: engine version, pinned commit, `catalog_ready=true`, indexed
-  name count, `sidecar_process_id`, and `sidecar_started_at` after the card
-  catalog has been loaded.
+  name count, bounded Live buffer metrics, `sidecar_process_id`, and
+  `sidecar_started_at` after the card catalog has been loaded.
 - `POST /coverage`: validates two 100-card, one-commander decks and returns
   `ready` plus structured `unsupported_cards`.
 - `POST /cards/coverage`: batch-checks arbitrary catalog rows without requiring
@@ -18,6 +18,11 @@ reported and are never removed from a deck.
   a compatibility fallback because XMage's name index stores individual faces.
 - `POST /simulate`: runs a covered battle. Coverage failures return HTTP 422;
   execution timeouts return HTTP 504.
+- `GET /live/<request_id>`: internal, read-only polling source for a simulation
+  already running in this process. It returns a bounded
+  `external_battle_live_source_v1` record stream; it is not an action or pause
+  endpoint. `after=<sequence>&limit=<1..500>` provides monotonic source
+  pagination (default 200) so polling never downloads the full buffer.
 
 Simulation timeout is a hard process boundary. The HTTP watchdog allows a
 five-second cleanup grace, returns `504`, and exits the sidecar so the container
@@ -43,6 +48,13 @@ library identities are not visible, and XMage does not expose the AI's rejected
 options or rationale. The response therefore carries
 `learning_contract.schema_version=external_battle_learning_v1`, an empty
 `decision_trace`, and `strategy_or_swap_proof=false`.
+
+The Live source retains at most 20,000 records per request, 64 recent streams,
+and 15 minutes of process-local history. It removes hand/library contents,
+decision options, prompts, rationale and credentials before buffering. The
+authenticated ManaLoom backend applies a second public allowlist, persists the
+incremental cursor records, and owns reconnection. A sidecar restart therefore
+converges to the durable replay instead of claiming that this buffer survived.
 
 ## Build and test
 

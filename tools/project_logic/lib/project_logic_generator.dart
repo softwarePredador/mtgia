@@ -11,7 +11,15 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
-const _generatorVersion = '1.2.0';
+const _generatorVersion = '1.2.1';
+
+// These packages have versioned lockfiles. Tool-package lockfiles are ignored
+// by repository policy and must never make lineage depend on local pub state.
+const _canonicalResolvedPubspecPaths = <String>[
+  'app/pubspec.yaml',
+  'pubspec.yaml',
+  'server/pubspec.yaml',
+];
 
 class ProjectLogicException implements Exception {
   ProjectLogicException(this.message);
@@ -64,6 +72,12 @@ class ProjectLogicGenerator {
     'docs/generated/DATABASE_ERD.md',
     'docs/generated/TRACEABILITY_MATRIX.md',
   ];
+
+  Future<Map<String, Object?>> dependencyInventoryForTesting() =>
+      _dependencies();
+
+  List<String> dependencyInputPathsForTesting() =>
+      _dependencyFiles().map(_relative).toList();
 
   Future<ProjectLogicResult> generate() async {
     final contractFile = _file('docs/project_logic_contracts.json');
@@ -411,12 +425,19 @@ class ProjectLogicGenerator {
       '.tsx',
       '.xml',
     };
-    final files = _filesUnder([
-      'web-public/src',
-      'app/web',
-      'app/android/app/src/main',
-      'app/ios/Runner',
-    ], (file) => extensions.contains(p.extension(file.path).toLowerCase()));
+    final files = _filesUnder(
+      [
+        'web-public/src',
+        'app/web',
+        'app/android/app/src/main',
+        'app/ios/Runner',
+      ],
+      (file) {
+        final name = p.basename(file.path);
+        return !name.startsWith('GeneratedPluginRegistrant.') &&
+            extensions.contains(p.extension(file.path).toLowerCase());
+      },
+    );
     for (final path in [
       'web-public/package.json',
       'web-public/package-lock.json',
@@ -483,12 +504,19 @@ class ProjectLogicGenerator {
 
   List<File> _dependencyFiles() {
     final files = <File>{..._pubspecFiles()};
-    for (final pubspec in _pubspecFiles()) {
+    for (final pubspec in _canonicalResolvedPubspecFiles()) {
       final lock = File(p.join(pubspec.parent.path, 'pubspec.lock'));
       if (lock.existsSync()) files.add(lock);
     }
     return files.toList()..sort((a, b) => _relative(a).compareTo(_relative(b)));
   }
+
+  List<File> _canonicalResolvedPubspecFiles() =>
+      _canonicalResolvedPubspecPaths
+          .map(_file)
+          .where((file) => file.existsSync())
+          .toList()
+        ..sort((a, b) => _relative(a).compareTo(_relative(b)));
 
   List<File> _canonicalDocumentFiles(Map<String, dynamic> contracts) =>
       (contracts['canonical_documents'] as List<dynamic>)
@@ -1034,9 +1062,9 @@ class ProjectLogicGenerator {
         relations.add(
           _SqlRelation(
             tableName,
-            match.group(2)!,
+            [match.group(2)!],
             _sqlName(reference.group(1)!),
-            reference.group(2)!,
+            [reference.group(2)!],
           ),
         );
       }
@@ -1123,16 +1151,18 @@ class ProjectLogicGenerator {
     if (item.isEmpty) return;
     final upper = item.toUpperCase();
     final foreignKey = RegExp(
-      r'FOREIGN\s+KEY\s*\(\s*"?([A-Za-z_]\w*)"?\s*\).*?REFERENCES\s+(["A-Za-z_][\w."]*)\s*\(\s*"?([A-Za-z_]\w*)"?\s*\)',
+      r'FOREIGN\s+KEY\s*\(([^)]+)\).*?REFERENCES\s+(["A-Za-z_][\w."]*)\s*\(([^)]+)\)',
       caseSensitive: false,
     ).firstMatch(item);
     if (foreignKey != null) {
+      final fromColumns = _sqlColumnList(foreignKey.group(1)!);
+      final toColumns = _sqlColumnList(foreignKey.group(3)!);
       relations.add(
         _SqlRelation(
           table.name,
-          foreignKey.group(1)!,
+          fromColumns,
           _sqlName(foreignKey.group(2)!),
-          foreignKey.group(3)!,
+          toColumns,
         ),
       );
       return;
@@ -1162,9 +1192,9 @@ class ProjectLogicGenerator {
       relations.add(
         _SqlRelation(
           table.name,
-          column.group(1)!,
+          [column.group(1)!],
           _sqlName(reference.group(1)!),
-          reference.group(2)!,
+          [reference.group(2)!],
         ),
       );
     }
@@ -1191,6 +1221,12 @@ class ProjectLogicGenerator {
   }
 
   String _sqlName(String value) => value.replaceAll('"', '').split('.').last;
+
+  List<String> _sqlColumnList(String value) => value
+      .split(',')
+      .map((column) => column.trim().replaceAll('"', ''))
+      .where((column) => column.isNotEmpty)
+      .toList(growable: false);
 
   String _sqlType(String definition) {
     final match = RegExp(
@@ -1237,11 +1273,13 @@ class ProjectLogicGenerator {
           : (a['package'] as String).compareTo(b['package'] as String);
     });
     final resolvedTrees = <Map<String, Object?>>[];
-    for (final pubspec in _pubspecFiles()) {
-      final packageConfig = File(
-        p.join(pubspec.parent.path, '.dart_tool/package_config.json'),
-      );
-      if (!packageConfig.existsSync()) continue;
+    for (final pubspec in _canonicalResolvedPubspecFiles()) {
+      final lock = File(p.join(pubspec.parent.path, 'pubspec.lock'));
+      if (!lock.existsSync()) {
+        throw ProjectLogicException(
+          'Canonical dependency lock is missing for ${_relative(pubspec)}.',
+        );
+      }
       final process = await Process.run(Platform.resolvedExecutable, [
         'pub',
         'deps',
@@ -1256,9 +1294,13 @@ class ProjectLogicGenerator {
       resolvedTrees.add({
         'source': _relative(pubspec),
         'root': tree['root'],
-        'packages': tree['packages'],
+        'packages': _canonicalizeDependencyJson(tree['packages']),
       });
     }
+    resolvedTrees.sort(
+      (left, right) =>
+          (left['source'] as String).compareTo(right['source'] as String),
+    );
     return {
       'declared': packages,
       'resolved_trees': resolvedTrees,
@@ -1316,6 +1358,21 @@ class ProjectLogicGenerator {
       'declared': declared,
       'resolved': resolved,
     };
+  }
+
+  Object? _canonicalizeDependencyJson(Object? value) {
+    if (value is Map) {
+      final keys = value.keys.map((key) => key.toString()).toList()..sort();
+      return <String, Object?>{
+        for (final key in keys) key: _canonicalizeDependencyJson(value[key]),
+      };
+    }
+    if (value is List) {
+      final normalized = value.map(_canonicalizeDependencyJson).toList()
+        ..sort((left, right) => jsonEncode(left).compareTo(jsonEncode(right)));
+      return normalized;
+    }
+    return value;
   }
 
   List<Map<String, Object?>> _scripts(List<File> files) {
@@ -1749,8 +1806,14 @@ flowchart LR
       ..writeln('```mermaid')
       ..writeln('erDiagram');
     for (final relation in relations) {
+      final fromColumns = relation['from_columns'] == null
+          ? [relation['from_column'] as String]
+          : (relation['from_columns'] as List<dynamic>).cast<String>();
+      final toColumns = relation['to_columns'] == null
+          ? [relation['to_column'] as String]
+          : (relation['to_columns'] as List<dynamic>).cast<String>();
       buffer.writeln(
-        '    ${_mermaidId(relation['to_table'] as String)} ||--o{ ${_mermaidId(relation['from_table'] as String)} : "${_mermaidText('${relation['from_column']} -> ${relation['to_column']}')}"',
+        '    ${_mermaidId(relation['to_table'] as String)} ||--o{ ${_mermaidId(relation['from_table'] as String)} : "${_mermaidText('${fromColumns.join(', ')} -> ${toColumns.join(', ')}')}"',
       );
     }
     for (final table in tables) {
@@ -2205,33 +2268,49 @@ class _SqlColumn {
 }
 
 class _SqlRelation {
-  const _SqlRelation(
+  _SqlRelation(
     this.fromTable,
-    this.fromColumn,
+    Iterable<String> fromColumns,
     this.toTable,
-    this.toColumn,
-  );
+    Iterable<String> toColumns,
+  ) : fromColumns = List.unmodifiable(fromColumns),
+      toColumns = List.unmodifiable(toColumns);
 
   final String fromTable;
-  final String fromColumn;
+  final List<String> fromColumns;
   final String toTable;
-  final String toColumn;
+  final List<String> toColumns;
 
   Map<String, Object?> toJson() => {
     'from_table': fromTable,
-    'from_column': fromColumn,
+    'from_columns': fromColumns,
+    if (fromColumns.length == 1) 'from_column': fromColumns.single,
     'to_table': toTable,
-    'to_column': toColumn,
+    'to_columns': toColumns,
+    if (toColumns.length == 1) 'to_column': toColumns.single,
   };
 
   @override
   bool operator ==(Object other) =>
       other is _SqlRelation &&
       fromTable == other.fromTable &&
-      fromColumn == other.fromColumn &&
       toTable == other.toTable &&
-      toColumn == other.toColumn;
+      _sameStrings(fromColumns, other.fromColumns) &&
+      _sameStrings(toColumns, other.toColumns);
 
   @override
-  int get hashCode => Object.hash(fromTable, fromColumn, toTable, toColumn);
+  int get hashCode => Object.hash(
+    fromTable,
+    Object.hashAll(fromColumns),
+    toTable,
+    Object.hashAll(toColumns),
+  );
+
+  static bool _sameStrings(List<String> left, List<String> right) {
+    if (left.length != right.length) return false;
+    for (var index = 0; index < left.length; index++) {
+      if (left[index] != right[index]) return false;
+    }
+    return true;
+  }
 }

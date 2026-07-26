@@ -5,6 +5,7 @@ import 'package:manaloom/core/utils/currency_formatter.dart';
 import 'package:manaloom/core/utils/friendly_error_mapper.dart';
 import 'package:manaloom/core/utils/mana_helper.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/core/widgets/mana_symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +18,9 @@ import '../models/deck_details.dart';
 
 class DeckAnalysisTab extends StatefulWidget {
   final DeckDetails deck;
+  final VoidCallback? onOpenBattleLab;
 
-  const DeckAnalysisTab({super.key, required this.deck});
+  const DeckAnalysisTab({super.key, required this.deck, this.onOpenBattleLab});
 
   @override
   State<DeckAnalysisTab> createState() => _DeckAnalysisTabState();
@@ -198,6 +200,20 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
             averageCmc: averageCmc,
             landCount: landCount,
           ),
+          if (widget.onOpenBattleLab != null) ...[
+            const SizedBox(height: AppTheme.space16),
+            _BattleLabLaunch(
+              deckName: effectiveDeck.name,
+              onOpen: widget.onOpenBattleLab!,
+            ),
+          ],
+          if (functionalAnalysis?.battleLearningEvidence != null) ...[
+            const SizedBox(height: AppTheme.space16),
+            _BattleEvidenceOverview(
+              evidence: functionalAnalysis!.battleLearningEvidence!,
+              onOpen: widget.onOpenBattleLab,
+            ),
+          ],
           const SizedBox(height: AppTheme.space16),
           _AnalysisActionBar(
             hasAnalysis: hasAiSummary,
@@ -520,6 +536,237 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         ),
       );
     }).toList();
+  }
+}
+
+class _BattleLabLaunch extends StatelessWidget {
+  const _BattleLabLaunch({required this.deckName, required this.onOpen});
+
+  final String deckName;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Semantics(
+      button: true,
+      label: 'Testar $deckName no Battle Lab',
+      hint: 'Abre o setup de confronto e o histórico de replays',
+      child: Material(
+        key: const Key('deck-analysis-battle-lab-entry'),
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onOpen,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space16,
+              vertical: AppTheme.space14,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: AppTheme.brass400.withValues(alpha: 0.62),
+                ),
+                bottom: BorderSide(
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compact = constraints.maxWidth < 620;
+                final copy = Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppTheme.brass400.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      ),
+                      child: const ManaLoomGlyph(
+                        ManaLoomGlyphKind.battleReplay,
+                        color: AppTheme.brass400,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.space12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Testar este deck',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: AppTheme.space4),
+                          Text(
+                            'Escolha um adversário, declare o objetivo e acompanhe as evidências do replay.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textSecondary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+                final action = FilledButton.icon(
+                  key: const Key('deck-analysis-open-battle-lab-button'),
+                  onPressed: onOpen,
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('Abrir Battle Lab'),
+                );
+
+                if (compact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      copy,
+                      const SizedBox(height: AppTheme.space12),
+                      action,
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(child: copy),
+                    const SizedBox(width: AppTheme.space16),
+                    action,
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BattleEvidenceOverview extends StatelessWidget {
+  const _BattleEvidenceOverview({required this.evidence, this.onOpen});
+
+  final DeckBattleLearningEvidence evidence;
+  final VoidCallback? onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final caveat = evidence.outcomeCaveat;
+    return Semantics(
+      container: true,
+      label: 'Evidências de confronto do deck',
+      child: Material(
+        key: const Key('deck-analysis-battle-evidence'),
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.52),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(color: AppTheme.frost400.withValues(alpha: 0.34)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ManaLoomGlyph(
+                    ManaLoomGlyphKind.battleReplay,
+                    color: AppTheme.frost400,
+                    size: 22,
+                  ),
+                  const SizedBox(width: AppTheme.space10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Evidências de confronto',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: AppTheme.space3),
+                        Text(
+                          evidence.reliableSampleLabel,
+                          key: const Key(
+                            'deck-analysis-battle-reliable-samples',
+                          ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.frost400,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (onOpen != null)
+                    TextButton(
+                      key: const Key('deck-analysis-view-battle-tests'),
+                      onPressed: onOpen,
+                      child: Text(
+                        evidence.latestReplayId == null
+                            ? 'Abrir testes'
+                            : 'Ver testes',
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.space10),
+              Text(
+                evidence.statusDetail,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: AppTheme.lineHeightCompact,
+                ),
+              ),
+              if (caveat != null) ...[
+                const SizedBox(height: AppTheme.space8),
+                Text(
+                  caveat,
+                  key: const Key('deck-analysis-battle-caveats'),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: AppTheme.warning,
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                evidence.positiveExposureBattleCount == 0
+                    ? 'Nenhuma exposição positiva foi observada nas amostras confiáveis.'
+                    : '${evidence.positiveExposureBattleCount} '
+                          '${evidence.positiveExposureBattleCount == 1 ? 'amostra registrou' : 'amostras registraram'} '
+                          'exposição positiva observável.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space6),
+              Text(
+                'Exposição não prova superioridade, valor da carta nem ausência de uso.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

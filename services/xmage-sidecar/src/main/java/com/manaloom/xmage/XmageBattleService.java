@@ -50,10 +50,16 @@ final class XmageBattleService {
 
     private final String host;
     private final int port;
+    private final BattleLiveRegistry liveRegistry;
 
     XmageBattleService(String host, int port) {
+        this(host, port, new BattleLiveRegistry());
+    }
+
+    XmageBattleService(String host, int port, BattleLiveRegistry liveRegistry) {
         this.host = host;
         this.port = port;
+        this.liveRegistry = liveRegistry;
     }
 
     void warmUp() {
@@ -139,12 +145,16 @@ final class XmageBattleService {
         BattleRequestContract contract = BattleRequestContract.parse(request, deckA, deckB);
         long timeoutMs = contract.timeoutMs;
         String requestId = contract.requestId;
+        liveRegistry.begin(requestId);
         TrackingMageClient client = new TrackingMageClient();
         Session session = new SessionImpl(client);
         UUID roomId = null;
         UUID tableId = null;
         long startedAt = System.currentTimeMillis();
         boolean timedOut = false;
+        int publishedViewCount = -1;
+        int publishedMessageCount = -1;
+        int publishedEventCount = 0;
 
         try {
             Connection connection = connection(requestId);
@@ -192,6 +202,21 @@ final class XmageBattleService {
                 if (lastView != null && lastView.getTurn() > 0) {
                     gameObserved = true;
                 }
+                List<GameView> liveViews = client.copyViews();
+                List<Map<String, Object>> liveMessages = client.copyMessages();
+                if (liveViews.size() != publishedViewCount
+                        || liveMessages.size() != publishedMessageCount) {
+                    publishedEventCount += publishLive(
+                            requestId,
+                            liveViews,
+                            liveMessages,
+                            Math.max(0, publishedViewCount),
+                            Math.max(0, publishedMessageCount),
+                            publishedEventCount
+                    );
+                    publishedViewCount = liveViews.size();
+                    publishedMessageCount = liveMessages.size();
+                }
                 if (shouldFinishBattle(
                         client.isGameOver(),
                         state == TableState.FINISHED,
@@ -210,13 +235,29 @@ final class XmageBattleService {
                 throw new TimeoutException("XMage battle exceeded " + timeoutMs + " ms");
             }
             Thread.sleep(250L);
-            return result(
+            List<GameView> finalViews = client.copyViews();
+            List<Map<String, Object>> finalMessages = client.copyMessages();
+            publishedEventCount += publishLive(
+                    requestId,
+                    finalViews,
+                    finalMessages,
+                    Math.max(0, publishedViewCount),
+                    Math.max(0, publishedMessageCount),
+                    publishedEventCount
+            );
+            Map<String, Object> result = result(
                     contract,
                     deckA,
                     deckB,
                     client,
                     System.currentTimeMillis() - startedAt
             );
+            liveRegistry.finish(
+                    requestId,
+                    String.valueOf(result.get("status")),
+                    "engine_" + String.valueOf(result.get("status"))
+            );
+            return result;
         } finally {
             if (!timedOut) {
                 if (roomId != null && tableId != null) {
@@ -231,6 +272,43 @@ final class XmageBattleService {
                 }
             }
         }
+    }
+
+    private int publishLive(
+            String requestId,
+            List<GameView> views,
+            List<Map<String, Object>> messages,
+            int publishedViewCount,
+            int publishedMessageCount,
+            int publishedEventCount
+    ) {
+        int viewStart = Math.min(Math.max(0, publishedViewCount), views.size());
+        int messageStart = Math.min(Math.max(0, publishedMessageCount), messages.size());
+        if (viewStart == views.size() && messageStart == messages.size()) {
+            return 0;
+        }
+
+        List<Map<String, Object>> newSnapshots = ReplayNormalizer.snapshots(
+                new ArrayList<>(views.subList(viewStart, views.size()))
+        );
+        for (int index = 0; index < newSnapshots.size(); index++) {
+            newSnapshots.get(index).put("index", viewStart + index);
+        }
+
+        int transitionStart = viewStart > 0 ? viewStart - 1 : 0;
+        List<Map<String, Object>> transitionSnapshots = ReplayNormalizer.snapshots(
+                new ArrayList<>(views.subList(transitionStart, views.size()))
+        );
+        List<Map<String, Object>> newMessages = new ArrayList<>(
+                messages.subList(messageStart, messages.size())
+        );
+        List<Map<String, Object>> events =
+                ReplayNormalizer.events(newMessages, transitionSnapshots);
+        for (int index = 0; index < events.size(); index++) {
+            events.get(index).put("live_event_index", publishedEventCount + index);
+        }
+        liveRegistry.publish(requestId, newSnapshots, events);
+        return events.size();
     }
 
     private Map<String, Object> result(

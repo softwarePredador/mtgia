@@ -172,6 +172,7 @@ void main() {
           result: const {
             'engine': 'xmage',
             'engine_commit': 'pinned-xmage-sha',
+            'test_objective': 'interaction',
             'seed': 42,
             'authorization': 'Bearer should-not-be-stored',
             'diagnostic': 'password=prod-secret',
@@ -232,6 +233,7 @@ void main() {
         final metrics =
             jsonDecode(parameters['metrics'] as String) as Map<String, dynamic>;
         expect(metrics['engine'], 'xmage');
+        expect(metrics['test_objective'], 'interaction');
         expect(metrics, isNot(contains('api_key')));
       },
     );

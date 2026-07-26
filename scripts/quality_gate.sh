@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-quick}"
 FLUTTER_TEST_TIMEOUT_SECONDS="${FLUTTER_TEST_TIMEOUT_SECONDS:-1200}"
+TEST_CONCURRENCY="${QUALITY_GATE_TEST_CONCURRENCY:-2}"
+BACKEND_TEST_BATCH_SIZE="${QUALITY_GATE_BACKEND_TEST_BATCH_SIZE:-8}"
 BACKEND_TEST_JWT_SECRET="${JWT_SECRET:-local_quality_gate_jwt_secret_not_for_production_20260706}"
 PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
 
@@ -53,7 +55,30 @@ run_backend_full() {
   print_header "Backend full checks"
   cd "$ROOT_DIR/server"
   echo "ℹ️ Perfil determinístico: tags live/live_backend/live_db_write/live_external ficam excluídas."
-  RUN_INTEGRATION_TESTS=0 JWT_SECRET="$BACKEND_TEST_JWT_SECRET" dart test -P all-local
+  local batch_start
+  local test_files=()
+  while IFS= read -r test_file; do
+    test_files+=("$test_file")
+  done < <(find test -type f -name '*_test.dart' -print | LC_ALL=C sort)
+  if [[ "${#test_files[@]}" -eq 0 ]]; then
+    echo "❌ Nenhum teste backend foi encontrado."
+    return 1
+  fi
+  for ((
+    batch_start = 0;
+    batch_start < ${#test_files[@]};
+    batch_start += BACKEND_TEST_BATCH_SIZE
+  )); do
+    local batch=(
+      "${test_files[@]:batch_start:BACKEND_TEST_BATCH_SIZE}"
+    )
+    echo "ℹ️ Backend batch $((batch_start / BACKEND_TEST_BATCH_SIZE + 1)): ${#batch[@]} arquivos."
+    RUN_INTEGRATION_TESTS=0 JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+      dart test \
+        --exclude-tags "live || live_backend || live_db_write || live_external || historical_external_snapshot" \
+        --concurrency="$TEST_CONCURRENCY" \
+        "${batch[@]}"
+  done
 }
 
 run_frontend_quick() {
@@ -73,7 +98,8 @@ run_flutter_tests_with_proof() {
   set +e
   perl -e 'alarm shift; exec @ARGV' \
     "$FLUTTER_TEST_TIMEOUT_SECONDS" \
-    "$FLUTTER_BIN" test --no-pub --no-version-check --reporter compact --timeout 2m \
+    "$FLUTTER_BIN" test --no-pub --no-version-check --reporter compact \
+      --concurrency="$TEST_CONCURRENCY" --timeout 2m \
     2>&1 | tee "$output_file"
   local pipeline_status=("${PIPESTATUS[@]}")
   status="${pipeline_status[0]}"
@@ -202,6 +228,40 @@ run_battle_product_gate() {
   "$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
 }
 
+run_battle_lab_gate() {
+  print_header "ManaLoom Battle Lab focused contracts"
+  (
+    cd "$ROOT_DIR/server"
+    RUN_INTEGRATION_TESTS=0 \
+      JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+      "$DART_BIN" test \
+        --exclude-tags "live || live_backend || live_db_write || live_external" \
+        --reporter compact \
+        test/battle_*_test.dart
+  )
+  (
+    cd "$ROOT_DIR/app"
+    "$FLUTTER_BIN" analyze \
+      lib/features/battle \
+      lib/features/decks/models/deck_analysis.dart \
+      lib/features/decks/widgets/deck_analysis_tab.dart \
+      lib/features/decks/screens/deck_details_screen.dart \
+      test/features/battle \
+      test/features/decks/models/deck_analysis_test.dart \
+      test/features/decks/widgets/deck_analysis_tab_test.dart \
+      --no-pub --no-version-check --no-fatal-infos
+    "$FLUTTER_BIN" test \
+      test/features/battle \
+      test/features/decks/models/deck_analysis_test.dart \
+      test/features/decks/widgets/deck_analysis_tab_test.dart \
+      --no-pub --no-version-check --reporter compact --timeout 2m
+  )
+  run_battle_product_gate
+  run_runtime_performance_contract
+  run_report_retention_audit
+  run_project_logic_docs
+}
+
 run_external_engine_delta_audit() {
   print_header "ManaLoom XMage/Forge upstream delta audit (read-only)"
   "$ROOT_DIR/scripts/manaloom_external_engine_delta_audit.sh"
@@ -233,6 +293,14 @@ ensure_cmd() {
 }
 
 ensure_prerequisites() {
+  if [[ ! "$TEST_CONCURRENCY" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ QUALITY_GATE_TEST_CONCURRENCY deve ser um inteiro positivo."
+    exit 2
+  fi
+  if [[ ! "$BACKEND_TEST_BATCH_SIZE" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ QUALITY_GATE_BACKEND_TEST_BATCH_SIZE deve ser um inteiro positivo."
+    exit 2
+  fi
   ensure_cmd "$DART_BIN"
   ensure_cmd "$FLUTTER_BIN"
   ensure_cmd perl
@@ -259,6 +327,7 @@ Uso:
   ./scripts/quality_gate.sh pg-contract # valida PG/Hermes/SQLite pelo wrapper do servidor novo
   ./scripts/quality_gate.sh deep-ai # tester profundo IA + dados + battle/deckbuilder
   ./scripts/quality_gate.sh battle # gate canônico battle: native, Forge, XMage, Python e Dart
+  ./scripts/quality_gate.sh battle-lab # Battle Lab: contratos focados, Battle, performance, retenção e drift
   ./scripts/quality_gate.sh engine-capabilities # uso, limites e evidencias XMage/Forge
   ./scripts/quality_gate.sh engine-delta # auditoria manual/read-only dos pins contra upstream oficial
   ./scripts/quality_gate.sh project-logic # manifesto, Mermaid, OpenAPI, ERD e drift documental
@@ -277,6 +346,8 @@ Dica:
   Use 'custom-lint' para bloquear regressões específicas do ManaLoom em Dart.
   Use 'patrol-smoke' para validar login, cadastro, paywall, planos, legal, upgrade e checkout no Patrol; exporte MANALOOM_RUN_PATROL_DEVICE_TESTS=1 para rodar no device/emulador.
   Use 'battle' para validar o contrato do produto battle sem chamar serviços live nem escrever em PostgreSQL/SQLite.
+  Use 'battle-lab' para o gate composto BL0–BL6; runtime Web/Android e
+  PostgreSQL mutante continuam gates explícitos separados.
   Use 'engine-capabilities' para bloquear drift de papeis, pins, licencas, imports e evidencias XMage/Forge.
   Use 'engine-delta' para consultar explicitamente o GitHub oficial e gerar JSON de revisão; nunca avança pins nem executa deploy/promoção.
   Use 'project-logic' para bloquear drift entre código, rotas, migrations, manifesto e documentação gerada.
@@ -299,6 +370,7 @@ Exemplos:
   ./scripts/quality_gate.sh pg-contract
   ./scripts/quality_gate.sh deep-ai
   ./scripts/quality_gate.sh battle
+  ./scripts/quality_gate.sh battle-lab
   ./scripts/quality_gate.sh engine-capabilities
   ./scripts/quality_gate.sh engine-delta
   ./scripts/quality_gate.sh project-logic
@@ -364,6 +436,9 @@ main() {
       ;;
     battle)
       run_battle_product_gate
+      ;;
+    battle-lab)
+      run_battle_lab_gate
       ;;
     engine-capabilities)
       run_external_engine_capability_audit

@@ -93,6 +93,52 @@ def _configure_runtime_limits(payload: dict[str, Any]) -> int:
     return max_turns
 
 
+def _native_replay_event(
+    event: str,
+    data: dict[str, Any],
+    *,
+    deck_a_player: str,
+    deck_b_player: str,
+) -> dict[str, Any]:
+    row = {"event_type": event, **dict(data)}
+    explicit = str(row.get("subject_deck_key") or "").strip().lower()
+    if explicit in {"deck_a", "deck_b"}:
+        subject = explicit
+    else:
+        actor = next(
+            (
+                str(row.get(field)).strip()
+                for field in (
+                    "actor",
+                    "player",
+                    "source_player",
+                    "controller",
+                    "active_player",
+                )
+                if row.get(field) is not None and str(row.get(field)).strip()
+            ),
+            "",
+        )
+        normalized_actor = actor.casefold()
+        aliases_a = {"deck_a", "deck a", deck_a_player.casefold()}
+        aliases_b = {"deck_b", "deck b", deck_b_player.casefold()}
+        matches_a = normalized_actor in aliases_a
+        matches_b = normalized_actor in aliases_b
+        subject = (
+            "deck_a"
+            if matches_a and not matches_b
+            else "deck_b"
+            if matches_b and not matches_a
+            else ""
+        )
+        if actor:
+            row["actor"] = actor
+    if subject:
+        row["actor_side"] = subject
+        row["subject_deck_key"] = subject
+    return row
+
+
 def simulate(payload: dict[str, Any]) -> dict[str, Any]:
     started = time.monotonic()
     db_path = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", battle.DB))
@@ -111,12 +157,17 @@ def simulate(payload: dict[str, Any]) -> dict[str, Any]:
     previous_event_handler = battle.REPLAY_EVENT_HANDLER
     previous_decision_handler = battle.DECISION_TRACE_HANDLER
     previous_target = os.environ.get(battle.EVALUATION_TARGET_ENV)
+    deck_a_player = battle.target_player_name_for_commander(commander_a)
+    deck_b_player = battle.target_player_name_for_commander(commander_b)
     try:
-        os.environ[battle.EVALUATION_TARGET_ENV] = battle.target_player_name_for_commander(
-            commander_a
-        )
+        os.environ[battle.EVALUATION_TARGET_ENV] = deck_a_player
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append(
-            {"event_type": event, **dict(data)}
+            _native_replay_event(
+                event,
+                dict(data),
+                deck_a_player=deck_a_player,
+                deck_b_player=deck_b_player,
+            )
         )
         battle.DECISION_TRACE_HANDLER = lambda row: decisions.append(dict(row))
         battle.reset_decision_trace_counter()

@@ -701,7 +701,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           onShowCardDetails: (card) =>
                               _showCardDetails(context, card),
                         ),
-                        DeckAnalysisTab(deck: deck),
+                        DeckAnalysisTab(
+                          deck: deck,
+                          onOpenBattleLab: _openBattleReplays,
+                        ),
                       ],
                     ),
                   ),

@@ -1,3 +1,5 @@
+import 'battle_replay_event_support.dart';
+
 const battlePositiveEvidenceSchema = 'battle_positive_evidence_v1';
 const externalBattleLearningSchema = 'external_battle_learning_v1';
 const nativeBattleLearningSchema = 'native_battle_learning_v1';
@@ -40,7 +42,7 @@ const _nonExecutionEventTokens = <String>{
   'waiting',
 };
 
-const _typedEventFields = <String>['event_type', 'action'];
+const _typedEventFields = <String>['event_type', 'type', 'action'];
 
 const _cardNameFields = <String>[
   'source_card_name',
@@ -59,10 +61,18 @@ const _cardNameFields = <String>[
 /// exposure, but it cannot prove strategy or swap superiority.
 Map<String, dynamic> buildBattleLearningEvidence(
   Map<String, dynamic> result, {
+  String subjectDeckKey = 'deck_a',
   List<String> focusCards = const [],
   bool sameLane = false,
   bool naturalSample = true,
 }) {
+  if (!const {'deck_a', 'deck_b'}.contains(subjectDeckKey)) {
+    throw ArgumentError.value(
+      subjectDeckKey,
+      'subjectDeckKey',
+      'must be deck_a or deck_b',
+    );
+  }
   final contract = _learningContract(result);
   final learningSchema = contract['schema_version']?.toString();
   final contractValid =
@@ -75,8 +85,19 @@ Map<String, dynamic> buildBattleLearningEvidence(
   final eventCounts = <String, int>{};
   final ignoredEventCounts = <String, int>{};
   var typedPositiveEventCount = 0;
+  var ignoredUnattributedEventCount = 0;
+  var ignoredOtherSubjectEventCount = 0;
 
   for (final event in _events(result)) {
+    final eventSubject = event['subject_deck_key']?.toString();
+    if (eventSubject == null || eventSubject.isEmpty) {
+      ignoredUnattributedEventCount++;
+      continue;
+    }
+    if (eventSubject != subjectDeckKey) {
+      ignoredOtherSubjectEventCount++;
+      continue;
+    }
     final eventType = _typedEventType(event);
     if (!_isTypedPositiveAction(eventType)) {
       final diagnosticType = _eventType(event);
@@ -136,6 +157,8 @@ Map<String, dynamic> buildBattleLearningEvidence(
   );
   return {
     'schema_version': battlePositiveEvidenceSchema,
+    'event_schema_version': battleReplayEventSchema,
+    'subject_deck_key': subjectDeckKey,
     'completed': completed,
     'learning_contract_valid': contractValid,
     'learning_contract_schema': learningSchema,
@@ -144,6 +167,8 @@ Map<String, dynamic> buildBattleLearningEvidence(
     'positive_evidence_basis': 'typed_event',
     'typed_positive_event_count': typedPositiveEventCount,
     'event_counts': sortedEventCounts,
+    'ignored_unattributed_event_count': ignoredUnattributedEventCount,
+    'ignored_other_subject_event_count': ignoredOtherSubjectEventCount,
     'ignored_untyped_or_nonexecution_event_counts': sortedIgnoredEventCounts,
     'exposed_card_names_normalized': exposedNames,
     'focus_cards': focusRows,

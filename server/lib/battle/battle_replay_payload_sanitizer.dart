@@ -30,6 +30,10 @@ Map<String, dynamic> sanitizeBattleReplayForStorage(
   return sanitized;
 }
 
+Map<String, dynamic> sanitizeBattleReplayMetadata(
+  Map<String, dynamic> payload,
+) => _sanitizeMap(payload, depth: 0, ancestors: HashSet<Object>.identity());
+
 Object sanitizePersistedBattleReplay(Object? payload) {
   final decoded = _decodePersistedJson(payload);
   if (decoded is! Map && decoded is! List) {

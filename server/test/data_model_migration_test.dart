@@ -860,5 +860,88 @@ void main() {
         migrate.MigrationRollbackPolicy.manualOnly,
       );
     });
+
+    test('migration 052 versions durable Battle attempts and outcomes', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '052',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('version_battle_simulation_attempts'));
+      for (final source in [up, bootstrap]) {
+        expect(
+          source,
+          contains('create table if not exists battle_simulation_attempts'),
+        );
+        for (final column in const [
+          'outcome',
+          'replay_id',
+          'test_objective',
+          'request_hash',
+          'deck_a_hash',
+          'deck_b_hash',
+          'engine_process_id',
+          'events_truncated',
+          'snapshots_truncated',
+        ]) {
+          expect(source, contains(column), reason: column);
+        }
+        expect(source, contains('chk_battle_attempt_test_objective'));
+        for (final outcome in const [
+          'completed',
+          'censored',
+          'timeout',
+          'coverage_error',
+          'engine_error',
+          'cancelled',
+          'persistence_error',
+        ]) {
+          expect(source, contains("'$outcome'"), reason: outcome);
+        }
+      }
+      expect(up, isNot(contains('insert into battle_simulation_attempts')));
+      expect(up, isNot(contains("else 'completed'")));
+      expect(up, contains('historical replays stay readable'));
+      expect(
+        migrate.migrationRollbackPolicy('052'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
+
+    test('migration 053 persists owner-scoped immutable replay notes', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '053',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('create_battle_replay_annotations'));
+      for (final source in [up, bootstrap]) {
+        expect(
+          source,
+          contains('create table if not exists battle_replay_annotations'),
+        );
+        expect(source, contains('fk_battle_annotation_attempt_replay'));
+        expect(source, contains('subject_deck_revision'));
+        expect(source, contains('idempotency_key'));
+        expect(source, contains('request_fingerprint'));
+        expect(source, contains('chk_battle_annotation_kind_refs'));
+        expect(source, contains('chk_battle_annotation_payload_shape'));
+        expect(source, contains("'would_do_differently'"));
+        expect(source, contains("'mulligan_decision'"));
+        expect(source, contains("'helpful_feedback'"));
+        expect(source, contains("'event_report'"));
+        expect(source, contains('uq_battle_annotation_reflection'));
+        expect(source, contains('uq_battle_annotation_mulligan'));
+        expect(source, contains('uq_battle_annotation_helpful'));
+      }
+      expect(
+        migrate.migrationRollbackPolicy('053'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
   });
 }

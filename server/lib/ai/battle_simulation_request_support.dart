@@ -7,6 +7,7 @@ class BattleSimulationRequestData {
     required this.seed,
     required this.timeoutMs,
     required this.maxTurns,
+    required this.testObjective,
     required this.focusCards,
     required this.forceFocusAccessMode,
     required this.sameLane,
@@ -21,6 +22,7 @@ class BattleSimulationRequestData {
   final int? seed;
   final int timeoutMs;
   final int maxTurns;
+  final String testObjective;
   final List<String> focusCards;
   final String forceFocusAccessMode;
   final bool sameLane;
@@ -90,6 +92,27 @@ BattleSimulationRequestData parseBattleSimulationRequest(
   }
 
   final focusCards = _readFocusCards(body['focus_cards'], report: report);
+  final testObjective =
+      _readString(
+        body['test_objective'],
+        key: 'test_objective',
+        maxLength: 32,
+        report: report,
+      )?.toLowerCase() ??
+      'general';
+  if (!const {
+    'general',
+    'commander',
+    'mana_curve',
+    'interaction',
+    'combo',
+    'focus_cards',
+  }.contains(testObjective)) {
+    report(
+      'test_objective must be general, commander, mana_curve, '
+      'interaction, combo or focus_cards',
+    );
+  }
   final forceFocusAccessMode =
       _readString(
         body['force_focus_access_mode'],
@@ -127,6 +150,7 @@ BattleSimulationRequestData parseBattleSimulationRequest(
     seed: seed,
     timeoutMs: timeoutMs,
     maxTurns: maxTurns,
+    testObjective: testObjective,
     focusCards: focusCards,
     forceFocusAccessMode: forceFocusAccessMode,
     sameLane: sameLane,

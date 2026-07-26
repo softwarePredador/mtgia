@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../lib/battle/battle_job_metrics_service.dart';
 import '../../../lib/commercial_metrics_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/operational_alerts.dart';
@@ -21,6 +22,7 @@ Future<Response> onRequest(RequestContext context) async {
     final aiCost = await _loadAiCostProxy(pool);
     final aiOptimize = await _loadAiOptimizeOverview(pool);
     final aiJobs = await _loadAiJobOverview(pool);
+    final battleJobs = await BattleJobMetricsService(pool).snapshot();
     final aiHistory = await commercialMetrics.aiPerformanceHistory(
       days: 30,
       bucket: 'day',
@@ -42,6 +44,7 @@ Future<Response> onRequest(RequestContext context) async {
           'ai_cost_proxy': aiCost,
           'ai_optimize': aiOptimize,
           'ai_jobs': aiJobs,
+          'battle_jobs': battleJobs,
           'operational_alerts': operationalAlerts,
           'ai_history': aiHistory,
           'commercial': commercial,

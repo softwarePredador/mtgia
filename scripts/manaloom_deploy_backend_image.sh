@@ -704,7 +704,7 @@ SQL
   fi
 }
 
-require_migrations_041_051_contract() {
+require_migrations_041_055_contract() {
   local contract_status
   contract_status="$(
     "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
@@ -722,7 +722,11 @@ WITH required_migrations(version, name) AS (
     ('048', 'close_ai_job_lifecycle'),
     ('049', 'preserve_binder_physical_identity'),
     ('050', 'canonicalize_pricing_provenance'),
-    ('051', 'close_social_safety_contract')
+    ('051', 'close_social_safety_contract'),
+    ('052', 'version_battle_simulation_attempts'),
+    ('053', 'create_battle_replay_annotations'),
+    ('054', 'create_battle_jobs'),
+    ('055', 'create_battle_job_live_records')
 ), checks(check_name, ok) AS (
   VALUES
     (
@@ -732,7 +736,7 @@ WITH required_migrations(version, name) AS (
     (
       'required_migrations_registered',
       (
-        SELECT COUNT(*) = 11
+        SELECT COUNT(*) = 15
         FROM required_migrations required
         JOIN public.schema_migrations actual
           ON actual.version = required.version
@@ -740,11 +744,11 @@ WITH required_migrations(version, name) AS (
       )
     ),
     (
-      'latest_migration_051',
+      'latest_migration_055',
       COALESCE(
         (SELECT MAX(version) FROM public.schema_migrations),
         ''
-      ) = '051'
+      ) = '055'
     )
 ), missing AS (
   SELECT check_name
@@ -752,8 +756,8 @@ WITH required_migrations(version, name) AS (
   WHERE NOT ok
 )
 SELECT CASE
-  WHEN COUNT(*) = 0 THEN 'migrations_041_051_ready'
-  ELSE 'migrations_041_051_incomplete:' ||
+  WHEN COUNT(*) = 0 THEN 'migrations_041_055_ready'
+  ELSE 'migrations_041_055_incomplete:' ||
        string_agg(check_name, ',' ORDER BY check_name)
 END
 FROM missing;
@@ -761,8 +765,8 @@ ROLLBACK;
 SQL
   )"
 
-  if [[ "$contract_status" != "migrations_041_051_ready" ]]; then
-    echo "deploy recusado: contrato read-only das migrations 041-051 incompleto: $contract_status" >&2
+  if [[ "$contract_status" != "migrations_041_055_ready" ]]; then
+    echo "deploy recusado: contrato read-only das migrations 041-055 incompleto: $contract_status" >&2
     exit 2
   fi
 }
@@ -909,7 +913,7 @@ require_clean_worktree
 require_migration_038_contract
 require_migration_039_contract
 require_migration_040_contract
-require_migrations_041_051_contract
+require_migrations_041_055_contract
 
 drain_timeout_seconds="${MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS:-300}"
 if ! [[ "$drain_timeout_seconds" =~ ^[0-9]+$ ]]; then
@@ -1128,6 +1132,7 @@ docker service update \
   --env-add SENTRY_DSN='$SENTRY_DSN' \
   --env-add SENTRY_ENVIRONMENT=production \
   --env-add SENTRY_RELEASE='manaloom-backend@$short_sha' \
+  --env-add BATTLE_JOB_WORKER_ENABLED=true \
   '$SERVICE'
 
 for attempt in \$(seq 1 45); do
@@ -1217,6 +1222,7 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     /^XMAGE_SIDECAR_URL=/{xmage=\$2}
     /^FORGE_SIDECAR_URL=/{forge=\$2}
     /^NATIVE_BATTLE_SIDECAR_URL=/{native=\$2}
+    /^BATTLE_JOB_WORKER_ENABLED=/{battle_worker=\$2}
     /^ENVIRONMENT=/{environment=\$2}
     /^OPENAI_PROFILE=/{profile=\$2}
     /^OPENAI_API_KEY=/{openai=(length(substr(\$0,index(\$0,\"=\")+1))>0 ? 1 : 0)}
@@ -1228,9 +1234,9 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     }
     /^MANALOOM_TRUSTED_PROXY_HOPS=/{proxy_hops_count++; proxy_hops=substr(\$0,index(\$0,\"=\")+1)}
     /^MANALOOM_TRUSTED_PROXY_PEERS=/{proxy_peers_count++; proxy_peers=substr(\$0,index(\$0,\"=\")+1)}
-    END{print sha \"|\" host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native \"|\" environment \"|\" profile \"|\" openai \"|\" ops \"|\" jwt \"|\" proxy_hops_count \"|\" proxy_hops \"|\" proxy_peers_count \"|\" proxy_peers}'
+    END{print sha \"|\" host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native \"|\" battle_worker \"|\" environment \"|\" profile \"|\" openai \"|\" ops \"|\" jwt \"|\" proxy_hops_count \"|\" proxy_hops \"|\" proxy_peers_count \"|\" proxy_peers}'
 ")"
-IFS='|' read -r runtime_sha runtime_db_host runtime_db_port runtime_db_name runtime_battle_engine runtime_xmage_url runtime_forge_url runtime_native_url runtime_environment runtime_openai_profile runtime_openai_configured runtime_ops_configured runtime_jwt_configured runtime_proxy_hops_count runtime_proxy_hops runtime_proxy_peers_count runtime_proxy_peers <<<"$runtime_contract"
+IFS='|' read -r runtime_sha runtime_db_host runtime_db_port runtime_db_name runtime_battle_engine runtime_xmage_url runtime_forge_url runtime_native_url runtime_battle_worker runtime_environment runtime_openai_profile runtime_openai_configured runtime_ops_configured runtime_jwt_configured runtime_proxy_hops_count runtime_proxy_hops runtime_proxy_peers_count runtime_proxy_peers <<<"$runtime_contract"
 runtime_allowed_origins_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -1257,6 +1263,7 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
 ")"
 if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_battle_engine|$runtime_xmage_url|$runtime_forge_url|$runtime_native_url" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|$EXPECTED_BATTLE_ENGINE|$EXPECTED_XMAGE_URL|$EXPECTED_FORGE_URL|$EXPECTED_NATIVE_URL" ||
       "$runtime_environment" != "production" ||
+      "$runtime_battle_worker" != "true" ||
       ( -n "$runtime_openai_profile" && "$runtime_openai_profile" != "prod" ) ||
       "$runtime_openai_configured" != "1" ||
       "$runtime_ops_configured" != "1" ||
@@ -1284,8 +1291,11 @@ for attempt in $(seq 1 "$readiness_attempts"); do
        .status == "ready" and
        .environment == "production" and
        .checks.release_schema.status == "healthy" and
-       .checks.release_schema.required_range == "038-051" and
-       .checks.release_schema.latest_migration == "051" and
+       .checks.release_schema.required_range == "038-055" and
+       .checks.release_schema.latest_migration == "055" and
+       .checks.battle_job_schema.status == "healthy" and
+       (.checks.battle_live_spectator.status == "disabled" or
+        .checks.battle_live_spectator.status == "ready") and
        .checks.ai_runtime.status == "healthy" and
        .checks.ai_runtime.provider_configured == true and
        .checks.ai_runtime.mock_fallbacks_allowed == false and

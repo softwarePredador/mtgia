@@ -19,6 +19,35 @@ const _identity = ExternalBattleEngineIdentity(
 );
 
 void main() {
+  test('checks Forge deck coverage without starting a battle', () async {
+    final client = ForgeBattleClient(
+      baseUrl: 'http://forge.internal:8080/',
+      expectedIdentity: _identity,
+      client: MockClient((request) async {
+        expect(request.url.toString(), 'http://forge.internal:8080/coverage');
+        return http.Response(
+          jsonEncode({
+            'status': 'ready',
+            'ready': true,
+            'engine': 'forge',
+            'engine_version': pinnedForgeVersion,
+            'engine_commit': pinnedForgeCommit,
+            'unsupported_cards': const <dynamic>[],
+          }),
+          200,
+        );
+      }),
+    );
+
+    final result = await client.coverage({
+      'deck_a': const <String, dynamic>{},
+      'deck_b': const <String, dynamic>{},
+    });
+
+    expect(result['ready'], isTrue);
+    client.close();
+  });
+
   test('returns a successful Forge battle payload', () async {
     final client = ForgeBattleClient(
       baseUrl: 'http://forge.internal:8080/',

@@ -46,6 +46,47 @@ class XmageBattleClient {
 
   void close() => _client.close();
 
+  Future<Map<String, dynamic>> coverage(Map<String, dynamic> request) async {
+    late http.Response response;
+    try {
+      response = await _client
+          .post(
+            _baseUri.resolve('/coverage'),
+            headers: const {'content-type': 'application/json'},
+            body: jsonEncode(request),
+          )
+          .timeout(_timeout);
+    } on TimeoutException {
+      throw XmageServiceException(
+        'XMage coverage check exceeded ${_timeout.inSeconds} seconds',
+        statusCode: 504,
+      );
+    } on http.ClientException catch (error) {
+      throw XmageServiceException(
+        'XMage coverage request failed: ${error.message}',
+      );
+    }
+
+    final body = _decodeBody(response);
+    _validateCoverageIdentity(body);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw XmageServiceException(
+        body['message']?.toString() ??
+            body['error']?.toString() ??
+            'XMage returned an invalid coverage response',
+        statusCode: response.statusCode,
+      );
+    }
+    if (body['ready'] is! bool ||
+        !const {'ready', 'unsupported'}.contains(body['status'])) {
+      throw XmageServiceException(
+        'XMage returned an invalid coverage payload',
+        statusCode: 502,
+      );
+    }
+    return body;
+  }
+
   Future<Map<String, dynamic>> simulate(Map<String, dynamic> request) async {
     late http.Response response;
     try {
@@ -141,6 +182,17 @@ class XmageBattleClient {
     if (identityError != null) {
       throw XmageServiceException(
         'XMage sidecar identity rejected: $identityError',
+        statusCode: 502,
+      );
+    }
+  }
+
+  void _validateCoverageIdentity(Map<String, dynamic> body) {
+    if (body['engine'] != _expectedIdentity.engine ||
+        body['engine_version'] != _expectedIdentity.version ||
+        body['engine_commit'] != _expectedIdentity.commit) {
+      throw XmageServiceException(
+        'XMage coverage identity rejected',
         statusCode: 502,
       );
     }

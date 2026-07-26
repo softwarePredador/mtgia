@@ -57,7 +57,9 @@ public final class SidecarMain {
         String xmageHost = env("XMAGE_SERVER_HOST", "127.0.0.1");
         int xmagePort = envInt("XMAGE_SERVER_PORT", 17171);
         int httpPort = envInt("PORT", 8080);
-        XmageBattleService battleService = new XmageBattleService(xmageHost, xmagePort);
+        BattleLiveRegistry liveRegistry = new BattleLiveRegistry();
+        XmageBattleService battleService =
+                new XmageBattleService(xmageHost, xmagePort, liveRegistry);
         battleService.warmUp();
 
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", httpPort), 32);
@@ -75,17 +77,26 @@ public final class SidecarMain {
             body.put("xmage_port", xmagePort);
             body.put("catalog_ready", true);
             body.put("indexed_names", battleService.catalogSize());
+            body.put("battle_live", liveRegistry.metrics());
             send(exchange, 200, body);
         });
         server.createContext("/cards/coverage", exchange -> handleCardCoverage(exchange, battleService));
         server.createContext("/coverage", exchange -> handleCoverage(exchange, battleService));
-        server.createContext("/simulate", exchange -> handleSimulation(exchange, battleService));
+        server.createContext(
+                "/simulate",
+                exchange -> handleSimulation(exchange, battleService, liveRegistry)
+        );
+        server.createContext("/live/", exchange -> handleLive(exchange, liveRegistry));
         server.setExecutor(Executors.newFixedThreadPool(4));
         server.start();
         System.out.println("ManaLoom XMage sidecar listening on port " + httpPort);
     }
 
-    private static void handleSimulation(HttpExchange exchange, XmageBattleService battleService)
+    private static void handleSimulation(
+            HttpExchange exchange,
+            XmageBattleService battleService,
+            BattleLiveRegistry liveRegistry
+    )
             throws IOException {
         if (!"POST".equals(exchange.getRequestMethod())) {
             send(exchange, 405, singleton("error", "method_not_allowed"));
@@ -107,13 +118,16 @@ public final class SidecarMain {
             }
             send(exchange, 200, result);
         } catch (XmageBattleService.UnsupportedCardsException error) {
+            finishLive(liveRegistry, request, "coverage_error", "xmage_coverage_incomplete");
             Map<String, Object> body = errorBody("xmage_coverage_incomplete", error.getMessage());
             body.put("unsupported_cards", error.getUnsupportedCards());
             body.putAll(requestMetadata(battleService, request, "coverage_incomplete"));
             send(exchange, 422, body);
         } catch (IllegalArgumentException error) {
+            finishLive(liveRegistry, request, "engine_error", "invalid_request");
             send(exchange, 400, errorBody("invalid_request", error.getMessage()));
         } catch (TimeoutException error) {
+            finishLive(liveRegistry, request, "timeout", "simulation_timeout");
             if (simulation != null) {
                 simulation.cancel(true);
             }
@@ -126,11 +140,94 @@ public final class SidecarMain {
                 restartAfterTimeout();
             }
         } catch (Exception error) {
+            finishLive(liveRegistry, request, "engine_error", "simulation_failed");
             error.printStackTrace(System.err);
             Map<String, Object> body = errorBody("simulation_failed", error.getMessage());
             body.putAll(requestMetadata(battleService, request, "failed"));
             send(exchange, 500, body);
         }
+    }
+
+    private static void handleLive(
+            HttpExchange exchange,
+            BattleLiveRegistry liveRegistry
+    ) throws IOException {
+        exchange.getResponseHeaders().set("Cache-Control", "no-store");
+        exchange.getResponseHeaders().set("X-Content-Type-Options", "nosniff");
+        if (!"GET".equals(exchange.getRequestMethod())) {
+            send(exchange, 405, singleton("error", "method_not_allowed"));
+            return;
+        }
+        String path = exchange.getRequestURI().getPath();
+        String requestId = path.startsWith("/live/") ? path.substring("/live/".length()) : "";
+        if (!BattleLiveRegistry.isRequestId(requestId)) {
+            send(exchange, 404, singleton("error", "live_stream_not_found"));
+            return;
+        }
+        int afterSequence = -1;
+        int limit = 200;
+        try {
+            Map<String, String> query = parseLiveQuery(exchange.getRequestURI().getRawQuery());
+            if (query.containsKey("after")) {
+                afterSequence = Integer.parseInt(query.get("after"));
+            }
+            if (query.containsKey("limit")) {
+                limit = Integer.parseInt(query.get("limit"));
+            }
+        } catch (IllegalArgumentException error) {
+            send(exchange, 400, singleton("error", "invalid_live_page"));
+            return;
+        }
+        Map<String, Object> body;
+        try {
+            body = liveRegistry.read(requestId, afterSequence, limit);
+        } catch (IllegalArgumentException error) {
+            send(exchange, 400, singleton("error", "invalid_live_page"));
+            return;
+        }
+        if (body == null) {
+            send(exchange, 404, singleton("error", "live_stream_not_found"));
+            return;
+        }
+        send(exchange, 200, body);
+    }
+
+    private static Map<String, String> parseLiveQuery(String rawQuery) {
+        Map<String, String> result = new LinkedHashMap<>();
+        if (rawQuery == null || rawQuery.isEmpty()) {
+            return result;
+        }
+        for (String part : rawQuery.split("&")) {
+            int separator = part.indexOf('=');
+            if (separator <= 0 || separator == part.length() - 1) {
+                throw new IllegalArgumentException("invalid Live query");
+            }
+            String key = part.substring(0, separator);
+            String value = part.substring(separator + 1);
+            if (!"after".equals(key) && !"limit".equals(key)) {
+                throw new IllegalArgumentException("unknown Live query");
+            }
+            if (result.put(key, value) != null) {
+                throw new IllegalArgumentException("duplicate Live query");
+            }
+        }
+        return result;
+    }
+
+    private static void finishLive(
+            BattleLiveRegistry liveRegistry,
+            JsonObject request,
+            String status,
+            String reason
+    ) {
+        if (request == null
+                || !request.has("request_id")
+                || request.get("request_id").isJsonNull()
+                || !request.get("request_id").isJsonPrimitive()
+                || !request.get("request_id").getAsJsonPrimitive().isString()) {
+            return;
+        }
+        liveRegistry.finish(request.get("request_id").getAsString(), status, reason);
     }
 
     static long simulationTimeoutMillis(JsonObject request) {

@@ -36,6 +36,7 @@ import 'features/decks/screens/deck_import_screen.dart';
 import 'features/cards/providers/card_provider.dart';
 import 'features/cards/screens/card_search_screen.dart';
 import 'features/cards/screens/card_detail_screen.dart';
+import 'features/battle/screens/battle_live_spectator_screen.dart';
 import 'features/battle/screens/battle_replays_screen.dart';
 import 'features/market/providers/market_provider.dart';
 import 'features/profile/profile_screen.dart';
@@ -548,6 +549,14 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                       path: 'battle-replays',
                       builder: (context, state) => BattleReplaysScreen(
                         deckId: state.pathParameters['id']!,
+                        initialReplayId: state.uri.queryParameters['replay'],
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'battle-live/:jobId',
+                      builder: (context, state) => BattleLiveSpectatorScreen(
+                        deckId: state.pathParameters['id']!,
+                        jobId: state.pathParameters['jobId']!,
                       ),
                     ),
                   ],

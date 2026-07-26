@@ -1,25 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/battle/models/battle_replay.dart';
+import 'package:manaloom/features/battle/models/battle_replay_annotation.dart';
+import 'package:manaloom/features/battle/models/battle_test_setup.dart';
 import 'package:manaloom/features/battle/screens/battle_replays_screen.dart';
 import 'package:manaloom/features/battle/services/battle_replay_service.dart';
 
 class _FakeBattleReplayGateway implements BattleReplayGateway {
   _FakeBattleReplayGateway({
     this.battleError,
+    this.replayListErrorOnFirstCall,
     this.replayListErrorAfterFirstCall,
-  });
+    this.replays,
+    this.moreReplays,
+    this.replayDetail,
+    List<BattleReplayAnnotation> annotations = const [],
+    this.preflight = const BattlePreflight(
+      status: 'ready',
+      cardCount: 100,
+      commanderCount: 1,
+      validationState: 'validated',
+      availableOpponentCount: 2,
+      engineCoverage: {'xmage': 'ready'},
+      blockers: [],
+    ),
+  }) : _annotations = List<BattleReplayAnnotation>.of(annotations);
 
   final Object? battleError;
+  final Object? replayListErrorOnFirstCall;
   final Object? replayListErrorAfterFirstCall;
+  final List<BattleReplaySummary>? replays;
+  final List<BattleReplaySummary>? moreReplays;
+  final BattleReplayDetail? replayDetail;
+  final BattlePreflight preflight;
+  final List<BattleReplayAnnotation> _annotations;
   int listCalls = 0;
   int fetchCalls = 0;
   int opponentListCalls = 0;
+  int preflightCalls = 0;
   int runBattleCalls = 0;
   String? lastOpponentDeckId;
+  BattleTestSetup? lastSetup;
+  BattleReplayAnnotationDraft? lastAnnotationDraft;
 
   @override
   Future<List<BattleOpponentDeck>> listOpponentDecks({
@@ -50,19 +76,49 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   @override
   Future<List<BattleReplaySummary>> listReplays(String deckId) async {
     listCalls += 1;
+    final initialError = replayListErrorOnFirstCall;
+    if (listCalls == 1 && initialError != null) throw initialError;
     final refreshError = replayListErrorAfterFirstCall;
     if (listCalls > 1 && refreshError != null) throw refreshError;
-    return [
-      BattleReplaySummary.fromJson(const {
-        'id': 'sim-1',
-        'deck_id': 'deck-1',
-        'type': 'battle',
-        'opponent_name': 'Atraxa Superfriends',
-        'winner_name': 'Player A',
-        'turns_played': 5,
-        'event_count': 2,
-      }, fallbackDeckId: deckId),
-    ];
+    return replays ??
+        [
+          BattleReplaySummary.fromJson(const {
+            'id': 'sim-1',
+            'deck_id': 'deck-1',
+            'type': 'battle',
+            'opponent_name': 'Atraxa Superfriends',
+            'winner_name': 'Player A',
+            'turns_played': 5,
+            'event_count': 2,
+          }, fallbackDeckId: deckId),
+        ];
+  }
+
+  @override
+  Future<BattleReplayPageResult> listReplayPage(
+    String deckId, {
+    String? cursor,
+    int limit = 30,
+  }) async {
+    if (cursor == null) {
+      final items = await listReplays(deckId);
+      return BattleReplayPageResult(
+        items: items,
+        hasMore: moreReplays != null,
+        nextCursor: moreReplays == null ? null : 'cursor_one',
+      );
+    }
+    listCalls += 1;
+    final refreshError = replayListErrorAfterFirstCall;
+    if (refreshError != null) throw refreshError;
+    if (cursor != 'cursor_one' || moreReplays == null) {
+      throw const BattleReplayException('Cursor de teste inválido.');
+    }
+    return BattleReplayPageResult(
+      items: moreReplays!,
+      hasMore: false,
+      nextCursor: null,
+    );
   }
 
   @override
@@ -71,12 +127,19 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     required String replayId,
   }) async {
     fetchCalls += 1;
+    final providedDetail = replayDetail;
+    if (providedDetail != null) return providedDetail;
     return BattleReplayDetail.fromJson(
       {
         'replay': {
           'id': replayId,
           'deck_id': deckId,
           'type': 'battle',
+          'engine': 'manaloom_native_reviewed',
+          'learning_contract': const {
+            'schema_version': 'native_battle_learning_v1',
+            'decision_trace_available': true,
+          },
           'opponent_name': 'Atraxa Superfriends',
           'winner_name': 'Player A',
           'turns': 5,
@@ -145,12 +208,107 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
                 },
               ],
             },
+            {
+              'turn': 2,
+              'phase': 'combat',
+              'step': 'declare_attackers',
+              'action': 'attacks',
+              'active_player': 'Player A',
+              'priority_player': 'Player B',
+              'event': {
+                'turn': 2,
+                'player': 'Player A',
+                'phase': 'combat',
+                'action': 'attacks',
+                'card': 'Serra Angel',
+              },
+              'stack': [
+                {'name': 'Combat Trick'},
+              ],
+              'combat': [
+                {
+                  'defender_name': 'Player B',
+                  'attackers': [
+                    {'name': 'Serra Angel'},
+                  ],
+                  'blockers': <Map<String, dynamic>>[],
+                },
+              ],
+              'players': [
+                {
+                  'name': 'Player A',
+                  'life': 40,
+                  'mana': 0,
+                  'hand_size': 5,
+                  'battlefield': [
+                    {'name': 'Serra Angel'},
+                  ],
+                  'graveyard': <Map<String, dynamic>>[],
+                  'command': [
+                    {'name': 'Giada, Font of Hope'},
+                  ],
+                  'exile': [
+                    {'name': 'Swords to Plowshares'},
+                  ],
+                  'library_size': 90,
+                },
+                {
+                  'name': 'Player B',
+                  'life': 37,
+                  'mana': 2,
+                  'hand_size': 6,
+                  'battlefield': <Map<String, dynamic>>[],
+                  'graveyard': <Map<String, dynamic>>[],
+                  'library_size': 93,
+                },
+              ],
+            },
           ],
         },
       },
       fallbackDeckId: deckId,
       fallbackId: replayId,
     );
+  }
+
+  @override
+  Future<List<BattleReplayAnnotation>> listReplayAnnotations({
+    required String deckId,
+    required String replayId,
+  }) async => List<BattleReplayAnnotation>.unmodifiable(_annotations);
+
+  @override
+  Future<BattleReplayAnnotation> createReplayAnnotation({
+    required String deckId,
+    required String replayId,
+    required BattleReplayAnnotationDraft draft,
+  }) async {
+    lastAnnotationDraft = draft;
+    final annotation = BattleReplayAnnotation.fromJson({
+      'schema_version': 'battle_replay_annotation_v1',
+      'id': 'annotation-${_annotations.length + 1}',
+      'replay_id': replayId,
+      'subject_deck_id': deckId,
+      'subject_deck_revision': 'deck_snapshot_sha256_v1:test-hash',
+      if (draft.eventRef != null) 'event_ref': draft.eventRef,
+      if (draft.snapshotRef != null) 'snapshot_ref': draft.snapshotRef,
+      'kind': draft.kind.wireValue,
+      'payload': draft.payload,
+      'created_at': '2026-07-26T12:00:00Z',
+    });
+    _annotations.insert(0, annotation);
+    return annotation;
+  }
+
+  @override
+  Future<bool> deleteReplayAnnotation({
+    required String deckId,
+    required String replayId,
+    required String annotationId,
+  }) async {
+    final previousLength = _annotations.length;
+    _annotations.removeWhere((annotation) => annotation.id == annotationId);
+    return _annotations.length != previousLength;
   }
 
   @override
@@ -183,6 +341,29 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   }
 
   @override
+  Future<BattlePreflight> loadBattlePreflight({
+    required String deckId,
+    required String opponentDeckId,
+  }) async {
+    preflightCalls += 1;
+    return preflight;
+  }
+
+  @override
+  Future<BattleReplayDetail> runBattleTest({
+    required String deckId,
+    required BattleTestSetup setup,
+    int maxTurns = 30,
+  }) {
+    lastSetup = setup;
+    return runBattleSimulation(
+      deckId: deckId,
+      opponentDeckId: setup.opponentDeckId,
+      maxTurns: maxTurns,
+    );
+  }
+
+  @override
   Future<BattleReplayDetail> runGoldfishSimulation({
     required String deckId,
     int simulations = 1000,
@@ -197,6 +378,54 @@ void main() {
       battleReplaysRouteLocation('deck id/with slash'),
       '/decks/deck%20id%2Fwith%20slash/battle-replays',
     );
+  });
+
+  testWidgets('opens a replay selected by the canonical query parameter', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(
+          deckId: 'deck-1',
+          gateway: gateway,
+          initialReplayId: 'sim-1',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(gateway.fetchCalls, 1);
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+  });
+
+  testWidgets('deep-linked replay remains available when history fails', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replayListErrorOnFirstCall: const BattleReplayException(
+        'Histórico temporariamente indisponível.',
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(
+          deckId: 'deck-1',
+          gateway: gateway,
+          initialReplayId: 'sim-1',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(gateway.listCalls, 1);
+    expect(gateway.fetchCalls, 1);
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+    expect(find.byKey(const Key('battle-replays-error-state')), findsNothing);
   });
 
   testWidgets('renders replay list and opens structured replay detail', (
@@ -266,11 +495,325 @@ void main() {
       await tester.pumpAndSettle();
     }
     expect(decisionsTab, findsOneWidget);
+    await tester.ensureVisible(decisionsTab);
+    await tester.pumpAndSettle();
     await tester.tap(decisionsTab);
     await tester.pumpAndSettle();
 
     expect(find.text('Cast Arcane Signet'), findsOneWidget);
     expect(find.text('Fixes mana before commander turn.'), findsOneWidget);
+    expect(find.text('Dados'), findsNothing);
+
+    final technicalDetails = find.byKey(
+      const Key('battle-replay-technical-details-expansion'),
+    );
+    for (var i = 0; i < 8 && technicalDetails.evaluate().isEmpty; i += 1) {
+      await tester.drag(detailPane, const Offset(0, -300));
+      await tester.pumpAndSettle();
+    }
+    expect(technicalDetails, findsOneWidget);
+    await tester.ensureVisible(technicalDetails);
+    await tester.pumpAndSettle();
+    expect(find.text('Dados técnicos'), findsOneWidget);
+    await tester.tap(technicalDetails);
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('"engine": "manaloom_native_reviewed"'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('keeps a replay as an explicit comparison baseline', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    final detailPane = find.byKey(const Key('battle-replay-detail-pane'));
+    final useCurrent = find.byKey(const Key('battle-comparison-use-current'));
+    for (var i = 0; i < 8 && useCurrent.evaluate().isEmpty; i += 1) {
+      await tester.drag(detailPane, const Offset(0, -300));
+      await tester.pumpAndSettle();
+    }
+
+    expect(useCurrent, findsOneWidget);
+    await tester.ensureVisible(useCurrent);
+    await tester.drag(detailPane, const Offset(0, -180));
+    await tester.pumpAndSettle();
+    await tester.tap(useCurrent);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('battle-comparison-baseline-selected')),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Seed igual é somente um rótulo'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('saves a private replay note through the account gateway', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    final detailPane = find.byKey(const Key('battle-replay-detail-pane'));
+    final annotations = find.byKey(const Key('battle-annotations-expansion'));
+    for (var i = 0; i < 8 && annotations.evaluate().isEmpty; i += 1) {
+      await tester.drag(detailPane, const Offset(0, -300));
+      await tester.pumpAndSettle();
+    }
+    expect(annotations, findsOneWidget);
+    await tester.ensureVisible(annotations);
+    await tester.tap(annotations);
+    await tester.pumpAndSettle();
+
+    final addNote = find.byKey(const Key('battle-annotation-add-note'));
+    await tester.ensureVisible(addNote);
+    await tester.drag(detailPane, const Offset(0, 180));
+    await tester.pumpAndSettle();
+    await tester.tap(addNote);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('battle-note-title')),
+      'Sequência de proteção',
+    );
+    await tester.enterText(
+      find.byKey(const Key('battle-note-text')),
+      'Eu seguraria a remoção para a pilha seguinte.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('battle-note-save')));
+    await tester.pumpAndSettle();
+
+    expect(gateway.lastAnnotationDraft?.kind, BattleReplayAnnotationKind.note);
+    expect(
+      gateway.lastAnnotationDraft?.payload['text'],
+      'Eu seguraria a remoção para a pilha seguinte.',
+    );
+    expect(find.text('Sequência de proteção'), findsOneWidget);
+    expect(find.textContaining('não usa shared_preferences'), findsOneWidget);
+  });
+
+  testWidgets('captures reflection before revealing the next event', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    final reflect = find.byKey(const Key('battle-visual-reflect-before-next'));
+    expect(reflect, findsOneWidget);
+    await tester.ensureVisible(reflect);
+    await tester.tap(reflect);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('battle-reflection-dialog')), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('battle-reflection-reason')),
+      'Eu manteria mana aberta.',
+    );
+    await tester.tap(find.byKey(const Key('battle-reflection-save')));
+    await tester.pumpAndSettle();
+
+    expect(
+      gateway.lastAnnotationDraft?.kind,
+      BattleReplayAnnotationKind.wouldDoDifferently,
+    );
+    expect(gateway.lastAnnotationDraft?.eventRef, 'event:0');
+    expect(
+      gateway.lastAnnotationDraft?.payload['reason'],
+      'Eu manteria mana aberta.',
+    );
+  });
+
+  testWidgets('filters saved history by outcome without deleting replays', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replays: [
+        BattleReplaySummary.fromJson(const {
+          'id': 'completed-replay',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'status': 'completed',
+          'engine': 'xmage',
+          'opponent_deck_id': 'opponent-a',
+          'opponent_name': 'Atraxa',
+          'deck_revision': {
+            'subject_deck_hash':
+                'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          },
+        }),
+        BattleReplaySummary.fromJson(const {
+          'id': 'censored-replay',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'status': 'censored',
+          'engine': 'forge',
+          'opponent_deck_id': 'opponent-b',
+          'opponent_name': 'Korvold',
+          'deck_revision': {
+            'subject_deck_hash':
+                'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+          },
+        }),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('battle-replay-summary-completed-replay')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-replay-summary-censored-replay')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const Key('battle-history-filters-expansion')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('battle-history-status-filter')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Censurado').last);
+    await tester.pumpAndSettle();
+    expect(find.text('1 de 2 replays'), findsOneWidget);
+
+    final clearFilters = find.byKey(const Key('battle-history-clear-filters'));
+    await tester.ensureVisible(clearFilters);
+    await tester.pumpAndSettle();
+    await tester.tap(clearFilters);
+    await tester.pumpAndSettle();
+    expect(find.text('2 de 2 replays'), findsOneWidget);
+  });
+
+  testWidgets('loads the next saved-history page with an opaque cursor', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replays: [
+        BattleReplaySummary.fromJson(const {
+          'id': 'replay-first',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'status': 'completed',
+          'opponent_name': 'Primeiro oponente',
+        }),
+      ],
+      moreReplays: [
+        BattleReplaySummary.fromJson(const {
+          'id': 'replay-second',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'status': 'timeout',
+          'opponent_name': 'Segundo oponente',
+        }),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Battle contra Primeiro oponente'), findsOneWidget);
+    expect(find.text('Battle contra Segundo oponente'), findsNothing);
+    final loadMore = find.byKey(const Key('battle-history-load-more'));
+    expect(loadMore, findsOneWidget);
+    await tester.ensureVisible(loadMore);
+    await tester.tap(loadMore);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Battle contra Segundo oponente'), findsOneWidget);
+    expect(find.byKey(const Key('battle-history-load-more')), findsNothing);
+    expect(gateway.listCalls, 2);
+  });
+
+  testWidgets('bounds initial rendering for a 20 thousand event replay', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replayDetail: BattleReplayDetail.fromJson(
+        {
+          'id': 'sim-1',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'events': [
+            for (var index = 0; index < 20000; index++)
+              {
+                'event_id': 'event-$index',
+                'turn': (index ~/ 20) + 1,
+                'player': index.isEven ? 'Player A' : 'Player B',
+                'action': index.isEven ? 'casts' : 'resolves',
+                'message': 'Evento observado $index',
+              },
+          ],
+        },
+        fallbackDeckId: 'deck-1',
+        fallbackId: 'sim-1',
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    final renderedEventTiles = find.byWidgetPredicate((widget) {
+      final key = widget.key;
+      return key is ValueKey<String> &&
+          key.value.startsWith('battle-replay-event-item-');
+    });
+    expect(renderedEventTiles, findsNWidgets(100));
+    expect(
+      find.text('Mostrando 100 de 20000 eventos observados'),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-replay-events-show-more')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('keeps a single-pane replay flow at 390px without overflow', (
@@ -302,6 +845,125 @@ void main() {
     expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
     expect(find.byKey(const Key('battle-replays-history-pane')), findsNothing);
     expect(find.byKey(const Key('battle-visual-player-grid')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('plays snapshots and exposes observed stack and combat', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1/2'), findsOneWidget);
+    final play = find.byKey(const Key('battle-visual-play-button'));
+    await tester.ensureVisible(play);
+    await tester.pumpAndSettle();
+    await tester.tap(play);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1300));
+
+    expect(find.text('Player A attacks Serra Angel'), findsOneWidget);
+    expect(find.text('Prioridade: Player B'), findsOneWidget);
+    expect(find.byKey(const Key('battle-visual-zone-stack')), findsOneWidget);
+    expect(find.byKey(const Key('battle-visual-combat-panel')), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-replay-observed-changes')),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Serra Angel entrou no campo observado'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Island saiu do campo observado'),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-visual-zone-command-Player A')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-visual-zone-exile-Player A')),
+      findsOneWidget,
+    );
+    expect(find.text('2/2'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('supports keyboard replay navigation and reduced motion', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1/2'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(find.text('2/2'), findsOneWidget);
+    expect(find.text('Player A attacks Serra Angel'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('1/2'), findsOneWidget);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    final play = tester.widget<IconButton>(
+      find.byKey(const Key('battle-visual-play-button')),
+    );
+    expect(play.onPressed, isNull);
+  });
+
+  testWidgets('keeps replay usable at 200 percent text scale', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(768, 1024));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final gateway = _FakeBattleReplayGateway();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-replay-visual-viewer')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -432,6 +1094,95 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('runs a focused objective only after a ready preflight', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(gateway.preflightCalls, 1);
+    expect(find.byKey(const Key('battle-preflight-ready')), findsOneWidget);
+
+    final objective = find.byKey(const Key('battle-test-objective-field'));
+    await tester.ensureVisible(objective);
+    await tester.tap(objective);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cartas de foco').last);
+    await tester.pumpAndSettle();
+
+    final focus = find.byKey(const Key('battle-focus-cards-field'));
+    await tester.ensureVisible(focus);
+    await tester.enterText(
+      focus,
+      'Sol Ring, Arcane Signet, Rhystic Study, Cyclonic Rift',
+    );
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pumpAndSettle();
+
+    expect(gateway.runBattleCalls, 1);
+    expect(gateway.lastSetup?.objective, BattleTestObjective.focusCards);
+    expect(gateway.lastSetup?.focusCards, const [
+      'Sol Ring',
+      'Arcane Signet',
+      'Rhystic Study',
+    ]);
+  });
+
+  testWidgets('keeps Battle blocked when preflight has a hard blocker', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      preflight: const BattlePreflight(
+        status: 'blocked',
+        cardCount: 99,
+        commanderCount: 1,
+        validationState: 'draft',
+        availableOpponentCount: 2,
+        engineCoverage: {'xmage': 'unknown'},
+        blockers: ['deck_validation_required'],
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('battle-preflight-blocked')), findsOneWidget);
+    expect(find.text('Valide novamente o deck'), findsOneWidget);
+    final button = tester.widget<FilledButton>(
+      find.byKey(const Key('battle-opponent-submit-button')),
+    );
+    expect(button.onPressed, isNull);
+    expect(gateway.runBattleCalls, 0);
+  });
 
   testWidgets(
     'keeps saved replay visible when the immediate history refresh fails',

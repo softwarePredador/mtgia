@@ -16,7 +16,9 @@ COPY server/ .
 # Gera o servidor de produção com o CLI resolvido pelo pubspec.lock.
 RUN mkdir -p /out \
   && dart run dart_frog_cli:dart_frog build \
-  && dart compile exe build/bin/server.dart -o /out/manaloom-server
+  && dart compile exe build/bin/server.dart -o /out/manaloom-server \
+  && dart compile exe bin/battle_job_worker.dart \
+    -o /out/manaloom-battle-worker
 
 # O runtime recebe somente o executável AOT. Código-fonte, testes, ferramentas
 # de build e qualquer fixture de desenvolvimento ficam fora da imagem final.
@@ -24,6 +26,8 @@ FROM dart:3.12.2@sha256:13140e26d84f4fda57cea31942222112aeb2eec10e5e6874c1c0f70b
 
 WORKDIR /app/server
 COPY --from=build --chown=10001:10001 /out/manaloom-server /app/server/manaloom-server
+COPY --from=build --chown=10001:10001 /out/manaloom-battle-worker /app/server/manaloom-battle-worker
+COPY --from=build --chown=10001:10001 /app/server/bin/api_with_battle_worker.sh /app/server/api_with_battle_worker.sh
 
 ENV PORT=8080
 EXPOSE 8080
@@ -35,4 +39,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     "http://127.0.0.1:${PORT:-8080}/health/live" || exit 1
 
 # Easypanel costuma injetar PORT; fallback para 8080.
-CMD ["/bin/sh", "-c", "exec /app/server/manaloom-server --hostname 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["/bin/sh", "/app/server/api_with_battle_worker.sh"]

@@ -5,6 +5,9 @@ import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import 'ai/battle_engine_config.dart';
+import 'battle/battle_live_cursor_contract.dart';
+import 'battle/battle_live_service.dart';
+import 'battle/battle_live_source_client.dart';
 import 'openai_runtime_config.dart';
 
 class AiRuntimeReadiness {
@@ -16,9 +19,17 @@ class AiRuntimeReadiness {
 
 typedef BattleSidecarProbe =
     Future<Map<String, dynamic>?> Function(String engine, Uri healthUri);
+typedef BattleLiveSchemaProbe = Future<bool> Function(Pool? pool);
 
 class BattleRuntimeReadiness {
   const BattleRuntimeReadiness({required this.healthy, required this.check});
+
+  final bool healthy;
+  final Map<String, dynamic> check;
+}
+
+class BattleJobWorkerReadiness {
+  const BattleJobWorkerReadiness({required this.healthy, required this.check});
 
   final bool healthy;
   final Map<String, dynamic> check;
@@ -36,6 +47,23 @@ class DeckValidationSchemaReadiness {
 
 class AiJobSchemaReadiness {
   const AiJobSchemaReadiness({required this.healthy, required this.check});
+
+  final bool healthy;
+  final Map<String, dynamic> check;
+}
+
+class BattleJobSchemaReadiness {
+  const BattleJobSchemaReadiness({required this.healthy, required this.check});
+
+  final bool healthy;
+  final Map<String, dynamic> check;
+}
+
+class BattleLiveSpectatorReadiness {
+  const BattleLiveSpectatorReadiness({
+    required this.healthy,
+    required this.check,
+  });
 
   final bool healthy;
   final Map<String, dynamic> check;
@@ -73,6 +101,10 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '049': 'preserve_binder_physical_identity',
   '050': 'canonicalize_pricing_provenance',
   '051': 'close_social_safety_contract',
+  '052': 'version_battle_simulation_attempts',
+  '053': 'create_battle_replay_annotations',
+  '054': 'create_battle_jobs',
+  '055': 'create_battle_job_live_records',
 };
 
 const releaseSchemaReadinessSql = '''
@@ -91,11 +123,15 @@ const releaseSchemaReadinessSql = '''
       ('048', 'close_ai_job_lifecycle'),
       ('049', 'preserve_binder_physical_identity'),
       ('050', 'canonicalize_pricing_provenance'),
-      ('051', 'close_social_safety_contract')
+      ('051', 'close_social_safety_contract'),
+      ('052', 'version_battle_simulation_attempts'),
+      ('053', 'create_battle_replay_annotations'),
+      ('054', 'create_battle_jobs'),
+      ('055', 'create_battle_job_live_records')
   )
   SELECT
     (
-      SELECT COUNT(*) = 14
+      SELECT COUNT(*) = 18
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
@@ -104,7 +140,7 @@ const releaseSchemaReadinessSql = '''
     COALESCE(
       (SELECT MAX(version) FROM public.schema_migrations),
       ''
-    ) = '051' AS latest_migration_ready,
+    ) = '055' AS latest_migration_ready,
     (
       SELECT COUNT(*)
       FROM pg_class
@@ -275,7 +311,254 @@ const releaseSchemaReadinessSql = '''
       )
         AND indisvalid
         AND indisready
-    ) = 9 AS social_safety_indexes_ready
+    ) = 9 AS social_safety_indexes_ready,
+    (
+      to_regclass('public.battle_simulation_attempts') IS NOT NULL
+      AND (
+        SELECT COUNT(*)
+        FROM (
+          VALUES
+            ('outcome'),
+            ('replay_id'),
+            ('test_objective'),
+            ('request_schema_version'),
+            ('request_hash'),
+            ('job_request_schema_version'),
+            ('job_request_hash'),
+            ('engine_request_correlation_source'),
+            ('deck_hash_schema'),
+            ('deck_a_hash'),
+            ('deck_b_hash'),
+            ('engine_process_id'),
+            ('timeout_ms'),
+            ('events_truncated'),
+            ('snapshots_truncated')
+        ) AS required(column_name)
+        WHERE EXISTS (
+          SELECT 1
+          FROM information_schema.columns actual
+          WHERE actual.table_schema = 'public'
+            AND actual.table_name = 'battle_simulation_attempts'
+            AND actual.column_name = required.column_name
+        )
+      ) = 15
+      AND (
+        SELECT COUNT(*)
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.battle_simulation_attempts')
+          AND conname IN (
+            'chk_battle_attempt_outcome',
+            'chk_battle_attempt_test_objective',
+            'chk_battle_attempt_lifecycle',
+            'chk_battle_attempt_job_request_hash',
+            'chk_battle_attempt_request_correlation'
+          )
+          AND convalidated
+      ) = 5
+    ) AS battle_attempt_contract_ready,
+    (
+      to_regclass('public.battle_replay_annotations') IS NOT NULL
+      AND (
+        SELECT COUNT(*)
+        FROM (
+          VALUES
+            ('user_id'),
+            ('replay_id'),
+            ('attempt_id'),
+            ('subject_deck_id'),
+            ('subject_deck_key'),
+            ('deck_hash_schema'),
+            ('subject_deck_hash'),
+            ('subject_deck_revision'),
+            ('event_ref'),
+            ('snapshot_ref'),
+            ('kind'),
+            ('payload'),
+            ('idempotency_key'),
+            ('request_fingerprint'),
+            ('created_at'),
+            ('updated_at')
+        ) AS required(column_name)
+        WHERE EXISTS (
+          SELECT 1
+          FROM information_schema.columns actual
+          WHERE actual.table_schema = 'public'
+            AND actual.table_name = 'battle_replay_annotations'
+            AND actual.column_name = required.column_name
+        )
+      ) = 16
+      AND (
+        SELECT COUNT(*)
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.battle_replay_annotations')
+          AND conname IN (
+            'fk_battle_annotation_attempt_replay',
+            'chk_battle_annotation_subject',
+            'chk_battle_annotation_hash',
+            'chk_battle_annotation_revision',
+            'chk_battle_annotation_kind',
+            'chk_battle_annotation_event_ref',
+            'chk_battle_annotation_snapshot_ref',
+            'chk_battle_annotation_payload',
+            'chk_battle_annotation_kind_refs',
+            'chk_battle_annotation_payload_shape',
+            'chk_battle_annotation_idempotency',
+            'chk_battle_annotation_timestamps'
+          )
+          AND convalidated
+      ) = 12
+      AND (
+        SELECT COUNT(*)
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.battle_replay_annotations')
+          AND contype = 'f'
+          AND confdeltype = 'c'
+          AND convalidated
+      ) = 4
+      AND (
+        SELECT COUNT(*)
+        FROM pg_index
+        WHERE indexrelid IN (
+          to_regclass('public.idx_battle_annotation_user_replay_created'),
+          to_regclass('public.idx_battle_annotation_subject_created'),
+          to_regclass('public.idx_battle_annotation_kind_created'),
+          to_regclass('public.uq_battle_annotation_reflection'),
+          to_regclass('public.uq_battle_annotation_mulligan'),
+          to_regclass('public.uq_battle_annotation_helpful')
+        )
+          AND indisvalid
+          AND indisready
+      ) = 6
+    ) AS battle_annotation_contract_ready,
+    (
+      to_regclass('public.battle_jobs') IS NOT NULL
+      AND (
+        SELECT COUNT(*)
+        FROM (
+          VALUES
+            ('schema_version'),
+            ('user_id'),
+            ('deck_a_hash'),
+            ('deck_b_hash'),
+            ('request_hash'),
+            ('engine_request_schema_version'),
+            ('engine_request_hash'),
+            ('engine_request_correlation_source'),
+            ('request_payload'),
+            ('requested_engine'),
+            ('engine_lane'),
+            ('status'),
+            ('progress_current'),
+            ('progress_total'),
+            ('lease_token'),
+            ('lease_expires_at'),
+            ('heartbeat_at'),
+            ('attempt_id'),
+            ('replay_id'),
+            ('idempotency_key'),
+            ('request_fingerprint'),
+            ('engine_process_id'),
+            ('finished_at')
+        ) AS required(column_name)
+        WHERE EXISTS (
+          SELECT 1
+          FROM information_schema.columns actual
+          WHERE actual.table_schema = 'public'
+            AND actual.table_name = 'battle_jobs'
+            AND actual.column_name = required.column_name
+        )
+      ) = 23
+      AND (
+        SELECT COUNT(*)
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.battle_jobs')
+          AND conname IN (
+            'fk_battle_job_attempt_replay',
+            'chk_battle_job_schema',
+            'chk_battle_job_status',
+            'chk_battle_job_stage',
+            'chk_battle_job_hashes',
+            'chk_battle_job_request',
+            'chk_battle_job_engine_request',
+            'chk_battle_job_progress',
+            'chk_battle_job_lease',
+            'chk_battle_job_completed_replay'
+          )
+          AND convalidated
+      ) = 10
+      AND (
+        SELECT COUNT(*)
+        FROM pg_index
+        WHERE indexrelid IN (
+          to_regclass('public.uq_battle_jobs_user_idempotency'),
+          to_regclass('public.idx_battle_jobs_user_active'),
+          to_regclass('public.idx_battle_jobs_claim'),
+          to_regclass('public.idx_battle_jobs_lease')
+        )
+          AND indisvalid
+          AND indisready
+      ) = 4
+    ) AS battle_job_contract_ready,
+    (
+      to_regclass('public.battle_job_live_records') IS NOT NULL
+      AND (
+        SELECT COUNT(*)
+        FROM (
+          VALUES
+            ('schema_version'),
+            ('job_id'),
+            ('sequence'),
+            ('record_id'),
+            ('kind'),
+            ('payload'),
+            ('content_truncated'),
+            ('fingerprint'),
+            ('source_kind'),
+            ('public_visible'),
+            ('source_process_id'),
+            ('source_sequence'),
+            ('source_record_id'),
+            ('source_truncated'),
+            ('created_at')
+        ) AS required(column_name)
+        WHERE EXISTS (
+          SELECT 1
+          FROM information_schema.columns actual
+          WHERE actual.table_schema = 'public'
+            AND actual.table_name = 'battle_job_live_records'
+            AND actual.column_name = required.column_name
+        )
+      ) = 15
+      AND (
+        SELECT COUNT(*)
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.battle_job_live_records')
+          AND conname IN (
+            'chk_battle_live_record_schema',
+            'chk_battle_live_record_sequence',
+            'chk_battle_live_record_id',
+            'chk_battle_live_record_kind',
+            'chk_battle_live_record_payload',
+            'chk_battle_live_record_fingerprint',
+            'chk_battle_live_record_source',
+            'chk_battle_live_record_source_identity',
+            'uq_battle_live_record_job_sequence',
+            'uq_battle_live_record_job_fingerprint'
+          )
+          AND convalidated
+      ) = 10
+      AND (
+        SELECT COUNT(*)
+        FROM pg_index
+        WHERE indexrelid IN (
+          to_regclass('public.idx_battle_live_record_job_public_sequence'),
+          to_regclass('public.idx_battle_live_record_checkpoint'),
+          to_regclass('public.idx_battle_live_record_source_identity')
+        )
+          AND indisvalid
+          AND indisready
+      ) = 3
+    ) AS battle_live_contract_ready
 ''';
 
 Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
@@ -285,13 +568,13 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
         .timeout(const Duration(seconds: 5));
     final row = result.first;
     final healthy =
-        row.length >= 11 && row.take(11).every((value) => value == true);
+        row.length >= 15 && row.take(15).every((value) => value == true);
     return ReleaseSchemaReadiness(
       healthy: healthy,
       check: {
         'status': healthy ? 'healthy' : 'unhealthy',
-        'required_range': '038-051',
-        'latest_migration': '051',
+        'required_range': '038-055',
+        'latest_migration': '055',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -303,8 +586,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: false,
       check: {
         'status': 'unhealthy',
-        'required_range': '038-051',
-        'latest_migration': '051',
+        'required_range': '038-055',
+        'latest_migration': '055',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -379,6 +662,323 @@ Future<AiJobSchemaReadiness> evaluateAiJobSchemaReadiness(Pool pool) async {
       },
     );
   }
+}
+
+const battleJobSchemaReadinessSql = '''
+  SELECT
+    EXISTS (
+      SELECT 1
+      FROM schema_migrations
+      WHERE version = '054'
+        AND name = 'create_battle_jobs'
+    ) AS migration_054_registered,
+    (
+      SELECT COUNT(*)
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'battle_jobs'
+        AND column_name IN (
+          'status',
+          'request_hash',
+          'deck_a_hash',
+          'deck_b_hash',
+          'idempotency_key',
+          'request_fingerprint',
+          'lease_token',
+          'lease_expires_at',
+          'heartbeat_at',
+          'attempt_id',
+          'replay_id',
+          'engine_process_id',
+          'engine_request_schema_version',
+          'engine_request_hash',
+          'engine_request_correlation_source'
+        )
+    ) = 15 AS battle_job_columns_ready,
+    (
+      SELECT COUNT(*)
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'battle_simulation_attempts'
+        AND column_name IN (
+          'job_request_schema_version',
+          'job_request_hash',
+          'engine_request_correlation_source'
+        )
+    ) = 3 AS battle_attempt_correlation_columns_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_constraint
+      WHERE conrelid = to_regclass('public.battle_jobs')
+        AND conname IN (
+          'chk_battle_job_status',
+          'chk_battle_job_lease',
+          'chk_battle_job_completed_replay',
+          'chk_battle_job_engine_request'
+        )
+        AND convalidated
+    ) = 4 AS battle_job_constraints_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_index
+      WHERE indexrelid IN (
+        to_regclass('public.uq_battle_jobs_user_idempotency'),
+        to_regclass('public.idx_battle_jobs_claim'),
+        to_regclass('public.idx_battle_jobs_lease')
+      )
+        AND indisvalid
+        AND indisready
+    ) = 3 AS battle_job_indexes_ready
+''';
+
+Future<BattleJobSchemaReadiness> evaluateBattleJobSchemaReadiness(
+  Pool pool,
+) async {
+  try {
+    final result = await pool
+        .execute(battleJobSchemaReadinessSql)
+        .timeout(const Duration(seconds: 5));
+    final row = result.first;
+    final healthy =
+        row.length >= 5 && row.take(5).every((value) => value == true);
+    return BattleJobSchemaReadiness(
+      healthy: healthy,
+      check: {
+        'status': healthy ? 'healthy' : 'unhealthy',
+        'schema_version': 'battle_job_v1',
+        'migrations': const ['054'],
+        if (!healthy) 'error_code': 'battle_job_schema_not_ready',
+      },
+    );
+  } on Object {
+    return const BattleJobSchemaReadiness(
+      healthy: false,
+      check: {
+        'status': 'unhealthy',
+        'schema_version': 'battle_job_v1',
+        'migrations': ['054'],
+        'error_code': 'battle_job_schema_check_failed',
+      },
+    );
+  }
+}
+
+const battleLiveSchemaReadinessSql = '''
+  SELECT
+    EXISTS (
+      SELECT 1
+      FROM schema_migrations
+      WHERE version = '055'
+        AND name = 'create_battle_job_live_records'
+    ) AS migration_055_registered,
+    (
+      SELECT COUNT(*)
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'battle_job_live_records'
+        AND column_name IN (
+          'schema_version',
+          'job_id',
+          'sequence',
+          'record_id',
+          'kind',
+          'payload',
+          'content_truncated',
+          'fingerprint',
+          'source_kind',
+          'public_visible',
+          'source_process_id',
+          'source_sequence',
+          'source_record_id',
+          'source_truncated',
+          'created_at'
+        )
+    ) = 15 AS battle_live_columns_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_constraint
+      WHERE conrelid = to_regclass('public.battle_job_live_records')
+        AND conname IN (
+          'chk_battle_live_record_schema',
+          'chk_battle_live_record_sequence',
+          'chk_battle_live_record_id',
+          'chk_battle_live_record_kind',
+          'chk_battle_live_record_payload',
+          'chk_battle_live_record_fingerprint',
+          'chk_battle_live_record_source',
+          'chk_battle_live_record_source_identity',
+          'uq_battle_live_record_job_sequence',
+          'uq_battle_live_record_job_fingerprint'
+        )
+        AND convalidated
+    ) = 10 AS battle_live_constraints_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_index
+      WHERE indexrelid IN (
+        to_regclass('public.idx_battle_live_record_job_public_sequence'),
+        to_regclass('public.idx_battle_live_record_checkpoint'),
+        to_regclass('public.idx_battle_live_record_source_identity')
+      )
+        AND indisvalid
+        AND indisready
+    ) = 3 AS battle_live_indexes_ready
+''';
+
+Future<bool> probeBattleLiveSchema(Pool? pool) async {
+  if (pool == null) return false;
+  final result = await pool
+      .execute(battleLiveSchemaReadinessSql)
+      .timeout(const Duration(seconds: 5));
+  final row = result.first;
+  return row.length >= 4 && row.take(4).every((value) => value == true);
+}
+
+Future<BattleLiveSpectatorReadiness> evaluateBattleLiveSpectatorReadiness(
+  DotEnv env,
+  Pool? pool, {
+  BattleSidecarProbe probe = probeBattleSidecarHealth,
+  BattleLiveSchemaProbe schemaProbe = probeBattleLiveSchema,
+}) async {
+  final configured = env[battleLiveSpectatorEnabledEnvironment]?.trim();
+  final enabled = battleLiveSpectatorEnabledValue(configured);
+  if (!enabled) {
+    final validDisabledValue =
+        configured == null ||
+        configured.isEmpty ||
+        configured.toLowerCase() == 'false';
+    return BattleLiveSpectatorReadiness(
+      healthy: true,
+      check: {
+        'status': 'disabled',
+        'enabled': false,
+        'schema_version': battleLiveCursorSchemaVersion,
+        'transport': battleLivePollingTransport,
+        'configuration_status':
+            validDisabledValue ? 'valid' : 'invalid_fail_closed',
+      },
+    );
+  }
+
+  var schemaReady = false;
+  try {
+    schemaReady = await schemaProbe(pool);
+  } on Object {
+    schemaReady = false;
+  }
+
+  var sourceReady = false;
+  final sourceUrl = env['XMAGE_SIDECAR_URL']?.trim() ?? '';
+  try {
+    final config = BattleEngineConfig.fromEnvironment({
+      'BATTLE_ENGINE': 'xmage',
+      'XMAGE_SIDECAR_URL': sourceUrl,
+      if (env['XMAGE_EXPECTED_COMMIT'] case final String value)
+        'XMAGE_EXPECTED_COMMIT': value,
+      if (env['XMAGE_EXPECTED_VERSION'] case final String value)
+        'XMAGE_EXPECTED_VERSION': value,
+    });
+    final baseUri = Uri.tryParse(sourceUrl);
+    if (baseUri != null &&
+        const {'http', 'https'}.contains(baseUri.scheme) &&
+        baseUri.host.isNotEmpty) {
+      final health = await probe('xmage', baseUri.resolve('/health'));
+      if (health != null) {
+        final identityError = externalBattleIdentityValidationError(
+          health,
+          expected: config.xmageIdentity,
+        );
+        sourceReady =
+            health['status'] == 'ok' &&
+            identityError == null &&
+            _validBattleLiveHealth(health['battle_live']);
+      }
+    }
+  } on Object {
+    sourceReady = false;
+  }
+
+  final healthy = schemaReady && sourceReady;
+  return BattleLiveSpectatorReadiness(
+    healthy: healthy,
+    check: {
+      'status': healthy ? 'ready' : 'unhealthy',
+      'enabled': true,
+      'schema_version': battleLiveCursorSchemaVersion,
+      'source_schema_version': externalBattleLiveSourceSchema,
+      'transport': battleLivePollingTransport,
+      'database': schemaReady ? 'ready' : 'unhealthy',
+      'source': sourceReady ? 'ready' : 'unhealthy',
+      if (!healthy) 'error_code': 'battle_live_spectator_not_ready',
+    },
+  );
+}
+
+bool _validBattleLiveHealth(Object? raw) {
+  if (raw is! Map) return false;
+  final value = raw.map((key, value) => MapEntry(key.toString(), value));
+  const keys = <String>{
+    'schema_version',
+    'stream_count',
+    'record_count',
+    'truncated_stream_count',
+    'max_streams',
+    'max_records_per_stream',
+    'retention_ms',
+  };
+  if (value.keys.toSet().difference(keys).isNotEmpty ||
+      keys.difference(value.keys.toSet()).isNotEmpty ||
+      value['schema_version'] != externalBattleLiveSourceSchema) {
+    return false;
+  }
+  final streamCount = value['stream_count'];
+  final recordCount = value['record_count'];
+  final truncatedCount = value['truncated_stream_count'];
+  final maxStreams = value['max_streams'];
+  final maxRecords = value['max_records_per_stream'];
+  final retentionMs = value['retention_ms'];
+  return streamCount is int &&
+      streamCount >= 0 &&
+      maxStreams is int &&
+      maxStreams >= 1 &&
+      maxStreams <= 10000 &&
+      streamCount <= maxStreams &&
+      recordCount is int &&
+      recordCount >= 0 &&
+      maxRecords is int &&
+      maxRecords >= battleLiveSourcePageLimit &&
+      maxRecords <= battleLiveMaximumSourceRecords &&
+      recordCount <= streamCount * maxRecords &&
+      truncatedCount is int &&
+      truncatedCount >= 0 &&
+      truncatedCount <= streamCount &&
+      retentionMs is int &&
+      retentionMs >= 1000 &&
+      retentionMs <= 86400000;
+}
+
+BattleJobWorkerReadiness evaluateBattleJobWorkerReadiness(DotEnv env) {
+  final enabled =
+      (env['BATTLE_JOB_WORKER_ENABLED'] ?? 'true').trim().toLowerCase() ==
+      'true';
+  final missing = <String>[
+    if ((env['XMAGE_SIDECAR_URL'] ?? '').trim().isEmpty) 'XMAGE_SIDECAR_URL',
+    if ((env['FORGE_SIDECAR_URL'] ?? '').trim().isEmpty) 'FORGE_SIDECAR_URL',
+    if ((env['NATIVE_BATTLE_SIDECAR_URL'] ?? '').trim().isEmpty)
+      'NATIVE_BATTLE_SIDECAR_URL',
+  ];
+  final healthy = enabled && missing.isEmpty;
+  return BattleJobWorkerReadiness(
+    healthy: healthy,
+    check: {
+      'status': healthy ? 'healthy' : 'unhealthy',
+      'enabled': enabled,
+      'supervision': 'container_fail_closed',
+      'required_engines': const ['xmage', 'forge', 'native'],
+      if (missing.isNotEmpty) 'missing_configuration': missing,
+      if (!healthy) 'error_code': 'battle_job_worker_not_ready',
+    },
+  );
 }
 
 const collectionAvailabilitySchemaReadinessSql = '''

@@ -218,9 +218,9 @@ def build_report() -> dict[str, object]:
         _check(
             "server/routes/ai/simulate/index.dart",
             contains=(
-                "NativeBattleClient",
-                "engineConfig.nativeSidecarUrl",
-                "'required_rule_cards'",
+                "BattleExecutionRuntime.fromEnvironment",
+                "runtime.execute(",
+                "_battleRuntimeFailure(",
                 "buildBattleLearningEvidence(",
                 "BattleSimulationPersistenceService(pool).save(",
                 "_simulationPersistenceFailure(",
@@ -232,6 +232,19 @@ def build_report() -> dict[str, object]:
                 "manaloom_native_legacy",
                 "experimental_advisory",
                 "Não falha a request se não conseguir salvar",
+            ),
+        ),
+        _check(
+            "server/lib/battle/battle_execution_runtime.dart",
+            contains=(
+                "NativeBattleClient",
+                "baseUrl: config.nativeSidecarUrl",
+                "'required_rule_cards': _allDeckCardRows(request)",
+                "canonical_rules_execution",
+                "canonical_rules_execution_secondary",
+                "xmage_coverage_incomplete",
+                "forge_coverage_incomplete",
+                "battleExternalClientGrace = Duration(seconds: 8)",
             ),
         ),
         _check(

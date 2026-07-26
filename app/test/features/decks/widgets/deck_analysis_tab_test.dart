@@ -149,6 +149,7 @@ Widget _subject(
   DeckDetails deck, {
   Map<String, dynamic>? analysisPayload,
   _FakeApiClient? apiClient,
+  VoidCallback? onOpenBattleLab,
 }) {
   return MaterialApp(
     theme: AppTheme.darkTheme.copyWith(splashFactory: InkRipple.splashFactory),
@@ -173,13 +174,105 @@ Widget _subject(
             ),
       ),
       child: Scaffold(
-        body: SingleChildScrollView(child: DeckAnalysisTab(deck: deck)),
+        body: SingleChildScrollView(
+          child: DeckAnalysisTab(deck: deck, onOpenBattleLab: onOpenBattleLab),
+        ),
       ),
     ),
   );
 }
 
 void main() {
+  testWidgets('opens Battle Lab from the deck analysis surface', (
+    tester,
+  ) async {
+    var opened = false;
+    final deck = _makeDeck(
+      id: 'deck-battle-lab',
+      name: 'Talrand Tempo',
+      synergyScore: 82,
+    );
+
+    await tester.pumpWidget(
+      _subject(deck, onOpenBattleLab: () => opened = true),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('deck-analysis-battle-lab-entry')),
+      findsOneWidget,
+    );
+    expect(find.text('Testar este deck'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const Key('deck-analysis-open-battle-lab-button')),
+    );
+    await tester.pump();
+
+    expect(opened, isTrue);
+  });
+
+  testWidgets(
+    'shows only reliable compatible Battle samples in deck analysis',
+    (tester) async {
+      var opened = false;
+      final deck = _makeDeck(
+        id: 'deck-evidence',
+        name: 'Talrand Evidence',
+        synergyScore: 82,
+      );
+
+      await tester.pumpWidget(
+        _subject(
+          deck,
+          onOpenBattleLab: () => opened = true,
+          analysisPayload: {
+            'deck_id': deck.id,
+            'stats': {
+              'composition': {'ramp': 8},
+            },
+            'battle_learning_evidence': {
+              'schema_version': 'battle_positive_evidence_v1',
+              'aggregate_schema_version': 'deck_battle_learning_evidence_v1',
+              'battle_count': 5,
+              'trusted_battle_count': 4,
+              'compatible_revision_battle_count': 3,
+              'reliable_compatible_battle_count': 2,
+              'stale_revision_battle_count': 1,
+              'censored_battle_count': 1,
+              'timeout_battle_count': 1,
+              'positive_exposure_battle_count': 1,
+              'positive_exposure_ready': true,
+              'promotion_allowed': false,
+              'latest_replay_id': 'replay-1',
+            },
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-analysis-battle-evidence')),
+        findsOneWidget,
+      );
+      expect(
+        find.text('2 amostras confiáveis da revisão atual'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('1 censurada'), findsOneWidget);
+      expect(
+        find.textContaining('Exposição não prova superioridade'),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('deck-analysis-view-battle-tests')),
+      );
+      await tester.pump();
+      expect(opened, isTrue);
+    },
+  );
+
   testWidgets('renders executive AI summary when analysis exists', (
     tester,
   ) async {

@@ -51,13 +51,14 @@
     },
     {
       "id": "battle_deep_link",
-      "expectation": "Battle/Replays possui URL canônica deck-scoped e recarrega sem objeto transitório.",
+      "expectation": "Battle/Replays e o espectador ao vivo possuem URLs canônicas deck-scoped e recarregam sem objeto transitório; replay final usa query estável.",
       "sources": {
-        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "BattleReplaysScreen"],
-        "lib/features/battle/screens/battle_replays_screen.dart": ["battleReplaysRouteLocation"],
+        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "path: 'battle-live/:jobId'", "BattleLiveSpectatorScreen"],
+        "lib/features/battle/screens/battle_replays_screen.dart": ["battleReplaysRouteLocation", "initialReplayId"],
+        "lib/features/battle/screens/battle_live_spectator_screen.dart": ["battleLiveRouteLocation", "battleReplayDetailRouteLocation"],
         "lib/features/decks/screens/deck_details_screen.dart": ["battleReplaysRouteLocation"]
       },
-      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart"]
+      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart"]
     },
     {
       "id": "card_detail_deep_link",

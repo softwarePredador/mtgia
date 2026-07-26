@@ -3,6 +3,34 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
+## Execução Battle Lab — 2026-07-26
+
+- a ampliação local de escopo foi autorizada e implementou BL0–BL6: Battle Lab
+  com entrada pela Análise, preflight/setup, replay visual, relatório,
+  comparação e anotações duráveis; jobs assíncronos e Live Spectator somente
+  leitura foram adicionados atrás de flags fail-closed;
+- anotações, jobs, tentativas, replays e registros públicos Live usam
+  PostgreSQL. `shared_preferences` não é storage durável de Battle;
+- migrations 052–055 passaram em PostgreSQL descartável. Elas não foram
+  aplicadas nem consultadas no banco live e não recebem crédito de deploy;
+- BL7 foi executado como spike XMage isolado e encerrou em `NO_GO`: callbacks
+  humanos necessários continuam incompletos e não existe takeover humano→IA
+  seguro comprovado. BL8 está bloqueado e BL9/BL10 não começaram por
+  dependência; o produto não oferece Coach Mode ou jogo interativo;
+- o build Web release local usa base `/app/` e o Live opt-in para validação. A
+  correção de imagens Scryfall usa `HTMLImageElement` somente no Web para
+  contornar a ausência de CORS no host final, sem enviar headers; plataformas
+  nativas mantêm cache/headers do `CachedNetworkImage`;
+- o gate `full` passou duas vezes consecutivas na árvore Battle Lab: 39 lotes
+  backend por rodada, análise Flutter limpa, 1.252 testes Flutter + 1 skip
+  declarado, site público com 13 rotas e audit de produção sem
+  vulnerabilidades, além de 17 contratos de performance. A correção de
+  batching preservou todas as exclusões live e fechou BL0-00;
+- validações físicas Android/TalkBack, carga no alvo, migrations/deploy,
+  Sentry/FCM e smoke autenticado na mesma SHA publicada continuam pendentes.
+  Portanto M1/M2 estão implementados localmente, mas o estado de release
+  permanece **NO-GO**.
+
 ## Revalidação técnica — 2026-07-23
 
 - revisão em andamento na branch
@@ -79,13 +107,13 @@
 - o plano executável é
   `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` e o estado por task fica em
   `docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md`;
-- a evolução Battle Lab/Live Spectator/Coach está planejada em
+- a evolução Battle Lab/Live Spectator/Coach está registrada em
   `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md` e
-  `docs/MANALOOM_BATTLE_LAB_TRACKER.md`; é backlog pós-`S10-11=GO`, não
-  próxima ação da release corrente e não reabre a Sprint 5;
+  `docs/MANALOOM_BATTLE_LAB_TRACKER.md`; BL0–BL6 foram implementados
+  localmente, BL7 terminou `NO_GO` e BL8–BL10 permanecem bloqueados;
 - Battle, Deckbuilder e Life Counter mantêm suas provas locais anteriores,
   mas nenhuma delas autoriza promoção, migration ou escrita live;
-- migrations 038–051 compõem o schema exigido pelo candidato atual. O estado
+- migrations 038–055 compõem o schema exigido por este checkout ampliado. O estado
   live não foi reconsultado nesta rodada e não deve ser inferido de snapshots
   anteriores;
 - checkout pago permanece desabilitado/não anunciado e billing falha fechado;

@@ -88,6 +88,8 @@ void main() {
       () {
         final simulate =
             File('routes/ai/simulate/index.dart').readAsStringSync();
+        final battleRuntime =
+            File('lib/battle/battle_execution_runtime.dart').readAsStringSync();
         final simulationPersistence =
             File(
               'lib/battle/battle_simulation_persistence_service.dart',
@@ -134,12 +136,14 @@ void main() {
         );
         expect(simulate, contains('canonicalBattleWinnerDeckId('));
         expect(simulate, contains("'winner_deck_id': winnerDeckId"));
-        expect(simulate, contains('NativeBattleClient'));
-        expect(simulate, contains('engineConfig.nativeSidecarUrl'));
-        expect(simulate, contains("'required_rule_cards'"));
+        expect(simulate, contains('BattleExecutionRuntime.fromEnvironment'));
+        expect(simulate, contains('runtime.execute('));
+        expect(battleRuntime, contains('NativeBattleClient'));
+        expect(battleRuntime, contains('baseUrl: config.nativeSidecarUrl'));
+        expect(battleRuntime, contains("'required_rule_cards'"));
         expect(
-          simulate,
-          contains('requiredRuleCards: _allDeckCardRows(battleRequest)'),
+          battleRuntime,
+          contains("'required_rule_cards': _allDeckCardRows(request)"),
         );
         expect(simulate, contains('_isNaturalBattleResult(data, result)'));
         expect(simulate, isNot(contains('BattleSimulator(')));

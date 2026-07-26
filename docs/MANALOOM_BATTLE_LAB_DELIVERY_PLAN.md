@@ -1,17 +1,18 @@
 # Plano de entrega do ManaLoom Battle Lab e Coach
 
-**Estado:** `PLANNED_POST_S10 / NOT_IN_CURRENT_RELEASE_SCOPE`
+**Estado:** `M2_LOCAL_IMPLEMENTED / BL7_NO_GO / RELEASE_NO_GO`
 
-**Atualizado em:** 2026-07-24
+**Atualizado em:** 2026-07-26
 
 **Baseline preservada:** a Sprint 5 de
 `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` continua `PASS` para execução,
 persistência, autorização e evidência técnica de Battle. Este plano não reabre
 nem reinterpreta aquela prova.
 
-**Condição de início padrão:** `S10-11=GO` para a beta atual. Começar antes
-exige uma decisão explícita de ampliar a release candidate, recongelar escopo e
-SHA e repetir todos os gates afetados; este documento não toma essa decisão.
+**Condição de início:** a ampliação local foi autorizada explicitamente em
+2026-07-26. Ela cobre código, testes locais, documentação, commit e push, mas
+não concede escrita PostgreSQL live, migration live, deploy ou GO de release.
+Os gates afetados precisam ser repetidos na SHA publicada.
 
 **Autoridade:** este documento organiza a evolução de produto posterior à
 baseline Battle. Os significados de `PASS`, `BLOCKED`, escrita live e release
@@ -61,9 +62,31 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
   biblioteca, escolhas privadas ou opções derivadas dessas zonas.
 - Nenhum resumo de Battle autoriza automaticamente promoção de carta, regra,
   swap ou deck.
-- A release candidate atual não recebe este programa implicitamente. Se o
-  Battle Lab entrar antes do fechamento da Sprint 10, a SHA precisa ser
-  recongelada e todos os gates afetados precisam ser repetidos.
+- A release candidate atual recebeu a implementação local de forma explícita,
+  sempre atrás de flags fail-closed. Isso não equivale a rollout: a SHA precisa
+  ser recongelada e os gates físicos/live precisam passar antes de habilitar
+  jobs/Live fora do ambiente local.
+
+## 2.1 Estado executado em 2026-07-26
+
+| Sprint | Resultado da rodada | Consequência |
+|---|---|---|
+| BL0 | `PASS_LOCAL` | BL0-00 recuperou capacidade de forma inventariada e duas execuções integradas consecutivas passaram; BL0-01..09 fecharam evidência, outcomes, proveniência, revisão, sanitização e migrations 052–055 |
+| BL1 | `PASS_LOCAL` | CTA na Análise, setup, preflight, objetivo, foco, histórico e navegação implementados |
+| BL2 | `PASS_LOCAL` | Replay responsivo, playback, snapshots, timeline incremental e desconhecidos explícitos implementados |
+| BL3 | `PASS_LOCAL_WITH_P1_DEFERRED` | Relatório, comparação, anotações PostgreSQL e feedback implementados; Keep/Mulligan humano e séries 3/5/10 permanecem P1 |
+| BL4 | `PARTIAL_BLOCKED_PHYSICAL_AND_RELEASE` | Automação local coberta; Android físico/TalkBack, smoke live e mesma SHA implantada não foram executados |
+| BL5 | `PASS_LOCAL_FEATURE_OFF` | Job assíncrono, worker, leases, quotas, cancelamento, correlação e fault injection implementados; rollout desligado |
+| BL6 | `PASS_LOCAL_FEATURE_OFF_WITH_DEVICE_BLOCK` | Polling Live, cursor, armazenamento durável, reconexão e UI Web implementados; Android físico/live pendentes |
+| BL7 | `PASS_DECISION_NO_GO` | Spike cumpriu seu objetivo e emitiu NO-GO por callbacks incompletos e ausência de takeover humano→IA seguro |
+| BL8 | `BLOCKED_BL7_NO_GO` | Nenhuma sessão interativa pública foi criada |
+| BL9 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Coach Mode não foi criado |
+| BL10 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Homologação do Coach não pode começar sem BL8/BL9 |
+
+O produto disponível nesta rodada termina em Battle Lab + Live Spectator
+somente leitura, ambos ainda sujeitos aos gates de release. Não há Coach Mode
+nem partida interativa. O estado por task e as evidências reproduzíveis ficam
+em `docs/MANALOOM_BATTLE_LAB_TRACKER.md` e `docs/qa/`.
 
 ## 3. Premissas da estimativa
 
@@ -85,8 +108,11 @@ credenciais, backup, Sentry ou aparelho indisponível acrescentam tempo de esper
 e devem aparecer como `BLOCKED`, não como esforço concluído.
 
 Em 2026-07-24 o volume local estava com aproximadamente 3,3 GiB disponíveis e
-marcado como 100% utilizado. Nenhum build amplo, imagem de sidecar ou gate
-`full` deve começar antes de recuperar capacidade segura de forma inventariada.
+marcado como 100% utilizado. Em 2026-07-26 a rodada removeu apenas diretórios
+temporários Dart e o cache ignorado/recriável de dependências Web previamente
+inventariados, limitou o gate backend a lotes explícitos e conservou cerca de
+1,8 GiB livres após duas execuções `full` consecutivas. O volume ainda exige
+monitoramento e cleanup exato antes de novos artefatos grandes.
 
 ## 4. Marcos e prazo
 
@@ -314,6 +340,24 @@ do resultado.
 - cancel, timeout e retry têm fault injection;
 - fila respeita serialização/recursos de cada engine.
 
+### Estado implementado de BL5 (2026-07-26)
+
+- `battle_job_v1`, lifecycle autenticado, idempotência, quotas, fencing,
+  heartbeat, recuperação de lease e cancelamento cooperativo estão
+  implementados.
+- API síncrona e daemon usam o mesmo runtime. `auto` faz fallback somente por
+  cobertura estruturada; falha operacional termina sem caminho silencioso.
+- `battle_job_request_v1` e cada request de engine têm hashes separados. O
+  vínculo job → tentativa → replay é validado no PostgreSQL antes do terminal.
+- Claims concorrentes têm admissão serializada e reserva por lane; `auto`
+  conflita com todas as lanes porque pode consumir qualquer engine.
+- O container supervisiona API e worker em conjunto; a readiness exige
+  migration 054, correlação e os três alvos do worker.
+- Provas locais concluídas: análise Dart sem erros, testes unitários/fault e
+  PostgreSQL descartável com executor real, replay, soft-delete e dois workers.
+  Promoção live continua dependendo dos gates de release, imagem, smoke e
+  mesma SHA do contrato geral.
+
 ## 13. BL6 — Live Spectator
 
 **Duração:** 1 sprint mais reserva operacional de até 1 sprint.
@@ -334,6 +378,24 @@ o engine ou fingir interação.
 **Saída M2:** simulação observável ao vivo. O usuário ainda não fornece ações ao
 engine.
 
+### Estado implementado de BL6 (2026-07-26)
+
+- O backend oferece polling autenticado e owner-scoped com cursor HMAC,
+  checkpoints/deduplicação em PostgreSQL, backfill terminal e duas camadas de
+  sanitização. A migration 055 guarda apenas estado público.
+- O sidecar XMage publica uma janela process-local limitada; PostgreSQL
+  continua sendo a verdade durável. Timeout, payload, quantidade de streams,
+  registros e eventos por poll possuem limites explícitos.
+- O Flutter cria/lista jobs, acompanha progresso, mantém polling durante a
+  pausa local, retoma por cursor, trata offline/retry e chega ao replay final.
+  A rota é `/decks/:id/battle-live/:jobId`.
+- Backend e app falham fechados por flags independentes,
+  `BATTLE_LIVE_SPECTATOR_ENABLED=false` e
+  `ENABLE_BATTLE_LIVE_SPECTATOR=false`.
+- A validação Web local e os contratos automatizados passam. Homologação em
+  Android físico/TalkBack, carga no alvo e smoke live da mesma SHA continuam
+  bloqueios de release, não sucessos herdados.
+
 ## 14. BL7 — Spike XMage humano contra IA
 
 **Duração:** 1 sprint time-boxed.
@@ -353,6 +415,14 @@ produto inteiro.
 
 O spike não abre rota pública, não cria promessa de retomada após queda e não
 altera a classificação do Battle atual.
+
+### Decisão executada de BL7 (2026-07-26)
+
+O spike isolado terminou `NO_GO`, registrado no ADR 0003. Três famílias
+experimentais (`GAME_ASK`, `GAME_SELECT`, `GAME_TARGET`) aceitaram o envelope
+opaco, mas sete famílias necessárias permaneceram sem tratamento e o runtime
+revisado não provou takeover seguro de humano para IA. BL8 não pode começar
+sem um novo spike e um GO explícito.
 
 ## 15. BL8 — Sessão interativa versionada
 
@@ -479,7 +549,7 @@ contrato E2E. O plano não concede essas autorizações.
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Volume local com apenas ~3,3 GiB livres em 2026-07-24 | bloqueia builds/gates amplos | inventariar e recuperar capacidade antes de BL0; não apagar mudança ou evidência ativa |
+| Volume local operando perto do limite, com ~1,8 GiB livres após os gates de 2026-07-26 | risco de regressão de capacidade com novos artefatos; os gates atuais passam | manter backend em lotes explícitos, inventariar e remover somente caches/temporários recriáveis; não apagar mudança ou evidência ativa |
 | Integridade dos logs exige migration maior | +1 sprint | BL0 é obrigatório e versiona compatibilidade antes da UI |
 | XMage muda callback ou bloqueia em prompt não tratado | NO-GO ou +2–4 sprints | spike time-boxed, allowlist e delegação segura |
 | Hidden information aparece em payload indireto | bloqueia release | duas visões, normalização por engine e testes negativos |
@@ -489,6 +559,14 @@ contrato E2E. O plano não concede essas autorizações.
 | Uma única pessoa executa tudo | prazo 2,5–3× maior | preservar ordem e reduzir paralelismo, não remover gates |
 
 ## 22. Resposta de calendário
+
+As estimativas abaixo eram a previsão anterior à execução. A rodada assistida
+de 2026-07-26 acelerou implementação e validação local de M1/M2, mas não
+encurta esperas físicas/live nem torna BL8–BL10 executáveis após o NO-GO.
+Para o estado atual, o tempo restante é condicionado: Android físico,
+TalkBack, ambiente homologado, deploy/migrations autorizados e smoke de mesma
+SHA precisam de janela própria; Coach não possui prazo até um novo BL7 terminar
+em GO.
 
 Com a equipe e premissas deste plano:
 

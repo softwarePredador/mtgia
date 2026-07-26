@@ -173,8 +173,8 @@ class CachedCardImage extends StatelessWidget {
   }) {
     final needsScryfallWebResilience =
         kIsWeb &&
-        (isScryfallApiImageUrl(effectiveImageUrl) ||
-            (fallbackUrl != null && isScryfallApiImageUrl(fallbackUrl)));
+        (isScryfallArtworkImageUrl(effectiveImageUrl) ||
+            (fallbackUrl != null && isScryfallArtworkImageUrl(fallbackUrl)));
     if (needsScryfallWebResilience) {
       return _ScryfallWebCardImage(
         key: networkImageKey,
@@ -184,7 +184,6 @@ class CachedCardImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: alignment,
-        decodeTarget: decodeTarget,
         loadingWidget: _loadingWidget,
         errorWidget: _errorWidget,
       );
@@ -318,7 +317,6 @@ class _ScryfallWebCardImage extends StatefulWidget {
     required this.height,
     required this.fit,
     required this.alignment,
-    required this.decodeTarget,
     required this.loadingWidget,
     required this.errorWidget,
   });
@@ -329,7 +327,6 @@ class _ScryfallWebCardImage extends StatefulWidget {
   final double? height;
   final BoxFit fit;
   final Alignment alignment;
-  final ImageDecodeTarget decodeTarget;
   final Widget Function() loadingWidget;
   final Widget Function() errorWidget;
 
@@ -487,19 +484,23 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
       return widget.loadingWidget();
     }
 
-    return CachedNetworkImage(
+    // Scryfall's image CDN does not guarantee CORS response headers. The
+    // platform-view strategy is the Flutter-supported escape hatch for that
+    // case. Headers must stay empty or Flutter falls back to an XHR byte fetch,
+    // which is exactly what browsers reject here.
+    return Image.network(
+      _currentUrl,
       key: ValueKey('$_currentUrl#$_requestSequence'),
-      imageUrl: _currentUrl,
       width: widget.width,
       height: widget.height,
       fit: widget.fit,
       alignment: widget.alignment,
-      httpHeaders: CachedCardImage._scryfallHeaders,
-      memCacheWidth: widget.decodeTarget.width,
-      memCacheHeight: widget.decodeTarget.height,
-      fadeInDuration: const Duration(milliseconds: 200),
-      placeholder: (_, __) => widget.loadingWidget(),
-      errorWidget: (_, __, error) {
+      webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+      frameBuilder: (_, child, frame, wasSynchronouslyLoaded) {
+        if (wasSynchronouslyLoaded || frame != null) return child;
+        return widget.loadingWidget();
+      },
+      errorBuilder: (_, error, __) {
         _queueErrorRecovery(error);
         return _canRecover ? widget.loadingWidget() : widget.errorWidget();
       },

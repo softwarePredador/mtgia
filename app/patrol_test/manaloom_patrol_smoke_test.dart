@@ -13,6 +13,8 @@ import 'package:manaloom/features/auth/screens/login_screen.dart';
 import 'package:manaloom/features/auth/screens/register_screen.dart';
 import 'package:manaloom/features/auth/screens/verify_email_screen.dart';
 import 'package:manaloom/features/battle/models/battle_replay.dart';
+import 'package:manaloom/features/battle/models/battle_replay_annotation.dart';
+import 'package:manaloom/features/battle/models/battle_test_setup.dart';
 import 'package:manaloom/features/battle/screens/battle_replays_screen.dart';
 import 'package:manaloom/features/battle/services/battle_replay_service.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
@@ -845,6 +847,8 @@ class _PaywallProbeScreen extends StatelessWidget {
 }
 
 class _PatrolBattleReplayGateway implements BattleReplayGateway {
+  final List<BattleReplayAnnotation> _annotations = [];
+
   @override
   Future<List<BattleOpponentDeck>> listOpponentDecks({
     required String currentDeckId,
@@ -876,6 +880,17 @@ class _PatrolBattleReplayGateway implements BattleReplayGateway {
       }, fallbackDeckId: deckId),
     ];
   }
+
+  @override
+  Future<BattleReplayPageResult> listReplayPage(
+    String deckId, {
+    String? cursor,
+    int limit = 30,
+  }) async => BattleReplayPageResult(
+    items: await listReplays(deckId),
+    hasMore: false,
+    nextCursor: null,
+  );
 
   @override
   Future<BattleReplayDetail> fetchReplay({
@@ -946,6 +961,45 @@ class _PatrolBattleReplayGateway implements BattleReplayGateway {
   }
 
   @override
+  Future<List<BattleReplayAnnotation>> listReplayAnnotations({
+    required String deckId,
+    required String replayId,
+  }) async => List<BattleReplayAnnotation>.unmodifiable(_annotations);
+
+  @override
+  Future<BattleReplayAnnotation> createReplayAnnotation({
+    required String deckId,
+    required String replayId,
+    required BattleReplayAnnotationDraft draft,
+  }) async {
+    final annotation = BattleReplayAnnotation.fromJson({
+      'schema_version': 'battle_replay_annotation_v1',
+      'id': 'patrol-annotation-${_annotations.length + 1}',
+      'replay_id': replayId,
+      'subject_deck_id': deckId,
+      'subject_deck_revision': 'deck_snapshot_sha256_v1:patrol',
+      if (draft.eventRef != null) 'event_ref': draft.eventRef,
+      if (draft.snapshotRef != null) 'snapshot_ref': draft.snapshotRef,
+      'kind': draft.kind.wireValue,
+      'payload': draft.payload,
+      'created_at': '2026-07-26T12:00:00Z',
+    });
+    _annotations.insert(0, annotation);
+    return annotation;
+  }
+
+  @override
+  Future<bool> deleteReplayAnnotation({
+    required String deckId,
+    required String replayId,
+    required String annotationId,
+  }) async {
+    final before = _annotations.length;
+    _annotations.removeWhere((annotation) => annotation.id == annotationId);
+    return _annotations.length != before;
+  }
+
+  @override
   Future<BattleReplayDetail> runBattleSimulation({
     required String deckId,
     required String opponentDeckId,
@@ -953,6 +1007,31 @@ class _PatrolBattleReplayGateway implements BattleReplayGateway {
   }) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<BattlePreflight> loadBattlePreflight({
+    required String deckId,
+    required String opponentDeckId,
+  }) async => const BattlePreflight(
+    status: 'ready',
+    cardCount: 100,
+    commanderCount: 1,
+    validationState: 'validated',
+    availableOpponentCount: 1,
+    engineCoverage: {'xmage': 'ready'},
+    blockers: [],
+  );
+
+  @override
+  Future<BattleReplayDetail> runBattleTest({
+    required String deckId,
+    required BattleTestSetup setup,
+    int maxTurns = 30,
+  }) => runBattleSimulation(
+    deckId: deckId,
+    opponentDeckId: setup.opponentDeckId,
+    maxTurns: maxTurns,
+  );
 
   @override
   Future<BattleReplayDetail> runGoldfishSimulation({

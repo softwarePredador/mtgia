@@ -165,6 +165,7 @@ Map<String, dynamic> _simulationMetrics(
     if (nested is Map) ...nested.cast<String, dynamic>(),
     'engine': result['engine'],
     'engine_contract': result['engine_contract'],
+    'test_objective': result['test_objective'],
     'duration_ms': result['duration_ms'],
     'turns': result['turns'],
     'winner_deck_id': winnerDeckId,
