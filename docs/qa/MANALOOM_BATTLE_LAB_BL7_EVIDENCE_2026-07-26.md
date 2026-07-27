@@ -1,6 +1,6 @@
 # Evidência BL7 — Spike XMage humano contra IA
 
-- Data: 2026-07-26
+- Data: 2026-07-26; reabertura técnica em 2026-07-27
 - Resultado da sprint: `PASS_DECISION_NO_GO`
 - Decisão de produto: `NO_GO`
 - Superfície pública criada: nenhuma
@@ -25,14 +25,16 @@ Allowlist experimental:
 - `GAME_CHOOSE_ABILITY` → UUID allowlisted;
 - `GAME_CHOOSE_PILE` → boolean;
 - `GAME_CHOOSE_CHOICE` → string/opção especial allowlisted;
+- `GAME_PLAY_MANA` → UUID presente em `GameView.canPlayObjects`, tipo de mana
+  presente no pool privado, ação especial anunciada ou cancelamento;
 - `GAME_PLAY_XMANA` → boolean;
 - `GAME_GET_AMOUNT` → inteiro dentro dos limites;
 - `GAME_GET_MULTI_AMOUNT` → string numérica delimitada e validada.
 
-Sem tratamento:
-
-- `GAME_PLAY_MANA`, cujo callback revisado não fornece UUIDs permitidos para
-  uma resposta remota segura; o spike falha fechado.
+O inventário conhecido não possui mais família sem tratamento. Para
+`GAME_PLAY_MANA`, o envelope não aceita UUID fornecido pelo cliente: ele
+transforma somente IDs produzidos pelo servidor em opções HMAC opacas e deixa
+a validação final da habilidade de mana com o XMage.
 
 Também não foi encontrada API revisada que prove transição segura de
 participante `HUMAN` para IA durante a partida.
@@ -44,6 +46,7 @@ bash -n services/xmage-sidecar/bin/human_vs_ai_spike.sh
 services/xmage-sidecar/bin/human_vs_ai_spike.sh
 ```
 
-O harness executa sete testes Maven focados e imprime
-`BL7_SPIKE_DECISION=NO_GO`. NO-GO é a saída correta do spike, não falha
-silenciosa nem permissão para iniciar BL8.
+O harness executa sete testes Maven focados, imprime
+`BL7_CALLBACKS_UNHANDLED=none` e mantém `BL7_SPIKE_DECISION=NO_GO`. NO-GO é a
+saída correta enquanto não houver partida humana completa, métricas runtime e
+takeover seguro; não é permissão para iniciar BL8.

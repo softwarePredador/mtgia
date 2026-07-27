@@ -14,11 +14,12 @@
 | BL8-06 | `NOT_STARTED_DEPENDENCY_BLOCKED` |
 | BL8-07 | `NOT_STARTED_DEPENDENCY_BLOCKED` |
 
-BL8 exigia `BL7=GO`. O ADR 0003 registrou NO-GO por callbacks necessários
-sem tratamento, ausência de partida humana completa e ausência de takeover
-humano→IA seguro. Criar persistência, endpoints ou pool XMage neste estado
-violaria o gate arquitetural e produziria uma sessão que pode travar ou expor
-informação privada.
+BL8 exigia `BL7=GO`. A reabertura técnica fechou o inventário conhecido de
+callbacks, mas o ADR 0003 continua `NO_GO` pela ausência de partida humana
+completa, métricas runtime de deadlock/privacidade e takeover humano→IA seguro.
+Criar persistência, endpoints ou pool XMage neste estado violaria o gate
+arquitetural e produziria uma sessão que ainda pode travar ou expor informação
+privada.
 
 Para reabrir, um novo spike precisa cumprir todas as condições do ADR 0003 e
 emitir GO explícito. Esta evidência negativa fecha a auditoria da sprint sem

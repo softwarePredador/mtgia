@@ -2,16 +2,20 @@ package com.manaloom.xmage;
 
 import mage.cards.decks.DeckCardLists;
 import mage.choices.ChoiceImpl;
+import mage.constants.ManaType;
 import mage.constants.PlayerAction;
 import mage.game.match.MatchOptions;
 import mage.interfaces.callback.ClientCallback;
 import mage.interfaces.callback.ClientCallbackMethod;
+import mage.players.ManaPool;
+import mage.players.PlayableObjectStats;
 import mage.players.PlayerType;
 import mage.remote.Session;
 import mage.util.MultiAmountMessage;
 import mage.view.AbilityPickerView;
 import mage.view.CardsView;
 import mage.view.GameClientMessage;
+import mage.view.ManaPoolView;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
@@ -20,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -80,7 +83,7 @@ final class HumanVsAiSpikeTest {
     }
 
     @Test
-    void mapsLegacyAndSixTypedFamiliesWhileKeepingPlayManaNativeOnly() {
+    void mapsLegacyAndSevenTypedFamiliesIncludingBoundedManaResponses() {
         Map<String, Object> mulliganOptions = new LinkedHashMap<>();
         mulliganOptions.put("UI.left.btn.text", "Mulligan");
         mulliganOptions.put("UI.right.btn.text", "Keep");
@@ -167,6 +170,14 @@ final class HumanVsAiSpikeTest {
                 )
         );
         assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MANA,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_PLAY_MANA,
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+        assertEquals(
                 HumanVsAiSpikeHarness.PromptKind.X_MANA,
                 HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_PLAY_XMANA,
@@ -198,16 +209,7 @@ final class HumanVsAiSpikeTest {
                     HumanVsAiSpikeHarness.callbackDisposition(method)
             );
         }
-        assertEquals(
-                HumanVsAiSpikeHarness.CallbackDisposition.NATIVE_ONLY_FAIL_CLOSED,
-                HumanVsAiSpikeHarness.callbackDisposition(
-                        ClientCallbackMethod.GAME_PLAY_MANA
-                )
-        );
-        assertEquals(
-                EnumSet.of(ClientCallbackMethod.GAME_PLAY_MANA),
-                HumanVsAiSpikeHarness.unhandledCallbacks()
-        );
+        assertTrue(HumanVsAiSpikeHarness.unhandledCallbacks().isEmpty());
     }
 
     @Test
@@ -305,7 +307,7 @@ final class HumanVsAiSpikeTest {
     }
 
     @Test
-    void bridgesSixPinnedCallbackFamiliesWithExactSessionResponseChannels() {
+    void bridgesSevenPinnedCallbackFamiliesWithExactSessionResponseChannels() {
         HumanVsAiSpikeHarness.PromptRegistry registry = newRegistry();
         UUID gameId = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
         List<String> sentMethods = new ArrayList<>();
@@ -404,10 +406,55 @@ final class HumanVsAiSpikeTest {
         assertEquals("blue", choiceResponse.command.value);
         assertTrue(choiceResponse.dispatch(session));
 
+        UUID manaSourceId = UUID.fromString(
+                "22222222-2222-2222-2222-222222222222"
+        );
+        UUID manaPlayerId = UUID.fromString(
+                "33333333-3333-3333-3333-333333333333"
+        );
+        Map<UUID, PlayableObjectStats> playableManaObjects =
+                new LinkedHashMap<>();
+        playableManaObjects.put(manaSourceId, new PlayableObjectStats());
+        ManaPoolView manaPool = new ManaPoolView(new ManaPool(manaPlayerId)) {
+            @Override
+            public int getGreen() {
+                return 1;
+            }
+        };
+        List<HumanVsAiSpikeHarness.ResponseCommand> manaCommands =
+                HumanVsAiSpikeHarness.PromptRegistry.buildManaResponses(
+                        playableManaObjects,
+                        manaPlayerId,
+                        manaPool,
+                        true
+                );
+        assertEquals(4, manaCommands.size());
+        assertEquals(
+                HumanVsAiSpikeHarness.ResponseChannel.UUID,
+                manaCommands.get(0).channel
+        );
+        assertEquals(manaSourceId, manaCommands.get(0).value);
+        assertEquals(
+                HumanVsAiSpikeHarness.ResponseChannel.MANA_TYPE,
+                manaCommands.get(1).channel
+        );
+        HumanVsAiSpikeHarness.ManaTypeResponse manaTypeResponse =
+                (HumanVsAiSpikeHarness.ManaTypeResponse) manaCommands.get(1).value;
+        assertEquals(manaPlayerId, manaTypeResponse.playerId);
+        assertEquals(ManaType.GREEN, manaTypeResponse.manaType);
+        assertEquals("special", manaCommands.get(2).value);
+        assertEquals(false, manaCommands.get(3).value);
+        for (HumanVsAiSpikeHarness.ResponseCommand command : manaCommands) {
+            assertTrue(
+                    new HumanVsAiSpikeHarness.ResolvedResponse(gameId, command)
+                            .dispatch(session)
+            );
+        }
+
         HumanVsAiSpikeHarness.Prompt xManaPrompt = registry.open(callback(
                 ClientCallbackMethod.GAME_PLAY_XMANA,
                 gameId,
-                4,
+                5,
                 new GameClientMessage(
                         null,
                         Collections.<String, Serializable>emptyMap(),
@@ -427,7 +474,7 @@ final class HumanVsAiSpikeTest {
         HumanVsAiSpikeHarness.Prompt amountPrompt = registry.open(callback(
                 ClientCallbackMethod.GAME_GET_AMOUNT,
                 gameId,
-                5,
+                6,
                 new GameClientMessage(
                         null,
                         Collections.<String, Serializable>emptyMap(),
@@ -466,7 +513,7 @@ final class HumanVsAiSpikeTest {
         HumanVsAiSpikeHarness.Prompt multiPrompt = registry.open(callback(
                 ClientCallbackMethod.GAME_GET_MULTI_AMOUNT,
                 gameId,
-                6,
+                7,
                 new GameClientMessage(
                         null,
                         Collections.<String, Serializable>emptyMap(),
@@ -504,6 +551,10 @@ final class HumanVsAiSpikeTest {
                         "sendPlayerUUID",
                         "sendPlayerBoolean",
                         "sendPlayerString",
+                        "sendPlayerUUID",
+                        "sendPlayerManaType",
+                        "sendPlayerString",
+                        "sendPlayerBoolean",
                         "sendPlayerBoolean",
                         "sendPlayerInteger",
                         "sendPlayerString"
@@ -517,10 +568,11 @@ final class HumanVsAiSpikeTest {
 
     @Test
     void typedAdaptersRejectUnprovenOrMalformedResponsesWithoutConsumingPrompt() {
-        HumanVsAiSpikeHarness.PromptRegistry nativeOnlyRegistry = newRegistry();
-        IllegalArgumentException nativeOnlyError = assertThrows(
+        HumanVsAiSpikeHarness.PromptRegistry malformedManaRegistry =
+                newRegistry();
+        IllegalArgumentException malformedManaError = assertThrows(
                 IllegalArgumentException.class,
-                () -> nativeOnlyRegistry.open(callback(
+                () -> malformedManaRegistry.open(callback(
                         ClientCallbackMethod.GAME_PLAY_MANA,
                         UUID.randomUUID(),
                         1,
@@ -531,7 +583,11 @@ final class HumanVsAiSpikeTest {
                         )
                 ))
         );
-        assertTrue(nativeOnlyError.getMessage().contains("native-only"));
+        assertTrue(
+                malformedManaError.getMessage().contains(
+                        "private player GameView"
+                )
+        );
 
         HumanVsAiSpikeHarness.PromptRegistry malformedRegistry = newRegistry();
         assertThrows(
@@ -728,7 +784,6 @@ final class HumanVsAiSpikeTest {
         assertEquals(
                 Arrays.asList(
                         "no_completed_human_runtime_match",
-                        "decision_callback_families_unhandled",
                         "human_to_ai_transition_unproven"
                 ),
                 assessment.blockers

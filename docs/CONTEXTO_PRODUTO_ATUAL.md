@@ -13,10 +13,12 @@
   PostgreSQL. `shared_preferences` não é storage durável de Battle;
 - migrations 052–055 passaram em PostgreSQL descartável. Elas não foram
   aplicadas nem consultadas no banco live e não recebem crédito de deploy;
-- BL7 foi executado como spike XMage isolado e encerrou em `NO_GO`: callbacks
-  humanos necessários continuam incompletos e não existe takeover humano→IA
-  seguro comprovado. BL8 está bloqueado e BL9/BL10 não começaram por
-  dependência; o produto não oferece Coach Mode ou jogo interativo;
+- BL7 foi executado como spike XMage isolado e encerrou em `NO_GO`: a
+  reabertura técnica fechou o inventário conhecido de callbacks, inclusive
+  `GAME_PLAY_MANA`, mas não existe partida humana completa, métricas runtime ou
+  takeover humano→IA seguro comprovado. BL8 está bloqueado e BL9/BL10 não
+  começaram por dependência; o produto não oferece Coach Mode ou jogo
+  interativo;
 - o build Web release local usa base `/app/` e o Live opt-in para validação. A
   correção de imagens Scryfall usa `HTMLImageElement` somente no Web para
   contornar a ausência de CORS no host final, sem enviar headers; plataformas

@@ -78,7 +78,7 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
 | BL4 | `PARTIAL_BLOCKED_PHYSICAL_AND_RELEASE` | Preflight local mede p50/p95 e acessibilidade automatizada; Android físico/TalkBack, carga real, smoke live e mesma SHA implantada não foram executados |
 | BL5 | `PASS_LOCAL_FEATURE_OFF` | Job assíncrono, worker, leases, quotas, cancelamento, correlação e fault injection implementados; rollout desligado |
 | BL6 | `PASS_LOCAL_FEATURE_OFF_WITH_DEVICE_BLOCK` | Polling Live, cursor, armazenamento durável, reconexão e UI Web implementados; fanout sintético local de 64 streams passou, Android físico/sockets reais/live pendentes |
-| BL7 | `PASS_DECISION_NO_GO` | Spike tipou seis famílias adicionais, mas `GAME_PLAY_MANA`, partida humana completa e takeover humano→IA seguro seguem não provados |
+| BL7 | `PASS_DECISION_NO_GO` | Spike tipou sete famílias adicionais e fechou o inventário conhecido de callbacks; partida humana completa, métricas runtime e takeover humano→IA seguro seguem não provados |
 | BL8 | `BLOCKED_BL7_NO_GO` | Nenhuma sessão interativa pública foi criada |
 | BL9 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Coach Mode não foi criado |
 | BL10 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Homologação do Coach não pode começar sem BL8/BL9 |
@@ -416,17 +416,20 @@ produto inteiro.
 O spike não abre rota pública, não cria promessa de retomada após queda e não
 altera a classificação do Battle atual.
 
-### Decisão executada de BL7 (2026-07-26)
+### Decisão executada de BL7 (2026-07-26; reabertura em 2026-07-27)
 
 O spike isolado terminou `NO_GO`, registrado no ADR 0003. Três famílias
-experimentais legadas (`GAME_ASK`, `GAME_SELECT`, `GAME_TARGET`) e seis
+experimentais legadas (`GAME_ASK`, `GAME_SELECT`, `GAME_TARGET`) e sete
 famílias tipadas (`GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`,
-`GAME_CHOOSE_CHOICE`, `GAME_PLAY_XMANA`, `GAME_GET_AMOUNT`,
-`GAME_GET_MULTI_AMOUNT`) passaram pelo envelope HMAC opaco, vinculado a
-`gameId`, `messageId` e versão, com despacho no máximo uma vez.
-`GAME_PLAY_MANA` continua fail-closed porque o callback não fornece allowlist
-UUID segura. O runtime também não provou uma partida humana completa nem
-takeover de humano para IA. BL8 não pode começar sem novo spike e GO explícito.
+`GAME_CHOOSE_CHOICE`, `GAME_PLAY_MANA`, `GAME_PLAY_XMANA`,
+`GAME_GET_AMOUNT`, `GAME_GET_MULTI_AMOUNT`) passaram pelo envelope HMAC opaco,
+vinculado a `gameId`, `messageId` e versão, com despacho no máximo uma vez.
+`GAME_PLAY_MANA` usa somente IDs presentes em `GameView.canPlayObjects`, tipos
+existentes no pool privado, ação especial anunciada ou cancelamento; o XMage
+continua responsável pela validação final da habilidade de mana. O runtime
+ainda não provou uma partida humana completa, métricas de deadlock/privacidade
+nem takeover de humano para IA. BL8 não pode começar sem novo spike runtime e
+GO explícito.
 
 ## 15. BL8 — Sessão interativa versionada
 

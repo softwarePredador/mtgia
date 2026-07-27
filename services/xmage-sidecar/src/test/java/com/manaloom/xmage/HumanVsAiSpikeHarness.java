@@ -3,17 +3,23 @@ package com.manaloom.xmage;
 import mage.abilities.Modes;
 import mage.cards.decks.DeckCardLists;
 import mage.choices.Choice;
+import mage.constants.ManaType;
 import mage.constants.MultiAmountType;
 import mage.constants.PlayerAction;
 import mage.game.match.MatchOptions;
 import mage.interfaces.callback.ClientCallback;
 import mage.interfaces.callback.ClientCallbackMethod;
+import mage.players.PlayableObjectStats;
+import mage.players.PlayableObjectsList;
 import mage.players.PlayerType;
 import mage.remote.Session;
 import mage.util.MultiAmountMessage;
 import mage.view.AbilityPickerView;
 import mage.view.CardsView;
 import mage.view.GameClientMessage;
+import mage.view.GameView;
+import mage.view.ManaPoolView;
+import mage.view.PlayerView;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -43,6 +49,7 @@ final class HumanVsAiSpikeHarness {
         ABILITY,
         PILE,
         CHOICE,
+        MANA,
         X_MANA,
         AMOUNT,
         MULTI_AMOUNT
@@ -56,7 +63,6 @@ final class HumanVsAiSpikeHarness {
 
     enum CallbackDisposition {
         TYPED_BRIDGE,
-        NATIVE_ONLY_FAIL_CLOSED,
         UNSUPPORTED_FAIL_CLOSED
     }
 
@@ -64,7 +70,8 @@ final class HumanVsAiSpikeHarness {
         UUID,
         BOOLEAN,
         STRING,
-        INTEGER
+        INTEGER,
+        MANA_TYPE
     }
 
     enum TimeoutPolicy {
@@ -99,6 +106,7 @@ final class HumanVsAiSpikeHarness {
             ClientCallbackMethod.GAME_CHOOSE_ABILITY,
             ClientCallbackMethod.GAME_CHOOSE_PILE,
             ClientCallbackMethod.GAME_CHOOSE_CHOICE,
+            ClientCallbackMethod.GAME_PLAY_MANA,
             ClientCallbackMethod.GAME_PLAY_XMANA,
             ClientCallbackMethod.GAME_GET_AMOUNT,
             ClientCallbackMethod.GAME_GET_MULTI_AMOUNT
@@ -195,6 +203,9 @@ final class HumanVsAiSpikeHarness {
         if (method == ClientCallbackMethod.GAME_CHOOSE_CHOICE) {
             return PromptKind.CHOICE;
         }
+        if (method == ClientCallbackMethod.GAME_PLAY_MANA) {
+            return PromptKind.MANA;
+        }
         if (method == ClientCallbackMethod.GAME_PLAY_XMANA) {
             return PromptKind.X_MANA;
         }
@@ -210,9 +221,6 @@ final class HumanVsAiSpikeHarness {
     static CallbackDisposition callbackDisposition(ClientCallbackMethod method) {
         if (BRIDGED_CALLBACKS.contains(method)) {
             return CallbackDisposition.TYPED_BRIDGE;
-        }
-        if (method == ClientCallbackMethod.GAME_PLAY_MANA) {
-            return CallbackDisposition.NATIVE_ONLY_FAIL_CLOSED;
         }
         return CallbackDisposition.UNSUPPORTED_FAIL_CLOSED;
     }
@@ -348,6 +356,13 @@ final class HumanVsAiSpikeHarness {
             return new ResponseCommand(ResponseChannel.INTEGER, value);
         }
 
+        static ResponseCommand manaType(UUID playerId, ManaType manaType) {
+            return new ResponseCommand(
+                    ResponseChannel.MANA_TYPE,
+                    new ManaTypeResponse(playerId, manaType)
+            );
+        }
+
         private boolean dispatch(Session session, UUID gameId) {
             switch (channel) {
                 case UUID:
@@ -358,6 +373,13 @@ final class HumanVsAiSpikeHarness {
                     return session.sendPlayerString(gameId, (String) value);
                 case INTEGER:
                     return session.sendPlayerInteger(gameId, (Integer) value);
+                case MANA_TYPE:
+                    ManaTypeResponse response = (ManaTypeResponse) value;
+                    return session.sendPlayerManaType(
+                            gameId,
+                            response.playerId,
+                            response.manaType
+                    );
                 default:
                     throw new IllegalStateException("unsupported response channel");
             }
@@ -370,6 +392,26 @@ final class HumanVsAiSpikeHarness {
         @Override
         public String toString() {
             return "ResponseCommand{" + channel.name() + "}";
+        }
+    }
+
+    static final class ManaTypeResponse {
+        final UUID playerId;
+        final ManaType manaType;
+
+        ManaTypeResponse(UUID playerId, ManaType manaType) {
+            if (playerId == null || manaType == null) {
+                throw new IllegalArgumentException(
+                        "mana response requires player and mana type"
+                );
+            }
+            this.playerId = playerId;
+            this.manaType = manaType;
+        }
+
+        @Override
+        public String toString() {
+            return playerId + ":" + manaType.name();
         }
     }
 
@@ -445,12 +487,6 @@ final class HumanVsAiSpikeHarness {
             if (callback == null || callback.getMethod() == null) {
                 throw new IllegalArgumentException("callback and method are required");
             }
-            CallbackDisposition disposition = callbackDisposition(callback.getMethod());
-            if (disposition == CallbackDisposition.NATIVE_ONLY_FAIL_CLOSED) {
-                throw new IllegalArgumentException(
-                        "GAME_PLAY_MANA is native-only: callback payload has no UUID allowlist"
-                );
-            }
             if (!TYPED_BRIDGED_CALLBACKS.contains(callback.getMethod())) {
                 throw new IllegalArgumentException("callback has no typed spike adapter");
             }
@@ -462,6 +498,8 @@ final class HumanVsAiSpikeHarness {
                     return openPile(callback);
                 case GAME_CHOOSE_CHOICE:
                     return openChoice(callback);
+                case GAME_PLAY_MANA:
+                    return openMana(callback);
                 case GAME_PLAY_XMANA:
                     requirePayload(callback, GameClientMessage.class);
                     return begin(
@@ -482,6 +520,141 @@ final class HumanVsAiSpikeHarness {
                     return openMultiAmount(callback);
                 default:
                     throw new IllegalArgumentException("callback has no typed spike adapter");
+            }
+        }
+
+        private Prompt openMana(ClientCallback callback) {
+            GameClientMessage payload = requirePayload(
+                    callback,
+                    GameClientMessage.class
+            );
+            GameView gameView = payload.getGameView();
+            if (gameView == null || !gameView.isPlayer()) {
+                throw new IllegalArgumentException(
+                        "mana callback requires a private player GameView"
+                );
+            }
+            PlayerView player = gameView.getMyPlayer();
+            if (player == null || player.getPlayerId() == null) {
+                throw new IllegalArgumentException(
+                        "mana callback player identity is required"
+                );
+            }
+            PlayableObjectsList playableObjects = gameView.getCanPlayObjects();
+            if (playableObjects == null || playableObjects.getObjects() == null) {
+                throw new IllegalArgumentException(
+                        "mana callback playable objects are required"
+                );
+            }
+
+            List<ResponseCommand> responses = buildManaResponses(
+                    playableObjects.getObjects(),
+                    player.getPlayerId(),
+                    player.getManaPool(),
+                    gameView.getSpecial()
+            );
+            return begin(
+                    callback,
+                    PromptKind.MANA,
+                    InputMode.OPTIONS,
+                    responses,
+                    0,
+                    0,
+                    Collections.<MultiAmountMessage>emptyList()
+            );
+        }
+
+        static List<ResponseCommand> buildManaResponses(
+                Map<UUID, PlayableObjectStats> playableObjects,
+                UUID playerId,
+                ManaPoolView manaPool,
+                boolean specialActionAvailable
+        ) {
+            if (playableObjects == null
+                    || playerId == null
+                    || manaPool == null) {
+                throw new IllegalArgumentException(
+                        "mana response inputs are required"
+                );
+            }
+
+            for (Map.Entry<UUID, PlayableObjectStats> entry
+                    : playableObjects.entrySet()) {
+                UUID objectId = entry.getKey();
+                if (objectId == null || entry.getValue() == null) {
+                    throw new IllegalArgumentException(
+                            "mana playable object entry is invalid"
+                    );
+                }
+            }
+            List<UUID> objectIds = new ArrayList<>(playableObjects.keySet());
+            objectIds.sort((left, right) -> left.toString().compareTo(
+                    right.toString()
+            ));
+            List<ResponseCommand> responses = new ArrayList<>();
+            for (UUID objectId : objectIds) {
+                responses.add(ResponseCommand.uuid(objectId));
+            }
+
+            addManaTypeIfPresent(
+                    responses,
+                    playerId,
+                    ManaType.BLACK,
+                    manaPool.getBlack()
+            );
+            addManaTypeIfPresent(
+                    responses,
+                    playerId,
+                    ManaType.BLUE,
+                    manaPool.getBlue()
+            );
+            addManaTypeIfPresent(
+                    responses,
+                    playerId,
+                    ManaType.GREEN,
+                    manaPool.getGreen()
+            );
+            addManaTypeIfPresent(
+                    responses,
+                    playerId,
+                    ManaType.RED,
+                    manaPool.getRed()
+            );
+            addManaTypeIfPresent(
+                    responses,
+                    playerId,
+                    ManaType.WHITE,
+                    manaPool.getWhite()
+            );
+            addManaTypeIfPresent(
+                    responses,
+                    playerId,
+                    ManaType.COLORLESS,
+                    manaPool.getColorless()
+            );
+            if (specialActionAvailable) {
+                responses.add(ResponseCommand.string("special"));
+            }
+
+            // HumanPlayer treats any Boolean response as cancellation. Use the
+            // same false value emitted by the native feedback panel.
+            responses.add(ResponseCommand.bool(false));
+            return responses;
+        }
+
+        private static void addManaTypeIfPresent(
+                List<ResponseCommand> responses,
+                UUID playerId,
+                ManaType manaType,
+                int count
+        ) {
+            if (count < 0) {
+                throw new IllegalArgumentException(
+                        "mana pool count cannot be negative"
+                );
+            }
+            if (count > 0) {
+                responses.add(ResponseCommand.manaType(playerId, manaType));
             }
         }
 
