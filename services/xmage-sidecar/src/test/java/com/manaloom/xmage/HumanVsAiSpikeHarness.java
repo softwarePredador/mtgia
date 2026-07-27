@@ -266,7 +266,8 @@ final class HumanVsAiSpikeHarness {
     static Assessment assess(
             boolean completedHumanRuntimeMatch,
             boolean hiddenInformationLeak,
-            int deadlocks
+            int deadlocks,
+            boolean explicitTerminationPolicyProven
     ) {
         List<String> blockers = new ArrayList<>();
         if (!completedHumanRuntimeMatch) {
@@ -275,8 +276,9 @@ final class HumanVsAiSpikeHarness {
         if (!unhandledCallbacks().isEmpty()) {
             blockers.add("decision_callback_families_unhandled");
         }
-        if (!hasRemoteHumanToAiTransition()) {
-            blockers.add("human_to_ai_transition_unproven");
+        if (!hasRemoteHumanToAiTransition()
+                && !explicitTerminationPolicyProven) {
+            blockers.add("safe_timeout_terminal_path_unproven");
         }
         if (hiddenInformationLeak) {
             blockers.add("hidden_information_leak");
@@ -983,6 +985,49 @@ final class HumanVsAiSpikeHarness {
                     gameId,
                     ResponseCommand.string(encoded.toString())
             );
+        }
+
+        ResolvedResponse resolveMinimumMultiAmount(
+                String promptId,
+                long stateVersion
+        ) {
+            assertActive(promptId, stateVersion);
+            if (activeInputMode != InputMode.MULTI_AMOUNT) {
+                throw new IllegalArgumentException(
+                        "prompt does not accept multi-amount values"
+                );
+            }
+
+            List<Integer> values = new ArrayList<>();
+            long total = 0L;
+            for (MultiAmountMessage constraint : activeMultiAmounts) {
+                values.add(constraint.min);
+                total += constraint.min;
+            }
+            if (total > activeMaximum) {
+                throw new IllegalArgumentException(
+                        "multi-amount minimums exceed total maximum"
+                );
+            }
+
+            long missing = Math.max(0L, (long) activeMinimum - total);
+            for (int index = 0; index < activeMultiAmounts.size()
+                    && missing > 0L; index++) {
+                MultiAmountMessage constraint = activeMultiAmounts.get(index);
+                int current = values.get(index);
+                int increment = (int) Math.min(
+                        missing,
+                        (long) constraint.max - current
+                );
+                values.set(index, current + increment);
+                missing -= increment;
+            }
+            if (missing > 0L) {
+                throw new IllegalArgumentException(
+                        "multi-amount bounds have no minimum solution"
+                );
+            }
+            return resolveMultiAmount(promptId, stateVersion, values);
         }
 
         private void assertActive(String promptId, long stateVersion) {

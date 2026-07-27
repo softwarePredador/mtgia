@@ -98,7 +98,7 @@ docker build -f services/xmage-sidecar/Dockerfile -t manaloom-xmage-sidecar .
 docker run --rm -p 8080:8080 manaloom-xmage-sidecar
 ```
 
-## Human-vs-AI spike (NO_GO)
+## Human-vs-AI spike (GO for default-off BL8 engineering)
 
 The BL7 human seat experiment remains test-only and is not reachable through
 the sidecar HTTP contract. Its pinned-bytecode harness now validates typed
@@ -113,16 +113,20 @@ validation.
 Prompt and option tokens are HMAC-bound to the callback game ID and message
 version, remain opaque, and can be resolved and dispatched only once.
 
-Timeout does not attempt an unproven HUMAN-to-AI takeover. It tries `CONCEDE`
-and terminates the isolated process even when concede is rejected or throws.
-The spike remains `NO_GO` until a complete human runtime match, the remaining
-runtime/deadlock/privacy measurements, and a safe remote seat-transition
-contract are all proven.
+Timeout does not attempt an unavailable HUMAN-to-AI takeover. It tries
+`CONCEDE` and terminates the isolated process even when concede is rejected or
+throws. Three loopback runtime matches completed with 251/251 accepted
+responses, zero deadlock and zero identifiable opponent-hand objects. A
+separate forced-timeout run received a concede acknowledgement and
+`GAME_OVER`. ADR 0004 therefore grants GO only to implement BL8 locally behind
+a default-off gate; it is not release or rollout authority.
 
-Run the bytecode audit and focused tests with:
+Run the bytecode audit/focused tests, then the loopback runtime gate with:
 
 ```bash
 services/xmage-sidecar/bin/human_vs_ai_spike.sh
+XMAGE_SERVER_PORT=17171 \
+  services/xmage-sidecar/bin/human_vs_ai_runtime_spike.sh
 ```
 
 ## Backend modes

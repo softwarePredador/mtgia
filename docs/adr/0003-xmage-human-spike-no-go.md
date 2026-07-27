@@ -1,9 +1,13 @@
 # ADR 0003 — NO-GO do spike XMage humano contra IA
 
-- Estado: aceito
+- Estado: substituído pelo ADR 0004 em 2026-07-27
 - Data: 2026-07-26
 - Programa: `BL7`
 - Decisão: `NO_GO`
+
+> Registro histórico: esta decisão era correta para a evidência disponível em
+> 2026-07-26. O runtime adicional e a política de encerramento explícito que
+> satisfizeram a reabertura estão no ADR 0004.
 
 ## Contexto
 
@@ -63,12 +67,9 @@ Um novo spike, deliberadamente autorizado, precisa:
 
 Até lá, o produto não oferece Coach Mode.
 
-## Provas reproduzíveis
+## Provas históricas
 
-```bash
-bash -n services/xmage-sidecar/bin/human_vs_ai_spike.sh
-services/xmage-sidecar/bin/human_vs_ai_spike.sh
-```
-
-O script valida o pin Maven/bytecode, executa sete testes e imprime a matriz de
-callbacks e a decisão `BL7_SPIKE_DECISION=NO_GO`.
+Na data desta decisão, o harness validava o pin Maven/bytecode, executava sete
+testes e ainda não possuía prova runtime. O script atual foi evoluído após a
+reabertura e reflete o GO do ADR 0004; não deve ser usado para reescrever
+retroativamente este registro histórico.

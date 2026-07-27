@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `3bc39835bd91531cc4e9b9c1536a90c4a9d67efb136cb07ae96a267706068faa`
+**Digest das fontes:** `57ef5d757e77d817f3d4fdd741cfd5dae5332f43dc12ffa9626fd651d88cd234`
 
 ## Fontes de verdade
 
@@ -17,7 +17,7 @@
 |---|---:|
 | `dart_source_files` | 628 |
 | `non_dart_product_files` | 47 |
-| `battle_sidecar_source_files` | 26 |
+| `battle_sidecar_source_files` | 28 |
 | `dart_symbols` | 4398 |
 | `semantic_resolved_files` | 628 |
 | `semantic_unresolved_files` | 0 |
@@ -31,8 +31,8 @@
 | `database_tables` | 77 |
 | `database_views` | 6 |
 | `migrations` | 55 |
-| `scripts_and_jobs` | 646 |
-| `environment_variables` | 625 |
+| `scripts_and_jobs` | 647 |
+| `environment_variables` | 631 |
 | `tests` | 1121 |
 | `flows` | 8 |
 | `traceability_rules` | 11 |

@@ -567,6 +567,44 @@ final class HumanVsAiSpikeTest {
     }
 
     @Test
+    void multiAmountCanResolveDeterministicMinimumSolution() {
+        HumanVsAiSpikeHarness.PromptRegistry registry =
+                new HumanVsAiSpikeHarness.PromptRegistry(
+                        "minimum-multi-amount-secret"
+                                .getBytes(StandardCharsets.UTF_8)
+                );
+        List<MultiAmountMessage> constraints = Arrays.asList(
+                new MultiAmountMessage("first", 1, 4),
+                new MultiAmountMessage("second", 2, 6)
+        );
+        ClientCallback callback = callback(
+                ClientCallbackMethod.GAME_GET_MULTI_AMOUNT,
+                UUID.randomUUID(),
+                73,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        constraints,
+                        6,
+                        8
+                )
+        );
+
+        HumanVsAiSpikeHarness.Prompt prompt = registry.open(callback);
+        HumanVsAiSpikeHarness.ResolvedResponse resolved =
+                registry.resolveMinimumMultiAmount(
+                        prompt.promptId,
+                        prompt.stateVersion
+                );
+
+        assertEquals(
+                HumanVsAiSpikeHarness.ResponseChannel.STRING,
+                resolved.command.channel
+        );
+        assertEquals("4 2", resolved.command.value);
+    }
+
+    @Test
     void typedAdaptersRejectUnprovenOrMalformedResponsesWithoutConsumingPrompt() {
         HumanVsAiSpikeHarness.PromptRegistry malformedManaRegistry =
                 newRegistry();
@@ -778,16 +816,27 @@ final class HumanVsAiSpikeTest {
     @Test
     void spikeIsNoGoWithoutRuntimeCompletionAndFullCallbackCoverage() {
         HumanVsAiSpikeHarness.Assessment assessment =
-                HumanVsAiSpikeHarness.assess(false, false, 0);
+                HumanVsAiSpikeHarness.assess(false, false, 0, false);
 
         assertEquals(HumanVsAiSpikeHarness.Decision.NO_GO, assessment.decision);
         assertEquals(
                 Arrays.asList(
                         "no_completed_human_runtime_match",
-                        "human_to_ai_transition_unproven"
+                        "safe_timeout_terminal_path_unproven"
                 ),
                 assessment.blockers
         );
+    }
+
+    @Test
+    void spikeCanGoWithSafeExplicitTerminationWithoutClaimingAiTakeover() {
+        assertFalse(HumanVsAiSpikeHarness.hasRemoteHumanToAiTransition());
+
+        HumanVsAiSpikeHarness.Assessment assessment =
+                HumanVsAiSpikeHarness.assess(true, false, 0, true);
+
+        assertEquals(HumanVsAiSpikeHarness.Decision.GO, assessment.decision);
+        assertTrue(assessment.blockers.isEmpty());
     }
 
     private static HumanVsAiSpikeHarness.PromptRegistry newRegistry() {

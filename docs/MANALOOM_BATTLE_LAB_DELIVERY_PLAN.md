@@ -1,8 +1,8 @@
 # Plano de entrega do ManaLoom Battle Lab e Coach
 
-**Estado:** `M2_LOCAL_IMPLEMENTED / BL7_NO_GO / RELEASE_NO_GO`
+**Estado:** `M2_LOCAL_IMPLEMENTED / BL7_GO / BL8_READY / RELEASE_NO_GO`
 
-**Atualizado em:** 2026-07-26
+**Atualizado em:** 2026-07-27
 
 **Baseline preservada:** a Sprint 5 de
 `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` continua `PASS` para execução,
@@ -78,8 +78,8 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
 | BL4 | `PARTIAL_BLOCKED_PHYSICAL_AND_RELEASE` | Preflight local mede p50/p95 e acessibilidade automatizada; Android físico/TalkBack, carga real, smoke live e mesma SHA implantada não foram executados |
 | BL5 | `PASS_LOCAL_FEATURE_OFF` | Job assíncrono, worker, leases, quotas, cancelamento, correlação e fault injection implementados; rollout desligado |
 | BL6 | `PASS_LOCAL_FEATURE_OFF_WITH_DEVICE_BLOCK` | Polling Live, cursor, armazenamento durável, reconexão e UI Web implementados; fanout sintético local de 64 streams passou, Android físico/sockets reais/live pendentes |
-| BL7 | `PASS_DECISION_NO_GO` | Spike tipou sete famílias adicionais e fechou o inventário conhecido de callbacks; partida humana completa, métricas runtime e takeover humano→IA seguro seguem não provados |
-| BL8 | `BLOCKED_BL7_NO_GO` | Nenhuma sessão interativa pública foi criada |
+| BL7 | `PASS_DECISION_GO` | Três partidas humanas isoladas e o timeout terminal passaram: 251/251 respostas normais aceitas, zero deadlock/leak e concessão confirmada; GO restrito a BL8 local/default-off |
+| BL8 | `READY_BL7_GO` | Pode iniciar infraestrutura local; nenhuma sessão interativa foi publicada |
 | BL9 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Coach Mode não foi criado |
 | BL10 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Homologação do Coach não pode começar sem BL8/BL9 |
 
@@ -418,7 +418,8 @@ altera a classificação do Battle atual.
 
 ### Decisão executada de BL7 (2026-07-26; reabertura em 2026-07-27)
 
-O spike isolado terminou `NO_GO`, registrado no ADR 0003. Três famílias
+O spike isolado recebeu `GO` limitado no ADR 0004, substituindo a decisão
+histórica do ADR 0003. Três famílias
 experimentais legadas (`GAME_ASK`, `GAME_SELECT`, `GAME_TARGET`) e sete
 famílias tipadas (`GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`,
 `GAME_CHOOSE_CHOICE`, `GAME_PLAY_MANA`, `GAME_PLAY_XMANA`,
@@ -426,10 +427,15 @@ famílias tipadas (`GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`,
 vinculado a `gameId`, `messageId` e versão, com despacho no máximo uma vez.
 `GAME_PLAY_MANA` usa somente IDs presentes em `GameView.canPlayObjects`, tipos
 existentes no pool privado, ação especial anunciada ou cancelamento; o XMage
-continua responsável pela validação final da habilidade de mana. O runtime
-ainda não provou uma partida humana completa, métricas de deadlock/privacidade
-nem takeover de humano para IA. BL8 não pode começar sem novo spike runtime e
-GO explícito.
+continua responsável pela validação final da habilidade de mana.
+
+Três partidas runtime completas terminaram nos turnos 19/19/20, com 251/251
+respostas aceitas, zero deadlock, zero informação identificável da mão
+adversária e p95 abaixo de 0,5 ms em cada rodada. Um cenário separado de
+timeout recebeu `CONCEDE=true` e `GAME_OVER`. Não existe takeover humano→IA:
+a política aprovada é conceder e terminar o processo. BL8 pode começar somente
+localmente, isolado e desabilitado por padrão; migration live, deploy e rollout
+continuam sem autorização.
 
 ## 15. BL8 — Sessão interativa versionada
 

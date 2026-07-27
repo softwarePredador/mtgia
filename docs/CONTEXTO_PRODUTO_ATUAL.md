@@ -13,12 +13,12 @@
   PostgreSQL. `shared_preferences` não é storage durável de Battle;
 - migrations 052–055 passaram em PostgreSQL descartável. Elas não foram
   aplicadas nem consultadas no banco live e não recebem crédito de deploy;
-- BL7 foi executado como spike XMage isolado e encerrou em `NO_GO`: a
-  reabertura técnica fechou o inventário conhecido de callbacks, inclusive
-  `GAME_PLAY_MANA`, mas não existe partida humana completa, métricas runtime ou
-  takeover humano→IA seguro comprovado. BL8 está bloqueado e BL9/BL10 não
-  começaram por dependência; o produto não oferece Coach Mode ou jogo
-  interativo;
+- BL7 foi reaberto e recebeu `GO` técnico limitado no ADR 0004: três partidas
+  XMage humanas isoladas concluíram com 251/251 respostas aceitas, zero
+  deadlock/leak identificável e timeout com concessão confirmada. Não existe
+  takeover humano→IA; a política é conceder e terminar. BL8 está pronto para
+  implementação local/default-off, sem migration live, deploy ou rollout; o
+  produto ainda não oferece Coach Mode ou jogo interativo;
 - o build Web release local usa base `/app/` e o Live opt-in para validação. A
   correção de imagens Scryfall usa `HTMLImageElement` somente no Web para
   contornar a ausência de CORS no host final, sem enviar headers; plataformas
@@ -112,7 +112,8 @@
 - a evolução Battle Lab/Live Spectator/Coach está registrada em
   `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md` e
   `docs/MANALOOM_BATTLE_LAB_TRACKER.md`; BL0–BL6 foram implementados
-  localmente, BL7 terminou `NO_GO` e BL8–BL10 permanecem bloqueados;
+  localmente, BL7 recebeu GO técnico limitado, BL8 está pronto para iniciar e
+  BL9–BL10 continuam dependentes;
 - Battle, Deckbuilder e Life Counter mantêm suas provas locais anteriores,
   mas nenhuma delas autoriza promoção, migration ou escrita live;
 - migrations 038–055 compõem o schema exigido por este checkout ampliado. O estado
