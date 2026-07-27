@@ -37,8 +37,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Test-only BL7 spike. Nothing in this class is reachable from the HTTP
- * sidecar and it must not be promoted without a separate GO decision.
+ * Versioned and fail-closed bridge between XMage human callbacks and opaque
+ * ManaLoom prompts. BL7 proved every decision callback family at the pinned
+ * XMage commit; BL8 reuses the exact bridge behind an isolated, default-off
+ * interactive runtime.
  */
 final class HumanVsAiSpikeHarness {
     enum PromptKind {

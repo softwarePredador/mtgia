@@ -57,10 +57,26 @@ public final class SidecarMain {
         String xmageHost = env("XMAGE_SERVER_HOST", "127.0.0.1");
         int xmagePort = envInt("XMAGE_SERVER_PORT", 17171);
         int httpPort = envInt("PORT", 8080);
+        String runtimeMode = env("XMAGE_RUNTIME_MODE", "batch")
+                .toLowerCase(java.util.Locale.ROOT);
+        if (!"batch".equals(runtimeMode)
+                && !"interactive".equals(runtimeMode)) {
+            throw new IllegalArgumentException(
+                    "XMAGE_RUNTIME_MODE must be batch or interactive"
+            );
+        }
         BattleLiveRegistry liveRegistry = new BattleLiveRegistry();
         XmageBattleService battleService =
                 new XmageBattleService(xmageHost, xmagePort, liveRegistry);
         battleService.warmUp();
+        InteractiveBattleRegistry interactiveRegistry =
+                "interactive".equals(runtimeMode)
+                        ? new InteractiveBattleRegistry(
+                        xmageHost,
+                        xmagePort,
+                        envInt("XMAGE_INTERACTIVE_MAX_ACTIVE", 1)
+                )
+                        : null;
 
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", httpPort), 32);
         server.createContext("/health", exchange -> {
@@ -77,19 +93,172 @@ public final class SidecarMain {
             body.put("xmage_port", xmagePort);
             body.put("catalog_ready", true);
             body.put("indexed_names", battleService.catalogSize());
-            body.put("battle_live", liveRegistry.metrics());
+            body.put("runtime_mode", runtimeMode);
+            body.put(
+                    "batch_simulation_available",
+                    "batch".equals(runtimeMode)
+            );
+            if ("batch".equals(runtimeMode)) {
+                body.put("battle_live", liveRegistry.metrics());
+            } else {
+                body.put(
+                        "interactive_battle",
+                        interactiveRegistry.metrics()
+                );
+            }
             send(exchange, 200, body);
         });
-        server.createContext("/cards/coverage", exchange -> handleCardCoverage(exchange, battleService));
-        server.createContext("/coverage", exchange -> handleCoverage(exchange, battleService));
-        server.createContext(
-                "/simulate",
-                exchange -> handleSimulation(exchange, battleService, liveRegistry)
+        if ("batch".equals(runtimeMode)) {
+            server.createContext(
+                    "/cards/coverage",
+                    exchange -> handleCardCoverage(exchange, battleService)
+            );
+            server.createContext(
+                    "/coverage",
+                    exchange -> handleCoverage(exchange, battleService)
+            );
+            server.createContext(
+                    "/simulate",
+                    exchange -> handleSimulation(
+                            exchange,
+                            battleService,
+                            liveRegistry
+                    )
+            );
+            server.createContext(
+                    "/live/",
+                    exchange -> handleLive(exchange, liveRegistry)
+            );
+        } else {
+            server.createContext(
+                    "/interactive/sessions",
+                    exchange -> handleInteractive(
+                            exchange,
+                            interactiveRegistry
+                    )
+            );
+            Runtime.getRuntime().addShutdownHook(
+                    new Thread(
+                            interactiveRegistry::close,
+                            "xmage-interactive-shutdown"
+                    )
+            );
+        }
+        server.setExecutor(
+                Executors.newFixedThreadPool(
+                        "interactive".equals(runtimeMode) ? 8 : 4
+                )
         );
-        server.createContext("/live/", exchange -> handleLive(exchange, liveRegistry));
-        server.setExecutor(Executors.newFixedThreadPool(4));
         server.start();
-        System.out.println("ManaLoom XMage sidecar listening on port " + httpPort);
+        System.out.println(
+                "ManaLoom XMage sidecar listening on port "
+                        + httpPort
+                        + " mode="
+                        + runtimeMode
+        );
+    }
+
+    private static void handleInteractive(
+            HttpExchange exchange,
+            InteractiveBattleRegistry registry
+    ) throws IOException {
+        exchange.getResponseHeaders().set("Cache-Control", "no-store");
+        exchange.getResponseHeaders().set(
+                "X-Content-Type-Options",
+                "nosniff"
+        );
+        String path = exchange.getRequestURI().getPath();
+        String prefix = "/interactive/sessions";
+        if (!path.startsWith(prefix)) {
+            send(exchange, 404, singleton("error", "session_not_found"));
+            return;
+        }
+        String suffix = path.substring(prefix.length());
+        try {
+            Map<String, Object> result;
+            if (suffix.isEmpty() || "/".equals(suffix)) {
+                if (!"POST".equals(exchange.getRequestMethod())) {
+                    send(
+                            exchange,
+                            405,
+                            singleton("error", "method_not_allowed")
+                    );
+                    return;
+                }
+                JsonObject request = JsonParser
+                        .parseString(readBody(exchange))
+                        .getAsJsonObject();
+                result = registry.create(request);
+                send(exchange, 201, result);
+                return;
+            }
+
+            String[] parts = suffix.substring(1).split("/");
+            if (parts.length < 1
+                    || parts.length > 2
+                    || !InteractiveBattleRegistry.isRuntimeId(parts[0])) {
+                throw new InteractiveBattleRegistry.NotFoundException();
+            }
+            String runtimeId = parts[0];
+            if (parts.length == 1) {
+                if (!"GET".equals(exchange.getRequestMethod())) {
+                    send(
+                            exchange,
+                            405,
+                            singleton("error", "method_not_allowed")
+                    );
+                    return;
+                }
+                result = registry.read(runtimeId);
+                send(exchange, 200, result);
+                return;
+            }
+            if (!"POST".equals(exchange.getRequestMethod())) {
+                send(
+                        exchange,
+                        405,
+                        singleton("error", "method_not_allowed")
+                );
+                return;
+            }
+            JsonObject request = JsonParser
+                    .parseString(readBody(exchange))
+                    .getAsJsonObject();
+            if ("actions".equals(parts[1])) {
+                result = registry.respond(runtimeId, request);
+            } else if ("concede".equals(parts[1])) {
+                result = registry.concede(runtimeId, request);
+            } else {
+                throw new InteractiveBattleRegistry.NotFoundException();
+            }
+            send(exchange, 200, result);
+        } catch (InteractiveBattleRegistry.NotFoundException error) {
+            send(exchange, 404, singleton("error", "session_not_found"));
+        } catch (InteractiveBattleRegistry.CapacityException error) {
+            send(exchange, 429, singleton("error", "interactive_capacity"));
+        } catch (InteractiveBattleRegistry.ConflictException error) {
+            send(exchange, 409, singleton("error", error.code));
+        } catch (XmageBattleService.UnsupportedCardsException error) {
+            Map<String, Object> body = errorBody(
+                    "xmage_coverage_incomplete",
+                    error.getMessage()
+            );
+            body.put("unsupported_cards", error.getUnsupportedCards());
+            send(exchange, 422, body);
+        } catch (IllegalArgumentException error) {
+            send(
+                    exchange,
+                    400,
+                    errorBody("invalid_request", error.getMessage())
+            );
+        } catch (Exception error) {
+            error.printStackTrace(System.err);
+            send(
+                    exchange,
+                    500,
+                    errorBody("interactive_failed", error.getMessage())
+            );
+        }
     }
 
     private static void handleSimulation(

@@ -45,9 +45,9 @@ void main() {
 
         expect(requiredReleaseSchemaMigrations, migrationsFromSource);
         expect(requiredReleaseSchemaMigrations.keys.first, '038');
-        expect(requiredReleaseSchemaMigrations.keys.last, '055');
+        expect(requiredReleaseSchemaMigrations.keys.last, '056');
         expect(releaseSchemaReadinessSql, contains("MAX(version)"));
-        expect(releaseSchemaReadinessSql, contains(") = '055'"));
+        expect(releaseSchemaReadinessSql, contains(") = '056'"));
         for (final entry in requiredReleaseSchemaMigrations.entries) {
           expect(
             releaseSchemaReadinessSql,
@@ -89,6 +89,8 @@ void main() {
           'idx_battle_jobs_user_active',
           'idx_battle_jobs_claim',
           'idx_battle_jobs_lease',
+          'interactive_battle_sessions',
+          'interactive_battle_records',
         ]) {
           expect(releaseSchemaReadinessSql, contains(anchor), reason: anchor);
         }
@@ -380,6 +382,100 @@ void main() {
       expect(readiness.check['source'], 'unhealthy');
       expect(readiness.check['error_code'], 'battle_live_spectator_not_ready');
     });
+
+    test(
+      'Interactive Battle is disabled and non-blocking by default',
+      () async {
+        final disabled = await evaluateInteractiveBattleReadiness(
+          DotEnv(),
+          null,
+          schemaProbe: (_) async => throw StateError('must not query schema'),
+          probe: (_, __) async => throw StateError('must not probe sidecar'),
+        );
+        final invalidFlag = await evaluateInteractiveBattleReadiness(
+          DotEnv()..addAll({'INTERACTIVE_BATTLE_ENABLED': 'yes'}),
+          null,
+          schemaProbe: (_) async => throw StateError('must not query schema'),
+          probe: (_, __) async => throw StateError('must not probe sidecar'),
+        );
+
+        expect(disabled.healthy, isTrue);
+        expect(disabled.check['status'], 'disabled');
+        expect(disabled.check['configuration_status'], 'valid');
+        expect(invalidFlag.healthy, isTrue);
+        expect(
+          invalidFlag.check['configuration_status'],
+          'invalid_fail_closed',
+        );
+      },
+    );
+
+    test(
+      'enabled Interactive Battle requires schema and isolated runtime',
+      () async {
+        final probed = <String>[];
+        final readiness = await evaluateInteractiveBattleReadiness(
+          DotEnv()..addAll({
+            'INTERACTIVE_BATTLE_ENABLED': 'true',
+            'XMAGE_SIDECAR_URL': 'http://xmage-batch:8080',
+            'XMAGE_INTERACTIVE_SIDECAR_URL': 'http://xmage-interactive:8080',
+            'INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT': '4',
+          }),
+          null,
+          schemaProbe: (_) async => true,
+          probe: (engine, uri) async {
+            probed.add('$engine:${uri.host}:${uri.path}');
+            return _battleHealth(engine)
+              ..['runtime_mode'] = 'interactive'
+              ..['batch_simulation_available'] = false
+              ..['interactive_battle'] = _interactiveBattleHealth();
+          },
+        );
+
+        expect(readiness.healthy, isTrue);
+        expect(readiness.check['status'], 'ready');
+        expect(readiness.check['database'], 'ready');
+        expect(readiness.check['source'], 'ready');
+        expect(readiness.check['maximum_active'], 4);
+        expect(probed, ['xmage:xmage-interactive:/health']);
+      },
+    );
+
+    test(
+      'Interactive Battle rejects shared or batch-capable runtime',
+      () async {
+        final shared = await evaluateInteractiveBattleReadiness(
+          DotEnv()..addAll({
+            'INTERACTIVE_BATTLE_ENABLED': 'true',
+            'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+            'XMAGE_INTERACTIVE_SIDECAR_URL': 'http://xmage:8080',
+          }),
+          null,
+          schemaProbe: (_) async => true,
+          probe: (_, __) async => _battleHealth('xmage'),
+        );
+        final batchCapable = await evaluateInteractiveBattleReadiness(
+          DotEnv()..addAll({
+            'INTERACTIVE_BATTLE_ENABLED': 'true',
+            'XMAGE_SIDECAR_URL': 'http://xmage-batch:8080',
+            'XMAGE_INTERACTIVE_SIDECAR_URL': 'http://xmage-interactive:8080',
+          }),
+          null,
+          schemaProbe: (_) async => true,
+          probe:
+              (_, __) async =>
+                  _battleHealth('xmage')
+                    ..['runtime_mode'] = 'interactive'
+                    ..['batch_simulation_available'] = true
+                    ..['interactive_battle'] = _interactiveBattleHealth(),
+        );
+
+        expect(shared.healthy, isFalse);
+        expect(shared.check['configuration'], 'unhealthy');
+        expect(batchCapable.healthy, isFalse);
+        expect(batchCapable.check['source'], 'unhealthy');
+      },
+    );
   });
 
   group('ready route contract', () {
@@ -419,6 +515,10 @@ void main() {
       expect(
         route,
         contains("checks['battle_job_schema'] = battleJobSchema.check"),
+      );
+      expect(
+        route,
+        contains("checks['interactive_battle'] = interactiveBattle.check"),
       );
       expect(
         route,
@@ -467,4 +567,13 @@ Map<String, dynamic> _battleLiveHealth() => {
   'max_streams': 64,
   'max_records_per_stream': 20000,
   'retention_ms': 900000,
+};
+
+Map<String, dynamic> _interactiveBattleHealth() => {
+  'schema_version': 'interactive_battle_runtime_v1',
+  'maximum_active': 4,
+  'active': 0,
+  'retained': 0,
+  'runtime_mode': 'interactive',
+  'batch_simulation_available': false,
 };

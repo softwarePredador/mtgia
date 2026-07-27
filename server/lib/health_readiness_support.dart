@@ -8,6 +8,8 @@ import 'ai/battle_engine_config.dart';
 import 'battle/battle_live_cursor_contract.dart';
 import 'battle/battle_live_service.dart';
 import 'battle/battle_live_source_client.dart';
+import 'battle/interactive_battle_contract.dart';
+import 'battle/interactive_battle_runtime_client.dart';
 import 'openai_runtime_config.dart';
 
 class AiRuntimeReadiness {
@@ -20,6 +22,7 @@ class AiRuntimeReadiness {
 typedef BattleSidecarProbe =
     Future<Map<String, dynamic>?> Function(String engine, Uri healthUri);
 typedef BattleLiveSchemaProbe = Future<bool> Function(Pool? pool);
+typedef InteractiveBattleSchemaProbe = Future<bool> Function(Pool? pool);
 
 class BattleRuntimeReadiness {
   const BattleRuntimeReadiness({required this.healthy, required this.check});
@@ -69,6 +72,16 @@ class BattleLiveSpectatorReadiness {
   final Map<String, dynamic> check;
 }
 
+class InteractiveBattleReadiness {
+  const InteractiveBattleReadiness({
+    required this.healthy,
+    required this.check,
+  });
+
+  final bool healthy;
+  final Map<String, dynamic> check;
+}
+
 class CollectionAvailabilitySchemaReadiness {
   const CollectionAvailabilitySchemaReadiness({
     required this.healthy,
@@ -105,6 +118,7 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '053': 'create_battle_replay_annotations',
   '054': 'create_battle_jobs',
   '055': 'create_battle_job_live_records',
+  '056': 'create_interactive_battle_sessions',
 };
 
 const releaseSchemaReadinessSql = '''
@@ -127,11 +141,12 @@ const releaseSchemaReadinessSql = '''
       ('052', 'version_battle_simulation_attempts'),
       ('053', 'create_battle_replay_annotations'),
       ('054', 'create_battle_jobs'),
-      ('055', 'create_battle_job_live_records')
+      ('055', 'create_battle_job_live_records'),
+      ('056', 'create_interactive_battle_sessions')
   )
   SELECT
     (
-      SELECT COUNT(*) = 18
+      SELECT COUNT(*) = 19
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
@@ -140,7 +155,7 @@ const releaseSchemaReadinessSql = '''
     COALESCE(
       (SELECT MAX(version) FROM public.schema_migrations),
       ''
-    ) = '055' AS latest_migration_ready,
+    ) = '056' AS latest_migration_ready,
     (
       SELECT COUNT(*)
       FROM pg_class
@@ -155,10 +170,12 @@ const releaseSchemaReadinessSql = '''
         to_regclass('public.notifications'),
         to_regclass('public.password_reset_tokens'),
         to_regclass('public.email_verification_tokens'),
-        to_regclass('public.price_history')
+        to_regclass('public.price_history'),
+        to_regclass('public.interactive_battle_sessions'),
+        to_regclass('public.interactive_battle_records')
       )
         AND relkind IN ('r', 'p')
-    ) = 11 AS release_runtime_tables_ready,
+    ) = 13 AS release_runtime_tables_ready,
     (
       SELECT COUNT(*)
       FROM (
@@ -573,8 +590,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: healthy,
       check: {
         'status': healthy ? 'healthy' : 'unhealthy',
-        'required_range': '038-055',
-        'latest_migration': '055',
+        'required_range': '038-056',
+        'latest_migration': '056',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -586,8 +603,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: false,
       check: {
         'status': 'unhealthy',
-        'required_range': '038-055',
-        'latest_migration': '055',
+        'required_range': '038-056',
+        'latest_migration': '056',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -955,6 +972,262 @@ bool _validBattleLiveHealth(Object? raw) {
       retentionMs is int &&
       retentionMs >= 1000 &&
       retentionMs <= 86400000;
+}
+
+const interactiveBattleSchemaReadinessSql = '''
+  SELECT
+    EXISTS (
+      SELECT 1
+      FROM schema_migrations
+      WHERE version = '056'
+        AND name = 'create_interactive_battle_sessions'
+    ) AS migration_056_registered,
+    (
+      SELECT COUNT(*)
+      FROM (
+        VALUES
+          ('interactive_battle_sessions', 'id'),
+          ('interactive_battle_sessions', 'schema_version'),
+          ('interactive_battle_sessions', 'user_id'),
+          ('interactive_battle_sessions', 'deck_a_id'),
+          ('interactive_battle_sessions', 'deck_b_id'),
+          ('interactive_battle_sessions', 'deck_hash_schema'),
+          ('interactive_battle_sessions', 'deck_a_hash'),
+          ('interactive_battle_sessions', 'deck_b_hash'),
+          ('interactive_battle_sessions', 'request_schema_version'),
+          ('interactive_battle_sessions', 'request_hash'),
+          ('interactive_battle_sessions', 'request_payload'),
+          ('interactive_battle_sessions', 'idempotency_key'),
+          ('interactive_battle_sessions', 'request_fingerprint'),
+          ('interactive_battle_sessions', 'engine'),
+          ('interactive_battle_sessions', 'engine_version'),
+          ('interactive_battle_sessions', 'engine_commit'),
+          ('interactive_battle_sessions', 'engine_build'),
+          ('interactive_battle_sessions', 'engine_process_id'),
+          ('interactive_battle_sessions', 'engine_process_started_at'),
+          ('interactive_battle_sessions', 'runtime_session_id'),
+          ('interactive_battle_sessions', 'status'),
+          ('interactive_battle_sessions', 'state_version'),
+          ('interactive_battle_sessions', 'active_prompt_id'),
+          ('interactive_battle_sessions', 'active_prompt'),
+          ('interactive_battle_sessions', 'private_state'),
+          ('interactive_battle_sessions', 'ttl_seconds'),
+          ('interactive_battle_sessions', 'prompt_deadline_at'),
+          ('interactive_battle_sessions', 'expires_at'),
+          ('interactive_battle_sessions', 'last_activity_at'),
+          ('interactive_battle_sessions', 'attempt_id'),
+          ('interactive_battle_sessions', 'replay_id'),
+          ('interactive_battle_sessions', 'terminal_reason'),
+          ('interactive_battle_sessions', 'error_code'),
+          ('interactive_battle_sessions', 'started_at'),
+          ('interactive_battle_sessions', 'finished_at'),
+          ('interactive_battle_sessions', 'created_at'),
+          ('interactive_battle_sessions', 'updated_at'),
+          ('interactive_battle_records', 'id'),
+          ('interactive_battle_records', 'schema_version'),
+          ('interactive_battle_records', 'session_id'),
+          ('interactive_battle_records', 'sequence'),
+          ('interactive_battle_records', 'record_kind'),
+          ('interactive_battle_records', 'visibility'),
+          ('interactive_battle_records', 'state_version'),
+          ('interactive_battle_records', 'prompt_id'),
+          ('interactive_battle_records', 'option_id'),
+          ('interactive_battle_records', 'idempotency_key'),
+          ('interactive_battle_records', 'request_fingerprint'),
+          ('interactive_battle_records', 'payload'),
+          ('interactive_battle_records', 'created_at')
+      ) AS required(table_name, column_name)
+      WHERE EXISTS (
+        SELECT 1
+        FROM information_schema.columns actual
+        WHERE actual.table_schema = 'public'
+          AND actual.table_name = required.table_name
+          AND actual.column_name = required.column_name
+      )
+    ) = 50 AS columns_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_constraint
+      WHERE conname IN (
+        'fk_interactive_battle_attempt_replay',
+        'chk_interactive_battle_schema',
+        'chk_interactive_battle_status',
+        'chk_interactive_battle_hashes',
+        'chk_interactive_battle_request',
+        'chk_interactive_battle_idempotency',
+        'chk_interactive_battle_engine',
+        'chk_interactive_battle_state',
+        'chk_interactive_battle_prompt',
+        'chk_interactive_battle_ttl',
+        'chk_interactive_battle_lifecycle',
+        'chk_interactive_battle_replay',
+        'chk_interactive_battle_timestamps',
+        'chk_interactive_battle_record_schema',
+        'chk_interactive_battle_record_sequence',
+        'chk_interactive_battle_record_kind',
+        'chk_interactive_battle_record_visibility',
+        'chk_interactive_battle_record_prompt',
+        'chk_interactive_battle_record_idempotency',
+        'chk_interactive_battle_record_payload',
+        'uq_interactive_battle_record_sequence'
+      )
+        AND convalidated
+    ) = 21 AS constraints_ready,
+    (
+      SELECT COUNT(*)
+      FROM pg_index
+      WHERE indexrelid IN (
+        to_regclass('public.uq_interactive_battle_user_idempotency'),
+        to_regclass('public.uq_interactive_battle_runtime_session'),
+        to_regclass('public.idx_interactive_battle_user_created'),
+        to_regclass('public.idx_interactive_battle_user_active'),
+        to_regclass('public.idx_interactive_battle_expiry'),
+        to_regclass('public.uq_interactive_battle_record_idempotency'),
+        to_regclass('public.idx_interactive_battle_record_prompt'),
+        to_regclass('public.idx_interactive_battle_record_created')
+      )
+        AND indisvalid
+        AND indisready
+    ) = 8 AS indexes_ready,
+    EXISTS (
+      SELECT 1
+      FROM pg_trigger
+      WHERE tgrelid = to_regclass('public.interactive_battle_records')
+        AND tgname = 'manaloom_interactive_battle_record_no_update'
+        AND tgenabled IN ('O', 'A')
+        AND NOT tgisinternal
+    ) AS append_only_trigger_ready
+''';
+
+Future<bool> probeInteractiveBattleSchema(Pool? pool) async {
+  if (pool == null) return false;
+  final result = await pool
+      .execute(interactiveBattleSchemaReadinessSql)
+      .timeout(const Duration(seconds: 5));
+  final row = result.first;
+  return row.length >= 5 && row.take(5).every((value) => value == true);
+}
+
+Future<InteractiveBattleReadiness> evaluateInteractiveBattleReadiness(
+  DotEnv env,
+  Pool? pool, {
+  BattleSidecarProbe probe = probeBattleSidecarHealth,
+  InteractiveBattleSchemaProbe schemaProbe = probeInteractiveBattleSchema,
+}) async {
+  final configured = env['INTERACTIVE_BATTLE_ENABLED']?.trim();
+  final enabled = configured?.toLowerCase() == 'true';
+  if (!enabled) {
+    final validDisabledValue =
+        configured == null ||
+        configured.isEmpty ||
+        configured.toLowerCase() == 'false';
+    return InteractiveBattleReadiness(
+      healthy: true,
+      check: {
+        'status': 'disabled',
+        'enabled': false,
+        'schema_version': interactiveBattleSessionSchema,
+        'configuration_status':
+            validDisabledValue ? 'valid' : 'invalid_fail_closed',
+      },
+    );
+  }
+
+  var schemaReady = false;
+  var sourceReady = false;
+  var configurationReady = false;
+  var maximumActive = 0;
+  try {
+    final environment = <String, String>{
+      for (final key in const [
+        'INTERACTIVE_BATTLE_ENABLED',
+        'XMAGE_INTERACTIVE_SIDECAR_URL',
+        'XMAGE_SIDECAR_URL',
+        'XMAGE_EXPECTED_VERSION',
+        'XMAGE_EXPECTED_COMMIT',
+        'INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT',
+        'INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT',
+      ])
+        if (env[key]?.trim().isNotEmpty == true) key: env[key]!.trim(),
+    };
+    final configuration = InteractiveBattleConfiguration.fromEnvironment(
+      environment,
+    );
+    configurationReady = configuration.enabled;
+    maximumActive = configuration.maximumActiveGlobal;
+    schemaReady = await schemaProbe(pool);
+    final baseUri = Uri.parse(configuration.baseUrl);
+    final health = await probe('xmage', baseUri.resolve('/health'));
+    if (health != null) {
+      final identityError = externalBattleIdentityValidationError(
+        health,
+        expected: configuration.identity,
+      );
+      sourceReady =
+          health['status'] == 'ok' &&
+          health['runtime_mode'] == 'interactive' &&
+          health['batch_simulation_available'] == false &&
+          identityError == null &&
+          _validInteractiveBattleHealth(
+            health['interactive_battle'],
+            expectedMaximumActive: maximumActive,
+          );
+    }
+  } on Object {
+    configurationReady = false;
+    sourceReady = false;
+  }
+
+  final healthy = configurationReady && schemaReady && sourceReady;
+  return InteractiveBattleReadiness(
+    healthy: healthy,
+    check: {
+      'status': healthy ? 'ready' : 'unhealthy',
+      'enabled': true,
+      'schema_version': interactiveBattleSessionSchema,
+      'runtime_schema_version': interactiveBattleRuntimeSchema,
+      'runtime_isolation': 'dedicated_interactive_sidecar',
+      'maximum_active': maximumActive,
+      'database': schemaReady ? 'ready' : 'unhealthy',
+      'source': sourceReady ? 'ready' : 'unhealthy',
+      'configuration': configurationReady ? 'ready' : 'unhealthy',
+      if (!healthy) 'error_code': 'interactive_battle_not_ready',
+    },
+  );
+}
+
+bool _validInteractiveBattleHealth(
+  Object? raw, {
+  required int expectedMaximumActive,
+}) {
+  if (raw is! Map) return false;
+  final value = raw.map((key, value) => MapEntry(key.toString(), value));
+  const requiredKeys = <String>{
+    'schema_version',
+    'maximum_active',
+    'active',
+    'retained',
+    'runtime_mode',
+    'batch_simulation_available',
+  };
+  if (value.keys.toSet().difference(requiredKeys).isNotEmpty ||
+      requiredKeys.difference(value.keys.toSet()).isNotEmpty ||
+      value['schema_version'] != interactiveBattleRuntimeSchema ||
+      value['runtime_mode'] != 'interactive' ||
+      value['batch_simulation_available'] != false) {
+    return false;
+  }
+  final active = value['active'];
+  final retained = value['retained'];
+  final maximumActiveValue = value['maximum_active'];
+  return maximumActiveValue is int &&
+      maximumActiveValue == expectedMaximumActive &&
+      maximumActiveValue >= 1 &&
+      active is int &&
+      active >= 0 &&
+      active <= maximumActiveValue &&
+      retained is int &&
+      retained >= 0;
 }
 
 BattleJobWorkerReadiness evaluateBattleJobWorkerReadiness(DotEnv env) {

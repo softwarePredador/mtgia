@@ -51,14 +51,15 @@
     },
     {
       "id": "battle_deep_link",
-      "expectation": "Battle/Replays e o espectador ao vivo possuem URLs canônicas deck-scoped e recarregam sem objeto transitório; replay final usa query estável.",
+      "expectation": "Battle Coach, Battle/Replays e o espectador ao vivo possuem URLs canônicas deck-scoped e recarregam sem objeto transitório; sessão e replay final usam identificadores estáveis.",
       "sources": {
-        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "path: 'battle-live/:jobId'", "BattleLiveSpectatorScreen"],
+        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "path: 'battle-coach/:sessionId'", "path: 'battle-coach'", "path: 'battle-live/:jobId'", "BattleLiveSpectatorScreen"],
+        "lib/features/battle/screens/battle_coach_screen.dart": ["battleCoachRouteLocation", "battleCoachSessionRouteLocation", "final String? sessionId"],
         "lib/features/battle/screens/battle_replays_screen.dart": ["battleReplaysRouteLocation", "initialReplayId"],
         "lib/features/battle/screens/battle_live_spectator_screen.dart": ["battleLiveRouteLocation", "battleReplayDetailRouteLocation"],
-        "lib/features/decks/screens/deck_details_screen.dart": ["battleReplaysRouteLocation"]
+        "lib/features/decks/screens/deck_details_screen.dart": ["battleCoachRouteLocation", "battleReplaysRouteLocation"]
       },
-      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart"]
+      "tests": ["test/features/battle/screens/battle_coach_screen_test.dart","test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart"]
     },
     {
       "id": "card_detail_deep_link",

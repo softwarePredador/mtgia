@@ -23,6 +23,39 @@ void main() {
     );
   });
 
+  test('interactive Battle Coach stays fail-closed by default', () {
+    expect(LaunchFeatures.interactiveBattleEnabled, isFalse);
+
+    final features = File(
+      'lib/core/config/launch_features.dart',
+    ).readAsStringSync();
+    expect(features, contains("'ENABLE_INTERACTIVE_BATTLE'"));
+    expect(
+      features,
+      matches(RegExp(r'interactiveBattleEnabled[\s\S]*?defaultValue:\s*false')),
+    );
+
+    final routes = File('lib/main.dart').readAsStringSync();
+    expect(
+      routes,
+      matches(
+        RegExp(
+          r"if \(LaunchFeatures\.interactiveBattleEnabled\)\s+GoRoute\(\s+path: 'battle-coach/:sessionId'",
+          multiLine: true,
+        ),
+      ),
+    );
+    expect(
+      routes,
+      matches(
+        RegExp(
+          r"if \(LaunchFeatures\.interactiveBattleEnabled\)\s+GoRoute\(\s+path: 'battle-coach'",
+          multiLine: true,
+        ),
+      ),
+    );
+  });
+
   test('disabled scanner route is absent and deep links recover to search', () {
     final source = File('lib/main.dart').readAsStringSync();
 
@@ -49,5 +82,24 @@ void main() {
     expect(build, contains('scanner_release_enabled: false'));
     expect(build, isNot(contains('ENABLE_SCANNER_RELEASE=true')));
     expect(build, isNot(contains('scanner_release_enabled: true')));
+  });
+
+  test('release build scripts pin interactive Battle off', () {
+    for (final path in const [
+      '../scripts/manaloom_build_android_release.sh',
+      '../scripts/manaloom_deploy_flutter_web.sh',
+    ]) {
+      final source = File(path).readAsStringSync();
+      expect(
+        source,
+        contains('--dart-define="ENABLE_INTERACTIVE_BATTLE=false"'),
+        reason: path,
+      );
+      expect(
+        source,
+        isNot(contains('ENABLE_INTERACTIVE_BATTLE=true')),
+        reason: path,
+      );
+    }
   });
 }

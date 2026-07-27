@@ -420,7 +420,7 @@ final class ReplayNormalizer {
         return players;
     }
 
-    private static List<Map<String, Object>> cards(Iterable<? extends CardView> cards) {
+    static List<Map<String, Object>> cards(Iterable<? extends CardView> cards) {
         List<Map<String, Object>> result = new ArrayList<>();
         for (CardView card : cards) {
             result.add(card(card));

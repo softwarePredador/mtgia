@@ -15,10 +15,10 @@
     "deep_link"
   ],
   "expected_totals": {
-    "go_route": 39,
+    "go_route": 41,
     "shell_route": 1,
     "material_page_route": 6,
-    "dialog": 46,
+    "dialog": 47,
     "bottom_sheet": 22,
     "menu": 9,
     "tabs": 10,
@@ -39,16 +39,16 @@
       "deep_link": "Rotas públicas aceitam redirect/token sanitizados; segredo nunca entra em evidência."
     },
     "battle": {
-      "job": "Executar Battle homologado, acompanhar jobs assíncronos habilitados e consultar replays sem inventar resultado ou expor dado privado.",
+      "job": "Executar Battle homologado, jogar sessões privadas do Battle Coach, acompanhar jobs assíncronos habilitados e consultar replays sem inventar resultado ou expor dado privado.",
       "owner": "Battle",
-      "source_of_truth": "PostgreSQL via API de battle/replays.",
-      "states": ["loading", "progress", "disabled", "offline", "empty", "error", "retry", "success", "permission_denied"],
-      "stable_key": "battle replay list/detail and battle-live status/timeline anchors plus canonical deck-scoped routes",
+      "source_of_truth": "PostgreSQL via APIs de battle/sessions/replays; runtime XMage isolado somente executa a partida.",
+      "states": ["loading", "progress", "saving", "disabled", "offline", "empty", "error", "retry", "success", "permission_denied"],
+      "stable_key": "battle coach private board/prompt, replay list/detail and battle-live status/timeline anchors plus canonical deck-scoped routes",
       "criticality": "P0",
-      "action": "Executar teste, acompanhar/pausar localmente/cancelar job autorizado ou abrir replay persistido.",
-      "success": "Cursor retoma sem duplicar registros e o replay correto é exibido com identidade de engine.",
-      "recovery": "Feature gate falha fechado; erro offline preserva cursor/registros e oferece reconexão segura.",
-      "deep_link": "Rotas canônicas /decks/:id/battle-replays e /decks/:id/battle-live/:jobId, recarregáveis sem state.extra."
+      "action": "Iniciar sessão privada, responder ou delegar prompt autorizado, conceder, acompanhar job ou abrir replay persistido.",
+      "success": "Sessão retoma sem repetir decisão, estado privado permanece restrito ao dono e o replay correto mantém identidade de engine.",
+      "recovery": "Feature gate falha fechado; erro offline preserva cursor/sessão e oferece reconexão segura; timeout encerra por concessão.",
+      "deep_link": "Rotas canônicas /decks/:id/battle-coach[/sessionId], /decks/:id/battle-replays e /decks/:id/battle-live/:jobId recarregam sem state.extra."
     },
     "binder": {
       "job": "Consultar e editar posse, desejo e disponibilidade de cartas.",
@@ -262,6 +262,8 @@
     {"id":"route.deck_scan","declared_path":"scan","canonical_path":"/decks/:id/scan","screen":"CardScannerScreen","domain":"scanner","scope":"deferred_by_scope"},
     {"id":"route.deck_post_game","declared_path":"post-game","canonical_path":"/decks/:id/post-game","screen":"PostGameNotesScreen","domain":"retention","scope":"active"},
     {"id":"route.deck_battle_replays","declared_path":"battle-replays","canonical_path":"/decks/:id/battle-replays","screen":"BattleReplaysScreen","domain":"battle","scope":"active"},
+    {"id":"route.deck_battle_coach_session","declared_path":"battle-coach/:sessionId","canonical_path":"/decks/:id/battle-coach/:sessionId","screen":"BattleCoachScreen","domain":"battle","scope":"deferred_by_scope"},
+    {"id":"route.deck_battle_coach","declared_path":"battle-coach","canonical_path":"/decks/:id/battle-coach","screen":"BattleCoachScreen","domain":"battle","scope":"deferred_by_scope"},
     {"id":"route.deck_battle_live","declared_path":"battle-live/:jobId","canonical_path":"/decks/:id/battle-live/:jobId","screen":"BattleLiveSpectatorScreen","domain":"battle","scope":"active"},
     {"id":"route.plans","declared_path":"/plans","canonical_path":"/plans","screen":"PlanScreen","domain":"commercial","scope":"active"},
     {"id":"route.card_detail","declared_path":"/cards/:cardId","canonical_path":"/cards/:cardId","screen":"CardDetailRouteScreen","domain":"cards","scope":"active"},
@@ -290,6 +292,7 @@
     {"source":"lib/features/auth/screens/login_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/register_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/reset_password_screen.dart","domain":"auth","occurrences":{"transient":1}},
+    {"source":"lib/features/battle/screens/battle_coach_screen.dart","domain":"battle","occurrences":{"dialog":1}},
     {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":5,"menu":1,"transient":5}},
     {"source":"lib/features/binder/screens/binder_screen.dart","domain":"binder","occurrences":{"material_page_route":2,"tabs":1}},
     {"source":"lib/features/binder/widgets/binder_item_editor.dart","domain":"binder","occurrences":{"dialog":1,"bottom_sheet":1,"transient":3}},

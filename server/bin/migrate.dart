@@ -3457,6 +3457,392 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS battle_job_live_records CASCADE;
     ''',
   ),
+  Migration(
+    version: '056',
+    name: 'create_interactive_battle_sessions',
+    up: '''
+      ALTER TABLE battle_simulation_attempts
+      DROP CONSTRAINT IF EXISTS chk_battle_attempt_timeout;
+      ALTER TABLE battle_simulation_attempts
+      ADD CONSTRAINT chk_battle_attempt_timeout
+      CHECK (timeout_ms BETWEEN 1 AND 7200000);
+
+      CREATE TABLE IF NOT EXISTS interactive_battle_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        schema_version TEXT NOT NULL DEFAULT 'interactive_battle_session_v1',
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+        deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+        deck_hash_schema TEXT NOT NULL,
+        deck_a_hash TEXT NOT NULL,
+        deck_b_hash TEXT NOT NULL,
+        request_schema_version TEXT NOT NULL,
+        request_hash TEXT NOT NULL,
+        request_payload JSONB NOT NULL,
+        idempotency_key TEXT NOT NULL,
+        request_fingerprint TEXT NOT NULL,
+        engine TEXT NOT NULL DEFAULT 'xmage',
+        engine_version TEXT,
+        engine_commit TEXT,
+        engine_build TEXT,
+        engine_process_id TEXT,
+        engine_process_started_at TIMESTAMP WITH TIME ZONE,
+        runtime_session_id TEXT,
+        status TEXT NOT NULL DEFAULT 'starting',
+        state_version BIGINT NOT NULL DEFAULT 0,
+        active_prompt_id TEXT,
+        active_prompt JSONB,
+        private_state JSONB NOT NULL DEFAULT '{}'::jsonb,
+        ttl_seconds INTEGER NOT NULL,
+        prompt_deadline_at TIMESTAMP WITH TIME ZONE,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        last_activity_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP,
+        attempt_id UUID UNIQUE
+          REFERENCES battle_simulation_attempts(id) ON DELETE SET NULL,
+        replay_id UUID UNIQUE
+          REFERENCES battle_simulations(id) ON DELETE SET NULL,
+        terminal_reason TEXT,
+        error_code TEXT,
+        started_at TIMESTAMP WITH TIME ZONE,
+        finished_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_interactive_battle_attempt_replay
+          FOREIGN KEY (attempt_id, replay_id)
+          REFERENCES battle_simulation_attempts (id, replay_id)
+          ON DELETE SET NULL,
+        CONSTRAINT chk_interactive_battle_schema
+          CHECK (schema_version = 'interactive_battle_session_v1'),
+        CONSTRAINT chk_interactive_battle_status
+          CHECK (
+            status IN (
+              'starting',
+              'running',
+              'waiting_for_action',
+              'action_pending',
+              'completed',
+              'censored',
+              'conceded',
+              'expired',
+              'timeout',
+              'abandoned',
+              'engine_error',
+              'process_lost',
+              'persistence_error'
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_hashes
+          CHECK (
+            deck_hash_schema = 'external_battle_deck_hash_v1'
+            AND deck_a_hash ~ '^[0-9a-f]{64}\$'
+            AND deck_b_hash ~ '^[0-9a-f]{64}\$'
+            AND request_hash ~ '^[0-9a-f]{64}\$'
+            AND request_fingerprint ~ '^[0-9a-f]{64}\$'
+          ),
+        CONSTRAINT chk_interactive_battle_request
+          CHECK (
+            request_schema_version = 'interactive_battle_request_v1'
+            AND jsonb_typeof(request_payload) = 'object'
+            AND octet_length(request_payload::text) <= 1048576
+          ),
+        CONSTRAINT chk_interactive_battle_idempotency
+          CHECK (idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}\$'),
+        CONSTRAINT chk_interactive_battle_engine
+          CHECK (
+            engine = 'xmage'
+            AND (
+              engine_commit IS NULL
+              OR engine_commit ~ '^[0-9a-f]{40}\$'
+            )
+            AND (
+              engine_process_id IS NULL
+              OR char_length(engine_process_id) BETWEEN 1 AND 256
+            )
+            AND (
+              runtime_session_id IS NULL
+              OR runtime_session_id ~ '^ibsrt_[A-Za-z0-9_-]{16,96}\$'
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_state
+          CHECK (
+            state_version BETWEEN 0 AND 20000000
+            AND jsonb_typeof(private_state) = 'object'
+            AND octet_length(private_state::text) <= 524288
+            AND (
+              active_prompt IS NULL
+              OR (
+                jsonb_typeof(active_prompt) = 'object'
+                AND octet_length(active_prompt::text) <= 262144
+              )
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_prompt
+          CHECK (
+            (
+              status = 'waiting_for_action'
+              AND active_prompt_id ~ '^p_[A-Za-z0-9_-]{16,64}\$'
+              AND active_prompt IS NOT NULL
+              AND prompt_deadline_at IS NOT NULL
+            )
+            OR (
+              status <> 'waiting_for_action'
+              AND active_prompt_id IS NULL
+              AND active_prompt IS NULL
+              AND prompt_deadline_at IS NULL
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_ttl
+          CHECK (
+            ttl_seconds BETWEEN 60 AND 7200
+            AND expires_at > created_at
+            AND last_activity_at >= created_at
+          ),
+        CONSTRAINT chk_interactive_battle_lifecycle
+          CHECK (
+            (
+              status IN (
+                'starting',
+                'running',
+                'waiting_for_action',
+                'action_pending'
+              )
+              AND finished_at IS NULL
+              AND terminal_reason IS NULL
+              AND error_code IS NULL
+            )
+            OR (
+              status IN (
+                'completed',
+                'censored',
+                'conceded',
+                'expired',
+                'timeout',
+                'abandoned',
+                'engine_error',
+                'process_lost',
+                'persistence_error'
+              )
+              AND finished_at IS NOT NULL
+              AND terminal_reason IS NOT NULL
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_replay
+          CHECK (
+            status NOT IN ('completed', 'censored')
+            OR (
+              attempt_id IS NOT NULL
+              AND replay_id IS NOT NULL
+              AND engine_process_id IS NOT NULL
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_timestamps
+          CHECK (
+            updated_at >= created_at
+            AND (started_at IS NULL OR started_at >= created_at)
+            AND (finished_at IS NULL OR finished_at >= created_at)
+            AND (
+              engine_process_started_at IS NULL
+              OR engine_process_started_at <= updated_at
+            )
+          )
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS
+        uq_interactive_battle_user_idempotency
+      ON interactive_battle_sessions (user_id, idempotency_key);
+      CREATE UNIQUE INDEX IF NOT EXISTS
+        uq_interactive_battle_runtime_session
+      ON interactive_battle_sessions (runtime_session_id)
+      WHERE runtime_session_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_interactive_battle_user_created
+      ON interactive_battle_sessions (user_id, created_at DESC, id DESC);
+      CREATE INDEX IF NOT EXISTS idx_interactive_battle_user_active
+      ON interactive_battle_sessions (user_id, status, updated_at DESC)
+      WHERE status IN (
+        'starting',
+        'running',
+        'waiting_for_action',
+        'action_pending'
+      );
+      CREATE INDEX IF NOT EXISTS idx_interactive_battle_expiry
+      ON interactive_battle_sessions (expires_at, status)
+      WHERE status IN (
+        'starting',
+        'running',
+        'waiting_for_action',
+        'action_pending'
+      );
+
+      CREATE TABLE IF NOT EXISTS interactive_battle_records (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        schema_version TEXT NOT NULL
+          DEFAULT 'interactive_battle_record_v1',
+        session_id UUID NOT NULL
+          REFERENCES interactive_battle_sessions(id) ON DELETE CASCADE,
+        sequence BIGINT NOT NULL,
+        record_kind TEXT NOT NULL,
+        visibility TEXT NOT NULL,
+        state_version BIGINT NOT NULL,
+        prompt_id TEXT,
+        option_id TEXT,
+        idempotency_key TEXT,
+        request_fingerprint TEXT,
+        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_interactive_battle_record_schema
+          CHECK (schema_version = 'interactive_battle_record_v1'),
+        CONSTRAINT chk_interactive_battle_record_sequence
+          CHECK (
+            sequence BETWEEN 0 AND 1000000
+            AND state_version BETWEEN 0 AND 20000000
+          ),
+        CONSTRAINT chk_interactive_battle_record_kind
+          CHECK (
+            record_kind IN (
+              'session_created',
+              'runtime_started',
+              'private_state',
+              'prompt_opened',
+              'action_submitted',
+              'action_accepted',
+              'action_rejected',
+              'concede_requested',
+              'terminal',
+              'replay_linked'
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_record_visibility
+          CHECK (
+            visibility IN (
+              'private_user',
+              'internal',
+              'public_replay_ref'
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_record_prompt
+          CHECK (
+            (
+              prompt_id IS NULL
+              OR prompt_id ~ '^p_[A-Za-z0-9_-]{16,64}\$'
+            )
+            AND (
+              option_id IS NULL
+              OR option_id ~ '^o_[A-Za-z0-9_-]{16,64}\$'
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_record_idempotency
+          CHECK (
+            (
+              idempotency_key IS NULL
+              AND request_fingerprint IS NULL
+            )
+            OR (
+              idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}\$'
+              AND request_fingerprint ~ '^[0-9a-f]{64}\$'
+            )
+          ),
+        CONSTRAINT chk_interactive_battle_record_payload
+          CHECK (
+            jsonb_typeof(payload) = 'object'
+            AND octet_length(payload::text) <= 524288
+          ),
+        CONSTRAINT uq_interactive_battle_record_sequence
+          UNIQUE (session_id, sequence)
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS
+        uq_interactive_battle_record_idempotency
+      ON interactive_battle_records (session_id, idempotency_key)
+      WHERE idempotency_key IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_interactive_battle_record_prompt
+      ON interactive_battle_records (
+        session_id,
+        prompt_id,
+        state_version,
+        sequence
+      )
+      WHERE prompt_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_interactive_battle_record_created
+      ON interactive_battle_records (session_id, created_at, sequence);
+
+      CREATE OR REPLACE FUNCTION
+        manaloom_interactive_battle_record_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$interactive_record_append_only\$
+      BEGIN
+        RAISE EXCEPTION USING
+          ERRCODE = '55000',
+          MESSAGE = 'interactive_battle_records_are_append_only';
+      END;
+      \$interactive_record_append_only\$;
+
+      DROP TRIGGER IF EXISTS
+        manaloom_interactive_battle_record_no_update
+      ON interactive_battle_records;
+      CREATE TRIGGER manaloom_interactive_battle_record_no_update
+      BEFORE UPDATE ON interactive_battle_records
+      FOR EACH ROW
+      EXECUTE FUNCTION manaloom_interactive_battle_record_append_only();
+
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS interactive_battle_records CASCADE;
+      DROP TABLE IF EXISTS interactive_battle_sessions CASCADE;
+      DROP FUNCTION IF EXISTS
+        manaloom_interactive_battle_record_append_only();
+      ALTER TABLE battle_simulation_attempts
+      DROP CONSTRAINT IF EXISTS chk_battle_attempt_timeout;
+      ALTER TABLE battle_simulation_attempts
+      ADD CONSTRAINT chk_battle_attempt_timeout
+      CHECK (timeout_ms BETWEEN 1 AND 600000);
+    ''',
+  ),
 ];
 
 class Migration {
@@ -3549,7 +3935,8 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '052' ||
       '053' ||
       '054' ||
-      '055' => MigrationRollbackPolicy.manualOnly,
+      '055' ||
+      '056' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

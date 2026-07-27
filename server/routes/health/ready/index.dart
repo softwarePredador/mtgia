@@ -149,6 +149,15 @@ Future<Response> onRequest(RequestContext context) async {
     allHealthy = false;
   }
 
+  final interactiveBattle = await evaluateInteractiveBattleReadiness(
+    env,
+    context.read<Pool>(),
+  );
+  checks['interactive_battle'] = interactiveBattle.check;
+  if (!interactiveBattle.healthy) {
+    allHealthy = false;
+  }
+
   final response = buildReadinessResponseBody(
     checks: checks,
     allHealthy: allHealthy,

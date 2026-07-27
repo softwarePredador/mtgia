@@ -144,8 +144,8 @@ void main() {
     expect(totals, inventory.expectedTotals);
     expect(
       totals.values.reduce((a, b) => a + b),
-      245,
-      reason: 'A baseline corrente classifica exatamente 245 superfícies.',
+      248,
+      reason: 'A baseline corrente classifica exatamente 248 superfícies.',
     );
   });
 }

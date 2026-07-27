@@ -1,6 +1,6 @@
 # Plano de entrega do ManaLoom Battle Lab e Coach
 
-**Estado:** `M2_LOCAL_IMPLEMENTED / BL7_GO / BL8_READY / RELEASE_NO_GO`
+**Estado:** `M3_LOCAL_IMPLEMENTED / BL10_PARTIAL / RELEASE_NO_GO`
 
 **Atualizado em:** 2026-07-27
 
@@ -67,7 +67,7 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
   ser recongelada e os gates físicos/live precisam passar antes de habilitar
   jobs/Live fora do ambiente local.
 
-## 2.1 Estado executado em 2026-07-26
+## 2.1 Estado executado em 2026-07-26–27
 
 | Sprint | Resultado da rodada | Consequência |
 |---|---|---|
@@ -79,14 +79,16 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
 | BL5 | `PASS_LOCAL_FEATURE_OFF` | Job assíncrono, worker, leases, quotas, cancelamento, correlação e fault injection implementados; rollout desligado |
 | BL6 | `PASS_LOCAL_FEATURE_OFF_WITH_DEVICE_BLOCK` | Polling Live, cursor, armazenamento durável, reconexão e UI Web implementados; fanout sintético local de 64 streams passou, Android físico/sockets reais/live pendentes |
 | BL7 | `PASS_DECISION_GO` | Três partidas humanas isoladas e o timeout terminal passaram: 251/251 respostas normais aceitas, zero deadlock/leak e concessão confirmada; GO restrito a BL8 local/default-off |
-| BL8 | `READY_BL7_GO` | Pode iniciar infraestrutura local; nenhuma sessão interativa foi publicada |
-| BL9 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Coach Mode não foi criado |
-| BL10 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Homologação do Coach não pode começar sem BL8/BL9 |
+| BL8 | `PASS_LOCAL_FEATURE_OFF` | Sessão, log append-only, API privada, lifecycle, idempotência, rejeição de ação obsoleta e runtime XMage separado foram implementados; migration 056 passou apenas em PostgreSQL descartável |
+| BL9 | `PASS_LOCAL_FEATURE_OFF_SCOPE_REFINED` | Coach Web/Android, prompts de opção/inteiro/múltiplos valores, mesa privada, reconexão, concessão e delegação por prompt foram implementados; preferência automática da sessão foi rejeitada para o alpha porque o runtime aprovado exige timeout terminal |
+| BL10 | `PARTIAL_LOCAL_RELEASE_NO_GO` | Segurança, fault handling, isolamento, runtime XMage real, Web release, `battle-lab`, gate completo e E2E determinístico possuem prova local; Android físico/TalkBack, carga alvo integrada, alertas, deploy/migration e smoke da mesma SHA permanecem abertos |
 
-O produto disponível nesta rodada termina em Battle Lab + Live Spectator
-somente leitura, ambos ainda sujeitos aos gates de release. Não há Coach Mode
-nem partida interativa. O estado por task e as evidências reproduzíveis ficam
-em `docs/MANALOOM_BATTLE_LAB_TRACKER.md` e `docs/qa/`.
+Battle Coach agora existe como alpha local atrás de duas flags fail-closed:
+`INTERACTIVE_BATTLE_ENABLED=false` no backend e
+`ENABLE_INTERACTIVE_BATTLE=false` no app/release. Portanto, o produto publicado
+continua terminando em Battle Lab + Live Spectator somente leitura e sujeito
+aos gates de release. O estado por task e as evidências reproduzíveis ficam em
+`docs/MANALOOM_BATTLE_LAB_TRACKER.md` e `docs/qa/`.
 
 ## 3. Premissas da estimativa
 
@@ -109,10 +111,14 @@ e devem aparecer como `BLOCKED`, não como esforço concluído.
 
 Em 2026-07-24 o volume local estava com aproximadamente 3,3 GiB disponíveis e
 marcado como 100% utilizado. Em 2026-07-26 a rodada removeu apenas diretórios
-temporários Dart e o cache ignorado/recriável de dependências Web previamente
-inventariados, limitou o gate backend a lotes explícitos e conservou cerca de
-1,8 GiB livres após duas execuções `full` consecutivas. O volume ainda exige
-monitoramento e cleanup exato antes de novos artefatos grandes.
+temporários Dart e caches recriáveis já inventariados. Em 2026-07-27 uma nova
+inspeção encontrou 31 GiB livres e removeu exclusivamente 10 GiB de
+`Library/Developer/Xcode/DerivedData`, que é reconstruível; CoreSimulator,
+Pub cache e dados pessoais de apps foram preservados. A capacidade subiu para
+41 GiB. A bateria completa de builds e gates recriou 6,6 GiB de DerivedData;
+esse cache e um temporário Flutter de 241 MiB foram removidos novamente,
+deixando aproximadamente 33 GiB livres. Não foi feita limpeza de dados de
+simuladores, pacotes ou caches pessoais.
 
 ## 4. Marcos e prazo
 
@@ -455,6 +461,24 @@ Contrato proposto: `interactive_battle_session_v1`.
 | BL8-06 | P0 | Definir lifecycle | TTL, abandono, concede, timeout, encerramento e processo perdido têm estados terminais |
 | BL8-07 | P0 | Reusar replay final | Ao terminar, resultado público sanitizado segue a persistência Battle existente |
 
+### Estado implementado de BL8 (2026-07-27)
+
+BL8-01..07 passaram localmente com a capacidade desabilitada por padrão.
+Migration 056 cria `interactive_battle_sessions` e
+`interactive_battle_records`; o segundo registro é append-only e ambos são
+owner-scoped. A API autenticada cria/lista/retoma sessão, aceita ação
+idempotente e concessão, rejeita versão/prompt/opção obsoletos e devolve apenas
+`interactive_battle_session_v1` privado ao dono. O resultado terminal reutiliza
+a tentativa/replay Battle sanitizados. O sidecar só oferece essas rotas em
+`XMAGE_RUNTIME_MODE=interactive`; o modo batch não aceita sessões e o modo
+interativo não aceita simulação batch.
+
+O runtime real concluiu uma partida com sessão
+`ibsrt_ecccf246eba84642b83f6c3d00cc1`, processo
+`21a95831-a940-41e3-a095-38b74d3e567f`, 83 decisões delegadas, 273 eventos e
+196 snapshots sem identidade da mão adversária. Migration live, deploy e
+rollout não foram executados.
+
 ## 16. BL9 — Coach Mode alpha
 
 **Duração:** 1 sprint.
@@ -469,9 +493,25 @@ usuário conduza toda prioridade do jogo.
 | BL9-03 | P0 | Implementar alvo | Alvos e cancelamento usam IDs opacos e estado atual |
 | BL9-04 | P0 | Implementar combate | Atacantes/bloqueadores respeitam constraints do engine |
 | BL9-05 | P1 | Implementar mana/X | Somente se o spike demonstrar shape estável; senão fica delegado |
-| BL9-06 | P0 | Criar delegação | “Deixar a IA decidir” funciona por prompt e como preferência da sessão |
+| BL9-06 | P0 | Criar delegação | “Deixar a IA decidir” funciona por prompt; preferência automática da sessão só entra após novo contrato runtime que não contradiga timeout terminal |
 | BL9-07 | P0 | Criar UI Coach | Estado, prioridade, prazo, opção selecionada e reconexão são legíveis em Web/Android |
 | BL9-08 | P0 | Preservar privacidade | Nenhuma opção, log ou analytics revela mão/decisão do adversário |
+
+### Estado implementado de BL9 (2026-07-27)
+
+BL9-01..05, BL9-07 e BL9-08 passaram localmente. BL9-06 foi refinado: a UI
+oferece delegação explícita por prompt, inclusive opção, inteiro, quantidades,
+mana/X, alvo e combate, mas não guarda uma preferência que responda prompts
+futuros sem o usuário. Essa automação conflitaria com o ADR 0004, no qual
+timeout deve conceder e terminar a sessão; ela exige uma decisão posterior.
+
+`BattleCoachScreen` é acessível diretamente pela aba Análise, menu do deck e
+lista de testes quando a flag do app está ativa. Mostra campo, mão própria,
+contagens da mão/biblioteca adversária, zonas públicas, vida, mana, stack,
+combate, prioridade, prazo e opções opacas. A sessão retoma pelo deep link
+`/decks/:id/battle-coach/:sessionId`; não usa `shared_preferences`.
+Testes automatizados cobrem 390×844 e 1440×900 sem overflow. O bundle Web
+local foi compilado com a flag ativa; os scripts de release a fixam em `false`.
 
 ## 17. BL10 — Homologação do Coach alpha
 
@@ -488,6 +528,26 @@ usuário conduza toda prioridade do jogo.
 | BL10-05 | P0 | Acessibilidade | Teclado, foco, live region, TalkBack, texto 200% e reduced motion passam |
 | BL10-06 | P0 | Observabilidade | Prompt travado, sessão abandonada, timeout e erro têm alerta/redaction e correlação |
 | BL10-07 | P0 | Emitir decisão alpha | GO limitado define quota, formatos/decks suportados e rollback; qualquer P0 aberto mantém rota inacessível |
+
+### Estado parcial de BL10 (2026-07-27)
+
+- BL10-01 possui prova local de auth/owner scope uniforme, IDs opacos,
+  idempotência, limite de corpo, quota e rejeição de payload/estado obsoleto.
+- BL10-02 possui prova local de correlação divergente, processo perdido,
+  timeout, concessão terminal, repetição e falha de runtime sem resultado
+  fabricado.
+- BL10-03 comprova limite local de capacidade e isolamento batch/interativo,
+  mas ainda não possui ensaio integrado de carga contra os budgets de API e
+  PostgreSQL.
+- BL10-04 possui partida XMage real e build Web local; Android físico,
+  background/foreground real e ambiente homologado permanecem abertos.
+- BL10-05 possui semântica, viewports, texto responsivo e reduced motion
+  automatizados; teclado completo, TalkBack em aparelho e validação manual de
+  texto 200% permanecem abertos.
+- BL10-06 possui logs bounded/redacted, correlação e readiness fail-closed;
+  alertas e painel operacional de sessões ainda não foram homologados.
+- BL10-07 permanece `NO_GO`: backend e app são default-off e os scripts de
+  release fixam ambas as flags em `false`.
 
 **Saída M3:** Coach Mode alpha controlado. Isso ainda não é uma partida humana
 completa nem garante suporte a toda escolha do protocolo XMage.
@@ -562,7 +622,7 @@ contrato E2E. O plano não concede essas autorizações.
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Volume local operando perto do limite, com ~1,8 GiB livres após os gates de 2026-07-26 | risco de regressão de capacidade com novos artefatos; os gates atuais passam | manter backend em lotes explícitos, inventariar e remover somente caches/temporários recriáveis; não apagar mudança ou evidência ativa |
+| Volume local chegou perto do limite; cleanup exato de `DerivedData` elevou a folga para ~41 GiB antes dos novos builds e ~38 GiB depois | artefatos Xcode/Flutter podem voltar a consumir capacidade | manter gates em lotes explícitos, medir antes/depois e remover somente caches/temporários recriáveis; não apagar simuladores, mudança ou evidência ativa |
 | Integridade dos logs exige migration maior | +1 sprint | BL0 é obrigatório e versiona compatibilidade antes da UI |
 | XMage muda callback ou bloqueia em prompt não tratado | NO-GO ou +2–4 sprints | spike time-boxed, allowlist e delegação segura |
 | Hidden information aparece em payload indireto | bloqueia release | duas visões, normalização por engine e testes negativos |
@@ -573,13 +633,17 @@ contrato E2E. O plano não concede essas autorizações.
 
 ## 22. Resposta de calendário
 
-As estimativas abaixo eram a previsão anterior à execução. A rodada assistida
-de 2026-07-26 acelerou implementação e validação local de M1/M2, mas não
-encurta esperas físicas/live nem torna BL8–BL10 executáveis após o NO-GO.
-Para o estado atual, o tempo restante é condicionado: Android físico,
-TalkBack, ambiente homologado, deploy/migrations autorizados e smoke de mesma
-SHA precisam de janela própria; Coach não possui prazo até um novo BL7 terminar
-em GO.
+As estimativas abaixo eram a previsão anterior à execução. As rodadas
+assistidas de 2026-07-26–27 aceleraram a implementação local de M1–M3:
+BL7 recebeu GO técnico, BL8/BL9 foram implementados default-off e BL10 começou.
+Isso não encurta as esperas físicas/live. Para decidir um alpha controlado,
+restam carga integrada, Android físico/TalkBack, observabilidade/alertas,
+ambiente homologado, migration/deploy autorizados e smoke na mesma SHA.
+
+Com ambiente, aparelho e autorizações disponíveis, a janela de engenharia e
+validação restante é de **5 a 10 dias úteis**. Esse prazo não inclui fila de
+aprovação/deploy. Sem esses recursos, o calendário fica bloqueado externamente
+e a rota permanece inacessível.
 
 Com a equipe e premissas deste plano:
 

@@ -119,9 +119,11 @@ if ! (
   DB_NAME=manaloom_tbls \
   RUN_BATTLE_JOB_DB_TESTS=1 \
   RUN_BATTLE_LIVE_DB_TESTS=1 \
+  RUN_INTERACTIVE_BATTLE_DB_TESTS=1 \
     "$DART_BIN" test --reporter compact -j 1 \
       test/battle_job_store_live_test.dart \
-      test/battle_live_store_live_test.dart
+      test/battle_live_store_live_test.dart \
+      test/interactive_battle_store_live_test.dart
 ) >"$RUN_DIR/battle-db-tests.log" 2>&1; then
   tail -200 "$RUN_DIR/battle-db-tests.log" >&2
   exit 1
@@ -249,5 +251,5 @@ print(
 )
 PY
 
-printf 'PASS: Battle jobs/Live exercitados no PostgreSQL descartável.\n'
+printf 'PASS: Battle jobs/Live/Interactive exercitados no PostgreSQL descartável.\n'
 printf 'PASS: PostgreSQL/tbls local descartável, sem conexão externa.\n'

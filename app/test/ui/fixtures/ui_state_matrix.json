@@ -31,11 +31,11 @@
     "battle": {
       "covered": ["loading","progress","saving","disabled","empty","error","retry","offline","permission_denied","success"],
       "not_applicable": ["partial","stale","loading_more","optimistic","session_expired"],
-      "sources": ["lib/features/battle/screens/battle_replays_screen.dart","lib/features/battle/screens/battle_live_spectator_screen.dart"],
-      "tests": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart","test/features/battle/services/battle_replay_service_test.dart","test/features/battle/services/battle_job_gateway_test.dart"],
-      "anchors": ["battle-replays-loading-state","battle-replays-error-state","battle-replays-empty-state","battle-opponent-retry-button","battle-live-disabled-state","battle-live-reconnect-banner","battle-live-terminal-state"],
-      "input_policy": "tested: seleção do oponente permanece até retry/cancelamento e pausa local não interrompe polling/cursor",
-      "raw_error_policy": "sanitized: _friendlyError/_friendlyLiveError convertem falha operacional em mensagem de produto"
+      "sources": ["lib/features/battle/screens/battle_coach_screen.dart","lib/features/battle/screens/battle_replays_screen.dart","lib/features/battle/screens/battle_live_spectator_screen.dart"],
+      "tests": ["test/features/battle/screens/battle_coach_screen_test.dart","test/features/battle/services/interactive_battle_service_test.dart","test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart","test/features/battle/services/battle_replay_service_test.dart","test/features/battle/services/battle_job_gateway_test.dart"],
+      "anchors": ["battle-coach-loading-state","battle-coach-welcome-state","battle-coach-error-banner","battle-coach-board","battle-coach-own-hand","battle-coach-action-progress","battle-coach-terminal-panel","battle-replays-loading-state","battle-replays-error-state","battle-replays-empty-state","battle-opponent-retry-button","battle-live-disabled-state","battle-live-reconnect-banner","battle-live-terminal-state"],
+      "input_policy": "tested: prompt do Coach bloqueia reenvio, delegação é por prompt e seleção do oponente permanece até retry/cancelamento; pausa local não interrompe polling/cursor",
+      "raw_error_policy": "sanitized: InteractiveBattleService e _friendlyError/_friendlyLiveError convertem falha operacional em mensagem de produto"
     },
     "binder": {
       "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","permission_denied","success"],

@@ -150,6 +150,7 @@ Widget _subject(
   Map<String, dynamic>? analysisPayload,
   _FakeApiClient? apiClient,
   VoidCallback? onOpenBattleLab,
+  VoidCallback? onOpenBattleCoach,
 }) {
   return MaterialApp(
     theme: AppTheme.darkTheme.copyWith(splashFactory: InkRipple.splashFactory),
@@ -175,7 +176,11 @@ Widget _subject(
       ),
       child: Scaffold(
         body: SingleChildScrollView(
-          child: DeckAnalysisTab(deck: deck, onOpenBattleLab: onOpenBattleLab),
+          child: DeckAnalysisTab(
+            deck: deck,
+            onOpenBattleLab: onOpenBattleLab,
+            onOpenBattleCoach: onOpenBattleCoach,
+          ),
         ),
       ),
     ),
@@ -210,6 +215,48 @@ void main() {
     await tester.pump();
 
     expect(opened, isTrue);
+  });
+
+  testWidgets('prioritizes interactive Battle Coach when explicitly enabled', (
+    tester,
+  ) async {
+    var coachOpened = false;
+    var labOpened = false;
+    final deck = _makeDeck(
+      id: 'deck-battle-coach',
+      name: 'Talrand Tempo',
+      synergyScore: 82,
+    );
+
+    await tester.pumpWidget(
+      _subject(
+        deck,
+        onOpenBattleLab: () => labOpened = true,
+        onOpenBattleCoach: () => coachOpened = true,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Jogar e aprender com este deck'), findsOneWidget);
+    expect(
+      find.byKey(const Key('deck-analysis-open-battle-coach-button')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('deck-analysis-open-battle-lab-button')),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(
+      find.byKey(const Key('deck-analysis-open-battle-coach-button')),
+    );
+    await tester.tap(
+      find.byKey(const Key('deck-analysis-open-battle-coach-button')),
+    );
+    await tester.pump();
+
+    expect(coachOpened, isTrue);
+    expect(labOpened, isFalse);
   });
 
   testWidgets(

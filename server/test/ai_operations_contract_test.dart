@@ -58,7 +58,7 @@ void main() {
     );
   });
 
-  test('backend deploy proves migrations 038-055 before remote mutation', () {
+  test('backend deploy proves migrations 038-056 before remote mutation', () {
     final source =
         File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
     final guard =
@@ -85,10 +85,10 @@ void main() {
       migration040Definition + 1,
     );
     final migration041To055Definition = source.indexOf(
-      'require_migrations_041_055_contract() {',
+      'require_migrations_041_056_contract() {',
     );
     final migration041To055Call = source.indexOf(
-      '\nrequire_migrations_041_055_contract\n',
+      '\nrequire_migrations_041_056_contract\n',
       migration041To055Definition + 1,
     );
     final environmentSource = source.indexOf(
@@ -177,7 +177,7 @@ void main() {
       'migration_038_ready',
       'migration_039_ready',
       'migration_040_ready',
-      'migrations_041_055_ready',
+      'migrations_041_056_ready',
       'manaloom_deck_cards_require_review',
       'manaloom_deck_format_require_review',
       'idx_decks_user_validation_state',
@@ -193,11 +193,11 @@ void main() {
     expect(source, contains('.checks.release_schema.status == "healthy"'));
     expect(
       source,
-      contains('.checks.release_schema.required_range == "038-055"'),
+      contains('.checks.release_schema.required_range == "038-056"'),
     );
     expect(
       source,
-      contains('.checks.release_schema.latest_migration == "055"'),
+      contains('.checks.release_schema.latest_migration == "056"'),
     );
     expect(source, contains('.checks.battle_job_schema.status == "healthy"'));
     expect(

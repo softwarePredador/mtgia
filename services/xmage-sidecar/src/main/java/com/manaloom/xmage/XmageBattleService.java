@@ -466,7 +466,15 @@ final class XmageBattleService {
         if (sanitized.isEmpty()) {
             sanitized = "request";
         }
-        return "ml_" + sanitized.substring(0, Math.min(8, sanitized.length()));
+        String suffix = BattleRequestContract
+                .sha256(sanitized)
+                .substring(0, 10);
+        // The pinned XMage runtime caps usernames at 14 characters.
+        return "ml_" + suffix;
+    }
+
+    static String canonicalDeckHash(DeckInput deck) {
+        return BattleRequestContract.canonicalDeckHash(deck);
     }
 
     private MatchOptions matchOptions(String requestId, GameTypeView gameType) {
@@ -521,7 +529,7 @@ final class XmageBattleService {
         return aliases;
     }
 
-    private static JsonObject requireObject(JsonObject input, String key) {
+    static JsonObject requireObject(JsonObject input, String key) {
         if (!input.has(key) || !input.get(key).isJsonObject()) {
             throw new IllegalArgumentException(key + " is required");
         }
@@ -849,7 +857,7 @@ final class XmageBattleService {
         }
     }
 
-    private static final class DeckInput {
+    static final class DeckInput {
         final String id;
         final String name;
         final List<CardInput> cards;

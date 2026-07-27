@@ -296,6 +296,7 @@ build_args=(
   --dart-define="PUBLIC_API_BASE_URL=$API_BASE_URL"
   --dart-define="SENTRY_ENVIRONMENT=production"
   --dart-define="SENTRY_RELEASE=manaloom-web@$SHORT_SHA"
+  --dart-define="ENABLE_INTERACTIVE_BATTLE=false"
   --no-version-check
   --no-pub
 )

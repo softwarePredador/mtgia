@@ -155,6 +155,7 @@ build_args=(
   --dart-define="RELEASE_IDENTITY_SHA256=$EMBEDDED_IDENTITY_SOURCE_SHA256"
   --dart-define="RELEASE_STARTUP_PROOF=true"
   --dart-define="ENABLE_SCANNER_RELEASE=false"
+  --dart-define="ENABLE_INTERACTIVE_BATTLE=false"
   --no-version-check
   --no-pub
 )

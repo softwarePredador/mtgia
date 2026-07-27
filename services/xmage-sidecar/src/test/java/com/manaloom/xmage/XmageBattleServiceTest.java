@@ -124,9 +124,22 @@ final class XmageBattleServiceTest {
 
     @Test
     void connectionUsernameAlwaysHasASafeSuffix() {
-        assertEquals("ml_request", XmageBattleService.connectionUsername("---"));
-        assertEquals("ml_abc12345", XmageBattleService.connectionUsername("abc-12345-xyz"));
-        assertEquals("ml_request", XmageBattleService.connectionUsername(null));
+        assertEquals(
+                XmageBattleService.connectionUsername("---"),
+                XmageBattleService.connectionUsername(null)
+        );
+        assertTrue(
+                XmageBattleService.connectionUsername("abc-12345-xyz")
+                        .matches("^ml_[0-9a-f]{10}$")
+        );
+        assertNotEquals(
+                XmageBattleService.connectionUsername(
+                        "interactive-11111111-1111-1111-1111-111111111111"
+                ),
+                XmageBattleService.connectionUsername(
+                        "interactive-22222222-2222-2222-2222-222222222222"
+                )
+        );
     }
 
     @Test

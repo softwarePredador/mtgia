@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
@@ -33,6 +34,7 @@ import '../widgets/deck_optimize_ui_support.dart';
 import '../widgets/deck_progress_indicator.dart';
 import '../widgets/sample_hand_widget.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../battle/screens/battle_coach_screen.dart';
 import '../../battle/screens/battle_replays_screen.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
@@ -177,6 +179,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     context.push(battleReplaysRouteLocation(widget.deckId));
   }
 
+  void _openBattleCoach() {
+    context.push(battleCoachRouteLocation(widget.deckId));
+  }
+
   Future<void> _openLifeCounterForDeck(DeckDetails deck) async {
     final result = await openLifeCounterRoute<LifeCounterExitResult>(
       context,
@@ -295,6 +301,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 case 'battle_replays':
                   _openBattleReplays();
                   break;
+                case 'battle_coach':
+                  _openBattleCoach();
+                  break;
                 case 'toggle_public':
                   _togglePublic();
                   break;
@@ -347,6 +356,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     dense: true,
                   ),
                 ),
+                if (LaunchFeatures.interactiveBattleEnabled)
+                  const PopupMenuItem(
+                    value: 'battle_coach',
+                    child: ListTile(
+                      leading: ManaLoomGlyph(ManaLoomGlyphKind.commander),
+                      title: Text('Jogar Battle Coach'),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
+                  ),
                 PopupMenuItem(
                   value: 'toggle_public',
                   child: ListTile(
@@ -704,6 +723,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         DeckAnalysisTab(
                           deck: deck,
                           onOpenBattleLab: _openBattleReplays,
+                          onOpenBattleCoach:
+                              LaunchFeatures.interactiveBattleEnabled
+                              ? _openBattleCoach
+                              : null,
                         ),
                       ],
                     ),

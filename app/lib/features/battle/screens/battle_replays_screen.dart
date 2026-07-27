@@ -26,6 +26,20 @@ import 'battle_live_spectator_screen.dart';
 String battleReplaysRouteLocation(String deckId) =>
     '/decks/${Uri.encodeComponent(deckId)}/battle-replays';
 
+Future<BattleTestSetup?> showBattleOpponentPicker({
+  required BuildContext context,
+  required BattleReplayGateway gateway,
+  required String currentDeckId,
+  bool allowSeries = false,
+}) => showDialog<BattleTestSetup>(
+  context: context,
+  builder: (context) => _BattleOpponentPickerDialog(
+    gateway: gateway,
+    currentDeckId: currentDeckId,
+    allowSeries: allowSeries,
+  ),
+);
+
 enum _ReplayDetailView { timeline, decisions }
 
 class BattleReplaysScreen extends StatefulWidget {
@@ -36,6 +50,7 @@ class BattleReplaysScreen extends StatefulWidget {
     this.jobGateway,
     this.initialReplayId,
     this.battleLiveEnabled = LaunchFeatures.battleLiveSpectatorEnabled,
+    this.interactiveBattleEnabled = LaunchFeatures.interactiveBattleEnabled,
   });
 
   final String deckId;
@@ -43,6 +58,7 @@ class BattleReplaysScreen extends StatefulWidget {
   final BattleJobGateway? jobGateway;
   final String? initialReplayId;
   final bool battleLiveEnabled;
+  final bool interactiveBattleEnabled;
 
   @override
   State<BattleReplaysScreen> createState() => _BattleReplaysScreenState();
@@ -266,6 +282,10 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     );
   }
 
+  void _openBattleCoach() {
+    context.push('/decks/${Uri.encodeComponent(widget.deckId)}/battle-coach');
+  }
+
   Future<void> _runLiveBattle() async {
     final setup = await _askBattleTestSetup(allowSeries: true);
     if (setup == null || setup.opponentDeckId.trim().isEmpty) return;
@@ -429,18 +449,13 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
-  Future<BattleTestSetup?> _askBattleTestSetup({
-    bool allowSeries = false,
-  }) async {
-    return showDialog<BattleTestSetup>(
-      context: context,
-      builder: (context) => _BattleOpponentPickerDialog(
+  Future<BattleTestSetup?> _askBattleTestSetup({bool allowSeries = false}) =>
+      showBattleOpponentPicker(
+        context: context,
         gateway: _gateway,
         currentDeckId: widget.deckId,
         allowSeries: allowSeries,
-      ),
-    );
-  }
+      );
 
   Future<void> _recordMulliganDecision(
     _OpeningHandExercise exercise,
@@ -641,6 +656,9 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
                   onRunGoldfish: _runGoldfish,
                   onRunBattle: _runBattle,
                   onRunLive: widget.battleLiveEnabled ? _runLiveBattle : null,
+                  onOpenCoach: widget.interactiveBattleEnabled
+                      ? _openBattleCoach
+                      : null,
                   isStartingLive: _isStartingLive,
                 ),
                 if (_seriesProgress != null || _seriesError != null)
@@ -1827,6 +1845,7 @@ class _BattleReplayActions extends StatelessWidget {
     required this.onRunGoldfish,
     required this.onRunBattle,
     required this.onRunLive,
+    required this.onOpenCoach,
     required this.isStartingLive,
   });
 
@@ -1834,6 +1853,7 @@ class _BattleReplayActions extends StatelessWidget {
   final VoidCallback onRunGoldfish;
   final VoidCallback onRunBattle;
   final VoidCallback? onRunLive;
+  final VoidCallback? onOpenCoach;
   final bool isStartingLive;
 
   @override
@@ -1881,6 +1901,7 @@ class _BattleReplayActions extends StatelessWidget {
           Text(
             'Consistência (Goldfish) observa mãos e curva sem adversário. '
             'Confronto (Battle) executa dois decks e salva evidências do replay. '
+            '${onOpenCoach == null ? '' : 'Battle Coach para nas decisões para você jogar. '}'
             'Nenhum modo prova superioridade ou substitui regra oficial.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
@@ -1892,12 +1913,20 @@ class _BattleReplayActions extends StatelessWidget {
             spacing: 10,
             runSpacing: 8,
             children: [
-              FilledButton.icon(
-                key: const Key('battle-run-goldfish-button'),
-                onPressed: isRunning ? null : onRunGoldfish,
-                icon: const Icon(Icons.speed_rounded),
-                label: const Text('Consistência · Goldfish'),
-              ),
+              if (onOpenCoach == null)
+                FilledButton.icon(
+                  key: const Key('battle-run-goldfish-button'),
+                  onPressed: isRunning ? null : onRunGoldfish,
+                  icon: const Icon(Icons.speed_rounded),
+                  label: const Text('Consistência · Goldfish'),
+                )
+              else
+                OutlinedButton.icon(
+                  key: const Key('battle-run-goldfish-button'),
+                  onPressed: isRunning ? null : onRunGoldfish,
+                  icon: const Icon(Icons.speed_rounded),
+                  label: const Text('Consistência · Goldfish'),
+                ),
               OutlinedButton.icon(
                 key: const Key('battle-run-battle-button'),
                 onPressed: isRunning ? null : onRunBattle,
@@ -1907,6 +1936,16 @@ class _BattleReplayActions extends StatelessWidget {
                 ),
                 label: const Text('Confronto · Battle'),
               ),
+              if (onOpenCoach != null)
+                FilledButton.icon(
+                  key: const Key('battle-open-coach-button'),
+                  onPressed: isRunning ? null : onOpenCoach,
+                  icon: const ManaLoomGlyph(
+                    ManaLoomGlyphKind.commander,
+                    size: 20,
+                  ),
+                  label: const Text('Jogar · Battle Coach'),
+                ),
               if (onRunLive != null)
                 OutlinedButton.icon(
                   key: const Key('battle-run-live-button'),

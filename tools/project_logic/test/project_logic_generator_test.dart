@@ -31,9 +31,9 @@ void main() {
     expect(stats['web_routes'] as int, greaterThanOrEqualTo(10));
     expect(stats['non_dart_product_files'] as int, greaterThanOrEqualTo(45));
     expect(stats['api_routes'] as int, greaterThanOrEqualTo(95));
-    expect(stats['database_tables'], 77);
+    expect(stats['database_tables'], 79);
     expect(stats['database_views'], 6);
-    expect(stats['migrations'], 55);
+    expect(stats['migrations'], 56);
     expect(stats['flows'], 8);
   });
 
@@ -167,7 +167,7 @@ void main() {
     expect(policy['cache_and_laboratory'], contains('never product source'));
     final database = result.manifest['database'] as Map<String, Object?>;
     expect(database['source_of_truth'], 'PostgreSQL/backend');
-    expect(database['latest_migration'], '055');
+    expect(database['latest_migration'], '056');
   });
 
   test('does not capture environment values', () {

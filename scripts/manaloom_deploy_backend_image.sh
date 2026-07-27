@@ -704,7 +704,7 @@ SQL
   fi
 }
 
-require_migrations_041_055_contract() {
+require_migrations_041_056_contract() {
   local contract_status
   contract_status="$(
     "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
@@ -726,7 +726,8 @@ WITH required_migrations(version, name) AS (
     ('052', 'version_battle_simulation_attempts'),
     ('053', 'create_battle_replay_annotations'),
     ('054', 'create_battle_jobs'),
-    ('055', 'create_battle_job_live_records')
+    ('055', 'create_battle_job_live_records'),
+    ('056', 'create_interactive_battle_sessions')
 ), checks(check_name, ok) AS (
   VALUES
     (
@@ -736,7 +737,7 @@ WITH required_migrations(version, name) AS (
     (
       'required_migrations_registered',
       (
-        SELECT COUNT(*) = 15
+        SELECT COUNT(*) = 16
         FROM required_migrations required
         JOIN public.schema_migrations actual
           ON actual.version = required.version
@@ -744,11 +745,11 @@ WITH required_migrations(version, name) AS (
       )
     ),
     (
-      'latest_migration_055',
+      'latest_migration_056',
       COALESCE(
         (SELECT MAX(version) FROM public.schema_migrations),
         ''
-      ) = '055'
+      ) = '056'
     )
 ), missing AS (
   SELECT check_name
@@ -756,8 +757,8 @@ WITH required_migrations(version, name) AS (
   WHERE NOT ok
 )
 SELECT CASE
-  WHEN COUNT(*) = 0 THEN 'migrations_041_055_ready'
-  ELSE 'migrations_041_055_incomplete:' ||
+  WHEN COUNT(*) = 0 THEN 'migrations_041_056_ready'
+  ELSE 'migrations_041_056_incomplete:' ||
        string_agg(check_name, ',' ORDER BY check_name)
 END
 FROM missing;
@@ -765,8 +766,8 @@ ROLLBACK;
 SQL
   )"
 
-  if [[ "$contract_status" != "migrations_041_055_ready" ]]; then
-    echo "deploy recusado: contrato read-only das migrations 041-055 incompleto: $contract_status" >&2
+  if [[ "$contract_status" != "migrations_041_056_ready" ]]; then
+    echo "deploy recusado: contrato read-only das migrations 041-056 incompleto: $contract_status" >&2
     exit 2
   fi
 }
@@ -913,7 +914,7 @@ require_clean_worktree
 require_migration_038_contract
 require_migration_039_contract
 require_migration_040_contract
-require_migrations_041_055_contract
+require_migrations_041_056_contract
 
 drain_timeout_seconds="${MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS:-300}"
 if ! [[ "$drain_timeout_seconds" =~ ^[0-9]+$ ]]; then
@@ -1133,6 +1134,8 @@ docker service update \
   --env-add SENTRY_ENVIRONMENT=production \
   --env-add SENTRY_RELEASE='manaloom-backend@$short_sha' \
   --env-add BATTLE_JOB_WORKER_ENABLED=true \
+  --env-add BATTLE_LIVE_SPECTATOR_ENABLED=false \
+  --env-add INTERACTIVE_BATTLE_ENABLED=false \
   '$SERVICE'
 
 for attempt in \$(seq 1 45); do
@@ -1291,11 +1294,13 @@ for attempt in $(seq 1 "$readiness_attempts"); do
        .status == "ready" and
        .environment == "production" and
        .checks.release_schema.status == "healthy" and
-       .checks.release_schema.required_range == "038-055" and
-       .checks.release_schema.latest_migration == "055" and
+       .checks.release_schema.required_range == "038-056" and
+       .checks.release_schema.latest_migration == "056" and
        .checks.battle_job_schema.status == "healthy" and
        (.checks.battle_live_spectator.status == "disabled" or
         .checks.battle_live_spectator.status == "ready") and
+       (.checks.interactive_battle.status == "disabled" or
+        .checks.interactive_battle.status == "ready") and
        .checks.ai_runtime.status == "healthy" and
        .checks.ai_runtime.provider_configured == true and
        .checks.ai_runtime.mock_fallbacks_allowed == false and

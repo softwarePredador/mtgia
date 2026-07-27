@@ -65,6 +65,13 @@ erDiagram
     conversations ||--o{ direct_messages : "conversation_id -> id"
     users ||--o{ direct_messages : "sender_id -> id"
     users ||--o{ email_verification_tokens : "user_id -> id"
+    interactive_battle_sessions ||--o{ interactive_battle_records : "session_id -> id"
+    battle_simulation_attempts ||--o{ interactive_battle_sessions : "attempt_id, replay_id -> id, replay_id"
+    battle_simulation_attempts ||--o{ interactive_battle_sessions : "attempt_id -> id"
+    decks ||--o{ interactive_battle_sessions : "deck_a_id -> id"
+    decks ||--o{ interactive_battle_sessions : "deck_b_id -> id"
+    battle_simulations ||--o{ interactive_battle_sessions : "replay_id -> id"
+    users ||--o{ interactive_battle_sessions : "user_id -> id"
     decks ||--o{ ml_prompt_feedback : "deck_id -> id"
     users ||--o{ ml_prompt_feedback : "user_id -> id"
     users ||--o{ moderation_actions : "moderator_user_id -> id"
@@ -781,6 +788,47 @@ erDiagram
         datetime last_synced_at
         uuid scryfall_id
     }
+    interactive_battle_records {
+        datetime created_at
+        uuid id PK
+        string idempotency_key
+        string option_id
+        json payload
+        string prompt_id
+        string record_kind
+        string request_fingerprint
+        string schema_version
+        number sequence
+        uuid session_id
+        number state_version
+        string visibility
+    }
+    interactive_battle_sessions {
+        json active_prompt
+        string active_prompt_id
+        uuid attempt_id
+        datetime created_at
+        string deck_a_hash
+        uuid deck_a_id
+        string deck_b_hash
+        uuid deck_b_id
+        string deck_hash_schema
+        string engine
+        string engine_build
+        string engine_commit
+        string engine_process_id
+        datetime engine_process_started_at
+        string engine_version
+        string error_code
+        datetime expires_at
+        datetime finished_at
+        uuid id PK
+        string idempotency_key
+        datetime last_activity_at
+        json private_state
+        datetime prompt_deadline_at
+        uuid replay_id
+    }
     meta_decks {
         string archetype
         string card_list
@@ -1067,4 +1115,4 @@ erDiagram
     }
 ```
 
-Tabelas: 77; views: 6; migrations: 55 (latest `055`).
+Tabelas: 79; views: 6; migrations: 56 (latest `056`).

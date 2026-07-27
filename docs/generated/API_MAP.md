@@ -9,6 +9,10 @@
 | `/ai/battle/jobs` | `GET, POST` | `server/routes/ai/battle/jobs/index.dart` | 2 | `source` |
 | `/ai/battle/jobs/{id}` | `DELETE, GET` | `server/routes/ai/battle/jobs/[id].dart` | 2 | `source` |
 | `/ai/battle/jobs/{id}/live` | `GET` | `server/routes/ai/battle/jobs/[id]/live/index.dart` | 2 | `source` |
+| `/ai/battle/sessions` | `GET, POST` | `server/routes/ai/battle/sessions/index.dart` | 2 | `source` |
+| `/ai/battle/sessions/{id}` | `GET` | `server/routes/ai/battle/sessions/[id].dart` | 2 | `source` |
+| `/ai/battle/sessions/{id}/actions` | `POST` | `server/routes/ai/battle/sessions/[id]/actions/index.dart` | 2 | `source` |
+| `/ai/battle/sessions/{id}/concede` | `POST` | `server/routes/ai/battle/sessions/[id]/concede/index.dart` | 2 | `source` |
 | `/ai/commander-learning` | `GET` | `server/routes/ai/commander-learning/index.dart` | 2 | `source` |
 | `/ai/commander-reference` | `GET` | `server/routes/ai/commander-reference/index.dart` | 2 | `source` |
 | `/ai/explain` | `POST` | `server/routes/ai/explain/index.dart` | 2 | `source` |

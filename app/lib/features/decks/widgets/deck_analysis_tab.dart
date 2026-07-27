@@ -19,8 +19,14 @@ import '../models/deck_details.dart';
 class DeckAnalysisTab extends StatefulWidget {
   final DeckDetails deck;
   final VoidCallback? onOpenBattleLab;
+  final VoidCallback? onOpenBattleCoach;
 
-  const DeckAnalysisTab({super.key, required this.deck, this.onOpenBattleLab});
+  const DeckAnalysisTab({
+    super.key,
+    required this.deck,
+    this.onOpenBattleLab,
+    this.onOpenBattleCoach,
+  });
 
   @override
   State<DeckAnalysisTab> createState() => _DeckAnalysisTabState();
@@ -205,6 +211,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
             _BattleLabLaunch(
               deckName: effectiveDeck.name,
               onOpen: widget.onOpenBattleLab!,
+              onOpenCoach: widget.onOpenBattleCoach,
             ),
           ],
           if (functionalAnalysis?.battleLearningEvidence != null) ...[
@@ -540,10 +547,15 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
 }
 
 class _BattleLabLaunch extends StatelessWidget {
-  const _BattleLabLaunch({required this.deckName, required this.onOpen});
+  const _BattleLabLaunch({
+    required this.deckName,
+    required this.onOpen,
+    this.onOpenCoach,
+  });
 
   final String deckName;
   final VoidCallback onOpen;
+  final VoidCallback? onOpenCoach;
 
   @override
   Widget build(BuildContext context) {
@@ -551,12 +563,14 @@ class _BattleLabLaunch extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'Testar $deckName no Battle Lab',
-      hint: 'Abre o setup de confronto e o histórico de replays',
+      hint: onOpenCoach == null
+          ? 'Abre o setup de confronto e o histórico de replays'
+          : 'Abre a mesa interativa ou o histórico de simulações',
       child: Material(
         key: const Key('deck-analysis-battle-lab-entry'),
         color: Colors.transparent,
         child: InkWell(
-          onTap: onOpen,
+          onTap: onOpenCoach ?? onOpen,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Container(
             width: double.infinity,
@@ -576,7 +590,8 @@ class _BattleLabLaunch extends StatelessWidget {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final compact = constraints.maxWidth < 620;
+                final compact =
+                    constraints.maxWidth < (onOpenCoach == null ? 620 : 900);
                 final copy = Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -600,7 +615,9 @@ class _BattleLabLaunch extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Testar este deck',
+                            onOpenCoach == null
+                                ? 'Testar este deck'
+                                : 'Jogar e aprender com este deck',
                             style: theme.textTheme.titleMedium?.copyWith(
                               color: AppTheme.textPrimary,
                               fontWeight: FontWeight.w800,
@@ -608,7 +625,9 @@ class _BattleLabLaunch extends StatelessWidget {
                           ),
                           const SizedBox(height: AppTheme.space4),
                           Text(
-                            'Escolha um adversário, declare o objetivo e acompanhe as evidências do replay.',
+                            onOpenCoach == null
+                                ? 'Escolha um adversário, declare o objetivo e acompanhe as evidências do replay.'
+                                : 'Assuma mulligans, alvos, combate e prioridades; o XMage cuida das regras e salva o replay.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: AppTheme.textSecondary,
                               height: 1.35,
@@ -619,11 +638,41 @@ class _BattleLabLaunch extends StatelessWidget {
                     ),
                   ],
                 );
-                final action = FilledButton.icon(
-                  key: const Key('deck-analysis-open-battle-lab-button'),
-                  onPressed: onOpen,
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Abrir Battle Lab'),
+                final actions = Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: AppTheme.space8,
+                  runSpacing: AppTheme.space8,
+                  children: [
+                    if (onOpenCoach != null)
+                      FilledButton.icon(
+                        key: const Key(
+                          'deck-analysis-open-battle-coach-button',
+                        ),
+                        onPressed: onOpenCoach,
+                        icon: const ManaLoomGlyph(
+                          ManaLoomGlyphKind.commander,
+                          size: 19,
+                        ),
+                        label: const Text('Jogar Battle Coach'),
+                      ),
+                    if (onOpenCoach != null)
+                      OutlinedButton.icon(
+                        key: const Key('deck-analysis-open-battle-lab-button'),
+                        onPressed: onOpen,
+                        icon: const ManaLoomGlyph(
+                          ManaLoomGlyphKind.battleReplay,
+                          size: 19,
+                        ),
+                        label: const Text('Simulações e replays'),
+                      )
+                    else
+                      FilledButton.icon(
+                        key: const Key('deck-analysis-open-battle-lab-button'),
+                        onPressed: onOpen,
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        label: const Text('Abrir Battle Lab'),
+                      ),
+                  ],
                 );
 
                 if (compact) {
@@ -632,7 +681,7 @@ class _BattleLabLaunch extends StatelessWidget {
                     children: [
                       copy,
                       const SizedBox(height: AppTheme.space12),
-                      action,
+                      actions,
                     ],
                   );
                 }
@@ -641,7 +690,7 @@ class _BattleLabLaunch extends StatelessWidget {
                   children: [
                     Expanded(child: copy),
                     const SizedBox(width: AppTheme.space16),
-                    action,
+                    actions,
                   ],
                 );
               },

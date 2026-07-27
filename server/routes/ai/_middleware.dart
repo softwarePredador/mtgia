@@ -31,7 +31,9 @@ AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
   if (path.startsWith('/ai/generate/jobs/') ||
       path.startsWith('/ai/optimize/jobs/') ||
       path == '/ai/battle/jobs' ||
-      path.startsWith('/ai/battle/jobs/')) {
+      path.startsWith('/ai/battle/jobs/') ||
+      path == '/ai/battle/sessions' ||
+      path.startsWith('/ai/battle/sessions/')) {
     return AiEndpointAccessPolicy.polling;
   }
   if (path == '/ai/commander-learning') {
