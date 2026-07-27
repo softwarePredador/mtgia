@@ -26,20 +26,20 @@ A fonte estruturada do inventário é
 as keys e os contratos de interação; o JSON classifica toda a superfície
 descoberta no código e o teste impede dívida silenciosa.
 
-Baseline ampliada da beta Web + Android em 2026-07-26:
+Baseline ampliada da beta Web + Android em 2026-07-27:
 
 | Tipo | Quantidade classificada |
 |---|---:|
-| `GoRoute` | 39 |
+| `GoRoute` | 41 |
 | `ShellRoute` | 1 |
 | `MaterialPageRoute` | 6 |
-| Dialogs | 46 |
+| Dialogs | 47 |
 | Bottom sheets | 22 |
 | Menus | 9 |
 | Tabs | 10 |
 | Navegação responsiva | 2 |
-| Transientes (`SnackBar`) | 109 |
-| **Total** | **244** |
+| Transientes (`SnackBar`) | 110 |
+| **Total** | **248** |
 
 Cada ocorrência pertence a um contrato de domínio que declara:
 
@@ -51,7 +51,7 @@ Cada ocorrência pertence a um contrato de domínio que declara:
 - ação, sucesso e recuperação;
 - política de deep link.
 
-As 39 rotas também declaram path canônico, tela/destino e escopo
+As 41 rotas também declaram path canônico, tela/destino e escopo
 `active`, `deferred_by_scope` ou `compatibility_redirect`. O Scanner permanece
 explicitamente deferido e `/market` é apenas compatibilidade para
 `/community?tab=3`; nenhum deles é contabilizado como tela ativa própria.
@@ -76,6 +76,8 @@ feature removida do escopo do artefato.
 As entradas canônicas são:
 
 - Análise do deck → `Testar este deck`;
+- Análise do deck → Battle gate → `Jogar no Battle Coach`;
+- rota privada → `/decks/:id/battle-coach[/sessionId]`;
 - menu do deck ou Visão Geral → `/decks/:id/battle-replays`;
 - job Live opt-in → `/decks/:id/battle-live/:jobId`;
 - detalhe direto → `/decks/:id/battle-replays?replay=:replayId`.
@@ -110,6 +112,30 @@ Os testes widget cobrem 390 px, fronteira 1199/1200, texto 200%, reduced
 motion, teclado, offline/retry, cursor sem duplicação, ID do replay final e
 feature flag. Android físico/TalkBack permanece evidência de release separada
 e não recebe crédito dos testes widget/Web.
+
+## Prova viva e revisão visual
+
+O contrato canônico é `docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md`. Nenhuma
+tela recebe aprovação visual apenas porque analyzer, widget, golden ou
+inventário passaram. O aggregate exige:
+
+- `PASS_AUTOMATED`;
+- `PASS_RUNTIME` com screenshot do código corrente em Android físico ou build
+  Web real;
+- `PASS_VISUAL_REVIEWED` depois que o revisor abriu todos os PNGs e registrou
+  coerência, funcionamento e atratividade.
+
+O digest de `scripts/manaloom_ui_source_digest.sh` invalida a evidência quando
+os sources app-facing mudam. O primeiro fluxo fechado por este contrato é o
+Battle Coach: welcome, mesa ativa, prompt, erro recuperável, confirmação de
+concessão, envio em progresso e terminal/replay. Rode:
+
+```bash
+./scripts/quality_gate.sh ui-proof
+```
+
+TalkBack físico e teclado Web real não são inferidos da revisão de imagem e
+continuam itens de release separados.
 
 ## Matriz executável de estados — S3-02
 

@@ -30,3 +30,11 @@ manifesto e remove o cluster ao terminar. Ele nunca aponta para o banco live.
 Decisões, motivos, exceções e riscos ficam em ADRs/contratos manuais. Um gate de
 drift verde prova sincronização documental, não conclusão E2E nem autorização
 para escrita live, migration, deploy ou promoção de deck/regra.
+
+Mudança app-facing de UI exige os três níveis do
+`docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md`: `PASS_AUTOMATED`,
+`PASS_RUNTIME` em Android físico ou build Web real e
+`PASS_VISUAL_REVIEWED` após abrir todas as capturas. Widget/golden, PNG
+histórico ou arquivo não inspecionado nunca recebem crédito de aprovação
+visual. Depois da implementação, rode `./scripts/quality_gate.sh ui-proof`;
+TalkBack humano e teclado Web real continuam verificações separadas de release.

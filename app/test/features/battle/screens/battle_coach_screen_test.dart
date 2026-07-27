@@ -67,6 +67,7 @@ void main() {
     expect(find.byKey(const Key('battle-coach-board')), findsOneWidget);
     expect(find.byKey(const Key('battle-coach-own-hand')), findsOneWidget);
     expect(find.text('Sua prioridade'), findsWidgets);
+    expect(find.text('Turno 1 · Início · Manutenção'), findsOneWidget);
     expect(find.text('Mão adversária privada'), findsNothing);
     expect(find.textContaining('Opponent'), findsOneWidget);
     expect(find.text('8'), findsOneWidget);
@@ -75,7 +76,7 @@ void main() {
       find.byKey(const Key('battle-coach-option-o_abcdefghijklmnop')),
     );
     await tester.pump();
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(gateway.responses, hasLength(1));
     expect(
@@ -86,6 +87,7 @@ void main() {
       find.byKey(const Key('battle-coach-open-replay-button')),
       findsOneWidget,
     );
+    expect(find.text('Prioridade'), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -245,7 +247,20 @@ InteractiveBattleSession _terminalSession({String status = 'completed'}) =>
       'replay_id': 'replay-1',
       'private_state': {
         'turn': 1,
-        'players': const <dynamic>[],
+        'priority_player': 'ManaLoom',
+        'own_player': 'ManaLoom',
+        'players': [
+          {
+            'name': 'ManaLoom',
+            'life': 40,
+            'library_count': 92,
+            'hand_count': 7,
+            'battlefield': const <dynamic>[],
+            'graveyard': const <dynamic>[],
+            'exile': const <dynamic>[],
+            'command': const <dynamic>[],
+          },
+        ],
         'stack': const <dynamic>[],
         'combat': const <dynamic>[],
         'own_hand': const <dynamic>[],

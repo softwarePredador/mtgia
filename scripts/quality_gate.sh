@@ -183,6 +183,12 @@ run_ui_audit() {
     test/core/widgets/debug_accessibility_tools_test.dart \
     test/features/home/onboarding_core_flow_screen_test.dart \
     --no-pub --no-version-check
+  run_ui_live_evidence
+}
+
+run_ui_live_evidence() {
+  print_header "ManaLoom fresh live UI evidence"
+  "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" --check
 }
 
 run_dependency_audit() {
@@ -273,6 +279,7 @@ run_battle_lab_gate() {
   run_battle_product_gate
   run_runtime_performance_contract
   run_report_retention_audit
+  run_ui_live_evidence
   run_project_logic_docs
 }
 
@@ -330,6 +337,7 @@ Uso:
   ./scripts/quality_gate.sh web-image-memory # profile real Chrome/CDP + fixture loopback
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
   ./scripts/quality_gate.sh ui-audit # golden/accessibility audit das telas críticas Flutter
+  ./scripts/quality_gate.sh ui-proof # prova UI viva, fresca e visualmente revisada
   ./scripts/quality_gate.sh web # lint, build, dependency audit e smoke HTTP do site público
   ./scripts/quality_gate.sh deps # valida dependências declaradas no app/server
   ./scripts/quality_gate.sh custom-lint # roda regras customizadas ManaLoom no app/server
@@ -356,7 +364,9 @@ Dica:
   live. Use 'web-image-memory' para a prova real e fail-closed com Chrome/CDP.
   Use o perfil E2E live guardado para chamadas contra uma API real.
   Use 'resolution' para validar o corpus estável Commander fim a fim.
-  Use 'ui-audit' depois de mexer em visual, paywall, login, home ou shell do app.
+  Use 'ui-audit' depois de mexer em UI; ele exige testes automatizados e também
+  a prova viva corrente. Use 'ui-proof' para revalidar somente o vínculo entre
+  source digest, runtime real e screenshots efetivamente revisados.
   Use 'deps' depois de adicionar/remover pacote no app ou backend.
   Use 'custom-lint' para bloquear regressões específicas do ManaLoom em Dart.
   Use 'patrol-smoke' para validar login, cadastro, paywall, planos, legal, upgrade e checkout no Patrol; exporte MANALOOM_RUN_PATROL_DEVICE_TESTS=1 para rodar no device/emulador.
@@ -374,6 +384,7 @@ Exemplos:
   ./scripts/quality_gate.sh web-image-memory
   ./scripts/quality_gate.sh resolution
   ./scripts/quality_gate.sh ui-audit
+  ./scripts/quality_gate.sh ui-proof
   ./scripts/quality_gate.sh web
   ./scripts/quality_gate.sh deps
   ./scripts/quality_gate.sh custom-lint
@@ -418,6 +429,9 @@ main() {
       ;;
     ui-audit)
       run_ui_audit
+      ;;
+    ui-proof)
+      run_ui_live_evidence
       ;;
     web)
       run_public_web_full

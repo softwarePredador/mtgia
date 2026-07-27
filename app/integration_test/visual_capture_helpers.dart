@@ -5,16 +5,19 @@ import 'package:integration_test/integration_test.dart';
 
 bool _surfaceConverted = false;
 
+void resetVisualCaptureSurface() {
+  _surfaceConverted = false;
+}
+
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
   const chunkSize = 2000;
   // ignore: avoid_print
   print('SCREENSHOT_BEGIN $name');
   for (var offset = 0; offset < encoded.length; offset += chunkSize) {
-    final end =
-        (offset + chunkSize < encoded.length)
-            ? offset + chunkSize
-            : encoded.length;
+    final end = (offset + chunkSize < encoded.length)
+        ? offset + chunkSize
+        : encoded.length;
     // ignore: avoid_print
     print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
   }

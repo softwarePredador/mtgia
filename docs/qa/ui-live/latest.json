@@ -1,0 +1,98 @@
+{
+  "schema_version": "manaloom_ui_live_review_v1",
+  "status": "PASS",
+  "source_digest": "da102eae9051bcee177d36a917d4990fbc933dccdd6c513fa178cc26da76fcba",
+  "automated": {
+    "status": "PASS_AUTOMATED",
+    "verified_at": "2026-07-27T17:27:33Z",
+    "commands": [
+      "./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+      "flutter analyze lib/features/battle/screens/battle_coach_screen.dart integration_test/battle_coach_visual_runtime_proof_test.dart test/features/battle/screens/battle_coach_screen_test.dart --no-pub --no-version-check --no-fatal-infos",
+      "flutter test test/features/battle/screens/battle_coach_screen_test.dart test/tool/ui_runtime_evidence_test.dart --no-pub --no-version-check --reporter compact"
+    ]
+  },
+  "runtime": {
+    "status": "PASS_RUNTIME",
+    "capture_manifest": {
+      "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
+      "sha256": "1f206d7bc57c7402b02b3accb0282f62f0313eaf2ccc4fe49aeaa4bec0603bbf"
+    }
+  },
+  "visual_review": {
+    "status": "PASS_VISUAL_REVIEWED",
+    "reviewed_at": "2026-07-27T17:27:33Z",
+    "reviewer": {
+      "kind": "agent",
+      "name": "Codex"
+    },
+    "visual_thesis": "Mesa de jogo premium, calma e legível, com superfícies Obsidian/Frost, arte real das cartas como informação e Brass reservado a prioridade e ações decisivas.",
+    "content_plan": "Orientação e estado da partida aparecem primeiro; campo, mão e pilha dão contexto; a decisão atual e seu CTA ficam em um painel próprio; replay e recuperação surgem no momento em que são úteis.",
+    "interaction_thesis": "Mudanças de estado recebem feedback imediato e legível, decisões continuam sob controle do jogador, ações destrutivas exigem confirmação e o terminal conduz diretamente ao replay.",
+    "criteria": {
+      "visual_hierarchy": {
+        "status": "pass",
+        "note": "Título, status/turno, mesa e decisão formam uma leitura vertical clara; cada estado mantém um único foco principal."
+      },
+      "brand_and_mtg_identity": {
+        "status": "pass",
+        "note": "Artes reais, zonas de campo/mão/pilha, vida, biblioteca, comandante e vocabulário de prioridade remetem diretamente a uma partida de MTG."
+      },
+      "color_and_contrast": {
+        "status": "pass",
+        "note": "Texto claro sobre superfícies escuras permanece legível; Brass sinaliza prioridade/ação, verde conclusão, azul apoio e vermelho falha recuperável."
+      },
+      "typography": {
+        "status": "pass",
+        "note": "A família editorial destaca welcome e confirmações; a sans mantém estado, números e opções compactos e escaneáveis."
+      },
+      "spacing_and_density": {
+        "status": "pass",
+        "note": "Zonas, badges, cartas e painéis preservam ritmo consistente sem perder a densidade informacional esperada de uma mesa."
+      },
+      "responsive_fit": {
+        "status": "pass",
+        "note": "Nos sete estados físicos 1080x2408 não há overflow, texto truncado crítico, CTA inacessível ou modal fora da área útil."
+      },
+      "interaction_clarity": {
+        "status": "pass",
+        "note": "Escolher adversário, conjurar, passar/delegar, reconectar, conceder e analisar replay têm affordance e feedback distintos."
+      },
+      "state_coverage": {
+        "status": "pass",
+        "note": "Foram inspecionados welcome, mesa ativa, prompt, erro recuperável, confirmação destrutiva, envio em progresso e terminal/replay."
+      },
+      "accessibility_visual": {
+        "status": "pass",
+        "note": "Estado não depende apenas de cor: ícones, títulos, texto e progresso reforçam cada mudança; a validação humana TalkBack permanece separada."
+      },
+      "attractiveness": {
+        "status": "pass",
+        "note": "A composição é coesa e autoral, usa a arte das cartas como protagonista e evita aparência de dashboard genérico ou excesso decorativo."
+      }
+    },
+    "reviewed_checkpoints": [
+      "battle_coach_00_welcome",
+      "battle_coach_01_active_table",
+      "battle_coach_02_decision_prompt",
+      "battle_coach_03_recoverable_error",
+      "battle_coach_04_concede_confirmation",
+      "battle_coach_05_action_progress",
+      "battle_coach_06_terminal_replay"
+    ],
+    "reviewed_screenshot_sha256": [
+      "393ae91c149818e2ec75d9e775337899c303423e4362686b08258e87f1e60acc",
+      "b9d450be4a133273aec7a9d755e7e2f1ebceff55b076b89add96c363c8c90fc6",
+      "3415899aa79206478d8e94a170bda8c09c8f6038084047979a56313373b8aacc",
+      "8f4441853d90f9ac879600db2ce9649254ec78caf2f059bd685ea6108e17bd2d",
+      "7d5f2d35e7a93091a8a2175cf883be4375715f99422d28c2ac92282467c94565",
+      "3ade64ad9661d574e68b9ff13cbf6672d8f662161ee5a5ae8a5f873348979fcd",
+      "31befa2397fd2ccf3982bfc5514d80ba8ff4c804608b040d912b61b8cc28eba3"
+    ],
+    "blocking_findings": []
+  },
+  "release_checks": {
+    "android_talkback_human": "pending",
+    "battle_coach_web_keyboard_real": "pending",
+    "ios_voiceover": "DEFERRED_BY_SCOPE"
+  }
+}

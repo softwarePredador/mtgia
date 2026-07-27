@@ -1,0 +1,65 @@
+{
+  "schema_version": "manaloom_ui_live_evidence_policy_v1",
+  "status_model": {
+    "automated": "PASS_AUTOMATED",
+    "runtime": "PASS_RUNTIME",
+    "visual_review": "PASS_VISUAL_REVIEWED",
+    "aggregate": "PASS",
+    "aggregate_requires_all_levels": true
+  },
+  "source_digest": {
+    "command": "../scripts/manaloom_ui_source_digest.sh",
+    "scope": "all app-facing Flutter sources, assets, Web shell, Android resources, visual surface contract and live-proof harness",
+    "stale_evidence_fails_closed": true
+  },
+  "gate": {
+    "command": "../scripts/manaloom_ui_live_evidence_gate.sh --check",
+    "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_DEVICE_ID> ../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+    "current_review": "../docs/qa/ui-live/latest.json",
+    "reviewer_must_open_every_screenshot": true,
+    "widget_or_golden_alone_can_pass_visual": false
+  },
+  "required_review_criteria": [
+    "visual_hierarchy",
+    "brand_and_mtg_identity",
+    "color_and_contrast",
+    "typography",
+    "spacing_and_density",
+    "responsive_fit",
+    "interaction_clarity",
+    "state_coverage",
+    "accessibility_visual",
+    "attractiveness"
+  ],
+  "surfaces": [
+    {
+      "id": "battle_coach",
+      "route": "/decks/:id/battle-coach[/sessionId]",
+      "source": "lib/features/battle/screens/battle_coach_screen.dart",
+      "automated_test": "test/features/battle/screens/battle_coach_screen_test.dart",
+      "runtime_test": "integration_test/battle_coach_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "battle-coach-welcome-state",
+        "battle-coach-board",
+        "battle-coach-own-hand",
+        "battle-coach-error-banner",
+        "battle-coach-action-progress",
+        "battle-coach-terminal-panel"
+      ],
+      "required_checkpoints": [
+        "battle_coach_00_welcome",
+        "battle_coach_01_active_table",
+        "battle_coach_02_decision_prompt",
+        "battle_coach_03_recoverable_error",
+        "battle_coach_04_concede_confirmation",
+        "battle_coach_05_action_progress",
+        "battle_coach_06_terminal_replay"
+      ]
+    }
+  ],
+  "release_accessibility": {
+    "android_talkback": "pending_physical_human_review",
+    "agent_visual_review_does_not_replace_screen_reader": true,
+    "ios_voiceover": "DEFERRED_BY_SCOPE"
+  }
+}

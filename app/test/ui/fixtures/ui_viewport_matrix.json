@@ -35,7 +35,7 @@
   },
   "domain_evidence": {
     "auth": ["test/features/auth/screens/auth_screens_test.dart"],
-    "battle": ["test/features/battle/screens/battle_replays_screen_test.dart"],
+    "battle": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_coach_screen_test.dart"],
     "binder": ["test/features/binder/screens/binder_screen_overflow_test.dart","test/features/binder/screens/marketplace_screen_overflow_test.dart"],
     "cards": ["test/features/cards/screens/card_detail_screen_responsive_test.dart","test/features/cards/screens/card_search_screen_test.dart"],
     "collection": ["test/features/collection/collection_screen_responsive_test.dart","test/features/collection/sets_catalog_screen_test.dart"],

@@ -146,6 +146,7 @@ void main() {
       '/community',
       '/profile',
       '/battle/replays',
+      '/decks/:id/battle-coach',
     });
 
     final ios = manual['ios'] as Map<String, dynamic>;

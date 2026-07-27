@@ -53,7 +53,8 @@ válidos são:
 | Memória/imagens Web runtime | `./scripts/quality_gate.sh web-image-memory` | não; fixture loopback e Chrome/CDP locais, exige ChromeDriver do mesmo major e falha fechado |
 | Dependências | `./scripts/quality_gate.sh deps` | não |
 | Regras ManaLoom | `./scripts/quality_gate.sh custom-lint` | não |
-| UI/goldens/acessibilidade | `./scripts/quality_gate.sh ui-audit` | não |
+| UI automatizada + prova viva revisada | `./scripts/quality_gate.sh ui-audit` | não; exige analyzer/widget/golden e evidência runtime já capturada |
+| Vínculo UI corrente | `./scripts/quality_gate.sh ui-proof` | não; valida digest, PNGs/hashes e revisão visual explícita |
 | Jornadas Patrol locais | `./scripts/quality_gate.sh patrol-smoke` | não |
 | Battle nativo/Forge/XMage | `./scripts/quality_gate.sh battle` | não |
 | Ponte app/IA | `./scripts/quality_gate.sh ai-bridge` | não |
@@ -113,7 +114,10 @@ Uma rodada pode ser declarada concluída localmente quando:
 4. artefatos removidos têm zero consumidor ativo e substituto canônico;
 5. relatórios gerados ficam em `/tmp` ou diretório ignorado, salvo evidência
    revisada e manifestada;
-6. toda camada não executada aparece como `SKIP`/pendência, nunca como sucesso.
+6. toda UI alterada possui `PASS_AUTOMATED`, `PASS_RUNTIME` e
+   `PASS_VISUAL_REVIEWED` conforme
+   `docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md`;
+7. toda camada não executada aparece como `SKIP`/pendência, nunca como sucesso.
 
 ### Conclusão de release
 

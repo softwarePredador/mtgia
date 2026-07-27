@@ -26,5 +26,14 @@
     "console_errors": 0,
     "remaining": [],
     "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays"]
+  },
+  "surface_followups": {
+    "battle_coach": {
+      "route": "/decks/:id/battle-coach[/sessionId]",
+      "widget_evidence": "test/features/battle/screens/battle_coach_screen_test.dart",
+      "android_runtime_evidence": "../docs/qa/ui-live/latest.json",
+      "web_keyboard_status": "pending_fresh_runtime",
+      "required_interactions": ["tab_forward","shift_tab","enter","space","escape_modal","visible_focus","reduced_motion"]
+    }
   }
 }

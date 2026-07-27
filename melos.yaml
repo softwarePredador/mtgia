@@ -38,8 +38,12 @@ scripts:
     run: ./scripts/quality_gate.sh patrol-smoke
 
   ui-audit:
-    description: Run ManaLoom Flutter golden/accessibility checks.
+    description: Run automated UI checks and require fresh reviewed live evidence.
     run: ./scripts/quality_gate.sh ui-audit
+
+  ui-proof:
+    description: Verify the current UI digest, real-runtime captures, and visual review.
+    run: ./scripts/quality_gate.sh ui-proof
 
   performance:
     description: Validate the deterministic p50/p95 runtime harness contract.

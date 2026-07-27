@@ -11,12 +11,14 @@
     "Cards use the same family as Meus Decks: dark surface, soft radius, restrained border/shadow, clear hierarchy.",
     "Display typography is reserved for brand/headers/deck identity; dense utility UI uses the app UI font.",
     "Buttons, tabs, chips, sheets and bottom navigation must use AppTheme tokens and consistent active/disabled states.",
-    "No screen gets a visual pass from static analysis alone; iPhone Simulator screenshots are required for app-facing changes."
+    "No screen gets a visual pass from static analysis, widget tests or goldens alone; app-facing changes require fresh screenshots from a real Web build or physical Android runtime, source-digest binding and explicit visual review.",
+    "Agent visual review must inspect every screenshot for hierarchy, MTG identity, color, typography, spacing, responsive fit, interaction clarity, state coverage, accessibility cues and attractiveness; physical TalkBack remains a separate release check."
   ],
   "capture_commands": {
     "non_life_counter": "cd app && flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check",
     "life_counter": "cd app && flutter test integration_test/life_counter_lotus_visual_capture_smoke_test.dart integration_test/life_counter_native_card_search_smoke_test.dart integration_test/life_counter_set_life_live_smoke_test.dart integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check",
-    "commander_learned_deck": "cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check"
+    "commander_learned_deck": "cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check",
+    "battle_coach_live_proof": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_DEVICE_ID> ./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach && ./scripts/manaloom_ui_live_evidence_gate.sh --check"
   },
   "surfaces": [
     {
@@ -128,6 +130,35 @@
       ],
       "captures": ["07_community", "09_profile", "profile_community_02_user_profile", "profile_community_05_community_deck_detail"],
       "focus": ["feed/cards", "perfil proprio e publico", "badges sociais", "botoes seguir/editar", "hierarquia de texto"]
+    },
+    {
+      "id": "battle_coach",
+      "label": "Battle Coach interativo",
+      "live_evidence_required": true,
+      "files": [
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "captures": [
+        "battle_coach_00_welcome",
+        "battle_coach_01_active_table",
+        "battle_coach_02_decision_prompt",
+        "battle_coach_03_recoverable_error",
+        "battle_coach_04_concede_confirmation",
+        "battle_coach_05_action_progress",
+        "battle_coach_06_terminal_replay"
+      ],
+      "focus": [
+        "mesa tática com identidade MTG sem expor a mão adversária",
+        "prioridade e próxima ação inequívocas",
+        "cartas, pilha, combate, vida e zonas legíveis",
+        "erro recuperável preserva a mesa e não exibe payload técnico",
+        "concessão exige confirmação",
+        "progresso da decisão impede envio duplicado",
+        "estado terminal encaminha para replay",
+        "mobile físico sem overflow e com CTA alcançável"
+      ]
     },
     {
       "id": "life_counter",

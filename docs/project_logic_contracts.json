@@ -9,6 +9,7 @@
   "canonical_documents": [
     "docs/CONTEXTO_PRODUTO_ATUAL.md",
     "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
+    "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
     "docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md",
     "docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md",
     "docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md",
@@ -162,7 +163,7 @@
       "name": "Battle, evidência de carta e replay",
       "status": "active_guarded",
       "source_of_truth": "battle request plus persisted battle_simulations; external pins do not promote native rules",
-      "entrypoints": ["/ai/simulate", "/ai/battle/jobs", "/ai/battle/jobs/{id}", "/ai/battle/jobs/{id}/live", "/decks/{id}/battle-preflight", "/decks/{id}/battle-replays", "/decks/{id}/battle-replays/{replayId}/annotations"],
+      "entrypoints": ["/ai/simulate", "/ai/battle/jobs", "/ai/battle/jobs/{id}", "/ai/battle/jobs/{id}/live", "/decks/{id}/battle-preflight", "/decks/{id}/battle-coach", "/decks/{id}/battle-coach/{sessionId}", "/decks/{id}/battle-replays", "/decks/{id}/battle-replays/{replayId}/annotations"],
       "implementation": [
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/ai/battle_simulator.dart",
@@ -181,6 +182,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
         "services/forge-sidecar/sidecar.py",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/services/battle_job_gateway.dart"
@@ -199,16 +201,19 @@
         "services/xmage-sidecar/src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java",
         "services/xmage-sidecar/src/test/java/com/manaloom/xmage/BattleLiveRegistryTest.java",
         "services/forge-sidecar/test_sidecar.py",
+        "app/test/features/battle/screens/battle_coach_screen_test.dart",
+        "app/integration_test/battle_coach_visual_runtime_proof_test.dart",
         "app/test/features/battle/screens/battle_replays_screen_test.dart",
         "app/test/features/battle/screens/battle_live_spectator_screen_test.dart",
         "app/test/features/battle/services/battle_job_gateway_test.dart"
       ],
-      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_battle_product_gate.sh", "scripts/manaloom_external_engine_delta_audit.sh"],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_battle_product_gate.sh", "scripts/manaloom_external_engine_delta_audit.sh", "scripts/manaloom_ui_live_evidence_gate.sh"],
       "sequence": [
         {"from": "Pessoa", "to": "Battle API", "message": "deck, oponente, seed e engine"},
         {"from": "Battle API", "to": "PostgreSQL", "message": "persistir attempt/job, hashes, owner e estado fechado"},
         {"from": "Battle Worker", "to": "Battle Router", "message": "claim com lease e selecionar native/XMage/Forge"},
         {"from": "Battle Router", "to": "Engine", "message": "request canônico com identidade, controles, hashes e semântica de seed declarada"},
+        {"from": "Engine", "to": "Battle Coach", "message": "estado privado do dono e prompts interativos; nunca mão adversária"},
         {"from": "Engine", "to": "Live Spectator", "message": "eventos/snapshots públicos incrementais; nenhuma ação humana"},
         {"from": "Engine", "to": "Battle Worker", "message": "resultado correlacionado, censura, timeout e fallback explícitos"},
         {"from": "Battle API", "to": "PostgreSQL", "message": "sanitizar e persistir replay e métricas"},

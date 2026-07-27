@@ -82,6 +82,8 @@ run_shell_contracts() {
   print_header "Contratos dos gates locais"
   bash -n \
     "$ROOT_DIR/scripts/manaloom_local_ci.sh" \
+    "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" \
+    "$ROOT_DIR/scripts/manaloom_ui_source_digest.sh" \
     "$ROOT_DIR/scripts/manaloom_tbls_local_gate.sh" \
     "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" \
     "$ROOT_DIR/.githooks/pre-commit" \
@@ -101,6 +103,11 @@ run_project_logic() {
     cd "$ROOT_DIR/tools/project_logic"
     "$DART_BIN" test
   )
+}
+
+run_ui_live_evidence() {
+  print_header "Prova UI viva e revisada"
+  "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" --check
 }
 
 run_secret_scan() {
@@ -177,6 +184,7 @@ run_quick() {
   run_mcp_preflight
   run_secret_scan
   run_project_logic
+  run_ui_live_evidence
 }
 
 run_full() {

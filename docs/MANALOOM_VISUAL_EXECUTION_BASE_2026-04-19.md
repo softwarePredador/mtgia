@@ -361,7 +361,9 @@ Must:
 
 A screen should only be considered visually approved when:
 
-- fresh screenshots exist
+- `docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md` está satisfeito com
+  `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`
+- fresh screenshots existem para o digest corrente e foram abertas pelo revisor
 - hierarchy is clear
 - colors feel disciplined
 - primary action is obvious
@@ -400,4 +402,3 @@ When asking agents to work from this base, explicitly say:
 - validate with fresh screenshots
 - compare before/after
 - do not approve based only on code
-

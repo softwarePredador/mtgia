@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/visual_fixture.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -561,10 +562,20 @@ class _BattleCoachStatusBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = session.privateState;
+    final phaseLabel = state.phase?.isNotEmpty == true
+        ? _humanize(state.phase!)
+        : null;
+    final stepLabel = state.step?.isNotEmpty == true
+        ? _humanize(state.step!)
+        : null;
     final phaseParts = <String>[
       if (state.turn > 0) 'Turno ${state.turn}',
-      if (state.phase?.isNotEmpty == true) _humanize(state.phase!),
-      if (state.step?.isNotEmpty == true) _humanize(state.step!),
+      if (phaseLabel != null) phaseLabel,
+      if (stepLabel != null &&
+          stepLabel != phaseLabel &&
+          !(stepLabel == 'Principal' &&
+              phaseLabel?.startsWith('Principal ') == true))
+        stepLabel,
     ];
     final waiting = session.isWaitingForAction;
     final accent = waiting
@@ -681,6 +692,7 @@ class _BattleCoachBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = session.privateState;
+    final priorityPlayer = session.isTerminal ? null : state.priorityPlayer;
     final own =
         state.ownPlayerState ??
         (state.players.isNotEmpty ? state.players.first : null);
@@ -705,13 +717,14 @@ class _BattleCoachBoard extends StatelessWidget {
           _PlayerZone(
             player: opponent,
             isOwn: false,
-            hasPriority: opponent?.name == state.priorityPlayer,
+            hasPriority:
+                priorityPlayer != null && opponent?.name == priorityPlayer,
           ),
           _SharedBattleZone(state: state),
           _PlayerZone(
             player: own,
             isOwn: true,
-            hasPriority: own?.name == state.priorityPlayer,
+            hasPriority: priorityPlayer != null && own?.name == priorityPlayer,
           ),
           _OwnHand(cards: state.ownHand),
         ],
@@ -1045,13 +1058,17 @@ class _BattleCard extends StatelessWidget {
     final cardBody = Stack(
       fit: StackFit.expand,
       children: [
-        CachedCardImage(
-          imageUrl: card.effectiveImageUrl,
-          width: width,
-          height: height,
-          fit: BoxFit.cover,
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          errorPlaceholder: _CardFallback(name: card.name),
+        AnimatedRotation(
+          turns: card.tapped ? 0.25 : 0,
+          duration: _motionDuration(context),
+          child: CachedCardImage(
+            imageUrl: card.effectiveImageUrl,
+            width: width,
+            height: height,
+            fit: BoxFit.cover,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            errorPlaceholder: _CardFallback(name: card.name),
+          ),
         ),
         if (card.damage > 0 || card.counters.isNotEmpty)
           Positioned(
@@ -1085,11 +1102,7 @@ class _BattleCard extends StatelessWidget {
     return Semantics(
       image: true,
       label: '${card.name}${card.tapped ? ', virada' : ''}',
-      child: AnimatedRotation(
-        turns: card.tapped ? 0.25 : 0,
-        duration: _motionDuration(context),
-        child: SizedBox(width: width, height: height, child: cardBody),
-      ),
+      child: SizedBox(width: width, height: height, child: cardBody),
     );
   }
 }
@@ -1228,7 +1241,11 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
       return const _BattleCoachAutoplayPanel();
     }
     final remaining = prompt.deadlineAt.difference(DateTime.now().toUtc());
-    final seconds = remaining.isNegative ? 0 : remaining.inSeconds;
+    final seconds = manaloomVisualFixtureMode
+        ? 60
+        : remaining.isNegative
+        ? 0
+        : remaining.inSeconds;
     return AnimatedSwitcher(
       duration: _motionDuration(context),
       child: Container(
@@ -1640,11 +1657,31 @@ String _friendlyError(Object error) {
 }
 
 String _humanize(String value) {
-  final spaced = value
+  final normalized = value
       .replaceAll('_', ' ')
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim()
       .toLowerCase();
-  if (spaced.isEmpty) return value;
-  return '${spaced[0].toUpperCase()}${spaced.substring(1)}';
+  final translated = switch (normalized) {
+    'beginning' => 'Início',
+    'untap' => 'Desvirar',
+    'upkeep' => 'Manutenção',
+    'draw' => 'Compra',
+    'precombat main' => 'Principal pré-combate',
+    'main' => 'Principal',
+    'combat' => 'Combate',
+    'begin combat' => 'Início do combate',
+    'declare attackers' => 'Declarar atacantes',
+    'declare blockers' => 'Declarar bloqueadores',
+    'combat damage' => 'Dano de combate',
+    'end combat' => 'Fim do combate',
+    'postcombat main' => 'Principal pós-combate',
+    'end' => 'Final',
+    'end step' => 'Etapa final',
+    'cleanup' => 'Limpeza',
+    _ => null,
+  };
+  if (translated != null) return translated;
+  if (normalized.isEmpty) return value;
+  return '${normalized[0].toUpperCase()}${normalized.substring(1)}';
 }

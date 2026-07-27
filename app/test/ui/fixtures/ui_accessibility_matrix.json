@@ -13,7 +13,7 @@
   ],
   "automated_evidence": {
     "auth": ["test/ui/manaloom_auth_ui_audit_test.dart","test/features/auth/screens/auth_screens_test.dart"],
-    "battle": ["test/features/battle/screens/battle_replays_screen_test.dart"],
+    "battle": ["test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_coach_screen_test.dart"],
     "binder": ["test/features/binder/widgets/binder_item_editor_accessibility_test.dart","test/features/binder/screens/binder_screen_overflow_test.dart"],
     "cards": ["test/core/widgets/card_artwork_test.dart","test/features/cards/screens/card_detail_screen_responsive_test.dart"],
     "collection": ["test/features/collection/collection_screen_responsive_test.dart","test/features/collection/sets_catalog_screen_test.dart"],
@@ -43,7 +43,7 @@
     "android": {
       "status": "pending_physical",
       "reader": "TalkBack",
-      "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays"]
+      "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays","/decks/:id/battle-coach"]
     },
     "ios": {
       "status": "DEFERRED_BY_SCOPE",

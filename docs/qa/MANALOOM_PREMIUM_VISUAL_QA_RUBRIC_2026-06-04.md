@@ -147,6 +147,7 @@ server/config/premium_visual_qa_surfaces.json
 
 Fontes de verdade:
 
+- `docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md`
 - `docs/MANALOOM_VISUAL_EXECUTION_BASE_2026-04-19.md`
 - `docs/qa/manaloom_layout_uniformity_audit_iphone15_2026-05-22.md`
 - `app/doc/UI_TEST_SURFACE_MAP.md`
@@ -158,7 +159,12 @@ Para qualquer ajuste visual app-facing:
 
 1. Rode o `premium_visual_audit.py`.
 2. Corrija P1 obvio de cor/botao/token.
-3. Rode screenshot no iPhone Simulator.
-4. Revise screenshots usando este checklist.
-5. Documente no handoff se o veredito foi `PASS`, `PASS_WITH_RISKS` ou
-   `PASS_STATIC_ONLY`.
+3. Rode os testes automatizados aplicáveis.
+4. Capture a implementação corrente em Android físico ou build Web real,
+   vinculada ao digest de UI.
+5. Abra todas as capturas e revise usando este checklist.
+6. Registre `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
+
+`PASS_STATIC_ONLY` e screenshot de bundle anterior são evidência histórica,
+não aprovação. TalkBack físico e teclado Web real permanecem verificações de
+release independentes da revisão por imagem.

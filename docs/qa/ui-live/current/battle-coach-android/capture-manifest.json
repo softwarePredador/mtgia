@@ -1,0 +1,84 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-07-27T17:26:39.280637Z",
+  "source_digest": "da102eae9051bcee177d36a917d4990fbc933dccdd6c513fa178cc26da76fcba",
+  "surface": "battle_coach",
+  "profile": "android_phone",
+  "runtime": "flutter_integration_test",
+  "target": "android_physical",
+  "device_contract": "Samsung_SM-A135M_Android14_API34",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "df2fe48c9adb6ea56d30f33f23ae2370da79c9b251ef5f041399591fbe6bbdbd",
+  "checkpoint_count": 7,
+  "required_checkpoints": [
+    "battle_coach_00_welcome",
+    "battle_coach_01_active_table",
+    "battle_coach_02_decision_prompt",
+    "battle_coach_03_recoverable_error",
+    "battle_coach_04_concede_confirmation",
+    "battle_coach_05_action_progress",
+    "battle_coach_06_terminal_replay"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "battle_coach_00_welcome",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_00_welcome.png",
+      "sha256": "393ae91c149818e2ec75d9e775337899c303423e4362686b08258e87f1e60acc",
+      "bytes": 610693,
+      "width": 1080,
+      "height": 2408
+    },
+    {
+      "checkpoint": "battle_coach_01_active_table",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_01_active_table.png",
+      "sha256": "b9d450be4a133273aec7a9d755e7e2f1ebceff55b076b89add96c363c8c90fc6",
+      "bytes": 1129835,
+      "width": 1080,
+      "height": 2408
+    },
+    {
+      "checkpoint": "battle_coach_02_decision_prompt",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_02_decision_prompt.png",
+      "sha256": "3415899aa79206478d8e94a170bda8c09c8f6038084047979a56313373b8aacc",
+      "bytes": 1047040,
+      "width": 1080,
+      "height": 2408
+    },
+    {
+      "checkpoint": "battle_coach_03_recoverable_error",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_03_recoverable_error.png",
+      "sha256": "8f4441853d90f9ac879600db2ce9649254ec78caf2f059bd685ea6108e17bd2d",
+      "bytes": 1049462,
+      "width": 1080,
+      "height": 2408
+    },
+    {
+      "checkpoint": "battle_coach_04_concede_confirmation",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_04_concede_confirmation.png",
+      "sha256": "7d5f2d35e7a93091a8a2175cf883be4375715f99422d28c2ac92282467c94565",
+      "bytes": 546332,
+      "width": 1080,
+      "height": 2408
+    },
+    {
+      "checkpoint": "battle_coach_05_action_progress",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_05_action_progress.png",
+      "sha256": "3ade64ad9661d574e68b9ff13cbf6672d8f662161ee5a5ae8a5f873348979fcd",
+      "bytes": 1030726,
+      "width": 1080,
+      "height": 2408
+    },
+    {
+      "checkpoint": "battle_coach_06_terminal_replay",
+      "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_06_terminal_replay.png",
+      "sha256": "31befa2397fd2ccf3982bfc5514d80ba8ff4c804608b040d912b61b8cc28eba3",
+      "bytes": 782172,
+      "width": 1080,
+      "height": 2408
+    }
+  ]
+}
