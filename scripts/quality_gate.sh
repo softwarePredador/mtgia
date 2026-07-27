@@ -154,6 +154,20 @@ run_runtime_performance_contract() {
       test_serve_image_memory_fixture.py \
       2>&1
   )
+  (
+    cd "$ROOT_DIR/server"
+    RUN_INTEGRATION_TESTS=0 \
+      JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+      "$DART_BIN" test \
+        --reporter compact \
+        test/battle_live_local_load_homologation_test.dart
+  )
+  (
+    cd "$ROOT_DIR/app"
+    "$FLUTTER_BIN" test \
+      test/features/battle/battle_local_homologation_test.dart \
+      --no-pub --no-version-check --reporter compact --timeout 2m
+  )
 }
 
 run_web_image_memory_profile() {
@@ -312,7 +326,7 @@ print_usage() {
 Uso:
   ./scripts/quality_gate.sh quick   # validação rápida (dart test + flutter analyze)
   ./scripts/quality_gate.sh full    # validação completa (dart test + flutter analyze + flutter test)
-  ./scripts/quality_gate.sh performance # contratos determinísticos dos harnesses runtime
+  ./scripts/quality_gate.sh performance # harnesses runtime + preflight Battle host com orçamentos
   ./scripts/quality_gate.sh web-image-memory # profile real Chrome/CDP + fixture loopback
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
   ./scripts/quality_gate.sh ui-audit # golden/accessibility audit das telas críticas Flutter
@@ -336,9 +350,10 @@ Uso:
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
   O modo 'full' é determinístico e exclui tags live/live_backend/live_db_write/live_external.
-  O modo 'performance' valida os harnesses e seus orçamentos sem exigir browser,
-  device, fixture autenticada ou executar uma medição runtime. Use
-  'web-image-memory' para a prova real e fail-closed com Chrome/CDP.
+  O modo 'performance' valida os harnesses e seus orçamentos, incluindo o
+  preflight sintético Battle no host, sem exigir browser, device ou fixture
+  autenticada. Ele não prova Android físico, TalkBack, CPU/RSS alvo nem carga
+  live. Use 'web-image-memory' para a prova real e fail-closed com Chrome/CDP.
   Use o perfil E2E live guardado para chamadas contra uma API real.
   Use 'resolution' para validar o corpus estável Commander fim a fim.
   Use 'ui-audit' depois de mexer em visual, paywall, login, home ou shell do app.

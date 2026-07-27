@@ -7,6 +7,7 @@ void main() {
       final setup = BattleTestSetup(
         opponentDeckId: ' opponent ',
         objective: BattleTestObjective.focusCards,
+        seriesSize: BattleSeriesSize.ten,
         focusCards: const [
           ' Sol Ring ',
           'sol ring',
@@ -22,11 +23,23 @@ void main() {
         'Arcane Signet',
         'Rhystic Study',
       ]);
+      expect(setup.seriesSize.count, 10);
       expect(setup.toRequestJson(), {
         'opponent_deck_id': 'opponent',
         'test_objective': 'focus_cards',
         'focus_cards': const ['Sol Ring', 'Arcane Signet', 'Rhystic Study'],
       });
+    });
+
+    test('offers only the supported independent sample sizes', () {
+      expect(BattleSeriesSize.values.map((value) => value.count), const [
+        1,
+        3,
+        5,
+        10,
+      ]);
+      expect(BattleSeriesSize.single.isSeries, isFalse);
+      expect(BattleSeriesSize.three.isSeries, isTrue);
     });
   });
 

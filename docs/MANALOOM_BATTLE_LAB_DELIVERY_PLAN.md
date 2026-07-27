@@ -74,11 +74,11 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
 | BL0 | `PASS_LOCAL` | BL0-00 recuperou capacidade de forma inventariada e duas execuções integradas consecutivas passaram; BL0-01..09 fecharam evidência, outcomes, proveniência, revisão, sanitização e migrations 052–055 |
 | BL1 | `PASS_LOCAL` | CTA na Análise, setup, preflight, objetivo, foco, histórico e navegação implementados |
 | BL2 | `PASS_LOCAL` | Replay responsivo, playback, snapshots, timeline incremental e desconhecidos explícitos implementados |
-| BL3 | `PASS_LOCAL_WITH_P1_DEFERRED` | Relatório, comparação, anotações PostgreSQL e feedback implementados; Keep/Mulligan humano e séries 3/5/10 permanecem P1 |
-| BL4 | `PARTIAL_BLOCKED_PHYSICAL_AND_RELEASE` | Automação local coberta; Android físico/TalkBack, smoke live e mesma SHA implantada não foram executados |
+| BL3 | `PASS_LOCAL_WITH_RUNTIME_RESIDUALS` | Relatório, comparação, anotações PostgreSQL, Keep/Mulligan antes da leitura e séries independentes 3/5/10 implementados; série retomável no servidor e exercício realmente cego dependem de novos contratos runtime |
+| BL4 | `PARTIAL_BLOCKED_PHYSICAL_AND_RELEASE` | Preflight local mede p50/p95 e acessibilidade automatizada; Android físico/TalkBack, carga real, smoke live e mesma SHA implantada não foram executados |
 | BL5 | `PASS_LOCAL_FEATURE_OFF` | Job assíncrono, worker, leases, quotas, cancelamento, correlação e fault injection implementados; rollout desligado |
-| BL6 | `PASS_LOCAL_FEATURE_OFF_WITH_DEVICE_BLOCK` | Polling Live, cursor, armazenamento durável, reconexão e UI Web implementados; Android físico/live pendentes |
-| BL7 | `PASS_DECISION_NO_GO` | Spike cumpriu seu objetivo e emitiu NO-GO por callbacks incompletos e ausência de takeover humano→IA seguro |
+| BL6 | `PASS_LOCAL_FEATURE_OFF_WITH_DEVICE_BLOCK` | Polling Live, cursor, armazenamento durável, reconexão e UI Web implementados; fanout sintético local de 64 streams passou, Android físico/sockets reais/live pendentes |
+| BL7 | `PASS_DECISION_NO_GO` | Spike tipou seis famílias adicionais, mas `GAME_PLAY_MANA`, partida humana completa e takeover humano→IA seguro seguem não provados |
 | BL8 | `BLOCKED_BL7_NO_GO` | Nenhuma sessão interativa pública foi criada |
 | BL9 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Coach Mode não foi criado |
 | BL10 | `NOT_STARTED_DEPENDENCY_BLOCKED` | Homologação do Coach não pode começar sem BL8/BL9 |
@@ -419,10 +419,14 @@ altera a classificação do Battle atual.
 ### Decisão executada de BL7 (2026-07-26)
 
 O spike isolado terminou `NO_GO`, registrado no ADR 0003. Três famílias
-experimentais (`GAME_ASK`, `GAME_SELECT`, `GAME_TARGET`) aceitaram o envelope
-opaco, mas sete famílias necessárias permaneceram sem tratamento e o runtime
-revisado não provou takeover seguro de humano para IA. BL8 não pode começar
-sem um novo spike e um GO explícito.
+experimentais legadas (`GAME_ASK`, `GAME_SELECT`, `GAME_TARGET`) e seis
+famílias tipadas (`GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`,
+`GAME_CHOOSE_CHOICE`, `GAME_PLAY_XMANA`, `GAME_GET_AMOUNT`,
+`GAME_GET_MULTI_AMOUNT`) passaram pelo envelope HMAC opaco, vinculado a
+`gameId`, `messageId` e versão, com despacho no máximo uma vez.
+`GAME_PLAY_MANA` continua fail-closed porque o callback não fornece allowlist
+UUID segura. O runtime também não provou uma partida humana completa nem
+takeover de humano para IA. BL8 não pode começar sem novo spike e GO explícito.
 
 ## 15. BL8 — Sessão interativa versionada
 

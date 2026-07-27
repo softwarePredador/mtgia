@@ -20,16 +20,18 @@ O bytecode fixado do XMage `1.4.60` e o harness de teste provaram:
 - deck B permanece `COMPUTER_MAD`;
 - `GAME_ASK`, `GAME_SELECT` e `GAME_TARGET` cobrem o recorte experimental de
   mulligan, ação principal, alvo e combate;
-- `messageId` pode compor a versão de estado;
-- prompt e opções podem usar IDs HMAC opacos, vinculados ao estado e de uso
+- `GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`, `GAME_CHOOSE_CHOICE`,
+  `GAME_PLAY_XMANA`, `GAME_GET_AMOUNT` e `GAME_GET_MULTI_AMOUNT` aceitam
+  adaptadores tipados com allowlists/limites próprios;
+- `gameId`, `messageId` e versão compõem o estado;
+- prompt e opções usam IDs HMAC opacos, vinculados ao jogo/estado e de uso
   único;
 - timeout pode tentar `CONCEDE` e sempre encerrar o processo isolado.
 
 O spike também confirmou bloqueios:
 
-- `GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`, `GAME_CHOOSE_CHOICE`,
-  `GAME_PLAY_MANA`, `GAME_PLAY_XMANA`, `GAME_GET_AMOUNT` e
-  `GAME_GET_MULTI_AMOUNT` permanecem sem tratamento;
+- `GAME_PLAY_MANA` permanece fail-closed porque o callback revisado não expõe
+  uma allowlist UUID segura para a resposta remota;
 - nenhuma API remota revisada prova transição segura de `HUMAN` para IA;
 - nenhuma partida humana completa foi executada em runtime;
 - portanto não há evidência suficiente para medir zero deadlock, zero
@@ -48,7 +50,8 @@ pausar o cliente não pausa o engine e nenhum payload do stream é um comando.
 
 Um novo spike, deliberadamente autorizado, precisa:
 
-1. tratar ou delegar explicitamente as sete famílias de callback restantes;
+1. tratar ou delegar explicitamente `GAME_PLAY_MANA` sem aceitar comandos
+   arbitrários;
 2. provar política de timeout sem alegar takeover humano→IA inexistente;
 3. executar partidas humanas completas no runtime isolado;
 4. medir latência, memória, deadlocks e vazamento de informação privada;
@@ -64,5 +67,5 @@ bash -n services/xmage-sidecar/bin/human_vs_ai_spike.sh
 services/xmage-sidecar/bin/human_vs_ai_spike.sh
 ```
 
-O script valida o pin Maven/bytecode, executa cinco testes e imprime a matriz de
+O script valida o pin Maven/bytecode, executa sete testes e imprime a matriz de
 callbacks e a decisão `BL7_SPIKE_DECISION=NO_GO`.

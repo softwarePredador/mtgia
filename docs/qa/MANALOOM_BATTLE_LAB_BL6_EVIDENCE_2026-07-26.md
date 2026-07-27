@@ -12,8 +12,8 @@
 | BL6-03 | `PASS_LOCAL` | Flutter mostra job/progresso/engine, mesa pública, stack/combat e timeline; pausa é apenas local |
 | BL6-04 | `PASS_LOCAL` | cursor HMAC, dedupe, checkpoint e `next_cursor` retomam sem duplicação; terminal abre replay |
 | BL6-05 | `PASS_LOCAL` | offline/retry preserva estado; mudança de processo reread uma vez; timeout/5xx não fabricam terminal |
-| BL6-06 | `PASS_LOCAL_CONTRACT` | sidecar limita 64 streams, 20 mil registros/stream e 15 min; poll/source/body possuem limites; carga no alvo não executada |
-| BL6-07 | `BLOCKED_ANDROID_AND_LIVE` | Web/widget/auth/IDOR/reconexão passam; Android físico/TalkBack e smoke no alvo permanecem pendentes |
+| BL6-06 | `PASS_LOCAL_PREFLIGHT_BLOCKED_TARGET` | fanout sintético de 64 streams × 200 eventos, histórico 20k, payload/RSS/tempo passaram; sockets reais e carga no alvo não executados |
+| BL6-07 | `PASS_LOCAL_AUTOMATED_BLOCKED_ANDROID_AND_LIVE` | Web/widget/auth/IDOR, rede lenta/offline/reconexão e dedupe passam; Android físico/TalkBack e smoke no alvo permanecem pendentes |
 
 ## Backend e segurança
 
@@ -43,6 +43,8 @@
   também integrado ao gate oficial de schema;
 - Flutter Battle antes da integração final: 95/95; telas finais: 35/35;
 - Maven cobre registry bounded/eviction/paginação e identidade;
+- preflight Dart limita 20 mil eventos, 64 streams, payload agregado, RSS e
+  p50/p95 do host sem alegar sockets ou perfil do alvo;
 - build Web release local concluído com Live opt-in.
 
 O endpoint e a tela estão implementados, mas rollout continua desligado e

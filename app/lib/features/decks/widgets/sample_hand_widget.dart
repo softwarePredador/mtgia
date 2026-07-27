@@ -9,6 +9,22 @@ import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 
+enum SampleHandChoice { keep, mulligan }
+
+class SampleHandDecision {
+  SampleHandDecision({
+    required this.choice,
+    required this.mulligansTaken,
+    required List<DeckCardItem> hand,
+  }) : hand = List<DeckCardItem>.unmodifiable(hand);
+
+  final SampleHandChoice choice;
+  final int mulligansTaken;
+  final List<DeckCardItem> hand;
+
+  int get handSize => hand.length;
+}
+
 /// Simulador de mão inicial — permite ao jogador "testar" mãos de 7 cartas
 /// aleatórias do deck, com opção de London mulligan. Cada mulligan compra uma
 /// nova mão de sete e informa quantas cartas devem ir para o fundo do grimório.
@@ -19,6 +35,7 @@ class SampleHandWidget extends StatefulWidget {
   final bool compact;
   final int? randomSeed;
   final ValueChanged<DeckCardItem>? onShowCardDetails;
+  final ValueChanged<SampleHandDecision>? onDecision;
 
   const SampleHandWidget({
     super.key,
@@ -26,6 +43,7 @@ class SampleHandWidget extends StatefulWidget {
     this.compact = false,
     this.randomSeed,
     this.onShowCardDetails,
+    this.onDecision,
   });
 
   @override
@@ -37,6 +55,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
   List<DeckCardItem> _hand = [];
   int _mulligansTaken = 0;
   bool _isDrawn = false;
+  SampleHandChoice? _choice;
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
   late final Random _random;
@@ -83,14 +102,33 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
     setState(() {
       _hand = pool.take(drawSize).toList();
       _isDrawn = true;
+      _choice = null;
     });
     _animController.forward(from: 0);
   }
 
   void _mulligan() {
     if (_mulligansTaken >= 7) return;
+    widget.onDecision?.call(
+      SampleHandDecision(
+        choice: SampleHandChoice.mulligan,
+        mulligansTaken: _mulligansTaken,
+        hand: _hand,
+      ),
+    );
     _mulligansTaken += 1;
     _drawHand();
+  }
+
+  void _keep() {
+    setState(() => _choice = SampleHandChoice.keep);
+    widget.onDecision?.call(
+      SampleHandDecision(
+        choice: SampleHandChoice.keep,
+        mulligansTaken: _mulligansTaken,
+        hand: _hand,
+      ),
+    );
   }
 
   void _newHand() {
@@ -228,9 +266,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                   child: Text(
                     _mulligansTaken == 0
                         ? '${_hand.length} cartas'
-                        : widget.compact
-                        ? '${_hand.length} · fundo $_mulligansTaken'
-                        : '${_hand.length} cartas · $_mulligansTaken ao fundo',
+                        : '${_hand.length} · fundo $_mulligansTaken',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -271,86 +307,124 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
           ],
 
           if (_isDrawn) ...[
-            // Stats bar
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppTheme.space12,
-                vertical: AppTheme.space8,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _StatChip(
-                      label: 'Terrenos',
-                      value: '$_landCount',
-                      color: AppTheme.mythicGold,
+            if (_choice == null) ...[
+              Container(
+                key: const Key('sample-hand-decision-gate'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppTheme.space12),
+                decoration: BoxDecoration(
+                  color: AppTheme.frost400.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.frost400.withValues(alpha: 0.30),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.visibility_off_outlined,
+                      size: 18,
+                      color: AppTheme.frost400,
                     ),
-                  ),
-                  Expanded(
-                    child: _StatChip(
-                      label: 'Magias',
-                      value: '$_nonLandCount',
-                      color: AppTheme.primarySoft,
-                    ),
-                  ),
-                  Expanded(
-                    child: _StatChip(
-                      label: 'Total',
-                      value: '${_hand.length}',
-                      color: AppTheme.manaViolet,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppTheme.space12),
-            Container(
-              key: const Key('sample-hand-assessment'),
-              padding: const EdgeInsets.all(AppTheme.space12),
-              decoration: BoxDecoration(
-                color: assessment.tone.background,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(color: assessment.tone.border),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    assessment.tone.icon,
-                    size: 18,
-                    color: assessment.tone.foreground,
-                  ),
-                  const SizedBox(width: AppTheme.space10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          assessment.verdict,
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: assessment.tone.foreground,
-                            fontWeight: FontWeight.w700,
-                          ),
+                    const SizedBox(width: AppTheme.space10),
+                    Expanded(
+                      child: Text(
+                        'Escolha Keep ou Mulligan antes de revelar a leitura '
+                        'automática. Ela apoia a revisão, mas não define uma '
+                        'resposta correta.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textPrimary,
+                          height: 1.35,
                         ),
-                        const SizedBox(height: AppTheme.space3),
-                        Text(
-                          assessment.summary,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textPrimary,
-                            height: 1.35,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: AppTheme.space12),
+              const SizedBox(height: AppTheme.space12),
+            ],
+            if (_choice == SampleHandChoice.keep) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space12,
+                  vertical: AppTheme.space8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceElevated,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _StatChip(
+                        label: 'Terrenos',
+                        value: '$_landCount',
+                        color: AppTheme.mythicGold,
+                      ),
+                    ),
+                    Expanded(
+                      child: _StatChip(
+                        label: 'Magias',
+                        value: '$_nonLandCount',
+                        color: AppTheme.primarySoft,
+                      ),
+                    ),
+                    Expanded(
+                      child: _StatChip(
+                        label: 'Total',
+                        value: '${_hand.length}',
+                        color: AppTheme.manaViolet,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppTheme.space12),
+              Container(
+                key: const Key('sample-hand-assessment'),
+                padding: const EdgeInsets.all(AppTheme.space12),
+                decoration: BoxDecoration(
+                  color: assessment.tone.background,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(color: assessment.tone.border),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      assessment.tone.icon,
+                      size: 18,
+                      color: assessment.tone.foreground,
+                    ),
+                    const SizedBox(width: AppTheme.space10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            assessment.verdict,
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: assessment.tone.foreground,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: AppTheme.space3),
+                          Text(
+                            assessment.summary,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textPrimary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppTheme.space12),
+            ],
             if (_mulligansTaken > 0) ...[
               Container(
                 key: const Key('sample-hand-bottom-guidance'),
@@ -378,7 +452,6 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
               const SizedBox(height: AppTheme.space12),
             ],
 
-            // Hand display
             FadeTransition(
               opacity: _fadeAnim,
               child: _SampleHandCarousel(
@@ -392,8 +465,6 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
             ),
             const SizedBox(height: AppTheme.space12),
 
-            // Action buttons stay compact on desktop and become full-width
-            // only when the available pane is genuinely narrow.
             LayoutBuilder(
               builder: (context, constraints) {
                 final stackActions = constraints.maxWidth < 520;
@@ -415,6 +486,12 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                     ),
                   ),
                 );
+                final keep = FilledButton.icon(
+                  key: const Key('sample-hand-keep'),
+                  onPressed: _keep,
+                  icon: const Icon(Icons.pan_tool_alt_outlined, size: 18),
+                  label: const Text('Keep'),
+                );
                 final newHand = ElevatedButton.icon(
                   key: const Key('sample-hand-new-hand'),
                   onPressed: _newHand,
@@ -428,6 +505,12 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                     foregroundColor: AppTheme.backgroundAbyss,
                   ),
                 );
+                if (_choice != null) {
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: newHand,
+                  );
+                }
 
                 if (stackActions) {
                   return Column(
@@ -435,7 +518,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                     children: [
                       mulligan,
                       const SizedBox(height: AppTheme.space8),
-                      newHand,
+                      keep,
                     ],
                   );
                 }
@@ -445,7 +528,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                   children: [
                     mulligan,
                     const SizedBox(width: AppTheme.space8),
-                    newHand,
+                    keep,
                   ],
                 );
               },

@@ -8,9 +8,9 @@
 |---|---|---|
 | BL4-01 | `PASS_LOCAL` | contratos, migrations 052–055, pins e fixtures versionados; project logic regenerado e `--check` verde |
 | BL4-02 | `PASS_LOCAL` | erros auth/owner, conflito, validação, quota, timeout, engine/persistência e truncamento possuem estados/retry fechados |
-| BL4-03 | `PARTIAL_AUTOMATED_BLOCKED_DEVICE` | timeline 20k, payloads/limites e contratos de performance passaram; p50/p95 de list/detail/scrub/filtros/série em Web/Android alvo não foram medidos |
+| BL4-03 | `PASS_LOCAL_PREFLIGHT_BLOCKED_TARGET` | p50/p95 de histórico 100, detalhe/scrub/filtro 20k e série 10 passaram em VM/Chrome; frame timing Web/Android alvo não foi medido |
 | BL4-04 | `PASS_LOCAL` | IDOR, cursor, hidden zones, body limits, rate limits, logs/redaction e soft delete testados |
-| BL4-05 | `BLOCKED_ANDROID_PHYSICAL` | widget/Web, teclado, texto 200% e reduced motion cobertos; sem aparelho Android/TalkBack na rodada |
+| BL4-05 | `PASS_LOCAL_AUTOMATED_BLOCKED_ANDROID` | Semantics, teclado, alvos, texto 200%, viewport móvel e reduced motion passaram em VM/Chrome; sem aparelho Android/TalkBack na rodada |
 | BL4-06 | `PASS_LOCAL_AUTOMATED_BLOCKED_DEVICE_RELEASE` | `battle-lab` e schema PostgreSQL oficial fecharam na árvore final; mutações live, Android físico e release seguem não autorizados/não disponíveis |
 | BL4-07 | `PASS_LOCAL_EVIDENCE` | esta evidência pertence ao commit da entrega; SHA/branch publicados e resultado do pre-push ficam no handoff final |
 

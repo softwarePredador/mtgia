@@ -1,14 +1,20 @@
 package com.manaloom.xmage;
 
 import mage.cards.decks.DeckCardLists;
+import mage.choices.ChoiceImpl;
 import mage.constants.PlayerAction;
 import mage.game.match.MatchOptions;
 import mage.interfaces.callback.ClientCallback;
 import mage.interfaces.callback.ClientCallbackMethod;
 import mage.players.PlayerType;
 import mage.remote.Session;
+import mage.util.MultiAmountMessage;
+import mage.view.AbilityPickerView;
+import mage.view.CardsView;
+import mage.view.GameClientMessage;
 import org.junit.jupiter.api.Test;
 
+import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -16,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -73,7 +80,7 @@ final class HumanVsAiSpikeTest {
     }
 
     @Test
-    void mapsOnlyTheFourTimeBoxedPromptFamiliesAndInventoriesTheRest() {
+    void mapsLegacyAndSixTypedFamiliesWhileKeepingPlayManaNativeOnly() {
         Map<String, Object> mulliganOptions = new LinkedHashMap<>();
         mulliganOptions.put("UI.left.btn.text", "Mulligan");
         mulliganOptions.put("UI.right.btn.text", "Keep");
@@ -136,15 +143,69 @@ final class HumanVsAiSpikeTest {
                 )
         );
         assertEquals(
-                EnumSet.of(
+                HumanVsAiSpikeHarness.PromptKind.ABILITY,
+                HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_CHOOSE_ABILITY,
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.PILE,
+                HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_CHOOSE_PILE,
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.CHOICE,
+                HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_CHOOSE_CHOICE,
-                        ClientCallbackMethod.GAME_PLAY_MANA,
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.X_MANA,
+                HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_PLAY_XMANA,
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.AMOUNT,
+                HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_GET_AMOUNT,
-                        ClientCallbackMethod.GAME_GET_MULTI_AMOUNT
-                ),
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MULTI_AMOUNT,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_GET_MULTI_AMOUNT,
+                        null,
+                        Collections.emptyMap()
+                )
+        );
+
+        for (ClientCallbackMethod method
+                : HumanVsAiSpikeHarness.TYPED_BRIDGED_CALLBACKS) {
+            assertEquals(
+                    HumanVsAiSpikeHarness.CallbackDisposition.TYPED_BRIDGE,
+                    HumanVsAiSpikeHarness.callbackDisposition(method)
+            );
+        }
+        assertEquals(
+                HumanVsAiSpikeHarness.CallbackDisposition.NATIVE_ONLY_FAIL_CLOSED,
+                HumanVsAiSpikeHarness.callbackDisposition(
+                        ClientCallbackMethod.GAME_PLAY_MANA
+                )
+        );
+        assertEquals(
+                EnumSet.of(ClientCallbackMethod.GAME_PLAY_MANA),
                 HumanVsAiSpikeHarness.unhandledCallbacks()
         );
     }
@@ -155,11 +216,12 @@ final class HumanVsAiSpikeTest {
                 new HumanVsAiSpikeHarness.PromptRegistry(
                         "0123456789abcdef0123456789abcdef"
                                 .getBytes(StandardCharsets.UTF_8)
-                );
+        );
         UUID rawTarget = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        UUID gameId = UUID.fromString("99999999-8888-7777-6666-555555555555");
         ClientCallback callback = new ClientCallback(
                 ClientCallbackMethod.GAME_TARGET,
-                UUID.randomUUID()
+                gameId
         );
         callback.setMessageId(41);
 
@@ -172,6 +234,7 @@ final class HumanVsAiSpikeTest {
 
         assertEquals(41L, prompt.stateVersion);
         assertEquals(HumanVsAiSpikeHarness.PromptKind.TARGET, prompt.kind);
+        assertFalse(prompt.promptId.contains(gameId.toString()));
         assertFalse(prompt.promptId.contains(rawTarget.toString()));
         assertFalse(prompt.optionIds.get(0).contains(rawTarget.toString()));
         assertNotEquals(rawTarget.toString(), prompt.optionIds.get(0));
@@ -218,6 +281,355 @@ final class HumanVsAiSpikeTest {
                         Collections.singletonList(rawTarget)
                 )
         );
+
+        HumanVsAiSpikeHarness.PromptRegistry otherGameRegistry =
+                new HumanVsAiSpikeHarness.PromptRegistry(
+                        "0123456789abcdef0123456789abcdef"
+                                .getBytes(StandardCharsets.UTF_8)
+                );
+        ClientCallback otherGame = new ClientCallback(
+                ClientCallbackMethod.GAME_TARGET,
+                UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+        );
+        otherGame.setMessageId(41);
+        HumanVsAiSpikeHarness.Prompt otherGamePrompt = otherGameRegistry.open(
+                otherGame,
+                "Select target creature",
+                Collections.emptyMap(),
+                Collections.singletonList(rawTarget)
+        );
+        assertNotEquals(prompt.promptId, otherGamePrompt.promptId);
+        assertFalse(
+                otherGamePrompt.promptId.contains(otherGamePrompt.gameId.toString())
+        );
+    }
+
+    @Test
+    void bridgesSixPinnedCallbackFamiliesWithExactSessionResponseChannels() {
+        HumanVsAiSpikeHarness.PromptRegistry registry = newRegistry();
+        UUID gameId = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        List<String> sentMethods = new ArrayList<>();
+        List<Object[]> sentArguments = new ArrayList<>();
+        Session session = (Session) Proxy.newProxyInstance(
+                Session.class.getClassLoader(),
+                new Class<?>[]{Session.class},
+                (proxy, method, arguments) -> {
+                    if (method.getName().startsWith("sendPlayer")) {
+                        sentMethods.add(method.getName());
+                        sentArguments.add(arguments);
+                    }
+                    if (method.getReturnType() == boolean.class) {
+                        return true;
+                    }
+                    return null;
+                }
+        );
+
+        UUID abilityId = UUID.fromString(
+                "11111111-1111-1111-1111-111111111111"
+        );
+        Map<UUID, String> abilityChoices = new LinkedHashMap<>();
+        abilityChoices.put(abilityId, "Tap: add one green mana");
+        HumanVsAiSpikeHarness.Prompt abilityPrompt = registry.open(callback(
+                ClientCallbackMethod.GAME_CHOOSE_ABILITY,
+                gameId,
+                1,
+                new AbilityPickerView(null, abilityChoices, "Choose an ability")
+        ));
+        assertEquals(HumanVsAiSpikeHarness.PromptKind.ABILITY, abilityPrompt.kind);
+        assertEquals(HumanVsAiSpikeHarness.InputMode.OPTIONS, abilityPrompt.inputMode);
+        assertEquals(2, abilityPrompt.optionIds.size());
+        HumanVsAiSpikeHarness.ResolvedResponse abilityResponse =
+                registry.resolveResponse(
+                        abilityPrompt.promptId,
+                        abilityPrompt.stateVersion,
+                        abilityPrompt.optionIds.get(0)
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.UUID,
+                abilityResponse.command.channel);
+        assertEquals(abilityId, abilityResponse.command.value);
+        assertEquals(gameId, abilityResponse.gameId);
+        assertTrue(abilityResponse.dispatch(session));
+        assertThrows(
+                IllegalStateException.class,
+                () -> abilityResponse.dispatch(session)
+        );
+
+        GameClientMessage pileMessage = new GameClientMessage(
+                null,
+                Collections.<String, Serializable>emptyMap(),
+                "Choose a pile",
+                new CardsView(),
+                new CardsView()
+        );
+        HumanVsAiSpikeHarness.Prompt pilePrompt = registry.open(callback(
+                ClientCallbackMethod.GAME_CHOOSE_PILE,
+                gameId,
+                2,
+                pileMessage
+        ));
+        assertEquals(HumanVsAiSpikeHarness.PromptKind.PILE, pilePrompt.kind);
+        HumanVsAiSpikeHarness.ResolvedResponse pileResponse =
+                registry.resolveResponse(
+                        pilePrompt.promptId,
+                        pilePrompt.stateVersion,
+                        pilePrompt.optionIds.get(0)
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.BOOLEAN,
+                pileResponse.command.channel);
+        assertEquals(true, pileResponse.command.value);
+        assertTrue(pileResponse.dispatch(session));
+
+        ChoiceImpl choice = new ChoiceImpl(true);
+        choice.setChoices(new LinkedHashSet<>(Arrays.asList("red", "blue")));
+        HumanVsAiSpikeHarness.Prompt choicePrompt = registry.open(callback(
+                ClientCallbackMethod.GAME_CHOOSE_CHOICE,
+                gameId,
+                3,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        choice
+                )
+        ));
+        assertEquals(HumanVsAiSpikeHarness.PromptKind.CHOICE, choicePrompt.kind);
+        HumanVsAiSpikeHarness.ResolvedResponse choiceResponse =
+                registry.resolveResponse(
+                        choicePrompt.promptId,
+                        choicePrompt.stateVersion,
+                        choicePrompt.optionIds.get(1)
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.STRING,
+                choiceResponse.command.channel);
+        assertEquals("blue", choiceResponse.command.value);
+        assertTrue(choiceResponse.dispatch(session));
+
+        HumanVsAiSpikeHarness.Prompt xManaPrompt = registry.open(callback(
+                ClientCallbackMethod.GAME_PLAY_XMANA,
+                gameId,
+                4,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        "Confirm X mana"
+                )
+        ));
+        assertEquals(HumanVsAiSpikeHarness.PromptKind.X_MANA, xManaPrompt.kind);
+        HumanVsAiSpikeHarness.ResolvedResponse xManaResponse =
+                registry.resolveResponse(
+                        xManaPrompt.promptId,
+                        xManaPrompt.stateVersion,
+                        xManaPrompt.optionIds.get(0)
+                );
+        assertEquals(true, xManaResponse.command.value);
+        assertTrue(xManaResponse.dispatch(session));
+
+        HumanVsAiSpikeHarness.Prompt amountPrompt = registry.open(callback(
+                ClientCallbackMethod.GAME_GET_AMOUNT,
+                gameId,
+                5,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        "Choose an amount",
+                        2,
+                        5
+                )
+        ));
+        assertEquals(HumanVsAiSpikeHarness.InputMode.INTEGER, amountPrompt.inputMode);
+        assertEquals(2, amountPrompt.minimum);
+        assertEquals(5, amountPrompt.maximum);
+        assertTrue(amountPrompt.optionIds.isEmpty());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> registry.resolveInteger(
+                        amountPrompt.promptId,
+                        amountPrompt.stateVersion,
+                        6
+                )
+        );
+        HumanVsAiSpikeHarness.ResolvedResponse amountResponse =
+                registry.resolveInteger(
+                        amountPrompt.promptId,
+                        amountPrompt.stateVersion,
+                        4
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.INTEGER,
+                amountResponse.command.channel);
+        assertEquals(4, amountResponse.command.value);
+        assertTrue(amountResponse.dispatch(session));
+
+        List<MultiAmountMessage> constraints = Arrays.asList(
+                new MultiAmountMessage("first", 0, 3),
+                new MultiAmountMessage("second", 1, 4)
+        );
+        HumanVsAiSpikeHarness.Prompt multiPrompt = registry.open(callback(
+                ClientCallbackMethod.GAME_GET_MULTI_AMOUNT,
+                gameId,
+                6,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        constraints,
+                        2,
+                        5
+                )
+        ));
+        assertEquals(
+                HumanVsAiSpikeHarness.InputMode.MULTI_AMOUNT,
+                multiPrompt.inputMode
+        );
+        assertEquals(2, multiPrompt.multiAmountCount);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> registry.resolveMultiAmount(
+                        multiPrompt.promptId,
+                        multiPrompt.stateVersion,
+                        Arrays.asList(4, 1)
+                )
+        );
+        HumanVsAiSpikeHarness.ResolvedResponse multiResponse =
+                registry.resolveMultiAmount(
+                        multiPrompt.promptId,
+                        multiPrompt.stateVersion,
+                        Arrays.asList(1, 2)
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.STRING,
+                multiResponse.command.channel);
+        assertEquals("1 2", multiResponse.command.value);
+        assertTrue(multiResponse.dispatch(session));
+
+        assertEquals(
+                Arrays.asList(
+                        "sendPlayerUUID",
+                        "sendPlayerBoolean",
+                        "sendPlayerString",
+                        "sendPlayerBoolean",
+                        "sendPlayerInteger",
+                        "sendPlayerString"
+                ),
+                sentMethods
+        );
+        for (Object[] arguments : sentArguments) {
+            assertEquals(gameId, arguments[0]);
+        }
+    }
+
+    @Test
+    void typedAdaptersRejectUnprovenOrMalformedResponsesWithoutConsumingPrompt() {
+        HumanVsAiSpikeHarness.PromptRegistry nativeOnlyRegistry = newRegistry();
+        IllegalArgumentException nativeOnlyError = assertThrows(
+                IllegalArgumentException.class,
+                () -> nativeOnlyRegistry.open(callback(
+                        ClientCallbackMethod.GAME_PLAY_MANA,
+                        UUID.randomUUID(),
+                        1,
+                        new GameClientMessage(
+                                null,
+                                Collections.<String, Serializable>emptyMap(),
+                                "Pay mana"
+                        )
+                ))
+        );
+        assertTrue(nativeOnlyError.getMessage().contains("native-only"));
+
+        HumanVsAiSpikeHarness.PromptRegistry malformedRegistry = newRegistry();
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> malformedRegistry.open(callback(
+                        ClientCallbackMethod.GAME_CHOOSE_ABILITY,
+                        UUID.randomUUID(),
+                        1,
+                        new Object()
+                ))
+        );
+
+        ChoiceImpl optionalSpecialChoice = new ChoiceImpl(false);
+        optionalSpecialChoice.setChoices(
+                new LinkedHashSet<>(Collections.singletonList("one"))
+        );
+        optionalSpecialChoice.setSpecial(true, false, "Remember", "Remember");
+        HumanVsAiSpikeHarness.PromptRegistry choiceRegistry = newRegistry();
+        HumanVsAiSpikeHarness.Prompt prompt = choiceRegistry.open(callback(
+                ClientCallbackMethod.GAME_CHOOSE_CHOICE,
+                UUID.randomUUID(),
+                1,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        optionalSpecialChoice
+                )
+        ));
+        assertEquals(3, prompt.optionIds.size());
+        HumanVsAiSpikeHarness.ResolvedResponse cancelResponse =
+                choiceRegistry.resolveResponse(
+                        prompt.promptId,
+                        prompt.stateVersion,
+                        prompt.optionIds.get(2)
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.STRING,
+                cancelResponse.command.channel);
+        assertEquals(null, cancelResponse.command.value);
+
+        Map<String, Serializable> cancellableOptions = new LinkedHashMap<>();
+        cancellableOptions.put("canCancel", true);
+        HumanVsAiSpikeHarness.PromptRegistry multiCancelRegistry = newRegistry();
+        HumanVsAiSpikeHarness.Prompt multiCancelPrompt =
+                multiCancelRegistry.open(callback(
+                        ClientCallbackMethod.GAME_GET_MULTI_AMOUNT,
+                        UUID.randomUUID(),
+                        1,
+                        new GameClientMessage(
+                                null,
+                                cancellableOptions,
+                                Arrays.asList(
+                                        new MultiAmountMessage("first", 0, 2),
+                                        new MultiAmountMessage("second", 0, 2)
+                                ),
+                                1,
+                                2
+                        )
+                ));
+        assertEquals(1, multiCancelPrompt.optionIds.size());
+        HumanVsAiSpikeHarness.ResolvedResponse multiCancelResponse =
+                multiCancelRegistry.resolveResponse(
+                        multiCancelPrompt.promptId,
+                        multiCancelPrompt.stateVersion,
+                        multiCancelPrompt.optionIds.get(0)
+                );
+        assertEquals(HumanVsAiSpikeHarness.ResponseChannel.BOOLEAN,
+                multiCancelResponse.command.channel);
+        assertEquals(false, multiCancelResponse.command.value);
+
+        HumanVsAiSpikeHarness.PromptRegistry activeRegistry = newRegistry();
+        HumanVsAiSpikeHarness.Prompt active = activeRegistry.open(callback(
+                ClientCallbackMethod.GAME_PLAY_XMANA,
+                UUID.randomUUID(),
+                1,
+                new GameClientMessage(
+                        null,
+                        Collections.<String, Serializable>emptyMap(),
+                        "Confirm"
+                )
+        ));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> activeRegistry.open(callback(
+                        ClientCallbackMethod.GAME_PLAY_XMANA,
+                        UUID.randomUUID(),
+                        2,
+                        new GameClientMessage(
+                                null,
+                                Collections.<String, Serializable>emptyMap(),
+                                "Confirm again"
+                        )
+                ))
+        );
+        activeRegistry.resolveResponse(
+                active.promptId,
+                active.stateVersion,
+                active.optionIds.get(1)
+        );
     }
 
     @Test
@@ -256,12 +668,14 @@ final class HumanVsAiSpikeTest {
                 result.policy
         );
         assertTrue(result.concedeAcknowledged);
+        assertEquals(null, result.concedeFailureClass);
+        assertTrue(result.processTerminationInvoked);
+        assertFalse(result.takeoverAttempted);
         assertTrue(terminated.get());
 
         AtomicBoolean terminatedAfterFailure = new AtomicBoolean();
-        assertThrows(
-                IllegalStateException.class,
-                () -> HumanVsAiSpikeHarness.expire(
+        HumanVsAiSpikeHarness.TimeoutResult failedConcedeResult =
+                HumanVsAiSpikeHarness.expire(
                         UUID.randomUUID(),
                         new HumanVsAiSpikeHarness.TimeoutBoundary() {
                             @Override
@@ -274,9 +688,35 @@ final class HumanVsAiSpikeTest {
                                 terminatedAfterFailure.set(true);
                             }
                         }
+                );
+        assertFalse(failedConcedeResult.concedeAcknowledged);
+        assertEquals(
+                "IllegalStateException",
+                failedConcedeResult.concedeFailureClass
+        );
+        assertTrue(failedConcedeResult.processTerminationInvoked);
+        assertFalse(failedConcedeResult.takeoverAttempted);
+        assertTrue(terminatedAfterFailure.get());
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> HumanVsAiSpikeHarness.expire(
+                        UUID.randomUUID(),
+                        new HumanVsAiSpikeHarness.TimeoutBoundary() {
+                            @Override
+                            public boolean concede(UUID gameId) {
+                                return false;
+                            }
+
+                            @Override
+                            public void terminateProcess() {
+                                throw new IllegalStateException(
+                                        "process isolation boundary unavailable"
+                                );
+                            }
+                        }
                 )
         );
-        assertTrue(terminatedAfterFailure.get());
     }
 
     @Test
@@ -293,5 +733,28 @@ final class HumanVsAiSpikeTest {
                 ),
                 assessment.blockers
         );
+    }
+
+    private static HumanVsAiSpikeHarness.PromptRegistry newRegistry() {
+        return new HumanVsAiSpikeHarness.PromptRegistry(
+                "0123456789abcdef0123456789abcdef"
+                        .getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    private static ClientCallback callback(
+            ClientCallbackMethod method,
+            UUID gameId,
+            int messageId,
+            Object payload
+    ) {
+        ClientCallback callback = new ClientCallback(
+                method,
+                gameId,
+                payload,
+                false
+        );
+        callback.setMessageId(messageId);
+        return callback;
     }
 }

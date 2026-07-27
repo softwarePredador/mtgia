@@ -18,6 +18,7 @@ import '../models/battle_replay.dart';
 import '../models/battle_replay_annotation.dart';
 import '../models/battle_test_setup.dart';
 import '../services/battle_job_gateway.dart';
+import '../services/battle_job_series_runner.dart';
 import '../services/battle_post_report_service.dart';
 import '../services/battle_replay_service.dart';
 import 'battle_live_spectator_screen.dart';
@@ -77,6 +78,9 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   bool _historyLoadingMore = false;
   String? _pendingLiveRequestFingerprint;
   String? _pendingLiveIdempotencyKey;
+  BattleJobSeriesProgress? _seriesProgress;
+  BattleJobSeriesCancellation? _seriesCancellation;
+  String? _seriesError;
 
   @override
   void initState() {
@@ -263,8 +267,12 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Future<void> _runLiveBattle() async {
-    final setup = await _askBattleTestSetup();
+    final setup = await _askBattleTestSetup(allowSeries: true);
     if (setup == null || setup.opponentDeckId.trim().isEmpty) return;
+    if (setup.seriesSize.isSeries) {
+      await _runLiveSeries(setup);
+      return;
+    }
     final requestFingerprint = jsonEncode({
       'deck_id': widget.deckId,
       ...setup.toRequestJson(),
@@ -311,6 +319,78 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
+  Future<void> _runLiveSeries(BattleTestSetup setup) async {
+    final cancellation = BattleJobSeriesCancellation();
+    final runner = BattleJobSeriesRunner(gateway: _jobGateway);
+    final seriesId = ApiClient.generateRequestId();
+    setState(() {
+      _isStartingLive = true;
+      _seriesCancellation = cancellation;
+      _seriesProgress = null;
+      _seriesError = null;
+      _jobsError = null;
+    });
+
+    void updateSeries(BattleJobSeriesProgress progress) {
+      if (!mounted) return;
+      final seriesJobs = progress.attempts.map((attempt) => attempt.job);
+      final seriesJobIds = seriesJobs.map((job) => job.jobId).toSet();
+      setState(() {
+        _seriesProgress = progress;
+        _jobs = [
+          ...seriesJobs.toList().reversed,
+          ..._jobs.where((job) => !seriesJobIds.contains(job.jobId)),
+        ];
+      });
+    }
+
+    try {
+      final result = await runner.run(
+        seriesId: seriesId,
+        deckId: widget.deckId,
+        setup: setup,
+        cancellation: cancellation,
+        onProgress: updateSeries,
+      );
+      if (!mounted) return;
+      setState(() {
+        _isStartingLive = false;
+        _seriesProgress = result;
+        _seriesCancellation = null;
+      });
+      final message = result.cancellationRequested
+          ? 'Série interrompida. Jobs já criados continuam no histórico.'
+          : 'Série encerrada: ${result.terminalCount}/${result.total} '
+                'tentativas finalizadas. Confira cada status.';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+      unawaited(_loadJobs(quiet: true));
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isStartingLive = false;
+        _seriesCancellation = null;
+        _seriesError = _friendlyJobError(error);
+      });
+    }
+  }
+
+  void _cancelLiveSeries() {
+    final cancellation = _seriesCancellation;
+    if (cancellation == null || cancellation.isCancellationRequested) return;
+    cancellation.requestCancellation();
+    setState(() {});
+  }
+
+  void _dismissLiveSeries() {
+    if (_isStartingLive) return;
+    setState(() {
+      _seriesProgress = null;
+      _seriesError = null;
+    });
+  }
+
   Future<void> _openLiveJob(BattleJob job) async {
     await context.push<void>(battleLiveRouteLocation(widget.deckId, job.jobId));
     if (mounted) unawaited(_loadJobs(quiet: true));
@@ -349,13 +429,35 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
-  Future<BattleTestSetup?> _askBattleTestSetup() async {
+  Future<BattleTestSetup?> _askBattleTestSetup({
+    bool allowSeries = false,
+  }) async {
     return showDialog<BattleTestSetup>(
       context: context,
       builder: (context) => _BattleOpponentPickerDialog(
         gateway: _gateway,
         currentDeckId: widget.deckId,
+        allowSeries: allowSeries,
       ),
+    );
+  }
+
+  Future<void> _recordMulliganDecision(
+    _OpeningHandExercise exercise,
+    String choice,
+  ) async {
+    await _saveAnnotation(
+      BattleReplayAnnotationDraft(
+        kind: BattleReplayAnnotationKind.mulliganDecision,
+        snapshotRef: 'snapshot:${exercise.snapshotPosition}',
+        payload: {
+          'choice': choice,
+          'hand_size': exercise.handSize,
+          'mulligan_number': exercise.mulliganNumber,
+        },
+      ),
+      successMessage:
+          'Escolha registrada antes da leitura detalhada. Ela não alterou o motor automático.',
     );
   }
 
@@ -541,7 +643,19 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
                   onRunLive: widget.battleLiveEnabled ? _runLiveBattle : null,
                   isStartingLive: _isStartingLive,
                 ),
-                if (widget.battleLiveEnabled)
+                if (_seriesProgress != null || _seriesError != null)
+                  _BattleSeriesProgressPanel(
+                    progress: _seriesProgress,
+                    error: _seriesError,
+                    running: _isStartingLive,
+                    cancellationRequested:
+                        _seriesCancellation?.isCancellationRequested ?? false,
+                    onCancel: _cancelLiveSeries,
+                    onDismiss: _dismissLiveSeries,
+                  ),
+                if (widget.battleLiveEnabled &&
+                    _seriesProgress == null &&
+                    _seriesError == null)
                   _BattleLiveJobStrip(
                     jobs: _jobs,
                     loading: _jobsLoading,
@@ -634,6 +748,34 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Widget _buildDetailPane(BattleReplayDetail detail, {bool showBack = true}) {
+    final openingHand = _openingHandExercise(detail);
+    if (openingHand != null) {
+      final annotationsMatch = _annotationsReplayId == detail.summary.id;
+      final annotationsReady = annotationsMatch && !_annotationsLoading;
+      final hasDecision =
+          annotationsReady &&
+          _annotations.any(
+            (annotation) =>
+                annotation.kind ==
+                    BattleReplayAnnotationKind.mulliganDecision &&
+                annotation.snapshotRef ==
+                    'snapshot:${openingHand.snapshotPosition}',
+          );
+      if (!hasDecision) {
+        return _BattleOpeningHandGate(
+          exercise: openingHand,
+          loading: !annotationsMatch || _annotationsLoading,
+          saving: _annotationSaving,
+          error: annotationsMatch ? _annotationError : null,
+          onReload: () => _loadAnnotations(detail.summary.id),
+          onKeep: () => _recordMulliganDecision(openingHand, 'keep'),
+          onMulligan: () => _recordMulliganDecision(openingHand, 'mulligan'),
+          onBack: () => setState(() => _selectedReplay = null),
+          showBack: showBack,
+        );
+      }
+    }
+
     final report = const BattlePostReportService().build(detail);
     return _BattleReplayDetailPane(
       detail: detail,
@@ -1033,10 +1175,12 @@ class _BattleOpponentPickerDialog extends StatefulWidget {
   const _BattleOpponentPickerDialog({
     required this.gateway,
     required this.currentDeckId,
+    this.allowSeries = false,
   });
 
   final BattleReplayGateway gateway;
   final String currentDeckId;
+  final bool allowSeries;
 
   @override
   State<_BattleOpponentPickerDialog> createState() =>
@@ -1058,6 +1202,7 @@ class _BattleOpponentPickerDialogState
   String? _preflightOpponentId;
   BattlePreflight? _preflight;
   BattleTestObjective _objective = BattleTestObjective.general;
+  BattleSeriesSize _seriesSize = BattleSeriesSize.single;
   List<BattleOpponentDeck> _decks = const <BattleOpponentDeck>[];
 
   @override
@@ -1162,6 +1307,7 @@ class _BattleOpponentPickerDialogState
       BattleTestSetup(
         opponentDeckId: opponentDeckId,
         objective: _objective,
+        seriesSize: _seriesSize,
         focusCards: focusCards,
       ),
     );
@@ -1203,7 +1349,9 @@ class _BattleOpponentPickerDialogState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Selecione um deck seu ou publico. O replay sera salvo no historico ao concluir.',
+                widget.allowSeries
+                    ? 'Selecione um deck e quantas tentativas independentes deseja enfileirar.'
+                    : 'Selecione um deck seu ou publico. O replay sera salvo no historico ao concluir.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                   height: 1.35,
@@ -1329,6 +1477,40 @@ class _BattleOpponentPickerDialogState
                   height: 1.3,
                 ),
               ),
+              if (widget.allowSeries) ...[
+                const SizedBox(height: AppTheme.space10),
+                DropdownButtonFormField<BattleSeriesSize>(
+                  key: const Key('battle-series-size-field'),
+                  initialValue: _seriesSize,
+                  decoration: const InputDecoration(
+                    labelText: 'Tamanho da amostra',
+                    prefixIcon: Icon(Icons.stacked_line_chart_rounded),
+                  ),
+                  items: BattleSeriesSize.values
+                      .map(
+                        (size) => DropdownMenuItem(
+                          value: size,
+                          child: Text(size.label),
+                        ),
+                      )
+                      .toList(growable: false),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _seriesSize = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: AppTheme.space5),
+                Text(
+                  'Séries usam um seed e uma chave de idempotência diferentes '
+                  'por tentativa. São amostras independentes: não há RNG '
+                  'pareado, escolha automática de vencedor ou promoção de troca.',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppTheme.textHint,
+                    height: 1.3,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppTheme.space8),
               _BattlePreflightPanel(
                 loading: _isCheckingPreflight,
@@ -1349,7 +1531,11 @@ class _BattleOpponentPickerDialogState
           key: const Key('battle-opponent-submit-button'),
           onPressed: canSubmit ? _submit : null,
           icon: const Icon(Icons.play_arrow_rounded),
-          label: const Text('Simular Battle'),
+          label: Text(
+            _seriesSize.isSeries
+                ? 'Iniciar série de ${_seriesSize.count}'
+                : 'Simular Battle',
+          ),
         ),
       ],
     );
@@ -1748,6 +1934,173 @@ class _BattleReplayActions extends StatelessWidget {
   }
 }
 
+class _BattleSeriesProgressPanel extends StatelessWidget {
+  const _BattleSeriesProgressPanel({
+    required this.progress,
+    required this.error,
+    required this.running,
+    required this.cancellationRequested,
+    required this.onCancel,
+    required this.onDismiss,
+  });
+
+  final BattleJobSeriesProgress? progress;
+  final String? error;
+  final bool running;
+  final bool cancellationRequested;
+  final VoidCallback onCancel;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final value = progress;
+    final total = value?.total ?? 0;
+    final terminal = value?.terminalCount ?? 0;
+    final submitted = value?.submittedCount ?? 0;
+    final active = value?.activeCount ?? 0;
+    return Container(
+      key: const Key('battle-series-progress-panel'),
+      width: double.infinity,
+      constraints: const BoxConstraints(maxHeight: 220),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.outlineMuted.withValues(alpha: 0.58),
+          ),
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.space16,
+          AppTheme.space10,
+          AppTheme.space16,
+          AppTheme.space12,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const ManaLoomGlyph(
+                  ManaLoomGlyphKind.battleReplay,
+                  size: 18,
+                  color: AppTheme.brass400,
+                ),
+                const SizedBox(width: AppTheme.space8),
+                Expanded(
+                  child: Text(
+                    total == 0
+                        ? 'Série independente'
+                        : 'Série independente · $terminal/$total encerradas',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                if (running)
+                  TextButton.icon(
+                    key: const Key('battle-series-cancel-button'),
+                    onPressed: cancellationRequested ? null : onCancel,
+                    icon: const Icon(Icons.stop_circle_outlined, size: 18),
+                    label: Text(
+                      cancellationRequested ? 'Interrompendo…' : 'Interromper',
+                    ),
+                  )
+                else
+                  IconButton(
+                    key: const Key('battle-series-dismiss-button'),
+                    tooltip: 'Fechar resumo da série',
+                    onPressed: onDismiss,
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+              ],
+            ),
+            if (total > 0) ...[
+              LinearProgressIndicator(
+                key: const Key('battle-series-progress'),
+                value: terminal / total,
+                minHeight: 3,
+              ),
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                '$submitted/$total enfileiradas · $active em andamento. '
+                'Cada tentativa usa job, seed e idempotência próprios.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+            if (error != null) ...[
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                error!,
+                key: const Key('battle-series-error'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ],
+            if (value != null && value.attempts.isNotEmpty) ...[
+              const SizedBox(height: AppTheme.space8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final attempt in value.attempts) ...[
+                      Container(
+                        key: Key('battle-series-attempt-${attempt.index}'),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.space10,
+                          vertical: AppTheme.space6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceElevated,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusPill,
+                          ),
+                          border: Border.all(
+                            color: attempt.job.isTerminal
+                                ? AppTheme.success.withValues(alpha: 0.42)
+                                : AppTheme.frost400.withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Text(
+                          '#${attempt.index}/${attempt.total} · '
+                          'seed ${attempt.seed} · '
+                          '${_battleJobListStatusLabel(attempt.job.status)}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.space8),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: AppTheme.space8),
+            Text(
+              'Nesta etapa, o app coordena a fila; cada job criado já é salvo '
+              'no PostgreSQL. Se o app fechar antes de enfileirar tudo, os jobs '
+              'existentes permanecem, mas a retomada automática da série ainda '
+              'não está disponível.',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: AppTheme.textHint,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _BattleLiveJobStrip extends StatelessWidget {
   const _BattleLiveJobStrip({
     required this.jobs,
@@ -2046,6 +2399,230 @@ class _ReplaySelectionEmpty extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _OpeningHandExercise {
+  const _OpeningHandExercise({
+    required this.snapshotPosition,
+    required this.player,
+    required this.handSize,
+    required this.mulliganNumber,
+  });
+
+  final int snapshotPosition;
+  final BattleReplayPlayerSnapshot player;
+  final int handSize;
+  final int mulliganNumber;
+}
+
+_OpeningHandExercise? _openingHandExercise(BattleReplayDetail detail) {
+  final rawDeckAId = detail.summary.raw['deck_a_id']?.toString().trim();
+  final rawDeckBId = detail.summary.raw['deck_b_id']?.toString().trim();
+  final subjectDeckKey = rawDeckAId == detail.summary.deckId
+      ? 'deck_a'
+      : rawDeckBId == detail.summary.deckId
+      ? 'deck_b'
+      : null;
+  if (subjectDeckKey == null) return null;
+
+  for (
+    var position = 0;
+    position < detail.visualSnapshots.length;
+    position += 1
+  ) {
+    final snapshot = detail.visualSnapshots[position];
+    final marker = [
+      snapshot.phase,
+      snapshot.step,
+      snapshot.action,
+      snapshot.event['phase'],
+      snapshot.event['step'],
+      snapshot.event['action'],
+      snapshot.event['event_type'],
+    ].whereType<Object>().map((value) => value.toString().trim().toLowerCase());
+    final isOpeningHand = marker.any(
+      (value) =>
+          value == 'opening_hand' ||
+          value == 'initial_hand' ||
+          value == 'mulligan',
+    );
+    if (!isOpeningHand) continue;
+
+    BattleReplayPlayerSnapshot? subjectPlayer;
+    for (final candidate in snapshot.players) {
+      if (candidate.deckKey?.trim().toLowerCase() == subjectDeckKey) {
+        subjectPlayer = candidate;
+        break;
+      }
+    }
+    if (subjectPlayer == null || subjectPlayer.hand.isEmpty) continue;
+    final handSize = subjectPlayer.hand.length;
+    if (handSize < 1 || handSize > 7) continue;
+    final rawMulliganNumber =
+        snapshot.event['mulligan_number'] ??
+        snapshot.event['mulligan_count'] ??
+        0;
+    final parsedMulliganNumber = rawMulliganNumber is int
+        ? rawMulliganNumber
+        : int.tryParse(rawMulliganNumber.toString()) ?? 0;
+    final mulliganNumber = parsedMulliganNumber.clamp(0, 7).toInt();
+    return _OpeningHandExercise(
+      snapshotPosition: position,
+      player: subjectPlayer,
+      handSize: handSize,
+      mulliganNumber: mulliganNumber,
+    );
+  }
+  return null;
+}
+
+class _BattleOpeningHandGate extends StatelessWidget {
+  const _BattleOpeningHandGate({
+    required this.exercise,
+    required this.loading,
+    required this.saving,
+    required this.error,
+    required this.onReload,
+    required this.onKeep,
+    required this.onMulligan,
+    required this.onBack,
+    required this.showBack,
+  });
+
+  final _OpeningHandExercise exercise;
+  final bool loading;
+  final bool saving;
+  final String? error;
+  final VoidCallback onReload;
+  final VoidCallback onKeep;
+  final VoidCallback onMulligan;
+  final VoidCallback onBack;
+  final bool showBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final blocked = loading || saving || error != null;
+    return ListView(
+      key: const Key('battle-opening-hand-gate'),
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space16,
+        AppTheme.space12,
+        AppTheme.space16,
+        AppTheme.space24,
+      ),
+      children: [
+        if (showBack)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+              label: const Text('Replays'),
+            ),
+          ),
+        Container(
+          padding: const EdgeInsets.all(AppTheme.space16),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.brass400.withValues(alpha: 0.44),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.pan_tool_alt_outlined,
+                    color: AppTheme.brass400,
+                  ),
+                  const SizedBox(width: AppTheme.space8),
+                  Expanded(
+                    child: Text(
+                      'Sua decisão antes da leitura',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                'Observe a mão inicial e registre o que você faria. Só depois '
+                'serão abertas a timeline e a heurística detalhada. O histórico '
+                'pode já indicar o outcome; isto é uma revisão, não uma decisão '
+                'cega da partida, e não existe resposta correta aqui.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space12),
+              _VisualCardZone(
+                key: const Key('battle-opening-hand-cards'),
+                title: 'Mão inicial observada',
+                cards: exercise.player.hand,
+                fallbackCount: exercise.handSize,
+                fallbackLabel: 'cartas',
+              ),
+              const SizedBox(height: AppTheme.space12),
+              if (loading || saving)
+                LinearProgressIndicator(
+                  key: const Key('battle-opening-hand-progress'),
+                  minHeight: 3,
+                ),
+              if (loading) ...[
+                const SizedBox(height: AppTheme.space8),
+                Text(
+                  'Confirmando se esta mão já tem uma escolha salva…',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+              if (error != null) ...[
+                _BattleAnnotationError(message: error!, onRetry: onReload),
+                const SizedBox(height: AppTheme.space10),
+              ],
+              Wrap(
+                spacing: AppTheme.space8,
+                runSpacing: AppTheme.space8,
+                children: [
+                  OutlinedButton.icon(
+                    key: const Key('battle-opening-hand-mulligan'),
+                    onPressed: blocked ? null : onMulligan,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Eu faria Mulligan'),
+                  ),
+                  FilledButton.icon(
+                    key: const Key('battle-opening-hand-keep'),
+                    onPressed: blocked ? null : onKeep,
+                    icon: const Icon(Icons.pan_tool_alt_outlined),
+                    label: const Text('Eu faria Keep'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.space10),
+              Text(
+                'A escolha será salva na sua conta PostgreSQL com a revisão '
+                'deste deck. É um exercício antes da análise detalhada: não '
+                'controla nem reescreve a batalha automática já executada.',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppTheme.textHint,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

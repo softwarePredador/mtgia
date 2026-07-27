@@ -27,6 +27,14 @@ void main() {
     expect(source, contains('run_battle_lab_gate()'));
     expect(source, contains('test/battle_*_test.dart'));
     expect(source, contains('test/features/battle'));
+    expect(
+      source,
+      contains('test/battle_live_local_load_homologation_test.dart'),
+    );
+    expect(
+      source,
+      contains('test/features/battle/battle_local_homologation_test.dart'),
+    );
     expect(source, contains('run_battle_product_gate'));
     expect(source, contains('run_runtime_performance_contract'));
     expect(source, contains('run_report_retention_audit'));

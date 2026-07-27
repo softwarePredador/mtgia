@@ -4,10 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
+import 'package:manaloom/features/battle/models/battle_job.dart';
 import 'package:manaloom/features/battle/models/battle_replay.dart';
 import 'package:manaloom/features/battle/models/battle_replay_annotation.dart';
 import 'package:manaloom/features/battle/models/battle_test_setup.dart';
 import 'package:manaloom/features/battle/screens/battle_replays_screen.dart';
+import 'package:manaloom/features/battle/services/battle_job_gateway.dart';
 import 'package:manaloom/features/battle/services/battle_replay_service.dart';
 
 class _FakeBattleReplayGateway implements BattleReplayGateway {
@@ -372,6 +374,15 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   }
 }
 
+class _EmptyBattleJobGateway extends BattleJobGateway {
+  @override
+  Future<List<BattleJob>> list({
+    int limit = 20,
+    BattleJobStatus? status,
+    String? deckId,
+  }) async => const <BattleJob>[];
+}
+
 void main() {
   test('battle replay location is canonical and URL-safe', () {
     expect(
@@ -651,6 +662,108 @@ void main() {
       gateway.lastAnnotationDraft?.payload['reason'],
       'Eu manteria mana aberta.',
     );
+  });
+
+  testWidgets('records Keep before revealing detailed replay heuristics', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replayDetail: BattleReplayDetail.fromJson(
+        {
+          'id': 'sim-1',
+          'deck_id': 'deck-1',
+          'deck_a_id': 'deck-1',
+          'deck_b_id': 'deck-2',
+          'type': 'battle',
+          'opponent_name': 'Atraxa Superfriends',
+          'winner_name': 'Player A',
+          'turns': 2,
+          'learning_contract': const {
+            'schema_version': 'native_battle_learning_v1',
+            'decision_trace_available': true,
+          },
+          'decision_trace': const [
+            {
+              'turn': 1,
+              'choice': 'Cast Arcane Signet',
+              'reason': 'Fixes mana before commander turn.',
+            },
+          ],
+          'visual_snapshots': [
+            {
+              'turn': 0,
+              'phase': 'opening_hand',
+              'action': 'opening_hand',
+              'event': const {
+                'turn': 0,
+                'phase': 'opening_hand',
+                'action': 'opening_hand',
+                'mulligan_number': 0,
+              },
+              'players': [
+                {
+                  'name': 'Player A',
+                  'deck_key': 'deck_a',
+                  'hand': [
+                    for (var index = 0; index < 7; index += 1)
+                      {
+                        'id': 'opening-$index',
+                        'name': index < 3 ? 'Island' : 'Spell $index',
+                        'type_line': index < 3 ? 'Basic Land' : 'Instant',
+                      },
+                  ],
+                  'battlefield': const <Map<String, dynamic>>[],
+                  'graveyard': const <Map<String, dynamic>>[],
+                },
+                {
+                  'name': 'Player B',
+                  'deck_key': 'deck_b',
+                  'hand_size': 7,
+                  'battlefield': const <Map<String, dynamic>>[],
+                  'graveyard': const <Map<String, dynamic>>[],
+                },
+              ],
+            },
+          ],
+        },
+        fallbackDeckId: 'deck-1',
+        fallbackId: 'sim-1',
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('battle-opening-hand-gate')), findsOneWidget);
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsNothing);
+    expect(find.textContaining('Vencedor:'), findsNothing);
+    expect(find.text('Cast Arcane Signet'), findsNothing);
+
+    final keepButton = find.byKey(const Key('battle-opening-hand-keep'));
+    await tester.ensureVisible(keepButton);
+    await tester.pumpAndSettle();
+    await tester.tap(keepButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      gateway.lastAnnotationDraft?.kind,
+      BattleReplayAnnotationKind.mulliganDecision,
+    );
+    expect(gateway.lastAnnotationDraft?.snapshotRef, 'snapshot:0');
+    expect(gateway.lastAnnotationDraft?.payload, {
+      'choice': 'keep',
+      'hand_size': 7,
+      'mulligan_number': 0,
+    });
+    expect(find.byKey(const Key('battle-opening-hand-gate')), findsNothing);
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+    expect(find.textContaining('Vencedor: Player A'), findsOneWidget);
   });
 
   testWidgets('filters saved history by outcome without deleting replays', (
@@ -1094,6 +1207,39 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('offers independent 1/3/5/10 samples for async Battle', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(
+          deckId: 'deck-1',
+          gateway: gateway,
+          jobGateway: _EmptyBattleJobGateway(),
+          battleLiveEnabled: true,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-live-button')));
+    await tester.pumpAndSettle();
+
+    final seriesField = find.byKey(const Key('battle-series-size-field'));
+    expect(seriesField, findsOneWidget);
+    await tester.ensureVisible(seriesField);
+    await tester.tap(seriesField);
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 tentativa').last, findsOneWidget);
+    expect(find.text('Série de 3').last, findsOneWidget);
+    expect(find.text('Série de 5').last, findsOneWidget);
+    expect(find.text('Série de 10').last, findsOneWidget);
+    expect(find.textContaining('não há RNG pareado'), findsOneWidget);
+  });
 
   testWidgets('runs a focused objective only after a ready preflight', (
     tester,

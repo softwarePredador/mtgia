@@ -23,7 +23,7 @@
     "menu": 9,
     "tabs": 10,
     "navigation": 2,
-    "transient": 109
+    "transient": 110
   },
   "domain_contracts": {
     "auth": {
@@ -290,7 +290,7 @@
     {"source":"lib/features/auth/screens/login_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/register_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/reset_password_screen.dart","domain":"auth","occurrences":{"transient":1}},
-    {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":5,"menu":1,"transient":4}},
+    {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":5,"menu":1,"transient":5}},
     {"source":"lib/features/binder/screens/binder_screen.dart","domain":"binder","occurrences":{"material_page_route":2,"tabs":1}},
     {"source":"lib/features/binder/widgets/binder_item_editor.dart","domain":"binder","occurrences":{"dialog":1,"bottom_sheet":1,"transient":3}},
     {"source":"lib/features/cards/screens/card_detail_screen.dart","domain":"cards","occurrences":{"material_page_route":1,"dialog":1}},

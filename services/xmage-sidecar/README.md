@@ -98,6 +98,31 @@ docker build -f services/xmage-sidecar/Dockerfile -t manaloom-xmage-sidecar .
 docker run --rm -p 8080:8080 manaloom-xmage-sidecar
 ```
 
+## Human-vs-AI spike (NO_GO)
+
+The BL7 human seat experiment remains test-only and is not reachable through
+the sidecar HTTP contract. Its pinned-bytecode harness now validates typed
+responses for `GAME_CHOOSE_ABILITY`, `GAME_CHOOSE_PILE`,
+`GAME_CHOOSE_CHOICE`, `GAME_PLAY_XMANA`, `GAME_GET_AMOUNT`, and
+`GAME_GET_MULTI_AMOUNT`. `GAME_PLAY_MANA` remains native-only and fails closed:
+its callback payload does not contain the UUID allowlist that the native XMage
+client derives from `GameView`.
+
+Prompt and option tokens are HMAC-bound to the callback game ID and message
+version, remain opaque, and can be resolved and dispatched only once.
+
+Timeout does not attempt an unproven HUMAN-to-AI takeover. It tries `CONCEDE`
+and terminates the isolated process even when concede is rejected or throws.
+The spike remains `NO_GO` until a complete human runtime match, the remaining
+mana-action bridge (or an approved native-client boundary), and a safe remote
+seat-transition contract are all proven.
+
+Run the bytecode audit and focused tests with:
+
+```bash
+services/xmage-sidecar/bin/human_vs_ai_spike.sh
+```
+
 ## Backend modes
 
 Configure the ManaLoom server with `XMAGE_SIDECAR_URL` and `BATTLE_ENGINE`:

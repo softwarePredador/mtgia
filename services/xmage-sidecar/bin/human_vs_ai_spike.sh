@@ -65,12 +65,18 @@ javap -classpath "$CLASSPATH" -public mage.interfaces.callback.ClientCallbackMet
   >"$AUDIT_DIR/callbacks.txt"
 javap -classpath "$CLASSPATH" -public mage.interfaces.callback.ClientCallback \
   >"$AUDIT_DIR/client_callback.txt"
-javap -classpath "$CLASSPATH" -public mage.player.human.HumanPlayer \
+javap -classpath "$CLASSPATH" -c -p mage.player.human.HumanPlayer \
   >"$AUDIT_DIR/human_player.txt"
-javap -classpath "$CLASSPATH" -p mage.server.game.GameSessionPlayer \
+javap -classpath "$CLASSPATH" -c -p mage.server.game.GameSessionPlayer \
   >"$AUDIT_DIR/game_session_player.txt"
 javap -classpath "$CLASSPATH" -p mage.server.game.GameController \
   >"$AUDIT_DIR/game_controller.txt"
+javap -classpath "$CLASSPATH" -p mage.view.GameClientMessage \
+  >"$AUDIT_DIR/game_client_message.txt"
+javap -classpath "$CLASSPATH" -p mage.view.AbilityPickerView \
+  >"$AUDIT_DIR/ability_picker_view.txt"
+javap -classpath "$CLASSPATH" -p mage.constants.MultiAmountType \
+  >"$AUDIT_DIR/multi_amount_type.txt"
 
 require_text "$AUDIT_DIR/player_type.txt" "mage.players.PlayerType HUMAN"
 require_text "$AUDIT_DIR/player_type.txt" "mage.players.PlayerType COMPUTER_MAD"
@@ -85,11 +91,26 @@ require_text "$AUDIT_DIR/human_player.txt" "priority("
 require_text "$AUDIT_DIR/human_player.txt" "selectAttackers("
 require_text "$AUDIT_DIR/human_player.txt" "selectBlockers("
 require_text "$AUDIT_DIR/human_player.txt" "signalPlayerConcede("
+require_text "$AUDIT_DIR/human_player.txt" "chooseTriggeredAbility("
+require_text "$AUDIT_DIR/human_player.txt" "choosePile("
+require_text "$AUDIT_DIR/human_player.txt" "choose(mage.constants.Outcome, mage.choices.Choice,"
+require_text "$AUDIT_DIR/human_player.txt" "playMana("
+require_text "$AUDIT_DIR/human_player.txt" "getAmount("
+require_text "$AUDIT_DIR/human_player.txt" "getMultiAmountWithIndividualConstraints("
 require_text "$AUDIT_DIR/client_callback.txt" "getMessageId("
 require_text "$AUDIT_DIR/client_callback.txt" "setMessageId("
 require_text "$AUDIT_DIR/game_controller.txt" "private boolean useResponseIdleTimeout"
 require_text "$AUDIT_DIR/game_controller.txt" "public void onResponseIdleTimeout("
 require_text "$AUDIT_DIR/game_controller.txt" "public void sendPlayerAction("
+require_text "$AUDIT_DIR/ability_picker_view.txt" "getChoices()"
+require_text "$AUDIT_DIR/game_client_message.txt" "getCardsView1()"
+require_text "$AUDIT_DIR/game_client_message.txt" "getCardsView2()"
+require_text "$AUDIT_DIR/game_client_message.txt" "getChoice()"
+require_text "$AUDIT_DIR/game_client_message.txt" "getMin()"
+require_text "$AUDIT_DIR/game_client_message.txt" "getMax()"
+require_text "$AUDIT_DIR/game_client_message.txt" "getMessages()"
+require_text "$AUDIT_DIR/multi_amount_type.txt" "isGoodValues("
+require_text "$AUDIT_DIR/multi_amount_type.txt" "parseAnswer("
 
 for callback_name in \
   GAME_ASK \
@@ -103,6 +124,7 @@ for callback_name in \
   GAME_GET_AMOUNT \
   GAME_GET_MULTI_AMOUNT; do
   require_text "$AUDIT_DIR/callbacks.txt" "$callback_name"
+  require_text "$AUDIT_DIR/game_session_player.txt" "$callback_name"
 done
 
 if grep -Eiq \
@@ -119,10 +141,13 @@ fi
 
 echo "BL7_SPIKE_SCOPE=isolated_test_and_pinned_bytecode"
 echo "BL7_SEATS=deck_a:HUMAN,deck_b:COMPUTER_MAD"
-echo "BL7_CALLBACKS_ALLOWLISTED=GAME_ASK,game_mulligan_only;GAME_SELECT,main_or_combat;GAME_TARGET,target_or_combat"
-echo "BL7_CALLBACKS_UNHANDLED=GAME_CHOOSE_ABILITY,GAME_CHOOSE_PILE,GAME_CHOOSE_CHOICE,GAME_PLAY_MANA,GAME_PLAY_XMANA,GAME_GET_AMOUNT,GAME_GET_MULTI_AMOUNT"
-echo "BL7_STATE_CONTRACT=callback_message_id_plus_hmac_opaque_single_use_options"
-echo "BL7_TIMEOUT_POLICY=concede_then_terminate_process"
+echo "BL7_CALLBACKS_LEGACY_BRIDGED=GAME_ASK,game_mulligan_only;GAME_SELECT,main_or_combat;GAME_TARGET,target_or_combat"
+echo "BL7_CALLBACKS_TYPED_BRIDGED=GAME_CHOOSE_ABILITY,uuid;GAME_CHOOSE_PILE,boolean;GAME_CHOOSE_CHOICE,string;GAME_PLAY_XMANA,boolean;GAME_GET_AMOUNT,integer;GAME_GET_MULTI_AMOUNT,validated_space_delimited_string"
+echo "BL7_CALLBACKS_NATIVE_ONLY_FAIL_CLOSED=GAME_PLAY_MANA,no_callback_uuid_allowlist"
+echo "BL7_CALLBACKS_UNHANDLED=GAME_PLAY_MANA"
+echo "BL7_STATE_CONTRACT=callback_game_id_and_message_id_plus_hmac_opaque_single_use_options"
+echo "BL7_TIMEOUT_POLICY=concede_then_terminate_process_even_when_concede_fails"
+echo "BL7_TIMEOUT_TAKEOVER=not_attempted_no_remote_api"
 echo "BL7_HUMAN_TO_AI_TRANSITION=unproven"
 echo "BL7_RUNTIME_HUMAN_MATCH_COMPLETED=false"
 echo "BL7_SPIKE_DECISION=NO_GO"

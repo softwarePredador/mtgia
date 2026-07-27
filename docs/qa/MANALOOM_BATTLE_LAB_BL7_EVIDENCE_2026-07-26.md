@@ -21,17 +21,18 @@ Allowlist experimental:
 
 - `GAME_ASK`;
 - `GAME_SELECT`;
-- `GAME_TARGET`.
+- `GAME_TARGET`;
+- `GAME_CHOOSE_ABILITY` → UUID allowlisted;
+- `GAME_CHOOSE_PILE` → boolean;
+- `GAME_CHOOSE_CHOICE` → string/opção especial allowlisted;
+- `GAME_PLAY_XMANA` → boolean;
+- `GAME_GET_AMOUNT` → inteiro dentro dos limites;
+- `GAME_GET_MULTI_AMOUNT` → string numérica delimitada e validada.
 
 Sem tratamento:
 
-- `GAME_CHOOSE_ABILITY`;
-- `GAME_CHOOSE_PILE`;
-- `GAME_CHOOSE_CHOICE`;
-- `GAME_PLAY_MANA`;
-- `GAME_PLAY_XMANA`;
-- `GAME_GET_AMOUNT`;
-- `GAME_GET_MULTI_AMOUNT`.
+- `GAME_PLAY_MANA`, cujo callback revisado não fornece UUIDs permitidos para
+  uma resposta remota segura; o spike falha fechado.
 
 Também não foi encontrada API revisada que prove transição segura de
 participante `HUMAN` para IA durante a partida.
@@ -43,6 +44,6 @@ bash -n services/xmage-sidecar/bin/human_vs_ai_spike.sh
 services/xmage-sidecar/bin/human_vs_ai_spike.sh
 ```
 
-O harness executa cinco testes Maven e imprime
+O harness executa sete testes Maven focados e imprime
 `BL7_SPIKE_DECISION=NO_GO`. NO-GO é a saída correta do spike, não falha
 silenciosa nem permissão para iniciar BL8.

@@ -12,17 +12,36 @@ enum BattleTestObjective {
   final String label;
 }
 
+enum BattleSeriesSize {
+  single(1, '1 tentativa'),
+  three(3, 'Série de 3'),
+  five(5, 'Série de 5'),
+  ten(10, 'Série de 10');
+
+  const BattleSeriesSize(this.count, this.label);
+
+  final int count;
+  final String label;
+
+  bool get isSeries => count > 1;
+}
+
 class BattleTestSetup {
   BattleTestSetup({
     required this.opponentDeckId,
     this.objective = BattleTestObjective.general,
+    this.seriesSize = BattleSeriesSize.single,
     List<String> focusCards = const <String>[],
   }) : focusCards = _normalizeFocusCards(focusCards);
 
   final String opponentDeckId;
   final BattleTestObjective objective;
+  final BattleSeriesSize seriesSize;
   final List<String> focusCards;
 
+  /// Only the single-attempt engine contract is serialized here. A series is
+  /// coordinated by the client as independent canonical jobs, each with its
+  /// own seed and idempotency key.
   Map<String, dynamic> toRequestJson() => {
     'opponent_deck_id': opponentDeckId.trim(),
     'test_objective': objective.apiValue,

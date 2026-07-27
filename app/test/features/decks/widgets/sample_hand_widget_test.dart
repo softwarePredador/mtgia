@@ -111,6 +111,7 @@ void main() {
     bool compact = false,
     double width = 300,
     ValueChanged<DeckCardItem>? onShowCardDetails,
+    ValueChanged<SampleHandDecision>? onDecision,
   }) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
@@ -123,6 +124,7 @@ void main() {
               compact: compact,
               randomSeed: 7,
               onShowCardDetails: onShowCardDetails,
+              onDecision: onDecision,
             ),
           ),
         ),
@@ -131,7 +133,7 @@ void main() {
   }
 
   group('SampleHandWidget', () {
-    testWidgets('draws a hand without the commander and shows assessment', (
+    testWidgets('requires a human choice before revealing the assessment', (
       tester,
     ) async {
       await tester.pumpWidget(createSubject());
@@ -152,7 +154,13 @@ void main() {
       await tester.tap(find.byKey(const Key('sample-hand-draw')));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('sample-hand-assessment')), findsOneWidget);
+      expect(
+        find.byKey(const Key('sample-hand-decision-gate')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('sample-hand-assessment')), findsNothing);
+      expect(find.byKey(const Key('sample-hand-new-hand')), findsNothing);
+      expect(find.byKey(const Key('sample-hand-keep')), findsOneWidget);
       expect(find.textContaining('cartas'), findsOneWidget);
       expect(find.text('Talrand, Sky Summoner'), findsNothing);
       expect(
@@ -162,6 +170,11 @@ void main() {
         ),
         findsOneWidget,
       );
+      await tester.tap(find.byKey(const Key('sample-hand-keep')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('sample-hand-decision-gate')), findsNothing);
+      expect(find.byKey(const Key('sample-hand-assessment')), findsOneWidget);
       expect(
         find.descendant(
           of: find.byKey(const Key('sample-hand-new-hand')),
@@ -194,6 +207,35 @@ void main() {
         ),
         isTrue,
       );
+    });
+
+    testWidgets('reports Keep and Mulligan before drawing the next hand', (
+      tester,
+    ) async {
+      final decisions = <SampleHandDecision>[];
+      await tester.pumpWidget(createSubject(onDecision: decisions.add));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sample-hand-draw')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('sample-hand-mulligan')));
+      await tester.pumpAndSettle();
+
+      expect(decisions, hasLength(1));
+      expect(decisions.single.choice, SampleHandChoice.mulligan);
+      expect(decisions.single.mulligansTaken, 0);
+      expect(decisions.single.handSize, 7);
+      expect(find.byKey(const Key('sample-hand-assessment')), findsNothing);
+
+      await tester.ensureVisible(find.byKey(const Key('sample-hand-keep')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('sample-hand-keep')));
+      await tester.pumpAndSettle();
+
+      expect(decisions, hasLength(2));
+      expect(decisions.last.choice, SampleHandChoice.keep);
+      expect(decisions.last.mulligansTaken, 1);
+      expect(find.byKey(const Key('sample-hand-assessment')), findsOneWidget);
     });
 
     testWidgets('opens details callback from a drawn card', (tester) async {
@@ -286,6 +328,8 @@ void main() {
 
         await tester.tap(find.byKey(const Key('sample-hand-mulligan')));
         await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('sample-hand-keep')));
+        await tester.pumpAndSettle();
         await tester.ensureVisible(
           find.byKey(const Key('sample-hand-new-hand')),
         );
@@ -319,6 +363,8 @@ void main() {
         tester.getSize(find.byKey(const Key('sample-hand-mulligan'))).width,
         lessThan(240),
       );
+      await tester.tap(find.byKey(const Key('sample-hand-keep')));
+      await tester.pumpAndSettle();
       expect(
         tester.getSize(find.byKey(const Key('sample-hand-new-hand'))).width,
         lessThan(200),
