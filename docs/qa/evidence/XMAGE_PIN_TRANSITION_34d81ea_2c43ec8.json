@@ -14,6 +14,92 @@
     "snapshot_name_count": 8073,
     "snapshot_path": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json"
   },
+  "card_data_diagnostics": {
+    "actionable_findings": [
+      {
+        "card_name": "Ajani Resolute",
+        "evidence": "Token quoted rules text loses its final period.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "Consider the Prime Directive",
+        "evidence": "The Interfere flavor word is attached to Choose one instead of the first mode.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "Crimson Cowl, Master of Evil",
+        "evidence": "Generated rules omit you before create and omit the menace reminder.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "Falcon's Wing Harness",
+        "evidence": "VerifyCardDataTest reports the required ward reminder as absent.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "Hire a Crew",
+        "evidence": "VerifyCardDataTest reports the required menace reminder as absent.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "My Precious",
+        "evidence": "Generated equip rule joins Pay 2 life and {2} in the wrong order and punctuation.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "Planetarium of Wan Shi Tong",
+        "evidence": "Commit 84e46530 removed setOptional(false) after setDoOnlyOnceEachTurn(true), so the mandatory look action is exposed as optional.",
+        "severity": "mechanical",
+        "status": "quarantined"
+      },
+      {
+        "card_name": "Sky Cycle",
+        "evidence": "Generated rule says deals 2 damage and then describes twice the Vehicle count; gameplay calculates the intended dynamic amount.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      },
+      {
+        "card_name": "Sting, Bilbo's Sword",
+        "evidence": "Three printings render an Equip reminder absent from the reference and omit the hone reminder.",
+        "severity": "visible_rules_text",
+        "status": "upstream_fix_required"
+      }
+    ],
+    "cataloged_classes_checked": 168,
+    "comparison_boundary": "The detailed comparison checks generated card information against the available reference corpus. Equivalent rendering differences are not promoted to defects.",
+    "good_face_count": 154,
+    "known_engine_risks": [
+      {
+        "card_name": "Krark, the Thumbless",
+        "issue": "magefree/mage#12911",
+        "status": "copy_lki_path_requires_focused_qualification"
+      },
+      {
+        "card_name": "Mandate of Peace",
+        "issue": "magefree/mage#12911",
+        "status": "copy_lki_path_requires_focused_qualification"
+      },
+      {
+        "card_name": "Metallic Mimic",
+        "issue": "magefree/mage#13062",
+        "status": "replacement_ordering_risk_not_confirmed_as_transition_regression"
+      }
+    ],
+    "missing_reference_cards": [
+      "Desolation Prowler",
+      "Mirkwood Pathmaker",
+      "Set Phasers to..."
+    ],
+    "missing_reference_face_count": 3,
+    "status": "review_required",
+    "wrong_face_count": 16
+  },
   "card_summary": {
     "added_external_residual": 1,
     "added_future_only_as_of_2026_07_28": 44,
@@ -21,20 +107,29 @@
     "added_with_current_or_prior_registration_as_of_2026_07_28": 43,
     "added_with_direct_nominal_test_reference": 2,
     "added_without_direct_nominal_semantic_proof": 84,
+    "changed_with_direct_nominal_test_reference": 5,
     "change_kinds": {
       "added": 87,
       "modified": 82
     },
     "dispositions": {
-      "catalog_supported_regression_only_review_required": 82,
+      "catalog_supported_nominal_test_passed_semantic_review_required": 3,
+      "catalog_supported_regression_only_review_required": 78,
       "catalog_supported_semantic_review_required": 84,
+      "external_runtime_quarantine_semantic_defect": 1,
       "external_residual_upstream_unfinished": 1,
-      "focused_upstream_test_passed": 2
+      "focused_upstream_test_passed": 1,
+      "focused_upstream_test_passed_card_data_warning_review_required": 1
     },
+    "modified_with_direct_nominal_test_reference": 3,
     "modified_with_source_todo_for_missing_copy_tests": 2,
+    "release_scopes": {
+      "future_only": 45,
+      "has_current_or_prior_registration": 124
+    },
     "runtime_catalog_statuses": {
-      "supported": 168,
-      "unsupported": 1
+      "supported": 167,
+      "unsupported": 2
     },
     "total_changed": 169
   },
@@ -1613,7 +1708,14 @@
       "direct_test_references": [
         "Mage.Tests/src/test/java/org/mage/test/cards/single/hob/StingBilbosSwordTest.java"
       ],
-      "disposition": "focused_upstream_test_passed",
+      "card_data_warnings": [
+        {
+          "kind": "rules_hint_mismatch",
+          "observed_printing_count": 3,
+          "summary": "Equip reminder is rendered although the reference omits it; the hone reminder is absent."
+        }
+      ],
+      "disposition": "focused_upstream_test_passed_card_data_warning_review_required",
       "focused_test_case_count": 2,
       "release_scope_as_of_2026_07_28": "future_only",
       "runtime_catalog_status": "supported",
@@ -2848,9 +2950,11 @@
       "card_name": "Krark, the Thumbless",
       "change_kind": "modified",
       "class": "KrarkTheThumbless",
-      "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
-      "focused_test_case_count": 0,
+      "direct_test_references": [
+        "Mage.Tests/src/test/java/org/mage/test/cards/single/cmr/KrarkTheThumblessTest.java"
+      ],
+      "disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "focused_test_case_count": 1,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
       "set_registrations": [
@@ -3018,9 +3122,13 @@
       "card_name": "Metallic Mimic",
       "change_kind": "modified",
       "class": "MetallicMimic",
-      "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
-      "focused_test_case_count": 0,
+      "direct_test_references": [
+        "Mage.Tests/src/test/java/org/mage/test/cards/continuous/ChangelingTest.java",
+        "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
+        "Mage.Tests/src/test/java/org/mage/test/cards/replacement/entersBattlefield/HardenedScaleTest.java"
+      ],
+      "disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "focused_test_case_count": 6,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
       "set_registrations": [
@@ -3155,9 +3263,11 @@
       "card_name": "Mjolnir, Hammer of Thor",
       "change_kind": "modified",
       "class": "MjolnirHammerOfThor",
-      "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
-      "focused_test_case_count": 0,
+      "direct_test_references": [
+        "Mage.Tests/src/test/java/org/mage/test/cards/single/msh/MjolnirHammerOfThorTest.java"
+      ],
+      "disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "focused_test_case_count": 1,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
       "set_registrations": [
@@ -3244,10 +3354,18 @@
       "change_kind": "modified",
       "class": "PlanetariumOfWanShiTong",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "external_runtime_quarantine_semantic_defect",
+      "external_residual": {
+        "policy_path": "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+        "qualification_engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+        "reason": "pinned_xmage_semantic_defect_quarantined",
+        "reason_code": "xmage_pin_semantic_defect",
+        "release_condition": "official_fix_and_focused_qualification",
+        "upstream_regression_commit": "84e46530"
+      },
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Planetarium of Wan Shi Tong",
@@ -3979,13 +4097,64 @@
     }
   ],
   "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+  "future_release_activation_gate": {
+    "future_only_card_count": 45,
+    "reason": "no_versioned_product_release_activation_gate_evidence",
+    "status": "missing"
+  },
   "generated_at_utc": "2026-07-28T09:22:06+00:00",
   "input_artifact_digests": {
     "added_87_coverage_request_sha256": "303099563165dd13ca3ecc8a0eb9c0bf90466858ec01eb4769dfc5952f57868b",
     "added_87_coverage_response_sha256": "04db8dee419825d086d6bcd7d04f2aae28a7dff7d0d1c2b3ec405f7ec9c52c39",
+    "all_169_test_scenario_miner_v2_sha256": "9f13dab77f0528fe1e596d8c40c5ba2853a4a3e2672ea8197ab6eaec55a73e90",
+    "card_data_detailed_comparison_xml_sha256": "f1c6ba499b7738403ca28b50a8474ec61dd169e34dc9d558d65d0072dc82d20e",
+    "card_data_warning_inventory_sha256": "b2603b897a14a5fa681ae2aed9dfb809d48264d4c90ac1a6284aa955c7345dda",
     "changed_169_coverage_exchange_sha256": "04b8d775ad2e9413fba563d565536982d9d66d38ce29dd19f330ef3d97e182bc",
     "corrected_added_87_test_scenario_miner_sha256": "4bc40bc3ecd659404a3f71aeda12d9ae1a01bac52d131fc645d3c7f35a6b0cf4",
     "exact_delta_report_sha256": "0bb7368758bfd662329d10e4ad71599205c56af95d4a7b2cc71f7e30c40dfaff"
+  },
+  "modified_change_scope": {
+    "boundary": "Presentation/metadata includes generated text, hints, filter descriptions, imports and formatting. It is not automatically gameplay proof and remains review-required where the card disposition says so.",
+    "classification_method": "exact_git_hunk_manual_review",
+    "comment_only_classes": [
+      "KrarkTheThumbless",
+      "MandateOfPeace"
+    ],
+    "counts": {
+      "comment_only": 2,
+      "executable_or_mixed": 26,
+      "presentation_or_metadata": 54,
+      "total_modified": 82
+    },
+    "executable_or_mixed_classes": [
+      "AntManElusiveAvenger",
+      "BaxterBuilding",
+      "BilboLuckwearer",
+      "BlackWidowIntelExpert",
+      "DevilDinosaur",
+      "DoctorStrangeSurgeon",
+      "DoraMilajeElite",
+      "HaktosTheUnscarred",
+      "HeroesHangout",
+      "IronManArmoredAvenger",
+      "IronManTonyStark",
+      "LightPawsEmperorsVoice",
+      "MatoyaArchonElder",
+      "MirrorOfLifeTrapping",
+      "OkoyeDoraMilajeLeader",
+      "PlanetariumOfWanShiTong",
+      "RestlessBloodseeker",
+      "SelflessPoliceCaptain",
+      "ShuriVibraniumTechnologist",
+      "SokkaAndSuki",
+      "TalionTheKindlyLord",
+      "TheGreatMound",
+      "TheSibsigCeremony",
+      "TheSquadronSinister",
+      "UltronMachineOverlord",
+      "VenomEvilUnleashed"
+    ],
+    "presentation_or_metadata_count": 54
   },
   "postgresql_scope_reconciliation": {
     "boundary": "PostgreSQL remains truth for product identity, Oracle text and legality; no fingerprint was guessed.",
@@ -3998,19 +4167,28 @@
   },
   "qualification": {
     "blocking_reasons": [
+      "changed_card_semantic_reviews_or_residuals_pending",
+      "card_data_diagnostics_not_passed",
+      "postgresql_product_scope_reconciliation_not_passed",
+      "future_only_card_activation_gate_not_passed",
+      "external_runtime_unsupported_cards_present",
       "84_added_cards_are_catalog_supported_without_direct_nominal_semantic_proof",
-      "82_modified_cards_have_regression_only_not_individual_semantic_proof",
+      "82_modified_cards_require_transition_specific_semantic_review",
+      "planetarium_of_wan_shi_tong_is_quarantined_for_a_confirmed_semantic_defect",
       "prudent_fateseer_is_unfinished_in_xmage_and_absent_from_pinned_forge",
       "postgresql_product_scope_reconciliation_blocked_missing_approved_ssh_host_key_sha256",
-      "44_added_cards_are_registered_only_in_future_dated_sets_as_of_2026_07_28"
+      "45_changed_cards_are_registered_only_in_future_dated_sets_as_of_2026_07_28"
     ],
     "deployment_allowed": false,
     "status": "review_required"
   },
   "repository": "https://github.com/magefree/mage",
+  "revised_at_utc": "2026-07-28T11:46:56Z",
   "runtime_catalog": {
     "catalog_ready": true,
+    "catalog_resolved_before_qualification": 168,
     "catalog_resolution_is_semantic_proof": false,
+    "catalog_unresolved_before_qualification": 1,
     "engine": "xmage",
     "engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
     "engine_version": "1.4.60",
@@ -4019,12 +4197,22 @@
     "indexed_name_count": 32561,
     "postgresql_writes": false,
     "probe_scope": "all_169_added_and_modified_card_implementation_names",
+    "qualification_policy_engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "qualification_policy_path": "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+    "qualification_policy_test": {
+      "command": "mvn -B -f services/xmage-sidecar/pom.xml -Dtest=XmageBattleServiceTest -Djacoco.skip=true test",
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 13
+    },
     "sidecar_build_identity": "xmage-sidecar-v2@2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
     "sidecar_protocol_version": "external_battle_sidecar_v2",
-    "supported": 168,
+    "supported": 167,
     "total": 169,
-    "unsupported": 1,
+    "unsupported": 2,
     "unsupported_card_names": [
+      "Planetarium of Wan Shi Tong",
       "Prudent Fateseer"
     ]
   },
@@ -4036,7 +4224,7 @@
     "rule_promotions": false,
     "source_audit_read_only": true
   },
-  "schema_version": "manaloom_xmage_pin_transition_evidence_v1_2026-07-28",
+  "schema_version": "manaloom_xmage_pin_transition_evidence_v2_2026-07-28",
   "source_delta": {
     "added_card_implementations": 87,
     "audit_mode": "read_only_local_git_object_diff",
@@ -4059,7 +4247,100 @@
     "raw_diff_sha256": "7b31245ebb55b908983374f87f8563e9a964fffd9c7c574acd6fb25f980a48a0"
   },
   "to_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+  "transition_card_nominal_tests": {
+    "boundary": "An exact card reference plus a passing upstream test is nominal regression evidence. It does not prove that every transition hunk or product-facing interaction is semantically correct.",
+    "cards_with_exact_test_reference": 5,
+    "cards_without_exact_test_reference": 164,
+    "command": "mvn -B -f Mage.Tests/pom.xml '-Dtest=org.mage.test.cards.single.cmr.KrarkTheThumblessTest,org.mage.test.cards.continuous.MetallicMiminTest,org.mage.test.cards.continuous.ChangelingTest,org.mage.test.cards.replacement.entersBattlefield.HardenedScaleTest,org.mage.test.cards.single.msh.MjolnirHammerOfThorTest,org.mage.test.cards.single.spm.SPDrPilotedByPeniTest,org.mage.test.cards.single.hob.StingBilbosSwordTest' -Djacoco.skip=true test",
+    "errors": 0,
+    "failures": 0,
+    "miner_schema_version": "manaloom_xmage_test_scenario_miner_v2_2026-07-28",
+    "requested_card_count": 169,
+    "result": "pass",
+    "runner": "maven_surefire",
+    "short_split_face_terms_rejected": true,
+    "skipped": 0,
+    "suites": [
+      {
+        "class": "org.mage.test.cards.single.spm.SPDrPilotedByPeniTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      {
+        "class": "org.mage.test.cards.single.msh.MjolnirHammerOfThorTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      {
+        "class": "org.mage.test.cards.single.hob.StingBilbosSwordTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      {
+        "class": "org.mage.test.cards.single.cmr.KrarkTheThumblessTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      {
+        "class": "org.mage.test.cards.replacement.entersBattlefield.HardenedScaleTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      {
+        "class": "org.mage.test.cards.continuous.MetallicMiminTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 3
+      },
+      {
+        "class": "org.mage.test.cards.continuous.ChangelingTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      }
+    ],
+    "tests": 15,
+    "usable_scenario_candidate_count": 11,
+    "xmage_test_files_scanned": 2017
+  },
   "transition_id": "xmage_34d81ea4995c_to_2c43ec8cdb5c_2026_07_28",
+  "upstream_card_data_verifier": {
+    "boundary": "VerifyCardDataTest proves card loading and structural/card-data invariants. It is not gameplay semantic proof.",
+    "command": "mvn -B -f Mage.Verify/pom.xml -Dtest=VerifyCardDataTest#test_verifyCards '-Dxmage.tests.verifyCheckSetCodes=MSC;MSH;SPM;PW26;HOB;HOC;FRA;FRC;TRK;TRC' -Djacoco.skip=true test",
+    "engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "errors": 0,
+    "failures": 0,
+    "is_gameplay_semantic_proof": false,
+    "requested_set_codes": [
+      "MSC",
+      "MSH",
+      "SPM",
+      "PW26",
+      "HOB",
+      "HOC",
+      "FRA",
+      "FRC",
+      "TRK",
+      "TRC"
+    ],
+    "result": "pass",
+    "skipped": 0,
+    "test_class": "mage.verify.VerifyCardDataTest",
+    "test_method": "test_verifyCards",
+    "tests": 1
+  },
   "upstream_focused_tests": {
     "boundary": "Passing changed-scenario tests is regression evidence; only explicit name/class references count as nominal card proof.",
     "command": "mvn -q -f pom.xml -Dtest=ModalDoubleFacedCardsTest,TorporOrbTest,HoneCounterRuleTest,StingBilbosSwordTest,BaronHelmutZemoTest,SPDrPilotedByPeniTest,ReturnToHandEffectsTest test",

@@ -20,6 +20,7 @@ import external_engine_source_contract as engine_source_contract
 
 DEFAULT_XMAGE_ROOT: Path | None = None
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
+SCHEMA_VERSION = "manaloom_xmage_test_scenario_miner_v2_2026-07-28"
 
 TEST_COMMANDS = [
     "addCard",
@@ -30,16 +31,36 @@ TEST_COMMANDS = [
     "block",
     "setChoice",
     "setTarget",
+    "addTarget",
+    "setModeChoice",
+    "setFlipCoinResult",
     "waitStackResolved",
     "checkLife",
     "checkPermanentCount",
     "checkGraveyardCount",
     "checkHandCardCount",
     "checkStackObject",
+    "checkStackSize",
     "checkPlayableAbility",
     "checkPT",
     "execute",
 ]
+
+SETUP_COMMANDS = {"addCard", "removeAllCardsFromLibrary"}
+ACTION_COMMANDS = {
+    "castSpell",
+    "activateAbility",
+    "attack",
+    "block",
+    "waitStackResolved",
+}
+CHOICE_COMMANDS = {
+    "setChoice",
+    "setTarget",
+    "addTarget",
+    "setModeChoice",
+    "setFlipCoinResult",
+}
 
 
 def utc_now() -> str:
@@ -104,13 +125,23 @@ def command_counts(source: str) -> dict[str, int]:
         count = source.count(command)
         if count:
             counts[command] = count
+    assertion_calls = Counter(
+        match.group(1)
+        for match in re.finditer(
+            r"\b((?:assert|check)[A-Z][A-Za-z0-9_]*)\s*\(",
+            source,
+        )
+    )
+    for command, call_count in assertion_calls.items():
+        counts[command] = call_count
     return dict(counts)
 
 
 def extract_methods(source: str) -> list[dict[str, Any]]:
     methods: list[dict[str, Any]] = []
     pattern = re.compile(
-        r"(?:@Test[^\n]*\s*)?(?:public|private|protected)\s+void\s+([A-Za-z0-9_]+)\s*\([^)]*\)\s*\{",
+        r"(?:(@Test[^\n]*)\s*)?(?:(?:public|private|protected)\s+)?void\s+"
+        r"([A-Za-z0-9_]+)\s*\([^)]*\)\s*\{",
         flags=re.MULTILINE,
     )
     for match in pattern.finditer(source):
@@ -126,9 +157,12 @@ def extract_methods(source: str) -> list[dict[str, Any]]:
                 if depth == 0:
                     end = index + 1
                     break
+        method_name = match.group(2)
         methods.append(
             {
-                "method_name": match.group(1),
+                "method_name": method_name,
+                "is_test_method": bool(match.group(1))
+                or method_name.casefold().startswith("test"),
                 "start_offset": match.start(),
                 "end_offset": end,
                 "source": source[match.start() : end],
@@ -144,21 +178,14 @@ def excerpt(source: str, *, max_lines: int = 70) -> str:
 
 def scenario_shape(source: str) -> dict[str, Any]:
     counts = command_counts(source)
-    setup = [name for name in ["addCard", "removeAllCardsFromLibrary"] if counts.get(name)]
-    actions = [name for name in ["castSpell", "activateAbility", "attack", "block", "waitStackResolved"] if counts.get(name)]
-    choices = [name for name in ["setChoice", "setTarget"] if counts.get(name)]
+    setup = [name for name in counts if name in SETUP_COMMANDS]
+    actions = [name for name in counts if name in ACTION_COMMANDS]
+    choices = [name for name in counts if name in CHOICE_COMMANDS]
     assertions = [
         name
-        for name in [
-            "checkLife",
-            "checkPermanentCount",
-            "checkGraveyardCount",
-            "checkHandCardCount",
-            "checkStackObject",
-            "checkPlayableAbility",
-            "checkPT",
-        ]
-        if counts.get(name)
+        for name in counts
+        if name.startswith("assert")
+        or (name.startswith("check") and name not in ACTION_COMMANDS)
     ]
     return {
         "setup_commands": setup,
@@ -182,20 +209,60 @@ def method_matches_card(method_source: str, terms: list[str]) -> bool:
     )
 
 
-def mine_card(card_name: str, *, xmage_root: Path, test_files: list[Path]) -> dict[str, Any]:
+def _assigned_identifiers(source: str, card_name: str) -> list[str]:
+    identifiers: set[str] = set()
+    for match in re.finditer(
+        r"\b(?:String|var)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"
+        r'"([^"]+)"',
+        source,
+    ):
+        if normalize_name(match.group(2)) == normalize_name(card_name):
+            identifiers.add(match.group(1))
+    return sorted(identifiers)
+
+
+def build_test_index(test_files: list[Path]) -> list[dict[str, Any]]:
+    return [
+        {
+            "path": path,
+            "source": source,
+            "methods": extract_methods(source),
+        }
+        for path in test_files
+        if (source := read_text(path))
+    ]
+
+
+def mine_card(
+    card_name: str,
+    *,
+    xmage_root: Path,
+    test_index: list[dict[str, Any]],
+) -> dict[str, Any]:
     terms = card_search_terms(card_name)
     file_hits: list[dict[str, Any]] = []
-    for path in test_files:
-        source = read_text(path)
+    card_class = java_class_name(card_name)
+    for indexed_file in test_index:
+        path = indexed_file["path"]
+        source = indexed_file["source"]
         if not method_matches_card(source, terms):
             continue
+        identifier_terms = _assigned_identifiers(source, card_name)
+        method_terms = terms + identifier_terms
         methods = [
             method
-            for method in extract_methods(source)
-            if method_matches_card(method["source"], terms)
+            for method in indexed_file["methods"]
+            if method["is_test_method"]
+            and method_matches_card(method["source"], method_terms)
         ]
+        if not methods and path.stem.casefold() == f"{card_class}Test".casefold():
+            methods = [
+                method
+                for method in indexed_file["methods"]
+                if method["is_test_method"]
+            ]
         if not methods:
-            methods = [{"method_name": None, "source": source}]
+            continue
         method_hits = []
         for method in methods[:8]:
             shape = scenario_shape(method["source"])
@@ -241,9 +308,14 @@ def load_cards_from_json(path: Path) -> list[str]:
 
 def build_report(cards: list[str], *, xmage_root: Path) -> dict[str, Any]:
     test_files = iter_test_files(xmage_root)
-    mined_cards = [mine_card(card, xmage_root=xmage_root, test_files=test_files) for card in cards]
+    test_index = build_test_index(test_files)
+    mined_cards = [
+        mine_card(card, xmage_root=xmage_root, test_index=test_index)
+        for card in cards
+    ]
     statuses = Counter(card["status"] for card in mined_cards)
     return {
+        "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "status": "ready",
         "mutations_performed": [],

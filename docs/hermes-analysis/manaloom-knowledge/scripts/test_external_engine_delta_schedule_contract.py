@@ -392,6 +392,10 @@ class ExternalEngineDeltaScheduleContractTests(unittest.TestCase):
             "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java": (
                 f'static final String XMAGE_COMMIT = "{xmage_pin}";\n'
             ),
+            "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java": (
+                "static final String ENGINE_COMMIT =\n"
+                f'        "{xmage_pin}";\n'
+            ),
             "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py": (
                 f'XMAGE_PIN = "{xmage_pin}"\nFORGE_PIN = "{forge_pin}"\n'
             ),

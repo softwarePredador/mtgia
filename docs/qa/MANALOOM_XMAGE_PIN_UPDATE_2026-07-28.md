@@ -1,6 +1,6 @@
 # Atualização controlada do pin XMage — 2026-07-28
 
-Status: `card_audit_review_required_not_deployed`.
+Status: `card_audit_review_required_quarantine_active_not_deployed`.
 
 ## Decisão
 
@@ -42,8 +42,8 @@ usados pelo contrato ManaLoom.
 | Build Maven `Mage.Server -am` | 33/33 módulos |
 | Assembly `mage-server.zip` | PASS |
 | Testes upstream focados nas regras alteradas | 72/72 |
-| Testes do sidecar XMage | 28/28 |
-| Contrato de execução XMage | 41/41 |
+| Testes do sidecar XMage | 30/30 |
+| Contrato de execução XMage | 42/42 |
 | Estratégia XMage | 29/29 |
 | Capacidades XMage/Forge | 95/95, 20 capacidades |
 | Gate canônico Battle | PASS, 46 checks de produto |
@@ -52,8 +52,12 @@ usados pelo contrato ManaLoom.
 | Auditor de pins/mirrors | PASS, zero divergências |
 | Diff Git exato, sem limite da API | 356/356 caminhos |
 | Catálogo das 87 cartas adicionadas | 86 reconhecidas; 1 não reconhecida |
-| Catálogo das 169 adicionadas/modificadas | 168 reconhecidas; 1 não reconhecida |
-| Teste nominal entre as 87 novas | 2 cartas; 3/3 casos focados |
+| Catálogo XMage das 169 adicionadas/modificadas | 168 reconhecidas; 1 não reconhecida |
+| Política ManaLoom após qualificação | 167 suportadas; 2 bloqueadas |
+| Verificador oficial de dados/classes XMage | 1/1 PASS nos 10 sets envolvidos |
+| Inventário nominal das 169 cartas | 5 cartas; 11 cenários candidatos |
+| Suítes nominais selecionadas | 15/15 PASS |
+| Teste da política de bloqueio do sidecar | 13/13 PASS |
 | Classificação nominal versionada | 169/169 cartas |
 | Qualificação para deploy | `review_required`; bloqueada |
 
@@ -83,9 +87,12 @@ teste nominal e disposição:
 
 | Disposição | Cartas | Interpretação |
 | --- | ---: | --- |
-| `focused_upstream_test_passed` | 2 | `SP//dr, Piloted by Peni` e `Sting, Bilbo's Sword`; 3/3 casos nominais passaram |
+| `focused_upstream_test_passed` | 1 | `SP//dr, Piloted by Peni`; cenário nominal aprovado sem finding conhecido |
+| `focused_upstream_test_passed_card_data_warning_review_required` | 1 | os 2 testes de `Sting, Bilbo's Sword` passam, mas o texto de regras ainda possui reminder divergente |
 | `catalog_supported_semantic_review_required` | 84 | carta nova resolve no runtime, mas não tem prova nominal individual |
-| `catalog_supported_regression_only_review_required` | 82 | implementação modificada resolve, mas só possui evidência de regressão compartilhada |
+| `catalog_supported_nominal_test_passed_semantic_review_required` | 3 | `Krark`, `Metallic Mimic` e `Mjolnir` têm testes nominais, mas eles não fecham todo o hunk da transição |
+| `catalog_supported_regression_only_review_required` | 78 | implementação modificada resolve, mas só possui evidência de regressão compartilhada |
+| `external_runtime_quarantine_semantic_defect` | 1 | `Planetarium of Wan Shi Tong` resolve no catálogo, porém está bloqueada por defeito mecânico confirmado |
 | `external_residual_upstream_unfinished` | 1 | `Prudent Fateseer` é removida do catálogo XMage como `unfinished` e não existe no Forge pinado |
 
 Entre as 87 adições, 45 têm alguma inscrição em set posterior a 2026-07-28 e
@@ -99,8 +106,29 @@ catálogo. O Forge `a62915f500c2411484689294659c6bb84ea215f8` não contém
 correspondência exata. Ela permanece residual externo; isso não cria
 automaticamente uma regra nativa ManaLoom.
 
-Também permanecem `TODO`s explícitos de copy tests em `Krark, the Thumbless` e
-`Mandate of Peace`.
+`Planetarium of Wan Shi Tong` sofreu uma regressão no commit upstream
+`84e46530`: `setDoOnlyOnceEachTurn(true)` torna o trigger opcional e o refactor
+removeu o `setOptional(false)` que mantinha obrigatória a ação de olhar o topo.
+Como o `master` oficial continua exatamente no pin atual, não há correção
+oficial posterior para absorver. O ManaLoom passou a bloqueá-la em
+`XmageCardQualificationPolicy`, com `reason_code=xmage_pin_semantic_defect`,
+até existir correção oficial e cenário focado aprovado.
+
+A política também declara explicitamente `Prudent Fateseer` como
+`xmage_upstream_mechanic_unfinished`. Ela é amarrada ao SHA do engine e o
+sidecar falha fechado se um próximo avanço de pin não revisar essa lista.
+
+Nas 82 classes modificadas, a revisão dos hunks classificou 26 mudanças
+executáveis ou mistas, 54 de apresentação/metadados e 2 somente de comentário.
+Os dois comentários (`Krark` e `Mandate of Peace`) apontam para o issue upstream
+de cópias/LKI e permanecem dívida de qualificação; não foram tratados como
+correção de comportamento.
+
+O comparador detalhado encontrou ainda findings acionáveis de texto/regras em
+`Ajani Resolute`, `Consider the Prime Directive`, `Sky Cycle`, `Sting`,
+`My Precious`, `Crimson Cowl`, `Hire a Crew` e `Falcon's Wing Harness`.
+Esses findings estão preservados na evidência, sem confundir diferença de
+rendering com falha mecânica.
 
 O reconciliador read-only de PostgreSQL parou corretamente antes da consulta
 porque este ambiente não forneceu
@@ -115,6 +143,14 @@ da evidência. `./scripts/quality_gate.sh engine-transition` valida a
 classificação completa sem rede. O deploy executa o mesmo auditor com
 `--require-deployable` e falha enquanto a qualificação for
 `review_required`.
+
+O auditor agora rejeita uma reconciliação PostgreSQL falsa contendo apenas
+`{"status":"pass"}`. Um passe exige 169 resultados individuais, transação
+read-only comprovada, consulta não vazia, zero ambiguidades, contagens
+reconciliadas e digest das linhas. Também recalcula a classificação
+`future_only` pelas datas dos sets. Como 45 cartas do delta são exclusivamente
+futuras e ainda não existe um gate versionado de ativação por lançamento, esse
+estado também permanece bloqueado.
 
 Uma comparação oficial repetida após a mudança retornou XMage com
 `ahead_by=0` e o mesmo SHA no upstream. Forge permaneceu no pin separado
@@ -149,8 +185,9 @@ pastas protegidas ou depois de uma concessão explícita e comprovada de acesso:
 
 ## Limite operacional
 
-Fonte, build, runtime loopback e inventário nominal foram auditados, mas 167
-cartas ainda têm revisão semântica/residual pendente e a reconciliação de
-escopo PostgreSQL não foi executada. Por isso o pin não está qualificado para
+Fonte, build, runtime loopback e inventário nominal foram auditados, mas 168
+cartas ainda têm revisão semântica, finding de dados ou residual pendente; a
+reconciliação de escopo PostgreSQL não foi executada; e o gate de ativação de
+cartas futuras ainda não existe. Por isso o pin não está qualificado para
 deploy. Nenhum deploy, reinício ou mutação de produção foi realizado; o serviço
 publicado continua no pin anterior.

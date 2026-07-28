@@ -119,9 +119,12 @@ Pin transitions have a second, narrower machine-readable contract:
 `docs/hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json`. Its
 versioned evidence must use the complete Git object diff, classify every
 changed card implementation, preserve the distinction between catalog
-resolution and semantic execution, and record PostgreSQL scope reconciliation.
-The weekly upstream delta is discovery input only. `review_required` is a valid
-integrity result but is not deployable.
+resolution and semantic execution, validate future-set scope from release
+dates, and record PostgreSQL scope reconciliation. A PostgreSQL `pass` is valid
+only with 169 card-level results, a proved read-only transaction, nonzero
+queries, zero ambiguities and a row digest. The weekly upstream delta is
+discovery input only. `review_required` is a valid integrity result but is not
+deployable.
 
 Current boundaries:
 
@@ -199,6 +202,24 @@ Both external sidecars expose:
 
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
+
+Catalog resolution is followed by a pin-scoped ManaLoom qualification policy.
+At XMage `2c43ec8cdb5cd475d47e6b555a4077151f476a3b`, the sidecar returns
+structured `unsupported_cards` for:
+
+- `Planetarium of Wan Shi Tong`, with
+  `reason_code=xmage_pin_semantic_defect`, because the pinned implementation
+  incorrectly exposes a mandatory trigger action as optional;
+- `Prudent Fateseer`, with
+  `reason_code=xmage_upstream_mechanic_unfinished`, because Prepare is
+  unfinished and upstream removes the card from its catalog.
+
+The qualification policy carries the exact engine SHA and fails closed if the
+runtime pin moves without reviewing the restrictions. A catalog hit cannot
+override quarantine. XMage `/health` publishes
+`card_qualification_policy_commit` and
+`card_qualification_restrictions` so readiness evidence can verify the active
+policy.
 
 Requests and responses use the versioned `external_battle_request_v2` and
 `external_battle_execution_v2` envelopes. The backend verifies the exact

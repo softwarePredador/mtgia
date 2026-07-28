@@ -2,13 +2,15 @@
 
 Executes Commander battles with the official XMage runtime pinned by
 [`XMAGE_COMMIT`](XMAGE_COMMIT). The service is strict: unresolved cards are
-reported and are never removed from a deck.
+reported and are never removed from a deck. Cards with a confirmed defect in
+the pinned engine are also rejected by a pin-scoped qualification policy.
 
 ## HTTP contract
 
 - `GET /health`: engine version, pinned commit, `catalog_ready=true`, indexed
   name count, bounded Live buffer metrics, `sidecar_process_id`, and
-  `sidecar_started_at` after the card catalog has been loaded.
+  `sidecar_started_at` after the card catalog has been loaded, plus the card
+  qualification policy commit and restriction count.
 - `POST /coverage`: validates two 100-card, one-commander decks and returns
   `ready` plus structured `unsupported_cards`.
 - `POST /cards/coverage`: batch-checks arbitrary catalog rows without requiring
@@ -33,6 +35,24 @@ different process ID before sending another game.
 
 Request bodies are capped at 8 MiB. This supports one full current card-corpus
 coverage request while retaining a bounded memory contract.
+
+### Pin-scoped card qualification
+
+`XmageCardQualificationPolicy` is tied to the exact `XMAGE_COMMIT`. A pin
+change without reviewing the policy fails closed. At the current pin:
+
+- `Planetarium of Wan Shi Tong` is quarantined with
+  `reason_code=xmage_pin_semantic_defect` because a mandatory trigger action is
+  incorrectly optional;
+- `Prudent Fateseer` is quarantined with
+  `reason_code=xmage_upstream_mechanic_unfinished` because Prepare is
+  unfinished and upstream removes the card from its catalog.
+
+Coverage responses preserve the submitted card row and add
+`support_status=quarantined`, the reason, upstream reference, qualification
+commit, and release condition. In `auto` mode this is a structured XMage
+coverage gap, so the reviewed Forge/native order may still handle the complete
+deck; strict `xmage` mode remains blocked.
 
 The request contains `request_id`, `seed`, `timeout_ms`, `deck_a`, and `deck_b`.
 Each deck contains `id`, `name`, and card rows with `name`, `set_code`,

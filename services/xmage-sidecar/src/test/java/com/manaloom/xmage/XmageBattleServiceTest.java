@@ -171,6 +171,31 @@ final class XmageBattleServiceTest {
     }
 
     @Test
+    void cardQualificationPolicyIsPinnedAndFailClosed() {
+        assertEquals(
+                SidecarMain.XMAGE_COMMIT,
+                XmageCardQualificationPolicy.ENGINE_COMMIT
+        );
+        assertEquals(2, XmageCardQualificationPolicy.restrictionCount());
+        assertNotNull(
+                XmageCardQualificationPolicy.restrictionFor(
+                        "Planetarium of Wan Shi Tong"
+                )
+        );
+        assertNotNull(
+                XmageCardQualificationPolicy.restrictionFor(
+                        "Prudent Fateseer"
+                )
+        );
+        assertThrows(
+                IllegalStateException.class,
+                () -> XmageCardQualificationPolicy.requireEngineCommit(
+                        "0000000000000000000000000000000000000000"
+                )
+        );
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void coverageReportsUnsupportedCardsWithoutDroppingThem() {
         XmageBattleService service = new XmageBattleService("127.0.0.1", 17171);
@@ -196,6 +221,46 @@ final class XmageBattleServiceTest {
         assertEquals("deck_a", unsupported.get(0).get("deck_key"));
         assertEquals("Molecule Man", unsupported.get(0).get("name"));
         assertEquals(2, ((List<?>) coverage.get("decks")).size());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void cardCoverageQuarantinesKnownPinDefectsWithStructuredReasons() {
+        XmageBattleService service = new XmageBattleService(
+                "127.0.0.1",
+                17171
+        );
+        JsonObject request = new JsonObject();
+        JsonArray cards = new JsonArray();
+        cards.add(card("Sol Ring", 1, false));
+        cards.add(card("Planetarium of Wan Shi Tong", 1, false));
+        cards.add(card("Prudent Fateseer", 1, false));
+        request.add("cards", cards);
+
+        Map<String, Object> coverage = service.cardCoverage(request);
+        List<Map<String, Object>> unsupported =
+                (List<Map<String, Object>>) coverage.get("unsupported_cards");
+
+        assertEquals("unsupported", coverage.get("status"));
+        assertEquals(3, coverage.get("total"));
+        assertEquals(1, coverage.get("supported"));
+        assertEquals(2, coverage.get("unsupported"));
+        assertEquals(
+                "xmage_pin_semantic_defect",
+                unsupported.get(0).get("reason_code")
+        );
+        assertEquals(
+                "xmage_upstream_mechanic_unfinished",
+                unsupported.get(1).get("reason_code")
+        );
+        assertEquals(
+                SidecarMain.XMAGE_COMMIT,
+                unsupported.get(0).get("qualification_engine_commit")
+        );
+        assertEquals(
+                "quarantined",
+                unsupported.get(1).get("support_status")
+        );
     }
 
     @Test

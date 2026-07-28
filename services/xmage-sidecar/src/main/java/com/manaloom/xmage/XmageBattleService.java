@@ -491,6 +491,7 @@ final class XmageBattleService {
     }
 
     private static synchronized void ensureCardDatabase() {
+        XmageCardQualificationPolicy.requireEngineCommit(SidecarMain.XMAGE_COMMIT);
         if (!cardDatabaseReady) {
             CardScanner.scan();
             Set<String> names = new HashSet<>(CardRepository.instance.getNames());
@@ -975,6 +976,9 @@ final class XmageBattleService {
         }
 
         CardInfo resolve() {
+            if (qualificationRestriction() != null) {
+                return null;
+            }
             CardInfo resolved = null;
             if (!setCode.isEmpty() && !number.isEmpty()) {
                 resolved = CardRepository.instance.findCard(setCode, number, true);
@@ -1003,9 +1007,10 @@ final class XmageBattleService {
         }
 
         boolean isAvailable() {
-            return availableCardNames.contains(name)
-                    || uniqueCardAliases.containsKey(identityAliasKey(name))
-                    || (name.contains(" // ") && resolve() != null);
+            return qualificationRestriction() == null
+                    && (availableCardNames.contains(name)
+                        || uniqueCardAliases.containsKey(identityAliasKey(name))
+                        || (name.contains(" // ") && resolve() != null));
         }
 
         Map<String, Object> unsupported(String deckKey) {
@@ -1018,7 +1023,19 @@ final class XmageBattleService {
             result.put("collector_number", number);
             result.put("quantity", quantity);
             result.put("is_commander", commander);
+            XmageCardQualificationPolicy.Restriction restriction =
+                    qualificationRestriction();
+            if (restriction != null) {
+                result.putAll(restriction.evidence());
+            } else {
+                result.put("support_status", "unresolved");
+                result.put("reason_code", "xmage_card_unresolved");
+            }
             return result;
+        }
+
+        private XmageCardQualificationPolicy.Restriction qualificationRestriction() {
+            return XmageCardQualificationPolicy.restrictionFor(name);
         }
     }
 
@@ -1026,7 +1043,11 @@ final class XmageBattleService {
         private final List<Map<String, Object>> unsupportedCards;
 
         UnsupportedCardsException(List<Map<String, Object>> unsupportedCards) {
-            super("XMage could not resolve " + unsupportedCards.size() + " card entries");
+            super(
+                    "XMage could not qualify or resolve "
+                            + unsupportedCards.size()
+                            + " card entries"
+            );
             this.unsupportedCards = new ArrayList<>(unsupportedCards);
         }
 

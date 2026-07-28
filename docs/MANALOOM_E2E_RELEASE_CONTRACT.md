@@ -75,7 +75,11 @@ transição estiver com `qualification.status=pass`. O gate estrutural aceita
 `review_required` para manter o desenvolvimento e a auditoria reproduzíveis,
 mas `scripts/manaloom_deploy_battle_sidecars.sh` repete o auditor com
 `--require-deployable` e falha antes de qualquer operação remota. Resolução no
-catálogo não é prova semântica de uma carta.
+catálogo não é prova semântica de uma carta. A qualificação inclui bloqueios
+pinados do sidecar: uma carta com defeito confirmado deve retornar
+`unsupported_cards` com motivo estruturado, e qualquer avanço de
+`XMAGE_COMMIT` precisa revisar a política antes de os testes aceitarem o novo
+runtime.
 
 A etapa focada da suíte E2E executa explicitamente os classificadores de ramp
 em Dart e Python, o piso estrutural do optimizer, os contratos de segurança da

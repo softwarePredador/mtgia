@@ -79,6 +79,11 @@ ENGINE_SPECS = (
                 "runtime_health_and_replay_identity",
             ),
             PinMirror(
+                "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+                r'(?m)^\s*static final String ENGINE_COMMIT\s*=\s*\n?\s*"([0-9a-f]{40})";\s*$',
+                "card_qualification_policy_identity",
+            ),
+            PinMirror(
                 "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py",
                 r'(?m)^XMAGE_PIN = "([0-9a-f]{40})"\s*$',
                 "execution_contract_expectation",

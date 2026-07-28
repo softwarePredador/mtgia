@@ -180,6 +180,7 @@
         "server/lib/battle/battle_live_store.dart",
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
         "services/forge-sidecar/sidecar.py",
         "app/lib/features/battle/screens/battle_coach_screen.dart",

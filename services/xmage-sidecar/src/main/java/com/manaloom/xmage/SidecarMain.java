@@ -93,6 +93,14 @@ public final class SidecarMain {
             body.put("xmage_port", xmagePort);
             body.put("catalog_ready", true);
             body.put("indexed_names", battleService.catalogSize());
+            body.put(
+                    "card_qualification_policy_commit",
+                    XmageCardQualificationPolicy.ENGINE_COMMIT
+            );
+            body.put(
+                    "card_qualification_restrictions",
+                    XmageCardQualificationPolicy.restrictionCount()
+            );
             body.put("runtime_mode", runtimeMode);
             body.put(
                     "batch_simulation_available",

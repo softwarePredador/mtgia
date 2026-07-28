@@ -105,6 +105,12 @@ class ExternalEngineUpstreamDeltaAuditTests(unittest.TestCase):
                 "xmage-sidecar-v2@" + divergent_pin,
                 "offline_runner_build_identity",
             ),
+            (
+                "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+                "a" * 40,
+                divergent_pin,
+                "card_qualification_policy_identity",
+            ),
         )
         for relative_path, old, new, role in cases:
             with self.subTest(role=role), tempfile.TemporaryDirectory() as tmpdir:
@@ -175,6 +181,10 @@ class ExternalEngineUpstreamDeltaAuditTests(unittest.TestCase):
             "services/forge-sidecar/Dockerfile": f"ARG FORGE_COMMIT={forge_pin}\n",
             "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java": (
                 f'static final String XMAGE_COMMIT = "{xmage_pin}";\n'
+            ),
+            "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java": (
+                "static final String ENGINE_COMMIT =\n"
+                f'        "{xmage_pin}";\n'
             ),
             "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py": (
                 f'XMAGE_PIN = "{xmage_pin}"\nFORGE_PIN = "{forge_pin}"\n'

@@ -108,6 +108,8 @@ def build_report() -> dict[str, object]:
                 "battleService.warmUp()",
                 'body.put("catalog_ready", true)',
                 'body.put("indexed_names", battleService.catalogSize())',
+                '"card_qualification_policy_commit"',
+                '"card_qualification_restrictions"',
                 "MAX_REQUEST_BYTES = 8 * 1024 * 1024",
                 'body.put("restart_required", true)',
                 'result.put("sidecar_process_id", PROCESS_ID)',
@@ -133,6 +135,21 @@ def build_report() -> dict[str, object]:
                 'learningContract.put("absence_proves_nonuse", false)',
                 "connectionUsername",
                 "if (!timedOut)",
+            ],
+        ),
+        source_check(
+            "sidecar.card_qualification_policy",
+            SIDECAR
+            / "src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+            [
+                XMAGE_PIN,
+                "requireEngineCommit",
+                '"Planetarium of Wan Shi Tong"',
+                '"xmage_pin_semantic_defect"',
+                '"Prudent Fateseer"',
+                '"xmage_upstream_mechanic_unfinished"',
+                '"support_status", "quarantined"',
+                '"qualification_engine_commit", ENGINE_COMMIT',
             ],
         ),
         source_check(
