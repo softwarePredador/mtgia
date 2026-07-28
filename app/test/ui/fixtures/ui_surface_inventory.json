@@ -23,7 +23,7 @@
     "menu": 9,
     "tabs": 10,
     "navigation": 2,
-    "transient": 110
+    "transient": 108
   },
   "domain_contracts": {
     "auth": {
@@ -308,7 +308,7 @@
     {"source":"lib/features/decks/screens/deck_details_screen.dart","domain":"decks","occurrences":{"material_page_route":1,"dialog":3,"bottom_sheet":1,"menu":1,"tabs":1,"transient":20}},
     {"source":"lib/features/decks/screens/deck_generate_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":12}},
     {"source":"lib/features/decks/screens/deck_import_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":3}},
-    {"source":"lib/features/decks/screens/deck_list_screen.dart","domain":"decks","occurrences":{"dialog":2,"menu":3,"transient":3}},
+    {"source":"lib/features/decks/screens/deck_list_screen.dart","domain":"decks","occurrences":{"dialog":2,"menu":3,"transient":1}},
     {"source":"lib/features/decks/widgets/deck_add_cards_menu.dart","domain":"decks","occurrences":{"menu":1}},
     {"source":"lib/features/decks/widgets/deck_analysis_tab.dart","domain":"decks","occurrences":{"dialog":1,"transient":1}},
     {"source":"lib/features/decks/widgets/deck_card_edit_dialog.dart","domain":"decks","occurrences":{"dialog":1}},

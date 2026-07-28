@@ -38,8 +38,8 @@ Baseline ampliada da beta Web + Android em 2026-07-27:
 | Menus | 9 |
 | Tabs | 10 |
 | Navegação responsiva | 2 |
-| Transientes (`SnackBar`) | 110 |
-| **Total** | **248** |
+| Transientes (`SnackBar`) | 108 |
+| **Total** | **246** |
 
 Cada ocorrência pertence a um contrato de domínio que declara:
 
@@ -361,6 +361,7 @@ dart run tool/authenticated_visual_diff.dart \
 | Pós-troca de comandante | API `GET /decks/:id` | N/A | Exatamente 1 comandante; card escolhido não aparece em `main_board`. | Conferir `commander.length == 1` e ausência nas 99. |
 | Dialog criar deck | `DeckListScreen` | `deck-create-dialog` | Modal de criação aberto no `Overlay`. | `find.byKey`; não usar `AlertDialog`/índice. |
 | Campos criar deck | `DeckListScreen` | `deck-create-name-field`, `deck-create-format-field`, `deck-create-description-field`, `deck-create-public-switch` | Preenche nome/formato/descrição/visibilidade. | `enterText`/tap por key. |
+| Erros criar deck | `DeckListScreen` | `deck-create-name-error`, `deck-create-submit-error` | Nome obrigatório fica anexado ao campo e falha de API permanece no modal; ambos preservam os dados e nunca usam `SnackBar` por trás do diálogo. | Validar descendência/bounds dentro de `deck-create-dialog`, foco no nome vazio, `liveRegion` na falha de submit e ausência de `SnackBar`. |
 | Ações criar deck | `DeckListScreen` | `deck-create-cancel-button`, `deck-create-submit-button` | Cancela ou cria deck. | Tap por key + API/lista. |
 | Lista de decks | `DeckListScreen` | `deck-list`, `deck-list-row-<deckId>`, `deck-list-empty-create-button`, `deck-list-empty-generate-button`, `deck-list-fab-menu`, `deck-list-menu-create`, `deck-list-menu-generate`, `deck-list-menu-import` | Lista/FAB não dependem de copy para abrir fluxos. | O menu e o dialog vivem no `Overlay`; localizar por key global. |
 | Ações do deck | `DeckDetailsScreen` | `deck-details-optimize-button`, `deck-details-menu`, `deck-details-menu-import-list` | Abre optimize e importar lista sem depender de ícone/texto do menu. | Tap por key; texto como evidência visual. |

@@ -389,6 +389,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('deck-list-menu-create')));
       await pumpUntilFound(tester, find.byKey(const Key('deck-create-dialog')));
+      await tester.tap(find.byKey(const Key('deck-create-submit-button')));
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('deck-create-name-error')),
+      );
       await _capture(binding, tester, 'deck_create_modal');
       Navigator.of(
         tester.element(find.byKey(const Key('deck-create-dialog'))),

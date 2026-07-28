@@ -28,6 +28,43 @@ class _StaticDeckProvider extends DeckProvider {
   Future<void> fetchDecks({bool silent = false}) async {}
 }
 
+class _FailingCreateDeckProvider extends _StaticDeckProvider {
+  _FailingCreateDeckProvider() : super(const <Deck>[]);
+
+  @override
+  String? get errorMessage => 'Não foi possível criar este deck agora.';
+
+  @override
+  Future<bool> createDeck({
+    required String name,
+    required String format,
+    String? description,
+    String? archetype,
+    int? bracket,
+    List<Map<String, dynamic>>? cards,
+    bool isPublic = false,
+  }) async {
+    return false;
+  }
+}
+
+class _SuccessfulCreateDeckProvider extends _StaticDeckProvider {
+  _SuccessfulCreateDeckProvider() : super(const <Deck>[]);
+
+  @override
+  Future<bool> createDeck({
+    required String name,
+    required String format,
+    String? description,
+    String? archetype,
+    int? bracket,
+    List<Map<String, dynamic>>? cards,
+    bool isPublic = false,
+  }) async {
+    return true;
+  }
+}
+
 const _commanderNames = <String>[
   'Lorehold, the Historian',
   'Atraxa, Grand Unifier',
@@ -73,6 +110,7 @@ Future<void> _pumpDecks(
   WidgetTester tester,
   Size size, {
   List<Deck>? decks,
+  DeckProvider? deckProvider,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -82,7 +120,7 @@ Future<void> _pumpDecks(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<DeckProvider>(
-          create: (_) => _StaticDeckProvider(decks ?? _decks()),
+          create: (_) => deckProvider ?? _StaticDeckProvider(decks ?? _decks()),
         ),
         ChangeNotifierProvider<MessageProvider>(
           create: (_) => MessageProvider(apiClient: _NoopApiClient()),
@@ -238,6 +276,179 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('deck-list-menu-generate')), findsOneWidget);
       expect(find.byKey(const Key('deck-list-menu-import')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'empty deck name stays inside modal, receives focus, and clears on edit',
+    (tester) async {
+      await _pumpDecks(tester, const Size(390, 844), decks: const <Deck>[]);
+
+      final create = find.byKey(const Key('deck-list-empty-create-button'));
+      await tester.ensureVisible(create);
+      await tester.pumpAndSettle();
+      await tester.tap(create);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('deck-create-submit-button')));
+      await tester.pump();
+
+      final dialog = find.byKey(const Key('deck-create-dialog'));
+      final error = find.byKey(const Key('deck-create-name-error'));
+      expect(dialog, findsOneWidget);
+      expect(error, findsOneWidget);
+      expect(find.text('Informe o nome do deck.'), findsOneWidget);
+      expect(find.byType(SnackBar), findsNothing);
+
+      final dialogRect = tester.getRect(dialog);
+      final errorRect = tester.getRect(error);
+      expect(dialogRect.contains(errorRect.topLeft), isTrue);
+      expect(dialogRect.contains(errorRect.bottomRight), isTrue);
+
+      final nameField = tester.widget<TextField>(
+        find.byKey(const Key('deck-create-name-field')),
+      );
+      expect(nameField.focusNode?.hasFocus, isTrue);
+
+      await tester.enterText(
+        find.byKey(const Key('deck-create-name-field')),
+        'Azorius Control',
+      );
+      await tester.pump();
+      expect(error, findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'create validation remains scrollable at 320x568 with 200 percent text',
+    (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await _pumpDecks(tester, const Size(320, 568), decks: const <Deck>[]);
+      expect(tester.takeException(), isNull);
+
+      final create = find.byKey(const Key('deck-list-empty-create-button'));
+      await tester.ensureVisible(create);
+      await tester.pumpAndSettle();
+      await tester.tap(create);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      final submit = find.byKey(const Key('deck-create-submit-button'));
+      await tester.ensureVisible(submit);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.tap(submit);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+
+      final error = find.byKey(const Key('deck-create-name-error'));
+      expect(error, findsOneWidget);
+      await tester.ensureVisible(error);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      final dialogRect = tester.getRect(
+        find.byKey(const Key('deck-create-dialog')),
+      );
+      final errorRect = tester.getRect(error);
+      expect(dialogRect.contains(errorRect.topLeft), isTrue);
+      expect(dialogRect.contains(errorRect.bottomRight), isTrue);
+      expect(find.byType(SnackBar), findsNothing);
+    },
+  );
+
+  testWidgets('create failure stays inside modal and preserves form values', (
+    tester,
+  ) async {
+    await _pumpDecks(
+      tester,
+      const Size(390, 844),
+      deckProvider: _FailingCreateDeckProvider(),
+    );
+
+    await tester.tap(find.byKey(const Key('deck-list-empty-create-button')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('deck-create-name-field')),
+      'Izzet Spells',
+    );
+    await tester.enterText(
+      find.byKey(const Key('deck-create-description-field')),
+      'Mágicas e valor incremental',
+    );
+    await tester.tap(find.byKey(const Key('deck-create-public-switch')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('deck-create-submit-button')));
+    await tester.pumpAndSettle();
+
+    final dialog = find.byKey(const Key('deck-create-dialog'));
+    final error = find.byKey(const Key('deck-create-submit-error'));
+    expect(dialog, findsOneWidget);
+    expect(error, findsOneWidget);
+    expect(
+      find.text('Não foi possível criar este deck agora.'),
+      findsOneWidget,
+    );
+    expect(find.byType(SnackBar), findsNothing);
+    expect(find.text('Izzet Spells'), findsOneWidget);
+    expect(find.text('Mágicas e valor incremental'), findsOneWidget);
+    expect(
+      tester
+          .widget<DropdownButtonFormField<String>>(
+            find.byKey(const Key('deck-create-format-field')),
+          )
+          .initialValue,
+      'commander',
+    );
+    expect(
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('deck-create-public-switch')),
+          )
+          .value,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<ElevatedButton>(
+            find.byKey(const Key('deck-create-submit-button')),
+          )
+          .onPressed,
+      isNotNull,
+    );
+
+    final dialogRect = tester.getRect(dialog);
+    final errorRect = tester.getRect(error);
+    expect(dialogRect.contains(errorRect.topLeft), isTrue);
+    expect(dialogRect.contains(errorRect.bottomRight), isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'successful create closes modal and shows only success feedback',
+    (tester) async {
+      await _pumpDecks(
+        tester,
+        const Size(390, 844),
+        deckProvider: _SuccessfulCreateDeckProvider(),
+      );
+
+      await tester.tap(find.byKey(const Key('deck-list-empty-create-button')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('deck-create-name-field')),
+        'Selesnya Tokens',
+      );
+      await tester.tap(find.byKey(const Key('deck-create-submit-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('deck-create-dialog')), findsNothing);
+      expect(find.byKey(const Key('deck-create-name-error')), findsNothing);
+      expect(find.byKey(const Key('deck-create-submit-error')), findsNothing);
+      expect(find.text('Deck criado com sucesso!'), findsOneWidget);
+      expect(find.byType(SnackBar), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

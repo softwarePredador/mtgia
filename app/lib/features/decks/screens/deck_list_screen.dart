@@ -64,11 +64,11 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
   Future<void> _showCreateDeckDialog(BuildContext context) async {
     final parentContext = context;
-    final nameController = TextEditingController();
-    final descriptionController = TextEditingController();
     String selectedFormat = 'commander';
     bool isPublic = false;
     bool isSubmitting = false;
+    String? nameError;
+    String? submitError;
     final formats = [
       'commander',
       'brawl',
@@ -80,150 +80,231 @@ class _DeckListScreenState extends State<DeckListScreen> {
       'pauper',
     ];
 
-    return showDialog(
+    await showDialog<void>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Dialog(
-          key: const Key('deck-create-dialog'),
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.space20,
-            vertical: AppTheme.space24,
-          ),
-          backgroundColor: AppTheme.surfaceElevated,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-            side: BorderSide(
-              color: AppTheme.outlineMuted.withValues(alpha: 0.7),
-            ),
-          ),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.space20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Novo Deck',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                color: AppTheme.textPrimary,
-                                fontWeight: FontWeight.w800,
-                                fontFamily: AppTheme.displayFontFamily,
+      builder: (_) => _DeckCreateDialogLifecycle(
+        builder:
+            (
+              dialogContext,
+              nameController,
+              descriptionController,
+              nameFocusNode,
+            ) => StatefulBuilder(
+              builder: (dialogContext, setState) => Dialog(
+                key: const Key('deck-create-dialog'),
+                insetPadding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.space20,
+                  vertical: AppTheme.space24,
+                ),
+                backgroundColor: AppTheme.surfaceElevated,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  side: BorderSide(
+                    color: AppTheme.outlineMuted.withValues(alpha: 0.7),
+                  ),
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppTheme.space20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Novo Deck',
+                                style: Theme.of(dialogContext)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      color: AppTheme.textPrimary,
+                                      fontWeight: FontWeight.w800,
+                                      fontFamily: AppTheme.displayFontFamily,
+                                    ),
                               ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              icon: const Icon(Icons.close_rounded),
+                              color: AppTheme.textSecondary,
+                              tooltip: 'Fechar',
+                            ),
+                          ],
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close_rounded),
-                        color: AppTheme.textSecondary,
-                        tooltip: 'Fechar',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTheme.space18),
-                  TextField(
-                    key: const Key('deck-create-name-field'),
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome do deck',
-                      hintText: 'Ex.: meu deck lorehold',
-                    ),
-                  ),
-                  const SizedBox(height: AppTheme.space14),
-                  DropdownButtonFormField<String>(
-                    key: const Key('deck-create-format-field'),
-                    initialValue: selectedFormat,
-                    decoration: const InputDecoration(labelText: 'Formato'),
-                    items: formats
-                        .map(
-                          (f) => DropdownMenuItem(
-                            value: f,
-                            child: Text(f[0].toUpperCase() + f.substring(1)),
+                        const SizedBox(height: AppTheme.space18),
+                        TextField(
+                          key: const Key('deck-create-name-field'),
+                          controller: nameController,
+                          focusNode: nameFocusNode,
+                          decoration: InputDecoration(
+                            labelText: 'Nome do deck',
+                            hintText: 'Ex.: meu deck lorehold',
+                            error: nameError == null
+                                ? null
+                                : Semantics(
+                                    liveRegion: true,
+                                    child: Text(
+                                      nameError!,
+                                      key: const Key('deck-create-name-error'),
+                                    ),
+                                  ),
                           ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selectedFormat = value);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: AppTheme.space14),
-                  TextField(
-                    key: const Key('deck-create-description-field'),
-                    controller: descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Descrição (opcional)',
-                      hintText: 'Sobre o que é este deck?',
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: AppTheme.space12),
-                  SwitchListTile(
-                    key: const Key('deck-create-public-switch'),
-                    title: const Text('Deck público'),
-                    subtitle: const Text('Visível na comunidade'),
-                    value: isPublic,
-                    onChanged: (v) => setState(() => isPublic = v),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  const SizedBox(height: AppTheme.space18),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          key: const Key('deck-create-cancel-button'),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancelar'),
+                          onChanged: (_) {
+                            if (nameError != null || submitError != null) {
+                              setState(() {
+                                nameError = null;
+                                submitError = null;
+                              });
+                            }
+                          },
                         ),
-                      ),
-                      const SizedBox(width: AppTheme.space12),
-                      Expanded(
-                        child: ElevatedButton(
-                          key: const Key('deck-create-submit-button'),
-                          onPressed: () async {
-                            if (isSubmitting) return;
-
+                        const SizedBox(height: AppTheme.space14),
+                        DropdownButtonFormField<String>(
+                          key: const Key('deck-create-format-field'),
+                          initialValue: selectedFormat,
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Formato',
+                          ),
+                          items: formats
+                              .map(
+                                (f) => DropdownMenuItem(
+                                  value: f,
+                                  child: Text(
+                                    f[0].toUpperCase() + f.substring(1),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedFormat = value;
+                                submitError = null;
+                              });
+                            }
+                          },
+                        ),
+                        const SizedBox(height: AppTheme.space14),
+                        TextField(
+                          key: const Key('deck-create-description-field'),
+                          controller: descriptionController,
+                          decoration: const InputDecoration(
+                            labelText: 'Descrição (opcional)',
+                            hintText: 'Sobre o que é este deck?',
+                          ),
+                          maxLines: 3,
+                          onChanged: (_) {
+                            if (submitError != null) {
+                              setState(() => submitError = null);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: AppTheme.space12),
+                        SwitchListTile(
+                          key: const Key('deck-create-public-switch'),
+                          title: const Text('Deck público'),
+                          subtitle: const Text('Visível na comunidade'),
+                          value: isPublic,
+                          onChanged: (value) {
+                            setState(() {
+                              isPublic = value;
+                              submitError = null;
+                            });
+                          },
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        if (submitError != null) ...[
+                          const SizedBox(height: AppTheme.space12),
+                          Semantics(
+                            container: true,
+                            liveRegion: true,
+                            label: submitError,
+                            child: Container(
+                              key: const Key('deck-create-submit-error'),
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(AppTheme.space12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.error.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusSm,
+                                ),
+                                border: Border.all(
+                                  color: AppTheme.error.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline_rounded,
+                                    color: AppTheme.error,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: AppTheme.space8),
+                                  Expanded(
+                                    child: Text(
+                                      submitError!,
+                                      style: Theme.of(dialogContext)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: AppTheme.textPrimary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: AppTheme.space18),
+                        _DeckCreateDialogActions(
+                          isSubmitting: isSubmitting,
+                          onCancel: () => Navigator.pop(dialogContext),
+                          onSubmit: () async {
                             final trimmedName = nameController.text.trim();
                             final trimmedDescription = descriptionController
                                 .text
                                 .trim();
 
                             if (trimmedName.isEmpty) {
-                              ScaffoldMessenger.of(parentContext).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Informe o nome do deck.'),
-                                  backgroundColor: AppTheme.error,
-                                ),
-                              );
+                              setState(() {
+                                nameError = 'Informe o nome do deck.';
+                                submitError = null;
+                              });
+                              nameFocusNode.requestFocus();
                               return;
                             }
 
-                            setState(() => isSubmitting = true);
+                            final deckProvider = dialogContext
+                                .read<DeckProvider>();
+                            setState(() {
+                              nameError = null;
+                              submitError = null;
+                              isSubmitting = true;
+                            });
 
-                            final success = await context
-                                .read<DeckProvider>()
-                                .createDeck(
-                                  name: trimmedName,
-                                  format: selectedFormat,
-                                  description: trimmedDescription.isEmpty
-                                      ? null
-                                      : trimmedDescription,
-                                  isPublic: isPublic,
-                                );
+                            final success = await deckProvider.createDeck(
+                              name: trimmedName,
+                              format: selectedFormat,
+                              description: trimmedDescription.isEmpty
+                                  ? null
+                                  : trimmedDescription,
+                              isPublic: isPublic,
+                            );
 
-                            if (context.mounted) {
-                              setState(() => isSubmitting = false);
-                            }
+                            if (!dialogContext.mounted) return;
 
-                            if (context.mounted) {
-                              if (success) {
-                                Navigator.pop(context);
+                            if (success) {
+                              Navigator.pop(dialogContext);
+                              if (parentContext.mounted) {
                                 ScaffoldMessenger.of(
                                   parentContext,
                                 ).showSnackBar(
@@ -231,42 +312,23 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                     content: Text('Deck criado com sucesso!'),
                                   ),
                                 );
-                              } else {
-                                ScaffoldMessenger.of(
-                                  parentContext,
-                                ).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      parentContext
-                                              .read<DeckProvider>()
-                                              .errorMessage ??
-                                          'Erro ao criar deck',
-                                    ),
-                                    backgroundColor: AppTheme.error,
-                                  ),
-                                );
                               }
+                            } else {
+                              setState(() {
+                                isSubmitting = false;
+                                submitError =
+                                    deckProvider.errorMessage ??
+                                    'Erro ao criar deck';
+                              });
                             }
                           },
-                          child: isSubmitting
-                              ? const SizedBox(
-                                  height: AppTheme.space18,
-                                  width: AppTheme.space18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.backgroundAbyss,
-                                  ),
-                                )
-                              : const Text('Criar deck'),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -1960,6 +2022,110 @@ class _EmptyDeckConstellation extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+typedef _DeckCreateDialogBuilder =
+    Widget Function(
+      BuildContext context,
+      TextEditingController nameController,
+      TextEditingController descriptionController,
+      FocusNode nameFocusNode,
+    );
+
+class _DeckCreateDialogLifecycle extends StatefulWidget {
+  const _DeckCreateDialogLifecycle({required this.builder});
+
+  final _DeckCreateDialogBuilder builder;
+
+  @override
+  State<_DeckCreateDialogLifecycle> createState() =>
+      _DeckCreateDialogLifecycleState();
+}
+
+class _DeckCreateDialogLifecycleState
+    extends State<_DeckCreateDialogLifecycle> {
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _nameFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _nameFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(
+      context,
+      _nameController,
+      _descriptionController,
+      _nameFocusNode,
+    );
+  }
+}
+
+class _DeckCreateDialogActions extends StatelessWidget {
+  const _DeckCreateDialogActions({
+    required this.isSubmitting,
+    required this.onCancel,
+    required this.onSubmit,
+  });
+
+  final bool isSubmitting;
+  final VoidCallback onCancel;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    final cancelButton = OutlinedButton(
+      key: const Key('deck-create-cancel-button'),
+      onPressed: isSubmitting ? null : onCancel,
+      child: const Text('Cancelar'),
+    );
+    final submitButton = ElevatedButton(
+      key: const Key('deck-create-submit-button'),
+      onPressed: isSubmitting ? null : onSubmit,
+      child: isSubmitting
+          ? const SizedBox(
+              height: AppTheme.space18,
+              width: AppTheme.space18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppTheme.backgroundAbyss,
+              ),
+            )
+          : const Text('Criar deck'),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textScale = MediaQuery.textScalerOf(context).scale(1);
+        final stackActions = constraints.maxWidth < 280 || textScale >= 1.6;
+
+        if (stackActions) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cancelButton,
+              const SizedBox(height: AppTheme.space8),
+              submitButton,
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(child: cancelButton),
+            const SizedBox(width: AppTheme.space12),
+            Expanded(child: submitButton),
+          ],
+        );
+      },
     );
   }
 }

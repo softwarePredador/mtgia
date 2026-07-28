@@ -114,7 +114,7 @@
       "id": "deck_create_modal",
       "route": "/decks",
       "auth": "seeded_user",
-      "states": ["modal", "above_fold"],
+      "states": ["modal", "validation_error", "above_fold"],
       "anchor": "deck-create-dialog",
       "source": "lib/features/decks/screens/deck_list_screen.dart"
     },

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-28T13:49:32.636881Z",
-  "source_digest": "c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9",
+  "generated_at": "2026-07-28T15:09:30.012415Z",
+  "source_digest": "5821fdc36dfcb363afeabd78124ea8cfe394c5b775bbdf08c032d5d64422a738",
   "surface": "authenticated_p0_matrix",
   "profile": "web_wide_1920x1080",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "4ff359d78c6f0523c0353d08475fa37b6af689ed482fd2850279f65882f15c8f",
+  "log_sha256": "6f3a9a2fd461abe3c6167e9ae1f9b9ac7b2316ac250cfc6385ce48dc45659029",
   "checkpoint_count": 53,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -153,16 +153,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/web_wide/community_deck_success.png",
-      "sha256": "29a3b944f2b9b335e3c7c5e22874a2d72bd1a97dbcf1df5703c445465463a984",
-      "bytes": 82051,
+      "sha256": "4f5ba89a1154d0a67e49b1d18fc1e936be643885a93017af33a4435dc27a8361",
+      "bytes": 81995,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "community_empty",
       "path": "app/test/ui/goldens/runtime/web_wide/community_empty.png",
-      "sha256": "678ac057ebb420a02745c74a6fd978edc78719675e682aeaa46ca300c71239b2",
-      "bytes": 121773,
+      "sha256": "5b2a4bbbbabc7f8edf58e44fc7bfc9439a0dd0fcfbd55ab4725accfe46e955a4",
+      "bytes": 121676,
       "width": 1920,
       "height": 1080
     },
@@ -193,8 +193,8 @@
     {
       "checkpoint": "deck_create_modal",
       "path": "app/test/ui/goldens/runtime/web_wide/deck_create_modal.png",
-      "sha256": "8a5a3d02f75d1ce4ba68b74aa243466e406fb6e58cd9f0ea836313124f35dee9",
-      "bytes": 135430,
+      "sha256": "32b4564a7aa7b9e2bdb4f99cff36ac9bb52f9f3d6635e30f12ddfd16f7e28781",
+      "bytes": 139329,
       "width": 1920,
       "height": 1080
     },
@@ -209,8 +209,8 @@
     {
       "checkpoint": "deck_detail_top",
       "path": "app/test/ui/goldens/runtime/web_wide/deck_detail_top.png",
-      "sha256": "39c89696bc24dbde16bca1ea96c7b4b60b3e839d896c6c858edc4b115abd9bd2",
-      "bytes": 261908,
+      "sha256": "d4261ad3a60cdd5a0cea9acc6836a4bbcecf609ac38f1135cb2fd2c17f835179",
+      "bytes": 262023,
       "width": 1920,
       "height": 1080
     },
@@ -353,8 +353,8 @@
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/web_wide/profile_success.png",
-      "sha256": "5ad3d4b4b2a1c5e6966681237dbae7fecdb4c73f8a9ae509193b12005f050213",
-      "bytes": 110204,
+      "sha256": "e38566221e6074571ad0c0c31536b64a77950e9fea9cd05b3271940a43d35763",
+      "bytes": 110472,
       "width": 1920,
       "height": 1080
     },
@@ -425,8 +425,8 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/web_wide/splash_boot.png",
-      "sha256": "7fbec87ba0a6693cd4ff9f7ea27a357ae3112a25a8baa5e3d230cc661206ac69",
-      "bytes": 481293,
+      "sha256": "5723da511b5725f55def227d10974e4beeb85e65603bc70e0949bc7287ff73ee",
+      "bytes": 481188,
       "width": 1920,
       "height": 1080
     },
@@ -465,8 +465,8 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/web_wide/user_profile_success.png",
-      "sha256": "0660f9e88dad79a761164d3e28f60eddd7df42c4f032f852cca52fda5e0b2eb0",
-      "bytes": 51716,
+      "sha256": "7a9ac244b1b3b2bf0e735fa208b1ac9d2266b9b32d4efef1cea0e6b84bc4ab8c",
+      "bytes": 50450,
       "width": 1920,
       "height": 1080
     },
@@ -481,8 +481,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/web_wide/user_search_results.png",
-      "sha256": "2e8b32d6f1a51d64be9bb714fbf36e9caf64aeb021a8d05bfc3f5a0ba5b1324d",
-      "bytes": 34178,
+      "sha256": "00df290cfa5b06296cecf5d8decee937c5d1676cd0f4812166594d150e647846",
+      "bytes": 33022,
       "width": 1920,
       "height": 1080
     },
