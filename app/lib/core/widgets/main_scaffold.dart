@@ -87,8 +87,8 @@ class MainScaffold extends StatelessWidget {
                         _selectDestination(context, index),
                     destinations: const [
                       NavigationRailDestination(
-                        icon: Icon(Icons.home_outlined),
-                        selectedIcon: Icon(Icons.home),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
+                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
                         label: Text('Início'),
                       ),
                       NavigationRailDestination(
@@ -104,13 +104,15 @@ class MainScaffold extends StatelessWidget {
                         label: Text('Coleção'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.public_outlined),
-                        selectedIcon: Icon(Icons.public),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.community),
+                        selectedIcon: ManaLoomGlyph(
+                          ManaLoomGlyphKind.community,
+                        ),
                         label: Text('Comunidade'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.person_outline),
-                        selectedIcon: Icon(Icons.person),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.player),
+                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.player),
                         label: Text('Perfil'),
                       ),
                     ],
@@ -140,8 +142,8 @@ class MainScaffold extends StatelessWidget {
                         _selectDestination(context, index),
                     destinations: const [
                       NavigationDestination(
-                        icon: Icon(Icons.home_outlined),
-                        selectedIcon: Icon(Icons.home),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
+                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
                         label: 'Início',
                       ),
                       NavigationDestination(
@@ -157,13 +159,15 @@ class MainScaffold extends StatelessWidget {
                         label: 'Coleção',
                       ),
                       NavigationDestination(
-                        icon: Icon(Icons.public_outlined),
-                        selectedIcon: Icon(Icons.public),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.community),
+                        selectedIcon: ManaLoomGlyph(
+                          ManaLoomGlyphKind.community,
+                        ),
                         label: 'Comunidade',
                       ),
                       NavigationDestination(
-                        icon: Icon(Icons.person_outline),
-                        selectedIcon: Icon(Icons.person),
+                        icon: ManaLoomGlyph(ManaLoomGlyphKind.player),
+                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.player),
                         label: 'Perfil',
                       ),
                     ],

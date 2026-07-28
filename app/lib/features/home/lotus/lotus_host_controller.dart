@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -1589,7 +1588,7 @@ class LotusHostController
   }
 
   Future<void> _captureUiSnapshot() async {
-    if (_isDisposed || !kDebugMode) {
+    if (_isDisposed || !lotusShouldCaptureUiSnapshot) {
       return;
     }
 
@@ -1609,8 +1608,11 @@ class LotusHostController
 
       final requestId = DateTime.now().microsecondsSinceEpoch;
       await webViewController.runJavaScript('''
-        (() => {
+        (async () => {
           try {
+            if (document.fonts) {
+              await document.fonts.ready;
+            }
             const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
             const root = document.documentElement;
             const body = document.body;

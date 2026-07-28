@@ -87,6 +87,18 @@ void main() {
       ),
       findsWidgets,
     );
+    for (final kind in const [
+      ManaLoomGlyphKind.brand,
+      ManaLoomGlyphKind.community,
+      ManaLoomGlyphKind.player,
+    ]) {
+      expect(
+        find.byWidgetPredicate(
+          (widget) => widget is ManaLoomGlyph && widget.kind == kind,
+        ),
+        findsWidgets,
+      );
+    }
     await expectManaLoomBaselineAccessibility(tester);
     semantics.dispose();
   });

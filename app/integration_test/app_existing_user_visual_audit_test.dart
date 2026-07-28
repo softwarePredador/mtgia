@@ -10,11 +10,14 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/splash_screen.dart';
+import 'package:manaloom/features/home/lotus/lotus_ui_snapshot.dart';
+import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/main.dart' as app;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'runtime_test_helpers.dart';
+import 'visual_capture_helpers.dart' show restoreVisualCaptureSurface;
 
 const _auditEmail = String.fromEnvironment('MANALOOM_VISUAL_EMAIL');
 const _auditPassword = String.fromEnvironment('MANALOOM_VISUAL_PASSWORD');
@@ -37,6 +40,45 @@ const _auditHeight = int.fromEnvironment(
   'MANALOOM_VISUAL_HEIGHT',
   defaultValue: 844,
 );
+
+Future<LotusUiSnapshot> _waitForNativeLifeCounterVisualReady(
+  WidgetTester tester,
+  LotusUiSnapshotStore snapshotStore,
+) async {
+  LotusUiSnapshot? snapshot;
+  await pumpUntil(
+    tester,
+    () async {
+      snapshot = await snapshotStore.load();
+      return snapshot != null &&
+          snapshot!.visualSkinApplied &&
+          snapshot!.playerCardCount == 4 &&
+          snapshot!.viewportWidth > snapshot!.viewportHeight &&
+          snapshot!.documentFontsStatus == 'loaded' &&
+          snapshot!.uiFontReady &&
+          snapshot!.displayFontReady &&
+          snapshot!.horizontalOverflowPx <= 1.5 &&
+          snapshot!.verticalOverflowPx <= 1.5;
+    },
+    description:
+        'a stable landscape Life Counter DOM with four players and loaded fonts',
+    attempts: 80,
+    step: const Duration(milliseconds: 250),
+  );
+
+  final readySnapshot = snapshot ?? await snapshotStore.load();
+  expect(readySnapshot, isNotNull);
+  // ignore: avoid_print
+  print(
+    'NATIVE_LIFE_DOM_READY '
+    'viewport=${readySnapshot!.viewportWidth}x${readySnapshot.viewportHeight} '
+    'players=${readySnapshot.playerCardCount} '
+    'fonts=${readySnapshot.documentFontsStatus} '
+    'overflow=${readySnapshot.horizontalOverflowPx}x'
+    '${readySnapshot.verticalOverflowPx}',
+  );
+  return readySnapshot;
+}
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -252,11 +294,27 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
       await _capture(binding, tester, 'onboarding_core_flow');
 
+      final lifeCounterUiSnapshotStore = LotusUiSnapshotStore();
+      if (!kIsWeb) {
+        // The Flutter screenshot API swaps the Android rendering surface for
+        // an ImageView. Restore the real surface before mounting the WebView;
+        // otherwise adb can capture a stale Flutter frame over a ready Lotus
+        // DOM and produce a convincing but invalid transition screenshot.
+        await restoreVisualCaptureSurface();
+        await lifeCounterUiSnapshotStore.clear();
+      }
       await _goRoute(tester, '/life-counter');
-      await tester.pump(const Duration(seconds: 3));
       if (kIsWeb) {
+        await tester.pump(const Duration(seconds: 3));
         await _capture(binding, tester, 'life_counter_initial');
       } else {
+        final readySnapshot = await _waitForNativeLifeCounterVisualReady(
+          tester,
+          lifeCounterUiSnapshotStore,
+        );
+        expect(readySnapshot.firstPlayerLifeBoxWidth, greaterThan(60));
+        expect(readySnapshot.firstPlayerLifeBoxHeight, greaterThan(80));
+        await tester.pump(const Duration(seconds: 1));
         // Android's Flutter screenshot API does not composite the embedded
         // WebView and returns an all-black PNG. Keep a bounded window for the
         // host runner to take the real device framebuffer with `adb screencap`

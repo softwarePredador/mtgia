@@ -76,6 +76,13 @@ void main() {
         lotusInjectedVisualSkinScript,
         contains('--manaloom-player-accent'),
       );
+      expect(lotusInjectedVisualSkinScript, contains('--manaloom-mana-white'));
+      expect(lotusInjectedVisualSkinScript, contains('--manaloom-mana-green'));
+      expect(lotusInjectedVisualSkinScript, contains('.menu-button::before'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('radial-gradient(circle at 96% 36%'),
+      );
       expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n + 1)'));
       expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n + 2)'));
       expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n + 3)'));
@@ -102,8 +109,9 @@ void main() {
     });
 
     test('replaces the Lotus dagger with the ManaLoom commander mark', () {
-      final commanderMark =
-          File('assets/lotus/images/dagger.svg').readAsStringSync();
+      final commanderMark = File(
+        'assets/lotus/images/dagger.svg',
+      ).readAsStringSync();
 
       expect(commanderMark, contains('Dano de comandante ManaLoom'));
       expect(commanderMark, contains('M14.5 17.5 3 6V3h3'));

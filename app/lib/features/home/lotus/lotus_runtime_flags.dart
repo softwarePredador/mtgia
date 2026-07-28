@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/config/visual_fixture.dart';
+
 const bool debugLotusBridgeProbe = bool.fromEnvironment(
   'DEBUG_LOTUS_BRIDGE_PROBE',
   defaultValue: false,
@@ -39,5 +41,7 @@ const String lotusLogPrefix = '[LotusLifeCounter]';
 bool get lotusShouldRunBridgeProbe => kDebugMode && debugLotusBridgeProbe;
 bool get lotusShouldRunDomProbe => kDebugMode && debugLotusDomProbe;
 bool get lotusHasVisualProof => kDebugMode && debugLotusVisualProof.isNotEmpty;
+bool get lotusShouldCaptureUiSnapshot =>
+    kDebugMode || manaloomVisualFixtureMode;
 
 bool get lotusShouldEnforceShellCleanup => !debugLotusDisableShellCleanup;

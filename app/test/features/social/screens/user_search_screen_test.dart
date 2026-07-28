@@ -50,6 +50,8 @@ void main() {
     );
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('user-search-clear-button')), findsNothing);
+    expect(find.byKey(const Key('user-search-empty-query')), findsOneWidget);
+    expect(find.text('Encontre outros jogadores'), findsOneWidget);
 
     await tester.enterText(
       find.byKey(const Key('user-search-field')),

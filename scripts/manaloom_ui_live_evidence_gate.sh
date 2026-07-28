@@ -43,24 +43,67 @@ capture_battle_coach() {
     echo "Flutter executable is required for runtime capture" >&2
     exit 2
   fi
+  command -v adb >/dev/null 2>&1 || {
+    echo "adb is required for physical Android runtime capture" >&2
+    exit 2
+  }
+  command -v python3 >/dev/null 2>&1 || {
+    echo "python3 is required for the local card-image fixture" >&2
+    exit 2
+  }
   local device_id="${MANALOOM_UI_PROOF_DEVICE:-}"
   if [[ -z "$device_id" ]]; then
     echo "MANALOOM_UI_PROOF_DEVICE must identify a connected physical Android device" >&2
     exit 2
   fi
   local device_contract="${MANALOOM_UI_PROOF_DEVICE_CONTRACT:-physical_android}"
-  local source_digest run_dir runtime_log status
+  local source_digest run_dir runtime_log status image_port image_server_pid
   source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
   run_dir="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_ui_proof.XXXXXX")"
   runtime_log="$run_dir/battle-coach-runtime.log"
+  image_port="$(python3 - <<'PY'
+import socket
+with socket.socket() as sock:
+    sock.bind(("127.0.0.1", 0))
+    print(sock.getsockname()[1])
+PY
+)"
+  image_server_pid=""
 
   cleanup_capture() {
     local cleanup_status="$?"
     trap - EXIT INT TERM
+    if [[ -n "$image_server_pid" ]] &&
+       kill -0 "$image_server_pid" >/dev/null 2>&1; then
+      kill -TERM "$image_server_pid" >/dev/null 2>&1
+      wait "$image_server_pid" >/dev/null 2>&1
+    fi
+    adb -s "$device_id" reverse --remove "tcp:$image_port" \
+      >/dev/null 2>&1 || true
     rm -rf "$run_dir"
     exit "$cleanup_status"
   }
   trap cleanup_capture EXIT INT TERM
+
+  python3 -m http.server "$image_port" \
+    --bind 127.0.0.1 \
+    --directory "$ROOT_DIR/app/assets/branding" \
+    >"$run_dir/card-image-fixture.log" 2>&1 &
+  image_server_pid="$!"
+  adb -s "$device_id" get-state | grep -qx device || {
+    echo "Android device is not ready: $device_id" >&2
+    exit 1
+  }
+  adb -s "$device_id" reverse "tcp:$image_port" "tcp:$image_port" >/dev/null
+  for _ in $(seq 1 40); do
+    if curl -fsS --max-time 1 \
+      "http://127.0.0.1:$image_port/splash_art.png" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.1
+  done
+  curl -fsS --max-time 3 \
+    "http://127.0.0.1:$image_port/splash_art.png" >/dev/null
 
   print_header "Battle Coach automated UI evidence"
   (
@@ -88,6 +131,8 @@ capture_battle_coach() {
       --dart-define=MANALOOM_UI_SOURCE_DIGEST="$source_digest" \
       --dart-define=MANALOOM_UI_PROOF_PROFILE=android_phone \
       --dart-define=MANALOOM_UI_PROOF_DEVICE_CONTRACT="$device_contract" \
+      --dart-define=MANALOOM_UI_PROOF_CARD_IMAGE_URL="http://127.0.0.1:$image_port/splash_art.png" \
+      --dart-define=MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES=true \
       --dart-define=MANALOOM_VISUAL_FIXTURE_MODE=true \
       --dart-define=DISABLE_FIREBASE_STARTUP=true \
       --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \

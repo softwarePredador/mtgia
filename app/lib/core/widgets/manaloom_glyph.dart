@@ -7,10 +7,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// set symbols, mana symbols, or other third-party marks.
 enum ManaLoomGlyphKind {
   brand,
+  card,
+  community,
   deck,
   collection,
   lifeCounter,
   commander,
+  player,
   battleReplay,
   trade,
   shuffle,
@@ -19,10 +22,13 @@ enum ManaLoomGlyphKind {
 extension ManaLoomGlyphKindAsset on ManaLoomGlyphKind {
   String get assetPath => switch (this) {
     ManaLoomGlyphKind.brand => 'assets/icons/brand.svg',
+    ManaLoomGlyphKind.card => 'assets/icons/card.svg',
+    ManaLoomGlyphKind.community => 'assets/icons/community.svg',
     ManaLoomGlyphKind.deck => 'assets/icons/deck.svg',
     ManaLoomGlyphKind.collection => 'assets/icons/collection.svg',
     ManaLoomGlyphKind.lifeCounter => 'assets/icons/life_counter.svg',
     ManaLoomGlyphKind.commander => 'assets/icons/commander.svg',
+    ManaLoomGlyphKind.player => 'assets/icons/player.svg',
     ManaLoomGlyphKind.battleReplay => 'assets/icons/battle_replay.svg',
     ManaLoomGlyphKind.trade => 'assets/icons/trade.svg',
     ManaLoomGlyphKind.shuffle => 'assets/icons/shuffle.svg',

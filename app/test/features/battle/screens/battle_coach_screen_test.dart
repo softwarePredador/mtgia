@@ -4,6 +4,7 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/battle/models/interactive_battle_session.dart';
 import 'package:manaloom/features/battle/screens/battle_coach_screen.dart';
 import 'package:manaloom/features/battle/services/interactive_battle_service.dart';
+import 'package:manaloom/core/widgets/manaloom_theme_motif.dart';
 
 class _FakeInteractiveGateway implements InteractiveBattleGateway {
   int getCount = 0;
@@ -47,6 +48,13 @@ void main() {
 
     expect(find.byKey(const Key('battle-coach-welcome-state')), findsOneWidget);
     expect(find.text('Jogue as decisões que importam'), findsOneWidget);
+    expect(find.text('MÃO · PILHA · CAMPO · PRIORIDADE'), findsOneWidget);
+    expect(
+      tester
+          .widget<ManaLoomThemeMotif>(find.byType(ManaLoomThemeMotif))
+          .variant,
+      ManaLoomMotifVariant.battlefield,
+    );
     expect(
       find.byKey(const Key('battle-coach-choose-opponent-button')),
       findsOneWidget,

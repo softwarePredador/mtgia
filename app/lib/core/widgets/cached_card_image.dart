@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../services/image_cache_policy.dart';
 import '../services/scryfall_image_request_policy.dart';
 import '../theme/app_theme.dart';
+import 'manaloom_glyph.dart';
 
 /// Widget centralizado para exibir imagens de cartas MTG com cache local.
 ///
@@ -254,20 +256,12 @@ class CachedCardImage extends StatelessWidget {
     if (errorPlaceholder != null) {
       return SizedBox(width: width, height: height, child: errorPlaceholder);
     }
-    return Container(
+    return _CardImageFallback(
+      key: const Key('cached-card-image-placeholder'),
       width: width,
       height: height,
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.style, // ícone de carta MTG genérico
-          color: AppTheme.outlineMuted,
-          size: 28,
-        ),
-      ),
+      borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
+      loading: false,
     );
   }
 
@@ -276,16 +270,12 @@ class CachedCardImage extends StatelessWidget {
     if (loadingPlaceholder != null) {
       return SizedBox(width: width, height: height, child: loadingPlaceholder);
     }
-    return Container(
+    return _CardImageFallback(
+      key: const Key('cached-card-image-loading'),
       width: width,
       height: height,
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
-      ),
-      child: const Center(
-        child: Icon(Icons.style, color: AppTheme.outlineMuted, size: 26),
-      ),
+      borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
+      loading: true,
     );
   }
 
@@ -293,16 +283,116 @@ class CachedCardImage extends StatelessWidget {
     if (errorPlaceholder != null) {
       return SizedBox(width: width, height: height, child: errorPlaceholder);
     }
-    return Container(
+    return _CardImageFallback(
+      key: const Key('cached-card-image-error'),
       width: width,
       height: height,
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
-      ),
-      child: const Icon(
-        Icons.image_not_supported,
-        color: AppTheme.outlineMuted,
+      borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
+      loading: false,
+    );
+  }
+}
+
+class _CardImageFallback extends StatelessWidget {
+  const _CardImageFallback({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.borderRadius,
+    required this.loading,
+  });
+
+  final double? width;
+  final double? height;
+  final BorderRadius borderRadius;
+  final bool loading;
+
+  static const _identityColors = <Color>[
+    AppTheme.manaW,
+    AppTheme.manaU,
+    AppTheme.manaB,
+    AppTheme.manaR,
+    AppTheme.manaG,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = loading ? AppTheme.frost400 : AppTheme.brass400;
+    return ExcludeSemantics(
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate,
+          borderRadius: borderRadius,
+          border: Border.all(
+            color: accent.withValues(alpha: 0.22),
+            width: AppTheme.strokeHairline,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final shortest = math.min(
+                constraints.maxWidth.isFinite ? constraints.maxWidth : 56,
+                constraints.maxHeight.isFinite ? constraints.maxHeight : 78,
+              );
+              final glyphSize = (shortest * 0.38).clamp(14.0, 30.0);
+              final pipSize = (shortest * 0.055).clamp(2.0, 3.5);
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned(
+                    left: shortest * 0.08,
+                    right: shortest * 0.08,
+                    top: shortest * 0.08,
+                    bottom: shortest * 0.08,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
+                        border: Border.all(
+                          color: AppTheme.outlineMuted.withValues(alpha: 0.48),
+                          width: AppTheme.strokeHairline,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: ManaLoomGlyph(
+                      ManaLoomGlyphKind.card,
+                      size: glyphSize,
+                      color: accent.withValues(alpha: loading ? 0.46 : 0.58),
+                    ),
+                  ),
+                  if (shortest >= 38)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: shortest * 0.14,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (final color in _identityColors)
+                            Container(
+                              width: pipSize,
+                              height: pipSize,
+                              margin: EdgeInsets.symmetric(
+                                horizontal: pipSize * 0.42,
+                              ),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: color.withValues(alpha: 0.54),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

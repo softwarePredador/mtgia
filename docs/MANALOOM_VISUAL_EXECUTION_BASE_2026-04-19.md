@@ -39,6 +39,59 @@ The app should not feel:
 - visually noisy
 - like several unrelated sub-products glued together
 
+## MTG product-identity thesis
+
+The product thesis is `arcane tabletop utility`.
+
+ManaLoom uses an original obsidian playmat, a restrained brass weave, frost
+technical information, card proportions, game zones, and the five color
+identities as contextual signals. Real card artwork remains the strongest
+visual anchor whenever the product has artwork to show. Ornament never replaces
+the deck, card, player, zone, or decision that the user came to inspect.
+
+This thesis translates the strongest qualities of MTG products without copying
+their layouts, logos, trade dress, set marks, or protected symbols:
+
+- Arena contributes spatial tabletop hierarchy: hand, stack, battlefield,
+  players, and priority must read as game state rather than a generic feed.
+- Companion contributes operational clarity: life totals, pairings, and the
+  next action remain immediately usable at the table.
+- Card and deck tools contribute object-first hierarchy: card art, card frame,
+  mana identity, set context, deck composition, and collection ownership carry
+  the theme more effectively than decorative fantasy chrome.
+
+### Content plan
+
+Every product surface should present, in this order:
+
+1. orientation: title, route context, or the ManaLoom brand;
+2. the relevant game object: card, deck, set, player, zone, replay, or trade;
+3. one dominant action;
+4. supporting state, provenance, or technical detail.
+
+When real artwork is unavailable, the fallback must still look like a card or
+tabletop object. A generic image, database, people, or dashboard placeholder is
+not an acceptable final-state identity cue.
+
+### Interaction thesis
+
+- Focus, hover, and selection use a quiet brass edge or frost technical cue.
+- Card and zone interactions should reveal state, ownership, legality, or the
+  next decision; motion is never decorative.
+- Empty states may use a static original card/playmat weave at low opacity.
+- Reduced-motion preferences remove non-essential transitions without removing
+  hierarchy or state feedback.
+- Utility icons such as back, search, delete, and settings remain familiar.
+  Product concepts use original ManaLoom glyphs.
+
+### Intellectual-property boundary
+
+ManaLoom motifs are original and MTG-adjacent. Do not add Wizards logos,
+Planeswalker marks, guild marks, copied set symbols, copied card backs, or other
+official brand marks. When licensed or permitted card artwork is displayed,
+preserve its attribution and legal notices. Five-color information is used as
+data and context, not as a replacement brand logo.
+
 ## Color system
 
 ### Core surfaces

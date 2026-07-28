@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/social_provider.dart';
 import 'user_profile_screen.dart';
@@ -116,7 +117,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   if (provider.searchError != null) {
                     return AppStatePanel(
                       key: const Key('user-search-error'),
-                      icon: Icons.person_search_rounded,
+                      iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.player),
                       title: 'Falha ao buscar jogadores',
                       message: provider.searchError,
                       accent: AppTheme.error,
@@ -127,52 +128,23 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   }
 
                   if (_searchController.text.trim().isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.person_search,
-                            size: 64,
-                            color: AppTheme.textSecondary.withValues(
-                              alpha: 0.4,
-                            ),
-                          ),
-                          const SizedBox(height: AppTheme.space16),
-                          const Text(
-                            'Digite para buscar usuários',
-                            style: TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontLg,
-                            ),
-                          ),
-                        ],
-                      ),
+                    return const AppStatePanel(
+                      key: Key('user-search-empty-query'),
+                      iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.player),
+                      title: 'Encontre outros jogadores',
+                      message:
+                          'Busque pelo nick ou nome de usuário para abrir perfis, decks e conexões da comunidade.',
+                      accent: AppTheme.frost400,
                     );
                   }
 
                   if (provider.searchResults.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 48,
-                            color: AppTheme.textSecondary.withValues(
-                              alpha: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: AppTheme.space12),
-                          const Text(
-                            'Nenhum usuário encontrado',
-                            style: TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontLg,
-                            ),
-                          ),
-                        ],
-                      ),
+                    return const AppStatePanel(
+                      key: Key('user-search-empty-results'),
+                      iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.player),
+                      title: 'Nenhum jogador encontrado',
+                      message: 'Revise o nome e tente novamente.',
+                      accent: AppTheme.warning,
                     );
                   }
 

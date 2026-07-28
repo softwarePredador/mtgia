@@ -7,6 +7,7 @@ import '../../../core/utils/mana_helper.dart';
 import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/mana_symbols.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../providers/card_provider.dart';
 import '../widgets/card_edition_metadata.dart';
@@ -121,7 +122,7 @@ class _CardDetailRouteScreenState extends State<CardDetailRouteScreen> {
               accent: AppTheme.brass400,
             )
           : AppStatePanel(
-              icon: Icons.style_outlined,
+              iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.card),
               title: 'Carta indisponível',
               message:
                   'Não foi possível carregar esta impressão agora. Verifique a conexão e tente novamente.',

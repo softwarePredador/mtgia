@@ -1,18 +1,23 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "b5af4634e18cda489b0b8d07d7246e6975e7c04d27f4c2643e18acfd5a8fd082",
+  "source_digest": "d0deb89da2f50418035f239ea66a136ac16535f7a3e56ccad63bbae0db5414f4",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-27T23:59:28Z",
+    "verified_at": "2026-07-28T02:46:50Z",
     "commands": [
-      "./scripts/manaloom_authenticated_visual_qa_isolated.sh",
+      "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (web_mobile_390x844, web_desktop_1440x900, web_wide_1920x1080)",
+      "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart",
       "./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
-      "flutter test test/features/auth/screens/auth_screens_test.dart test/features/commercial/commercial_screens_responsive_test.dart test/features/battle/screens/battle_replays_screen_test.dart test/features/battle/screens/battle_coach_screen_test.dart test/features/community/screens/community_screen_responsive_test.dart test/features/messages/screens/chat_screen_test.dart test/features/home/lotus_presentation_mode_test.dart test/tool/serve_flutter_web_app_contract_test.dart test/tool/ui_runtime_evidence_test.dart test/ui/ui_authenticated_visual_matrix_test.dart test/ui/ui_keyboard_focus_matrix_test.dart test/ui/ui_live_evidence_policy_test.dart test/ui/manaloom_auth_ui_audit_test.dart --no-pub --no-version-check",
+      "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
+      "Codex in-app Browser physical Tab/Shift+Tab/Enter/Space/Escape and typed-search capture at 1280x720",
       "flutter analyze --no-pub --no-version-check",
+      "flutter test <18 focused suites> --no-pub --no-version-check",
       "./scripts/quality_gate.sh ui-audit",
       "./scripts/quality_gate.sh ui-proof",
-      "./scripts/manaloom_local_ci.sh full"
+      "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
+      "./scripts/manaloom_local_ci.sh quick",
+      "flutter build web --release --no-pub --base-href /app/ --no-web-resources-cdn"
     ]
   },
   "runtime": {
@@ -20,40 +25,40 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "d448b88da5750a1ac082309075ba5fc931e55559ac0c03e70580cd6c1182a03b"
+        "sha256": "b07a0b0377ec176b502c5c1fcc359b4dd305058a0f08e511e364885b3b3a75c7"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "7485971e57a947db703e2627864010d56b4dd81d5bb9d43356a55d8406349398"
+        "sha256": "e29a4f4f214f8b741beadc5f8770febf9bc2b63cd3758c5583a2b5e95c83eaee"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "a9f45a477f93caaaba75b90d40e5c95095eca2fa56f6709a15de8235a36ccf97"
+        "sha256": "c3f5850fd7f019f83c1d9a186764a2bb2e9a8593fc8aed384f756a39af11cfb6"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "66e861d11d0a8e9e1632a41c93c36adef771b8acfafec6dc10f289bb374fa37b"
+        "sha256": "9db5afd83d396dc4f391650f4f3fbb9598d47d6df5466f223e7903235acdd948"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "e0a2f52769c62f01efc5606be2120b9cc67d2bef1cd146f2ad10ea3151559545"
+        "sha256": "de50f0ac1724fbc82c534b0bd192583187d505fdaa46548c8654f16d4de85816"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "33d75996f4baf083218b4d663822d7110df2637d9abde5f8f7af5114a8ac55af"
+        "sha256": "6316496942a724f3514b9a3482b6c592b604d2491394a5a57818aea17f265b53"
       }
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-27T23:59:28Z",
+    "reviewed_at": "2026-07-28T02:35:13Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
     },
-    "visual_thesis": "ManaLoom mantém uma identidade MTG editorial e tática: Obsidian organiza o plano de fundo, Frost sustenta leitura, Brass indica prioridade e ações, e arte/símbolos de mana carregam a identidade do jogo sem transformar as telas em dashboards genéricos.",
-    "content_plan": "Cada rota apresenta contexto e estado antes da ação; formulários preservam ajuda e validação junto ao campo, áreas autenticadas conduzem da visão geral ao detalhe, e Battle/Life Counter mantêm mesa, decisão e resultado em ordem de leitura previsível.",
-    "interaction_thesis": "A próxima ação permanece identificável por hierarquia, foco e feedback; teclado real cobre avanço, retorno, ativação, fechamento e restauração no Battle Coach, enquanto erros, vazios, bloqueios e progresso permanecem distinguíveis e recuperáveis.",
+    "visual_thesis": "ManaLoom assume a identidade original de um utilitário arcano de mesa: Obsidian organiza o fundo, Frost sustenta leitura, Brass indica prioridade, objetos de carta e motivos de campo dão contexto e WUBRG aparece como dado do jogo. O resultado remete a Magic sem copiar logos, card backs, set marks ou trade dress da Wizards.",
+    "content_plan": "Cada rota apresenta contexto e estado antes da ação; decks, cartas, formatos, legalidade e coleção permanecem objetos primários, enquanto Battle explicita mão, pilha, campo e prioridade e o Life Counter preserva a leitura de mesa. Formulários mantêm ajuda e validação junto ao campo.",
+    "interaction_thesis": "A próxima ação permanece identificável por hierarquia, foco e feedback; teclado físico cobre avanço, retorno, ativação, fechamento e restauração no Battle Coach, enquanto erros, vazios, bloqueios, progresso e zonas de jogo permanecem distinguíveis e recuperáveis.",
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
@@ -61,7 +66,7 @@
       },
       "brand_and_mtg_identity": {
         "status": "pass",
-        "note": "Símbolos de mana, zonas, cartas, vida, grimório, terminologia e arte são usados onde comunicam função; ícones genéricos ficam restritos a ações universais."
+        "note": "Cartas, Commander, legalidade, mão, pilha, campo, prioridade, vida e WUBRG comunicam o domínio; glifos originais substituem ícones genéricos em carta, comunidade e jogador, e marcas proprietárias da Wizards não são reproduzidas."
       },
       "color_and_contrast": {
         "status": "pass",
@@ -77,7 +82,7 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 53 capturas Web mobile, 52 desktop, 52 wide e 53 Android físico; Life Counter foi capturado nativamente em landscape e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 53 capturas Web mobile, 52 desktop, 52 wide e 53 Android físico; o Life Counter real foi recapturado pelo compositor nativo em landscape 2408×1080, e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
@@ -93,16 +98,16 @@
       },
       "attractiveness": {
         "status": "pass",
-        "note": "A composição é coesa, funcional e reconhecível como produto de MTG; as telas críticas usam densidade controlada e reservam acentos visuais ao que pede atenção."
+        "note": "A composição é coesa, funcional e reconhecível como produto para jogadores de MTG: estados antes genéricos agora usam moldura de carta/campo, Battle parece uma mesa decisória e Home/Deck/Life preservam personalidade sem ruído ornamental."
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "d448b88da5750a1ac082309075ba5fc931e55559ac0c03e70580cd6c1182a03b",
-      "7485971e57a947db703e2627864010d56b4dd81d5bb9d43356a55d8406349398",
-      "a9f45a477f93caaaba75b90d40e5c95095eca2fa56f6709a15de8235a36ccf97",
-      "66e861d11d0a8e9e1632a41c93c36adef771b8acfafec6dc10f289bb374fa37b",
-      "e0a2f52769c62f01efc5606be2120b9cc67d2bef1cd146f2ad10ea3151559545",
-      "33d75996f4baf083218b4d663822d7110df2637d9abde5f8f7af5114a8ac55af"
+      "b07a0b0377ec176b502c5c1fcc359b4dd305058a0f08e511e364885b3b3a75c7",
+      "e29a4f4f214f8b741beadc5f8770febf9bc2b63cd3758c5583a2b5e95c83eaee",
+      "c3f5850fd7f019f83c1d9a186764a2bb2e9a8593fc8aed384f756a39af11cfb6",
+      "9db5afd83d396dc4f391650f4f3fbb9598d47d6df5466f223e7903235acdd948",
+      "de50f0ac1724fbc82c534b0bd192583187d505fdaa46548c8654f16d4de85816",
+      "6316496942a724f3514b9a3482b6c592b604d2491394a5a57818aea17f265b53"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
@@ -110,7 +115,7 @@
       "web_mobile_390x844",
       "web_wide_1920x1080",
       "android_phone",
-      "web_in_app_748x907"
+      "web_in_app_1280x720"
     ],
     "reviewed_screenshot_count": 226,
     "blocking_findings": []

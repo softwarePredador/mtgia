@@ -8,7 +8,8 @@ abstract final class LotusVisualSkinStyleIds {
 }
 
 String get lotusInjectedVisualSkinScript {
-  final css = '''
+  final css =
+      '''
 @font-face {
   font-family: "Inter";
   src: url("fonts/Inter.ttf") format("truetype");
@@ -44,6 +45,11 @@ String get lotusInjectedVisualSkinScript {
   --manaloom-shell-accent-warm: #d89a2f;
   --manaloom-shell-accent-warm-strong: #f2bc49;
   --manaloom-shell-border-warm: rgba(216, 154, 47, 0.42);
+  --manaloom-mana-white: #f0f2c0;
+  --manaloom-mana-blue: #b3ceea;
+  --manaloom-mana-black: #a69f9d;
+  --manaloom-mana-red: #eb9f82;
+  --manaloom-mana-green: #c4d3ca;
   --manaloom-shell-radius: 22px;
   --manaloom-shell-pill-radius: 999px;
   --manaloom-shell-backdrop: saturate(1.12) blur(16px);
@@ -260,6 +266,30 @@ ${LotusDomSelectors.menuButton} {
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
+}
+
+${LotusDomSelectors.menuButton}::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 80px !important;
+  height: 80px !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 27px !important;
+  border: 1px solid rgba(216, 154, 47, 0.28) !important;
+  background:
+    radial-gradient(circle at 50% 3%, var(--manaloom-mana-white) 0 2.4px, transparent 3.2px),
+    radial-gradient(circle at 96% 36%, var(--manaloom-mana-blue) 0 2.4px, transparent 3.2px),
+    radial-gradient(circle at 79% 94%, var(--manaloom-mana-black) 0 2.4px, transparent 3.2px),
+    radial-gradient(circle at 21% 94%, var(--manaloom-mana-red) 0 2.4px, transparent 3.2px),
+    radial-gradient(circle at 4% 36%, var(--manaloom-mana-green) 0 2.4px, transparent 3.2px) !important;
+  box-shadow:
+    0 0 0 5px rgba(120, 168, 255, 0.025),
+    0 0 24px rgba(216, 154, 47, 0.09) !important;
+  opacity: 0.78 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
 }
 
 ${LotusDomSelectors.menuButton} .menu-button-shape,
@@ -3190,7 +3220,8 @@ String? get lotusInjectedVisualProofScript {
   }
 }
 
-String get _visualProofChromeCleanupScript => '''
+String get _visualProofChromeCleanupScript =>
+    '''
   [
     ${jsonEncode(LotusDomSelectors.menuButton)},
     ${jsonEncode(LotusDomSelectors.turnTracker)},
@@ -3267,8 +3298,9 @@ String _buildSimpleVisualProofScript({
   required String text,
   required List<String> buttons,
 }) {
-  final buttonsHtml =
-      buttons.map((label) => '<div class="btn">$label</div>').join();
+  final buttonsHtml = buttons
+      .map((label) => '<div class="btn">$label</div>')
+      .join();
   final overlayClassJson = jsonEncode(overlayClass);
   final titleJson = jsonEncode(title);
   final textJson = jsonEncode(text);

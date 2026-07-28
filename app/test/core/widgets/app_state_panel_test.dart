@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/app_state_panel.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
+import 'package:manaloom/core/widgets/manaloom_theme_motif.dart';
 
 import '../../ui/support/manaloom_ui_audit_harness.dart';
 
@@ -35,7 +36,32 @@ void main() {
 
     expect(find.text('Nenhum conteúdo por aqui'), findsOneWidget);
     expect(find.text('Atualizar'), findsOneWidget);
+    expect(find.byType(ManaLoomThemeMotif), findsOneWidget);
+    expect(find.byKey(const Key('manaloom-theme-motif-paint')), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('supports a static battlefield motif for battle states', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: const Scaffold(
+          body: AppStatePanel(
+            iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.battleReplay),
+            title: 'Nenhum replay',
+            accent: AppTheme.brass400,
+            motif: ManaLoomMotifVariant.battlefield,
+          ),
+        ),
+      ),
+    );
+
+    final motif = tester.widget<ManaLoomThemeMotif>(
+      find.byType(ManaLoomThemeMotif),
+    );
+    expect(motif.variant, ManaLoomMotifVariant.battlefield);
   });
 
   testWidgets('announces state changes as a live status region', (

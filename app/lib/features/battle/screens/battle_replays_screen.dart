@@ -12,6 +12,7 @@ import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/mana_symbols.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
+import '../../../core/widgets/manaloom_theme_motif.dart';
 import '../models/battle_job.dart';
 import '../models/battle_post_report.dart';
 import '../models/battle_replay.dart';
@@ -842,13 +843,14 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   Widget _buildEmptyState() {
     return AppStatePanel(
       key: const Key('battle-replays-empty-state'),
-      icon: Icons.history_toggle_off_rounded,
+      iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.battleReplay),
       title: 'Nenhum replay salvo',
       message:
           'Rode uma simulacao para criar historico. Cada replay informa o motor e o contrato de execucao usados.',
       accent: AppTheme.brass400,
       actionLabel: 'Rodar goldfish',
       onAction: _runGoldfish,
+      motif: ManaLoomMotifVariant.battlefield,
     );
   }
 

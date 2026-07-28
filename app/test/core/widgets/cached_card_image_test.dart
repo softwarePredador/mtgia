@@ -3,8 +3,36 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 
 void main() {
+  testWidgets('uses an original card-frame fallback when artwork is absent', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: CachedCardImage(imageUrl: null, width: 80, height: 112),
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const Key('cached-card-image-placeholder')),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph && widget.kind == ManaLoomGlyphKind.card,
+      ),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.style), findsNothing);
+    expect(find.byIcon(Icons.image_not_supported), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   test('HTTP image URLs stay secure outside an explicit loopback fixture', () {
     expect(
       CachedCardImage.sanitizeImageUrlForTesting(

@@ -8,6 +8,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
+import '../../../core/widgets/manaloom_theme_motif.dart';
 import '../models/battle_test_setup.dart';
 import '../models/interactive_battle_session.dart';
 import '../services/battle_replay_service.dart';
@@ -424,7 +425,7 @@ class _BattleCoachWelcome extends StatelessWidget {
         child: Container(
           key: const Key('battle-coach-welcome-state'),
           constraints: const BoxConstraints(maxWidth: 760),
-          padding: const EdgeInsets.all(AppTheme.space32),
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             gradient: AppTheme.heroGradient,
             borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -432,92 +433,109 @@ class _BattleCoachWelcome extends StatelessWidget {
               color: AppTheme.brass400.withValues(alpha: 0.35),
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 68,
-                height: 68,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppTheme.brass400.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                ),
-                child: const ManaLoomGlyph(
-                  ManaLoomGlyphKind.battleReplay,
-                  size: 38,
-                  color: AppTheme.brass400,
-                ),
-              ),
-              const SizedBox(height: AppTheme.space18),
-              Text(
-                'Jogue as decisões que importam',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: AppTheme.space8),
-              Text(
-                'O XMage conduz regras e ações automáticas. Quando houver uma '
-                'decisão real — mulligan, alvo, combate, mana ou prioridade — '
-                'a mesa para e entrega a escolha a você.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textSecondary,
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: AppTheme.space18),
-              const Wrap(
-                alignment: WrapAlignment.center,
-                spacing: AppTheme.space8,
-                runSpacing: AppTheme.space8,
+          child: ManaLoomThemeMotif(
+            variant: ManaLoomMotifVariant.battlefield,
+            intensity: 0.86,
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.space32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _CoachTrustChip(
-                    icon: Icons.rule_rounded,
-                    label: 'Regras pelo XMage',
+                  Text(
+                    'MÃO · PILHA · CAMPO · PRIORIDADE',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppTheme.brass400,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.7,
+                    ),
                   ),
-                  _CoachTrustChip(
-                    icon: Icons.visibility_off_outlined,
-                    label: 'Mão adversária privada',
+                  const SizedBox(height: AppTheme.space12),
+                  Container(
+                    width: 68,
+                    height: 68,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppTheme.brass400.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    ),
+                    child: const ManaLoomGlyph(
+                      ManaLoomGlyphKind.battleReplay,
+                      size: 38,
+                      color: AppTheme.brass400,
+                    ),
                   ),
-                  _CoachTrustChip(
-                    icon: Icons.history_rounded,
-                    label: 'Replay e decisões salvos',
+                  const SizedBox(height: AppTheme.space18),
+                  Text(
+                    'Jogue as decisões que importam',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space8),
+                  Text(
+                    'O XMage conduz regras e ações automáticas. Quando houver uma '
+                    'decisão real — mulligan, alvo, combate, mana ou prioridade — '
+                    'a mesa para e entrega a escolha a você.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space18),
+                  const Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: AppTheme.space8,
+                    runSpacing: AppTheme.space8,
+                    children: [
+                      _CoachTrustChip(
+                        icon: Icons.rule_rounded,
+                        label: 'Regras pelo XMage',
+                      ),
+                      _CoachTrustChip(
+                        icon: Icons.visibility_off_outlined,
+                        label: 'Mão adversária privada',
+                      ),
+                      _CoachTrustChip(
+                        icon: Icons.history_rounded,
+                        label: 'Replay e decisões salvos',
+                      ),
+                    ],
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: AppTheme.space16),
+                    Text(
+                      error!,
+                      key: const Key('battle-coach-start-error'),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.error,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: AppTheme.space24),
+                  FilledButton.icon(
+                    key: const Key('battle-coach-choose-opponent-button'),
+                    onPressed: starting ? null : onChooseOpponent,
+                    icon: starting
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const ManaLoomGlyph(
+                            ManaLoomGlyphKind.commander,
+                            size: 20,
+                          ),
+                    label: Text(
+                      starting ? 'Preparando a mesa…' : 'Escolher adversário',
+                    ),
                   ),
                 ],
               ),
-              if (error != null) ...[
-                const SizedBox(height: AppTheme.space16),
-                Text(
-                  error!,
-                  key: const Key('battle-coach-start-error'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.error,
-                  ),
-                ),
-              ],
-              const SizedBox(height: AppTheme.space24),
-              FilledButton.icon(
-                key: const Key('battle-coach-choose-opponent-button'),
-                onPressed: starting ? null : onChooseOpponent,
-                icon: starting
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const ManaLoomGlyph(
-                        ManaLoomGlyphKind.commander,
-                        size: 20,
-                      ),
-                label: Text(
-                  starting ? 'Preparando a mesa…' : 'Escolher adversário',
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

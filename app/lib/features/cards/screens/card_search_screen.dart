@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../providers/card_provider.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
@@ -413,7 +414,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           return _SearchStateFrame(
             child: AppStatePanel(
               key: const Key('card-search-error'),
-              icon: Icons.error_outline_rounded,
+              iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.card),
               title: 'Falha ao buscar cartas',
               message: provider.errorMessage!,
               accent: AppTheme.error,
@@ -429,9 +430,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           return _SearchStateFrame(
             child: AppStatePanel(
               key: const Key('card-search-empty-state'),
-              icon: query.length >= 3
-                  ? Icons.search_off_rounded
-                  : Icons.search_rounded,
+              iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.card),
               title: query.length >= 3
                   ? 'Nenhuma carta encontrada'
                   : 'Busque uma carta',

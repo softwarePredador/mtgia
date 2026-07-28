@@ -1,15 +1,31 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 bool _surfaceConverted = false;
+const MethodChannel _integrationTestChannel = MethodChannel(
+  'plugins.flutter.io/integration_test',
+);
 const _emitScreenshotChunks = bool.fromEnvironment(
   'MANALOOM_EMIT_SCREENSHOT_CHUNKS',
   defaultValue: true,
 );
 
 void resetVisualCaptureSurface() {
+  _surfaceConverted = false;
+}
+
+Future<void> restoreVisualCaptureSurface() async {
+  if (!_surfaceConverted) return;
+
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await _integrationTestChannel
+        .invokeMethod<void>('revertFlutterImage')
+        .timeout(const Duration(seconds: 25));
+  }
   _surfaceConverted = false;
 }
 

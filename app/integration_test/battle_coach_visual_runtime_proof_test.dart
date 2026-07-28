@@ -21,6 +21,11 @@ const _deviceContract = String.fromEnvironment(
   'MANALOOM_UI_PROOF_DEVICE_CONTRACT',
   defaultValue: 'physical_android',
 );
+const _proofCardImageUrl = String.fromEnvironment(
+  'MANALOOM_UI_PROOF_CARD_IMAGE_URL',
+  defaultValue:
+      'https://cards.scryfall.io/normal/front/7/b/7b7a348a-51f7-4dc5-8fe7-1c70fea5e050.jpg?1761053659',
+);
 
 const _checkpoints = <String>[
   'battle_coach_00_welcome',
@@ -218,7 +223,7 @@ Future<void> _waitForRenderedCardArt(WidgetTester tester) async {
     }
   }
   fail(
-    'Battle Coach did not render at least three real card artworks within '
+    'Battle Coach did not render at least three card-image objects within '
     'the live-proof window.',
   );
 }
@@ -269,104 +274,116 @@ class _BattleCoachProofGateway implements InteractiveBattleGateway {
   }
 }
 
-InteractiveBattleSession
-_waitingSession() => InteractiveBattleSession.fromJson({
-  'schema_version': 'interactive_battle_session_v1',
-  'id': 'session-proof',
-  'status': 'waiting_for_action',
-  'state_version': 12,
-  'deck_id': '00000000-0000-4000-8000-000000000001',
-  'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
-  'expires_at': '2099-07-27T15:30:00Z',
-  'updated_at': '2026-07-27T15:00:00Z',
-  'private_state': {
-    'turn': 6,
-    'phase': 'COMBAT',
-    'step': 'DECLARE_ATTACKERS',
-    'active_player': 'ManaLoom',
-    'priority_player': 'ManaLoom',
-    'own_player': 'ManaLoom',
-    'priority_time_seconds': 60,
-    'players': [
-      {
-        'name': 'ManaLoom',
-        'life': 31,
-        'library_count': 78,
-        'hand_count': 5,
-        'battlefield': [
-          _card(
-            'c_urza',
-            'Urza, Lord High Artificer',
-            image:
-                'https://cards.scryfall.io/normal/front/7/b/7b7a348a-51f7-4dc5-8fe7-1c70fea5e050.jpg?1761053659',
-          ),
-          _card('c_ring', 'Sol Ring', tapped: true),
-          _card(
-            'c_construct',
-            'Construct',
-            counters: const [
-              {'name': '+1/+1', 'count': 2},
-            ],
-          ),
-        ],
-        'graveyard': [_card('c_countered', 'Arcane Denial')],
-        'exile': const <dynamic>[],
-        'command': [_card('c_commander', 'Urza, Lord High Artificer')],
-      },
-      {
-        'name': 'Krenko Mob',
-        'life': 26,
-        'library_count': 72,
-        'hand_count': 4,
-        'battlefield': [
-          _card('c_krenko', 'Krenko, Mob Boss', tapped: true, damage: 1),
-          _card('c_goblin', 'Goblin Instigator'),
-          _card('c_signet', 'Arcane Signet'),
-        ],
-        'graveyard': [_card('c_bolt', 'Lightning Bolt')],
-        'exile': const <dynamic>[],
-        'command': [_card('c_enemy_commander', 'Krenko, Mob Boss')],
-      },
-    ],
-    'stack': [_card('c_stack', 'Counterspell')],
-    'combat': [
-      {
-        'defender_name': 'Krenko Mob',
-        'blocked': true,
-        'attackers': [_card('c_attacker', 'Construct')],
-        'blockers': [_card('c_blocker', 'Goblin Instigator')],
-      },
-    ],
-    'own_hand': [
-      _card('c_hand_1', 'Swan Song'),
-      _card('c_hand_2', 'Cyclonic Rift'),
-      _card('c_hand_3', 'Island'),
-      _card('c_hand_4', 'Mystic Remora'),
-      _card('c_hand_5', 'Thought Vessel'),
-    ],
-  },
-  'prompt': {
-    'schema_version': 'interactive_battle_prompt_v1',
-    'id': 'p_priority_counterspell',
+InteractiveBattleSession _waitingSession() => InteractiveBattleSession.fromJson(
+  {
+    'schema_version': 'interactive_battle_session_v1',
+    'id': 'session-proof',
+    'status': 'waiting_for_action',
     'state_version': 12,
-    'kind': 'priority',
-    'input_mode': 'options',
-    'title': 'Sua prioridade',
-    'message':
-        'Counterspell está na pilha. Escolha uma resposta legal ou passe '
-        'a prioridade.',
-    'deadline_at': '2099-07-27T15:01:00Z',
-    'options': [
-      {
-        'id': 'o_cast_counterspell',
-        'label': 'Conjurar Swan Song',
-        'role': 'choice',
-        'card': _card('c_option', 'Swan Song'),
-      },
-      {'id': 'o_pass_priority', 'label': 'Passar prioridade', 'role': 'done'},
-    ],
+    'deck_id': '00000000-0000-4000-8000-000000000001',
+    'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
+    'expires_at': '2099-07-27T15:30:00Z',
+    'updated_at': '2026-07-27T15:00:00Z',
+    'private_state': {
+      'turn': 6,
+      'phase': 'COMBAT',
+      'step': 'DECLARE_ATTACKERS',
+      'active_player': 'ManaLoom',
+      'priority_player': 'ManaLoom',
+      'own_player': 'ManaLoom',
+      'priority_time_seconds': 60,
+      'players': [
+        {
+          'name': 'ManaLoom',
+          'life': 31,
+          'library_count': 78,
+          'hand_count': 5,
+          'battlefield': [
+            _card(
+              'c_urza',
+              'Urza, Lord High Artificer',
+              image: _proofCardImageUrl,
+            ),
+            _card(
+              'c_ring',
+              'Sol Ring',
+              image: _proofCardImageUrl,
+              tapped: true,
+            ),
+            _card(
+              'c_construct',
+              'Construct',
+              image: _proofCardImageUrl,
+              counters: const [
+                {'name': '+1/+1', 'count': 2},
+              ],
+            ),
+          ],
+          'graveyard': [_card('c_countered', 'Arcane Denial')],
+          'exile': const <dynamic>[],
+          'command': [_card('c_commander', 'Urza, Lord High Artificer')],
+        },
+        {
+          'name': 'Krenko Mob',
+          'life': 26,
+          'library_count': 72,
+          'hand_count': 4,
+          'battlefield': [
+            _card(
+              'c_krenko',
+              'Krenko, Mob Boss',
+              image: _proofCardImageUrl,
+              tapped: true,
+              damage: 1,
+            ),
+            _card('c_goblin', 'Goblin Instigator'),
+            _card('c_signet', 'Arcane Signet'),
+          ],
+          'graveyard': [_card('c_bolt', 'Lightning Bolt')],
+          'exile': const <dynamic>[],
+          'command': [_card('c_enemy_commander', 'Krenko, Mob Boss')],
+        },
+      ],
+      'stack': [_card('c_stack', 'Counterspell')],
+      'combat': [
+        {
+          'defender_name': 'Krenko Mob',
+          'blocked': true,
+          'attackers': [_card('c_attacker', 'Construct')],
+          'blockers': [_card('c_blocker', 'Goblin Instigator')],
+        },
+      ],
+      'own_hand': [
+        _card('c_hand_1', 'Swan Song'),
+        _card('c_hand_2', 'Cyclonic Rift'),
+        _card('c_hand_3', 'Island'),
+        _card('c_hand_4', 'Mystic Remora'),
+        _card('c_hand_5', 'Thought Vessel'),
+      ],
+    },
+    'prompt': {
+      'schema_version': 'interactive_battle_prompt_v1',
+      'id': 'p_priority_counterspell',
+      'state_version': 12,
+      'kind': 'priority',
+      'input_mode': 'options',
+      'title': 'Sua prioridade',
+      'message':
+          'Counterspell está na pilha. Escolha uma resposta legal ou passe '
+          'a prioridade.',
+      'deadline_at': '2099-07-27T15:01:00Z',
+      'options': [
+        {
+          'id': 'o_cast_counterspell',
+          'label': 'Conjurar Swan Song',
+          'role': 'choice',
+          'card': _card('c_option', 'Swan Song'),
+        },
+        {'id': 'o_pass_priority', 'label': 'Passar prioridade', 'role': 'done'},
+      ],
+    },
   },
-});
+);
 
 InteractiveBattleSession _terminalSession({String status = 'completed'}) =>
     InteractiveBattleSession.fromJson({
