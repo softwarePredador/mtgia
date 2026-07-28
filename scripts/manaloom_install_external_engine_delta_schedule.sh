@@ -22,6 +22,10 @@ Modos:
   --check       valida plist, carga e último relatório disponível
   --run-now     dispara a auditoria instalada imediatamente
   --uninstall   descarrega/remove apenas o LaunchAgent; preserva relatórios
+
+Checkouts sob Documents, Desktop ou Downloads são bloqueados por padrão porque
+o launchd pode não ter autorização TCC para acessá-los. Nesses locais, use a
+automação local do Codex documentada no projeto.
 USAGE
 }
 
@@ -50,6 +54,18 @@ require_runtime() {
     echo "diretório de relatórios deve terminar em external-engine-delta" >&2
     exit 2
   fi
+  case "$ROOT_DIR" in
+    "$HOME/Documents"|"$HOME/Documents"/*|\
+    "$HOME/Desktop"|"$HOME/Desktop"/*|\
+    "$HOME/Downloads"|"$HOME/Downloads"/*)
+      if [[ "${MANALOOM_ALLOW_PROTECTED_LAUNCHD_ROOT:-}" != \
+        "I_HAVE_GRANTED_FULL_DISK_ACCESS" ]]; then
+        echo "checkout em pasta protegida pelo macOS; use a automação local do Codex" >&2
+        echo "ou conceda acesso ao launchd e confirme com MANALOOM_ALLOW_PROTECTED_LAUNCHD_ROOT=I_HAVE_GRANTED_FULL_DISK_ACCESS" >&2
+        exit 2
+      fi
+      ;;
+  esac
 }
 
 render_plist() {

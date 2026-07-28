@@ -32,14 +32,30 @@ oito dias.
 
 ## Operação no macOS
 
-O projeto não usa GitHub Actions. O agendamento é um LaunchAgent local,
-domingo às 09:17 no fuso do Mac, e dispara uma primeira execução na instalação:
+O projeto não usa GitHub Actions. Para checkouts em `Documents`, `Desktop` ou
+`Downloads`, a opção operacional é uma automação cron local do Codex associada
+ao projeto `mtgia`. Ela roda domingo às 09:17 no fuso do Mac e executa somente
+o runner versionado desta página. A automação atual se chama
+`ManaLoom • Deltas XMage/Forge`.
+
+O Codex deve resumir o relatório, mas não pode atualizar pins, editar o
+checkout, fazer commit/push, implantar serviços ou escrever em bancos. O
+`dirty_worktree` continua sendo avaliado pelo próprio runner antes da rede.
+
+Um LaunchAgent continua disponível para checkouts fora das pastas protegidas
+pelo TCC do macOS:
 
 ```bash
 ./scripts/manaloom_install_external_engine_delta_schedule.sh --install
 ./scripts/manaloom_install_external_engine_delta_schedule.sh --check
 ./scripts/manaloom_install_external_engine_delta_schedule.sh --run-now
 ```
+
+O instalador bloqueia pastas protegidas por padrão para não criar um job
+aparentemente carregado que termina com `Operation not permitted`. O override
+`MANALOOM_ALLOW_PROTECTED_LAUNCHD_ROOT=I_HAVE_GRANTED_FULL_DISK_ACCESS` só deve
+ser usado depois de o operador conceder e comprovar a permissão necessária ao
+processo do `launchd`.
 
 Para remover apenas o agendamento e preservar todo o histórico:
 

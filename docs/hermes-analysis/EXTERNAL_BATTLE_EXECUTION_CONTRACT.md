@@ -78,10 +78,11 @@ canonical gate. A pre-populated developer Maven cache is not CI evidence.
 ### Weekly upstream-delta schedule
 
 XMage and Forge upstream drift is monitored by the local, read-only schedule in
-`docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md`. It uses a macOS LaunchAgent
-rather than GitHub Actions, runs the canonical compare audit weekly, and never
-advances a pin. The schedule is permitted because it has all three guards
-required for unattended local evidence:
+`docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md`. It uses a project-scoped
+Codex automation for TCC-protected macOS checkouts, or a macOS LaunchAgent for
+unprotected checkouts, rather than GitHub Actions. Both run the canonical
+compare audit weekly and never advance a pin. The schedule is permitted because
+it has all three guards required for unattended local evidence:
 
 - a dirty-worktree guard, including tracked and untracked changes, that records
   an explicit `skipped` result before any upstream request;
@@ -90,8 +91,8 @@ required for unattended local evidence:
 - no PostgreSQL, Hermes/SQLite, runtime, deployment, rule-promotion, or pin
   mutation path.
 
-Installation, health inspection, immediate execution, and reversible removal
-are explicit operator actions:
+LaunchAgent installation, health inspection, immediate execution, and
+reversible removal remain explicit operator actions:
 
 ```bash
 ./scripts/manaloom_install_external_engine_delta_schedule.sh --install

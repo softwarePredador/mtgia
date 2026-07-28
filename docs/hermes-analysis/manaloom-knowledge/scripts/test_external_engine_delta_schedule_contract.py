@@ -2,6 +2,7 @@
 import json
 import os
 import plistlib
+import shutil
 import subprocess
 import tempfile
 import time
@@ -233,6 +234,48 @@ class ExternalEngineDeltaScheduleContractTests(unittest.TestCase):
             self.assertIn("kickstart gui/", calls)
             self.assertIn("bootout", calls)
             self.assertIn("disable", calls)
+
+    def test_installer_rejects_a_tcc_protected_checkout_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            home = root / "home"
+            scripts = home / "Documents" / "project" / "scripts"
+            scripts.mkdir(parents=True)
+            installer = scripts / INSTALLER.name
+            runner = scripts / RUNNER.name
+            shutil.copy2(INSTALLER, installer)
+            runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            runner.chmod(0o755)
+            tool_dir = root / "bin"
+            tool_dir.mkdir()
+            launchctl = tool_dir / "launchctl"
+            launchctl.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            plutil = tool_dir / "plutil"
+            plutil.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            launchctl.chmod(0o755)
+            plutil.chmod(0o755)
+            env = {
+                **os.environ,
+                "HOME": str(home),
+                "MANALOOM_LAUNCH_AGENTS_DIR": str(root / "LaunchAgents"),
+                "MANALOOM_ENGINE_DELTA_REPORT_DIR": str(
+                    root / "reports" / "external-engine-delta"
+                ),
+                "MANALOOM_LAUNCHCTL_BIN": str(launchctl),
+                "MANALOOM_PLUTIL_BIN": str(plutil),
+            }
+
+            result = subprocess.run(
+                [str(installer), "--install"],
+                env=env,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 2, result.stdout)
+            self.assertIn("pasta protegida", result.stderr)
+            self.assertFalse((root / "LaunchAgents").exists())
 
     def test_check_status_and_freshness_matrix(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

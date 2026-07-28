@@ -80,7 +80,13 @@ Foi adicionada uma auditoria semanal somente leitura, descrita em
   como estado não saudável;
 - trata `review_required` como uma execução válida que exige revisão humana.
 
-A ativação local deve ocorrer somente depois de o checkout ficar limpo:
+A automação local `ManaLoom • Deltas XMage/Forge` foi ativada no Codex para
+domingo às 09:17. Essa é a opção usada neste Mac porque o checkout está sob
+`Documents` e um LaunchAgent sem permissão TCC falhou fechado com
+`Operation not permitted`.
+
+O LaunchAgent abaixo permanece disponível apenas para um checkout fora das
+pastas protegidas ou depois de uma concessão explícita e comprovada de acesso:
 
 ```bash
 ./scripts/manaloom_install_external_engine_delta_schedule.sh --install
