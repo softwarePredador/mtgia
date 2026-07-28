@@ -14,6 +14,7 @@ import 'optimization_validator.dart';
 import 'otimizacao.dart';
 import 'optimize_state_support.dart' as optimize_state;
 import 'optimize_route_request_support.dart';
+import 'optimize_swap_integrity.dart';
 import '../ai_generate_internal_url_support.dart';
 import '../internal_ai_request_token.dart';
 import '../logger.dart';
@@ -371,6 +372,7 @@ Future<void> processCompleteModeAsync({
       () => optimize_complete.rebalanceCompleteDeckForLandDeficit(
         state: state,
         maxTotal: maxTotal,
+        deckFormat: deckFormat,
       ),
     );
 
@@ -415,6 +417,7 @@ Future<void> processCompleteModeAsync({
         maxTotal: maxTotal,
         currentTotalCards: currentTotalCards,
         targetArchetype: targetArchetype,
+        deckFormat: deckFormat,
       ),
     );
 
@@ -457,6 +460,16 @@ Future<void> processCompleteModeAsync({
           intensity: intensity.selected,
         ),
       );
+      final finalQualityError = responseBody['quality_error'];
+      if (finalQualityError is Map) {
+        await OptimizeJobStore.fail(
+          pool,
+          jobId,
+          error: 'Complete mode não atingiu o piso seguro de terrenos.',
+          qualityError: finalQualityError.cast<String, dynamic>(),
+        );
+        return;
+      }
       if (cacheKey != null && cacheKey.isNotEmpty) {
         responseBody['cache'] = {'hit': false, 'cache_key': cacheKey};
         responseBody['intensity'] = intensity.selected;
@@ -474,6 +487,11 @@ Future<void> processCompleteModeAsync({
       responseBody['stage_telemetry'] = responseBody['timings'];
       responseBody['strategy_source'] ??=
           jsonResponse['strategy_source'] ?? 'complete_pipeline';
+      responseBody['swap_integrity'] ??= buildSwapIntegrityForResponse(
+        deckId: deckId,
+        deckSignature: deckSignature,
+        responseBody: responseBody,
+      );
       optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(
         responseBody,
       );

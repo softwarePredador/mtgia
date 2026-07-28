@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/decks/models/deck.dart';
+import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_list_screen.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
@@ -51,6 +53,12 @@ class _FailingCreateDeckProvider extends _StaticDeckProvider {
 class _SuccessfulCreateDeckProvider extends _StaticDeckProvider {
   _SuccessfulCreateDeckProvider() : super(const <Deck>[]);
 
+  String? createdName;
+  String? createdFormat;
+  String? createdDescription;
+  List<Map<String, dynamic>>? createdCards;
+  bool? createdIsPublic;
+
   @override
   Future<bool> createDeck({
     required String name,
@@ -61,9 +69,108 @@ class _SuccessfulCreateDeckProvider extends _StaticDeckProvider {
     List<Map<String, dynamic>>? cards,
     bool isPublic = false,
   }) async {
+    createdName = name;
+    createdFormat = format;
+    createdDescription = description;
+    createdCards = cards;
+    createdIsPublic = isPublic;
     return true;
   }
 }
+
+class _CommanderCardProvider extends CardProvider {
+  _CommanderCardProvider(this.seededCards, {this.shouldFail = false})
+    : super(apiClient: _NoopApiClient());
+
+  final List<DeckCardItem> seededCards;
+  final bool shouldFail;
+  List<DeckCardItem> _results = const [];
+  bool _loading = false;
+  String? _error;
+  String? lastQuery;
+  String? lastFormat;
+  int searchCount = 0;
+
+  @override
+  List<DeckCardItem> get searchResults => List.unmodifiable(_results);
+
+  @override
+  bool get isLoading => _loading;
+
+  @override
+  String? get errorMessage => _error;
+
+  @override
+  Future<void> searchCommanderCandidates(
+    String query, {
+    required String format,
+  }) async {
+    lastQuery = query;
+    lastFormat = format;
+    searchCount += 1;
+    _loading = true;
+    _error = null;
+    _results = const [];
+    notifyListeners();
+    await Future<void>.delayed(const Duration(milliseconds: 1));
+    _loading = false;
+    if (shouldFail) {
+      _error = 'Não foi possível buscar cartas agora.';
+    } else {
+      _results = List.of(seededCards);
+    }
+    notifyListeners();
+  }
+
+  @override
+  void clearSearch() {
+    _results = const [];
+    _loading = false;
+    _error = null;
+    lastQuery = null;
+    lastFormat = null;
+    notifyListeners();
+  }
+}
+
+final _atraxa = DeckCardItem(
+  id: 'card-atraxa',
+  name: 'Atraxa, Grand Unifier',
+  manaCost: '{3}{G}{W}{U}{B}',
+  typeLine: 'Legendary Creature — Phyrexian Angel',
+  oracleText: 'Flying, vigilance, deathtouch, lifelink',
+  colors: const ['W', 'U', 'B', 'G'],
+  colorIdentity: const ['W', 'U', 'B', 'G'],
+  setCode: 'one',
+  rarity: 'mythic',
+  quantity: 1,
+  isCommander: false,
+);
+
+final _solRing = DeckCardItem(
+  id: 'card-sol-ring',
+  name: 'Sol Ring',
+  manaCost: '{1}',
+  typeLine: 'Artifact',
+  oracleText: '{T}: Add {C}{C}.',
+  colorIdentity: const [],
+  setCode: 'cmm',
+  rarity: 'uncommon',
+  quantity: 1,
+  isCommander: false,
+);
+
+final _brawlPlaneswalker = DeckCardItem(
+  id: 'card-teferi',
+  name: 'Teferi, Hero of Dominaria',
+  manaCost: '{3}{W}{U}',
+  typeLine: 'Legendary Planeswalker — Teferi',
+  colorIdentity: const ['W', 'U'],
+  setCode: 'dom',
+  rarity: 'mythic',
+  quantity: 1,
+  isCommander: false,
+);
 
 const _commanderNames = <String>[
   'Lorehold, the Historian',
@@ -111,6 +218,7 @@ Future<void> _pumpDecks(
   Size size, {
   List<Deck>? decks,
   DeckProvider? deckProvider,
+  CardProvider? cardProvider,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -121,6 +229,9 @@ Future<void> _pumpDecks(
       providers: [
         ChangeNotifierProvider<DeckProvider>(
           create: (_) => deckProvider ?? _StaticDeckProvider(decks ?? _decks()),
+        ),
+        ChangeNotifierProvider<CardProvider>(
+          create: (_) => cardProvider ?? _CommanderCardProvider(const []),
         ),
         ChangeNotifierProvider<MessageProvider>(
           create: (_) => MessageProvider(apiClient: _NoopApiClient()),
@@ -135,6 +246,26 @@ Future<void> _pumpDecks(
       ),
     ),
   );
+  await tester.pumpAndSettle();
+}
+
+Future<void> _openCreateDialog(WidgetTester tester) async {
+  final create = find.byKey(const Key('deck-list-empty-create-button'));
+  await tester.ensureVisible(create);
+  await tester.tap(create);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _selectCommander(WidgetTester tester, DeckCardItem card) async {
+  await tester.tap(find.byKey(const Key('deck-create-commander-select')));
+  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.byKey(const Key('deck-create-commander-search-field')),
+    card.name.substring(0, 3),
+  );
+  await tester.pump(const Duration(milliseconds: 321));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(Key('deck-create-commander-result-${card.id}')));
   await tester.pumpAndSettle();
 }
 
@@ -321,6 +452,254 @@ void main() {
   );
 
   testWidgets(
+    'Commander and Brawl expose commander selection while regular formats hide it',
+    (tester) async {
+      await _pumpDecks(tester, const Size(390, 844), decks: const <Deck>[]);
+      await _openCreateDialog(tester);
+
+      expect(
+        find.byKey(const Key('deck-create-commander-section')),
+        findsOneWidget,
+      );
+
+      final format = find.byKey(const Key('deck-create-format-field'));
+      await tester.tap(format);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Standard').last);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('deck-create-commander-section')),
+        findsNothing,
+      );
+
+      await tester.tap(format);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Brawl').last);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('deck-create-commander-section')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('commander picker shows only eligible cards and keeps focus', (
+    tester,
+  ) async {
+    final cards = _CommanderCardProvider([_solRing, _atraxa]);
+    await _pumpDecks(
+      tester,
+      const Size(390, 844),
+      decks: const <Deck>[],
+      cardProvider: cards,
+    );
+    await _openCreateDialog(tester);
+
+    await tester.tap(find.byKey(const Key('deck-create-commander-select')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('commander-picker-dialog')), findsOneWidget);
+    final searchField = tester.widget<TextField>(
+      find.byKey(const Key('deck-create-commander-search-field')),
+    );
+    expect(searchField.focusNode?.hasFocus, isTrue);
+
+    await tester.enterText(
+      find.byKey(const Key('deck-create-commander-search-field')),
+      'At',
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(cards.searchCount, 0);
+
+    await tester.enterText(
+      find.byKey(const Key('deck-create-commander-search-field')),
+      'Atr',
+    );
+    await tester.pump(const Duration(milliseconds: 321));
+    await tester.pumpAndSettle();
+    expect(cards.searchCount, 1);
+    expect(
+      find.byKey(const Key('deck-create-commander-results')),
+      findsOneWidget,
+    );
+    final resultWidgets = tester.widgetList<InkWell>(
+      find.descendant(
+        of: find.byKey(const Key('deck-create-commander-results')),
+        matching: find.byType(InkWell),
+      ),
+    );
+    expect(
+      resultWidgets.first.key,
+      const Key('deck-create-commander-result-card-atraxa'),
+    );
+    expect(
+      tester
+          .widget<InkWell>(
+            find.byKey(const Key('deck-create-commander-result-card-atraxa')),
+          )
+          .onTap,
+      isNotNull,
+    );
+    expect(
+      find.byKey(const Key('deck-create-commander-result-card-sol-ring')),
+      findsNothing,
+    );
+    expect(find.text('Não elegível como comandante'), findsNothing);
+    expect(cards.lastFormat, 'commander');
+
+    final result = find.byKey(
+      const Key('deck-create-commander-result-card-atraxa'),
+    );
+    await tester.ensureVisible(result);
+    await tester.pumpAndSettle();
+    await tester.tap(result);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('deck-create-commander-selected')),
+      findsOneWidget,
+    );
+    expect(find.text('Atraxa, Grand Unifier'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('commander picker keeps search failures and retry inside modal', (
+    tester,
+  ) async {
+    final cards = _CommanderCardProvider(const [], shouldFail: true);
+    await _pumpDecks(
+      tester,
+      const Size(390, 844),
+      decks: const <Deck>[],
+      cardProvider: cards,
+    );
+    await _openCreateDialog(tester);
+    await tester.tap(find.byKey(const Key('deck-create-commander-select')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('deck-create-commander-search-field')),
+      'Atr',
+    );
+    await tester.pump(const Duration(milliseconds: 321));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('deck-create-commander-error')),
+      findsOneWidget,
+    );
+    expect(find.byType(SnackBar), findsNothing);
+    expect(cards.searchCount, 1);
+
+    await tester.tap(find.byKey(const Key('commander-picker-retry')));
+    await tester.pumpAndSettle();
+    expect(cards.searchCount, 2);
+    expect(find.byKey(const Key('commander-picker-dialog')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Brawl accepts a legendary planeswalker candidate', (
+    tester,
+  ) async {
+    final cards = _CommanderCardProvider([_brawlPlaneswalker]);
+    await _pumpDecks(
+      tester,
+      const Size(390, 844),
+      decks: const <Deck>[],
+      cardProvider: cards,
+    );
+    await _openCreateDialog(tester);
+    final format = find.byKey(const Key('deck-create-format-field'));
+    await tester.tap(format);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Brawl').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('deck-create-commander-select')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('deck-create-commander-search-field')),
+      'Tef',
+    );
+    await tester.pump(const Duration(milliseconds: 321));
+    await tester.pumpAndSettle();
+    expect(cards.lastFormat, 'brawl');
+    expect(
+      tester
+          .widget<InkWell>(
+            find.byKey(const Key('deck-create-commander-result-card-teferi')),
+          )
+          .onTap,
+      isNotNull,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('selected commander is sent atomically with deck creation', (
+    tester,
+  ) async {
+    final decks = _SuccessfulCreateDeckProvider();
+    await _pumpDecks(
+      tester,
+      const Size(390, 844),
+      deckProvider: decks,
+      cardProvider: _CommanderCardProvider([_atraxa]),
+    );
+    await _openCreateDialog(tester);
+    await _selectCommander(tester, _atraxa);
+    await tester.enterText(
+      find.byKey(const Key('deck-create-name-field')),
+      'Atraxa Value',
+    );
+    final submit = find.byKey(const Key('deck-create-submit-button'));
+    await tester.ensureVisible(submit);
+    await tester.tap(submit);
+    await tester.pumpAndSettle();
+
+    expect(decks.createdName, 'Atraxa Value');
+    expect(decks.createdFormat, 'commander');
+    expect(decks.createdCards, [
+      {'card_id': 'card-atraxa', 'quantity': 1, 'is_commander': true},
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('changing format clears commander and omits it from payload', (
+    tester,
+  ) async {
+    final decks = _SuccessfulCreateDeckProvider();
+    await _pumpDecks(
+      tester,
+      const Size(390, 844),
+      deckProvider: decks,
+      cardProvider: _CommanderCardProvider([_atraxa]),
+    );
+    await _openCreateDialog(tester);
+    await _selectCommander(tester, _atraxa);
+    final format = find.byKey(const Key('deck-create-format-field'));
+    await tester.ensureVisible(format);
+    await tester.tap(format);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Standard').last);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('deck-create-commander-selected')),
+      findsNothing,
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('deck-create-name-field')),
+      'Standard Midrange',
+    );
+    final submit = find.byKey(const Key('deck-create-submit-button'));
+    await tester.ensureVisible(submit);
+    await tester.tap(submit);
+    await tester.pumpAndSettle();
+
+    expect(decks.createdFormat, 'standard');
+    expect(decks.createdCards, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
     'create validation remains scrollable at 320x568 with 200 percent text',
     (tester) async {
       tester.platformDispatcher.textScaleFactorTestValue = 2;
@@ -359,6 +738,65 @@ void main() {
     },
   );
 
+  testWidgets(
+    'commander picker and selected state fit 320x568 at 200 percent text',
+    (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await _pumpDecks(
+        tester,
+        const Size(320, 568),
+        decks: const <Deck>[],
+        cardProvider: _CommanderCardProvider([_atraxa]),
+      );
+      await _openCreateDialog(tester);
+
+      final commanderSelector = find.byKey(
+        const Key('deck-create-commander-select'),
+      );
+      await Scrollable.ensureVisible(
+        tester.element(commanderSelector),
+        alignment: 0.45,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(commanderSelector);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      await tester.enterText(
+        find.byKey(const Key('deck-create-commander-search-field')),
+        'Atr',
+      );
+      await tester.pump(const Duration(milliseconds: 321));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      final compactResult = find.byKey(
+        const Key('deck-create-commander-result-card-atraxa'),
+      );
+      await tester.drag(
+        find.byKey(const Key('deck-create-commander-results')),
+        const Offset(0, -180),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(compactResult);
+      await tester.pumpAndSettle();
+
+      final selected = find.byKey(const Key('deck-create-commander-selected'));
+      expect(selected, findsOneWidget);
+      await tester.ensureVisible(selected);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('deck-create-commander-clear')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-create-commander-change')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('create failure stays inside modal and preserves form values', (
     tester,
   ) async {
@@ -366,10 +804,11 @@ void main() {
       tester,
       const Size(390, 844),
       deckProvider: _FailingCreateDeckProvider(),
+      cardProvider: _CommanderCardProvider([_atraxa]),
     );
 
-    await tester.tap(find.byKey(const Key('deck-list-empty-create-button')));
-    await tester.pumpAndSettle();
+    await _openCreateDialog(tester);
+    await _selectCommander(tester, _atraxa);
     await tester.enterText(
       find.byKey(const Key('deck-create-name-field')),
       'Izzet Spells',
@@ -378,7 +817,13 @@ void main() {
       find.byKey(const Key('deck-create-description-field')),
       'Mágicas e valor incremental',
     );
-    await tester.tap(find.byKey(const Key('deck-create-public-switch')));
+    final publicSwitch = find.byKey(const Key('deck-create-public-switch'));
+    await Scrollable.ensureVisible(
+      tester.element(publicSwitch),
+      alignment: 0.5,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(publicSwitch);
     await tester.pump();
     await tester.tap(find.byKey(const Key('deck-create-submit-button')));
     await tester.pumpAndSettle();
@@ -394,6 +839,10 @@ void main() {
     expect(find.byType(SnackBar), findsNothing);
     expect(find.text('Izzet Spells'), findsOneWidget);
     expect(find.text('Mágicas e valor incremental'), findsOneWidget);
+    expect(
+      find.byKey(const Key('deck-create-commander-selected')),
+      findsOneWidget,
+    );
     expect(
       tester
           .widget<DropdownButtonFormField<String>>(

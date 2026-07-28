@@ -401,6 +401,14 @@ void main() {
       'additions_detailed': const [
         {'card_id': 'add-1', 'name': 'Arcane Signet', 'quantity': 2},
       ],
+      'swap_integrity': const {
+        'version': 'v1',
+        'algo': 'sha256',
+        'hash': 'signed-complete-preview',
+        'deck_signature': 'commander-1:1:NM',
+        'removal_count': 0,
+        'addition_count': 1,
+      },
     });
 
     final plan = buildOptimizeApplyPlan(preview);
@@ -408,6 +416,7 @@ void main() {
     expect(plan.mode, OptimizeApplyMode.addBulk);
     expect(plan.bulkCards.single['card_id'], 'add-1');
     expect(plan.bulkCards.single['quantity'], 2);
+    expect(plan.mutationContext['expected_deck_signature'], 'commander-1:1:NM');
   });
 
   test('buildOptimizeApplyPlan falls back to ids or names as needed', () {

@@ -3,7 +3,6 @@ set -euo pipefail
 
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 APP_DIR="$ROOT_DIR/app"
-FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-flutter}"
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)_$$_${RANDOM}"
 RUN_DIR="${MANALOOM_VISUAL_QA_ROOT:-${TMPDIR:-/tmp}/manaloom_visual_qa}/$RUN_ID"
 BACKEND_LOG="$RUN_DIR/backend-fixture.log"
@@ -29,6 +28,11 @@ SEED_CARD_ID=""
 SEED_DECK_ID=""
 readonly SEED_PASSWORD='VisualQA!2026-Deck'
 
+# shellcheck source=scripts/lib/manaloom_dart_toolchain.sh
+source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
+resolve_manaloom_flutter_root
+FLUTTER_BIN="$MANALOOM_FLUTTER_ROOT_RESOLVED/bin/flutter"
+
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
 source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 require_postgres_write_approval \
@@ -42,7 +46,7 @@ for tool in curl jq pg_isready psql python3 shasum; do
     exit 2
   }
 done
-if [[ "$FLUTTER_BIN" == */* && ! -x "$FLUTTER_BIN" ]]; then
+if [[ ! -x "$FLUTTER_BIN" ]]; then
   echo "Flutter configurado não é executável: $FLUTTER_BIN" >&2
   exit 2
 fi
@@ -258,7 +262,7 @@ PY
 
 # The visual baseline must not depend on Scryfall/CDN availability. Point the
 # disposable card at a same-origin asset that ships inside the real Web build.
-fixture_image_url="http://127.0.0.1:$WEB_PORT/app/assets/assets/symbols/logo.png"
+fixture_image_url="http://127.0.0.1:$WEB_PORT/app/assets/assets/branding/visual_fixture_arcane_ring.webp"
 psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -d "$DATABASE" \
   -v card_id="$SEED_CARD_ID" \
   -v commander_card_id="$SEED_COMMANDER_CARD_ID" \

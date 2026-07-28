@@ -48,8 +48,16 @@ void main() {
     final findings = <String>[];
     for (final file in _dartFiles(Directory('lib'))) {
       final source = file.readAsStringSync();
+      final tooltipCalls = _constructorCalls(source, 'Tooltip').toList();
       for (final call in _constructorCalls(source, 'IconButton')) {
         if (call.block.contains('tooltip:')) continue;
+        final hasTooltipAncestor = tooltipCalls.any(
+          (tooltip) =>
+              tooltip.start < call.start &&
+              tooltip.end >= call.end &&
+              tooltip.block.contains('message:'),
+        );
+        if (hasTooltipAncestor) continue;
         findings.add('${file.path}:${call.line} IconButton missing tooltip');
       }
     }
@@ -212,6 +220,8 @@ Iterable<_ConstructorCall> _constructorCalls(
     yield _ConstructorCall(
       source.substring(index, end + 1),
       '\n'.allMatches(source.substring(0, index)).length + 1,
+      index,
+      end + 1,
     );
     index = end + 1;
   }
@@ -243,8 +253,10 @@ double _contrast(Color first, Color second) {
 }
 
 class _ConstructorCall {
-  const _ConstructorCall(this.block, this.line);
+  const _ConstructorCall(this.block, this.line, this.start, this.end);
 
   final String block;
   final int line;
+  final int start;
+  final int end;
 }

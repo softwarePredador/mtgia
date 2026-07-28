@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/deck_cards_bulk_support.dart';
+import '../../../../../lib/commander_mana_floor.dart';
 import '../../../../../lib/deck_rules_service.dart';
 import '../../../../../lib/deck_validation_state_support.dart';
 import '../../../../../lib/decks/deck_applied_analysis_support.dart';
@@ -169,6 +170,49 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         cards: normalized,
         strict: isOptimizationMutation,
       );
+      if (isOptimizationMutation && commanderManaFloorApplies(format)) {
+        final cardIds = normalized
+            .map((card) => card['card_id']?.toString() ?? '')
+            .where((id) => id.isNotEmpty)
+            .toList(growable: false);
+        final typeLineResult = await session.execute(
+          Sql.named('''
+            SELECT id::text, type_line
+            FROM cards
+            WHERE id = ANY(@cardIds)
+          '''),
+          parameters: {'cardIds': cardIds},
+        );
+        final typeLineById = <String, String>{
+          for (final row in typeLineResult)
+            row[0].toString(): row[1]?.toString() ?? '',
+        };
+        final manaFloorAssessment = assessCommanderManaFloor(
+          format: format,
+          cards: [
+            for (final card in normalized)
+              {
+                ...card,
+                'type_line':
+                    typeLineById[card['card_id']?.toString() ?? ''] ?? '',
+              },
+          ],
+        );
+        if (!manaFloorAssessment.satisfied) {
+          final qualityError = manaFloorAssessment.toQualityError(
+            code: 'OPTIMIZATION_APPLY_LAND_FLOOR',
+            message:
+                'Aplicação bloqueada: a otimização deixaria o deck com '
+                '${manaFloorAssessment.landCount} terrenos; o piso seguro de '
+                'Commander é ${manaFloorAssessment.minimumLandCount}.',
+          );
+          return {
+            'error_code': 'optimization_land_floor_violation',
+            'error': qualityError['message'],
+            'quality_error': qualityError,
+          };
+        }
+      }
 
       // Substitui o deck (em lote) – ok para bulk pois é uma operação rara.
       await session.execute(

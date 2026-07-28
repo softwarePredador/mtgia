@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/battle/models/interactive_battle_session.dart';
 import 'package:manaloom/features/battle/screens/battle_coach_screen.dart';
 import 'package:manaloom/features/battle/services/interactive_battle_service.dart';
@@ -21,10 +22,25 @@ const _deviceContract = String.fromEnvironment(
   'MANALOOM_UI_PROOF_DEVICE_CONTRACT',
   defaultValue: 'physical_android',
 );
-const _proofCardImageUrl = String.fromEnvironment(
+const _proofCardImageBaseUrl = String.fromEnvironment(
+  'MANALOOM_UI_PROOF_CARD_IMAGE_BASE_URL',
+);
+const _fallbackProofCardImageUrl = String.fromEnvironment(
   'MANALOOM_UI_PROOF_CARD_IMAGE_URL',
   defaultValue:
       'https://cards.scryfall.io/normal/front/7/b/7b7a348a-51f7-4dc5-8fe7-1c70fea5e050.jpg?1761053659',
+);
+final _proofArcaneArtificerImageUrl = _proofImageUrl(
+  'visual_fixture_arcane_artificer.webp',
+);
+final _proofArcaneRingImageUrl = _proofImageUrl(
+  'visual_fixture_arcane_ring.webp',
+);
+final _proofBlueSpellImageUrl = _proofImageUrl(
+  'visual_fixture_blue_spell.webp',
+);
+final _proofEmberRaidersImageUrl = _proofImageUrl(
+  'visual_fixture_ember_raiders.webp',
 );
 
 const _checkpoints = <String>[
@@ -141,6 +157,7 @@ void main() {
         tester,
         find.byKey(const Key('battle-coach-terminal-panel')),
       );
+      await _waitForRenderedCardArt(tester);
       expect(
         find.byKey(const Key('battle-coach-open-replay-button')),
         findsOneWidget,
@@ -209,6 +226,10 @@ Future<void> _capture(
 }
 
 Future<void> _waitForRenderedCardArt(WidgetTester tester) async {
+  final cardImages = find.descendant(
+    of: find.byKey(const Key('battle-coach-board')),
+    matching: find.byType(CachedCardImage),
+  );
   final renderedCardArt = find.descendant(
     of: find.byKey(const Key('battle-coach-board')),
     matching: find.byType(RawImage),
@@ -218,14 +239,22 @@ Future<void> _waitForRenderedCardArt(WidgetTester tester) async {
       () => Future<void>.delayed(const Duration(milliseconds: 500)),
     );
     await tester.pump(const Duration(milliseconds: 120));
-    if (renderedCardArt.evaluate().length >= 3) {
+    final expectedCount = cardImages.evaluate().length;
+    final renderedCount = renderedCardArt.evaluate().length;
+    if (expectedCount >= 3 && renderedCount >= expectedCount) {
       return;
     }
   }
   fail(
-    'Battle Coach did not render at least three card-image objects within '
+    'Battle Coach did not finish rendering every visible card image within '
     'the live-proof window.',
   );
+}
+
+String _proofImageUrl(String fileName) {
+  final baseUrl = _proofCardImageBaseUrl.trim();
+  if (baseUrl.isEmpty) return _fallbackProofCardImageUrl;
+  return '${baseUrl.replaceFirst(RegExp(r'/+$'), '')}/$fileName';
 }
 
 class _BattleCoachProofGateway implements InteractiveBattleGateway {
@@ -302,18 +331,18 @@ InteractiveBattleSession _waitingSession() => InteractiveBattleSession.fromJson(
             _card(
               'c_urza',
               'Urza, Lord High Artificer',
-              image: _proofCardImageUrl,
+              image: _proofArcaneArtificerImageUrl,
             ),
             _card(
               'c_ring',
               'Sol Ring',
-              image: _proofCardImageUrl,
+              image: _proofArcaneRingImageUrl,
               tapped: true,
             ),
             _card(
               'c_construct',
               'Construct',
-              image: _proofCardImageUrl,
+              image: _proofArcaneArtificerImageUrl,
               counters: const [
                 {'name': '+1/+1', 'count': 2},
               ],
@@ -332,16 +361,26 @@ InteractiveBattleSession _waitingSession() => InteractiveBattleSession.fromJson(
             _card(
               'c_krenko',
               'Krenko, Mob Boss',
-              image: _proofCardImageUrl,
+              image: _proofEmberRaidersImageUrl,
               tapped: true,
               damage: 1,
             ),
-            _card('c_goblin', 'Goblin Instigator'),
+            _card(
+              'c_goblin',
+              'Goblin Instigator',
+              image: _proofEmberRaidersImageUrl,
+            ),
             _card('c_signet', 'Arcane Signet'),
           ],
           'graveyard': [_card('c_bolt', 'Lightning Bolt')],
           'exile': const <dynamic>[],
-          'command': [_card('c_enemy_commander', 'Krenko, Mob Boss')],
+          'command': [
+            _card(
+              'c_enemy_commander',
+              'Krenko, Mob Boss',
+              image: _proofEmberRaidersImageUrl,
+            ),
+          ],
         },
       ],
       'stack': [_card('c_stack', 'Counterspell')],
@@ -409,20 +448,44 @@ InteractiveBattleSession _terminalSession({String status = 'completed'}) =>
             'life': 31,
             'library_count': 77,
             'hand_count': 4,
-            'battlefield': [_card('c_urza', 'Urza, Lord High Artificer')],
+            'battlefield': [
+              _card(
+                'c_urza',
+                'Urza, Lord High Artificer',
+                image: _proofArcaneArtificerImageUrl,
+              ),
+            ],
             'graveyard': [_card('c_song', 'Swan Song')],
             'exile': const <dynamic>[],
-            'command': [_card('c_commander', 'Urza, Lord High Artificer')],
+            'command': [
+              _card(
+                'c_commander',
+                'Urza, Lord High Artificer',
+                image: _proofArcaneArtificerImageUrl,
+              ),
+            ],
           },
           {
             'name': 'Krenko Mob',
             'life': 22,
             'library_count': 71,
             'hand_count': 4,
-            'battlefield': [_card('c_krenko', 'Krenko, Mob Boss')],
+            'battlefield': [
+              _card(
+                'c_krenko',
+                'Krenko, Mob Boss',
+                image: _proofEmberRaidersImageUrl,
+              ),
+            ],
             'graveyard': [_card('c_countered', 'Counterspell')],
             'exile': const <dynamic>[],
-            'command': [_card('c_enemy_commander', 'Krenko, Mob Boss')],
+            'command': [
+              _card(
+                'c_enemy_commander',
+                'Krenko, Mob Boss',
+                image: _proofEmberRaidersImageUrl,
+              ),
+            ],
           },
         ],
         'stack': const <dynamic>[],
@@ -446,7 +509,7 @@ Map<String, dynamic> _card(
 }) => {
   'id': id,
   'name': name,
-  if (image != null) 'image_url': image,
+  'image_url': image ?? _proofBlueSpellImageUrl,
   'tapped': tapped,
   'damage': damage,
   'counters': counters,

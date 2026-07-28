@@ -506,7 +506,7 @@ class _BattleCoachWelcome extends StatelessWidget {
           ),
           child: ManaLoomThemeMotif(
             variant: ManaLoomMotifVariant.battlefield,
-            intensity: 0.86,
+            intensity: 0.20,
             child: Padding(
               padding: const EdgeInsets.all(AppTheme.space32),
               child: Column(

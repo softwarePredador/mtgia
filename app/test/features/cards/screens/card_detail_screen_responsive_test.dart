@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
-import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 
@@ -141,13 +140,7 @@ void main() {
       Exception('fixture 404'),
     );
     await tester.pumpWidget(MaterialApp(home: failure));
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is ManaLoomGlyph && widget.kind == ManaLoomGlyphKind.card,
-      ),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('manaloom-card-back')), findsOneWidget);
     expect(find.byIcon(Icons.image_not_supported), findsNothing);
     expect(failedFrameHeight, closeTo(390 * 88 / 63, 0.1));
 

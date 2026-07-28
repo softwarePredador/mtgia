@@ -148,7 +148,7 @@ void main() {
     test('documents deck builder read/write contract boundaries', () {
       final cards = _contractRowFor(
         contracts,
-        'GET /cards?id=&name=&set=&include_tokens=&dedupe=&page=&limit=',
+        'GET /cards?id=&name=&set=&include_tokens=&dedupe=&commander_format=&page=&limit=',
       );
       final printings = _contractRowFor(
         contracts,
@@ -185,7 +185,10 @@ void main() {
       );
 
       expect(cards, contains('include_tokens` defaults to `false`'));
-      expect(cards, contains('dedupe` defaults to `true`'));
+      expect(cards, contains('`dedupe=identity`'));
+      expect(cards, contains('`dedupe=false`'));
+      expect(cards, contains('`commander_format=commander\\|brawl`'));
+      expect(cards, contains('final commander eligibility'));
 
       expect(printings, contains('sync=true'));
       expect(printings, contains('write-capable'));

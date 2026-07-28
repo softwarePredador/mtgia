@@ -1,11 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/scryfall_image_helper.dart';
+import '../../../core/widgets/card_artwork.dart';
+import '../../../core/widgets/mana_symbols.dart';
+import '../models/deck_card_item.dart';
 import '../providers/deck_provider_support.dart';
 import 'deck_optimize_flow_support.dart';
 import 'deck_ui_components.dart';
+
+typedef RecommendationCardLoader = Future<DeckCardItem> Function(String cardId);
 
 class SheetHeroCard extends StatelessWidget {
   final IconData icon;
@@ -170,6 +179,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
   final List<String> applyBlockers;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
+  final RecommendationCardLoader? loadCard;
   final VoidCallback onCancel;
   final ValueChanged<OptimizePreviewSelection> onConfirm;
   final Future<void> Function()? onCopyDebug;
@@ -196,6 +206,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
     required this.applyBlockers,
     required this.displayRemovals,
     required this.displayAdditions,
+    this.loadCard,
     required this.onCancel,
     required this.onConfirm,
     this.onCopyDebug,
@@ -210,6 +221,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
 class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   late final Set<int> _selectedRemovalIndexes;
   late final Set<int> _selectedAdditionIndexes;
+  final Map<String, Future<DeckCardItem?>> _cardPreviewCache = {};
 
   @override
   void initState() {
@@ -353,6 +365,21 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     );
   }
 
+  Future<DeckCardItem?> _loadRecommendationCard(Map<String, dynamic> item) {
+    final cardId = item['card_id']?.toString().trim() ?? '';
+    final loader = widget.loadCard;
+    if (cardId.isEmpty || loader == null) {
+      return Future<DeckCardItem?>.value();
+    }
+    return _cardPreviewCache.putIfAbsent(cardId, () async {
+      try {
+        return await loader(cardId);
+      } catch (_) {
+        return null;
+      }
+    });
+  }
+
   Future<void> _shareReport() async {
     var text = _buildShareReport();
     final createShareLink = widget.onCreateShareLink;
@@ -433,9 +460,13 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
         for (var index = 0; index < items.take(limit).length; index++)
           _SelectableSuggestionLineItem(
             key: Key('optimize-suggestion-$keyPrefix-$index'),
+            interactionKey: 'optimize-suggestion-$keyPrefix-$index',
             item: items[index],
             accent: accent,
             selected: selectedIndexes.contains(index),
+            loadCard: widget.loadCard == null
+                ? null
+                : () => _loadRecommendationCard(items[index]),
             onChanged: (value) {
               if (value) {
                 onToggleOn(index);
@@ -1404,22 +1435,292 @@ class _TrustSignalGrid extends StatelessWidget {
   }
 }
 
-class _SelectableSuggestionLineItem extends StatelessWidget {
+class _SelectableSuggestionLineItem extends StatefulWidget {
+  final String interactionKey;
   final Map<String, dynamic> item;
   final Color accent;
   final bool selected;
+  final Future<DeckCardItem?> Function()? loadCard;
   final ValueChanged<bool> onChanged;
 
   const _SelectableSuggestionLineItem({
     super.key,
+    required this.interactionKey,
     required this.item,
     required this.accent,
     required this.selected,
+    this.loadCard,
     required this.onChanged,
   });
 
   @override
+  State<_SelectableSuggestionLineItem> createState() =>
+      _SelectableSuggestionLineItemState();
+}
+
+class _SelectableSuggestionLineItemState
+    extends State<_SelectableSuggestionLineItem> {
+  static const _hoverDelay = Duration(milliseconds: 220);
+  static const _previewGap = AppTheme.space12;
+
+  final LayerLink _previewLayerLink = LayerLink();
+  final GlobalKey _previewTargetKey = GlobalKey();
+  final FocusScopeNode _readerFocusScopeNode = FocusScopeNode(
+    debugLabel: 'optimization recommendation card reader',
+    traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop,
+  );
+  OverlayEntry? _hoverPreviewEntry;
+  OverlayEntry? _readerEntry;
+  LocalHistoryEntry? _readerHistoryEntry;
+  FocusNode? _readerPreviousFocus;
+  Timer? _hoverTimer;
+  Future<DeckCardItem?>? _cardFuture;
+  bool _pointerInside = false;
+  bool _keyboardFocus = false;
+
+  @override
+  void didUpdateWidget(covariant _SelectableSuggestionLineItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item['card_id'] != widget.item['card_id'] ||
+        oldWidget.item['name'] != widget.item['name']) {
+      _cardFuture = null;
+      _hideHoverPreview();
+    } else {
+      _hoverPreviewEntry?.markNeedsBuild();
+    }
+  }
+
+  @override
+  void dispose() {
+    _hoverTimer?.cancel();
+    _hoverPreviewEntry?.remove();
+    _hoverPreviewEntry = null;
+    _readerPreviousFocus = null;
+    _closeCardReader(removeHistoryEntry: true, restoreFocus: false);
+    _readerFocusScopeNode.dispose();
+    super.dispose();
+  }
+
+  Future<DeckCardItem?>? _ensureCardFuture() {
+    final loader = widget.loadCard;
+    if (loader == null) return null;
+    return _cardFuture ??= loader();
+  }
+
+  void _scheduleHoverPreview({Duration delay = _hoverDelay}) {
+    _hoverTimer?.cancel();
+    if (_hoverPreviewEntry != null) {
+      _hoverPreviewEntry!.markNeedsBuild();
+      return;
+    }
+    _hoverTimer = Timer(delay, _showHoverPreview);
+  }
+
+  void _handlePointerEnter(PointerEnterEvent _) {
+    _pointerInside = true;
+    _scheduleHoverPreview();
+  }
+
+  void _handlePointerExit(PointerExitEvent _) {
+    _pointerInside = false;
+    _hoverTimer?.cancel();
+    if (!_keyboardFocus) _hideHoverPreview();
+  }
+
+  void _handleFocusChange(bool focused) {
+    _keyboardFocus =
+        focused &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    if (_keyboardFocus) {
+      _scheduleHoverPreview(delay: Duration.zero);
+    } else if (!_pointerInside) {
+      _hideHoverPreview();
+    }
+  }
+
+  void _showHoverPreview() {
+    if (!mounted || (!_pointerInside && !_keyboardFocus)) return;
+    final targetContext = _previewTargetKey.currentContext;
+    final targetBox = targetContext?.findRenderObject();
+    final overlay = Overlay.of(context, rootOverlay: true);
+    if (targetBox is! RenderBox || !targetBox.hasSize) return;
+
+    final media = MediaQuery.of(context);
+    final screenSize = media.size;
+    final targetOrigin = targetBox.localToGlobal(Offset.zero);
+    final previewWidth = (screenSize.width - AppTheme.space24).clamp(
+      220.0,
+      278.0,
+    );
+    final previewHeight =
+        previewWidth / CardArtworkSpec.mtgCardAspectRatio + 72;
+    final rightSpace =
+        screenSize.width - targetOrigin.dx - targetBox.size.width;
+    final leftSpace = targetOrigin.dx;
+
+    final double horizontalOffset;
+    if (rightSpace >= previewWidth + _previewGap) {
+      horizontalOffset = targetBox.size.width + _previewGap;
+    } else if (leftSpace >= previewWidth + _previewGap) {
+      horizontalOffset = -previewWidth - _previewGap;
+    } else {
+      horizontalOffset = (targetBox.size.width - previewWidth) / 2;
+    }
+
+    final minimumTop = media.padding.top + AppTheme.space12;
+    final maximumTop =
+        screenSize.height -
+        media.padding.bottom -
+        AppTheme.space12 -
+        previewHeight;
+    final desiredTop = targetOrigin.dy.clamp(
+      minimumTop,
+      maximumTop < minimumTop ? minimumTop : maximumTop,
+    );
+    final verticalOffset = desiredTop - targetOrigin.dy;
+
+    _hoverPreviewEntry = OverlayEntry(
+      builder: (_) => Positioned(
+        width: previewWidth,
+        child: CompositedTransformFollower(
+          link: _previewLayerLink,
+          showWhenUnlinked: false,
+          targetAnchor: Alignment.topLeft,
+          followerAnchor: Alignment.topLeft,
+          offset: Offset(horizontalOffset, verticalOffset),
+          child: IgnorePointer(
+            child: _RecommendationHoverPreview(
+              key: Key('${widget.interactionKey}-hover-card-preview'),
+              item: widget.item,
+              cardFuture: _ensureCardFuture(),
+            ),
+          ),
+        ),
+      ),
+    );
+    overlay.insert(_hoverPreviewEntry!);
+  }
+
+  void _hideHoverPreview() {
+    _hoverTimer?.cancel();
+    _hoverTimer = null;
+    _hoverPreviewEntry?.remove();
+    _hoverPreviewEntry = null;
+  }
+
+  void _openCardReader() {
+    _hideHoverPreview();
+    if (_readerEntry != null) return;
+    final cardFuture = _ensureCardFuture();
+    final compact =
+        MediaQuery.sizeOf(context).width < AppTheme.breakpointMedium;
+    final overlay = Overlay.of(context, rootOverlay: true);
+    _readerPreviousFocus = FocusManager.instance.primaryFocus;
+    _readerEntry = OverlayEntry(
+      builder: (overlayContext) => Positioned.fill(
+        child: CallbackShortcuts(
+          bindings: {
+            const SingleActivator(LogicalKeyboardKey.escape): _closeCardReader,
+          },
+          child: FocusScope(
+            node: _readerFocusScopeNode,
+            autofocus: true,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Semantics(
+                    button: true,
+                    label: 'Fechar leitura da carta',
+                    child: GestureDetector(
+                      key: Key('${widget.interactionKey}-card-preview-barrier'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _closeCardReader,
+                      child: ColoredBox(
+                        color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+                      ),
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: compact
+                      ? Align(
+                          alignment: Alignment.bottomCenter,
+                          child: FractionallySizedBox(
+                            widthFactor: 1,
+                            heightFactor: 0.92,
+                            child: _RecommendationCardReader(
+                              key: Key(
+                                '${widget.interactionKey}-card-preview-panel',
+                              ),
+                              item: widget.item,
+                              cardFuture: cardFuture,
+                              compact: true,
+                              onClose: _closeCardReader,
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: 460,
+                              maxHeight:
+                                  MediaQuery.sizeOf(overlayContext).height *
+                                  0.9,
+                            ),
+                            child: _RecommendationCardReader(
+                              key: Key(
+                                '${widget.interactionKey}-card-preview-panel',
+                              ),
+                              item: widget.item,
+                              cardFuture: cardFuture,
+                              compact: false,
+                              onClose: _closeCardReader,
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    overlay.insert(_readerEntry!);
+
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      _readerHistoryEntry = LocalHistoryEntry(
+        onRemove: () => _closeCardReader(removeHistoryEntry: false),
+      );
+      route.addLocalHistoryEntry(_readerHistoryEntry!);
+    }
+  }
+
+  void _closeCardReader({
+    bool removeHistoryEntry = true,
+    bool restoreFocus = true,
+  }) {
+    final historyEntry = _readerHistoryEntry;
+    _readerHistoryEntry = null;
+    if (removeHistoryEntry) historyEntry?.remove();
+
+    _readerEntry?.remove();
+    _readerEntry = null;
+
+    final previousFocus = _readerPreviousFocus;
+    _readerPreviousFocus = null;
+    if (restoreFocus &&
+        previousFocus != null &&
+        previousFocus.canRequestFocus) {
+      previousFocus.requestFocus();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+    final accent = widget.accent;
+    final selected = widget.selected;
     final name = item['name']?.toString() ?? '';
     final playerFacing = (item['player_facing'] is Map)
         ? (item['player_facing'] as Map).cast<String, dynamic>()
@@ -1483,74 +1784,497 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
       suffix = ' • ${(score * 100).round()}%';
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppTheme.space8),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        onTap: () => onChanged(!selected),
-        child: Container(
-          padding: const EdgeInsets.all(AppTheme.space8),
-          decoration: BoxDecoration(
-            color: selected
-                ? accent.withValues(alpha: 0.08)
-                : AppTheme.surfaceElevated,
-            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-            border: Border.all(
-              color: selected
-                  ? accent.withValues(alpha: 0.35)
-                  : AppTheme.outlineMuted.withValues(alpha: 0.45),
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): _hideHoverPreview,
+      },
+      child: Focus(
+        skipTraversal: true,
+        onFocusChange: _handleFocusChange,
+        child: MouseRegion(
+          onEnter: _handlePointerEnter,
+          onExit: _handlePointerExit,
+          child: CompositedTransformTarget(
+            key: _previewTargetKey,
+            link: _previewLayerLink,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppTheme.space8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                onTap: () => widget.onChanged(!selected),
+                onLongPress: _openCardReader,
+                child: Container(
+                  padding: const EdgeInsets.all(AppTheme.space8),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? accent.withValues(alpha: 0.08)
+                        : AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: selected
+                          ? accent.withValues(alpha: 0.35)
+                          : AppTheme.outlineMuted.withValues(alpha: 0.45),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Checkbox(
+                        value: selected,
+                        onChanged: (value) => widget.onChanged(value ?? false),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      const SizedBox(width: AppTheme.space4),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$name$suffix',
+                              style: TextStyle(
+                                color: selected
+                                    ? accent
+                                    : AppTheme.textSecondary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            if (metadata.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: AppTheme.space3,
+                                ),
+                                child: Text(
+                                  metadata,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: AppTheme.fontSm,
+                                    height: AppTheme.lineHeightCompact,
+                                  ),
+                                ),
+                              ),
+                            if (reason.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: AppTheme.space3,
+                                ),
+                                child: Text(
+                                  reason,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: AppTheme.fontSm,
+                                    height: AppTheme.lineHeightCompact,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Semantics(
+                        button: true,
+                        label: 'Ver carta $name',
+                        child: Tooltip(
+                          message: 'Ver carta',
+                          child: IconButton(
+                            key: Key('${widget.interactionKey}-preview-button'),
+                            onPressed: _openCardReader,
+                            constraints: const BoxConstraints.tightFor(
+                              width: AppTheme.touchTargetMin,
+                              height: AppTheme.touchTargetMin,
+                            ),
+                            icon: const Icon(Icons.style_outlined, size: 20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Checkbox(
-                value: selected,
-                onChanged: (value) => onChanged(value ?? false),
-                visualDensity: VisualDensity.compact,
-              ),
-              const SizedBox(width: AppTheme.space4),
-              Expanded(
+        ),
+      ),
+    );
+  }
+}
+
+class _RecommendationHoverPreview extends StatelessWidget {
+  const _RecommendationHoverPreview({
+    super.key,
+    required this.item,
+    required this.cardFuture,
+  });
+
+  final Map<String, dynamic> item;
+  final Future<DeckCardItem?>? cardFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOutCubic,
+      tween: Tween(begin: 0.96, end: 1),
+      builder: (context, value, child) => Opacity(
+        opacity: ((value - 0.96) / 0.04).clamp(0, 1),
+        child: Transform.scale(
+          scale: value,
+          alignment: Alignment.topCenter,
+          child: child,
+        ),
+      ),
+      child: Material(
+        elevation: 20,
+        shadowColor: AppTheme.backgroundAbyss.withValues(alpha: 0.72),
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        clipBehavior: Clip.antiAlias,
+        child: FutureBuilder<DeckCardItem?>(
+          future: cardFuture,
+          builder: (context, snapshot) {
+            final card = snapshot.data;
+            final name = _recommendationCardName(item, card);
+            return Semantics(
+              container: true,
+              liveRegion: true,
+              label: 'Prévia da carta $name',
+              child: Padding(
+                padding: const EdgeInsets.all(AppTheme.space10),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '$name$suffix',
-                      style: TextStyle(
-                        color: selected ? accent : AppTheme.textSecondary,
-                        fontWeight: FontWeight.w700,
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.style_outlined,
+                          size: 17,
+                          color: AppTheme.brass400,
+                        ),
+                        const SizedBox(width: AppTheme.space6),
+                        Expanded(
+                          child: Text(
+                            name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.space8),
+                    CardArtwork(
+                      key: const Key('recommendation-hover-card-artwork'),
+                      variant: CardArtworkVariant.fullCard,
+                      imageUrl: _recommendationCardImageUrl(
+                        item,
+                        card,
+                        version: 'normal',
+                      ),
+                      fallbackImageUrl: ScryfallImageHelper.namedImageUrl(
+                        name,
+                        version: 'normal',
+                      ),
+                      semanticLabel: 'Imagem completa da carta $name',
+                      errorPlaceholder: _RecommendationCardImageFallback(
+                        name: name,
                       ),
                     ),
-                    if (metadata.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: AppTheme.space3),
-                        child: Text(
-                          metadata,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontSm,
-                            height: AppTheme.lineHeightCompact,
-                          ),
-                        ),
-                      ),
-                    if (reason.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: AppTheme.space3),
-                        child: Text(
-                          reason,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontSm,
-                            height: AppTheme.lineHeightCompact,
-                          ),
-                        ),
-                      ),
                   ],
                 ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _RecommendationCardReader extends StatelessWidget {
+  const _RecommendationCardReader({
+    super.key,
+    required this.item,
+    required this.cardFuture,
+    required this.compact,
+    required this.onClose,
+  });
+
+  final Map<String, dynamic> item;
+  final Future<DeckCardItem?>? cardFuture;
+  final bool compact;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderRadius = compact
+        ? const BorderRadius.vertical(top: Radius.circular(AppTheme.radiusLg))
+        : BorderRadius.circular(AppTheme.radiusLg);
+
+    return Material(
+      color: AppTheme.surfaceElevated,
+      borderRadius: borderRadius,
+      clipBehavior: Clip.antiAlias,
+      child: FutureBuilder<DeckCardItem?>(
+        future: cardFuture,
+        builder: (context, snapshot) {
+          final card = snapshot.data;
+          final name = _recommendationCardName(item, card);
+          final typeLine =
+              card?.typeLine.trim() ??
+              item['type_line']?.toString().trim() ??
+              '';
+          final oracleText =
+              card?.oracleText?.trim() ??
+              item['oracle_text']?.toString().trim() ??
+              '';
+          final manaCost =
+              card?.manaCost?.trim() ??
+              item['mana_cost']?.toString().trim() ??
+              '';
+          final setLabel = _recommendationSetLabel(item, card);
+
+          return Semantics(
+            container: true,
+            namesRoute: true,
+            label: 'Leitura da carta $name',
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.space16,
+                    AppTheme.space12,
+                    AppTheme.space8,
+                    AppTheme.space8,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: AppTheme.brass400.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.style_outlined,
+                          size: 20,
+                          color: AppTheme.brass400,
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.space10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: AppTheme.textPrimary,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                            ),
+                            const Text(
+                              'Prévia da carta',
+                              style: TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: AppTheme.fontSm,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Fechar',
+                        onPressed: onClose,
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(
+                  height: 1,
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppTheme.space16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: compact ? 360 : 310,
+                            ),
+                            child: AspectRatio(
+                              aspectRatio: CardArtworkSpec.mtgCardAspectRatio,
+                              child: InteractiveViewer(
+                                minScale: 1,
+                                maxScale: 4,
+                                child: CardArtwork(
+                                  key: const Key(
+                                    'recommendation-reader-card-artwork',
+                                  ),
+                                  variant: CardArtworkVariant.fullCard,
+                                  imageUrl: _recommendationCardImageUrl(
+                                    item,
+                                    card,
+                                    version: 'large',
+                                  ),
+                                  fallbackImageUrl:
+                                      ScryfallImageHelper.namedImageUrl(
+                                        name,
+                                        version: 'large',
+                                      ),
+                                  semanticLabel:
+                                      'Imagem ampliável da carta $name',
+                                  constrainAspectRatio: false,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  errorPlaceholder:
+                                      _RecommendationCardImageFallback(
+                                        name: name,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppTheme.space12),
+                        Text(
+                          compact
+                              ? 'Use dois dedos para ampliar e ler a carta.'
+                              : 'Use o zoom para ampliar e ler a carta.',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppTheme.textSecondary),
+                        ),
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) ...[
+                          const SizedBox(height: AppTheme.space10),
+                          const LinearProgressIndicator(
+                            minHeight: 2,
+                            color: AppTheme.frost400,
+                            backgroundColor: AppTheme.surfaceSlate,
+                          ),
+                        ],
+                        if (typeLine.isNotEmpty ||
+                            manaCost.isNotEmpty ||
+                            oracleText.isNotEmpty ||
+                            setLabel.isNotEmpty) ...[
+                          const SizedBox(height: AppTheme.space16),
+                          Divider(
+                            height: 1,
+                            color: AppTheme.outlineMuted.withValues(
+                              alpha: 0.62,
+                            ),
+                          ),
+                          const SizedBox(height: AppTheme.space16),
+                          if (typeLine.isNotEmpty || manaCost.isNotEmpty)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    typeLine,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: AppTheme.textPrimary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                ),
+                                if (manaCost.isNotEmpty) ...[
+                                  const SizedBox(width: AppTheme.space8),
+                                  ManaCostRow(cost: manaCost, symbolSize: 17),
+                                ],
+                              ],
+                            ),
+                          if (oracleText.isNotEmpty) ...[
+                            const SizedBox(height: AppTheme.space12),
+                            OracleTextWidget(oracleText),
+                          ],
+                          if (setLabel.isNotEmpty) ...[
+                            const SizedBox(height: AppTheme.space12),
+                            Text(
+                              setLabel,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: AppTheme.textSecondary),
+                            ),
+                          ],
+                        ] else if (cardFuture != null &&
+                            snapshot.connectionState ==
+                                ConnectionState.done) ...[
+                          const SizedBox(height: AppTheme.space12),
+                          Text(
+                            'Os dados detalhados não ficaram disponíveis; a imagem foi resolvida pelo nome da carta.',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  height: AppTheme.lineHeightCompact,
+                                ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _RecommendationCardImageFallback extends StatelessWidget {
+  const _RecommendationCardImageFallback({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppTheme.surfaceSlate,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.style_outlined,
+                size: 42,
+                color: AppTheme.brass400,
+              ),
+              const SizedBox(height: AppTheme.space10),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space4),
+              const Text(
+                'Imagem indisponível',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppTheme.textSecondary),
               ),
             ],
           ),
@@ -1558,6 +2282,52 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
       ),
     );
   }
+}
+
+String _recommendationCardName(Map<String, dynamic> item, DeckCardItem? card) {
+  return card?.name.trim().isNotEmpty == true
+      ? card!.name.trim()
+      : item['name']?.toString().trim() ?? '';
+}
+
+String? _recommendationCardImageUrl(
+  Map<String, dynamic> item,
+  DeckCardItem? card, {
+  required String version,
+}) {
+  String? explicitUrl = card?.effectiveImageUrl;
+  if (explicitUrl == null || explicitUrl.trim().isEmpty) {
+    explicitUrl = item['image_url']?.toString();
+  }
+  if (explicitUrl == null || explicitUrl.trim().isEmpty) {
+    final imageUris = item['image_uris'];
+    if (imageUris is Map) {
+      explicitUrl =
+          imageUris[version]?.toString() ??
+          imageUris['normal']?.toString() ??
+          imageUris['large']?.toString() ??
+          imageUris['small']?.toString();
+    }
+  }
+  return ScryfallImageHelper.preferredImageUrl(
+    explicitUrl: explicitUrl,
+    cardName: _recommendationCardName(item, card),
+    version: version,
+  );
+}
+
+String _recommendationSetLabel(Map<String, dynamic> item, DeckCardItem? card) {
+  final setName =
+      card?.setName?.trim() ?? item['set_name']?.toString().trim() ?? '';
+  final setCode =
+      card?.setCode.trim() ?? item['set_code']?.toString().trim() ?? '';
+  final collector =
+      card?.collectorNumber?.trim() ??
+      item['collector_number']?.toString().trim() ??
+      '';
+  final edition = setName.isNotEmpty ? setName : setCode.toUpperCase();
+  if (edition.isEmpty) return '';
+  return collector.isEmpty ? edition : '$edition · #$collector';
 }
 
 String _friendlyRoleLabel(String role) {

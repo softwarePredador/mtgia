@@ -87,6 +87,25 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
     sql =
         hasSets
             ? '''
+      WITH ranked_sets AS (
+        SELECT
+          code,
+          name,
+          release_date,
+          ROW_NUMBER() OVER (
+            PARTITION BY LOWER(code)
+            ORDER BY
+              release_date DESC NULLS LAST,
+              CASE WHEN code = UPPER(code) THEN 0 ELSE 1 END,
+              name ASC
+          ) AS rn
+        FROM sets
+      ),
+      canonical_sets AS (
+        SELECT code, name, release_date
+        FROM ranked_sets
+        WHERE rn = 1
+      )
       SELECT
         c.id::text,
         c.scryfall_id::text,
@@ -95,6 +114,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         c.mana_cost,
         c.type_line,
         c.oracle_text,
+        c.power,
+        c.toughness,
         c.colors,
         c.color_identity,
         c.image_url,
@@ -109,7 +130,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         c.collector_number,
         c.foil
       FROM cards c
-      LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+      LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
       WHERE LOWER(c.name) = LOWER(@name)
       ORDER BY s.release_date DESC NULLS LAST,
         LOWER(c.set_code) ASC,
@@ -126,6 +147,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         c.mana_cost,
         c.type_line,
         c.oracle_text,
+        c.power,
+        c.toughness,
         c.colors,
         c.color_identity,
         c.image_url,
@@ -146,6 +169,25 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
     ''';
   } else if (hasSets) {
     sql = '''
+      WITH ranked_sets AS (
+        SELECT
+          code,
+          name,
+          release_date,
+          ROW_NUMBER() OVER (
+            PARTITION BY LOWER(code)
+            ORDER BY
+              release_date DESC NULLS LAST,
+              CASE WHEN code = UPPER(code) THEN 0 ELSE 1 END,
+              name ASC
+          ) AS rn
+        FROM sets
+      ),
+      canonical_sets AS (
+        SELECT code, name, release_date
+        FROM ranked_sets
+        WHERE rn = 1
+      )
       SELECT * FROM (
         SELECT DISTINCT ON (LOWER(c.set_code))
           c.id::text,
@@ -155,6 +197,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           c.mana_cost,
           c.type_line,
           c.oracle_text,
+          c.power,
+          c.toughness,
           c.colors,
           c.color_identity,
           c.image_url,
@@ -169,7 +213,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           c.collector_number,
           c.foil
         FROM cards c
-        LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+        LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
         WHERE LOWER(c.name) = LOWER(@name)
         ORDER BY LOWER(c.set_code), s.release_date DESC NULLS LAST
       ) AS deduplicated
@@ -187,6 +231,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           c.mana_cost,
           c.type_line,
           c.oracle_text,
+          c.power,
+          c.toughness,
           c.colors,
           c.color_identity,
           c.image_url,
@@ -230,6 +276,8 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           'mana_cost': m['mana_cost'],
           'type_line': m['type_line'],
           'oracle_text': m['oracle_text'],
+          'power': m['power'],
+          'toughness': m['toughness'],
           'colors': m['colors'],
           'color_identity': m['color_identity'],
           'image_url': imageUrl,
@@ -314,6 +362,8 @@ Future<int> _syncPrintingsFromScryfall(
     final manaCost = p['mana_cost']?.toString();
     final typeLine = p['type_line']?.toString();
     final oracleText = p['oracle_text']?.toString();
+    final power = p['power']?.toString();
+    final toughness = p['toughness']?.toString();
     final setCode = p['set']?.toString();
     final rarity = p['rarity']?.toString();
     final isReserved = p['reserved'] is bool ? p['reserved'] as bool : null;
@@ -358,15 +408,19 @@ Future<int> _syncPrintingsFromScryfall(
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
+                             power, toughness,
                              colors, color_identity, image_url, set_code, rarity, cmc,
                              is_reserved, collector_number, foil$identityInsertColumns)
           VALUES (
             @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
+            @power, @toughness,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
             @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
             image_url = COALESCE(EXCLUDED.image_url, cards.image_url),
+            power = COALESCE(EXCLUDED.power, cards.power),
+            toughness = COALESCE(EXCLUDED.toughness, cards.toughness),
             is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
             foil = COALESCE(cards.foil, EXCLUDED.foil),
@@ -380,6 +434,8 @@ Future<int> _syncPrintingsFromScryfall(
           'mana_cost': manaCost,
           'type_line': typeLine,
           'oracle_text': oracleText,
+          'power': power,
+          'toughness': toughness,
           'colors': colors,
           'color_identity': colorIdentity,
           'image_url': imageUrl,

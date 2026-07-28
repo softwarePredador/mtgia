@@ -22,11 +22,18 @@ const basicLandNames = <String>{
 };
 
 String normalizeBasicLandName(String name) {
-  return name
+  final normalized = name
       .trim()
       .toLowerCase()
       .replaceAll(RegExp(r'[‐‑‒–—−-]+'), ' ')
       .replaceAll(RegExp(r'\s+'), ' ');
+  final faces = normalized.split(RegExp(r'\s*//\s*'));
+  if (faces.length > 1 &&
+      faces.first.isNotEmpty &&
+      faces.every((face) => face == faces.first)) {
+    return faces.first;
+  }
+  return normalized;
 }
 
 bool isBasicLandName(String name) {

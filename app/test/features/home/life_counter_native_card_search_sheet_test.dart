@@ -11,7 +11,11 @@ class _FakeCardProvider extends CardProvider {
   int clearCount = 0;
 
   @override
-  Future<void> searchCards(String query) async {
+  Future<void> searchCards(
+    String query, {
+    bool collapsePrintings = true,
+    String? commanderFormat,
+  }) async {
     lastQuery = query.trim();
     _searchResultsProxy = [
       DeckCardItem(

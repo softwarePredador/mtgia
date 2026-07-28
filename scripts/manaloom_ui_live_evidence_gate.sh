@@ -97,13 +97,13 @@ PY
   adb -s "$device_id" reverse "tcp:$image_port" "tcp:$image_port" >/dev/null
   for _ in $(seq 1 40); do
     if curl -fsS --max-time 1 \
-      "http://127.0.0.1:$image_port/splash_art.png" >/dev/null 2>&1; then
+      "http://127.0.0.1:$image_port/visual_fixture_arcane_ring.webp" >/dev/null 2>&1; then
       break
     fi
     sleep 0.1
   done
   curl -fsS --max-time 3 \
-    "http://127.0.0.1:$image_port/splash_art.png" >/dev/null
+    "http://127.0.0.1:$image_port/visual_fixture_arcane_ring.webp" >/dev/null
 
   print_header "Battle Coach automated UI evidence"
   (
@@ -131,7 +131,7 @@ PY
       --dart-define=MANALOOM_UI_SOURCE_DIGEST="$source_digest" \
       --dart-define=MANALOOM_UI_PROOF_PROFILE=android_phone \
       --dart-define=MANALOOM_UI_PROOF_DEVICE_CONTRACT="$device_contract" \
-      --dart-define=MANALOOM_UI_PROOF_CARD_IMAGE_URL="http://127.0.0.1:$image_port/splash_art.png" \
+      --dart-define=MANALOOM_UI_PROOF_CARD_IMAGE_BASE_URL="http://127.0.0.1:$image_port" \
       --dart-define=MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES=true \
       --dart-define=MANALOOM_VISUAL_FIXTURE_MODE=true \
       --dart-define=DISABLE_FIREBASE_STARTUP=true \

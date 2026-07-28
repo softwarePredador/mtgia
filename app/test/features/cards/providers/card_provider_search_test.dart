@@ -9,7 +9,7 @@ class _SearchApiClient extends ApiClient {
 
   @override
   Future<ApiResponse> get(String endpoint, {Duration? timeout}) async {
-    if (endpoint == '/cards?name=Fable&limit=50&page=1') {
+    if (endpoint == '/cards?name=Fable&limit=50&page=1&dedupe=identity') {
       return ApiResponse(200, {
         'data': [
           {
@@ -85,6 +85,92 @@ class _CardByIdApiClient extends ApiClient {
   }
 }
 
+class _CommanderSearchApiClient extends ApiClient {
+  final List<String> requestedEndpoints = [];
+
+  @override
+  Future<ApiResponse> get(String endpoint, {Duration? timeout}) async {
+    requestedEndpoints.add(endpoint);
+    if (endpoint ==
+        '/cards?name=Weatherlight&limit=50&page=1'
+            '&dedupe=identity&commander_format=commander') {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'weatherlight',
+            'name': 'Weatherlight',
+            'type_line': 'Legendary Artifact — Vehicle',
+            'power': '4',
+            'toughness': '5',
+            'colors': <String>[],
+            'color_identity': <String>[],
+            'set_code': 'dom',
+            'rarity': 'mythic',
+          },
+        ],
+      });
+    }
+    fail('Unexpected endpoint: $endpoint');
+  }
+}
+
+class _LoreholdSearchApiClient extends ApiClient {
+  final List<String> requestedEndpoints = [];
+
+  @override
+  Future<ApiResponse> get(String endpoint, {Duration? timeout}) async {
+    requestedEndpoints.add(endpoint);
+    if (endpoint.startsWith('/binder/availability?card_ids=')) {
+      return ApiResponse(200, {'data': const []});
+    }
+    if (endpoint == '/cards?name=Lorehold&limit=50&page=1&dedupe=identity') {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'lorehold-psos',
+            'oracle_id': 'oracle-lorehold',
+            'name': 'Lorehold, the Historian',
+            'type_line': 'Legendary Creature — Elder Dragon',
+            'set_code': 'psos',
+            'rarity': 'mythic',
+          },
+          {
+            'id': 'lorehold-sos',
+            'oracle_id': 'oracle-lorehold',
+            'name': 'Lorehold, the Historian',
+            'type_line': 'Legendary Creature — Elder Dragon',
+            'set_code': 'sos',
+            'rarity': 'mythic',
+          },
+        ],
+      });
+    }
+    if (endpoint == '/cards?name=Lorehold&limit=50&page=1&dedupe=false') {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'lorehold-sos',
+            'oracle_id': 'oracle-lorehold',
+            'name': 'Lorehold, the Historian',
+            'type_line': 'Legendary Creature — Elder Dragon',
+            'set_code': 'sos',
+            'rarity': 'mythic',
+          },
+          {
+            'id': 'lorehold-psos',
+            'oracle_id': 'oracle-lorehold',
+            'name': 'Lorehold, the Historian',
+            'type_line': 'Legendary Creature — Elder Dragon',
+            'set_code': 'psos',
+            'rarity': 'mythic',
+          },
+        ],
+      });
+    }
+    fail('Unexpected endpoint: $endpoint');
+  }
+}
+
 void main() {
   test('card search preserves multi-face artwork from the backend', () async {
     final provider = CardProvider(apiClient: _SearchApiClient());
@@ -120,6 +206,62 @@ void main() {
     expect(provider.errorMessage, isNull);
     expect(provider.searchResults, hasLength(1));
     expect(provider.collectionAvailabilityFor('dfc-search'), isNull);
+  });
+
+  test(
+    'commander search maps combat fields and skips binder availability',
+    () async {
+      final api = _CommanderSearchApiClient();
+      final provider = CardProvider(apiClient: api);
+
+      await provider.searchCommanderCandidates(
+        'Weatherlight',
+        format: 'commander',
+      );
+
+      expect(api.requestedEndpoints, [
+        '/cards?name=Weatherlight&limit=50&page=1'
+            '&dedupe=identity&commander_format=commander',
+      ]);
+      expect(provider.searchResults, hasLength(1));
+      expect(provider.searchResults.single.power, '4');
+      expect(provider.searchResults.single.toughness, '5');
+      expect(provider.collectionAvailabilityFor('weatherlight'), isNull);
+    },
+  );
+
+  test('deck search collapses printings by playable identity', () async {
+    final api = _LoreholdSearchApiClient();
+    final provider = CardProvider(apiClient: api);
+
+    await provider.searchCards('Lorehold');
+
+    expect(provider.searchResults, hasLength(1));
+    final card = provider.searchResults.single;
+    expect(card.id, 'lorehold-sos');
+    expect(card.oracleId, 'oracle-lorehold');
+    expect(provider.printingCountFor(card.id), 2);
+    expect(
+      api.requestedEndpoints.first,
+      '/cards?name=Lorehold&limit=50&page=1&dedupe=identity',
+    );
+  });
+
+  test('binder search preserves physical printings', () async {
+    final api = _LoreholdSearchApiClient();
+    final provider = CardProvider(apiClient: api);
+
+    await provider.searchCards('Lorehold', collapsePrintings: false);
+
+    expect(provider.searchResults, hasLength(2));
+    expect(provider.searchResults.map((card) => card.id), {
+      'lorehold-sos',
+      'lorehold-psos',
+    });
+    expect(
+      api.requestedEndpoints.first,
+      '/cards?name=Lorehold&limit=50&page=1&dedupe=false',
+    );
   });
 
   test('card detail reload resolves the exact backend card id', () async {

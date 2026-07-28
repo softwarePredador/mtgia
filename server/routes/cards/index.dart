@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../lib/card_identity_support.dart';
 import '../../lib/card_query_contract.dart';
+import '../../lib/commander_eligibility.dart';
 import '../../lib/endpoint_cache.dart';
 import '../../lib/scryfall_image_url.dart';
 
@@ -21,9 +22,23 @@ Future<Response> onRequest(RequestContext context) async {
   final nameFilter = params['name'];
   final setFilter = normalizeCardSetFilter(params['set']);
   final includeTokens = params['include_tokens']?.toLowerCase() == 'true';
-  // Deduplicar por padrão para evitar variantes duplicadas
-  // Use ?dedupe=false para obter todas as variantes
-  final deduplicate = params['dedupe']?.toLowerCase() != 'false';
+  final dedupeMode = parseCardDedupeMode(params['dedupe']);
+  if (dedupeMode == null) {
+    return Response.json(
+      statusCode: 400,
+      body: {'error': 'dedupe deve ser true, false ou identity'},
+    );
+  }
+  final rawCommanderFormat = params['commander_format'];
+  final commanderFormat = normalizeCommanderCandidateFormat(rawCommanderFormat);
+  if (rawCommanderFormat != null &&
+      rawCommanderFormat.trim().isNotEmpty &&
+      commanderFormat == null) {
+    return Response.json(
+      statusCode: 400,
+      body: {'error': 'commander_format deve ser commander ou brawl'},
+    );
+  }
 
   // Paginação
   final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
@@ -47,8 +62,9 @@ Future<Response> onRequest(RequestContext context) async {
       offset,
       includeSetInfo: hasSets,
       includeIdentityColumns: hasIdentityColumns,
-      deduplicate: deduplicate,
+      dedupeMode: dedupeMode,
       includeTokens: includeTokens,
+      commanderFormat: commanderFormat,
     );
 
     final queryResult = await conn.execute(
@@ -76,6 +92,8 @@ Future<Response> onRequest(RequestContext context) async {
             'mana_cost': map['mana_cost'],
             'type_line': map['type_line'],
             'oracle_text': map['oracle_text'],
+            'power': map['power'],
+            'toughness': map['toughness'],
             'colors': map['colors'],
             'color_identity': map['color_identity'],
             'image_url': imageUrl,
@@ -91,6 +109,8 @@ Future<Response> onRequest(RequestContext context) async {
             'is_reserved': map['is_reserved'] == true,
             'collector_number': map['collector_number'],
             'foil': map['foil'],
+            if (map.containsKey('printing_count'))
+              'printing_count': map['printing_count'],
           };
         }).toList();
 
@@ -130,11 +150,13 @@ _QueryBuilder _buildQuery(
   int offset, {
   required bool includeSetInfo,
   required bool includeIdentityColumns,
-  bool deduplicate = false,
+  CardDedupeMode dedupeMode = CardDedupeMode.set,
   bool includeTokens = false,
+  String? commanderFormat,
 }) {
   final params = <String, dynamic>{};
   final conditions = <String>[];
+  final hasNameFilter = nameFilter != null && nameFilter.isNotEmpty;
 
   // Para ordenação: prioriza match exato, depois basic lands, depois alfabético
   String orderExpression = 'c.name ASC';
@@ -144,7 +166,7 @@ _QueryBuilder _buildQuery(
     params['id'] = idFilter;
   }
 
-  if (nameFilter != null && nameFilter.isNotEmpty) {
+  if (hasNameFilter) {
     conditions.add('c.name ILIKE @name');
     params['name'] = '%$nameFilter%';
     params['exact_name'] = nameFilter;
@@ -170,91 +192,185 @@ _QueryBuilder _buildQuery(
     params['set'] = setFilter;
   }
 
+  if (!includeTokens) {
+    conditions.add("COALESCE(c.type_line, '') NOT ILIKE '%Token%'");
+  }
+
+  if (commanderFormat != null) {
+    conditions.add(
+      commanderEligibilitySql(format: commanderFormat, tableAlias: 'c'),
+    );
+  }
+
   final whereClause =
       conditions.isNotEmpty ? 'WHERE ${conditions.join(' AND ')}' : '';
 
-  String sql;
   final identityColumns = cardIdentitySelectSql('c', includeIdentityColumns);
-
-  if (deduplicate) {
-    // Deduplicar por (name, LOWER(set_code)) para evitar variantes e inconsistências de case
-    // Nota: para dedup com priorização, fazemos ORDER BY com CASE no select externo
-    sql =
-        includeSetInfo
-            ? '''
-          SELECT * FROM (
-            SELECT DISTINCT ON (c.name, LOWER(c.set_code))
-              c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
-              $identityColumns
-              c.oracle_text, c.colors, c.color_identity, c.image_url,
-              LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
-              c.is_reserved, c.collector_number, c.foil,
-              s.name AS set_name,
-              s.release_date AS set_release_date
-            FROM cards c
-            LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
-            $whereClause
-            ORDER BY c.name, LOWER(c.set_code), s.release_date DESC NULLS LAST
-          ) AS deduped
-          ORDER BY ${nameFilter != null ? '''
-            CASE 
-              ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
-              WHEN LOWER(name) = LOWER(@exact_name) THEN 0
-              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
-                   AND LOWER(name) = LOWER(@exact_name) THEN 1
-              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)' THEN 2
-              WHEN LOWER(name) LIKE LOWER(@exact_name) || '%' THEN 3
-              ELSE 4
-            END, name ASC
-          ''' : 'name ASC, set_code ASC'}
-          LIMIT @limit OFFSET @offset
-        '''
-            : '''
-          SELECT * FROM (
-            SELECT DISTINCT ON (c.name, LOWER(c.set_code))
-              c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
-              $identityColumns
-              c.oracle_text, c.colors, c.color_identity, c.image_url,
-              LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
-              c.is_reserved, c.collector_number, c.foil
-            FROM cards c
-            $whereClause
-            ORDER BY c.name, LOWER(c.set_code)
-          ) AS deduped
-          ORDER BY ${nameFilter != null ? '''
-            CASE 
-              ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
-              WHEN LOWER(name) = LOWER(@exact_name) THEN 0
-              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
-                   AND LOWER(name) = LOWER(@exact_name) THEN 1
-              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)' THEN 2
-              WHEN LOWER(name) LIKE LOWER(@exact_name) || '%' THEN 3
-              ELSE 4
-            END, name ASC
-          ''' : 'name ASC, set_code ASC'}
-          LIMIT @limit OFFSET @offset
-        ''';
-  } else {
-    // Query normal sem deduplicação
-    sql =
-        includeSetInfo
-            ? '''
+  final identityExpression =
+      includeIdentityColumns
+          ? "COALESCE(NULLIF(BTRIM(c.oracle_id::text), ''), "
+              "'name:' || LOWER(BTRIM(c.name)))"
+          : "'name:' || LOWER(BTRIM(c.name))";
+  final canonicalSetsCte =
+      includeSetInfo
+          ? '''
+        WITH ranked_sets AS (
           SELECT
-            c.*,
-            s.name AS set_name,
-            s.release_date AS set_release_date
-          FROM cards c
-          LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
-          $whereClause
-          ORDER BY $orderExpression
-          LIMIT @limit OFFSET @offset
-        '''
-            : '''
-          SELECT c.* FROM cards c
-          $whereClause
-          ORDER BY $orderExpression
-          LIMIT @limit OFFSET @offset
+            code,
+            name,
+            release_date,
+            ROW_NUMBER() OVER (
+              PARTITION BY LOWER(code)
+              ORDER BY
+                release_date DESC NULLS LAST,
+                CASE WHEN code = UPPER(code) THEN 0 ELSE 1 END,
+                name ASC
+            ) AS rn
+          FROM sets
+        ),
+        canonical_sets AS (
+          SELECT code, name, release_date
+          FROM ranked_sets
+          WHERE rn = 1
+        )
+      '''
+          : '';
+  final setJoin =
+      includeSetInfo
+          ? 'LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)'
+          : '';
+  final setSelect =
+      includeSetInfo
+          ? ''',
+              s.name AS set_name,
+              s.release_date AS set_release_date'''
+          : '';
+  final representativeOrder = '''
+          CASE
+            WHEN LOWER(COALESCE(c.set_code, '')) LIKE 'p%' THEN 1
+            ELSE 0
+          END,
+          CASE
+            WHEN NULLIF(BTRIM(c.image_url), '') IS NULL THEN 1
+            ELSE 0
+          END,
+          ${includeSetInfo ? 's.release_date DESC NULLS LAST,' : ''}
+          LOWER(COALESCE(c.set_code, '')) ASC,
+          COALESCE(c.collector_number, '') ASC,
+          c.id ASC
         ''';
+  final resultOrderExpression =
+      hasNameFilter
+          ? '''
+          CASE
+            ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
+            WHEN LOWER(name) = LOWER(@exact_name) THEN 0
+            WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
+                 AND LOWER(name) = LOWER(@exact_name) THEN 1
+            WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)' THEN 2
+            WHEN LOWER(name) LIKE LOWER(@exact_name) || '%' THEN 3
+            ELSE 4
+          END,
+          name ASC
+        '''
+          : 'name ASC, set_code ASC';
+
+  final String sql;
+  switch (dedupeMode) {
+    case CardDedupeMode.identity:
+      sql = '''
+        $canonicalSetsCte
+        SELECT *
+        FROM (
+          SELECT
+            c.id,
+            c.scryfall_id,
+            c.name,
+            c.mana_cost,
+            c.type_line,
+            $identityColumns
+            c.oracle_text,
+            c.power,
+            c.toughness,
+            c.colors,
+            c.color_identity,
+            c.image_url,
+            LOWER(c.set_code) AS set_code,
+            c.rarity,
+            c.cmc,
+            c.is_reserved,
+            c.collector_number,
+            c.foil
+            $setSelect,
+            COUNT(*) OVER (
+              PARTITION BY $identityExpression
+            )::int AS printing_count,
+            ROW_NUMBER() OVER (
+              PARTITION BY $identityExpression
+              ORDER BY $representativeOrder
+            ) AS identity_rank
+          FROM cards c
+          $setJoin
+          $whereClause
+        ) AS identity_deduped
+        WHERE identity_rank = 1
+        ORDER BY $resultOrderExpression
+        LIMIT @limit OFFSET @offset
+      ''';
+      break;
+    case CardDedupeMode.set:
+      sql = '''
+        $canonicalSetsCte
+        SELECT *
+        FROM (
+          SELECT DISTINCT ON (c.name, LOWER(c.set_code))
+            c.id,
+            c.scryfall_id,
+            c.name,
+            c.mana_cost,
+            c.type_line,
+            $identityColumns
+            c.oracle_text,
+            c.power,
+            c.toughness,
+            c.colors,
+            c.color_identity,
+            c.image_url,
+            LOWER(c.set_code) AS set_code,
+            c.rarity,
+            c.cmc,
+            c.is_reserved,
+            c.collector_number,
+            c.foil
+            $setSelect,
+            1::int AS printing_count
+          FROM cards c
+          $setJoin
+          $whereClause
+          ORDER BY
+            c.name,
+            LOWER(c.set_code),
+            ${includeSetInfo ? 's.release_date DESC NULLS LAST,' : ''}
+            c.id ASC
+        ) AS set_deduped
+        ORDER BY $resultOrderExpression
+        LIMIT @limit OFFSET @offset
+      ''';
+      break;
+    case CardDedupeMode.none:
+      sql = '''
+        $canonicalSetsCte
+        SELECT
+          c.*,
+          1::int AS printing_count
+          $setSelect
+        FROM cards c
+        $setJoin
+        $whereClause
+        ORDER BY $orderExpression
+        LIMIT @limit OFFSET @offset
+      ''';
+      break;
   }
 
   params['limit'] = limit;

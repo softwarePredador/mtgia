@@ -18,19 +18,54 @@ Future<Map<String, String>> loadBasicLandIds(
   if (names.isEmpty) return const {};
   final result = await pool.execute(
     Sql.named('''
-      SELECT name, id::text
-      FROM cards
-      WHERE name = ANY(@names)
-        AND COALESCE(type_line, '') ~*
+      WITH input_names AS (
+        SELECT DISTINCT
+          TRIM(value) AS input_name,
+          LOWER(TRIM(value)) AS normalized_input_name
+        FROM unnest(@names::text[]) AS value
+        WHERE TRIM(value) <> ''
+      ),
+      ranked AS (
+        SELECT
+          input_names.input_name,
+          cib.card_id::text AS card_id,
+          ROW_NUMBER() OVER (
+            PARTITION BY input_names.input_name
+            ORDER BY
+              CASE
+                WHEN cib.normalized_lookup_name =
+                     input_names.normalized_input_name THEN 0
+                WHEN cib.normalized_canonical_name =
+                     input_names.normalized_input_name THEN 1
+                WHEN cib.normalized_canonical_name LIKE
+                     input_names.normalized_input_name || ' // %' THEN 2
+                ELSE 3
+              END,
+              COALESCE(cib.match_priority, 999),
+              cib.card_id::text
+          ) AS resolution_rank
+        FROM input_names
+        JOIN card_identity_bridge cib
+          ON cib.normalized_lookup_name =
+               input_names.normalized_input_name
+          OR cib.normalized_canonical_name =
+               input_names.normalized_input_name
+          OR cib.normalized_canonical_name LIKE
+               input_names.normalized_input_name || ' // %'
+        WHERE COALESCE(cib.type_line, '') ~*
           '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
-      ORDER BY name ASC
+      )
+      SELECT input_name, card_id
+      FROM ranked
+      WHERE resolution_rank = 1
+      ORDER BY input_name ASC
     '''),
-    parameters: {'names': names},
+    parameters: {'names': TypedValue(Type.textArray, names)},
   );
   final map = <String, String>{};
   for (final row in result) {
-    final n = row[0] as String;
-    final id = row[1] as String;
+    final n = row[0].toString();
+    final id = row[1].toString();
     map[n] = id;
   }
   return map;

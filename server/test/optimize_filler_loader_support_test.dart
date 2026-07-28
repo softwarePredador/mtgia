@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/ai/optimize_filler_loader_support.dart';
@@ -48,4 +50,17 @@ void main() {
       },
     );
   });
+
+  test(
+    'basic land loader resolves canonical split aliases through identity bridge',
+    () {
+      final source =
+          File('lib/ai/optimize_filler_loader_support.dart').readAsStringSync();
+
+      expect(source, contains('JOIN card_identity_bridge cib'));
+      expect(source, contains("input_names.normalized_input_name || ' // %'"));
+      expect(source, contains('SELECT input_name, card_id'));
+      expect(source, contains('WHERE resolution_rank = 1'));
+    },
+  );
 }

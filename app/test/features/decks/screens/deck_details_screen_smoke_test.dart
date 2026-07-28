@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
@@ -208,6 +210,17 @@ Future<void> _pumpScreen(
 }
 
 void main() {
+  test('empty Commander deck CTA opens commander-only search mode', () {
+    final source = File(
+      'lib/features/decks/screens/deck_details_screen.dart',
+    ).readAsStringSync();
+
+    expect(
+      source,
+      contains("'/decks/\${widget.deckId}/search?mode=commander'"),
+    );
+  });
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });

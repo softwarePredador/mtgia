@@ -13,6 +13,42 @@ void main() {
     });
   });
 
+  group('commander candidate query contract', () {
+    test('normalizes only Commander and Brawl', () {
+      expect(normalizeCommanderCandidateFormat(' Commander '), 'commander');
+      expect(normalizeCommanderCandidateFormat('brawl'), 'brawl');
+      expect(normalizeCommanderCandidateFormat('standard'), isNull);
+      expect(normalizeCommanderCandidateFormat(null), isNull);
+    });
+
+    test('SQL mirrors creature, exception, vehicle, and Brawl branches', () {
+      final commander = commanderEligibilitySql(format: 'commander');
+      final brawl = commanderEligibilitySql(format: 'brawl');
+
+      expect(commander, contains("LIKE '%legendary%'"));
+      expect(commander, contains("LIKE '%creature%'"));
+      expect(commander, contains("LIKE '%vehicle%'"));
+      expect(commander, contains('NULLIF(BTRIM(c.power)'));
+      expect(commander, contains("LIKE '%can be your commander%'"));
+      expect(commander, isNot(contains("LIKE '%planeswalker%'")));
+      expect(brawl, contains("LIKE '%planeswalker%'"));
+    });
+
+    test('rejects unsupported formats and unsafe aliases', () {
+      expect(
+        () => commanderEligibilitySql(format: 'standard'),
+        throwsArgumentError,
+      );
+      expect(
+        () => commanderEligibilitySql(
+          format: 'commander',
+          tableAlias: 'c; DROP TABLE cards',
+        ),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('isCommanderEligibleCard', () {
     test('accepts legendary creatures', () {
       expect(
@@ -35,9 +71,7 @@ void main() {
 
     test('keeps Commander planeswalker eligibility strict by default', () {
       expect(
-        isCommanderEligibleCard(
-          typeLine: 'Legendary Planeswalker — Chandra',
-        ),
+        isCommanderEligibleCard(typeLine: 'Legendary Planeswalker — Chandra'),
         isFalse,
       );
     });
@@ -52,25 +86,27 @@ void main() {
       );
     });
 
-    test('accepts 2026 legendary Vehicle and Spacecraft commanders with P/T',
-        () {
-      expect(
-        isCommanderEligibleCard(
-          typeLine: 'Legendary Artifact — Vehicle',
-          power: '5',
-          toughness: '5',
-        ),
-        isTrue,
-      );
-      expect(
-        isCommanderEligibleCard(
-          typeLine: 'Legendary Artifact — Spacecraft',
-          power: '3',
-          toughness: '4',
-        ),
-        isTrue,
-      );
-    });
+    test(
+      'accepts 2026 legendary Vehicle and Spacecraft commanders with P/T',
+      () {
+        expect(
+          isCommanderEligibleCard(
+            typeLine: 'Legendary Artifact — Vehicle',
+            power: '5',
+            toughness: '5',
+          ),
+          isTrue,
+        );
+        expect(
+          isCommanderEligibleCard(
+            typeLine: 'Legendary Artifact — Spacecraft',
+            power: '3',
+            toughness: '4',
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('rejects legendary Vehicle or Spacecraft without P/T', () {
       expect(

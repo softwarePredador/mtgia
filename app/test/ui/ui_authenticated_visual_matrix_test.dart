@@ -113,7 +113,12 @@ void main() {
     ).readAsStringSync();
     expect(harness, contains('MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES=true'));
     expect(harness, contains('MANALOOM_VISUAL_FIXTURE_MODE=true'));
-    expect(harness, contains('app/assets/assets/symbols/logo.png'));
+    expect(harness, contains('resolve_manaloom_flutter_root'));
+    expect(harness, contains('MANALOOM_FLUTTER_ROOT_RESOLVED/bin/flutter'));
+    expect(
+      harness,
+      contains('app/assets/assets/branding/visual_fixture_arcane_ring.webp'),
+    );
     expect(harness, contains("'S3-07 Visual Fixture Set'"));
     expect(harness, contains("set_code = 'TST'"));
     expect(harness, contains('capture_flow_contains_signup: false'));

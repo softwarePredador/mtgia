@@ -573,7 +573,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     _showOptimizationOptions(context),
                 onOpenBattleReplays: _openBattleReplays,
                 onSelectCommander: () =>
-                    context.go('/decks/${widget.deckId}/search'),
+                    context.go('/decks/${widget.deckId}/search?mode=commander'),
                 onImportList: () => _showImportListDialog(context),
                 onEditDescription: _showEditDescriptionDialog,
                 onShowCardDetails: (card) => _showCardDetails(context, card),
@@ -2079,6 +2079,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             applyBlockers: preview.applyBlockers,
             displayRemovals: preview.displayRemovals,
             displayAdditions: preview.displayAdditions,
+            loadCard: context.read<CardProvider>().fetchCardById,
             onCopyDebug: kDebugMode
                 ? () async {
                     await _copyOptimizeDebug(

@@ -9,6 +9,7 @@ import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/models/deck_details.dart';
+import '../../decks/utils/commander_eligibility.dart';
 import '../../decks/widgets/deck_details_aux_widgets.dart';
 import '../../collection/screens/sets_catalog_screen.dart';
 import '../widgets/card_edition_metadata.dart';
@@ -97,10 +98,40 @@ class _CardSearchScreenState extends State<CardSearchScreen>
       context.read<CardProvider>().clearSearch();
       return;
     }
-    _debounce = Timer(const Duration(milliseconds: 350), () {
+    _debounce = Timer(const Duration(milliseconds: 350), () async {
       if (!mounted) return;
-      context.read<CardProvider>().searchCards(q);
+      if (!widget.isBinderMode) {
+        final deckProvider = context.read<DeckProvider>();
+        if (deckProvider.selectedDeck?.id != widget.deckId) {
+          await deckProvider.fetchDeckDetails(widget.deckId);
+        }
+        if (!mounted || _searchController.text.trim() != q) return;
+      }
+      context.read<CardProvider>().searchCards(
+        q,
+        collapsePrintings: !widget.isBinderMode,
+        commanderFormat: _activeCommanderSearchFormat(),
+      );
     });
+  }
+
+  String? _activeCommanderSearchFormat() {
+    if (widget.isBinderMode) return null;
+    final deckProvider = context.read<DeckProvider>();
+    final deck = deckProvider.selectedDeck?.id == widget.deckId
+        ? deckProvider.selectedDeck
+        : null;
+    final format = deck?.format.trim().toLowerCase();
+    final isCommanderFormat = format == 'commander' || format == 'brawl';
+    final explicitCommanderMode =
+        (widget.mode ?? '').trim().toLowerCase() == 'commander';
+    if (explicitCommanderMode) {
+      return isCommanderFormat ? format : 'commander';
+    }
+    if (isCommanderFormat && (deck?.commander.isEmpty ?? true)) {
+      return format;
+    }
+    return null;
   }
 
   void _addCardToDeck(DeckCardItem card) async {
@@ -132,7 +163,10 @@ class _CardSearchScreenState extends State<CardSearchScreen>
     final commanderIdentity = _computeCommanderIdentity(deck);
     final mustPickCommanderFirst =
         isCommanderFormat && (deck?.commander.isEmpty ?? true);
-    final isCommanderEligible = _isCommanderEligible(card);
+    final isCommanderEligible = isPotentialCommander(
+      card,
+      format: format ?? 'commander',
+    );
 
     final isAllowedByCommander =
         !isCommanderFormat ||
@@ -372,6 +406,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
             ),
             child: _buildCardSearchResults(
               isCommanderFormat: isCommanderFormat,
+              commanderFormat: format ?? 'commander',
               commanderIdentity: commanderIdentity,
               mustPickCommanderFirst: mustPickCommanderFirst,
               isCommanderMode: isCommanderMode,
@@ -393,6 +428,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
 
   Widget _buildCardSearchResults({
     required bool isCommanderFormat,
+    required String commanderFormat,
     required Set<String>? commanderIdentity,
     required bool mustPickCommanderFirst,
     required bool isCommanderMode,
@@ -400,6 +436,16 @@ class _CardSearchScreenState extends State<CardSearchScreen>
     return Consumer<CardProvider>(
       builder: (context, provider, child) {
         final query = _searchController.text.trim();
+        final commanderSelectionOnly =
+            isCommanderMode || mustPickCommanderFirst;
+        final visibleResults = commanderSelectionOnly
+            ? provider.searchResults
+                  .where(
+                    (card) =>
+                        isPotentialCommander(card, format: commanderFormat),
+                  )
+                  .toList(growable: false)
+            : provider.searchResults;
 
         if (provider.isLoading) {
           return const AppStatePanel.loading(
@@ -426,18 +472,26 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           );
         }
 
-        if (provider.searchResults.isEmpty) {
+        if (visibleResults.isEmpty) {
           return _SearchStateFrame(
             child: AppStatePanel(
               key: const Key('card-search-empty-state'),
               iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.card),
               title: query.length >= 3
-                  ? 'Nenhuma carta encontrada'
+                  ? commanderSelectionOnly
+                        ? 'Nenhum comandante elegível'
+                        : 'Nenhuma carta encontrada'
+                  : commanderSelectionOnly
+                  ? 'Busque um comandante'
                   : 'Busque uma carta',
               message: query.length >= 3
-                  ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
+                  ? commanderSelectionOnly
+                        ? 'Tente outro nome. Apenas comandantes elegíveis para o formato são exibidos.'
+                        : 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
                   : widget.isBinderMode
                   ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
+                  : commanderSelectionOnly
+                  ? 'Digite pelo menos 3 letras para buscar apenas comandantes elegíveis.'
                   : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
               accent: query.length >= 3 ? AppTheme.warning : AppTheme.brass400,
             ),
@@ -445,9 +499,12 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         }
 
         Widget buildResultTile(int resultIndex, {required bool inGrid}) {
-          final card = provider.searchResults[resultIndex];
+          final card = visibleResults[resultIndex];
           final availability = provider.collectionAvailabilityFor(card.id);
-          final isCommanderEligible = _isCommanderEligible(card);
+          final isCommanderEligible = isPotentialCommander(
+            card,
+            format: commanderFormat,
+          );
           final allowedByIdentity =
               !isCommanderFormat ||
               commanderIdentity == null ||
@@ -463,14 +520,14 @@ class _CardSearchScreenState extends State<CardSearchScreen>
             key: Key('card-search-result-${card.id}'),
             inGrid: inGrid,
             card: card,
+            printingCount: provider.printingCountFor(card.id),
             availability: availability,
             showTypeLine: !widget.isBinderMode,
-            warning: mustPickCommanderFirst && !isCommanderEligible
-                ? 'Selecione um comandante primeiro'
-                : !mustPickCommanderFirst &&
-                      isCommanderFormat &&
-                      commanderIdentity != null &&
-                      !allowedByIdentity
+            warning:
+                !commanderSelectionOnly &&
+                    isCommanderFormat &&
+                    commanderIdentity != null &&
+                    !allowedByIdentity
                 ? 'Fora da identidade do comandante'
                 : null,
             canAdd: canAdd,
@@ -520,7 +577,8 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                       SliverToBoxAdapter(
                         child: _SearchResultsHeader(
                           query: query,
-                          count: provider.searchResults.length,
+                          count: visibleResults.length,
+                          commanderOnly: commanderSelectionOnly,
                           horizontalPadding: pageGutter,
                         ),
                       ),
@@ -544,7 +602,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                             delegate: SliverChildBuilderDelegate(
                               (context, index) =>
                                   buildResultTile(index, inGrid: true),
-                              childCount: provider.searchResults.length,
+                              childCount: visibleResults.length,
                             ),
                           ),
                         )
@@ -561,7 +619,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                             delegate: SliverChildBuilderDelegate(
                               (context, index) =>
                                   buildResultTile(index, inGrid: false),
-                              childCount: provider.searchResults.length,
+                              childCount: visibleResults.length,
                             ),
                           ),
                         ),
@@ -614,11 +672,13 @@ class _SearchResultsHeader extends StatelessWidget {
   const _SearchResultsHeader({
     required this.query,
     required this.count,
+    required this.commanderOnly,
     required this.horizontalPadding,
   });
 
   final String query;
   final int count;
+  final bool commanderOnly;
   final double horizontalPadding;
 
   @override
@@ -657,7 +717,9 @@ class _SearchResultsHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: AppTheme.space2),
                 Text(
-                  '$count cartas encontradas',
+                  commanderOnly
+                      ? '$count ${count == 1 ? 'comandante elegível' : 'comandantes elegíveis'}'
+                      : '$count ${count == 1 ? 'carta encontrada' : 'cartas encontradas'}',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: AppTheme.textSecondary,
                     fontSize: AppTheme.fontXs,
@@ -677,6 +739,7 @@ class _CardSearchResultTile extends StatelessWidget {
     super.key,
     required this.inGrid,
     required this.card,
+    required this.printingCount,
     required this.availability,
     required this.showTypeLine,
     required this.warning,
@@ -687,6 +750,7 @@ class _CardSearchResultTile extends StatelessWidget {
 
   final bool inGrid;
   final DeckCardItem card;
+  final int printingCount;
   final CardCollectionAvailability? availability;
   final bool showTypeLine;
   final String? warning;
@@ -790,6 +854,11 @@ class _CardSearchResultTile extends StatelessWidget {
                                 setCode: card.setCode,
                                 collectorNumber: card.collectorNumber,
                               ),
+                            ),
+                          if (printingCount > 1)
+                            _SearchPrintingCountPill(
+                              cardId: card.id,
+                              count: printingCount,
                             ),
                           if (card.colorIdentity.isNotEmpty)
                             _SearchIdentityPips(identity: card.colorIdentity),
@@ -949,6 +1018,40 @@ class _SearchSetPill extends StatelessWidget {
   }
 }
 
+class _SearchPrintingCountPill extends StatelessWidget {
+  const _SearchPrintingCountPill({required this.cardId, required this.count});
+
+  final String cardId;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: '$count impressões agrupadas desta carta',
+      child: Container(
+        key: Key('card-search-printing-count-$cardId'),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space5,
+          vertical: AppTheme.space2,
+        ),
+        decoration: BoxDecoration(
+          color: AppTheme.brass400.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+          border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.28)),
+        ),
+        child: Text(
+          '$count impressões',
+          style: const TextStyle(
+            color: AppTheme.brass400,
+            fontSize: AppTheme.fontTiny,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SearchWarningPill extends StatelessWidget {
   const _SearchWarningPill({required this.label});
 
@@ -1025,7 +1128,10 @@ class _AddCardDialogState extends State<_AddCardDialog> {
       'basic land',
     );
     final canIncreaseQuantity = !isCommanderFormat || isBasicLand;
-    final isCommanderEligible = _isCommanderEligible(widget.card);
+    final isCommanderEligible = isPotentialCommander(
+      widget.card,
+      format: format ?? 'commander',
+    );
     final showCommanderChoice =
         isCommanderFormat &&
         isCommanderEligible &&
@@ -1414,15 +1520,15 @@ class _CommanderChoiceCard extends StatelessWidget {
             subtitle: 'Esta carta será o comandante do deck.',
             onTap: onChanged == null ? null : () => onChanged!(true),
           ),
-          const SizedBox(height: AppTheme.space8),
-          _CommanderChoiceRow(
-            selected: !isCommander,
-            title: 'Adicionar como carta comum',
-            subtitle: 'Adicionar ao deck sem definir como comandante.',
-            onTap: onChanged == null || requireCommander
-                ? null
-                : () => onChanged!(false),
-          ),
+          if (!requireCommander) ...[
+            const SizedBox(height: AppTheme.space8),
+            _CommanderChoiceRow(
+              selected: !isCommander,
+              title: 'Adicionar como carta comum',
+              subtitle: 'Adicionar ao deck sem definir como comandante.',
+              onTap: onChanged == null ? null : () => onChanged!(false),
+            ),
+          ],
         ],
       ),
     );
@@ -1527,13 +1633,6 @@ bool _isSubset(List<String> cardIdentity, Set<String> commanderIdentity) {
     if (!commanderIdentity.contains(c.toUpperCase())) return false;
   }
   return true;
-}
-
-bool _isCommanderEligible(DeckCardItem card) {
-  final typeLine = card.typeLine.toLowerCase();
-  final oracle = (card.oracleText ?? '').toLowerCase();
-  return typeLine.contains('legendary creature') ||
-      oracle.contains('can be your commander');
 }
 
 class _CardSearchEditionSubtitle extends StatelessWidget {

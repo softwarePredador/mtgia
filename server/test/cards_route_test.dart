@@ -16,21 +16,41 @@ void main() {
       expect(normalizeCardSetFilter('   '), isNull);
     });
 
-    test('cards route keeps default dedupe and token exclusion explicit', () {
+    test('dedupe parser preserves legacy, identity, and printing grains', () {
+      expect(parseCardDedupeMode(null), CardDedupeMode.set);
+      expect(parseCardDedupeMode('true'), CardDedupeMode.set);
+      expect(parseCardDedupeMode(' identity '), CardDedupeMode.identity);
+      expect(parseCardDedupeMode('false'), CardDedupeMode.none);
+      expect(parseCardDedupeMode('invalid'), isNull);
+    });
+
+    test('cards route keeps identity and commander filters explicit', () {
       final source = File('routes/cards/index.dart').readAsStringSync();
 
       expect(
         source,
         contains("params['include_tokens']?.toLowerCase() == 'true'"),
       );
-      expect(source, contains("params['dedupe']?.toLowerCase() != 'false'"));
+      expect(source, contains("parseCardDedupeMode(params['dedupe'])"));
+      expect(source, contains("params['commander_format']"));
+      expect(source, contains('CardDedupeMode.identity'));
+      expect(source, contains(r'PARTITION BY $identityExpression'));
+      expect(source, contains('commanderEligibilitySql'));
+      expect(source, contains("COALESCE(c.type_line, '') NOT ILIKE '%Token%'"));
       expect(source, contains('final safeLimit = limit.clamp(1, 200)'));
       expect(source, contains("params['limit'] ?? '50'"));
       expect(source, contains("params['page'] ?? '1'"));
       expect(source, contains("final idFilter = params['id']?.trim()"));
       expect(source, contains("conditions.add('c.id::text = @id')"));
       expect(source, contains("'is_reserved': map['is_reserved'] == true"));
+      expect(source, contains("'power': map['power']"));
+      expect(source, contains("'toughness': map['toughness']"));
+      expect(source, contains('c.oracle_text,'));
+      expect(source, contains('c.power,'));
+      expect(source, contains('c.toughness,'));
       expect(source, contains('c.is_reserved'));
+      expect(source, contains("'printing_count': map['printing_count']"));
+      expect(source, contains('canonical_sets'));
     });
 
     test('printings sync boundary is explicit and write-capable', () {
@@ -47,6 +67,12 @@ void main() {
       expect(source, contains('is_reserved'));
       expect(source, contains("p['reserved']"));
       expect(source, contains('ON CONFLICT (scryfall_id) DO UPDATE SET'));
+      expect(source, contains('LEFT JOIN canonical_sets s'));
+      expect(source, contains('power = COALESCE(EXCLUDED.power, cards.power)'));
+      expect(
+        source,
+        contains('toughness = COALESCE(EXCLUDED.toughness, cards.toughness)'),
+      );
       expect(source, contains('scryfallNormalImageUrlFromPayload(p)'));
       expect(
         source,
@@ -61,6 +87,11 @@ void main() {
       expect(source, contains("'is_reserved': m['is_reserved'] == true"));
       expect(source, contains("card['reserved']"));
       expect(source, contains('is_reserved = COALESCE'));
+      expect(source, contains('power = COALESCE(EXCLUDED.power, cards.power)'));
+      expect(
+        source,
+        contains('toughness = COALESCE(EXCLUDED.toughness, cards.toughness)'),
+      );
       expect(source, contains('scryfallNormalImageUrlFromPayload(card)'));
       expect(
         source,

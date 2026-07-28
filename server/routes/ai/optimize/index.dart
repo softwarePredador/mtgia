@@ -1385,6 +1385,18 @@ Future<Response> onRequest(RequestContext context) async {
           targetArchetype: targetArchetype,
           intensity: intensity.selected,
         );
+        final finalQualityError = responseBody['quality_error'];
+        if (finalQualityError is Map) {
+          return Response.json(
+            statusCode: HttpStatus.unprocessableEntity,
+            body: {
+              'error': 'Complete mode não atingiu o piso seguro de terrenos.',
+              'quality_error': finalQualityError,
+              'mode': 'complete',
+              'target_additions': jsonResponse['target_additions'],
+            },
+          );
+        }
         responseBody['intensity'] = intensity.selected;
         responseBody['optimize_intensity'] = intensity.toJson(
           returnedSwaps:

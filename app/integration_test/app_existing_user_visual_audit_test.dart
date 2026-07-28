@@ -531,7 +531,7 @@ void main() {
         attempts: 100,
       );
       await tester.pump(const Duration(seconds: 1));
-      await _capture(binding, tester, 'community_empty');
+      await _capture(binding, tester, 'community_public_decks');
 
       const communityTabCheckpoints = <String>[
         'community_tab_1',

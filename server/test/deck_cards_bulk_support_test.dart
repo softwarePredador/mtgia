@@ -27,9 +27,7 @@ void main() {
         ],
       );
 
-      final byId = {
-        for (final card in merged) card['card_id'] as String: card,
-      };
+      final byId = {for (final card in merged) card['card_id'] as String: card};
 
       expect(byId['sol-ring']?['quantity'], 3);
       expect(byId['sol-ring']?['condition'], 'LP');
@@ -59,10 +57,7 @@ void main() {
       final source =
           File('routes/decks/[id]/cards/bulk/index.dart').readAsStringSync();
 
-      expect(
-        source,
-        contains('mergeBulkCardIncrementsPreservingCondition'),
-      );
+      expect(source, contains('mergeBulkCardIncrementsPreservingCondition'));
       expect(
         source,
         contains(
@@ -77,5 +72,22 @@ void main() {
       );
       expect(source, contains("params[pCond] = card['condition'] ?? 'NM'"));
     });
+
+    test(
+      'optimization bulk apply checks mana floor before replacing cards',
+      () {
+        final source =
+            File('routes/decks/[id]/cards/bulk/index.dart').readAsStringSync();
+
+        final floorGate = source.indexOf('assessCommanderManaFloor');
+        final destructiveReplace = source.indexOf(
+          "DELETE FROM deck_cards WHERE deck_id = @deckId",
+        );
+
+        expect(floorGate, greaterThanOrEqualTo(0));
+        expect(destructiveReplace, greaterThan(floorGate));
+        expect(source, contains('optimization_land_floor_violation'));
+      },
+    );
   });
 }

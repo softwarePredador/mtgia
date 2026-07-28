@@ -11,6 +11,11 @@ void main() {
       expect(isBasicLandName('snow covered forest'), isTrue);
       expect(isBasicLandName('Snow—Covered Mountain'), isTrue);
       expect(isBasicLandName('Snow-Covered Wastes'), isTrue);
+      expect(isBasicLandName('Plains // Plains'), isTrue);
+      expect(
+        isBasicLandName('Snow-Covered Mountain // Snow-Covered Mountain'),
+        isTrue,
+      );
     });
 
     test('does not classify nonbasic names containing basic words', () {
@@ -19,6 +24,7 @@ void main() {
       expect(isBasicLandName('Llanowar Wastes'), isFalse);
       expect(isBasicLandName('Adarkar Wastes'), isFalse);
       expect(isBasicLandName('Snowfield Sinkhole'), isFalse);
+      expect(isBasicLandName('Plains // Mountain'), isFalse);
     });
 
     test('detects basic type lines without matching nonbasic land', () {

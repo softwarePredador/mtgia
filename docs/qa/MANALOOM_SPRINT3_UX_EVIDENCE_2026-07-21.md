@@ -817,11 +817,12 @@ vinculada ao source atual. O documento detalhado é
 - S3-05 voltou a `PASS`: o Battle Coach Web release passou 9/9 checkpoints de
   Tab, Shift+Tab, Enter, Space, Escape, foco visível, restauração, digitação,
   filtro, seleção e preflight real.
-- S3-07 voltou a `PASS`: a matriz P0 passou em 53 Web mobile, 52 desktop,
-  52 wide e 53 Android físico. Somados os sete estados Battle Coach Android e
-  os nove checkpoints Web, 226/226 PNGs foram abertos e revisados.
-- O aggregate `docs/qa/ui-live/latest.json` liga os seis manifestos ao digest
-  `b5af4634e18cda489b0b8d07d7246e6975e7c04d27f4c2643e18acfd5a8fd082`
+- S3-07 voltou a `PASS`: a matriz P0 passou em 54 Web mobile, 53 desktop,
+  53 wide e 54 Android físico. Somados os sete estados Battle Coach Android,
+  os nove checkpoints Web e a prova do verso autoral, 231/231 PNGs foram
+  abertos e revisados.
+- O aggregate `docs/qa/ui-live/latest.json` liga os sete manifestos ao digest
+  `78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59`
   e fecha `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
 - Cadastro, links de Termos/Privacidade, documentos legais, navegação filha de
   Community, retorno de Mensagens/Notificações, composer indisponível, ação de

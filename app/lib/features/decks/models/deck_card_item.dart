@@ -79,10 +79,13 @@ class CardFaceArtwork {
 
 class DeckCardItem {
   final String id;
+  final String? oracleId;
   final String name;
   final String? manaCost;
   final String typeLine;
   final String? oracleText;
+  final String? power;
+  final String? toughness;
   final List<String> colors;
   final List<String> colorIdentity;
   final String? imageUrl;
@@ -93,6 +96,7 @@ class DeckCardItem {
   final String? setReleaseDate; // yyyy-mm-dd
   final String rarity;
   final bool isReserved;
+  final int printingCount;
   final int quantity;
   final bool isCommander;
 
@@ -143,10 +147,13 @@ class DeckCardItem {
 
   DeckCardItem({
     required this.id,
+    this.oracleId,
     required this.name,
     this.manaCost,
     required this.typeLine,
     this.oracleText,
+    this.power,
+    this.toughness,
     this.colors = const [],
     this.colorIdentity = const [],
     this.imageUrl,
@@ -157,6 +164,7 @@ class DeckCardItem {
     this.setReleaseDate,
     required this.rarity,
     this.isReserved = false,
+    this.printingCount = 1,
     required this.quantity,
     required this.isCommander,
     this.collectorNumber,
@@ -167,10 +175,13 @@ class DeckCardItem {
   /// Cria cópia com campos alterados.
   DeckCardItem copyWith({
     String? id,
+    String? oracleId,
     String? name,
     String? manaCost,
     String? typeLine,
     String? oracleText,
+    String? power,
+    String? toughness,
     List<String>? colors,
     List<String>? colorIdentity,
     String? imageUrl,
@@ -181,6 +192,7 @@ class DeckCardItem {
     String? setReleaseDate,
     String? rarity,
     bool? isReserved,
+    int? printingCount,
     int? quantity,
     bool? isCommander,
     String? collectorNumber,
@@ -189,10 +201,13 @@ class DeckCardItem {
   }) {
     return DeckCardItem(
       id: id ?? this.id,
+      oracleId: oracleId ?? this.oracleId,
       name: name ?? this.name,
       manaCost: manaCost ?? this.manaCost,
       typeLine: typeLine ?? this.typeLine,
       oracleText: oracleText ?? this.oracleText,
+      power: power ?? this.power,
+      toughness: toughness ?? this.toughness,
       colors: colors ?? this.colors,
       colorIdentity: colorIdentity ?? this.colorIdentity,
       imageUrl: imageUrl ?? this.imageUrl,
@@ -203,6 +218,7 @@ class DeckCardItem {
       setReleaseDate: setReleaseDate ?? this.setReleaseDate,
       rarity: rarity ?? this.rarity,
       isReserved: isReserved ?? this.isReserved,
+      printingCount: printingCount ?? this.printingCount,
       quantity: quantity ?? this.quantity,
       isCommander: isCommander ?? this.isCommander,
       collectorNumber: collectorNumber ?? this.collectorNumber,
@@ -214,10 +230,13 @@ class DeckCardItem {
   factory DeckCardItem.fromJson(Map<String, dynamic> json) {
     return DeckCardItem(
       id: json['id'] as String,
+      oracleId: json['oracle_id']?.toString(),
       name: json['name'] as String,
       manaCost: json['mana_cost'] as String?,
       typeLine: json['type_line'] as String? ?? '',
       oracleText: json['oracle_text'] as String?,
+      power: json['power']?.toString(),
+      toughness: json['toughness']?.toString(),
       colors: (json['colors'] as List?)?.map((e) => e as String).toList() ?? [],
       colorIdentity:
           (json['color_identity'] as List?)?.map((e) => e as String).toList() ??
@@ -230,6 +249,12 @@ class DeckCardItem {
       setReleaseDate: json['set_release_date'] as String?,
       rarity: json['rarity'] as String? ?? '',
       isReserved: json['is_reserved'] as bool? ?? false,
+      printingCount: switch (json['printing_count']) {
+        final int value => value < 1 ? 1 : value,
+        final num value => value.toInt() < 1 ? 1 : value.toInt(),
+        final Object value => int.tryParse(value.toString()) ?? 1,
+        null => 1,
+      },
       quantity: json['quantity'] as int? ?? 1,
       isCommander: json['is_commander'] as bool? ?? false,
       collectorNumber: json['collector_number'] as String?,

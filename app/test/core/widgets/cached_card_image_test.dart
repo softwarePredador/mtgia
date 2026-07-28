@@ -21,10 +21,11 @@ void main() {
       find.byKey(const Key('cached-card-image-placeholder')),
       findsOneWidget,
     );
+    expect(find.byKey(const Key('manaloom-card-back')), findsOneWidget);
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is ManaLoomGlyph && widget.kind == ManaLoomGlyphKind.card,
+            widget is ManaLoomGlyph && widget.kind == ManaLoomGlyphKind.brand,
       ),
       findsOneWidget,
     );

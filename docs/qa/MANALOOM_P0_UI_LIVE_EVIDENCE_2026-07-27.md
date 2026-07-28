@@ -6,12 +6,12 @@
 
 **Toolchain:** Flutter `3.44.6`, Dart `3.12.2`
 
-**Digest visual:** `25a74e45b91e0849d442c85ee05cd72f8bdb6cea3e42270a87f1fddcee04a274`
+**Digest visual:** `78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59`
 **Decisão:** `PASS` para S3-05 e S3-07; TalkBack humano continua pendente em S3-04
 
 ## Escopo realmente comprovado
 
-A matriz executável possui 53 checkpoints de telas/estados P0. Ela cobre as
+A matriz executável possui 54 checkpoints de telas/estados P0. Ela cobre as
 rotas públicas e autenticadas correntes e seus estados representativos:
 autenticação, cadastro e consentimento, Termos, Privacidade, onboarding, Home,
 decks, coleção, cartas e sets, Community e usuários, perfil, Life Counter,
@@ -23,19 +23,20 @@ Foram produzidas e abertas as seguintes capturas:
 
 | Manifesto/perfil | Runtime | Capturas | Dimensão |
 |---|---|---:|---:|
-| Web mobile | build release real | 53 | viewport 390×844; raster 500×844 |
-| Web desktop | build release real | 52 | 1440×900 |
-| Web wide | build release real | 52 | 1920×1080 |
-| Android físico | profile, `kDebugMode=false` | 53 | 1080×2408; Life Counter 2408×1080 |
+| Web mobile | build release real | 54 | viewport 390×844; raster 500×844 |
+| Web desktop | build release real | 53 | 1440×900 |
+| Web wide | build release real | 53 | 1920×1080 |
+| Android físico | profile, `kDebugMode=false` | 54 | 1080×2408; Life Counter 2408×1080 |
 | Battle Coach Android | integration test físico | 7 | 1080×2408 |
 | Battle Coach teclado Web | build release + teclado físico | 9 | 1280×720 |
-| **Total revisado** |  | **226** |  |
+| Fallback de arte Web | build release real | 1 | 1280×720 |
+| **Total revisado** |  | **231** |  |
 
-As 210 imagens da matriz foram divididas em 24 contact sheets e inspecionadas
-em resolução útil, além das folhas dedicadas ao Battle Coach Android e teclado
-Web, totalizando 26 folhas abertas. A revisão verificou hierarquia, identidade
-MTG, contraste, tipografia, espaçamento, adaptação, clareza de ação, estados,
-acessibilidade visual e atratividade. Não restou finding visual bloqueante.
+As 214 imagens da matriz foram inspecionadas em contact sheets e resolução
+original, além das folhas dedicadas ao Battle Coach Android, teclado Web e
+fallback de arte. A revisão verificou hierarquia, identidade MTG, contraste,
+tipografia, espaçamento, adaptação, clareza de ação, estados, acessibilidade
+visual e atratividade. Não restou finding visual bloqueante.
 Os estados centrais de Deckbuilder e Battle também foram reabertos em resolução
 original; a aba Análise foi conferida no build real e não recebeu crédito
 duplicado no total versionado.
@@ -103,6 +104,12 @@ cada ocorrência transitória do inventário como se fosse uma rota autônoma.
     visual. O modo Coach passou a usar CTA e texto próprios, omitiu parâmetros
     inertes, mantém o aviso `ALPHA` e diferencia conclusão, interrupção e erro
     por cor, ícone, título e mensagem.
+15. **Fallback genérico de imagem:** carta sem arte ou ainda carregando usava
+    um símbolo abstrato sem comunicar imediatamente o objeto. O estado agora
+    mostra um verso autoral ManaLoom com moldura dupla, órbitas, glifo da marca
+    e cinco pontos WUBRG. Ele preserva a proporção da carta, funciona em
+    loading, URL ausente e erro de rede e não reproduz o verso oficial,
+    logotipos ou trade dress da Wizards.
 
 ## Life Counter e platform view
 
@@ -150,6 +157,18 @@ Os nove arquivos finais são PNG reais em 1280×720, foram reindexados pelo
 digest corrente e abertos na folha dedicada; somente esse conjunto entrou no
 aggregate.
 
+## Verso autoral para arte indisponível
+
+A prova Web abriu o detalhe de uma carta do banco PostgreSQL loopback, tornou a
+URL de imagem temporariamente nula, aguardou o render real e capturou o fallback
+ao lado dos dados da carta. Em seguida, restaurou a URL original antes do
+cleanup. O manifesto versionado comprova um PNG 1280×720 no digest corrente.
+
+O desenho é deliberadamente próprio do ManaLoom: moldura, elipses de campo,
+glifo central e cinco pontos de cor. Ele comunica “carta” durante carregamento,
+ausência de URL ou falha da imagem sem usar a imagem oficial apresentada como
+referência pelo usuário.
+
 ## Tentativas recusadas
 
 Não contam como aprovação:
@@ -183,11 +202,13 @@ do gate.
   `docs/qa/ui-live/current/battle-coach-android`;
 - Battle Coach Web:
   `docs/qa/ui-live/current/battle-coach-web-keyboard`;
+- fallback de arte:
+  `docs/qa/ui-live/current/card-back-fallback-web`;
 - baselines: `app/test/ui/goldens/runtime`;
 - matriz: `app/test/ui/fixtures/ui_authenticated_visual_matrix.json`;
 - teclado: `app/test/ui/fixtures/ui_keyboard_focus_matrix.json`.
 
-O aggregate foi verificado com 226 screenshots e os três níveis:
+O aggregate foi verificado com 231 screenshots e os três níveis:
 `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
 
 ## Pendência honesta
@@ -204,20 +225,27 @@ A recertificação deste digest fechou com:
 
 - 292/292 testes do domínio Deck aprovados;
 - 129/129 testes do domínio Battle aprovados;
+- 126/126 testes focados das superfícies alteradas aprovados;
+- 91 testes focados do backend aprovados e uma integração de alias delegada
+  ao schema descartável;
+- 1.341 testes Flutter completos aprovados e um skip declarado;
 - 12/12 checks focados de orientação e responsividade aprovados;
 - `flutter analyze` sem issues;
-- 53/53 checks do gate `ui-audit`;
-- 226/226 screenshots aceitos pelo gate `ui-proof`;
+- 53/53 testes do gate `ui-audit` e 54 checkpoints na matriz de captura;
+- 231/231 screenshots aceitos pelo gate `ui-proof`;
 - 9/9 passos físicos de teclado/foco do Battle Coach Web;
 - sete estados visuais e dois testes de runtime do Battle Coach no Samsung;
 - `manaloom_project_logic --write` e `--check` sincronizados;
 - CI local `quick` aprovada;
+- CI local `full` aprovada, incluindo 62 auditorias determinísticas, 27
+  contratos de release, 9 jornadas Patrol e auditoria de dependências;
+- schema descartável aprovado com 79 tabelas, 6 views, 98 FKs e 56 migrations;
 - build Web release e smoke test em `/app/` aprovados.
 
-O gate `full` continua obrigatório no `pre-push`; seu resultado pertence ao
-registro da entrega Git, sem ser antecipado por este documento visual.
+O mesmo gate `full` permanece obrigatório no `pre-push`; a execução acima é a
+prova prévia e o hook repete a proteção no envio Git.
 
 O `main.dart.js` do Web release validado tem SHA-256
-`ea153b96bc81ba247598b33fe188863e69fd7ba019e00b1728b9c92e3792409a`.
+`c401726d877efb3490f3f3c7fdee570a3e2f07cf463d6fcccb3eca209b1c142a`.
 O digest definitivo das fontes da UI é
-`25a74e45b91e0849d442c85ee05cd72f8bdb6cea3e42270a87f1fddcee04a274`.
+`78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59`.

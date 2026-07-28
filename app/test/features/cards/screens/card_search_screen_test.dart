@@ -38,6 +38,14 @@ class _FixedCardProvider extends CardProvider {
   @override
   CardCollectionAvailability? collectionAvailabilityFor(String cardId) =>
       availability[cardId];
+
+  @override
+  int printingCountFor(String cardId) {
+    for (final card in _results) {
+      if (card.id == cardId) return card.printingCount;
+    }
+    return 1;
+  }
 }
 
 class _FakeSetsApiClient extends ApiClient {
@@ -112,12 +120,16 @@ class _FakeSetsApiClient extends ApiClient {
 }
 
 class _FakeDeckApiClient extends ApiClient {
+  _FakeDeckApiClient({Map<String, dynamic>? deckDetails})
+    : _deckDetails = deckDetails ?? _deckDetailsJson();
+
+  final Map<String, dynamic> _deckDetails;
   final List<Map<String, dynamic>> postBodies = [];
 
   @override
   Future<ApiResponse> get(String endpoint) async {
     if (endpoint == '/decks/deck-1') {
-      return ApiResponse(200, _deckDetailsJson());
+      return ApiResponse(200, _deckDetails);
     }
     return ApiResponse(404, {'error': 'not found'});
   }
@@ -154,6 +166,20 @@ DeckCardItem _sampleCard() {
   );
 }
 
+DeckCardItem _nonCommanderCard() {
+  return DeckCardItem(
+    id: 'card-sol-ring',
+    name: 'Sol Ring',
+    manaCost: '{1}',
+    typeLine: 'Artifact',
+    oracleText: '{T}: Add {C}{C}.',
+    setCode: 'cmm',
+    rarity: 'uncommon',
+    quantity: 1,
+    isCommander: false,
+  );
+}
+
 List<DeckCardItem> _sampleCards(int count) {
   final card = _sampleCard();
   return List.generate(
@@ -178,6 +204,28 @@ Map<String, dynamic> _deckDetailsJson() {
     'stats': {'total_cards': 0},
     'commander': <Map<String, dynamic>>[],
     'main_board': <String, List<Map<String, dynamic>>>{},
+  };
+}
+
+Map<String, dynamic> _deckDetailsWithCommanderJson() {
+  return {
+    ..._deckDetailsJson(),
+    'color_identity': <String>['R', 'W'],
+    'commander': [
+      {
+        'id': 'lorehold-commander',
+        'name': 'Lorehold, the Historian',
+        'mana_cost': '{3}{R}{W}',
+        'type_line': 'Legendary Creature — Elder Dragon',
+        'oracle_text': 'Flying',
+        'colors': <String>['R', 'W'],
+        'color_identity': <String>['R', 'W'],
+        'set_code': 'sos',
+        'rarity': 'mythic',
+        'quantity': 1,
+        'is_commander': true,
+      },
+    ],
   };
 }
 
@@ -389,6 +437,30 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('grouped playable card exposes its printing count', (
+    tester,
+  ) async {
+    final card = _sampleCard().copyWith(printingCount: 2);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create: (_) => _FixedCardProvider([card]),
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'binder-1', mode: 'binder'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(Key('card-search-printing-count-${card.id}')),
+      findsOneWidget,
+    );
+    expect(find.text('2 impressões'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('card search exposes keyed empty and error states', (
     tester,
   ) async {
@@ -442,7 +514,7 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider<CardProvider>(
-              create: (_) => _FixedCardProvider([card]),
+              create: (_) => _FixedCardProvider([card, _nonCommanderCard()]),
             ),
             ChangeNotifierProvider<DeckProvider>(
               create: (_) => DeckProvider(apiClient: apiClient),
@@ -456,6 +528,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      expect(find.text(card.name), findsOneWidget);
+      expect(find.text('Sol Ring'), findsNothing);
+      expect(find.text('1 comandante elegível'), findsOneWidget);
       await tester.tap(find.byTooltip('Adicionar'));
       await tester.pumpAndSettle();
 
@@ -488,6 +563,45 @@ void main() {
       expect(apiClient.postBodies.single['card_id'], card.id);
       expect(apiClient.postBodies.single['quantity'], 1);
       expect(apiClient.postBodies.single['is_commander'], isFalse);
+    },
+  );
+
+  testWidgets(
+    'commander replacement does not apply the old commander color warning',
+    (tester) async {
+      final card = _sampleCard();
+      final apiClient = _FakeDeckApiClient(
+        deckDetails: _deckDetailsWithCommanderJson(),
+      );
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CardProvider>(
+              create: (_) => _FixedCardProvider([card]),
+            ),
+            ChangeNotifierProvider<DeckProvider>(
+              create: (_) => DeckProvider(apiClient: apiClient),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: const CardSearchScreen(deckId: 'deck-1', mode: 'commander'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(card.name), findsOneWidget);
+      expect(find.text('1 comandante elegível'), findsOneWidget);
+      expect(find.text('Fora da identidade do comandante'), findsNothing);
+
+      await tester.tap(find.byTooltip('Adicionar'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Definir como comandante'), findsOneWidget);
+      expect(find.text('Adicionar como carta comum'), findsNothing);
+      expect(tester.takeException(), isNull);
     },
   );
 }

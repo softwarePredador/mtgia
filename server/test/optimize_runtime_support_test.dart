@@ -180,8 +180,8 @@ void main() {
       );
 
       expect(light, isNot(equals(aggressive)));
-      expect(light, startsWith('v9:'));
-      expect(aggressive, startsWith('v9:'));
+      expect(light, startsWith('v10:'));
+      expect(aggressive, startsWith('v10:'));
     });
   });
 

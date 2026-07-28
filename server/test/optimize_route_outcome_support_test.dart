@@ -48,6 +48,7 @@ void main() {
           statusCode: 200,
           body: const {
             'mode': 'complete',
+            'mana_foundation_satisfied': true,
             'additions': ['New Card'],
             'additions_detailed': [
               {'name': 'New Card', 'card_id': 'new-card-id', 'quantity': 1},
@@ -64,6 +65,45 @@ void main() {
           deckState: repairDeckState,
         ),
         equals('rebuild_guided'),
+      );
+    });
+
+    test('complete requires an explicit verified mana foundation', () {
+      const legacyUnsafeBody = {
+        'mode': 'complete',
+        'strategy_source': 'complete_pipeline',
+        'outcome_code': 'deck_completed',
+        'additions': ['New Card'],
+        'additions_detailed': [
+          {'name': 'New Card', 'card_id': 'new-card-id', 'quantity': 1},
+        ],
+      };
+      const verifiedBody = {
+        ...legacyUnsafeBody,
+        'mana_foundation_satisfied': true,
+      };
+
+      expect(
+        deriveOptimizeOutcomeCode(
+          statusCode: 200,
+          body: legacyUnsafeBody,
+          deckState: healthyDeckState,
+        ),
+        equals('no_safe_upgrade_found'),
+      );
+      expect(
+        isReusableCachedOptimizeResponse(
+          legacyUnsafeBody,
+          effectiveMode: 'complete',
+        ),
+        isFalse,
+      );
+      expect(
+        isReusableCachedOptimizeResponse(
+          verifiedBody,
+          effectiveMode: 'complete',
+        ),
+        isTrue,
       );
     });
 

@@ -224,7 +224,8 @@ Future<List<Map<String, dynamic>>> _searchLocal(
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
       $identityColumns
-      c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
+      c.oracle_text, c.power, c.toughness,
+      c.colors, c.color_identity, c.image_url, c.set_code,
       s.name AS set_name, s.release_date AS set_release_date,
       c.rarity, c.is_reserved, COALESCE(c.price_usd, c.price) AS price,
       c.price_source, c.price_updated_at,
@@ -239,7 +240,8 @@ Future<List<Map<String, dynamic>>> _searchLocal(
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
       $identityColumns
-      c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
+      c.oracle_text, c.power, c.toughness,
+      c.colors, c.color_identity, c.image_url, c.set_code,
       c.rarity, c.is_reserved, COALESCE(c.price_usd, c.price) AS price,
       c.price_source, c.price_updated_at,
       c.collector_number, c.foil
@@ -266,6 +268,8 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       'mana_cost': m['mana_cost'],
       'type_line': m['type_line'],
       'oracle_text': m['oracle_text'],
+      'power': m['power'],
+      'toughness': m['toughness'],
       'colors': m['colors'],
       'color_identity': m['color_identity'],
       'image_url': normalizeScryfallImageUrl(
@@ -476,6 +480,8 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
     final manaCost = card['mana_cost']?.toString();
     final typeLine = card['type_line']?.toString();
     final oracleText = card['oracle_text']?.toString();
+    final power = card['power']?.toString();
+    final toughness = card['toughness']?.toString();
     final setCode = card['set']?.toString();
     final rarity = card['rarity']?.toString();
     final isReserved =
@@ -524,15 +530,19 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
+                             power, toughness,
                              colors, color_identity, image_url, set_code, rarity, cmc,
                              is_reserved, collector_number, foil$identityInsertColumns)
           VALUES (
             @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
+            @power, @toughness,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
             @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
             image_url = COALESCE(EXCLUDED.image_url, cards.image_url),
+            power = COALESCE(EXCLUDED.power, cards.power),
+            toughness = COALESCE(EXCLUDED.toughness, cards.toughness),
             is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
             foil = COALESCE(cards.foil, EXCLUDED.foil),
@@ -546,6 +556,8 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
           'mana_cost': manaCost,
           'type_line': typeLine,
           'oracle_text': oracleText,
+          'power': power,
+          'toughness': toughness,
           'colors': colors,
           'color_identity': colorIdentity,
           'image_url': imageUrl,

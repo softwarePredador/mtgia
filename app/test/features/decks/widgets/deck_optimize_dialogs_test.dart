@@ -1,5 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/widgets/card_artwork.dart';
+import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/providers/deck_provider_support.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_dialogs.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_flow_support.dart';
@@ -577,6 +581,220 @@ void main() {
     expect(selection!.selectedAdditionIndexes, contains(1));
   });
 
+  testWidgets(
+    'optimization recommendation shows exact card on mouse hover and hides on exit',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var loadCount = 0;
+
+      await tester.pumpWidget(
+        _recommendationPreviewLauncher(
+          additions: const [
+            {'card_id': 'arcane-signet-id', 'name': 'Arcane Signet'},
+          ],
+          loadCard: (cardId) async {
+            loadCount += 1;
+            expect(cardId, 'arcane-signet-id');
+            return _previewCard();
+          },
+        ),
+      );
+      await tester.tap(find.text('open-card-preview'));
+      await tester.pumpAndSettle();
+
+      final row = find.byKey(const Key('optimize-suggestion-add-0'));
+      await tester.ensureVisible(row);
+      await tester.pump();
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(tester.getCenter(row));
+      await tester.pump(const Duration(milliseconds: 240));
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('optimize-suggestion-add-0-hover-card-preview')),
+        findsOneWidget,
+      );
+      expect(loadCount, 1);
+      final artwork = tester.widget<CardArtwork>(
+        find.byKey(const Key('recommendation-hover-card-artwork')),
+      );
+      expect(artwork.imageUrl, contains('arcane-signet.jpg'));
+
+      await mouse.moveTo(const Offset(8, 8));
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('optimize-suggestion-add-0-hover-card-preview')),
+        findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'keyboard focus shows recommendation preview and Escape keeps dialog open',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final previousHighlightStrategy = FocusManager.instance.highlightStrategy;
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTraditional;
+      addTearDown(() {
+        FocusManager.instance.highlightStrategy = previousHighlightStrategy;
+      });
+
+      await tester.pumpWidget(
+        _recommendationPreviewLauncher(
+          additions: const [
+            {'name': 'Swiftfoot Boots'},
+          ],
+        ),
+      );
+      await tester.tap(find.text('open-card-preview'));
+      await tester.pumpAndSettle();
+      final row = find.byKey(const Key('optimize-suggestion-add-0'));
+      await tester.ensureVisible(row);
+      await tester.pump();
+
+      final hoverPreview = find.byKey(
+        const Key('optimize-suggestion-add-0-hover-card-preview'),
+      );
+      final previewIcon = find.descendant(
+        of: find.byKey(const Key('optimize-suggestion-add-0-preview-button')),
+        matching: find.byIcon(Icons.style_outlined),
+      );
+      Focus.of(tester.element(previewIcon)).requestFocus();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
+
+      expect(hoverPreview, findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(hoverPreview, findsNothing);
+      expect(find.byKey(const Key('optimize-preview-dialog')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'compact recommendation reader opens by button and long press without changing selection',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var loadCount = 0;
+
+      await tester.pumpWidget(
+        _recommendationPreviewLauncher(
+          additions: const [
+            {'card_id': 'arcane-signet-id', 'name': 'Arcane Signet'},
+          ],
+          loadCard: (_) async {
+            loadCount += 1;
+            return _previewCard();
+          },
+        ),
+      );
+      await tester.tap(find.text('open-card-preview'));
+      await tester.pumpAndSettle();
+
+      final row = find.byKey(const Key('optimize-suggestion-add-0'));
+      final previewButton = find.byKey(
+        const Key('optimize-suggestion-add-0-preview-button'),
+      );
+      await tester.ensureVisible(previewButton);
+      await tester.pump();
+      expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+
+      await tester.tap(previewButton);
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('optimize-suggestion-add-0-card-preview-panel')),
+        findsOneWidget,
+      );
+      expect(find.text('Legendary Artifact'), findsOneWidget);
+      expect(find.textContaining('Add one mana of any color'), findsOneWidget);
+      expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+      expect(loadCount, 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(
+        find.byKey(const Key('optimize-suggestion-add-0-card-preview-panel')),
+        findsNothing,
+      );
+      expect(find.byKey(const Key('optimize-preview-dialog')), findsOneWidget);
+
+      await tester.ensureVisible(row);
+      await tester.longPress(row);
+      await tester.pump();
+      expect(
+        find.byKey(const Key('optimize-suggestion-add-0-card-preview-panel')),
+        findsOneWidget,
+      );
+      expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+      expect(loadCount, 1);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'recommendation reader falls back to exact-name artwork for legacy payload',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        _recommendationPreviewLauncher(
+          additions: const [
+            {'name': 'The One Ring'},
+          ],
+        ),
+      );
+      await tester.tap(find.text('open-card-preview'));
+      await tester.pumpAndSettle();
+      final previewButton = find.byKey(
+        const Key('optimize-suggestion-add-0-preview-button'),
+      );
+      await tester.ensureVisible(previewButton);
+      expect(
+        find.ancestor(
+          of: previewButton,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is Semantics &&
+                widget.properties.label == 'Ver carta The One Ring',
+          ),
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(previewButton);
+      await tester.pump();
+
+      final artwork = tester.widget<CardArtwork>(
+        find.byKey(const Key('recommendation-reader-card-artwork')),
+      );
+      expect(artwork.imageUrl, contains('/cards/named'));
+      expect(
+        Uri.parse(artwork.imageUrl!).queryParameters['exact'],
+        'The One Ring',
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('optimization preview disables apply when backend blocks it', (
     tester,
   ) async {
@@ -695,4 +913,54 @@ void main() {
     );
     expect(find.textContaining('PostgreSQL'), findsNothing);
   });
+}
+
+Widget _recommendationPreviewLauncher({
+  required List<Map<String, dynamic>> additions,
+  Future<DeckCardItem> Function(String cardId)? loadCard,
+}) {
+  return _TestMaterialApp(
+    home: Builder(
+      builder: (context) => Scaffold(
+        body: TextButton(
+          onPressed: () => showOptimizationPreviewDialog(
+            context,
+            mode: 'complete',
+            archetype: 'spellslinger',
+            keepTheme: true,
+            preservedTheme: null,
+            reasoning: '',
+            intensity: OptimizeIntensity.focused,
+            optimizeIntensity: const <String, dynamic>{},
+            qualityWarning: null,
+            deckAnalysis: const <String, dynamic>{},
+            postAnalysis: const <String, dynamic>{},
+            warnings: const <String, dynamic>{},
+            metaReferenceContext: const <String, dynamic>{},
+            displayRemovals: const <Map<String, dynamic>>[],
+            displayAdditions: additions,
+            loadCard: loadCard,
+          ),
+          child: const Text('open-card-preview'),
+        ),
+      ),
+    ),
+  );
+}
+
+DeckCardItem _previewCard() {
+  return DeckCardItem(
+    id: 'arcane-signet-id',
+    name: 'Arcane Signet',
+    manaCost: '{2}',
+    typeLine: 'Legendary Artifact',
+    oracleText: '{T}: Add one mana of any color.',
+    imageUrl: 'https://cards.scryfall.io/normal/front/a/b/arcane-signet.jpg',
+    setCode: 'cmm',
+    setName: 'Commander Masters',
+    rarity: 'uncommon',
+    quantity: 1,
+    isCommander: false,
+    collectorNumber: '380',
+  );
 }

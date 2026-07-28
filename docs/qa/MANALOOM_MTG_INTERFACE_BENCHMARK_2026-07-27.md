@@ -57,8 +57,8 @@ automática de qualidade.
 
 - estados vazios, loading e erro receberam um motivo original de cartas/mesa
   com baixa intensidade;
-- fallbacks de imagens passaram a preservar proporção de carta, moldura e cinco
-  pontos de identidade;
+- fallbacks de imagens passaram a usar um verso autoral ManaLoom, preservando
+  proporção de carta, moldura e cinco pontos de identidade;
 - navegação ganhou glifos originais para marca, comunidade e jogador;
 - busca social e estados de comunidade passaram a falar em jogadores, decks e
   mesa, sem ilustrações genéricas;
@@ -73,8 +73,9 @@ automática de qualidade.
 ## Limite de propriedade intelectual
 
 A solução não copia logos da Wizards, marca de Planeswalker, símbolos de set,
-versos de cartas, trade dress nem layouts proprietários. Os glifos e motivos
-são originais e usam proporções de carta, zonas e cores como informação.
+o verso oficial das cartas, trade dress nem layouts proprietários. O verso
+ManaLoom, os glifos e os motivos são originais e usam proporções de carta,
+zonas e cores como informação.
 Essa decisão também segue a
 [Política de Conteúdo de Fãs da Wizards](https://company.wizards.com/pt-BR/legal/fancontentpolicy),
 que restringe logos e marcas registradas.
@@ -83,10 +84,11 @@ que restringe logos e marcas registradas.
 
 A mudança só recebe aceite depois de:
 
-- recaptura das 210 telas/estados P0 em Web mobile, desktop, wide e Android
+- recaptura das 214 telas/estados P0 em Web mobile, desktop, wide e Android
   físico;
 - sete estados dedicados do Battle Coach Android;
 - nove checkpoints de teclado/foco real no Battle Coach Web;
+- uma prova dedicada do verso autoral quando a arte está indisponível;
 - inspeção visual de todas as imagens, inclusive a platform view do Life
   Counter capturada pelo compositor Android;
 - `flutter analyze`, testes focados, gates `ui-audit` e `ui-proof`, drift

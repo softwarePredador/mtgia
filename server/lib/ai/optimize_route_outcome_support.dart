@@ -141,9 +141,11 @@ bool _hasActionableCompleteAdditions(Map<String, dynamic> body) {
       detailedAdditions != null &&
       additions.isNotEmpty &&
       _sameNameMultiset(additions, detailedAdditions.names) &&
+      body['mana_foundation_satisfied'] == true &&
       _optionalResponseFlagsAreWellTyped(body) &&
       body['is_mock'] != true &&
       body['can_apply'] != false &&
+      body['learning_eligible'] != false &&
       !body.containsKey('quality_error');
 }
 

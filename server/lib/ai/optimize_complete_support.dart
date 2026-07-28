@@ -3,6 +3,7 @@ import 'package:postgres/postgres.dart';
 import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../card_validation_service.dart';
+import '../commander_mana_floor.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import '../meta/meta_deck_reference_support.dart';
@@ -531,7 +532,14 @@ Future<int> _bootstrapSparseCompleteInput({
   required int maxTotal,
 }) async {
   final currentLands = _countCurrentLands(state.virtualDeck);
-  final targetLands = (state.commanderRecommendedLands ?? 36).clamp(32, 40);
+  final minimumTargetLands =
+      commanderManaFloorApplies(deckFormat)
+          ? commanderStrategicMinimumLandCount
+          : 32;
+  final targetLands = (state.commanderRecommendedLands ?? 36).clamp(
+    minimumTargetLands,
+    40,
+  );
   final targetSpells = (maxTotal - targetLands).clamp(
     state.virtualTotal,
     maxTotal,
@@ -550,6 +558,9 @@ Future<int> _bootstrapSparseCompleteInput({
 
   void addUnique(Iterable<Map<String, dynamic>> items) {
     for (final item in items) {
+      if (basic_lands.isLandTypeLine(item['type_line']?.toString() ?? '')) {
+        continue;
+      }
       final lowerName = ((item['name'] as String?) ?? '').trim().toLowerCase();
       if (lowerName.isEmpty) continue;
       if (existingNames.contains(lowerName) ||
@@ -660,6 +671,7 @@ Future<int> _bootstrapSparseCompleteInput({
 void rebalanceCompleteDeckForLandDeficit({
   required CompleteBuildAccumulator state,
   required int maxTotal,
+  required String deckFormat,
 }) {
   var currentLands = 0;
   for (final card in state.virtualDeck) {
@@ -684,9 +696,13 @@ void rebalanceCompleteDeckForLandDeficit({
         nonLandCards.length;
   }
 
+  final minimumTargetLands =
+      commanderManaFloorApplies(deckFormat)
+          ? commanderStrategicMinimumLandCount
+          : 28;
   final idealLands = (state.commanderRecommendedLands ??
           (avgCmc < 2.0 ? 32 : (avgCmc < 3.0 ? 35 : (avgCmc < 4.0 ? 37 : 39))))
-      .clamp(28, 42);
+      .clamp(minimumTargetLands, 42);
   final landDeficit = idealLands - currentLands;
   final slotsAvailable = maxTotal - state.virtualTotal;
 
@@ -759,9 +775,13 @@ Future<void> fillCompleteDeckRemainder({
   final missing = maxTotal - state.virtualTotal;
   var currentLands = _countCurrentLands(state.virtualDeck);
   final avgCmc = _calculateAverageNonLandCmc(state.virtualDeck);
+  final minimumTargetLands =
+      commanderManaFloorApplies(deckFormat)
+          ? commanderStrategicMinimumLandCount
+          : 28;
   final idealLands = (state.commanderRecommendedLands ??
           (avgCmc < 2.0 ? 32 : (avgCmc < 3.0 ? 35 : (avgCmc < 4.0 ? 37 : 39))))
-      .clamp(28, 42);
+      .clamp(minimumTargetLands, 42);
   final landsNeeded = (idealLands - currentLands).clamp(0, missing);
   final spellsNeeded = missing - landsNeeded;
 
@@ -783,6 +803,9 @@ Future<void> fillCompleteDeckRemainder({
       final selectedSpellNames = <String>{};
       void mergeUniqueSpells(List<Map<String, dynamic>> incoming) {
         for (final item in incoming) {
+          if (basic_lands.isLandTypeLine(item['type_line']?.toString() ?? '')) {
+            continue;
+          }
           final lowerName =
               ((item['name'] as String?) ?? '').trim().toLowerCase();
           if (lowerName.isEmpty) continue;
@@ -1167,6 +1190,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
   required int maxTotal,
   required int currentTotalCards,
   required String targetArchetype,
+  required String deckFormat,
 }) {
   final additionsDetailed = <Map<String, dynamic>>[];
   for (final entry in state.addedCountsById.entries) {
@@ -1194,6 +1218,10 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
   }
 
   final nonBasicAdded = addedTotal - basicAdded;
+  final manaFloorAssessment = assessCommanderManaFloor(
+    format: deckFormat,
+    cards: state.virtualDeck,
+  );
   Map<String, dynamic>? qualityError;
 
   if (addedTotal < targetTotal) {
@@ -1206,6 +1234,14 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       'basic_added': basicAdded,
       'non_basic_added': nonBasicAdded,
     };
+  } else if (!manaFloorAssessment.satisfied) {
+    qualityError = manaFloorAssessment.toQualityError(
+      code: 'COMPLETE_QUALITY_LAND_FLOOR',
+      message:
+          'Complete bloqueado: a lista final teria apenas '
+          '${manaFloorAssessment.landCount} terrenos; o piso seguro de '
+          'Commander é ${manaFloorAssessment.minimumLandCount}.',
+    );
   } else if (targetTotal >= 40 && basicAdded > state.maxBasicAdditions) {
     qualityError = {
       'code': 'COMPLETE_QUALITY_BASIC_OVERFLOW',
@@ -1230,6 +1266,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
 
   return normalizeOptimizePayload({
     'mode': 'complete',
+    'mana_foundation_satisfied': manaFloorAssessment.satisfied,
     'target_additions': targetTotal,
     'iterations': state.iterations,
     'additions_detailed': additionsDetailed,
@@ -1248,6 +1285,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
     },
     'consistency_slo': {
       'completed_target': addedTotal >= targetTotal,
+      'mana_foundation_satisfied': manaFloorAssessment.satisfied,
       'ai_stage_used': state.aiStageUsed,
       'competitive_model_stage_used': state.competitiveModelStageUsed,
       'average_deck_seed_stage_used': state.averageDeckSeedStageUsed,
@@ -1257,6 +1295,11 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       'target_total': targetTotal,
       'non_basic_added': nonBasicAdded,
       'basic_added': basicAdded,
+      if (manaFloorAssessment.applies) ...{
+        'land_count': manaFloorAssessment.landCount,
+        'minimum_land_count': manaFloorAssessment.minimumLandCount,
+        'land_floor_satisfied': manaFloorAssessment.satisfied,
+      },
     },
     if (state.commanderMetaEvidencePayload != null &&
         state.commanderMetaEvidencePayload!.isNotEmpty)
@@ -1294,6 +1337,7 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   final ids = rawAdditionsDetailed.map((e) => e['card_id'] as String).toList();
   final cardInfoById = <String, Map<String, String>>{};
   var additionsDetailed = <Map<String, dynamic>>[];
+  var resolvedAdditionsForFloor = <Map<String, dynamic>>[];
   Map<String, dynamic>? postAnalysisComplete;
 
   if (ids.isNotEmpty) {
@@ -1347,8 +1391,11 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       }
     }
 
+    resolvedAdditionsForFloor = aggregatedByName.values
+        .map((entry) => Map<String, dynamic>.from(entry))
+        .toList(growable: false);
     additionsDetailed =
-        aggregatedByName.values
+        resolvedAdditionsForFloor
             .map(
               (e) => {
                 'card_id': e['card_id'],
@@ -1433,8 +1480,13 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     }
   }
 
+  final finalManaFloorAssessment = assessCommanderManaFloor(
+    format: deckFormat,
+    cards: [...originalDeck, ...resolvedAdditionsForFloor],
+  );
   final responseBody = <String, dynamic>{
     'mode': 'complete',
+    'mana_foundation_satisfied': finalManaFloorAssessment.satisfied,
     'constraints': {'keep_theme': keepTheme},
     'theme': theme,
     'bracket': bracket,
@@ -1462,6 +1514,19 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     'post_analysis': postAnalysisComplete,
     'validation_warnings': const <String>[],
   };
+  if (!finalManaFloorAssessment.satisfied) {
+    responseBody
+      ..['quality_error'] = finalManaFloorAssessment.toQualityError(
+        code: 'COMPLETE_QUALITY_LAND_FLOOR',
+        message:
+            'Complete bloqueado na validação final: a lista resolvida teria '
+            '${finalManaFloorAssessment.landCount} terrenos; o piso seguro é '
+            '${finalManaFloorAssessment.minimumLandCount}.',
+      )
+      ..['can_apply'] = false
+      ..['learning_eligible'] = false
+      ..['apply_blockers'] = const ['commander_land_floor_not_met'];
+  }
 
   responseBody['optimization_contract'] = buildOptimizeDecisionContract(
     mode: 'complete',
@@ -1490,6 +1555,15 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   final consistencySlo = jsonResponse['consistency_slo'];
   if (consistencySlo is Map) {
     responseBody['consistency_slo'] = consistencySlo.cast<String, dynamic>();
+  }
+  if (finalManaFloorAssessment.applies) {
+    responseBody['consistency_slo'] = {
+      ...?responseBody['consistency_slo'] as Map<String, dynamic>?,
+      'mana_foundation_satisfied': finalManaFloorAssessment.satisfied,
+      'land_count': finalManaFloorAssessment.landCount,
+      'minimum_land_count': finalManaFloorAssessment.minimumLandCount,
+      'land_floor_satisfied': finalManaFloorAssessment.satisfied,
+    };
   }
 
   final metaReferenceContext = jsonResponse['meta_reference_context'];

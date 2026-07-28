@@ -5,7 +5,7 @@ import '../e2e_validation_policy.dart';
 // Bump whenever the player-facing optimize response contract changes. Cached
 // payloads are returned as-is, so reusing an older schema can omit safety fields
 // such as optimization_contract and battle_validation for up to six hours.
-const optimizeCacheContractVersion = 'v9';
+const optimizeCacheContractVersion = 'v10';
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   final entries = <String>[];

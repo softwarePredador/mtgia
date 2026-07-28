@@ -307,14 +307,6 @@ class _CardImageFallback extends StatelessWidget {
   final BorderRadius borderRadius;
   final bool loading;
 
-  static const _identityColors = <Color>[
-    AppTheme.manaW,
-    AppTheme.manaU,
-    AppTheme.manaB,
-    AppTheme.manaR,
-    AppTheme.manaG,
-  ];
-
   @override
   Widget build(BuildContext context) {
     final accent = loading ? AppTheme.frost400 : AppTheme.brass400;
@@ -323,10 +315,18 @@ class _CardImageFallback extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: AppTheme.surfaceSlate,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.backgroundAbyss,
+              AppTheme.surfaceSlate,
+              AppTheme.backgroundAbyss,
+            ],
+          ),
           borderRadius: borderRadius,
           border: Border.all(
-            color: accent.withValues(alpha: 0.22),
+            color: accent.withValues(alpha: 0.44),
             width: AppTheme.strokeHairline,
           ),
         ),
@@ -338,56 +338,43 @@ class _CardImageFallback extends StatelessWidget {
                 constraints.maxWidth.isFinite ? constraints.maxWidth : 56,
                 constraints.maxHeight.isFinite ? constraints.maxHeight : 78,
               );
-              final glyphSize = (shortest * 0.38).clamp(14.0, 30.0);
-              final pipSize = (shortest * 0.055).clamp(2.0, 3.5);
+              final glyphSize = (shortest * 0.34).clamp(13.0, 29.0);
               return Stack(
+                key: const Key('manaloom-card-back'),
                 fit: StackFit.expand,
                 children: [
-                  Positioned(
-                    left: shortest * 0.08,
-                    right: shortest * 0.08,
-                    top: shortest * 0.08,
-                    bottom: shortest * 0.08,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
-                        border: Border.all(
-                          color: AppTheme.outlineMuted.withValues(alpha: 0.48),
-                          width: AppTheme.strokeHairline,
-                        ),
-                      ),
+                  CustomPaint(
+                    painter: _ManaLoomCardBackPainter(
+                      accent: accent,
+                      loading: loading,
                     ),
                   ),
                   Center(
-                    child: ManaLoomGlyph(
-                      ManaLoomGlyphKind.card,
-                      size: glyphSize,
-                      color: accent.withValues(alpha: loading ? 0.46 : 0.58),
-                    ),
-                  ),
-                  if (shortest >= 38)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: shortest * 0.14,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (final color in _identityColors)
-                            Container(
-                              width: pipSize,
-                              height: pipSize,
-                              margin: EdgeInsets.symmetric(
-                                horizontal: pipSize * 0.42,
-                              ),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: color.withValues(alpha: 0.54),
-                              ),
-                            ),
+                    child: Container(
+                      width: glyphSize * 1.58,
+                      height: glyphSize * 1.58,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppTheme.backgroundAbyss.withValues(alpha: 0.88),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: accent.withValues(alpha: 0.54),
+                          width: AppTheme.strokeHairline,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: accent.withValues(alpha: 0.10),
+                            blurRadius: glyphSize * 0.55,
+                          ),
                         ],
                       ),
+                      child: ManaLoomGlyph(
+                        ManaLoomGlyphKind.brand,
+                        size: glyphSize,
+                        color: accent.withValues(alpha: loading ? 0.72 : 0.82),
+                      ),
                     ),
+                  ),
                 ],
               );
             },
@@ -396,6 +383,97 @@ class _CardImageFallback extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ManaLoomCardBackPainter extends CustomPainter {
+  const _ManaLoomCardBackPainter({required this.accent, required this.loading});
+
+  final Color accent;
+  final bool loading;
+
+  static const _identityColors = <Color>[
+    AppTheme.manaW,
+    AppTheme.manaU,
+    AppTheme.manaB,
+    AppTheme.manaR,
+    AppTheme.manaG,
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final shortest = math.min(size.width, size.height);
+    final center = Offset(size.width / 2, size.height / 2);
+    final line = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(0.65, shortest * 0.012)
+      ..color = accent.withValues(alpha: loading ? 0.25 : 0.34);
+    final quietLine = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(0.5, shortest * 0.008)
+      ..color = AppTheme.frost400.withValues(alpha: 0.16);
+
+    final inset = shortest * 0.09;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          inset,
+          inset,
+          size.width - inset * 2,
+          size.height - inset * 2,
+        ),
+        Radius.circular(math.max(2, shortest * 0.08)),
+      ),
+      quietLine,
+    );
+
+    final orbit = Rect.fromCenter(
+      center: center,
+      width: size.width * 0.72,
+      height: size.height * 0.64,
+    );
+    canvas.drawOval(orbit, line);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center,
+        width: orbit.width * 0.72,
+        height: orbit.height * 0.72,
+      ),
+      quietLine,
+    );
+    canvas.drawLine(
+      Offset(center.dx, orbit.top),
+      Offset(center.dx, orbit.bottom),
+      quietLine,
+    );
+    canvas.drawLine(
+      Offset(orbit.left, center.dy),
+      Offset(orbit.right, center.dy),
+      quietLine,
+    );
+
+    final pipRadius = (shortest * 0.045).clamp(1.8, 3.4);
+    final pipOrbitX = orbit.width * 0.43;
+    final pipOrbitY = orbit.height * 0.43;
+    for (var index = 0; index < _identityColors.length; index++) {
+      final angle = -math.pi / 2 + index * (math.pi * 2 / 5);
+      canvas.drawCircle(
+        Offset(
+          center.dx + math.cos(angle) * pipOrbitX,
+          center.dy + math.sin(angle) * pipOrbitY,
+        ),
+        pipRadius,
+        Paint()
+          ..color = _identityColors[index].withValues(
+            alpha: loading ? 0.48 : 0.66,
+          ),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ManaLoomCardBackPainter oldDelegate) =>
+      oldDelegate.accent != accent || oldDelegate.loading != loading;
 }
 
 class _ScryfallWebCardImage extends StatefulWidget {

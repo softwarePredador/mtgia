@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-28T13:30:52.997918Z",
-  "source_digest": "c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9",
+  "generated_at": "2026-07-28T20:03:39.742369Z",
+  "source_digest": "78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59",
   "surface": "battle_coach",
   "profile": "android_phone",
   "runtime": "flutter_integration_test",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "c1817b6beef2ad29b3ee3592d02a8b68e4c605511e5e501ad93ea61e55109010",
+  "log_sha256": "4986fb28c217eb88f944f74ef05369b6d4b545df211028473581e9cf9012a294",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "battle_coach_00_welcome",
@@ -27,56 +27,56 @@
     {
       "checkpoint": "battle_coach_00_welcome",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_00_welcome.png",
-      "sha256": "3f85cda68ac70448443e171cdd46c19468d826bc3c1973082faf7b0a1434f70b",
-      "bytes": 691772,
+      "sha256": "af8a1771f3d7f5277d615eb5b86d81cb65bb831d482a857fe55f84a036d22e51",
+      "bytes": 686592,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_01_active_table",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_01_active_table.png",
-      "sha256": "7e2dbd1c55204ddb9e029550d294fbc0180be47da87287b3765723246f3e28f8",
-      "bytes": 359760,
+      "sha256": "dd27f3b89be5b5edb453b24980e466afe32a9afe9be23bbd1208202a77ec1b2f",
+      "bytes": 1086702,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_02_decision_prompt",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_02_decision_prompt.png",
-      "sha256": "c36893b7b68330f1f5e5a0b42f37fbae68fe26139f78ef10352516d9483cc26b",
-      "bytes": 315633,
+      "sha256": "f9be8066efed1f9c93d2ccbf4ca5c6c613e223eca603047c1211c7995f743696",
+      "bytes": 972763,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_03_recoverable_error",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_03_recoverable_error.png",
-      "sha256": "f03a41955eab18105c4146c2dc9e719bb086f51c1534404b400d3804db4cc9dd",
-      "bytes": 854520,
+      "sha256": "c5ee2878868fde244251f07d8899ec5710d6793de15dbf22449daa3e307d63ea",
+      "bytes": 973493,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_04_concede_confirmation",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_04_concede_confirmation.png",
-      "sha256": "38d9f87dfb4f2a013d10aba7225e78fc0dbc61ba58d7da51bed12864b4fe0743",
-      "bytes": 384968,
+      "sha256": "9154da7a8bab6bf45100241621ec6965ff7c495b764ad5c1f409c679860fac3c",
+      "bytes": 564823,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_05_action_progress",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_05_action_progress.png",
-      "sha256": "234177fa0cc4017ed755fa99af1d273fa0b79fa83b1d5d910d45508d6a1c9099",
-      "bytes": 841394,
+      "sha256": "fa7309130ac4b19b3b05142ca750170d03b43b016befbc45bad694be22da7efa",
+      "bytes": 972702,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_06_terminal_replay",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_06_terminal_replay.png",
-      "sha256": "d697f01c245f87b91e8c6bf89ba744e4ab682abd22f6e230c20d20ee692c98ed",
-      "bytes": 712937,
+      "sha256": "9ade2341f3633325f0c5a870be051ea563b9f24ec3a83b9415f78f4ba71dc425",
+      "bytes": 722542,
       "width": 1080,
       "height": 2408
     }

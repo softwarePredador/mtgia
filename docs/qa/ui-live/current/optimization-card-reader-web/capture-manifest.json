@@ -1,0 +1,79 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-07-28T18:17:11Z",
+  "source_digest": "961ec03e563f0cf1cc4a73c6d4d750bb4d4652a1c583ffafa846669d51e140b1",
+  "bundle_sha256": "7632188e52e55249ebfa5bc76be03d7c4ab50479e0362d7e7538444181c07f4f",
+  "surface": "optimization_card_reader",
+  "profile": "web_in_app_1280x720",
+  "runtime": "flutter_web_release_deterministic_preview_fixture",
+  "target": "web_real_build",
+  "device_contract": "Flutter Web release build served under /app/ in the in-app browser at 1280x720 with real mouse hover, click and physical Escape.",
+  "fixture_contract": {
+    "ai_upstream_called": false,
+    "deck_mutation_called": false,
+    "apply_action_clicked": false,
+    "preview_cancelled": true,
+    "card_reader_payload": "deterministic_loopback_fixture",
+    "authenticated_read_requests": true,
+    "activation_analytics_event": true
+  },
+  "automated_validation": {
+    "status": "PASS_AUTOMATED",
+    "analyzer_issues": 0,
+    "focused_tests_passed": 66,
+    "mobile_viewport": "390x844",
+    "mobile_assertions": [
+      "explicit 48px preview target",
+      "long press opens the reader",
+      "selection remains unchanged",
+      "card request is cached",
+      "Escape closes the reader before the optimization dialog"
+    ]
+  },
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "visual_review": {
+    "status": "PASS_VISUAL_REVIEWED",
+    "reviewed_all_captures": true,
+    "visual_thesis": "Obsidian and slate remain dominant; brass marks card identity and actions while selection colors retain their add/remove meaning.",
+    "content_plan": "The recommendation and its selected state remain primary; hover exposes the card beside the row and the explicit reader provides image, type, mana and Oracle text.",
+    "interaction_thesis": "Mouse hover and keyboard focus provide a reversible glance; the explicit button and mobile long press open a zoomable reader; Escape or Back closes only the reader and restores the underlying decision.",
+    "checks": {
+      "hierarchy": "pass",
+      "mtg_identity": "pass",
+      "color_and_contrast": "pass",
+      "typography": "pass",
+      "spacing_and_density": "pass",
+      "responsive_adaptation": "pass_automated_mobile_and_runtime_web",
+      "interaction_clarity": "pass",
+      "visual_accessibility": "pass",
+      "attractiveness": "pass"
+    }
+  },
+  "checkpoint_count": 2,
+  "required_checkpoints": [
+    "01_hover_card",
+    "02_full_reader"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "01_hover_card",
+      "path": "docs/qa/ui-live/current/optimization-card-reader-web/01_hover_card.png",
+      "sha256": "e9462e8198c5e9d3cec654403741422a0063fde976810d4075ba115296ee54d2",
+      "bytes": 420714,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "checkpoint": "02_full_reader",
+      "path": "docs/qa/ui-live/current/optimization-card-reader-web/02_full_reader.png",
+      "sha256": "b2a8e76dc5c0df705d0f7ecdf538fb106d056de9c3ca79b6349991697efb4411",
+      "bytes": 353309,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

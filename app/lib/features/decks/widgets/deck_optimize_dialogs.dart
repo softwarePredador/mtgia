@@ -157,6 +157,7 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
   List<String> applyBlockers = const <String>[],
   required List<Map<String, dynamic>> displayRemovals,
   required List<Map<String, dynamic>> displayAdditions,
+  RecommendationCardLoader? loadCard,
   Future<void> Function()? onCopyDebug,
   Future<String?> Function(Map<String, dynamic> payload)? onCreateShareLink,
 }) {
@@ -181,6 +182,7 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
       applyBlockers: applyBlockers,
       displayRemovals: displayRemovals,
       displayAdditions: displayAdditions,
+      loadCard: loadCard,
       onCancel: () => Navigator.pop(ctx),
       onConfirm: (selection) => Navigator.pop(ctx, selection),
       onCopyDebug: onCopyDebug,

@@ -85,10 +85,10 @@
     "decks": {
       "covered": ["loading","progress","partial","stale","loading_more","saving","disabled","empty","error","retry","offline","session_expired","permission_denied","success"],
       "not_applicable": ["optimistic"],
-      "sources": ["lib/features/decks/screens/deck_list_screen.dart","lib/features/decks/screens/deck_details_screen.dart","lib/features/decks/screens/deck_generate_screen.dart","lib/features/decks/screens/deck_import_screen.dart"],
+      "sources": ["lib/features/decks/screens/deck_list_screen.dart","lib/features/decks/widgets/deck_commander_selector.dart","lib/features/decks/screens/deck_details_screen.dart","lib/features/decks/screens/deck_generate_screen.dart","lib/features/decks/screens/deck_import_screen.dart"],
       "tests": ["test/features/decks/screens/deck_details_screen_smoke_test.dart","test/features/decks/screens/deck_runtime_widget_flow_test.dart","test/features/decks/screens/deck_list_responsive_test.dart","test/features/decks/providers/deck_provider_test.dart"],
-      "anchors": ["deck-list-loading-state","deck-list-error-state","deck-create-name-error","deck-create-submit-error","deck-details-loading-state","deck-details-error-state"],
-      "input_policy": "tested: criação/import/prompt/diff preservam entradas em erro; nome obrigatório recebe foco e retry mantém o modal",
+      "anchors": ["deck-list-loading-state","deck-list-error-state","deck-create-name-error","deck-create-submit-error","deck-create-commander-loading","deck-create-commander-error","deck-create-commander-empty","deck-create-commander-results","deck-details-loading-state","deck-details-error-state"],
+      "input_policy": "tested: criação/import/prompt/diff preservam entradas em erro; nome obrigatório recebe foco; busca e seleção opcional de comandante sobrevivem ao retry e permanecem dentro dos dialogs",
       "raw_error_policy": "sanitized: FriendlyErrorMapper e dialogs de outcome impedem exception/metadata crua"
     },
     "home": {

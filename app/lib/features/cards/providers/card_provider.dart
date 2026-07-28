@@ -48,11 +48,15 @@ class CardProvider extends ChangeNotifier {
   final ApiClient _apiClient;
 
   List<DeckCardItem> _searchResults = [];
+  List<DeckCardItem> _rawSearchResults = [];
+  Map<String, int> _printingCounts = {};
   bool _isLoading = false;
   bool _isLoadingMore = false;
   bool _hasMore = false;
   int _page = 1;
   String _currentQuery = '';
+  String? _commanderFormatFilter;
+  bool _collapsePrintings = true;
   String? _errorMessage;
   Map<String, CardCollectionAvailability> _collectionAvailability = {};
 
@@ -61,28 +65,91 @@ class CardProvider extends ChangeNotifier {
   bool get isLoadingMore => _isLoadingMore;
   bool get hasMore => _hasMore;
   String? get errorMessage => _errorMessage;
+  int printingCountFor(String cardId) => _printingCounts[cardId] ?? 1;
   CardCollectionAvailability? collectionAvailabilityFor(String cardId) =>
       _collectionAvailability[cardId];
 
   CardProvider({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
-  Future<void> searchCards(String query) async {
+  Future<void> searchCards(
+    String query, {
+    bool collapsePrintings = true,
+    String? commanderFormat,
+  }) async {
     final q = query.trim();
     if (q.isEmpty) {
       clearSearch();
       return;
     }
+    final normalizedCommanderFormat = _normalizeCommanderFormat(
+      commanderFormat,
+    );
+    if (commanderFormat != null && normalizedCommanderFormat == null) {
+      throw ArgumentError.value(
+        commanderFormat,
+        'commanderFormat',
+        'Use commander or brawl.',
+      );
+    }
 
     _currentQuery = q;
+    _commanderFormatFilter = normalizedCommanderFormat;
+    _collapsePrintings = collapsePrintings;
     _page = 1;
     _hasMore = true;
     _searchResults = [];
+    _rawSearchResults = [];
+    _printingCounts = {};
     _errorMessage = null;
     _isLoading = true;
     notifyListeners();
 
     try {
       await _fetchPage(query: q, page: 1, append: false);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Busca leve para seletores de comandante.
+  ///
+  /// A disponibilidade do fichário não participa desta decisão, portanto essa
+  /// variante evita uma segunda chamada de rede que não agrega ao fluxo.
+  Future<void> searchCommanderCandidates(
+    String query, {
+    required String format,
+  }) async {
+    final q = query.trim();
+    if (q.isEmpty) {
+      clearSearch();
+      return;
+    }
+    final normalizedFormat = _normalizeCommanderFormat(format);
+    if (normalizedFormat == null) {
+      throw ArgumentError.value(format, 'format', 'Use commander or brawl.');
+    }
+
+    _currentQuery = q;
+    _commanderFormatFilter = normalizedFormat;
+    _collapsePrintings = true;
+    _page = 1;
+    _hasMore = false;
+    _searchResults = [];
+    _rawSearchResults = [];
+    _printingCounts = {};
+    _collectionAvailability = {};
+    _errorMessage = null;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _fetchPage(
+        query: q,
+        page: 1,
+        append: false,
+        fetchAvailability: false,
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -109,16 +176,30 @@ class CardProvider extends ChangeNotifier {
     required String query,
     required int page,
     required bool append,
+    bool fetchAvailability = true,
   }) async {
     const limit = 50;
     final requestQuery = query.trim();
+    final requestCommanderFormat = _commanderFormatFilter;
+    final requestCollapsePrintings = _collapsePrintings;
     final encoded = Uri.encodeQueryComponent(requestQuery);
+    final commanderFilter = requestCommanderFormat == null
+        ? ''
+        : '&commander_format=${Uri.encodeQueryComponent(requestCommanderFormat)}';
+    final dedupeMode = requestCollapsePrintings ? 'identity' : 'false';
     final response = await _apiClient.get(
-      '/cards?name=$encoded&limit=$limit&page=$page',
+      '/cards?name=$encoded&limit=$limit&page=$page'
+      '&dedupe=$dedupeMode$commanderFilter',
     );
 
     // Se o usuário trocou o query no meio, ignora a resposta antiga.
-    if (requestQuery != _currentQuery) return;
+    if (!_isCurrentRequest(
+      query: requestQuery,
+      commanderFormat: requestCommanderFormat,
+      collapsePrintings: requestCollapsePrintings,
+    )) {
+      return;
+    }
 
     if (response.statusCode != 200) {
       _errorMessage =
@@ -137,29 +218,118 @@ class CardProvider extends ChangeNotifier {
           ),
         )
         .toList();
-    final availability = await _fetchCollectionAvailability(
-      results.map((card) => card.id),
-    );
+    final availability = fetchAvailability
+        ? await _fetchCollectionAvailability(results.map((card) => card.id))
+        : const <String, CardCollectionAvailability>{};
 
-    if (requestQuery != _currentQuery) return;
+    if (!_isCurrentRequest(
+      query: requestQuery,
+      commanderFormat: requestCommanderFormat,
+      collapsePrintings: requestCollapsePrintings,
+    )) {
+      return;
+    }
 
     if (append) {
-      _searchResults = [..._searchResults, ...results];
-      _collectionAvailability = {
-        ..._collectionAvailability,
-        ...availability,
-      };
+      _rawSearchResults = [..._rawSearchResults, ...results];
+      _collectionAvailability = {..._collectionAvailability, ...availability};
     } else {
-      _searchResults = results;
+      _rawSearchResults = results;
       _collectionAvailability = availability;
     }
+    _applyPrintingPolicy(collapsePrintings: requestCollapsePrintings);
 
     _page = page;
     _hasMore = results.length == limit;
   }
 
-  Future<Map<String, CardCollectionAvailability>>
-  _fetchCollectionAvailability(Iterable<String> rawCardIds) async {
+  bool _isCurrentRequest({
+    required String query,
+    required String? commanderFormat,
+    required bool collapsePrintings,
+  }) {
+    return query == _currentQuery &&
+        commanderFormat == _commanderFormatFilter &&
+        collapsePrintings == _collapsePrintings;
+  }
+
+  void _applyPrintingPolicy({required bool collapsePrintings}) {
+    if (!collapsePrintings) {
+      _searchResults = List<DeckCardItem>.unmodifiable(_rawSearchResults);
+      _printingCounts = {
+        for (final card in _rawSearchResults) card.id: card.printingCount,
+      };
+      return;
+    }
+
+    final representatives = <String, DeckCardItem>{};
+    final printingIds = <String, Set<String>>{};
+    for (final card in _rawSearchResults) {
+      final identity = _playableIdentityKey(card);
+      final current = representatives[identity];
+      if (current == null || _preferPrinting(card, over: current)) {
+        representatives[identity] = card;
+      }
+      printingIds.putIfAbsent(identity, () => <String>{}).add(card.id);
+    }
+
+    _searchResults = List<DeckCardItem>.unmodifiable(representatives.values);
+    _printingCounts = {
+      for (final entry in representatives.entries)
+        entry.value.id:
+            entry.value.printingCount > printingIds[entry.key]!.length
+            ? entry.value.printingCount
+            : printingIds[entry.key]!.length,
+    };
+  }
+
+  String _playableIdentityKey(DeckCardItem card) {
+    final oracleId = card.oracleId?.trim().toLowerCase();
+    if (oracleId != null && oracleId.isNotEmpty) return 'oracle:$oracleId';
+    final normalizedName = card.name.trim().toLowerCase().replaceAll(
+      RegExp(r'\s+'),
+      ' ',
+    );
+    return 'name:$normalizedName';
+  }
+
+  bool _preferPrinting(DeckCardItem candidate, {required DeckCardItem over}) {
+    final candidatePromo = candidate.setCode.trim().toLowerCase().startsWith(
+      'p',
+    );
+    final currentPromo = over.setCode.trim().toLowerCase().startsWith('p');
+    if (candidatePromo != currentPromo) return !candidatePromo;
+
+    final candidateHasImage =
+        (candidate.imageUrl ?? '').trim().isNotEmpty ||
+        candidate.cardFaces.any(
+          (face) => (face.imageUrl ?? '').trim().isNotEmpty,
+        );
+    final currentHasImage =
+        (over.imageUrl ?? '').trim().isNotEmpty ||
+        over.cardFaces.any((face) => (face.imageUrl ?? '').trim().isNotEmpty);
+    if (candidateHasImage != currentHasImage) return candidateHasImage;
+
+    final candidateRelease = candidate.setReleaseDate?.trim() ?? '';
+    final currentRelease = over.setReleaseDate?.trim() ?? '';
+    if (candidateRelease != currentRelease) {
+      return candidateRelease.compareTo(currentRelease) > 0;
+    }
+
+    return candidate.id.compareTo(over.id) < 0;
+  }
+
+  String? _normalizeCommanderFormat(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    if (normalized == 'commander' || normalized == 'brawl') {
+      return normalized;
+    }
+    return null;
+  }
+
+  Future<Map<String, CardCollectionAvailability>> _fetchCollectionAvailability(
+    Iterable<String> rawCardIds,
+  ) async {
     final cardIds = rawCardIds
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
@@ -233,10 +403,13 @@ class CardProvider extends ChangeNotifier {
   DeckCardItem _cardFromJson(Map<String, dynamic> json) {
     return DeckCardItem(
       id: json['id']?.toString() ?? '',
+      oracleId: json['oracle_id']?.toString(),
       name: json['name']?.toString() ?? '',
       manaCost: json['mana_cost']?.toString(),
       typeLine: json['type_line']?.toString() ?? '',
       oracleText: json['oracle_text']?.toString(),
+      power: json['power']?.toString(),
+      toughness: json['toughness']?.toString(),
       colors:
           (json['colors'] as List?)
               ?.map((value) => value.toString())
@@ -255,6 +428,7 @@ class CardProvider extends ChangeNotifier {
       setReleaseDate: json['set_release_date']?.toString(),
       rarity: json['rarity']?.toString() ?? '',
       isReserved: json['is_reserved'] as bool? ?? false,
+      printingCount: _positiveInt(json['printing_count']),
       collectorNumber: json['collector_number']?.toString(),
       foil: json['foil'] as bool?,
       quantity: 1,
@@ -262,11 +436,22 @@ class CardProvider extends ChangeNotifier {
     );
   }
 
+  int _positiveInt(Object? value) {
+    final parsed = value is num
+        ? value.toInt()
+        : int.tryParse(value?.toString() ?? '');
+    return parsed == null || parsed < 1 ? 1 : parsed;
+  }
+
   void clearSearch() {
     _searchResults = [];
+    _rawSearchResults = [];
+    _printingCounts = {};
     _collectionAvailability = {};
     _errorMessage = null;
     _currentQuery = '';
+    _commanderFormatFilter = null;
+    _collapsePrintings = true;
     _page = 1;
     _hasMore = false;
     _isLoading = false;

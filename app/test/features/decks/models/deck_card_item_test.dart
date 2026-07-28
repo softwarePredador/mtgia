@@ -37,6 +37,7 @@ void main() {
     test('fromJson deve parsear corretamente com todos os campos', () {
       final json = {
         'id': 'card-1',
+        'oracle_id': 'oracle-sol-ring',
         'name': 'Sol Ring',
         'mana_cost': '{1}',
         'type_line': 'Artifact',
@@ -49,6 +50,7 @@ void main() {
         'set_release_date': '2020-11-20',
         'rarity': 'uncommon',
         'is_reserved': true,
+        'printing_count': 7,
         'quantity': 1,
         'is_commander': false,
         'collector_number': '331',
@@ -59,6 +61,7 @@ void main() {
       final card = DeckCardItem.fromJson(json);
 
       expect(card.id, 'card-1');
+      expect(card.oracleId, 'oracle-sol-ring');
       expect(card.name, 'Sol Ring');
       expect(card.manaCost, '{1}');
       expect(card.typeLine, 'Artifact');
@@ -71,6 +74,7 @@ void main() {
       expect(card.setReleaseDate, '2020-11-20');
       expect(card.rarity, 'uncommon');
       expect(card.isReserved, isTrue);
+      expect(card.printingCount, 7);
       expect(card.quantity, 1);
       expect(card.isCommander, false);
       expect(card.collectorNumber, '331');
@@ -94,6 +98,7 @@ void main() {
       expect(card.setCode, '');
       expect(card.rarity, '');
       expect(card.isReserved, isFalse);
+      expect(card.printingCount, 1);
       expect(card.quantity, 1);
       expect(card.isCommander, false);
       expect(card.foil, isNull);

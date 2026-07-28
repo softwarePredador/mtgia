@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9",
+  "source_digest": "78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-28T13:51:25Z",
+    "verified_at": "2026-07-28T21:13:43Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (web_mobile_390x844, web_desktop_1440x900, web_wide_1920x1080)",
       "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart",
@@ -17,6 +17,7 @@
       "./scripts/quality_gate.sh ui-proof",
       "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
       "./scripts/manaloom_local_ci.sh quick",
+      "./scripts/manaloom_local_ci.sh full",
       "flutter build web --release --no-pub --base-href /app/ --no-web-resources-cdn"
     ]
   },
@@ -25,33 +26,37 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "6a55fc7cc64eb2093fcd6024523ad4ccdf42ef3b22ad4368e9dc8cc6ec1ab559"
+        "sha256": "ad952e14afa5874b0336a1ac03362d05bf20be82ca48d8082473caffe0251cad"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "1119d0081bcf994ca2ee758a6e126d6335b1d73b78207f86683e3e3e4b5a8831"
+        "sha256": "de9dc48a7e8ed13925716cdd573f4f4ca2a4ab0a909ccb0afd649205557c429a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "d686a2cbea604e5d75355b001951d1ff11e04e372b79ba33f078f0d425f4fe5a"
+        "sha256": "c8becfd6b74bc4e6e57aa1a69ca6f225685c0baf1faccb11c3e7428307991c49"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "cc57c039d3387ccc967ac7a21595b9efc2d993fe1a21bdd761393bddda1afe1d"
+        "sha256": "26aa328238906e9a4bf97e6595fa1a024298429c205b1f6fa29bff4b99f75910"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "e8691ec037172ad932203b3133ba9010e266920ced3b1e033c5c1d44e049ea14"
+        "sha256": "0640df8fe56d9f2ac957069cdcc6ff96117beedf86640da72abe8171f8af7c09"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "afc5cdd9102a52ced4a7b4e787cf81d183e6a25412df104a4a2eb4487d556eb4"
+        "sha256": "de75f4fdbe23ca8789b68e71aa309e12aaf278cb298eebba4a1e2887f851cff0"
+      },
+      {
+        "path": "docs/qa/ui-live/current/card-back-fallback-web/capture-manifest.json",
+        "sha256": "b1d9560823a049def6b5ceee969c6ede18669bd7021263c44745719411a6c114"
       }
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-28T13:51:25Z",
+    "reviewed_at": "2026-07-28T20:43:59Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -62,11 +67,11 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 230 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle e Life Counter não apresentam competição indevida entre ações."
+        "note": "As 231 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter e o fallback de arte não apresentam competição indevida entre ações."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
-        "note": "Cartas, Commander, legalidade, mão, pilha, campo, prioridade, vida e WUBRG comunicam o domínio; glifos originais substituem ícones genéricos em carta, comunidade e jogador, e marcas proprietárias da Wizards não são reproduzidas."
+        "note": "Cartas, Commander, legalidade, mão, pilha, campo, prioridade, vida e WUBRG comunicam o domínio; o verso autoral do ManaLoom substitui o ícone genérico quando a arte está ausente, e marcas proprietárias da Wizards não são reproduzidas."
       },
       "color_and_contrast": {
         "status": "pass",
@@ -102,12 +107,13 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "6a55fc7cc64eb2093fcd6024523ad4ccdf42ef3b22ad4368e9dc8cc6ec1ab559",
-      "1119d0081bcf994ca2ee758a6e126d6335b1d73b78207f86683e3e3e4b5a8831",
-      "d686a2cbea604e5d75355b001951d1ff11e04e372b79ba33f078f0d425f4fe5a",
-      "cc57c039d3387ccc967ac7a21595b9efc2d993fe1a21bdd761393bddda1afe1d",
-      "e8691ec037172ad932203b3133ba9010e266920ced3b1e033c5c1d44e049ea14",
-      "afc5cdd9102a52ced4a7b4e787cf81d183e6a25412df104a4a2eb4487d556eb4"
+      "ad952e14afa5874b0336a1ac03362d05bf20be82ca48d8082473caffe0251cad",
+      "de9dc48a7e8ed13925716cdd573f4f4ca2a4ab0a909ccb0afd649205557c429a",
+      "c8becfd6b74bc4e6e57aa1a69ca6f225685c0baf1faccb11c3e7428307991c49",
+      "26aa328238906e9a4bf97e6595fa1a024298429c205b1f6fa29bff4b99f75910",
+      "0640df8fe56d9f2ac957069cdcc6ff96117beedf86640da72abe8171f8af7c09",
+      "de75f4fdbe23ca8789b68e71aa309e12aaf278cb298eebba4a1e2887f851cff0",
+      "b1d9560823a049def6b5ceee969c6ede18669bd7021263c44745719411a6c114"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
@@ -117,7 +123,7 @@
       "android_phone",
       "web_in_app_1280x720"
     ],
-    "reviewed_screenshot_count": 230,
+    "reviewed_screenshot_count": 231,
     "blocking_findings": []
   },
   "release_checks": {
