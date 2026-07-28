@@ -120,6 +120,20 @@ void main() {
     expect(find.byKey(const Key('register-submit-button')), findsOneWidget);
     expect(find.byKey(const Key('register-legal-acceptance')), findsOneWidget);
     expect(find.byKey(const Key('register-open-login-button')), findsOneWidget);
+
+    final legalAcceptance = find.byKey(
+      const Key('register-legal-acceptance'),
+    );
+    await tester.ensureVisible(legalAcceptance);
+    await tester.tap(legalAcceptance);
+    await tester.pump();
+    expect(
+      tester.takeException(),
+      isNull,
+      reason:
+          'The decorated consent block must provide its own Material for '
+          'ListTile ink and focus feedback.',
+    );
   });
 
   testWidgets('login resumes the protected deep link after authentication', (

@@ -77,6 +77,17 @@ void main() {
         isEmpty,
         reason: 'Live UI surface evidence drift:\n${findings.join('\n')}',
       );
+
+      final p0Matrix = surfaces.singleWhere(
+        (surface) => surface['id'] == 'authenticated_p0_matrix',
+      );
+      expect(p0Matrix['required_profiles'], <String, dynamic>{
+        'web_mobile_390x844': 53,
+        'web_desktop_1440x900': 52,
+        'web_wide_1920x1080': 52,
+        'android_physical_sm_a135m': 53,
+      });
+      expect((p0Matrix['required_checkpoints'] as List).toSet(), hasLength(53));
     },
   );
 

@@ -121,6 +121,20 @@ void main() {
       expect(find.byKey(const Key('chat-error-state')), findsOneWidget);
       expect(find.byKey(const Key('chat-empty-state')), findsNothing);
       expect(find.text('Tentar novamente'), findsOneWidget);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const Key('chat-message-field')))
+            .enabled,
+        isFalse,
+      );
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const Key('chat-message-send-button')),
+            )
+            .onPressed,
+        isNull,
+      );
 
       await tester.tap(find.text('Tentar novamente'));
       await tester.pump();

@@ -63,6 +63,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundAbyss,
+        leading: IconButton(
+          key: const Key('notifications-back-button'),
+          tooltip: 'Voltar',
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              context.pop();
+              return;
+            }
+            context.go('/home');
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text('Notificações'),
         actions: [
           Consumer<NotificationProvider>(

@@ -68,6 +68,10 @@ void main() {
 
       await _tapVisible(
         tester,
+        find.byKey(const Key('register-legal-acceptance')),
+      );
+      await _tapVisible(
+        tester,
         find.byKey(const Key('register-submit-button')),
       );
       await pumpUntilAnyFound(tester, [
@@ -142,7 +146,11 @@ void main() {
       await captureRuntimeCheckpoint(binding, tester, 'mobile_qa_10_checkout');
 
       await _goRoute(tester, '/legal');
-      await pumpUntilFound(tester, find.text('Legal'), attempts: 80);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('legal-content')),
+        attempts: 80,
+      );
       await _assertClean(tester, 'legal');
       await captureRuntimeCheckpoint(binding, tester, 'mobile_qa_11_legal');
 

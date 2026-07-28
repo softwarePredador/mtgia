@@ -144,12 +144,25 @@ void main() {
       password,
     );
     await tester.pump(const Duration(milliseconds: 300));
-    await _capture(binding, tester, '02_register_filled');
+    await _capture(binding, tester, '02_register_filled_unchecked');
 
-    // Tap the submit button (there is also a heading with the same text).
+    // Prove that legal consent is explicit and that the rejected state remains
+    // readable before accepting it.
     final submit = find.byKey(const Key('register-submit-button'));
     await tester.ensureVisible(submit);
     await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(submit);
+    await tester.pump();
+    await pumpUntilFound(tester, find.byKey(const Key('register-legal-error')));
+    await _capture(binding, tester, '02a_register_consent_error');
+
+    final legalAcceptance = find.byKey(const Key('register-legal-acceptance'));
+    await tester.ensureVisible(legalAcceptance);
+    await tester.tap(legalAcceptance);
+    await tester.pump();
+    await _capture(binding, tester, '02b_register_consent_accepted');
+
+    await tester.ensureVisible(submit);
     await tester.tap(submit);
     await tester.pump();
 

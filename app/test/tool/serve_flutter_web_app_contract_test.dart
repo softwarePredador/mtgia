@@ -9,6 +9,8 @@ void main() {
       final source = File('tool/serve_flutter_web_app.py').readAsStringSync();
 
       expect(source, contains('--allow-loopback-http-api'));
+      expect(source, contains('Access-Control-Allow-Origin'));
+      expect(source, contains('Cross-Origin-Resource-Policy'));
       expect(
         source,
         contains(

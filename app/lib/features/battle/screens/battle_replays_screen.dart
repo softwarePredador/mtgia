@@ -1271,6 +1271,23 @@ class _BattleOpponentPickerDialogState
     await _loadPreflight(deckId);
   }
 
+  Future<void> _selectSearchResult(String query) async {
+    final normalizedQuery = query.trim().toLowerCase();
+    final matches = _decks
+        .where((deck) => deck.matches(query))
+        .toList(growable: false);
+    final exactMatches = matches
+        .where((deck) => deck.name.trim().toLowerCase() == normalizedQuery)
+        .toList(growable: false);
+    final candidate = exactMatches.length == 1
+        ? exactMatches.single
+        : matches.length == 1
+        ? matches.single
+        : null;
+    if (candidate == null) return;
+    await _selectDeck(candidate.id);
+  }
+
   Future<BattlePreflight?> _loadPreflight(String opponentDeckId) async {
     setState(() {
       _isCheckingPreflight = true;
@@ -1386,7 +1403,9 @@ class _BattleOpponentPickerDialogState
                     hintText: 'Nome, comandante ou formato',
                     prefixIcon: Icon(Icons.search_rounded),
                   ),
+                  textInputAction: TextInputAction.search,
                   onChanged: (_) => setState(() {}),
+                  onSubmitted: _selectSearchResult,
                 ),
                 const SizedBox(height: AppTheme.space10),
                 Text(

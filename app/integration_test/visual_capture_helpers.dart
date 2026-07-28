@@ -4,6 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 bool _surfaceConverted = false;
+const _emitScreenshotChunks = bool.fromEnvironment(
+  'MANALOOM_EMIT_SCREENSHOT_CHUNKS',
+  defaultValue: true,
+);
 
 void resetVisualCaptureSurface() {
   _surfaceConverted = false;
@@ -56,7 +60,9 @@ Future<void> captureVisualProof(
         .timeout(const Duration(seconds: 90));
     // ignore: avoid_print
     print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
-    _emitScreenshot(name, screenshot);
+    if (_emitScreenshotChunks) {
+      _emitScreenshot(name, screenshot);
+    }
   } catch (error, stackTrace) {
     // ignore: avoid_print
     print('CAPTURE_ERROR $name $error');

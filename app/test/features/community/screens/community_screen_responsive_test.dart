@@ -127,6 +127,54 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('does not replace an active nested community route', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final api = _CommunityGridApiFixture();
+    final router = GoRouter(
+      initialLocation: '/community/search-users',
+      routes: [
+        GoRoute(
+          path: '/community',
+          builder: (context, state) => const CommunityScreen(),
+          routes: [
+            GoRoute(
+              path: 'search-users',
+              builder: (context, state) => const Scaffold(
+                key: Key('nested-community-route'),
+                body: Text('Buscar jogadores'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      _CommunityProviders(
+        api: api,
+        child: MaterialApp.router(
+          theme: AppTheme.darkTheme,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('nested-community-route')), findsOneWidget);
+    expect(
+      router.routeInformationProvider.value.uri.toString(),
+      '/community/search-users',
+    );
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpCommunity(

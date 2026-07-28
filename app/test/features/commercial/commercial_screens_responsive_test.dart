@@ -77,6 +77,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('legal deep links clear the fixed app bar on compact screens', (
+    tester,
+  ) async {
+    await _pumpAt(
+      tester,
+      const Size(390, 900),
+      const CommercialLegalScreen(initialSection: 'terms'),
+    );
+
+    final terms = tester.getRect(find.byKey(const Key('legal-terms-section')));
+    expect(terms.top, greaterThanOrEqualTo(kToolbarHeight));
+    expect(terms.top, lessThanOrEqualTo(kToolbarHeight + 24));
+
+    await _pumpAt(
+      tester,
+      const Size(390, 900),
+      const CommercialLegalScreen(initialSection: 'privacy'),
+    );
+
+    final privacy = tester.getRect(
+      find.byKey(const Key('legal-privacy-section')),
+    );
+    expect(privacy.top, greaterThanOrEqualTo(kToolbarHeight));
+    expect(privacy.top, lessThanOrEqualTo(kToolbarHeight + 24));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('free beta checkout fallback is full-width at 390px', (
     tester,
   ) async {

@@ -109,6 +109,13 @@ class FlutterWebAppHandler(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
+        # Flutter Web decodes network images through browser fetch APIs. The
+        # isolated visual runner may serve its app and deterministic artwork
+        # from different loopback ports, so static fixture assets must opt in
+        # to cross-origin reads. This helper is loopback-only and is never the
+        # production asset server.
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cross-Origin-Resource-Policy", "cross-origin")
         self.end_headers()
 
         if not head_only:

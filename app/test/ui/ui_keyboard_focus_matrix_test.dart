@@ -73,6 +73,34 @@ void main() {
     if (manualWeb['status'] != 'pass') {
       expect(manualWeb['remaining'], isNotEmpty);
     }
+    final requiredRoutes = (manualWeb['required_routes'] as List)
+        .cast<String>();
+    expect(requiredRoutes, contains('/decks/:id/battle-replays'));
+    expect(requiredRoutes, contains('/decks/:id/battle-coach'));
+    expect(requiredRoutes, isNot(contains('/battle/replays')));
+
+    final battleCoach =
+        (matrix['surface_followups'] as Map<String, dynamic>)['battle_coach']
+            as Map<String, dynamic>;
+    expect(battleCoach['web_keyboard_status'], 'governed_by_live_evidence');
+    expect(
+      File(battleCoach['web_runtime_evidence'] as String).existsSync(),
+      isTrue,
+    );
+    expect(
+      (battleCoach['required_interactions'] as List).cast<String>(),
+      containsAll(<String>[
+        'tab_forward',
+        'shift_tab',
+        'enter',
+        'space',
+        'escape_modal',
+        'modal_trap',
+        'focus_restoration',
+        'visible_focus',
+        'reduced_motion',
+      ]),
+    );
   });
 
   testWidgets('login follows forward and reverse form focus order', (

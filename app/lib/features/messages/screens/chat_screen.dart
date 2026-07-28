@@ -253,6 +253,11 @@ class _ChatScreenState extends State<ChatScreen> {
         widget.otherUser;
     final label = otherUser?.label ?? 'Conversa';
     final avatarUrl = otherUser?.avatarUrl;
+    final composerEnabled = context.select<MessageProvider, bool>(
+      (provider) =>
+          !provider.isLoadingMessages &&
+          !(provider.error != null && provider.messages.isEmpty),
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
@@ -426,11 +431,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                       key: const Key('chat-message-field'),
                       controller: _messageController,
+                      enabled: composerEnabled,
                       style: const TextStyle(color: AppTheme.textPrimary),
                       maxLines: 4,
                       minLines: 1,
                       decoration: InputDecoration(
-                        hintText: 'Mensagem...',
+                        hintText: composerEnabled
+                            ? 'Mensagem...'
+                            : 'Conversa indisponível',
                         hintStyle: const TextStyle(
                           color: AppTheme.textSecondary,
                         ),
@@ -447,7 +455,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      onSubmitted: (_) => _sendMessage(),
+                      onSubmitted: composerEnabled
+                          ? (_) => _sendMessage()
+                          : null,
                     ),
                   ),
                   const SizedBox(width: AppTheme.space8),
@@ -456,7 +466,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       return IconButton(
                         key: const Key('chat-message-send-button'),
                         tooltip: 'Enviar mensagem',
-                        onPressed: provider.isSending ? null : _sendMessage,
+                        onPressed: !composerEnabled || provider.isSending
+                            ? null
+                            : _sendMessage,
                         icon: provider.isSending
                             ? const SizedBox(
                                 width: AppTheme.iconSpinnerSm,
@@ -466,9 +478,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                   color: AppTheme.brass400,
                                 ),
                               )
-                            : const Icon(
+                            : Icon(
                                 Icons.send_rounded,
-                                color: AppTheme.brass400,
+                                color: composerEnabled
+                                    ? AppTheme.brass400
+                                    : AppTheme.textHint,
                               ),
                       );
                     },

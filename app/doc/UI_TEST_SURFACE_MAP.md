@@ -227,8 +227,14 @@ manual seja confundida com `PASS` enquanto houver itens em `remaining`.
 
 O roteiro no build Web real validou `/login` e as rotas autenticadas críticas
 com Tab/Shift+Tab, Enter/Space, foco visível, Escape, trap/restauração de foco,
-browser back e reduced motion, sem erro de console. O fixture registra `pass`;
-essa prova continua separada da validação manual em leitores de tela físicos.
+browser back e reduced motion, sem erro de console. O Battle Coach recebeu
+prova física adicional em nove checkpoints: avanço e retorno entre ações,
+abertura por Enter e Space, Escape com restauração no launcher, foco no campo
+de busca, digitação que filtra o rival e Enter que seleciona o resultado e
+executa o preflight real. O fixture e
+`docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json`
+registram `pass`; essa prova continua separada da validação manual em leitores
+de tela físicos.
 
 ## Matriz executável de navegação e retomada — S3-06
 
@@ -259,19 +265,22 @@ flutter test --no-pub test/ui/ui_navigation_resume_matrix_test.dart \
 
 ## Regressão visual autenticada — S3-07
 
-`app/test/ui/fixtures/ui_authenticated_visual_matrix.json` fixa 20
-checkpoints canônicos e os estados sucesso, vazio, erro, modal, acima e abaixo
-da dobra. Cada checkpoint foi capturado no mesmo fixture PostgreSQL/API
+`app/test/ui/fixtures/ui_authenticated_visual_matrix.json` fixa 53
+checkpoints canônicos e os estados sucesso, vazio, erro, modal, disabled,
+acima e abaixo da dobra. A matriz cobre as rotas P0 públicas e autenticadas,
+incluindo cadastro e aceite legal, Termos, Privacidade, onboarding, Life
+Counter, busca, Community, usuários, Battle, mensagens, notificações e trades.
+Cada checkpoint aplicável foi capturado no mesmo fixture PostgreSQL/API
 descartável em quatro plataformas:
 
 | Plataforma | Dimensão capturada | Capturas |
 |---|---:|---:|
-| Web mobile | 390×844 | 20 |
-| Web desktop | 1440×900 | 20 |
-| Web wide | 1920×1080 | 20 |
-| Android físico Samsung SM-A135M | 1080×2408 | 20 |
+| Web mobile | viewport 390×844; raster 500×844 | 53 |
+| Web desktop | 1440×900 | 52 |
+| Web wide | 1920×1080 | 52 |
+| Android físico Samsung SM-A135M | 1080×2408; Life Counter 2408×1080 | 53 |
 
-Os 80 PNGs aprovados vivem em `app/test/ui/goldens/runtime`. O comparador
+Os 210 PNGs aprovados vivem em `app/test/ui/goldens/runtime`. O comparador
 `app/tool/authenticated_visual_diff.dart` rejeita arquivo ausente/inesperado,
 dimensão diferente e razão de pixels alterados acima de `0.001`; divergências
 são materializadas em `app/test/ui/failures/runtime`.
@@ -285,7 +294,16 @@ alterar o comportamento normal do app.
 
 No Android, o runner oficial `flutter drive` não aceita `--release` fora da
 Web. A prova física usa `--profile`, com `kDebugMode=false`, e registra esse
-limite explicitamente na matriz; não é apresentada como release.
+limite explicitamente na matriz; não é apresentada como release. O Life
+Counter usa WebView/plataform view e, por isso, sua imagem final é capturada
+pelo compositor do aparelho com `adb screencap`, depois de um marcador de
+prontidão; screenshot da surface Flutter, que não compõe a view nativa, não é
+aceita.
+
+Os quatro manifestos da matriz, os sete estados Android do Battle Coach e os
+nove checkpoints Web de teclado totalizam 226 imagens abertas e revisadas no
+aggregate `docs/qa/ui-live/latest.json`. Todas estão vinculadas ao digest
+`b5af4634e18cda489b0b8d07d7246e6975e7c04d27f4c2643e18acfd5a8fd082`.
 
 ## Onboarding e primeiro uso — S3-08
 

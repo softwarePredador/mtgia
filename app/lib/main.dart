@@ -417,7 +417,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         ),
         GoRoute(
           path: '/legal',
-          builder: (context, state) => const CommercialLegalScreen(),
+          builder: (context, state) => CommercialLegalScreen(
+            initialSection: state.uri.queryParameters['section'],
+          ),
         ),
         GoRoute(
           path: '/verify-email',

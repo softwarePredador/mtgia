@@ -21,6 +21,8 @@ WEB_PORT=""
 WEB_URL=""
 SEED_EMAIL=""
 SEED_USER_ID=""
+SEED_PEER_USER_ID=""
+SEED_PEER_USERNAME=""
 SEED_CARD_ID=""
 SEED_DECK_ID=""
 readonly SEED_PASSWORD='VisualQA!2026-Deck'
@@ -140,6 +142,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 MANALOOM_HOLD_FOR_BROWSER_QA=1 \
+MANALOOM_ALLOW_DEV_ORIGINS=true \
 MANALOOM_CONFIRM_POSTGRES_WRITES="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
 MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
   "$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh" \
@@ -178,10 +181,28 @@ register_response="$(curl -fsS --max-time 20 \
 seed_token="$(jq -er '.token' <<<"$register_response")"
 SEED_USER_ID="$(jq -er '.user.id' <<<"$register_response")"
 
+SEED_PEER_USERNAME="visualpeer${seed_suffix//_/}"
+peer_response="$(curl -fsS --max-time 20 \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -cn --arg username "$SEED_PEER_USERNAME" \
+    --arg email "visual-peer-$seed_suffix@example.invalid" \
+    --arg password "$SEED_PASSWORD" \
+    '{username: $username, email: $email, password: $password}')" \
+  "$API_BASE_URL/auth/register")"
+SEED_PEER_USER_ID="$(jq -er '.user.id' <<<"$peer_response")"
+peer_token="$(jq -er '.token' <<<"$peer_response")"
+
 card_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $seed_token" \
   "$API_BASE_URL/cards?name=Sol%20Ring&limit=1")"
 SEED_CARD_ID="$(jq -er '.data[0].id' <<<"$card_response")"
+cards_response="$(curl -fsS --max-time 20 \
+  -H "Authorization: Bearer $seed_token" \
+  "$API_BASE_URL/cards?limit=50")"
+SEED_COMMANDER_CARD_ID="$(jq -er \
+  --arg card_id "$SEED_CARD_ID" \
+  'first(.data[] | select(.id != $card_id) | .id)' \
+  <<<"$cards_response")"
 
 deck_response="$(curl -fsS --max-time 20 \
   -H 'Content-Type: application/json' \
@@ -196,6 +217,19 @@ deck_response="$(curl -fsS --max-time 20 \
   "$API_BASE_URL/decks")"
 SEED_DECK_ID="$(jq -er '.id' <<<"$deck_response")"
 
+peer_deck_response="$(curl -fsS --max-time 20 \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $peer_token" \
+  -d "$(jq -cn --arg card_id "$SEED_CARD_ID" '{
+    name: "Battle Coach Public Rival",
+    format: "commander",
+    description: "Disposable public opponent for live interaction proof",
+    is_public: true,
+    cards: [{card_id: $card_id, quantity: 1, is_commander: false}]
+  }')" \
+  "$API_BASE_URL/decks")"
+SEED_PEER_DECK_ID="$(jq -er '.id' <<<"$peer_deck_response")"
+
 WEB_PORT="$(python3 - <<'PY'
 import socket
 with socket.socket() as sock:
@@ -208,7 +242,11 @@ PY
 # disposable card at a same-origin asset that ships inside the real Web build.
 fixture_image_url="http://127.0.0.1:$WEB_PORT/app/assets/assets/symbols/logo.png"
 psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -d "$DATABASE" \
-  -v card_id="$SEED_CARD_ID" -v image_url="$fixture_image_url" \
+  -v card_id="$SEED_CARD_ID" \
+  -v commander_card_id="$SEED_COMMANDER_CARD_ID" \
+  -v deck_id="$SEED_DECK_ID" \
+  -v peer_deck_id="$SEED_PEER_DECK_ID" \
+  -v image_url="$fixture_image_url" \
   >"$RUN_DIR/card-image-fixture.log" 2>&1 <<'SQL'
 INSERT INTO sets (
   code,
@@ -227,9 +265,31 @@ ON CONFLICT (code) DO UPDATE SET
   is_foreign_only = EXCLUDED.is_foreign_only;
 
 UPDATE cards
-SET image_url = :'image_url',
-    set_code = 'TST'
-WHERE id = :'card_id'::uuid;
+SET image_url = :'image_url';
+
+UPDATE cards
+SET set_code = 'TST'
+WHERE id IN (:'card_id'::uuid, :'commander_card_id'::uuid);
+
+UPDATE deck_cards
+SET quantity = 99,
+    is_commander = FALSE
+WHERE deck_id IN (:'deck_id'::uuid, :'peer_deck_id'::uuid)
+  AND card_id = :'card_id'::uuid;
+
+INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander)
+VALUES
+  (:'deck_id'::uuid, :'commander_card_id'::uuid, 1, TRUE),
+  (:'peer_deck_id'::uuid, :'commander_card_id'::uuid, 1, TRUE)
+ON CONFLICT (deck_id, card_id) DO UPDATE SET
+  quantity = EXCLUDED.quantity,
+  is_commander = EXCLUDED.is_commander;
+
+UPDATE decks
+SET validation_state = 'validated',
+    validation_reasons = '[]'::jsonb,
+    validation_updated_at = NOW()
+WHERE id IN (:'deck_id'::uuid, :'peer_deck_id'::uuid);
 SQL
 
 (
@@ -241,6 +301,7 @@ SQL
     --dart-define=API_BASE_URL=/api \
     --dart-define=MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES=true \
     --dart-define=MANALOOM_VISUAL_FIXTURE_MODE=true \
+    --dart-define=ENABLE_INTERACTIVE_BATTLE=true \
     --dart-define=DISABLE_FIREBASE_STARTUP=true \
     --dart-define=DISABLE_PUSH_INIT=true \
     --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true
@@ -284,8 +345,11 @@ jq -n \
   --arg run_dir "$RUN_DIR" \
   --arg credentials_file "$CREDENTIALS_FILE" \
   --arg seed_user_id "$SEED_USER_ID" \
+  --arg seed_peer_user_id "$SEED_PEER_USER_ID" \
+  --arg seed_peer_username "$SEED_PEER_USERNAME" \
   --arg seed_card_id "$SEED_CARD_ID" \
   --arg seed_deck_id "$SEED_DECK_ID" \
+  --arg seed_peer_deck_id "$SEED_PEER_DECK_ID" \
   --arg bundle_sha256 "$bundle_sha256" \
   '{
     status: "ready",
@@ -298,8 +362,11 @@ jq -n \
     run_dir: $run_dir,
     credentials_file: $credentials_file,
     seed_user_id: $seed_user_id,
+    seed_peer_user_id: $seed_peer_user_id,
+    seed_peer_username: $seed_peer_username,
     seed_card_id: $seed_card_id,
     seed_deck_id: $seed_deck_id,
+    seed_peer_deck_id: $seed_peer_deck_id,
     bundle_sha256: $bundle_sha256,
     cleanup: "trap_registered"
   }' >"$READY_MANIFEST"
@@ -310,6 +377,8 @@ printf 'web_url=%s\n' "$WEB_URL"
 printf 'credentials_file=%s\n' "$CREDENTIALS_FILE"
 printf 'seed_deck_id=%s\n' "$SEED_DECK_ID"
 printf 'seed_card_id=%s\n' "$SEED_CARD_ID"
+printf 'seed_peer_user_id=%s\n' "$SEED_PEER_USER_ID"
+printf 'seed_peer_deck_id=%s\n' "$SEED_PEER_DECK_ID"
 printf 'bundle_sha256=%s\n' "$bundle_sha256"
 printf 'Press Ctrl+C to stop and prove cleanup.\n'
 

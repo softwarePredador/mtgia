@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "matrix_id": "manaloom-s3-05-web-keyboard-focus-2026-07-21",
+  "matrix_id": "manaloom-s3-05-web-keyboard-focus-2026-07-27",
   "interactions": {
     "tab_forward": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"login follows forward and reverse form focus order"},
     "shift_tab": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"login follows forward and reverse form focus order"},
@@ -25,15 +25,16 @@
     "passed": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","browser_back","reduced_motion","authenticated_routes"],
     "console_errors": 0,
     "remaining": [],
-    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays"]
+    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id/battle-replays","/decks/:id/battle-coach"]
   },
   "surface_followups": {
     "battle_coach": {
       "route": "/decks/:id/battle-coach[/sessionId]",
       "widget_evidence": "test/features/battle/screens/battle_coach_screen_test.dart",
       "android_runtime_evidence": "../docs/qa/ui-live/latest.json",
-      "web_keyboard_status": "pending_fresh_runtime",
-      "required_interactions": ["tab_forward","shift_tab","enter","space","escape_modal","visible_focus","reduced_motion"]
+      "web_keyboard_status": "governed_by_live_evidence",
+      "web_runtime_evidence": "../docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
+      "required_interactions": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","reduced_motion"]
     }
   }
 }

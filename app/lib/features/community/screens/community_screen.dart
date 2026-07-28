@@ -113,6 +113,10 @@ class _CommunityScreenState extends State<CommunityScreen>
       queryParameters: {'tab': '$tab'},
     );
     final currentUri = GoRouterState.of(context).uri;
+    // Nested community routes render over this parent route. Canonicalizing
+    // the parent's tab while one of those children is active used to eject
+    // users from search, profiles and public deck details back to Explore.
+    if (currentUri.path != '/community') return;
     if (currentUri == canonicalUri) return;
 
     router.go(canonicalUri.toString());

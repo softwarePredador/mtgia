@@ -44,6 +44,18 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundAbyss,
+        leading: IconButton(
+          key: const Key('messages-inbox-back-button'),
+          tooltip: 'Voltar',
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              context.pop();
+              return;
+            }
+            context.go('/community');
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text('Mensagens'),
       ),
       body: Consumer<MessageProvider>(

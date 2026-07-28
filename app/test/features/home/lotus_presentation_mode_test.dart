@@ -53,21 +53,30 @@ void main() {
     expect(wakeLockController.states, <bool>[true, false]);
   });
 
-  test('restores every orientation when leaving the life counter', () async {
-    await presentationMode.enter();
-    platformCalls.clear();
-    await presentationMode.exit();
+  test(
+    'returns to portrait before restoring every supported orientation',
+    () async {
+      await presentationMode.enter();
+      platformCalls.clear();
+      await presentationMode.exit();
 
-    final orientationCall = platformCalls.firstWhere(
-      (call) => call.method == 'SystemChrome.setPreferredOrientations',
-    );
-    expect(orientationCall.arguments, <String>[
-      'DeviceOrientation.portraitUp',
-      'DeviceOrientation.landscapeLeft',
-      'DeviceOrientation.portraitDown',
-      'DeviceOrientation.landscapeRight',
-    ]);
-  });
+      final orientationCalls = platformCalls
+          .where(
+            (call) => call.method == 'SystemChrome.setPreferredOrientations',
+          )
+          .toList(growable: false);
+      expect(orientationCalls, hasLength(2));
+      expect(orientationCalls.first.arguments, <String>[
+        'DeviceOrientation.portraitUp',
+      ]);
+      expect(orientationCalls.last.arguments, <String>[
+        'DeviceOrientation.portraitUp',
+        'DeviceOrientation.landscapeLeft',
+        'DeviceOrientation.portraitDown',
+        'DeviceOrientation.landscapeRight',
+      ]);
+    },
+  );
 
   test('keeps landscape when one counter exits while another enters', () async {
     final firstEnter = presentationMode.enter();

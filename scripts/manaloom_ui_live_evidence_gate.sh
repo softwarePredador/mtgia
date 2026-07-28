@@ -6,6 +6,7 @@ MODE="${1:---check}"
 PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
 REVIEW_FILE="$ROOT_DIR/docs/qa/ui-live/latest.json"
 CAPTURE_OUTPUT="docs/qa/ui-live/current/battle-coach-android"
+P0_CAPTURE_OUTPUT="docs/qa/ui-live/current/p0-matrix"
 
 source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 resolve_manaloom_dart
@@ -118,6 +119,71 @@ capture_battle_coach() {
   rm -rf "$run_dir"
 }
 
+index_p0_matrix() {
+  local source_digest
+  source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
+
+  index_profile() {
+    local profile="$1"
+    local target="$2"
+    local device_contract="$3"
+    local screenshot_dir="$4"
+    local runtime_log="$5"
+    local relative_screenshot_dir
+
+    if [[ -z "$screenshot_dir" || -z "$runtime_log" ]]; then
+      echo "P0 profile $profile requires a screenshot directory and runtime log" >&2
+      exit 2
+    fi
+    relative_screenshot_dir="${screenshot_dir#"$ROOT_DIR"/}"
+    if [[ "$relative_screenshot_dir" == "$screenshot_dir" ]]; then
+      echo "P0 screenshots must already live inside the repository: $screenshot_dir" >&2
+      exit 2
+    fi
+
+    (
+      cd "$ROOT_DIR/app"
+      "$DART_BIN" run tool/ui_runtime_evidence.dart index-directory \
+        --repo-root "$ROOT_DIR" \
+        --screenshots "$relative_screenshot_dir" \
+        --log "$runtime_log" \
+        --manifest "$P0_CAPTURE_OUTPUT/$profile.json" \
+        --source-digest "$source_digest" \
+        --surface authenticated_p0_matrix \
+        --profile "$profile" \
+        --runtime flutter_drive \
+        --target "$target" \
+        --device-contract "$device_contract"
+    )
+  }
+
+  print_header "Index complete authenticated P0 matrix"
+  index_profile \
+    web_mobile_390x844 \
+    web_real_build \
+    "Chrome real build, viewport 390x844, capture 500x844" \
+    "${MANALOOM_P0_WEB_MOBILE_DIR:-}" \
+    "${MANALOOM_P0_WEB_MOBILE_LOG:-}"
+  index_profile \
+    web_desktop_1440x900 \
+    web_real_build \
+    "Chrome real build 1440x900" \
+    "${MANALOOM_P0_WEB_DESKTOP_DIR:-}" \
+    "${MANALOOM_P0_WEB_DESKTOP_LOG:-}"
+  index_profile \
+    web_wide_1920x1080 \
+    web_real_build \
+    "Chrome real build 1920x1080" \
+    "${MANALOOM_P0_WEB_WIDE_DIR:-}" \
+    "${MANALOOM_P0_WEB_WIDE_LOG:-}"
+  index_profile \
+    android_physical_sm_a135m \
+    android_physical \
+    "Samsung SM-A135M, Android 14, profile mode, 1080x2408" \
+    "${MANALOOM_P0_ANDROID_DIR:-}" \
+    "${MANALOOM_P0_ANDROID_LOG:-}"
+}
+
 case "$MODE" in
   --check)
     verify_current_evidence
@@ -125,10 +191,14 @@ case "$MODE" in
   --capture-battle-coach)
     capture_battle_coach
     ;;
+  --index-p0-matrix)
+    index_p0_matrix
+    ;;
   -h|--help|help)
     printf '%s\n' \
       "usage: $0 --check" \
-      "       MANALOOM_UI_PROOF_DEVICE=<id> $0 --capture-battle-coach"
+      "       MANALOOM_UI_PROOF_DEVICE=<id> $0 --capture-battle-coach" \
+      "       MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
     ;;
   *)
     echo "unknown mode: $MODE" >&2

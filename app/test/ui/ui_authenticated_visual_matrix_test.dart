@@ -10,8 +10,8 @@ void main() {
   test(
     'authenticated visual matrix owns every required platform and state',
     () {
-      expect(matrix['schema_version'], 1);
-      expect(matrix['status'], anyOf('in_progress', 'pass'));
+      expect(matrix['schema_version'], 2);
+      expect(matrix['status'], 'governed_by_live_evidence');
 
       final platforms = (matrix['platforms'] as List)
           .cast<Map<String, dynamic>>();
@@ -38,14 +38,24 @@ void main() {
         hasLength(1),
       );
 
-      for (final platform in platforms) {
-        expect(platform['capture_count'], 20);
-        expect(platform['human_review'], 'approved');
-      }
+      expect(
+        {
+          for (final platform in platforms)
+            platform['id'] as String: platform['capture_count'] as int,
+        },
+        <String, int>{
+          'web_mobile': 53,
+          'web_desktop': 52,
+          'web_wide': 52,
+          'android_physical': 53,
+        },
+      );
 
       final android = platforms.singleWhere(
         (platform) => platform['id'] == 'android_physical',
       );
+      expect(android['width'], 384);
+      expect(android['height'], 856);
       expect(android['capture_width'], 1080);
       expect(android['capture_height'], 2408);
       expect(android['device_contract'], contains('SM-A135M'));
@@ -59,6 +69,7 @@ void main() {
         'modal',
         'above_fold',
         'below_fold',
+        'disabled',
       });
       final coveredStates = (matrix['checkpoints'] as List)
           .cast<Map<String, dynamic>>()
@@ -111,7 +122,7 @@ void main() {
           .map((checkpoint) => checkpoint['id'] as String)
           .toList();
       expect(ids.toSet(), hasLength(ids.length));
-      expect(checkpoints.length, greaterThanOrEqualTo(20));
+      expect(checkpoints, hasLength(53));
 
       final findings = <String>[];
       for (final checkpoint in checkpoints) {
@@ -140,54 +151,47 @@ void main() {
     },
   );
 
-  test(
-    'visual gate requires pixel diff, console cleanliness and human review',
-    () {
-      final gate = matrix['visual_gate'] as Map<String, dynamic>;
-      expect(gate['runner'], 'tool/authenticated_visual_diff.dart');
-      expect(File(gate['runner'] as String).existsSync(), isTrue);
-      expect(gate['baseline_root'], 'test/ui/goldens/runtime');
-      expect(gate['failure_root'], 'test/ui/failures/runtime');
-      expect(gate['maximum_changed_pixel_ratio'], 0.001);
-      expect(gate['required_console_levels'], <String>['warning', 'error']);
-      expect(gate['maximum_console_entries'], 0);
-      expect(gate['human_review'], anyOf('pending', 'approved'));
+  test('visual gate binds the complete baseline to live evidence approval', () {
+    final gate = matrix['visual_gate'] as Map<String, dynamic>;
+    expect(gate['runner'], 'tool/authenticated_visual_diff.dart');
+    expect(File(gate['runner'] as String).existsSync(), isTrue);
+    expect(gate['baseline_root'], 'test/ui/goldens/runtime');
+    expect(gate['failure_root'], 'test/ui/failures/runtime');
+    expect(gate['maximum_changed_pixel_ratio'], 0.001);
+    expect(gate['required_console_levels'], <String>['warning', 'error']);
+    expect(gate['maximum_console_entries'], 0);
+    expect(gate['approval_is_owned_by_live_evidence'], isTrue);
+    expect(File(gate['live_evidence_review'] as String).existsSync(), isTrue);
+    expect(File(gate['source_digest_command'] as String).existsSync(), isTrue);
+    expect(gate['baseline_files'], 210);
+    expect(gate['required_profile_counts'], <String, dynamic>{
+      'web_mobile': 53,
+      'web_desktop': 52,
+      'web_wide': 52,
+      'android_physical': 53,
+    });
 
-      if (matrix['status'] == 'pass') {
-        expect(gate['human_review'], 'approved');
-        expect(
-          gate['approved_build_sha256'],
-          matches(RegExp(r'^[0-9a-f]{64}$')),
-        );
-        expect(
-          gate['approved_capture_manifest_sha256'],
-          matches(RegExp(r'^[0-9a-f]{64}$')),
-        );
-        expect(gate['baseline_files'], 80);
-
-        final diff = gate['pixel_diff'] as Map<String, dynamic>;
-        expect(diff['status'], 'pass');
-        expect(diff['passed_files'], 80);
-        expect(diff['failed_files'], 0);
-        expect(diff['maximum_observed_changed_pixel_ratio'], 0.0);
-
-        final console = gate['web_console_observation'] as Map<String, dynamic>;
-        expect(console['warning_or_error_entries'], 0);
-
-        final android = gate['android_run'] as Map<String, dynamic>;
-        expect(android['mode'], 'profile');
-        expect(android['result'], 'pass');
-        expect(android['tests_passed'], greaterThan(0));
-        expect(android['adb_reverse_after_run'], 0);
-
-        final baseline = Directory(gate['baseline_root'] as String);
-        final baselineFiles = baseline
-            .listSync(recursive: true)
-            .whereType<File>()
-            .where((file) => file.path.endsWith('.png'))
-            .toList();
-        expect(baselineFiles, hasLength(80));
-      }
-    },
-  );
+    final checkpointIds = (matrix['checkpoints'] as List)
+        .cast<Map<String, dynamic>>()
+        .map((checkpoint) => checkpoint['id'] as String)
+        .toSet();
+    final baseline = Directory(gate['baseline_root'] as String);
+    final expectedByProfile = <String, Set<String>>{
+      'web_mobile': checkpointIds,
+      'web_desktop': checkpointIds.difference({'home_quick_actions_scrolled'}),
+      'web_wide': checkpointIds.difference({'home_quick_actions_scrolled'}),
+      'android_physical': checkpointIds,
+    };
+    for (final entry in expectedByProfile.entries) {
+      final profileDirectory = Directory('${baseline.path}/${entry.key}');
+      expect(profileDirectory.existsSync(), isTrue);
+      final actualNames = profileDirectory
+          .listSync()
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.png'))
+          .map((file) => file.uri.pathSegments.last.replaceFirst('.png', ''))
+          .toSet();
+      expect(actualNames, entry.value, reason: entry.key);
+    }
+  });
 }

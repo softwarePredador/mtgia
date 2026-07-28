@@ -1208,6 +1208,51 @@ void main() {
     },
   );
 
+  testWidgets('Enter selects the unique filtered opponent and runs preflight', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('battle-opponent-search-field')),
+      'Atraxa',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    expect(gateway.preflightCalls, 1);
+    expect(
+      tester
+          .widget<ListTile>(
+            find.byKey(
+              const Key(
+                'battle-opponent-deck-22222222-2222-4222-8222-222222222222',
+              ),
+            ),
+          )
+          .selected,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.byKey(const Key('battle-opponent-submit-button')),
+          )
+          .onPressed,
+      isNotNull,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('offers independent 1/3/5/10 samples for async Battle', (
     tester,
   ) async {

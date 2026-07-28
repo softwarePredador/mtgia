@@ -59,13 +59,17 @@ class AuthVisualShell extends StatelessWidget {
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                const padding = EdgeInsets.fromLTRB(
-                  AppTheme.space20,
-                  AppTheme.space18,
-                  AppTheme.space20,
-                  AppTheme.space32,
+                final compact =
+                    constraints.maxWidth < AppTheme.breakpointCompact;
+                final padding = EdgeInsets.fromLTRB(
+                  compact ? AppTheme.space12 : AppTheme.space20,
+                  compact ? AppTheme.space12 : AppTheme.space18,
+                  compact ? AppTheme.space12 : AppTheme.space20,
+                  compact ? AppTheme.space20 : AppTheme.space32,
                 );
                 return SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: padding,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
@@ -192,21 +196,30 @@ class AuthFormSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppTheme.space20),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.16)),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.backgroundAbyss.withValues(alpha: 0.46),
-            blurRadius: 20,
-            offset: const Offset(0, 12),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < AppTheme.breakpointCompact;
+        return Container(
+          padding: EdgeInsets.all(
+            compact ? AppTheme.space16 : AppTheme.space20,
           ),
-        ],
-      ),
-      child: child,
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceElevated.withValues(alpha: 0.92),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.brass400.withValues(alpha: 0.16),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.46),
+                blurRadius: 20,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
     );
   }
 }

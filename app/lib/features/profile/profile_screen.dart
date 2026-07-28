@@ -458,23 +458,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final user = context.select<AuthProvider, User?>((p) => p.user);
+    final compact =
+        MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact;
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
-      floatingActionButton: user == null
+      bottomNavigationBar: user == null
           ? null
-          : FloatingActionButton.extended(
-              key: const Key('profile-save-button'),
-              tooltip: 'Salvar perfil',
-              onPressed: _isSaving ? null : _save,
-              icon: _isSaving
-                  ? const SizedBox(
-                      width: AppTheme.space18,
-                      height: AppTheme.space18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.save_outlined),
-              label: Text(_isSaving ? 'Salvando' : 'Salvar'),
+          : Material(
+              color: AppTheme.surfaceSlate,
+              child: SafeArea(
+                top: false,
+                child: Container(
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: AppTheme.outlineMuted,
+                        width: AppTheme.strokeHairline,
+                      ),
+                    ),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compact ? AppTheme.space16 : AppTheme.space24,
+                    vertical: AppTheme.space8,
+                  ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 840),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: SizedBox(
+                          width: compact ? double.infinity : 180,
+                          child: FilledButton.icon(
+                            key: const Key('profile-save-button'),
+                            onPressed: _isSaving ? null : _save,
+                            icon: _isSaving
+                                ? const SizedBox(
+                                    width: AppTheme.space18,
+                                    height: AppTheme.space18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.save_outlined),
+                            label: Text(_isSaving ? 'Salvando' : 'Salvar'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
       appBar: AppBar(
         toolbarHeight: 54,

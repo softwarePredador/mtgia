@@ -48,6 +48,39 @@ void main() {
     expect(screenshots.map((entry) => entry['height']), everyElement(6));
   });
 
+  test('indexes screenshot directories from a real runtime log', () {
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/web_mobile',
+    )..createSync(recursive: true);
+    final png = img.encodePng(img.Image(width: 390, height: 844));
+    File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+    final log = File('${temp.path}/web-mobile.log')
+      ..writeAsStringSync('All tests passed.\n');
+
+    final result = indexUiRuntimeScreenshotDirectory(
+      screenshotDirectory: screenshotDirectory,
+      runtimeLog: log,
+      repoRoot: temp,
+      manifestRelativePath: 'docs/qa/ui-live/current/p0-matrix/web-mobile.json',
+      expectedSourceDigest: _digest,
+      surface: 'authenticated_p0_matrix',
+      profile: 'web_mobile_390x844',
+      runtime: 'flutter_drive_release',
+      target: 'web_real_build',
+      deviceContract: 'Chrome 150',
+      generatedAt: DateTime.utc(2026, 7, 27, 18),
+    );
+
+    expect(result.manifest['checkpoint_count'], 1);
+    expect(result.manifest['profile'], 'web_mobile_390x844');
+    final screenshots = (result.manifest['screenshots'] as List).cast<Map>();
+    expect(screenshots.single['checkpoint'], 'login_empty');
+    expect(
+      screenshots.single['path'],
+      'app/test/ui/goldens/runtime/web_mobile/login_empty.png',
+    );
+  });
+
   test('rejects missing checkpoints instead of accepting partial proof', () {
     final png = img.encodePng(img.Image(width: 2, height: 2));
     final log = File('${temp.path}/runtime.log')
@@ -162,6 +195,85 @@ void main() {
       'PASS_RUNTIME',
       'PASS_VISUAL_REVIEWED',
     ]);
+  });
+
+  test('verifies multiple runtime profiles through their manifest hashes', () {
+    final png = img.encodePng(img.Image(width: 8, height: 10));
+    final references = <Map<String, Object>>[];
+    for (final profile in const ['web_mobile', 'android_physical']) {
+      final screenshotDirectory = Directory(
+        '${temp.path}/app/test/ui/goldens/runtime/$profile',
+      )..createSync(recursive: true);
+      File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+      final log = File('${temp.path}/$profile.log')
+        ..writeAsStringSync('All tests passed.\n');
+      final extraction = indexUiRuntimeScreenshotDirectory(
+        screenshotDirectory: screenshotDirectory,
+        runtimeLog: log,
+        repoRoot: temp,
+        manifestRelativePath: 'docs/qa/ui-live/current/p0-matrix/$profile.json',
+        expectedSourceDigest: _digest,
+        surface: 'authenticated_p0_matrix',
+        profile: profile,
+        runtime: 'flutter_drive',
+        target: profile == 'android_physical'
+            ? 'android_physical'
+            : 'web_real_build',
+        deviceContract: profile,
+        generatedAt: DateTime.utc(2026, 7, 27, 18),
+      );
+      references.add(<String, Object>{
+        'path':
+            'docs/qa/ui-live/current/p0-matrix/'
+            '$profile.json',
+        'sha256': sha256
+            .convert(extraction.manifestFile.readAsBytesSync())
+            .toString(),
+      });
+    }
+
+    final review = File('${temp.path}/docs/qa/ui-live/latest.json');
+    review.parent.createSync(recursive: true);
+    review.writeAsStringSync(
+      const JsonEncoder.withIndent('  ').convert(<String, Object>{
+        'schema_version': 'manaloom_ui_live_review_v1',
+        'status': 'PASS',
+        'source_digest': _digest,
+        'automated': {
+          'status': 'PASS_AUTOMATED',
+          'verified_at': '2026-07-27T18:00:00Z',
+          'commands': ['flutter test'],
+        },
+        'runtime': {'status': 'PASS_RUNTIME', 'capture_manifests': references},
+        'visual_review': {
+          'status': 'PASS_VISUAL_REVIEWED',
+          'reviewed_at': '2026-07-27T18:05:00Z',
+          'reviewer': {'kind': 'agent', 'name': 'Codex'},
+          'visual_thesis': 'One coherent product across target surfaces.',
+          'content_plan': 'Context, state, action and recovery.',
+          'interaction_thesis': 'The next action remains explicit.',
+          'criteria': {
+            for (final criterion in uiLiveEvidenceCriteria)
+              criterion: {'status': 'pass', 'note': 'Inspected and coherent.'},
+          },
+          'reviewed_capture_manifest_sha256': references
+              .map((reference) => reference['sha256']!)
+              .toList(),
+          'reviewed_profiles': const ['web_mobile', 'android_physical'],
+          'reviewed_screenshot_count': 2,
+          'blocking_findings': const <String>[],
+        },
+      }),
+    );
+
+    final verification = verifyUiLiveEvidence(
+      reviewFile: review,
+      repoRoot: temp,
+      expectedSourceDigest: _digest,
+    );
+
+    expect(verification.screenshotCount, 2);
+    expect(verification.surface, 'authenticated_p0_matrix');
   });
 
   test('rejects a review whose inspected hashes do not cover the capture', () {

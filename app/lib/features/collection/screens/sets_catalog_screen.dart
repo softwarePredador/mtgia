@@ -228,6 +228,18 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
+        leading: IconButton(
+          key: const Key('sets-catalog-back-button'),
+          tooltip: 'Voltar para coleção',
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              context.pop();
+              return;
+            }
+            context.go('/collection?tab=3');
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text('Coleções MTG'),
         backgroundColor: AppTheme.backgroundAbyss,
         actions: [

@@ -38,6 +38,7 @@ class LotusPresentationMode {
     statusBarIconBrightness: Brightness.light,
     statusBarBrightness: Brightness.dark,
   );
+  static const Duration _portraitResetSettleDelay = Duration(milliseconds: 180);
 
   Future<void> enter() {
     _activeClients += 1;
@@ -83,6 +84,11 @@ class LotusPresentationMode {
 
   Future<void> _applyExit() async {
     await _setWakeLockEnabled(false);
+    // Android commonly keeps the last locked landscape rotation after the
+    // orientation allowlist is widened. Return to the app's normal portrait
+    // posture first, then restore support for every orientation.
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    await Future<void>.delayed(_portraitResetSettleDelay);
     await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(_overlayStyle);

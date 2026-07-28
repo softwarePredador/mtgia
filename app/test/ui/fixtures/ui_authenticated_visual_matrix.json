@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "matrix_id": "manaloom-s3-07-authenticated-visual-regression-2026-07-22",
-  "status": "pass",
+  "schema_version": 2,
+  "matrix_id": "manaloom-s3-07-authenticated-p0-live-matrix-2026-07-27",
+  "status": "governed_by_live_evidence",
   "harness": "../scripts/manaloom_authenticated_visual_qa_isolated.sh",
   "fixture": {
     "scope": "disposable_loopback_postgresql_api",
@@ -18,9 +18,10 @@
       "kind": "web_real_build",
       "width": 390,
       "height": 844,
+      "capture_width": 500,
+      "capture_height": 844,
       "device_pixel_ratio": 1,
-      "capture_count": 20,
-      "human_review": "approved"
+      "capture_count": 53
     },
     {
       "id": "web_desktop",
@@ -28,8 +29,7 @@
       "width": 1440,
       "height": 900,
       "device_pixel_ratio": 1,
-      "capture_count": 20,
-      "human_review": "approved"
+      "capture_count": 52
     },
     {
       "id": "web_wide",
@@ -37,20 +37,18 @@
       "width": 1920,
       "height": 1080,
       "device_pixel_ratio": 1,
-      "capture_count": 20,
-      "human_review": "approved"
+      "capture_count": 52
     },
     {
       "id": "android_physical",
       "kind": "android_physical_profile",
-      "width": 390,
-      "height": 844,
+      "width": 384,
+      "height": 856,
       "capture_width": 1080,
       "capture_height": 2408,
-      "capture_count": 20,
+      "capture_count": 53,
       "device_contract": "Samsung SM-A135M, Android 14",
-      "runner_constraint": "flutter drive does not support non-Web --release; profile keeps kDebugMode=false",
-      "human_review": "approved"
+      "runner_constraint": "flutter drive does not support non-Web --release; profile keeps kDebugMode=false"
     }
   ],
   "required_states": [
@@ -59,7 +57,8 @@
     "error",
     "modal",
     "above_fold",
-    "below_fold"
+    "below_fold",
+    "disabled"
   ],
   "checkpoints": [
     {
@@ -79,11 +78,11 @@
       "source": "lib/features/home/home_screen.dart"
     },
     {
-      "id": "home_below_fold",
+      "id": "home_quick_actions_scrolled",
       "route": "/",
       "auth": "seeded_user",
       "states": ["success", "below_fold"],
-      "anchor": "home-recent-decks-rail",
+      "anchor": "home-quick-actions-list",
       "source": "lib/features/home/home_screen.dart"
     },
     {
@@ -221,6 +220,270 @@
       "states": ["success", "above_fold"],
       "anchor": "legal-content",
       "source": "lib/features/commercial/screens/legal_screen.dart"
+    },
+    {
+      "id": "splash_boot",
+      "route": "/",
+      "auth": "initializing",
+      "states": ["success", "above_fold"],
+      "anchor": "ManaLoom splash art",
+      "source": "lib/features/auth/screens/splash_screen.dart"
+    },
+    {
+      "id": "register_empty",
+      "route": "/register",
+      "auth": "public",
+      "states": ["empty", "above_fold"],
+      "anchor": "register-username-field",
+      "source": "lib/features/auth/screens/register_screen.dart"
+    },
+    {
+      "id": "register_consent_unchecked",
+      "route": "/register",
+      "auth": "public",
+      "states": ["empty", "below_fold"],
+      "anchor": "register-legal-acceptance",
+      "source": "lib/features/auth/screens/register_screen.dart"
+    },
+    {
+      "id": "register_consent_error",
+      "route": "/register",
+      "auth": "public",
+      "states": ["error", "below_fold"],
+      "anchor": "register-legal-error",
+      "source": "lib/features/auth/screens/register_screen.dart"
+    },
+    {
+      "id": "register_consent_accepted",
+      "route": "/register",
+      "auth": "public",
+      "states": ["success", "below_fold"],
+      "anchor": "register-legal-acceptance",
+      "source": "lib/features/auth/screens/register_screen.dart"
+    },
+    {
+      "id": "forgot_password_empty",
+      "route": "/forgot-password",
+      "auth": "public",
+      "states": ["empty", "above_fold"],
+      "anchor": "forgot-password-email-field",
+      "source": "lib/features/auth/screens/forgot_password_screen.dart"
+    },
+    {
+      "id": "reset_password_invalid_link",
+      "route": "/reset-password",
+      "auth": "public",
+      "states": ["error", "above_fold"],
+      "anchor": "reset-password-error",
+      "source": "lib/features/auth/screens/reset_password_screen.dart"
+    },
+    {
+      "id": "verify_email_signed_out",
+      "route": "/verify-email",
+      "auth": "public",
+      "states": ["empty", "above_fold"],
+      "anchor": "Verifique seu email",
+      "source": "lib/features/auth/screens/verify_email_screen.dart"
+    },
+    {
+      "id": "legal_terms",
+      "route": "/legal?section=terms",
+      "auth": "public",
+      "states": ["success", "above_fold"],
+      "anchor": "legal-terms-section",
+      "source": "lib/features/commercial/screens/legal_screen.dart"
+    },
+    {
+      "id": "legal_privacy",
+      "route": "/legal?section=privacy",
+      "auth": "public",
+      "states": ["success", "above_fold"],
+      "anchor": "legal-privacy-section",
+      "source": "lib/features/commercial/screens/legal_screen.dart"
+    },
+    {
+      "id": "onboarding_core_flow",
+      "route": "/onboarding/core-flow",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "onboarding-format-dropdown",
+      "source": "lib/features/home/onboarding_core_flow_screen.dart"
+    },
+    {
+      "id": "life_counter_initial",
+      "route": "/life-counter",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "lifeCounterRoutePath",
+      "source": "lib/features/home/lotus_life_counter_screen.dart"
+    },
+    {
+      "id": "card_search_empty",
+      "route": "/decks/{seed_deck_id}/search",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "card-search-field",
+      "source": "lib/features/cards/screens/card_search_screen.dart"
+    },
+    {
+      "id": "card_search_results",
+      "route": "/decks/{seed_deck_id}/search",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "card-search-results-frame",
+      "source": "lib/features/cards/screens/card_search_screen.dart"
+    },
+    {
+      "id": "post_game_empty",
+      "route": "/decks/{seed_deck_id}/post-game",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "post-game-responsive-frame",
+      "source": "lib/features/retention/screens/post_game_notes_screen.dart"
+    },
+    {
+      "id": "sets_catalog_route",
+      "route": "/collection/sets",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "setsCatalogList",
+      "source": "lib/features/collection/screens/sets_catalog_screen.dart"
+    },
+    {
+      "id": "latest_set",
+      "route": "/collection/latest-set",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "setCardsList",
+      "source": "lib/features/collection/screens/set_cards_screen.dart"
+    },
+    {
+      "id": "set_detail_tst",
+      "route": "/collection/sets/TST",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "setCardsList",
+      "source": "lib/features/collection/screens/set_cards_screen.dart"
+    },
+    {
+      "id": "community_tab_1",
+      "route": "/community?tab=1",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "community-tabs",
+      "source": "lib/features/community/screens/community_screen.dart"
+    },
+    {
+      "id": "community_tab_2",
+      "route": "/community?tab=2",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "community-tabs",
+      "source": "lib/features/community/screens/community_screen.dart"
+    },
+    {
+      "id": "community_tab_3",
+      "route": "/community?tab=3",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "community-tabs",
+      "source": "lib/features/community/screens/community_screen.dart"
+    },
+    {
+      "id": "user_search_empty",
+      "route": "/community/search-users",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "user-search-field",
+      "source": "lib/features/social/screens/user_search_screen.dart"
+    },
+    {
+      "id": "user_search_results",
+      "route": "/community/search-users",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "user-search-list",
+      "source": "lib/features/social/screens/user_search_screen.dart"
+    },
+    {
+      "id": "user_profile_success",
+      "route": "/community/user/{seed_peer_user_id}",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "user-profile-content",
+      "source": "lib/features/social/screens/user_profile_screen.dart"
+    },
+    {
+      "id": "community_deck_success",
+      "route": "/community/decks/{seed_deck_id}",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "community-deck-detail-frame",
+      "source": "lib/features/community/screens/community_deck_detail_screen.dart"
+    },
+    {
+      "id": "battle_coach_welcome",
+      "route": "/decks/{seed_deck_id}/battle-coach",
+      "auth": "seeded_user",
+      "states": ["success", "above_fold"],
+      "anchor": "battle-coach-welcome-state",
+      "source": "lib/features/battle/screens/battle_coach_screen.dart"
+    },
+    {
+      "id": "battle_live_disabled",
+      "route": "/decks/{seed_deck_id}/battle-live/{job_id}",
+      "auth": "seeded_user",
+      "states": ["disabled", "above_fold"],
+      "anchor": "battle-live-disabled-state",
+      "source": "lib/features/battle/screens/battle_live_spectator_screen.dart"
+    },
+    {
+      "id": "messages_inbox",
+      "route": "/messages",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "messages-inbox-empty",
+      "source": "lib/features/messages/screens/message_inbox_screen.dart"
+    },
+    {
+      "id": "chat_unavailable",
+      "route": "/messages/{missing_conversation_id}",
+      "auth": "seeded_user",
+      "states": ["error", "above_fold"],
+      "anchor": "chat-error-state",
+      "source": "lib/features/messages/screens/chat_screen.dart"
+    },
+    {
+      "id": "notifications",
+      "route": "/notifications",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "notifications-empty",
+      "source": "lib/features/notifications/screens/notification_screen.dart"
+    },
+    {
+      "id": "trades_inbox",
+      "route": "/trades",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "trade-inbox-tab-bar",
+      "source": "lib/features/trades/screens/trade_inbox_screen.dart"
+    },
+    {
+      "id": "trade_create",
+      "route": "/trades/create/{seed_peer_user_id}",
+      "auth": "seeded_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "create-trade-content",
+      "source": "lib/features/trades/screens/create_trade_screen.dart"
+    },
+    {
+      "id": "trade_detail_unavailable",
+      "route": "/trades/{missing_trade_id}",
+      "auth": "seeded_user",
+      "states": ["error", "above_fold"],
+      "anchor": "trade-detail-error-state",
+      "source": "lib/features/trades/screens/trade_detail_screen.dart"
     }
   ],
   "visual_gate": {
@@ -230,27 +493,15 @@
     "maximum_changed_pixel_ratio": 0.001,
     "required_console_levels": ["warning", "error"],
     "maximum_console_entries": 0,
-    "human_review": "approved",
-    "approved_build_sha256": "160c5cae6ccb046c1df87509c1805a3ee127d17d8b9b834330585db841ba2d3d",
-    "approved_capture_manifest_sha256": "d84119af03c9ee5ba16d921f228c01e1a17e0877a86437640d007f52f5a63100",
-    "baseline_files": 80,
-    "pixel_diff": {
-      "status": "pass",
-      "passed_files": 80,
-      "failed_files": 0,
-      "maximum_observed_changed_pixel_ratio": 0.0
-    },
-    "web_console_observation": {
-      "total_entries": 100,
-      "warning_or_error_entries": 0
-    },
-    "android_run": {
-      "mode": "profile",
-      "device": "Samsung SM-A135M",
-      "android_version": 14,
-      "result": "pass",
-      "tests_passed": 2,
-      "adb_reverse_after_run": 0
+    "baseline_files": 210,
+    "approval_is_owned_by_live_evidence": true,
+    "live_evidence_review": "../docs/qa/ui-live/latest.json",
+    "source_digest_command": "../scripts/manaloom_ui_source_digest.sh",
+    "required_profile_counts": {
+      "web_mobile": 53,
+      "web_desktop": 52,
+      "web_wide": 52,
+      "android_physical": 53
     }
   }
 }

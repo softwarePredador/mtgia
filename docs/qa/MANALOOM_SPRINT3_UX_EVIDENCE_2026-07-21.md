@@ -808,8 +808,32 @@ Após a prova válida: banco descartável ausente, listeners API/ChromeDriver ze
 do usuário continuou como único listener em `127.0.0.1:8088`. Nenhum EasyPanel,
 SSH, commit, push ou deploy foi utilizado.
 
+## Recertificação visual corrente — 2026-07-27
+
+As evidências históricas de S3-05 e S3-07 foram substituídas por prova viva
+vinculada ao source atual. O documento detalhado é
+`docs/qa/MANALOOM_P0_UI_LIVE_EVIDENCE_2026-07-27.md`.
+
+- S3-05 voltou a `PASS`: o Battle Coach Web release passou 9/9 checkpoints de
+  Tab, Shift+Tab, Enter, Space, Escape, foco visível, restauração, digitação,
+  filtro, seleção e preflight real.
+- S3-07 voltou a `PASS`: a matriz P0 passou em 53 Web mobile, 52 desktop,
+  52 wide e 53 Android físico. Somados os sete estados Battle Coach Android e
+  os nove checkpoints Web, 226/226 PNGs foram abertos e revisados.
+- O aggregate `docs/qa/ui-live/latest.json` liga os seis manifestos ao digest
+  `b5af4634e18cda489b0b8d07d7246e6975e7c04d27f4c2643e18acfd5a8fd082`
+  e fecha `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
+- Cadastro, links de Termos/Privacidade, documentos legais, navegação filha de
+  Community, retorno de Mensagens/Notificações, composer indisponível, ação de
+  salvar Perfil e retorno de orientação do Life Counter receberam correções e
+  regressões antes da captura definitiva.
+- A platform view do Life Counter foi capturada pelo compositor físico com
+  `adb screencap`; imagens pretas ou frames de transição da surface Flutter
+  foram explicitamente recusados.
+
 ## Próxima task
 
-S3-08 está fechada localmente. S3-04 continua bloqueada apenas pelas duas ações
-físicas descritas acima, e as duas provas pós-deploy de S3-06 permanecem
-vinculadas ao gate de release. A sequência de produto passa para S4-01.
+S3-08, S3-05 e S3-07 estão fechadas localmente. S3-04 continua bloqueada
+somente pela interação humana TalkBack no Samsung alvo; VoiceOver está
+`DEFERRED_BY_SCOPE`. As duas provas pós-deploy de S3-06 permanecem vinculadas
+ao gate de release. A sequência de produto passa para S4-01.

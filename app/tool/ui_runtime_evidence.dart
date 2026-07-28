@@ -200,6 +200,124 @@ UiRuntimeExtractionResult extractUiRuntimeEvidence({
   );
 }
 
+UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
+  required Directory screenshotDirectory,
+  required File runtimeLog,
+  required Directory repoRoot,
+  required String manifestRelativePath,
+  required String expectedSourceDigest,
+  required String surface,
+  required String profile,
+  required String runtime,
+  required String target,
+  required String deviceContract,
+  DateTime? generatedAt,
+}) {
+  _expectSha256(expectedSourceDigest, 'expected source digest');
+  if (!runtimeLog.existsSync()) {
+    throw UiRuntimeEvidenceException(
+      'Runtime log does not exist: ${runtimeLog.path}',
+    );
+  }
+  if (!screenshotDirectory.existsSync()) {
+    throw UiRuntimeEvidenceException(
+      'Screenshot directory does not exist: ${screenshotDirectory.path}',
+    );
+  }
+
+  final repoPath = repoRoot.absolute.path;
+  final screenshotPath = screenshotDirectory.absolute.path;
+  final screenshotPrefix = '$repoPath${Platform.pathSeparator}';
+  if (!screenshotPath.startsWith(screenshotPrefix)) {
+    throw const UiRuntimeEvidenceException(
+      'Indexed screenshots must live inside the repository.',
+    );
+  }
+  final screenshotRelativeRoot = screenshotPath
+      .substring(screenshotPrefix.length)
+      .replaceAll(Platform.pathSeparator, '/');
+  _safeRelativePath(screenshotRelativeRoot);
+
+  final relativeManifest = _safeRelativePath(manifestRelativePath);
+  if (!relativeManifest.startsWith('docs/qa/ui-live/current/') ||
+      !relativeManifest.endsWith('.json')) {
+    throw const UiRuntimeEvidenceException(
+      'Indexed runtime manifest must be a JSON file below '
+      'docs/qa/ui-live/current/.',
+    );
+  }
+
+  final logBytes = runtimeLog.readAsBytesSync();
+  final log = utf8.decode(logBytes, allowMalformed: false);
+  _expectCleanRuntimeLog(log);
+
+  final pngFiles =
+      screenshotDirectory
+          .listSync(followLinks: false)
+          .whereType<File>()
+          .where((file) => file.path.toLowerCase().endsWith('.png'))
+          .toList(growable: false)
+        ..sort((left, right) => left.path.compareTo(right.path));
+  if (pngFiles.isEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'Indexed runtime directory contains no PNG screenshots.',
+    );
+  }
+
+  final screenshotEntries = <Map<String, Object>>[];
+  for (final file in pngFiles) {
+    final checkpoint = file.uri.pathSegments.last.replaceFirst(
+      RegExp(r'\.png$', caseSensitive: false),
+      '',
+    );
+    _expectCheckpointName(checkpoint);
+    final bytes = file.readAsBytesSync();
+    final image = img.decodePng(bytes);
+    if (image == null || image.width <= 0 || image.height <= 0) {
+      throw UiRuntimeEvidenceException(
+        'Checkpoint $checkpoint is not a valid non-empty PNG.',
+      );
+    }
+    screenshotEntries.add(<String, Object>{
+      'checkpoint': checkpoint,
+      'path': '$screenshotRelativeRoot/${file.uri.pathSegments.last}',
+      'sha256': sha256.convert(bytes).toString(),
+      'bytes': bytes.length,
+      'width': image.width,
+      'height': image.height,
+    });
+  }
+
+  final timestamp = (generatedAt ?? DateTime.now().toUtc()).toUtc();
+  final manifest = <String, Object?>{
+    'schema_version': 'manaloom_ui_runtime_capture_v1',
+    'status': 'PASS_RUNTIME',
+    'generated_at': timestamp.toIso8601String(),
+    'source_digest': expectedSourceDigest,
+    'surface': surface,
+    'profile': profile,
+    'runtime': runtime,
+    'target': target,
+    'device_contract': deviceContract,
+    'runtime_console': const <String, Object>{
+      'status': 'pass',
+      'forbidden_entries': 0,
+    },
+    'log_sha256': sha256.convert(logBytes).toString(),
+    'checkpoint_count': screenshotEntries.length,
+    'required_checkpoints': screenshotEntries
+        .map((entry) => entry['checkpoint'])
+        .toList(growable: false),
+    'screenshots': screenshotEntries,
+  };
+  final manifestFile = File('$repoPath/$relativeManifest');
+  _writeJson(manifestFile, manifest);
+  return UiRuntimeExtractionResult(
+    manifestFile: manifestFile,
+    manifest: manifest,
+  );
+}
+
 UiLiveEvidenceVerification verifyUiLiveEvidence({
   required File reviewFile,
   required Directory repoRoot,
@@ -247,90 +365,119 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
     runtime['status'] == 'PASS_RUNTIME',
     'runtime evidence is not PASS_RUNTIME',
   );
-  final captureReference = _objectOrEmpty(runtime['capture_manifest']);
-  final captureRelativePath = captureReference['path']?.toString() ?? '';
-  final captureExpectedHash = captureReference['sha256']?.toString() ?? '';
-  File? captureManifestFile;
-  Map<String, dynamic> capture = <String, dynamic>{};
-  if (captureRelativePath.isEmpty) {
-    findings.add('runtime capture manifest path is missing');
-  } else {
-    try {
-      final safePath = _safeRelativePath(captureRelativePath);
-      captureManifestFile = File('${repoRoot.absolute.path}/$safePath');
-      if (!captureManifestFile.existsSync()) {
-        findings.add('runtime capture manifest does not exist');
-      } else {
-        final bytes = captureManifestFile.readAsBytesSync();
-        expect(
-          sha256.convert(bytes).toString() == captureExpectedHash,
-          'runtime capture manifest hash does not match',
-        );
-        capture = _readJsonObject(
-          captureManifestFile,
-          'runtime capture manifest',
-        );
-      }
-    } on UiRuntimeEvidenceException catch (error) {
-      findings.add(error.message);
-    }
+  final captureReferences = <Map<String, dynamic>>[
+    ..._objectListOrEmpty(runtime['capture_manifests']),
+  ];
+  if (captureReferences.isEmpty) {
+    final legacyReference = _objectOrEmpty(runtime['capture_manifest']);
+    if (legacyReference.isNotEmpty) captureReferences.add(legacyReference);
   }
-
   expect(
-    capture['status'] == 'PASS_RUNTIME',
-    'capture status is not PASS_RUNTIME',
-  );
-  expect(
-    capture['source_digest'] == expectedSourceDigest,
-    'capture source digest is stale',
-  );
-  expect(
-    capture['target'] == 'android_physical' ||
-        capture['target'] == 'web_real_build',
-    'capture target is not a real Android or Web runtime',
-  );
-  final runtimeConsole = _objectOrEmpty(capture['runtime_console']);
-  expect(
-    runtimeConsole['status'] == 'pass' &&
-        runtimeConsole['forbidden_entries'] == 0,
-    'runtime console is not clean',
+    captureReferences.isNotEmpty,
+    'runtime capture manifest path is missing',
   );
 
-  final screenshotEntries = _objectListOrEmpty(capture['screenshots']);
-  expect(screenshotEntries.isNotEmpty, 'capture contains no screenshots');
+  final captureManifestFiles = <File>[];
+  final captureManifestHashes = <String>{};
   final captureNames = <String>{};
   final captureHashes = <String>{};
-  for (final screenshot in screenshotEntries) {
-    final checkpoint = screenshot['checkpoint']?.toString() ?? '';
-    final relativePath = screenshot['path']?.toString() ?? '';
-    final expectedHash = screenshot['sha256']?.toString() ?? '';
-    if (!captureNames.add(checkpoint)) {
-      findings.add('duplicate capture checkpoint $checkpoint');
-    }
-    if (!_isSha256(expectedHash)) {
-      findings.add('invalid screenshot hash for $checkpoint');
+  final captureProfiles = <String>{};
+  final captureSurfaces = <String>{};
+  var screenshotCount = 0;
+  final hasMultipleCaptures = captureReferences.length > 1;
+  for (final captureReference in captureReferences) {
+    final captureRelativePath = captureReference['path']?.toString() ?? '';
+    final captureExpectedHash = captureReference['sha256']?.toString() ?? '';
+    Map<String, dynamic> capture = <String, dynamic>{};
+    if (captureRelativePath.isEmpty) {
+      findings.add('runtime capture manifest path is missing');
       continue;
     }
-    captureHashes.add(expectedHash);
     try {
-      final safePath = _safeRelativePath(relativePath);
-      final imageFile = File('${repoRoot.absolute.path}/$safePath');
-      if (!imageFile.existsSync()) {
-        findings.add('screenshot is missing for $checkpoint');
+      final safeManifestPath = _safeRelativePath(captureRelativePath);
+      final captureManifestFile = File(
+        '${repoRoot.absolute.path}/$safeManifestPath',
+      );
+      if (!captureManifestFile.existsSync()) {
+        findings.add('runtime capture manifest does not exist');
         continue;
       }
-      final bytes = imageFile.readAsBytesSync();
-      if (sha256.convert(bytes).toString() != expectedHash) {
-        findings.add('screenshot hash does not match for $checkpoint');
-      }
-      final image = img.decodePng(bytes);
-      if (image == null) {
-        findings.add('screenshot is not valid PNG for $checkpoint');
-      } else {
+      final manifestBytes = captureManifestFile.readAsBytesSync();
+      final observedManifestHash = sha256.convert(manifestBytes).toString();
+      expect(
+        observedManifestHash == captureExpectedHash,
+        'runtime capture manifest hash does not match',
+      );
+      captureManifestFiles.add(captureManifestFile);
+      captureManifestHashes.add(observedManifestHash);
+      capture = _readJsonObject(
+        captureManifestFile,
+        'runtime capture manifest',
+      );
+
+      expect(
+        capture['status'] == 'PASS_RUNTIME',
+        'capture status is not PASS_RUNTIME',
+      );
+      expect(
+        capture['source_digest'] == expectedSourceDigest,
+        'capture source digest is stale',
+      );
+      expect(
+        capture['target'] == 'android_physical' ||
+            capture['target'] == 'web_real_build',
+        'capture target is not a real Android or Web runtime',
+      );
+      final runtimeConsole = _objectOrEmpty(capture['runtime_console']);
+      expect(
+        runtimeConsole['status'] == 'pass' &&
+            runtimeConsole['forbidden_entries'] == 0,
+        'runtime console is not clean',
+      );
+
+      final profile = capture['profile']?.toString() ?? '';
+      final surface = capture['surface']?.toString() ?? '';
+      expect(profile.trim().isNotEmpty, 'capture profile is missing');
+      expect(surface.trim().isNotEmpty, 'capture surface is missing');
+      captureProfiles.add(profile);
+      captureSurfaces.add(surface);
+      final screenshotEntries = _objectListOrEmpty(capture['screenshots']);
+      expect(screenshotEntries.isNotEmpty, 'capture contains no screenshots');
+      screenshotCount += screenshotEntries.length;
+      for (final screenshot in screenshotEntries) {
+        final checkpoint = screenshot['checkpoint']?.toString() ?? '';
+        final captureName = hasMultipleCaptures
+            ? '$profile:$checkpoint'
+            : checkpoint;
+        final relativePath = screenshot['path']?.toString() ?? '';
+        final expectedHash = screenshot['sha256']?.toString() ?? '';
+        if (!captureNames.add(captureName)) {
+          findings.add('duplicate capture checkpoint $captureName');
+        }
+        if (!_isSha256(expectedHash)) {
+          findings.add('invalid screenshot hash for $captureName');
+          continue;
+        }
+        captureHashes.add(expectedHash);
+        final safePath = _safeRelativePath(relativePath);
+        final imageFile = File('${repoRoot.absolute.path}/$safePath');
+        if (!imageFile.existsSync()) {
+          findings.add('screenshot is missing for $captureName');
+          continue;
+        }
+        final bytes = imageFile.readAsBytesSync();
+        if (sha256.convert(bytes).toString() != expectedHash) {
+          findings.add('screenshot hash does not match for $captureName');
+        }
+        final image = img.decodePng(bytes);
+        if (image == null) {
+          findings.add('screenshot is not valid PNG for $captureName');
+          continue;
+        }
         expect(
           screenshot['width'] == image.width &&
               screenshot['height'] == image.height,
-          'screenshot dimensions do not match for $checkpoint',
+          'screenshot dimensions do not match for $captureName',
         );
       }
     } on UiRuntimeEvidenceException catch (error) {
@@ -384,20 +531,41 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
     );
   }
 
-  final reviewedCheckpoints = _stringListOrEmpty(
-    visual['reviewed_checkpoints'],
-  ).toSet();
-  final reviewedHashes = _stringListOrEmpty(
-    visual['reviewed_screenshot_sha256'],
-  ).toSet();
-  expect(
-    _sameSet(reviewedCheckpoints, captureNames),
-    'visual review did not inspect every captured checkpoint',
-  );
-  expect(
-    _sameSet(reviewedHashes, captureHashes),
-    'visual review screenshot hashes do not match the capture',
-  );
+  if (hasMultipleCaptures) {
+    final reviewedManifestHashes = _stringListOrEmpty(
+      visual['reviewed_capture_manifest_sha256'],
+    ).toSet();
+    final reviewedProfiles = _stringListOrEmpty(
+      visual['reviewed_profiles'],
+    ).toSet();
+    expect(
+      _sameSet(reviewedManifestHashes, captureManifestHashes),
+      'visual review manifest hashes do not cover every runtime capture',
+    );
+    expect(
+      _sameSet(reviewedProfiles, captureProfiles),
+      'visual review profiles do not cover every runtime capture',
+    );
+    expect(
+      visual['reviewed_screenshot_count'] == screenshotCount,
+      'visual review screenshot count does not cover every runtime capture',
+    );
+  } else {
+    final reviewedCheckpoints = _stringListOrEmpty(
+      visual['reviewed_checkpoints'],
+    ).toSet();
+    final reviewedHashes = _stringListOrEmpty(
+      visual['reviewed_screenshot_sha256'],
+    ).toSet();
+    expect(
+      _sameSet(reviewedCheckpoints, captureNames),
+      'visual review did not inspect every captured checkpoint',
+    );
+    expect(
+      _sameSet(reviewedHashes, captureHashes),
+      'visual review screenshot hashes do not match the capture',
+    );
+  }
   expect(
     _stringListOrEmpty(visual['blocking_findings']).isEmpty,
     'visual review has unresolved blocking findings',
@@ -411,9 +579,9 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
 
   return UiLiveEvidenceVerification(
     reviewFile: reviewFile,
-    captureManifestFile: captureManifestFile!,
-    screenshotCount: screenshotEntries.length,
-    surface: capture['surface']!.toString(),
+    captureManifestFile: captureManifestFiles.first,
+    screenshotCount: screenshotCount,
+    surface: (captureSurfaces.toList()..sort()).join(','),
     sourceDigest: expectedSourceDigest,
   );
 }
@@ -633,6 +801,11 @@ Never _usage([String? message]) {
     '  dart run tool/ui_runtime_evidence.dart extract '
     '--repo-root <dir> --log <file> --output <relative-dir> '
     '--source-digest <sha256> [--replace]\n'
+    '  dart run tool/ui_runtime_evidence.dart index-directory '
+    '--repo-root <dir> --screenshots <relative-dir> --log <file> '
+    '--manifest <relative-json> --source-digest <sha256> '
+    '--surface <id> --profile <id> --runtime <id> --target <id> '
+    '--device-contract <text>\n'
     '  dart run tool/ui_runtime_evidence.dart verify '
     '--repo-root <dir> --review <file> --source-digest <sha256>',
   );
@@ -677,6 +850,52 @@ void main(List<String> args) {
         const JsonEncoder.withIndent('  ').convert(<String, Object>{
           'status': 'PASS_RUNTIME',
           'capture_manifest': result.manifestFile.path,
+          'next_required_level': 'PASS_VISUAL_REVIEWED',
+        }),
+      );
+      return;
+    }
+    if (command == 'index-directory') {
+      final screenshotPath = values['--screenshots'];
+      final logPath = values['--log'];
+      final manifestPath = values['--manifest'];
+      final surface = values['--surface'];
+      final profile = values['--profile'];
+      final runtime = values['--runtime'];
+      final target = values['--target'];
+      final deviceContract = values['--device-contract'];
+      if (<String?>[
+        screenshotPath,
+        logPath,
+        manifestPath,
+        surface,
+        profile,
+        runtime,
+        target,
+        deviceContract,
+      ].any((value) => value == null || value.trim().isEmpty)) {
+        _usage('index-directory is missing a required argument');
+      }
+      final safeScreenshotPath = _safeRelativePath(screenshotPath!);
+      final result = indexUiRuntimeScreenshotDirectory(
+        screenshotDirectory: Directory(
+          '${repoRoot.absolute.path}/$safeScreenshotPath',
+        ),
+        runtimeLog: File(logPath!),
+        repoRoot: repoRoot,
+        manifestRelativePath: manifestPath!,
+        expectedSourceDigest: sourceDigest,
+        surface: surface!,
+        profile: profile!,
+        runtime: runtime!,
+        target: target!,
+        deviceContract: deviceContract!,
+      );
+      stdout.writeln(
+        const JsonEncoder.withIndent('  ').convert(<String, Object>{
+          'status': 'PASS_RUNTIME',
+          'capture_manifest': result.manifestFile.path,
+          'checkpoint_count': result.manifest['checkpoint_count']!,
           'next_required_level': 'PASS_VISUAL_REVIEWED',
         }),
       );
