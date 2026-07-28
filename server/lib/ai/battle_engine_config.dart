@@ -7,7 +7,7 @@ const externalBattleRequestSchema = 'external_battle_request_v2';
 const externalBattleDeckHashSchema = 'external_battle_deck_hash_v1';
 const externalBattleSidecarProtocol = 'external_battle_sidecar_v2';
 
-const pinnedXmageCommit = '34d81ea4995ce15d7e1a788dc6d2a3595d35bcec';
+const pinnedXmageCommit = '2c43ec8cdb5cd475d47e6b555a4077151f476a3b';
 const pinnedForgeCommit = 'a62915f500c2411484689294659c6bb84ea215f8';
 const pinnedXmageVersion = '1.4.60';
 const pinnedForgeVersion = '2.0.14-SNAPSHOT';

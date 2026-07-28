@@ -81,7 +81,7 @@ final class XmageBattleServiceTest {
                 ((Map<String, Object>) metadata.get("deck_hashes")).get("deck_a")
         );
         assertEquals(
-                "ad93b5dd41231adc7c9c1a25772aca16a4cc0e418081d6897962edf1153539b6",
+                "0c4420f5f91dfcf870d88093641387e522bf6693aa40cfa3111d0e78f424f3d2",
                 metadata.get("request_hash")
         );
         assertEquals(

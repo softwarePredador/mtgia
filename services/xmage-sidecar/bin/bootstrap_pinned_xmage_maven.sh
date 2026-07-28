@@ -5,7 +5,7 @@ SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
 SIDECAR_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
 XMAGE_COMMIT="$(tr -d '[:space:]' < "$SIDECAR_DIR/XMAGE_COMMIT")"
 XMAGE_VERSION="1.4.60"
-SQLITE_JDBC_VERSION="3.50.2.0"
+SQLITE_JDBC_VERSION="3.53.2.0"
 MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-${HOME:?HOME is required}/.m2/repository}"
 PIN_MARKER="$MAVEN_REPO_LOCAL/.manaloom-xmage-pin"
 PIN_FINGERPRINT="$XMAGE_COMMIT xmage=$XMAGE_VERSION sqlite-jdbc=$SQLITE_JDBC_VERSION"
@@ -39,7 +39,6 @@ fi
 
 require_command git
 require_command mvn
-require_command perl
 
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-xmage-bootstrap.XXXXXX")"
 cleanup() {
@@ -53,10 +52,8 @@ git -C "$WORK_DIR/xmage" fetch --depth 1 origin "$XMAGE_COMMIT"
 git -C "$WORK_DIR/xmage" checkout --detach FETCH_HEAD
 test "$(git -C "$WORK_DIR/xmage" rev-parse HEAD)" = "$XMAGE_COMMIT"
 
-# Keep the host bootstrap aligned with the pinned production Docker build.
-perl -0pi -e \
-  's#<version>3\.32\.3\.2</version>#<version>3.50.2.0</version>#' \
-  "$WORK_DIR/xmage/Mage.Server/pom.xml"
+# Fail closed if the dependency graph at the exact pin differs from the
+# reviewed production build. Do not rewrite an upstream dependency downward.
 grep -A2 '<artifactId>sqlite-jdbc</artifactId>' \
   "$WORK_DIR/xmage/Mage.Server/pom.xml" | grep -Fq "$SQLITE_JDBC_VERSION"
 

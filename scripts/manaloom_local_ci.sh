@@ -86,6 +86,8 @@ run_shell_contracts() {
     "$ROOT_DIR/scripts/manaloom_ui_source_digest.sh" \
     "$ROOT_DIR/scripts/manaloom_tbls_local_gate.sh" \
     "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" \
+    "$ROOT_DIR/scripts/manaloom_external_engine_delta_weekly.sh" \
+    "$ROOT_DIR/scripts/manaloom_install_external_engine_delta_schedule.sh" \
     "$ROOT_DIR/.githooks/pre-commit" \
     "$ROOT_DIR/.githooks/pre-push"
   "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" --check
@@ -128,6 +130,7 @@ run_guardrail_audits() {
     cd "$scripts_dir"
     python3 -m unittest \
       test_external_card_rule_reference_harvester.py \
+      test_external_engine_delta_schedule_contract.py \
       test_external_engine_upstream_delta_audit.py \
       test_legacy_contamination_audit.py \
       test_operational_surface_alignment_audit.py \

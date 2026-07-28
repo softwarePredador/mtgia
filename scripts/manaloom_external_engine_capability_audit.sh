@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 AUDITOR="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_capability_alignment_audit.py"
 TEST="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_capability_alignment_audit.py"
 SOURCE_CONTRACT_TEST="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_source_contract.py"
+SCHEDULE_CONTRACT_TEST="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_delta_schedule_contract.py"
 OUTPUT_PREFIX="${MANALOOM_EXTERNAL_ENGINE_CAPABILITY_OUT:-/tmp/manaloom_external_engine_capability_alignment}"
 
 args=(--output-prefix "$OUTPUT_PREFIX")
@@ -21,5 +22,6 @@ fi
 cd "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts"
 PYTHONWARNINGS=error::ResourceWarning python3 "$TEST"
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q "$SOURCE_CONTRACT_TEST"
+PYTHONWARNINGS=error::ResourceWarning python3 "$SCHEDULE_CONTRACT_TEST"
 cd "$ROOT_DIR"
 python3 "$AUDITOR" "${args[@]}"

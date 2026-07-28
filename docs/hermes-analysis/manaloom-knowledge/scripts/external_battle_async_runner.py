@@ -42,9 +42,9 @@ DECK_HASH_SCHEMA = "external_battle_deck_hash_v1"
 ENGINE_IDENTITIES = {
     "xmage": {
         "engine_version": "1.4.60",
-        "engine_commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+        "engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
         "ai_profile": "computer_mad",
-        "sidecar_build_identity": "xmage-sidecar-v2@34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+        "sidecar_build_identity": "xmage-sidecar-v2@2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
         "telemetry_field": "normalizer_version",
         "telemetry_version": "xmage_replay_normalizer_v2",
         "seed_semantics": "request_correlation_only_server_rng_uncontrolled",

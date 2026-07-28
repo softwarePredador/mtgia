@@ -84,6 +84,47 @@ class ExternalEngineUpstreamDeltaAuditTests(unittest.TestCase):
             forge["pin_consistency"]["mirrors"][0]["detail"],
         )
 
+    def test_active_xmage_runtime_mirrors_are_each_enforced(self) -> None:
+        divergent_pin = "c" * 40
+        cases = (
+            (
+                "server/lib/ai/battle_engine_config.dart",
+                "a" * 40,
+                divergent_pin,
+                "backend_runtime_identity",
+            ),
+            (
+                "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+                '"engine_commit": "' + "a" * 40 + '"',
+                '"engine_commit": "' + divergent_pin + '"',
+                "offline_runner_engine_identity",
+            ),
+            (
+                "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+                "xmage-sidecar-v2@" + "a" * 40,
+                "xmage-sidecar-v2@" + divergent_pin,
+                "offline_runner_build_identity",
+            ),
+        )
+        for relative_path, old, new, role in cases:
+            with self.subTest(role=role), tempfile.TemporaryDirectory() as tmpdir:
+                repo_root = Path(tmpdir)
+                self._write_minimal_pin_contract(repo_root)
+                path = repo_root / relative_path
+                path.write_text(
+                    path.read_text(encoding="utf-8").replace(old, new, 1),
+                    encoding="utf-8",
+                )
+
+                result = audit.validate_engine_pin(repo_root, audit.ENGINE_SPECS[0])
+
+                self.assertEqual(result["status"], "fail")
+                mirror = next(
+                    item for item in result["mirrors"] if item["role"] == role
+                )
+                self.assertEqual(mirror["status"], "fail")
+                self.assertEqual(mirror["detail"], "mirror_diverges_from_canonical_pin")
+
     def test_upstream_failure_is_unknown_and_never_claims_up_to_date(self) -> None:
         def unavailable(spec: audit.EngineSpec, pin: str) -> dict:
             raise audit.CompareFetchError("rate limited for test")
@@ -137,6 +178,15 @@ class ExternalEngineUpstreamDeltaAuditTests(unittest.TestCase):
             ),
             "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py": (
                 f'XMAGE_PIN = "{xmage_pin}"\nFORGE_PIN = "{forge_pin}"\n'
+            ),
+            "server/lib/ai/battle_engine_config.dart": (
+                f"const pinnedXmageCommit = '{xmage_pin}';\n"
+            ),
+            "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py": (
+                '"xmage": {\n'
+                f'  "engine_commit": "{xmage_pin}",\n'
+                f'  "sidecar_build_identity": "xmage-sidecar-v2@{xmage_pin}",\n'
+                "}\n"
             ),
             "docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py": (
                 'XMAGE_PIN = canonical_engine_pin("services/xmage-sidecar/XMAGE_COMMIT")\n'

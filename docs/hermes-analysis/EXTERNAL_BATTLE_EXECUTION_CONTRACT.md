@@ -75,6 +75,31 @@ CI and clean hosts must run
 exact `services/xmage-sidecar/XMAGE_COMMIT` and installs its modules before the
 canonical gate. A pre-populated developer Maven cache is not CI evidence.
 
+### Weekly upstream-delta schedule
+
+XMage and Forge upstream drift is monitored by the local, read-only schedule in
+`docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md`. It uses a macOS LaunchAgent
+rather than GitHub Actions, runs the canonical compare audit weekly, and never
+advances a pin. The schedule is permitted because it has all three guards
+required for unattended local evidence:
+
+- a dirty-worktree guard, including tracked and untracked changes, that records
+  an explicit `skipped` result before any upstream request;
+- an exclusive output path outside the repository with timestamped reports and
+  a bounded 180-day retention policy;
+- no PostgreSQL, Hermes/SQLite, runtime, deployment, rule-promotion, or pin
+  mutation path.
+
+Installation, health inspection, immediate execution, and reversible removal
+are explicit operator actions:
+
+```bash
+./scripts/manaloom_install_external_engine_delta_schedule.sh --install
+./scripts/manaloom_install_external_engine_delta_schedule.sh --check
+./scripts/manaloom_install_external_engine_delta_schedule.sh --run-now
+./scripts/manaloom_install_external_engine_delta_schedule.sh --uninstall
+```
+
 ## External Engine Capability Adoption
 
 The machine-readable decision matrix is

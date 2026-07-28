@@ -1,6 +1,6 @@
 FROM maven:3.9.16-eclipse-temurin-17-noble@sha256:1ed5d1f54416b706707b4f3238f63a20bb06aab27c6d240090a2bb9ad895ed45 AS build
 
-ARG XMAGE_COMMIT=34d81ea4995ce15d7e1a788dc6d2a3595d35bcec
+ARG XMAGE_COMMIT=2c43ec8cdb5cd475d47e6b555a4077151f476a3b
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git unzip \
@@ -13,8 +13,7 @@ RUN git clone https://github.com/magefree/mage.git xmage \
     && test "$(git rev-parse HEAD)" = "$XMAGE_COMMIT"
 
 WORKDIR /build/xmage
-RUN sed -i 's/<version>3\.32\.3\.2<\/version>/<version>3.50.2.0<\/version>/' Mage.Server/pom.xml \
-    && grep -A2 '<artifactId>sqlite-jdbc</artifactId>' Mage.Server/pom.xml | grep '3.50.2.0' \
+RUN grep -A2 '<artifactId>sqlite-jdbc</artifactId>' Mage.Server/pom.xml | grep '3.53.2.0' \
     && mvn -pl Mage.Server -am install -DskipTests -Djacoco.skip=true -B \
     && mvn -pl Mage.Server package assembly:single -DskipTests -Djacoco.skip=true -B
 

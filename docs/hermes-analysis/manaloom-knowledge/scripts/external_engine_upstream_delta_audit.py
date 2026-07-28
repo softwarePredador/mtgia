@@ -83,6 +83,27 @@ ENGINE_SPECS = (
                 r'(?m)^XMAGE_PIN = "([0-9a-f]{40})"\s*$',
                 "execution_contract_expectation",
             ),
+            PinMirror(
+                "server/lib/ai/battle_engine_config.dart",
+                r"(?m)^const pinnedXmageCommit = '([0-9a-f]{40})';\s*$",
+                "backend_runtime_identity",
+            ),
+            PinMirror(
+                "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+                (
+                    r'(?ms)^\s*"xmage":\s*\{.*?'
+                    r'^\s*"engine_commit":\s*"([0-9a-f]{40})",\s*$'
+                ),
+                "offline_runner_engine_identity",
+            ),
+            PinMirror(
+                "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+                (
+                    r'(?m)^\s*"sidecar_build_identity":\s*'
+                    r'"xmage-sidecar-v2@([0-9a-f]{40})",\s*$'
+                ),
+                "offline_runner_build_identity",
+            ),
         ),
     ),
     EngineSpec(

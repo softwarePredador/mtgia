@@ -20,7 +20,7 @@ BATTLE_PERSISTENCE_SERVICE = (
 CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
 CLOSURE = REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 RULE_SYNC = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
-XMAGE_PIN = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec"
+XMAGE_PIN = "2c43ec8cdb5cd475d47e6b555a4077151f476a3b"
 FORGE_PIN = "a62915f500c2411484689294659c6bb84ea215f8"
 
 
@@ -357,6 +357,7 @@ def build_report() -> dict[str, object]:
             "server.engine_configuration",
             SERVER / "lib/ai/battle_engine_config.dart",
             [
+                f"const pinnedXmageCommit = '{XMAGE_PIN}';",
                 "environment['BATTLE_ENGINE'] ?? 'auto'",
                 "XMAGE_SIDECAR_URL is required for BATTLE_ENGINE=$mode",
                 "FORGE_SIDECAR_URL is required for BATTLE_ENGINE=$mode",
@@ -497,6 +498,8 @@ def build_report() -> dict[str, object]:
             REPO_ROOT
             / "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
             [
+                f'"engine_commit": "{XMAGE_PIN}"',
+                f'"sidecar_build_identity": "xmage-sidecar-v2@{XMAGE_PIN}"',
                 "external_battle_async_registry_v2",
                 "external_battle_async_checkpoint_v2",
                 "external_battle_comparison_gate_v1",

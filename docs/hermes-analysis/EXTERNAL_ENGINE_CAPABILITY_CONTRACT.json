@@ -205,10 +205,14 @@
       "rationale": "Runtime identity and upstream deltas are reviewed explicitly; no branch head is promoted automatically.",
       "product_evidence": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_upstream_delta_audit.py",
-        "scripts/manaloom_external_engine_delta_audit.sh"
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_external_engine_delta_weekly.sh",
+        "scripts/manaloom_install_external_engine_delta_schedule.sh",
+        "docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md"
       ],
       "test_evidence": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_upstream_delta_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_delta_schedule_contract.py",
         "server/test/ops_sidecar_digest_release_contract_test.dart"
       ]
     },
