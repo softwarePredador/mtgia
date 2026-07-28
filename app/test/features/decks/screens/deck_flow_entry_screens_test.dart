@@ -324,6 +324,34 @@ void main() {
   });
 
   testWidgets(
+    'DeckGenerateScreen keeps its CTA reachable at 844x390 landscape',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(844, 390);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(wrapSimple(const DeckGenerateScreen()));
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('deck-generate-desktop-panes')),
+        findsNothing,
+      );
+      final submit = find.byKey(const Key('deck-generate-submit-button'));
+      await tester.ensureVisible(submit);
+      await tester.pumpAndSettle();
+
+      final rect = tester.getRect(submit);
+      expect(rect.left, greaterThanOrEqualTo(0));
+      expect(rect.right, lessThanOrEqualTo(844));
+      expect(rect.top, greaterThanOrEqualTo(kToolbarHeight));
+      expect(rect.bottom, lessThanOrEqualTo(390));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'DeckGenerateScreen keeps the primary action reachable with keyboard and 200% text',
     (tester) async {
       final semantics = tester.ensureSemantics();
@@ -467,6 +495,29 @@ void main() {
     );
   });
 
+  testWidgets(
+    'DeckGenerateScreen flushes the last edit when closed inside debounce',
+    (tester) async {
+      const owner = 'draft-owner-generate-fast-close';
+      final store = DeckEntryDraftStore();
+      await tester.pumpWidget(
+        wrapSimple(DeckGenerateScreen(draftOwnerId: owner, draftStore: store)),
+      );
+      await tester.pump();
+      await tester.enterText(
+        find.byKey(const Key('deck-generate-prompt-field')),
+        'Última edição ainda dentro do debounce.',
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+
+      final draft = await store.loadGenerate(owner);
+      expect(draft?['prompt'], 'Última edição ainda dentro do debounce.');
+    },
+  );
+
   testWidgets('DeckGenerateScreen restores the saved format selection', (
     tester,
   ) async {
@@ -604,6 +655,34 @@ void main() {
       expect(name.controller?.text, 'Lorehold Import Draft');
       expect(list.controller?.text, '1 Sol Ring\n1 Arcane Signet');
       expect(find.text('2 cartas detectadas'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DeckImportScreen flushes the original list when closed inside debounce',
+    (tester) async {
+      const owner = 'draft-owner-import-fast-close';
+      final store = DeckEntryDraftStore();
+      await tester.pumpWidget(
+        wrapSimple(DeckImportScreen(draftOwnerId: owner, draftStore: store)),
+      );
+      await tester.pump();
+      await tester.enterText(
+        find.byKey(const Key('deck-import-screen-name-field')),
+        'Import rápido',
+      );
+      await tester.enterText(
+        find.byKey(const Key('deck-import-screen-list-field')),
+        '1 Sol Ring\n1 Arcane Signet',
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+
+      final draft = await store.loadImport(owner);
+      expect(draft?['name'], 'Import rápido');
+      expect(draft?['card_list'], '1 Sol Ring\n1 Arcane Signet');
     },
   );
 

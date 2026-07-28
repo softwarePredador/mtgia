@@ -99,6 +99,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       context: context,
       gateway: _opponentGateway,
       currentDeckId: widget.deckId,
+      mode: BattleOpponentPickerMode.coach,
     );
     if (setup == null || !mounted) return;
     await _start(setup);
@@ -311,7 +312,14 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       ),
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
-        child: SafeArea(child: _buildBody()),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const _BattleCoachAlphaBanner(),
+              Expanded(child: _buildBody()),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -403,6 +411,69 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       ],
     );
   }
+}
+
+class _BattleCoachAlphaBanner extends StatelessWidget {
+  const _BattleCoachAlphaBanner();
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    label:
+        'Battle Coach Alpha experimental. Decisões assistidas e suporte limitado.',
+    child: Container(
+      key: const Key('battle-coach-alpha-banner'),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.pageGutterCompact,
+        vertical: AppTheme.space7,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.warning.withValues(alpha: 0.10),
+        border: Border(
+          bottom: BorderSide(color: AppTheme.warning.withValues(alpha: 0.34)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            key: const Key('battle-coach-alpha-badge'),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.space7,
+              vertical: AppTheme.space3,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.warning.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+              border: Border.all(
+                color: AppTheme.warning.withValues(alpha: 0.42),
+              ),
+            ),
+            child: Text(
+              'ALPHA',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: AppTheme.warning,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppTheme.space8),
+          Expanded(
+            child: Text(
+              'Experimental · decisões assistidas e suporte limitado',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _BattleCoachWelcome extends StatelessWidget {
@@ -596,11 +667,11 @@ class _BattleCoachStatusBar extends StatelessWidget {
         stepLabel,
     ];
     final waiting = session.isWaitingForAction;
-    final accent = waiting
-        ? AppTheme.brass400
-        : session.isTerminal
-        ? AppTheme.success
-        : AppTheme.frost400;
+    final presentation = _battleCoachStatusPresentation(
+      session.status,
+      waiting: waiting,
+    );
+    final accent = presentation.color;
     return Semantics(
       liveRegion: true,
       child: Container(
@@ -631,15 +702,7 @@ class _BattleCoachStatusBar extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 else
-                  Icon(
-                    waiting
-                        ? Icons.touch_app_rounded
-                        : session.isTerminal
-                        ? Icons.check_circle_outline_rounded
-                        : Icons.auto_mode_rounded,
-                    size: 18,
-                    color: accent,
-                  ),
+                  Icon(presentation.icon, size: 18, color: accent),
                 const SizedBox(width: AppTheme.space8),
                 Text(
                   session.status.label,
@@ -1593,64 +1656,224 @@ class _BattleCoachTerminalPanel extends StatelessWidget {
   final VoidCallback onOpenReplay;
 
   @override
-  Widget build(BuildContext context) => Container(
-    key: const Key('battle-coach-terminal-panel'),
-    padding: const EdgeInsets.all(AppTheme.space18),
-    decoration: BoxDecoration(
-      color: AppTheme.surfaceElevated,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      border: Border.all(color: AppTheme.success.withValues(alpha: 0.48)),
+  Widget build(BuildContext context) {
+    final presentation = _battleCoachTerminalPresentation(session);
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: '${session.status.label}. ${presentation.message}',
+      child: Container(
+        key: const Key('battle-coach-terminal-panel'),
+        padding: const EdgeInsets.all(AppTheme.space18),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceElevated,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: presentation.color.withValues(alpha: 0.48)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Icon(
+              presentation.icon,
+              key: Key('battle-coach-terminal-${presentation.tone.name}-icon'),
+              color: presentation.color,
+              size: 38,
+            ),
+            const SizedBox(height: AppTheme.space12),
+            Text(
+              session.status.label,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: AppTheme.space6),
+            Text(
+              presentation.message,
+              key: const Key('battle-coach-terminal-message'),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+            if (session.errorCode != null) ...[
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                'Código técnico: ${session.errorCode}',
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(color: AppTheme.textHint),
+              ),
+            ],
+            const SizedBox(height: AppTheme.space16),
+            FilledButton.icon(
+              key: const Key('battle-coach-open-replay-button'),
+              onPressed: onOpenReplay,
+              icon: const ManaLoomGlyph(
+                ManaLoomGlyphKind.battleReplay,
+                size: 19,
+              ),
+              label: Text(
+                session.replayId == null
+                    ? 'Abrir histórico'
+                    : 'Analisar replay',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _BattleCoachTerminalTone { success, warning, error }
+
+class _BattleCoachStatusPresentation {
+  const _BattleCoachStatusPresentation({
+    required this.color,
+    required this.icon,
+  });
+
+  final Color color;
+  final IconData icon;
+}
+
+class _BattleCoachTerminalPresentation {
+  const _BattleCoachTerminalPresentation({
+    required this.tone,
+    required this.color,
+    required this.icon,
+    required this.message,
+  });
+
+  final _BattleCoachTerminalTone tone;
+  final Color color;
+  final IconData icon;
+  final String message;
+}
+
+_BattleCoachStatusPresentation _battleCoachStatusPresentation(
+  InteractiveBattleStatus status, {
+  required bool waiting,
+}) {
+  if (waiting) {
+    return const _BattleCoachStatusPresentation(
+      color: AppTheme.brass400,
+      icon: Icons.touch_app_rounded,
+    );
+  }
+  return switch (status) {
+    InteractiveBattleStatus.completed => const _BattleCoachStatusPresentation(
+      color: AppTheme.success,
+      icon: Icons.check_circle_outline_rounded,
     ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Icon(
-          Icons.check_circle_outline_rounded,
-          color: AppTheme.success,
-          size: 38,
-        ),
-        const SizedBox(height: AppTheme.space12),
-        Text(
-          session.status.label,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: AppTheme.space6),
-        Text(
-          session.replayId == null
-              ? 'A sessão terminou. O estado final permanece disponível nesta tela.'
-              : 'O replay e a trilha de decisões estão prontos para revisão.',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.textSecondary,
-            height: 1.35,
-          ),
-        ),
-        if (session.errorCode != null) ...[
-          const SizedBox(height: AppTheme.space8),
-          Text(
-            'Código técnico: ${session.errorCode}',
-            textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AppTheme.textHint),
-          ),
-        ],
-        const SizedBox(height: AppTheme.space16),
-        FilledButton.icon(
-          key: const Key('battle-coach-open-replay-button'),
-          onPressed: onOpenReplay,
-          icon: const ManaLoomGlyph(ManaLoomGlyphKind.battleReplay, size: 19),
-          label: Text(
-            session.replayId == null ? 'Abrir histórico' : 'Analisar replay',
-          ),
-        ),
-      ],
+    InteractiveBattleStatus.censored ||
+    InteractiveBattleStatus.conceded ||
+    InteractiveBattleStatus.expired ||
+    InteractiveBattleStatus.timeout ||
+    InteractiveBattleStatus.abandoned => const _BattleCoachStatusPresentation(
+      color: AppTheme.warning,
+      icon: Icons.warning_amber_rounded,
     ),
-  );
+    InteractiveBattleStatus.engineError ||
+    InteractiveBattleStatus.processLost ||
+    InteractiveBattleStatus.persistenceError =>
+      const _BattleCoachStatusPresentation(
+        color: AppTheme.error,
+        icon: Icons.error_outline_rounded,
+      ),
+    InteractiveBattleStatus.unknown => const _BattleCoachStatusPresentation(
+      color: AppTheme.textHint,
+      icon: Icons.help_outline_rounded,
+    ),
+    _ => const _BattleCoachStatusPresentation(
+      color: AppTheme.frost400,
+      icon: Icons.auto_mode_rounded,
+    ),
+  };
+}
+
+_BattleCoachTerminalPresentation _battleCoachTerminalPresentation(
+  InteractiveBattleSession session,
+) {
+  final replayReady = session.replayId?.isNotEmpty == true;
+  return switch (session.status) {
+    InteractiveBattleStatus.completed => _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.success,
+      color: AppTheme.success,
+      icon: Icons.check_circle_outline_rounded,
+      message: replayReady
+          ? 'Partida concluída. O replay e a trilha de decisões estão prontos para revisão.'
+          : 'Partida concluída. O estado final permanece disponível nesta tela.',
+    ),
+    InteractiveBattleStatus.censored => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.warning,
+      color: AppTheme.warning,
+      icon: Icons.hourglass_bottom_rounded,
+      message:
+          'A partida atingiu o limite definido. Não há vencedor confirmado.',
+    ),
+    InteractiveBattleStatus.conceded => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.warning,
+      color: AppTheme.warning,
+      icon: Icons.flag_outlined,
+      message:
+          'A sessão terminou por concessão. O replay disponível pode ser parcial.',
+    ),
+    InteractiveBattleStatus.expired => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.warning,
+      color: AppTheme.warning,
+      icon: Icons.event_busy_outlined,
+      message:
+          'A sessão expirou antes da conclusão. Inicie outra mesa para continuar.',
+    ),
+    InteractiveBattleStatus.timeout => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.warning,
+      color: AppTheme.warning,
+      icon: Icons.timer_off_outlined,
+      message:
+          'O prazo da decisão terminou e a sessão foi encerrada com segurança.',
+    ),
+    InteractiveBattleStatus.abandoned => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.warning,
+      color: AppTheme.warning,
+      icon: Icons.pause_circle_outline_rounded,
+      message:
+          'A sessão foi encerrada por abandono. Nenhum resultado foi presumido.',
+    ),
+    InteractiveBattleStatus.engineError =>
+      const _BattleCoachTerminalPresentation(
+        tone: _BattleCoachTerminalTone.error,
+        color: AppTheme.error,
+        icon: Icons.settings_suggest_outlined,
+        message:
+            'O motor não concluiu a partida. Nenhum resultado foi fabricado.',
+      ),
+    InteractiveBattleStatus.processLost => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.error,
+      color: AppTheme.error,
+      icon: Icons.link_off_rounded,
+      message:
+          'O processo da partida foi perdido e esta mesa não pode ser retomada.',
+    ),
+    InteractiveBattleStatus.persistenceError =>
+      const _BattleCoachTerminalPresentation(
+        tone: _BattleCoachTerminalTone.error,
+        color: AppTheme.error,
+        icon: Icons.save_as_outlined,
+        message:
+            'O resultado não pôde ser salvo com segurança. Nenhum replay foi confirmado.',
+      ),
+    _ => const _BattleCoachTerminalPresentation(
+      tone: _BattleCoachTerminalTone.error,
+      color: AppTheme.error,
+      icon: Icons.error_outline_rounded,
+      message: 'A sessão terminou em um estado que precisa de revisão.',
+    ),
+  };
 }
 
 IconData _optionIcon(String role) => switch (role) {

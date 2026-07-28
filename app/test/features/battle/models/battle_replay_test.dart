@@ -175,7 +175,7 @@ void main() {
       expect(first.players.first.librarySize, isNull);
       expect(first.players.first.graveyardSize, isNull);
       expect(detail.visualSnapshots.last.turn, isNull);
-      expect(detail.visualSnapshots.last.turnLabel, 'Turno nao disponivel');
+      expect(detail.visualSnapshots.last.turnLabel, 'Turno não disponível');
       expect(detail.visualSnapshots.last.players.last.life, 0);
     });
 
@@ -286,12 +286,12 @@ void main() {
 
       expect(detail.summary.id, 'goldfish-latest');
       expect(detail.summary.typeLabel, 'Goldfish');
-      expect(detail.summary.sourceLabel, 'Simulacao recem-gerada');
+      expect(detail.summary.sourceLabel, 'Simulação recém-gerada');
       expect(detail.summary.simulations, 1000);
       expect(detail.summary.turnCount, isNull);
       expect(detail.summary.eventCount, isNull);
-      expect(detail.summary.turnLabel, 'Turnos nao informados');
-      expect(detail.summary.eventLabel, 'Eventos nao informados');
+      expect(detail.summary.turnLabel, 'Turnos não informados');
+      expect(detail.summary.eventLabel, 'Eventos não informados');
       expect(detail.hasReplayBody, isFalse);
     });
   });

@@ -124,7 +124,7 @@ class BattleOpponentDeck {
     if (commander != null && commander.isNotEmpty) return commander;
     final normalizedFormat = format.trim();
     return normalizedFormat.isEmpty
-        ? 'Formato nao informado'
+        ? 'Formato não informado'
         : normalizedFormat;
   }
 
@@ -193,7 +193,7 @@ class BattleReplayService implements BattleReplayGateway {
     final community = await communityFuture;
     if (!own.succeeded && !community.succeeded) {
       throw const BattleReplayException(
-        'Nao foi possivel carregar os decks adversarios.',
+        'Não foi possível carregar os decks adversários.',
       );
     }
 
@@ -334,7 +334,7 @@ class BattleReplayService implements BattleReplayGateway {
 
     final data = response.data;
     if (data is! Map) {
-      throw const BattleReplayException('Resposta de replay invalida.');
+      throw const BattleReplayException('Resposta de replay inválida.');
     }
     return BattleReplayDetail.fromJson(
       data.map((key, value) => MapEntry(key.toString(), value)),
@@ -467,11 +467,11 @@ class BattleReplayService implements BattleReplayGateway {
     );
     _throwIfNotOk(
       response,
-      fallback: 'Falha ao verificar se os decks estao prontos para Battle.',
+      fallback: 'Falha ao verificar se os decks estão prontos para Battle.',
     );
     final data = response.data;
     if (data is! Map) {
-      throw const BattleReplayException('Resposta de preflight invalida.');
+      throw const BattleReplayException('Resposta de preflight inválida.');
     }
     return BattlePreflight.fromJson(
       data.map((key, value) => MapEntry(key.toString(), value)),
@@ -509,7 +509,7 @@ class BattleReplayService implements BattleReplayGateway {
   }) {
     final data = response.data;
     if (data is! Map) {
-      throw const BattleReplayException('Resposta de simulacao invalida.');
+      throw const BattleReplayException('Resposta de simulação inválida.');
     }
     final persistence = data['persistence'];
     final persistenceMap = persistence is Map
@@ -524,7 +524,7 @@ class BattleReplayService implements BattleReplayGateway {
         persistedReplayId.isEmpty ||
         replayIdValue != persistedReplayId) {
       throw const BattleReplayException(
-        'O servidor nao confirmou o salvamento do replay. Tente novamente.',
+        'O servidor não confirmou o salvamento do replay. Tente novamente.',
       );
     }
     return BattleReplayDetail.fromJson(

@@ -30,8 +30,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Análise do deck'), findsOneWidget);
-    expect(find.text('Legalidade'), findsOneWidget);
-    expect(find.text('100/100'), findsOneWidget);
+    expect(find.text('Validação'), findsOneWidget);
+    expect(find.text('Validado'), findsOneWidget);
+    expect(find.text('Servidor'), findsOneWidget);
+    expect(find.text('100/100'), findsNothing);
     expect(find.text('Preço total'), findsOneWidget);
     expect(find.text('R\$ 1.234,56'), findsOneWidget);
     expect(find.text('2 sem preço'), findsOneWidget);
@@ -76,6 +78,8 @@ DeckDetails _pricedDeck() {
     pricingTotal: 1234.56,
     pricingCurrency: 'BRL',
     pricingMissingCards: 2,
+    validationState: 'validated',
+    reviewReasons: const [],
     stats: const {
       'average_cmc': 3.9,
       'land_count': 34,

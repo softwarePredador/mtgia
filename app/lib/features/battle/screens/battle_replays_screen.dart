@@ -27,17 +27,21 @@ import 'battle_live_spectator_screen.dart';
 String battleReplaysRouteLocation(String deckId) =>
     '/decks/${Uri.encodeComponent(deckId)}/battle-replays';
 
+enum BattleOpponentPickerMode { simulation, coach }
+
 Future<BattleTestSetup?> showBattleOpponentPicker({
   required BuildContext context,
   required BattleReplayGateway gateway,
   required String currentDeckId,
   bool allowSeries = false,
+  BattleOpponentPickerMode mode = BattleOpponentPickerMode.simulation,
 }) => showDialog<BattleTestSetup>(
   context: context,
   builder: (context) => _BattleOpponentPickerDialog(
     gateway: gateway,
     currentDeckId: currentDeckId,
     allowSeries: allowSeries,
+    mode: mode,
   ),
 );
 
@@ -149,7 +153,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Replay salvo, mas o historico nao foi atualizado. '
+              'Replay salvo, mas o histórico não foi atualizado. '
               'Tente atualizar novamente.',
             ),
           ),
@@ -620,7 +624,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   String _friendlyError(Object error) {
     if (error is BattleReplayException) return error.message;
-    return 'Nao foi possivel carregar as simulacoes.';
+    return 'Não foi possível carregar as simulações.';
   }
 
   String _friendlyJobError(Object error) {
@@ -696,7 +700,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       return const AppStatePanel.loading(
         key: Key('battle-replays-loading-state'),
         title: 'Carregando replays',
-        message: 'Buscando simulacoes salvas e trilhas de decisao do deck.',
+        message: 'Buscando simulações salvas e trilhas de decisão do deck.',
         accent: AppTheme.frost400,
       );
     }
@@ -705,7 +709,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       return AppStatePanel(
         key: const Key('battle-replays-error-state'),
         icon: Icons.error_outline_rounded,
-        title: 'Nao foi possivel carregar battle',
+        title: 'Não foi possível carregar Battle',
         message: _error,
         accent: Theme.of(context).colorScheme.error,
         actionLabel: 'Tentar novamente',
@@ -846,7 +850,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.battleReplay),
       title: 'Nenhum replay salvo',
       message:
-          'Rode uma simulacao para criar historico. Cada replay informa o motor e o contrato de execucao usados.',
+          'Rode uma simulação para criar histórico. Cada replay informa o motor e o contrato de execução usados.',
       accent: AppTheme.brass400,
       actionLabel: 'Rodar goldfish',
       onAction: _runGoldfish,
@@ -1196,11 +1200,13 @@ class _BattleOpponentPickerDialog extends StatefulWidget {
     required this.gateway,
     required this.currentDeckId,
     this.allowSeries = false,
+    this.mode = BattleOpponentPickerMode.simulation,
   });
 
   final BattleReplayGateway gateway;
   final String currentDeckId;
   final bool allowSeries;
+  final BattleOpponentPickerMode mode;
 
   @override
   State<_BattleOpponentPickerDialog> createState() =>
@@ -1259,7 +1265,7 @@ class _BattleOpponentPickerDialogState
         _isLoading = false;
         _error = error is BattleReplayException
             ? error.message
-            : 'Nao foi possivel carregar os decks adversarios.';
+            : 'Não foi possível carregar os decks adversários.';
       });
     }
   }
@@ -1314,7 +1320,7 @@ class _BattleOpponentPickerDialogState
         _isCheckingPreflight = false;
         _manualError = error is BattleReplayException
             ? error.message
-            : 'Nao foi possivel verificar os decks.';
+            : 'Não foi possível verificar os decks.';
       });
       return null;
     }
@@ -1326,7 +1332,7 @@ class _BattleOpponentPickerDialogState
         : _selectedDeckId?.trim() ?? '';
     if (!_isUuid(opponentDeckId)) {
       setState(() {
-        _manualError = 'Informe um UUID de deck valido.';
+        _manualError = 'Informe um UUID de deck válido.';
       });
       return;
     }
@@ -1353,6 +1359,7 @@ class _BattleOpponentPickerDialogState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isCoach = widget.mode == BattleOpponentPickerMode.coach;
     final query = _searchController.text;
     final visibleDecks = _decks
         .where((deck) => deck.matches(query))
@@ -1362,8 +1369,13 @@ class _BattleOpponentPickerDialogState
     final mediaQuery = MediaQuery.of(context);
     final availableHeight =
         mediaQuery.size.height - mediaQuery.viewInsets.bottom;
-    final contentHeight = (availableHeight - 170).clamp(300.0, 680.0);
-    final deckBodyHeight = (availableHeight * 0.28).clamp(150.0, 260.0);
+    final shortViewport = availableHeight < 560;
+    final contentHeight = shortViewport
+        ? (availableHeight - 230).clamp(120.0, 280.0)
+        : (availableHeight - 170).clamp(300.0, 680.0);
+    final deckBodyHeight = shortViewport
+        ? (availableHeight * 0.20).clamp(72.0, 120.0)
+        : (availableHeight * 0.28).clamp(150.0, 260.0);
     final selectedId = _showTechnicalId
         ? _technicalIdController.text.trim()
         : _selectedDeckId;
@@ -1377,7 +1389,11 @@ class _BattleOpponentPickerDialogState
 
     return AlertDialog(
       key: const Key('battle-opponent-picker-dialog'),
-      title: const Text('Escolha o deck adversario'),
+      title: Text(
+        isCoach
+            ? 'Escolha o adversário do Battle Coach'
+            : 'Escolha o deck adversário',
+      ),
       content: SizedBox(
         width: 560,
         height: contentHeight,
@@ -1386,9 +1402,17 @@ class _BattleOpponentPickerDialogState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.allowSeries
+                isCoach
+                    ? 'Selecione o deck que o XMage controlará. O Coach abrirá '
+                          'uma sessão interativa e pausará nas decisões disponíveis.'
+                    : widget.allowSeries
                     ? 'Selecione um deck e quantas tentativas independentes deseja enfileirar.'
-                    : 'Selecione um deck seu ou publico. O replay sera salvo no historico ao concluir.',
+                    : 'Selecione um deck seu ou público. O replay será salvo no histórico ao concluir.',
+                key: Key(
+                  isCoach
+                      ? 'battle-opponent-coach-description'
+                      : 'battle-opponent-simulation-description',
+                ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                   height: 1.35,
@@ -1401,7 +1425,7 @@ class _BattleOpponentPickerDialogState
                   controller: _searchController,
                   autofocus: true,
                   decoration: const InputDecoration(
-                    labelText: 'Buscar adversario',
+                    labelText: 'Buscar adversário',
                     hintText: 'Nome, comandante ou formato',
                     prefixIcon: Icon(Icons.search_rounded),
                   ),
@@ -1411,7 +1435,7 @@ class _BattleOpponentPickerDialogState
                 ),
                 const SizedBox(height: AppTheme.space10),
                 Text(
-                  '$ownCount meus · $publicCount publicos',
+                  '$ownCount meus · $publicCount públicos',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: AppTheme.textHint,
                     fontWeight: FontWeight.w700,
@@ -1444,7 +1468,7 @@ class _BattleOpponentPickerDialogState
                       : Icons.data_object_rounded,
                 ),
                 label: Text(
-                  _showTechnicalId ? 'Ocultar ID tecnico' : 'Usar ID tecnico',
+                  _showTechnicalId ? 'Ocultar ID técnico' : 'Usar ID técnico',
                 ),
               ),
               if (_showTechnicalId) ...[
@@ -1453,7 +1477,7 @@ class _BattleOpponentPickerDialogState
                   key: const Key('battle-opponent-deck-id-field'),
                   controller: _technicalIdController,
                   decoration: InputDecoration(
-                    labelText: 'UUID do deck adversario',
+                    labelText: 'UUID do deck adversário',
                     hintText: '00000000-0000-0000-0000-000000000000',
                     errorText: _manualError,
                   ),
@@ -1472,50 +1496,52 @@ class _BattleOpponentPickerDialogState
                   onSubmitted: (_) => _submit(),
                 ),
               ],
-              const SizedBox(height: AppTheme.space10),
-              DropdownButtonFormField<BattleTestObjective>(
-                key: const Key('battle-test-objective-field'),
-                initialValue: _objective,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'O que voce quer observar?',
-                  prefixIcon: Icon(Icons.track_changes_rounded),
-                ),
-                items: BattleTestObjective.values
-                    .map(
-                      (objective) => DropdownMenuItem(
-                        value: objective,
-                        child: Text(
-                          objective.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+              if (!isCoach) ...[
+                const SizedBox(height: AppTheme.space10),
+                DropdownButtonFormField<BattleTestObjective>(
+                  key: const Key('battle-test-objective-field'),
+                  initialValue: _objective,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'O que você quer observar?',
+                    prefixIcon: Icon(Icons.track_changes_rounded),
+                  ),
+                  items: BattleTestObjective.values
+                      .map(
+                        (objective) => DropdownMenuItem(
+                          value: objective,
+                          child: Text(
+                            objective.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    )
-                    .toList(growable: false),
-                onChanged: (value) {
-                  if (value != null) setState(() => _objective = value);
-                },
-              ),
-              const SizedBox(height: AppTheme.space10),
-              TextField(
-                key: const Key('battle-focus-cards-field'),
-                controller: _focusCardsController,
-                decoration: const InputDecoration(
-                  labelText: 'Cartas de foco (opcional)',
-                  hintText: 'Ate 3 nomes, separados por virgula',
-                  prefixIcon: Icon(Icons.center_focus_strong_rounded),
+                      )
+                      .toList(growable: false),
+                  onChanged: (value) {
+                    if (value != null) setState(() => _objective = value);
+                  },
                 ),
-                maxLines: 1,
-              ),
-              const SizedBox(height: AppTheme.space5),
-              Text(
-                'O foco organiza as observacoes; nao força compra, uso ou resultado.',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: AppTheme.textHint,
-                  height: 1.3,
+                const SizedBox(height: AppTheme.space10),
+                TextField(
+                  key: const Key('battle-focus-cards-field'),
+                  controller: _focusCardsController,
+                  decoration: const InputDecoration(
+                    labelText: 'Cartas de foco (opcional)',
+                    hintText: 'Até 3 nomes, separados por vírgula',
+                    prefixIcon: Icon(Icons.center_focus_strong_rounded),
+                  ),
+                  maxLines: 1,
                 ),
-              ),
+                const SizedBox(height: AppTheme.space5),
+                Text(
+                  'O foco organiza as observações; não força compra, uso ou resultado.',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppTheme.textHint,
+                    height: 1.3,
+                  ),
+                ),
+              ],
               if (widget.allowSeries) ...[
                 const SizedBox(height: AppTheme.space10),
                 DropdownButtonFormField<BattleSeriesSize>(
@@ -1571,7 +1597,9 @@ class _BattleOpponentPickerDialogState
           onPressed: canSubmit ? _submit : null,
           icon: const Icon(Icons.play_arrow_rounded),
           label: Text(
-            _seriesSize.isSeries
+            isCoach
+                ? 'Iniciar Battle Coach'
+                : _seriesSize.isSeries
                 ? 'Iniciar série de ${_seriesSize.count}'
                 : 'Simular Battle',
           ),
@@ -1625,7 +1653,7 @@ class _BattleOpponentPickerDialogState
       return const Center(
         key: Key('battle-opponent-empty-state'),
         child: Text(
-          'Nenhum outro deck com cartas foi encontrado.\nVoce ainda pode usar um ID tecnico.',
+          'Nenhum outro deck com cartas foi encontrado.\nVocê ainda pode usar um ID técnico.',
           textAlign: TextAlign.center,
           style: TextStyle(color: AppTheme.textSecondary),
         ),
@@ -1663,7 +1691,7 @@ class _BattleOpponentPickerDialogState
                   AppTheme.space6,
                 ),
                 child: Text(
-                  deck.isOwn ? 'MEUS DECKS' : 'DECKS PUBLICOS',
+                  deck.isOwn ? 'MEUS DECKS' : 'DECKS PÚBLICOS',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: AppTheme.frost400,
                     fontWeight: FontWeight.w900,
@@ -1741,7 +1769,7 @@ class _BattlePreflightPanel extends StatelessWidget {
         key: const Key('battle-preflight-error'),
         icon: Icons.error_outline_rounded,
         color: AppTheme.error,
-        title: 'Preflight indisponivel',
+        title: 'Preflight indisponível',
         message: error!,
       );
     }
@@ -1751,9 +1779,9 @@ class _BattlePreflightPanel extends StatelessWidget {
         key: Key('battle-preflight-idle'),
         icon: Icons.shield_outlined,
         color: AppTheme.textHint,
-        title: 'Selecione um adversario',
+        title: 'Selecione um adversário',
         message:
-            'Validacao, revisao do deck e cobertura do motor serao verificadas antes de iniciar.',
+            'Validação, revisão do deck e cobertura do motor serão verificadas antes de iniciar.',
       );
     }
 
@@ -1838,18 +1866,18 @@ class _BattlePreflightMessage extends StatelessWidget {
 }
 
 String _battlePreflightBlockerMessage(List<String> blockers) {
-  if (blockers.isEmpty) return 'O preflight nao confirmou prontidao.';
+  if (blockers.isEmpty) return 'O preflight não confirmou prontidão.';
   const labels = <String, String>{
     'deck_size_invalid': 'Tamanho do deck precisa ser corrigido',
     'deck_commander_invalid': 'Comandante do deck precisa ser corrigido',
     'deck_validation_required': 'Valide novamente o deck',
-    'opponent_size_invalid': 'Deck adversario tem tamanho invalido',
-    'opponent_commander_invalid': 'Comandante adversario e invalido',
-    'opponent_validation_required': 'Deck adversario nao esta validado',
-    'no_available_opponents': 'Nenhum adversario esta disponivel',
-    'engine_not_configured': 'Motor Battle nao esta configurado',
+    'opponent_size_invalid': 'Deck adversário tem tamanho inválido',
+    'opponent_commander_invalid': 'Comandante adversário é inválido',
+    'opponent_validation_required': 'Deck adversário não está validado',
+    'no_available_opponents': 'Nenhum adversário está disponível',
+    'engine_not_configured': 'Motor Battle não está configurado',
     'engine_coverage_incomplete': 'Cartas sem cobertura de regras',
-    'engine_coverage_unavailable': 'Motor Battle indisponivel',
+    'engine_coverage_unavailable': 'Motor Battle indisponível',
   };
   return blockers
       .map((blocker) => labels[blocker] ?? blocker.replaceAll('_', ' '))
@@ -2448,7 +2476,7 @@ class _ReplaySelectionEmpty extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.space6),
               Text(
-                'O historico permanece visivel enquanto voce percorre a partida.',
+                'O histórico permanece visível enquanto você percorre a partida.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
@@ -2792,7 +2820,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
                   ButtonSegment(
                     value: _ReplayDetailView.decisions,
                     icon: Icon(Icons.account_tree_outlined),
-                    label: Text('Decisoes'),
+                    label: Text('Decisões'),
                   ),
                 ],
                 selected: {view},
@@ -2894,7 +2922,7 @@ class _BattlePostReportPanel extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          'Relatorio descritivo · n=${report.n} · ${_nullableMetric(report.turnCount, suffix: ' turnos')}',
+          'Relatório descritivo · n=${report.n} · ${_nullableMetric(report.turnCount, suffix: ' turnos')}',
           style: theme.textTheme.bodySmall?.copyWith(
             color: AppTheme.textSecondary,
           ),
@@ -2908,7 +2936,7 @@ class _BattlePostReportPanel extends StatelessWidget {
                 label: _nullableMetric(
                   report.durationMs,
                   suffix: ' ms',
-                  unknown: 'Duracao —',
+                  unknown: 'Duração —',
                 ),
               ),
               _ReplayMetaChip(
@@ -3546,18 +3574,18 @@ String _battleComparisonBlockerLabel(BattleComparisonBlocker blocker) {
     BattleReportOutcome.completed => (
       label: switch (report.completedResult) {
         BattleCompletedResult.subjectWin =>
-          'Execucao concluida · vitoria do deck',
+          'Execução concluída · vitória do deck',
         BattleCompletedResult.opponentWin =>
-          'Execucao concluida · vitoria do adversario',
-        BattleCompletedResult.draw => 'Execucao concluida · empate',
+          'Execução concluída · vitória do adversário',
+        BattleCompletedResult.draw => 'Execução concluída · empate',
         BattleCompletedResult.unknown =>
-          'Execucao concluida · resultado desconhecido',
+          'Execução concluída · resultado desconhecido',
       },
       icon: Icons.check_circle_outline_rounded,
       color: AppTheme.success,
     ),
     BattleReportOutcome.censored => (
-      label: 'Execucao censurada pelo limite',
+      label: 'Execução censurada pelo limite',
       icon: Icons.hourglass_bottom_rounded,
       color: AppTheme.warning,
     ),
@@ -3567,7 +3595,7 @@ String _battleComparisonBlockerLabel(BattleComparisonBlocker blocker) {
       color: AppTheme.error,
     ),
     BattleReportOutcome.unknown => (
-      label: 'Outcome nao informado',
+      label: 'Outcome não informado',
       icon: Icons.help_outline_rounded,
       color: AppTheme.textHint,
     ),
@@ -3645,7 +3673,7 @@ class _ReplayTimeline extends StatelessWidget {
         key: Key('battle-replay-no-events-state'),
         icon: Icons.timeline_outlined,
         title: 'Replay sem jogadas registradas',
-        message: 'Ainda nao ha relato suficiente para exibir esta partida.',
+        message: 'Ainda não há relato suficiente para exibir esta partida.',
       );
     }
 
@@ -3731,7 +3759,7 @@ class _ReplayEventListState extends State<_ReplayEventList> {
               controller: _queryController,
               decoration: const InputDecoration(
                 labelText: 'Filtrar replay',
-                hintText: 'Jogador, acao, turno ou capacidade',
+                hintText: 'Jogador, ação, turno ou capacidade',
                 prefixIcon: Icon(Icons.search_rounded),
               ),
               onChanged: (_) => setState(() => _visibleCount = _pageSize),
@@ -3797,7 +3825,7 @@ class _ReplayEventListState extends State<_ReplayEventList> {
             icon: Icons.filter_alt_off_outlined,
             title: 'Nenhum evento corresponde ao filtro',
             message:
-                'Limpe a busca ou escolha outro tipo. Isso nao prova que uma jogada nao ocorreu.',
+                'Limpe a busca ou escolha outro tipo. Isso não prova que uma jogada não ocorreu.',
           )
         else
           for (var index = 0; index < visible.length; index++)
@@ -3829,9 +3857,9 @@ class _ReplayDecisions extends StatelessWidget {
       return const _InlineEmptyPanel(
         key: Key('battle-replay-no-decisions-state'),
         icon: Icons.account_tree_outlined,
-        title: 'Sem decisoes registradas',
+        title: 'Sem decisões registradas',
         message:
-            'Quando a simulacao explicar escolhas importantes, elas aparecem aqui.',
+            'Quando a simulação explicar escolhas importantes, elas aparecem aqui.',
       );
     }
 
@@ -4115,7 +4143,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                     ),
                     IconButton(
                       key: const Key('battle-visual-next-button'),
-                      tooltip: 'Proximo',
+                      tooltip: 'Próximo',
                       onPressed: canMoveForward ? () => _move(1) : null,
                       icon: const Icon(Icons.chevron_right_rounded),
                     ),
@@ -4135,7 +4163,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                       IconButton.filledTonal(
                         key: const Key('battle-visual-play-button'),
                         tooltip: reduceMotion
-                            ? 'Reproducao automatica desativada por reduced motion'
+                            ? 'Reprodução automática desativada por reduced motion'
                             : _isPlaying
                             ? 'Pausar replay'
                             : 'Reproduzir replay',
@@ -4165,7 +4193,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                             ? null
                             : _moveToNextKeyMoment,
                         icon: const Icon(Icons.auto_awesome_rounded, size: 17),
-                        label: const Text('Proximo destaque'),
+                        label: const Text('Próximo destaque'),
                       ),
                       OutlinedButton.icon(
                         key: const Key('battle-visual-reflect-before-next'),
@@ -4624,7 +4652,7 @@ class _VisualPlayerBoard extends StatelessWidget {
           const SizedBox(height: AppTheme.space10),
           _VisualCardZone(
             key: Key('battle-visual-zone-graveyard-${player.name}'),
-            title: 'Cemiterio',
+            title: 'Cemitério',
             cards: player.graveyard,
             fallbackCount: player.graveyardSize,
             fallbackLabel: 'cartas',
@@ -4869,7 +4897,7 @@ class _BattleVisualCardCarouselState extends State<_BattleVisualCardCarousel> {
                   right: 0,
                   top: 18,
                   child: _BattleCarouselNavButton(
-                    tooltip: 'Proxima carta',
+                    tooltip: 'Próxima carta',
                     icon: Icons.chevron_right_rounded,
                     onPressed: _index < widget.cards.length - 1
                         ? () => _move(1)
@@ -5491,7 +5519,7 @@ class _ReplayDecisionTile extends StatelessWidget {
                 if (decision.score != null) ...[
                   const SizedBox(height: AppTheme.space6),
                   Text(
-                    'Avaliacao ${decision.score!.toStringAsFixed(2)}',
+                    'Avaliação ${decision.score!.toStringAsFixed(2)}',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.textHint,
                     ),

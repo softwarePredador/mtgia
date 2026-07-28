@@ -201,7 +201,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
           ),
           const SizedBox(height: AppTheme.space16),
           _AnalysisSummaryStrip(
-            legalityScore: _legalityScore(effectiveDeck),
+            validation: _validationSummary(effectiveDeck),
             price: _priceSummary(effectiveDeck),
             averageCmc: averageCmc,
             landCount: landCount,
@@ -455,14 +455,51 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     );
   }
 
-  int _legalityScore(DeckDetails deck) {
-    final format = deck.format.toLowerCase();
-    final target = format == 'commander' ? 100 : (format == 'brawl' ? 60 : 60);
-    final hasCommander = (format == 'commander' || format == 'brawl')
-        ? deck.commander.isNotEmpty
-        : true;
-    final countScore = ((deck.cardCount / target).clamp(0.0, 1.0) * 85).round();
-    return (countScore + (hasCommander ? 15 : 0)).clamp(0, 100);
+  _DeckValidationSummary _validationSummary(DeckDetails deck) {
+    if (deck.isValidated) {
+      return const _DeckValidationSummary(
+        value: 'Validado',
+        helper: 'Servidor',
+        icon: Icons.verified_outlined,
+        accent: AppTheme.success,
+      );
+    }
+
+    if (deck.validationState == 'draft') {
+      final reasons = deck.reviewReasons.toSet();
+      final helper = switch (reasons) {
+        final value when value.contains('strict_validation_failed') =>
+          'Regra do formato pendente',
+        final value when value.contains('unresolved_import_lines') =>
+          'Importação incompleta',
+        final value when value.contains('missing_commander') =>
+          'Comandante pendente',
+        final value when value.contains('incomplete_deck_size') =>
+          'Lista incompleta',
+        final value
+            when value.contains('deck_cards_changed_since_validation') =>
+          'Cartas alteradas',
+        final value
+            when value.contains('deck_format_changed_since_validation') =>
+          'Formato alterado',
+        _ => 'Revisão necessária',
+      };
+      return _DeckValidationSummary(
+        value: 'Revisar',
+        helper: helper,
+        icon: Icons.rule_folder_outlined,
+        accent: reasons.contains('strict_validation_failed')
+            ? AppTheme.error
+            : AppTheme.warning,
+      );
+    }
+
+    return const _DeckValidationSummary(
+      value: 'Não verificado',
+      helper: 'Validar deck',
+      icon: Icons.help_outline_rounded,
+      accent: AppTheme.frost400,
+    );
   }
 
   _DeckPriceSummary _priceSummary(DeckDetails deck) {
@@ -1178,13 +1215,13 @@ String _formatDeckCurrency(double value, String currency) {
 
 class _AnalysisSummaryStrip extends StatelessWidget {
   const _AnalysisSummaryStrip({
-    required this.legalityScore,
+    required this.validation,
     required this.price,
     required this.averageCmc,
     required this.landCount,
   });
 
-  final int legalityScore;
+  final _DeckValidationSummary validation;
   final _DeckPriceSummary price;
   final double averageCmc;
   final int landCount;
@@ -1201,13 +1238,14 @@ class _AnalysisSummaryStrip extends StatelessWidget {
           runSpacing: gap,
           children: [
             SizedBox(
+              key: const Key('deck-analysis-validation-summary'),
               width: width,
               child: _SummaryMetricTile(
-                icon: Icons.verified_outlined,
-                label: 'Legalidade',
-                value: '$legalityScore/100',
-                helper: legalityScore >= 100 ? 'Pronto' : 'Revisar lista',
-                accent: AppTheme.success,
+                icon: validation.icon,
+                label: 'Validação',
+                value: validation.value,
+                helper: validation.helper,
+                accent: validation.accent,
               ),
             ),
             SizedBox(
@@ -1247,6 +1285,20 @@ class _AnalysisSummaryStrip extends StatelessWidget {
       },
     );
   }
+}
+
+class _DeckValidationSummary {
+  const _DeckValidationSummary({
+    required this.value,
+    required this.helper,
+    required this.icon,
+    required this.accent,
+  });
+
+  final String value;
+  final String helper;
+  final IconData icon;
+  final Color accent;
 }
 
 class _SummaryMetricTile extends StatelessWidget {

@@ -521,6 +521,7 @@ void main() {
 
   for (final viewport in <Size>[
     const Size(390, 1000),
+    const Size(844, 390),
     const Size(768, 1024),
     const Size(1440, 1000),
     const Size(1920, 1080),
@@ -574,6 +575,19 @@ void main() {
           ),
           findsOneWidget,
         );
+        if (viewport == const Size(844, 390)) {
+          final terminalAction = find.byKey(
+            const Key('battle-live-terminal-state'),
+          );
+          final openReplay = find.byKey(
+            const Key('battle-live-open-replay-button'),
+          );
+          expect(terminalAction, findsOneWidget);
+          expect(openReplay, findsOneWidget);
+          await tester.ensureVisible(openReplay);
+          await tester.pump();
+          expect(openReplay.hitTestable(), findsOneWidget);
+        }
         expect(tester.takeException(), isNull);
       },
     );

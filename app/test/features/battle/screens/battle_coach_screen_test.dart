@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/battle/models/interactive_battle_session.dart';
+import 'package:manaloom/features/battle/models/battle_test_setup.dart';
 import 'package:manaloom/features/battle/screens/battle_coach_screen.dart';
+import 'package:manaloom/features/battle/services/battle_replay_service.dart';
 import 'package:manaloom/features/battle/services/interactive_battle_service.dart';
 import 'package:manaloom/core/widgets/manaloom_theme_motif.dart';
 
 class _FakeInteractiveGateway implements InteractiveBattleGateway {
+  _FakeInteractiveGateway({InteractiveBattleSession? session})
+    : session = session ?? _waitingSession();
+
+  final InteractiveBattleSession session;
   int getCount = 0;
   final List<InteractiveBattleResponse> responses = [];
 
@@ -21,7 +27,7 @@ class _FakeInteractiveGateway implements InteractiveBattleGateway {
   @override
   Future<InteractiveBattleSession> get(String sessionId) async {
     getCount += 1;
-    return _waitingSession();
+    return session;
   }
 
   @override
@@ -37,6 +43,36 @@ class _FakeInteractiveGateway implements InteractiveBattleGateway {
   @override
   Future<InteractiveBattleSession> concede(String sessionId) async =>
       _terminalSession(status: 'conceded');
+}
+
+class _FakeOpponentGateway extends BattleReplayService {
+  @override
+  Future<List<BattleOpponentDeck>> listOpponentDecks({
+    required String currentDeckId,
+  }) async => const [
+    BattleOpponentDeck(
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Atraxa de teste',
+      format: 'commander',
+      source: BattleOpponentDeckSource.own,
+      commanderName: "Atraxa, Praetors' Voice",
+      cardCount: 100,
+    ),
+  ];
+
+  @override
+  Future<BattlePreflight> loadBattlePreflight({
+    required String deckId,
+    required String opponentDeckId,
+  }) async => const BattlePreflight(
+    status: 'ready',
+    cardCount: 100,
+    commanderCount: 1,
+    validationState: 'validated',
+    availableOpponentCount: 1,
+    engineCoverage: {'xmage': 'ready'},
+    blockers: [],
+  );
 }
 
 void main() {
@@ -59,6 +95,40 @@ void main() {
       find.byKey(const Key('battle-coach-choose-opponent-button')),
       findsOneWidget,
     );
+    expect(find.byKey(const Key('battle-coach-alpha-banner')), findsOneWidget);
+    expect(find.text('ALPHA'), findsOneWidget);
+    expect(
+      find.text('Experimental · decisões assistidas e suporte limitado'),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('uses interactive copy and CTA in the Coach opponent picker', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _subject(
+        _FakeInteractiveGateway(),
+        opponentGateway: _FakeOpponentGateway(),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(
+      find.byKey(const Key('battle-coach-choose-opponent-button')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('battle-opponent-coach-description')),
+      findsOneWidget,
+    );
+    expect(find.text('Iniciar Battle Coach'), findsOneWidget);
+    expect(find.text('Simular Battle'), findsNothing);
+    expect(find.byKey(const Key('battle-test-objective-field')), findsNothing);
+    expect(find.byKey(const Key('battle-focus-cards-field')), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -80,9 +150,12 @@ void main() {
     expect(find.textContaining('Opponent'), findsOneWidget);
     expect(find.text('8'), findsOneWidget);
 
-    await tester.tap(
-      find.byKey(const Key('battle-coach-option-o_abcdefghijklmnop')),
+    final option = find.byKey(
+      const Key('battle-coach-option-o_abcdefghijklmnop'),
     );
+    await tester.ensureVisible(option);
+    await tester.pump();
+    await tester.tap(option);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -109,7 +182,11 @@ void main() {
     });
     tester.view.devicePixelRatio = 1;
 
-    for (final size in const [Size(390, 844), Size(1440, 900)]) {
+    for (final size in const [
+      Size(390, 844),
+      Size(844, 390),
+      Size(1440, 900),
+    ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(
         _subject(_FakeInteractiveGateway(), sessionId: 'session-1'),
@@ -123,9 +200,114 @@ void main() {
         reason: 'Battle Coach must fit ${size.width} px.',
       );
       expect(find.byKey(const Key('battle-coach-board')), findsOneWidget);
+      if (size == const Size(844, 390)) {
+        expect(
+          find.byKey(const Key('battle-coach-compact-scroll')),
+          findsOneWidget,
+        );
+        final delegate = find.byKey(const Key('battle-coach-delegate-button'));
+        expect(delegate, findsOneWidget);
+        await tester.ensureVisible(delegate);
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+      }
       await tester.pumpWidget(const SizedBox.shrink());
     }
   });
+
+  for (final group in const <String, Map<String, Object>>{
+    'completed': {
+      'tone': 'success',
+      'label': 'Partida concluída',
+      'message': 'Partida concluída.',
+      'color': AppTheme.success,
+    },
+    'censored': {
+      'tone': 'warning',
+      'label': 'Partida encerrada pelo limite',
+      'message': 'Não há vencedor confirmado.',
+      'color': AppTheme.warning,
+    },
+    'conceded': {
+      'tone': 'warning',
+      'label': 'Você concedeu',
+      'message': 'terminou por concessão',
+      'color': AppTheme.warning,
+    },
+    'expired': {
+      'tone': 'warning',
+      'label': 'Sessão expirada',
+      'message': 'expirou antes da conclusão',
+      'color': AppTheme.warning,
+    },
+    'timeout': {
+      'tone': 'warning',
+      'label': 'Tempo da decisão esgotado',
+      'message': 'prazo da decisão terminou',
+      'color': AppTheme.warning,
+    },
+    'abandoned': {
+      'tone': 'warning',
+      'label': 'Sessão abandonada',
+      'message': 'encerrada por abandono',
+      'color': AppTheme.warning,
+    },
+    'engine_error': {
+      'tone': 'error',
+      'label': 'Motor indisponível',
+      'message': 'Nenhum resultado foi fabricado.',
+      'color': AppTheme.error,
+    },
+    'process_lost': {
+      'tone': 'error',
+      'label': 'Processo da partida perdido',
+      'message': 'não pode ser retomada',
+      'color': AppTheme.error,
+    },
+    'persistence_error': {
+      'tone': 'error',
+      'label': 'Falha ao salvar a partida',
+      'message': 'não pôde ser salvo com segurança',
+      'color': AppTheme.error,
+    },
+  }.entries) {
+    testWidgets('renders ${group.key} with its terminal semantics', (
+      tester,
+    ) async {
+      final session = _terminalSession(
+        status: group.key,
+        replayId: group.key == 'completed' ? 'replay-1' : null,
+      );
+      await tester.pumpWidget(
+        _subject(
+          _FakeInteractiveGateway(session: session),
+          sessionId: 'session-1',
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text(group.value['label']! as String), findsWidgets);
+      expect(
+        find.textContaining(group.value['message']! as String),
+        findsOneWidget,
+      );
+      final icon = tester.widget<Icon>(
+        find.byKey(
+          Key('battle-coach-terminal-${group.value['tone']! as String}-icon'),
+        ),
+      );
+      expect(icon.color, group.value['color']);
+      if (group.key != 'completed') {
+        expect(
+          find.byKey(const Key('battle-coach-terminal-success-icon')),
+          findsNothing,
+        );
+      }
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
 
   testWidgets('disables decorative motion when accessibility requests it', (
     tester,
@@ -167,6 +349,7 @@ Widget _subject(
   InteractiveBattleGateway gateway, {
   String? sessionId,
   bool disableAnimations = false,
+  BattleReplayGateway? opponentGateway,
 }) => MaterialApp(
   theme: AppTheme.darkTheme.copyWith(splashFactory: InkRipple.splashFactory),
   builder: (context, child) => MediaQuery(
@@ -177,6 +360,7 @@ Widget _subject(
     deckId: '00000000-0000-4000-8000-000000000001',
     sessionId: sessionId,
     gateway: gateway,
+    opponentGateway: opponentGateway,
     pollInterval: const Duration(hours: 1),
   ),
 );
@@ -242,35 +426,38 @@ InteractiveBattleSession _waitingSession() =>
       },
     });
 
-InteractiveBattleSession _terminalSession({String status = 'completed'}) =>
-    InteractiveBattleSession.fromJson({
-      'schema_version': 'interactive_battle_session_v1',
-      'id': 'session-1',
-      'status': status,
-      'state_version': 8,
-      'deck_id': '00000000-0000-4000-8000-000000000001',
-      'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
-      'expires_at': '2099-07-27T15:30:00Z',
-      'updated_at': '2026-07-27T15:02:00Z',
-      'replay_id': 'replay-1',
-      'private_state': {
-        'turn': 1,
-        'priority_player': 'ManaLoom',
-        'own_player': 'ManaLoom',
-        'players': [
-          {
-            'name': 'ManaLoom',
-            'life': 40,
-            'library_count': 92,
-            'hand_count': 7,
-            'battlefield': const <dynamic>[],
-            'graveyard': const <dynamic>[],
-            'exile': const <dynamic>[],
-            'command': const <dynamic>[],
-          },
-        ],
-        'stack': const <dynamic>[],
-        'combat': const <dynamic>[],
-        'own_hand': const <dynamic>[],
+InteractiveBattleSession _terminalSession({
+  String status = 'completed',
+  String? replayId = 'replay-1',
+}) => InteractiveBattleSession.fromJson({
+  'schema_version': 'interactive_battle_session_v1',
+  'id': 'session-1',
+  'status': status,
+  'state_version': 8,
+  'deck_id': '00000000-0000-4000-8000-000000000001',
+  'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
+  'expires_at': '2099-07-27T15:30:00Z',
+  'updated_at': '2026-07-27T15:02:00Z',
+  if (replayId != null) 'replay_id': replayId,
+  if (status.endsWith('error')) 'error_code': status,
+  'private_state': {
+    'turn': 1,
+    'priority_player': 'ManaLoom',
+    'own_player': 'ManaLoom',
+    'players': [
+      {
+        'name': 'ManaLoom',
+        'life': 40,
+        'library_count': 92,
+        'hand_count': 7,
+        'battlefield': const <dynamic>[],
+        'graveyard': const <dynamic>[],
+        'exile': const <dynamic>[],
+        'command': const <dynamic>[],
       },
-    });
+    ],
+    'stack': const <dynamic>[],
+    'combat': const <dynamic>[],
+    'own_hand': const <dynamic>[],
+  },
+});

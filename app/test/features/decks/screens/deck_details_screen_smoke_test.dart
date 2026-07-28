@@ -451,6 +451,43 @@ void main() {
   });
 
   testWidgets(
+    'DeckDetailsScreen keeps overview actions reachable at 844x390 landscape',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(844, 390);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
+              deckId: 'deck-1',
+              name: 'Talrand horizontal',
+            ),
+          ),
+        },
+      );
+
+      final provider = DeckProvider(apiClient: apiClient);
+      await _pumpScreen(tester, apiClient: apiClient, provider: provider);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Talrand horizontal'), findsOneWidget);
+      final optimize = find.byKey(const Key('deck-optimize-button'));
+      await tester.ensureVisible(optimize);
+      await tester.pumpAndSettle();
+      final rect = tester.getRect(optimize);
+      expect(rect.left, greaterThanOrEqualTo(0));
+      expect(rect.right, lessThanOrEqualTo(844));
+      expect(rect.top, greaterThanOrEqualTo(0));
+      expect(rect.bottom, lessThanOrEqualTo(390));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'DeckDetailsScreen smoke: optimize -> preview -> apply -> validate',
     (tester) async {
       final cardsById = <String, int>{

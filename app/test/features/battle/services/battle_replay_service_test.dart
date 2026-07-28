@@ -445,7 +445,7 @@ void main() {
       });
       expect(replay.summary.typeLabel, 'Battle');
       expect(replay.summary.id, 'sim-saved-1');
-      expect(replay.summary.sourceLabel, 'Historico salvo');
+      expect(replay.summary.sourceLabel, 'Histórico salvo');
       expect(replay.events, hasLength(1));
     });
 
@@ -604,7 +604,7 @@ void main() {
             isA<BattleReplayException>().having(
               (error) => error.message,
               'message',
-              contains('nao confirmou o salvamento'),
+              contains('não confirmou o salvamento'),
             ),
           ),
         );
@@ -638,7 +638,7 @@ void main() {
             isA<BattleReplayException>().having(
               (error) => error.message,
               'message',
-              contains('nao confirmou o salvamento'),
+              contains('não confirmou o salvamento'),
             ),
           ),
         );

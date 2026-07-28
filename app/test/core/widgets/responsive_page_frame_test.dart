@@ -9,7 +9,9 @@ Future<void> _pump(WidgetTester tester, Size size, Widget child) async {
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(
-    MaterialApp(home: Scaffold(body: ResponsivePageFrame(child: child))),
+    MaterialApp(
+      home: Scaffold(body: ResponsivePageFrame(child: child)),
+    ),
   );
 }
 
@@ -62,5 +64,33 @@ void main() {
       tester.getTopLeft(find.byKey(const Key('wide-detail'))).dx,
       greaterThan(tester.getTopRight(find.byKey(const Key('wide-master'))).dx),
     );
+  });
+
+  testWidgets('keeps reference phones bounded after landscape rotation', (
+    tester,
+  ) async {
+    for (final size in const [Size(844, 390), Size(915, 412)]) {
+      await _pump(
+        tester,
+        size,
+        const SizedBox(
+          key: Key('landscape-phone-content'),
+          width: double.infinity,
+          height: 40,
+        ),
+      );
+
+      final rect = tester.getRect(
+        find.byKey(const Key('landscape-phone-content')),
+      );
+      expect(
+        AppTheme.viewportClassForWidth(size.width),
+        AppViewportClass.expanded,
+      );
+      expect(rect.left, greaterThanOrEqualTo(0));
+      expect(rect.right, lessThanOrEqualTo(size.width));
+      expect(rect.width, closeTo(size.width - (AppTheme.pageGutter * 2), 0.1));
+      expect(tester.takeException(), isNull);
+    }
   });
 }

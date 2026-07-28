@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-28T02:33:13.125120Z",
-  "source_digest": "d0deb89da2f50418035f239ea66a136ac16535f7a3e56ccad63bbae0db5414f4",
+  "generated_at": "2026-07-28T05:40:55.224526Z",
+  "source_digest": "25a74e45b91e0849d442c85ee05cd72f8bdb6cea3e42270a87f1fddcee04a274",
   "surface": "authenticated_p0_matrix",
   "profile": "android_physical_sm_a135m",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "004a14d0ae1eca9da4985af42b9e6a2c79612bc39d18e9b51b32e4d1bea0f31f",
+  "log_sha256": "49ff39161e771b29510ec8b7a54271df50b67672ac050537c4b6b043b4828077",
   "checkpoint_count": 53,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -73,8 +73,8 @@
     {
       "checkpoint": "battle_coach_welcome",
       "path": "app/test/ui/goldens/runtime/android_physical/battle_coach_welcome.png",
-      "sha256": "6a91e4c99d8060d4804486997e043657ea0679ded8c9edc240e8b75a5b2cf8fd",
-      "bytes": 668581,
+      "sha256": "9fcafd40b80918f3c200aa55253c6d64e183fd61b633f88a5652624383e8cead",
+      "bytes": 691964,
       "width": 1080,
       "height": 2408
     },
@@ -89,8 +89,8 @@
     {
       "checkpoint": "battle_replays_empty",
       "path": "app/test/ui/goldens/runtime/android_physical/battle_replays_empty.png",
-      "sha256": "03fdeefa65f3a7a95c4ef700c7ba892f13a75b6aa8eb675bdf299359c2d992fe",
-      "bytes": 194449,
+      "sha256": "806a698ca27dae51ec93084de4754419e5aab9a5d653ec0500b58a025d0ccf28",
+      "bytes": 195206,
       "width": 1080,
       "height": 2408
     },
@@ -153,16 +153,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/android_physical/community_deck_success.png",
-      "sha256": "71e60394c3c387721e5cedb0c36bb47f452725c8d2295047bdaee5da0163aa45",
-      "bytes": 226998,
+      "sha256": "2bfef4f26c6dff1f756176d408955cac9774f43670210fbaed8fe430f2a05b97",
+      "bytes": 226417,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "community_empty",
       "path": "app/test/ui/goldens/runtime/android_physical/community_empty.png",
-      "sha256": "f38d4d8a410dacb780e3cc2c7d376c54695fe9d3ccd1267da1bf1a07d4b23269",
-      "bytes": 589027,
+      "sha256": "763d16c278ea975f377df7da3d6c224af3d27e2744395ae6acf64d53838b8d99",
+      "bytes": 588542,
       "width": 1080,
       "height": 2408
     },
@@ -209,8 +209,8 @@
     {
       "checkpoint": "deck_detail_top",
       "path": "app/test/ui/goldens/runtime/android_physical/deck_detail_top.png",
-      "sha256": "4daab474d5861e522a8071d76fc1cc6f42669300da05bf92afa93cb1d18eed42",
-      "bytes": 498765,
+      "sha256": "a39825b91f8a245754d47a93414acb2de1a8e130f3953aa3087e393dabc08b13",
+      "bytes": 498152,
       "width": 1080,
       "height": 2408
     },
@@ -225,8 +225,8 @@
     {
       "checkpoint": "deck_import_detected",
       "path": "app/test/ui/goldens/runtime/android_physical/deck_import_detected.png",
-      "sha256": "3618cbc9db61b9ffa0419fee10042971e26c09372565deb290d673463ba852ca",
-      "bytes": 124322,
+      "sha256": "7c3e496148d1d9556cb36ea8d9c034f9cb77174c1d74d03dfa046ac1f367e47a",
+      "bytes": 124570,
       "width": 1080,
       "height": 2408
     },
@@ -305,8 +305,8 @@
     {
       "checkpoint": "login_empty",
       "path": "app/test/ui/goldens/runtime/android_physical/login_empty.png",
-      "sha256": "9facd175076eb6d8351276a09f08d79327b776f429f16db81dbac45a398f6558",
-      "bytes": 1177759,
+      "sha256": "a33befb81d79fcda862e1b2e08b18bf0e9c038d57a5cf0fb906402e5a0085e5d",
+      "bytes": 1273706,
       "width": 1080,
       "height": 2408
     },
@@ -353,8 +353,8 @@
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/android_physical/profile_success.png",
-      "sha256": "2eea925478a43de78340fb5f303be81e61d8055b1fdc81bb142d30a1f322f37c",
-      "bytes": 238188,
+      "sha256": "1e3172bf07bd82d573a2b8e0e1fb5d6b8dc81a564ae8273f62c5481af2e31fd6",
+      "bytes": 237054,
       "width": 1080,
       "height": 2408
     },
@@ -425,8 +425,8 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/android_physical/splash_boot.png",
-      "sha256": "08a9384c05120f0a066390c2d98615932dfc3d22eec4461abe6de0b8cd299255",
-      "bytes": 875420,
+      "sha256": "3fb9074329d934debcacbbc273493123d400dd666bca23053ce11ea620fb0734",
+      "bytes": 875646,
       "width": 1080,
       "height": 2408
     },
@@ -465,8 +465,8 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/android_physical/user_profile_success.png",
-      "sha256": "aafa80a3a875d2d8562912500a48bd5bc613546defab7429fb8e477292c0737f",
-      "bytes": 139878,
+      "sha256": "1b40135539def6066fc03287b079b3911921ee7d36691c8ceed6cdd2bae526ed",
+      "bytes": 139012,
       "width": 1080,
       "height": 2408
     },
@@ -481,8 +481,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/android_physical/user_search_results.png",
-      "sha256": "df97d2f7c5a0310630db164a101db602f6a509e69cbe6ebf233d0e67369f3fe9",
-      "bytes": 75354,
+      "sha256": "e9c185ca8ff8ff9e341dd8e12571fd36d9f4377fe3ad3a30bb005eebf94b1614",
+      "bytes": 75735,
       "width": 1080,
       "height": 2408
     },

@@ -220,4 +220,25 @@ void main() {
     }
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'phone landscape deck list stays usable and exposes its create actions',
+    (tester) async {
+      await _pumpDecks(tester, const Size(844, 390));
+
+      final first = find.byKey(const Key('deck-list-row-deck-0'));
+      expect(first, findsOneWidget);
+      final firstRect = tester.getRect(first);
+      expect(firstRect.left, greaterThanOrEqualTo(0));
+      expect(firstRect.right, lessThanOrEqualTo(844));
+
+      final menu = find.byKey(const Key('deck-list-fab-menu'));
+      expect(menu, findsOneWidget);
+      await tester.tap(menu);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('deck-list-menu-generate')), findsOneWidget);
+      expect(find.byKey(const Key('deck-list-menu-import')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

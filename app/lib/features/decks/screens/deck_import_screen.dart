@@ -53,6 +53,8 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   late final DeckEntryDraftStore _draftStore;
   Timer? _draftSaveTimer;
   bool _restoringDraft = false;
+  bool _draftDirty = false;
+  Future<void> _draftSaveChain = Future<void>.value();
 
   @override
   void initState() {
@@ -97,6 +99,10 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   @override
   void dispose() {
     _draftSaveTimer?.cancel();
+    if (_draftDirty) {
+      _draftDirty = false;
+      unawaited(_saveDraft());
+    }
     _nameController.removeListener(_scheduleDraftSave);
     _descriptionController.removeListener(_scheduleDraftSave);
     _commanderController.removeListener(_scheduleDraftSave);
@@ -148,25 +154,51 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
   void _scheduleDraftSave() {
     if (_restoringDraft) return;
+    _draftDirty = true;
     _draftSaveTimer?.cancel();
     _draftSaveTimer = Timer(const Duration(milliseconds: 250), () {
       _draftSaveTimer = null;
+      _draftDirty = false;
       unawaited(_saveDraft());
     });
   }
 
-  Future<void> _saveDraft() => _draftStore.saveImport(
-    widget.draftOwnerId,
-    format: _selectedFormat,
-    name: _nameController.text,
-    description: _descriptionController.text,
-    commander: _commanderController.text,
-    cardList: _listController.text,
-  );
+  Future<void> _saveDraft() {
+    final ownerId = widget.draftOwnerId;
+    final format = _selectedFormat;
+    final name = _nameController.text;
+    final description = _descriptionController.text;
+    final commander = _commanderController.text;
+    final cardList = _listController.text;
+    _draftSaveChain = _draftSaveChain
+        .then(
+          (_) => _draftStore.saveImport(
+            ownerId,
+            format: format,
+            name: name,
+            description: description,
+            commander: commander,
+            cardList: cardList,
+          ),
+        )
+        .catchError((Object _) {
+          // Draft persistence is best-effort and must never crash navigation.
+        });
+    return _draftSaveChain;
+  }
+
+  Future<void> _flushDraft() async {
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = null;
+    _draftDirty = false;
+    await _saveDraft();
+  }
 
   Future<void> _clearDraft() async {
     _draftSaveTimer?.cancel();
     _draftSaveTimer = null;
+    _draftDirty = false;
+    await _draftSaveChain;
     await _draftStore.clearImport(widget.draftOwnerId);
   }
 
@@ -217,8 +249,6 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     });
 
     if (result['success'] == true) {
-      await _clearDraft();
-      if (!mounted) return;
       final deck = result['deck'];
       final isPartial =
           result['requires_review'] == true ||
@@ -226,6 +256,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           result['is_partial'] == true ||
           _notFoundLines.isNotEmpty ||
           _warnings.isNotEmpty;
+
+      if (isPartial) {
+        await _flushDraft();
+      } else {
+        await _clearDraft();
+      }
+      if (!mounted) return;
 
       // Se houve avisos/cartas não encontradas, mostra revisão antes de abrir.
       if (isPartial) {

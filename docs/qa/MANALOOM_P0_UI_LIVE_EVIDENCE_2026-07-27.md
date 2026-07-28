@@ -1,12 +1,12 @@
 # ManaLoom — prova viva P0 Web + Android
 
-**Data:** 2026-07-27
+**Data:** 2026-07-28
 
 **Branch:** `codex/free-beta-release-candidate-2026-07-17`
 
 **Toolchain:** Flutter `3.44.6`, Dart `3.12.2`
 
-**Digest visual:** `d0deb89da2f50418035f239ea66a136ac16535f7a3e56ccad63bbae0db5414f4`
+**Digest visual:** `25a74e45b91e0849d442c85ee05cd72f8bdb6cea3e42270a87f1fddcee04a274`
 **Decisão:** `PASS` para S3-05 e S3-07; TalkBack humano continua pendente em S3-04
 
 ## Escopo realmente comprovado
@@ -31,11 +31,14 @@ Foram produzidas e abertas as seguintes capturas:
 | Battle Coach teclado Web | build release + teclado físico | 9 | 1280×720 |
 | **Total revisado** |  | **226** |  |
 
-As 210 imagens da matriz foram divididas em 20 contact sheets e inspecionadas
+As 210 imagens da matriz foram divididas em 24 contact sheets e inspecionadas
 em resolução útil, além das folhas dedicadas ao Battle Coach Android e teclado
-Web, totalizando 22 folhas abertas. A revisão verificou hierarquia, identidade
+Web, totalizando 26 folhas abertas. A revisão verificou hierarquia, identidade
 MTG, contraste, tipografia, espaçamento, adaptação, clareza de ação, estados,
 acessibilidade visual e atratividade. Não restou finding visual bloqueante.
+Os estados centrais de Deckbuilder e Battle também foram reabertos em resolução
+original; a aba Análise foi conferida no build real e não recebeu crédito
+duplicado no total versionado.
 
 O inventário estrutural continua maior que esta matriz porque também contém
 dialogs, sheets, menus, transient states e redirects. A prova acima é o
@@ -84,6 +87,22 @@ cada ocorrência transitória do inventário como se fosse uma rota autônoma.
 11. **Harness Android:** o splash de uma tentativa inicial exibia o banner
     DEBUG do `MaterialApp` do próprio harness; ele foi removido e a captura foi
     repetida.
+12. **Orientação global indevidamente restrita:** o manifesto PWA ainda
+    declarava `portrait-primary`. Web, Android e iOS agora aceitam portrait e
+    landscape; somente o Life Counter aplica o lock temporário de apresentação
+    em runtime nativo e restaura todas as orientações ao sair. A matriz
+    executável ganhou 844×390 e 915×412.
+13. **Deckbuilder e persistência de rascunho:** a Análise podia sugerir
+    legalidade sem resposta canônica e os últimos caracteres de geração/import
+    podiam ficar fora do `SharedPreferences` durante dispose. A UI agora deriva
+    `Validado`, `Revisar` ou `Não verificado` de `deck_state` e
+    `review_reasons`; gravações são serializadas e drenadas, e importação
+    parcial preserva lista e rascunho.
+14. **Coerência do Battle Coach:** o seletor reutilizava linguagem de simulação
+    automática, campos sem efeito e estados terminais com o mesmo sucesso
+    visual. O modo Coach passou a usar CTA e texto próprios, omitiu parâmetros
+    inertes, mantém o aviso `ALPHA` e diferencia conclusão, interrupção e erro
+    por cor, ícone, título e mensagem.
 
 ## Life Counter e platform view
 
@@ -183,9 +202,11 @@ executado.
 
 A recertificação deste digest fechou com:
 
-- 125 testes focados aprovados e 1 skip Web explícito;
+- 292/292 testes do domínio Deck aprovados;
+- 129/129 testes do domínio Battle aprovados;
+- 12/12 checks focados de orientação e responsividade aprovados;
 - `flutter analyze` sem issues;
-- 51/51 checks do gate `ui-audit`;
+- 53/53 checks do gate `ui-audit`;
 - 226/226 screenshots aceitos pelo gate `ui-proof`;
 - 9/9 passos físicos de teclado/foco do Battle Coach Web;
 - sete estados visuais e dois testes de runtime do Battle Coach no Samsung;
@@ -196,7 +217,7 @@ A recertificação deste digest fechou com:
 O gate `full` continua obrigatório no `pre-push`; seu resultado pertence ao
 registro da entrega Git, sem ser antecipado por este documento visual.
 
-O bundle Web validado tem SHA-256
-`86f54879f54805716d4ab8a75f6e672c597a2ff4bf69b650a94a5dcd7bfe9f96`.
+O `main.dart.js` do Web release validado tem SHA-256
+`ea153b96bc81ba247598b33fe188863e69fd7ba019e00b1728b9c92e3792409a`.
 O digest definitivo das fontes da UI é
-`d0deb89da2f50418035f239ea66a136ac16535f7a3e56ccad63bbae0db5414f4`.
+`25a74e45b91e0849d442c85ee05cd72f8bdb6cea3e42270a87f1fddcee04a274`.

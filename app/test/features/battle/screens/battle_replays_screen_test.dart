@@ -499,7 +499,7 @@ void main() {
     await tester.tap(find.byTooltip('Fechar'));
     await tester.pumpAndSettle();
 
-    final decisionsTab = find.text('Decisoes');
+    final decisionsTab = find.text('Decisões');
     final detailPane = find.byKey(const Key('battle-replay-detail-pane'));
     for (var i = 0; i < 4 && decisionsTab.evaluate().isEmpty; i += 1) {
       await tester.drag(detailPane, const Offset(0, 300));
@@ -1203,7 +1203,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Battle contra Meu Korvold'), findsOneWidget);
-      expect(find.textContaining('Historico salvo'), findsOneWidget);
+      expect(find.textContaining('Histórico salvo'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -1414,7 +1414,7 @@ void main() {
       expect(find.byKey(const Key('battle-replays-error-state')), findsNothing);
       expect(
         find.text(
-          'Replay salvo, mas o historico nao foi atualizado. '
+          'Replay salvo, mas o histórico não foi atualizado. '
           'Tente atualizar novamente.',
         ),
         findsOneWidget,
@@ -1481,7 +1481,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
     await tester.pump();
-    expect(find.text('Informe um UUID de deck valido.'), findsOneWidget);
+    expect(find.text('Informe um UUID de deck válido.'), findsOneWidget);
 
     await tester.enterText(
       find.byKey(const Key('battle-opponent-deck-id-field')),
@@ -1514,7 +1514,45 @@ void main() {
     final dialog = find.byKey(const Key('battle-opponent-picker-dialog'));
     expect(dialog, findsOneWidget);
     expect(find.byKey(const Key('battle-opponent-deck-list')), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-opponent-simulation-description')),
+      findsOneWidget,
+    );
+    expect(find.text('Simular Battle'), findsOneWidget);
+    expect(find.text('Iniciar Battle Coach'), findsNothing);
     expect(tester.getSize(dialog).width, lessThanOrEqualTo(390));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keeps replay navigation and Battle CTA usable at 844x390', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(844, 390));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('battle-replays-history-list')),
+      findsOneWidget,
+    );
+    final runBattle = find.byKey(const Key('battle-run-battle-button'));
+    expect(runBattle, findsOneWidget);
+    await tester.tap(runBattle);
+    await tester.pumpAndSettle();
+
+    final dialog = find.byKey(const Key('battle-opponent-picker-dialog'));
+    final submit = find.byKey(const Key('battle-opponent-submit-button'));
+    expect(dialog, findsOneWidget);
+    expect(submit, findsOneWidget);
+    expect(find.text('Simular Battle'), findsOneWidget);
+    expect(tester.getRect(submit).bottom, lessThanOrEqualTo(390));
     expect(tester.takeException(), isNull);
   });
 }

@@ -114,17 +114,17 @@ class BattleReplaySummary {
       case 'battle':
         return 'Battle';
       default:
-        return type.trim().isEmpty ? 'Simulacao' : type;
+        return type.trim().isEmpty ? 'Simulação' : type;
     }
   }
 
   String get statusLabel {
     switch (status) {
       case 'legacy_consistency_only':
-        return 'Consistencia legada';
+        return 'Consistência legada';
       case 'completed':
       case 'success':
-        return 'Concluido';
+        return 'Concluído';
       case 'censored':
         return 'Censurado';
       case 'timeout':
@@ -149,11 +149,11 @@ class BattleReplaySummary {
   String get sourceLabel {
     switch (source) {
       case 'immediate_simulation':
-        return 'Simulacao recem-gerada';
+        return 'Simulação recém-gerada';
       case 'battle_simulations':
-        return 'Historico salvo';
+        return 'Histórico salvo';
       default:
-        return source.trim().isEmpty ? 'Fonte nao informada' : source;
+        return source.trim().isEmpty ? 'Fonte não informada' : source;
     }
   }
 
@@ -172,25 +172,25 @@ class BattleReplaySummary {
       return 'Vencedor: $winner';
     }
     if (winnerDeckId != null && winnerDeckId == deckId) {
-      return 'Vitoria do deck';
+      return 'Vitória do deck';
     }
     if (winnerDeckId != null && winnerDeckId == opponentDeckId) {
-      return 'Vitoria do oponente';
+      return 'Vitória do oponente';
     }
     if (winRate != null) {
       final percent = (winRate!.clamp(0, 1) * 100).round();
-      return '$percent% de vitoria';
+      return '$percent% de vitória';
     }
     return 'Resultado advisory';
   }
 
   String get turnLabel {
-    if (turnCount == null) return 'Turnos nao informados';
+    if (turnCount == null) return 'Turnos não informados';
     return turnCount == 1 ? '1 turno' : '$turnCount turnos';
   }
 
   String get eventLabel {
-    if (eventCount == null) return 'Eventos nao informados';
+    if (eventCount == null) return 'Eventos não informados';
     if (eventCount == 0) return 'Sem eventos estruturados';
     return eventCount == 1 ? '1 evento' : '$eventCount eventos';
   }
@@ -415,14 +415,14 @@ class BattleReplayDecision {
           _optionalString(merged['decision']) ??
           _optionalString(merged['action']) ??
           decisionType ??
-          'Decisao registrada',
+          'Decisão registrada',
       reason:
           _optionalString(merged['reason']) ??
           _optionalString(merged['rationale']) ??
           _optionalString(merged['explanation']) ??
           _optionalString(merged['expected_payoff_reason']) ??
           _optionalString(merged['strategic_principle']) ??
-          'Justificativa nao disponivel.',
+          'Justificativa não disponível.',
       isNativeHeuristic: isNativeHeuristic,
       decisionType: decisionType,
       turn: _parseInt(merged['turn']),
@@ -445,7 +445,7 @@ class BattleReplayDecision {
     );
   }
 
-  String get turnLabel => turn == null ? 'Decisao' : 'T$turn';
+  String get turnLabel => turn == null ? 'Decisão' : 'T$turn';
 }
 
 class BattleReplayVisualSnapshot {
@@ -515,7 +515,7 @@ class BattleReplayVisualSnapshot {
   }
 
   String get turnLabel {
-    if (turn == null) return 'Turno nao disponivel';
+    if (turn == null) return 'Turno não disponível';
     return turn == 0 ? 'Setup' : 'T$turn';
   }
 

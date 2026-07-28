@@ -30,6 +30,8 @@ void main() {
       expect(AppTheme.viewportClassForWidth(600), AppViewportClass.medium);
       expect(AppTheme.viewportClassForWidth(839), AppViewportClass.medium);
       expect(AppTheme.viewportClassForWidth(840), AppViewportClass.expanded);
+      expect(AppTheme.viewportClassForWidth(844), AppViewportClass.expanded);
+      expect(AppTheme.viewportClassForWidth(915), AppViewportClass.expanded);
       expect(AppTheme.viewportClassForWidth(1199), AppViewportClass.expanded);
       expect(AppTheme.viewportClassForWidth(1200), AppViewportClass.wide);
       expect(AppTheme.viewportClassForWidth(1599), AppViewportClass.wide);

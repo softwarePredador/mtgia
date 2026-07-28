@@ -55,6 +55,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   late final DeckEntryDraftStore _draftStore;
   Timer? _draftSaveTimer;
   bool _restoringDraft = false;
+  bool _draftDirty = false;
+  Future<void> _draftSaveChain = Future<void>.value();
 
   @override
   void initState() {
@@ -127,6 +129,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   @override
   void dispose() {
     _draftSaveTimer?.cancel();
+    if (_draftDirty) {
+      _draftDirty = false;
+      unawaited(_saveDraft());
+    }
     _commanderController.removeListener(_handleCommanderChanged);
     _promptController.removeListener(_scheduleDraftSave);
     _deckNameController.removeListener(_scheduleDraftSave);
@@ -189,29 +195,52 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   void _scheduleDraftSave() {
     if (_restoringDraft) return;
+    _draftDirty = true;
     _draftSaveTimer?.cancel();
     _draftSaveTimer = Timer(const Duration(milliseconds: 250), () {
       _draftSaveTimer = null;
+      _draftDirty = false;
       unawaited(_saveDraft());
     });
   }
 
-  Future<void> _saveDraft() => _draftStore.saveGenerate(
-    widget.draftOwnerId,
-    format: _selectedFormat,
-    commander: _commanderController.text,
-    prompt: _promptController.text,
-    deckName: _deckNameController.text,
-    activeJobId: _activeGenerateJobId,
-    requestKey: _activeGenerateRequestKey,
-    preferCollection: _preferCollection,
-    collectionOnly: _collectionOnly,
-    budgetLimitBrl: _budgetController.text,
-  );
+  Future<void> _saveDraft() {
+    final ownerId = widget.draftOwnerId;
+    final format = _selectedFormat;
+    final commander = _commanderController.text;
+    final prompt = _promptController.text;
+    final deckName = _deckNameController.text;
+    final activeJobId = _activeGenerateJobId;
+    final requestKey = _activeGenerateRequestKey;
+    final preferCollection = _preferCollection;
+    final collectionOnly = _collectionOnly;
+    final budgetLimitBrl = _budgetController.text;
+    _draftSaveChain = _draftSaveChain
+        .then(
+          (_) => _draftStore.saveGenerate(
+            ownerId,
+            format: format,
+            commander: commander,
+            prompt: prompt,
+            deckName: deckName,
+            activeJobId: activeJobId,
+            requestKey: requestKey,
+            preferCollection: preferCollection,
+            collectionOnly: collectionOnly,
+            budgetLimitBrl: budgetLimitBrl,
+          ),
+        )
+        .catchError((Object _) {
+          // Draft persistence is best-effort and must never crash navigation.
+        });
+    return _draftSaveChain;
+  }
 
   Future<void> _clearDraft() async {
     _draftSaveTimer?.cancel();
     _draftSaveTimer = null;
+    _draftDirty = false;
+    await _draftSaveChain;
     await _draftStore.clearGenerate(widget.draftOwnerId);
   }
 

@@ -1,10 +1,12 @@
 {
-  "schema_version": 1,
-  "matrix_id": "manaloom-s3-03-viewport-matrix-2026-07-21",
+  "schema_version": 2,
+  "matrix_id": "manaloom-s3-03-viewport-matrix-2026-07-28",
   "viewports": [
     {"id":"mobile-min","width":320,"height":568,"orientation":"portrait","class":"compact"},
     {"id":"mobile-reference","width":390,"height":844,"orientation":"portrait","class":"compact"},
     {"id":"mobile-large","width":412,"height":915,"orientation":"portrait","class":"compact"},
+    {"id":"mobile-reference-landscape","width":844,"height":390,"orientation":"landscape","class":"expanded"},
+    {"id":"mobile-large-landscape","width":915,"height":412,"orientation":"landscape","class":"expanded"},
     {"id":"tablet-portrait","width":768,"height":1024,"orientation":"portrait","class":"medium"},
     {"id":"tablet-landscape","width":1024,"height":768,"orientation":"landscape","class":"expanded"},
     {"id":"boundary-compact-last","width":599,"height":844,"orientation":"portrait","class":"compact"},
@@ -19,6 +21,32 @@
     {"id":"boundary-ultrawide-first","width":1600,"height":900,"orientation":"landscape","class":"ultraWide"},
     {"id":"desktop-ultrawide","width":1920,"height":1080,"orientation":"landscape","class":"ultraWide"}
   ],
+  "orientation_policy": {
+    "app_shell": {
+      "mode": "responsive",
+      "supported_postures": ["portrait", "landscape"],
+      "android_manifest": "android/app/src/main/AndroidManifest.xml",
+      "ios_manifest": "ios/Runner/Info.plist"
+    },
+    "life_counter_native": {
+      "mode": "route_scoped_landscape_lock",
+      "source": "lib/features/home/lotus/lotus_presentation_mode.dart",
+      "entry_source": "lib/features/home/lotus_life_counter_screen.dart",
+      "web_exclusion_guard": "!kIsWeb",
+      "allowed_device_orientations": [
+        "DeviceOrientation.landscapeLeft",
+        "DeviceOrientation.landscapeRight"
+      ],
+      "test": "test/features/home/lotus_presentation_mode_test.dart",
+      "anchor": "locks the life counter to both landscape orientations"
+    },
+    "web_pwa": {
+      "mode": "responsive",
+      "supported_postures": ["portrait", "landscape"],
+      "manifest": "web/manifest.json",
+      "manifest_orientation": "any"
+    }
+  },
   "adaptations": {
     "virtual_keyboard": {
       "viewport_id": "mobile-reference",

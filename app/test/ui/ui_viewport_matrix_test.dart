@@ -20,6 +20,8 @@ void main() {
       '320x568',
       '390x844',
       '412x915',
+      '844x390',
+      '915x412',
       '768x1024',
       '1024x768',
       '599x844',
@@ -53,6 +55,132 @@ void main() {
       );
     }
   });
+
+  test('documents and guards the app orientation policy', () {
+    final policy = matrix['orientation_policy'] as Map<String, dynamic>;
+    final appShell = policy['app_shell'] as Map<String, dynamic>;
+    final lifeCounter = policy['life_counter_native'] as Map<String, dynamic>;
+    final webPwa = policy['web_pwa'] as Map<String, dynamic>;
+
+    expect(appShell['mode'], 'responsive');
+    expect((appShell['supported_postures'] as List<dynamic>).toSet(), {
+      'portrait',
+      'landscape',
+    });
+    expect(webPwa['mode'], 'responsive');
+    expect((webPwa['supported_postures'] as List<dynamic>).toSet(), {
+      'portrait',
+      'landscape',
+    });
+
+    final androidManifest = File(
+      appShell['android_manifest'] as String,
+    ).readAsStringSync();
+    expect(
+      androidManifest,
+      isNot(contains('android:screenOrientation=')),
+      reason: 'the Android app shell must remain responsive to rotation',
+    );
+
+    final iosManifest = File(
+      appShell['ios_manifest'] as String,
+    ).readAsStringSync();
+    expect(iosManifest, contains('UIInterfaceOrientationPortrait'));
+    expect(iosManifest, contains('UIInterfaceOrientationLandscapeLeft'));
+    expect(iosManifest, contains('UIInterfaceOrientationLandscapeRight'));
+
+    final pwaManifest =
+        jsonDecode(File(webPwa['manifest'] as String).readAsStringSync())
+            as Map<String, dynamic>;
+    expect(pwaManifest['orientation'], webPwa['manifest_orientation']);
+    expect(pwaManifest['orientation'], 'any');
+
+    expect(lifeCounter['mode'], 'route_scoped_landscape_lock');
+    final lifeCounterSource = lifeCounter['source'] as String;
+    final orientationOwners = Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'))
+        .where(
+          (file) => file.readAsStringSync().contains(
+            'SystemChrome.setPreferredOrientations',
+          ),
+        )
+        .map((file) => file.path)
+        .toSet();
+    expect(
+      orientationOwners,
+      {lifeCounterSource},
+      reason: 'only the native Life Counter route may lock orientation',
+    );
+
+    final lifeCounterEntrySource = lifeCounter['entry_source'] as String;
+    final presentationModeClients = Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'))
+        .where(
+          (file) => file.readAsStringSync().contains(
+            'LotusPresentationMode.instance.enter()',
+          ),
+        )
+        .map((file) => file.path)
+        .toSet();
+    expect(
+      presentationModeClients,
+      {lifeCounterEntrySource},
+      reason: 'no app route besides Life Counter may enter landscape mode',
+    );
+    final entrySource = File(lifeCounterEntrySource).readAsStringSync();
+    expect(entrySource, contains(lifeCounter['web_exclusion_guard']));
+    expect(
+      entrySource,
+      matches(RegExp(r'_ownsPresentationMode\s*=\s*!kIsWeb\s*&&')),
+      reason: 'Web and installed PWA must never enter native landscape mode',
+    );
+
+    final source = File(lifeCounterSource).readAsStringSync();
+    for (final orientation
+        in (lifeCounter['allowed_device_orientations'] as List<dynamic>)
+            .cast<String>()) {
+      expect(source, contains(orientation));
+    }
+    expect(
+      source,
+      contains(
+        'SystemChrome.setPreferredOrientations(DeviceOrientation.values)',
+      ),
+      reason: 'leaving Life Counter must restore every app orientation',
+    );
+    _expectTestContains(
+      lifeCounter['test'] as String,
+      lifeCounter['anchor'] as String,
+    );
+  });
+
+  test(
+    'covers reference phones in portrait and landscape by logical width',
+    () {
+      final viewportsById = {
+        for (final viewport in _viewports(matrix)) viewport['id']: viewport,
+      };
+
+      for (final pair in const [
+        ('mobile-reference', 'mobile-reference-landscape'),
+        ('mobile-large', 'mobile-large-landscape'),
+      ]) {
+        final portrait = viewportsById[pair.$1]!;
+        final landscape = viewportsById[pair.$2]!;
+
+        expect(portrait['width'], landscape['height']);
+        expect(portrait['height'], landscape['width']);
+        expect(portrait['orientation'], 'portrait');
+        expect(landscape['orientation'], 'landscape');
+        expect(portrait['class'], 'compact');
+        expect(landscape['class'], 'expanded');
+      }
+    },
+  );
 
   test(
     'keyboard, 200% text and every product domain have executable evidence',

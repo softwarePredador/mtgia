@@ -70,6 +70,8 @@ DeckDetails _makeDeck({
   String? pricingCurrency,
   int? pricingMissingCards,
   Map<String, dynamic> stats = const {},
+  String validationState = 'unknown',
+  List<String> reviewReasons = const ['validation_not_recorded'],
 }) {
   return DeckDetails(
     id: id,
@@ -88,6 +90,8 @@ DeckDetails _makeDeck({
     pricingTotal: pricingTotal,
     pricingCurrency: pricingCurrency,
     pricingMissingCards: pricingMissingCards,
+    validationState: validationState,
+    reviewReasons: reviewReasons,
     stats: stats,
     commander: [
       DeckCardItem(
@@ -402,6 +406,113 @@ void main() {
     expect(find.text('Leitura pronta'), findsOneWidget);
     expect(find.text('Atualizar análise'), findsOneWidget);
   });
+
+  testWidgets(
+    'summary uses canonical backend validation and never calls a duplicate deck ready',
+    (tester) async {
+      final deck = _makeDeck(
+        id: 'deck-invalid-singleton',
+        name: 'Talrand inválido',
+        cardCount: 100,
+        validationState: 'draft',
+        reviewReasons: const [
+          'strict_validation_failed',
+          'singleton_violation',
+        ],
+      );
+
+      await tester.pumpWidget(_subject(deck));
+      await tester.pumpAndSettle();
+
+      final summary = find.byKey(const Key('deck-analysis-validation-summary'));
+      expect(summary, findsOneWidget);
+      expect(
+        find.descendant(of: summary, matching: find.text('Validação')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: summary, matching: find.text('Revisar')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: summary,
+          matching: find.text('Regra do formato pendente'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: summary, matching: find.text('Pronto')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: summary, matching: find.text('100/100')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'summary only reports validated when backend state is validated',
+    (tester) async {
+      final deck = _makeDeck(
+        id: 'deck-backend-validated',
+        name: 'Talrand validado',
+        validationState: 'validated',
+        reviewReasons: const [],
+      );
+
+      await tester.pumpWidget(_subject(deck));
+      await tester.pumpAndSettle();
+
+      final summary = find.byKey(const Key('deck-analysis-validation-summary'));
+      expect(
+        find.descendant(of: summary, matching: find.text('Validado')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: summary, matching: find.text('Servidor')),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'analysis remains scrollable and actionable at 844x390 landscape',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(844, 390);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      var opened = false;
+      final deck = _makeDeck(
+        id: 'deck-analysis-landscape',
+        name: 'Talrand horizontal',
+        validationState: 'draft',
+        reviewReasons: const ['strict_validation_failed'],
+      );
+
+      await tester.pumpWidget(
+        _subject(deck, onOpenBattleLab: () => opened = true),
+      );
+      await tester.pumpAndSettle();
+
+      final action = find.byKey(
+        const Key('deck-analysis-open-battle-lab-button'),
+      );
+      await tester.ensureVisible(action);
+      await tester.pumpAndSettle();
+      final rect = tester.getRect(action);
+      expect(rect.left, greaterThanOrEqualTo(0));
+      expect(rect.right, lessThanOrEqualTo(844));
+      expect(rect.top, greaterThanOrEqualTo(0));
+      expect(rect.bottom, lessThanOrEqualTo(390));
+      await tester.tap(action);
+      await tester.pump();
+      expect(opened, isTrue);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('generates AI summary only after an explicit player action', (
     tester,

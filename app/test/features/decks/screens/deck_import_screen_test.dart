@@ -4,6 +4,7 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_import_screen.dart';
+import 'package:manaloom/features/decks/services/deck_entry_draft_store.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -128,6 +129,29 @@ void main() {
     expect(ctaSize.width, lessThanOrEqualTo(320));
   });
 
+  testWidgets('keeps the import CTA reachable at 844x390 landscape', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(844, 390);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(_buildSubject());
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('deck-import-desktop-panes')), findsNothing);
+    final submit = find.byKey(const Key('deck-import-screen-submit-button'));
+    await tester.ensureVisible(submit);
+    await tester.pumpAndSettle();
+    final rect = tester.getRect(submit);
+    expect(rect.left, greaterThanOrEqualTo(0));
+    expect(rect.right, lessThanOrEqualTo(844));
+    expect(rect.top, greaterThanOrEqualTo(kToolbarHeight));
+    expect(rect.bottom, lessThanOrEqualTo(390));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('filled desktop list keeps an accessible text-field label', (
     tester,
   ) async {
@@ -247,5 +271,10 @@ void main() {
     );
     expect(find.text('Abrir rascunho'), findsOneWidget);
     expect(find.text('1 cartas não identificadas'), findsOneWidget);
+
+    final draft = await DeckEntryDraftStore().loadImport('local');
+    expect(draft?['name'], 'Kaalia import');
+    expect(draft?['commander'], 'Kaalia da Vastidão');
+    expect(draft?['card_list'], '1 Sol Ring\n1 Dragao Pira Funesta');
   });
 }
