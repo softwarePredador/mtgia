@@ -57,6 +57,17 @@ class XMageTestScenarioMinerTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["status"], "no_exact_test_reference_found")
         self.assertIn("does not mean XMage has no card implementation", report["notes"][1])
 
+    def test_short_split_face_does_not_match_generic_java_fragments(self) -> None:
+        report = miner.build_report(
+            ["SP//dr, Piloted by Peni"],
+            xmage_root=self._root(),
+        )
+
+        card = report["cards"][0]
+        self.assertNotIn("SP", card["search_terms"])
+        self.assertEqual(card["status"], "no_exact_test_reference_found")
+        self.assertEqual(card["test_file_count"], 0)
+
     def test_markdown_contains_boundary(self) -> None:
         report = miner.build_report(["Promise of Loyalty"], xmage_root=self._root())
         markdown = miner.render_markdown(report)

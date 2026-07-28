@@ -83,8 +83,19 @@ def iter_test_files(xmage_root: Path) -> list[Path]:
 
 def card_search_terms(card_name: str) -> list[str]:
     first = first_face_name(card_name)
-    terms = [card_name, first, java_class_name(first), java_class_name(card_name)]
-    return sorted({term for term in terms if term}, key=lambda value: (len(value), value.lower()), reverse=True)
+    terms = [card_name, java_class_name(card_name)]
+    for derived in (first, java_class_name(first)):
+        # Short split-card faces such as "SP" are common Java/text fragments.
+        # Treating them as substring evidence turns one card into hundreds of
+        # unrelated scenario hits. Keep only derived terms with enough identity
+        # to be useful; the complete printed name and complete class name remain.
+        if len(re.sub(r"[^A-Za-z0-9]", "", derived)) >= 4:
+            terms.append(derived)
+    return sorted(
+        {term for term in terms if term},
+        key=lambda value: (len(value), value.lower()),
+        reverse=True,
+    )
 
 
 def command_counts(source: str) -> dict[str, int]:
@@ -160,8 +171,15 @@ def scenario_shape(source: str) -> dict[str, Any]:
 
 
 def method_matches_card(method_source: str, terms: list[str]) -> bool:
-    lower_source = method_source.lower()
-    return any(term.lower() in lower_source for term in terms)
+    return any(
+        re.search(
+            rf"(?<![A-Za-z0-9_]){re.escape(term)}(?![A-Za-z0-9_])",
+            method_source,
+            flags=re.IGNORECASE,
+        )
+        is not None
+        for term in terms
+    )
 
 
 def mine_card(card_name: str, *, xmage_root: Path, test_files: list[Path]) -> dict[str, Any]:

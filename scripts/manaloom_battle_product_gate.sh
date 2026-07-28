@@ -683,6 +683,8 @@ run_static_gate() {
     --json-output "$PIN_AUDIT_OUT"
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_capability_alignment_audit.py \
     --output-prefix "$STATIC_AUDIT_DIR/external_engine_capability_alignment"
+  python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py \
+    --output-prefix "$STATIC_AUDIT_DIR/xmage_pin_transition"
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py \
     --output-prefix "$STATIC_AUDIT_DIR/xmage_execution_contract"
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py \
@@ -706,6 +708,10 @@ run_static_gate() {
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_external_battle_async_runner.py
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_capability_alignment_audit.py
+  PYTHONWARNINGS=error::ResourceWarning \
+    python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_pin_transition_audit.py
+  PYTHONWARNINGS=error::ResourceWarning \
+    python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py

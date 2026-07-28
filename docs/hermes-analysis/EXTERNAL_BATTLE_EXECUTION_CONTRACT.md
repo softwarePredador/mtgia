@@ -48,7 +48,10 @@ deploy refuses to run when the service spec does not point to the internal
 new-server PostgreSQL target. Both deploy paths require the expected image in
 the service spec and in the running task, a completed update state, and `1/1`
 replicas; an old healthy task cannot satisfy deployment success. Host-port
-services use `stop-first` for update and rollback.
+services use `stop-first` for update and rollback. Before reading deployment
+coordinates, the sidecar deploy also runs the active XMage pin-transition
+auditor with `--require-deployable`; a structurally valid
+`review_required` card audit blocks deployment.
 
 All three battle deploy scripts execute
 `scripts/manaloom_battle_product_gate.sh` before deployment. The live product
@@ -64,6 +67,7 @@ The supported quality hierarchy has one battle product gate:
 | `scripts/quality_gate.sh battle` / `dart run melos run battle` | canonical dispatcher | discoverable local and CI aliases |
 | `scripts/manaloom_battle_product_gate.sh` | canonical battle product gate | native, Forge, XMage, manifest, static product contract, and focused Dart checks; no live service or database writes |
 | `scripts/quality_gate.sh engine-capabilities` | engine capability alignment | checks roles, pins, licenses, Java import boundaries, evidence paths, and explicit adoption decisions; optional exact source inventories remain read-only |
+| `scripts/quality_gate.sh engine-transition` | XMage pin-transition integrity | validates the complete Git delta and one evidence-backed disposition for every added/modified card; structural PASS does not imply deployment qualification |
 | `scripts/manaloom_e2e_suite.sh` | broader E2E orchestrator | calls the canonical battle gate plus app, server, deckbuilder, and optional live layers |
 | `server/bin/manaloom_battle_product_e2e_audit.py` | component static audit | verifies app-to-engine-to-persistence wiring and this topology; it is not a second E2E runner |
 | `server/test/battle_product_e2e_test.dart` | opt-in live contract | post-deploy proof; creates temporary database rows and cleans them up |
@@ -110,6 +114,14 @@ by
 and by the canonical Battle gate. Every reviewed XMage/Forge capability must be
 classified as adopted, evaluated but not adopted, out of current product scope,
 or explicitly rejected. Unclassified capabilities fail the audit.
+
+Pin transitions have a second, narrower machine-readable contract:
+`docs/hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json`. Its
+versioned evidence must use the complete Git object diff, classify every
+changed card implementation, preserve the distinction between catalog
+resolution and semantic execution, and record PostgreSQL scope reconciliation.
+The weekly upstream delta is discovery input only. `review_required` is a valid
+integrity result but is not deployable.
 
 Current boundaries:
 

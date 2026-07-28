@@ -20,6 +20,10 @@ for tool in base64 curl git jq python3 shasum ssh; do
   require_tool "$tool"
 done
 
+python3 \
+  "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py" \
+  --require-deployable
+
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "env file not found: $ENV_FILE" >&2
   exit 2

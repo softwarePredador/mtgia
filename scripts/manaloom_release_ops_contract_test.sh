@@ -77,6 +77,7 @@ SHELL_SCRIPTS=(
   scripts/manaloom_build_android_release.sh
   scripts/manaloom_build_beta_release.sh
   scripts/manaloom_battle_product_gate.sh
+  scripts/manaloom_deploy_battle_sidecars.sh
   scripts/manaloom_deep_ai_alignment_tester.sh
   scripts/manaloom_deploy_backend_image.sh
   scripts/manaloom_deploy_flutter_web.sh
@@ -85,6 +86,7 @@ SHELL_SCRIPTS=(
   scripts/manaloom_full_restore_drill.sh
   scripts/manaloom_global_battle_closure.sh
   scripts/manaloom_install_remote_backup_cron.sh
+  scripts/manaloom_xmage_pin_transition_audit.sh
   scripts/manaloom_offsite_backup.sh
   scripts/manaloom_pg_hermes_sqlite_contract_audit.sh
   scripts/manaloom_publish_android_release.sh
@@ -101,6 +103,29 @@ SHELL_SCRIPTS=(
 for relative in "${SHELL_SCRIPTS[@]}"; do
   bash -n "$ROOT_DIR/$relative"
 done
+
+XMAGE_TRANSITION_AUDITOR="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py"
+grep -Fq '"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py"' \
+  "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
+grep -Fq -- '--require-deployable' \
+  "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
+PYTHONDONTWRITEBYTECODE=1 python3 "$XMAGE_TRANSITION_AUDITOR" \
+  --output-prefix "$TMP_DIR/xmage-pin-transition"
+XMAGE_DEPLOYMENT_ALLOWED="$(
+  jq -r '.deployment_allowed' "$TMP_DIR/xmage-pin-transition.json"
+)"
+if [[ "$XMAGE_DEPLOYMENT_ALLOWED" != "true" &&
+      "$XMAGE_DEPLOYMENT_ALLOWED" != "false" ]]; then
+  echo "auditor de transicao XMage nao publicou deployment_allowed booleano" >&2
+  exit 1
+elif [[ "$XMAGE_DEPLOYMENT_ALLOWED" == "true" ]]; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "$XMAGE_TRANSITION_AUDITOR" \
+    --require-deployable >/dev/null
+elif PYTHONDONTWRITEBYTECODE=1 python3 "$XMAGE_TRANSITION_AUDITOR" \
+  --require-deployable >/dev/null 2>&1; then
+  echo "deploy de XMage aceitou transicao com revisoes de cartas pendentes" >&2
+  exit 1
+fi
 PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
   python3 -m py_compile \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \

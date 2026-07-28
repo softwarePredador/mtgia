@@ -30,6 +30,14 @@ como `PASS`. O modo `--check` também falha quando não existe relatório, quand
 o resultado mais recente é `fail`/`skipped` ou quando `latest.json` tem mais de
 oito dias.
 
+Esta rotina é somente descoberta. Depois de um avanço explícito de XMage, a
+qualificação do pin passa para
+`docs/hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json` e
+`./scripts/quality_gate.sh engine-transition`. O gate de transição usa o diff
+Git exato entre os dois SHAs e exige uma disposição para cada implementação de
+carta adicionada ou modificada; a lista truncada da API nunca pode ser usada
+como inventário final.
+
 ## Operação no macOS
 
 O projeto não usa GitHub Actions. Para checkouts em `Documents`, `Desktop` ou
@@ -86,9 +94,15 @@ continua exigindo, no mínimo:
 1. leitura dos commits/arquivos classificados e dos fixtures candidatos;
 2. avanço explícito e consistente de todos os mirrors do pin;
 3. build reproduzível dos sidecars;
-4. testes focados das regras alteradas e gates de Battle/capacidades;
-5. replay, persistência e identidade de runtime coerentes;
-6. commit e implantação separados, sem promoção automática de regra.
+4. diff Git exato e classificação nominal de todas as cartas
+   adicionadas/modificadas, distinguindo resolução de catálogo de prova
+   semântica;
+5. testes focados das regras alteradas e gates de
+   Battle/capacidades/transição;
+6. reconciliação read-only com a identidade/Oracle/legality do PostgreSQL
+   antes de permitir deploy;
+7. replay, persistência e identidade de runtime coerentes;
+8. commit e implantação separados, sem promoção automática de regra.
 
 ## Validação do contrato
 
@@ -98,4 +112,5 @@ bash -n \
   scripts/manaloom_install_external_engine_delta_schedule.sh
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_delta_schedule_contract.py
 ./scripts/quality_gate.sh engine-capabilities
+./scripts/quality_gate.sh engine-transition
 ```

@@ -1,0 +1,4133 @@
+{
+  "canonical_snapshot_regression": {
+    "added_exact_name_matches": 0,
+    "interpretation": "The 8073-name coverage proof did not exercise any of the 87 added XMage implementation names; it remains an old-corpus regression proof, not a new-card delta proof.",
+    "is_new_card_delta_proof": false,
+    "modified_exact_name_matches": 5,
+    "modified_matching_classes": [
+      "AvengersTower",
+      "BaxterBuilding",
+      "CurrencyConverter",
+      "PlanetariumOfWanShiTong",
+      "TalionTheKindlyLord"
+    ],
+    "snapshot_name_count": 8073,
+    "snapshot_path": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json"
+  },
+  "card_summary": {
+    "added_external_residual": 1,
+    "added_future_only_as_of_2026_07_28": 44,
+    "added_with_any_future_set_registration_as_of_2026_07_28": 45,
+    "added_with_current_or_prior_registration_as_of_2026_07_28": 43,
+    "added_with_direct_nominal_test_reference": 2,
+    "added_without_direct_nominal_semantic_proof": 84,
+    "change_kinds": {
+      "added": 87,
+      "modified": 82
+    },
+    "dispositions": {
+      "catalog_supported_regression_only_review_required": 82,
+      "catalog_supported_semantic_review_required": 84,
+      "external_residual_upstream_unfinished": 1,
+      "focused_upstream_test_passed": 2
+    },
+    "modified_with_source_todo_for_missing_copy_tests": 2,
+    "runtime_catalog_statuses": {
+      "supported": 168,
+      "unsupported": 1
+    },
+    "total_changed": 169
+  },
+  "cards": [
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Advancing the Spirit",
+      "change_kind": "added",
+      "class": "AdvancingTheSpirit",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Advancing the Spirit",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AdvancingTheSpirit.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ajani Resolute",
+      "change_kind": "added",
+      "class": "AjaniResolute",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ajani Resolute",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AjaniResolute.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "change_kind": "added",
+      "class": "AliciaMastersSkilledSculptor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AliciaMastersSkilledSculptor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Amok Time",
+      "change_kind": "added",
+      "class": "AmokTime",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Amok Time",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AmokTime.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bag End Banquet",
+      "change_kind": "added",
+      "class": "BagEndBanquet",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bag End Banquet",
+          "release_date": "2026-08-14",
+          "set_code": "HOC",
+          "set_name": "The Hobbit Commander",
+          "set_registry": "TheHobbitCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BagEndBanquet.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bast, Panther Goddess",
+      "change_kind": "added",
+      "class": "BastPantherGoddess",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bast, Panther Goddess",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BastPantherGoddess.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Beckett Mariner, Impetuous Ensign",
+      "change_kind": "added",
+      "class": "BeckettMarinerImpetuousEnsign",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Beckett Mariner, Impetuous Ensign",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BeckettMarinerImpetuousEnsign.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Benjamin Sisko, Besieged",
+      "change_kind": "added",
+      "class": "BenjaminSiskoBesieged",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Benjamin Sisko, Besieged",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BenjaminSiskoBesieged.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bilbo, Fellow Conspirator",
+      "change_kind": "added",
+      "class": "BilboFellowConspirator",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bilbo, Fellow Conspirator",
+          "release_date": "2026-08-14",
+          "set_code": "HOC",
+          "set_name": "The Hobbit Commander",
+          "set_registry": "TheHobbitCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BilboFellowConspirator.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bio-Asset Allocator",
+      "change_kind": "added",
+      "class": "BioAssetAllocator",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bio-Asset Allocator",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BioAssetAllocator.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Black Panther, Most Dangerous",
+      "change_kind": "added",
+      "class": "BlackPantherMostDangerous",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Black Panther, Most Dangerous",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherMostDangerous.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bothersome Noisemaker",
+      "change_kind": "added",
+      "class": "BothersomeNoisemaker",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bothersome Noisemaker",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BothersomeNoisemaker.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Brawn, Amadeus Cho",
+      "change_kind": "added",
+      "class": "BrawnAmadeusCho",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Brawn, Amadeus Cho",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BrawnAmadeusCho.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bucky Barnes, Eager Ally",
+      "change_kind": "added",
+      "class": "BuckyBarnesEagerAlly",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bucky Barnes, Eager Ally",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BuckyBarnesEagerAlly.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Burn, Burn, Tree and Fern",
+      "change_kind": "added",
+      "class": "BurnBurnTreeAndFern",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Burn, Burn, Tree and Fern",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BurnBurnTreeAndFern.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Captain America, Liberator",
+      "change_kind": "added",
+      "class": "CaptainAmericaLiberator",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Captain America, Liberator",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainAmericaLiberator.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Captain James T. Kirk",
+      "change_kind": "added",
+      "class": "CaptainJamesTKirk",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Captain James T. Kirk",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainJamesTKirk.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Captain Kathryn Janeway",
+      "change_kind": "added",
+      "class": "CaptainKathrynJaneway",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Captain Kathryn Janeway",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainKathrynJaneway.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Consider the Prime Directive",
+      "change_kind": "added",
+      "class": "ConsiderThePrimeDirective",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Consider the Prime Directive",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/ConsiderThePrimeDirective.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Craterclaw Colossus",
+      "change_kind": "added",
+      "class": "CraterclawColossus",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Craterclaw Colossus",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CraterclawColossus.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Crossover Collaboration",
+      "change_kind": "added",
+      "class": "CrossoverCollaboration",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Crossover Collaboration",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CrossoverCollaboration.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Crystalline Entity",
+      "change_kind": "added",
+      "class": "CrystallineEntity",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Crystalline Entity",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CrystallineEntity.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Darksteel Angel",
+      "change_kind": "added",
+      "class": "DarksteelAngel",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Darksteel Angel",
+          "release_date": "2026-10-02",
+          "set_code": "FRC",
+          "set_name": "Reality Fracture Commander",
+          "set_registry": "RealityFractureCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DarksteelAngel.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Desolation of Smaug",
+      "change_kind": "added",
+      "class": "DesolationOfSmaug",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Desolation of Smaug",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DesolationOfSmaug.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Desolation Prowler",
+      "change_kind": "added",
+      "class": "DesolationProwler",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Desolation Prowler",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DesolationProwler.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Donald Blake, Guise of Thor",
+      "change_kind": "added",
+      "class": "DonaldBlakeGuiseOfThor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Donald Blake, Guise of Thor",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DonaldBlakeGuiseOfThor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Dr. Beverly Crusher",
+      "change_kind": "added",
+      "class": "DrBeverlyCrusher",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Dr. Beverly Crusher",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DrBeverlyCrusher.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Endless Ranks of HYDRA",
+      "change_kind": "added",
+      "class": "EndlessRanksOfHYDRA",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Endless Ranks of HYDRA",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/e/EndlessRanksOfHYDRA.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Fili and Kili, Joyous",
+      "change_kind": "added",
+      "class": "FiliAndKiliJoyous",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Fili and Kili, Joyous",
+          "release_date": "2026-08-14",
+          "set_code": "HOC",
+          "set_name": "The Hobbit Commander",
+          "set_registry": "TheHobbitCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/f/FiliAndKiliJoyous.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Garruk, Veiled Butcher",
+      "change_kind": "added",
+      "class": "GarrukVeiledButcher",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Garruk, Veiled Butcher",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/g/GarrukVeiledButcher.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Gathering of Darkness",
+      "change_kind": "added",
+      "class": "GatheringOfDarkness",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Gathering of Darkness",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/g/GatheringOfDarkness.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "HYDRA Troopers",
+      "change_kind": "added",
+      "class": "HYDRATroopers",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "HYDRA Troopers",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HYDRATroopers.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hatut Zeraze Strike Force",
+      "change_kind": "added",
+      "class": "HatutZerazeStrikeForce",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hatut Zeraze Strike Force",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HatutZerazeStrikeForce.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hawkeye, Bowslinger",
+      "change_kind": "added",
+      "class": "HawkeyeBowslinger",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hawkeye, Bowslinger",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HawkeyeBowslinger.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hex Magic",
+      "change_kind": "added",
+      "class": "HexMagic",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hex Magic",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        },
+        {
+          "card_name": "Hex Magic",
+          "release_date": "2020-03-12",
+          "set_code": "SLD",
+          "set_name": "Secret Lair Drop",
+          "set_registry": "SecretLairDrop"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HexMagic.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Highly Illogical",
+      "change_kind": "added",
+      "class": "HighlyIllogical",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Highly Illogical",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        },
+        {
+          "card_name": "Highly Illogical",
+          "release_date": "2026-01-01",
+          "set_code": "PW26",
+          "set_name": "Wizards Play Network 2026",
+          "set_registry": "WizardsPlayNetwork2026"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HighlyIllogical.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hyperion's Atomic Vision",
+      "change_kind": "added",
+      "class": "HyperionsAtomicVision",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hyperion's Atomic Vision",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HyperionsAtomicVision.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "In the Pale Moonlight",
+      "change_kind": "added",
+      "class": "InThePaleMoonlight",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "In the Pale Moonlight",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/i/InThePaleMoonlight.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Iron Fist, Hero for Hire",
+      "change_kind": "added",
+      "class": "IronFistHeroForHire",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Iron Fist, Hero for Hire",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/i/IronFistHeroForHire.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Jocasta, Automaton Avenger",
+      "change_kind": "added",
+      "class": "JocastaAutomatonAvenger",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Jocasta, Automaton Avenger",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/j/JocastaAutomatonAvenger.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Killmonger, Ruthless Usurper",
+      "change_kind": "added",
+      "class": "KillmongerRuthlessUsurper",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Killmonger, Ruthless Usurper",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/k/KillmongerRuthlessUsurper.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Kirk, Enterprising Captain",
+      "change_kind": "added",
+      "class": "KirkEnterprisingCaptain",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Kirk, Enterprising Captain",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/k/KirkEnterprisingCaptain.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Klingon Strike Force",
+      "change_kind": "added",
+      "class": "KlingonStrikeForce",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Klingon Strike Force",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/k/KlingonStrikeForce.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Liliana the Faultless",
+      "change_kind": "added",
+      "class": "LilianaTheFaultless",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Liliana the Faultless",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/l/LilianaTheFaultless.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Liliana the Repentant",
+      "change_kind": "added",
+      "class": "LilianaTheRepentant",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Liliana the Repentant",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/l/LilianaTheRepentant.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "MACH-1, Swooping Scoundrel",
+      "change_kind": "added",
+      "class": "MACH1SwoopingScoundrel",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "MACH-1, Swooping Scoundrel",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MACH1SwoopingScoundrel.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Mirkwood Pathmaker",
+      "change_kind": "added",
+      "class": "MirkwoodPathmaker",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Mirkwood Pathmaker",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MirkwoodPathmaker.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Misty Mountains Raider",
+      "change_kind": "added",
+      "class": "MistyMountainsRaider",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Misty Mountains Raider",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MistyMountainsRaider.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Munitions Enthusiast",
+      "change_kind": "added",
+      "class": "MunitionsEnthusiast",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Munitions Enthusiast",
+          "release_date": "2026-01-01",
+          "set_code": "PW26",
+          "set_name": "Wizards Play Network 2026",
+          "set_registry": "WizardsPlayNetwork2026"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MunitionsEnthusiast.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Nick Fury, Agent of S.H.I.E.L.D.",
+      "change_kind": "added",
+      "class": "NickFuryAgentOfSHIELD",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Nick Fury, Agent of S.H.I.E.L.D.",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/n/NickFuryAgentOfSHIELD.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Operations Officer",
+      "change_kind": "added",
+      "class": "OperationsOfficer",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Operations Officer",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/o/OperationsOfficer.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Origin of Captain America",
+      "change_kind": "added",
+      "class": "OriginOfCaptainAmerica",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Origin of Captain America",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfCaptainAmerica.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Origin of the Avengers",
+      "change_kind": "added",
+      "class": "OriginOfTheAvengers",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Origin of the Avengers",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfTheAvengers.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Origin of the Hulk",
+      "change_kind": "added",
+      "class": "OriginOfTheHulk",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Origin of the Hulk",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfTheHulk.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Origin of Thor",
+      "change_kind": "added",
+      "class": "OriginOfThor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Origin of Thor",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfThor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Photon Blast Barrage",
+      "change_kind": "added",
+      "class": "PhotonBlastBarrage",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Photon Blast Barrage",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/p/PhotonBlastBarrage.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Picard, Steadfast Captain",
+      "change_kind": "added",
+      "class": "PicardSteadfastCaptain",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Picard, Steadfast Captain",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/p/PicardSteadfastCaptain.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Prudent Fateseer",
+      "change_kind": "added",
+      "class": "PrudentFateseer",
+      "direct_test_references": [],
+      "disposition": "external_residual_upstream_unfinished",
+      "external_residual": {
+        "forge_exact_match_count": 0,
+        "forge_pin": "a62915f500c2411484689294659c6bb84ea215f8",
+        "product_scope_status": "pending_postgresql_read_only_reconciliation",
+        "reason": "removed_from_xmage_catalog_as_unfinished",
+        "set_release_date": "2026-10-02",
+        "xmage_catalog_removal_line": 61,
+        "xmage_set_registry_path": "Mage.Sets/src/mage/sets/RealityFracture.java",
+        "xmage_unfinished_list_line": 15
+      },
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "unsupported",
+      "set_registrations": [
+        {
+          "card_name": "Prudent Fateseer",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/p/PrudentFateseer.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Quicksilver, Speedster",
+      "change_kind": "added",
+      "class": "QuicksilverSpeedster",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Quicksilver, Speedster",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/q/QuicksilverSpeedster.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Raft Security Officer",
+      "change_kind": "added",
+      "class": "RaftSecurityOfficer",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Raft Security Officer",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RaftSecurityOfficer.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ravenhill Flock",
+      "change_kind": "added",
+      "class": "RavenhillFlock",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ravenhill Flock",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RavenhillFlock.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Red Guardian, Super-Soldier",
+      "change_kind": "added",
+      "class": "RedGuardianSuperSoldier",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Red Guardian, Super-Soldier",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RedGuardianSuperSoldier.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Red Hulk",
+      "change_kind": "added",
+      "class": "RedHulk",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Red Hulk",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RedHulk.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "SP//dr, Piloted by Peni",
+      "change_kind": "added",
+      "class": "SPDrPilotedByPeni",
+      "direct_test_references": [
+        "Mage.Tests/src/test/java/org/mage/test/cards/single/spm/SPDrPilotedByPeniTest.java"
+      ],
+      "disposition": "focused_upstream_test_passed",
+      "focused_test_case_count": 1,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "SP//dr, Piloted by Peni",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SPDrPilotedByPeni.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Set Phasers to...",
+      "change_kind": "added",
+      "class": "SetPhasersTo",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Set Phasers to...",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SetPhasersTo.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "She-Hulk, Wallbreaker",
+      "change_kind": "added",
+      "class": "SheHulkWallbreaker",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "She-Hulk, Wallbreaker",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SheHulkWallbreaker.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Sky Cycle",
+      "change_kind": "added",
+      "class": "SkyCycle",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Sky Cycle",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SkyCycle.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Spock, Logical Choice",
+      "change_kind": "added",
+      "class": "SpockLogicalChoice",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Spock, Logical Choice",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SpockLogicalChoice.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Stark's Ingenuity",
+      "change_kind": "added",
+      "class": "StarksIngenuity",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Stark's Ingenuity",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/StarksIngenuity.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Stick, Fearless Mentor",
+      "change_kind": "added",
+      "class": "StickFearlessMentor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Stick, Fearless Mentor",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/StickFearlessMentor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Sting, Bilbo's Sword",
+      "change_kind": "added",
+      "class": "StingBilbosSword",
+      "direct_test_references": [
+        "Mage.Tests/src/test/java/org/mage/test/cards/single/hob/StingBilbosSwordTest.java"
+      ],
+      "disposition": "focused_upstream_test_passed",
+      "focused_test_case_count": 2,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Sting, Bilbo's Sword",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/StingBilbosSword.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Stunning Shot",
+      "change_kind": "added",
+      "class": "StunningShot",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Stunning Shot",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/StunningShot.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Swordsman's Steel",
+      "change_kind": "added",
+      "class": "SwordsmansSteel",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Swordsman's Steel",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SwordsmansSteel.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Tenacious Tosk",
+      "change_kind": "added",
+      "class": "TenaciousTosk",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Tenacious Tosk",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TenaciousTosk.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Chief Warg",
+      "change_kind": "added",
+      "class": "TheChiefWarg",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Chief Warg",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheChiefWarg.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Lonely Mountain",
+      "change_kind": "added",
+      "class": "TheLonelyMountain",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Lonely Mountain",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheLonelyMountain.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Queen of Dale",
+      "change_kind": "added",
+      "class": "TheQueenOfDale",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Queen of Dale",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheQueenOfDale.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Theorist, Jace Beleren",
+      "change_kind": "added",
+      "class": "TheTheoristJaceBeleren",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Theorist, Jace Beleren",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheTheoristJaceBeleren.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Thing Swing",
+      "change_kind": "added",
+      "class": "ThingSwing",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Thing Swing",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/ThingSwing.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Tinybones, Pocket Nuisance",
+      "change_kind": "added",
+      "class": "TinybonesPocketNuisance",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Tinybones, Pocket Nuisance",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TinybonesPocketNuisance.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Titanbones, Towering Heart",
+      "change_kind": "added",
+      "class": "TitanbonesToweringHeart",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Titanbones, Towering Heart",
+          "release_date": "2026-10-02",
+          "set_code": "FRA",
+          "set_name": "Reality Fracture",
+          "set_registry": "RealityFracture"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TitanbonesToweringHeart.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Trelane, Squire of Gothos",
+      "change_kind": "added",
+      "class": "TrelaneSquireOfGothos",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Trelane, Squire of Gothos",
+          "release_date": "2026-11-13",
+          "set_code": "TRC",
+          "set_name": "Star Trek Commander",
+          "set_registry": "StarTrekCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TrelaneSquireOfGothos.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "U.S.S. Enterprise-D, Galaxy-Class",
+      "change_kind": "added",
+      "class": "USSEnterpriseDGalaxyClass",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "U.S.S. Enterprise-D, Galaxy-Class",
+          "release_date": "2026-11-13",
+          "set_code": "TRK",
+          "set_name": "Star Trek",
+          "set_registry": "StarTrek"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/u/USSEnterpriseDGalaxyClass.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Vibranium Strike Gauntlets",
+      "change_kind": "added",
+      "class": "VibraniumStrikeGauntlets",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Vibranium Strike Gauntlets",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/v/VibraniumStrikeGauntlets.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "War Machine, Avenging Arsenal",
+      "change_kind": "added",
+      "class": "WarMachineAvengingArsenal",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "War Machine, Avenging Arsenal",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/w/WarMachineAvengingArsenal.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Winter Soldier, Reborn Avenger",
+      "change_kind": "added",
+      "class": "WinterSoldierRebornAvenger",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Winter Soldier, Reborn Avenger",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/w/WinterSoldierRebornAvenger.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Wolverine, Claws Out",
+      "change_kind": "added",
+      "class": "WolverineClawsOut",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_semantic_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Wolverine, Claws Out",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/w/WolverineClawsOut.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ant-Man, Colony Commander",
+      "change_kind": "modified",
+      "class": "AntManColonyCommander",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ant-Man, Colony Commander",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AntManColonyCommander.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ant-Man, Elusive Avenger",
+      "change_kind": "modified",
+      "class": "AntManElusiveAvenger",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ant-Man, Elusive Avenger",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AntManElusiveAvenger.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ant-Man, Reformed Rogue",
+      "change_kind": "modified",
+      "class": "AntManReformedRogue",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ant-Man, Reformed Rogue",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AntManReformedRogue.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Aunt May",
+      "change_kind": "modified",
+      "class": "AuntMay",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Aunt May",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Aunt May",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AuntMay.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": true,
+      "card_name": "Avengers Tower",
+      "change_kind": "modified",
+      "class": "AvengersTower",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Avengers Tower",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/a/AvengersTower.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": true,
+      "card_name": "Baxter Building",
+      "change_kind": "modified",
+      "class": "BaxterBuilding",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Baxter Building",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        },
+        {
+          "card_name": "Baxter Building",
+          "release_date": "2020-03-12",
+          "set_code": "SLD",
+          "set_name": "Secret Lair Drop",
+          "set_registry": "SecretLairDrop"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BaxterBuilding.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bilbo, Luckwearer",
+      "change_kind": "modified",
+      "class": "BilboLuckwearer",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bilbo, Luckwearer",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        },
+        {
+          "card_name": "Bilbo, Luckwearer",
+          "release_date": "2026-01-01",
+          "set_code": "PW26",
+          "set_name": "Wizards Play Network 2026",
+          "set_registry": "WizardsPlayNetwork2026"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BilboLuckwearer.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Black Panther, Vanguard",
+      "change_kind": "modified",
+      "class": "BlackPantherVanguard",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Black Panther, Vanguard",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherVanguard.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Black Widow, Deadly Hunter",
+      "change_kind": "modified",
+      "class": "BlackWidowDeadlyHunter",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Black Widow, Deadly Hunter",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackWidowDeadlyHunter.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Black Widow, Intel Expert",
+      "change_kind": "modified",
+      "class": "BlackWidowIntelExpert",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Black Widow, Intel Expert",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackWidowIntelExpert.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Bullseye, Death Dealer",
+      "change_kind": "modified",
+      "class": "BullseyeDeathDealer",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Bullseye, Death Dealer",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/b/BullseyeDeathDealer.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Captain America, Wings of Freedom",
+      "change_kind": "modified",
+      "class": "CaptainAmericaWingsOfFreedom",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Captain America, Wings of Freedom",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainAmericaWingsOfFreedom.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Claim the Kingdom",
+      "change_kind": "modified",
+      "class": "ClaimTheKingdom",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Claim the Kingdom",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/ClaimTheKingdom.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Count Nefaria",
+      "change_kind": "modified",
+      "class": "CountNefaria",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Count Nefaria",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CountNefaria.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Crimson Cowl, Master of Evil",
+      "change_kind": "modified",
+      "class": "CrimsonCowlMasterOfEvil",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Crimson Cowl, Master of Evil",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CrimsonCowlMasterOfEvil.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Crossbones, Malicious Mercenary",
+      "change_kind": "modified",
+      "class": "CrossbonesMaliciousMercenary",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Crossbones, Malicious Mercenary",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CrossbonesMaliciousMercenary.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": true,
+      "card_name": "Currency Converter",
+      "change_kind": "modified",
+      "class": "CurrencyConverter",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Currency Converter",
+          "release_date": "2002-06-24",
+          "set_code": "PRM",
+          "set_name": "Magic Online Promos",
+          "set_registry": "MagicOnlinePromos"
+        },
+        {
+          "card_name": "Currency Converter",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Currency Converter",
+          "release_date": "2022-04-29",
+          "set_code": "NCC",
+          "set_name": "New Capenna Commander",
+          "set_registry": "NewCapennaCommander"
+        },
+        {
+          "card_name": "Currency Converter",
+          "release_date": "2026-04-24",
+          "set_code": "SOC",
+          "set_name": "Secrets of Strixhaven Commander",
+          "set_registry": "SecretsOfStrixhavenCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/c/CurrencyConverter.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Darwin, Adaptive Mutant",
+      "change_kind": "modified",
+      "class": "DarwinAdaptiveMutant",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Darwin, Adaptive Mutant",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DarwinAdaptiveMutant.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Devil Dinosaur",
+      "change_kind": "modified",
+      "class": "DevilDinosaur",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Devil Dinosaur",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DevilDinosaur.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Doctor Doom, Unrivaled",
+      "change_kind": "modified",
+      "class": "DoctorDoomUnrivaled",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Doctor Doom, Unrivaled",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DoctorDoomUnrivaled.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Doctor Strange, Surgeon",
+      "change_kind": "modified",
+      "class": "DoctorStrangeSurgeon",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Doctor Strange, Surgeon",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DoctorStrangeSurgeon.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Doorman",
+      "change_kind": "modified",
+      "class": "Doorman",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Doorman",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/Doorman.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Dora Milaje Elite",
+      "change_kind": "modified",
+      "class": "DoraMilajeElite",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Dora Milaje Elite",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/d/DoraMilajeElite.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Eerie Gravestone",
+      "change_kind": "modified",
+      "class": "EerieGravestone",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Eerie Gravestone",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Eerie Gravestone",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/e/EerieGravestone.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Falcon, Joaquin Torres",
+      "change_kind": "modified",
+      "class": "FalconJoaquinTorres",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Falcon, Joaquin Torres",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/f/FalconJoaquinTorres.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Falcon's Wing Harness",
+      "change_kind": "modified",
+      "class": "FalconsWingHarness",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Falcon's Wing Harness",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/f/FalconsWingHarness.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Gert and Old Lace, Runaways",
+      "change_kind": "modified",
+      "class": "GertAndOldLaceRunaways",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Gert and Old Lace, Runaways",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/g/GertAndOldLaceRunaways.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Haktos the Unscarred",
+      "change_kind": "modified",
+      "class": "HaktosTheUnscarred",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Haktos the Unscarred",
+          "release_date": "2002-06-24",
+          "set_code": "PRM",
+          "set_name": "Magic Online Promos",
+          "set_registry": "MagicOnlinePromos"
+        },
+        {
+          "card_name": "Haktos the Unscarred",
+          "release_date": "2020-01-24",
+          "set_code": "THB",
+          "set_name": "Theros Beyond Death",
+          "set_registry": "TherosBeyondDeath"
+        },
+        {
+          "card_name": "Haktos the Unscarred",
+          "release_date": "2020-01-24",
+          "set_code": "PTHB",
+          "set_name": "Theros Beyond Death Promos",
+          "set_registry": "TherosBeyondDeathPromos"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HaktosTheUnscarred.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hawkeye, Trick Shot",
+      "change_kind": "modified",
+      "class": "HawkeyeTrickShot",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hawkeye, Trick Shot",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HawkeyeTrickShot.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Heroes' Hangout",
+      "change_kind": "modified",
+      "class": "HeroesHangout",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Heroes' Hangout",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Heroes' Hangout",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HeroesHangout.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hire a Crew",
+      "change_kind": "modified",
+      "class": "HireACrew",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hire a Crew",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HireACrew.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Hulkbuster Armor",
+      "change_kind": "modified",
+      "class": "HulkbusterArmor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Hulkbuster Armor",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/h/HulkbusterArmor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "I Am Iron Man",
+      "change_kind": "modified",
+      "class": "IAmIronMan",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "I Am Iron Man",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/i/IAmIronMan.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Iron Man, Armored Avenger",
+      "change_kind": "modified",
+      "class": "IronManArmoredAvenger",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Iron Man, Armored Avenger",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/i/IronManArmoredAvenger.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Iron Man, Tony Stark",
+      "change_kind": "modified",
+      "class": "IronManTonyStark",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Iron Man, Tony Stark",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/i/IronManTonyStark.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "King T'Challa",
+      "change_kind": "modified",
+      "class": "KingTChalla",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "King T'Challa",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/k/KingTChalla.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Krark, the Thumbless",
+      "change_kind": "modified",
+      "class": "KrarkTheThumbless",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Krark, the Thumbless",
+          "release_date": "2020-11-01",
+          "set_code": "CMR",
+          "set_name": "Commander Legends",
+          "set_registry": "CommanderLegends"
+        },
+        {
+          "card_name": "Krark, the Thumbless",
+          "release_date": "2002-06-24",
+          "set_code": "PRM",
+          "set_name": "Magic Online Promos",
+          "set_registry": "MagicOnlinePromos"
+        },
+        {
+          "card_name": "Krark, the Thumbless",
+          "release_date": "2020-03-12",
+          "set_code": "SLD",
+          "set_name": "Secret Lair Drop",
+          "set_registry": "SecretLairDrop"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/k/KrarkTheThumbless.java",
+      "source_warning_markers": [
+        {
+          "line": 82,
+          "marker": "TODO: need copy tests, see #12911"
+        }
+      ]
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Light-Paws, Emperor's Voice",
+      "change_kind": "modified",
+      "class": "LightPawsEmperorsVoice",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Light-Paws, Emperor's Voice",
+          "release_date": "2022-02-18",
+          "set_code": "NEO",
+          "set_name": "Kamigawa: Neon Dynasty",
+          "set_registry": "KamigawaNeonDynasty"
+        },
+        {
+          "card_name": "Light-Paws, Emperor's Voice",
+          "release_date": "2002-06-24",
+          "set_code": "PRM",
+          "set_name": "Magic Online Promos",
+          "set_registry": "MagicOnlinePromos"
+        },
+        {
+          "card_name": "Light-Paws, Emperor's Voice",
+          "release_date": "2020-03-12",
+          "set_code": "SLD",
+          "set_name": "Secret Lair Drop",
+          "set_registry": "SecretLairDrop"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/l/LightPawsEmperorsVoice.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Living Lightning, Charged Up",
+      "change_kind": "modified",
+      "class": "LivingLightningChargedUp",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Living Lightning, Charged Up",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/l/LivingLightningChargedUp.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Machine Man, Model X-51",
+      "change_kind": "modified",
+      "class": "MachineManModelX51",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Machine Man, Model X-51",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MachineManModelX51.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Mandate of Peace",
+      "change_kind": "modified",
+      "class": "MandateOfPeace",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Mandate of Peace",
+          "release_date": "2019-08-23",
+          "set_code": "C19",
+          "set_name": "Commander 2019",
+          "set_registry": "Commander2019"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MandateOfPeace.java",
+      "source_warning_markers": [
+        {
+          "line": 117,
+          "marker": "TODO: need copy tests, see #12911"
+        }
+      ]
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Matoya, Archon Elder",
+      "change_kind": "modified",
+      "class": "MatoyaArchonElder",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Matoya, Archon Elder",
+          "release_date": "2025-06-13",
+          "set_code": "FIN",
+          "set_name": "Final Fantasy",
+          "set_registry": "FinalFantasy"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MatoyaArchonElder.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Metallic Mimic",
+      "change_kind": "modified",
+      "class": "MetallicMimic",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2017-01-20",
+          "set_code": "AER",
+          "set_name": "Aether Revolt",
+          "set_registry": "AetherRevolt"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2017-01-21",
+          "set_code": "PAER",
+          "set_name": "Aether Revolt Promos",
+          "set_registry": "AetherRevoltPromos"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2025-01-24",
+          "set_code": "INR",
+          "set_name": "Innistrad Remastered",
+          "set_registry": "InnistradRemastered"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2020-11-12",
+          "set_code": "KLR",
+          "set_name": "Kaladesh Remastered",
+          "set_registry": "KaladeshRemastered"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2020-03-12",
+          "set_code": "SLD",
+          "set_name": "Secret Lair Drop",
+          "set_registry": "SecretLairDrop"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2026-03-06",
+          "set_code": "PZA",
+          "set_name": "Teenage Mutant Ninja Turtles Source Material",
+          "set_registry": "TeenageMutantNinjaTurtlesSourceMaterial"
+        },
+        {
+          "card_name": "Metallic Mimic",
+          "release_date": "2023-11-17",
+          "set_code": "LCC",
+          "set_name": "The Lost Caverns of Ixalan Commander",
+          "set_registry": "TheLostCavernsOfIxalanCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Midnight Angel Armor",
+      "change_kind": "modified",
+      "class": "MidnightAngelArmor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Midnight Angel Armor",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MidnightAngelArmor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Mikey & Don, Party Planners",
+      "change_kind": "modified",
+      "class": "MikeyAndDonPartyPlanners",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Mikey & Don, Party Planners",
+          "release_date": "2026-03-06",
+          "set_code": "TMT",
+          "set_name": "Teenage Mutant Ninja Turtles",
+          "set_registry": "TeenageMutantNinjaTurtles"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MikeyAndDonPartyPlanners.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Mirror of Life Trapping",
+      "change_kind": "modified",
+      "class": "MirrorOfLifeTrapping",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Mirror of Life Trapping",
+          "release_date": "2022-06-10",
+          "set_code": "CLB",
+          "set_name": "Commander Legends: Battle for Baldur's Gate",
+          "set_registry": "CommanderLegendsBattleForBaldursGate"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MirrorOfLifeTrapping.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Mjolnir, Hammer of Thor",
+      "change_kind": "modified",
+      "class": "MjolnirHammerOfThor",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Mjolnir, Hammer of Thor",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MjolnirHammerOfThor.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "My Precious",
+      "change_kind": "modified",
+      "class": "MyPrecious",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "My Precious",
+          "release_date": "2026-08-14",
+          "set_code": "HOB",
+          "set_name": "The Hobbit",
+          "set_registry": "TheHobbit"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/m/MyPrecious.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Namor the Sub-Mariner",
+      "change_kind": "modified",
+      "class": "NamorTheSubMariner",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Namor the Sub-Mariner",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/n/NamorTheSubMariner.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Okoye, Dora Milaje Leader",
+      "change_kind": "modified",
+      "class": "OkoyeDoraMilajeLeader",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Okoye, Dora Milaje Leader",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/o/OkoyeDoraMilajeLeader.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": true,
+      "card_name": "Planetarium of Wan Shi Tong",
+      "change_kind": "modified",
+      "class": "PlanetariumOfWanShiTong",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Planetarium of Wan Shi Tong",
+          "release_date": "2025-11-21",
+          "set_code": "TLA",
+          "set_name": "Avatar: The Last Airbender",
+          "set_registry": "AvatarTheLastAirbender"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/p/PlanetariumOfWanShiTong.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ratchet, Field Medic",
+      "change_kind": "modified",
+      "class": "RatchetFieldMedic",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ratchet, Field Medic",
+          "release_date": "2022-11-18",
+          "set_code": "BOT",
+          "set_name": "Transformers",
+          "set_registry": "Transformers"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RatchetFieldMedic.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Red Ghost, Intangible Genius",
+      "change_kind": "modified",
+      "class": "RedGhostIntangibleGenius",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Red Ghost, Intangible Genius",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RedGhostIntangibleGenius.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Repulsor Bots",
+      "change_kind": "modified",
+      "class": "RepulsorBots",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Repulsor Bots",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RepulsorBots.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Restless Bloodseeker",
+      "change_kind": "modified",
+      "class": "RestlessBloodseeker",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Restless Bloodseeker",
+          "release_date": "2021-11-19",
+          "set_code": "VOW",
+          "set_name": "Innistrad: Crimson Vow",
+          "set_registry": "InnistradCrimsonVow"
+        },
+        {
+          "card_name": "Restless Bloodseeker",
+          "release_date": "2021-01-28",
+          "set_code": "DBL",
+          "set_name": "Innistrad: Double Feature",
+          "set_registry": "InnistradDoubleFeature"
+        },
+        {
+          "card_name": "Restless Bloodseeker",
+          "release_date": "2025-01-24",
+          "set_code": "INR",
+          "set_name": "Innistrad Remastered",
+          "set_registry": "InnistradRemastered"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RestlessBloodseeker.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Restorative Technique",
+      "change_kind": "modified",
+      "class": "RestorativeTechnique",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Restorative Technique",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/r/RestorativeTechnique.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Scout the City",
+      "change_kind": "modified",
+      "class": "ScoutTheCity",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Scout the City",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Scout the City",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/ScoutTheCity.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Secure Detention",
+      "change_kind": "modified",
+      "class": "SecureDetention",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Secure Detention",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SecureDetention.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Selfless Police Captain",
+      "change_kind": "modified",
+      "class": "SelflessPoliceCaptain",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Selfless Police Captain",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Selfless Police Captain",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SelflessPoliceCaptain.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Shuri, Vibranium Technologist",
+      "change_kind": "modified",
+      "class": "ShuriVibraniumTechnologist",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Shuri, Vibranium Technologist",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/ShuriVibraniumTechnologist.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Shuri's Fabricator",
+      "change_kind": "modified",
+      "class": "ShurisFabricator",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Shuri's Fabricator",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/ShurisFabricator.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Sokka and Suki",
+      "change_kind": "modified",
+      "class": "SokkaAndSuki",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Sokka and Suki",
+          "release_date": "2025-11-21",
+          "set_code": "TLE",
+          "set_name": "Avatar: The Last Airbender Eternal",
+          "set_registry": "AvatarTheLastAirbenderEternal"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SokkaAndSuki.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Swordsman, Sharp Scoundrel",
+      "change_kind": "modified",
+      "class": "SwordsmanSharpScoundrel",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Swordsman, Sharp Scoundrel",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/s/SwordsmanSharpScoundrel.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "TVA Bureaucrat",
+      "change_kind": "modified",
+      "class": "TVABureaucrat",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "TVA Bureaucrat",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TVABureaucrat.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": true,
+      "card_name": "Talion, the Kindly Lord",
+      "change_kind": "modified",
+      "class": "TalionTheKindlyLord",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Talion, the Kindly Lord",
+          "release_date": "2023-09-08",
+          "set_code": "WOE",
+          "set_name": "Wilds of Eldraine",
+          "set_registry": "WildsOfEldraine"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TalionTheKindlyLord.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Team Transmitter",
+      "change_kind": "modified",
+      "class": "TeamTransmitter",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Team Transmitter",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TeamTransmitter.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Great Mound",
+      "change_kind": "modified",
+      "class": "TheGreatMound",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Great Mound",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheGreatMound.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Ruinous Wrecking Crew",
+      "change_kind": "modified",
+      "class": "TheRuinousWreckingCrew",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Ruinous Wrecking Crew",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheRuinousWreckingCrew.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Sibsig Ceremony",
+      "change_kind": "modified",
+      "class": "TheSibsigCeremony",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Sibsig Ceremony",
+          "release_date": "2025-04-11",
+          "set_code": "TDM",
+          "set_name": "Tarkir: Dragonstorm",
+          "set_registry": "TarkirDragonstorm"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheSibsigCeremony.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Squadron Sinister",
+      "change_kind": "modified",
+      "class": "TheSquadronSinister",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Squadron Sinister",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheSquadronSinister.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "The Wasp, Janet Van Dyne",
+      "change_kind": "modified",
+      "class": "TheWaspJanetVanDyne",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "The Wasp, Janet Van Dyne",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TheWaspJanetVanDyne.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Tiger Shark, Abyssal Hunter",
+      "change_kind": "modified",
+      "class": "TigerSharkAbyssalHunter",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Tiger Shark, Abyssal Hunter",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/t/TigerSharkAbyssalHunter.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Ultron, Machine Overlord",
+      "change_kind": "modified",
+      "class": "UltronMachineOverlord",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Ultron, Machine Overlord",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/u/UltronMachineOverlord.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Unstable Molecule Suit",
+      "change_kind": "modified",
+      "class": "UnstableMoleculeSuit",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Unstable Molecule Suit",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/u/UnstableMoleculeSuit.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Venom, Evil Unleashed",
+      "change_kind": "modified",
+      "class": "VenomEvilUnleashed",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Venom, Evil Unleashed",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        },
+        {
+          "card_name": "Venom, Evil Unleashed",
+          "release_date": "2025-09-26",
+          "set_code": "SPM",
+          "set_name": "Marvel's Spider-Man",
+          "set_registry": "MarvelsSpiderMan"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/v/VenomEvilUnleashed.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Villainous Hideout",
+      "change_kind": "modified",
+      "class": "VillainousHideout",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Villainous Hideout",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/v/VillainousHideout.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Visions of Villainy",
+      "change_kind": "modified",
+      "class": "VisionsOfVillainy",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Visions of Villainy",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/v/VisionsOfVillainy.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Wakandan Tusker",
+      "change_kind": "modified",
+      "class": "WakandanTusker",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Wakandan Tusker",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/w/WakandanTusker.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Wolverine, Fierce Fighter",
+      "change_kind": "modified",
+      "class": "WolverineFierceFighter",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Wolverine, Fierce Fighter",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/w/WolverineFierceFighter.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Wondrous Revival",
+      "change_kind": "modified",
+      "class": "WondrousRevival",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Wondrous Revival",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/w/WondrousRevival.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "X-23, Deadly Weapon",
+      "change_kind": "modified",
+      "class": "X23DeadlyWeapon",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "X-23, Deadly Weapon",
+          "release_date": "2026-06-26",
+          "set_code": "MSC",
+          "set_name": "Marvel Super Heroes Commander",
+          "set_registry": "MarvelSuperHeroesCommander"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/x/X23DeadlyWeapon.java",
+      "source_warning_markers": []
+    },
+    {
+      "canonical_8073_snapshot_exact_name_match": false,
+      "card_name": "Yellowjacket, Heartless Marauder",
+      "change_kind": "modified",
+      "class": "YellowjacketHeartlessMarauder",
+      "direct_test_references": [],
+      "disposition": "catalog_supported_regression_only_review_required",
+      "focused_test_case_count": 0,
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_registrations": [
+        {
+          "card_name": "Yellowjacket, Heartless Marauder",
+          "release_date": "2026-06-26",
+          "set_code": "MSH",
+          "set_name": "Marvel Super Heroes",
+          "set_registry": "MarvelSuperHeroes"
+        }
+      ],
+      "source_path": "Mage.Sets/src/mage/cards/y/YellowjacketHeartlessMarauder.java",
+      "source_warning_markers": []
+    }
+  ],
+  "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+  "generated_at_utc": "2026-07-28T09:22:06+00:00",
+  "input_artifact_digests": {
+    "added_87_coverage_request_sha256": "303099563165dd13ca3ecc8a0eb9c0bf90466858ec01eb4769dfc5952f57868b",
+    "added_87_coverage_response_sha256": "04db8dee419825d086d6bcd7d04f2aae28a7dff7d0d1c2b3ec405f7ec9c52c39",
+    "changed_169_coverage_exchange_sha256": "04b8d775ad2e9413fba563d565536982d9d66d38ce29dd19f330ef3d97e182bc",
+    "corrected_added_87_test_scenario_miner_sha256": "4bc40bc3ecd659404a3f71aeda12d9ae1a01bac52d131fc645d3c7f35a6b0cf4",
+    "exact_delta_report_sha256": "0bb7368758bfd662329d10e4ad71599205c56af95d4a7b2cc71f7e30c40dfaff"
+  },
+  "postgresql_scope_reconciliation": {
+    "boundary": "PostgreSQL remains truth for product identity, Oracle text and legality; no fingerprint was guessed.",
+    "canonical_wrapper": "server/bin/with_new_server_pg.sh",
+    "queries_executed": 0,
+    "reason": "missing_approved_ssh_host_key_sha256",
+    "required_environment_key": "MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256",
+    "status": "blocked",
+    "writes_performed": false
+  },
+  "qualification": {
+    "blocking_reasons": [
+      "84_added_cards_are_catalog_supported_without_direct_nominal_semantic_proof",
+      "82_modified_cards_have_regression_only_not_individual_semantic_proof",
+      "prudent_fateseer_is_unfinished_in_xmage_and_absent_from_pinned_forge",
+      "postgresql_product_scope_reconciliation_blocked_missing_approved_ssh_host_key_sha256",
+      "44_added_cards_are_registered_only_in_future_dated_sets_as_of_2026_07_28"
+    ],
+    "deployment_allowed": false,
+    "status": "review_required"
+  },
+  "repository": "https://github.com/magefree/mage",
+  "runtime_catalog": {
+    "catalog_ready": true,
+    "catalog_resolution_is_semantic_proof": false,
+    "engine": "xmage",
+    "engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "engine_version": "1.4.60",
+    "health_status": "ok",
+    "hermes_sqlite_writes": false,
+    "indexed_name_count": 32561,
+    "postgresql_writes": false,
+    "probe_scope": "all_169_added_and_modified_card_implementation_names",
+    "sidecar_build_identity": "xmage-sidecar-v2@2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "sidecar_protocol_version": "external_battle_sidecar_v2",
+    "supported": 168,
+    "total": 169,
+    "unsupported": 1,
+    "unsupported_card_names": [
+      "Prudent Fateseer"
+    ]
+  },
+  "safety": {
+    "deck_promotions": false,
+    "hermes_sqlite_writes": false,
+    "postgresql_writes": false,
+    "production_runtime_mutations": false,
+    "rule_promotions": false,
+    "source_audit_read_only": true
+  },
+  "schema_version": "manaloom_xmage_pin_transition_evidence_v1_2026-07-28",
+  "source_delta": {
+    "added_card_implementations": 87,
+    "audit_mode": "read_only_local_git_object_diff",
+    "changed_card_implementations": 169,
+    "changed_gameplay_scenario_file_count": 7,
+    "changed_path_count": 356,
+    "changed_path_status_counts": {
+      "A": 106,
+      "D": 3,
+      "M": 217,
+      "R": 30
+    },
+    "commit_count": 152,
+    "core_mage_java_path_count": 41,
+    "github_compare_api_observed_file_limit": 300,
+    "github_compare_file_limit_used": false,
+    "modified_card_implementations": 82,
+    "name_status_sha256": "fbe99a09622c14b3424a6f986e7cea3788873b553785d046471c871be5c4764c",
+    "old_is_ancestor": true,
+    "raw_diff_sha256": "7b31245ebb55b908983374f87f8563e9a964fffd9c7c574acd6fb25f980a48a0"
+  },
+  "to_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+  "transition_id": "xmage_34d81ea4995c_to_2c43ec8cdb5c_2026_07_28",
+  "upstream_focused_tests": {
+    "boundary": "Passing changed-scenario tests is regression evidence; only explicit name/class references count as nominal card proof.",
+    "command": "mvn -q -f pom.xml -Dtest=ModalDoubleFacedCardsTest,TorporOrbTest,HoneCounterRuleTest,StingBilbosSwordTest,BaronHelmutZemoTest,SPDrPilotedByPeniTest,ReturnToHandEffectsTest test",
+    "errors": 0,
+    "failures": 0,
+    "module": "Mage.Tests",
+    "nominal_reference_inventory": {
+      "cards_with_exact_name_or_class_reference": 2,
+      "cards_without_exact_name_or_class_reference": 85,
+      "interpretation": "Exact reference inventory locates nominal tests; Maven results establish whether those selected test classes passed.",
+      "requested_added_cards": 87,
+      "short_split_face_terms_rejected": true,
+      "xmage_test_files_scanned": 2017
+    },
+    "result": "pass",
+    "runner": "maven_surefire",
+    "skipped": 0,
+    "suites": [
+      {
+        "class": "ModalDoubleFacedCardsTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 48
+      },
+      {
+        "class": "TorporOrbTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      {
+        "class": "HoneCounterRuleTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      {
+        "class": "StingBilbosSwordTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      {
+        "class": "BaronHelmutZemoTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      {
+        "class": "SPDrPilotedByPeniTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      {
+        "class": "ReturnToHandEffectsTest",
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 11
+      }
+    ],
+    "tests": 72
+  }
+}

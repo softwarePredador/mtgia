@@ -293,6 +293,11 @@ run_external_engine_capability_audit() {
   "$ROOT_DIR/scripts/manaloom_external_engine_capability_audit.sh"
 }
 
+run_xmage_pin_transition_audit() {
+  print_header "ManaLoom XMage pin transition card audit"
+  "$ROOT_DIR/scripts/manaloom_xmage_pin_transition_audit.sh"
+}
+
 run_project_logic_docs() {
   print_header "ManaLoom generated project logic and documentation drift"
   "$ROOT_DIR/scripts/manaloom_project_logic.sh" --check
@@ -351,6 +356,7 @@ Uso:
   ./scripts/quality_gate.sh battle # gate canônico battle: native, Forge, XMage, Python e Dart
   ./scripts/quality_gate.sh battle-lab # Battle Lab: contratos focados, Battle, performance, retenção e drift
   ./scripts/quality_gate.sh engine-capabilities # uso, limites e evidencias XMage/Forge
+  ./scripts/quality_gate.sh engine-transition # classifica todas as cartas do avanço de pin XMage
   ./scripts/quality_gate.sh engine-delta # auditoria manual/read-only dos pins contra upstream oficial
   ./scripts/quality_gate.sh project-logic # manifesto, Mermaid, OpenAPI, ERD e drift documental
   ./scripts/quality_gate.sh e2e # suite E2E local: app, deckbuilder, battle, IA, contratos e logs
@@ -374,6 +380,9 @@ Dica:
   Use 'battle-lab' para o gate composto BL0–BL6; runtime Web/Android e
   PostgreSQL mutante continuam gates explícitos separados.
   Use 'engine-capabilities' para bloquear drift de papeis, pins, licencas, imports e evidencias XMage/Forge.
+  Use 'engine-transition' para validar o diff exato e a classificação nominal
+  de cada carta adicionada/modificada; PASS estrutural não libera deploy quando
+  a qualificação permanece review_required.
   Use 'engine-delta' para consultar explicitamente o GitHub oficial e gerar JSON de revisão; nunca avança pins nem executa deploy/promoção.
   Use 'project-logic' para bloquear drift entre código, rotas, migrations, manifesto e documentação gerada.
   Use 'e2e' para varredura completa local de deckbuilder, battle, IA, logs e contratos; exporte MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 ou MANALOOM_RUN_LIVE_PRODUCT_E2E=1 para camadas vivas opcionais.
@@ -398,6 +407,7 @@ Exemplos:
   ./scripts/quality_gate.sh battle
   ./scripts/quality_gate.sh battle-lab
   ./scripts/quality_gate.sh engine-capabilities
+  ./scripts/quality_gate.sh engine-transition
   ./scripts/quality_gate.sh engine-delta
   ./scripts/quality_gate.sh project-logic
   ./scripts/quality_gate.sh e2e
@@ -472,6 +482,9 @@ main() {
     engine-capabilities)
       run_external_engine_capability_audit
       ;;
+    engine-transition)
+      run_xmage_pin_transition_audit
+      ;;
     engine-delta)
       run_external_engine_delta_audit
       ;;
@@ -493,7 +506,11 @@ main() {
   esac
 
   print_header "Quality gate concluído"
-  echo "✅ Todos os checks do modo '$MODE' passaram."
+  if [[ "$MODE" == "engine-transition" ]]; then
+    echo "✅ Integridade da evidência passou; a qualificação de deploy é reportada separadamente pelo auditor."
+  else
+    echo "✅ Todos os checks do modo '$MODE' passaram."
+  fi
 }
 
 main "$@"

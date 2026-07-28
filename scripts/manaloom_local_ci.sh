@@ -88,6 +88,7 @@ run_shell_contracts() {
     "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" \
     "$ROOT_DIR/scripts/manaloom_external_engine_delta_weekly.sh" \
     "$ROOT_DIR/scripts/manaloom_install_external_engine_delta_schedule.sh" \
+    "$ROOT_DIR/scripts/manaloom_xmage_pin_transition_audit.sh" \
     "$ROOT_DIR/.githooks/pre-commit" \
     "$ROOT_DIR/.githooks/pre-push"
   "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" --check
@@ -125,7 +126,9 @@ run_guardrail_audits() {
     "$scripts_dir/external_engine_upstream_delta_audit.py" \
     "$scripts_dir/legacy_contamination_audit.py" \
     "$scripts_dir/operational_surface_alignment_audit.py" \
-    "$scripts_dir/report_retention_audit.py"
+    "$scripts_dir/report_retention_audit.py" \
+    "$scripts_dir/xmage_pin_transition_audit.py" \
+    "$scripts_dir/xmage_test_scenario_miner.py"
   (
     cd "$scripts_dir"
     python3 -m unittest \
@@ -134,7 +137,9 @@ run_guardrail_audits() {
       test_external_engine_upstream_delta_audit.py \
       test_legacy_contamination_audit.py \
       test_operational_surface_alignment_audit.py \
-      test_report_retention_audit.py
+      test_report_retention_audit.py \
+      test_xmage_pin_transition_audit.py \
+      test_xmage_test_scenario_miner.py
   )
 
   python3 - "$RUN_DIR/knowledge.db" <<'PY'
@@ -153,6 +158,8 @@ PY
   python3 "$scripts_dir/external_engine_upstream_delta_audit.py" \
     --local-only \
     --json-output "$RUN_DIR/external-engine-pin.json"
+  python3 "$scripts_dir/xmage_pin_transition_audit.py" \
+    --output-prefix "$RUN_DIR/xmage-pin-transition"
   python3 "$scripts_dir/operational_surface_alignment_audit.py" \
     --out-prefix "$RUN_DIR/operational-surface"
   python3 "$scripts_dir/report_retention_audit.py" \

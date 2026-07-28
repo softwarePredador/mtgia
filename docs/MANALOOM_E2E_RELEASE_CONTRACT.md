@@ -57,6 +57,7 @@ válidos são:
 | Vínculo UI corrente | `./scripts/quality_gate.sh ui-proof` | não; valida digest, PNGs/hashes e revisão visual explícita |
 | Jornadas Patrol locais | `./scripts/quality_gate.sh patrol-smoke` | não |
 | Battle nativo/Forge/XMage | `./scripts/quality_gate.sh battle` | não |
+| Transição nominal do pin XMage | `./scripts/quality_gate.sh engine-transition` | não; valida cada carta adicionada/modificada e pode manter deploy bloqueado |
 | Ponte app/IA | `./scripts/quality_gate.sh ai-bridge` | não |
 | Ramp, optimizer, fundação de dados e regras | etapa `Ramp classifiers and data-foundation safety contracts` de `./scripts/quality_gate.sh e2e` | não; somente testes locais, preflight e injeção simulada de falha |
 | Contrato PG/Hermes/SQLite | `./scripts/quality_gate.sh pg-contract` | leitura de PG; relatórios em `/tmp` |
@@ -68,6 +69,13 @@ O gate de battle deve ser reprodutível sem o `~/.m2` da máquina. O bootstrap
 `services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh` instala os módulos
 XMage ausentes do Maven Central a partir do SHA de `XMAGE_COMMIT`; o CI executa
 esse bootstrap antes do gate.
+
+Um pin XMage atualizado só pode ser implantado quando o contrato versionado de
+transição estiver com `qualification.status=pass`. O gate estrutural aceita
+`review_required` para manter o desenvolvimento e a auditoria reproduzíveis,
+mas `scripts/manaloom_deploy_battle_sidecars.sh` repete o auditor com
+`--require-deployable` e falha antes de qualquer operação remota. Resolução no
+catálogo não é prova semântica de uma carta.
 
 A etapa focada da suíte E2E executa explicitamente os classificadores de ramp
 em Dart e Python, o piso estrutural do optimizer, os contratos de segurança da
@@ -109,7 +117,8 @@ Uma rodada pode ser declarada concluída localmente quando:
 
 1. `git diff --check` e a sintaxe dos scripts alterados estão verdes;
 2. `full`, `deps`, `custom-lint`, `ui-audit`, `patrol-smoke`, `battle`,
-   `report-retention` e o perfil E2E determinístico estão sem falhas;
+   `engine-transition`, `report-retention` e o perfil E2E determinístico estão
+   sem falhas estruturais;
 3. Android e iOS continuam enumeráveis/compiláveis nos alvos disponíveis;
 4. artefatos removidos têm zero consumidor ativo e substituto canônico;
 5. relatórios gerados ficam em `/tmp` ou diretório ignorado, salvo evidência
@@ -129,6 +138,9 @@ Além da conclusão local, exige:
 4. pagamentos/webhooks/serviços externos aplicáveis ao release;
 5. `/health`, `/ready` e SHA implantado compatíveis com a revisão entregue;
 6. nenhuma migração pendente necessária ao código implantado.
+7. toda transição ativa de pin XMage está com qualificação
+   `pass`/`deployment_allowed=true`, sem carta residual ou reconciliação
+   PostgreSQL pendente.
 
 Sem esses itens, o resultado correto é “localmente concluído, release
 pendente”, e não “produção concluída”.
