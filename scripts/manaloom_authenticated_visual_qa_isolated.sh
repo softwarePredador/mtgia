@@ -21,6 +21,8 @@ WEB_PORT=""
 WEB_URL=""
 SEED_EMAIL=""
 SEED_USER_ID=""
+EMPTY_EMAIL=""
+EMPTY_USER_ID=""
 SEED_PEER_USER_ID=""
 SEED_PEER_USERNAME=""
 SEED_CARD_ID=""
@@ -181,6 +183,22 @@ register_response="$(curl -fsS --max-time 20 \
 seed_token="$(jq -er '.token' <<<"$register_response")"
 SEED_USER_ID="$(jq -er '.user.id' <<<"$register_response")"
 
+EMPTY_EMAIL="visual-empty-$seed_suffix@example.invalid"
+empty_username="visualempty${seed_suffix//_/}"
+empty_response="$(curl -fsS --max-time 20 \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -cn --arg username "$empty_username" --arg email "$EMPTY_EMAIL" \
+    --arg password "$SEED_PASSWORD" \
+    '{username: $username, email: $email, password: $password}')" \
+  "$API_BASE_URL/auth/register")"
+empty_token="$(jq -er '.token' <<<"$empty_response")"
+EMPTY_USER_ID="$(jq -er '.user.id' <<<"$empty_response")"
+empty_decks_response="$(curl -fsS --max-time 20 \
+  -H "Authorization: Bearer $empty_token" \
+  "$API_BASE_URL/decks")"
+jq -e 'type == "array" and length == 0' \
+  <<<"$empty_decks_response" >/dev/null
+
 SEED_PEER_USERNAME="visualpeer${seed_suffix//_/}"
 peer_response="$(curl -fsS --max-time 20 \
   -H 'Content-Type: application/json' \
@@ -334,6 +352,8 @@ umask 077
 {
   printf 'MANALOOM_VISUAL_EMAIL=%q\n' "$SEED_EMAIL"
   printf 'MANALOOM_VISUAL_PASSWORD=%q\n' "$SEED_PASSWORD"
+  printf 'MANALOOM_VISUAL_EMPTY_EMAIL=%q\n' "$EMPTY_EMAIL"
+  printf 'MANALOOM_VISUAL_EMPTY_PASSWORD=%q\n' "$SEED_PASSWORD"
 } >"$CREDENTIALS_FILE"
 
 bundle_sha256="$(shasum -a 256 "$WEB_BUILD_DIR/main.dart.js" | awk '{print $1}')"
@@ -345,6 +365,7 @@ jq -n \
   --arg run_dir "$RUN_DIR" \
   --arg credentials_file "$CREDENTIALS_FILE" \
   --arg seed_user_id "$SEED_USER_ID" \
+  --arg empty_user_id "$EMPTY_USER_ID" \
   --arg seed_peer_user_id "$SEED_PEER_USER_ID" \
   --arg seed_peer_username "$SEED_PEER_USERNAME" \
   --arg seed_card_id "$SEED_CARD_ID" \
@@ -362,6 +383,8 @@ jq -n \
     run_dir: $run_dir,
     credentials_file: $credentials_file,
     seed_user_id: $seed_user_id,
+    empty_user_id: $empty_user_id,
+    empty_user_has_decks: false,
     seed_peer_user_id: $seed_peer_user_id,
     seed_peer_username: $seed_peer_username,
     seed_card_id: $seed_card_id,
@@ -377,6 +400,7 @@ printf 'web_url=%s\n' "$WEB_URL"
 printf 'credentials_file=%s\n' "$CREDENTIALS_FILE"
 printf 'seed_deck_id=%s\n' "$SEED_DECK_ID"
 printf 'seed_card_id=%s\n' "$SEED_CARD_ID"
+printf 'empty_user_id=%s\n' "$EMPTY_USER_ID"
 printf 'seed_peer_user_id=%s\n' "$SEED_PEER_USER_ID"
 printf 'seed_peer_deck_id=%s\n' "$SEED_PEER_DECK_ID"
 printf 'bundle_sha256=%s\n' "$bundle_sha256"

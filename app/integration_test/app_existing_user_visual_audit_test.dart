@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/splash_screen.dart';
@@ -21,6 +22,10 @@ import 'visual_capture_helpers.dart' show restoreVisualCaptureSurface;
 
 const _auditEmail = String.fromEnvironment('MANALOOM_VISUAL_EMAIL');
 const _auditPassword = String.fromEnvironment('MANALOOM_VISUAL_PASSWORD');
+const _auditEmptyEmail = String.fromEnvironment('MANALOOM_VISUAL_EMPTY_EMAIL');
+const _auditEmptyPassword = String.fromEnvironment(
+  'MANALOOM_VISUAL_EMPTY_PASSWORD',
+);
 const _auditDeckId = String.fromEnvironment('MANALOOM_VISUAL_DECK_ID');
 const _auditCardId = String.fromEnvironment('MANALOOM_VISUAL_CARD_ID');
 const _auditUserId = String.fromEnvironment('MANALOOM_VISUAL_USER_ID');
@@ -91,6 +96,8 @@ void main() {
       <String>[
         _auditEmail,
         _auditPassword,
+        _auditEmptyEmail,
+        _auditEmptyPassword,
         _auditDeckId,
         _auditCardId,
         _auditUserId,
@@ -99,8 +106,8 @@ void main() {
       ],
       everyElement(isNotEmpty),
       reason:
-          'Pass the visual user, password, seeded deck and seeded card with '
-          '--dart-define.',
+          'Pass the visual users, passwords, seeded deck and seeded card with '
+          '--dart-define. The dedicated empty user must not own a deck.',
     );
 
     expect(_auditWidth, greaterThanOrEqualTo(320));
@@ -337,6 +344,38 @@ void main() {
         await _waitForPortraitViewportAfterLifeCounter(tester);
       }
 
+      await _authenticateVisualUser(
+        email: _auditEmptyEmail,
+        password: _auditEmptyPassword,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()));
+      await tester.pump();
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('home-hero-frame')),
+        attempts: 120,
+      );
+      await _tapMainDestination(tester, 'Decks');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('deck-list-empty-state')),
+        attempts: 100,
+      );
+      await tester.pump(const Duration(seconds: 1));
+      await _capture(binding, tester, 'decks_empty');
+
+      await _authenticateExistingUser();
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()));
+      await tester.pump();
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('home-hero-frame')),
+        attempts: 120,
+      );
       await _tapMainDestination(tester, 'Decks');
       await pumpUntilFound(
         tester,
@@ -646,11 +685,17 @@ class _HoldingAuthProvider extends AuthProvider {
   Future<void> initialize() => _initialization.future;
 }
 
-Future<void> _authenticateExistingUser() async {
+Future<void> _authenticateExistingUser() =>
+    _authenticateVisualUser(email: _auditEmail, password: _auditPassword);
+
+Future<void> _authenticateVisualUser({
+  required String email,
+  required String password,
+}) async {
   final api = ApiClient();
   final response = await api.post('/auth/login', <String, String>{
-    'email': _auditEmail,
-    'password': _auditPassword,
+    'email': email,
+    'password': password,
   });
   expect(response.statusCode, 200);
   final payload = (response.data as Map).cast<String, dynamic>();
@@ -661,7 +706,7 @@ Future<void> _authenticateExistingUser() async {
 
   ApiClient.setToken(token);
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('auth_token', token!);
+  await AuthTokenStore().write(token!);
   await prefs.setString('user_data', jsonEncode(user));
   await markRuntimeOnboardingSettled(user!['id']?.toString() ?? '');
 }

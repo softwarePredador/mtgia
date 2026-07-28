@@ -9,7 +9,16 @@
     "capture_flow_contains_signup": false,
     "production_coordinates_allowed": false,
     "required_entities": ["user", "card", "deck"],
-    "required_empty_domains": ["collection", "community", "battle_replays"],
+    "required_empty_domains": [
+      "decks_for_empty_user",
+      "collection",
+      "community",
+      "battle_replays"
+    ],
+    "fixture_users": {
+      "seeded_user": "owns the canonical seeded deck",
+      "empty_deck_user": "owns no deck and exists only for decks_empty"
+    },
     "cleanup": "kill listeners and drop disposable database"
   },
   "platforms": [
@@ -21,7 +30,7 @@
       "capture_width": 500,
       "capture_height": 844,
       "device_pixel_ratio": 1,
-      "capture_count": 53
+      "capture_count": 54
     },
     {
       "id": "web_desktop",
@@ -29,7 +38,7 @@
       "width": 1440,
       "height": 900,
       "device_pixel_ratio": 1,
-      "capture_count": 52
+      "capture_count": 53
     },
     {
       "id": "web_wide",
@@ -37,7 +46,7 @@
       "width": 1920,
       "height": 1080,
       "device_pixel_ratio": 1,
-      "capture_count": 52
+      "capture_count": 53
     },
     {
       "id": "android_physical",
@@ -46,7 +55,7 @@
       "height": 856,
       "capture_width": 1080,
       "capture_height": 2408,
-      "capture_count": 53,
+      "capture_count": 54,
       "device_contract": "Samsung SM-A135M, Android 14",
       "runner_constraint": "flutter drive does not support non-Web --release; profile keeps kDebugMode=false"
     }
@@ -84,6 +93,14 @@
       "states": ["success", "below_fold"],
       "anchor": "home-quick-actions-list",
       "source": "lib/features/home/home_screen.dart"
+    },
+    {
+      "id": "decks_empty",
+      "route": "/decks",
+      "auth": "empty_deck_user",
+      "states": ["empty", "above_fold"],
+      "anchor": "deck-list-empty-state",
+      "source": "lib/features/decks/screens/deck_list_screen.dart"
     },
     {
       "id": "decks_seeded",
@@ -493,15 +510,15 @@
     "maximum_changed_pixel_ratio": 0.001,
     "required_console_levels": ["warning", "error"],
     "maximum_console_entries": 0,
-    "baseline_files": 210,
+    "baseline_files": 214,
     "approval_is_owned_by_live_evidence": true,
     "live_evidence_review": "../docs/qa/ui-live/latest.json",
     "source_digest_command": "../scripts/manaloom_ui_source_digest.sh",
     "required_profile_counts": {
-      "web_mobile": 53,
-      "web_desktop": 52,
-      "web_wide": 52,
-      "android_physical": 53
+      "web_mobile": 54,
+      "web_desktop": 53,
+      "web_wide": 53,
+      "android_physical": 54
     }
   }
 }

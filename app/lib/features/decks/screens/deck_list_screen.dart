@@ -1823,6 +1823,7 @@ class _DeckEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return DecoratedBox(
+      key: const Key('deck-list-empty-state'),
       decoration: const BoxDecoration(color: AppTheme.backgroundAbyss),
       child: Center(
         child: SingleChildScrollView(
@@ -1951,7 +1952,7 @@ class _EmptyDeckConstellation extends StatelessWidget {
                 ],
               ),
               child: const ManaLoomGlyph(
-                ManaLoomGlyphKind.deck,
+                ManaLoomGlyphKind.deckAdd,
                 size: 34,
                 color: AppTheme.brass400,
               ),
@@ -2002,11 +2003,13 @@ class _EmptyDeckCard extends StatelessWidget {
         ],
       ),
       alignment: Alignment.center,
-      child: Icon(
-        Icons.filter_vintage_rounded,
-        size: math.max(12, width * 0.32),
-        color: AppTheme.brass400.withValues(alpha: 0.46),
-      ),
+      child: width >= 32
+          ? ManaLoomGlyph(
+              ManaLoomGlyphKind.brand,
+              size: math.max(12, width * 0.32),
+              color: AppTheme.brass400.withValues(alpha: 0.46),
+            )
+          : null,
     );
   }
 }

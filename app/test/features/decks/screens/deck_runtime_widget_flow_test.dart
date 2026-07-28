@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/login_screen.dart';
 import 'package:manaloom/features/auth/screens/register_screen.dart';
@@ -542,6 +543,30 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Gerar com IA'), findsOneWidget);
+      final emptyState = find.byKey(const Key('deck-list-empty-state'));
+      expect(emptyState, findsOneWidget);
+      expect(
+        find.descendant(
+          of: emptyState,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is ManaLoomGlyph &&
+                widget.kind == ManaLoomGlyphKind.deckAdd,
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: emptyState,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is ManaLoomGlyph &&
+                widget.kind == ManaLoomGlyphKind.brand,
+          ),
+        ),
+        findsNWidgets(3),
+      );
 
       await tester.tap(
         find.byKey(const Key('deck-list-empty-generate-button')),

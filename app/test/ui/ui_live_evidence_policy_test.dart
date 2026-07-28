@@ -82,12 +82,16 @@ void main() {
         (surface) => surface['id'] == 'authenticated_p0_matrix',
       );
       expect(p0Matrix['required_profiles'], <String, dynamic>{
-        'web_mobile_390x844': 53,
-        'web_desktop_1440x900': 52,
-        'web_wide_1920x1080': 52,
-        'android_physical_sm_a135m': 53,
+        'web_mobile_390x844': 54,
+        'web_desktop_1440x900': 53,
+        'web_wide_1920x1080': 53,
+        'android_physical_sm_a135m': 54,
       });
-      expect((p0Matrix['required_checkpoints'] as List).toSet(), hasLength(53));
+      final p0Checkpoints = (p0Matrix['required_checkpoints'] as List)
+          .cast<String>()
+          .toSet();
+      expect(p0Checkpoints, hasLength(54));
+      expect(p0Checkpoints, contains('decks_empty'));
     },
   );
 

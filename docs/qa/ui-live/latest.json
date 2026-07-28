@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "25a74e45b91e0849d442c85ee05cd72f8bdb6cea3e42270a87f1fddcee04a274",
+  "source_digest": "c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-28T06:02:50Z",
+    "verified_at": "2026-07-28T13:51:25Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (web_mobile_390x844, web_desktop_1440x900, web_wide_1920x1080)",
       "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart",
@@ -25,33 +25,33 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "ba77239e68a91a2d3d7b3685fd7f4baa1b6fbc94c42c690c2a60b0d05ebf89ef"
+        "sha256": "6a55fc7cc64eb2093fcd6024523ad4ccdf42ef3b22ad4368e9dc8cc6ec1ab559"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "0e8670319771cd16018562d1c1e5ade8577a55a97e2a7df86c09ba05f643a06f"
+        "sha256": "1119d0081bcf994ca2ee758a6e126d6335b1d73b78207f86683e3e3e4b5a8831"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "ea76a97785da23a127cba1564317a209e95165a605722cd124ef6347e7dd04f6"
+        "sha256": "d686a2cbea604e5d75355b001951d1ff11e04e372b79ba33f078f0d425f4fe5a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "590995b0da46c275af2ae28040afd269ec1b33a637e82b91e197c925b0e7ba91"
+        "sha256": "cc57c039d3387ccc967ac7a21595b9efc2d993fe1a21bdd761393bddda1afe1d"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "0cf411cd7233b2590dbae17dc1b2109f10c33593f545a368c3ef7261f52bf8de"
+        "sha256": "e8691ec037172ad932203b3133ba9010e266920ced3b1e033c5c1d44e049ea14"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "1d6dca33792b0432d8f5ebc4d156acfe2db22edd2f29223da48375a63fb7c3d9"
+        "sha256": "afc5cdd9102a52ced4a7b4e787cf81d183e6a25412df104a4a2eb4487d556eb4"
       }
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-28T05:49:44Z",
+    "reviewed_at": "2026-07-28T13:51:25Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -62,7 +62,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 226 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle e Life Counter não apresentam competição indevida entre ações."
+        "note": "As 230 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle e Life Counter não apresentam competição indevida entre ações."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -82,7 +82,7 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 53 capturas Web mobile, 52 desktop, 52 wide e 53 Android físico; o Life Counter real foi recapturado pelo compositor nativo em landscape 2408×1080, e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide e 54 Android físico; o Life Counter real foi recapturado pelo compositor nativo em landscape 2408×1080, e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
@@ -90,7 +90,7 @@
       },
       "state_coverage": {
         "status": "pass",
-        "note": "A matriz cobre 53 checkpoints de rotas/estados P0, incluindo sucesso, vazio, erro, modal, disabled, acima/abaixo da dobra, cadastro/legal, comunidades, trades, Battle e Life Counter."
+        "note": "A matriz cobre 54 checkpoints de rotas/estados P0, incluindo o estado vazio de decks, sucesso, erro, modal, disabled, acima/abaixo da dobra, cadastro/legal, comunidades, trades, Battle e Life Counter."
       },
       "accessibility_visual": {
         "status": "pass",
@@ -102,12 +102,12 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "ba77239e68a91a2d3d7b3685fd7f4baa1b6fbc94c42c690c2a60b0d05ebf89ef",
-      "0e8670319771cd16018562d1c1e5ade8577a55a97e2a7df86c09ba05f643a06f",
-      "ea76a97785da23a127cba1564317a209e95165a605722cd124ef6347e7dd04f6",
-      "590995b0da46c275af2ae28040afd269ec1b33a637e82b91e197c925b0e7ba91",
-      "0cf411cd7233b2590dbae17dc1b2109f10c33593f545a368c3ef7261f52bf8de",
-      "1d6dca33792b0432d8f5ebc4d156acfe2db22edd2f29223da48375a63fb7c3d9"
+      "6a55fc7cc64eb2093fcd6024523ad4ccdf42ef3b22ad4368e9dc8cc6ec1ab559",
+      "1119d0081bcf994ca2ee758a6e126d6335b1d73b78207f86683e3e3e4b5a8831",
+      "d686a2cbea604e5d75355b001951d1ff11e04e372b79ba33f078f0d425f4fe5a",
+      "cc57c039d3387ccc967ac7a21595b9efc2d993fe1a21bdd761393bddda1afe1d",
+      "e8691ec037172ad932203b3133ba9010e266920ced3b1e033c5c1d44e049ea14",
+      "afc5cdd9102a52ced4a7b4e787cf81d183e6a25412df104a4a2eb4487d556eb4"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
@@ -117,7 +117,7 @@
       "android_phone",
       "web_in_app_1280x720"
     ],
-    "reviewed_screenshot_count": 226,
+    "reviewed_screenshot_count": 230,
     "blocking_findings": []
   },
   "release_checks": {

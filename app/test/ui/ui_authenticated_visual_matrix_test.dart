@@ -44,10 +44,10 @@ void main() {
             platform['id'] as String: platform['capture_count'] as int,
         },
         <String, int>{
-          'web_mobile': 53,
-          'web_desktop': 52,
-          'web_wide': 52,
-          'android_physical': 53,
+          'web_mobile': 54,
+          'web_desktop': 53,
+          'web_wide': 53,
+          'android_physical': 54,
         },
       );
 
@@ -95,6 +95,17 @@ void main() {
       (fixture['required_entities'] as List).cast<String>(),
       containsAll(<String>['user', 'card', 'deck']),
     );
+    expect(
+      (fixture['required_empty_domains'] as List).cast<String>(),
+      contains('decks_for_empty_user'),
+    );
+    expect(
+      (fixture['fixture_users'] as Map).cast<String, String>(),
+      containsPair(
+        'empty_deck_user',
+        'owns no deck and exists only for decks_empty',
+      ),
+    );
     expect(fixture['cleanup'], contains('drop disposable database'));
 
     final harness = File(
@@ -106,6 +117,8 @@ void main() {
     expect(harness, contains("'S3-07 Visual Fixture Set'"));
     expect(harness, contains("set_code = 'TST'"));
     expect(harness, contains('capture_flow_contains_signup: false'));
+    expect(harness, contains('MANALOOM_VISUAL_EMPTY_EMAIL'));
+    expect(harness, contains('empty_user_has_decks: false'));
 
     final backendHarness = File(
       '../scripts/manaloom_server_contract_e2e_isolated.sh',
@@ -122,7 +135,12 @@ void main() {
           .map((checkpoint) => checkpoint['id'] as String)
           .toList();
       expect(ids.toSet(), hasLength(ids.length));
-      expect(checkpoints, hasLength(53));
+      expect(checkpoints, hasLength(54));
+      final emptyDeckCheckpoint = checkpoints.singleWhere(
+        (checkpoint) => checkpoint['id'] == 'decks_empty',
+      );
+      expect(emptyDeckCheckpoint['auth'], 'empty_deck_user');
+      expect(emptyDeckCheckpoint['anchor'], 'deck-list-empty-state');
 
       final findings = <String>[];
       for (final checkpoint in checkpoints) {
@@ -163,12 +181,12 @@ void main() {
     expect(gate['approval_is_owned_by_live_evidence'], isTrue);
     expect(File(gate['live_evidence_review'] as String).existsSync(), isTrue);
     expect(File(gate['source_digest_command'] as String).existsSync(), isTrue);
-    expect(gate['baseline_files'], 210);
+    expect(gate['baseline_files'], 214);
     expect(gate['required_profile_counts'], <String, dynamic>{
-      'web_mobile': 53,
-      'web_desktop': 52,
-      'web_wide': 52,
-      'android_physical': 53,
+      'web_mobile': 54,
+      'web_desktop': 53,
+      'web_wide': 53,
+      'android_physical': 54,
     });
 
     final checkpointIds = (matrix['checkpoints'] as List)

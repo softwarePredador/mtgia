@@ -69,15 +69,16 @@
         "legal-terms-section",
         "legal-privacy-section",
         "home-hero-frame",
+        "deck-list-empty-state",
         "deck-overview-hero",
         "battle-coach-welcome-state",
         "profile-content"
       ],
       "required_profiles": {
-        "web_mobile_390x844": 53,
-        "web_desktop_1440x900": 52,
-        "web_wide_1920x1080": 52,
-        "android_physical_sm_a135m": 53
+        "web_mobile_390x844": 54,
+        "web_desktop_1440x900": 53,
+        "web_wide_1920x1080": 53,
+        "android_physical_sm_a135m": 54
       },
       "required_checkpoints": [
         "splash_boot",
@@ -95,6 +96,7 @@
         "home_quick_actions_scrolled",
         "onboarding_core_flow",
         "life_counter_initial",
+        "decks_empty",
         "decks_seeded",
         "deck_create_modal",
         "deck_detail_top",

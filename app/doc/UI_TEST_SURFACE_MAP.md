@@ -265,30 +265,34 @@ flutter test --no-pub test/ui/ui_navigation_resume_matrix_test.dart \
 
 ## Regressão visual autenticada — S3-07
 
-`app/test/ui/fixtures/ui_authenticated_visual_matrix.json` fixa 53
+`app/test/ui/fixtures/ui_authenticated_visual_matrix.json` fixa 54
 checkpoints canônicos e os estados sucesso, vazio, erro, modal, disabled,
 acima e abaixo da dobra. A matriz cobre as rotas P0 públicas e autenticadas,
 incluindo cadastro e aceite legal, Termos, Privacidade, onboarding, Life
-Counter, busca, Community, usuários, Battle, mensagens, notificações e trades.
-Cada checkpoint aplicável foi capturado no mesmo fixture PostgreSQL/API
+Counter, lista de decks semeada e vazia, busca, Community, usuários, Battle,
+mensagens, notificações e trades.
+Cada checkpoint aplicável deve ser capturado no mesmo fixture PostgreSQL/API
 descartável em quatro plataformas:
 
 | Plataforma | Dimensão capturada | Capturas |
 |---|---:|---:|
-| Web mobile | viewport 390×844; raster 500×844 | 53 |
-| Web desktop | 1440×900 | 52 |
-| Web wide | 1920×1080 | 52 |
-| Android físico Samsung SM-A135M | 1080×2408; Life Counter 2408×1080 | 53 |
+| Web mobile | viewport 390×844; raster 500×844 | 54 |
+| Web desktop | 1440×900 | 53 |
+| Web wide | 1920×1080 | 53 |
+| Android físico Samsung SM-A135M | 1080×2408; Life Counter 2408×1080 | 54 |
 
-Os 210 PNGs aprovados vivem em `app/test/ui/goldens/runtime`. O comparador
+Os 214 PNGs aprovados vivem em `app/test/ui/goldens/runtime`. O comparador
 `app/tool/authenticated_visual_diff.dart` rejeita arquivo ausente/inesperado,
 dimensão diferente e razão de pixels alterados acima de `0.001`; divergências
 são materializadas em `app/test/ui/failures/runtime`.
 
-O harness `scripts/manaloom_authenticated_visual_qa_isolated.sh` cria usuário,
-card, deck e set representativo somente no banco descartável, usa imagem
-same-origin, nunca cadastra durante a captura e remove credencial, banco e
-listeners ao encerrar. Textos relativos a tempo usam
+O harness `scripts/manaloom_authenticated_visual_qa_isolated.sh` cria um
+usuário com o deck canônico, outro usuário sem decks, peer, card e set
+representativo somente no banco descartável. O checkpoint `decks_empty`
+autentica o usuário vazio e depois retorna ao usuário semeado, sem apagar ou
+alterar o deck principal. O fluxo usa imagem same-origin, nunca cadastra
+durante a captura e remove credenciais, banco e listeners ao encerrar. Textos
+relativos a tempo usam
 `MANALOOM_VISUAL_FIXTURE_MODE=true`, mantendo o baseline determinístico sem
 alterar o comportamento normal do app.
 
@@ -300,10 +304,11 @@ pelo compositor do aparelho com `adb screencap`, depois de um marcador de
 prontidão; screenshot da surface Flutter, que não compõe a view nativa, não é
 aceita.
 
-Os quatro manifestos da matriz, os sete estados Android do Battle Coach e os
-nove checkpoints Web de teclado totalizam 226 imagens abertas e revisadas no
-aggregate `docs/qa/ui-live/latest.json`. Todas estão vinculadas ao digest
-`b5af4634e18cda489b0b8d07d7246e6975e7c04d27f4c2643e18acfd5a8fd082`.
+A recaptura dos quatro manifestos da matriz, somada aos sete estados Android do
+Battle Coach e aos nove checkpoints Web de teclado, totaliza 230 imagens
+abertas e revisadas no aggregate `docs/qa/ui-live/latest.json`. Todas estão
+vinculadas ao digest
+`c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9`.
 
 ## Onboarding e primeiro uso — S3-08
 
