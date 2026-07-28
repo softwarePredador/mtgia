@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59",
+  "source_digest": "591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-28T21:13:43Z",
+    "verified_at": "2026-07-28T22:18:04Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (web_mobile_390x844, web_desktop_1440x900, web_wide_1920x1080)",
       "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart",
@@ -26,37 +26,41 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "ad952e14afa5874b0336a1ac03362d05bf20be82ca48d8082473caffe0251cad"
+        "sha256": "bb198a8283b19c5197f5bfb1cadf25aee01669c10e15c8ba182aae34b5056a94"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "de9dc48a7e8ed13925716cdd573f4f4ca2a4ab0a909ccb0afd649205557c429a"
+        "sha256": "68813cfce3b8b204799beec8cbe88d41427cba45aa12a27a957325ee7a0737f2"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "c8becfd6b74bc4e6e57aa1a69ca6f225685c0baf1faccb11c3e7428307991c49"
+        "sha256": "135c4b0a308819139a35af0dfd67eaf86f31de5d988f69bb107b85c2c5172be8"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "26aa328238906e9a4bf97e6595fa1a024298429c205b1f6fa29bff4b99f75910"
+        "sha256": "b94c5ad9d0afe6676a7e899d76ea31c44a66cd04a107fb08ff68d5bcff83642d"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "0640df8fe56d9f2ac957069cdcc6ff96117beedf86640da72abe8171f8af7c09"
+        "sha256": "a1298506b163efb2387ff391269c2e860f8cb404a9cefd5765421ba5df2d745f"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "de75f4fdbe23ca8789b68e71aa309e12aaf278cb298eebba4a1e2887f851cff0"
+        "sha256": "8ed713109895c120f84e69fff2d14d2f471d7f326c1fd5ed9f46bd91d8ef7145"
       },
       {
         "path": "docs/qa/ui-live/current/card-back-fallback-web/capture-manifest.json",
-        "sha256": "b1d9560823a049def6b5ceee969c6ede18669bd7021263c44745719411a6c114"
+        "sha256": "8938e8b52027d2d7caf8bb647ee1a158cc4c57de3f588b82ac80d151f227976f"
+      },
+      {
+        "path": "docs/qa/ui-live/current/card-details-navigation-web/capture-manifest.json",
+        "sha256": "eafe9e737050ea9bddec2e3ca72329ba192dce3a72e09b8d0a486e4e577385d5"
       }
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-28T20:43:59Z",
+    "reviewed_at": "2026-07-28T22:18:04Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -67,7 +71,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 231 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter e o fallback de arte não apresentam competição indevida entre ações."
+        "note": "As 234 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, fallback de arte e a transição preview → detalhes mantêm foco e camadas previsíveis."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -87,11 +91,11 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide e 54 Android físico; o Life Counter real foi recapturado pelo compositor nativo em landscape 2408×1080, e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide e 54 Android físico, além de 20 checkpoints direcionados; o Life Counter real foi recapturado pelo compositor nativo em landscape 2408×1080, e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; a sequência física de teclado do Battle Coach passou em 9/9 checkpoints."
+        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; o teclado físico do Battle Coach passou em 9/9 checkpoints e o preview de carta fecha antes da rota completa, sem reaparecer ao voltar, em 3/3."
       },
       "state_coverage": {
         "status": "pass",
@@ -107,13 +111,14 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "ad952e14afa5874b0336a1ac03362d05bf20be82ca48d8082473caffe0251cad",
-      "de9dc48a7e8ed13925716cdd573f4f4ca2a4ab0a909ccb0afd649205557c429a",
-      "c8becfd6b74bc4e6e57aa1a69ca6f225685c0baf1faccb11c3e7428307991c49",
-      "26aa328238906e9a4bf97e6595fa1a024298429c205b1f6fa29bff4b99f75910",
-      "0640df8fe56d9f2ac957069cdcc6ff96117beedf86640da72abe8171f8af7c09",
-      "de75f4fdbe23ca8789b68e71aa309e12aaf278cb298eebba4a1e2887f851cff0",
-      "b1d9560823a049def6b5ceee969c6ede18669bd7021263c44745719411a6c114"
+      "bb198a8283b19c5197f5bfb1cadf25aee01669c10e15c8ba182aae34b5056a94",
+      "68813cfce3b8b204799beec8cbe88d41427cba45aa12a27a957325ee7a0737f2",
+      "135c4b0a308819139a35af0dfd67eaf86f31de5d988f69bb107b85c2c5172be8",
+      "b94c5ad9d0afe6676a7e899d76ea31c44a66cd04a107fb08ff68d5bcff83642d",
+      "a1298506b163efb2387ff391269c2e860f8cb404a9cefd5765421ba5df2d745f",
+      "8ed713109895c120f84e69fff2d14d2f471d7f326c1fd5ed9f46bd91d8ef7145",
+      "8938e8b52027d2d7caf8bb647ee1a158cc4c57de3f588b82ac80d151f227976f",
+      "eafe9e737050ea9bddec2e3ca72329ba192dce3a72e09b8d0a486e4e577385d5"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
@@ -123,8 +128,14 @@
       "android_phone",
       "web_in_app_1280x720"
     ],
-    "reviewed_screenshot_count": 231,
-    "blocking_findings": []
+    "reviewed_screenshot_count": 234,
+    "blocking_findings": [],
+    "follow_up_findings": [
+      "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
+      "O carrossel de ações rápidas pode deixar fragmentos laterais após scroll em telas estreitas; avaliar snap e padding de borda.",
+      "Os CTAs do estado vazio de decks ficam largos demais em desktop/wide; limitar largura numa rodada visual dedicada.",
+      "A captura Web do harness preserva a superfície Flutter correta, mas inclui margens externas do host; adicionar recorte físico por viewport numa evolução do contrato."
+    ]
   },
   "release_checks": {
     "android_talkback_human": "pending",

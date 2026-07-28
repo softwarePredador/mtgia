@@ -1,18 +1,18 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-28T20:03:39.742369Z",
-  "source_digest": "78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59",
+  "generated_at": "2026-07-28T22:17:39.958912Z",
+  "source_digest": "591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a",
   "surface": "battle_coach",
   "profile": "android_phone",
   "runtime": "flutter_integration_test",
   "target": "android_physical",
-  "device_contract": "physical_android",
+  "device_contract": "Samsung SM-A135M, Android 14, physical device",
   "runtime_console": {
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "4986fb28c217eb88f944f74ef05369b6d4b545df211028473581e9cf9012a294",
+  "log_sha256": "5e4f4ebbf6c2c24113b3cf4286e83beeff697c72f4571191f1e5de9f1d42c203",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "battle_coach_00_welcome",
@@ -67,8 +67,8 @@
     {
       "checkpoint": "battle_coach_05_action_progress",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_05_action_progress.png",
-      "sha256": "fa7309130ac4b19b3b05142ca750170d03b43b016befbc45bad694be22da7efa",
-      "bytes": 972702,
+      "sha256": "1c482286dfa2ea5930053e685590a3f8b4fedeed4bbd11240a6de0d4685d343f",
+      "bytes": 972636,
       "width": 1080,
       "height": 2408
     },

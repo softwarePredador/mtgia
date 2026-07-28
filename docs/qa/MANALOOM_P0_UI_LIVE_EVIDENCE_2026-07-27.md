@@ -6,7 +6,7 @@
 
 **Toolchain:** Flutter `3.44.6`, Dart `3.12.2`
 
-**Digest visual:** `78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59`
+**Digest visual:** `591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a`
 **Decisão:** `PASS` para S3-05 e S3-07; TalkBack humano continua pendente em S3-04
 
 ## Escopo realmente comprovado
@@ -30,13 +30,15 @@ Foram produzidas e abertas as seguintes capturas:
 | Battle Coach Android | integration test físico | 7 | 1080×2408 |
 | Battle Coach teclado Web | build release + teclado físico | 9 | 1280×720 |
 | Fallback de arte Web | build release real | 1 | 1280×720 |
-| **Total revisado** |  | **231** |  |
+| Preview → detalhe de carta Web | build release real | 3 | 1280×720 |
+| **Total revisado** |  | **234** |  |
 
 As 214 imagens da matriz foram inspecionadas em contact sheets e resolução
 original, além das folhas dedicadas ao Battle Coach Android, teclado Web e
-fallback de arte. A revisão verificou hierarquia, identidade MTG, contraste,
-tipografia, espaçamento, adaptação, clareza de ação, estados, acessibilidade
-visual e atratividade. Não restou finding visual bloqueante.
+fallback de arte e navegação do preview. A revisão verificou hierarquia,
+identidade MTG, contraste, tipografia, espaçamento, adaptação, clareza de
+ação, estados, acessibilidade visual e atratividade. Não restou finding visual
+bloqueante para esta correção.
 Os estados centrais de Deckbuilder e Battle também foram reabertos em resolução
 original; a aba Análise foi conferida no build real e não recebeu crédito
 duplicado no total versionado.
@@ -110,6 +112,13 @@ cada ocorrência transitória do inventário como se fosse uma rota autônoma.
     e cinco pontos WUBRG. Ele preserva a proporção da carta, funciona em
     loading, URL ausente e erro de rede e não reproduz o verso oficial,
     logotipos ou trade dress da Wizards.
+16. **Preview persistia sobre a rota de detalhes:** o dialog era criado no
+    navegador raiz, mas o callback tentava fechá-lo pelo contexto do
+    `ShellRoute`. A rota completa era empilhada no navegador interno e o
+    `DialogRoute` permanecia por cima. O dialog agora retorna uma intenção,
+    fecha explicitamente o root navigator e só depois aguarda a navegação.
+    O teste de regressão cobre navegador aninhado, retorno ao deck e
+    reabertura/fechamento sem ressuscitar o modal.
 
 ## Life Counter e platform view
 
@@ -124,7 +133,7 @@ landscape, `document.fonts.ready` e overflow zero; só então capturou o
 compositor do Samsung via `adb screencap`. O PNG final:
 
 - possui 2408×1080 em landscape;
-- contém 16.809 cores e 567.841 bytes;
+- contém 559.443 bytes;
 - mostra a mesa de quatro jogadores sem overflow;
 - passou alvo/semântica automatizados;
 - a persistência e restauração continuam cobertas pelos testes funcionais
@@ -179,6 +188,9 @@ Não contam como aprovação:
 - onboarding antigo e frame Android distorcido após a conversão deixar a
   surface `ImageView` ativa;
 - banner DEBUG introduzido pelo harness;
+- uma tentativa do Battle Coach Android rejeitada por assertion transitória
+  do binding de gesto; o app foi reiniciado e os sete checkpoints foram
+  recapturados com os dois testes runtime aprovados;
 - arquivos JPEG apenas renomeados como PNG.
 
 Cada causa foi eliminada e o cenário inteiro relevante foi repetido com a
@@ -204,12 +216,28 @@ do gate.
   `docs/qa/ui-live/current/battle-coach-web-keyboard`;
 - fallback de arte:
   `docs/qa/ui-live/current/card-back-fallback-web`;
+- navegação preview → detalhe:
+  `docs/qa/ui-live/current/card-details-navigation-web`;
 - baselines: `app/test/ui/goldens/runtime`;
 - matriz: `app/test/ui/fixtures/ui_authenticated_visual_matrix.json`;
 - teclado: `app/test/ui/fixtures/ui_keyboard_focus_matrix.json`.
 
-O aggregate foi verificado com 231 screenshots e os três níveis:
+O aggregate foi verificado com 234 screenshots e os três níveis:
 `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
+
+## Findings de acompanhamento
+
+Não bloqueiam a correção do modal, mas ficaram registrados no aggregate:
+
+- o conteúdo de Privacidade ainda é conciso para um documento jurídico
+  completo e deve passar por revisão de conteúdo/governança antes de promoção
+  comercial;
+- o carrossel de ações rápidas pode deixar fragmentos laterais após scroll em
+  telas estreitas;
+- os CTAs do estado vazio de decks devem receber largura máxima em
+  desktop/wide;
+- o raster Web do harness mantém margens externas do host; uma evolução deve
+  recortar e certificar também o viewport físico de cada perfil.
 
 ## Pendência honesta
 
@@ -223,16 +251,17 @@ executado.
 
 A recertificação deste digest fechou com:
 
-- 292/292 testes do domínio Deck aprovados;
+- 314/314 testes do domínio Deck aprovados;
 - 129/129 testes do domínio Battle aprovados;
-- 126/126 testes focados das superfícies alteradas aprovados;
+- 126/126 testes focados das superfícies anteriores e 10/10 testes focados do
+  diálogo de detalhes aprovados;
 - 91 testes focados do backend aprovados e uma integração de alias delegada
   ao schema descartável;
-- 1.341 testes Flutter completos aprovados e um skip declarado;
+- 1.342 testes Flutter completos aprovados e um skip declarado;
 - 12/12 checks focados de orientação e responsividade aprovados;
 - `flutter analyze` sem issues;
 - 53/53 testes do gate `ui-audit` e 54 checkpoints na matriz de captura;
-- 231/231 screenshots aceitos pelo gate `ui-proof`;
+- 234/234 screenshots aceitos pelo gate `ui-proof`;
 - 9/9 passos físicos de teclado/foco do Battle Coach Web;
 - sete estados visuais e dois testes de runtime do Battle Coach no Samsung;
 - `manaloom_project_logic --write` e `--check` sincronizados;
@@ -246,6 +275,6 @@ O mesmo gate `full` permanece obrigatório no `pre-push`; a execução acima é 
 prova prévia e o hook repete a proteção no envio Git.
 
 O `main.dart.js` do Web release validado tem SHA-256
-`c401726d877efb3490f3f3c7fdee570a3e2f07cf463d6fcccb3eca209b1c142a`.
+`a044b90d0c9ac2fc9fd6d99776d85726aa7b70639b647265c0d52c448842901d`.
 O digest definitivo das fontes da UI é
-`78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59`.
+`591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a`.

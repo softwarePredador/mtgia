@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-28T20:43:18.292548Z",
-  "source_digest": "78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59",
+  "generated_at": "2026-07-28T22:15:52.184032Z",
+  "source_digest": "591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a",
   "surface": "card_back_fallback",
   "profile": "web_in_app_1280x720",
   "runtime": "in_app_browser",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "ac057141dde3d3587887feb65c723051d958fbca00cc4903c2d8786278fc63be",
+  "log_sha256": "c933499e31ae88ef793723854c3d66b54bcaa1bdd156ebce378d6d7ea2bbaeec",
   "checkpoint_count": 1,
   "required_checkpoints": [
     "01_missing_art_uses_manaloom_card_back"
@@ -21,8 +21,8 @@
     {
       "checkpoint": "01_missing_art_uses_manaloom_card_back",
       "path": "docs/qa/ui-live/current/card-back-fallback-web/01_missing_art_uses_manaloom_card_back.png",
-      "sha256": "429120de69669360904fb145328f6ee3efb92e004b8999fc2555301fcdecd4ad",
-      "bytes": 196056,
+      "sha256": "e249a804b810d44e7f6bb9ba433c97b70aa249e940781419ffdc371ffd9c6b22",
+      "bytes": 175246,
       "width": 1280,
       "height": 720
     }

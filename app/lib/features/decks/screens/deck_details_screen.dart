@@ -1428,10 +1428,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       card: card,
       onShowAiExplanation: () => _showAiExplanation(context, card),
       onShowEditionPicker: () => _showEditionPicker(context, card),
-      onOpenFullDetails: () {
-        Navigator.pop(context);
-        openCardDetailRoute(context, card);
-      },
+      onOpenFullDetails: () => openCardDetailRoute(context, card),
     );
   }
 

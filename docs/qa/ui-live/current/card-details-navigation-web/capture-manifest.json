@@ -1,0 +1,48 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-07-28T22:13:41.589889Z",
+  "source_digest": "591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a",
+  "surface": "card_details_navigation",
+  "profile": "web_in_app_1280x720",
+  "runtime": "in_app_browser",
+  "target": "web_real_build",
+  "device_contract": "Flutter Web release build, Chrome in-app browser 1280x720, real pointer activation and browser history navigation",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "be4f90b0fa4d8840c80a6a889689348c89933a8b0178fe862a081ff7e54f3819",
+  "checkpoint_count": 3,
+  "required_checkpoints": [
+    "01_deck_card_preview_modal",
+    "02_full_details_without_modal",
+    "03_back_to_deck_without_modal"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "01_deck_card_preview_modal",
+      "path": "docs/qa/ui-live/current/card-details-navigation-web/01_deck_card_preview_modal.png",
+      "sha256": "6880d31dbd8ab0c958708e1b72892ab88007f323cd53e0f3bbb51ae950a9fbfa",
+      "bytes": 267772,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "checkpoint": "02_full_details_without_modal",
+      "path": "docs/qa/ui-live/current/card-details-navigation-web/02_full_details_without_modal.png",
+      "sha256": "0a18b1b10386aefe647ed548fe93971be755b1cc0987d5dad63a3cc2c9161765",
+      "bytes": 379014,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "checkpoint": "03_back_to_deck_without_modal",
+      "path": "docs/qa/ui-live/current/card-details-navigation-web/03_back_to_deck_without_modal.png",
+      "sha256": "1efcbef535c0cfa62b9bc5a2a98e667dcf574c96d71015c2f7f92d696b014d56",
+      "bytes": 232355,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

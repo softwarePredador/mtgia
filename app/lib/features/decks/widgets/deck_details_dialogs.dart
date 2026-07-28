@@ -390,10 +390,11 @@ Future<void> showDeckCardDetailsDialog({
   required DeckCardItem card,
   required Future<void> Function() onShowAiExplanation,
   required Future<void> Function() onShowEditionPicker,
-  required VoidCallback onOpenFullDetails,
+  required Future<void> Function() onOpenFullDetails,
 }) async {
-  await showDialog(
+  final shouldOpenFullDetails = await showDialog<bool>(
     context: context,
+    useRootNavigator: true,
     builder: (dialogContext) {
       final media = MediaQuery.sizeOf(dialogContext);
       return Dialog(
@@ -421,7 +422,7 @@ Future<void> showDeckCardDetailsDialog({
                     card: card,
                     onShowAiExplanation: onShowAiExplanation,
                     onShowEditionPicker: () async {
-                      Navigator.pop(dialogContext);
+                      Navigator.of(dialogContext, rootNavigator: true).pop();
                       await onShowEditionPicker();
                     },
                   ),
@@ -435,12 +436,18 @@ Future<void> showDeckCardDetailsDialog({
                   runSpacing: 4,
                   children: [
                     TextButton.icon(
-                      onPressed: onOpenFullDetails,
+                      onPressed: () => Navigator.of(
+                        dialogContext,
+                        rootNavigator: true,
+                      ).pop(true),
                       icon: const Icon(Icons.open_in_new, size: 16),
                       label: const Text('Ver Detalhes'),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
+                      onPressed: () => Navigator.of(
+                        dialogContext,
+                        rootNavigator: true,
+                      ).pop(),
                       child: const Text('Fechar'),
                     ),
                   ],
@@ -452,6 +459,10 @@ Future<void> showDeckCardDetailsDialog({
       );
     },
   );
+
+  if (shouldOpenFullDetails == true && context.mounted) {
+    await onOpenFullDetails();
+  }
 }
 
 class _DeckCardDetailsDialogBody extends StatelessWidget {

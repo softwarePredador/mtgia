@@ -195,7 +195,7 @@ void main() {
                       onShowEditionPicker: () async {
                         editionCalls++;
                       },
-                      onOpenFullDetails: () {
+                      onOpenFullDetails: () async {
                         detailsCalls++;
                       },
                     );
@@ -238,9 +238,11 @@ void main() {
     await tester.tap(find.text('Ver Detalhes'));
     await tester.pumpAndSettle();
     expect(detailsCalls, 1);
+    expect(
+      find.byKey(const Key('deck-card-details-dialog-card-1')),
+      findsNothing,
+    );
 
-    await tester.tap(find.text('Fechar'));
-    await tester.pumpAndSettle();
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('deck-card-change-edition-card-1')));
@@ -251,6 +253,74 @@ void main() {
       findsNothing,
     );
   });
+
+  testWidgets(
+    'showDeckCardDetailsDialog dismisses the root dialog before navigating a nested navigator',
+    (tester) async {
+      final card = _buildCard();
+      final nestedNavigatorKey = GlobalKey<NavigatorState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Navigator(
+            key: nestedNavigatorKey,
+            onGenerateRoute: (_) => MaterialPageRoute<void>(
+              builder: (nestedContext) => Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await showDeckCardDetailsDialog(
+                        context: nestedContext,
+                        card: card,
+                        onShowAiExplanation: () async {},
+                        onShowEditionPicker: () async {},
+                        onOpenFullDetails: () async {
+                          unawaited(
+                            Navigator.of(nestedContext).push<void>(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    const Scaffold(body: Text('detalhes')),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: const Text('abrir'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('deck-card-details-dialog-card-1')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Ver Detalhes'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-card-details-dialog-card-1')),
+        findsNothing,
+      );
+      expect(find.text('detalhes'), findsOneWidget);
+
+      nestedNavigatorKey.currentState!.pop();
+      await tester.pumpAndSettle();
+
+      expect(find.text('abrir'), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-card-details-dialog-card-1')),
+        findsNothing,
+      );
+    },
+  );
 
   testWidgets(
     'showDeckCardDetailsDialog keeps footer actions tappable on compact mobile layout',
@@ -274,7 +344,7 @@ void main() {
                         card: card,
                         onShowAiExplanation: () async {},
                         onShowEditionPicker: () async {},
-                        onOpenFullDetails: () {
+                        onOpenFullDetails: () async {
                           detailsCalls++;
                         },
                       );
@@ -303,9 +373,21 @@ void main() {
       await tester.tap(find.text('Ver Detalhes'));
       await tester.pumpAndSettle();
       expect(detailsCalls, 1);
+      expect(
+        find.byKey(const Key('deck-card-details-dialog-card-1')),
+        findsNothing,
+      );
 
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Fechar'));
       await tester.pumpAndSettle();
+
+      expect(detailsCalls, 1);
+      expect(
+        find.byKey(const Key('deck-card-details-dialog-card-1')),
+        findsNothing,
+      );
       expectNoLayoutExceptions(tester);
     },
   );
