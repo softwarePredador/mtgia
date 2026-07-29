@@ -8,8 +8,15 @@ import '../ai/forge_battle_client.dart';
 import '../ai/native_battle_client.dart';
 import '../ai/xmage_battle_client.dart';
 import '../deck_validation_state_support.dart';
+import 'battle_deck_admission.dart';
 
 const battlePreflightSchemaVersion = 'battle_preflight_v1';
+const battlePreflightModeSimulation = 'simulation';
+const battlePreflightModeInteractive = 'interactive';
+const battlePreflightModes = <String>{
+  battlePreflightModeSimulation,
+  battlePreflightModeInteractive,
+};
 
 class BattlePreflightNotFound implements Exception {
   const BattlePreflightNotFound(this.target);
@@ -110,7 +117,11 @@ class BattlePreflightService {
     required String deckId,
     required String opponentDeckId,
     required Map<String, String> environment,
+    String mode = battlePreflightModeSimulation,
   }) async {
+    if (!battlePreflightModes.contains(mode)) {
+      throw ArgumentError.value(mode, 'mode', 'unsupported preflight mode');
+    }
     final deck = await _loadDeck(
       userId: userId,
       deckId: deckId,
@@ -129,35 +140,55 @@ class BattlePreflightService {
       userId: userId,
       deckId: deckId,
     );
-    final blockers = <String>[
-      ..._deckBlockers(deck, prefix: 'deck'),
-      ..._deckBlockers(opponent, prefix: 'opponent'),
+    final admissionBlockers = <String>[
+      ...battlePreflightDeckBlockers(deck, prefix: 'deck'),
+      ...battlePreflightDeckBlockers(opponent, prefix: 'opponent'),
       if (availableOpponentCount == 0) 'no_available_opponents',
     ];
+    final configurationBlockers = <String>[
+      if (mode == battlePreflightModeInteractive)
+        ..._interactiveConfigurationBlockers(environment),
+    ];
+    final blockers = <String>[...admissionBlockers, ...configurationBlockers];
 
     BattleCoverageReport coverage;
-    try {
-      final config = BattleEngineConfig.fromEnvironment(environment);
-      coverage = await _coverageProbe(
-        config: config,
-        deck: deck,
-        opponent: opponent,
-      );
-    } on BattleEngineConfigurationException {
+    if (!shouldProbeBattleCoverage(blockers)) {
       coverage = const BattleCoverageReport(
         engineCoverage: {
-          'xmage': 'unknown',
-          'forge': 'unknown',
-          'native': 'unknown',
+          'xmage': 'not_checked',
+          'forge': 'not_checked',
+          'native': 'not_checked',
         },
-        blockers: ['engine_not_configured'],
+        blockers: [],
       );
+    } else {
+      try {
+        final config = BattleEngineConfig.fromEnvironment({
+          ...environment,
+          if (mode == battlePreflightModeInteractive) 'BATTLE_ENGINE': 'xmage',
+        });
+        coverage = await _coverageProbe(
+          config: config,
+          deck: deck,
+          opponent: opponent,
+        );
+      } on BattleEngineConfigurationException {
+        coverage = const BattleCoverageReport(
+          engineCoverage: {
+            'xmage': 'unknown',
+            'forge': 'unknown',
+            'native': 'unknown',
+          },
+          blockers: ['engine_not_configured'],
+        );
+      }
     }
     blockers.addAll(coverage.blockers);
     final normalizedBlockers = blockers.toSet().toList(growable: false);
 
     return {
       'schema_version': battlePreflightSchemaVersion,
+      'mode': mode,
       'status':
           normalizedBlockers.isEmpty && coverage.ready ? 'ready' : 'blocked',
       'read_only': true,
@@ -209,6 +240,7 @@ class BattlePreflightService {
         JOIN deck_cards dc ON dc.deck_id = d.id
         JOIN cards c ON c.id = dc.card_id
         WHERE d.id = CAST(@deckId AS uuid)
+          AND d.deleted_at IS NULL
           AND (
             d.user_id = CAST(@userId AS uuid)
             OR (CAST(@allowPublic AS boolean) AND d.is_public = true)
@@ -262,10 +294,22 @@ class BattlePreflightService {
         SELECT COUNT(*)::int
         FROM decks d
         WHERE d.id <> CAST(@deckId AS uuid)
+          AND d.deleted_at IS NULL
+          AND LOWER(d.format) = 'commander'
+          AND d.validation_state = 'validated'
           AND (d.user_id = CAST(@userId AS uuid) OR d.is_public = true)
-          AND EXISTS (
-            SELECT 1 FROM deck_cards dc WHERE dc.deck_id = d.id
-          )
+          AND (
+            SELECT COALESCE(SUM(dc.quantity), 0)::int
+            FROM deck_cards dc
+            WHERE dc.deck_id = d.id
+          ) = 100
+          AND (
+            SELECT COALESCE(SUM(dc.quantity) FILTER (
+              WHERE dc.is_commander = TRUE
+            ), 0)::int
+            FROM deck_cards dc
+            WHERE dc.deck_id = d.id
+          ) = 1
       '''),
       parameters: {'deckId': deckId, 'userId': userId},
     );
@@ -273,26 +317,48 @@ class BattlePreflightService {
   }
 }
 
-List<String> _deckBlockers(BattlePreflightDeck deck, {required String prefix}) {
-  final blockers = <String>[];
-  final expectedCount = switch (deck.format) {
-    'commander' => 100,
-    'brawl' => 60,
-    _ => 60,
-  };
-  final exactSizeRequired =
-      deck.format == 'commander' || deck.format == 'brawl';
-  if ((exactSizeRequired && deck.cardCount != expectedCount) ||
-      (!exactSizeRequired && deck.cardCount < expectedCount)) {
-    blockers.add('${prefix}_size_invalid');
+List<String> _interactiveConfigurationBlockers(
+  Map<String, String> environment,
+) {
+  final enabled =
+      environment['INTERACTIVE_BATTLE_ENABLED']?.trim().toLowerCase() == 'true';
+  if (!enabled) return const ['interactive_battle_disabled'];
+
+  final batchUrl = environment['XMAGE_SIDECAR_URL']?.trim() ?? '';
+  final interactiveUrl =
+      environment['XMAGE_INTERACTIVE_SIDECAR_URL']?.trim() ?? '';
+  if (interactiveUrl.isEmpty) {
+    return const ['interactive_battle_runtime_not_configured'];
   }
-  if (exactSizeRequired && deck.commanderCount != 1) {
-    blockers.add('${prefix}_commander_invalid');
+  if (batchUrl.isNotEmpty && batchUrl == interactiveUrl) {
+    return const ['interactive_battle_runtime_not_isolated'];
   }
-  if (deck.validationState != deckValidationStateValidated) {
-    blockers.add('${prefix}_validation_required');
-  }
-  return blockers;
+  return const [];
+}
+
+bool shouldProbeBattleCoverage(Iterable<String> blockers) => blockers.isEmpty;
+
+List<String> battlePreflightDeckBlockers(
+  BattlePreflightDeck deck, {
+  required String prefix,
+}) {
+  return battleDeckAdmissionFailures(
+        format: deck.format,
+        validationState: deck.validationState,
+        cards: deck.cards,
+      )
+      .map((failure) {
+        return switch (failure) {
+          BattleDeckAdmissionFailure.format => '${prefix}_format_invalid',
+          BattleDeckAdmissionFailure.validation =>
+            '${prefix}_validation_required',
+          BattleDeckAdmissionFailure.quantity ||
+          BattleDeckAdmissionFailure.size => '${prefix}_size_invalid',
+          BattleDeckAdmissionFailure.commander => '${prefix}_commander_invalid',
+        };
+      })
+      .toSet()
+      .toList(growable: false);
 }
 
 Future<BattleCoverageReport> checkExternalBattleCoverage({

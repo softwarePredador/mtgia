@@ -26,17 +26,21 @@ enum BattleSeriesSize {
   bool get isSeries => count > 1;
 }
 
+enum BattleTestLaunchMode { automatic, interactive }
+
 class BattleTestSetup {
   BattleTestSetup({
     required this.opponentDeckId,
     this.objective = BattleTestObjective.general,
     this.seriesSize = BattleSeriesSize.single,
+    this.launchMode = BattleTestLaunchMode.automatic,
     List<String> focusCards = const <String>[],
   }) : focusCards = _normalizeFocusCards(focusCards);
 
   final String opponentDeckId;
   final BattleTestObjective objective;
   final BattleSeriesSize seriesSize;
+  final BattleTestLaunchMode launchMode;
   final List<String> focusCards;
 
   /// Only the single-attempt engine contract is serialized here. A series is
@@ -58,6 +62,9 @@ class BattlePreflight {
     required this.availableOpponentCount,
     required this.engineCoverage,
     required this.blockers,
+    this.unsupportedCardNames = const <String>[],
+    this.mode = 'simulation',
+    this.selectedEngine,
     this.deckSnapshotHash,
     this.deckRevision,
   });
@@ -69,14 +76,23 @@ class BattlePreflight {
   final int availableOpponentCount;
   final Map<String, String> engineCoverage;
   final List<String> blockers;
+  final List<String> unsupportedCardNames;
+  final String mode;
+  final String? selectedEngine;
   final String? deckSnapshotHash;
   final String? deckRevision;
 
   bool get canStart => status == 'ready' && blockers.isEmpty;
+  bool get canStartInteractive =>
+      canStart && mode == 'interactive' && selectedEngine == 'xmage';
 
-  factory BattlePreflight.fromJson(Map<String, dynamic> json) {
+  factory BattlePreflight.fromJson(
+    Map<String, dynamic> json, {
+    String requestedMode = 'simulation',
+  }) {
     final coverage = json['engine_coverage'];
     final blockerValues = json['blockers'];
+    final unsupportedValues = json['unsupported_cards'];
     return BattlePreflight(
       status: _optionalText(json['status']) ?? 'unknown',
       cardCount: _readInt(json['card_count']) ?? 0,
@@ -95,10 +111,26 @@ class BattlePreflight {
                 .whereType<String>()
                 .toList(growable: false)
           : const <String>[],
+      unsupportedCardNames: _unsupportedCardNames(unsupportedValues),
+      mode: _optionalText(json['mode']) ?? requestedMode,
+      selectedEngine: _optionalText(json['selected_engine']),
       deckSnapshotHash: _optionalText(json['deck_snapshot_hash']),
       deckRevision: _optionalText(json['deck_revision']),
     );
   }
+}
+
+List<String> _unsupportedCardNames(Object? values) {
+  if (values is! List) return const <String>[];
+  final names = <String>[];
+  final seen = <String>{};
+  for (final value in values) {
+    if (value is! Map) continue;
+    final name = _optionalText(value['name']);
+    if (name == null || !seen.add(name.toLowerCase())) continue;
+    names.add(name);
+  }
+  return List<String>.unmodifiable(names);
 }
 
 List<String> _normalizeFocusCards(List<String> values) {

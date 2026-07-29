@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../../lib/battle/battle_job_contract.dart';
-import '../../../../lib/battle/battle_job_service.dart';
-import '../../../../lib/battle/battle_job_store.dart';
-import '../../../../lib/http_responses.dart';
-import '../../../../lib/logger.dart';
-import '../../../../lib/observability.dart';
+import '../../../../../lib/battle/battle_job_contract.dart';
+import '../../../../../lib/battle/battle_job_service.dart';
+import '../../../../../lib/battle/battle_job_store.dart';
+import '../../../../../lib/http_responses.dart';
+import '../../../../../lib/logger.dart';
+import '../../../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   if (context.request.method != HttpMethod.get &&

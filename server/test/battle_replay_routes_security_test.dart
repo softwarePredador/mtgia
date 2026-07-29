@@ -140,6 +140,25 @@ void main() {
       expect(pool.calls, 0);
     });
 
+    test('invalid preflight mode does not query the database', () async {
+      final pool = _ThrowingPool();
+
+      final response = await battle_preflight_route.onRequest(
+        _context(
+          '/decks/$_deckAId/battle-preflight'
+          '?opponent_deck_id=$_deckBId&mode=automatic',
+          pool: pool,
+        ),
+        _deckAId,
+      );
+
+      expect(response.statusCode, HttpStatus.badRequest);
+      expect(await _jsonBody(response), {
+        'error': 'mode must be simulation or interactive',
+      });
+      expect(pool.calls, 0);
+    });
+
     test('owner scope hides missing and inaccessible source decks', () async {
       final pool = _ScriptedPool([_result(rows: const [])]);
 

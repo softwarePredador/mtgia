@@ -2,6 +2,7 @@ import '../../../core/api/api_client.dart';
 import '../models/battle_replay.dart';
 import '../models/battle_replay_annotation.dart';
 import '../models/battle_test_setup.dart';
+import '../utils/battle_runtime_presentation.dart';
 
 abstract class BattleReplayGateway {
   Future<List<BattleOpponentDeck>> listOpponentDecks({
@@ -56,6 +57,7 @@ abstract class BattleReplayGateway {
   Future<BattlePreflight> loadBattlePreflight({
     required String deckId,
     required String opponentDeckId,
+    bool interactive = false,
   }) async => const BattlePreflight(
     status: 'ready',
     cardCount: 0,
@@ -460,10 +462,13 @@ class BattleReplayService implements BattleReplayGateway {
   Future<BattlePreflight> loadBattlePreflight({
     required String deckId,
     required String opponentDeckId,
+    bool interactive = false,
   }) async {
+    final mode = interactive ? 'interactive' : 'simulation';
     final response = await _apiClient.get(
       '/decks/${Uri.encodeComponent(deckId)}/battle-preflight'
-      '?opponent_deck_id=${Uri.encodeQueryComponent(opponentDeckId)}',
+      '?opponent_deck_id=${Uri.encodeQueryComponent(opponentDeckId)}'
+      '&mode=$mode',
     );
     _throwIfNotOk(
       response,
@@ -475,6 +480,7 @@ class BattleReplayService implements BattleReplayGateway {
     }
     return BattlePreflight.fromJson(
       data.map((key, value) => MapEntry(key.toString(), value)),
+      requestedMode: mode,
     );
   }
 
@@ -541,7 +547,7 @@ class BattleReplayService implements BattleReplayGateway {
     final message = data is Map
         ? data['message']?.toString() ?? data['error']?.toString()
         : null;
-    throw BattleReplayException(message ?? fallback);
+    throw BattleReplayException(sanitizeBattleUserMessage(message ?? fallback));
   }
 }
 

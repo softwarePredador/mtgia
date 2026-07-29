@@ -12,7 +12,7 @@ void main() {
 
       for (final path in const [
         'routes/ai/battle/sessions/index.dart',
-        'routes/ai/battle/sessions/[id].dart',
+        'routes/ai/battle/sessions/[id]/index.dart',
         'routes/ai/battle/sessions/[id]/actions/index.dart',
         'routes/ai/battle/sessions/[id]/concede/index.dart',
       ]) {
@@ -57,5 +57,18 @@ void main() {
     expect(concede, contains("'idempotency-key'"));
     expect(concede, contains("'idempotency_key'"));
     expect(concede, contains('InteractiveBattleIdempotencyConflictException'));
+  });
+
+  test('expired sessions cannot consume interactive battle quota', () {
+    final store =
+        File('lib/battle/interactive_battle_store.dart').readAsStringSync();
+
+    expect(
+      store,
+      contains('AND expires_at > CURRENT_TIMESTAMP'),
+      reason:
+          'A quota precisa considerar apenas sessões realmente ativas; '
+          'registros vencidos são finalizados quando consultados.',
+    );
   });
 }

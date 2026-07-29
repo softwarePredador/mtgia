@@ -111,6 +111,8 @@ void main() {
           source,
           contains('SELECT @newDeckId, card_id, quantity, is_commander'),
         );
+        expect(source, contains('DeckRulesService(session).validateAndThrow'));
+        expect(source, contains('statusCode: HttpStatus.unprocessableEntity'));
         expect(source, isNot(contains('condition)')));
       },
     );

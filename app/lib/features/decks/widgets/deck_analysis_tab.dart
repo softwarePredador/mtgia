@@ -664,7 +664,7 @@ class _BattleLabLaunch extends StatelessWidget {
                           Text(
                             onOpenCoach == null
                                 ? 'Escolha um adversário, declare o objetivo e acompanhe as evidências do replay.'
-                                : 'Assuma mulligans, alvos, combate e prioridades; o XMage cuida das regras e salva o replay.',
+                                : 'Assuma mulligans, alvos, combate e prioridades; o motor cuida das regras e salva o replay.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: AppTheme.textSecondary,
                               height: 1.35,

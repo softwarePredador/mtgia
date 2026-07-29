@@ -206,6 +206,13 @@ void main() {
     expect(route, contains("'fallback_eligibility_reason':"));
     expect(
       route,
+      contains(
+        "'Algumas cartas ainda não têm cobertura de regras para esta simulação.'",
+      ),
+    );
+    expect(route, isNot(contains("'details': error.message")));
+    expect(
+      route,
       isNot(contains("'fallback_reason': 'strict_mode_coverage_incomplete'")),
     );
     expect(

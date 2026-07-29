@@ -21,6 +21,14 @@ void main() {
       expect(service, contains("'battle_simulations': battleSimulations"));
       expect(service, contains("'battle_jobs': battleJobs"));
       expect(service, contains("'battle_live_records': battleLiveRecords"));
+      expect(
+        service,
+        contains("'interactive_battle_sessions': interactiveBattleSessions"),
+      );
+      expect(
+        service,
+        contains("'interactive_battle_records': interactiveBattleRecords"),
+      );
       expect(service, contains("- 'request_payload'"));
       expect(service, contains("- 'lease_token'"));
       expect(
@@ -34,6 +42,18 @@ void main() {
       expect(service, contains('FROM battle_simulation_attempts attempt'));
       expect(service, contains('FROM battle_job_live_records record'));
       expect(service, contains('AND record.public_visible'));
+      expect(
+        service,
+        contains('FROM interactive_battle_sessions battle_session'),
+      );
+      expect(service, contains('FROM interactive_battle_records record'));
+      expect(
+        service,
+        contains("record.visibility IN ('private_user', 'public_replay_ref')"),
+      );
+      expect(service, contains("'interactive_battle_internal_records'"));
+      expect(service, contains("'interactive_battle_request_payload'"));
+      expect(service, contains("'interactive_battle_request_fingerprints'"));
       expect(service, contains('FROM battle_replay_annotations annotation'));
       expect(service, isNot(contains("'request_fingerprint'")));
       expect(service, contains("'binder_items': binderItems"));
@@ -76,6 +96,7 @@ void main() {
       );
       expect(service, contains('DELETE FROM battle_simulations simulation'));
       expect(service, contains('DELETE FROM battle_jobs'));
+      expect(service, contains('DELETE FROM interactive_battle_sessions'));
       expect(
         service,
         contains('DELETE FROM battle_simulation_attempts attempt'),

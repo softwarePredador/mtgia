@@ -449,36 +449,66 @@ void main() {
       expect(replay.events, hasLength(1));
     });
 
-    test(
-      'loads read-only battle preflight for the selected opponent',
-      () async {
-        final apiClient = _FakeApiClient(
-          getResponses: {
-            '/decks/deck-1/battle-preflight?opponent_deck_id=deck-2':
-                ApiResponse(200, const {
-                  'status': 'ready',
-                  'card_count': 100,
-                  'commander_count': 1,
-                  'validation_state': 'validated',
-                  'available_opponent_count': 4,
-                  'engine_coverage': {'xmage': 'unsupported', 'forge': 'ready'},
-                  'blockers': <String>[],
-                  'deck_snapshot_hash': 'hash-1',
-                  'deck_revision': 'revision-1',
-                }),
-          },
-        );
+    test('loads read-only battle preflight for the selected opponent', () async {
+      final apiClient = _FakeApiClient(
+        getResponses: {
+          '/decks/deck-1/battle-preflight?opponent_deck_id=deck-2&mode=simulation':
+              ApiResponse(200, const {
+                'status': 'ready',
+                'card_count': 100,
+                'commander_count': 1,
+                'validation_state': 'validated',
+                'available_opponent_count': 4,
+                'engine_coverage': {'xmage': 'unsupported', 'forge': 'ready'},
+                'blockers': <String>[],
+                'deck_snapshot_hash': 'hash-1',
+                'deck_revision': 'revision-1',
+              }),
+        },
+      );
 
-        final preflight = await BattleReplayService(
-          apiClient: apiClient,
-        ).loadBattlePreflight(deckId: 'deck-1', opponentDeckId: 'deck-2');
+      final preflight = await BattleReplayService(
+        apiClient: apiClient,
+      ).loadBattlePreflight(deckId: 'deck-1', opponentDeckId: 'deck-2');
 
-        expect(preflight.canStart, isTrue);
-        expect(preflight.cardCount, 100);
-        expect(preflight.engineCoverage['forge'], 'ready');
-        expect(preflight.deckRevision, 'revision-1');
-      },
-    );
+      expect(preflight.canStart, isTrue);
+      expect(preflight.cardCount, 100);
+      expect(preflight.engineCoverage['forge'], 'ready');
+      expect(preflight.deckRevision, 'revision-1');
+    });
+
+    test('requests XMage-only preflight for Battle Coach', () async {
+      final apiClient = _FakeApiClient(
+        getResponses: {
+          '/decks/deck-1/battle-preflight'
+              '?opponent_deck_id=deck-2&mode=interactive': ApiResponse(
+            200,
+            const {
+              'status': 'ready',
+              'mode': 'interactive',
+              'selected_engine': 'xmage',
+              'card_count': 100,
+              'commander_count': 1,
+              'validation_state': 'validated',
+              'available_opponent_count': 1,
+              'engine_coverage': {'xmage': 'ready'},
+              'blockers': <String>[],
+            },
+          ),
+        },
+      );
+
+      final preflight = await BattleReplayService(apiClient: apiClient)
+          .loadBattlePreflight(
+            deckId: 'deck-1',
+            opponentDeckId: 'deck-2',
+            interactive: true,
+          );
+
+      expect(preflight.mode, 'interactive');
+      expect(preflight.selectedEngine, 'xmage');
+      expect(preflight.canStartInteractive, isTrue);
+    });
 
     test('sends objective and focus cards without forcing access', () async {
       final apiClient = _FakeApiClient(
@@ -671,5 +701,35 @@ void main() {
         );
       },
     );
+
+    test('sanitizes runtime vendors from backend errors', () async {
+      final apiClient = _FakeApiClient(
+        postResponses: {
+          '/ai/simulate': ApiResponse(503, const {
+            'error': 'simulation_runtime_failed',
+            'message': 'XMage failed to execute the battle.',
+          }),
+        },
+      );
+
+      expect(
+        () => BattleReplayService(
+          apiClient: apiClient,
+        ).runBattleSimulation(deckId: 'deck-1', opponentDeckId: 'deck-2'),
+        throwsA(
+          isA<BattleReplayException>()
+              .having(
+                (error) => error.message,
+                'message',
+                contains('motor de regras'),
+              )
+              .having(
+                (error) => error.message,
+                'vendor names',
+                isNot(contains('XMage')),
+              ),
+        ),
+      );
+    });
   });
 }

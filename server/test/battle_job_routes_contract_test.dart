@@ -24,7 +24,8 @@ void main() {
   });
 
   test('item route hides malformed, missing, and other-owner UUIDs as 404', () {
-    final route = File('routes/ai/battle/jobs/[id].dart').readAsStringSync();
+    final route =
+        File('routes/ai/battle/jobs/[id]/index.dart').readAsStringSync();
     final store = File('lib/battle/battle_job_store.dart').readAsStringSync();
 
     expect(route, contains('battleJobUuidPattern.hasMatch(id)'));

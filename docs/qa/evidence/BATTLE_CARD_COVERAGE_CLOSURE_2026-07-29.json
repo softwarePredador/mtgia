@@ -1,0 +1,98 @@
+{
+  "schema_version": "manaloom_battle_card_coverage_evidence_v1",
+  "captured_at": "2026-07-29",
+  "status": "pass",
+  "method": {
+    "read_only": true,
+    "catalog_grain": "normalized_unique_card_name",
+    "engine_order": [
+      "primary_candidate",
+      "compatible_fallback",
+      "native_reviewed",
+      "terminal_disposition"
+    ],
+    "catalog_presence_is_not_semantic_execution_proof": true,
+    "postgresql_is_product_truth": true,
+    "postgres_mutations": []
+  },
+  "engine_identity": {
+    "canonical_primary_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "primary_candidate_commit": "3ac810da650a51c33142175d6191693c3a077131",
+    "primary_candidate_version": "1.4.60",
+    "compatible_fallback_commit": "a62915f500c2411484689294659c6bb84ea215f8",
+    "compatible_fallback_version": "2.0.14-SNAPSHOT",
+    "canonical_pin_promoted": false
+  },
+  "catalog": {
+    "total_unique_names": 34071,
+    "primary_candidate_exact": 31045,
+    "primary_candidate_residual": 3026,
+    "compatible_fallback_exact": 1784,
+    "native_reviewed": 187,
+    "operationally_covered": 33016,
+    "technical_terminal": 1055,
+    "actionable_conventional_or_digital_residual": 0,
+    "operational_coverage_ratio": 0.969035
+  },
+  "terminal_dispositions": {
+    "status": "pass",
+    "input_rows": 1055,
+    "input_identities": 1055,
+    "terminal_rows": 1055,
+    "unknown": 0,
+    "promotion_allowed": 0,
+    "scope_counts": {
+      "auxiliary_game_object": 133,
+      "nonstandard_or_playtest_ruleset": 813,
+      "physical_or_external_interaction": 55,
+      "scenario_or_challenge_deck_ruleset": 54
+    }
+  },
+  "native_runtime_recheck": {
+    "endpoint_scope": "loopback_isolated_sidecar",
+    "engine_contract": "native_reviewed_rules_execution",
+    "total": 187,
+    "supported": 187,
+    "unsupported": 0,
+    "reviewed_rules_without_oracle_hash": 0,
+    "request_sha256": "38591388c0c11935004775e48942143ebd18608320ca9eb6579e8eb1b3f8d903",
+    "response_sha256": "c65414d7f671fe0dd4a256ea88d7108eb15f979eab8b5678bb86e3f6160ad90f",
+    "normalized_rule_evidence_sha256": "71012f256116399d93996992c3d0b42072af0db5780401f70bffc60ad10249a7"
+  },
+  "deck_scope": {
+    "all_decks_unique_names": 1761,
+    "primary_candidate_residual": 17,
+    "compatible_fallback_exact": 13,
+    "native_reviewed": 1,
+    "terminal_nonstandard_not_legal": 3,
+    "battle_eligible_decks": 6,
+    "battle_eligible_unique_names": 336,
+    "battle_eligible_supported": 336,
+    "battle_eligible_residual": 0
+  },
+  "product_eligibility_correction": {
+    "commander_legal_metadata_traps": 50,
+    "sticker_sheets": 48,
+    "attractions": 1,
+    "playtest_cards": 1,
+    "normal_deck_guard_required": true,
+    "public_deck_copy_guard_required": true,
+    "direct_battle_api_admission_required": true
+  },
+  "artifact_sha256": {
+    "candidate_primary.json": "72a61381488b567377e91b5e49253053e34a879bb24bd95b5c359228eb6adc9b",
+    "classification_summary.json": "30c9a16588f933b9d84acdc5ceea6e38315d57b1d93736b51afbf71be5b03ac1",
+    "full_funnel.json": "985e13334c6eab291a591e1e18017b866c70f97fbd0c601bcd395b4c6c2bc586",
+    "terminal_dispositions.json": "dba812000054622252e79baad6ed52c5ccb68cd1a4a1fbb2adb7b096a6006030",
+    "cards.json": "866f8b98a3d1b47bf6a302b624040798a905680ea7f4f42a6d79add7c582959b",
+    "native.json": "c64f614234a563f3e98b5385ff87386d5a8d7c4545496ef6f597f556565bb5f3",
+    "forge_response.json": "a3c89b111d1f88e3c2031c78e4700a79995e11dc3f7a982e25cae87a87434f8b",
+    "deck_cards.json": "0e18595c0fac85ea24b12d96b45ec6a24ae355c6090c4e2e1d920d26b57b9625",
+    "xmage_strategy_consistency.json": "74a22163848cd06da8c22db52189288b578265045dfaf749d50b406cd073de4b"
+  },
+  "decision": {
+    "implement_3026_as_native_rules": false,
+    "reason": "The number is the primary-engine residual; all normal product scope closes through the complete execution funnel.",
+    "remaining_release_gate": "Primary candidate promotion remains governed by the independent pin-transition qualification."
+  }
+}

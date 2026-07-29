@@ -117,12 +117,60 @@ void main() {
       ]);
     },
   );
+
+  test('rejects an unvalidated deck before persistence or runtime', () async {
+    final store = _Store();
+    final runtime = _Runtime();
+    final persistence = _Persistence();
+    final service = _service(
+      store: store,
+      runtime: runtime,
+      persistence: persistence,
+      deckStore: _DeckStore(
+        deckA: const BattleJobDeckSnapshot(
+          id: _deckAId,
+          name: 'Unvalidated',
+          format: 'commander',
+          validationState: 'unknown',
+          validationReasons: ['validation_not_recorded'],
+          cards: [
+            {'name': 'Isamaru', 'quantity': 1, 'is_commander': true},
+            {'name': 'Plains', 'quantity': 99, 'is_commander': false},
+          ],
+          hash: _deckAHash,
+        ),
+      ),
+    );
+
+    await expectLater(
+      service.create(
+        userId: _userId,
+        input: const InteractiveBattleCreateInput(
+          deckId: _deckAId,
+          opponentDeckId: _deckBId,
+          ttlSeconds: 600,
+          promptTimeoutSeconds: 60,
+          idempotencyKey: 'create-unvalidated',
+        ),
+      ),
+      throwsA(
+        isA<InteractiveBattleValidationException>().having(
+          (error) => error.code,
+          'code',
+          'interactive_battle_deck_validation_required',
+        ),
+      ),
+    );
+    expect(persistence.started, 0);
+    expect(runtime.createdRequests, isEmpty);
+  });
 }
 
 InteractiveBattleService _service({
   required _Store store,
   required _Runtime runtime,
   required _Persistence persistence,
+  BattleJobStoreApi? deckStore,
 }) => InteractiveBattleService(
   configuration: const InteractiveBattleConfiguration(
     enabled: true,
@@ -141,12 +189,16 @@ InteractiveBattleService _service({
     maximumActiveGlobal: 4,
   ),
   store: store,
-  deckStore: _DeckStore(),
+  deckStore: deckStore ?? _DeckStore(),
   runtime: runtime,
   persistence: persistence,
 );
 
 class _DeckStore implements BattleJobStoreApi {
+  const _DeckStore({this.deckA = _deckA});
+
+  final BattleJobDeckSnapshot deckA;
+
   @override
   Future<BattleJobDeckSnapshot?> loadDeckSnapshot({
     required String userId,
@@ -154,7 +206,7 @@ class _DeckStore implements BattleJobStoreApi {
     required bool allowPublic,
   }) async =>
       deckId == _deckAId
-          ? _deckA
+          ? deckA
           : deckId == _deckBId
           ? _deckB
           : null;
@@ -416,6 +468,9 @@ InteractiveBattleRuntimeSnapshot _snapshot({
 const _deckA = BattleJobDeckSnapshot(
   id: _deckAId,
   name: 'Deck A',
+  format: 'commander',
+  validationState: 'validated',
+  validationReasons: [],
   cards: [
     {'name': 'Isamaru', 'quantity': 1, 'is_commander': true},
     {'name': 'Plains', 'quantity': 99, 'is_commander': false},
@@ -425,6 +480,9 @@ const _deckA = BattleJobDeckSnapshot(
 const _deckB = BattleJobDeckSnapshot(
   id: _deckBId,
   name: 'Deck B',
+  format: 'commander',
+  validationState: 'validated',
+  validationReasons: [],
   cards: [
     {'name': 'Krenko', 'quantity': 1, 'is_commander': true},
     {'name': 'Mountain', 'quantity': 99, 'is_commander': false},

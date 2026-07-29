@@ -88,6 +88,7 @@ def disposition_for(row: dict[str, Any]) -> dict[str, Any]:
             "type_line": row.get("type_line"),
             "commander_legality": row.get("commander_legality"),
             "oracle_text_present": bool(str(row.get("oracle_text") or "").strip()),
+            "coverage_evidence": row.get("coverage_evidence") or {},
         },
     }
 

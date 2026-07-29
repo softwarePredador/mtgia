@@ -13,6 +13,7 @@ import '../models/battle_test_setup.dart';
 import '../models/interactive_battle_session.dart';
 import '../services/battle_replay_service.dart';
 import '../services/interactive_battle_service.dart';
+import '../utils/battle_runtime_presentation.dart';
 import 'battle_replays_screen.dart';
 
 String battleCoachRouteLocation(String deckId) =>
@@ -102,7 +103,36 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       mode: BattleOpponentPickerMode.coach,
     );
     if (setup == null || !mounted) return;
+    if (setup.launchMode == BattleTestLaunchMode.automatic) {
+      await _runAutomaticSimulation(setup);
+      return;
+    }
     await _start(setup);
+  }
+
+  Future<void> _runAutomaticSimulation(BattleTestSetup setup) async {
+    setState(() {
+      _starting = true;
+      _error = null;
+    });
+    try {
+      final replay = await _opponentGateway.runBattleTest(
+        deckId: widget.deckId,
+        setup: setup,
+      );
+      if (!mounted) return;
+      setState(() => _starting = false);
+      final location =
+          '${battleReplaysRouteLocation(widget.deckId)}'
+          '?replay=${Uri.encodeQueryComponent(replay.summary.id)}';
+      context.go(location);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _starting = false;
+        _error = _friendlyError(error);
+      });
+    }
   }
 
   Future<void> _start(BattleTestSetup setup) async {
@@ -547,7 +577,7 @@ class _BattleCoachWelcome extends StatelessWidget {
                   ),
                   const SizedBox(height: AppTheme.space8),
                   Text(
-                    'O XMage conduz regras e ações automáticas. Quando houver uma '
+                    'O motor de regras conduz regras e ações automáticas. Quando houver uma '
                     'decisão real — mulligan, alvo, combate, mana ou prioridade — '
                     'a mesa para e entrega a escolha a você.',
                     textAlign: TextAlign.center,
@@ -564,7 +594,7 @@ class _BattleCoachWelcome extends StatelessWidget {
                     children: [
                       _CoachTrustChip(
                         icon: Icons.rule_rounded,
-                        label: 'Regras pelo XMage',
+                        label: 'Regras verificadas',
                       ),
                       _CoachTrustChip(
                         icon: Icons.visibility_off_outlined,
@@ -1701,7 +1731,7 @@ class _BattleCoachTerminalPanel extends StatelessWidget {
             if (session.errorCode != null) ...[
               const SizedBox(height: AppTheme.space8),
               Text(
-                'Código técnico: ${session.errorCode}',
+                'Código técnico: ${sanitizeBattleTechnicalToken(session.errorCode!)}',
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,

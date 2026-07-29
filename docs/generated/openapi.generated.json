@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "b1fb7e9506d850f69b607aecd7fad194680c6f6688e608f476155c46db9fb073",
+  "x-manaloom-source-digest-sha256": "a34427b9079ff8c3df6848372b04caf8692200fded2900aa27b5f26e8ef24b05",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -148,7 +148,7 @@
         "tags": [
           "ai"
         ],
-        "x-manaloom-source": "server/routes/ai/battle/jobs/[id].dart",
+        "x-manaloom-source": "server/routes/ai/battle/jobs/[id]/index.dart",
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
@@ -191,7 +191,7 @@
         "tags": [
           "ai"
         ],
-        "x-manaloom-source": "server/routes/ai/battle/jobs/[id].dart",
+        "x-manaloom-source": "server/routes/ai/battle/jobs/[id]/index.dart",
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
@@ -349,7 +349,7 @@
         "tags": [
           "ai"
         ],
-        "x-manaloom-source": "server/routes/ai/battle/sessions/[id].dart",
+        "x-manaloom-source": "server/routes/ai/battle/sessions/[id]/index.dart",
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "app/integration_test/commander_learned_deck_availability_runtime_test.dart",

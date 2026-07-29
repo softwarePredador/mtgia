@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/commander_eligibility.dart';
+import '../../../../lib/deck_card_eligibility.dart';
 import '../../../../lib/deck_rules_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -20,33 +21,39 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     body = await context.request.json() as Map<String, dynamic>;
   } catch (_) {
     return Response.json(
-        statusCode: HttpStatus.badRequest, body: {'error': 'JSON inválido'});
+      statusCode: HttpStatus.badRequest,
+      body: {'error': 'JSON inválido'},
+    );
   }
 
   final cardId = body['card_id']?.toString();
   final quantityRaw = body['quantity'];
-  final quantity = quantityRaw is int
-      ? quantityRaw
-      : int.tryParse(quantityRaw?.toString() ?? '');
+  final quantity =
+      quantityRaw is int
+          ? quantityRaw
+          : int.tryParse(quantityRaw?.toString() ?? '');
   final isCommander = body['is_commander'] == true;
   final condition = _validateCondition(body['condition']?.toString());
 
   if (cardId == null || cardId.isEmpty) {
     return Response.json(
-        statusCode: HttpStatus.badRequest,
-        body: {'error': 'card_id é obrigatório'});
+      statusCode: HttpStatus.badRequest,
+      body: {'error': 'card_id é obrigatório'},
+    );
   }
   if (quantity == null || quantity <= 0) {
     return Response.json(
-        statusCode: HttpStatus.badRequest,
-        body: {'error': 'quantity deve ser > 0'});
+      statusCode: HttpStatus.badRequest,
+      body: {'error': 'quantity deve ser > 0'},
+    );
   }
 
   try {
     final result = await pool.runTx((session) async {
       final deckResult = await session.execute(
         Sql.named(
-            'SELECT id::text, format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1'),
+          'SELECT id::text, format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1',
+        ),
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
@@ -55,15 +62,17 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
       final format = (deckResult.first[1] as String).toLowerCase();
       validateNoUnsupportedDeckSections(cards: [body]);
-      final maxTotal = (format == 'commander')
-          ? 100
-          : (format == 'brawl')
+      final maxTotal =
+          (format == 'commander')
+              ? 100
+              : (format == 'brawl')
               ? 60
               : null;
 
       final cardInfoResult = await session.execute(
         Sql.named(
-            'SELECT id::text, name, type_line, oracle_text, colors, color_identity, power, toughness FROM cards WHERE id = @id LIMIT 1'),
+          'SELECT id::text, name, type_line, oracle_text, colors, color_identity, power, toughness, set_code, layout FROM cards WHERE id = @id LIMIT 1',
+        ),
         parameters: {'id': cardId},
       );
       if (cardInfoResult.isEmpty) {
@@ -74,33 +83,51 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final cardName = row[1] as String;
       final typeLine = (row[2] as String? ?? '').toLowerCase();
       final oracleText = row[3] as String?;
-      final colors = (row[4] as List?)?.map((e) => e.toString()).toList() ??
+      final colors =
+          (row[4] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
       final colorIdentity =
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
-              const <String>[];
+          const <String>[];
       final power = row[6] as String?;
       final toughness = row[7] as String?;
+      final setCode = row[8] as String?;
+      final layout = row[9] as String?;
+
+      try {
+        validateMainDeckCardEligibility(
+          name: cardName,
+          typeLine: typeLine,
+          setCode: setCode,
+          layout: layout,
+        );
+      } on MainDeckCardEligibilityException catch (error) {
+        throw DeckRulesException(error.message, cardName: cardName);
+      }
 
       // Legalidade (banned/not_legal/restricted)
       final legalityResult = await session.execute(
         Sql.named(
-            'SELECT status FROM card_legalities WHERE card_id = @id AND format = @format LIMIT 1'),
+          'SELECT status FROM card_legalities WHERE card_id = @id AND format = @format LIMIT 1',
+        ),
         parameters: {'id': cardId, 'format': format},
       );
       if (legalityResult.isNotEmpty) {
         final status = (legalityResult.first[0] as String).toLowerCase();
         if (status == 'banned') {
           throw DeckRulesException(
-              'Regra violada: "$cardName" é BANIDA no formato $format.');
+            'Regra violada: "$cardName" é BANIDA no formato $format.',
+          );
         }
         if (status == 'not_legal') {
           throw DeckRulesException(
-              'Regra violada: "$cardName" não é válida no formato $format.');
+            'Regra violada: "$cardName" não é válida no formato $format.',
+          );
         }
         if (status == 'restricted' && quantity > 1) {
           throw DeckRulesException(
-              'Regra violada: "$cardName" é RESTRITA no formato $format (máx. 1).');
+            'Regra violada: "$cardName" é RESTRITA no formato $format (máx. 1).',
+          );
         }
       }
 
@@ -120,11 +147,14 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           oracleText: oracleText,
           power: power,
           toughness: toughness,
+          setCode: setCode,
+          layout: layout,
           format: format,
         );
         if (!eligible) {
           throw DeckRulesException(
-              'Regra violada: "$cardName" não pode ser comandante.');
+            'Regra violada: "$cardName" não pode ser comandante.',
+          );
         }
 
         final deckCardsResult = await session.execute(
@@ -138,8 +168,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
         final existingCommanders =
             deckCardsResult.where((row) => row[2] as bool? ?? false).toList();
-        final targetAlreadyCommander =
-            existingCommanders.any((row) => row[0] == cardId);
+        final targetAlreadyCommander = existingCommanders.any(
+          (row) => row[0] == cardId,
+        );
         if (existingCommanders.length > 1 && !targetAlreadyCommander) {
           throw DeckRulesException(
             'Regra violada: este deck tem múltiplos comandantes; edite o slot de comandante específico.',
@@ -158,17 +189,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             'is_commander': existingIsCommander,
           });
         }
-        nextCards.add({
-          'card_id': cardId,
-          'quantity': 1,
-          'is_commander': true,
-        });
+        nextCards.add({'card_id': cardId, 'quantity': 1, 'is_commander': true});
 
-        await DeckRulesService(session).validateAndThrow(
-          format: format,
-          cards: nextCards,
-          strict: false,
-        );
+        await DeckRulesService(
+          session,
+        ).validateAndThrow(format: format, cards: nextCards, strict: false);
 
         if (existingCommanders.length <= 1) {
           await session.execute(
@@ -203,7 +228,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
         final updatedTotalResult = await session.execute(
           Sql.named(
-              'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId'),
+            'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId',
+          ),
           parameters: {'deckId': deckId},
         );
         final updatedTotal = (updatedTotalResult.first[0] as int?) ?? 0;
@@ -223,13 +249,15 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final maxCopies = (format == 'commander' || format == 'brawl') ? 1 : 4;
       if (!isBasicLand && quantity > maxCopies && !isCommander) {
         throw DeckRulesException(
-            'Regra violada: "$cardName" excede o limite de $maxCopies cópia(s) para o formato $format.');
+          'Regra violada: "$cardName" excede o limite de $maxCopies cópia(s) para o formato $format.',
+        );
       }
 
       // Total atual de cartas
       final totalResult = await session.execute(
         Sql.named(
-            'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId'),
+          'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId',
+        ),
         parameters: {'deckId': deckId},
       );
       final currentTotal = (totalResult.first[0] as int?) ?? 0;
@@ -237,14 +265,16 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       // Quantidade atual da carta no deck (se existir)
       final existingResult = await session.execute(
         Sql.named(
-            'SELECT quantity::int, is_commander FROM deck_cards WHERE deck_id = @deckId AND card_id = @cardId LIMIT 1'),
+          'SELECT quantity::int, is_commander FROM deck_cards WHERE deck_id = @deckId AND card_id = @cardId LIMIT 1',
+        ),
         parameters: {'deckId': deckId, 'cardId': cardId},
       );
       final existingQty =
           existingResult.isNotEmpty ? (existingResult.first[0] as int) : 0;
-      final existingIsCommander = existingResult.isNotEmpty
-          ? (existingResult.first[1] as bool? ?? false)
-          : false;
+      final existingIsCommander =
+          existingResult.isNotEmpty
+              ? (existingResult.first[1] as bool? ?? false)
+              : false;
       if (existingIsCommander && !isCommander) {
         throw DeckRulesException(
           'Regra violada: "$cardName" já está selecionada como comandante; edite o slot de comandante em vez de adicionar ao deck principal.',
@@ -281,7 +311,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         final nextTotal = currentTotal + delta;
         if (nextTotal > maxTotal) {
           throw DeckRulesException(
-              'Regra violada: deck $format não pode exceder $maxTotal cartas (atual: $nextTotal).');
+            'Regra violada: deck $format não pode exceder $maxTotal cartas (atual: $nextTotal).',
+          );
         }
       }
 
@@ -300,27 +331,32 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             parameters: {'deckId': deckId},
           );
           if (commanderResult.isNotEmpty) {
-            final commanderIdentityList = (commanderResult.first[0] as List?)
+            final commanderIdentityList =
+                (commanderResult.first[0] as List?)
                     ?.map((e) => e.toString())
                     .toList() ??
                 const <String>[];
-            final commanderColors = (commanderResult.first[1] as List?)
+            final commanderColors =
+                (commanderResult.first[1] as List?)
                     ?.map((e) => e.toString())
                     .toList() ??
                 const <String>[];
-            final commanderSet = (commanderIdentityList.isNotEmpty
-                    ? commanderIdentityList
-                    : commanderColors)
-                .map((e) => e.toUpperCase())
-                .toSet();
+            final commanderSet =
+                (commanderIdentityList.isNotEmpty
+                        ? commanderIdentityList
+                        : commanderColors)
+                    .map((e) => e.toUpperCase())
+                    .toSet();
 
             final identity =
                 (colorIdentity.isNotEmpty ? colorIdentity : colors);
-            final ok =
-                identity.every((c) => commanderSet.contains(c.toUpperCase()));
+            final ok = identity.every(
+              (c) => commanderSet.contains(c.toUpperCase()),
+            );
             if (!ok) {
               throw DeckRulesException(
-                  'Regra violada: "$cardName" está fora da identidade de cor do comandante.');
+                'Regra violada: "$cardName" está fora da identidade de cor do comandante.',
+              );
             }
           }
         }
@@ -341,17 +377,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             'quantity': row[1] as int,
             'is_commander': row[2] as bool? ?? false,
           },
-        {
-          'card_id': cardId,
-          'quantity': nextQty,
-          'is_commander': false,
-        },
+        {'card_id': cardId, 'quantity': nextQty, 'is_commander': false},
       ];
-      await DeckRulesService(session).validateAndThrow(
-        format: format,
-        cards: nextCards,
-        strict: false,
-      );
+      await DeckRulesService(
+        session,
+      ).validateAndThrow(format: format, cards: nextCards, strict: false);
 
       // Upsert (deck_id, card_id) com a quantidade final, flag de comandante e condição
       await session.execute(
@@ -374,7 +404,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
       final updatedTotalResult = await session.execute(
         Sql.named(
-            'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId'),
+          'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId',
+        ),
         parameters: {'deckId': deckId},
       );
       final updatedTotal = (updatedTotalResult.first[0] as int?) ?? 0;
@@ -395,12 +426,15 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   } on DeckRulesException catch (e) {
     print('[ERROR] handler: $e');
     return Response.json(
-        statusCode: HttpStatus.badRequest, body: {'error': e.message});
+      statusCode: HttpStatus.badRequest,
+      body: {'error': e.message},
+    );
   } catch (e) {
     print('[ERROR] handler: $e');
     return Response.json(
-        statusCode: HttpStatus.internalServerError,
-        body: {'error': e.toString()});
+      statusCode: HttpStatus.internalServerError,
+      body: {'error': e.toString()},
+    );
   }
 }
 

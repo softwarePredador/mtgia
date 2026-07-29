@@ -28,6 +28,10 @@ def row(name: str, scope: str, *, type_line: str = "Card") -> dict:
         "layout": "normal",
         "commander_legality": "not_legal",
         "oracle_text": "test oracle",
+        "coverage_evidence": {
+            "xmage": {"reason": "catalog_miss"},
+            "forge": {"reason_code": "unsupported_card"},
+        },
     }
 
 
@@ -50,6 +54,13 @@ class GlobalResidualTerminalDispositionsTest(unittest.TestCase):
         self.assertEqual(result["summary"]["promotion_allowed"], 0)
         self.assertTrue(all(item["terminal"] for item in result["dispositions"]))
         self.assertTrue(all(not item["promotion_allowed"] for item in result["dispositions"]))
+        self.assertEqual(
+            result["dispositions"][0]["source_evidence"]["coverage_evidence"],
+            {
+                "xmage": {"reason": "catalog_miss"},
+                "forge": {"reason_code": "unsupported_card"},
+            },
+        )
 
     def test_auxiliary_subsystems_receive_specific_reasons(self) -> None:
         cases = {

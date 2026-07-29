@@ -29,7 +29,7 @@ EXPECTED_SHELL_MODES = {
     "scripts/manaloom_global_battle_closure.sh": (
         "--read-only",
         "--read-only",
-        "--write-approved",
+        "--read-only",
     ),
     "scripts/manaloom_pg_hermes_sqlite_contract_audit.sh": (
         "--read-only",
@@ -161,6 +161,8 @@ class NewServerPgCallerModeContractTest(unittest.TestCase):
             / "docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py",
             REPO_ROOT
             / "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py",
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py",
         ]
         for audit_path in audit_paths:
             with self.subTest(audit=audit_path.name), tempfile.TemporaryDirectory() as tmp:

@@ -20,6 +20,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     this.replays,
     this.moreReplays,
     this.replayDetail,
+    this.automaticPreflight,
     List<BattleReplayAnnotation> annotations = const [],
     this.preflight = const BattlePreflight(
       status: 'ready',
@@ -39,6 +40,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   final List<BattleReplaySummary>? moreReplays;
   final BattleReplayDetail? replayDetail;
   final BattlePreflight preflight;
+  final BattlePreflight? automaticPreflight;
   final List<BattleReplayAnnotation> _annotations;
   int listCalls = 0;
   int fetchCalls = 0;
@@ -346,8 +348,12 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   Future<BattlePreflight> loadBattlePreflight({
     required String deckId,
     required String opponentDeckId,
+    bool interactive = false,
   }) async {
     preflightCalls += 1;
+    if (!interactive && automaticPreflight != null) {
+      return automaticPreflight!;
+    }
     return preflight;
   }
 
@@ -529,8 +535,12 @@ void main() {
     await tester.tap(technicalDetails);
     await tester.pumpAndSettle();
     expect(
-      find.textContaining('"engine": "manaloom_native_reviewed"'),
+      find.textContaining('"engine": "Execução revisada"'),
       findsOneWidget,
+    );
+    expect(
+      find.textContaining('"engine": "manaloom_native_reviewed"'),
+      findsNothing,
     );
   });
 
@@ -1346,7 +1356,11 @@ void main() {
         validationState: 'draft',
         availableOpponentCount: 2,
         engineCoverage: {'xmage': 'unknown'},
-        blockers: ['deck_validation_required'],
+        blockers: [
+          'deck_format_invalid',
+          'deck_validation_required',
+          'interactive_battle_disabled',
+        ],
       ),
     );
     await tester.pumpWidget(
@@ -1367,12 +1381,204 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('battle-preflight-blocked')), findsOneWidget);
-    expect(find.text('Valide novamente o deck'), findsOneWidget);
+    expect(
+      find.textContaining('O deck precisa usar o formato Commander'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Valide novamente o deck'), findsOneWidget);
+    expect(
+      find.textContaining('Battle Coach interativo está desativado'),
+      findsOneWidget,
+    );
     final button = tester.widget<FilledButton>(
       find.byKey(const Key('battle-opponent-submit-button')),
     );
     expect(button.onPressed, isNull);
     expect(gateway.runBattleCalls, 0);
+  });
+
+  testWidgets('names uncovered cards without exposing the runtime vendor', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      preflight: const BattlePreflight(
+        status: 'blocked',
+        cardCount: 100,
+        commanderCount: 1,
+        validationState: 'validated',
+        availableOpponentCount: 2,
+        engineCoverage: {'xmage': 'unsupported'},
+        blockers: ['engine_coverage_incomplete'],
+        unsupportedCardNames: ['Lorehold, the Historian'],
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining(
+        'Cobertura de regras em preparação para Lorehold, the Historian',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('XMage'), findsNothing);
+  });
+
+  testWidgets(
+    'offers an explicit automatic simulation when Coach coverage is incomplete',
+    (tester) async {
+      final gateway = _FakeBattleReplayGateway(
+        preflight: const BattlePreflight(
+          status: 'blocked',
+          cardCount: 100,
+          commanderCount: 1,
+          validationState: 'validated',
+          availableOpponentCount: 2,
+          engineCoverage: {'xmage': 'unsupported'},
+          blockers: ['engine_coverage_incomplete'],
+          unsupportedCardNames: ['Lorehold, the Historian'],
+          mode: 'interactive',
+        ),
+        automaticPreflight: const BattlePreflight(
+          status: 'ready',
+          cardCount: 100,
+          commanderCount: 1,
+          validationState: 'validated',
+          availableOpponentCount: 2,
+          engineCoverage: {'forge': 'ready'},
+          blockers: [],
+          mode: 'simulation',
+          selectedEngine: 'forge',
+        ),
+      );
+      BattleTestSetup? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Builder(
+            builder: (context) => TextButton(
+              onPressed: () async {
+                result = await showBattleOpponentPicker(
+                  context: context,
+                  gateway: gateway,
+                  currentDeckId: 'deck-1',
+                  mode: BattleOpponentPickerMode.coach,
+                );
+              },
+              child: const Text('Abrir Coach'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Abrir Coach'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(gateway.preflightCalls, 2);
+      expect(
+        find.byKey(const Key('battle-automatic-fallback-ready')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('battle-opponent-automatic-fallback-button')),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Você não escolherá as jogadas'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('XMage'), findsNothing);
+      final coachButton = tester.widget<FilledButton>(
+        find.byKey(const Key('battle-opponent-submit-button')),
+      );
+      expect(coachButton.onPressed, isNull);
+
+      await tester.tap(
+        find.byKey(const Key('battle-opponent-automatic-fallback-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result?.launchMode, BattleTestLaunchMode.automatic);
+      expect(result?.opponentDeckId, isNotEmpty);
+    },
+  );
+
+  testWidgets('does not offer an automatic fallback without ready coverage', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      preflight: const BattlePreflight(
+        status: 'blocked',
+        cardCount: 100,
+        commanderCount: 1,
+        validationState: 'validated',
+        availableOpponentCount: 2,
+        engineCoverage: {'xmage': 'unsupported'},
+        blockers: ['engine_coverage_incomplete'],
+        mode: 'interactive',
+      ),
+      automaticPreflight: const BattlePreflight(
+        status: 'blocked',
+        cardCount: 100,
+        commanderCount: 1,
+        validationState: 'validated',
+        availableOpponentCount: 2,
+        engineCoverage: {'forge': 'unsupported'},
+        blockers: ['engine_coverage_incomplete'],
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showBattleOpponentPicker(
+              context: context,
+              gateway: gateway,
+              currentDeckId: 'deck-1',
+              mode: BattleOpponentPickerMode.coach,
+            ),
+            child: const Text('Abrir Coach'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Abrir Coach'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('battle-opponent-automatic-fallback-button')),
+      findsNothing,
+    );
   });
 
   testWidgets(

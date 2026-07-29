@@ -216,6 +216,7 @@ class InteractiveBattleStore implements InteractiveBattleStoreApi {
             'waiting_for_action',
             'action_pending'
           )
+            AND expires_at > CURRENT_TIMESTAMP
         '''),
         parameters: {'user_id': command.userId},
       );

@@ -252,7 +252,7 @@ class BattleJobCreateInput {
     if (!battleJobRequestedEngines.contains(requestedEngine)) {
       throw const BattleJobValidationException(
         'battle_job_engine_invalid',
-        'engine must be auto, xmage, forge or native.',
+        'engine must be a supported execution mode.',
       );
     }
 
@@ -313,7 +313,7 @@ class BattleJobCreateInput {
     if (requestedEngine != 'native' && forceFocusAccessMode != 'none') {
       throw const BattleJobValidationException(
         'external_battle_control_unsupported',
-        'Forced focus access is available only for the reviewed native engine.',
+        'Forced focus access is available only for the reviewed simulation mode.',
       );
     }
 
@@ -357,12 +357,18 @@ class BattleJobDeckSnapshot {
   const BattleJobDeckSnapshot({
     required this.id,
     required this.name,
+    required this.format,
+    required this.validationState,
+    required this.validationReasons,
     required this.cards,
     required this.hash,
   });
 
   final String id;
   final String name;
+  final String format;
+  final String validationState;
+  final List<String> validationReasons;
   final List<Map<String, dynamic>> cards;
   final String hash;
 

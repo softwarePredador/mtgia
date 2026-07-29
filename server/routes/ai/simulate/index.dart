@@ -10,6 +10,7 @@ import '../../../lib/ai/battle_replay_event_support.dart';
 import '../../../lib/ai/battle_simulation_request_support.dart';
 import '../../../lib/ai/goldfish_simulator.dart';
 import '../../../lib/battle/battle_execution_runtime.dart';
+import '../../../lib/battle/battle_deck_admission.dart';
 import '../../../lib/battle/battle_simulation_persistence_service.dart';
 import '../../../lib/battle/battle_simulation_attempt_service.dart';
 import '../../../lib/http_responses.dart';
@@ -89,6 +90,16 @@ Future<Response> onRequest(RequestContext context) async {
       if (opponentCards.isEmpty) {
         return notFound('Opponent deck not found or empty');
       }
+      final deckAdmission = _battleDeckAdmissionResponse(
+        deckCards,
+        field: 'deck_id',
+      );
+      if (deckAdmission != null) return deckAdmission;
+      final opponentAdmission = _battleDeckAdmissionResponse(
+        opponentCards,
+        field: 'opponent_deck_id',
+      );
+      if (opponentAdmission != null) return opponentAdmission;
 
       final seed =
           routeRequest.seed ??
@@ -467,7 +478,10 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
         c.collector_number,
         dc.quantity,
         dc.is_commander,
-        d.name AS deck_name
+        d.name AS deck_name,
+        d.format AS deck_format,
+        d.validation_state AS deck_validation_state,
+        d.validation_reasons AS deck_validation_reasons
       FROM deck_cards dc
       JOIN decks d ON d.id = dc.deck_id
       JOIN cards c ON c.id = dc.card_id
@@ -509,8 +523,46 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
       'quantity': row[13],
       'is_commander': row[14],
       'deck_name': row[15],
+      'deck_format': row[16],
+      'deck_validation_state': row[17],
+      'deck_validation_reasons': row[18],
     };
   }).toList();
+}
+
+Response? _battleDeckAdmissionResponse(
+  List<Map<String, dynamic>> cards, {
+  required String field,
+}) {
+  if (cards.isEmpty) return null;
+  final failure = battleDeckAdmissionFailure(
+    format: cards.first['deck_format']?.toString() ?? '',
+    validationState:
+        cards.first['deck_validation_state']?.toString() ?? 'unknown',
+    cards: cards,
+  );
+  if (failure == null) return null;
+  final error = switch (failure) {
+    BattleDeckAdmissionFailure.format => 'battle_deck_format_invalid',
+    BattleDeckAdmissionFailure.validation => 'battle_deck_validation_required',
+    _ => 'battle_deck_invalid',
+  };
+  final message = switch (failure) {
+    BattleDeckAdmissionFailure.format =>
+      '$field precisa usar o formato Commander.',
+    BattleDeckAdmissionFailure.validation =>
+      '$field precisa ser validado novamente antes do Battle.',
+    BattleDeckAdmissionFailure.quantity =>
+      '$field contém uma quantidade de carta inválida.',
+    BattleDeckAdmissionFailure.size =>
+      '$field precisa ter exatamente 100 cartas.',
+    BattleDeckAdmissionFailure.commander =>
+      '$field precisa ter exatamente um comandante.',
+  };
+  return Response.json(
+    statusCode: HttpStatus.unprocessableEntity,
+    body: {'error': error, 'message': message, 'field': field},
+  );
 }
 
 Map<String, dynamic> _externalDeckPayload(
@@ -554,7 +606,10 @@ Response _engineConfigurationFailure(
   BattleEngineConfigurationException error,
 ) => Response.json(
   statusCode: HttpStatus.serviceUnavailable,
-  body: {'error': error.code, 'details': error.message},
+  body: {
+    'error': error.code,
+    'message': 'O motor de regras não está configurado para esta simulação.',
+  },
 );
 
 Response _battleRuntimeFailure(BattleExecutionRuntimeFailure error) {
@@ -571,6 +626,14 @@ Response _battleRuntimeFailure(BattleExecutionRuntimeFailure error) {
             : HttpStatus.badGateway,
     body: {
       'error': error.code,
+      'message':
+          coverage
+              ? 'Algumas cartas ainda não têm cobertura de regras para esta simulação.'
+              : cancelled
+              ? 'A simulação foi cancelada antes de concluir.'
+              : error.timedOut
+              ? 'A simulação excedeu o tempo disponível. Tente novamente.'
+              : 'O motor de regras não conseguiu concluir esta simulação.',
       if (error.unsupportedCards.isNotEmpty)
         'unsupported_cards': error.unsupportedCards,
       'fallback_allowed': false,
@@ -584,7 +647,6 @@ Response _battleRuntimeFailure(BattleExecutionRuntimeFailure error) {
       if (error.engineSelectionReason != null)
         'engine_selection_reason': error.engineSelectionReason,
       if (error.fallbackChain.isNotEmpty) 'fallback_chain': error.fallbackChain,
-      'details': error.message,
     },
   );
 }

@@ -274,9 +274,9 @@ def _coverage(
     batch_size: int,
     timeout: float,
     client: JsonHttpClient,
-) -> tuple[set[int], dict[str, Any]]:
-    unsupported: set[int] = set()
-    engine_metadata: dict[str, Any] = {}
+) -> tuple[dict[int, dict[str, Any]], dict[str, Any]]:
+    unsupported: dict[int, dict[str, Any]] = {}
+    engine_metadata: dict[str, Any] | None = None
     for offset, batch in _chunks(list(rows), batch_size):
         payload_rows = []
         for local_index, row in enumerate(batch):
@@ -298,11 +298,18 @@ def _coverage(
             raise RuntimeError(
                 f"coverage request failed status={response.status} body={response.body}"
             )
-        engine_metadata = {
+        batch_engine_metadata = {
             key: response.body.get(key)
             for key in ("engine", "engine_version", "engine_commit")
             if response.body.get(key) is not None
         }
+        if engine_metadata is None:
+            engine_metadata = batch_engine_metadata
+        elif batch_engine_metadata != engine_metadata:
+            raise RuntimeError(
+                "coverage engine identity changed between batches "
+                f"expected={engine_metadata} actual={batch_engine_metadata}"
+            )
         unsupported_rows = response.body.get("unsupported_cards") or []
         if not isinstance(unsupported_rows, list):
             raise RuntimeError("coverage response unsupported_cards must be a list")
@@ -334,8 +341,8 @@ def _coverage(
                     f"coverage response has invalid input_index={local_index!r}"
                 )
             seen_local_indexes.add(local_index)
-            unsupported.add(offset + local_index)
-    return unsupported, engine_metadata
+            unsupported[offset + local_index] = dict(item)
+    return unsupported, engine_metadata or {}
 
 
 def _supported_aliases(
@@ -371,18 +378,50 @@ def _supported_aliases(
     return result
 
 
-def _native_names(payload: Any) -> set[str]:
+def _native_rule_evidence(
+    payload: Any,
+    *,
+    require_oracle_hash: bool = False,
+) -> dict[str, list[dict[str, Any]]]:
     if isinstance(payload, Mapping):
         payload = payload.get("cards") or payload.get("names") or payload.get("rows") or []
-    result: set[str] = set()
+    result: dict[str, list[dict[str, Any]]] = {}
     if not isinstance(payload, list):
         return result
     for item in payload:
         name = item.get("name") if isinstance(item, Mapping) else item
         normalized = normalize_name(name)
-        if normalized:
-            result.add(normalized)
+        if not normalized:
+            continue
+        if isinstance(item, Mapping):
+            oracle_hash = str(item.get("oracle_hash") or "").strip()
+            if require_oracle_hash and not oracle_hash:
+                raise ValueError(
+                    f"native rule for {name!r} is missing required oracle_hash"
+                )
+            evidence = {
+                key: item.get(key)
+                for key in ("logical_rule_key", "oracle_hash")
+                if item.get(key) is not None
+            }
+        else:
+            if require_oracle_hash:
+                raise ValueError(
+                    "native rule inventory must contain objects with oracle_hash"
+                )
+            evidence = {}
+        if evidence not in result.setdefault(normalized, []):
+            result[normalized].append(evidence)
     return result
+
+
+def _native_names(payload: Any, *, require_oracle_hash: bool = False) -> set[str]:
+    return set(
+        _native_rule_evidence(
+            payload,
+            require_oracle_hash=require_oracle_hash,
+        )
+    )
 
 
 def build_closure(
@@ -391,12 +430,17 @@ def build_closure(
     xmage_url: str,
     forge_url: str,
     native_names: set[str] | None = None,
+    native_rule_evidence: Mapping[str, Sequence[Mapping[str, Any]]] | None = None,
     batch_size: int = 20_000,
     timeout: float = 30.0,
     client: JsonHttpClient | None = None,
 ) -> dict[str, Any]:
     http = client or JsonHttpClient()
     native = native_names or set()
+    native_evidence = {
+        normalize_name(name): [dict(row) for row in rows]
+        for name, rows in (native_rule_evidence or {}).items()
+    }
     rows: list[dict[str, Any]] = []
     keys: set[str] = set()
     for index, raw in enumerate(cards):
@@ -425,7 +469,7 @@ def build_closure(
         batch_size=batch_size,
         timeout=timeout,
         client=http,
-    ) if xmage_residual else (set(), {})
+    ) if xmage_residual else ({}, {})
     forge_unsupported_keys = {
         xmage_residual[index]["_key"] for index in forge_unsupported_local
     }
@@ -449,6 +493,14 @@ def build_closure(
 
     ledger: list[dict[str, Any]] = []
     xmage_unsupported_keys = {rows[index]["_key"] for index in xmage_unsupported}
+    xmage_unsupported_evidence = {
+        rows[index]["_key"]: evidence
+        for index, evidence in xmage_unsupported.items()
+    }
+    forge_unsupported_evidence = {
+        xmage_residual[index]["_key"]: evidence
+        for index, evidence in forge_unsupported_local.items()
+    }
     for row in rows:
         key = row["_key"]
         normalized = normalize_name(row["name"])
@@ -485,6 +537,15 @@ def build_closure(
             if covered
             else residual_execution_scope(row),
         }
+        coverage_evidence = {}
+        if key in xmage_unsupported_evidence:
+            coverage_evidence["xmage"] = xmage_unsupported_evidence[key]
+        if key in forge_unsupported_evidence:
+            coverage_evidence["forge"] = forge_unsupported_evidence[key]
+        if coverage_evidence:
+            ledger_row["coverage_evidence"] = coverage_evidence
+        if lane == "native_verified":
+            ledger_row["native_rule_evidence"] = native_evidence.get(normalized, [])
         if not covered:
             ledger_row.update(
                 {
@@ -527,6 +588,23 @@ def build_closure(
         any(states) and not all(states) for states in identities.values()
     )
     residual_identities = len(identities) - fully_covered_identities
+    unique_names: dict[str, list[dict[str, Any]]] = {}
+    for row in ledger:
+        unique_names.setdefault(normalize_name(row.get("name")), []).append(row)
+    fully_covered_unique_names = sum(
+        all(bool(row["covered"]) for row in name_rows)
+        for name_rows in unique_names.values()
+    )
+    partially_covered_unique_names = sum(
+        any(bool(row["covered"]) for row in name_rows)
+        and not all(bool(row["covered"]) for row in name_rows)
+        for name_rows in unique_names.values()
+    )
+    residual_unique_names = len(unique_names) - fully_covered_unique_names
+    unique_name_lane_counts = Counter()
+    for name_rows in unique_names.values():
+        lanes = {str(row["lane"]) for row in name_rows}
+        unique_name_lane_counts[next(iter(lanes)) if len(lanes) == 1 else "mixed"] += 1
     family_gates = []
     for family, count in sorted(semantic_family_counts.items()):
         family_rows = [
@@ -561,6 +639,11 @@ def build_closure(
         "method": {
             "engine_order": list(ENGINE_ORDER),
             "read_only": True,
+            "reported_grains": [
+                "printing_rows",
+                "normalized_unique_names",
+                "oracle_or_name_identities",
+            ],
             "identity_reconciliation_is_not_coverage_until_runtime_uses_it": True,
             "catalog_presence_is_not_card_use_evidence": True,
         },
@@ -570,6 +653,15 @@ def build_closure(
             "covered": covered_count,
             "residual": residual_count,
             "coverage_ratio": round(covered_count / max(total, 1), 6),
+            "total_unique_names": len(unique_names),
+            "fully_covered_unique_names": fully_covered_unique_names,
+            "partially_covered_unique_names": partially_covered_unique_names,
+            "residual_unique_names": residual_unique_names,
+            "unique_name_coverage_ratio": round(
+                fully_covered_unique_names / max(len(unique_names), 1),
+                6,
+            ),
+            "unique_name_lane_counts": dict(sorted(unique_name_lane_counts.items())),
             "total_identities": len(identities),
             "fully_covered_identities": fully_covered_identities,
             "partially_covered_identities": partially_covered_identities,
@@ -608,6 +700,11 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
         f"| Covered | {summary['covered']} |",
         f"| Residual | {summary['residual']} |",
         f"| Coverage ratio | {summary['coverage_ratio']:.4%} |",
+        f"| Total unique names | {summary['total_unique_names']} |",
+        f"| Fully covered unique names | {summary['fully_covered_unique_names']} |",
+        f"| Partially covered unique names | {summary['partially_covered_unique_names']} |",
+        f"| Residual unique names | {summary['residual_unique_names']} |",
+        f"| Unique-name coverage ratio | {summary['unique_name_coverage_ratio']:.4%} |",
         f"| Total identities | {summary['total_identities']} |",
         f"| Fully covered identities | {summary['fully_covered_identities']} |",
         f"| Partially covered identities | {summary['partially_covered_identities']} |",
@@ -620,6 +717,17 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
         "| --- | ---: |",
     ]
     for lane, count in summary["lane_counts"].items():
+        lines.append(f"| `{lane}` | {count} |")
+    lines.extend(
+        [
+            "",
+            "## Unique-name lanes",
+            "",
+            "| Lane | Unique names |",
+            "| --- | ---: |",
+        ]
+    )
+    for lane, count in summary["unique_name_lane_counts"].items():
         lines.append(f"| `{lane}` | {count} |")
     lines.extend(["", "## Residual Families", "", "| Family | Cards |", "| --- | ---: |"])
     for family, count in summary["residual_family_counts"].items():
@@ -681,6 +789,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cards", type=Path, required=True)
     parser.add_argument("--native-cards", type=Path)
+    parser.add_argument("--require-native-oracle-hash", action="store_true")
     parser.add_argument("--xmage-url", required=True)
     parser.add_argument("--forge-url", required=True)
     parser.add_argument("--batch-size", type=int, default=20_000)
@@ -693,13 +802,20 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     native = set()
+    native_evidence: dict[str, list[dict[str, Any]]] = {}
     if args.native_cards:
-        native = _native_names(json.loads(args.native_cards.read_text(encoding="utf-8")))
+        native_payload = json.loads(args.native_cards.read_text(encoding="utf-8"))
+        native_evidence = _native_rule_evidence(
+            native_payload,
+            require_oracle_hash=args.require_native_oracle_hash,
+        )
+        native = set(native_evidence)
     payload = build_closure(
         load_cards(args.cards),
         xmage_url=args.xmage_url,
         forge_url=args.forge_url,
         native_names=native,
+        native_rule_evidence=native_evidence,
         batch_size=max(1, args.batch_size),
         timeout=max(1.0, args.timeout_seconds),
     )

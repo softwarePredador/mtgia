@@ -7,28 +7,18 @@ void main() {
     test('detects unsupported deck sections before persistence', () {
       expect(
         unsupportedDeckSectionLabels(const [
-          {
-            'card_id': 'blast-id',
-            'quantity': 1,
-            'zone': 'sideboard',
-          },
-          {
-            'card_id': 'wish-id',
-            'quantity': 1,
-            'is_wishboard': true,
-          },
+          {'card_id': 'blast-id', 'quantity': 1, 'zone': 'sideboard'},
+          {'card_id': 'wish-id', 'quantity': 1, 'is_wishboard': true},
         ]),
         equals(['sideboard', 'wishboard']),
       );
 
       expect(
-        () => validateNoUnsupportedDeckSections(cards: const [
-          {
-            'card_id': 'blast-id',
-            'quantity': 1,
-            'zone': 'outside the game',
-          },
-        ]),
+        () => validateNoUnsupportedDeckSections(
+          cards: const [
+            {'card_id': 'blast-id', 'quantity': 1, 'zone': 'outside the game'},
+          ],
+        ),
         throwsA(
           isA<DeckRulesException>().having(
             (error) => error.message,
@@ -42,17 +32,9 @@ void main() {
     test('detects unsupported raw list maps before import parsing', () {
       expect(
         unsupportedRawDeckSectionLabels(const [
-          {
-            'card_id': 'card-a',
-            'quantity': 1,
-            'section': 'Maybeboard',
-          },
+          {'card_id': 'card-a', 'quantity': 1, 'section': 'Maybeboard'},
           '1 Sol Ring',
-          {
-            'card_id': 'card-b',
-            'quantity': 1,
-            'is_outside_game': 'true',
-          },
+          {'card_id': 'card-b', 'quantity': 1, 'is_outside_game': 'true'},
         ]),
         equals(['Maybeboard', 'outside-game']),
       );
@@ -60,43 +42,45 @@ void main() {
       expect(unsupportedRawDeckSectionLabels('1 Sol Ring'), isEmpty);
     });
 
-    test('uses oracle_id to enforce Commander singleton across printings',
-        () async {
-      final session = _DeckRulesFakeSession(
-        hasIdentityColumns: true,
-        cards: {
-          'print-a': _cardRow(
-            id: 'print-a',
-            oracleId: 'oracle-sol-ring',
-            name: 'Sol Ring',
-            typeLine: 'Artifact',
-          ),
-          'print-b': _cardRow(
-            id: 'print-b',
-            oracleId: 'oracle-sol-ring',
-            name: 'Sol Ring',
-            typeLine: 'Artifact',
-          ),
-        },
-      );
+    test(
+      'uses oracle_id to enforce Commander singleton across printings',
+      () async {
+        final session = _DeckRulesFakeSession(
+          hasIdentityColumns: true,
+          cards: {
+            'print-a': _cardRow(
+              id: 'print-a',
+              oracleId: 'oracle-sol-ring',
+              name: 'Sol Ring',
+              typeLine: 'Artifact',
+            ),
+            'print-b': _cardRow(
+              id: 'print-b',
+              oracleId: 'oracle-sol-ring',
+              name: 'Sol Ring',
+              typeLine: 'Artifact',
+            ),
+          },
+        );
 
-      await expectLater(
-        DeckRulesService(session).validateAndThrow(
-          format: 'commander',
-          cards: const [
-            {'card_id': 'print-a', 'quantity': 1, 'is_commander': false},
-            {'card_id': 'print-b', 'quantity': 1, 'is_commander': false},
-          ],
-        ),
-        throwsA(
-          isA<DeckRulesException>().having(
-            (error) => error.message,
-            'message',
-            contains('excede o limite de 1'),
+        await expectLater(
+          DeckRulesService(session).validateAndThrow(
+            format: 'commander',
+            cards: const [
+              {'card_id': 'print-a', 'quantity': 1, 'is_commander': false},
+              {'card_id': 'print-b', 'quantity': 1, 'is_commander': false},
+            ],
           ),
-        ),
-      );
-    });
+          throwsA(
+            isA<DeckRulesException>().having(
+              (error) => error.message,
+              'message',
+              contains('excede o limite de 1'),
+            ),
+          ),
+        );
+      },
+    );
 
     test('blocks the commander oracle identity from entering the 99', () async {
       final session = _DeckRulesFakeSession(
@@ -142,6 +126,48 @@ void main() {
         ),
       );
     });
+
+    test('blocks supplemental and playtest objects before legality', () async {
+      final session = _DeckRulesFakeSession(
+        hasIdentityColumns: true,
+        cards: {
+          'attraction': _cardRow(
+            id: 'attraction',
+            oracleId: 'oracle-attraction',
+            name: 'Costume Shop',
+            typeLine: 'Artifact — Attraction',
+            setCode: 'unf',
+          ),
+          'playtest': _cardRow(
+            id: 'playtest',
+            oracleId: 'oracle-playtest',
+            name: 'Clear, the Mind',
+            typeLine: 'Sorcery',
+            oracleText: 'Spell commander (This card can be your commander.)',
+            setCode: 'unk',
+          ),
+        },
+      );
+
+      for (final cardId in const ['attraction', 'playtest']) {
+        await expectLater(
+          DeckRulesService(session).validateAndThrow(
+            format: 'commander',
+            cards: [
+              {'card_id': cardId, 'quantity': 1, 'is_commander': true},
+            ],
+          ),
+          throwsA(
+            isA<DeckRulesException>().having(
+              (error) => error.message,
+              'message',
+              contains('não pode entrar no deck principal'),
+            ),
+          ),
+        );
+        session.reset();
+      }
+    });
   });
 }
 
@@ -157,6 +183,8 @@ List<Object?> _cardRow({
   double? cmc,
   String? power,
   String? toughness,
+  String? setCode,
+  String? layout,
 }) {
   return [
     id,
@@ -170,6 +198,8 @@ List<Object?> _cardRow({
     power,
     toughness,
     oracleId,
+    setCode,
+    layout,
   ];
 }
 
@@ -182,6 +212,10 @@ class _DeckRulesFakeSession implements Session {
   final bool hasIdentityColumns;
   final Map<String, List<Object?>> cards;
   var _executeCount = 0;
+
+  void reset() {
+    _executeCount = 0;
+  }
 
   @override
   bool get isOpen => true;
@@ -225,9 +259,7 @@ class _DeckRulesFakeSession implements Session {
 Result _result(List<List<Object?>> rows) {
   final schema = ResultSchema(const []);
   return Result(
-    rows: [
-      for (final row in rows) ResultRow(values: row, schema: schema),
-    ],
+    rows: [for (final row in rows) ResultRow(values: row, schema: schema)],
     affectedRows: rows.length,
     schema: schema,
   );

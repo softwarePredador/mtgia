@@ -1,5 +1,6 @@
 import '../../../core/api/api_client.dart';
 import '../models/interactive_battle_session.dart';
+import '../utils/battle_runtime_presentation.dart';
 
 abstract class InteractiveBattleGateway {
   Future<InteractiveBattleSession> create({
@@ -214,12 +215,8 @@ Map<String, dynamic>? _asMap(Object? value) {
 }
 
 String _friendlyMessage(int statusCode, Map<String, dynamic> payload) {
-  final backendMessage = payload['message']?.toString().trim();
-  if (backendMessage != null && backendMessage.isNotEmpty) {
-    return backendMessage;
-  }
   final code = payload['error']?.toString() ?? '';
-  return switch (code) {
+  final knownMessage = switch (code) {
     'interactive_battle_quota_exceeded' =>
       'Você já tem uma mesa ativa. Retome-a ou encerre-a antes de iniciar outra.',
     'interactive_battle_action_stale' ||
@@ -229,11 +226,18 @@ String _friendlyMessage(int statusCode, Map<String, dynamic> payload) {
       'Battle Coach não está habilitado neste ambiente, ou esta mesa não existe mais.',
     'interactive_battle_engine_unavailable' ||
     'interactive_battle_runtime_unavailable' =>
-      'O motor XMage interativo está indisponível agora.',
-    _ when statusCode == 404 =>
-      'Battle Coach ainda não está habilitado neste ambiente.',
-    _ when statusCode == 429 =>
-      'O limite de mesas ativas foi atingido. Aguarde alguns segundos.',
+      'O motor de regras interativo está indisponível agora.',
+    _ => null,
+  };
+  if (knownMessage != null) return knownMessage;
+
+  final backendMessage = payload['message']?.toString().trim();
+  if (backendMessage != null && backendMessage.isNotEmpty) {
+    return sanitizeBattleUserMessage(backendMessage);
+  }
+  return switch (statusCode) {
+    404 => 'Battle Coach ainda não está habilitado neste ambiente.',
+    429 => 'O limite de mesas ativas foi atingido. Aguarde alguns segundos.',
     _ when statusCode >= 500 =>
       'Não foi possível falar com o motor da partida.',
     _ => 'Não foi possível atualizar a mesa.',

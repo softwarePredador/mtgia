@@ -27,6 +27,7 @@ class FakeClient:
                         "input_index": index,
                         "card_id": card.get("card_id"),
                         "name": card["name"],
+                        "reason": f"{engine}_catalog_miss",
                     }
                 )
         return closure.HttpResult(
@@ -85,6 +86,52 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
                 client=MalformedClient(),
             )
 
+    def test_engine_identity_change_between_batches_fails_closed(self):
+        class ChangingIdentityClient(FakeClient):
+            def __init__(self):
+                super().__init__({"xmage": set(), "forge": set()})
+                self.sequence = 0
+
+            def post(self, url, payload, timeout):
+                response = super().post(url, payload, timeout)
+                if "xmage" in url:
+                    self.sequence += 1
+                    response.body["engine_commit"] = f"xmage-sha-{self.sequence}"
+                return response
+
+        with self.assertRaisesRegex(RuntimeError, "identity changed between batches"):
+            closure.build_closure(
+                [
+                    {"id": "1", "name": "First"},
+                    {"id": "2", "name": "Second"},
+                ],
+                xmage_url="http://xmage",
+                forge_url="http://forge",
+                batch_size=1,
+                client=ChangingIdentityClient(),
+            )
+
+    def test_native_inventory_can_require_oracle_hash(self):
+        with self.assertRaisesRegex(ValueError, "missing required oracle_hash"):
+            closure._native_rule_evidence(
+                [{"name": "Native Card", "logical_rule_key": "rule"}],
+                require_oracle_hash=True,
+            )
+        evidence = closure._native_rule_evidence(
+            [
+                {
+                    "name": "Native Card",
+                    "logical_rule_key": "rule",
+                    "oracle_hash": "abc123",
+                }
+            ],
+            require_oracle_hash=True,
+        )
+        self.assertEqual(
+            evidence["native card"],
+            [{"logical_rule_key": "rule", "oracle_hash": "abc123"}],
+        )
+
     def test_engine_order_native_and_explicit_residual(self):
         cards = [
             {"id": "1", "name": "XMage Card", "layout": "normal", "oracle_text": "Draw a card."},
@@ -132,6 +179,13 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
         )
         self.assertEqual(payload["summary"]["covered"], 3)
         self.assertEqual(payload["summary"]["residual"], 2)
+        self.assertEqual(payload["summary"]["total_unique_names"], 5)
+        self.assertEqual(payload["summary"]["residual_unique_names"], 2)
+        forge = next(row for row in payload["ledger"] if row["name"] == "Forge Card")
+        self.assertEqual(
+            forge["coverage_evidence"]["xmage"]["reason"],
+            "xmage_catalog_miss",
+        )
         alias = next(row for row in payload["ledger"] if row["name"] == "Front / Back")
         self.assertFalse(alias["covered"])
         self.assertEqual(alias["engine_name_candidate"], "Front")
@@ -156,6 +210,8 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
             client=client,
         )
         self.assertEqual(payload["summary"]["total"], 2)
+        self.assertEqual(payload["summary"]["total_unique_names"], 1)
+        self.assertEqual(payload["summary"]["fully_covered_unique_names"], 1)
         self.assertEqual(len({row["key"] for row in payload["ledger"]}), 2)
         self.assertEqual(payload["summary"]["total_identities"], 1)
         self.assertEqual(payload["summary"]["fully_covered_identities"], 1)

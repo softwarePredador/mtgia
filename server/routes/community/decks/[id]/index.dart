@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../lib/auth_service.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
+import '../../../../lib/deck_rules_service.dart';
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/scryfall_image_url.dart';
@@ -345,6 +346,29 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
 
       final origMap = original.first.toColumnMap();
       final newName = 'Cópia de ${origMap['name']}';
+      final sourceCardsResult = await session.execute(
+        Sql.named('''
+          SELECT card_id::text, quantity::int, is_commander
+          FROM deck_cards
+          WHERE deck_id = @deckId
+          ORDER BY card_id::text
+        '''),
+        parameters: {'deckId': deckId},
+      );
+      final sourceCards = sourceCardsResult
+          .map(
+            (row) => <String, dynamic>{
+              'card_id': row[0].toString(),
+              'quantity': row[1] as int,
+              'is_commander': row[2] as bool? ?? false,
+            },
+          )
+          .toList(growable: false);
+      await DeckRulesService(session).validateAndThrow(
+        format: origMap['format']?.toString() ?? '',
+        cards: sourceCards,
+        strict: false,
+      );
 
       // 2. Criar novo deck para o usuário
       final insertResult = await session.execute(
@@ -385,6 +409,14 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
     return Response.json(
       statusCode: HttpStatus.created,
       body: {'success': true, 'deck': newDeck},
+    );
+  } on DeckRulesException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: {
+        'error': error.message,
+        if (error.cardName != null) 'card_name': error.cardName,
+      },
     );
   } on Exception catch (e, st) {
     Log.e(

@@ -69,6 +69,21 @@ void main() {
       );
     });
 
+    test('does not let playtest metadata create a commander candidate', () {
+      expect(
+        isCommanderEligibleCard(
+          typeLine: 'Sorcery',
+          oracleText: 'Spell commander (This card can be your commander.)',
+          setCode: 'unk',
+        ),
+        isFalse,
+      );
+      expect(
+        commanderEligibilitySql(format: 'commander'),
+        contains("c.set_code"),
+      );
+    });
+
     test('keeps Commander planeswalker eligibility strict by default', () {
       expect(
         isCommanderEligibleCard(typeLine: 'Legendary Planeswalker — Chandra'),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/features/battle/models/battle_replay.dart';
 import 'package:manaloom/features/battle/models/interactive_battle_session.dart';
 import 'package:manaloom/features/battle/models/battle_test_setup.dart';
 import 'package:manaloom/features/battle/screens/battle_coach_screen.dart';
@@ -64,6 +66,7 @@ class _FakeOpponentGateway extends BattleReplayService {
   Future<BattlePreflight> loadBattlePreflight({
     required String deckId,
     required String opponentDeckId,
+    bool interactive = false,
   }) async => const BattlePreflight(
     status: 'ready',
     cardCount: 100,
@@ -72,7 +75,66 @@ class _FakeOpponentGateway extends BattleReplayService {
     availableOpponentCount: 1,
     engineCoverage: {'xmage': 'ready'},
     blockers: [],
+    mode: 'interactive',
+    selectedEngine: 'xmage',
   );
+}
+
+class _FallbackOpponentGateway extends _FakeOpponentGateway {
+  int automaticRuns = 0;
+
+  @override
+  Future<BattlePreflight> loadBattlePreflight({
+    required String deckId,
+    required String opponentDeckId,
+    bool interactive = false,
+  }) async {
+    if (interactive) {
+      return const BattlePreflight(
+        status: 'blocked',
+        cardCount: 100,
+        commanderCount: 1,
+        validationState: 'validated',
+        availableOpponentCount: 1,
+        engineCoverage: {'xmage': 'unsupported'},
+        blockers: ['engine_coverage_incomplete'],
+        unsupportedCardNames: ['Lorehold, the Historian'],
+        mode: 'interactive',
+      );
+    }
+    return const BattlePreflight(
+      status: 'ready',
+      cardCount: 100,
+      commanderCount: 1,
+      validationState: 'validated',
+      availableOpponentCount: 1,
+      engineCoverage: {'forge': 'ready'},
+      blockers: [],
+      selectedEngine: 'forge',
+    );
+  }
+
+  @override
+  Future<BattleReplayDetail> runBattleTest({
+    required String deckId,
+    required BattleTestSetup setup,
+    int maxTurns = 30,
+  }) async {
+    automaticRuns += 1;
+    return BattleReplayDetail.fromJson(
+      {
+        'replay_id': 'fallback-replay',
+        'type': 'battle',
+        'deck_a_id': deckId,
+        'deck_b_id': setup.opponentDeckId,
+        'turns': 7,
+        'events': const <dynamic>[],
+      },
+      fallbackDeckId: deckId,
+      fallbackId: 'fallback-replay',
+      source: 'battle_simulations',
+    );
+  }
 }
 
 void main() {
@@ -132,6 +194,68 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'runs an explicitly selected automatic fallback and opens its replay',
+    (tester) async {
+      const deckId = '00000000-0000-4000-8000-000000000001';
+      final interactiveGateway = _FakeInteractiveGateway();
+      final opponentGateway = _FallbackOpponentGateway();
+      final router = GoRouter(
+        initialLocation: '/decks/$deckId/battle-coach',
+        routes: [
+          GoRoute(
+            path: '/decks/:id/battle-coach',
+            builder: (context, state) => BattleCoachScreen(
+              deckId: state.pathParameters['id']!,
+              gateway: interactiveGateway,
+              opponentGateway: opponentGateway,
+              pollInterval: const Duration(hours: 1),
+            ),
+          ),
+          GoRoute(
+            path: '/decks/:id/battle-replays',
+            builder: (context, state) => Scaffold(
+              body: Text(
+                'Replay aberto: ${state.uri.queryParameters['replay']}',
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        MaterialApp.router(
+          theme: AppTheme.darkTheme.copyWith(
+            splashFactory: InkRipple.splashFactory,
+          ),
+          routerConfig: router,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('battle-coach-choose-opponent-button')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('battle-opponent-automatic-fallback-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(opponentGateway.automaticRuns, 1);
+      expect(find.text('Replay aberto: fallback-replay'), findsOneWidget);
+      expect(find.textContaining('XMage'), findsNothing);
+    },
+  );
 
   testWidgets('resumes, renders private state, and submits a prompt choice', (
     tester,

@@ -11,6 +11,7 @@ import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/battle_job.dart';
 import '../models/battle_live_cursor.dart';
 import '../services/battle_job_gateway.dart';
+import '../utils/battle_runtime_presentation.dart';
 
 String battleLiveRouteLocation(String deckId, String jobId) =>
     '/decks/${Uri.encodeComponent(deckId)}/battle-live/'
@@ -1197,11 +1198,8 @@ String _battleStageLabel(String stage) => switch (stage) {
   _ => stage.replaceAll('_', ' '),
 };
 
-String _engineLabel(BattleExecutionEngine engine) => switch (engine) {
-  BattleExecutionEngine.xmage => 'XMage',
-  BattleExecutionEngine.forge => 'Forge',
-  BattleExecutionEngine.nativeReviewed => 'ManaLoom nativo revisado',
-};
+String _engineLabel(BattleExecutionEngine engine) =>
+    battleRuntimeUserLabel(engine.wireValue);
 
 String _terminalReasonCopy(String? reason) => switch (reason) {
   'cancelled' => 'A execução foi cancelada antes da persistência do replay.',

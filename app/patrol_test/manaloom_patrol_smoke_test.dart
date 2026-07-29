@@ -1012,6 +1012,7 @@ class _PatrolBattleReplayGateway implements BattleReplayGateway {
   Future<BattlePreflight> loadBattlePreflight({
     required String deckId,
     required String opponentDeckId,
+    bool interactive = false,
   }) async => const BattlePreflight(
     status: 'ready',
     cardCount: 100,

@@ -1,18 +1,18 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-28T22:17:39.958912Z",
-  "source_digest": "591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a",
+  "generated_at": "2026-07-29T12:58:42.272758Z",
+  "source_digest": "f883da79de7531d168c5fd3c182b10456dc602bebe03deae87d602c151771a84",
   "surface": "battle_coach",
   "profile": "android_phone",
   "runtime": "flutter_integration_test",
   "target": "android_physical",
-  "device_contract": "Samsung SM-A135M, Android 14, physical device",
+  "device_contract": "physical_android",
   "runtime_console": {
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "5e4f4ebbf6c2c24113b3cf4286e83beeff697c72f4571191f1e5de9f1d42c203",
+  "log_sha256": "ea9f7b70fe9d38c1090dab001d0b1c95fb3b1b87dba89394db17a0b59e812c23",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "battle_coach_00_welcome",
@@ -27,16 +27,16 @@
     {
       "checkpoint": "battle_coach_00_welcome",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_00_welcome.png",
-      "sha256": "af8a1771f3d7f5277d615eb5b86d81cb65bb831d482a857fe55f84a036d22e51",
-      "bytes": 686592,
+      "sha256": "7bf4badd29639000c11e2d52331e3a3dbc4422d31b189c751fdccc8f7a568e25",
+      "bytes": 689786,
       "width": 1080,
       "height": 2408
     },
     {
       "checkpoint": "battle_coach_01_active_table",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_01_active_table.png",
-      "sha256": "dd27f3b89be5b5edb453b24980e466afe32a9afe9be23bbd1208202a77ec1b2f",
-      "bytes": 1086702,
+      "sha256": "211698f325cf0375f2a9116413ddbc33d4a326b6bcb62a762238581839bc25c5",
+      "bytes": 1086811,
       "width": 1080,
       "height": 2408
     },
@@ -67,8 +67,8 @@
     {
       "checkpoint": "battle_coach_05_action_progress",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_05_action_progress.png",
-      "sha256": "1c482286dfa2ea5930053e685590a3f8b4fedeed4bbd11240a6de0d4685d343f",
-      "bytes": 972636,
+      "sha256": "9c28ed61898fa2441843ba9807b0aacfee50d843b4e4b3bd051955e512520665",
+      "bytes": 972643,
       "width": 1080,
       "height": 2408
     },

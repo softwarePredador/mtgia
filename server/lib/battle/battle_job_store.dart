@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:postgres/postgres.dart';
 
 import '../ai/battle_engine_config.dart';
+import '../deck_validation_state_support.dart';
 import 'battle_job_contract.dart';
 import 'battle_request_correlation.dart';
 
@@ -308,6 +309,9 @@ class BattleJobStore implements BattleJobStoreApi, BattleJobWorkerStore {
         SELECT
           deck.id::text AS deck_id,
           deck.name AS deck_name,
+          deck.format AS deck_format,
+          deck.validation_state,
+          deck.validation_reasons,
           card.name,
           card.set_code,
           card.collector_number,
@@ -357,6 +361,11 @@ class BattleJobStore implements BattleJobStoreApi, BattleJobWorkerStore {
     return BattleJobDeckSnapshot(
       id: payload['id']! as String,
       name: payload['name']! as String,
+      format: first['deck_format']?.toString().trim().toLowerCase() ?? '',
+      validationState: normalizeDeckValidationState(first['validation_state']),
+      validationReasons: normalizeDeckValidationReasons(
+        first['validation_reasons'],
+      ),
       cards: cards,
       hash: canonicalExternalBattleDeckHash(payload),
     );

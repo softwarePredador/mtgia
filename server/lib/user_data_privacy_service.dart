@@ -425,6 +425,72 @@ class UserDataPrivacyService {
         ''',
           userId: userId,
         );
+        final interactiveBattleSessions = await _optionalJsonRows(
+          session,
+          relation: 'interactive_battle_sessions',
+          query: '''
+          SELECT jsonb_build_object(
+            'id', battle_session.id,
+            'schema_version', battle_session.schema_version,
+            'deck_a_id', battle_session.deck_a_id,
+            'deck_b_id', battle_session.deck_b_id,
+            'deck_hash_schema', battle_session.deck_hash_schema,
+            'deck_a_hash', battle_session.deck_a_hash,
+            'deck_b_hash', battle_session.deck_b_hash,
+            'request_schema_version', battle_session.request_schema_version,
+            'engine', battle_session.engine,
+            'engine_version', battle_session.engine_version,
+            'engine_commit', battle_session.engine_commit,
+            'engine_build', battle_session.engine_build,
+            'status', battle_session.status,
+            'state_version', battle_session.state_version,
+            'active_prompt', battle_session.active_prompt,
+            'private_state', battle_session.private_state,
+            'ttl_seconds', battle_session.ttl_seconds,
+            'prompt_deadline_at', battle_session.prompt_deadline_at,
+            'expires_at', battle_session.expires_at,
+            'last_activity_at', battle_session.last_activity_at,
+            'attempt_id', battle_session.attempt_id,
+            'replay_id', battle_session.replay_id,
+            'terminal_reason', battle_session.terminal_reason,
+            'error_code', battle_session.error_code,
+            'started_at', battle_session.started_at,
+            'finished_at', battle_session.finished_at,
+            'created_at', battle_session.created_at,
+            'updated_at', battle_session.updated_at
+          )
+          FROM interactive_battle_sessions battle_session
+          WHERE battle_session.user_id = CAST(@userId AS uuid)
+          ORDER BY battle_session.created_at, battle_session.id
+        ''',
+          userId: userId,
+        );
+        final interactiveBattleRecords = await _optionalJsonRows(
+          session,
+          relation: 'interactive_battle_records',
+          query: '''
+          SELECT jsonb_build_object(
+            'id', record.id,
+            'schema_version', record.schema_version,
+            'session_id', record.session_id,
+            'sequence', record.sequence,
+            'record_kind', record.record_kind,
+            'visibility', record.visibility,
+            'state_version', record.state_version,
+            'prompt_id', record.prompt_id,
+            'option_id', record.option_id,
+            'payload', record.payload,
+            'created_at', record.created_at
+          )
+          FROM interactive_battle_records record
+          JOIN interactive_battle_sessions battle_session
+            ON battle_session.id = record.session_id
+          WHERE battle_session.user_id = CAST(@userId AS uuid)
+            AND record.visibility IN ('private_user', 'public_replay_ref')
+          ORDER BY record.session_id, record.sequence
+        ''',
+          userId: userId,
+        );
         final battleReplayAnnotations = await _optionalJsonRows(
           session,
           relation: 'battle_replay_annotations',
@@ -474,6 +540,8 @@ class UserDataPrivacyService {
             'battle_simulation_attempts': battleSimulationAttempts,
             'battle_jobs': battleJobs,
             'battle_live_records': battleLiveRecords,
+            'interactive_battle_sessions': interactiveBattleSessions,
+            'interactive_battle_records': interactiveBattleRecords,
             'battle_replay_annotations': battleReplayAnnotations,
             'binder_items': binderItems,
             'post_game_notes': postGameNotes,
@@ -513,6 +581,9 @@ class UserDataPrivacyService {
               'notification_message_bodies',
               'battle_job_internal_request_payload',
               'battle_job_lease_credentials',
+              'interactive_battle_internal_records',
+              'interactive_battle_request_payload',
+              'interactive_battle_request_fingerprints',
             ],
           },
         };
@@ -597,6 +668,13 @@ class UserDataPrivacyService {
         session,
         'battle_jobs',
         'DELETE FROM battle_jobs WHERE user_id = CAST(@userId AS uuid)',
+        userId,
+      );
+      await _deleteIfPresent(
+        session,
+        'interactive_battle_sessions',
+        'DELETE FROM interactive_battle_sessions '
+            'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
       await _deleteIfPresent(

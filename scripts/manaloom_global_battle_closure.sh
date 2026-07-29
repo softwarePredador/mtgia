@@ -2,12 +2,15 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
-source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+# shellcheck source=scripts/lib/manaloom_safe_env.sh
+source "$ROOT_DIR/scripts/lib/manaloom_safe_env.sh"
+# shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 KNOWLEDGE_SCRIPTS="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts"
 SERVER_ENV="$ROOT_DIR/server/.env"
 NETWORK="${MANALOOM_EASYPANEL_NETWORK:-easypanel-evolution}"
-PYTHON_IMAGE="${MANALOOM_CLOSURE_PYTHON_IMAGE:-python:3.13-alpine}"
+PYTHON_IMAGE="${MANALOOM_CLOSURE_PYTHON_IMAGE:-}"
+SSH_TARGET=""
 
 usage() {
   cat <<'EOF'
@@ -20,6 +23,8 @@ coverage
   XMage source candidates with live catalogs, assigns a non-promotable terminal
   disposition to every technical residual, and keeps only compact evidence
   under output_root (default: /tmp/manaloom-global-closure-output).
+  MANALOOM_CLOSURE_PYTHON_IMAGE must be an immutable image reference ending
+  in @sha256:<64 lowercase hex characters>.
 
 battle
   Runs or resumes an external_battle_async_registry_v2 queue with strict
@@ -35,30 +40,51 @@ require_file() {
   }
 }
 
+validate_python_image() {
+  if [[ ! "$PYTHON_IMAGE" =~ ^[^[:space:]@]+@sha256:[0-9a-f]{64}$ ]]; then
+    echo "MANALOOM_CLOSURE_PYTHON_IMAGE must be pinned by sha256 digest" >&2
+    exit 2
+  fi
+}
+
 load_server_env() {
   require_file "$SERVER_ENV"
-  set -a
-  # shellcheck disable=SC1090
-  source "$SERVER_ENV"
-  set +a
+  load_manaloom_env_keys "$SERVER_ENV" \
+    EASYPANEL_SSH_KEY EASYPANEL_SSH_USER EASYPANEL_SERVER_IP
   : "${EASYPANEL_SSH_KEY:?EASYPANEL_SSH_KEY is required}"
   : "${EASYPANEL_SSH_USER:?EASYPANEL_SSH_USER is required}"
   : "${EASYPANEL_SERVER_IP:?EASYPANEL_SERVER_IP is required}"
+  EASYPANEL_SSH_KEY="$(
+    python3 - "$ROOT_DIR" "$EASYPANEL_SSH_KEY" <<'PY'
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1]).resolve()
+candidate = Path(sys.argv[2]).expanduser()
+if not candidate.is_absolute():
+    candidate = root / candidate
+print(candidate.resolve())
+PY
+  )"
+  require_file "$EASYPANEL_SSH_KEY"
+  SSH_TARGET="${EASYPANEL_SSH_USER}@${EASYPANEL_SERVER_IP}"
+  validate_manaloom_ssh_target_syntax "$SSH_TARGET"
+  initialize_manaloom_secure_ssh "$SSH_TARGET"
 }
 
 remote() {
   ssh -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
-    "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP" "$@"
+    "$SSH_TARGET" "$@"
 }
 
 copy_to_remote() {
   scp -C -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes "$@" \
-    "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP:$REMOTE_DIR/"
+    "$SSH_TARGET:$REMOTE_DIR/"
 }
 
 copy_from_remote() {
   scp -C -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
-    "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP:$REMOTE_DIR/$1" "$2"
+    "$SSH_TARGET:$REMOTE_DIR/$1" "$2"
 }
 
 prepare_workdirs() {
@@ -76,6 +102,7 @@ cleanup() {
   if [[ -n "${WORK_DIR:-}" ]]; then
     rm -rf "$WORK_DIR"
   fi
+  cleanup_manaloom_secure_ssh
   exit "$exit_code"
 }
 
@@ -137,13 +164,23 @@ run_coverage() {
 
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only psql -X -A -t \
     -o "$WORK_DIR/native.json" -c \
-    "SELECT COALESCE(json_agg(DISTINCT card_name ORDER BY card_name), '[]'::json)
+    "SELECT COALESCE(json_agg(native_rule ORDER BY native_rule->>'name',
+                                               native_rule->>'logical_rule_key'),
+                     '[]'::json)
+     FROM (
+       SELECT DISTINCT jsonb_build_object(
+         'name', card_name,
+         'logical_rule_key', logical_rule_key,
+         'oracle_hash', oracle_hash
+       ) AS native_rule
      FROM card_battle_rules
      WHERE review_status IN ('verified','active')
        AND execution_status IN ('auto','executable')
-       AND COALESCE(effect_json, '{}'::jsonb) <> '{}'::jsonb"
+       AND COALESCE(oracle_hash, '') <> ''
+       AND COALESCE(effect_json, '{}'::jsonb) <> '{}'::jsonb
+     ) verified_native_rules"
 
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved python3 \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only python3 \
     "$KNOWLEDGE_SCRIPTS/xmage_authoritative_adaptation_queue.py" \
     --scope all_battle_gap \
     --out-prefix "$WORK_DIR/xmage_source_queue"
@@ -181,6 +218,7 @@ run_coverage() {
   run_remote_python external_card_coverage_closure.py \
     --cards cards.json \
     --native-cards native.json \
+    --require-native-oracle-hash \
     --xmage-url http://xmage-sidecar:8080 \
     --forge-url http://forge-sidecar:8080 \
     --timeout-seconds 60 \
@@ -189,6 +227,7 @@ run_coverage() {
   run_remote_python external_card_coverage_closure.py \
     --cards xmage_source_cards.json \
     --native-cards native.json \
+    --require-native-oracle-hash \
     --xmage-url http://xmage-sidecar:8080 \
     --forge-url http://forge-sidecar:8080 \
     --timeout-seconds 60 \
@@ -218,14 +257,26 @@ run_coverage() {
     >"$output_dir/source_catalog_residual.json"
 
   jq -n \
+    --arg cards_sha256 "$(shasum -a 256 "$WORK_DIR/cards.json" | awk '{print $1}')" \
+    --arg native_sha256 "$(shasum -a 256 "$WORK_DIR/native.json" | awk '{print $1}')" \
+    --arg source_queue_sha256 "$(shasum -a 256 "$WORK_DIR/xmage_source_queue.json" | awk '{print $1}')" \
+    --arg python_image "$PYTHON_IMAGE" \
     --slurpfile global "$WORK_DIR/global_coverage.json" \
     --slurpfile source "$WORK_DIR/source_catalog_reconciliation.json" \
     --slurpfile terminal "$output_dir/terminal_dispositions.json" \
     '{schema_version:"global_battle_closure_summary_v1",
       generated_at:($global[0].generated_at),
+      method:$global[0].method,
+      engines:$global[0].engines,
       global:$global[0].summary,
       source_catalog:$source[0].summary,
       terminal_dispositions:$terminal[0].summary,
+      inputs:{
+        cards_sha256:$cards_sha256,
+        native_rules_sha256:$native_sha256,
+        source_queue_sha256:$source_queue_sha256
+      },
+      runtime:{python_image:$python_image},
       postgres_mutations:[]}' \
     >"$output_dir/summary.json"
 
@@ -266,7 +317,7 @@ run_battle() {
 
   copy_from_remote checkpoint.json "$state_dir/checkpoint.json"
   scp -C -r -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
-    "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP:$REMOTE_DIR/results/." \
+    "$SSH_TARGET:$REMOTE_DIR/results/." \
     "$state_dir/results/"
   echo "Battle state: $state_dir"
   jq '{status, updated_at, comparison_gates,
@@ -278,8 +329,7 @@ main() {
   local action="${1:-}"
   case "$action" in
     coverage)
-      require_live_mutation_approval "ManaLoom global battle closure PostgreSQL runner"
-      require_postgres_write_approval "ManaLoom global battle closure PostgreSQL runner"
+      validate_python_image
       load_server_env
       trap cleanup EXIT INT TERM
       prepare_workdirs
@@ -290,6 +340,7 @@ main() {
         usage
         exit 2
       }
+      validate_python_image
       load_server_env
       trap cleanup EXIT INT TERM
       prepare_workdirs

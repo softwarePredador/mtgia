@@ -95,6 +95,29 @@ void main() {
     );
   });
 
+  test('does not expose the runtime vendor returned by the backend', () async {
+    final service = InteractiveBattleService(
+      apiClient: _VendorErrorApiClient(),
+    );
+
+    await expectLater(
+      service.get('failed'),
+      throwsA(
+        isA<InteractiveBattleGatewayException>()
+            .having(
+              (error) => error.message,
+              'message',
+              contains('motor de regras'),
+            )
+            .having(
+              (error) => error.message,
+              'vendor name',
+              isNot(contains('XMage')),
+            ),
+      ),
+    );
+  });
+
   test('reuses the create idempotency key after a lost response', () async {
     final api = _RetryCreateApiClient();
     final service = InteractiveBattleService(apiClient: api);
@@ -149,6 +172,14 @@ class _DisabledApiClient extends ApiClient {
   @override
   Future<ApiResponse> get(String endpoint) async =>
       ApiResponse(404, {'error': 'interactive_battle_not_found'});
+}
+
+class _VendorErrorApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> get(String endpoint) async => ApiResponse(503, const {
+    'error': 'interactive_battle_runtime_unavailable',
+    'message': 'XMage interactive connection is not ready',
+  });
 }
 
 class _RetryCreateApiClient extends ApiClient {

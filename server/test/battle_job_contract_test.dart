@@ -69,6 +69,29 @@ void main() {
       );
     });
 
+    test('keeps invalid execution-mode copy vendor neutral', () {
+      expect(
+        () => BattleJobCreateInput.parse({
+          'deck_id': _deckA,
+          'opponent_deck_id': _deckB,
+          'engine': 'old-runner',
+        }),
+        throwsA(
+          isA<BattleJobValidationException>()
+              .having(
+                (error) => error.code,
+                'code',
+                'battle_job_engine_invalid',
+              )
+              .having(
+                (error) => error.message,
+                'message',
+                isNot(anyOf(contains('xmage'), contains('forge'))),
+              ),
+        ),
+      );
+    });
+
     test('rejects external forced draws and more than three focus cards', () {
       expect(
         () => BattleJobCreateInput.parse({

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:postgres/postgres.dart';
 
 import '../ai/battle_engine_config.dart';
+import 'battle_deck_admission.dart';
 import 'battle_job_contract.dart';
 import 'battle_job_store.dart';
 import 'battle_request_correlation.dart';
@@ -658,23 +659,30 @@ void _validateCommanderDeck(
   BattleJobDeckSnapshot deck, {
   required String field,
 }) {
-  var count = 0;
-  var commanders = 0;
-  for (final card in deck.cards) {
-    final quantity = card['quantity'];
-    if (quantity is! int || quantity < 1) {
-      throw InteractiveBattleValidationException(
-        'interactive_battle_deck_invalid',
-        '$field contém quantidade inválida.',
-      );
-    }
-    count += quantity;
-    if (card['is_commander'] == true) commanders += quantity;
-  }
-  if (count != 100 || commanders != 1) {
-    throw InteractiveBattleValidationException(
-      'interactive_battle_deck_invalid',
-      '$field precisa ter exatamente 100 cartas e um comandante.',
-    );
-  }
+  final failure = battleDeckAdmissionFailure(
+    format: deck.format,
+    validationState: deck.validationState,
+    cards: deck.cards,
+  );
+  if (failure == null) return;
+  final code = switch (failure) {
+    BattleDeckAdmissionFailure.format =>
+      'interactive_battle_deck_format_invalid',
+    BattleDeckAdmissionFailure.validation =>
+      'interactive_battle_deck_validation_required',
+    _ => 'interactive_battle_deck_invalid',
+  };
+  final message = switch (failure) {
+    BattleDeckAdmissionFailure.format =>
+      '$field precisa usar o formato Commander.',
+    BattleDeckAdmissionFailure.validation =>
+      '$field precisa ser validado novamente antes do Battle.',
+    BattleDeckAdmissionFailure.quantity =>
+      '$field contém quantidade de carta inválida.',
+    BattleDeckAdmissionFailure.size =>
+      '$field precisa ter exatamente 100 cartas.',
+    BattleDeckAdmissionFailure.commander =>
+      '$field precisa ter exatamente um comandante.',
+  };
+  throw InteractiveBattleValidationException(code, message);
 }

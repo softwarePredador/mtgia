@@ -13,9 +13,9 @@ class LaunchFeatures {
     defaultValue: false,
   );
 
-  /// Human-in-the-loop XMage sessions require the dedicated interactive
-  /// sidecar mode and PostgreSQL session store. Keep the surface fail-closed
-  /// until both runtimes are explicitly enabled in the target environment.
+  /// Human-in-the-loop battle sessions require a dedicated interactive rules
+  /// runtime and PostgreSQL session store. Keep the surface fail-closed until
+  /// both runtimes are explicitly enabled in the target environment.
   static const bool interactiveBattleEnabled = bool.fromEnvironment(
     'ENABLE_INTERACTIVE_BATTLE',
     defaultValue: false,

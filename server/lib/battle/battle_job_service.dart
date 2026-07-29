@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import '../ai/battle_engine_config.dart';
+import 'battle_deck_admission.dart';
 import 'battle_job_contract.dart';
 import 'battle_request_correlation.dart';
 import 'battle_job_store.dart';
@@ -159,25 +160,31 @@ void _validateCommanderDeck(
   BattleJobDeckSnapshot deck, {
   required String field,
 }) {
-  var cardCount = 0;
-  var commanderCount = 0;
-  for (final card in deck.cards) {
-    final quantity = card['quantity'];
-    if (quantity is! int || quantity < 1) {
-      throw BattleJobValidationException(
-        'battle_job_deck_invalid',
-        '$field contains an invalid card quantity.',
-      );
-    }
-    cardCount += quantity;
-    if (card['is_commander'] == true) commanderCount += quantity;
-  }
-  if (cardCount != 100 || commanderCount != 1) {
-    throw BattleJobValidationException(
-      'battle_job_deck_invalid',
-      '$field must contain exactly 100 cards and one commander.',
-    );
-  }
+  final failure = battleDeckAdmissionFailure(
+    format: deck.format,
+    validationState: deck.validationState,
+    cards: deck.cards,
+  );
+  if (failure == null) return;
+  final code = switch (failure) {
+    BattleDeckAdmissionFailure.format => 'battle_job_deck_format_invalid',
+    BattleDeckAdmissionFailure.validation =>
+      'battle_job_deck_validation_required',
+    _ => 'battle_job_deck_invalid',
+  };
+  final message = switch (failure) {
+    BattleDeckAdmissionFailure.format =>
+      '$field precisa usar o formato Commander.',
+    BattleDeckAdmissionFailure.validation =>
+      '$field precisa ser validado novamente antes do Battle.',
+    BattleDeckAdmissionFailure.quantity =>
+      '$field contém uma quantidade de carta inválida.',
+    BattleDeckAdmissionFailure.size =>
+      '$field precisa ter exatamente 100 cartas.',
+    BattleDeckAdmissionFailure.commander =>
+      '$field precisa ter exatamente um comandante.',
+  };
+  throw BattleJobValidationException(code, message);
 }
 
 int _stableSeed({required String userId, required String key}) {

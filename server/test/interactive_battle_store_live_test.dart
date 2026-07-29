@@ -216,12 +216,18 @@ InteractiveBattleCreateCommand _command({
   deckA: const BattleJobDeckSnapshot(
     id: _deckAId,
     name: 'Interactive A',
+    format: 'commander',
+    validationState: 'validated',
+    validationReasons: [],
     cards: [],
     hash: _deckAHash,
   ),
   deckB: const BattleJobDeckSnapshot(
     id: _deckBId,
     name: 'Interactive B',
+    format: 'commander',
+    validationState: 'validated',
+    validationReasons: [],
     cards: [],
     hash: _deckBHash,
   ),
@@ -294,12 +300,17 @@ Future<void> _seed(Pool pool) async {
   );
   await pool.execute(
     Sql.named('''
-      INSERT INTO decks (id, user_id, name, format, is_public)
+      INSERT INTO decks (
+        id, user_id, name, format, is_public, validation_state,
+        validation_reasons, validation_updated_at
+      )
       VALUES
         (CAST(@deck_a AS uuid), CAST(@owner_id AS uuid),
-         'Interactive A', 'commander', FALSE),
+         'Interactive A', 'commander', FALSE, 'validated', '[]'::jsonb,
+         CURRENT_TIMESTAMP),
         (CAST(@deck_b AS uuid), CAST(@other_id AS uuid),
-         'Interactive B', 'commander', TRUE)
+         'Interactive B', 'commander', TRUE, 'validated', '[]'::jsonb,
+         CURRENT_TIMESTAMP)
     '''),
     parameters: {
       'deck_a': _deckAId,

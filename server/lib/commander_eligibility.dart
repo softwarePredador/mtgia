@@ -1,3 +1,5 @@
+import 'deck_card_eligibility.dart';
+
 bool isCommanderStyleFormat(String format) {
   final normalizedFormat = format.trim().toLowerCase();
   return normalizedFormat == 'commander' || normalizedFormat == 'brawl';
@@ -40,11 +42,14 @@ String commanderEligibilitySql({
       " AND NULLIF(BTRIM($tableAlias.power), '') IS NOT NULL"
       " AND NULLIF(BTRIM($tableAlias.toughness), '') IS NOT NULL)";
   final explicitCommander = " OR $oracleText LIKE '%can be your commander%'";
+  final mainDeckEligibility = mainDeckCardEligibilitySql(
+    tableAlias: tableAlias,
+  );
 
-  return '($legendaryCreature'
+  return '($mainDeckEligibility AND ($legendaryCreature'
       '$brawlPlaneswalker'
       '$legendaryVehicleOrSpacecraft'
-      '$explicitCommander)';
+      '$explicitCommander))';
 }
 
 bool isCommanderEligibleCard({
@@ -52,8 +57,17 @@ bool isCommanderEligibleCard({
   String? oracleText,
   String? power,
   String? toughness,
+  String? setCode,
+  String? layout,
   String format = 'commander',
 }) {
+  if (!isMainDeckCardEligible(
+    typeLine: typeLine,
+    setCode: setCode,
+    layout: layout,
+  )) {
+    return false;
+  }
   final normalizedTypeLine = typeLine.toLowerCase();
   final normalizedOracle = (oracleText ?? '').toLowerCase();
   final normalizedFormat = format.toLowerCase();

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:server/ai/battle_engine_config.dart';
 import 'package:server/battle/battle_preflight_service.dart';
 import 'package:test/test.dart';
@@ -12,6 +14,43 @@ void main() {
       expect(first.revision, second.revision);
       expect(first.cardCount, 100);
       expect(first.commanderCount, 1);
+    });
+
+    test('reports every structural blocker before probing coverage', () {
+      final deck = BattlePreflightDeck(
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Invalid',
+        format: 'modern',
+        validationState: 'unknown',
+        validationReasons: const ['validation_not_recorded'],
+        validationUpdatedAt: null,
+        cards: const [
+          {'name': 'Only card', 'quantity': 1, 'is_commander': false},
+        ],
+      );
+      final blockers = battlePreflightDeckBlockers(deck, prefix: 'deck');
+
+      expect(
+        blockers,
+        containsAll([
+          'deck_format_invalid',
+          'deck_validation_required',
+          'deck_size_invalid',
+          'deck_commander_invalid',
+        ]),
+      );
+      expect(shouldProbeBattleCoverage(blockers), isFalse);
+      expect(shouldProbeBattleCoverage(const []), isTrue);
+    });
+
+    test('opponent inventory query matches the executable admission gate', () {
+      final source =
+          File('lib/battle/battle_preflight_service.dart').readAsStringSync();
+      expect(source, contains('d.deleted_at IS NULL'));
+      expect(source, contains("LOWER(d.format) = 'commander'"));
+      expect(source, contains("d.validation_state = 'validated'"));
+      expect(source, contains('SUM(dc.quantity)'));
+      expect(source, contains('dc.is_commander = TRUE'));
     });
   });
 

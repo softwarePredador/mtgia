@@ -104,6 +104,20 @@ for relative in "${SHELL_SCRIPTS[@]}"; do
   bash -n "$ROOT_DIR/$relative"
 done
 
+GLOBAL_CLOSURE="$ROOT_DIR/scripts/manaloom_global_battle_closure.sh"
+grep -Fq 'load_manaloom_env_keys "$SERVER_ENV"' "$GLOBAL_CLOSURE"
+grep -Fq 'initialize_manaloom_secure_ssh "$SSH_TARGET"' "$GLOBAL_CLOSURE"
+grep -Fq 'cleanup_manaloom_secure_ssh' "$GLOBAL_CLOSURE"
+grep -Fq 'with_new_server_pg.sh" --read-only python3' "$GLOBAL_CLOSURE"
+grep -Fq -- '--require-native-oracle-hash' "$GLOBAL_CLOSURE"
+grep -Fq 'PYTHON_IMAGE="${MANALOOM_CLOSURE_PYTHON_IMAGE:-}"' "$GLOBAL_CLOSURE"
+grep -Fq '@sha256:[0-9a-f]{64}' "$GLOBAL_CLOSURE"
+if grep -Fq 'with_new_server_pg.sh" --write-approved python3' \
+  "$GLOBAL_CLOSURE"; then
+  echo "coverage global voltou a declarar escrita para auditor read-only" >&2
+  exit 1
+fi
+
 XMAGE_TRANSITION_AUDITOR="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py"
 grep -Fq '"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py"' \
   "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"

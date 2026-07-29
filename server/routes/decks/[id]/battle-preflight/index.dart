@@ -18,6 +18,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   }
   final opponentDeckId =
       context.request.uri.queryParameters['opponent_deck_id']?.trim() ?? '';
+  final mode =
+      context.request.uri.queryParameters['mode']?.trim().toLowerCase() ??
+      battlePreflightModeSimulation;
   if (!_uuidPattern.hasMatch(deckId)) {
     return notFound('Deck nao encontrado.');
   }
@@ -27,6 +30,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   if (deckId.toLowerCase() == opponentDeckId.toLowerCase()) {
     return badRequest('opponent_deck_id must differ from deck_id');
   }
+  if (!battlePreflightModes.contains(mode)) {
+    return badRequest('mode must be simulation or interactive');
+  }
 
   try {
     final payload = await BattlePreflightService(context.read<Pool>()).inspect(
@@ -34,6 +40,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       deckId: deckId,
       opponentDeckId: opponentDeckId,
       environment: Platform.environment,
+      mode: mode,
     );
     return Response.json(body: payload);
   } on BattlePreflightNotFound catch (error) {

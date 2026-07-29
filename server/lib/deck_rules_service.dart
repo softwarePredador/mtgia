@@ -4,6 +4,7 @@ import 'basic_land_utils.dart' as basic_lands;
 import 'card_identity_support.dart';
 import 'commander_eligibility.dart';
 import 'commander_pairing.dart' as commander_pairing;
+import 'deck_card_eligibility.dart';
 import 'color_identity.dart';
 import 'deck_section_support.dart';
 import 'deck_format_support.dart';
@@ -70,6 +71,18 @@ class DeckRulesService {
     }
 
     final cardsData = await _loadCardsData(cardIds);
+    for (final info in cardsData.values) {
+      try {
+        validateMainDeckCardEligibility(
+          name: info.name,
+          typeLine: info.typeLine,
+          setCode: info.setCode,
+          layout: info.layout,
+        );
+      } on MainDeckCardEligibilityException catch (error) {
+        throw DeckRulesException(error.message, cardName: info.name);
+      }
+    }
     final legalities = await _loadLegalities(cardIds, normalizedFormat);
 
     // Regras gerais: limite de cópias por carta física.
@@ -353,6 +366,8 @@ class DeckRulesService {
       oracleText: card.oracleText,
       power: card.power,
       toughness: card.toughness,
+      setCode: card.setCode,
+      layout: card.layout,
       format: format,
     );
   }
@@ -390,7 +405,9 @@ class DeckRulesService {
             : 'NULL::text AS oracle_id';
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc, power, toughness, $identitySelect
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity,
+               mana_cost, cmc, power, toughness, $identitySelect, set_code,
+               layout
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -413,6 +430,8 @@ class DeckRulesService {
       final power = row[8] as String?;
       final toughness = row[9] as String?;
       final oracleId = nonEmptyCardIdentityString(row[10]);
+      final setCode = row[11] as String?;
+      final layout = row[12] as String?;
 
       map[id] = _CardData(
         id: id,
@@ -426,6 +445,8 @@ class DeckRulesService {
         cmc: cmc,
         power: power,
         toughness: toughness,
+        setCode: setCode,
+        layout: layout,
       );
     }
 
@@ -600,6 +621,8 @@ class _CardData {
     required this.cmc,
     required this.power,
     required this.toughness,
+    required this.setCode,
+    required this.layout,
   });
 
   final String id;
@@ -613,6 +636,8 @@ class _CardData {
   final double? cmc;
   final String? power;
   final String? toughness;
+  final String? setCode;
+  final String? layout;
 
   String get physicalCopyKey {
     final canonicalId = nonEmptyCardIdentityString(oracleId);

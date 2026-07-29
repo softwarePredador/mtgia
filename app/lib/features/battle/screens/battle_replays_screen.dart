@@ -22,6 +22,7 @@ import '../services/battle_job_gateway.dart';
 import '../services/battle_job_series_runner.dart';
 import '../services/battle_post_report_service.dart';
 import '../services/battle_replay_service.dart';
+import '../utils/battle_runtime_presentation.dart';
 import 'battle_live_spectator_screen.dart';
 
 String battleReplaysRouteLocation(String deckId) =>
@@ -1181,12 +1182,8 @@ String _historyStatusLabel(String value) => switch (value) {
 };
 
 String _historyEngineLabel(String value) => switch (value) {
-  'all' => 'Todos os motores',
-  'xmage' => 'XMage',
-  'forge' => 'Forge',
-  'manaloom_native_reviewed' || 'native' => 'ManaLoom nativo',
-  'unknown' => 'Motor não informado',
-  _ => value,
+  'all' => 'Todos os modos',
+  _ => battleRuntimeUserLabel(value),
 };
 
 String _historyRevisionLabel(String value) {
@@ -1227,6 +1224,7 @@ class _BattleOpponentPickerDialogState
   String? _selectedDeckId;
   String? _preflightOpponentId;
   BattlePreflight? _preflight;
+  BattlePreflight? _automaticFallbackPreflight;
   BattleTestObjective _objective = BattleTestObjective.general;
   BattleSeriesSize _seriesSize = BattleSeriesSize.single;
   List<BattleOpponentDeck> _decks = const <BattleOpponentDeck>[];
@@ -1300,6 +1298,7 @@ class _BattleOpponentPickerDialogState
     setState(() {
       _isCheckingPreflight = true;
       _preflight = null;
+      _automaticFallbackPreflight = null;
       _preflightOpponentId = opponentDeckId;
       _manualError = null;
     });
@@ -1307,10 +1306,25 @@ class _BattleOpponentPickerDialogState
       final result = await widget.gateway.loadBattlePreflight(
         deckId: widget.currentDeckId,
         opponentDeckId: opponentDeckId,
+        interactive: widget.mode == BattleOpponentPickerMode.coach,
       );
+      BattlePreflight? automaticFallback;
+      if (widget.mode == BattleOpponentPickerMode.coach &&
+          !result.canStartInteractive &&
+          result.blockers.contains('engine_coverage_incomplete')) {
+        try {
+          automaticFallback = await widget.gateway.loadBattlePreflight(
+            deckId: widget.currentDeckId,
+            opponentDeckId: opponentDeckId,
+          );
+        } on Object {
+          automaticFallback = null;
+        }
+      }
       if (!mounted || _preflightOpponentId != opponentDeckId) return null;
       setState(() {
         _preflight = result;
+        _automaticFallbackPreflight = automaticFallback;
         _isCheckingPreflight = false;
       });
       return result;
@@ -1326,7 +1340,9 @@ class _BattleOpponentPickerDialogState
     }
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit({
+    BattleTestLaunchMode launchMode = BattleTestLaunchMode.automatic,
+  }) async {
     final opponentDeckId = _showTechnicalId
         ? _technicalIdController.text.trim()
         : _selectedDeckId?.trim() ?? '';
@@ -1337,9 +1353,21 @@ class _BattleOpponentPickerDialogState
       return;
     }
 
-    var preflight = _preflightOpponentId == opponentDeckId ? _preflight : null;
-    preflight ??= await _loadPreflight(opponentDeckId);
-    if (!mounted || preflight == null || !preflight.canStart) return;
+    final automaticFallback =
+        launchMode == BattleTestLaunchMode.automatic &&
+        widget.mode == BattleOpponentPickerMode.coach;
+    var preflight = _preflightOpponentId == opponentDeckId
+        ? automaticFallback
+              ? _automaticFallbackPreflight
+              : _preflight
+        : null;
+    if (preflight == null && !automaticFallback) {
+      preflight = await _loadPreflight(opponentDeckId);
+    }
+    final canStart = automaticFallback
+        ? preflight?.canStart == true
+        : preflight != null && _preflightCanStart(preflight);
+    if (!mounted || !canStart) return;
 
     final focusCards = _focusCardsController.text
         .split(RegExp(r'[,;\n]'))
@@ -1351,6 +1379,7 @@ class _BattleOpponentPickerDialogState
         opponentDeckId: opponentDeckId,
         objective: _objective,
         seriesSize: _seriesSize,
+        launchMode: launchMode,
         focusCards: focusCards,
       ),
     );
@@ -1385,7 +1414,10 @@ class _BattleOpponentPickerDialogState
     final canSubmit =
         hasCandidate &&
         !_isCheckingPreflight &&
-        (_preflightOpponentId != selectedId || _preflight?.canStart == true);
+        (_preflightOpponentId != selectedId ||
+            (_preflight != null && _preflightCanStart(_preflight!)));
+    final canSimulateAutomatically =
+        isCoach && _automaticFallbackPreflight?.canStart == true;
 
     return AlertDialog(
       key: const Key('battle-opponent-picker-dialog'),
@@ -1403,7 +1435,7 @@ class _BattleOpponentPickerDialogState
             children: [
               Text(
                 isCoach
-                    ? 'Selecione o deck que o XMage controlará. O Coach abrirá '
+                    ? 'Selecione o deck adversário. O Coach abrirá '
                           'uma sessão interativa e pausará nas decisões disponíveis.'
                     : widget.allowSeries
                     ? 'Selecione um deck e quantas tentativas independentes deseja enfileirar.'
@@ -1581,7 +1613,12 @@ class _BattleOpponentPickerDialogState
                 loading: _isCheckingPreflight,
                 preflight: _preflight,
                 error: _preflightOpponentId == null ? null : _manualError,
+                interactive: isCoach,
               ),
+              if (canSimulateAutomatically) ...[
+                const SizedBox(height: AppTheme.space8),
+                const _BattleAutomaticFallbackMessage(),
+              ],
               const SizedBox(height: AppTheme.space8),
             ],
           ),
@@ -1592,9 +1629,23 @@ class _BattleOpponentPickerDialogState
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancelar'),
         ),
+        if (canSimulateAutomatically)
+          OutlinedButton.icon(
+            key: const Key('battle-opponent-automatic-fallback-button'),
+            onPressed: () =>
+                _submit(launchMode: BattleTestLaunchMode.automatic),
+            icon: const Icon(Icons.smart_display_outlined),
+            label: const Text('Simular automaticamente'),
+          ),
         FilledButton.icon(
           key: const Key('battle-opponent-submit-button'),
-          onPressed: canSubmit ? _submit : null,
+          onPressed: canSubmit
+              ? () => _submit(
+                  launchMode: isCoach
+                      ? BattleTestLaunchMode.interactive
+                      : BattleTestLaunchMode.automatic,
+                )
+              : null,
           icon: const Icon(Icons.play_arrow_rounded),
           label: Text(
             isCoach
@@ -1607,6 +1658,11 @@ class _BattleOpponentPickerDialogState
       ],
     );
   }
+
+  bool _preflightCanStart(BattlePreflight value) =>
+      widget.mode == BattleOpponentPickerMode.coach
+      ? value.canStartInteractive
+      : value.canStart;
 
   Widget _buildDeckBody(
     BuildContext context, {
@@ -1741,16 +1797,54 @@ class _BattleOpponentPickerDialogState
   }
 }
 
+class _BattleAutomaticFallbackMessage extends StatelessWidget {
+  const _BattleAutomaticFallbackMessage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('battle-automatic-fallback-ready'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.space10),
+      decoration: BoxDecoration(
+        color: AppTheme.frost400.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.32)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.smart_display_outlined,
+            color: AppTheme.frost400,
+            size: 19,
+          ),
+          SizedBox(width: AppTheme.space8),
+          Expanded(
+            child: Text(
+              'A partida automática está disponível. Você não escolherá as '
+              'jogadas, mas poderá acompanhar e revisar o replay completo.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.3),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BattlePreflightPanel extends StatelessWidget {
   const _BattlePreflightPanel({
     required this.loading,
     required this.preflight,
     required this.error,
+    required this.interactive,
   });
 
   final bool loading;
   final BattlePreflight? preflight;
   final String? error;
+  final bool interactive;
 
   @override
   Widget build(BuildContext context) {
@@ -1785,21 +1879,24 @@ class _BattlePreflightPanel extends StatelessWidget {
       );
     }
 
-    final coverage = value.engineCoverage.entries
-        .map((entry) => '${entry.key}: ${entry.value}')
-        .join(' · ');
+    final canStart = interactive ? value.canStartInteractive : value.canStart;
     return _BattlePreflightMessage(
       key: Key(
-        value.canStart ? 'battle-preflight-ready' : 'battle-preflight-blocked',
+        canStart ? 'battle-preflight-ready' : 'battle-preflight-blocked',
       ),
-      icon: value.canStart
-          ? Icons.verified_outlined
-          : Icons.warning_amber_rounded,
-      color: value.canStart ? AppTheme.success : AppTheme.warning,
-      title: value.canStart ? 'Pronto para Battle' : 'Battle bloqueada',
-      message: value.canStart
-          ? '${value.cardCount} cartas · cobertura $coverage'
-          : _battlePreflightBlockerMessage(value.blockers),
+      icon: canStart ? Icons.verified_outlined : Icons.warning_amber_rounded,
+      color: canStart ? AppTheme.success : AppTheme.warning,
+      title: canStart ? 'Pronto para Battle' : 'Battle bloqueada',
+      message: canStart
+          ? interactive
+                ? '${value.cardCount} cartas verificadas · modo interativo pronto.'
+                : '${value.cardCount} cartas verificadas · regras prontas para simulação.'
+          : interactive && value.canStart && value.selectedEngine != 'xmage'
+          ? 'Este deck ainda não está pronto para decisões interativas.'
+          : _battlePreflightBlockerMessage(
+              value.blockers,
+              unsupportedCardNames: value.unsupportedCardNames,
+            ),
     );
   }
 }
@@ -1865,16 +1962,29 @@ class _BattlePreflightMessage extends StatelessWidget {
   }
 }
 
-String _battlePreflightBlockerMessage(List<String> blockers) {
+String _battlePreflightBlockerMessage(
+  List<String> blockers, {
+  List<String> unsupportedCardNames = const <String>[],
+}) {
+  if (unsupportedCardNames.isNotEmpty) {
+    final visibleNames = unsupportedCardNames.take(3).join(', ');
+    final remaining = unsupportedCardNames.length - 3;
+    return 'Cobertura de regras em preparação para $visibleNames'
+        '${remaining > 0 ? ' e mais $remaining carta(s)' : ''}.';
+  }
   if (blockers.isEmpty) return 'O preflight não confirmou prontidão.';
   const labels = <String, String>{
     'deck_size_invalid': 'Tamanho do deck precisa ser corrigido',
+    'deck_format_invalid': 'O deck precisa usar o formato Commander',
     'deck_commander_invalid': 'Comandante do deck precisa ser corrigido',
     'deck_validation_required': 'Valide novamente o deck',
     'opponent_size_invalid': 'Deck adversário tem tamanho inválido',
     'opponent_commander_invalid': 'Comandante adversário é inválido',
     'opponent_validation_required': 'Deck adversário não está validado',
+    'opponent_format_invalid':
+        'O deck adversário precisa usar o formato Commander',
     'no_available_opponents': 'Nenhum adversário está disponível',
+    'interactive_battle_disabled': 'Battle Coach interativo está desativado',
     'engine_not_configured': 'Motor Battle não está configurado',
     'engine_coverage_incomplete': 'Cartas sem cobertura de regras',
     'engine_coverage_unavailable': 'Motor Battle indisponível',
@@ -2942,7 +3052,7 @@ class _BattlePostReportPanel extends StatelessWidget {
               _ReplayMetaChip(
                 label: engine == null || engine.isEmpty
                     ? 'Motor —'
-                    : 'Motor $engine',
+                    : 'Motor ${battleRuntimeUserLabel(engine)}',
               ),
               if (commit != null && commit.isNotEmpty)
                 _ReplayMetaChip(label: 'Commit ${_shortIdentity(commit)}'),
@@ -3878,7 +3988,9 @@ class _ReplayTechnicalDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = const JsonEncoder.withIndent('  ').convert(detail.raw);
+    final text = const JsonEncoder.withIndent(
+      '  ',
+    ).convert(sanitizeBattleDiagnosticPayload(detail.raw));
     return Material(
       key: const Key('battle-replay-technical-details'),
       color: AppTheme.surfaceElevated,

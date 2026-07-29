@@ -1,13 +1,15 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "a22e35a6e71544d3d31d1c9ca1e636116c8f5a7f708cb472a7240803c2898695",
+  "source_digest": "f883da79de7531d168c5fd3c182b10456dc602bebe03deae87d602c151771a84",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-29T03:20:00Z",
+    "verified_at": "2026-07-29T14:08:08Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
-      "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart (43 checkpoints recaptured in authenticated segments; 11 unchanged checkpoints carried from the successful 54-checkpoint physical run)",
+      "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on physical Samsung SM-A135M, including native Life Counter landscape)",
+      "flutter test integration_test/battle_coach_live_evidence_test.dart -d R58T300SREH (7 Battle Coach runtime states on physical Android)",
+      "in-app browser physical keyboard audit at 1280x720 (9 Battle Coach focus/modal/filter/preflight checkpoints; positive XMage-backed preflight)",
       "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
       "dart test <focused optimizer suites> (173 broad cases, plus 107 final format/cache/rebuild regressions) and flutter test <focused optimizer suites> (121 passed)",
       "./scripts/manaloom_local_ci.sh full (41 deterministic backend batches passed; flutter test 1352 passed with 1 conditional skip)",
@@ -27,30 +29,39 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "ab1054c07a457d3fb95b5bb0cc06218be7e5d338f59dfd75ca558e24abac27ef"
+        "sha256": "46add2a5d534800d804b38d4dc1d1a0a5c7267fb08c4f4fd493cb131969622e1"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "7aa7daa3c453ba613207c1acc71faa66c66e6b7f90c356e29dafcc6c57d59059"
+        "sha256": "95afd2469e81c3268540e55dac6e0679fbeca9ef24b3839a7ec6733d0bbb8162"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "8160e06f7cc87fa7794c43e390b628ede05edde977c90005415931bb9c28a9fb"
+        "sha256": "622bec4db039bad8aefe90fd330d2dfa665090cf8043ef6fb69845ac7b7059d8"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "a64498bdac3f4277420bdf87e2973cec214edaa096b8980edca10bb13a640274"
+        "sha256": "f8d60c628e8bedf8acabf6f82e007173d23635be858c919a969f60a49c44e832"
+      },
+      {
+        "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
+        "sha256": "7df4aaf6527b322d4a07ec5934f585940cd280e904790bfd6c3d8fe90059f465"
+      },
+      {
+        "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
+        "sha256": "fb0c4c511bab8f29739eecc771daab7676300735b4ee855f3d819acf5285c5be"
       }
     ],
     "evidence_notes": [
-      "As 160 capturas Web foram recapturadas integralmente no digest atual.",
-      "No Samsung SM-A135M, 43 capturas foram refeitas nesta rodada, incluindo todas as superfícies de deck afetadas; 11 capturas de comunidade/trades sem código alterado foram preservadas da execução física completa já aprovada.",
-      "O aparelho deixou de aparecer no ADB após o reboot de recuperação. A matriz não declara uma nova execução física monolítica de 54 checkpoints."
+      "As 160 capturas Web e as 54 capturas Android da matriz P0 foram recapturadas integralmente no digest atual, sem carry-forward.",
+      "O Samsung SM-A135M físico concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2408×1080.",
+      "O Battle Coach ganhou prova dedicada de 7 estados no Android físico e 9 estados Web com teclado real, foco visível, modal, filtro e preflight interativo positivo.",
+      "A fixture positiva usou PostgreSQL/API loopback descartáveis, dois decks Commander válidos de 100 cartas e cobertura pronta do sidecar XMage pinado; nenhum dado de produção foi alterado."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-29T02:31:21Z",
+    "reviewed_at": "2026-07-29T14:08:08Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -61,7 +72,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 214 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca e detalhes de deck mantêm foco e camadas previsíveis."
+        "note": "As 230 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca e detalhes de deck mantêm foco e camadas previsíveis."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -81,11 +92,11 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide e 54 Android físico. No Android, 43 checkpoints são desta rodada e 11 superfícies não alteradas vêm da execução física completa anterior; o Life Counter permanece validado em landscape 2408×1080 e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, 7 estados dedicados do Battle Coach Android e 9 estados de teclado Web. O Life Counter permanece validado em landscape 2408×1080 e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; nesta rodada de fundação de mana, a matriz P0 atual confirmou que a navegação, o modal de criação, a busca e os detalhes do deck permanecem funcionais."
+        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; teclado físico confirmou Tab, Shift+Tab, Enter, Space, Escape, restauração de foco, filtro do rival e preflight positivo com o CTA de início habilitado."
       },
       "state_coverage": {
         "status": "pass",
@@ -101,18 +112,22 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "ab1054c07a457d3fb95b5bb0cc06218be7e5d338f59dfd75ca558e24abac27ef",
-      "7aa7daa3c453ba613207c1acc71faa66c66e6b7f90c356e29dafcc6c57d59059",
-      "8160e06f7cc87fa7794c43e390b628ede05edde977c90005415931bb9c28a9fb",
-      "a64498bdac3f4277420bdf87e2973cec214edaa096b8980edca10bb13a640274"
+      "46add2a5d534800d804b38d4dc1d1a0a5c7267fb08c4f4fd493cb131969622e1",
+      "95afd2469e81c3268540e55dac6e0679fbeca9ef24b3839a7ec6733d0bbb8162",
+      "622bec4db039bad8aefe90fd330d2dfa665090cf8043ef6fb69845ac7b7059d8",
+      "f8d60c628e8bedf8acabf6f82e007173d23635be858c919a969f60a49c44e832",
+      "7df4aaf6527b322d4a07ec5934f585940cd280e904790bfd6c3d8fe90059f465",
+      "fb0c4c511bab8f29739eecc771daab7676300735b4ee855f3d819acf5285c5be"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
       "web_desktop_1440x900",
       "web_mobile_390x844",
-      "web_wide_1920x1080"
+      "web_wide_1920x1080",
+      "android_phone",
+      "web_in_app_1280x720"
     ],
-    "reviewed_screenshot_count": 214,
+    "reviewed_screenshot_count": 230,
     "blocking_findings": [],
     "follow_up_findings": [
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
@@ -123,7 +138,9 @@
   },
   "release_checks": {
     "android_talkback_human": "pending",
-    "battle_coach_web_keyboard_real": "not_revalidated_optimizer_only",
+    "battle_coach_android_physical": "pass_current_digest",
+    "battle_coach_web_keyboard_real": "pass_current_digest",
+    "battle_coach_positive_preflight": "pass_current_digest",
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }
 }

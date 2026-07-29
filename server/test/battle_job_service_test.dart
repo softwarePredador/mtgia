@@ -72,6 +72,9 @@ void main() {
     final invalid = BattleJobDeckSnapshot(
       id: _deckAId,
       name: 'Invalid',
+      format: 'commander',
+      validationState: 'validated',
+      validationReasons: const [],
       cards: const [
         {'name': 'Commander', 'quantity': 1, 'is_commander': true},
         {'name': 'Main', 'quantity': 98, 'is_commander': false},
@@ -102,6 +105,38 @@ void main() {
     );
     expect(store.commands, isEmpty);
   });
+
+  test(
+    'rejects direct jobs for decks not validated by the product gate',
+    () async {
+      final store = _FakeStore(
+        snapshots: {
+          _deckAId: _commanderDeck(
+            _deckAId,
+            hash: 'a' * 64,
+            validationState: 'unknown',
+          ),
+          _deckBId: _commanderDeck(_deckBId, hash: 'b' * 64),
+        },
+      );
+      final input = BattleJobCreateInput.parse({
+        'deck_id': _deckAId,
+        'opponent_deck_id': _deckBId,
+      });
+
+      await expectLater(
+        BattleJobService(store).create(userId: _userId, input: input),
+        throwsA(
+          isA<BattleJobValidationException>().having(
+            (error) => error.code,
+            'code',
+            'battle_job_deck_validation_required',
+          ),
+        ),
+      );
+      expect(store.commands, isEmpty);
+    },
+  );
 
   test('fails closed when either scoped deck is unavailable', () async {
     final service = BattleJobService(_FakeStore(snapshots: const {}));
@@ -158,10 +193,20 @@ class _FakeStore implements BattleJobStoreApi {
   Future<BattleJobCancelResult?> cancel(String userId, String id) async => null;
 }
 
-BattleJobDeckSnapshot _commanderDeck(String id, {required String hash}) {
+BattleJobDeckSnapshot _commanderDeck(
+  String id, {
+  required String hash,
+  String validationState = 'validated',
+}) {
   return BattleJobDeckSnapshot(
     id: id,
     name: 'Deck $id',
+    format: 'commander',
+    validationState: validationState,
+    validationReasons:
+        validationState == 'validated'
+            ? const []
+            : const ['validation_not_recorded'],
     cards: const [
       {'name': 'Commander', 'quantity': 1, 'is_commander': true},
       {'name': 'Main cards', 'quantity': 99, 'is_commander': false},

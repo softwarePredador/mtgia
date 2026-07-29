@@ -1,0 +1,63 @@
+diff --git a/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java b/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
+index d821d2bce..011ce4502 100644
+--- a/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
++++ b/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
+@@ -296,4 +296,58 @@ public class MiracleTest extends CardTestPlayerBase {
+         assertPermanentCount(playerB, "Astartes Warrior Token", 2);
+         assertTapped("Plains", true);
+     }
++
++    @Test
++    public void testLoreholdGrantsMiracleOnlyToInstantAndSorceryCards() {
++        skipInitShuffling();
++        addCard(Zone.BATTLEFIELD, playerB, "Lorehold, the Historian");
++        addCard(Zone.BATTLEFIELD, playerB, "Wastes", 2);
++        addCard(Zone.LIBRARY, playerB, "Mountain", 2);
++        addCard(Zone.LIBRARY, playerB, "Divination");
++
++        setChoice(playerB, true);
++        setChoice(playerB, true);
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertGraveyardCount(playerB, "Divination", 1);
++        assertHandCount(playerB, 2);
++        assertTappedCount("Wastes", true, 2);
++    }
++
++    @Test
++    public void testLoreholdDoesNotGrantMiracleToCreatureCards() {
++        skipInitShuffling();
++        addCard(Zone.BATTLEFIELD, playerB, "Lorehold, the Historian");
++        addCard(Zone.BATTLEFIELD, playerB, "Forest", 2);
++        addCard(Zone.LIBRARY, playerB, "Colossal Dreadmaw");
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertHandCount(playerB, "Colossal Dreadmaw", 1);
++        assertPermanentCount(playerB, "Colossal Dreadmaw", 0);
++        assertTappedCount("Forest", false, 2);
++    }
++
++    @Test
++    public void testLoreholdMayDiscardAndDrawOnOpponentsUpkeep() {
++        skipInitShuffling();
++        addCard(Zone.BATTLEFIELD, playerA, "Lorehold, the Historian");
++        addCard(Zone.HAND, playerA, "Mountain");
++        addCard(Zone.LIBRARY, playerA, "Island");
++
++        setChoice(playerA, true);
++        setChoice(playerA, "Mountain");
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.DRAW);
++        execute();
++
++        assertGraveyardCount(playerA, "Mountain", 1);
++        assertHandCount(playerA, "Island", 1);
++    }
+ }
