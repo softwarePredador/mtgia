@@ -1,11 +1,18 @@
 import '../basic_land_utils.dart' as basic_lands;
+import '../commander_mana_floor.dart';
 import 'optimize_archetype_support.dart' as archetype_support;
+import 'optimize_deck_support.dart' show buildDeckRepairPlan;
 
 class DeckArchetypeAnalyzer {
-  DeckArchetypeAnalyzer(this.cards, this.colors);
+  DeckArchetypeAnalyzer(
+    this.cards,
+    this.colors, {
+    this.deckFormat = 'commander',
+  });
 
   final List<Map<String, dynamic>> cards;
   final List<String> colors;
+  final String deckFormat;
 
   double calculateAverageCMC() {
     if (cards.isEmpty) return 0.0;
@@ -157,7 +164,12 @@ class DeckArchetypeAnalyzer {
       'symbols': manaSymbols,
       'sources': landSources,
       'land_count': landCount,
-      'assessment': _assessManaBase(manaSymbols, landSources, landCount),
+      'assessment': _assessManaBase(
+        manaSymbols,
+        landSources,
+        landCount,
+        deckFormat: deckFormat,
+      ),
     };
   }
 
@@ -174,34 +186,53 @@ class DeckArchetypeAnalyzer {
     return colors;
   }
 
-  String _assessManaBase(
+  static String _assessManaBase(
     Map<String, int> symbols,
     Map<String, int> sources,
-    int landCount,
-  ) {
-    if (symbols.isEmpty) return 'N/A';
-    final totalSymbols = symbols.values.fold<int>(0, (a, b) => a + b);
-    if (totalSymbols == 0) return 'N/A';
-
+    int landCount, {
+    required String deckFormat,
+  }) {
     final issues = <String>[];
 
-    if (landCount < 34) {
+    final minimumLandCount = strategicMinimumLandCountForFormat(deckFormat);
+    final maximumLandCount = strategicMaximumAutomaticLandFloorForFormat(
+      deckFormat,
+    );
+    final formatLabel = manaFoundationFormatLabel(deckFormat);
+    if (minimumLandCount != null && landCount < minimumLandCount) {
       issues.add(
-        'Poucos terrenos para Commander (Tem $landCount, mínimo seguro 34)',
+        'Poucos terrenos para $formatLabel '
+        '(Tem $landCount, mínimo seguro $minimumLandCount)',
       );
-    } else if (landCount > 45) {
-      issues.add('Terrenos em excesso (Tem $landCount, ideal <= 40)');
+    } else if (minimumLandCount != null && landCount > maximumLandCount) {
+      issues.add(
+        'Terrenos em excesso '
+        '(Tem $landCount, faixa automática até $maximumLandCount)',
+      );
     }
 
+    final totalSymbols = symbols.values.fold<int>(0, (a, b) => a + b);
+    if (symbols.isEmpty || totalSymbols == 0) {
+      return issues.isEmpty ? 'N/A' : issues.join('. ');
+    }
+
+    final dominantSourceFloor = dominantColorSourceFloorForFormat(deckFormat);
+    final secondarySourceFloor = secondaryColorSourceFloorForFormat(deckFormat);
     symbols.forEach((color, count) {
       if (count <= 0) return;
       final percent = count / totalSymbols;
       final sourceCount = sources[color]! + sources['Any']!;
 
-      if (percent > 0.30 && sourceCount < 15) {
-        issues.add('Falta mana $color (Tem $sourceCount fontes, ideal > 15)');
-      } else if (percent > 0.10 && sourceCount < 10) {
-        issues.add('Falta mana $color (Tem $sourceCount fontes, ideal > 10)');
+      if (percent > 0.30 && sourceCount < dominantSourceFloor) {
+        issues.add(
+          'Falta mana $color '
+          '(Tem $sourceCount fontes, ideal >= $dominantSourceFloor)',
+        );
+      } else if (percent > 0.10 && sourceCount < secondarySourceFloor) {
+        issues.add(
+          'Falta mana $color '
+          '(Tem $sourceCount fontes, ideal >= $secondarySourceFloor)',
+        );
       }
     });
 
@@ -324,6 +355,51 @@ DeckOptimizationState assessDeckOptimizationState({
       deckFormat == 'commander' ? 100 : (deckFormat == 'brawl' ? 60 : null);
   if (maxTotal != null && currentTotalCards < maxTotal) {
     final missing = maxTotal - currentTotalCards;
+    final manaFoundation = assessCommanderManaFloor(
+      format: deckFormat,
+      cards: cards,
+    );
+    final cannotReachMinimum =
+        manaFoundation.landCount + missing < manaFoundation.minimumLandCount;
+    if (cannotReachMinimum || manaFoundation.hasSevereExcess) {
+      final targetLandCount = strategicTargetLandCountForFormat(deckFormat);
+      final landsToAdd = (targetLandCount - manaFoundation.landCount).clamp(
+        0,
+        maxTotal,
+      );
+      final landsToRemove = (manaFoundation.landCount - targetLandCount).clamp(
+        0,
+        maxTotal,
+      );
+      return DeckOptimizationState(
+        status: 'needs_repair',
+        recommendedMode: 'repair',
+        suggestedScope: 'rebuild_core',
+        severityScore: 100,
+        reasons: [
+          if (cannotReachMinimum)
+            'Mesmo preenchendo os $missing slots restantes, o deck chegaria '
+                'a no máximo ${manaFoundation.landCount + missing} terrenos, '
+                'abaixo do mínimo seguro de '
+                '${manaFoundation.minimumLandCount}.',
+          if (manaFoundation.hasSevereExcess)
+            'O deck incompleto já tem ${manaFoundation.landCount} terrenos e '
+                'precisa cortar o excesso antes de completar a lista.',
+        ],
+        repairPlan: {
+          'summary':
+              'A estrutura atual não pode ser corrigida apenas preenchendo os '
+              'slots vazios; use rebuild guiado.',
+          'missing_cards': missing,
+          'target_land_count': targetLandCount,
+          'requires_replacement': true,
+          'role_targets': {
+            if (landsToAdd > 0) 'lands_to_add': landsToAdd,
+            if (landsToRemove > 0) 'lands_to_remove': landsToRemove,
+          },
+        },
+      );
+    }
     return DeckOptimizationState(
       status: 'incomplete',
       recommendedMode: 'complete',
@@ -354,7 +430,11 @@ DeckOptimizationState assessDeckOptimizationState({
   for (final card in cards) {
     deckColors.addAll((card['colors'] as List?)?.cast<String>() ?? const []);
   }
-  final analyzer = DeckArchetypeAnalyzer(cards, deckColors.toList());
+  final analyzer = DeckArchetypeAnalyzer(
+    cards,
+    deckColors.toList(),
+    deckFormat: deckFormat,
+  );
   final manaBase = analyzer.analyzeManaBase();
   final typeDistribution =
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
@@ -406,28 +486,41 @@ DeckOptimizationState assessDeckOptimizationState({
     );
   }
 
-  if (landCount >= 55) {
+  final minimumLandCount =
+      strategicMinimumLandCountForFormat(deckFormat) ??
+      commanderStrategicMinimumLandCount;
+  final maximumLandCount = strategicMaximumAutomaticLandFloorForFormat(
+    deckFormat,
+  );
+  final severeExcessLandCount = strategicSevereExcessLandCountForFormat(
+    deckFormat,
+  );
+  final minimumNonLandCount = strategicMinimumNonLandCountForFormat(deckFormat);
+  final formatLabel = manaFoundationFormatLabel(deckFormat);
+
+  if (landCount >= severeExcessLandCount) {
     addReason(
       'O deck está com $landCount terrenos, muito acima do intervalo saudável para $deckFormat.',
       severe: true,
     );
-  } else if (landCount > 45) {
+  } else if (landCount > maximumLandCount) {
     addReason(
       'O deck está com $landCount terrenos e tende a floodar antes de gerar valor.',
       severe: false,
     );
   }
 
-  if (landCount > 0 && nonLandCount < 25) {
+  if (nonLandCount < minimumNonLandCount) {
     addReason(
       'O deck tem apenas $nonLandCount não-terrenos, insuficiente para sustainar o plano do comandante.',
       severe: true,
     );
   }
 
-  if (landCount > 0 && landCount <= 24) {
+  if (landCount < minimumLandCount) {
     addReason(
-      'O deck está com apenas $landCount terrenos, abaixo do mínimo seguro para Commander.',
+      'O deck está com apenas $landCount terrenos, abaixo do mínimo seguro '
+      'de $minimumLandCount para $formatLabel.',
       severe: true,
     );
   }
@@ -495,7 +588,7 @@ DeckOptimizationState assessDeckOptimizationState({
     suggestedScope: 'rebuild_core',
     severityScore: (severeIssues * 30 + moderateIssues * 12).clamp(0, 100),
     reasons: reasons.take(6).toList(),
-    repairPlan: _buildDeckRepairPlan(
+    repairPlan: buildDeckRepairPlan(
       deckFormat: deckFormat,
       landCount: landCount,
       nonLandCount: nonLandCount,
@@ -507,66 +600,6 @@ DeckOptimizationState assessDeckOptimizationState({
       manaAssessment: manaAssessment,
     ),
   );
-}
-
-Map<String, dynamic> _buildDeckRepairPlan({
-  required String deckFormat,
-  required int landCount,
-  required int nonLandCount,
-  required int instantSorceryCount,
-  required int artifactCount,
-  required int enchantmentCount,
-  required Set<String> commanderColorIdentity,
-  required String commanderText,
-  required String manaAssessment,
-}) {
-  final targetLandCount = deckFormat == 'brawl' ? 25 : 36;
-  final priorityRepairs = <String>[];
-  final roleTargets = <String, int>{};
-
-  if (landCount > targetLandCount) {
-    priorityRepairs.add(
-      'Cortar aproximadamente ${landCount - targetLandCount} terrenos excedentes antes de avaliar upgrades finos.',
-    );
-  }
-
-  if (commanderColorIdentity.isNotEmpty &&
-      manaAssessment.toLowerCase().contains('falta mana')) {
-    priorityRepairs.add(
-      'Trocar terrenos incolores por fontes ${commanderColorIdentity.join('/')} até estabilizar a base.',
-    );
-  }
-
-  if (_commanderSignalsSpellslinger(commanderText) &&
-      instantSorceryCount < 24) {
-    roleTargets['instants_or_sorceries_to_add'] = 24 - instantSorceryCount;
-    priorityRepairs.add(
-      'Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.',
-    );
-  }
-
-  if (_commanderSignalsArtifacts(commanderText) && artifactCount < 12) {
-    roleTargets['artifacts_to_add'] = 12 - artifactCount;
-  }
-
-  if (_commanderSignalsEnchantments(commanderText) && enchantmentCount < 10) {
-    roleTargets['enchantments_to_add'] = 10 - enchantmentCount;
-  }
-
-  if (nonLandCount < 30) {
-    priorityRepairs.add(
-      'Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações.',
-    );
-  }
-
-  return {
-    'summary':
-        'O deck precisa de reconstrução estrutural antes de trocas pontuais.',
-    'target_land_count': targetLandCount,
-    'priority_repairs': priorityRepairs,
-    'role_targets': roleTargets,
-    'preserve': const ['commander', 'cartas core realmente sinérgicas'],
-  };
 }
 
 bool _commanderSignalsSpellslinger(String commanderText) {

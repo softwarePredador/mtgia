@@ -218,6 +218,7 @@ Future<Response> onRequest(RequestContext context) async {
             DeckArchetypeAnalyzer(
               persistedCards,
               deckColors.toList(),
+              deckFormat: deckFormat,
             ).generateAnalysis();
         responseDeckState = assessDeckOptimizationState(
           cards: persistedCards,
@@ -286,6 +287,8 @@ Future<Response> onRequest(RequestContext context) async {
                   (card) => {
                     'card_id': card['card_id'],
                     'name': card['name'],
+                    'type_line': card['type_line'],
+                    'oracle_text': card['oracle_text'],
                     'quantity': card['quantity'],
                     'is_commander': card['is_commander'] ?? false,
                   },

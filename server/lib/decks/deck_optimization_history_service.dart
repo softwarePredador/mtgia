@@ -369,7 +369,8 @@ class DeckOptimizationHistoryService {
     return normalizeCards(cards)
         .map(
           (card) =>
-              '${card['card_id']}:${card['quantity']}:${card['condition']}',
+              '${card['card_id']}:${card['quantity']}:${card['condition']}:'
+              '${card['is_commander'] == true ? 'commander' : 'main'}',
         )
         .join('|');
   }

@@ -272,8 +272,17 @@ run_ramp_and_data_foundation_contracts() {
     test/ramp_family_classifier_test.dart
     test/optimization_ramp_profile_test.dart
     test/ramp_floor_consumer_contract_test.dart
+    test/commander_mana_floor_test.dart
+    test/optimize_mana_base_floor_test.dart
+    test/rebuild_guided_land_support_test.dart
+    test/optimize_cache_support_test.dart
+    test/optimize_route_outcome_support_test.dart
     test/functional_card_tags_test.dart
     test/optimization_quality_gate_test.dart
+    test/optimize_complete_land_floor_test.dart
+    test/optimize_route_land_removal_protection_support_test.dart
+    test/deck_cards_bulk_support_test.dart
+    test/deck_update_optimization_mana_floor_test.dart
     test/optimization_validator_test.dart
     test/optimize_filler_loader_support_test.dart
     test/optimize_functional_role_support_test.dart
@@ -417,6 +426,9 @@ main() {
     "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_e2e_$STAMP dart test test/ai_generate_learning_boundary_test.dart test/deck_simulate_route_adapter_test.dart test/deck_recommendations_route_adapter_test.dart test/deck_recommendations_route_support_test.dart test/deck_recommendations_power_level_support_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_ai_prompt_eval_suite_test.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/production_ai_mock_fallback_policy_test.dart"
 
   run_ramp_and_data_foundation_contracts
+
+  run_postgres_runner_step "Optimizer mana floor isolated E2E" \
+    "\"$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh\" test/deck_optimization_mana_floor_live_test.dart"
 
   run_step "Canonical battle product gate" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" battle"

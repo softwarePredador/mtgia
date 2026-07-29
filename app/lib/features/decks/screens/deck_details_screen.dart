@@ -1933,11 +1933,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         if (!mounted) return;
         sheetNavigator.pop();
         showGuidedRebuildCreatedSnackBar(context);
-        await rootNavigator.push(
-          MaterialPageRoute(
-            builder: (_) => DeckDetailsScreen(deckId: draftDeckId),
-          ),
-        );
+        GoRouter.of(
+          dialogContext,
+        ).go('/decks/${Uri.encodeComponent(draftDeckId)}');
       },
       onRebuildAiError: (rebuildError) async {
         if (!dialogContext.mounted) return;

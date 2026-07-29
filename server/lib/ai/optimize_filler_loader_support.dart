@@ -76,6 +76,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -92,7 +93,8 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
           c.color_identity AS color_identity,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)'
@@ -107,7 +109,10 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
       ORDER BY sub.pop_score DESC, LOWER(sub.name) ASC
       LIMIT 600
     '''),
-    parameters: {'exclude': excludeNames.toList()},
+    parameters: {
+      'exclude': excludeNames.toList(),
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   final candidates = <Map<String, dynamic>>[];
@@ -463,6 +468,7 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
   required Set<String> excludeNames,
   Set<String>? preferredNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -478,6 +484,7 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
     bracket: bracket,
     excludeNames: excludeNames,
     limit: limit < 80 ? 240 : (limit * 4),
+    deckFormat: deckFormat,
   );
 
   if (candidates.isEmpty) return const [];
@@ -533,6 +540,7 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -543,7 +551,8 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
              mi.meta_deck_count, mi.usage_count
       FROM card_meta_insights mi
       JOIN cards c ON LOWER(c.name) = LOWER(mi.card_name)
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+      LEFT JOIN card_legalities cl
+        ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
         AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
         AND c.name NOT LIKE 'A-%'
@@ -583,7 +592,11 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
       ORDER BY mi.meta_deck_count DESC, mi.usage_count DESC, c.name ASC
       LIMIT @limit
     '''),
-    parameters: {'identity': identity, 'limit': limit},
+    parameters: {
+      'identity': identity,
+      'limit': limit,
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   final mapped =
@@ -633,6 +646,7 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
   required Set<String> excludeNames,
   required int? bracket,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -650,7 +664,8 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
           COALESCE(cmi.usage_count, 0) AS usage_count,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+      LEFT JOIN card_legalities cl
+        ON cl.card_id = c.id AND cl.format = @legality_format
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
         AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
@@ -681,7 +696,11 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT @limit
     '''),
-    parameters: {'identity': identity, 'limit': limit},
+    parameters: {
+      'identity': identity,
+      'limit': limit,
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   Log.d('  [broad] sql rows=${result.length}');
@@ -763,6 +782,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
   required Set<String> excludeNames,
   required Set<String> preferredNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -788,6 +808,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
     excludeNames: excludeNames,
     preferredNames: preferredNames,
     limit: limit,
+    deckFormat: deckFormat,
   );
   addUnique(withBracket);
 
@@ -801,6 +822,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       excludeNames: excludeNames.union(seen),
       preferredNames: preferredNames,
       limit: limit - aggregated.length,
+      deckFormat: deckFormat,
     );
     addUnique(noBracket);
   }
@@ -811,6 +833,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: excludeNames.union(seen),
       limit: limit - aggregated.length,
+      deckFormat: deckFormat,
     );
     addUnique(
       _filterCandidatesByBracketPolicy(
@@ -829,6 +852,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       excludeNames: excludeNames.union(seen),
       bracket: bracket,
       limit: limit - aggregated.length,
+      deckFormat: deckFormat,
     );
     addUnique(broadWithBracket);
   }
@@ -841,6 +865,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       excludeNames: excludeNames.union(seen),
       bracket: null,
       limit: limit - aggregated.length,
+      deckFormat: deckFormat,
     );
     addUnique(broadNoBracket);
   }
@@ -855,6 +880,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
   required int? bracket,
   required Set<String> excludeNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -867,7 +893,8 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
@@ -898,7 +925,10 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT 600
     '''),
-    parameters: {'identity': identity},
+    parameters: {
+      'identity': identity,
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   var candidates =
@@ -931,7 +961,8 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
       Sql.named('''
         SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
         FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND LOWER(c.name) IN (SELECT LOWER(unnest(@names::text[])))
           AND (
@@ -942,6 +973,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
       parameters: {
         'names': commanderCompletionStapleNames,
         'identity': identity,
+        'legality_format': deckFormat.trim().toLowerCase(),
       },
     );
     final stapleCandidates =
@@ -1006,6 +1038,7 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
   required Set<String> excludeNames,
   required int? bracket,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -1017,7 +1050,8 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
@@ -1030,7 +1064,10 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT @limit
     '''),
-    parameters: {'limit': limit * 3},
+    parameters: {
+      'limit': limit * 3,
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   var candidates =
@@ -1111,6 +1148,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -1126,7 +1164,8 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
@@ -1139,6 +1178,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT 4000
     '''),
+    parameters: {'legality_format': deckFormat.trim().toLowerCase()},
   );
 
   Log.d('  [identity-safe] sql rows=${result.length}');
@@ -1198,6 +1238,7 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0 || preferredNames.isEmpty) return const [];
 
@@ -1223,13 +1264,19 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
         COALESCE(cmi.usage_count, 0) AS usage_count
       FROM cards c
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+      LEFT JOIN card_legalities cl
+        ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE LOWER(name) = ANY(@preferred::text[])
+        AND (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
         AND NOT (COALESCE(type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
       ORDER BY COALESCE(cmi.meta_deck_count, 0) DESC,
                COALESCE(cmi.usage_count, 0) DESC,
                c.name ASC
     '''),
-    parameters: {'preferred': normalizedPreferred.toList()},
+    parameters: {
+      'preferred': normalizedPreferred.toList(),
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   final filtered = <Map<String, dynamic>>[];

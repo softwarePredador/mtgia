@@ -18,6 +18,7 @@ class OptimizeVirtualPostAnalysisResult {
 }
 
 OptimizeVirtualPostAnalysisResult buildOptimizeVirtualPostAnalysis({
+  required String deckFormat,
   required List<Map<String, dynamic>> originalDeck,
   required List<String> validRemovals,
   required List<String> validAdditions,
@@ -39,16 +40,17 @@ OptimizeVirtualPostAnalysisResult buildOptimizeVirtualPostAnalysis({
   final postAnalyzer = optimize_state.DeckArchetypeAnalyzerCore(
     virtualDeck,
     deckColors.toList(),
+    deckFormat: deckFormat,
   );
   final postAnalysis = Map<String, dynamic>.from(
     postAnalyzer.generateAnalysis(),
   );
-  final postValidationSummary =
-      optimize_route_post_validation.buildPostAnalysisValidationSummary(
-    deckAnalysis: deckAnalysis,
-    postAnalysis: postAnalysis,
-    effectiveOptimizeArchetype: effectiveOptimizeArchetype,
-  );
+  final postValidationSummary = optimize_route_post_validation
+      .buildPostAnalysisValidationSummary(
+        deckAnalysis: deckAnalysis,
+        postAnalysis: postAnalysis,
+        effectiveOptimizeArchetype: effectiveOptimizeArchetype,
+      );
 
   if (postValidationSummary.improvements.isNotEmpty) {
     postAnalysis['improvements'] = postValidationSummary.improvements;

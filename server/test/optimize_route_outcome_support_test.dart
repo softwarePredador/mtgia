@@ -49,6 +49,7 @@ void main() {
           body: const {
             'mode': 'complete',
             'mana_foundation_satisfied': true,
+            'target_additions': 1,
             'additions': ['New Card'],
             'additions_detailed': [
               {'name': 'New Card', 'card_id': 'new-card-id', 'quantity': 1},
@@ -81,6 +82,7 @@ void main() {
       const verifiedBody = {
         ...legacyUnsafeBody,
         'mana_foundation_satisfied': true,
+        'target_additions': 1,
       };
 
       expect(
@@ -105,6 +107,43 @@ void main() {
         ),
         isTrue,
       );
+    });
+
+    test('complete requires the exact physical target and coherent totals', () {
+      final partialBody = <String, dynamic>{
+        'mode': 'complete',
+        'mana_foundation_satisfied': true,
+        'target_additions': 25,
+        'additions': ['Plains'],
+        'additions_detailed': [
+          {'name': 'Plains', 'card_id': 'plains-id', 'quantity': 9},
+        ],
+        'deck_analysis': {'total_cards': 75},
+        'post_analysis': {'total_cards': 84},
+      };
+      final incoherentTotalsBody = <String, dynamic>{
+        ...partialBody,
+        'target_additions': 9,
+        'post_analysis': {'total_cards': 83},
+      };
+      final completeBody = <String, dynamic>{
+        ...partialBody,
+        'target_additions': 9,
+        'post_analysis': {'total_cards': 84},
+      };
+
+      enforceSuccessfulOptimizeOutcomeSafety(partialBody);
+      expect(partialBody['outcome_code'], 'no_safe_upgrade_found');
+      expect(partialBody['can_apply'], isFalse);
+      expect(partialBody['learning_eligible'], isFalse);
+
+      enforceSuccessfulOptimizeOutcomeSafety(incoherentTotalsBody);
+      expect(incoherentTotalsBody['outcome_code'], 'no_safe_upgrade_found');
+      expect(incoherentTotalsBody['can_apply'], isFalse);
+
+      enforceSuccessfulOptimizeOutcomeSafety(completeBody);
+      expect(completeBody['outcome_code'], 'deck_completed');
+      expect(completeBody['can_apply'], isNot(false));
     });
 
     test('fails closed for an empty successful optimize body', () {

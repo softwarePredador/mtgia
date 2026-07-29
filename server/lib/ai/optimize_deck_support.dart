@@ -1,3 +1,5 @@
+import '../commander_mana_floor.dart';
+
 bool commanderSignalsSpellslinger(String commanderText) {
   return commanderText.contains('instant or sorcery') ||
       commanderText.contains('instant or sorcery spell') ||
@@ -24,11 +26,19 @@ Map<String, dynamic> buildDeckRepairPlan({
   required String commanderText,
   required String manaAssessment,
 }) {
-  final targetLandCount = deckFormat == 'brawl' ? 25 : 36;
+  final targetLandCount = strategicTargetLandCountForFormat(deckFormat);
   final priorityRepairs = <String>[];
   final roleTargets = <String, int>{};
 
-  if (landCount > targetLandCount) {
+  if (landCount < targetLandCount) {
+    final missingLands = targetLandCount - landCount;
+    roleTargets['lands_to_add'] = missingLands;
+    priorityRepairs.add(
+      'Adicionar aproximadamente $missingLands terrenos para alcançar '
+      'a base-alvo de $targetLandCount.',
+    );
+  } else if (landCount > targetLandCount) {
+    roleTargets['lands_to_remove'] = landCount - targetLandCount;
     priorityRepairs.add(
       'Cortar aproximadamente ${landCount - targetLandCount} terrenos excedentes antes de avaliar upgrades finos.',
     );
@@ -98,10 +108,7 @@ List<Map<String, dynamic>> buildOptimizeAdditionEntries({
   for (final entry in requestedCountsByName.entries) {
     final card = canonicalByName[entry.key];
     if (card == null) continue;
-    entries.add({
-      ...card,
-      'quantity': entry.value,
-    });
+    entries.add({...card, 'quantity': entry.value});
   }
 
   return entries;
@@ -137,10 +144,7 @@ List<Map<String, dynamic>> buildVirtualDeckForAnalysis({
         virtualDeck.removeAt(i);
         toRemove -= quantity;
       } else {
-        virtualDeck[i] = {
-          ...virtualDeck[i],
-          'quantity': quantity - toRemove,
-        };
+        virtualDeck[i] = {...virtualDeck[i], 'quantity': quantity - toRemove};
         toRemove = 0;
       }
     }
@@ -159,10 +163,7 @@ List<Map<String, dynamic>> buildVirtualDeckForAnalysis({
     );
 
     if (existingIndex == -1) {
-      virtualDeck.add({
-        ...incoming,
-        'quantity': incomingQty,
-      });
+      virtualDeck.add({...incoming, 'quantity': incomingQty});
       continue;
     }
 

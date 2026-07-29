@@ -473,6 +473,60 @@ HTTP and returning redirect/HTML instead of JSON.
 - **Legacy shapes:** `GET /decks` returns a raw JSON array while most newer lists return `{data, page, limit, total}`.
 - **No secrets in docs:** The repository contains local environment/config files; never copy credentials into this or any other committed doc.
 
+## Optimization Signature Amendment — 2026-07-28
+
+The current `swap_integrity.deck_signature` and optimization apply guard use
+`card_id:quantity:condition:role`, where `role` is `commander` or `main`.
+This supersedes the older `card_id:quantity:condition` wording in the
+`POST /ai/optimize` table row above. Changing which physical card is the
+commander therefore invalidates the preview even when card IDs, quantities and
+conditions are otherwise unchanged. The persistent optimize cache contract is
+`v12`; earlier entries are not reused. Its cache key also includes the
+normalized deck format, so identical signatures and archetypes cannot share a
+payload across Commander and Brawl.
+
+## Optimize Mana and Format Foundation — 2026-07-28/29
+
+Commander and Brawl optimization carry the normalized deck format through the
+complete/optimize provider context, ML lookup, hate-card lookup, local
+`format_staples`, Scryfall synergy query, deterministic candidate loaders and
+post-provider legality filter. Brawl does not consume Commander reference/meta
+profiles or Commander EDHREC pools. Its provider prompt receives an explicit
+60-card, Brawl-legality and 24–30-land override. This separation also applies
+to Complete seed preparation, the sync priority pool, EDHREC post-validation
+warnings and rebuild candidate sourcing.
+
+Known `card_legalities` rows are fail-closed before preview: a card with only a
+`not_legal`/`banned` row for the requested format is removed. A card name with
+no materialized legality row remains fail-open for compatibility with fresh
+catalog entries. Sync optimize may expose additive
+`format_legality.{format,blocked_additions}` plus a player-safe validation
+warning. Complete mode reports the equivalent under
+`warnings.filtered_by_format_legality`.
+
+`optimization_contract` now uses
+`optimize_decision_contract_v2_2026-07-28`. For `mode=complete`,
+`user_decision.selection_unit=complete_plan`,
+`complete_selection_required=true` and
+`can_select_individual_changes=false`; `addition_count` and
+`optimize_intensity.returned_swaps` count physical copies rather than
+aggregated recommendation rows.
+
+Automatic mutation is stricter than advisory analysis. Commander requires at
+least 34 lands and blocks severe excess from 55; Brawl requires at least 24 and
+blocks severe excess from 36. A profile can raise the floor only within the
+protected format range. `PUT /decks/:id` and
+`POST /decks/:id/cards/bulk` resolve physical quantities and `type_line` inside
+the owner transaction, then return HTTP 409 with stable
+`error_code=optimization_land_floor_violation` before any deck/history/state
+write when the signed optimization violates the floor or excess gate.
+
+Coverage: `commander_mana_floor_test.dart`,
+`optimize_format_legality_support_test.dart`,
+`synergy_engine_runtime_test.dart`, `optimize_runtime_support_test.dart`,
+`deck_optimization_mana_floor_live_test.dart`, app optimize-flow/provider
+tests, and the disposable PostgreSQL contract harness.
+
 ## Update Checklist
 
 When changing an app-facing contract:

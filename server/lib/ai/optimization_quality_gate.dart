@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../basic_land_utils.dart' as basic_lands;
+import '../commander_mana_floor.dart';
 import 'cmc_safety.dart';
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
@@ -27,6 +28,7 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   required List<Map<String, dynamic>> originalDeck,
   required List<Map<String, dynamic>> additionsData,
   required String archetype,
+  String deckFormat = 'commander',
   String? commanderName,
   Map<String, Map<String, dynamic>>? cardDeckProfiles,
   Map<String, dynamic>? profileRoleTargets,
@@ -43,19 +45,28 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   final structuralRecoveryScenario = _isStructuralRecoveryScenario(
     originalDeck,
   );
-  final profileGatePolicy = _resolveProfileGatePolicy(profileRoleTargets);
+  final profileGatePolicy = _resolveProfileGatePolicy(
+    profileRoleTargets,
+    deckFormat: deckFormat,
+  );
   final landTrimContext = _computeLandTrimContext(
     originalDeck,
     archetype,
+    deckFormat: deckFormat,
     profileGatePolicy: profileGatePolicy,
   );
   final profileMinimumLandCount = profileGatePolicy?.minimumLandCount;
-  final minimumLandFloor =
-      profileMinimumLandCount != null && profileMinimumLandCount > 34
-          ? profileMinimumLandCount
-          : 34;
+  final formatMinimumLandCount = strategicMinimumLandCountForFormat(deckFormat);
+  final minimumLandFloor = [
+    if (formatMinimumLandCount != null) formatMinimumLandCount,
+    if (profileMinimumLandCount != null) profileMinimumLandCount,
+  ].fold<int>(0, (current, value) => value > current ? value : current);
+  final minimumDeckSizeForFloor =
+      deckFormat.trim().toLowerCase() == 'brawl' ? 55 : 90;
   final enforceAggregateLandFloor =
-      landTrimContext.totalCards >= 90 || profileMinimumLandCount != null;
+      formatMinimumLandCount != null &&
+      (landTrimContext.totalCards >= minimumDeckSizeForFloor ||
+          profileMinimumLandCount != null);
 
   for (var i = 0; i < pairCount; i++) {
     final removalName = removals[i];
@@ -427,13 +438,18 @@ class _ProfileGatePolicy {
 }
 
 _ProfileGatePolicy? _resolveProfileGatePolicy(
-  Map<String, dynamic>? roleTargets,
-) {
+  Map<String, dynamic>? roleTargets, {
+  String deckFormat = 'commander',
+}) {
   if (roleTargets == null || roleTargets.isEmpty) return null;
 
   final criticalRoles = <String>{};
-  int? recommendedLandCount;
-  int? minimumLandCount;
+  final landPolicy = resolveOptimizationProfileLandPolicy(
+    format: deckFormat,
+    roleTargets: roleTargets,
+  );
+  final recommendedLandCount = landPolicy?.targetLandCount;
+  final minimumLandCount = landPolicy?.minimumLandCount;
 
   for (final entry in roleTargets.entries) {
     final key = entry.key.toString().trim().toLowerCase();
@@ -446,8 +462,6 @@ _ProfileGatePolicy? _resolveProfileGatePolicy(
 
     final normalizedKey = key.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
     if (normalizedKey == 'lands' || normalizedKey == 'land') {
-      recommendedLandCount = targetMax ?? targetMin;
-      minimumLandCount = targetMin ?? targetMax;
       continue;
     }
 
@@ -534,7 +548,11 @@ Set<String> _rolesForProfileTargetKey(String key) {
   return roles;
 }
 
-int _recommendedLandCountForArchetype(String archetype) {
+int _recommendedLandCountForFormat(String deckFormat, String archetype) {
+  final normalizedFormat = deckFormat.trim().toLowerCase();
+  if (normalizedFormat == 'brawl') return 25;
+  if (normalizedFormat != 'commander' && normalizedFormat != 'edh') return 24;
+
   final normalized = archetype.trim().toLowerCase();
   if (normalized.contains('aggro')) return 34;
   if (normalized.contains('combo')) return 33;
@@ -545,6 +563,7 @@ int _recommendedLandCountForArchetype(String archetype) {
 _LandTrimContext _computeLandTrimContext(
   List<Map<String, dynamic>> originalDeck,
   String archetype, {
+  required String deckFormat,
   _ProfileGatePolicy? profileGatePolicy,
 }) {
   var totalCards = 0;
@@ -565,7 +584,7 @@ _LandTrimContext _computeLandTrimContext(
     landCount: landCount,
     recommendedLandCount:
         profileGatePolicy?.recommendedLandCount ??
-        _recommendedLandCountForArchetype(archetype),
+        _recommendedLandCountForFormat(deckFormat, archetype),
   );
 }
 

@@ -27,14 +27,15 @@ class FormatStaplesService {
   Future<List<String>> getStaples({
     required List<String> colors,
     String? archetype,
+    String format = 'commander',
     int limit = 50,
   }) async {
     // Normaliza cores para uppercase
     final normalizedColors = colors.map((c) => c.toUpperCase()).toList();
 
     // Monta query dinâmica
-    String whereClause = "format = 'commander' AND is_banned = false";
-    final params = <String, dynamic>{};
+    String whereClause = 'format = @format AND is_banned = false';
+    final params = <String, dynamic>{'format': _normalizeFormat(format)};
 
     // Filtro de cor: cartas devem ter identidade de cor compatível
     // (todos os elementos de color_identity devem estar nas cores do deck)
@@ -82,6 +83,7 @@ class FormatStaplesService {
   Future<List<String>> getStaplesMultiArchetype({
     required List<String> colors,
     required List<String> archetypes,
+    String format = 'commander',
     int limitPerArchetype = 15,
   }) async {
     final results = <String>[];
@@ -91,6 +93,7 @@ class FormatStaplesService {
       final staples = await getStaples(
         colors: colors,
         archetype: archetype,
+        format: format,
         limit: limitPerArchetype,
       );
 
@@ -109,9 +112,15 @@ class FormatStaplesService {
   /// Inclui staples de todas as categorias.
   Future<List<String>> getGenericStaples({
     required List<String> colors,
+    String format = 'commander',
     int limit = 50,
   }) async {
-    return getStaples(colors: colors, archetype: null, limit: limit);
+    return getStaples(
+      colors: colors,
+      archetype: null,
+      format: format,
+      limit: limit,
+    );
   }
 
   /// Verifica se a tabela tem dados (para fallback para Scryfall).
@@ -164,5 +173,11 @@ class FormatStaplesService {
     };
 
     return aliases[lower] ?? lower;
+  }
+
+  String _normalizeFormat(String format) {
+    final normalized = format.trim().toLowerCase();
+    if (normalized.isEmpty || normalized == 'edh') return 'commander';
+    return normalized;
   }
 }

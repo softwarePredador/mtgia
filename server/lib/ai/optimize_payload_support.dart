@@ -559,9 +559,11 @@ Map<String, dynamic> buildOptimizeDecisionContract({
       targetArchetype.trim().isEmpty
           ? 'plano escolhido'
           : targetArchetype.trim();
-  final pairedSelectionRequired = mode.trim().toLowerCase() == 'optimize';
+  final normalizedMode = mode.trim().toLowerCase();
+  final pairedSelectionRequired = normalizedMode == 'optimize';
+  final completeSelectionRequired = normalizedMode == 'complete';
   return {
-    'schema_version': 'optimize_decision_contract_v1_2026-07-07',
+    'schema_version': 'optimize_decision_contract_v2_2026-07-28',
     'mode': mode,
     'target_archetype': archetype,
     'intensity': intensity,
@@ -574,10 +576,15 @@ Map<String, dynamic> buildOptimizeDecisionContract({
     'battle_validation': _pendingBattleValidation(),
     'user_decision': {
       'preview_required': true,
-      'can_select_individual_changes': true,
+      'can_select_individual_changes': !completeSelectionRequired,
       'selection_unit':
-          pairedSelectionRequired ? 'paired_swap' : 'individual_addition',
+          pairedSelectionRequired
+              ? 'paired_swap'
+              : completeSelectionRequired
+              ? 'complete_plan'
+              : 'individual_addition',
       'paired_selection_required': pairedSelectionRequired,
+      'complete_selection_required': completeSelectionRequired,
       'changes_are_not_applied_automatically': true,
       'addition_count': additionCount,
       'removal_count': removalCount,

@@ -299,6 +299,7 @@ class OptimizePreviewData {
   final Map<String, dynamic> optimizationContract;
   final Map<String, dynamic> battleValidation;
   final Map<String, dynamic> commanderContract;
+  final int? targetAdditions;
   final bool canApply;
   final List<String> applyBlockers;
 
@@ -325,11 +326,16 @@ class OptimizePreviewData {
     required this.optimizationContract,
     required this.battleValidation,
     required this.commanderContract,
+    required this.targetAdditions,
     required this.canApply,
     required this.applyBlockers,
   });
 
-  bool get hasChanges => removals.isNotEmpty || additions.isNotEmpty;
+  bool get hasChanges =>
+      removals.isNotEmpty ||
+      additions.isNotEmpty ||
+      removalsDetailed.isNotEmpty ||
+      additionsDetailed.isNotEmpty;
   bool get hasActionableChanges => hasChanges && canApply;
 
   factory OptimizePreviewData.fromResult(Map<String, dynamic> result) {
@@ -366,6 +372,26 @@ class OptimizePreviewData {
             (result['swap_integrity'] as Map).cast<String, dynamic>(),
           )
         : null;
+    final mode = result['mode']?.toString() ?? 'optimize';
+    final outcomeCode = result['outcome_code']?.toString();
+    final normalizedOutcome = outcomeCode?.trim().toLowerCase() ?? '';
+    final outcomeAllowsApply =
+        normalizedOutcome.isEmpty ||
+        normalizedOutcome == 'optimized' ||
+        normalizedOutcome == 'deck_completed';
+    final completeDetailsAreApplicable =
+        mode != 'complete' ||
+        (additionsDetailed.isNotEmpty &&
+            additionsDetailed.every(_isApplicableDetailedAddition));
+    final targetAdditions = switch (result['target_additions']) {
+      num value => value.toInt(),
+      String value => int.tryParse(value.trim()),
+      _ => null,
+    };
+    final completeQuantityMatchesTarget =
+        mode != 'complete' ||
+        targetAdditions == null ||
+        _physicalDetailedChangeCount(additionsDetailed) == targetAdditions;
 
     return OptimizePreviewData(
       removals: removals,
@@ -380,7 +406,7 @@ class OptimizePreviewData {
       constraints: (result['constraints'] is Map)
           ? (result['constraints'] as Map).cast<String, dynamic>()
           : const <String, dynamic>{},
-      mode: (result['mode'] as String?) ?? 'optimize',
+      mode: mode,
       additionsDetailed: additionsDetailed,
       removalsDetailed: removalsDetailed,
       deckAnalysis:
@@ -403,7 +429,7 @@ class OptimizePreviewData {
           : additions.map((name) => {'name': name}).toList(),
       intensity: OptimizeIntensity.fromApiValue(selectedIntensity),
       optimizeIntensity: optimizeIntensity,
-      outcomeCode: result['outcome_code']?.toString(),
+      outcomeCode: outcomeCode,
       swapIntegrity: swapIntegrity,
       optimizationContract: (result['optimization_contract'] is Map)
           ? (result['optimization_contract'] as Map).cast<String, dynamic>()
@@ -414,7 +440,11 @@ class OptimizePreviewData {
       commanderContract: (result['commander_contract'] is Map)
           ? (result['commander_contract'] as Map).cast<String, dynamic>()
           : const <String, dynamic>{},
+      targetAdditions: targetAdditions,
       canApply:
+          outcomeAllowsApply &&
+          completeDetailsAreApplicable &&
+          completeQuantityMatchesTarget &&
           result['can_apply'] != false &&
           result['learning_eligible'] != false &&
           result['quality_error'] is! Map,
@@ -426,6 +456,31 @@ class OptimizePreviewData {
           const <String>[],
     );
   }
+}
+
+bool _isApplicableDetailedAddition(Map<String, dynamic> item) {
+  final cardId = item['card_id']?.toString().trim() ?? '';
+  if (cardId.isEmpty) return false;
+  return _positiveDetailedQuantity(item['quantity']) != null;
+}
+
+int? _positiveDetailedQuantity(Object? rawQuantity) {
+  if (rawQuantity == null) return 1;
+  final quantity = switch (rawQuantity) {
+    int() => rawQuantity,
+    num() when rawQuantity == rawQuantity.roundToDouble() =>
+      rawQuantity.toInt(),
+    String() => int.tryParse(rawQuantity.trim()),
+    _ => null,
+  };
+  return quantity != null && quantity > 0 ? quantity : null;
+}
+
+int _physicalDetailedChangeCount(Iterable<Map<String, dynamic>> detailed) {
+  return detailed.fold<int>(
+    0,
+    (sum, item) => sum + (_positiveDetailedQuantity(item['quantity']) ?? 0),
+  );
 }
 
 class OptimizeSwapIntegrityPayload {
@@ -489,7 +544,7 @@ List<String> _canonicalOptimizeSwapEntries(
   for (final item in detailed) {
     final id = (item['card_id'] ?? item['name'] ?? '').toString().trim();
     if (id.isEmpty) continue;
-    final quantity = (item['quantity'] as num?)?.toInt() ?? 1;
+    final quantity = _positiveDetailedQuantity(item['quantity']) ?? 0;
     entries.add('$id:$quantity');
   }
   entries.sort();
@@ -814,30 +869,46 @@ Map<String, dynamic> buildOptimizeMutationContext(
   );
   final removalIndexes = _sortedIndexes(selection?.selectedRemovalIndexes);
   final additionIndexes = _sortedIndexes(selection?.selectedAdditionIndexes);
-  final detailedSelectedChangeCount =
+  final detailedSelectedEntryCount =
       selectedRemovalsDetailed.length + selectedAdditionsDetailed.length;
   final namedSelectedChangeCount =
       selectedRemovals.length + selectedAdditions.length;
+  final selectedEntryCount = (selection == null)
+      ? (detailedSelectedEntryCount > 0
+            ? detailedSelectedEntryCount
+            : namedSelectedChangeCount)
+      : selection.selectedCount;
+  final detailedSelectedChangeCount =
+      _physicalDetailedChangeCount(selectedRemovalsDetailed) +
+      _physicalDetailedChangeCount(selectedAdditionsDetailed);
   final selectedChangeCount = (selection == null)
       ? (detailedSelectedChangeCount > 0
             ? detailedSelectedChangeCount
             : namedSelectedChangeCount)
-      : selection.selectedCount;
-  final detailedPreviewChangeCount =
+      : (detailedSelectedEntryCount > 0
+            ? detailedSelectedChangeCount
+            : selection.selectedCount);
+  final detailedPreviewEntryCount =
       preview.removalsDetailed.length + preview.additionsDetailed.length;
   final namedPreviewChangeCount =
       preview.removals.length + preview.additions.length;
+  final previewEntryCount = detailedPreviewEntryCount > 0
+      ? detailedPreviewEntryCount
+      : namedPreviewChangeCount;
+  final detailedPreviewChangeCount =
+      _physicalDetailedChangeCount(preview.removalsDetailed) +
+      _physicalDetailedChangeCount(preview.additionsDetailed);
   final previewChangeCount = detailedPreviewChangeCount > 0
       ? detailedPreviewChangeCount
       : namedPreviewChangeCount;
-  final selectionScope = selectedChangeCount < previewChangeCount
+  final selectionScope = selectedEntryCount < previewEntryCount
       ? 'partial_selection'
       : 'full_preview';
 
   return {
     'type': 'optimization_apply',
     'source': 'optimize_preview',
-    'schema_version': 'optimize_apply_context_v1_2026-07-07',
+    'schema_version': 'optimize_apply_context_v2_2026-07-28',
     'mode': preview.mode,
     'intensity': preview.intensity.apiValue,
     'optimize_intensity': preview.optimizeIntensity,
@@ -846,12 +917,15 @@ Map<String, dynamic> buildOptimizeMutationContext(
     'apply_blockers': preview.applyBlockers,
     'preview_change_count': previewChangeCount,
     'selected_change_count': selectedChangeCount,
+    'preview_entry_count': previewEntryCount,
+    'selected_entry_count': selectedEntryCount,
     'selection_scope': selectionScope,
     'recompute_post_analysis_required': true,
     'selection': {
       'removal_indexes': removalIndexes,
       'addition_indexes': additionIndexes,
       'selected_change_count': selectedChangeCount,
+      'selected_entry_count': selectedEntryCount,
     },
     'removals': selectedRemovalsDetailed.isNotEmpty
         ? selectedRemovalsDetailed
@@ -889,6 +963,7 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
   }
 
   _validatePairedOptimizeSelection(preview, selection);
+  _validateCompleteSelection(preview, selection);
 
   final mutationContext = buildOptimizeMutationContext(
     preview,
@@ -925,11 +1000,11 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
     return OptimizeApplyPlan(
       mode: OptimizeApplyMode.addBulk,
       bulkCards: selectedAdditionsDetailed
-          .where((m) => m['card_id'] != null)
+          .where(_isApplicableDetailedAddition)
           .map(
             (m) => {
               'card_id': m['card_id'],
-              'quantity': (m['quantity'] as int?) ?? 1,
+              'quantity': _positiveDetailedQuantity(m['quantity'])!,
               'is_commander': false,
             },
           )
@@ -955,6 +1030,32 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
     additions: selectedAdditions,
     mutationContext: mutationContext,
   );
+}
+
+void _validateCompleteSelection(
+  OptimizePreviewData preview,
+  OptimizePreviewSelection? selection,
+) {
+  if (preview.mode != 'complete' || selection == null) return;
+
+  final allRemovalsSelected =
+      selection.selectedRemovalIndexes.length ==
+          preview.removalsDetailed.length &&
+      selection.selectedRemovalIndexes.every(
+        (index) => index >= 0 && index < preview.removalsDetailed.length,
+      );
+  final allAdditionsSelected =
+      selection.selectedAdditionIndexes.length ==
+          preview.additionsDetailed.length &&
+      selection.selectedAdditionIndexes.every(
+        (index) => index >= 0 && index < preview.additionsDetailed.length,
+      );
+  if (!allRemovalsSelected || !allAdditionsSelected) {
+    throw StateError(
+      'A conclusão do deck precisa aplicar a lista inteira para preservar o '
+      'tamanho e a fundação de mana validados.',
+    );
+  }
 }
 
 void _validatePairedOptimizeSelection(

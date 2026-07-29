@@ -23,10 +23,15 @@ List<String>? _recommendationNames(dynamic raw) {
 }
 
 class _DetailedRecommendations {
-  const _DetailedRecommendations({required this.names, required this.cardIds});
+  const _DetailedRecommendations({
+    required this.names,
+    required this.cardIds,
+    required this.physicalCount,
+  });
 
   final List<String> names;
   final List<String> cardIds;
+  final int physicalCount;
 }
 
 _DetailedRecommendations? _detailedRecommendations(
@@ -36,6 +41,7 @@ _DetailedRecommendations? _detailedRecommendations(
   if (raw is! List) return null;
   final names = <String>[];
   final cardIds = <String>[];
+  var physicalCount = 0;
   for (final entry in raw) {
     if (entry is! Map) return null;
     final name = entry['name']?.toString().trim() ?? '';
@@ -50,8 +56,13 @@ _DetailedRecommendations? _detailedRecommendations(
     }
     names.add(name.toLowerCase());
     cardIds.add(cardId.toLowerCase());
+    physicalCount += rawQuantity;
   }
-  return _DetailedRecommendations(names: names, cardIds: cardIds);
+  return _DetailedRecommendations(
+    names: names,
+    cardIds: cardIds,
+    physicalCount: physicalCount,
+  );
 }
 
 bool _allUnique(List<String> values) => values.toSet().length == values.length;
@@ -137,16 +148,49 @@ bool _hasActionableCompleteAdditions(Map<String, dynamic> body) {
     body['additions_detailed'],
     requireUnitQuantity: false,
   );
+  final targetAdditions = switch (body['target_additions']) {
+    int value => value,
+    num value when value == value.roundToDouble() => value.toInt(),
+    String value => int.tryParse(value.trim()),
+    _ => null,
+  };
+  final deckAnalysis =
+      body['deck_analysis'] is Map ? body['deck_analysis'] as Map : const {};
+  final postAnalysis =
+      body['post_analysis'] is Map ? body['post_analysis'] as Map : const {};
+  final beforeTotal = _readAnalysisTotal(deckAnalysis);
+  final afterTotal = _readAnalysisTotal(postAnalysis);
+  final totalsAreCoherent =
+      beforeTotal == null ||
+      afterTotal == null ||
+      afterTotal == beforeTotal + (targetAdditions ?? 0);
   return additions != null &&
       detailedAdditions != null &&
       additions.isNotEmpty &&
       _sameNameMultiset(additions, detailedAdditions.names) &&
+      targetAdditions != null &&
+      targetAdditions > 0 &&
+      detailedAdditions.physicalCount == targetAdditions &&
+      totalsAreCoherent &&
       body['mana_foundation_satisfied'] == true &&
       _optionalResponseFlagsAreWellTyped(body) &&
       body['is_mock'] != true &&
       body['can_apply'] != false &&
       body['learning_eligible'] != false &&
       !body.containsKey('quality_error');
+}
+
+int? _readAnalysisTotal(Map<dynamic, dynamic> analysis) {
+  for (final key in const ['total_cards', 'total_card_count']) {
+    final parsed = switch (analysis[key]) {
+      int value => value,
+      num value when value == value.roundToDouble() => value.toInt(),
+      String value => int.tryParse(value.trim()),
+      _ => null,
+    };
+    if (parsed != null && parsed >= 0) return parsed;
+  }
+  return null;
 }
 
 String _deriveSuccessfulOptimizeOutcome(Map<String, dynamic> body) {

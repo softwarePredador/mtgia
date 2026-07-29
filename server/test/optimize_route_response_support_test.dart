@@ -19,13 +19,13 @@ void main() {
           responseBody: {
             'mode': 'complete',
             'additions_detailed': [
-              {'name': 'A'},
+              {'name': 'A', 'quantity': 25},
               {'name': 'B'},
             ],
           },
           effectiveMode: 'optimize',
         ),
-        2,
+        26,
       );
 
       expect(

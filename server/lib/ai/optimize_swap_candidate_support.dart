@@ -31,6 +31,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   bool preferCollection = false,
   int? budgetLimitBrl,
   double usdToBrlRate = defaultOptimizeUsdToBrlRate,
+  String deckFormat = 'commander',
 }) async {
   final results = <Map<String, dynamic>>[];
 
@@ -134,7 +135,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           COALESCE(availability.owned_quantity, 0)::int AS owned_quantity,
           COALESCE(availability.free_quantity, 0)::int AS available_quantity
         FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
         LEFT JOIN collection_availability_snapshot availability
@@ -171,6 +173,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       'identity': colorIdentityArr,
       'prefer_collection': preferCollection,
       'user_id': userId,
+      'legality_format': deckFormat.trim().toLowerCase(),
     },
   );
 
@@ -558,6 +561,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   bool preferCollection = false,
   int? budgetLimitBrl,
   double usdToBrlRate = defaultOptimizeUsdToBrlRate,
+  String deckFormat = 'commander',
 }) async {
   if (allCardData.isEmpty) return const [];
   final effectiveSwapLimit = swapLimit.clamp(1, 20).toInt();
@@ -633,6 +637,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     preferCollection: preferCollection,
     budgetLimitBrl: budgetLimitBrl,
     usdToBrlRate: usdToBrlRate,
+    deckFormat: deckFormat,
   );
   final pairs = buildSameLaneOptimizeSwapPairs(
     removalCandidates: removalCandidates,

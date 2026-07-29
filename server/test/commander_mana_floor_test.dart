@@ -55,6 +55,28 @@ void main() {
       expect(error['minimum_land_count'], 34);
     });
 
+    test('rejects severe land excess without banning legitimate landfall', () {
+      final landfall = assessCommanderManaFloor(
+        format: 'commander',
+        cards: const [
+          {'name': 'Forest', 'type_line': 'Basic Land', 'quantity': 50},
+          {'name': 'Spell', 'type_line': 'Sorcery', 'quantity': 50},
+        ],
+      );
+      final flooded = assessCommanderManaFloor(
+        format: 'commander',
+        cards: const [
+          {'name': 'Forest', 'type_line': 'Basic Land', 'quantity': 90},
+          {'name': 'Spell', 'type_line': 'Sorcery', 'quantity': 10},
+        ],
+      );
+
+      expect(landfall.hasSevereExcess, isFalse);
+      expect(landfall.satisfied, isTrue);
+      expect(flooded.hasSevereExcess, isTrue);
+      expect(flooded.satisfied, isFalse);
+    });
+
     test(
       'does not turn the Commander floor into legality for other formats',
       () {
@@ -69,5 +91,88 @@ void main() {
         expect(assessment.satisfied, isTrue);
       },
     );
+
+    test('carries a stricter preview floor into automatic apply', () {
+      final contract = buildOptimizationManaFoundationContract(
+        format: 'commander',
+        minimumLandCount: 36,
+        landCount: 36,
+        satisfied: true,
+      );
+      final resolved = resolveOptimizationMinimumLandCountFromMutationContext({
+        'optimization_contract': {'mana_foundation': contract},
+      }, format: 'commander');
+
+      expect(contract['policy'], 'automatic_apply_floor');
+      expect(contract['minimum_land_count'], 36);
+      expect(resolved, 36);
+    });
+
+    test('mutation context cannot lower or absurdly raise safety bounds', () {
+      expect(
+        resolveOptimizationMinimumLandCountFromMutationContext({
+          'optimization_contract': {
+            'mana_foundation': {'minimum_land_count': 9},
+          },
+        }, format: 'commander'),
+        commanderStrategicMinimumLandCount,
+      );
+      expect(
+        resolveOptimizationMinimumLandCountFromMutationContext({
+          'optimization_contract': {
+            'mana_foundation': {'minimum_land_count': 99},
+          },
+        }, format: 'commander'),
+        commanderStrategicMaximumAutomaticLandFloor,
+      );
+    });
+
+    test('uses the 60-card Brawl floor without affecting other formats', () {
+      final brawl = assessCommanderManaFloor(
+        format: 'brawl',
+        cards: const [
+          {'name': 'Forest', 'type_line': 'Basic Land', 'quantity': 24},
+          {'name': 'Spell', 'type_line': 'Sorcery', 'quantity': 36},
+        ],
+      );
+      final standard = assessCommanderManaFloor(
+        format: 'standard',
+        cards: const [
+          {'name': 'Forest', 'type_line': 'Basic Land', 'quantity': 22},
+          {'name': 'Spell', 'type_line': 'Sorcery', 'quantity': 38},
+        ],
+      );
+
+      expect(brawl.minimumLandCount, brawlStrategicMinimumLandCount);
+      expect(brawl.satisfied, isTrue);
+      expect(standard.applies, isFalse);
+      expect(standard.satisfied, isTrue);
+    });
+
+    test('profile target cannot contradict a stricter role minimum', () {
+      final policy = resolveOptimizationProfileLandPolicy(
+        format: 'commander',
+        recommendedStructure: const {'lands': 35},
+        roleTargets: const {
+          'lands': {'min': 36, 'max': 38},
+        },
+      );
+
+      expect(policy?.targetLandCount, 36);
+      expect(policy?.minimumLandCount, 36);
+    });
+
+    test('profile target remains distinct from its automatic floor', () {
+      final policy = resolveOptimizationProfileLandPolicy(
+        format: 'commander',
+        recommendedStructure: const {'lands': 38},
+        roleTargets: const {
+          'lands': {'min': 36, 'max': 40},
+        },
+      );
+
+      expect(policy?.targetLandCount, 38);
+      expect(policy?.minimumLandCount, 36);
+    });
   });
 }

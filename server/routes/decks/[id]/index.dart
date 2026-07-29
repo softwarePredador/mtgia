@@ -12,6 +12,7 @@ import '../../../lib/deck_schema_support.dart';
 import '../../../lib/deck_validation_state_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
 import '../../../lib/decks/deck_applied_analysis_support.dart';
+import '../../../lib/decks/optimization_mana_floor_support.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/card_identity_support.dart';
 import '../../../lib/http_responses.dart';
@@ -325,6 +326,18 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           cards: dedupedList,
           strict: isOptimizationMutation,
         );
+        if (isOptimizationMutation) {
+          final manaFloorAssessment =
+              await assessOptimizationCommanderManaFloor(
+                session: session,
+                format: currentFormat,
+                cards: dedupedList,
+                mutationContext: mutationContext,
+              );
+          if (!manaFloorAssessment.satisfied) {
+            throw OptimizationLandFloorViolation(manaFloorAssessment);
+          }
+        }
 
         // Apaga as cartas antigas
         await session.execute(
@@ -421,6 +434,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           appliedPostAnalysis = await loadAppliedDeckPostAnalysis(
             session: session,
             persistedCards: dedupedList,
+            deckFormat: currentFormat,
           );
           optimizationEvent = await DeckOptimizationHistoryService(
             conn,
@@ -511,6 +525,9 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
     });
 
     return Response.json(body: {'success': true, ...updateResult});
+  } on OptimizationLandFloorViolation catch (e) {
+    print('[WARN] Optimization mana floor blocked deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
   } on DeckRulesException catch (e) {
     print('[ERROR] Failed to update deck: $e');
     return badRequest(e.message);

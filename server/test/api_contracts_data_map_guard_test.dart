@@ -140,8 +140,9 @@ void main() {
       expect(matchup, contains('This is a write route'));
 
       expect(optimize, contains('swap_integrity'));
-      expect(optimize, contains('card_id:quantity:condition'));
-      expect(optimize, contains('condition-aware deck signature'));
+      expect(contracts, contains('card_id:quantity:condition:role'));
+      expect(contracts, contains('Changing which physical card is the'));
+      expect(contracts, contains('cache contract is\n`v12`'));
       expect(optimize, contains('optimize_cache_support_test.dart'));
     });
 

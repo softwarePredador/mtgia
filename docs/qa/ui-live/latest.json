@@ -1,23 +1,24 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a",
+  "source_digest": "a22e35a6e71544d3d31d1c9ca1e636116c8f5a7f708cb472a7240803c2898695",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-28T22:18:04Z",
+    "verified_at": "2026-07-29T03:20:00Z",
     "commands": [
-      "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (web_mobile_390x844, web_desktop_1440x900, web_wide_1920x1080)",
-      "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart",
-      "./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+      "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
+      "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart (43 checkpoints recaptured in authenticated segments; 11 unchanged checkpoints carried from the successful 54-checkpoint physical run)",
       "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
-      "Codex in-app Browser physical Tab/Shift+Tab/Enter/Space/Escape and typed-search capture at 1280x720",
-      "flutter analyze --no-pub --no-version-check",
-      "flutter test <18 focused suites> --no-pub --no-version-check",
-      "./scripts/quality_gate.sh ui-audit",
-      "./scripts/quality_gate.sh ui-proof",
-      "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
+      "dart test <focused optimizer suites> (173 broad cases, plus 107 final format/cache/rebuild regressions) and flutter test <focused optimizer suites> (121 passed)",
+      "./scripts/manaloom_local_ci.sh full (41 deterministic backend batches passed; flutter test 1352 passed with 1 conditional skip)",
+      "flutter analyze --no-pub --no-version-check and dart analyze",
+      "isolated PostgreSQL/API optimizer E2E (3/3 passed)",
+      "./scripts/quality_gate.sh ui-proof && ./scripts/quality_gate.sh ui-audit",
       "./scripts/manaloom_local_ci.sh quick",
-      "./scripts/manaloom_local_ci.sh full",
+      "./scripts/manaloom_performance_gate.sh",
+      "./scripts/manaloom_local_ci.sh schema",
+      "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
+      "./scripts/manaloom_web_gate.sh (Node 26, zero vulnerabilities)",
       "flutter build web --release --no-pub --base-href /app/ --no-web-resources-cdn"
     ]
   },
@@ -26,41 +27,30 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "bb198a8283b19c5197f5bfb1cadf25aee01669c10e15c8ba182aae34b5056a94"
+        "sha256": "ab1054c07a457d3fb95b5bb0cc06218be7e5d338f59dfd75ca558e24abac27ef"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "68813cfce3b8b204799beec8cbe88d41427cba45aa12a27a957325ee7a0737f2"
+        "sha256": "7aa7daa3c453ba613207c1acc71faa66c66e6b7f90c356e29dafcc6c57d59059"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "135c4b0a308819139a35af0dfd67eaf86f31de5d988f69bb107b85c2c5172be8"
+        "sha256": "8160e06f7cc87fa7794c43e390b628ede05edde977c90005415931bb9c28a9fb"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "b94c5ad9d0afe6676a7e899d76ea31c44a66cd04a107fb08ff68d5bcff83642d"
-      },
-      {
-        "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "a1298506b163efb2387ff391269c2e860f8cb404a9cefd5765421ba5df2d745f"
-      },
-      {
-        "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "8ed713109895c120f84e69fff2d14d2f471d7f326c1fd5ed9f46bd91d8ef7145"
-      },
-      {
-        "path": "docs/qa/ui-live/current/card-back-fallback-web/capture-manifest.json",
-        "sha256": "8938e8b52027d2d7caf8bb647ee1a158cc4c57de3f588b82ac80d151f227976f"
-      },
-      {
-        "path": "docs/qa/ui-live/current/card-details-navigation-web/capture-manifest.json",
-        "sha256": "eafe9e737050ea9bddec2e3ca72329ba192dce3a72e09b8d0a486e4e577385d5"
+        "sha256": "a64498bdac3f4277420bdf87e2973cec214edaa096b8980edca10bb13a640274"
       }
+    ],
+    "evidence_notes": [
+      "As 160 capturas Web foram recapturadas integralmente no digest atual.",
+      "No Samsung SM-A135M, 43 capturas foram refeitas nesta rodada, incluindo todas as superfícies de deck afetadas; 11 capturas de comunidade/trades sem código alterado foram preservadas da execução física completa já aprovada.",
+      "O aparelho deixou de aparecer no ADB após o reboot de recuperação. A matriz não declara uma nova execução física monolítica de 54 checkpoints."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-28T22:18:04Z",
+    "reviewed_at": "2026-07-29T02:31:21Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -71,7 +61,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 234 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, fallback de arte e a transição preview → detalhes mantêm foco e camadas previsíveis."
+        "note": "As 214 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca e detalhes de deck mantêm foco e camadas previsíveis."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -91,11 +81,11 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide e 54 Android físico, além de 20 checkpoints direcionados; o Life Counter real foi recapturado pelo compositor nativo em landscape 2408×1080, e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide e 54 Android físico. No Android, 43 checkpoints são desta rodada e 11 superfícies não alteradas vêm da execução física completa anterior; o Life Counter permanece validado em landscape 2408×1080 e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; o teclado físico do Battle Coach passou em 9/9 checkpoints e o preview de carta fecha antes da rota completa, sem reaparecer ao voltar, em 3/3."
+        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; nesta rodada de fundação de mana, a matriz P0 atual confirmou que a navegação, o modal de criação, a busca e os detalhes do deck permanecem funcionais."
       },
       "state_coverage": {
         "status": "pass",
@@ -111,24 +101,18 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "bb198a8283b19c5197f5bfb1cadf25aee01669c10e15c8ba182aae34b5056a94",
-      "68813cfce3b8b204799beec8cbe88d41427cba45aa12a27a957325ee7a0737f2",
-      "135c4b0a308819139a35af0dfd67eaf86f31de5d988f69bb107b85c2c5172be8",
-      "b94c5ad9d0afe6676a7e899d76ea31c44a66cd04a107fb08ff68d5bcff83642d",
-      "a1298506b163efb2387ff391269c2e860f8cb404a9cefd5765421ba5df2d745f",
-      "8ed713109895c120f84e69fff2d14d2f471d7f326c1fd5ed9f46bd91d8ef7145",
-      "8938e8b52027d2d7caf8bb647ee1a158cc4c57de3f588b82ac80d151f227976f",
-      "eafe9e737050ea9bddec2e3ca72329ba192dce3a72e09b8d0a486e4e577385d5"
+      "ab1054c07a457d3fb95b5bb0cc06218be7e5d338f59dfd75ca558e24abac27ef",
+      "7aa7daa3c453ba613207c1acc71faa66c66e6b7f90c356e29dafcc6c57d59059",
+      "8160e06f7cc87fa7794c43e390b628ede05edde977c90005415931bb9c28a9fb",
+      "a64498bdac3f4277420bdf87e2973cec214edaa096b8980edca10bb13a640274"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
       "web_desktop_1440x900",
       "web_mobile_390x844",
-      "web_wide_1920x1080",
-      "android_phone",
-      "web_in_app_1280x720"
+      "web_wide_1920x1080"
     ],
-    "reviewed_screenshot_count": 234,
+    "reviewed_screenshot_count": 214,
     "blocking_findings": [],
     "follow_up_findings": [
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
@@ -139,7 +123,7 @@
   },
   "release_checks": {
     "android_talkback_human": "pending",
-    "battle_coach_web_keyboard_real": "pass",
+    "battle_coach_web_keyboard_real": "not_revalidated_optimizer_only",
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }
 }

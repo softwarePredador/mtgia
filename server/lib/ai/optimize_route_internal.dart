@@ -7,6 +7,7 @@ import 'package:postgres/postgres.dart';
 import 'optimize_complete_support.dart' as optimize_complete;
 import 'optimize_analysis_support.dart' as optimize_analysis;
 import 'optimize_route_outcome_support.dart' as optimize_route_outcome;
+import 'optimize_route_response_support.dart' as optimize_route_response;
 import 'optimize_job.dart';
 import 'optimize_runtime_support.dart';
 import 'optimize_stage_telemetry.dart';
@@ -320,6 +321,7 @@ Future<void> processCompleteModeAsync({
       () => optimize_complete.prepareCompleteCommanderSeed(
         pool: pool,
         commanders: commanders,
+        deckFormat: deckFormat,
         maxTotal: maxTotal,
         currentTotalCards: currentTotalCards,
         state: state,
@@ -474,8 +476,10 @@ Future<void> processCompleteModeAsync({
         responseBody['cache'] = {'hit': false, 'cache_key': cacheKey};
         responseBody['intensity'] = intensity.selected;
         responseBody['optimize_intensity'] = intensity.toJson(
-          returnedSwaps:
-              (responseBody['additions_detailed'] as List?)?.length ?? 0,
+          returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+            responseBody: responseBody,
+            effectiveMode: 'complete',
+          ),
         );
         responseBody['preferences'] = {
           'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
@@ -530,10 +534,10 @@ Future<void> processCompleteModeAsync({
       }
       jsonResponse['intensity'] = intensity.selected;
       jsonResponse['optimize_intensity'] = intensity.toJson(
-        returnedSwaps:
-            (jsonResponse['additions_detailed'] as List?)?.length ??
-            (jsonResponse['additions'] as List?)?.length ??
-            0,
+        returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+          responseBody: jsonResponse,
+          effectiveMode: 'complete',
+        ),
       );
       jsonResponse['timings'] = telemetry.snapshot();
       jsonResponse['stage_telemetry'] = jsonResponse['timings'];

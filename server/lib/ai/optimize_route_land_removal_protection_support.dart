@@ -1,4 +1,5 @@
 import '../basic_land_utils.dart' as basic_lands;
+import '../commander_mana_floor.dart';
 
 class OptimizeLandRemovalProtectionResult {
   final List<String> removals;
@@ -23,12 +24,13 @@ class OptimizeLandRemovalProtectionResult {
 }
 
 OptimizeLandRemovalProtectionResult applyOptimizeLandRemovalProtection({
+  required String deckFormat,
   required List<String> removals,
   required List<Map<String, dynamic>> allCardData,
   List<String> additions = const <String>[],
   List<Map<String, dynamic>> additionsCardData = const <Map<String, dynamic>>[],
   Map<String, dynamic>? profileRoleTargets,
-  int commanderMinLands = 34,
+  int? minimumLandCount,
 }) {
   final currentLandCount = allCardData.fold<int>(0, (sum, card) {
     final type = (card['type_line']?.toString() ?? '').toLowerCase();
@@ -38,8 +40,23 @@ OptimizeLandRemovalProtectionResult applyOptimizeLandRemovalProtection({
     return sum + (int.tryParse(quantity?.toString() ?? '') ?? 1);
   });
 
+  final formatMinimum = strategicMinimumLandCountForFormat(deckFormat);
+  if (formatMinimum == null) {
+    return OptimizeLandRemovalProtectionResult(
+      removals: List<String>.of(removals),
+      additions: List<String>.of(additions),
+      currentLandCount: currentLandCount,
+      projectedLandCount: currentLandCount,
+      blockedCount: 0,
+      minSafeLands: 0,
+      floorSatisfied: true,
+      protectionApplied: false,
+    );
+  }
+
   final minSafeLands = resolveOptimizeMinimumLandFloor(
-    commanderMinLands: commanderMinLands,
+    deckFormat: deckFormat,
+    minimumLandCount: minimumLandCount,
     profileRoleTargets: profileRoleTargets,
   );
   final landNamesInDeck = _landNames(allCardData);
@@ -126,33 +143,27 @@ OptimizeLandRemovalProtectionResult applyOptimizeLandRemovalProtection({
 }
 
 int resolveOptimizeMinimumLandFloor({
+  required String deckFormat,
   Map<String, dynamic>? profileRoleTargets,
-  int commanderMinLands = 34,
+  int? minimumLandCount,
 }) {
-  var floor = commanderMinLands < 34 ? 34 : commanderMinLands;
-  if (profileRoleTargets == null) return floor;
-
-  for (final entry in profileRoleTargets.entries) {
-    final key = entry.key.trim().toLowerCase().replaceAll(
-      RegExp(r'[^a-z0-9]+'),
-      '_',
-    );
-    if (key != 'land' && key != 'lands') continue;
-    final value = entry.value;
-    int? profileFloor;
-    if (value is num) {
-      profileFloor = value.round();
-    } else if (value is String) {
-      profileFloor = int.tryParse(value.trim());
-    } else if (value is Map) {
-      final rawMin = value['min'] ?? value['MIN'];
-      if (rawMin is num) {
-        profileFloor = rawMin.round();
-      } else if (rawMin is String) {
-        profileFloor = int.tryParse(rawMin.trim());
-      }
-    }
-    if (profileFloor != null && profileFloor > floor) floor = profileFloor;
+  final formatMinimumLandCount =
+      strategicMinimumLandCountForFormat(deckFormat) ??
+      commanderStrategicMinimumLandCount;
+  final maximumAutomaticLandFloor = strategicMaximumAutomaticLandFloorForFormat(
+    deckFormat,
+  );
+  var floor = (minimumLandCount ?? formatMinimumLandCount).clamp(
+    formatMinimumLandCount,
+    maximumAutomaticLandFloor,
+  );
+  final profilePolicy = resolveOptimizationProfileLandPolicy(
+    format: deckFormat,
+    roleTargets: profileRoleTargets,
+  );
+  final profileFloor = profilePolicy?.minimumLandCount;
+  if (profileFloor != null && profileFloor > floor) {
+    floor = profileFloor;
   }
   return floor;
 }

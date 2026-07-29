@@ -684,7 +684,7 @@ void main() {
 
         expect(
           optimizeResponse.statusCode,
-          anyOf(equals(200), equals(422)),
+          equals(200),
           reason: optimizeResponse.body,
         );
 
@@ -694,6 +694,16 @@ void main() {
           equals('complete'),
           reason:
               'Deck com 1 carta deve entrar em complete mode para reproduzir fluxo do app.',
+        );
+        expect(
+          optimizeBody['outcome_code'],
+          equals('deck_completed'),
+          reason: optimizeResponse.body,
+        );
+        expect(
+          optimizeBody['can_apply'],
+          isNot(false),
+          reason: optimizeResponse.body,
         );
 
         final additionsDetailed =
@@ -708,6 +718,30 @@ void main() {
           isNotEmpty,
           reason:
               'complete mode sem additions_detailed não é aplicável no app.',
+        );
+        final targetAdditions =
+            (optimizeBody['target_additions'] as num?)?.toInt();
+        final physicalAdditions = additionsDetailed.fold<int>(
+          0,
+          (sum, item) => sum + ((item['quantity'] as num?)?.toInt() ?? 0),
+        );
+        expect(targetAdditions, equals(99), reason: optimizeResponse.body);
+        expect(
+          physicalAdditions,
+          equals(targetAdditions),
+          reason: optimizeResponse.body,
+        );
+        final previewPostAnalysis =
+            (optimizeBody['post_analysis'] as Map?)?.cast<String, dynamic>() ??
+            {};
+        final previewTypeDistribution =
+            (previewPostAnalysis['type_distribution'] as Map?)
+                ?.cast<String, dynamic>() ??
+            {};
+        expect(
+          (previewTypeDistribution['lands'] as num?)?.toInt(),
+          inInclusiveRange(34, 42),
+          reason: optimizeResponse.body,
         );
 
         final bulkCards =
@@ -726,10 +760,37 @@ void main() {
           isNotEmpty,
           reason: 'Nenhuma carta com card_id retornada para bulk save.',
         );
+        final swapIntegrity =
+            (optimizeBody['swap_integrity'] as Map?)?.cast<String, dynamic>() ??
+            {};
+        final deckSignature =
+            swapIntegrity['deck_signature']?.toString().trim() ?? '';
+        expect(deckSignature, isNotEmpty, reason: optimizeResponse.body);
+        final mutationContext = <String, dynamic>{
+          'type': 'optimization_apply',
+          'source': 'optimize_preview',
+          'schema_version': 'optimize_apply_context_v2_2026-07-28',
+          'mode': 'complete',
+          'intensity': optimizeBody['intensity'] ?? 'focused',
+          'archetype': 'Control',
+          'bracket': 2,
+          'selected_change_count': physicalAdditions,
+          'selected_entry_count': additionsDetailed.length,
+          'preview_change_count': physicalAdditions,
+          'preview_entry_count': additionsDetailed.length,
+          'selection_scope': 'full_preview',
+          'expected_deck_signature': deckSignature,
+          'removals': const <Map<String, dynamic>>[],
+          'additions': additionsDetailed,
+          'before_snapshot': optimizeBody['deck_analysis'],
+          'preview_post_analysis': optimizeBody['post_analysis'],
+          'optimization_contract': optimizeBody['optimization_contract'],
+          'battle_validation': optimizeBody['battle_validation'],
+        };
 
         final bulkResponse = await postJsonWithRetry(
           '/decks/$deckId/cards/bulk',
-          {'cards': bulkCards},
+          {'cards': bulkCards, 'mutation_context': mutationContext},
         );
 
         expect(
@@ -738,6 +799,52 @@ void main() {
           reason:
               'Bulk save falhou após optimize complete. body=${bulkResponse.body}',
         );
+        final bulkBody = decodeJson(bulkResponse);
+        expect(bulkBody['total_cards'], 100, reason: bulkResponse.body);
+        final appliedPostAnalysis =
+            (bulkBody['post_analysis'] as Map?)?.cast<String, dynamic>() ?? {};
+        final appliedTypeDistribution =
+            (appliedPostAnalysis['type_distribution'] as Map?)
+                ?.cast<String, dynamic>() ??
+            {};
+        final appliedLandCount =
+            (appliedTypeDistribution['lands'] as num?)?.toInt();
+        expect(
+          appliedLandCount,
+          inInclusiveRange(34, 42),
+          reason: bulkResponse.body,
+        );
+        final event =
+            (bulkBody['optimization_event'] as Map?)?.cast<String, dynamic>() ??
+            {};
+        expect(
+          (event['selected_change_count'] as num?)?.toInt(),
+          physicalAdditions,
+          reason: bulkResponse.body,
+        );
+
+        final persistedDeck = await fetchDeckDetails(deckId);
+        expect(persistedDeck, isNotNull);
+        final persistedCards =
+            (persistedDeck!['all_cards_flat'] as List?)
+                ?.whereType<Map>()
+                .map((card) => card.cast<String, dynamic>())
+                .toList(growable: false) ??
+            const <Map<String, dynamic>>[];
+        final persistedTotal = persistedCards.fold<int>(
+          0,
+          (sum, card) => sum + ((card['quantity'] as num?)?.toInt() ?? 0),
+        );
+        final persistedLands = persistedCards
+            .where(
+              (card) => isLandTypeLine(card['type_line']?.toString() ?? ''),
+            )
+            .fold<int>(
+              0,
+              (sum, card) => sum + ((card['quantity'] as num?)?.toInt() ?? 0),
+            );
+        expect(persistedTotal, 100);
+        expect(persistedLands, appliedLandCount);
       },
       skip: skipIntegration,
       timeout: const Timeout(Duration(minutes: 8)),
@@ -824,6 +931,23 @@ void main() {
                       false,
                 )
                 .toList();
+        final landCount = landCards.fold<int>(
+          0,
+          (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+        );
+        expect(landCount, greaterThanOrEqualTo(34), reason: response.body);
+        expect(landCount, lessThanOrEqualTo(42), reason: response.body);
+        final postAnalysis =
+            (body['post_analysis'] as Map?)?.cast<String, dynamic>() ?? {};
+        final typeDistribution =
+            (postAnalysis['type_distribution'] as Map?)
+                ?.cast<String, dynamic>() ??
+            {};
+        expect(
+          (typeDistribution['lands'] as num?)?.toInt(),
+          landCount,
+          reason: response.body,
+        );
         final utilityColorlessLands =
             landCards.where((card) {
               final name = (card['name'] as String?)?.toLowerCase() ?? '';

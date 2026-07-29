@@ -8,13 +8,37 @@ int countOptimizeResponseSwaps({
 }) {
   final mode = responseBody['mode']?.toString() ?? effectiveMode;
   if (mode == 'complete') {
-    return (responseBody['additions_detailed'] as List?)?.length ??
-        (responseBody['additions'] as List?)?.length ??
-        0;
+    final detailed = responseBody['additions_detailed'];
+    if (detailed is List) {
+      return countOptimizeDetailedPhysicalCards(detailed);
+    }
+    return (responseBody['additions'] as List?)?.length ?? 0;
   }
   final removalsCount = (responseBody['removals'] as List?)?.length ?? 0;
   final additionsCount = (responseBody['additions'] as List?)?.length ?? 0;
   return removalsCount < additionsCount ? removalsCount : additionsCount;
+}
+
+int countOptimizeDetailedPhysicalCards(Iterable<dynamic> detailed) {
+  var total = 0;
+  for (final raw in detailed) {
+    if (raw is! Map) {
+      total += 1;
+      continue;
+    }
+    final rawQuantity = raw['quantity'];
+    final quantity = switch (rawQuantity) {
+      null => 1,
+      int value => value,
+      num value when value == value.roundToDouble() => value.toInt(),
+      String value => int.tryParse(value.trim()),
+      _ => null,
+    };
+    if (quantity != null && quantity > 0) {
+      total += quantity;
+    }
+  }
+  return total;
 }
 
 Map<String, dynamic>? buildCachedOptimizeResponse({

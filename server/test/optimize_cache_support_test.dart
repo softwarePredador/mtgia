@@ -9,6 +9,7 @@ void main() {
     test('buildOptimizeCacheKey is stable and separates intensity', () {
       final focused = cache_support.buildOptimizeCacheKey(
         deckId: 'deck-1',
+        deckFormat: 'commander',
         archetype: ' Spellslinger ',
         mode: ' Optimize ',
         bracket: 3,
@@ -19,6 +20,7 @@ void main() {
 
       final focusedAgain = cache_support.buildOptimizeCacheKey(
         deckId: 'deck-1',
+        deckFormat: 'commander',
         archetype: 'spellslinger',
         mode: 'optimize',
         bracket: 3,
@@ -29,6 +31,7 @@ void main() {
 
       final aggressive = cache_support.buildOptimizeCacheKey(
         deckId: 'deck-1',
+        deckFormat: 'commander',
         archetype: 'spellslinger',
         mode: 'optimize',
         bracket: 3,
@@ -37,7 +40,7 @@ void main() {
         intensity: 'aggressive',
       );
 
-      expect(focused, startsWith('v10:'));
+      expect(focused, startsWith('v12:'));
       expect(focused, equals(focusedAgain));
       expect(aggressive, isNot(equals(focused)));
     });
@@ -47,6 +50,7 @@ void main() {
       () {
         final withoutContext = cache_support.buildOptimizeCacheKey(
           deckId: 'deck-1',
+          deckFormat: 'commander',
           archetype: 'control',
           mode: 'optimize',
           bracket: 2,
@@ -57,6 +61,7 @@ void main() {
 
         final explicitEmptyContext = cache_support.buildOptimizeCacheKey(
           deckId: 'deck-1',
+          deckFormat: 'commander',
           archetype: 'control',
           mode: 'optimize',
           bracket: 2,
@@ -68,6 +73,7 @@ void main() {
 
         final withContext = cache_support.buildOptimizeCacheKey(
           deckId: 'deck-1',
+          deckFormat: 'commander',
           archetype: 'control',
           mode: 'optimize',
           bracket: 2,
@@ -86,6 +92,7 @@ void main() {
     test('runtime wrapper delegates to extracted cache key implementation', () {
       final direct = cache_support.buildOptimizeCacheKey(
         deckId: 'deck-2',
+        deckFormat: 'brawl',
         archetype: 'control',
         mode: 'complete',
         bracket: null,
@@ -97,6 +104,7 @@ void main() {
 
       final wrapped = runtime_support.buildOptimizeCacheKey(
         deckId: 'deck-2',
+        deckFormat: 'brawl',
         archetype: 'control',
         mode: 'complete',
         bracket: null,
@@ -109,22 +117,57 @@ void main() {
       expect(wrapped, equals(direct));
     });
 
-    test('deck signature includes physical condition with NM fallback', () {
-      final rows = [
-        _optimizeResultRow(cardId: 'card-b', quantity: 2, condition: 'lp'),
-        _optimizeResultRow(cardId: 'card-a', quantity: 1, condition: 'HP'),
-        _legacyOptimizeResultRow(cardId: 'card-c', quantity: 1),
-      ];
+    test('cache keys cannot cross Commander and Brawl', () {
+      String build(String format) => cache_support.buildOptimizeCacheKey(
+        deckId: 'deck-3',
+        deckFormat: format,
+        archetype: 'midrange',
+        mode: 'optimize',
+        bracket: 2,
+        keepTheme: true,
+        deckSignature: 'same:1:NM:commander',
+      );
 
-      expect(
-        cache_support.buildOptimizeDeckSignature(rows),
-        'card-a:1:HP|card-b:2:LP|card-c:1:NM',
-      );
-      expect(
-        runtime_support.buildOptimizeDeckSignature(rows),
-        'card-a:1:HP|card-b:2:LP|card-c:1:NM',
-      );
+      expect(build('commander'), isNot(build('brawl')));
     });
+
+    test(
+      'deck signature includes condition and commander role with NM fallback',
+      () {
+        final rows = [
+          _optimizeResultRow(cardId: 'card-b', quantity: 2, condition: 'lp'),
+          _optimizeResultRow(
+            cardId: 'card-a',
+            quantity: 1,
+            condition: 'HP',
+            isCommander: true,
+          ),
+          _legacyOptimizeResultRow(cardId: 'card-c', quantity: 1),
+        ];
+
+        expect(
+          cache_support.buildOptimizeDeckSignature(rows),
+          'card-a:1:HP:commander|card-b:2:LP:main|card-c:1:NM:main',
+        );
+        expect(
+          runtime_support.buildOptimizeDeckSignature(rows),
+          'card-a:1:HP:commander|card-b:2:LP:main|card-c:1:NM:main',
+        );
+        expect(
+          cache_support.buildOptimizeDeckSignature([
+            _optimizeResultRow(cardId: 'card-a', quantity: 1, condition: 'HP'),
+            _optimizeResultRow(
+              cardId: 'card-b',
+              quantity: 2,
+              condition: 'lp',
+              isCommander: true,
+            ),
+            _legacyOptimizeResultRow(cardId: 'card-c', quantity: 1),
+          ]),
+          isNot(cache_support.buildOptimizeDeckSignature(rows)),
+        );
+      },
+    );
 
     test('stableOptimizeHash returns deterministic lowercase hex', () {
       final first = cache_support.stableOptimizeHash('mana-loom');
@@ -141,10 +184,11 @@ ResultRow _optimizeResultRow({
   required String cardId,
   required int quantity,
   required String condition,
+  bool isCommander = false,
 }) {
   return _row([
     'Test Card',
-    false,
+    isCommander,
     quantity,
     'Artifact',
     '{2}',

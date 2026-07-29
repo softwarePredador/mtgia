@@ -34,7 +34,26 @@ void main() {
       );
       expect(
         DeckOptimizationHistoryService.buildDeckSignature(first),
-        'card-a:1:NM|card-b:2:LP',
+        'card-a:1:NM:commander|card-b:2:LP:main',
+      );
+      expect(
+        DeckOptimizationHistoryService.buildDeckSignature(first),
+        isNot(
+          DeckOptimizationHistoryService.buildDeckSignature(const [
+            {
+              'card_id': 'card-a',
+              'quantity': 1,
+              'is_commander': false,
+              'condition': 'NM',
+            },
+            {
+              'card_id': 'card-b',
+              'quantity': 2,
+              'is_commander': true,
+              'condition': 'LP',
+            },
+          ]),
+        ),
       );
     });
 
@@ -91,8 +110,8 @@ void main() {
 
       final before = normalized['before_snapshot'] as Map;
       final after = normalized['after_snapshot'] as Map;
-      expect(before['signature'], 'old-card:1:NM');
-      expect(after['signature'], 'new-card:1:NM');
+      expect(before['signature'], 'old-card:1:NM:main');
+      expect(after['signature'], 'new-card:1:NM:main');
       expect((before['cards'] as List), hasLength(1));
       expect((after['cards'] as List), hasLength(1));
       expect((before['analysis'] as Map)['average_cmc'], 3.2);

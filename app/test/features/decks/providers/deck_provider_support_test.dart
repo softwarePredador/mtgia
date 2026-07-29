@@ -230,58 +230,79 @@ void main() {
     expect(before, isNot(after));
   });
 
-  test('buildDeckOptimizationSignature includes physical condition codes', () {
-    final deck = DeckDetails(
-      id: 'deck-1',
-      name: 'Deck',
-      format: 'commander',
-      isPublic: false,
-      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-      stats: const {'total_cards': 3},
-      commander: [
-        DeckCardItem(
-          id: 'cmd-1',
-          name: 'Talrand',
-          typeLine: 'Legendary Creature',
-          setCode: 'tst',
-          rarity: 'rare',
-          quantity: 1,
-          isCommander: true,
-          condition: CardCondition.hp,
-        ),
-      ],
-      mainBoard: {
-        'Artifacts': [
+  test(
+    'buildDeckOptimizationSignature includes condition and commander role',
+    () {
+      final deck = DeckDetails(
+        id: 'deck-1',
+        name: 'Deck',
+        format: 'commander',
+        isPublic: false,
+        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+        stats: const {'total_cards': 3},
+        commander: [
           DeckCardItem(
-            id: 'card-1',
-            name: 'Mind Stone',
-            typeLine: 'Artifact',
+            id: 'cmd-1',
+            name: 'Talrand',
+            typeLine: 'Legendary Creature',
             setCode: 'tst',
-            rarity: 'uncommon',
-            quantity: 2,
-            isCommander: false,
-            condition: CardCondition.lp,
+            rarity: 'rare',
+            quantity: 1,
+            isCommander: true,
+            condition: CardCondition.hp,
           ),
         ],
-      },
-    );
+        mainBoard: {
+          'Artifacts': [
+            DeckCardItem(
+              id: 'card-1',
+              name: 'Mind Stone',
+              typeLine: 'Artifact',
+              setCode: 'tst',
+              rarity: 'uncommon',
+              quantity: 2,
+              isCommander: false,
+              condition: CardCondition.lp,
+            ),
+          ],
+        },
+      );
 
-    final changedCondition = deck.copyWith(
-      mainBoard: {
-        'Artifacts': [
+      final changedCondition = deck.copyWith(
+        mainBoard: {
+          'Artifacts': [
+            deck.mainBoard['Artifacts']!.single.copyWith(
+              condition: CardCondition.nm,
+            ),
+          ],
+        },
+      );
+      final swappedCommander = deck.copyWith(
+        commander: [
           deck.mainBoard['Artifacts']!.single.copyWith(
-            condition: CardCondition.nm,
+            quantity: 2,
+            isCommander: true,
           ),
         ],
-      },
-    );
+        mainBoard: {
+          'Creatures': [deck.commander.single.copyWith(isCommander: false)],
+        },
+      );
 
-    expect(buildDeckOptimizationSignature(deck), 'card-1:2:LP|cmd-1:1:HP');
-    expect(
-      buildDeckOptimizationSignature(changedCondition),
-      isNot(buildDeckOptimizationSignature(deck)),
-    );
-  });
+      expect(
+        buildDeckOptimizationSignature(deck),
+        'card-1:2:LP:main|cmd-1:1:HP:commander',
+      );
+      expect(
+        buildDeckOptimizationSignature(changedCondition),
+        isNot(buildDeckOptimizationSignature(deck)),
+      );
+      expect(
+        buildDeckOptimizationSignature(swappedCommander),
+        isNot(buildDeckOptimizationSignature(deck)),
+      );
+    },
+  );
 
   test('buildCurrentCardsMap preserves physical condition codes', () {
     final deck = DeckDetails(
@@ -388,6 +409,142 @@ void main() {
     expect(byId['remove-1']?['quantity'], 1);
     expect(byId['remove-1']?['condition'], 'LP');
     expect(byId['add-1']?['condition'], isNull);
+  });
+
+  test('buildOptimizedCardPayload applies exact detailed quantities', () {
+    final deck = DeckDetails(
+      id: 'deck-1',
+      name: 'Deck',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+      stats: const {'total_cards': 4},
+      commander: [
+        DeckCardItem(
+          id: 'cmd-1',
+          name: 'Talrand',
+          typeLine: 'Legendary Creature',
+          setCode: 'tst',
+          rarity: 'rare',
+          quantity: 1,
+          isCommander: true,
+        ),
+      ],
+      mainBoard: {
+        'Artifacts': [
+          DeckCardItem(
+            id: 'remove-1',
+            name: 'Mind Stone',
+            typeLine: 'Artifact',
+            setCode: 'tst',
+            rarity: 'uncommon',
+            quantity: 3,
+            isCommander: false,
+          ),
+        ],
+      },
+    );
+
+    final payload = buildOptimizedCardPayload(
+      deck: deck,
+      removalsDetailed: const [
+        {'card_id': 'remove-1', 'name': 'Mind Stone', 'quantity': 2},
+      ],
+      additionsDetailed: const [
+        {
+          'card_id': 'plains-1',
+          'name': 'Plains',
+          'type_line': 'Basic Land — Plains',
+          'quantity': 25,
+          'is_basic_land': true,
+        },
+      ],
+    );
+    final byId = {for (final card in payload) card['card_id'] as String: card};
+
+    expect(byId['remove-1']?['quantity'], 1);
+    expect(byId['plains-1']?['quantity'], 25);
+  });
+
+  test('buildOptimizedCardPayload rejects stale or commander removals', () {
+    final deck = DeckDetails(
+      id: 'deck-1',
+      name: 'Deck',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+      stats: const {'total_cards': 2},
+      commander: [
+        DeckCardItem(
+          id: 'cmd-1',
+          name: 'Talrand',
+          typeLine: 'Legendary Creature',
+          setCode: 'tst',
+          rarity: 'rare',
+          quantity: 1,
+          isCommander: true,
+        ),
+      ],
+      mainBoard: {
+        'Artifacts': [
+          DeckCardItem(
+            id: 'keep-1',
+            name: 'Sol Ring',
+            typeLine: 'Artifact',
+            setCode: 'tst',
+            rarity: 'rare',
+            quantity: 1,
+            isCommander: false,
+          ),
+        ],
+      },
+    );
+
+    expect(
+      () => buildOptimizedCardPayload(
+        deck: deck,
+        removalsDetailed: const [
+          {'card_id': 'missing-1', 'quantity': 1},
+        ],
+        additionsDetailed: const [],
+      ),
+      throwsStateError,
+    );
+    expect(
+      () => buildOptimizedCardPayload(
+        deck: deck,
+        removalsDetailed: const [
+          {'name': 'Sol Ring', 'quantity': 1},
+        ],
+        additionsDetailed: const [],
+      ),
+      throwsStateError,
+    );
+    expect(
+      () => buildOptimizedCardPayload(
+        deck: deck,
+        removalsDetailed: const [
+          {'card_id': 'cmd-1', 'quantity': 1},
+        ],
+        additionsDetailed: const [],
+      ),
+      throwsStateError,
+    );
+    expect(
+      () => buildOptimizedCardPayload(
+        deck: deck,
+        removalsDetailed: const [],
+        additionsDetailed: const [
+          {
+            'card_id': 'new-nonbasic',
+            'name': 'Arcane Signet',
+            'type_line': 'Artifact',
+            'quantity': 2,
+          },
+        ],
+      ),
+      throwsStateError,
+    );
   });
 
   test(

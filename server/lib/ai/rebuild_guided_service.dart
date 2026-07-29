@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 
 import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
+import '../commander_mana_floor.dart';
 import '../deck_rules_service.dart';
 import '../deck_schema_support.dart';
 import '../edh_bracket_policy.dart';
@@ -153,6 +154,7 @@ class RebuildGuidedService {
         DeckArchetypeAnalyzer(
           originalDeck,
           deckColors.toList(),
+          deckFormat: deckFormat,
         ).generateAnalysis();
     final deckStateBefore = assessDeckOptimizationState(
       cards: originalDeck,
@@ -172,15 +174,21 @@ class RebuildGuidedService {
       );
     }
 
-    final commanderData = await _edhrecService.fetchCommanderData(
-      commanderName,
+    final useCommanderReferenceSources = rebuildUsesCommanderReferenceSources(
+      deckFormat,
     );
-    final averageDeckData = await _edhrecService.fetchAverageDeckData(
-      commanderName,
-    );
-    final cachedProfile = await _loadCommanderReferenceProfileFromCache(
-      commanderName,
-    );
+    final commanderData =
+        useCommanderReferenceSources
+            ? await _edhrecService.fetchCommanderData(commanderName)
+            : null;
+    final averageDeckData =
+        useCommanderReferenceSources
+            ? await _edhrecService.fetchAverageDeckData(commanderName)
+            : null;
+    final cachedProfile =
+        useCommanderReferenceSources
+            ? await _loadCommanderReferenceProfileFromCache(commanderName)
+            : null;
 
     final resolvedTheme = _resolveTheme(
       requestedTheme: requestedTheme,
@@ -253,6 +261,7 @@ class RebuildGuidedService {
       originalDeck: originalDeck,
       scopeDecision: scopeDecision,
       weightedCandidates: weightedCandidates,
+      currentCardScores: currentCardScores,
       targetProfile: targetProfile,
       commanderColorIdentity: commanderColorIdentity,
       deckFormat: deckFormat,
@@ -264,6 +273,29 @@ class RebuildGuidedService {
       basicLandCatalog: basicLandCatalog,
     );
     _assertResolvedCardIds(rebuiltCards);
+    final manaFoundation = assessCommanderManaFloor(
+      format: deckFormat,
+      cards: rebuiltCards,
+      minimumLandCount: targetProfile.landCount,
+    );
+    final maximumLandCount = strategicMaximumAutomaticLandFloorForFormat(
+      deckFormat,
+    );
+    if (!manaFoundation.satisfied ||
+        manaFoundation.landCount > maximumLandCount) {
+      throw RebuildException(
+        'O rebuild gerou ${manaFoundation.landCount} terrenos; a fundacao de '
+        'mana segura para ${manaFoundationFormatLabel(deckFormat)} exige entre '
+        '${manaFoundation.minimumLandCount} e $maximumLandCount antes de criar '
+        'um draft.',
+      );
+    }
+    if (manaFoundation.totalCardCount != targetProfile.totalCards) {
+      throw RebuildException(
+        'O rebuild gerou ${manaFoundation.totalCardCount} cartas em vez de '
+        '${targetProfile.totalCards}. Nenhum draft foi criado.',
+      );
+    }
 
     await _pool.runTx(
       (session) => DeckRulesService(session).validateAndThrow(
@@ -292,6 +324,7 @@ class RebuildGuidedService {
         DeckArchetypeAnalyzer(
           rebuiltCards,
           rebuiltDeckColors.toList(),
+          deckFormat: deckFormat,
         ).generateAnalysis();
     final deckStateAfter = assessDeckOptimizationState(
       cards: rebuiltCards,
@@ -350,6 +383,16 @@ class RebuildGuidedService {
         'used_edhrec_top_cards': commanderData != null,
         'used_cached_commander_profile': cachedProfile != null,
         'candidate_pool_size': weightedCandidates.length,
+        'mana_foundation': {
+          ...buildOptimizationManaFoundationContract(
+            format: deckFormat,
+            minimumLandCount: manaFoundation.minimumLandCount,
+            landCount: manaFoundation.landCount,
+            satisfied: manaFoundation.satisfied,
+          ),
+          'target_land_count': targetProfile.landCount,
+          'maximum_automatic_land_count': maximumLandCount,
+        },
         'ramp_profile_before': rampProfileBefore.toJson(),
         'ramp_profile_after': rampProfileAfter.toJson(),
       },
@@ -367,6 +410,22 @@ class RebuildGuidedService {
     required String resolvedTheme,
     required String selectedScope,
   }) async {
+    final manaFoundation = assessCommanderManaFloor(
+      format: deckFormat,
+      cards: rebuiltCards,
+    );
+    final maximumLandCount = strategicMaximumAutomaticLandFloorForFormat(
+      deckFormat,
+    );
+    if (!manaFoundation.satisfied ||
+        manaFoundation.landCount > maximumLandCount) {
+      throw RebuildException(
+        'O draft nao foi salvo: a fundacao de mana tem '
+        '${manaFoundation.landCount} terrenos e precisa permanecer entre '
+        '${manaFoundation.minimumLandCount} e $maximumLandCount.',
+      );
+    }
+
     final hasMeta = await hasDeckMetaColumns(_pool);
     final draftName = 'Rebuild Draft - $sourceDeckName';
 
@@ -441,14 +500,22 @@ class RebuildGuidedService {
             : const <String, int>{};
 
     final totalCards = deckFormat == 'brawl' ? 60 : 100;
-    final recommendedLands =
-        _toInt(recommendedStructure['lands']) ??
-        _deriveRecommendedLands(
-          deckFormat: deckFormat,
-          requestedArchetype: requestedArchetype,
-          resolvedTheme: resolvedTheme,
-          commanderData: commanderData,
-        );
+    final roleTargets =
+        cachedProfile?['role_targets'] is Map
+            ? (cachedProfile!['role_targets'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
+    final derivedLands = _deriveRecommendedLands(
+      deckFormat: deckFormat,
+      requestedArchetype: requestedArchetype,
+      resolvedTheme: resolvedTheme,
+      commanderData: commanderData,
+    );
+    final recommendedLands = resolveRebuildGuidedLandTarget(
+      format: deckFormat,
+      derivedTarget: derivedLands,
+      recommendedStructure: recommendedStructure,
+      roleTargets: roleTargets,
+    );
 
     var ramp = 10;
     var drawSelection = 12;
@@ -954,6 +1021,7 @@ class RebuildGuidedService {
     required List<Map<String, dynamic>> originalDeck,
     required RebuildScopeDecision scopeDecision,
     required List<_WeightedCard> weightedCandidates,
+    required Map<String, int> currentCardScores,
     required RebuildTargetProfile targetProfile,
     required Set<String> commanderColorIdentity,
     required String deckFormat,
@@ -991,10 +1059,19 @@ class RebuildGuidedService {
       selected[name] = Map<String, dynamic>.from(card);
     }
 
+    final candidatePool = _withOriginalNonLandFallbackCandidates(
+      weightedCandidates: weightedCandidates,
+      cutCards: scopeDecision.cutCards,
+      currentCardScores: currentCardScores,
+      commanderColorIdentity: commanderColorIdentity,
+      resolvedArchetype: resolvedArchetype,
+      resolvedTheme: resolvedTheme,
+      mustAvoid: mustAvoid,
+    );
     final currentCardsForBracket =
         selected.values.map((card) => Map<String, dynamic>.from(card)).toList();
     final candidateCardsOrdered =
-        weightedCandidates.map((item) => item.card).toList();
+        candidatePool.map((item) => item.card).toList();
     final bracketAllowedNames = <String>{};
     if (bracket != null) {
       final decision = applyBracketPolicyToAdditions(
@@ -1016,7 +1093,7 @@ class RebuildGuidedService {
     final coloredLandCandidates = <_WeightedCard>[];
     final utilityLandCandidates = <_WeightedCard>[];
     final nonLandCandidates = <_WeightedCard>[];
-    for (final candidate in weightedCandidates) {
+    for (final candidate in candidatePool) {
       final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
       if (!bracketAllowedNames.contains(lower)) continue;
       if (selected.containsKey(lower)) continue;
@@ -1140,12 +1217,14 @@ class RebuildGuidedService {
       }
     }
 
-    _addBasicLandsUntilDeckComplete(
-      selected: selected,
-      targetTotal: maxTotal,
-      commanderColorIdentity: commanderColorIdentity,
-      basicLandCatalog: basicLandCatalog,
-    );
+    final selectedTotal = _totalCards(selected.values.toList());
+    if (selectedTotal < maxTotal) {
+      throw RebuildException(
+        'O catalogo seguro nao possui cartas nao-terreno suficientes para '
+        'concluir o rebuild: faltam ${maxTotal - selectedTotal} cartas. '
+        'Nenhum draft foi criado.',
+      );
+    }
 
     var assembled = selected.values
         .map((card) => Map<String, dynamic>.from(card))
@@ -1157,12 +1236,15 @@ class RebuildGuidedService {
       resolvedTheme: resolvedTheme,
     );
     if (_totalCards(assembled) > maxTotal) {
-      assembled = _trimDeckToTarget(
-        cards: assembled,
-        targetTotal: maxTotal,
-        resolvedArchetype: resolvedArchetype,
-        resolvedTheme: resolvedTheme,
-      );
+      try {
+        assembled = trimRebuildGuidedDeckToTarget(
+          cards: assembled,
+          targetTotal: maxTotal,
+          minimumLandCount: targetProfile.landCount,
+        );
+      } on StateError catch (error) {
+        throw RebuildException(error.message.toString());
+      }
     }
 
     assembled.sort((a, b) {
@@ -1175,6 +1257,66 @@ class RebuildGuidedService {
       );
     });
     return assembled;
+  }
+
+  List<_WeightedCard> _withOriginalNonLandFallbackCandidates({
+    required List<_WeightedCard> weightedCandidates,
+    required Iterable<Map<String, dynamic>> cutCards,
+    required Map<String, int> currentCardScores,
+    required Set<String> commanderColorIdentity,
+    required String resolvedArchetype,
+    required String resolvedTheme,
+    required Set<String> mustAvoid,
+  }) {
+    final merged = <_WeightedCard>[...weightedCandidates];
+    final seenNames = {
+      for (final candidate in weightedCandidates)
+        ((candidate.card['name'] as String?) ?? '').trim().toLowerCase(),
+    };
+    final originalFallbacks = <_WeightedCard>[];
+
+    for (final original in cutCards) {
+      if (original['is_commander'] == true || _isLandCard(original)) continue;
+      final name = (original['name'] as String?)?.trim() ?? '';
+      final lower = name.toLowerCase();
+      if (lower.isEmpty ||
+          seenNames.contains(lower) ||
+          mustAvoid.contains(lower)) {
+        continue;
+      }
+      final identity = _extractIdentity(original);
+      if (identity.isNotEmpty &&
+          identity.difference(commanderColorIdentity).isNotEmpty) {
+        continue;
+      }
+      final role = _normalizedRoleForCard(
+        original,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
+      originalFallbacks.add(
+        _WeightedCard(
+          card: {
+            ...Map<String, dynamic>.from(original),
+            'quantity': 1,
+            'is_commander': false,
+          },
+          weight: currentCardScores[lower] ?? 0,
+          role: role,
+        ),
+      );
+      seenNames.add(lower);
+    }
+
+    originalFallbacks.sort((a, b) {
+      final byWeight = b.weight.compareTo(a.weight);
+      if (byWeight != 0) return byWeight;
+      return ((a.card['name'] as String?) ?? '').compareTo(
+        (b.card['name'] as String?) ?? '',
+      );
+    });
+    merged.addAll(originalFallbacks);
+    return merged;
   }
 
   List<Map<String, dynamic>> _rebalanceMonoColorManaBase({
@@ -1578,24 +1720,6 @@ class RebuildGuidedService {
     }
   }
 
-  void _addBasicLandsUntilDeckComplete({
-    required Map<String, Map<String, dynamic>> selected,
-    required int targetTotal,
-    required Set<String> commanderColorIdentity,
-    required Map<String, Map<String, dynamic>> basicLandCatalog,
-  }) {
-    final currentTotal = _totalCards(selected.values.toList());
-    if (currentTotal >= targetTotal) return;
-    final basics = _buildBasicLandDistribution(
-      missing: targetTotal - currentTotal,
-      commanderColorIdentity: commanderColorIdentity,
-      basicLandCatalog: basicLandCatalog,
-    );
-    for (final basic in basics) {
-      _addCardToSelection(selected, basic);
-    }
-  }
-
   List<Map<String, dynamic>> _buildBasicLandDistribution({
     required int missing,
     required Set<String> commanderColorIdentity,
@@ -1689,56 +1813,6 @@ class RebuildGuidedService {
       if (_isLandCard(card)) return sum;
       return sum + ((card['quantity'] as int?) ?? 1);
     });
-  }
-
-  List<Map<String, dynamic>> _trimDeckToTarget({
-    required List<Map<String, dynamic>> cards,
-    required int targetTotal,
-    required String resolvedArchetype,
-    required String resolvedTheme,
-  }) {
-    final mutable =
-        cards.map((card) => Map<String, dynamic>.from(card)).toList();
-    mutable.sort((a, b) {
-      final commanderA = a['is_commander'] == true ? 0 : 1;
-      final commanderB = b['is_commander'] == true ? 0 : 1;
-      final byCommander = commanderB.compareTo(commanderA);
-      if (byCommander != 0) return byCommander;
-      final roleA = _normalizedRoleForCard(
-        a,
-        resolvedArchetype: resolvedArchetype,
-        resolvedTheme: resolvedTheme,
-      );
-      final roleB = _normalizedRoleForCard(
-        b,
-        resolvedArchetype: resolvedArchetype,
-        resolvedTheme: resolvedTheme,
-      );
-      final removableA = roleA == 'land' ? 0 : 1;
-      final removableB = roleB == 'land' ? 0 : 1;
-      final byRole = removableA.compareTo(removableB);
-      if (byRole != 0) return byRole;
-      return ((a['name'] as String?) ?? '').compareTo(
-        (b['name'] as String?) ?? '',
-      );
-    });
-
-    while (_totalCards(mutable) > targetTotal) {
-      final idx = mutable.indexWhere(
-        (card) =>
-            card['is_commander'] != true &&
-            ((card['quantity'] as int?) ?? 1) > 0,
-      );
-      if (idx == -1) break;
-      final quantity = (mutable[idx]['quantity'] as int?) ?? 1;
-      if (quantity <= 1) {
-        mutable.removeAt(idx);
-      } else {
-        mutable[idx]['quantity'] = quantity - 1;
-      }
-    }
-
-    return mutable;
   }
 
   Future<Map<String, dynamic>?> _loadCommanderReferenceProfileFromCache(

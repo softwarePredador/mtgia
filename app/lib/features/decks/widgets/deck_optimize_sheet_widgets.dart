@@ -313,6 +313,40 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   int get _selectedChangeCount =>
       _selectedRemovalIndexes.length + _selectedAdditionIndexes.length;
 
+  int _quantityOf(Map<String, dynamic> item) {
+    final raw = item['quantity'];
+    final parsed = switch (raw) {
+      null => 1,
+      int() => raw,
+      num() when raw == raw.roundToDouble() => raw.toInt(),
+      String() => int.tryParse(raw.trim()),
+      _ => null,
+    };
+    return parsed != null && parsed > 0 ? parsed : 1;
+  }
+
+  int _physicalCount(
+    List<Map<String, dynamic>> items, [
+    Set<int>? selectedIndexes,
+  ]) {
+    var count = 0;
+    for (var index = 0; index < items.length; index++) {
+      if (selectedIndexes != null && !selectedIndexes.contains(index)) {
+        continue;
+      }
+      count += _quantityOf(items[index]);
+    }
+    return count;
+  }
+
+  bool get _isPartialSelection =>
+      _selectedRemovalIndexes.length < widget.displayRemovals.length ||
+      _selectedAdditionIndexes.length < widget.displayAdditions.length;
+
+  int get _selectedPhysicalChangeCount =>
+      _physicalCount(widget.displayRemovals, _selectedRemovalIndexes) +
+      _physicalCount(widget.displayAdditions, _selectedAdditionIndexes);
+
   void _toggleRemoval(int index, bool selected) {
     setState(() {
       if (_pairedSelectionRequired) {
@@ -408,10 +442,11 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
       'plan_label': _planLabel,
       'archetype': widget.archetype,
       'intensity_label': _intensityLabel,
-      'selected_change_count': _selectedChangeCount,
+      'selected_change_count': _selectedPhysicalChangeCount,
       'reasoning': widget.reasoning,
       'before': widget.deckAnalysis,
-      'after': widget.postAnalysis,
+      if (!_isPartialSelection) 'after': widget.postAnalysis,
+      if (_isPartialSelection) 'post_analysis_status': 'recompute_after_apply',
       'warnings': widget.warnings,
       'meta_reference_context': widget.metaReferenceContext,
       'optimization_contract': widget.optimizationContract,
@@ -425,7 +460,12 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     String names(List<Map<String, dynamic>> items, Set<int> selectedIndexes) {
       final selected = selectedIndexes
           .where((index) => index >= 0 && index < items.length)
-          .map((index) => items[index]['name']?.toString() ?? '')
+          .map((index) {
+            final item = items[index];
+            final name = item['name']?.toString() ?? '';
+            final quantity = _quantityOf(item);
+            return quantity > 1 ? '$name x$quantity' : name;
+          })
           .where((name) => name.trim().isNotEmpty)
           .take(12)
           .toList();
@@ -437,12 +477,15 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
       'Plano: $_planLabel',
       'Estratégia: ${widget.archetype}',
       'Intensidade: $_intensityLabel',
-      'Mudanças selecionadas: $_selectedChangeCount',
+      'Cartas selecionadas: $_selectedPhysicalChangeCount',
       'Remover: ${names(widget.displayRemovals, _selectedRemovalIndexes)}',
       'Adicionar: ${names(widget.displayAdditions, _selectedAdditionIndexes)}',
       if (widget.reasoning.isNotEmpty) 'Motivo: ${widget.reasoning}',
-      if (widget.deckAnalysis.isNotEmpty || widget.postAnalysis.isNotEmpty)
+      if (!_isPartialSelection &&
+          (widget.deckAnalysis.isNotEmpty || widget.postAnalysis.isNotEmpty))
         'Antes/depois: CMC ${widget.deckAnalysis['average_cmc'] ?? '-'} -> ${widget.postAnalysis['average_cmc'] ?? '-'}; cartas ${widget.deckAnalysis['total_cards'] ?? '-'} -> ${widget.postAnalysis['total_cards'] ?? widget.postAnalysis['card_count'] ?? '-'}.',
+      if (_isPartialSelection)
+        'Depois: será recalculado ao aplicar a seleção parcial.',
     ].join('\n');
   }
 
@@ -453,6 +496,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     required Color accent,
     required ValueChanged<int> onToggleOff,
     required ValueChanged<int> onToggleOn,
+    bool selectionLocked = false,
     int limit = 30,
   }) {
     return Column(
@@ -467,13 +511,15 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
             loadCard: widget.loadCard == null
                 ? null
                 : () => _loadRecommendationCard(items[index]),
-            onChanged: (value) {
-              if (value) {
-                onToggleOn(index);
-              } else {
-                onToggleOff(index);
-              }
-            },
+            onChanged: selectionLocked
+                ? null
+                : (value) {
+                    if (value) {
+                      onToggleOn(index);
+                    } else {
+                      onToggleOff(index);
+                    }
+                  },
           ),
       ],
     );
@@ -501,6 +547,22 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     if (widget.battleValidation.isNotEmpty) return widget.battleValidation;
     final raw = widget.optimizationContract['battle_validation'];
     return raw is Map ? raw.cast<String, dynamic>() : const {};
+  }
+
+  Map<String, dynamic> get _manaFoundation {
+    final raw = widget.optimizationContract['mana_foundation'];
+    return raw is Map ? raw.cast<String, dynamic>() : const {};
+  }
+
+  String? get _automaticLandFloorText {
+    final raw = _manaFoundation['minimum_land_count'];
+    final minimum = switch (raw) {
+      int() => raw,
+      num() when raw == raw.roundToDouble() => raw.toInt(),
+      String() => int.tryParse(raw.trim()),
+      _ => null,
+    };
+    return minimum == null || minimum <= 0 ? null : '≥ $minimum terrenos';
   }
 
   List<String> get _applyBlockerMessages {
@@ -684,7 +746,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                     ),
                     _TrustSignal(
                       label: 'Mudanças',
-                      value: '$_selectedChangeCount selecionadas',
+                      value: '$_selectedPhysicalChangeCount cartas',
                       icon: Icons.swap_horiz_rounded,
                     ),
                     _TrustSignal(
@@ -694,20 +756,30 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                     ),
                     _TrustSignal(
                       label: 'Cartas depois',
-                      value: _metric(widget.postAnalysis, const [
-                        'total_cards',
-                        'card_count',
-                      ]),
+                      value: _isPartialSelection
+                          ? 'Recalcular'
+                          : _metric(widget.postAnalysis, const [
+                              'total_cards',
+                              'card_count',
+                            ]),
                       icon: Icons.format_list_numbered,
                     ),
                     _TrustSignal(
                       label: 'Terrenos',
-                      value: _metric(widget.postAnalysis, const [
-                        'lands',
-                        'land_count',
-                      ]),
+                      value: _isPartialSelection
+                          ? 'Recalcular'
+                          : _metric(widget.postAnalysis, const [
+                              'lands',
+                              'land_count',
+                            ]),
                       icon: Icons.terrain_outlined,
                     ),
+                    if (_automaticLandFloorText case final floorText?)
+                      _TrustSignal(
+                        label: 'Piso automático',
+                        value: floorText,
+                        icon: Icons.foundation_outlined,
+                      ),
                     _TrustSignal(
                       label: 'Validação',
                       value: !widget.canApply
@@ -757,7 +829,25 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 const SizedBox(height: AppTheme.space16),
                 _MetaReferenceSection(contextData: widget.metaReferenceContext),
               ],
-              if (widget.deckAnalysis.isNotEmpty &&
+              if (_isPartialSelection) ...[
+                const SizedBox(height: AppTheme.space16),
+                DialogSectionCard(
+                  title: 'Seleção parcial',
+                  accent: AppTheme.brass400,
+                  icon: Icons.calculate_outlined,
+                  child: const Text(
+                    'Os indicadores do plano completo não valem para esta seleção. '
+                    'Cartas, terrenos e curva serão recalculados pelo servidor ao aplicar.',
+                    key: Key('optimize-preview-partial-recompute-message'),
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      height: AppTheme.lineHeightCompact,
+                    ),
+                  ),
+                ),
+              ],
+              if (!_isPartialSelection &&
+                  widget.deckAnalysis.isNotEmpty &&
                   widget.postAnalysis.isNotEmpty) ...[
                 const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
@@ -825,7 +915,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title:
-                      'Remover (${_selectedRemovalIndexes.length}/${widget.displayRemovals.length})',
+                      'Remover (${_physicalCount(widget.displayRemovals, _selectedRemovalIndexes)}/${_physicalCount(widget.displayRemovals)} cartas)',
                   accent: AppTheme.error,
                   icon: Icons.remove_circle_outline_rounded,
                   child: Column(
@@ -837,6 +927,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                         accent: AppTheme.error,
                         onToggleOff: (index) => _toggleRemoval(index, false),
                         onToggleOn: (index) => _toggleRemoval(index, true),
+                        selectionLocked: widget.mode == 'complete',
                         limit: 20,
                       ),
                     ],
@@ -847,11 +938,27 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title:
-                      'Adicionar (${_selectedAdditionIndexes.length}/${widget.displayAdditions.length})',
+                      'Adicionar (${_physicalCount(widget.displayAdditions, _selectedAdditionIndexes)}/${_physicalCount(widget.displayAdditions)} cartas)',
                   accent: AppTheme.success,
                   icon: Icons.add_circle_outline_rounded,
                   child: Column(
                     children: [
+                      if (widget.mode == 'complete')
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: AppTheme.space10),
+                          child: Text(
+                            'Todas as adições são obrigatórias para completar '
+                            'o tamanho do deck e preservar a base de mana '
+                            'validada.',
+                            key: Key(
+                              'optimize-complete-selection-locked-message',
+                            ),
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: AppTheme.lineHeightCompact,
+                            ),
+                          ),
+                        ),
                       _selectableSuggestionList(
                         items: widget.displayAdditions,
                         selectedIndexes: _selectedAdditionIndexes,
@@ -859,6 +966,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                         accent: AppTheme.success,
                         onToggleOff: (index) => _toggleAddition(index, false),
                         onToggleOn: (index) => _toggleAddition(index, true),
+                        selectionLocked: widget.mode == 'complete',
                       ),
                       if (widget.displayAdditions.length > 30)
                         Padding(
@@ -1441,7 +1549,7 @@ class _SelectableSuggestionLineItem extends StatefulWidget {
   final Color accent;
   final bool selected;
   final Future<DeckCardItem?> Function()? loadCard;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   const _SelectableSuggestionLineItem({
     super.key,
@@ -1450,7 +1558,7 @@ class _SelectableSuggestionLineItem extends StatefulWidget {
     required this.accent,
     required this.selected,
     this.loadCard,
-    required this.onChanged,
+    this.onChanged,
   });
 
   @override
@@ -1722,6 +1830,15 @@ class _SelectableSuggestionLineItemState
     final accent = widget.accent;
     final selected = widget.selected;
     final name = item['name']?.toString() ?? '';
+    final rawQuantity = item['quantity'];
+    final quantity = switch (rawQuantity) {
+      int() => rawQuantity,
+      num() when rawQuantity == rawQuantity.roundToDouble() =>
+        rawQuantity.toInt(),
+      String() => int.tryParse(rawQuantity.trim()) ?? 1,
+      _ => 1,
+    };
+    final displayName = quantity > 1 ? '$name x$quantity' : name;
     final playerFacing = (item['player_facing'] is Map)
         ? (item['player_facing'] as Map).cast<String, dynamic>()
         : const <String, dynamic>{};
@@ -1801,7 +1918,9 @@ class _SelectableSuggestionLineItemState
               padding: const EdgeInsets.only(bottom: AppTheme.space8),
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                onTap: () => widget.onChanged(!selected),
+                onTap: widget.onChanged == null
+                    ? null
+                    : () => widget.onChanged!(!selected),
                 onLongPress: _openCardReader,
                 child: Container(
                   padding: const EdgeInsets.all(AppTheme.space8),
@@ -1821,7 +1940,9 @@ class _SelectableSuggestionLineItemState
                     children: [
                       Checkbox(
                         value: selected,
-                        onChanged: (value) => widget.onChanged(value ?? false),
+                        onChanged: widget.onChanged == null
+                            ? null
+                            : (value) => widget.onChanged!(value ?? false),
                         visualDensity: VisualDensity.compact,
                       ),
                       const SizedBox(width: AppTheme.space4),
@@ -1830,7 +1951,7 @@ class _SelectableSuggestionLineItemState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '$name$suffix',
+                              '$displayName$suffix',
                               style: TextStyle(
                                 color: selected
                                     ? accent

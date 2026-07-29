@@ -1310,6 +1310,84 @@ void main() {
       );
     });
 
+    test('uses a 60-card constructed target outside Commander', () {
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        deckFormat: 'standard',
+        removals: const ['Maze of Ith'],
+        additions: const ['Ichor Wellspring'],
+        originalDeck: [
+          _card(
+            name: 'Maze of Ith',
+            typeLine: 'Land',
+            manaCost: '',
+            cmc: 0,
+            oracleText: 'Untap target attacking creature.',
+            quantity: 26,
+          ),
+          _card(
+            name: 'Plan Filler',
+            typeLine: 'Creature',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: 'Vigilance.',
+            quantity: 34,
+          ),
+        ],
+        additionsData: [
+          _card(
+            name: 'Ichor Wellspring',
+            typeLine: 'Artifact',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: 'When this enters, draw a card.',
+          ),
+        ],
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, ['Maze of Ith']);
+      expect(result.additions, ['Ichor Wellspring']);
+    });
+
+    test('Brawl protects its 24-land automatic floor', () {
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        deckFormat: 'brawl',
+        removals: const ['Maze of Ith'],
+        additions: const ['Ichor Wellspring'],
+        originalDeck: [
+          _card(
+            name: 'Maze of Ith',
+            typeLine: 'Land',
+            manaCost: '',
+            cmc: 0,
+            oracleText: 'Untap target attacking creature.',
+            quantity: 24,
+          ),
+          _card(
+            name: 'Plan Filler',
+            typeLine: 'Creature',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: 'Vigilance.',
+            quantity: 36,
+          ),
+        ],
+        additionsData: [
+          _card(
+            name: 'Ichor Wellspring',
+            typeLine: 'Artifact',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: 'When this enters, draw a card.',
+          ),
+        ],
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+    });
+
     test('uses profile role_targets in final rejection reasons', () {
       final validation = ValidationReport(
         score: 72,

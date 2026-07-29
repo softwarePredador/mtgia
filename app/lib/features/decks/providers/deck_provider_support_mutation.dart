@@ -387,11 +387,31 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
   }
 
   for (final removal in removalsDetailed) {
-    final cardId = removal['card_id'] as String?;
-    if (cardId == null) continue;
-    if (!currentCards.containsKey(cardId)) continue;
+    final cardId = removal['card_id']?.toString().trim() ?? '';
+    if (cardId.isEmpty) {
+      throw StateError('Remoção de otimização sem card_id.');
+    }
+    if (commanderIds.contains(cardId)) {
+      throw StateError('A otimização não pode remover o comandante.');
+    }
+    if (!currentCards.containsKey(cardId)) {
+      throw StateError(
+        'A carta de remoção não está mais no deck. Atualize o preview.',
+      );
+    }
+    final removalQuantity = _optimizationDetailQuantity(
+      removal,
+      operation: 'remoção',
+    );
     final existing = currentCards[cardId]!;
-    final qty = (existing['quantity'] as int) - 1;
+    final currentQuantity = existing['quantity'] as int;
+    if (removalQuantity > currentQuantity) {
+      throw StateError(
+        'A remoção pede $removalQuantity cópias, mas o deck possui '
+        '$currentQuantity.',
+      );
+    }
+    final qty = currentQuantity - removalQuantity;
     if (qty <= 0) {
       currentCards.remove(cardId);
     } else {
@@ -417,8 +437,14 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
   };
 
   for (final addition in additionsDetailed) {
-    final cardId = addition['card_id'] as String?;
-    if (cardId == null || cardId.isEmpty) continue;
+    final cardId = addition['card_id']?.toString().trim() ?? '';
+    if (cardId.isEmpty) {
+      throw StateError('Adição de otimização sem card_id.');
+    }
+    final additionQuantity = _optimizationDetailQuantity(
+      addition,
+      operation: 'adição',
+    );
 
     final isBasicFromServer = addition['is_basic_land'] as bool? ?? false;
     final typeLine = ((addition['type_line'] as String?) ?? '').toLowerCase();
@@ -431,14 +457,22 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
 
     if (currentCards.containsKey(cardId)) {
       final existing = currentCards[cardId]!;
-      final newQty = (existing['quantity'] as int) + 1;
-      if (newQty <= limit) {
-        currentCards[cardId] = {...existing, 'quantity': newQty};
+      final newQty = (existing['quantity'] as int) + additionQuantity;
+      if (newQty > limit) {
+        throw StateError(
+          'A adição excede o limite de $limit cópia(s) para $cardName.',
+        );
       }
+      currentCards[cardId] = {...existing, 'quantity': newQty};
     } else {
+      if (additionQuantity > limit) {
+        throw StateError(
+          'A adição excede o limite de $limit cópia(s) para $cardName.',
+        );
+      }
       currentCards[cardId] = {
         'card_id': cardId,
-        'quantity': 1,
+        'quantity': additionQuantity,
         'is_commander': false,
       };
     }
@@ -447,15 +481,33 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
   return currentCards.values.toList();
 }
 
+int _optimizationDetailQuantity(
+  Map<String, dynamic> detail, {
+  required String operation,
+}) {
+  final raw = detail['quantity'];
+  final quantity = switch (raw) {
+    null => 1,
+    int() => raw,
+    num() when raw == raw.roundToDouble() => raw.toInt(),
+    String() => int.tryParse(raw.trim()),
+    _ => null,
+  };
+  if (quantity == null || quantity <= 0) {
+    throw StateError('Quantidade inválida na $operation de otimização.');
+  }
+  return quantity;
+}
+
 String buildDeckOptimizationSignature(DeckDetails deck) {
   final entries = <String>[];
   for (final commander in deck.commander) {
-    entries.add('${commander.id}:1:${commander.condition.code}');
+    entries.add('${commander.id}:1:${commander.condition.code}:commander');
   }
   for (final cards in deck.mainBoard.values) {
     for (final card in cards) {
       final quantity = card.quantity <= 0 ? 1 : card.quantity;
-      entries.add('${card.id}:$quantity:${card.condition.code}');
+      entries.add('${card.id}:$quantity:${card.condition.code}:main');
     }
   }
   entries.sort();

@@ -54,5 +54,54 @@ void main() {
       expect(result, ['Faithless Looting']);
       expect(calls, 2);
     });
+
+    test(
+      'Brawl synergy queries never fall back to Commander legality',
+      () async {
+        final observedQueries = <String>[];
+        final engine = SynergyEngine(
+          client: MockClient((request) async {
+            if (request.url.path.endsWith('/cards/named')) {
+              return http.Response(
+                jsonEncode({
+                  'oracle_text': 'Whenever you cast an instant, draw a card.',
+                  'type_line': 'Legendary Creature',
+                }),
+                200,
+              );
+            }
+            final query = request.url.queryParameters['q'] ?? '';
+            observedQueries.add(query);
+            return http.Response(
+              jsonEncode({
+                'data': [
+                  {'name': 'Brawl Legal Cantrip'},
+                ],
+              }),
+              200,
+            );
+          }),
+        );
+
+        final result = await engine.fetchCommanderSynergies(
+          commanderName: 'Brawl Commander',
+          colors: const ['U'],
+          archetype: 'spellslinger',
+          deckFormat: 'brawl',
+        );
+
+        expect(result, contains('Brawl Legal Cantrip'));
+        expect(observedQueries, isNotEmpty);
+        expect(
+          observedQueries,
+          everyElement(
+            allOf(
+              contains('format:brawl'),
+              isNot(contains('format:commander')),
+            ),
+          ),
+        );
+      },
+    );
   });
 }

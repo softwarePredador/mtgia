@@ -478,6 +478,12 @@ void main() {
                       'label': 'Preview seguro',
                       'message': 'As sugestões passaram pelas regras do deck.',
                     },
+                    'mana_foundation': {
+                      'policy': 'automatic_apply_floor',
+                      'minimum_land_count': 36,
+                      'land_count': 37,
+                      'satisfied': true,
+                    },
                   },
                   battleValidation: const {
                     'label': 'Battle pendente',
@@ -508,6 +514,8 @@ void main() {
     expect(find.textContaining('não como cópia cega'), findsOneWidget);
     expect(find.text('Validação da recomendação'), findsOneWidget);
     expect(find.text('Preview seguro'), findsAtLeastNWidgets(1));
+    expect(find.text('Piso automático'), findsOneWidget);
+    expect(find.text('≥ 36 terrenos'), findsOneWidget);
     expect(find.text('Battle pendente'), findsOneWidget);
     expect(find.text('#1 Talrand Tempo'), findsOneWidget);
     expect(find.text('Mystic Remora'), findsAtLeastNWidgets(1));
@@ -569,8 +577,17 @@ void main() {
 
     final checkboxes = find.byType(Checkbox);
     expect(checkboxes, findsNWidgets(4));
+    expect(
+      find.byKey(const Key('optimize-preview-partial-recompute-message')),
+      findsNothing,
+    );
     await tester.tap(checkboxes.first);
     await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('optimize-preview-partial-recompute-message')),
+      findsOneWidget,
+    );
+    expect(find.text('Recalcular'), findsNWidgets(2));
     await tester.tap(find.text('Aplicar mudanças'));
     await tester.pumpAndSettle();
 
@@ -579,6 +596,71 @@ void main() {
     expect(selection!.selectedRemovalIndexes, contains(1));
     expect(selection!.selectedAdditionIndexes, isNot(contains(0)));
     expect(selection!.selectedAdditionIndexes, contains(1));
+  });
+
+  testWidgets('complete preview exposes physical quantities for lands', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      _TestMaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed: () => showOptimizationPreviewDialog(
+                  context,
+                  mode: 'complete',
+                  archetype: 'midrange',
+                  keepTheme: true,
+                  preservedTheme: null,
+                  reasoning: 'Completar base de mana.',
+                  intensity: OptimizeIntensity.focused,
+                  optimizeIntensity: const <String, dynamic>{},
+                  qualityWarning: null,
+                  deckAnalysis: const {'total_cards': 72, 'land_count': 9},
+                  postAnalysis: const {'total_cards': 100, 'land_count': 36},
+                  warnings: const <String, dynamic>{},
+                  metaReferenceContext: const <String, dynamic>{},
+                  displayRemovals: const <Map<String, dynamic>>[],
+                  displayAdditions: const [
+                    {'name': 'Plains', 'quantity': 25},
+                    {'name': 'Arcane Signet', 'quantity': 1},
+                    {'name': 'Swords to Plowshares', 'quantity': 1},
+                    {'name': 'Sol Ring', 'quantity': 1},
+                  ],
+                ),
+                child: const Text('preview-quantities'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('preview-quantities'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Plains x25'), findsOneWidget);
+    expect(find.text('Adicionar (28/28 cartas)'), findsOneWidget);
+    expect(find.text('28 cartas'), findsOneWidget);
+    expect(
+      find.byKey(const Key('optimize-complete-selection-locked-message')),
+      findsOneWidget,
+    );
+    final checkboxes = tester
+        .widgetList<Checkbox>(find.byType(Checkbox))
+        .toList(growable: false);
+    expect(checkboxes, isNotEmpty);
+    expect(checkboxes.every((checkbox) => checkbox.onChanged == null), isTrue);
+    expect(
+      find.byKey(const Key('optimize-preview-partial-recompute-message')),
+      findsNothing,
+    );
   });
 
   testWidgets(

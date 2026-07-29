@@ -10,6 +10,7 @@ import '../meta/meta_deck_reference_support.dart';
 import 'edhrec_service.dart';
 import 'optimize_complete_mana_support.dart';
 import 'optimize_deck_support.dart';
+import 'optimize_format_legality_support.dart';
 import 'optimize_runtime_support.dart';
 import 'optimize_state_support.dart';
 import 'otimizacao.dart';
@@ -23,6 +24,7 @@ class CompleteBuildAccumulator {
   final Map<String, int> addedCountsById;
   final List<Map<String, dynamic>> blockedByBracketAll;
   final List<String> filteredByIdentityAll;
+  final List<String> filteredByLegalityAll;
   final List<String> invalidAll;
   final Set<String> aiSuggestedNames;
   final Set<String> commanderMetaPriorityNames;
@@ -31,6 +33,7 @@ class CompleteBuildAccumulator {
   int virtualTotal;
   int maxBasicAdditions = 999;
   int? commanderRecommendedLands;
+  int? commanderMinimumLands;
   bool aiStageUsed = false;
   bool deterministicStageUsed = false;
   bool guaranteedBasicsStageUsed = false;
@@ -47,6 +50,7 @@ class CompleteBuildAccumulator {
     this.addedCountsById = const <String, int>{},
     this.blockedByBracketAll = const <Map<String, dynamic>>[],
     this.filteredByIdentityAll = const <String>[],
+    this.filteredByLegalityAll = const <String>[],
     this.invalidAll = const <String>[],
     this.aiSuggestedNames = const <String>{},
     this.commanderMetaPriorityNames = const <String>{},
@@ -74,6 +78,7 @@ class CompleteBuildAccumulator {
       addedCountsById: <String, int>{},
       blockedByBracketAll: <Map<String, dynamic>>[],
       filteredByIdentityAll: <String>[],
+      filteredByLegalityAll: <String>[],
       invalidAll: <String>[],
       aiSuggestedNames: <String>{},
       commanderMetaPriorityNames: <String>{},
@@ -84,29 +89,46 @@ class CompleteBuildAccumulator {
 Future<void> prepareCompleteCommanderSeed({
   required Pool pool,
   required List<String> commanders,
+  required String deckFormat,
   required int maxTotal,
   required int currentTotalCards,
   required CompleteBuildAccumulator state,
   int? bracket,
 }) async {
   final targetAdditionsForComplete = maxTotal - currentTotalCards;
+  final normalizedDeckFormat = deckFormat.trim().toLowerCase();
+
+  if (targetAdditionsForComplete >= 40) {
+    state.maxBasicAdditions = calculateCompleteMaxBasicAdditions(
+      null,
+      deckFormat: normalizedDeckFormat,
+    );
+  }
+
   if (commanders.isEmpty) return;
 
   final commanderName = commanders.first.trim();
   if (commanderName.isEmpty) return;
+
+  // Commander reference profiles and EDHREC are Commander-format evidence.
+  // Brawl keeps its own 60-card mana policy and receives format-legal
+  // candidates from the downstream loaders instead of inheriting a
+  // Commander-only metagame.
+  if (normalizedDeckFormat != 'commander') return;
 
   final commanderReferenceProfile =
       await loadCommanderReferenceProfileFromCache(
         pool: pool,
         commanderName: commanderName,
       );
-  state.commanderRecommendedLands = extractRecommendedLandsFromProfile(
-    commanderReferenceProfile,
-  );
+  final landPolicy = extractLandPolicyFromProfile(commanderReferenceProfile);
+  state.commanderRecommendedLands = landPolicy?.targetLandCount;
+  state.commanderMinimumLands = landPolicy?.minimumLandCount;
 
   if (targetAdditionsForComplete >= 40) {
     state.maxBasicAdditions = calculateCompleteMaxBasicAdditions(
       state.commanderRecommendedLands,
+      deckFormat: normalizedDeckFormat,
     );
   }
 
@@ -122,7 +144,7 @@ Future<void> prepareCompleteCommanderSeed({
   }
 
   final commanderMetaScope = resolveCommanderOptimizeMetaScope(
-    deckFormat: 'commander',
+    deckFormat: deckFormat,
     bracket: bracket,
   );
   if (commanderMetaScope != null) {
@@ -227,14 +249,15 @@ Future<void> _addBasicLandPlanToVirtualDeck({
   for (final name in basicPlan) {
     final id = basicsWithIds[name];
     if (id == null) continue;
+    final metadata = buildVirtualBasicLandMetadata(name);
     _addCardToVirtualDeck(
       state: state,
       id: id,
       name: name,
-      typeLine: 'Basic Land',
-      oracleText: '',
-      colors: const <String>[],
-      colorIdentity: const <String>[],
+      typeLine: metadata['type_line'] as String,
+      oracleText: metadata['oracle_text'] as String,
+      colors: (metadata['colors'] as List).cast<String>(),
+      colorIdentity: (metadata['color_identity'] as List).cast<String>(),
       isBasic: true,
     );
   }
@@ -259,6 +282,7 @@ Future<void> _addIdentitySafeNonBasicLands({
     commanderColorIdentity: commanderColorIdentity,
     excludeNames: excludeNames,
     limit: limit,
+    deckFormat: deckFormat,
   );
 
   var added = 0;
@@ -370,6 +394,7 @@ Future<void> runCompleteAiSuggestionLoop({
             commanders: commanders,
             targetArchetype: targetArchetype,
             targetAdditions: requestedAdditions,
+            deckFormat: deckFormat,
             bracket: bracket,
             keepTheme: keepTheme,
             detectedTheme: detectedTheme,
@@ -409,7 +434,14 @@ Future<void> runCompleteAiSuggestionLoop({
 
     final validList =
         (validation['valid'] as List).cast<Map<String, dynamic>>();
-    final validNames = validList.map((v) => (v['name'] as String)).toList();
+    var validNames = validList.map((v) => (v['name'] as String)).toList();
+    final legalityFilter = await filterOptimizeCardNamesByKnownFormatLegality(
+      pool: pool,
+      names: validNames,
+      deckFormat: deckFormat,
+    );
+    validNames = legalityFilter.allowed;
+    state.filteredByLegalityAll.addAll(legalityFilter.blocked);
     if (validNames.isEmpty) break;
 
     final additionsInfoResult = await pool.execute(
@@ -532,13 +564,9 @@ Future<int> _bootstrapSparseCompleteInput({
   required int maxTotal,
 }) async {
   final currentLands = _countCurrentLands(state.virtualDeck);
-  final minimumTargetLands =
-      commanderManaFloorApplies(deckFormat)
-          ? commanderStrategicMinimumLandCount
-          : 32;
-  final targetLands = (state.commanderRecommendedLands ?? 36).clamp(
-    minimumTargetLands,
-    40,
+  final targetLands = resolveCompleteTargetLandCount(
+    deckFormat: deckFormat,
+    recommendedLandCount: state.commanderRecommendedLands,
   );
   final targetSpells = (maxTotal - targetLands).clamp(
     state.virtualTotal,
@@ -582,6 +610,7 @@ Future<int> _bootstrapSparseCompleteInput({
     detectedTheme: detectedTheme,
     excludeNames: existingNames,
     limit: spellSlotsToFill,
+    deckFormat: deckFormat,
   );
   addUnique(foundationPool);
 
@@ -591,6 +620,7 @@ Future<int> _bootstrapSparseCompleteInput({
       excludeNames: existingNames.union(selectedNames),
       commanderColorIdentity: commanderColorIdentity,
       limit: spellSlotsToFill - selected.length,
+      deckFormat: deckFormat,
     );
     addUnique(universalPool);
   }
@@ -601,6 +631,7 @@ Future<int> _bootstrapSparseCompleteInput({
     commanderColorIdentity: commanderColorIdentity,
     excludeNames: existingNames.union(selectedNames),
     limit: spellSlotsToFill - selected.length,
+    deckFormat: deckFormat,
   );
   addUnique(preferredPool);
 
@@ -612,6 +643,7 @@ Future<int> _bootstrapSparseCompleteInput({
       excludeNames: existingNames.union(selectedNames),
       bracket: bracket,
       limit: spellSlotsToFill - selected.length,
+      deckFormat: deckFormat,
     );
     addUnique(broadPool);
   }
@@ -622,6 +654,7 @@ Future<int> _bootstrapSparseCompleteInput({
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: existingNames.union(selectedNames),
       limit: spellSlotsToFill - selected.length,
+      deckFormat: deckFormat,
     );
     addUnique(identitySafePool);
   }
@@ -696,13 +729,11 @@ void rebalanceCompleteDeckForLandDeficit({
         nonLandCards.length;
   }
 
-  final minimumTargetLands =
-      commanderManaFloorApplies(deckFormat)
-          ? commanderStrategicMinimumLandCount
-          : 28;
-  final idealLands = (state.commanderRecommendedLands ??
-          (avgCmc < 2.0 ? 32 : (avgCmc < 3.0 ? 35 : (avgCmc < 4.0 ? 37 : 39))))
-      .clamp(minimumTargetLands, 42);
+  final idealLands = resolveCompleteTargetLandCount(
+    deckFormat: deckFormat,
+    recommendedLandCount: state.commanderRecommendedLands,
+    averageNonLandCmc: avgCmc,
+  );
   final landDeficit = idealLands - currentLands;
   final slotsAvailable = maxTotal - state.virtualTotal;
 
@@ -775,13 +806,11 @@ Future<void> fillCompleteDeckRemainder({
   final missing = maxTotal - state.virtualTotal;
   var currentLands = _countCurrentLands(state.virtualDeck);
   final avgCmc = _calculateAverageNonLandCmc(state.virtualDeck);
-  final minimumTargetLands =
-      commanderManaFloorApplies(deckFormat)
-          ? commanderStrategicMinimumLandCount
-          : 28;
-  final idealLands = (state.commanderRecommendedLands ??
-          (avgCmc < 2.0 ? 32 : (avgCmc < 3.0 ? 35 : (avgCmc < 4.0 ? 37 : 39))))
-      .clamp(minimumTargetLands, 42);
+  final idealLands = resolveCompleteTargetLandCount(
+    deckFormat: deckFormat,
+    recommendedLandCount: state.commanderRecommendedLands,
+    averageNonLandCmc: avgCmc,
+  );
   final landsNeeded = (idealLands - currentLands).clamp(0, missing);
   final spellsNeeded = missing - landsNeeded;
 
@@ -835,6 +864,7 @@ Future<void> fillCompleteDeckRemainder({
         excludeNames: existingNames,
         allCardData: state.virtualDeck,
         preferredNames: state.aiSuggestedNames,
+        deckFormat: deckFormat,
       );
       mergeUniqueSpells(dedupeCandidatesByName(initialSynergySpells));
 
@@ -844,6 +874,7 @@ Future<void> fillCompleteDeckRemainder({
           excludeNames: existingNames,
           commanderColorIdentity: commanderColorIdentity,
           limit: spellsNeeded,
+          deckFormat: deckFormat,
         );
         if (universalFallback.isNotEmpty) {
           Log.d(
@@ -862,6 +893,7 @@ Future<void> fillCompleteDeckRemainder({
               detectedTheme: detectedTheme,
               excludeNames: existingNames.union(selectedSpellNames),
               limit: spellsNeeded - selectedSpells.length,
+              deckFormat: deckFormat,
             );
         if (foundationFallback.isNotEmpty) {
           Log.d(
@@ -881,6 +913,7 @@ Future<void> fillCompleteDeckRemainder({
           commanderColorIdentity: commanderColorIdentity,
           excludeNames: existingNames.union(selectedSpellNames),
           limit: spellsNeeded - selectedSpells.length,
+          deckFormat: deckFormat,
         );
         if (preferredPool.isNotEmpty) {
           Log.d(
@@ -897,6 +930,7 @@ Future<void> fillCompleteDeckRemainder({
             excludeNames: existingNames.union(selectedSpellNames),
             bracket: bracket,
             limit: spellsNeeded - selectedSpells.length,
+            deckFormat: deckFormat,
           );
           Log.d('  Broad pool retornou: ${broadPool.length} cartas.');
           if (broadPool.isNotEmpty) {
@@ -913,6 +947,7 @@ Future<void> fillCompleteDeckRemainder({
             commanderColorIdentity: commanderColorIdentity,
             excludeNames: existingNames.union(selectedSpellNames),
             limit: spellsNeeded - selectedSpells.length,
+            deckFormat: deckFormat,
           );
           if (emergencyIdentityPool.isNotEmpty) {
             Log.d(
@@ -1013,6 +1048,7 @@ Future<void> fillCompleteDeckRemainder({
       excludeNames: existingNames,
       preferredNames: state.aiSuggestedNames,
       limit: remaining,
+      deckFormat: deckFormat,
     );
     if (fillers.isNotEmpty) state.deterministicStageUsed = true;
 
@@ -1051,6 +1087,7 @@ Future<void> fillCompleteDeckRemainder({
                 .toSet(),
         bracket: bracket,
         limit: emergencyRemaining,
+        deckFormat: deckFormat,
       );
       if (emergencyFillers.isNotEmpty) state.deterministicStageUsed = true;
 
@@ -1221,6 +1258,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
   final manaFloorAssessment = assessCommanderManaFloor(
     format: deckFormat,
     cards: state.virtualDeck,
+    minimumLandCount: state.commanderMinimumLands,
   );
   Map<String, dynamic>? qualityError;
 
@@ -1234,13 +1272,22 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       'basic_added': basicAdded,
       'non_basic_added': nonBasicAdded,
     };
-  } else if (!manaFloorAssessment.satisfied) {
+  } else if (!manaFloorAssessment.meetsMinimum) {
     qualityError = manaFloorAssessment.toQualityError(
       code: 'COMPLETE_QUALITY_LAND_FLOOR',
       message:
           'Complete bloqueado: a lista final teria apenas '
           '${manaFloorAssessment.landCount} terrenos; o piso seguro de '
-          'Commander é ${manaFloorAssessment.minimumLandCount}.',
+          '${manaFoundationFormatLabel(deckFormat)} é '
+          '${manaFloorAssessment.minimumLandCount}.',
+    );
+  } else if (manaFloorAssessment.hasSevereExcess) {
+    qualityError = manaFloorAssessment.toQualityError(
+      code: 'COMPLETE_QUALITY_LAND_EXCESS',
+      message:
+          'Complete bloqueado: a lista final teria '
+          '${manaFloorAssessment.landCount} terrenos e precisa de rebuild '
+          'estrutural antes de qualquer preenchimento automático.',
     );
   } else if (targetTotal >= 40 && basicAdded > state.maxBasicAdditions) {
     qualityError = {
@@ -1279,6 +1326,11 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       if (state.filteredByIdentityAll.isNotEmpty)
         'filtered_by_color_identity': {
           'removed_additions': state.filteredByIdentityAll,
+        },
+      if (state.filteredByLegalityAll.isNotEmpty)
+        'filtered_by_format_legality': {
+          'format': deckFormat,
+          'removed_additions': state.filteredByLegalityAll,
         },
       if (state.blockedByBracketAll.isNotEmpty)
         'blocked_by_bracket': {'blocked_additions': state.blockedByBracketAll},
@@ -1470,6 +1522,7 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       final postAnalyzer = DeckArchetypeAnalyzerCore(
         virtualDeck,
         deckColors.toList(),
+        deckFormat: deckFormat,
       );
       postAnalysisComplete = postAnalyzer.generateAnalysis();
     } catch (e) {
@@ -1480,9 +1533,20 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     }
   }
 
+  final intermediateConsistency =
+      jsonResponse['consistency_slo'] is Map
+          ? (jsonResponse['consistency_slo'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+  final intermediateMinimumLandCount =
+      switch (intermediateConsistency['minimum_land_count']) {
+        num value => value.toInt(),
+        String value => int.tryParse(value.trim()),
+        _ => null,
+      };
   final finalManaFloorAssessment = assessCommanderManaFloor(
     format: deckFormat,
     cards: [...originalDeck, ...resolvedAdditionsForFloor],
+    minimumLandCount: intermediateMinimumLandCount,
   );
   final responseBody = <String, dynamic>{
     'mode': 'complete',
@@ -1515,27 +1579,51 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     'validation_warnings': const <String>[],
   };
   if (!finalManaFloorAssessment.satisfied) {
+    final excessive = finalManaFloorAssessment.hasSevereExcess;
     responseBody
       ..['quality_error'] = finalManaFloorAssessment.toQualityError(
-        code: 'COMPLETE_QUALITY_LAND_FLOOR',
+        code:
+            excessive
+                ? 'COMPLETE_QUALITY_LAND_EXCESS'
+                : 'COMPLETE_QUALITY_LAND_FLOOR',
         message:
-            'Complete bloqueado na validação final: a lista resolvida teria '
-            '${finalManaFloorAssessment.landCount} terrenos; o piso seguro é '
-            '${finalManaFloorAssessment.minimumLandCount}.',
+            excessive
+                ? 'Complete bloqueado na validação final: a lista resolvida '
+                    'teria ${finalManaFloorAssessment.landCount} terrenos e '
+                    'exige rebuild estrutural.'
+                : 'Complete bloqueado na validação final: a lista resolvida '
+                    'teria ${finalManaFloorAssessment.landCount} terrenos; o '
+                    'piso seguro é '
+                    '${finalManaFloorAssessment.minimumLandCount}.',
       )
       ..['can_apply'] = false
       ..['learning_eligible'] = false
-      ..['apply_blockers'] = const ['commander_land_floor_not_met'];
+      ..['apply_blockers'] = [
+        excessive
+            ? 'commander_land_excess_requires_rebuild'
+            : 'commander_land_floor_not_met',
+      ];
   }
 
-  responseBody['optimization_contract'] = buildOptimizeDecisionContract(
-    mode: 'complete',
-    targetArchetype: targetArchetype,
-    intensity: intensity,
-    keepTheme: keepTheme,
-    additionCount: additionsDetailed.length,
-    removalCount: 0,
-  );
+  responseBody['optimization_contract'] = {
+    ...buildOptimizeDecisionContract(
+      mode: 'complete',
+      targetArchetype: targetArchetype,
+      intensity: intensity,
+      keepTheme: keepTheme,
+      additionCount: additionsDetailed.fold<int>(
+        0,
+        (sum, entry) => sum + ((entry['quantity'] as int?) ?? 1),
+      ),
+      removalCount: 0,
+    ),
+    'mana_foundation': buildOptimizationManaFoundationContract(
+      format: deckFormat,
+      minimumLandCount: finalManaFloorAssessment.minimumLandCount,
+      landCount: finalManaFloorAssessment.landCount,
+      satisfied: finalManaFloorAssessment.satisfied,
+    ),
+  };
   responseBody['battle_validation'] =
       (responseBody['optimization_contract'] as Map)['battle_validation'];
 

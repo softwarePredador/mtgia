@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_validation_service.dart';
+import '../../../lib/commander_mana_floor.dart';
 import '../../../lib/ai_job_lifecycle.dart';
 import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/runtime_environment.dart';
@@ -41,6 +42,7 @@ import '../../../lib/ai/optimize_route_diagnostics_support.dart'
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
 import '../../../lib/ai/optimize_feedback_support.dart' as optimize_feedback;
+import '../../../lib/ai/optimize_format_legality_support.dart';
 import '../../../lib/ai/optimize_route_final_gate_support.dart'
     as optimize_route_final_gate;
 import '../../../lib/ai/optimize_route_quality_rejection_support.dart'
@@ -218,6 +220,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   String? userId,
   bool preferCollection = false,
   int? budgetLimitBrl,
+  String deckFormat = 'commander',
 }) => optimize_support.buildDeterministicOptimizeSwapCandidates(
   pool: pool,
   allCardData: allCardData,
@@ -235,6 +238,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   userId: userId,
   preferCollection: preferCollection,
   budgetLimitBrl: budgetLimitBrl,
+  deckFormat: deckFormat,
 );
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
@@ -326,7 +330,7 @@ Map<String, dynamic> _buildEmptyFallbackAggregate() {
 }
 
 class DeckArchetypeAnalyzer extends optimize_state.DeckArchetypeAnalyzerCore {
-  DeckArchetypeAnalyzer(super.cards, super.colors);
+  DeckArchetypeAnalyzer(super.cards, super.colors, {super.deckFormat});
 }
 
 class DeckThemeProfile extends optimize_state.DeckThemeProfileResult {
@@ -978,7 +982,7 @@ Future<Response> onRequest(RequestContext context) async {
     // Preparar dados para o otimizador
     final deckData = {'cards': allCardData, 'colors': deckColors.toList()};
 
-    if (commanders.isNotEmpty) {
+    if (deckFormat == 'commander' && commanders.isNotEmpty) {
       try {
         final commanderName = commanders.first.trim();
         if (commanderName.isNotEmpty) {
@@ -1130,6 +1134,7 @@ Future<Response> onRequest(RequestContext context) async {
             userId: authenticatedUserId,
             preferCollection: recommendationContext.preferCollection == true,
             budgetLimitBrl: recommendationContext.budgetLimitBrl,
+            deckFormat: deckFormat,
           ),
         ),
       );
@@ -1282,6 +1287,7 @@ Future<Response> onRequest(RequestContext context) async {
             deckData: deckData,
             commanders: commanders,
             targetArchetype: effectiveOptimizeArchetype,
+            deckFormat: deckFormat,
             priorityPool: optimizeCommanderPriorityNames,
             deterministicSwapCandidates: deterministicSwapCandidates,
             bracket: bracket,
@@ -1399,8 +1405,10 @@ Future<Response> onRequest(RequestContext context) async {
         }
         responseBody['intensity'] = intensity.selected;
         responseBody['optimize_intensity'] = intensity.toJson(
-          returnedSwaps:
-              (responseBody['additions_detailed'] as List?)?.length ?? 0,
+          returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+            responseBody: responseBody,
+            effectiveMode: 'complete',
+          ),
         );
         responseBody['timings'] = telemetry.snapshot();
         responseBody['stage_telemetry'] = responseBody['timings'];
@@ -1601,6 +1609,14 @@ Future<Response> onRequest(RequestContext context) async {
       if (!isComplete) {
         validAdditions = validAdditions.toSet().toList();
       }
+      final formatLegalityFilter =
+          await filterOptimizeCardNamesByKnownFormatLegality(
+            pool: pool,
+            names: validAdditions,
+            deckFormat: deckFormat,
+          );
+      validAdditions = formatLegalityFilter.allowed;
+      final filteredByFormatLegality = formatLegalityFilter.blocked;
 
       // DEBUG: Log quantidades antes dos filtros avançados
       Log.d('Antes dos filtros de cor/bracket:');
@@ -1748,11 +1764,15 @@ Future<Response> onRequest(RequestContext context) async {
         }
         final landProtectionResult = optimize_route_land_removal_protection
             .applyOptimizeLandRemovalProtection(
+              deckFormat: deckFormat,
               removals: validRemovals,
               allCardData: allCardData,
               additions: validAdditions,
               additionsCardData: landProtectionAdditionData,
-              profileRoleTargets: optimizeCommanderRoleTargets,
+              profileRoleTargets:
+                  deckFormat == 'commander'
+                      ? optimizeCommanderRoleTargets
+                      : null,
             );
         validRemovals = landProtectionResult.removals;
         validAdditions = landProtectionResult.additions;
@@ -1952,6 +1972,12 @@ Future<Response> onRequest(RequestContext context) async {
       Map<String, dynamic>? postAnalysis;
       List<String> validationWarnings = [];
       validationWarnings.addAll(recommendationConstraintWarnings);
+      if (filteredByFormatLegality.isNotEmpty) {
+        validationWarnings.add(
+          'Legalidade de $deckFormat removeu '
+          '${filteredByFormatLegality.length} adição(ões) antes do preview.',
+        );
+      }
 
       // VALIDAÇÃO PÓS-PROCESSAMENTO: Color Identity + EDHREC + Tema
 
@@ -1965,7 +1991,9 @@ Future<Response> onRequest(RequestContext context) async {
       // 2. Validação EDHREC: verificar se additions têm sinergia comprovada
       EdhrecCommanderData? edhrecValidationData;
       List<String> additionsNotInEdhrec = [];
-      if (commanders.isNotEmpty && validAdditions.isNotEmpty) {
+      if (deckFormat == 'commander' &&
+          commanders.isNotEmpty &&
+          validAdditions.isNotEmpty) {
         try {
           final edhrecService = optimizer.edhrecService;
           edhrecValidationData = await edhrecService.fetchCommanderData(
@@ -2033,7 +2061,11 @@ Future<Response> onRequest(RequestContext context) async {
               originalDeck: allCardData,
               additionsData: additionsData,
               archetype: effectiveOptimizeArchetype,
-              profileRoleTargets: optimizeCommanderRoleTargets,
+              deckFormat: deckFormat,
+              profileRoleTargets:
+                  deckFormat == 'commander'
+                      ? optimizeCommanderRoleTargets
+                      : null,
             );
 
             if (gateResult.changed) {
@@ -2135,6 +2167,7 @@ Future<Response> onRequest(RequestContext context) async {
 
           final virtualPostAnalysis = optimize_route_virtual_analysis
               .buildOptimizeVirtualPostAnalysis(
+                deckFormat: deckFormat,
                 originalDeck: allCardData,
                 validRemovals: validRemovals,
                 validAdditions: validAdditions,
@@ -2475,6 +2508,11 @@ Future<Response> onRequest(RequestContext context) async {
         'post_analysis':
             postAnalysis, // Retorna a análise futura para o front mostrar
         'validation_warnings': validationWarnings,
+        if (filteredByFormatLegality.isNotEmpty)
+          'format_legality': {
+            'format': deckFormat,
+            'blocked_additions': filteredByFormatLegality,
+          },
         'bracket': bracket,
         'target_additions': jsonResponse['target_additions'],
         'optimize_diagnostics': optimize_route_diagnostics
@@ -2602,18 +2640,35 @@ Future<Response> onRequest(RequestContext context) async {
         isComplete: isComplete,
       );
 
-      responseBody['optimization_contract'] = buildOptimizeDecisionContract(
-        mode: effectiveMode,
-        targetArchetype: targetArchetype,
-        intensity: intensity.selected,
-        keepTheme: keepTheme,
-        additionCount:
-            (responseBody['additions_detailed'] as List?)?.length ??
-            validAdditions.length,
-        removalCount:
-            (responseBody['removals_detailed'] as List?)?.length ??
-            validRemovals.length,
-      );
+      responseBody['optimization_contract'] = {
+        ...buildOptimizeDecisionContract(
+          mode: effectiveMode,
+          targetArchetype: targetArchetype,
+          intensity: intensity.selected,
+          keepTheme: keepTheme,
+          additionCount:
+              responseBody['additions_detailed'] is List
+                  ? optimize_route_response.countOptimizeDetailedPhysicalCards(
+                    responseBody['additions_detailed'] as List,
+                  )
+                  : validAdditions.length,
+          removalCount:
+              (responseBody['removals_detailed'] as List?)?.length ??
+              validRemovals.length,
+        ),
+        if (commanderManaFloorApplies(deckFormat))
+          'mana_foundation': buildOptimizationManaFoundationContract(
+            format: deckFormat,
+            minimumLandCount:
+                deckFormat == 'commander'
+                    ? optimize_route_land_removal_protection
+                        .resolveOptimizeMinimumLandFloor(
+                          deckFormat: deckFormat,
+                          profileRoleTargets: optimizeCommanderRoleTargets,
+                        )
+                    : strategicMinimumLandCountForFormat(deckFormat),
+          ),
+      };
       responseBody['battle_validation'] =
           (responseBody['optimization_contract'] as Map)['battle_validation'];
       optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(

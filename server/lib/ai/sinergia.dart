@@ -20,6 +20,7 @@ class SynergyEngine {
     required String commanderName,
     required List<String> colors,
     required String archetype,
+    String deckFormat = 'commander',
   }) async {
     // 1. Obter Oracle Text do Comandante
     final commanderData = await _getCardData(commanderName);
@@ -75,8 +76,15 @@ class SynergyEngine {
 
     // 3. Executar Queries SEQUENCIALMENTE com rate limiting (Scryfall pede 50-100ms entre requests)
     final results = <List<String>>[];
+    final normalizedFormat = switch (deckFormat.trim().toLowerCase()) {
+      '' => 'commander',
+      'edh' => 'commander',
+      final value => value,
+    };
     for (final q in queries.take(3)) {
-      final result = await searchScryfall(q);
+      final result = await searchScryfall(
+        '$q format:$normalizedFormat -is:banned',
+      );
       results.add(result);
       // Rate limiting: 120ms entre requests para respeitar Scryfall API
       await Future.delayed(const Duration(milliseconds: 120));
@@ -160,33 +168,35 @@ class SynergyEngine {
     // Extrair a parte de identidade de cor (id<=...)
     final colorMatch = RegExp(r'id<=\S+').firstMatch(query);
     final colorPart = colorMatch?.group(0) ?? '';
+    final formatMatch = RegExp(r'format:\S+').firstMatch(query);
+    final formatPart = formatMatch?.group(0) ?? 'format:commander';
 
     if (query.contains('function:artifact-payoff')) {
-      return 'o:"whenever" o:"artifact" $colorPart format:commander -is:banned';
+      return 'o:"whenever" o:"artifact" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:enchantress')) {
-      return 'o:"whenever" o:"enchantment" o:"draw" $colorPart format:commander -is:banned';
+      return 'o:"whenever" o:"enchantment" o:"draw" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:token-doubler')) {
-      return 'o:"if one or more tokens" $colorPart format:commander -is:banned';
+      return 'o:"if one or more tokens" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:anthem')) {
-      return 'o:"creatures you control get" $colorPart format:commander -is:banned';
+      return 'o:"creatures you control get" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:reanimate')) {
-      return 'o:"return" o:"from your graveyard to the battlefield" $colorPart format:commander -is:banned';
+      return 'o:"return" o:"from your graveyard to the battlefield" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:sacrifice-outlet')) {
-      return 'o:"sacrifice a creature" $colorPart format:commander -is:banned';
+      return 'o:"sacrifice a creature" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:entomb')) {
-      return 'o:"put" o:"into your graveyard" $colorPart format:commander -is:banned';
+      return 'o:"put" o:"into your graveyard" $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:cantrip')) {
-      return 'o:"draw a card" cmc<=2 $colorPart format:commander -is:banned';
+      return 'o:"draw a card" cmc<=2 $colorPart $formatPart -is:banned';
     }
     if (query.contains('function:storm-payoff')) {
-      return 'o:"whenever you cast" o:"instant or sorcery" $colorPart format:commander -is:banned';
+      return 'o:"whenever you cast" o:"instant or sorcery" $colorPart $formatPart -is:banned';
     }
     return null;
   }

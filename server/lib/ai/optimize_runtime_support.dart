@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 import '../basic_land_utils.dart' as basic_lands;
+import '../commander_mana_floor.dart';
 import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
 import 'commander_fallback_policy.dart';
@@ -68,14 +69,26 @@ String basicLandNameForColor(String color) {
 }
 
 int? extractRecommendedLandsFromProfile(Map<String, dynamic>? profile) {
+  return extractLandPolicyFromProfile(profile)?.targetLandCount;
+}
+
+int? extractMinimumLandsFromProfile(Map<String, dynamic>? profile) {
+  return extractLandPolicyFromProfile(profile)?.minimumLandCount;
+}
+
+OptimizationProfileLandPolicy? extractLandPolicyFromProfile(
+  Map<String, dynamic>? profile,
+) {
   if (profile == null) return null;
   final structure = profile['recommended_structure'];
-  if (structure is! Map) return null;
-  final landsRaw = structure['lands'];
-  if (landsRaw is int) return landsRaw;
-  if (landsRaw is num) return landsRaw.toInt();
-  if (landsRaw is String) return int.tryParse(landsRaw);
-  return null;
+  final roleTargets = profile['role_targets'];
+  return resolveOptimizationProfileLandPolicy(
+    format: 'commander',
+    recommendedStructure:
+        structure is Map ? structure.cast<String, dynamic>() : null,
+    roleTargets:
+        roleTargets is Map ? roleTargets.cast<String, dynamic>() : null,
+  );
 }
 
 List<String> extractTopCardNamesFromProfile(
@@ -124,6 +137,7 @@ String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
 
 String buildOptimizeCacheKey({
   required String deckId,
+  required String deckFormat,
   required String archetype,
   required String mode,
   required int? bracket,
@@ -134,6 +148,7 @@ String buildOptimizeCacheKey({
 }) {
   return optimize_cache.buildOptimizeCacheKey(
     deckId: deckId,
+    deckFormat: deckFormat,
     archetype: archetype,
     mode: mode,
     bracket: bracket,
@@ -159,6 +174,7 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
   required Set<String> excludeNames,
   Set<String> commanderColorIdentity = const <String>{},
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -170,13 +186,21 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
 
   final result = await pool.execute(
     Sql.named('''
-      SELECT id::text, name, type_line, oracle_text, mana_cost, colors, color_identity
-      FROM cards
-      WHERE name = ANY(@names)
-      ORDER BY name ASC
+      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
+             c.colors, c.color_identity
+      FROM cards c
+      LEFT JOIN card_legalities cl
+        ON cl.card_id = c.id AND cl.format = @legality_format
+      WHERE c.name = ANY(@names)
+        AND (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+      ORDER BY c.name ASC
       LIMIT @limit
     '''),
-    parameters: {'names': filteredPreferred, 'limit': limit},
+    parameters: {
+      'names': filteredPreferred,
+      'limit': limit,
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   final mapped =
@@ -213,6 +237,7 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
   required String? detectedTheme,
   required Set<String> excludeNames,
   required int limit,
+  String deckFormat = 'commander',
 }) async {
   if (limit <= 0) return const [];
 
@@ -235,7 +260,8 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
              COALESCE(cmi.usage_count, 0) AS usage_count
       FROM cards c
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+      LEFT JOIN card_legalities cl
+        ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
         AND LOWER(c.name) IN (SELECT LOWER(unnest(@names::text[])))
         AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
@@ -244,7 +270,11 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
                c.name ASC
       LIMIT @limit
     '''),
-    parameters: {'names': filteredNames, 'limit': limit * 2},
+    parameters: {
+      'names': filteredNames,
+      'limit': limit * 2,
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
   );
 
   final mapped =

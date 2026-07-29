@@ -133,7 +133,7 @@ void main() {
 
       expect(
         contract['schema_version'],
-        'optimize_decision_contract_v1_2026-07-07',
+        'optimize_decision_contract_v2_2026-07-28',
       );
       expect(
         (contract['deckbuilder_validation'] as Map)['status'],
@@ -148,28 +148,28 @@ void main() {
       expect(decision['can_select_individual_changes'], isTrue);
       expect(decision['selection_unit'], 'paired_swap');
       expect(decision['paired_selection_required'], isTrue);
+      expect(decision['complete_selection_required'], isFalse);
       expect(decision['changes_are_not_applied_automatically'], isTrue);
       expect(decision['addition_count'], 3);
       expect(decision['removal_count'], 3);
     });
 
-    test(
-      'complete decision contract keeps additions independently selectable',
-      () {
-        final contract = payload.buildOptimizeDecisionContract(
-          mode: 'complete',
-          targetArchetype: 'Spellslinger',
-          intensity: 'focused',
-          keepTheme: true,
-          additionCount: 8,
-          removalCount: 0,
-        );
+    test('complete decision contract requires the validated complete plan', () {
+      final contract = payload.buildOptimizeDecisionContract(
+        mode: 'complete',
+        targetArchetype: 'Spellslinger',
+        intensity: 'focused',
+        keepTheme: true,
+        additionCount: 8,
+        removalCount: 0,
+      );
 
-        final decision = contract['user_decision'] as Map;
-        expect(decision['selection_unit'], 'individual_addition');
-        expect(decision['paired_selection_required'], isFalse);
-      },
-    );
+      final decision = contract['user_decision'] as Map;
+      expect(decision['can_select_individual_changes'], isFalse);
+      expect(decision['selection_unit'], 'complete_plan');
+      expect(decision['paired_selection_required'], isFalse);
+      expect(decision['complete_selection_required'], isTrue);
+    });
 
     test('runtime export remains compatible', () {
       expect(runtime.resolveOptimizeIntensity('focused').targetMax, 10);

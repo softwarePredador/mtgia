@@ -196,6 +196,7 @@ void main() {
         (session) => loadAppliedDeckPostAnalysis(
           session: session,
           persistedCards: cards(plainsId, islandId),
+          deckFormat: 'standard',
         ),
       );
       expect(directPostAnalysis['average_cmc'], '0.00');

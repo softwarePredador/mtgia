@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
@@ -188,11 +189,22 @@ Map<String, dynamic> _buildDeckDetailsJson(
   };
 }
 
-Future<void> _pumpScreen(
+Future<GoRouter> _pumpScreen(
   WidgetTester tester, {
   required ApiClient apiClient,
   required DeckProvider provider,
 }) async {
+  final router = GoRouter(
+    initialLocation: '/decks/deck-1',
+    routes: [
+      GoRoute(
+        path: '/decks/:deckId',
+        builder: (_, state) =>
+            DeckDetailsScreen(deckId: state.pathParameters['deckId']!),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
   await tester.pumpWidget(
     MultiProvider(
       providers: [
@@ -204,9 +216,10 @@ Future<void> _pumpScreen(
           create: (_) => AuthProvider(apiClient: apiClient),
         ),
       ],
-      child: const MaterialApp(home: DeckDetailsScreen(deckId: 'deck-1')),
+      child: MaterialApp.router(routerConfig: router),
     ),
   );
+  return router;
 }
 
 void main() {
@@ -754,6 +767,12 @@ void main() {
       expect(find.text('Draft Deck'), findsOneWidget);
       expect(apiClient.postCalls, contains('/ai/rebuild'));
       expect(apiClient.getCalls, contains('/decks/draft-1'));
+      expect(
+        GoRouter.of(
+          tester.element(find.text('Draft Deck')),
+        ).routeInformationProvider.value.uri.path,
+        '/decks/draft-1',
+      );
     },
   );
 }

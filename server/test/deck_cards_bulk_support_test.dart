@@ -79,15 +79,30 @@ void main() {
         final source =
             File('routes/decks/[id]/cards/bulk/index.dart').readAsStringSync();
 
-        final floorGate = source.indexOf('assessCommanderManaFloor');
+        final floorGate = source.indexOf(
+          'assessOptimizationCommanderManaFloor',
+        );
         final destructiveReplace = source.indexOf(
           "DELETE FROM deck_cards WHERE deck_id = @deckId",
         );
 
         expect(floorGate, greaterThanOrEqualTo(0));
         expect(destructiveReplace, greaterThan(floorGate));
-        expect(source, contains('optimization_land_floor_violation'));
+        expect(source, contains('throw OptimizationLandFloorViolation'));
+        expect(source, contains('on OptimizationLandFloorViolation catch (e)'));
+        expect(source, contains('statusCode: HttpStatus.conflict'));
+        expect(source, contains("result['error_code']"));
       },
     );
+
+    test('bulk route keeps signature failures fail-closed as HTTP 409', () {
+      final source =
+          File('routes/decks/[id]/cards/bulk/index.dart').readAsStringSync();
+
+      expect(source, contains('optimization_signature_required'));
+      expect(source, contains('optimization_preview_stale'));
+      expect(source, contains("if (result['error_code'] != null)"));
+      expect(source, contains('statusCode: HttpStatus.conflict'));
+    });
   });
 }

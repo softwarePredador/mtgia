@@ -5,19 +5,20 @@ import '../e2e_validation_policy.dart';
 // Bump whenever the player-facing optimize response contract changes. Cached
 // payloads are returned as-is, so reusing an older schema can omit safety fields
 // such as optimization_contract and battle_validation for up to six hours.
-const optimizeCacheContractVersion = 'v10';
+const optimizeCacheContractVersion = 'v12';
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   final entries = <String>[];
   for (final row in cardsResult) {
     final cardId = row[9].toString();
     final quantity = (row[2] as int?) ?? 1;
+    final commanderRole = row[1] == true ? 'commander' : 'main';
     final condition = row.length > 12 ? row[12]?.toString() : null;
     final normalizedCondition =
         (condition == null || condition.trim().isEmpty)
             ? 'NM'
             : condition.trim().toUpperCase();
-    entries.add('$cardId:$quantity:$normalizedCondition');
+    entries.add('$cardId:$quantity:$normalizedCondition:$commanderRole');
   }
   entries.sort();
   return entries.join('|');
@@ -25,6 +26,7 @@ String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
 
 String buildOptimizeCacheKey({
   required String deckId,
+  required String deckFormat,
   required String archetype,
   required String mode,
   required int? bracket,
@@ -36,6 +38,7 @@ String buildOptimizeCacheKey({
   final parts = [
     'optimize',
     mode.toLowerCase().trim(),
+    deckFormat.toLowerCase().trim(),
     intensity.toLowerCase().trim(),
     deckId,
     archetype.toLowerCase().trim(),

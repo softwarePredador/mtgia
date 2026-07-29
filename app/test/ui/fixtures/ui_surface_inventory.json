@@ -17,7 +17,7 @@
   "expected_totals": {
     "go_route": 41,
     "shell_route": 1,
-    "material_page_route": 6,
+    "material_page_route": 5,
     "dialog": 48,
     "bottom_sheet": 22,
     "menu": 9,
@@ -305,7 +305,7 @@
     {"source":"lib/features/commercial/widgets/ai_usage_gate.dart","domain":"commercial","occurrences":{"dialog":1}},
     {"source":"lib/features/community/screens/community_deck_detail_screen.dart","domain":"community","occurrences":{"dialog":1,"menu":1,"transient":7}},
     {"source":"lib/features/community/screens/community_screen.dart","domain":"community","occurrences":{"tabs":2}},
-    {"source":"lib/features/decks/screens/deck_details_screen.dart","domain":"decks","occurrences":{"material_page_route":1,"dialog":3,"bottom_sheet":1,"menu":1,"tabs":1,"transient":20}},
+    {"source":"lib/features/decks/screens/deck_details_screen.dart","domain":"decks","occurrences":{"dialog":3,"bottom_sheet":1,"menu":1,"tabs":1,"transient":20}},
     {"source":"lib/features/decks/screens/deck_generate_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":12}},
     {"source":"lib/features/decks/screens/deck_import_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":3}},
     {"source":"lib/features/decks/screens/deck_list_screen.dart","domain":"decks","occurrences":{"dialog":2,"menu":3,"transient":1}},

@@ -12,6 +12,7 @@ OUTPUT_FILE="$3"
 MARKER="${MANALOOM_NATIVE_CAPTURE_MARKER:-NATIVE_SCREENSHOT_READY life_counter_initial}"
 TIMEOUT_SECONDS="${MANALOOM_NATIVE_CAPTURE_TIMEOUT_SECONDS:-300}"
 SETTLE_SECONDS="${MANALOOM_NATIVE_CAPTURE_SETTLE_SECONDS:-3}"
+EXPECTED_ORIENTATION="${MANALOOM_NATIVE_CAPTURE_ORIENTATION:-landscape}"
 
 command -v adb >/dev/null 2>&1 || {
   echo "adb is required for the Android platform-view capture" >&2
@@ -29,12 +30,21 @@ command -v python3 >/dev/null 2>&1 || {
   echo "MANALOOM_NATIVE_CAPTURE_SETTLE_SECONDS must be a non-negative number" >&2
   exit 2
 }
+case "$EXPECTED_ORIENTATION" in
+  landscape|portrait|any) ;;
+  *)
+    echo "MANALOOM_NATIVE_CAPTURE_ORIENTATION must be landscape, portrait or any" >&2
+    exit 2
+    ;;
+esac
 
 mkdir -p "$(dirname -- "$OUTPUT_FILE")"
-temporary_png="$(mktemp "${TMPDIR:-/tmp}/manaloom_native_capture.XXXXXX.png")"
+temporary_dir="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_native_capture.XXXXXX")"
+temporary_png="$temporary_dir/capture.png"
 
 cleanup() {
   rm -f "$temporary_png"
+  rmdir "$temporary_dir" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT INT TERM
 
@@ -70,16 +80,28 @@ print(width, height, os.path.getsize(path))
 PY
 )
 
-if [[ "$width" -le "$height" ]]; then
-  echo "Life Counter native capture is not landscape: ${width}x${height}" >&2
-  exit 1
-fi
+case "$EXPECTED_ORIENTATION" in
+  landscape)
+    if [[ "$width" -le "$height" ]]; then
+      echo "Native capture is not landscape: ${width}x${height}" >&2
+      exit 1
+    fi
+    ;;
+  portrait)
+    if [[ "$height" -le "$width" ]]; then
+      echo "Native capture is not portrait: ${width}x${height}" >&2
+      exit 1
+    fi
+    ;;
+  any) ;;
+esac
 if [[ "$byte_count" -lt 50000 ]]; then
   echo "Life Counter native capture is suspiciously small: $byte_count bytes" >&2
   exit 1
 fi
 
 mv "$temporary_png" "$OUTPUT_FILE"
+rmdir "$temporary_dir" >/dev/null 2>&1 || true
 trap - EXIT INT TERM
 printf 'native_capture=%s\n' "$OUTPUT_FILE"
 printf 'dimensions=%sx%s\n' "$width" "$height"

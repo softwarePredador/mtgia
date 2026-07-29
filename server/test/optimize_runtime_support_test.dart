@@ -10,6 +10,52 @@ import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
 void main() {
+  group('extractRecommendedLandsFromProfile', () {
+    test('never leaves the target below the role minimum', () {
+      expect(
+        extractRecommendedLandsFromProfile({
+          'recommended_structure': {'lands': 35},
+          'role_targets': {
+            'lands': {'min': 36, 'max': 38},
+          },
+        }),
+        36,
+      );
+      expect(
+        extractMinimumLandsFromProfile({
+          'recommended_structure': {'lands': 35},
+          'role_targets': {
+            'lands': {'min': 36, 'max': 38},
+          },
+        }),
+        36,
+      );
+    });
+
+    test('falls back to the minimum of a structured land role target', () {
+      expect(
+        extractRecommendedLandsFromProfile({
+          'role_targets': {
+            'lands': {'min': '36', 'max': 38},
+          },
+        }),
+        36,
+      );
+    });
+
+    test('keeps target and automatic floor as separate policy values', () {
+      final policy = extractLandPolicyFromProfile({
+        'recommended_structure': {'lands': 38},
+        'role_targets': {
+          'lands': {'min': 36, 'max': 40},
+        },
+      });
+
+      expect(policy?.targetLandCount, 38);
+      expect(policy?.minimumLandCount, 36);
+    });
+  });
+
   group('inferFunctionalRoleForCard', () {
     test('uses persisted functional tags before legacy text heuristics', () {
       final role = inferFunctionalRoleForCard({
@@ -162,6 +208,7 @@ void main() {
     test('separates cache entries by intensity', () {
       final light = buildOptimizeCacheKey(
         deckId: 'deck-1',
+        deckFormat: 'commander',
         archetype: 'midrange',
         mode: 'optimize',
         bracket: 2,
@@ -171,6 +218,7 @@ void main() {
       );
       final aggressive = buildOptimizeCacheKey(
         deckId: 'deck-1',
+        deckFormat: 'commander',
         archetype: 'midrange',
         mode: 'optimize',
         bracket: 2,
@@ -180,8 +228,8 @@ void main() {
       );
 
       expect(light, isNot(equals(aggressive)));
-      expect(light, startsWith('v10:'));
-      expect(aggressive, startsWith('v10:'));
+      expect(light, startsWith('v12:'));
+      expect(aggressive, startsWith('v12:'));
     });
   });
 
@@ -530,6 +578,51 @@ void main() {
       expect(source, contains('aggregated.length < limit && bracket == null'));
     });
 
+    test('candidate loaders bind legality to the requested deck format', () {
+      final fillerSource =
+          File('lib/ai/optimize_filler_loader_support.dart').readAsStringSync();
+      final runtimeSource =
+          File('lib/ai/optimize_runtime_support.dart').readAsStringSync();
+      final swapSource =
+          File(
+            'lib/ai/optimize_swap_candidate_support.dart',
+          ).readAsStringSync();
+      final completeSource =
+          File('lib/ai/optimize_complete_support.dart').readAsStringSync();
+
+      for (final source in [fillerSource, runtimeSource, swapSource]) {
+        expect(source, isNot(contains("cl.format = 'commander'")));
+        expect(source, contains('cl.format = @legality_format'));
+        expect(source, contains("'legality_format':"));
+      }
+      expect(completeSource, contains('deckFormat: deckFormat'));
+    });
+
+    test('AI candidate context propagates Brawl format end to end', () {
+      final optimizerSource = File('lib/ai/otimizacao.dart').readAsStringSync();
+      final staplesSource =
+          File('lib/ai/format_staples_service.dart').readAsStringSync();
+      final synergySource = File('lib/ai/sinergia.dart').readAsStringSync();
+      final legalitySource =
+          File(
+            'lib/ai/optimize_format_legality_support.dart',
+          ).readAsStringSync();
+      final routeSource =
+          File('routes/ai/optimize/index.dart').readAsStringSync();
+
+      expect(optimizerSource, contains('format: normalizedDeckFormat'));
+      expect(optimizerSource, contains('deckFormat: normalizedDeckFormat'));
+      expect(optimizerSource, contains('FORMATO SOLICITADO: BRAWL'));
+      expect(staplesSource, contains('format = @format'));
+      expect(synergySource, contains('format:\$normalizedFormat'));
+      expect(legalitySource, contains('cl.format = @legality_format'));
+      expect(
+        routeSource,
+        contains('filterOptimizeCardNamesByKnownFormatLegality'),
+      );
+      expect(routeSource, contains('deckFormat: deckFormat'));
+    });
+
     test('complete responses expose the decision and battle contracts', () {
       final completeSource =
           File('lib/ai/optimize_complete_support.dart').readAsStringSync();
@@ -543,6 +636,29 @@ void main() {
         contains("responseBody['optimization_contract'] ="),
       );
       expect(completeSource, contains("responseBody['battle_validation'] ="));
+      expect(
+        completeSource,
+        contains(
+          'resolveCommanderOptimizeMetaScope(\n'
+          '    deckFormat: deckFormat,',
+        ),
+      );
+      expect(
+        completeSource,
+        contains("if (normalizedDeckFormat != 'commander') return;"),
+      );
+      expect(
+        syncRoute,
+        contains("if (deckFormat == 'commander' && commanders.isNotEmpty) {"),
+      );
+      expect(
+        syncRoute,
+        contains(
+          "if (deckFormat == 'commander' &&\n"
+          '          commanders.isNotEmpty &&\n'
+          '          validAdditions.isNotEmpty) {',
+        ),
+      );
       for (final caller in [syncRoute, asyncRoute]) {
         expect(caller, contains('targetArchetype: targetArchetype'));
         expect(caller, contains('intensity: intensity.selected'));

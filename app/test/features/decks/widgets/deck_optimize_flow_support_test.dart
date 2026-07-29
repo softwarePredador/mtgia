@@ -419,6 +419,130 @@ void main() {
     expect(plan.mutationContext['expected_deck_signature'], 'commander-1:1:NM');
   });
 
+  test('complete mode preserves aggregated quantities in bulk apply', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'complete',
+      'outcome_code': 'deck_completed',
+      'target_additions': 26,
+      'removals': const <String>[],
+      'additions': const ['Plains', 'Arcane Signet'],
+      'additions_detailed': const [
+        {
+          'card_id': 'plains-1',
+          'name': 'Plains',
+          'quantity': 25,
+          'is_basic_land': true,
+        },
+        {'card_id': 'signet-1', 'name': 'Arcane Signet', 'quantity': 1},
+      ],
+    });
+
+    final plan = buildOptimizeApplyPlan(preview);
+
+    expect(plan.mode, OptimizeApplyMode.addBulk);
+    expect(plan.bulkCards.first['quantity'], 25);
+    expect(plan.mutationContext['selected_change_count'], 26);
+    expect(plan.mutationContext['selected_entry_count'], 2);
+    expect(plan.mutationContext['preview_change_count'], 26);
+    expect(plan.mutationContext['preview_entry_count'], 2);
+  });
+
+  test('complete mode normalizes string quantities without losing copies', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'complete',
+      'outcome_code': 'deck_completed',
+      'target_additions': '28',
+      'additions_detailed': const [
+        {'card_id': 'plains-1', 'name': 'Plains', 'quantity': '25'},
+        {'card_id': 'spell-1', 'name': 'Spell', 'quantity': 3.0},
+      ],
+    });
+
+    final plan = buildOptimizeApplyPlan(preview);
+
+    expect(plan.bulkCards.map((card) => card['quantity']), [25, 3]);
+    expect(plan.mutationContext['selected_change_count'], 28);
+    expect(plan.mutationContext['selected_entry_count'], 2);
+  });
+
+  test('complete mode rejects a partial selection', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'complete',
+      'outcome_code': 'deck_completed',
+      'target_additions': 26,
+      'additions_detailed': const [
+        {'card_id': 'plains-1', 'name': 'Plains', 'quantity': 25},
+        {'card_id': 'spell-1', 'name': 'Spell', 'quantity': 1},
+      ],
+    });
+
+    expect(
+      () => buildOptimizeApplyPlan(
+        preview,
+        selection: const OptimizePreviewSelection(
+          selectedRemovalIndexes: <int>{},
+          selectedAdditionIndexes: {0},
+        ),
+      ),
+      throwsStateError,
+    );
+  });
+
+  test('complete mode fails closed when physical total misses target', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'complete',
+      'outcome_code': 'deck_completed',
+      'target_additions': 28,
+      'additions_detailed': const [
+        {'card_id': 'plains-1', 'name': 'Plains', 'quantity': 25},
+        {'card_id': 'spell-1', 'name': 'Spell', 'quantity': 1},
+      ],
+    });
+
+    expect(preview.canApply, isFalse);
+    expect(buildOptimizeApplyPlan(preview).mode, OptimizeApplyMode.none);
+  });
+
+  test('complete mode fails closed without detailed card quantities', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'complete',
+      'outcome_code': 'deck_completed',
+      'additions': const ['Plains'],
+    });
+
+    expect(preview.canApply, isFalse);
+    expect(preview.hasActionableChanges, isFalse);
+    expect(buildOptimizeApplyPlan(preview).mode, OptimizeApplyMode.none);
+  });
+
+  test('explicit non-actionable outcome cannot become an apply preview', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'optimize',
+      'outcome_code': 'no_safe_upgrade_found',
+      'removals': const ['Mind Stone'],
+      'additions': const ['Arcane Signet'],
+    });
+
+    expect(preview.canApply, isFalse);
+    expect(buildOptimizeApplyPlan(preview).mode, OptimizeApplyMode.none);
+  });
+
+  test('detailed-only response is recognized as a change', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'optimize',
+      'outcome_code': 'optimized',
+      'removals_detailed': const [
+        {'card_id': 'remove-1', 'name': 'Mind Stone'},
+      ],
+      'additions_detailed': const [
+        {'card_id': 'add-1', 'name': 'Arcane Signet'},
+      ],
+    });
+
+    expect(preview.hasChanges, isTrue);
+    expect(preview.hasActionableChanges, isTrue);
+  });
+
   test('buildOptimizeApplyPlan falls back to ids or names as needed', () {
     final idsPreview = OptimizePreviewData.fromResult({
       'mode': 'optimize',

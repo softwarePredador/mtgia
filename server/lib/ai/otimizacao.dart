@@ -44,6 +44,7 @@ class DeckOptimizerService {
     required Map<String, dynamic> deckData,
     required List<String> commanders,
     required String targetArchetype,
+    String deckFormat = 'commander',
     List<String> priorityPool = const [],
     List<Map<String, dynamic>> deterministicSwapCandidates = const [],
     int? bracket,
@@ -58,13 +59,14 @@ class DeckOptimizerService {
   }) async {
     final List<dynamic> currentCards = deckData['cards'];
     final List<String> colors = List<String>.from(deckData['colors']);
+    final normalizedDeckFormat = _normalizeOptimizeDeckFormat(deckFormat);
 
     // 0. BUSCA DE DADOS EDHREC (co-ocorrência real)
     // Esta é a fonte mais confiável: dados de milhões de decks reais.
     // Cartas frequentemente usadas juntas têm sinergia comprovada.
     // NOTA: Pular se não há comandante (Modern, Standard, etc.)
     EdhrecCommanderData? edhrecData;
-    if (commanders.isNotEmpty) {
+    if (commanders.isNotEmpty && normalizedDeckFormat == 'commander') {
       edhrecData = await edhrecService.fetchCommanderData(
         commanders.firstOrNull ?? "",
       );
@@ -139,6 +141,7 @@ class DeckOptimizerService {
           commanderName: commanders.firstOrNull ?? "",
           colors: colors,
           archetype: targetArchetype,
+          deckFormat: normalizedDeckFormat,
         );
 
         // Misturar: 70% EDHREC + 30% tema (sem duplicatas)
@@ -162,6 +165,7 @@ class DeckOptimizerService {
         commanderName: commanders.firstOrNull ?? '',
         colors: colors,
         archetype: targetArchetype,
+        deckFormat: normalizedDeckFormat,
       );
     }
 
@@ -172,7 +176,11 @@ class DeckOptimizerService {
     );
 
     // 3. RECUPERAÇÃO DE DADOS DE META (Staples de formato)
-    final formatStaples = await _fetchFormatStaples(colors, targetArchetype);
+    final formatStaples = await _fetchFormatStaples(
+      colors,
+      targetArchetype,
+      normalizedDeckFormat,
+    );
 
     // 3.5. CONSULTA AO CONHECIMENTO ML (Imitation Learning)
     // Busca padrões aprendidos dos meta decks e sinergias conhecidas
@@ -181,7 +189,7 @@ class DeckOptimizerService {
       try {
         final mlData = await _mlService.getContextForDeck(
           archetype: targetArchetype,
-          format: 'commander',
+          format: normalizedDeckFormat,
           commanderName: commanders.firstOrNull,
           currentCards: currentCards.map((c) => c['name'].toString()).toList(),
         );
@@ -202,6 +210,7 @@ class DeckOptimizerService {
         final hateCards = await _hateService.getRelevantHateCards(
           deckColors: colors,
           detectedThemes: [targetArchetype], // Não sugerir hate do próprio tema
+          format: normalizedDeckFormat,
         );
         if (hateCards.isNotEmpty) {
           hateContext = _hateService.generatePromptContext(hateCards);
@@ -224,7 +233,9 @@ class DeckOptimizerService {
     // Buscar perfil do commander no PostgreSQL
     // Buscar perfil do commander no PostgreSQL
     String? commanderProfileText;
-    if (_db != null && commanders.isNotEmpty) {
+    if (_db != null &&
+        commanders.isNotEmpty &&
+        normalizedDeckFormat == 'commander') {
       try {
         final profile = await cmd_ref.loadUsableCommanderReferenceProfile(
           pool: _db,
@@ -281,6 +292,7 @@ class DeckOptimizerService {
       deterministicSwapCandidates: deterministicSwapCandidates,
       staplesPool: formatStaples,
       archetype: targetArchetype,
+      deckFormat: normalizedDeckFormat,
       bracket: bracket,
       keepTheme: keepTheme,
       detectedTheme: detectedTheme,
@@ -304,6 +316,7 @@ class DeckOptimizerService {
     required List<String> commanders,
     required String targetArchetype,
     required int targetAdditions,
+    String deckFormat = 'commander',
     int? bracket,
     bool keepTheme = true,
     String? detectedTheme,
@@ -314,12 +327,16 @@ class DeckOptimizerService {
   }) async {
     final List<dynamic> currentCards = deckData['cards'];
     final List<String> colors = List<String>.from(deckData['colors']);
+    final normalizedDeckFormat = _normalizeOptimizeDeckFormat(deckFormat);
 
     // Busca dados EDHREC para sugestões mais precisas
     // HÍBRIDO: Se tema detectado não bate com EDHREC, mistura 70% EDHREC + 30% tema
-    final edhrecData = await edhrecService.fetchCommanderData(
-      commanders.firstOrNull ?? "",
-    );
+    final edhrecData =
+        normalizedDeckFormat == 'commander'
+            ? await edhrecService.fetchCommanderData(
+              commanders.firstOrNull ?? "",
+            )
+            : null;
 
     List<String> synergyCards;
     bool themeMatchesEdhrec = false;
@@ -361,6 +378,7 @@ class DeckOptimizerService {
           commanderName: commanders.firstOrNull ?? "",
           colors: colors,
           archetype: targetArchetype,
+          deckFormat: normalizedDeckFormat,
         );
 
         // Misturar: 70% EDHREC + 30% tema (sem duplicatas)
@@ -384,10 +402,15 @@ class DeckOptimizerService {
         commanderName: commanders.firstOrNull ?? "",
         colors: colors,
         archetype: targetArchetype,
+        deckFormat: normalizedDeckFormat,
       );
     }
 
-    final formatStaples = await _fetchFormatStaples(colors, targetArchetype);
+    final formatStaples = await _fetchFormatStaples(
+      colors,
+      targetArchetype,
+      normalizedDeckFormat,
+    );
 
     // CONSULTA AO CONHECIMENTO ML (Imitation Learning) para complete
     String? mlContext;
@@ -395,7 +418,7 @@ class DeckOptimizerService {
       try {
         final mlData = await _mlService.getContextForDeck(
           archetype: targetArchetype,
-          format: 'commander',
+          format: normalizedDeckFormat,
           commanderName: commanders.firstOrNull,
           currentCards: currentCards.map((c) => c['name'].toString()).toList(),
         );
@@ -415,6 +438,7 @@ class DeckOptimizerService {
         final hateCards = await _hateService.getRelevantHateCards(
           deckColors: colors,
           detectedThemes: [targetArchetype],
+          format: normalizedDeckFormat,
         );
         if (hateCards.isNotEmpty) {
           hateContext = _hateService.generatePromptContext(hateCards);
@@ -436,6 +460,7 @@ class DeckOptimizerService {
       synergyPool: synergyCards,
       staplesPool: formatStaples,
       archetype: targetArchetype,
+      deckFormat: normalizedDeckFormat,
       bracket: bracket,
       targetAdditions: targetAdditions,
       keepTheme: keepTheme,
@@ -706,6 +731,7 @@ class DeckOptimizerService {
   Future<List<String>> _fetchFormatStaples(
     List<String> colors,
     String archetype,
+    String deckFormat,
   ) async {
     // 1. Tentar buscar do banco local (format_staples) - ~10x mais rápido
     if (_staplesService != null) {
@@ -715,10 +741,12 @@ class DeckOptimizerService {
         final archetypeStaples = await _staplesService.getStaples(
           colors: colors,
           archetype: archetype,
+          format: deckFormat,
           limit: 25,
         );
         final genericStaples = await _staplesService.getGenericStaples(
           colors: colors,
+          format: deckFormat,
           limit: 25,
         );
 
@@ -739,7 +767,7 @@ class DeckOptimizerService {
     // 2. Fallback: buscar do Scryfall (mais lento)
     Log.i('FormatStaples: fallback para Scryfall');
     final colorQuery = colors.isEmpty ? "c:c" : "id<=${colors.join('')}";
-    final query = "format:commander -is:banned $colorQuery";
+    final query = "format:$deckFormat -is:banned $colorQuery";
     return await synergyEngine.searchScryfall(query);
   }
 
@@ -752,6 +780,7 @@ class DeckOptimizerService {
     required List<Map<String, dynamic>> deterministicSwapCandidates,
     required List<String> staplesPool,
     required String archetype,
+    required String deckFormat,
     int? bracket,
     required bool keepTheme,
     String? detectedTheme,
@@ -794,6 +823,7 @@ class DeckOptimizerService {
     // Construir prompt com dados contextuais enriquecidos
     final promptMap = <String, dynamic>{
       "commander": commanders.join(" & "),
+      "format": deckFormat,
       "archetype": archetype,
       "bracket": bracket,
       "suggested_swaps": suggestedSwaps,
@@ -845,7 +875,7 @@ class DeckOptimizerService {
               'messages': [
                 {
                   'role': 'system',
-                  'content': _getSystemPrompt(),
+                  'content': _getSystemPrompt(deckFormat),
                 }, // Função que retorna o texto do arquivo Markdown
                 {'role': 'user', 'content': userPrompt},
               ],
@@ -881,7 +911,7 @@ class DeckOptimizerService {
           endpoint: 'provider:optimize',
           model: model,
           promptSummary:
-              'Commander: ${commanders.join(" & ")}, Archetype: $archetype, Bracket: $bracket',
+              'Format: $deckFormat, Commander: ${commanders.join(" & ")}, Archetype: $archetype, Bracket: $bracket',
           responseSummary: result['summary']?.toString(),
           latencyMs: stopwatch.elapsedMilliseconds,
           inputTokens: data['usage']?['prompt_tokens'] as int?,
@@ -900,7 +930,7 @@ class DeckOptimizerService {
         endpoint: 'provider:optimize',
         model: model,
         promptSummary:
-            'Commander: ${commanders.join(" & ")}, Archetype: $archetype',
+            'Format: $deckFormat, Commander: ${commanders.join(" & ")}, Archetype: $archetype',
         latencyMs: stopwatch.elapsedMilliseconds,
         success: false,
         errorMessage: e.toString(),
@@ -909,7 +939,7 @@ class DeckOptimizerService {
     }
   }
 
-  String _getSystemPrompt() {
+  String _getSystemPrompt(String deckFormat) {
     try {
       // Tenta localizar o arquivo prompt.md relativo ao diretório de execução (server/)
       var file = File('lib/ai/prompt.md');
@@ -920,14 +950,23 @@ class DeckOptimizerService {
       }
 
       if (file.existsSync()) {
-        return file.readAsStringSync();
+        return _withOptimizeFormatDirective(
+          file.readAsStringSync(),
+          deckFormat,
+        );
       }
 
       Log.w('Arquivo prompt.md não encontrado em ${file.path}');
-      return "Você é um especialista em otimização de decks de Magic: The Gathering.";
+      return _withOptimizeFormatDirective(
+        "Você é um especialista em otimização de decks de Magic: The Gathering.",
+        deckFormat,
+      );
     } catch (e) {
       Log.e('Erro ao ler prompt.md type=${e.runtimeType}');
-      return "Você é um especialista em otimização de decks de Magic: The Gathering.";
+      return _withOptimizeFormatDirective(
+        "Você é um especialista em otimização de decks de Magic: The Gathering.",
+        deckFormat,
+      );
     }
   }
 
@@ -937,6 +976,7 @@ class DeckOptimizerService {
     required List<String> synergyPool,
     required List<String> staplesPool,
     required String archetype,
+    required String deckFormat,
     required int targetAdditions,
     int? bracket,
     required bool keepTheme,
@@ -961,6 +1001,7 @@ class DeckOptimizerService {
 
     final userPrompt = jsonEncode({
       "commander": commanders.join(" & "),
+      "format": deckFormat,
       "archetype": archetype,
       "target_additions": targetAdditions,
       "constraints": {
@@ -990,7 +1031,10 @@ class DeckOptimizerService {
               ...aiSafetyIdentifierPayload(userId),
               'model': model,
               'messages': [
-                {'role': 'system', 'content': _getSystemPromptComplete()},
+                {
+                  'role': 'system',
+                  'content': _getSystemPromptComplete(deckFormat),
+                },
                 {'role': 'user', 'content': userPrompt},
               ],
               'temperature': temperature,
@@ -1025,7 +1069,7 @@ class DeckOptimizerService {
           endpoint: 'provider:complete',
           model: model,
           promptSummary:
-              'Commander: ${commanders.join(" & ")}, Archetype: $archetype, Additions: $targetAdditions',
+              'Format: $deckFormat, Commander: ${commanders.join(" & ")}, Archetype: $archetype, Additions: $targetAdditions',
           responseSummary: result['summary']?.toString(),
           latencyMs: stopwatch.elapsedMilliseconds,
           inputTokens: data['usage']?['prompt_tokens'] as int?,
@@ -1045,7 +1089,7 @@ class DeckOptimizerService {
         endpoint: 'provider:complete',
         model: model,
         promptSummary:
-            'Commander: ${commanders.join(" & ")}, Archetype: $archetype',
+            'Format: $deckFormat, Commander: ${commanders.join(" & ")}, Archetype: $archetype',
         latencyMs: stopwatch.elapsedMilliseconds,
         success: false,
         errorMessage: e.toString(),
@@ -1054,20 +1098,52 @@ class DeckOptimizerService {
     }
   }
 
-  String _getSystemPromptComplete() {
+  String _getSystemPromptComplete(String deckFormat) {
     try {
       var file = File('lib/ai/prompt_complete.md');
       if (!file.existsSync()) {
         file = File('server/lib/ai/prompt_complete.md');
       }
       if (file.existsSync()) {
-        return file.readAsStringSync();
+        return _withOptimizeFormatDirective(
+          file.readAsStringSync(),
+          deckFormat,
+        );
       }
-      return 'Você é um especialista em construção de decks de Magic: The Gathering.';
+      return _withOptimizeFormatDirective(
+        'Você é um especialista em construção de decks de Magic: The Gathering.',
+        deckFormat,
+      );
     } catch (_) {
-      return 'Você é um especialista em construção de decks de Magic: The Gathering.';
+      return _withOptimizeFormatDirective(
+        'Você é um especialista em construção de decks de Magic: The Gathering.',
+        deckFormat,
+      );
     }
   }
+}
+
+String _normalizeOptimizeDeckFormat(String deckFormat) {
+  final normalized = deckFormat.trim().toLowerCase();
+  if (normalized.isEmpty || normalized == 'edh') return 'commander';
+  return normalized;
+}
+
+String _withOptimizeFormatDirective(String basePrompt, String deckFormat) {
+  if (_normalizeOptimizeDeckFormat(deckFormat) != 'brawl') return basePrompt;
+  return '''
+$basePrompt
+
+FORMATO SOLICITADO: BRAWL
+
+Este pedido é Brawl, não Commander. Esta diretiva prevalece sobre exemplos e
+faixas de Commander do texto-base:
+- o deck final tem exatamente 60 cartas incluindo o comandante;
+- use apenas cartas legais em Brawl e dentro da identidade de cor;
+- a fundação automática de mana deve permanecer entre 24 e 30 terrenos;
+- não aplique regras exclusivas de Commander, como 100 cartas, 40 de vida ou
+  dano de comandante.
+''';
 }
 
 List<String> mergePriorityPool({

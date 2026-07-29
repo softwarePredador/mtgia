@@ -1,9 +1,11 @@
 import 'package:server/ai/optimize_route_land_removal_protection_support.dart';
+import 'package:server/commander_mana_floor.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('blocks land removals when deck is below safe land threshold', () {
     final result = applyOptimizeLandRemovalProtection(
+      deckFormat: 'commander',
       removals: const ['Mountain', 'Weak Spell'],
       allCardData: const [
         {'name': 'Mountain', 'type_line': 'Basic Land', 'quantity': 24},
@@ -22,6 +24,7 @@ void main() {
 
   test('does not block land removals when deck has safe land count', () {
     final result = applyOptimizeLandRemovalProtection(
+      deckFormat: 'commander',
       removals: const ['Island', 'Weak Spell'],
       allCardData: const [
         {'name': 'Island', 'type_line': 'Basic Land', 'quantity': 36},
@@ -39,6 +42,7 @@ void main() {
 
   test('matches land removals case-insensitively by card name', () {
     final result = applyOptimizeLandRemovalProtection(
+      deckFormat: 'commander',
       removals: const ['sacred foundry', 'Filler Card'],
       allCardData: const [
         {'name': 'Sacred Foundry', 'type_line': 'Land', 'quantity': 1},
@@ -54,6 +58,7 @@ void main() {
 
   test('does not treat nonlands with land-like names as lands', () {
     final result = applyOptimizeLandRemovalProtection(
+      deckFormat: 'commander',
       removals: const ['Land Tax', 'Plains'],
       allCardData: const [
         {'name': 'Land Tax', 'type_line': 'Enchantment', 'quantity': 1},
@@ -71,6 +76,7 @@ void main() {
     'blocks the exact 34 to 32 fast-mana canary and keeps pairs aligned',
     () {
       final result = applyOptimizeLandRemovalProtection(
+        deckFormat: 'commander',
         removals: const ['Turbulent Steppe', 'Bloodstained Mire'],
         additions: const ['Lotus Petal', 'Chrome Mox'],
         allCardData: const [
@@ -98,6 +104,7 @@ void main() {
     'uses the higher profile floor and allows structural land replacement',
     () {
       final profileBlocked = applyOptimizeLandRemovalProtection(
+        deckFormat: 'commander',
         removals: const ['Turbulent Steppe'],
         additions: const ['Lotus Petal'],
         allCardData: const [
@@ -119,6 +126,7 @@ void main() {
       expect(profileBlocked.additions, isEmpty);
 
       final structuralReplacement = applyOptimizeLandRemovalProtection(
+        deckFormat: 'commander',
         removals: const ['Turbulent Steppe'],
         additions: const ['Command Tower'],
         allCardData: const [
@@ -141,6 +149,7 @@ void main() {
     'rejects unrelated swaps while proposal remains below profile floor',
     () {
       final result = applyOptimizeLandRemovalProtection(
+        deckFormat: 'commander',
         removals: const ['Weak Spell'],
         additions: const ['Better Spell'],
         allCardData: const [
@@ -162,4 +171,44 @@ void main() {
       expect(result.additions, isEmpty);
     },
   );
+
+  test('does not apply the Commander floor to 60-card constructed formats', () {
+    final result = applyOptimizeLandRemovalProtection(
+      deckFormat: 'standard',
+      removals: const ['Weak Spell'],
+      additions: const ['Better Spell'],
+      allCardData: const [
+        {'name': 'Plains', 'type_line': 'Basic Land', 'quantity': 22},
+        {'name': 'Weak Spell', 'type_line': 'Sorcery', 'quantity': 1},
+      ],
+      additionsCardData: const [
+        {'name': 'Better Spell', 'type_line': 'Instant'},
+      ],
+    );
+
+    expect(result.floorSatisfied, isTrue);
+    expect(result.minSafeLands, 0);
+    expect(result.removals, ['Weak Spell']);
+    expect(result.additions, ['Better Spell']);
+  });
+
+  test('uses the Brawl-specific automatic floor', () {
+    final result = applyOptimizeLandRemovalProtection(
+      deckFormat: 'brawl',
+      removals: const ['Forest'],
+      additions: const ['Better Spell'],
+      allCardData: const [
+        {'name': 'Forest', 'type_line': 'Basic Land', 'quantity': 24},
+      ],
+      additionsCardData: const [
+        {'name': 'Better Spell', 'type_line': 'Instant'},
+      ],
+    );
+
+    expect(result.minSafeLands, brawlStrategicMinimumLandCount);
+    expect(result.blockedCount, 1);
+    expect(result.projectedLandCount, 24);
+    expect(result.removals, isEmpty);
+    expect(result.additions, isEmpty);
+  });
 }

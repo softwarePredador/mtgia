@@ -183,6 +183,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   final deckSignature = buildOptimizeDeckSignature(cardsResult);
   final cacheKey = buildOptimizeCacheKey(
     deckId: deckId,
+    deckFormat: deckFormat,
     archetype: targetArchetype,
     mode: effectiveMode,
     bracket: bracket,
@@ -297,7 +298,11 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       ) ??
       detectThemeProfile(allCardData, commanders: commanders, pool: pool);
 
-  final analyzer = DeckArchetypeAnalyzerCore(allCardData, deckColors.toList());
+  final analyzer = DeckArchetypeAnalyzerCore(
+    allCardData,
+    deckColors.toList(),
+    deckFormat: deckFormat,
+  );
   final deckAnalysis =
       telemetry?.trackSync(
         'deck_context.analysis',

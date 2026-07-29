@@ -8,6 +8,7 @@ const appliedDeckPostAnalysisVersion =
 Map<String, dynamic> buildAppliedDeckPostAnalysis({
   required Iterable<Map<String, dynamic>> persistedCards,
   required Iterable<Map<String, dynamic>> catalogCards,
+  String deckFormat = 'commander',
 }) {
   final catalogById = <String, Map<String, dynamic>>{};
   for (final card in catalogCards) {
@@ -62,6 +63,7 @@ Map<String, dynamic> buildAppliedDeckPostAnalysis({
       DeckArchetypeAnalyzerCore(
         analysisCards,
         deckColors.toList()..sort(),
+        deckFormat: deckFormat,
       ).generateAnalysis();
   return {
     'schema_version': appliedDeckPostAnalysisVersion,
@@ -82,6 +84,7 @@ double _readDouble(Object? value) => switch (value) {
 Future<Map<String, dynamic>> loadAppliedDeckPostAnalysis({
   required Session session,
   required Iterable<Map<String, dynamic>> persistedCards,
+  String deckFormat = 'commander',
 }) async {
   final cards = persistedCards
       .map((card) => Map<String, dynamic>.from(card))
@@ -95,6 +98,7 @@ Future<Map<String, dynamic>> loadAppliedDeckPostAnalysis({
     return buildAppliedDeckPostAnalysis(
       persistedCards: cards,
       catalogCards: const <Map<String, dynamic>>[],
+      deckFormat: deckFormat,
     );
   }
 
@@ -123,5 +127,6 @@ Future<Map<String, dynamic>> loadAppliedDeckPostAnalysis({
   return buildAppliedDeckPostAnalysis(
     persistedCards: cards,
     catalogCards: catalogCards,
+    deckFormat: deckFormat,
   );
 }

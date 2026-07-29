@@ -34,6 +34,14 @@ const _auditPeerUsername = String.fromEnvironment(
   'MANALOOM_VISUAL_PEER_USERNAME',
 );
 const _auditResumeFrom = String.fromEnvironment('MANALOOM_VISUAL_RESUME_FROM');
+const _auditSegment = String.fromEnvironment(
+  'MANALOOM_VISUAL_SEGMENT',
+  defaultValue: 'all',
+);
+const _auditCheckpoint = String.fromEnvironment('MANALOOM_VISUAL_CHECKPOINT');
+const _nativeDeckDetailCapture = bool.fromEnvironment(
+  'MANALOOM_VISUAL_NATIVE_DECK_DETAIL_CAPTURE',
+);
 const _interactiveBattleEnabled = bool.fromEnvironment(
   'ENABLE_INTERACTIVE_BATTLE',
 );
@@ -45,6 +53,62 @@ const _auditHeight = int.fromEnvironment(
   'MANALOOM_VISUAL_HEIGHT',
   defaultValue: 844,
 );
+
+const _supportedAuditSegments = <String>{
+  'all',
+  'auth_home',
+  'decks',
+  'deck_list',
+  'deck_detail',
+  'catalog',
+  'social',
+  'community',
+  'profile_battle',
+  'trades_commercial',
+};
+
+const _supportedIsolatedCheckpoints = <String>{
+  'deck_detail_top',
+  'deck_detail_below_fold',
+  'card_search_empty',
+  'card_search_results',
+};
+
+bool get _capturesBoot =>
+    _auditSegment == 'all' || _auditSegment == 'auth_home';
+
+bool get _runsAuthHome =>
+    _auditSegment == 'auth_home' ||
+    (_auditSegment == 'all' && _auditResumeFrom.isEmpty);
+
+bool get _runsDeckList =>
+    _auditSegment == 'decks' ||
+    _auditSegment == 'deck_list' ||
+    (_auditSegment == 'all' && _auditResumeFrom.isEmpty);
+
+bool get _runsDeckDetail =>
+    _auditSegment == 'decks' ||
+    _auditSegment == 'deck_detail' ||
+    (_auditSegment == 'all' && _auditResumeFrom.isEmpty);
+
+bool get _runsCatalog =>
+    _auditSegment == 'catalog' ||
+    (_auditSegment == 'all' && _auditResumeFrom != 'social');
+
+bool get _runsCommunity =>
+    _auditSegment == 'community' ||
+    _auditSegment == 'social' ||
+    _auditSegment == 'all';
+
+bool get _runsProfileBattle =>
+    _auditSegment == 'profile_battle' ||
+    _auditSegment == 'social' ||
+    _auditSegment == 'all';
+
+bool get _runsTradesCommercial =>
+    _auditSegment == 'trades_commercial' ||
+    _auditSegment == 'social' ||
+    _auditSegment == 'all';
 
 Future<LotusUiSnapshot> _waitForNativeLifeCounterVisualReady(
   WidgetTester tester,
@@ -113,11 +177,28 @@ void main() {
     expect(_auditWidth, greaterThanOrEqualTo(320));
     expect(_auditHeight, greaterThanOrEqualTo(568));
     expect(
+      _supportedAuditSegments,
+      contains(_auditSegment),
+      reason:
+          'MANALOOM_VISUAL_SEGMENT must be all, auth_home, decks, '
+          'deck_list, deck_detail, catalog, social, community, '
+          'profile_battle or trades_commercial.',
+    );
+    expect(
       _interactiveBattleEnabled,
       isTrue,
       reason:
           'The P0 live matrix must compile the gated Battle Coach route so '
           'its welcome state and real Web focus can be audited.',
+    );
+    expect(
+      _auditCheckpoint.isEmpty ||
+          (_auditSegment == 'deck_detail' &&
+              _supportedIsolatedCheckpoints.contains(_auditCheckpoint)),
+      isTrue,
+      reason:
+          'MANALOOM_VISUAL_CHECKPOINT is only supported with the deck_detail '
+          'segment and must identify one of its four runtime checkpoints.',
     );
     if (kIsWeb) {
       await binding.setSurfaceSize(
@@ -139,7 +220,9 @@ void main() {
       ),
     );
     await tester.pump(const Duration(milliseconds: 700));
-    await _capture(binding, tester, 'splash_boot');
+    if (_capturesBoot) {
+      await _capture(binding, tester, 'splash_boot');
+    }
     await tester.pumpWidget(const SizedBox.shrink());
     holdingAuth.dispose();
 
@@ -154,9 +237,11 @@ void main() {
       attempts: 120,
     );
     expect(find.text('Entrar'), findsOneWidget);
-    await _capture(binding, tester, 'login_empty');
+    if (_capturesBoot) {
+      await _capture(binding, tester, 'login_empty');
+    }
 
-    if (_auditResumeFrom.isEmpty) {
+    if (_runsAuthHome) {
       await _goRoute(tester, '/register');
       await pumpUntilFound(
         tester,
@@ -280,7 +365,7 @@ void main() {
       attempts: 120,
     );
     await tester.pump(const Duration(seconds: 1));
-    if (_auditResumeFrom.isEmpty) {
+    if (_runsAuthHome) {
       await _capture(binding, tester, 'home_top');
 
       if (_auditWidth < 760) {
@@ -343,7 +428,11 @@ void main() {
       if (!kIsWeb) {
         await _waitForPortraitViewportAfterLifeCounter(tester);
       }
+    }
 
+    if (_auditSegment == 'auth_home') return;
+
+    if (_runsDeckList) {
       await _authenticateVisualUser(
         email: _auditEmptyEmail,
         password: _auditEmptyPassword,
@@ -399,45 +488,104 @@ void main() {
         tester.element(find.byKey(const Key('deck-create-dialog'))),
       ).pop();
       await tester.pumpAndSettle();
-
-      await _goRoute(tester, '/decks/$_auditDeckId');
-      await pumpUntilFound(
-        tester,
-        find.byKey(const Key('deck-overview-hero')),
-        attempts: 120,
-      );
-      await tester.pump(const Duration(seconds: 1));
-      await _capture(binding, tester, 'deck_detail_top');
-      final deckOverviewMoved = await _scrollVerticalParentBy(
-        tester,
-        find.byKey(const Key('deck-overview-hero')),
-        560,
-      );
-      expect(
-        deckOverviewMoved,
-        isTrue,
-        reason:
-            'Deck details must expose distinct content below the first viewport.',
-      );
-      await _capture(binding, tester, 'deck_detail_below_fold');
-
-      await _goRoute(tester, '/decks/$_auditDeckId/search');
-      await pumpUntilFound(tester, find.byKey(const Key('card-search-field')));
-      await _capture(binding, tester, 'card_search_empty');
-      await _enterTextField(
-        tester,
-        find.byKey(const Key('card-search-field')),
-        'Sol Ring',
-      );
-      await pumpUntilFound(
-        tester,
-        find.byKey(const Key('card-search-results-frame')),
-        attempts: 120,
-      );
-      await _capture(binding, tester, 'card_search_results');
     }
 
-    if (_auditResumeFrom != 'social') {
+    if (_auditSegment == 'deck_list') return;
+
+    if (_runsDeckDetail) {
+      final runsDeckOverview =
+          _auditCheckpoint.isEmpty ||
+          _auditCheckpoint == 'deck_detail_top' ||
+          _auditCheckpoint == 'deck_detail_below_fold';
+      if (runsDeckOverview) {
+        await _goRoute(tester, '/decks/$_auditDeckId');
+        await pumpUntilFound(
+          tester,
+          find.byKey(const Key('deck-overview-hero')),
+          attempts: 120,
+        );
+        await tester.pump(const Duration(seconds: 1));
+        if (_auditCheckpoint != 'deck_detail_below_fold') {
+          await _captureDeckDetailRuntimeCheckpoint(
+            binding,
+            tester,
+            'deck_detail_top',
+          );
+          if (_auditCheckpoint == 'deck_detail_top') return;
+        }
+        if (!kIsWeb &&
+            _nativeDeckDetailCapture &&
+            _auditCheckpoint == 'deck_detail_below_fold') {
+          // The physical-device renderer can ANR when WidgetTester traverses
+          // this complex sliver tree during a synthetic jump. Give the host
+          // runner a bounded window to perform a real Android swipe before
+          // the framebuffer checkpoint is announced.
+          // ignore: avoid_print
+          print('NATIVE_SCROLL_READY deck_detail_below_fold');
+          await Future<void>.delayed(const Duration(seconds: 5));
+          await tester.pump();
+        } else {
+          final deckOverviewMoved = await _scrollVerticalParentBy(
+            tester,
+            find.byKey(const Key('deck-overview-hero')),
+            560,
+          );
+          expect(
+            deckOverviewMoved,
+            isTrue,
+            reason:
+                'Deck details must expose distinct content below the first '
+                'viewport.',
+          );
+        }
+        await _captureDeckDetailRuntimeCheckpoint(
+          binding,
+          tester,
+          'deck_detail_below_fold',
+        );
+        if (_auditCheckpoint == 'deck_detail_below_fold') return;
+      }
+
+      final runsCardSearch =
+          _auditCheckpoint.isEmpty ||
+          _auditCheckpoint == 'card_search_empty' ||
+          _auditCheckpoint == 'card_search_results';
+      if (runsCardSearch) {
+        await _goRoute(tester, '/decks/$_auditDeckId/search');
+        await pumpUntilFound(
+          tester,
+          find.byKey(const Key('card-search-field')),
+        );
+        if (_auditCheckpoint != 'card_search_results') {
+          await _captureDeckDetailRuntimeCheckpoint(
+            binding,
+            tester,
+            'card_search_empty',
+          );
+          if (_auditCheckpoint == 'card_search_empty') return;
+        }
+        await _enterTextField(
+          tester,
+          find.byKey(const Key('card-search-field')),
+          'Sol Ring',
+        );
+        await pumpUntilFound(
+          tester,
+          find.byKey(const Key('card-search-results-frame')),
+          attempts: 120,
+        );
+        await _captureDeckDetailRuntimeCheckpoint(
+          binding,
+          tester,
+          'card_search_results',
+        );
+        if (_auditCheckpoint == 'card_search_results') return;
+      }
+    }
+
+    if (_auditSegment == 'decks' || _auditSegment == 'deck_detail') return;
+
+    if (_runsCatalog) {
       await _goRoute(tester, '/decks/$_auditDeckId/post-game');
       await pumpUntilFound(
         tester,
@@ -550,136 +698,157 @@ void main() {
       }
     }
 
-    await _goRoute(tester, '/community/search-users');
-    await tester.pump(const Duration(seconds: 2));
-    await _capture(binding, tester, 'user_search_empty');
-    await _enterTextField(
-      tester,
-      find.byKey(const Key('user-search-field')),
-      _auditPeerUsername,
-    );
-    await pumpUntilFound(
-      tester,
-      find.byKey(Key('user-search-row-$_auditPeerUserId')),
-      attempts: 100,
-    );
-    await _capture(binding, tester, 'user_search_results');
+    if (_auditSegment == 'catalog') return;
+    if (!_runsCommunity && !_runsProfileBattle && !_runsTradesCommercial) {
+      return;
+    }
 
-    await _goRoute(tester, '/community/user/$_auditPeerUserId');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('user-profile-content')),
-      attempts: 120,
-    );
-    await _capture(binding, tester, 'user_profile_success');
+    if (_runsCommunity) {
+      await _goRoute(tester, '/community/search-users');
+      await tester.pump(const Duration(seconds: 2));
+      await _capture(binding, tester, 'user_search_empty');
+      await _enterTextField(
+        tester,
+        find.byKey(const Key('user-search-field')),
+        _auditPeerUsername,
+      );
+      await pumpUntilFound(
+        tester,
+        find.byKey(Key('user-search-row-$_auditPeerUserId')),
+        attempts: 100,
+      );
+      await _capture(binding, tester, 'user_search_results');
 
-    await _goRoute(tester, '/community/decks/$_auditDeckId');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('community-deck-detail-frame')),
-      attempts: 120,
-    );
-    await _capture(binding, tester, 'community_deck_success');
+      await _goRoute(tester, '/community/user/$_auditPeerUserId');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('user-profile-content')),
+        attempts: 120,
+      );
+      await _capture(binding, tester, 'user_profile_success');
 
-    await _goRoute(tester, '/profile');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('profile-content')),
-      attempts: 100,
-    );
-    await tester.pump(const Duration(seconds: 1));
-    await _capture(binding, tester, 'profile_success');
+      await _goRoute(tester, '/community/decks/$_auditDeckId');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('community-deck-detail-frame')),
+        attempts: 120,
+      );
+      await _capture(binding, tester, 'community_deck_success');
+    }
 
-    await _goRoute(tester, '/decks/$_auditDeckId/battle-replays');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('battle-replays-empty-state')),
-      attempts: 120,
-    );
-    await _capture(binding, tester, 'battle_replays_empty');
+    if (_auditSegment == 'community') return;
 
-    await _goRoute(tester, '/decks/$_auditDeckId/battle-coach');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('battle-coach-welcome-state')),
-      attempts: 100,
-    );
-    await _capture(binding, tester, 'battle_coach_welcome');
+    if (_runsProfileBattle) {
+      await _goRoute(tester, '/profile');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('profile-content')),
+        attempts: 100,
+      );
+      await tester.pump(const Duration(seconds: 1));
+      await _capture(binding, tester, 'profile_success');
 
-    await _goRoute(
-      tester,
-      '/decks/$_auditDeckId/battle-live/00000000-0000-0000-0000-000000000000',
-    );
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('battle-live-disabled-state')),
-    );
-    await _capture(binding, tester, 'battle_live_disabled');
+      await _goRoute(tester, '/decks/$_auditDeckId/battle-replays');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('battle-replays-empty-state')),
+        attempts: 120,
+      );
+      await _capture(binding, tester, 'battle_replays_empty');
 
-    await _goRoute(tester, '/messages');
-    await pumpUntilAnyFound(tester, <Finder>[
-      find.byKey(const Key('messages-inbox-empty')),
-      find.byKey(const Key('messages-inbox-list')),
-    ], attempts: 100);
-    await _capture(binding, tester, 'messages_inbox');
+      await _goRoute(tester, '/decks/$_auditDeckId/battle-coach');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('battle-coach-welcome-state')),
+        attempts: 100,
+      );
+      await _capture(binding, tester, 'battle_coach_welcome');
 
-    await _goRoute(tester, '/messages/00000000-0000-0000-0000-000000000000');
-    await pumpUntilAnyFound(tester, <Finder>[
-      find.byKey(const Key('chat-error-state')),
-      find.byKey(const Key('chat-empty-state')),
-    ], attempts: 100);
-    await _capture(binding, tester, 'chat_unavailable');
+      await _goRoute(
+        tester,
+        '/decks/$_auditDeckId/battle-live/00000000-0000-0000-0000-000000000000',
+      );
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('battle-live-disabled-state')),
+      );
+      await _capture(binding, tester, 'battle_live_disabled');
 
-    await _goRoute(tester, '/notifications');
-    await pumpUntilAnyFound(tester, <Finder>[
-      find.byKey(const Key('notifications-empty')),
-      find.byKey(const Key('notifications-list')),
-    ], attempts: 100);
-    await _capture(binding, tester, 'notifications');
+      await _goRoute(tester, '/messages');
+      await pumpUntilAnyFound(tester, <Finder>[
+        find.byKey(const Key('messages-inbox-empty')),
+        find.byKey(const Key('messages-inbox-list')),
+      ], attempts: 100);
+      await _capture(binding, tester, 'messages_inbox');
 
-    await _goRoute(tester, '/trades');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('trade-inbox-tab-bar')),
-      attempts: 100,
-    );
-    await tester.pump(const Duration(milliseconds: 500));
-    await _capture(binding, tester, 'trades_inbox');
+      await _goRoute(tester, '/messages/00000000-0000-0000-0000-000000000000');
+      await pumpUntilAnyFound(tester, <Finder>[
+        find.byKey(const Key('chat-error-state')),
+        find.byKey(const Key('chat-empty-state')),
+      ], attempts: 100);
+      await _capture(binding, tester, 'chat_unavailable');
 
-    await _goRoute(tester, '/trades/create/$_auditPeerUserId');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('create-trade-content')),
-      attempts: 100,
-    );
-    await _capture(binding, tester, 'trade_create');
+      await _goRoute(tester, '/notifications');
+      await pumpUntilAnyFound(tester, <Finder>[
+        find.byKey(const Key('notifications-empty')),
+        find.byKey(const Key('notifications-list')),
+      ], attempts: 100);
+      await _capture(binding, tester, 'notifications');
+    }
 
-    await _goRoute(tester, '/trades/00000000-0000-0000-0000-000000000000');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('trade-detail-error-state')),
-      attempts: 100,
-    );
-    await _capture(binding, tester, 'trade_detail_unavailable');
+    if (_auditSegment == 'profile_battle') return;
 
-    await _goRoute(tester, '/plans');
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('beta-free-access-panel')),
-    );
-    await _capture(binding, tester, 'plans_success');
+    if (_runsTradesCommercial) {
+      await _goRoute(tester, '/trades');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('trade-inbox-tab-bar')),
+        attempts: 100,
+      );
+      await tester.pump(const Duration(milliseconds: 500));
+      await _capture(binding, tester, 'trades_inbox');
 
-    await _goRoute(tester, '/upgrade');
-    await pumpUntilFound(tester, find.byKey(const Key('upgrade-beta-notice')));
-    await _capture(binding, tester, 'upgrade_success');
+      await _goRoute(tester, '/trades/create/$_auditPeerUserId');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('create-trade-content')),
+        attempts: 100,
+      );
+      await _capture(binding, tester, 'trade_create');
 
-    await _goRoute(tester, '/checkout');
-    await pumpUntilFound(tester, find.byKey(const Key('checkout-beta-notice')));
-    await _capture(binding, tester, 'checkout_success');
+      await _goRoute(tester, '/trades/00000000-0000-0000-0000-000000000000');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('trade-detail-error-state')),
+        attempts: 100,
+      );
+      await _capture(binding, tester, 'trade_detail_unavailable');
 
-    await _goRoute(tester, '/legal');
-    await pumpUntilFound(tester, find.byKey(const Key('legal-content')));
-    await _capture(binding, tester, 'legal_success');
+      await _goRoute(tester, '/plans');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('beta-free-access-panel')),
+      );
+      await _capture(binding, tester, 'plans_success');
+
+      await _goRoute(tester, '/upgrade');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('upgrade-beta-notice')),
+      );
+      await _capture(binding, tester, 'upgrade_success');
+
+      await _goRoute(tester, '/checkout');
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('checkout-beta-notice')),
+      );
+      await _capture(binding, tester, 'checkout_success');
+
+      await _goRoute(tester, '/legal');
+      await pumpUntilFound(tester, find.byKey(const Key('legal-content')));
+      await _capture(binding, tester, 'legal_success');
+    }
   });
 }
 
@@ -724,6 +893,28 @@ Future<void> _capture(
   await tester.pump(const Duration(milliseconds: 250));
   await captureRuntimeCheckpoint(binding, tester, name);
   await _assertClean(tester, name);
+}
+
+Future<void> _captureDeckDetailRuntimeCheckpoint(
+  IntegrationTestWidgetsFlutterBinding binding,
+  WidgetTester tester,
+  String name,
+) async {
+  if (!kIsWeb && _nativeDeckDetailCapture) {
+    // The Samsung physical-device renderer can keep the complex deck-detail
+    // frame responsive while Flutter's surface conversion never completes.
+    // Announce a bounded host-side adb screencap window so the proof uses the
+    // real device framebuffer instead of timing out or accepting no image.
+    // ignore: avoid_print
+    print('NATIVE_SCREENSHOT_READY $name');
+    await Future<void>.delayed(const Duration(seconds: 8));
+    await tester.pump();
+    // ignore: avoid_print
+    print('NATIVE_SCREENSHOT_WINDOW_CLOSED $name');
+    await _assertClean(tester, name);
+    return;
+  }
+  await _capture(binding, tester, name);
 }
 
 Future<void> _tapMainDestination(WidgetTester tester, String label) async {

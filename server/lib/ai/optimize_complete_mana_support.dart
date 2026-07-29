@@ -1,12 +1,81 @@
 import '../basic_land_utils.dart' as basic_lands;
+import '../commander_mana_floor.dart';
 import 'optimize_filler_candidate_support.dart' show resolvedCardIdentity;
 import 'optimize_runtime_support.dart' show basicLandNameForColor;
 import 'optimize_state_support.dart';
 
-int calculateCompleteMaxBasicAdditions(int? commanderRecommendedLands) {
+int calculateCompleteMaxBasicAdditions(
+  int? commanderRecommendedLands, {
+  String deckFormat = 'commander',
+}) {
+  if (deckFormat.trim().toLowerCase() == 'brawl') {
+    final recommended = (commanderRecommendedLands ?? 25).clamp(24, 27);
+    return (recommended + 3).clamp(24, 30);
+  }
   final recommended = (commanderRecommendedLands ?? 38).clamp(28, 42);
-  final buffered = recommended + 4;
-  return buffered > 40 ? 40 : buffered;
+  return (recommended + 4).clamp(28, 40);
+}
+
+int resolveCompleteTargetLandCount({
+  required String deckFormat,
+  int? recommendedLandCount,
+  double? averageNonLandCmc,
+}) {
+  final normalized = deckFormat.trim().toLowerCase();
+  if (normalized == 'brawl') {
+    final fallback = switch (averageNonLandCmc) {
+      null => 25,
+      < 2.0 => 24,
+      < 3.0 => 25,
+      < 4.0 => 26,
+      _ => 27,
+    };
+    return (recommendedLandCount ?? fallback).clamp(
+      brawlStrategicMinimumLandCount,
+      27,
+    );
+  }
+
+  final fallback = switch (averageNonLandCmc) {
+    null => 36,
+    < 2.0 => 34,
+    < 3.0 => 35,
+    < 4.0 => 37,
+    _ => 39,
+  };
+  final minimum =
+      strategicMinimumLandCountForFormat(normalized) ??
+      commanderStrategicMinimumLandCount;
+  return (recommendedLandCount ?? fallback).clamp(minimum, 42);
+}
+
+Map<String, dynamic> buildVirtualBasicLandMetadata(String name) {
+  final normalizedName = name.trim().toLowerCase();
+  final color = switch (normalizedName) {
+    'plains' => 'W',
+    'island' => 'U',
+    'swamp' => 'B',
+    'mountain' => 'R',
+    'forest' => 'G',
+    _ => null,
+  };
+  final canonicalName = switch (normalizedName) {
+    'plains' => 'Plains',
+    'island' => 'Island',
+    'swamp' => 'Swamp',
+    'mountain' => 'Mountain',
+    'forest' => 'Forest',
+    'wastes' => 'Wastes',
+    _ => name.trim(),
+  };
+
+  return {
+    'type_line':
+        canonicalName.isEmpty ? 'Basic Land' : 'Basic Land — $canonicalName',
+    'oracle_text': color == null ? '{T}: Add {C}.' : '{T}: Add {$color}.',
+    'colors': const <String>[],
+    'color_identity': color == null ? const <String>[] : <String>[color],
+  };
 }
 
 Map<String, int> buildCompleteColorDemandMap({

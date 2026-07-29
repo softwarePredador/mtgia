@@ -10,8 +10,32 @@ void main() {
       expect(calculateCompleteMaxBasicAdditions(32), equals(36));
     });
 
-    test('buildWeightedBasicLandPlan favors the color with highest deficit',
-        () {
+    test('Brawl uses a 60-card land target and cap', () {
+      expect(resolveCompleteTargetLandCount(deckFormat: 'brawl'), equals(25));
+      expect(
+        resolveCompleteTargetLandCount(
+          deckFormat: 'brawl',
+          averageNonLandCmc: 4.2,
+        ),
+        equals(27),
+      );
+      expect(
+        calculateCompleteMaxBasicAdditions(null, deckFormat: 'brawl'),
+        equals(28),
+      );
+    });
+
+    test('Commander target never drops below the automatic floor', () {
+      expect(
+        resolveCompleteTargetLandCount(
+          deckFormat: 'commander',
+          recommendedLandCount: 29,
+        ),
+        equals(34),
+      );
+    });
+
+    test('buildWeightedBasicLandPlan favors the color with highest deficit', () {
       final currentDeck = [
         _card(
           name: 'Talrand, Sky Summoner',
@@ -73,38 +97,89 @@ void main() {
       );
     });
 
-    test('buildWeightedBasicLandPlan returns wastes for colorless identity',
-        () {
+    test(
+      'buildWeightedBasicLandPlan returns wastes for colorless identity',
+      () {
+        final plan = buildWeightedBasicLandPlan(
+          currentDeck: const [],
+          commanderColorIdentity: const <String>{},
+          slotsToAdd: 3,
+        );
+
+        expect(plan, equals(const ['Wastes', 'Wastes', 'Wastes']));
+      },
+    );
+
+    test('virtual basics preserve canonical colored-source metadata', () {
+      expect(buildVirtualBasicLandMetadata('Plains'), {
+        'type_line': 'Basic Land — Plains',
+        'oracle_text': '{T}: Add {W}.',
+        'colors': const <String>[],
+        'color_identity': const ['W'],
+      });
+      expect(buildVirtualBasicLandMetadata('Wastes'), {
+        'type_line': 'Basic Land — Wastes',
+        'oracle_text': '{T}: Add {C}.',
+        'colors': const <String>[],
+        'color_identity': const <String>[],
+      });
+    });
+
+    test('second mana stage accounts for basics added by the first stage', () {
+      final forestMetadata = buildVirtualBasicLandMetadata('Forest');
+      final currentDeck = [
+        _card(
+          name: 'Simic commander',
+          typeLine: 'Legendary Creature',
+          manaCost: '{G}{U}',
+          oracleText: '',
+          quantity: 1,
+          colors: const ['G', 'U'],
+          cmc: 2,
+        ),
+        {
+          'name': 'Forest',
+          ...forestMetadata,
+          'mana_cost': '',
+          'quantity': 8,
+          'cmc': 0.0,
+        },
+      ];
+
       final plan = buildWeightedBasicLandPlan(
-        currentDeck: const [],
-        commanderColorIdentity: const <String>{},
-        slotsToAdd: 3,
+        currentDeck: currentDeck,
+        commanderColorIdentity: const {'G', 'U'},
+        slotsToAdd: 4,
       );
 
-      expect(plan, equals(const ['Wastes', 'Wastes', 'Wastes']));
+      expect(
+        plan.where((name) => name == 'Island').length,
+        greaterThan(plan.where((name) => name == 'Forest').length),
+      );
     });
 
     test(
-        'buildCompleteColorDemandMap falls back to color identity when mana cost has no explicit symbols',
-        () {
-      final demand = buildCompleteColorDemandMap(
-        currentDeck: [
-          _card(
-            name: 'Colorless Simic Spell',
-            typeLine: 'Sorcery',
-            manaCost: '{3}',
-            oracleText: 'Draw a card.',
-            quantity: 2,
-            colors: const ['G', 'U'],
-            cmc: 3,
-          ),
-        ],
-        commanderColorIdentity: {'G', 'U'},
-      );
+      'buildCompleteColorDemandMap falls back to color identity when mana cost has no explicit symbols',
+      () {
+        final demand = buildCompleteColorDemandMap(
+          currentDeck: [
+            _card(
+              name: 'Colorless Simic Spell',
+              typeLine: 'Sorcery',
+              manaCost: '{3}',
+              oracleText: 'Draw a card.',
+              quantity: 2,
+              colors: const ['G', 'U'],
+              cmc: 3,
+            ),
+          ],
+          commanderColorIdentity: {'G', 'U'},
+        );
 
-      expect(demand['G'], equals(2));
-      expect(demand['U'], equals(2));
-    });
+        expect(demand['G'], equals(2));
+        expect(demand['U'], equals(2));
+      },
+    );
   });
 }
 
