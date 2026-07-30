@@ -29,7 +29,11 @@
       "focused_test_count": 6,
       "postgresql_printing_match_count": 4,
       "postgresql_distinct_oracle_ids": 1,
-      "postgresql_legendary_creature_rows": 4
+      "postgresql_legendary_creature_rows": 4,
+      "versioned_patch_sha256": "ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812",
+      "raw_diff_sha256": "fc94374d923b88c7c31d9a65605c23309b92ea7903865b030c93c62dc9844ef0",
+      "name_status_sha256": "a8cb9207f38eda271cc17efd27be732941eae0377ad893da82347c1948e9af39",
+      "sorted_paths_sha256": "8c5cd517e644a08bec69dccc8a9b022caec88a15610cfb0850be4f5caaac949e"
     }
   }
 }

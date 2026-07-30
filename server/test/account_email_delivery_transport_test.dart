@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 void main() {
   const resetToken = 'reset-token-test-only';
   const verificationToken = 'verification-token-test-only';
-  const resendApiKey = 're_test_only_never_real_123456789';
+  const resendApiKey = "re_test_only_never_real_'_123456789";
   final expiresAt = DateTime.utc(2026, 7, 30, 18, 30);
 
   test('generic webhook keeps Authorization and canonical payload', () async {
@@ -66,8 +66,8 @@ void main() {
         'ENVIRONMENT': 'production',
         'MANALOOM_EMAIL_DELIVERY_PROVIDER': 'resend',
         'RESEND_API_KEY': resendApiKey,
-        'RESEND_FROM_EMAIL': 'conta@mail.example.test',
-        'RESEND_FROM_NAME': 'ManaLoom Conta',
+        'RESEND_FROM_EMAIL': "o'connor@mail.example.test",
+        'RESEND_FROM_NAME': "ManaLoom O'Connor",
         'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
         'EMAIL_VERIFICATION_APP_URL':
             'https://app.example.test/app/#/verify-email?source=account',
@@ -95,7 +95,10 @@ void main() {
     expect(idempotencyKey, isNot(contains('player@example.test')));
 
     final payload = jsonDecode(captured.body) as Map<String, dynamic>;
-    expect(payload['from'], 'ManaLoom Conta <conta@mail.example.test>');
+    expect(
+      payload['from'],
+      "ManaLoom O'Connor <o'connor@mail.example.test>",
+    );
     expect(payload['to'], ['player@example.test']);
     expect(payload['subject'], 'Verifique seu email no ManaLoom');
     expect(payload, isNot(contains('template')));

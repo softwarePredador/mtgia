@@ -1338,12 +1338,69 @@ if [[ "$PREVIOUS_SOURCE_IMAGE" != "$ROLLBACK_SOURCE_IMAGE" ]]; then
   echo "origem EasyPanel anterior sera normalizada para o digest imutavel da spec durante eventual rollback" >&2
 fi
 
-# Local deploy values are embedded; remote values are escaped. Swarm must keep
-# the full repo@sha256 reference in both its spec and running task.
+encode_remote_value() {
+  printf '%s' "$1" | base64 | tr -d '\r\n'
+}
+
+# Values originating in configuration are transported as base64 and decoded
+# into remote shell variables. This preserves apostrophes, spaces and other
+# valid content without allowing any value to become shell syntax.
+deploy_timestamp_b64="$(encode_remote_value "$deploy_timestamp")"
+allowed_origins_b64="$(encode_remote_value "$ALLOWED_ORIGINS_CANONICAL")"
+trusted_proxy_hops_b64="$(
+  encode_remote_value "$MANALOOM_TRUSTED_PROXY_HOPS"
+)"
+trusted_proxy_peers_b64="$(
+  encode_remote_value "$MANALOOM_TRUSTED_PROXY_PEERS"
+)"
+email_delivery_provider_b64="$(
+  encode_remote_value "$MANALOOM_EMAIL_DELIVERY_PROVIDER"
+)"
+resend_api_key_b64="$(encode_remote_value "$RESEND_API_KEY")"
+resend_from_email_b64="$(encode_remote_value "$RESEND_FROM_EMAIL")"
+resend_from_name_b64="$(encode_remote_value "$RESEND_FROM_NAME")"
+resend_verified_domain_b64="$(encode_remote_value "$RESEND_VERIFIED_DOMAIN")"
+password_reset_webhook_url_b64="$(
+  encode_remote_value "$PASSWORD_RESET_WEBHOOK_URL"
+)"
+password_reset_webhook_token_b64="$(
+  encode_remote_value "$PASSWORD_RESET_WEBHOOK_TOKEN"
+)"
+password_reset_app_url_b64="$(encode_remote_value "$PASSWORD_RESET_APP_URL")"
+email_verification_webhook_url_b64="$(
+  encode_remote_value "$EMAIL_VERIFICATION_WEBHOOK_URL"
+)"
+email_verification_webhook_token_b64="$(
+  encode_remote_value "$EMAIL_VERIFICATION_WEBHOOK_TOKEN"
+)"
+email_verification_app_url_b64="$(
+  encode_remote_value "$EMAIL_VERIFICATION_APP_URL"
+)"
+sentry_dsn_b64="$(encode_remote_value "$SENTRY_DSN")"
+
+# Swarm must keep the full repo@sha256 reference in both its spec and running
+# task. Only fixed, validated identifiers remain embedded directly.
 DEPLOY_MUTATION_STARTED=1
 # shellcheck disable=SC2087
 ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
 set -euo pipefail
+decode_b64() { printf '%s' "\$1" | base64 -d; }
+deploy_timestamp_value=\$(decode_b64 '$deploy_timestamp_b64')
+allowed_origins=\$(decode_b64 '$allowed_origins_b64')
+trusted_proxy_hops=\$(decode_b64 '$trusted_proxy_hops_b64')
+trusted_proxy_peers=\$(decode_b64 '$trusted_proxy_peers_b64')
+email_delivery_provider=\$(decode_b64 '$email_delivery_provider_b64')
+resend_api_key=\$(decode_b64 '$resend_api_key_b64')
+resend_from_email=\$(decode_b64 '$resend_from_email_b64')
+resend_from_name=\$(decode_b64 '$resend_from_name_b64')
+resend_verified_domain=\$(decode_b64 '$resend_verified_domain_b64')
+password_reset_webhook_url=\$(decode_b64 '$password_reset_webhook_url_b64')
+password_reset_webhook_token=\$(decode_b64 '$password_reset_webhook_token_b64')
+password_reset_app_url=\$(decode_b64 '$password_reset_app_url_b64')
+email_verification_webhook_url=\$(decode_b64 '$email_verification_webhook_url_b64')
+email_verification_webhook_token=\$(decode_b64 '$email_verification_webhook_token_b64')
+email_verification_app_url=\$(decode_b64 '$email_verification_app_url_b64')
+sentry_dsn=\$(decode_b64 '$sentry_dsn_b64')
 docker service update \
   --update-order stop-first \
   --update-failure-action rollback \
@@ -1354,22 +1411,22 @@ docker service update \
   --detach=true \
   --image '$image_digest_ref' \
   --env-add GIT_SHA='$sha' \
-  --env-add DEPLOY_TIMESTAMP='$deploy_timestamp' \
-  --env-add MANALOOM_ALLOWED_ORIGINS='$ALLOWED_ORIGINS_CANONICAL' \
-  --env-add MANALOOM_TRUSTED_PROXY_HOPS='$MANALOOM_TRUSTED_PROXY_HOPS' \
-  --env-add MANALOOM_TRUSTED_PROXY_PEERS='$MANALOOM_TRUSTED_PROXY_PEERS' \
-  --env-add MANALOOM_EMAIL_DELIVERY_PROVIDER='$MANALOOM_EMAIL_DELIVERY_PROVIDER' \
-  --env-add RESEND_API_KEY='$RESEND_API_KEY' \
-  --env-add RESEND_FROM_EMAIL='$RESEND_FROM_EMAIL' \
-  --env-add RESEND_FROM_NAME='$RESEND_FROM_NAME' \
-  --env-add RESEND_VERIFIED_DOMAIN='$RESEND_VERIFIED_DOMAIN' \
-  --env-add PASSWORD_RESET_WEBHOOK_URL='$PASSWORD_RESET_WEBHOOK_URL' \
-  --env-add PASSWORD_RESET_WEBHOOK_TOKEN='$PASSWORD_RESET_WEBHOOK_TOKEN' \
-  --env-add PASSWORD_RESET_APP_URL='$PASSWORD_RESET_APP_URL' \
-  --env-add EMAIL_VERIFICATION_WEBHOOK_URL='$EMAIL_VERIFICATION_WEBHOOK_URL' \
-  --env-add EMAIL_VERIFICATION_WEBHOOK_TOKEN='$EMAIL_VERIFICATION_WEBHOOK_TOKEN' \
-  --env-add EMAIL_VERIFICATION_APP_URL='$EMAIL_VERIFICATION_APP_URL' \
-  --env-add SENTRY_DSN='$SENTRY_DSN' \
+  --env-add DEPLOY_TIMESTAMP="\$deploy_timestamp_value" \
+  --env-add MANALOOM_ALLOWED_ORIGINS="\$allowed_origins" \
+  --env-add MANALOOM_TRUSTED_PROXY_HOPS="\$trusted_proxy_hops" \
+  --env-add MANALOOM_TRUSTED_PROXY_PEERS="\$trusted_proxy_peers" \
+  --env-add MANALOOM_EMAIL_DELIVERY_PROVIDER="\$email_delivery_provider" \
+  --env-add RESEND_API_KEY="\$resend_api_key" \
+  --env-add RESEND_FROM_EMAIL="\$resend_from_email" \
+  --env-add RESEND_FROM_NAME="\$resend_from_name" \
+  --env-add RESEND_VERIFIED_DOMAIN="\$resend_verified_domain" \
+  --env-add PASSWORD_RESET_WEBHOOK_URL="\$password_reset_webhook_url" \
+  --env-add PASSWORD_RESET_WEBHOOK_TOKEN="\$password_reset_webhook_token" \
+  --env-add PASSWORD_RESET_APP_URL="\$password_reset_app_url" \
+  --env-add EMAIL_VERIFICATION_WEBHOOK_URL="\$email_verification_webhook_url" \
+  --env-add EMAIL_VERIFICATION_WEBHOOK_TOKEN="\$email_verification_webhook_token" \
+  --env-add EMAIL_VERIFICATION_APP_URL="\$email_verification_app_url" \
+  --env-add SENTRY_DSN="\$sentry_dsn" \
   --env-add SENTRY_ENVIRONMENT=production \
   --env-add SENTRY_RELEASE='manaloom-backend@$short_sha' \
   --env-add BATTLE_JOB_WORKER_ENABLED=true \

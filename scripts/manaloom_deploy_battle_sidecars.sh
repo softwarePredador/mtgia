@@ -194,6 +194,7 @@ DEPLOY_COMMITTED=0
 XMAGE_MUTATION_STARTED=0
 FORGE_MUTATION_STARTED=0
 XMAGE_INTERACTIVE_MUTATION_STARTED=0
+BACKEND_ENV_MUTATION_STARTED=0
 XMAGE_INTERACTIVE_PREVIOUS_EXISTS=0
 XMAGE_PREVIOUS_SOURCE_IMAGE=""
 XMAGE_ROLLBACK_SOURCE_IMAGE=""
@@ -212,6 +213,11 @@ FORGE_ROLLBACK_SOURCE_IMAGE=""
 FORGE_PREVIOUS_SPEC_IMAGE=""
 FORGE_PREVIOUS_RUNNING_IMAGE=""
 FORGE_PREVIOUS_UPDATE_STATE=""
+BACKEND_PREVIOUS_EASYPANEL_ENV=""
+BACKEND_PREVIOUS_SPEC_IMAGE=""
+BACKEND_PREVIOUS_RUNNING_IMAGE=""
+BACKEND_PREVIOUS_UPDATE_STATE=""
+BACKEND_PREVIOUS_ENV_SHA256=""
 SOURCE_WORKTREE=""
 
 cleanup_remote_build_dir() {
@@ -657,6 +663,21 @@ printf '%s|%s|%s|%s' \"\$replicas\" \"\$spec\" \"\$running\" \"\$update\"
 "
 }
 
+runtime_environment_sha256() {
+  local swarm_service="$1"
+  # Only the digest leaves the server. Environment values, including
+  # credentials, never enter local output or rollback logs.
+  # shellcheck disable=SC2029
+  ssh "${ssh_args[@]}" "$ssh_target" "
+set -euo pipefail
+docker service inspect '$swarm_service' \
+  --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  LC_ALL=C sort |
+  sha256sum |
+  awk '{print \$1}'
+"
+}
+
 validate_sidecar_baseline() {
   local label="$1"
   local image_repo="$2"
@@ -687,12 +708,21 @@ FORGE_PREVIOUS_SOURCE_IMAGE="$(jq -er \
   <<<"$services_json")"
 XMAGE_PREVIOUS_RUNTIME_STATE="$(sidecar_runtime_state "${PROJECT}_${XMAGE_SERVICE}")"
 FORGE_PREVIOUS_RUNTIME_STATE="$(sidecar_runtime_state "${PROJECT}_${FORGE_SERVICE}")"
+backend_swarm_service="${PROJECT}_${BACKEND_SERVICE}"
+BACKEND_PREVIOUS_EASYPANEL_ENV="$(jq -er \
+  --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" \
+  '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .env' \
+  <<<"$services_json")"
+BACKEND_PREVIOUS_RUNTIME_STATE="$(sidecar_runtime_state "$backend_swarm_service")"
 IFS='|' read -r xmage_previous_replicas XMAGE_PREVIOUS_SPEC_IMAGE \
   XMAGE_PREVIOUS_RUNNING_IMAGE XMAGE_PREVIOUS_UPDATE_STATE \
   <<<"$XMAGE_PREVIOUS_RUNTIME_STATE"
 IFS='|' read -r forge_previous_replicas FORGE_PREVIOUS_SPEC_IMAGE \
   FORGE_PREVIOUS_RUNNING_IMAGE FORGE_PREVIOUS_UPDATE_STATE \
   <<<"$FORGE_PREVIOUS_RUNTIME_STATE"
+IFS='|' read -r backend_previous_replicas BACKEND_PREVIOUS_SPEC_IMAGE \
+  BACKEND_PREVIOUS_RUNNING_IMAGE BACKEND_PREVIOUS_UPDATE_STATE \
+  <<<"$BACKEND_PREVIOUS_RUNTIME_STATE"
 validate_sidecar_baseline \
   "$XMAGE_SERVICE" "$XMAGE_IMAGE_REPO" "$XMAGE_PREVIOUS_RUNTIME_STATE" \
   "$xmage_previous_replicas" "$XMAGE_PREVIOUS_SPEC_IMAGE" \
@@ -701,6 +731,22 @@ validate_sidecar_baseline \
   "$FORGE_SERVICE" "$FORGE_IMAGE_REPO" "$FORGE_PREVIOUS_RUNTIME_STATE" \
   "$forge_previous_replicas" "$FORGE_PREVIOUS_SPEC_IMAGE" \
   "$FORGE_PREVIOUS_RUNNING_IMAGE" "$FORGE_PREVIOUS_UPDATE_STATE"
+if [[ "$backend_previous_replicas" != "1/1" ||
+      "$BACKEND_PREVIOUS_RUNNING_IMAGE" != "$BACKEND_PREVIOUS_SPEC_IMAGE" ||
+      ( -n "$BACKEND_PREVIOUS_UPDATE_STATE" &&
+        "$BACKEND_PREVIOUS_UPDATE_STATE" != "completed" &&
+        "$BACKEND_PREVIOUS_UPDATE_STATE" != "rollback_completed" ) ||
+      ! "$BACKEND_PREVIOUS_SPEC_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]; then
+  echo "deploy recusado: baseline backend nao e rollback-safe: $BACKEND_PREVIOUS_RUNTIME_STATE" >&2
+  exit 2
+fi
+BACKEND_PREVIOUS_ENV_SHA256="$(
+  runtime_environment_sha256 "$backend_swarm_service"
+)"
+if [[ ! "$BACKEND_PREVIOUS_ENV_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+  echo "deploy recusado: ambiente baseline do backend nao produziu digest valido" >&2
+  exit 2
+fi
 wait_for_sidecar_health \
   "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" catalog_ready >/dev/null
 wait_for_sidecar_health \
@@ -1160,6 +1206,75 @@ rollback_xmage_interactive() {
   echo "rollback XMage interativo comprovado: spec, digest e health restaurados" >&2
 }
 
+rollback_backend_environment() {
+  local easypanel_status=1 runtime_status=1 configured_status=1 health_status=1
+  local current_services current_env runtime_state current_env_sha256
+
+  if [[ "$BACKEND_ENV_MUTATION_STARTED" != "1" ]]; then
+    return 0
+  fi
+
+  if trpc_post services.app.updateEnv "$(jq -cn \
+       --arg project "$PROJECT" \
+       --arg service "$BACKEND_SERVICE" \
+       --arg env "$BACKEND_PREVIOUS_EASYPANEL_ENV" \
+       '{projectName:$project,serviceName:$service,env:$env}')" >/dev/null; then
+    easypanel_status=0
+  fi
+
+  runtime_state="$(sidecar_runtime_state "$backend_swarm_service")"
+  current_env_sha256="$(runtime_environment_sha256 "$backend_swarm_service")"
+  IFS='|' read -r rollback_replicas rollback_spec rollback_running \
+    rollback_update <<<"$runtime_state"
+  if [[ "$rollback_replicas" == "1/1" &&
+        "$rollback_spec" == "$BACKEND_PREVIOUS_SPEC_IMAGE" &&
+        "$rollback_running" == "$BACKEND_PREVIOUS_SPEC_IMAGE" &&
+        "$current_env_sha256" == "$BACKEND_PREVIOUS_ENV_SHA256" &&
+        ( -z "$rollback_update" || "$rollback_update" == "completed" ||
+          "$rollback_update" == "rollback_completed" ) ]]; then
+    runtime_status=0
+  else
+    # The immediately previous Swarm spec is the exact backend baseline
+    # captured before this script changed its environment.
+    # shellcheck disable=SC2029
+    if ssh "${ssh_args[@]}" "$ssh_target" \
+         "docker service update --detach=true --rollback '$backend_swarm_service' >/dev/null" &&
+       wait_for_service \
+         "$backend_swarm_service" "$BACKEND_PREVIOUS_SPEC_IMAGE"; then
+      current_env_sha256="$(
+        runtime_environment_sha256 "$backend_swarm_service"
+      )"
+      if [[ "$current_env_sha256" == "$BACKEND_PREVIOUS_ENV_SHA256" ]]; then
+        runtime_status=0
+      fi
+    fi
+  fi
+
+  if current_services="$(trpc_post projects.listProjectsAndServices null)" &&
+     current_env="$(jq -er \
+       --arg project "$PROJECT" \
+       --arg service "$BACKEND_SERVICE" \
+       '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .env' \
+       <<<"$current_services")" &&
+     [[ "$current_env" == "$BACKEND_PREVIOUS_EASYPANEL_ENV" ]]; then
+    configured_status=0
+  fi
+
+  if [[ "$runtime_status" == "0" ]] &&
+     wait_for_sidecar_health \
+       "$backend_swarm_service" "$BACKEND_SERVICE" >/dev/null; then
+    health_status=0
+  fi
+
+  if [[ "$easypanel_status" == "0" && "$runtime_status" == "0" &&
+        "$configured_status" == "0" && "$health_status" == "0" ]]; then
+    echo "rollback backend comprovado: EasyPanel, spec, tarefa, ambiente e health restaurados" >&2
+    return 0
+  fi
+  echo "CRITICAL: rollback backend nao comprovado (easypanel=$easypanel_status runtime=$runtime_status configured=$configured_status health=$health_status)" >&2
+  return 1
+}
+
 rollback_battle_sidecars() {
   local rollback_status=0
   echo "deploy dos battle sidecars falhou; restaurando digests anteriores" >&2
@@ -1175,6 +1290,9 @@ rollback_battle_sidecars() {
     rollback_one_sidecar \
       "$XMAGE_SERVICE" "$XMAGE_PREVIOUS_SPEC_IMAGE" \
       "$XMAGE_ROLLBACK_SOURCE_IMAGE" "$XMAGE_SERVICE" catalog_ready || rollback_status=1
+  fi
+  if [[ "$BACKEND_ENV_MUTATION_STARTED" == "1" ]]; then
+    rollback_backend_environment || rollback_status=1
   fi
   return "$rollback_status"
 }
@@ -1249,6 +1367,7 @@ backend_env="$(upsert_env "$backend_env" DB_PASS "$DB_PASS")"
 backend_env="$(upsert_env "$backend_env" DATABASE_URL "$DATABASE_URL")"
 backend_env="$(upsert_env "$backend_env" DB_SSL_MODE "$DB_SSL_MODE")"
 
+BACKEND_ENV_MUTATION_STARTED=1
 trpc_post services.app.updateEnv "$(jq -cn --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" --arg env "$backend_env" '{projectName:$project,serviceName:$service,env:$env}')" >/dev/null
 
 encode_base64() {
@@ -1262,7 +1381,6 @@ db_user_b64="$(encode_base64 "$DB_USER")"
 db_pass_b64="$(encode_base64 "$DB_PASS")"
 database_url_b64="$(encode_base64 "$DATABASE_URL")"
 db_ssl_mode_b64="$(encode_base64 "$DB_SSL_MODE")"
-backend_swarm_service="${PROJECT}_${BACKEND_SERVICE}"
 
 # shellcheck disable=SC2029
 ssh "${ssh_args[@]}" "$ssh_target" "

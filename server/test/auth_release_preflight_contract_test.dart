@@ -30,6 +30,28 @@ void main() {
     expect(deploy, contains('--env-add RESEND_FROM_EMAIL='));
     expect(deploy, contains('--env-add RESEND_FROM_NAME='));
     expect(deploy, contains('--env-add RESEND_VERIFIED_DOMAIN='));
+    expect(
+      deploy,
+      contains(
+        'resend_api_key_b64="\$(encode_remote_value "\$RESEND_API_KEY")"',
+      ),
+    );
+    expect(
+      deploy,
+      contains("resend_api_key=\\\$(decode_b64 '\$resend_api_key_b64')"),
+    );
+    expect(
+      deploy,
+      contains('--env-add RESEND_API_KEY="\\\$resend_api_key"'),
+    );
+    expect(
+      deploy,
+      isNot(contains("--env-add RESEND_API_KEY='\$RESEND_API_KEY'")),
+    );
+    expect(
+      deploy,
+      isNot(contains("--env-add RESEND_FROM_NAME='\$RESEND_FROM_NAME'")),
+    );
     expect(deploy, contains('spec_resend_api_key_sha256'));
     expect(deploy, contains('runtime_resend_api_key_sha256'));
     expect(deploy, contains('jwt_secret_configured'));

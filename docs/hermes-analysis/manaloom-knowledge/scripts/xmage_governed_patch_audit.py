@@ -23,6 +23,7 @@ EVIDENCE_SCHEMA = "manaloom_xmage_governed_patch_evidence_v1_2026-07-30"
 AUDIT_SCHEMA = "manaloom_xmage_governed_patch_audit_v1_2026-07-30"
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+PATCH_DIFF_HEADER = re.compile(r"^diff --git a/(.+) b/(.+)$")
 EXPECTED_POLICY = {
     "upstream_pin_remains_canonical": True,
     "governed_patch_must_be_fetchable": True,
@@ -68,6 +69,56 @@ def file_sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def versioned_patch_name_status(path: Path) -> list[tuple[str, str]]:
+    """Derive the exact Git name-status surface from a versioned text patch."""
+
+    entries: list[tuple[str, str]] = []
+    current_path: str | None = None
+    current_status = "M"
+
+    def finish_entry() -> None:
+        if current_path is not None:
+            entries.append((current_status, current_path))
+
+    for line in path.read_text(encoding="utf-8").splitlines():
+        header = PATCH_DIFF_HEADER.fullmatch(line)
+        if header is not None:
+            finish_entry()
+            before_path, after_path = header.groups()
+            if before_path != after_path:
+                raise ValueError("renamed or mismatched patch paths are forbidden")
+            current_path = after_path
+            current_status = "M"
+            continue
+        if current_path is None:
+            if line:
+                raise ValueError("patch content appeared before the first diff header")
+            continue
+        if line.startswith(("rename from ", "rename to ", "copy from ", "copy to ")):
+            raise ValueError("renames and copies are forbidden in governed patches")
+        if line.startswith("deleted file mode "):
+            current_status = "D"
+        elif line.startswith("new file mode "):
+            current_status = "A"
+
+    finish_entry()
+    if not entries:
+        raise ValueError("versioned patch has no changed paths")
+    return entries
+
+
+def canonical_name_status_sha256(entries: list[tuple[str, str]]) -> str:
+    encoded = "".join(f"{status}\t{path}\n" for status, path in entries)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def canonical_sorted_paths_sha256(entries: list[tuple[str, str]]) -> str:
+    encoded = "".join(
+        f"{path}\n" for _, path in sorted(entries, key=lambda row: row[1])
+    )
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def safe_repo_path(root: Path, value: object) -> Path | None:
@@ -278,7 +329,12 @@ def build_report(
                 "name_status_sha256",
                 "sorted_paths_sha256",
             )
-        ),
+        )
+        and delta.get("raw_diff_sha256") == expected.get("raw_diff_sha256")
+        and delta.get("name_status_sha256")
+        == expected.get("name_status_sha256")
+        and delta.get("sorted_paths_sha256")
+        == expected.get("sorted_paths_sha256"),
         "The full parent-to-patch Git delta must be digest-pinned and exact.",
     )
     _check(
@@ -296,22 +352,65 @@ def build_report(
     )
     versioned_path = safe_repo_path(root, versioned.get("path"))
     versioned_digest = ""
+    versioned_entries: list[tuple[str, str]] = []
+    versioned_delta_error = ""
     if versioned_path is not None:
         try:
             versioned_digest = file_sha256(versioned_path)
-        except OSError:
-            pass
+            versioned_entries = versioned_patch_name_status(versioned_path)
+        except (OSError, UnicodeError, ValueError) as error:
+            versioned_delta_error = str(error)
     _check(
         checks,
         "versioned_patch",
         SHA256_PATTERN.fullmatch(str(versioned.get("sha256") or "")) is not None
         and versioned_digest == versioned.get("sha256")
+        and versioned_digest == expected.get("versioned_patch_sha256")
         and versioned.get("applies_to_upstream_base") is True
         and versioned.get("result_tree_matches_governed_commit") is True
         and isinstance(versioned.get("source_commits"), list)
         and len(versioned.get("source_commits")) == 2,
         "The committed runtime tree must be reproduced by the versioned patch.",
         observed_sha256=versioned_digest,
+    )
+    versioned_path_set = {path for _, path in versioned_entries}
+    versioned_name_status_sha256 = (
+        canonical_name_status_sha256(versioned_entries)
+        if versioned_entries
+        else ""
+    )
+    versioned_sorted_paths_sha256 = (
+        canonical_sorted_paths_sha256(versioned_entries)
+        if versioned_entries
+        else ""
+    )
+    added_card_paths = {
+        path
+        for status, path in versioned_entries
+        if status == "A"
+        and path.startswith("Mage.Sets/src/mage/cards/")
+        and path.endswith(".java")
+    }
+    _check(
+        checks,
+        "versioned_patch_delta",
+        not versioned_delta_error
+        and len(versioned_entries) == len(EXPECTED_PATHS)
+        and len(versioned_path_set) == len(versioned_entries)
+        and versioned_path_set == EXPECTED_PATHS
+        and versioned_name_status_sha256 == delta.get("name_status_sha256")
+        and versioned_name_status_sha256 == expected.get("name_status_sha256")
+        and versioned_sorted_paths_sha256 == delta.get("sorted_paths_sha256")
+        and versioned_sorted_paths_sha256 == expected.get("sorted_paths_sha256")
+        and added_card_paths
+        == {"Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java"},
+        "The committed patch itself must reproduce the classified path and "
+        "name-status digests used to authorize deployment.",
+        error=versioned_delta_error,
+        observed_name_status_sha256=versioned_name_status_sha256,
+        observed_sorted_paths_sha256=versioned_sorted_paths_sha256,
+        observed_paths=sorted(versioned_path_set),
+        observed_added_card_paths=sorted(added_card_paths),
     )
 
     focused = (

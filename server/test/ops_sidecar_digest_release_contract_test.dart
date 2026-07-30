@@ -217,14 +217,42 @@ void main() {
     test('rollback restores both origins and runtime digests with health', () {
       expect(sidecars, contains('rollback_battle_sidecars'));
       expect(sidecars, contains('rollback_one_sidecar'));
+      expect(sidecars, contains('rollback_backend_environment'));
+      expect(sidecars, contains('BACKEND_PREVIOUS_EASYPANEL_ENV'));
+      expect(sidecars, contains('BACKEND_PREVIOUS_ENV_SHA256'));
+      expect(sidecars, contains('runtime_environment_sha256'));
       expect(sidecars, contains("--image '\$previous_digest_ref'"));
       expect(sidecars, contains('services.app.deployService'));
+      expect(sidecars, contains('services.app.updateEnv'));
+      expect(
+        sidecars,
+        contains(
+          "docker service update --detach=true --rollback "
+          "'\$backend_swarm_service'",
+        ),
+      );
       expect(
         sidecars,
         contains('configured_image" == "\$rollback_source_image'),
       );
       expect(sidecars, contains('wait_for_sidecar_health'));
       expect(sidecars, contains('rollback \$service_name comprovado'));
+      expect(
+        sidecars,
+        contains(
+          'rollback backend comprovado: EasyPanel, spec, tarefa, ambiente e '
+          'health restaurados',
+        ),
+      );
+      final sidecarRollback = sidecars.indexOf(
+        'rollback_one_sidecar \\\n'
+        '      "\$XMAGE_SERVICE"',
+      );
+      final backendRollback = sidecars.indexOf(
+        'rollback_backend_environment || rollback_status=1',
+      );
+      expect(sidecarRollback, greaterThanOrEqualTo(0));
+      expect(backendRollback, greaterThan(sidecarRollback));
       expect(sidecars, contains('DEPLOY_COMMITTED=1'));
     });
   });

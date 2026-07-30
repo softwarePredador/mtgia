@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import copy
+import tempfile
 import unittest
+from pathlib import Path
 
 import xmage_governed_patch_audit as audit
 
@@ -44,6 +46,49 @@ class XmageGovernedPatchAuditTests(unittest.TestCase):
             "runtime_identity_surfaces",
             {row["id"] for row in report["checks"]},
         )
+        self.assertIn(
+            "versioned_patch_delta",
+            {row["id"] for row in report["checks"]},
+        )
+
+    def test_versioned_patch_reproduces_name_status_and_path_digests(
+        self,
+    ) -> None:
+        patch_path = audit.safe_repo_path(
+            audit.REPO_ROOT,
+            self.evidence["versioned_patch"]["path"],
+        )
+        assert patch_path is not None
+        entries = audit.versioned_patch_name_status(patch_path)
+
+        self.assertEqual(len(entries), 14)
+        self.assertEqual(
+            audit.canonical_name_status_sha256(entries),
+            self.evidence["exact_delta"]["name_status_sha256"],
+        )
+        self.assertEqual(
+            audit.canonical_sorted_paths_sha256(entries),
+            self.evidence["exact_delta"]["sorted_paths_sha256"],
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tampered = Path(temp_dir) / "tampered.patch"
+            tampered.write_text(
+                patch_path.read_text(encoding="utf-8").replace(
+                    "LoreholdTheHistorian.java",
+                    "UnreviewedCard.java",
+                ),
+                encoding="utf-8",
+            )
+            tampered_entries = audit.versioned_patch_name_status(tampered)
+            self.assertNotEqual(
+                audit.canonical_name_status_sha256(tampered_entries),
+                self.evidence["exact_delta"]["name_status_sha256"],
+            )
+            self.assertNotEqual(
+                audit.canonical_sorted_paths_sha256(tampered_entries),
+                self.evidence["exact_delta"]["sorted_paths_sha256"],
+            )
 
     def test_evidence_digest_mismatch_fails_closed(self) -> None:
         report = self.report(digest="0" * 64, require_deployable=True)
@@ -76,6 +121,17 @@ class XmageGovernedPatchAuditTests(unittest.TestCase):
             "complete_git_delta",
             {row["id"] for row in report["failures"]},
         )
+
+    def test_declared_name_status_digest_substitution_fails_closed(self) -> None:
+        evidence = copy.deepcopy(self.evidence)
+        evidence["exact_delta"]["name_status_sha256"] = "0" * 64
+
+        report = self.report(evidence=evidence, require_deployable=True)
+
+        failure_ids = {row["id"] for row in report["failures"]}
+        self.assertIn("complete_git_delta", failure_ids)
+        self.assertIn("versioned_patch_delta", failure_ids)
+        self.assertFalse(report["deployment_allowed"])
 
     def test_skipped_focused_test_fails_closed(self) -> None:
         evidence = copy.deepcopy(self.evidence)
