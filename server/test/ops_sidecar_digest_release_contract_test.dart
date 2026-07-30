@@ -185,6 +185,11 @@ void main() {
       expect(sidecars, contains(r'''grep -Fq \"\$expected_fragment\"'''));
       expect(sidecars, contains('MANALOOM_HEALTH_B64='));
       expect(sidecars, contains('health_count='));
+      expect(sidecars, contains('for health_frame_attempt in 1 2 3'));
+      expect(
+        sidecars,
+        contains('health remoto invalido apos 3 leituras'),
+      );
       expect(
         sidecars,
         contains(r'''jq -s -e 'length == 1 and (.[0] | type == "object")' '''),
