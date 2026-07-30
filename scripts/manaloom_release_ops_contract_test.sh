@@ -37,8 +37,11 @@ for web_deploy in \
     exit 1
   fi
 done
-if ! grep -Fq 'extract_manaloom_repo_digest_ref "$IMAGE_REPO"' \
-  "$ROOT_DIR/scripts/manaloom_deploy_ops_image.sh"; then
+OPS_DEPLOY_SOURCE="$ROOT_DIR/scripts/manaloom_deploy_ops_image.sh"
+if ! grep -Fq 'IMAGE_DIGEST_OUTPUT="$(ssh ' "$OPS_DEPLOY_SOURCE" ||
+   ! grep -Fq 'extract_manaloom_repo_digest_ref "$IMAGE_REPO"' \
+     "$OPS_DEPLOY_SOURCE" ||
+   ! grep -Fq 'unset IMAGE_DIGEST_OUTPUT' "$OPS_DEPLOY_SOURCE"; then
   echo "deploy manaloom-ops nao filtra o MOTD antes de validar RepoDigest" >&2
   exit 1
 fi
