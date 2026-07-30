@@ -711,7 +711,11 @@ run_static_gate() {
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_pin_transition_audit.py
   PYTHONWARNINGS=error::ResourceWarning \
+    python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_transition_activation_policy.py
+  PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_transition_nominal_review.py
+  PYTHONWARNINGS=error::ResourceWarning \
+    python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_transition_postgresql_scope_reconciliation.py
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py
   PYTHONWARNINGS=error::ResourceWarning \

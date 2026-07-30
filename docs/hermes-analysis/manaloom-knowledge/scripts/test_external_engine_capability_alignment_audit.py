@@ -103,6 +103,11 @@ class ExternalEngineCapabilityAlignmentAuditTests(unittest.TestCase):
                 'ROOT = "/Users/example/Downloads/mage-master"\n',
                 encoding="utf-8",
             )
+            portable_guard = root / "scripts/portable_guard.sh"
+            portable_guard.write_text(
+                "grep -Eq '(/Users/)' evidence.json\n",
+                encoding="utf-8",
+            )
             checks: list[dict[str, object]] = []
 
             audit._validate_local_source_policy(self.contract, root, checks)

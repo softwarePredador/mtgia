@@ -1,6 +1,6 @@
 # Atualização controlada do pin XMage — 2026-07-28
 
-Status: `card_audit_review_required_quarantine_active_not_deployed`.
+Status: `product_scope_qualified_quarantine_active_not_deployed`.
 
 ## Decisão
 
@@ -53,13 +53,16 @@ usados pelo contrato ManaLoom.
 | Diff Git exato, sem limite da API | 356/356 caminhos |
 | Catálogo das 87 cartas adicionadas | 86 reconhecidas; 1 não reconhecida |
 | Catálogo XMage das 169 adicionadas/modificadas | 168 reconhecidas; 1 não reconhecida |
-| Política ManaLoom após qualificação | 167 suportadas; 2 bloqueadas |
+| Qualificação bruta do catálogo | 166 suportadas; 3 quarentenas/residuais |
+| Escopo PostgreSQL read-only | 34 no produto; 2 gaps; 45 futuras; 88 ausentes |
+| Runtime após política de ativação | 34 disponíveis; 135 bloqueadas de forma explícita |
 | Verificador oficial de dados/classes XMage | 1/1 PASS nos 10 sets envolvidos |
 | Inventário nominal das 169 cartas | 5 cartas; 11 cenários candidatos |
 | Suítes nominais selecionadas | 15/15 PASS |
-| Teste da política de bloqueio do sidecar | 13/13 PASS |
+| Testes focados no escopo do produto | 68/68 PASS; 31 identidades diretas; 3 fontes/patches e 4 execuções |
+| Teste da política de bloqueio do sidecar | 16/16 PASS |
 | Classificação nominal versionada | 169/169 cartas |
-| Qualificação para deploy | `review_required`; bloqueada |
+| Qualificação para deploy | `pass`; liberada pelo auditor local |
 
 O runtime loopback foi iniciado duas vezes a partir do artefato atualizado. Nos
 dois boots, `/health` publicou o novo commit, `catalog_ready=true` e exatamente
@@ -87,17 +90,20 @@ teste nominal e disposição:
 
 | Disposição | Cartas | Interpretação |
 | --- | ---: | --- |
-| `focused_upstream_test_passed` | 1 | `SP//dr, Piloted by Peni`; cenário nominal aprovado sem finding conhecido |
-| `focused_upstream_test_passed_card_data_warning_review_required` | 1 | os 2 testes de `Sting, Bilbo's Sword` passam, mas o texto de regras ainda possui reminder divergente |
-| `catalog_supported_semantic_review_required` | 84 | carta nova resolve no runtime, mas não tem prova nominal individual |
-| `presentation_hunk_nominal_tests_passed` | 1 | `Metallic Mimic`; o diff exato contém somente comentário e uma troca literal de `staticText`, e os 6 cenários nominais passam |
-| `catalog_supported_nominal_test_passed_semantic_review_required` | 2 | `Krark` e `Mjolnir` têm testes nominais, mas eles não fecham os ramos alterados ou explicitamente pendentes |
-| `catalog_supported_regression_only_review_required` | 78 | implementação modificada resolve, mas só possui evidência de regressão compartilhada |
+| `product_scope_focused_semantic_tests_passed` | 29 | carta do escopo atual coberta por identidade exata, patches pinados e execução semântica focada |
+| `exact_non_executable_tokens_passed` | 5 | equivalências estritas de tokens não executáveis no escopo atual; outras 6 equivalências continuam preservadas sob o bloqueio de ativação |
+| `activation_blocked_pending_product_semantic_review` | 133 | carta futura ou ausente do PostgreSQL atual; a disposição anterior e o estado de catálogo foram preservados para a próxima revisão |
 | `external_runtime_quarantine_semantic_defect` | 1 | `Planetarium of Wan Shi Tong` resolve no catálogo, porém está bloqueada por defeito mecânico confirmado |
-| `external_residual_upstream_unfinished` | 1 | `Prudent Fateseer` é removida do catálogo XMage como `unfinished` e não existe no Forge pinado |
+| `external_runtime_quarantine_known_upstream_gap` | 1 | `Mandate of Peace` permanece indisponível pelo gap upstream aberto de cópia/LKI; a quarentena não promove a carta nem bloqueia o deploy das demais |
 
-Entre as 87 adições, 45 têm alguma inscrição em set posterior a 2026-07-28 e
-44 aparecem exclusivamente em sets futuros nessa data. Isso exige nova
+As 133 linhas de ativação são uma camada operacional, não uma reclassificação
+semântica. Cada uma conserva `underlying_transition_disposition` e
+`catalog_status_before_activation`. Isso inclui `Prudent Fateseer`, cujo
+residual `external_residual_upstream_unfinished` continua anexado à linha, mas
+não bloqueia o deploy das 34 cartas que pertencem ao escopo atual.
+
+Entre as 169 cartas da transição, 45 aparecem exclusivamente em sets futuros
+na data de corte. Isso exige nova
 conferência de identidade/Oracle/legality conforme os dados oficiais
 amadurecem.
 
@@ -119,53 +125,99 @@ A política também declara explicitamente `Prudent Fateseer` como
 `xmage_upstream_mechanic_unfinished`. Ela é amarrada ao SHA do engine e o
 sidecar falha fechado se um próximo avanço de pin não revisar essa lista.
 
-Nas 82 classes modificadas, a revisão dos hunks classificou 27 mudanças
-executáveis ou mistas, 53 de apresentação/metadados e 2 somente de comentário.
+Nas 82 classes modificadas, a revisão dos hunks classificou 28 mudanças
+executáveis ou mistas, 52 de apresentação/metadados e 2 somente de comentário.
 Os dois comentários (`Krark` e `Mandate of Peace`) apontam para o issue upstream
 de cópias/LKI e permanecem dívida de qualificação; não foram tratados como
 correção de comportamento.
 
+Em `Mandate of Peace`, o comentário referencia o issue oficial
+`magefree/mage#12911`, ainda aberto, e a implementação usa a remoção direta da
+pilha no ramo afetado por cópias/LKI. O comentário não causou uma regressão:
+ele documenta uma lacuna executável preexistente. A carta foi colocada em uma
+quarentena pinada e não promocional. Como a restrição impede somente essa
+carta, ela não integra a contagem de revisões que bloqueia o deploy global.
+
 O classificador exato e sem rede em
 `docs/qa/evidence/XMAGE_TRANSITION_NOMINAL_REVIEW_34d81EA_2c43ec8.json`
-reduziu as revisões pendentes de 168 para 167. A única baixa foi
-`Metallic Mimic`: removidos os comentários e normalizada a única troca literal
-permitida, os tokens Java dos dois pins são equivalentes. Essa conclusão exige
-o hash exato do diff e os 6 cenários upstream; resolução no catálogo não entra
-como prova semântica.
+reduziu as revisões pendentes de 168 para 157. As 11 baixas são `Avengers
+Tower`, `Black Panther, Vanguard`, `Bullseye, Death Dealer`, `Currency
+Converter`, `Doorman`, `Metallic Mimic`, `Repulsor Bots`, `Restorative
+Technique`, `The Ruinous Wrecking Crew`, `Villainous Hideout` e `Wondrous
+Revival`. Cada regra é presa aos pins, caminho/classe, OIDs completos dos
+blobs, SHA-256 das fontes, diff canônico com `--full-index` e hash dos tokens
+normalizados. Apenas imports reordenados/delta exato e literais explicitamente
+listados podem ser normalizados; filtros, predicados, números, booleanos e
+tokens executáveis falham fechado. Resolução no catálogo não entra como prova
+semântica e essa autorização não ativa a carta no runtime.
+
+`Swordsman, Sharp Scoundrel` foi movida para a faixa executável: o hunk remove
+o vínculo do predicado ao controlador do atacante. Ela permanece bloqueada
+fora do escopo atual até passarem cenários positivo e negativo que diferenciem
+criatura equipada controlada e atacante equipado do oponente.
 
 `Mjolnir, Hammer of Thor` foi corrigida na taxonomia para mudança executável:
 o hunk altera o `ChannelAbility` para `TimingRule.INSTANT`, enquanto o teste
-nominal existente cobre equipar e dobrar dano. Ela continua pendente até haver
-um cenário específico de timing de Channel. `Krark` também continua pendente
-porque seu teste nominal não cobre a dívida de cópia/LKI marcada no fonte.
+nominal existente cobre equipar e dobrar dano. Ela permanece bloqueada fora do
+escopo atual até haver um cenário específico de timing de Channel. `Krark`
+também permanece na faixa bloqueada porque seu teste nominal não cobre a dívida
+de cópia/LKI marcada no fonte. Essas dívidas não entram nos zero bloqueios
+globais das 34 cartas atualmente disponíveis.
 
-O comparador detalhado encontrou ainda findings acionáveis de texto/regras em
+O comparador detalhado encontrou ainda findings de texto/regras em
 `Ajani Resolute`, `Consider the Prime Directive`, `Sky Cycle`, `Sting`,
 `My Precious`, `Crimson Cowl`, `Hire a Crew` e `Falcon's Wing Harness`.
-Esses findings estão preservados na evidência, sem confundir diferença de
-rendering com falha mecânica.
+Os sete primeiros estão sob o bloqueio de ativação. Em `Falcon's Wing Harness`,
+a diferença é restrita à informação de carta gerada pelo engine: a prova
+comparativa cobre anexar, reequipar, +1/+1, voar e ward `{1}` nos dois pins.
+O replay normalizado não publica texto de regras, a entrada de Battle usa
+identidade do PostgreSQL e o produto mantém o Oracle do PostgreSQL como fonte
+de verdade. A evidência, portanto, não afirma que o upstream corrigiu o texto;
+ela classifica o aviso como apresentação fora da fronteira do runtime. Isso
+não afirma uma correção upstream; a carta entra na disposição focada somente
+porque seu comportamento de produto foi comprovado nos dois pins e o texto de
+regras publicado continua vindo do PostgreSQL.
 
-O reconciliador read-only de PostgreSQL parou corretamente antes da consulta
-porque este ambiente não forneceu
-`MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256`. Nenhum fingerprint foi inferido,
-nenhuma consulta foi executada e nenhuma escrita ocorreu. PostgreSQL continua
-sendo a verdade para decidir se cada identidade futura está no escopo do
-produto.
+O reconciliador PostgreSQL confirmou o fingerprint aprovado e executou duas
+consultas dentro de uma transação comprovadamente read-only. As 169 identidades
+foram reconciliadas sem ambiguidade e sem escrita: 34 estão no escopo do
+produto, 2 são gaps de runtime, 45 são futuras e 88 ainda não existem no catálogo
+do produto. O artefato completo das linhas fica fora do JSON principal e é
+referenciado por caminho, SHA-256 e digest canônico das linhas.
 
 O contrato
 `docs/hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json` fixa o hash
 da evidência. `./scripts/quality_gate.sh engine-transition` valida a
 classificação completa sem rede. O deploy executa o mesmo auditor com
-`--require-deployable` e falha enquanto a qualificação for
-`review_required`.
+`--require-deployable`; com as 29 provas focadas e as 5 equivalências exatas do
+escopo atual, a qualificação local passa sem revisão pendente.
 
-O auditor agora rejeita uma reconciliação PostgreSQL falsa contendo apenas
+O auditor rejeita uma reconciliação PostgreSQL falsa contendo apenas
 `{"status":"pass"}`. Um passe exige 169 resultados individuais, transação
 read-only comprovada, consulta não vazia, zero ambiguidades, contagens
 reconciliadas e digest das linhas. Também recalcula a classificação
-`future_only` pelas datas dos sets. Como 45 cartas do delta são exclusivamente
-futuras e ainda não existe um gate versionado de ativação por lançamento, esse
-estado também permanece bloqueado.
+`future_only` pelas datas dos sets. A política de ativação versionada bloqueia
+as 45 cartas futuras e as 88 ausentes do PostgreSQL. Somadas às quarentenas
+exatas de `Planetarium` e `Mandate of Peace`, a disponibilidade efetiva fica
+em 34 suportadas e 135
+indisponíveis; essa indisponibilidade deliberada é uma propriedade de
+segurança, não uma falha que deva ser reduzida artificialmente a zero.
+
+O pacote
+`docs/qa/evidence/XMAGE_PRODUCT_SCOPE_FOCUSED_TEST_EVIDENCE_34d81ea_2c43ec8_2026-07-30.json`
+registra três patches somente de testes e 68/68 cenários para 31 identidades
+diretas. São quatro execuções: 15 testes das cartas adicionadas no pin novo, 29
+testes executáveis no pin novo e 12 testes idênticos de apresentação em cada
+pin. As execuções comparativas usam repositórios Maven locais separados
+(`m2-from` e `m2-to`); compartilhar o cache entre pins é rejeitado porque pode
+misturar JARs e produzir um falso resultado. Ambos os lados são reconstruídos e
+executados com Java 17. Testes marcados como parciais continuam pendentes.
+`Planetarium` aparece apenas para confirmar executavelmente a quarentena; esse
+teste não é evidência de promoção. O mesmo vale para o cenário de reprodução
+de `Mandate of Peace`, que confirma o residual de cópia/LKI e não libera a
+carta. As outras 29 identidades diretas cobrem exatamente as cartas executáveis
+do escopo atual; somadas às 5 equivalências estritas, cobrem as 34 cartas
+disponíveis no produto. Nenhum fonte de carta do upstream foi alterado.
 
 Uma comparação oficial repetida após a mudança retornou XMage com
 `ahead_by=0` e o mesmo SHA no upstream. Forge permaneceu no pin separado
@@ -200,9 +252,14 @@ pastas protegidas ou depois de uma concessão explícita e comprovada de acesso:
 
 ## Limite operacional
 
-Fonte, build, runtime loopback e inventário nominal foram auditados, mas 167
-cartas ainda têm revisão semântica, finding de dados ou residual pendente; a
-reconciliação de escopo PostgreSQL não foi executada; e o gate de ativação de
-cartas futuras ainda não existe. Por isso o pin não está qualificado para
-deploy. Nenhum deploy, reinício ou mutação de produção foi realizado; o serviço
-publicado continua no pin anterior.
+Fonte, build, runtime loopback, inventário nominal, escopo PostgreSQL e política
+de ativação foram auditados. Não resta revisão semântica global nas 34 cartas
+do escopo atual: 29 têm prova focada e 5 têm equivalência estrita
+não executável. As 133 cartas fora do escopo atual permanecem indisponíveis por
+política e serão revisadas quando puderem ser ativadas; elas não contam como
+bloqueio global. `Planetarium` e `Mandate of Peace` ficam em quarentenas exatas
+e não promocionais. `Prudent Fateseer` conserva o residual upstream sob o
+bloqueio de ativação, e `Swordsman` conserva a dívida de controlador na mesma
+faixa até entrar no escopo do produto. O pin está qualificado localmente para
+deploy, mas nenhum deploy, reinício ou mutação de produção foi realizado; o
+serviço publicado continua no pin anterior.

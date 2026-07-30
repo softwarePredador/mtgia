@@ -1,34 +1,404 @@
 {
-  "schema_version": "manaloom_xmage_transition_nominal_review_policy_v1_2026-07-29",
-  "transition_id": "xmage_34d81ea4995c_to_2c43ec8cdb5c_2026_07_28",
-  "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
-  "to_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
-  "catalog_resolution_is_semantic_proof": false,
   "automatic_transition_clearance_rules": [
     {
-      "id": "metallic_mimic_presentation_literal_v1",
-      "card_name": "Metallic Mimic",
-      "class": "MetallicMimic",
-      "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"Hero card\"",
+          "occurrences": 1,
+          "old": "\"Hero\"",
+          "reviewed_presentation_sink": "FilterCard display message"
+        },
+        {
+          "new": "\"Spend this mana only to cast a Hero spell or to activate an ability of a Hero source\"",
+          "occurrences": 1,
+          "old": "\"Spend this mana only to cast a Hero spell or activate an ability of a Hero source\"",
+          "reviewed_presentation_sink": "ConditionalManaBuilder.getRule display text"
+        }
+      ],
+      "canonical_diff_sha256": "9430fab9d2f2143e2a6644a3fb83bfb412f856d55b69a4db6c1ef29899ccb11b",
+      "card_name": "Avengers Tower",
       "change_kind": "modified",
+      "class": "AvengersTower",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "5637781ed54e62a7c3939c8c29ec760b33d02446",
+      "from_source_sha256": "cfbf97f8c328e896c30b528992654a9d6af992635ae001f3eb5123082f59ce89",
+      "id": "avengers_tower_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "c2036786c10591bd60974dbf736b95082bd14a6d4f004257d737eef420ad586c",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
       "required_change_scope": "presentation_or_metadata",
-      "exact_diff_sha256": "be680a3ba2ce6015b34b8e19900bca8d7e22da8a55c9056248c48b3049f1fe44",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/a/AvengersTower.java",
+      "to_blob_oid_sha1": "9fcbd12e2396283017dce1abda976647cde9e969",
+      "to_source_sha256": "8b2589f50dd8214ff29332c1cb79006ded5b562018ed8e25cffbde21302d4def"
+    },
+    {
+      "allow_import_reordering": true,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"another nontoken Hero you control\"",
+          "occurrences": 1,
+          "old": "\"another nontoken Hero\"",
+          "reviewed_presentation_sink": "FilterControlledPermanent display message"
+        }
+      ],
+      "canonical_diff_sha256": "df2f001825d82d85263fdad164a76b7db780f83453734abc6b621c8734fb4741",
+      "card_name": "Black Panther, Vanguard",
+      "change_kind": "modified",
+      "class": "BlackPantherVanguard",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "836767c466c6862a4612a1ed46d01343992d1c31",
+      "from_source_sha256": "95d73bcd85f1418a089edc5f20b09d9bf2d07050d7ef4e03c39e6f3909ba0818",
+      "id": "black_panther_vanguard_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "22e178c48f3e7c67efd444e52c4c90aad8bf9f82ed2f38103e29bc00ecc2e9d5",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherVanguard.java",
+      "to_blob_oid_sha1": "5ce60f8faf9b54de1c56ec8b92a800fbb01f7ab4",
+      "to_source_sha256": "674faa2b58d333edf2be0660d0d9f4b490c75605b3ce37d8aeba702221e16a4c"
+    },
+    {
+      "allow_import_reordering": true,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "                    \"sacrifice an artifact or discard a nonland card\",\n",
+          "occurrences": 1,
+          "old": "                \"Sacrifice an artifact or discard a nonland card?\",\n",
+          "reviewed_presentation_sink": "First OrCost choice prompt line"
+        },
+        {
+          "new": "                \"sacrifice an artifact or discard a nonland card\",\n",
+          "occurrences": 1,
+          "old": "            \"Sacrifice an artifact or discard a nonland card?\",\n",
+          "reviewed_presentation_sink": "Activated OrCost choice prompt line"
+        }
+      ],
+      "canonical_diff_sha256": "450ad75137913019cde190e7600e3451160f981c99fbdf6c40c42a2ad0e46713",
+      "card_name": "Bullseye, Death Dealer",
+      "change_kind": "modified",
+      "class": "BullseyeDeathDealer",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "d6a2f027fb065e7201a2efe040571573c427f923",
+      "from_source_sha256": "94ccc5ff28fdd78e9447885a271dc2edcddbe2107c627fa4138079e7c8df4a73",
+      "id": "bullseye_death_dealer_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "6351011a880f1f7bbbe25f7cbc6b88944d6e05cef0641ce4a314f9589d5cb17f",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/b/BullseyeDeathDealer.java",
+      "to_blob_oid_sha1": "f35be40c24a01f4065bc0bead7121e5442971126",
+      "to_source_sha256": "af7e921b093312e3ed44399c6dee98e292f84bcfbe7e4731c748c3f1d237daad"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"put a card exiled with {this} into its owner's graveyard. If it's a land card, \"",
+          "occurrences": 1,
+          "old": "\"put a card exiled with {this} into your graveyard. If it's a land card, \"",
+          "reviewed_presentation_sink": "OneShotEffect.staticText"
+        }
+      ],
+      "canonical_diff_sha256": "ee858b26f110b1c383851a83068b3eab0c3070bf67cd31825758e08d04497895",
+      "card_name": "Currency Converter",
+      "change_kind": "modified",
+      "class": "CurrencyConverter",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "4ab44451afcf2fa79abe3a4638ec3c89af18dcbc",
+      "from_source_sha256": "cd5badbce3dc93267a50bd37de8e492a84d6d54cbc21af4c832fd7732d5955f4",
+      "id": "currency_converter_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "39300cbbf604bebe4e2db755b2c83b09ef33e177784920979bbfd8fda745a75d",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/c/CurrencyConverter.java",
+      "to_blob_oid_sha1": "4372662d1f9db19c326510db5b0e5f1d7fb80fee",
+      "to_source_sha256": "b52a6df2c2c932619ace765673d4fa208f4f52f8c41856a978aab9843f23dfe3"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"Until end of turn, target creature can't be blocked by creatures with power 2 or less and/or Walls\"",
+          "occurrences": 1,
+          "old": "\"Until end of turn, target creature can't be blocked by creatures with power 2 or less and/or Walls this turn\"",
+          "reviewed_presentation_sink": "Effect.setText display text"
+        }
+      ],
+      "canonical_diff_sha256": "d32c8cea3f112c79e19c439c9df60b2579f8119bc3383da0af79392fd89bca7d",
+      "card_name": "Doorman",
+      "change_kind": "modified",
+      "class": "Doorman",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "3a204c36e9d3056dd44ec73736a9c3887b64cf8a",
+      "from_source_sha256": "a323235ab2c1ceb13f1bbed4a1e92f62e337ccfd14ce07fea18dd7c582a6acc4",
+      "id": "doorman_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "cc22fea8e72d9bba91fd1aa80c8c72c0154bd20a52bd69a29dfcc335cf5030ff",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/d/Doorman.java",
+      "to_blob_oid_sha1": "2e16947a0771c6b620cee64f5797d91dadc37bd2",
+      "to_source_sha256": "6ea12fa292d3c2011cb456af3063a73a993e09b76ca03852e83c1f002ee2582d"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"Each other creature you control of the chosen type enters with an additional +1/+1 counter on it\"",
+          "occurrences": 1,
+          "old": "\"Each other creature you control of the chosen type enters the battlefield with an additional +1/+1 counter on it\"",
+          "reviewed_presentation_sink": "ReplacementEffect.staticText"
+        }
+      ],
+      "canonical_diff_sha256": "fac66314b4541d6b0460ae81a8dff5aeba9fc6dac3f8fe7250c2e270c1500bf3",
+      "card_name": "Metallic Mimic",
+      "change_kind": "modified",
+      "class": "MetallicMimic",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "f9041e595b1bfb2b799f25569879e994dee1684d",
+      "from_source_sha256": "1114f92f66e8f2459b13bd35b6f88b9eea32a1a6a7397f6546b91342e839cf1e",
+      "id": "metallic_mimic_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "9e183cdfd76800124400125c88afd8c3c6f1df77ffac2b22456b7c545c4b6566",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
       "required_direct_test_references": [
         "Mage.Tests/src/test/java/org/mage/test/cards/continuous/ChangelingTest.java",
         "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
         "Mage.Tests/src/test/java/org/mage/test/cards/replacement/entersBattlefield/HardenedScaleTest.java"
       ],
       "required_focused_test_case_count": 6,
-      "require_no_source_warning_markers": true,
-      "require_no_card_data_actionable_finding": true,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
+      "to_blob_oid_sha1": "d91dc5e4168e826af88385abd15e12b32dfe97ff",
+      "to_source_sha256": "00a6746969828ce49058632f097ff1fcd2855890b4e0125e04eef2981ea4951a"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
       "allowed_presentation_literal_changes": [
         {
-          "old": "\"Each other creature you control of the chosen type enters the battlefield with an additional +1/+1 counter on it\"",
-          "new": "\"Each other creature you control of the chosen type enters with an additional +1/+1 counter on it\"",
-          "occurrences": 1
+          "new": "\"other target artifacts and/or creatures\"",
+          "occurrences": 1,
+          "old": "\"other artifacts and/or creatures\"",
+          "reviewed_presentation_sink": "FilterPermanent display message"
         }
       ],
-      "review_basis": "After Java comments and the one exact staticText literal are normalized, the old and new card sources are byte-token equivalent. Six exact nominal upstream scenarios pass. Catalog resolution is not used as semantic proof."
+      "canonical_diff_sha256": "312b78b6a59e055384a67724050a3113c3fe4cdf33234553cfc2b3351d0822ec",
+      "card_name": "Repulsor Bots",
+      "change_kind": "modified",
+      "class": "RepulsorBots",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "ff846309df27f0a4ce6baff3d8a6f2d64250d432",
+      "from_source_sha256": "164bf46cebaac0592f8a2e3fa4537aa42202346639b032a274e42a7d861cbd5c",
+      "id": "repulsor_bots_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "1adf80507b56e7d6bd159c6f402def2a824a61255e7a2f009fa3cbd46d47e1d0",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/r/RepulsorBots.java",
+      "to_blob_oid_sha1": "3870490461fbe519c2d0ab09c066345f28abba32",
+      "to_source_sha256": "bc7830fab7c7759583ed0026d9b091fd481190d913ef99548c3769b90948a3c5"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\", then searches their library for a basic land card, puts it onto the battlefield tapped, then shuffles\"",
+          "occurrences": 1,
+          "old": "\"then searches their library for a basic land card, puts it onto the battlefield tapped, then shuffles\"",
+          "reviewed_presentation_sink": "Effect.setText display text"
+        }
+      ],
+      "canonical_diff_sha256": "759aa14a2262bf844f6a89e2435aa57c62b2b14eb0b70014a62b370d65271e56",
+      "card_name": "Restorative Technique",
+      "change_kind": "modified",
+      "class": "RestorativeTechnique",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "232baa0fe87aaf174845042ca711fd64387e67c2",
+      "from_source_sha256": "b4b06ebf6f9f5d4507ec923219e08f1c68d7acd278873124c64a83601ade2d7a",
+      "id": "restorative_technique_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "357b642aa9abdadbfebf2d332544f0ed796e796adda7490257b1b9af8923d933",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/r/RestorativeTechnique.java",
+      "to_blob_oid_sha1": "dce06eb7c5bd072111f464ea931d95264fe7f3b1",
+      "to_source_sha256": "cf9e2ffd9296ae172916228983481286ef10133c4be008bae3ab5cc741fcbfe7"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [
+          "import mage.abilities.effects.common.*;"
+        ],
+        "removed": [
+          "import mage.abilities.effects.common.DestroyTargetEffect;",
+          "import mage.abilities.effects.common.DrawCardSourceControllerEffect;",
+          "import mage.abilities.effects.common.EntersBattlefieldWithXCountersEffect;",
+          "import mage.abilities.effects.common.LoseLifeTargetEffect;",
+          "import mage.abilities.effects.common.SacrificeAllEffect;"
+        ]
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"choose up to X &mdash;\"",
+          "occurrences": 1,
+          "old": "\"choose up to X\"",
+          "reviewed_presentation_sink": "Modes.setChooseText display text"
+        }
+      ],
+      "canonical_diff_sha256": "31e76cd5bdf6dfd34280cd4ca72042039653ef5aa8138c946fdad0a856cd9224",
+      "card_name": "The Ruinous Wrecking Crew",
+      "change_kind": "modified",
+      "class": "TheRuinousWreckingCrew",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "2b1fea654f0aa7885913503c48172e5f519a4083",
+      "from_source_sha256": "d6464d51ef301f52c5025cf46f881d56cbe815d561929df2cff691be27517b76",
+      "id": "ruinous_wrecking_crew_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "7caa0b884b28df86bceb3ad0e81a8a784c50ced295f2b4bdb23be85b22e2d1cd",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheRuinousWreckingCrew.java",
+      "to_blob_oid_sha1": "b8d151bbe9a4d7075e673da0271fa885e80b355d",
+      "to_source_sha256": "615ac7aef53c1f8bcfca8d02c4569d327b2a4ed7de6e8975f246ae7a543034ea"
+    },
+    {
+      "allow_import_reordering": false,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"Spend this mana only to cast a Villain spell or to activate an ability of a Villain source\"",
+          "occurrences": 1,
+          "old": "\"Spend this mana only to cast a Villain spell or activate an ability of a Villain source\"",
+          "reviewed_presentation_sink": "ConditionalManaBuilder.getRule display text"
+        }
+      ],
+      "canonical_diff_sha256": "012cbb6412a78e2d8a22220377e7034ef5f949c372900e7d63eef4fe2661d5f8",
+      "card_name": "Villainous Hideout",
+      "change_kind": "modified",
+      "class": "VillainousHideout",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "ff1c7df08bf6cf94c6adc9612f1da452d2a7f82e",
+      "from_source_sha256": "bd1d9b7b673df5270ac03bf9a071aa8e867922a7497dfe6ad061c85a5f3325c4",
+      "id": "villainous_hideout_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "20b565c92dd317c6f355789ccf435de558164d4c616430c1b78ee67dd786feef",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/v/VillainousHideout.java",
+      "to_blob_oid_sha1": "060a3f76d1808652d0f5ebeb793e3ec4e44a0030",
+      "to_source_sha256": "62115e74e65fb2526ba7c94160e7b3fb2199d0c7781a34e71852a69f295de4d8"
+    },
+    {
+      "allow_import_reordering": true,
+      "allowed_import_delta": {
+        "added": [],
+        "removed": []
+      },
+      "allowed_presentation_literal_changes": [
+        {
+          "new": "\"Hero creature cards from your graveyard\"",
+          "occurrences": 1,
+          "old": "\"Hero creature cards\"",
+          "reviewed_presentation_sink": "FilterCreatureCard display message"
+        }
+      ],
+      "canonical_diff_sha256": "35bd30b7c91f033208692a3bc8a102017254d7ecc17c5b000f891fb61372ef0a",
+      "card_name": "Wondrous Revival",
+      "change_kind": "modified",
+      "class": "WondrousRevival",
+      "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+      "from_blob_oid_sha1": "7326d56b070ceffd951fd2cb9e4d320c6408a52f",
+      "from_source_sha256": "557a148a7a8bc02d9b6f75b3043872d3fab71ac3477be67383b12cf3b5715376",
+      "id": "wondrous_revival_exact_non_executable_tokens_v2",
+      "normalized_token_sha256": "98ce6a979e3544fe1f431bd7d2bff3208918a659038f47ffe26df0685d2c3a8f",
+      "require_no_card_data_actionable_finding": true,
+      "require_no_source_warning_markers": true,
+      "required_change_scope": "presentation_or_metadata",
+      "required_direct_test_references": [],
+      "required_focused_test_case_count": 0,
+      "review_basis": "Exact pins, path, full blob OIDs, source hashes and full-index diff are pinned. After comments, the exact import delta/reordering and only the listed presentation literals are normalized, all remaining Java tokens are byte-identical. Filters, predicates, booleans, numeric values, enums, targets, costs, zones and executable tokens are never normalized.",
+      "source_path": "Mage.Sets/src/mage/cards/w/WondrousRevival.java",
+      "to_blob_oid_sha1": "5b3990fdcb683d7fa9a165c05cd21c1382681bd8",
+      "to_source_sha256": "addb92b988a5ae36a9dcc7b76a0a2c1a01285261ddb2c00628246650499ca34c"
     }
-  ]
+  ],
+  "automatic_clearance_does_not_activate_runtime_card": true,
+  "canonical_diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index",
+  "catalog_resolution_is_semantic_proof": false,
+  "filter_predicate_normalization_allowed": false,
+  "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+  "import_changes_require_exact_delta": true,
+  "requires_full_blob_oids": true,
+  "requires_source_sha256": true,
+  "schema_version": "manaloom_xmage_transition_nominal_review_policy_v2_2026-07-30",
+  "string_literal_changes_require_explicit_map": true,
+  "to_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+  "transition_id": "xmage_34d81ea4995c_to_2c43ec8cdb5c_2026_07_28",
+  "unlisted_token_changes_allowed": false
 }

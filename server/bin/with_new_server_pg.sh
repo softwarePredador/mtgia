@@ -50,6 +50,7 @@ else
     "$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py"
     "$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py"
     "$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py"
+    "$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_transition_postgresql_scope_reconciliation.py"
     "$REPO_ROOT/server/bin/backfill_card_image_urls.py"
   )
   case "$(basename -- "$1")" in

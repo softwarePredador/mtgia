@@ -101,6 +101,35 @@ public final class SidecarMain {
                     "card_qualification_restrictions",
                     XmageCardQualificationPolicy.restrictionCount()
             );
+            body.put(
+                    "card_activation_policy_schema",
+                    XmageCardQualificationPolicy.ACTIVATION_POLICY_SCHEMA
+            );
+            body.put(
+                    "card_activation_restrictions",
+                    XmageCardQualificationPolicy.activationRestrictionCount()
+            );
+            body.put(
+                    "pin_transition_card_inventory",
+                    XmageCardQualificationPolicy.transitionCardNames().size()
+            );
+            body.put(
+                    "card_activation_postgresql_evidence_sha256",
+                    XmageCardQualificationPolicy
+                            .POSTGRES_RECONCILIATION_SHA256
+            );
+            body.put(
+                    "card_activation_postgresql_rows_sha256",
+                    XmageCardQualificationPolicy.POSTGRES_ROWS_SHA256
+            );
+            body.put(
+                    "future_card_activation_restrictions",
+                    XmageCardQualificationPolicy.futureDeferredCount()
+            );
+            body.put(
+                    "released_missing_card_activation_restrictions",
+                    XmageCardQualificationPolicy.releasedMissingCount()
+            );
             body.put("runtime_mode", runtimeMode);
             body.put(
                     "batch_simulation_available",

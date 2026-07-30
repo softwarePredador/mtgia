@@ -1,0 +1,1800 @@
+{
+  "blocked_card_count": 133,
+  "cards": [
+    {
+      "card_name": "Advancing the Spirit",
+      "class": "AdvancingTheSpirit",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/a/AdvancingTheSpirit.java"
+    },
+    {
+      "card_name": "Ajani Resolute",
+      "class": "AjaniResolute",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/a/AjaniResolute.java"
+    },
+    {
+      "card_name": "Amok Time",
+      "class": "AmokTime",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/a/AmokTime.java"
+    },
+    {
+      "card_name": "Ant-Man, Elusive Avenger",
+      "class": "AntManElusiveAvenger",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/a/AntManElusiveAvenger.java"
+    },
+    {
+      "card_name": "Ant-Man, Reformed Rogue",
+      "class": "AntManReformedRogue",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/a/AntManReformedRogue.java"
+    },
+    {
+      "card_name": "Bag End Banquet",
+      "class": "BagEndBanquet",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BagEndBanquet.java"
+    },
+    {
+      "card_name": "Bast, Panther Goddess",
+      "class": "BastPantherGoddess",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BastPantherGoddess.java"
+    },
+    {
+      "card_name": "Beckett Mariner, Impetuous Ensign",
+      "class": "BeckettMarinerImpetuousEnsign",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BeckettMarinerImpetuousEnsign.java"
+    },
+    {
+      "card_name": "Benjamin Sisko, Besieged",
+      "class": "BenjaminSiskoBesieged",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BenjaminSiskoBesieged.java"
+    },
+    {
+      "card_name": "Bilbo, Fellow Conspirator",
+      "class": "BilboFellowConspirator",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BilboFellowConspirator.java"
+    },
+    {
+      "card_name": "Bilbo, Luckwearer",
+      "class": "BilboLuckwearer",
+      "declared_release_dates": [
+        "2026-01-01",
+        "2026-08-14"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BilboLuckwearer.java"
+    },
+    {
+      "card_name": "Bio-Asset Allocator",
+      "class": "BioAssetAllocator",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BioAssetAllocator.java"
+    },
+    {
+      "card_name": "Black Panther, Most Dangerous",
+      "class": "BlackPantherMostDangerous",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherMostDangerous.java"
+    },
+    {
+      "card_name": "Black Widow, Deadly Hunter",
+      "class": "BlackWidowDeadlyHunter",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackWidowDeadlyHunter.java"
+    },
+    {
+      "card_name": "Black Widow, Intel Expert",
+      "class": "BlackWidowIntelExpert",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackWidowIntelExpert.java"
+    },
+    {
+      "card_name": "Bothersome Noisemaker",
+      "class": "BothersomeNoisemaker",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BothersomeNoisemaker.java"
+    },
+    {
+      "card_name": "Brawn, Amadeus Cho",
+      "class": "BrawnAmadeusCho",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BrawnAmadeusCho.java"
+    },
+    {
+      "card_name": "Bucky Barnes, Eager Ally",
+      "class": "BuckyBarnesEagerAlly",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BuckyBarnesEagerAlly.java"
+    },
+    {
+      "card_name": "Bullseye, Death Dealer",
+      "class": "BullseyeDeathDealer",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/b/BullseyeDeathDealer.java"
+    },
+    {
+      "card_name": "Burn, Burn, Tree and Fern",
+      "class": "BurnBurnTreeAndFern",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/b/BurnBurnTreeAndFern.java"
+    },
+    {
+      "card_name": "Captain America, Liberator",
+      "class": "CaptainAmericaLiberator",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainAmericaLiberator.java"
+    },
+    {
+      "card_name": "Captain James T. Kirk",
+      "class": "CaptainJamesTKirk",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainJamesTKirk.java"
+    },
+    {
+      "card_name": "Captain Kathryn Janeway",
+      "class": "CaptainKathrynJaneway",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainKathrynJaneway.java"
+    },
+    {
+      "card_name": "Consider the Prime Directive",
+      "class": "ConsiderThePrimeDirective",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/c/ConsiderThePrimeDirective.java"
+    },
+    {
+      "card_name": "Count Nefaria",
+      "class": "CountNefaria",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/c/CountNefaria.java"
+    },
+    {
+      "card_name": "Craterclaw Colossus",
+      "class": "CraterclawColossus",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/c/CraterclawColossus.java"
+    },
+    {
+      "card_name": "Crimson Cowl, Master of Evil",
+      "class": "CrimsonCowlMasterOfEvil",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/c/CrimsonCowlMasterOfEvil.java"
+    },
+    {
+      "card_name": "Crossover Collaboration",
+      "class": "CrossoverCollaboration",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/c/CrossoverCollaboration.java"
+    },
+    {
+      "card_name": "Crystalline Entity",
+      "class": "CrystallineEntity",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/c/CrystallineEntity.java"
+    },
+    {
+      "card_name": "Darksteel Angel",
+      "class": "DarksteelAngel",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/d/DarksteelAngel.java"
+    },
+    {
+      "card_name": "Darwin, Adaptive Mutant",
+      "class": "DarwinAdaptiveMutant",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/DarwinAdaptiveMutant.java"
+    },
+    {
+      "card_name": "Desolation of Smaug",
+      "class": "DesolationOfSmaug",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/d/DesolationOfSmaug.java"
+    },
+    {
+      "card_name": "Desolation Prowler",
+      "class": "DesolationProwler",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/d/DesolationProwler.java"
+    },
+    {
+      "card_name": "Devil Dinosaur",
+      "class": "DevilDinosaur",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/DevilDinosaur.java"
+    },
+    {
+      "card_name": "Doctor Doom, Unrivaled",
+      "class": "DoctorDoomUnrivaled",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/DoctorDoomUnrivaled.java"
+    },
+    {
+      "card_name": "Doctor Strange, Surgeon",
+      "class": "DoctorStrangeSurgeon",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/DoctorStrangeSurgeon.java"
+    },
+    {
+      "card_name": "Donald Blake, Guise of Thor",
+      "class": "DonaldBlakeGuiseOfThor",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/DonaldBlakeGuiseOfThor.java"
+    },
+    {
+      "card_name": "Doorman",
+      "class": "Doorman",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/Doorman.java"
+    },
+    {
+      "card_name": "Dora Milaje Elite",
+      "class": "DoraMilajeElite",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/d/DoraMilajeElite.java"
+    },
+    {
+      "card_name": "Dr. Beverly Crusher",
+      "class": "DrBeverlyCrusher",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/d/DrBeverlyCrusher.java"
+    },
+    {
+      "card_name": "Endless Ranks of HYDRA",
+      "class": "EndlessRanksOfHYDRA",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/e/EndlessRanksOfHYDRA.java"
+    },
+    {
+      "card_name": "Falcon, Joaquin Torres",
+      "class": "FalconJoaquinTorres",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/f/FalconJoaquinTorres.java"
+    },
+    {
+      "card_name": "Fili and Kili, Joyous",
+      "class": "FiliAndKiliJoyous",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/f/FiliAndKiliJoyous.java"
+    },
+    {
+      "card_name": "Garruk, Veiled Butcher",
+      "class": "GarrukVeiledButcher",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/g/GarrukVeiledButcher.java"
+    },
+    {
+      "card_name": "Gathering of Darkness",
+      "class": "GatheringOfDarkness",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/g/GatheringOfDarkness.java"
+    },
+    {
+      "card_name": "Gert and Old Lace, Runaways",
+      "class": "GertAndOldLaceRunaways",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/g/GertAndOldLaceRunaways.java"
+    },
+    {
+      "card_name": "Hatut Zeraze Strike Force",
+      "class": "HatutZerazeStrikeForce",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HatutZerazeStrikeForce.java"
+    },
+    {
+      "card_name": "Hawkeye, Bowslinger",
+      "class": "HawkeyeBowslinger",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HawkeyeBowslinger.java"
+    },
+    {
+      "card_name": "Hawkeye, Trick Shot",
+      "class": "HawkeyeTrickShot",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HawkeyeTrickShot.java"
+    },
+    {
+      "card_name": "Hex Magic",
+      "class": "HexMagic",
+      "declared_release_dates": [
+        "2020-03-12",
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HexMagic.java"
+    },
+    {
+      "card_name": "Highly Illogical",
+      "class": "HighlyIllogical",
+      "declared_release_dates": [
+        "2026-01-01",
+        "2026-11-13"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HighlyIllogical.java"
+    },
+    {
+      "card_name": "Hire a Crew",
+      "class": "HireACrew",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HireACrew.java"
+    },
+    {
+      "card_name": "Hulkbuster Armor",
+      "class": "HulkbusterArmor",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HulkbusterArmor.java"
+    },
+    {
+      "card_name": "Hyperion's Atomic Vision",
+      "class": "HyperionsAtomicVision",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/h/HyperionsAtomicVision.java"
+    },
+    {
+      "card_name": "I Am Iron Man",
+      "class": "IAmIronMan",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/i/IAmIronMan.java"
+    },
+    {
+      "card_name": "In the Pale Moonlight",
+      "class": "InThePaleMoonlight",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/i/InThePaleMoonlight.java"
+    },
+    {
+      "card_name": "Iron Fist, Hero for Hire",
+      "class": "IronFistHeroForHire",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/i/IronFistHeroForHire.java"
+    },
+    {
+      "card_name": "Iron Man, Tony Stark",
+      "class": "IronManTonyStark",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/i/IronManTonyStark.java"
+    },
+    {
+      "card_name": "Jocasta, Automaton Avenger",
+      "class": "JocastaAutomatonAvenger",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/j/JocastaAutomatonAvenger.java"
+    },
+    {
+      "card_name": "Killmonger, Ruthless Usurper",
+      "class": "KillmongerRuthlessUsurper",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/k/KillmongerRuthlessUsurper.java"
+    },
+    {
+      "card_name": "King T'Challa",
+      "class": "KingTChalla",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/k/KingTChalla.java"
+    },
+    {
+      "card_name": "Kirk, Enterprising Captain",
+      "class": "KirkEnterprisingCaptain",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/k/KirkEnterprisingCaptain.java"
+    },
+    {
+      "card_name": "Klingon Strike Force",
+      "class": "KlingonStrikeForce",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/k/KlingonStrikeForce.java"
+    },
+    {
+      "card_name": "Krark, the Thumbless",
+      "class": "KrarkTheThumbless",
+      "declared_release_dates": [
+        "2002-06-24",
+        "2020-03-12",
+        "2020-11-01"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/k/KrarkTheThumbless.java"
+    },
+    {
+      "card_name": "Liliana the Faultless",
+      "class": "LilianaTheFaultless",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/l/LilianaTheFaultless.java"
+    },
+    {
+      "card_name": "Liliana the Repentant",
+      "class": "LilianaTheRepentant",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/l/LilianaTheRepentant.java"
+    },
+    {
+      "card_name": "Living Lightning, Charged Up",
+      "class": "LivingLightningChargedUp",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/l/LivingLightningChargedUp.java"
+    },
+    {
+      "card_name": "MACH-1, Swooping Scoundrel",
+      "class": "MACH1SwoopingScoundrel",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/m/MACH1SwoopingScoundrel.java"
+    },
+    {
+      "card_name": "Machine Man, Model X-51",
+      "class": "MachineManModelX51",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/m/MachineManModelX51.java"
+    },
+    {
+      "card_name": "Midnight Angel Armor",
+      "class": "MidnightAngelArmor",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/m/MidnightAngelArmor.java"
+    },
+    {
+      "card_name": "Mirkwood Pathmaker",
+      "class": "MirkwoodPathmaker",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/m/MirkwoodPathmaker.java"
+    },
+    {
+      "card_name": "Misty Mountains Raider",
+      "class": "MistyMountainsRaider",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/m/MistyMountainsRaider.java"
+    },
+    {
+      "card_name": "Mjolnir, Hammer of Thor",
+      "class": "MjolnirHammerOfThor",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/m/MjolnirHammerOfThor.java"
+    },
+    {
+      "card_name": "Munitions Enthusiast",
+      "class": "MunitionsEnthusiast",
+      "declared_release_dates": [
+        "2026-01-01"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/m/MunitionsEnthusiast.java"
+    },
+    {
+      "card_name": "My Precious",
+      "class": "MyPrecious",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/m/MyPrecious.java"
+    },
+    {
+      "card_name": "Okoye, Dora Milaje Leader",
+      "class": "OkoyeDoraMilajeLeader",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/o/OkoyeDoraMilajeLeader.java"
+    },
+    {
+      "card_name": "Operations Officer",
+      "class": "OperationsOfficer",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/o/OperationsOfficer.java"
+    },
+    {
+      "card_name": "Origin of Captain America",
+      "class": "OriginOfCaptainAmerica",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfCaptainAmerica.java"
+    },
+    {
+      "card_name": "Origin of the Hulk",
+      "class": "OriginOfTheHulk",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfTheHulk.java"
+    },
+    {
+      "card_name": "Origin of Thor",
+      "class": "OriginOfThor",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfThor.java"
+    },
+    {
+      "card_name": "Picard, Steadfast Captain",
+      "class": "PicardSteadfastCaptain",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/p/PicardSteadfastCaptain.java"
+    },
+    {
+      "card_name": "Prudent Fateseer",
+      "class": "PrudentFateseer",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/p/PrudentFateseer.java"
+    },
+    {
+      "card_name": "Quicksilver, Speedster",
+      "class": "QuicksilverSpeedster",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/q/QuicksilverSpeedster.java"
+    },
+    {
+      "card_name": "Raft Security Officer",
+      "class": "RaftSecurityOfficer",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RaftSecurityOfficer.java"
+    },
+    {
+      "card_name": "Ratchet, Field Medic",
+      "class": "RatchetFieldMedic",
+      "declared_release_dates": [
+        "2022-11-18"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RatchetFieldMedic.java"
+    },
+    {
+      "card_name": "Ravenhill Flock",
+      "class": "RavenhillFlock",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/r/RavenhillFlock.java"
+    },
+    {
+      "card_name": "Red Ghost, Intangible Genius",
+      "class": "RedGhostIntangibleGenius",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RedGhostIntangibleGenius.java"
+    },
+    {
+      "card_name": "Red Guardian, Super-Soldier",
+      "class": "RedGuardianSuperSoldier",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RedGuardianSuperSoldier.java"
+    },
+    {
+      "card_name": "Red Hulk",
+      "class": "RedHulk",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RedHulk.java"
+    },
+    {
+      "card_name": "Repulsor Bots",
+      "class": "RepulsorBots",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RepulsorBots.java"
+    },
+    {
+      "card_name": "Restless Bloodseeker",
+      "class": "RestlessBloodseeker",
+      "declared_release_dates": [
+        "2021-01-28",
+        "2021-11-19",
+        "2025-01-24"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RestlessBloodseeker.java"
+    },
+    {
+      "card_name": "Restorative Technique",
+      "class": "RestorativeTechnique",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/r/RestorativeTechnique.java"
+    },
+    {
+      "card_name": "Secure Detention",
+      "class": "SecureDetention",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/SecureDetention.java"
+    },
+    {
+      "card_name": "Set Phasers to...",
+      "class": "SetPhasersTo",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/s/SetPhasersTo.java"
+    },
+    {
+      "card_name": "She-Hulk, Wallbreaker",
+      "class": "SheHulkWallbreaker",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/SheHulkWallbreaker.java"
+    },
+    {
+      "card_name": "Shuri's Fabricator",
+      "class": "ShurisFabricator",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/ShurisFabricator.java"
+    },
+    {
+      "card_name": "Shuri, Vibranium Technologist",
+      "class": "ShuriVibraniumTechnologist",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/ShuriVibraniumTechnologist.java"
+    },
+    {
+      "card_name": "Sky Cycle",
+      "class": "SkyCycle",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/SkyCycle.java"
+    },
+    {
+      "card_name": "Spock, Logical Choice",
+      "class": "SpockLogicalChoice",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/s/SpockLogicalChoice.java"
+    },
+    {
+      "card_name": "Stark's Ingenuity",
+      "class": "StarksIngenuity",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/StarksIngenuity.java"
+    },
+    {
+      "card_name": "Stick, Fearless Mentor",
+      "class": "StickFearlessMentor",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/StickFearlessMentor.java"
+    },
+    {
+      "card_name": "Sting, Bilbo's Sword",
+      "class": "StingBilbosSword",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/s/StingBilbosSword.java"
+    },
+    {
+      "card_name": "Stunning Shot",
+      "class": "StunningShot",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/StunningShot.java"
+    },
+    {
+      "card_name": "Swordsman's Steel",
+      "class": "SwordsmansSteel",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/SwordsmansSteel.java"
+    },
+    {
+      "card_name": "Swordsman, Sharp Scoundrel",
+      "class": "SwordsmanSharpScoundrel",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/s/SwordsmanSharpScoundrel.java"
+    },
+    {
+      "card_name": "Team Transmitter",
+      "class": "TeamTransmitter",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/TeamTransmitter.java"
+    },
+    {
+      "card_name": "Tenacious Tosk",
+      "class": "TenaciousTosk",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TenaciousTosk.java"
+    },
+    {
+      "card_name": "The Chief Warg",
+      "class": "TheChiefWarg",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheChiefWarg.java"
+    },
+    {
+      "card_name": "The Great Mound",
+      "class": "TheGreatMound",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheGreatMound.java"
+    },
+    {
+      "card_name": "The Lonely Mountain",
+      "class": "TheLonelyMountain",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheLonelyMountain.java"
+    },
+    {
+      "card_name": "The Queen of Dale",
+      "class": "TheQueenOfDale",
+      "declared_release_dates": [
+        "2026-08-14"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheQueenOfDale.java"
+    },
+    {
+      "card_name": "The Squadron Sinister",
+      "class": "TheSquadronSinister",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheSquadronSinister.java"
+    },
+    {
+      "card_name": "The Theorist, Jace Beleren",
+      "class": "TheTheoristJaceBeleren",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheTheoristJaceBeleren.java"
+    },
+    {
+      "card_name": "The Wasp, Janet Van Dyne",
+      "class": "TheWaspJanetVanDyne",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheWaspJanetVanDyne.java"
+    },
+    {
+      "card_name": "Thing Swing",
+      "class": "ThingSwing",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/ThingSwing.java"
+    },
+    {
+      "card_name": "Tiger Shark, Abyssal Hunter",
+      "class": "TigerSharkAbyssalHunter",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/TigerSharkAbyssalHunter.java"
+    },
+    {
+      "card_name": "Tinybones, Pocket Nuisance",
+      "class": "TinybonesPocketNuisance",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TinybonesPocketNuisance.java"
+    },
+    {
+      "card_name": "Titanbones, Towering Heart",
+      "class": "TitanbonesToweringHeart",
+      "declared_release_dates": [
+        "2026-10-02"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TitanbonesToweringHeart.java"
+    },
+    {
+      "card_name": "Trelane, Squire of Gothos",
+      "class": "TrelaneSquireOfGothos",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/t/TrelaneSquireOfGothos.java"
+    },
+    {
+      "card_name": "TVA Bureaucrat",
+      "class": "TVABureaucrat",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/t/TVABureaucrat.java"
+    },
+    {
+      "card_name": "U.S.S. Enterprise-D, Galaxy-Class",
+      "class": "USSEnterpriseDGalaxyClass",
+      "declared_release_dates": [
+        "2026-11-13"
+      ],
+      "product_scope_status": "future_deferred",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "future_only",
+      "source_path": "Mage.Sets/src/mage/cards/u/USSEnterpriseDGalaxyClass.java"
+    },
+    {
+      "card_name": "Ultron, Machine Overlord",
+      "class": "UltronMachineOverlord",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/u/UltronMachineOverlord.java"
+    },
+    {
+      "card_name": "Unstable Molecule Suit",
+      "class": "UnstableMoleculeSuit",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/u/UnstableMoleculeSuit.java"
+    },
+    {
+      "card_name": "Vibranium Strike Gauntlets",
+      "class": "VibraniumStrikeGauntlets",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/v/VibraniumStrikeGauntlets.java"
+    },
+    {
+      "card_name": "Villainous Hideout",
+      "class": "VillainousHideout",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/v/VillainousHideout.java"
+    },
+    {
+      "card_name": "Visions of Villainy",
+      "class": "VisionsOfVillainy",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/v/VisionsOfVillainy.java"
+    },
+    {
+      "card_name": "Wakandan Tusker",
+      "class": "WakandanTusker",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/w/WakandanTusker.java"
+    },
+    {
+      "card_name": "War Machine, Avenging Arsenal",
+      "class": "WarMachineAvengingArsenal",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/w/WarMachineAvengingArsenal.java"
+    },
+    {
+      "card_name": "Winter Soldier, Reborn Avenger",
+      "class": "WinterSoldierRebornAvenger",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/w/WinterSoldierRebornAvenger.java"
+    },
+    {
+      "card_name": "Wolverine, Claws Out",
+      "class": "WolverineClawsOut",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/w/WolverineClawsOut.java"
+    },
+    {
+      "card_name": "Wondrous Revival",
+      "class": "WondrousRevival",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/w/WondrousRevival.java"
+    },
+    {
+      "card_name": "X-23, Deadly Weapon",
+      "class": "X23DeadlyWeapon",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/x/X23DeadlyWeapon.java"
+    },
+    {
+      "card_name": "Yellowjacket, Heartless Marauder",
+      "class": "YellowjacketHeartlessMarauder",
+      "declared_release_dates": [
+        "2026-06-26"
+      ],
+      "product_scope_status": "released_missing_from_postgresql",
+      "reason_code": "battle_card_activation_review_required",
+      "release_condition": "repeat_product_identity_oracle_legality_and_semantic_review",
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "source_path": "Mage.Sets/src/mage/cards/y/YellowjacketHeartlessMarauder.java"
+    }
+  ],
+  "engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+  "from_engine_commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+  "future_deferred_count": 45,
+  "generated_at_utc": "2026-07-30T04:33:15+00:00",
+  "policy": {
+    "activation_requires_new_versioned_review": true,
+    "catalog_absence_is_semantic_proof": false,
+    "future_release_is_semantic_proof": false,
+    "user_facing_reason_must_be_engine_neutral": true
+  },
+  "postgresql_reconciliation": {
+    "artifact_sha256": "64f2175bc4b1c040ccb352f8e3647a11d0c1088d591b5a7b5ec8a08603ced3cb",
+    "rows_sha256": "7ed18075c34b0a4b7f3c3206f250aeb86879f7ea568f648586dd696ad2d412dc",
+    "schema_version": "manaloom_xmage_postgresql_scope_reconciliation_v1_2026-07-28",
+    "transaction_read_only": true,
+    "writes_performed": false
+  },
+  "released_missing_count": 88,
+  "schema_version": "manaloom_xmage_transition_activation_policy_v1_2026-07-30",
+  "transition_card_count": 169,
+  "transition_card_names": [
+    "Advancing the Spirit",
+    "Ajani Resolute",
+    "Alicia Masters, Skilled Sculptor",
+    "Amok Time",
+    "Ant-Man, Colony Commander",
+    "Ant-Man, Elusive Avenger",
+    "Ant-Man, Reformed Rogue",
+    "Aunt May",
+    "Avengers Tower",
+    "Bag End Banquet",
+    "Bast, Panther Goddess",
+    "Baxter Building",
+    "Beckett Mariner, Impetuous Ensign",
+    "Benjamin Sisko, Besieged",
+    "Bilbo, Fellow Conspirator",
+    "Bilbo, Luckwearer",
+    "Bio-Asset Allocator",
+    "Black Panther, Most Dangerous",
+    "Black Panther, Vanguard",
+    "Black Widow, Deadly Hunter",
+    "Black Widow, Intel Expert",
+    "Bothersome Noisemaker",
+    "Brawn, Amadeus Cho",
+    "Bucky Barnes, Eager Ally",
+    "Bullseye, Death Dealer",
+    "Burn, Burn, Tree and Fern",
+    "Captain America, Liberator",
+    "Captain America, Wings of Freedom",
+    "Captain James T. Kirk",
+    "Captain Kathryn Janeway",
+    "Claim the Kingdom",
+    "Consider the Prime Directive",
+    "Count Nefaria",
+    "Craterclaw Colossus",
+    "Crimson Cowl, Master of Evil",
+    "Crossbones, Malicious Mercenary",
+    "Crossover Collaboration",
+    "Crystalline Entity",
+    "Currency Converter",
+    "Darksteel Angel",
+    "Darwin, Adaptive Mutant",
+    "Desolation of Smaug",
+    "Desolation Prowler",
+    "Devil Dinosaur",
+    "Doctor Doom, Unrivaled",
+    "Doctor Strange, Surgeon",
+    "Donald Blake, Guise of Thor",
+    "Doorman",
+    "Dora Milaje Elite",
+    "Dr. Beverly Crusher",
+    "Eerie Gravestone",
+    "Endless Ranks of HYDRA",
+    "Falcon's Wing Harness",
+    "Falcon, Joaquin Torres",
+    "Fili and Kili, Joyous",
+    "Garruk, Veiled Butcher",
+    "Gathering of Darkness",
+    "Gert and Old Lace, Runaways",
+    "Haktos the Unscarred",
+    "Hatut Zeraze Strike Force",
+    "Hawkeye, Bowslinger",
+    "Hawkeye, Trick Shot",
+    "Heroes' Hangout",
+    "Hex Magic",
+    "Highly Illogical",
+    "Hire a Crew",
+    "Hulkbuster Armor",
+    "HYDRA Troopers",
+    "Hyperion's Atomic Vision",
+    "I Am Iron Man",
+    "In the Pale Moonlight",
+    "Iron Fist, Hero for Hire",
+    "Iron Man, Armored Avenger",
+    "Iron Man, Tony Stark",
+    "Jocasta, Automaton Avenger",
+    "Killmonger, Ruthless Usurper",
+    "King T'Challa",
+    "Kirk, Enterprising Captain",
+    "Klingon Strike Force",
+    "Krark, the Thumbless",
+    "Light-Paws, Emperor's Voice",
+    "Liliana the Faultless",
+    "Liliana the Repentant",
+    "Living Lightning, Charged Up",
+    "MACH-1, Swooping Scoundrel",
+    "Machine Man, Model X-51",
+    "Mandate of Peace",
+    "Matoya, Archon Elder",
+    "Metallic Mimic",
+    "Midnight Angel Armor",
+    "Mikey & Don, Party Planners",
+    "Mirkwood Pathmaker",
+    "Mirror of Life Trapping",
+    "Misty Mountains Raider",
+    "Mjolnir, Hammer of Thor",
+    "Munitions Enthusiast",
+    "My Precious",
+    "Namor the Sub-Mariner",
+    "Nick Fury, Agent of S.H.I.E.L.D.",
+    "Okoye, Dora Milaje Leader",
+    "Operations Officer",
+    "Origin of Captain America",
+    "Origin of the Avengers",
+    "Origin of the Hulk",
+    "Origin of Thor",
+    "Photon Blast Barrage",
+    "Picard, Steadfast Captain",
+    "Planetarium of Wan Shi Tong",
+    "Prudent Fateseer",
+    "Quicksilver, Speedster",
+    "Raft Security Officer",
+    "Ratchet, Field Medic",
+    "Ravenhill Flock",
+    "Red Ghost, Intangible Genius",
+    "Red Guardian, Super-Soldier",
+    "Red Hulk",
+    "Repulsor Bots",
+    "Restless Bloodseeker",
+    "Restorative Technique",
+    "Scout the City",
+    "Secure Detention",
+    "Selfless Police Captain",
+    "Set Phasers to...",
+    "She-Hulk, Wallbreaker",
+    "Shuri's Fabricator",
+    "Shuri, Vibranium Technologist",
+    "Sky Cycle",
+    "Sokka and Suki",
+    "SP//dr, Piloted by Peni",
+    "Spock, Logical Choice",
+    "Stark's Ingenuity",
+    "Stick, Fearless Mentor",
+    "Sting, Bilbo's Sword",
+    "Stunning Shot",
+    "Swordsman's Steel",
+    "Swordsman, Sharp Scoundrel",
+    "Talion, the Kindly Lord",
+    "Team Transmitter",
+    "Tenacious Tosk",
+    "The Chief Warg",
+    "The Great Mound",
+    "The Lonely Mountain",
+    "The Queen of Dale",
+    "The Ruinous Wrecking Crew",
+    "The Sibsig Ceremony",
+    "The Squadron Sinister",
+    "The Theorist, Jace Beleren",
+    "The Wasp, Janet Van Dyne",
+    "Thing Swing",
+    "Tiger Shark, Abyssal Hunter",
+    "Tinybones, Pocket Nuisance",
+    "Titanbones, Towering Heart",
+    "Trelane, Squire of Gothos",
+    "TVA Bureaucrat",
+    "U.S.S. Enterprise-D, Galaxy-Class",
+    "Ultron, Machine Overlord",
+    "Unstable Molecule Suit",
+    "Venom, Evil Unleashed",
+    "Vibranium Strike Gauntlets",
+    "Villainous Hideout",
+    "Visions of Villainy",
+    "Wakandan Tusker",
+    "War Machine, Avenging Arsenal",
+    "Winter Soldier, Reborn Avenger",
+    "Wolverine, Claws Out",
+    "Wolverine, Fierce Fighter",
+    "Wondrous Revival",
+    "X-23, Deadly Weapon",
+    "Yellowjacket, Heartless Marauder"
+  ],
+  "transition_id": "xmage_34d81ea4995c_to_2c43ec8cdb5c_2026_07_28"
+}

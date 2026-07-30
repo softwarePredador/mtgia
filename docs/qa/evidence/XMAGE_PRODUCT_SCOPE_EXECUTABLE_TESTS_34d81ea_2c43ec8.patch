@@ -1,0 +1,820 @@
+diff --git a/Mage.Tests/src/test/java/org/mage/test/cards/single/XmagePinProductScopeTransitionTest.java b/Mage.Tests/src/test/java/org/mage/test/cards/single/XmagePinProductScopeTransitionTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4051ee18b0af34e1bd31cdfe844a64e298cd89f0
+--- /dev/null
++++ b/Mage.Tests/src/test/java/org/mage/test/cards/single/XmagePinProductScopeTransitionTest.java
+@@ -0,0 +1,814 @@
++package org.mage.test.cards.single;
++
++import mage.abilities.Ability;
++import mage.abilities.Mode;
++import mage.abilities.TriggeredAbility;
++import mage.abilities.common.ScryOrSurveilTriggeredAbility;
++import mage.abilities.effects.Effect;
++import mage.abilities.effects.common.continuous.GainAbilityAllEffect;
++import mage.abilities.keyword.DeathtouchAbility;
++import mage.abilities.keyword.FirstStrikeAbility;
++import mage.abilities.keyword.FlyingAbility;
++import mage.abilities.keyword.ProtectionAbility;
++import mage.cards.Card;
++import mage.cards.repository.CardRepository;
++import mage.constants.PhaseStep;
++import mage.constants.Zone;
++import mage.counters.CounterType;
++import mage.game.Game;
++import mage.game.permanent.Permanent;
++import mage.util.RandomUtil;
++import org.junit.Assert;
++import org.junit.Test;
++import org.mage.test.player.TestPlayer;
++import org.mage.test.serverside.base.CardTestPlayerBase;
++
++import java.util.List;
++import java.util.concurrent.atomic.AtomicInteger;
++
++/**
++ * Focused executable evidence for product-scope cards changed between the
++ * ManaLoom XMage transition pins 34d81ea and 2c43ec8.
++ *
++ * Planetarium is deliberately represented by a quarantine assertion that
++ * records the confirmed optional-trigger regression. This class does not
++ * change card sources and that assertion is not promotion evidence.
++ */
++public class XmagePinProductScopeTransitionTest extends CardTestPlayerBase {
++
++    private static final String BAXTER_BUILDING = "Baxter Building";
++    private static final String HAKTOS = "Haktos the Unscarred";
++    private static final String HEROES_HANGOUT = "Heroes' Hangout";
++    private static final String IRON_MAN = "Iron Man, Armored Avenger";
++    private static final String LIGHT_PAWS = "Light-Paws, Emperor's Voice";
++    private static final String MANDATE_OF_PEACE = "Mandate of Peace";
++    private static final String MATOYA = "Matoya, Archon Elder";
++    private static final String MIRROR = "Mirror of Life Trapping";
++    private static final String PLANETARIUM = "Planetarium of Wan Shi Tong";
++    private static final String SELFLESS_CAPTAIN = "Selfless Police Captain";
++    private static final String SOKKA_AND_SUKI = "Sokka and Suki";
++    private static final String TALION = "Talion, the Kindly Lord";
++    private static final String SIBSIG_CEREMONY = "The Sibsig Ceremony";
++    private static final String VENOM = "Venom, Evil Unleashed";
++
++    private static final String CARD_A = "Alaborn Trooper";
++    private static final String CARD_B = "Barbtooth Wurm";
++    private static final String CARD_C = "Canopy Gorger";
++    private static final String CARD_D = "Devilthorn Fox";
++
++    private void initPlayerALibrary() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, CARD_D);
++        addCard(Zone.LIBRARY, playerA, CARD_C);
++        addCard(Zone.LIBRARY, playerA, CARD_B);
++        addCard(Zone.LIBRARY, playerA, CARD_A);
++    }
++
++    private static ProtectionAbility getHaktosProtection(Permanent haktos, Game game) {
++        List<ProtectionAbility> abilities = haktos.getAbilities(game).getProtectionAbilities();
++        Assert.assertEquals("Haktos must have exactly one granted protection ability", 1, abilities.size());
++        return abilities.get(0);
++    }
++
++    private static int getHaktosChosenNumber(Permanent haktos, ProtectionAbility protection, Game game) {
++        String key = haktos.getId() + "_" + protection.getStackMomentSourceZCC() + "_haktos_number";
++        Object value = game.getState().getValue(key);
++        Assert.assertTrue("Haktos chosen-number state must exist at key " + key, value instanceof Integer);
++        int number = (Integer) value;
++        Assert.assertTrue("Haktos chosen number must be 2, 3, or 4", number >= 2 && number <= 4);
++        return number;
++    }
++
++    private static Card createCard(String name, TestPlayer owner) {
++        Card card = CardRepository.instance.findCard(name).createCard();
++        card.setOwnerId(owner.getId());
++        return card;
++    }
++
++    @Test
++    public void baxterDrawIsUnavailableWhenToughnessConditionIsFalse() {
++        addCard(Zone.BATTLEFIELD, playerA, BAXTER_BUILDING);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 4);
++
++        checkPlayableAbility(
++                "draw must require a creature with toughness four",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                "{4}, {T}: Draw a card", false
++        );
++
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++    }
++
++    @Test
++    public void baxterDrawDefinitionRetainsGenericFourManaCost() {
++        Card card = CardRepository.instance.findCard(BAXTER_BUILDING).createCard();
++        Ability drawAbility = card.getAbilities().stream()
++                .filter(ability -> ability.getRule().contains("Draw a card"))
++                .findFirst()
++                .orElseThrow(() -> new AssertionError("Baxter Building draw ability not found"));
++
++        Assert.assertEquals(
++                "Baxter Building draw ability must retain the restored generic-four mana cost",
++                "{4}",
++                drawAbility.getManaCostsToPay().getText()
++        );
++    }
++
++    @Test
++    public void baxterDrawPaysFourTapsSourceAndDrawsExactlyOne() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.BATTLEFIELD, playerA, BAXTER_BUILDING);
++        addCard(Zone.BATTLEFIELD, playerA, "Pillarfield Ox");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 4);
++
++        activateAbility(
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                "{4}, {T}: Draw a card"
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertHandCount(playerA, "Mountain", 1);
++        assertTapped(BAXTER_BUILDING, true);
++    }
++
++    @Test
++    public void haktosProtectionReadsTheChosenNumberFromItsSourceZcc() {
++        skipInitShuffling();
++        addCard(Zone.HAND, playerA, HAKTOS);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        runCode(
++                "seed Haktos choice",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                (info, player, game) -> RandomUtil.setSeed(1)
++        );
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, HAKTOS);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        runCode(
++                "verify chosen-number protection",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                (info, player, game) -> {
++                    Permanent haktos = getPermanent(HAKTOS, playerA);
++                    ProtectionAbility protection = getHaktosProtection(haktos, game);
++                    int chosen = getHaktosChosenNumber(haktos, protection, game);
++
++                    for (String candidate : new String[]{"Grizzly Bears", "Centaur Courser", "Hill Giant"}) {
++                        Card card = createCard(candidate, playerB);
++                        boolean canTarget = protection.canTarget(card, game);
++                        Assert.assertEquals(
++                                info + " — protection must apply to every mana value except " + chosen
++                                        + " for " + candidate,
++                                card.getManaValue() == chosen,
++                                canTarget
++                        );
++                    }
++                }
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++    }
++
++    @Test
++    public void haktosZoneChangeUsesFreshZccStateInsteadOfStaleChoice() {
++        AtomicInteger firstZcc = new AtomicInteger();
++        AtomicInteger firstChoice = new AtomicInteger();
++
++        skipInitShuffling();
++        addCard(Zone.HAND, playerA, HAKTOS);
++        addCard(Zone.HAND, playerA, "Ghostway");
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 5);
++
++        runCode(
++                "seed two different Haktos choices",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                (info, player, game) -> RandomUtil.setSeed(1)
++        );
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, HAKTOS);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        runCode(
++                "capture first Haktos state",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                (info, player, game) -> {
++                    Permanent haktos = getPermanent(HAKTOS, playerA);
++                    ProtectionAbility protection = getHaktosProtection(haktos, game);
++                    firstZcc.set(haktos.getZoneChangeCounter(game));
++                    firstChoice.set(getHaktosChosenNumber(haktos, protection, game));
++                }
++        );
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Ghostway");
++        runCode(
++                "verify fresh Haktos state",
++                2, PhaseStep.UPKEEP, playerA,
++                (info, player, game) -> {
++                    Permanent haktos = getPermanent(HAKTOS, playerA);
++                    ProtectionAbility protection = getHaktosProtection(haktos, game);
++                    int secondZcc = haktos.getZoneChangeCounter(game);
++                    int secondChoice = getHaktosChosenNumber(haktos, protection, game);
++
++                    Assert.assertNotEquals(info + " — zone change must advance source ZCC", firstZcc.get(), secondZcc);
++                    Assert.assertNotEquals(
++                            info + " — deterministic seed must expose stale-state reads",
++                            firstChoice.get(), secondChoice
++                    );
++
++                    Card oldMatch = createCard(
++                            firstChoice.get() == 2 ? "Grizzly Bears"
++                                    : firstChoice.get() == 3 ? "Centaur Courser" : "Hill Giant",
++                            playerB
++                    );
++                    Assert.assertFalse(
++                            info + " — old chosen value must now be protected against",
++                            protection.canTarget(oldMatch, game)
++                    );
++                }
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
++        execute();
++    }
++
++    @Test
++    public void heroesHangoutPatrolNightBoostsTwoTargetsAndGrantsFirstStrike() {
++        addCard(Zone.HAND, playerA, HEROES_HANGOUT);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain");
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, HEROES_HANGOUT);
++        setModeChoice(playerA, "2");
++        addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPowerToughness(playerA, "Grizzly Bears", 3, 2);
++        assertPowerToughness(playerA, "Silvercoat Lion", 3, 2);
++        assertAbility(playerA, "Grizzly Bears", FirstStrikeAbility.getInstance(), true);
++        assertAbility(playerA, "Silvercoat Lion", FirstStrikeAbility.getInstance(), true);
++    }
++
++    @Test
++    public void heroesHangoutDateNightPlaysOnlyTheChosenExiledCardThroughNextTurn() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, CARD_D);
++        addCard(Zone.LIBRARY, playerA, CARD_C);
++        addCard(Zone.LIBRARY, playerA, CARD_B);
++        addCard(Zone.LIBRARY, playerA, CARD_A);
++        addCard(Zone.LIBRARY, playerA, "Accorder's Shield");
++        addCard(Zone.LIBRARY, playerA, "Memnite");
++        addCard(Zone.HAND, playerA, HEROES_HANGOUT);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain");
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, HEROES_HANGOUT);
++        setModeChoice(playerA, "1");
++        setChoice(playerA, "Memnite");
++        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
++
++        setStrictChooseMode(true);
++        setStopAt(3, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Memnite", 1);
++        assertExileCount(playerA, "Memnite", 0);
++        assertExileCount(playerA, "Accorder's Shield", 1);
++        assertPowerToughness(playerA, "Grizzly Bears", 2, 2);
++        assertAbility(playerA, "Grizzly Bears", FirstStrikeAbility.getInstance(), false);
++    }
++
++    @Test
++    public void ironManOnlyGrantsFlyingToOtherAttackingModifiedCreature() {
++        addCard(Zone.BATTLEFIELD, playerA, IRON_MAN);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion");
++        addCard(Zone.BATTLEFIELD, playerA, "Short Sword");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains");
++
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Equip {1}", "Grizzly Bears");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        attack(1, playerA, IRON_MAN, playerB);
++        attack(1, playerA, "Grizzly Bears", playerB);
++        attack(1, playerA, "Silvercoat Lion", playerB);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertAttachedTo(playerA, "Short Sword", "Grizzly Bears", true);
++        assertAbility(playerA, "Grizzly Bears", FlyingAbility.getInstance(), true);
++        assertAbility(playerA, "Silvercoat Lion", FlyingAbility.getInstance(), false);
++    }
++
++    @Test
++    public void ironManFlyingDefinitionExplicitlyExcludesItsSource() {
++        Card card = CardRepository.instance.findCard(IRON_MAN).createCard();
++        Effect effect = card.getAbilities().stream()
++                .flatMap(ability -> ability.getEffects().stream())
++                .filter(GainAbilityAllEffect.class::isInstance)
++                .findFirst()
++                .orElseThrow(() -> new AssertionError("Iron Man flying grant effect not found"));
++
++        Assert.assertEquals(
++                "The generated definition starts with 'other' only when GainAbilityAllEffect.excludeSource is true",
++                "other attacking modified creatures gain flying until end of turn",
++                effect.getText((Mode) null)
++        );
++    }
++
++    @Test
++    public void lightPawsRecognizesNormallyCastAuraThroughStackLki() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Hyena Umbra");
++        addCard(Zone.BATTLEFIELD, playerA, LIGHT_PAWS);
++        addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
++        addCard(Zone.HAND, playerA, "Pacifism");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Pacifism", "Grizzly Bears");
++        setChoice(playerA, true);
++        addTarget(playerA, "Hyena Umbra");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertAttachedTo(playerB, "Pacifism", "Grizzly Bears", true);
++        assertAttachedTo(playerA, "Hyena Umbra", LIGHT_PAWS, true);
++    }
++
++    @Test
++    public void lightPawsIgnoresAuraPutOntoBattlefieldWithoutBeingCast() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Hyena Umbra");
++        addCard(Zone.BATTLEFIELD, playerA, LIGHT_PAWS);
++        addCard(Zone.HAND, playerA, "Academy Researchers");
++        addCard(Zone.HAND, playerA, "Pacifism");
++        addCard(Zone.BATTLEFIELD, playerA, "Island", 3);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Academy Researchers");
++        setChoice(playerA, true);
++        setChoice(playerA, "Pacifism");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertAttachedTo(playerA, "Pacifism", "Academy Researchers", true);
++        assertPermanentCount(playerA, "Hyena Umbra", 0);
++        assertLibraryCount(playerA, "Hyena Umbra", 1);
++    }
++
++    @Test
++    public void lightPawsRecognizesAuraCopiedAsACardThenCast() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Hyena Umbra");
++        addCard(Zone.BATTLEFIELD, playerA, LIGHT_PAWS);
++        addCard(Zone.BATTLEFIELD, playerA, "Baron Helmut Zemo");
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.GRAVEYARD, playerA, "Doomsday Excruciator", 3);
++        addCard(Zone.GRAVEYARD, playerA, "Dead Weight");
++
++        attack(1, playerA, "Baron Helmut Zemo");
++        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Boast");
++        setChoice(playerA, "Doomsday Excruciator", 3);
++        setChoice(playerA, "Dead Weight");
++        setChoice(playerA, "Dead Weight");
++        setChoice(playerA, true);
++        addTarget(playerA, "Grizzly Bears");
++        setChoice(playerA, TestPlayer.CHOICE_SKIP);
++        setChoice(playerA, false);
++        setChoice(playerA, true);
++        addTarget(playerA, "Hyena Umbra");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.END_TURN);
++        execute();
++
++        assertPermanentCount(playerA, "Grizzly Bears", 0);
++        assertAttachedTo(playerA, "Hyena Umbra", LIGHT_PAWS, true);
++    }
++
++    @Test
++    public void matoyaControllerScryDrawsExactlyOneAdditionalCard() {
++        initPlayerALibrary();
++        addCard(Zone.BATTLEFIELD, playerA, MATOYA);
++        addCard(Zone.HAND, playerA, "Preordain");
++        addCard(Zone.BATTLEFIELD, playerA, "Island");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Preordain");
++        addTarget(playerA, TestPlayer.TARGET_SKIP);
++        setChoice(playerA, CARD_B);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertHandCount(playerA, CARD_A, 1);
++        assertHandCount(playerA, CARD_B, 1);
++        assertHandCount(playerA, 2);
++    }
++
++    @Test
++    public void matoyaControllerSurveilDrawsExactlyOneAdditionalCard() {
++        initPlayerALibrary();
++        addCard(Zone.BATTLEFIELD, playerA, MATOYA);
++        addCard(Zone.HAND, playerA, "Curate");
++        addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Curate");
++        addTarget(playerA, CARD_A + "^" + CARD_B);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertGraveyardCount(playerA, CARD_A, 1);
++        assertGraveyardCount(playerA, CARD_B, 1);
++        assertHandCount(playerA, CARD_C, 1);
++        assertHandCount(playerA, CARD_D, 1);
++        assertHandCount(playerA, 2);
++    }
++
++    @Test
++    public void matoyaIgnoresOpponentScry() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        removeAllCardsFromLibrary(playerB);
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.LIBRARY, playerB, "Plains");
++        addCard(Zone.LIBRARY, playerB, "Swamp");
++        addCard(Zone.BATTLEFIELD, playerA, MATOYA);
++        addCard(Zone.HAND, playerB, "Opt");
++        addCard(Zone.BATTLEFIELD, playerB, "Island");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerB, "Opt");
++        addTarget(playerB, TestPlayer.TARGET_SKIP);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertHandCount(playerA, 0);
++        assertHandCount(playerB, "Swamp", 1);
++    }
++
++    @Test
++    public void mirrorRotatesCastCreaturesThroughItsDedicatedExileZone() {
++        addCard(Zone.BATTLEFIELD, playerA, MIRROR);
++        addCard(Zone.HAND, playerA, "Grizzly Bears");
++        addCard(Zone.HAND, playerA, "Silvercoat Lion");
++        addCard(Zone.BATTLEFIELD, playerA, "Forest", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Silvercoat Lion");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Grizzly Bears", 1);
++        assertPermanentCount(playerA, "Silvercoat Lion", 0);
++        assertExileCount(playerA, "Grizzly Bears", 0);
++        assertExileCount(playerA, "Silvercoat Lion", 1);
++    }
++
++    @Test
++    public void mirrorIgnoresCreatureTokensThatWereNotCast() {
++        addCard(Zone.BATTLEFIELD, playerA, MIRROR);
++        addCard(Zone.HAND, playerA, "Raise the Alarm");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Raise the Alarm");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Soldier Token", 2);
++    }
++
++    @Test
++    public void mirrorRecognizesCreatureCopiedAsACardThenCast() {
++        addCard(Zone.BATTLEFIELD, playerA, MIRROR);
++        addCard(Zone.BATTLEFIELD, playerA, "Baron Helmut Zemo");
++        addCard(Zone.GRAVEYARD, playerA, "Doomsday Excruciator", 3);
++        addCard(Zone.GRAVEYARD, playerA, "Walking Corpse");
++
++        attack(1, playerA, "Baron Helmut Zemo");
++        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Boast");
++        setChoice(playerA, "Doomsday Excruciator", 3);
++        setChoice(playerA, "Walking Corpse");
++        setChoice(playerA, "Walking Corpse");
++        setChoice(playerA, true);
++        setChoice(playerA, TestPlayer.CHOICE_SKIP);
++        setChoice(playerA, false);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.END_TURN);
++        execute();
++
++        assertPermanentCount(playerA, "Walking Corpse", 0);
++    }
++
++    @Test
++    public void selflessCaptainBounceTransfersCountersUsingLastKnownInformation() {
++        addCard(Zone.BATTLEFIELD, playerA, SELFLESS_CAPTAIN);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.HAND, playerA, "Unsummon");
++        addCard(Zone.BATTLEFIELD, playerA, "Island");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Unsummon", SELFLESS_CAPTAIN);
++        addTarget(playerA, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertHandCount(playerA, SELFLESS_CAPTAIN, 1);
++        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 1);
++    }
++
++    @Test
++    public void sokkaAttachesChosenEquipmentAndAllowsZeroTargets() {
++        addCard(Zone.BATTLEFIELD, playerA, SOKKA_AND_SUKI);
++        addCard(Zone.BATTLEFIELD, playerA, "Short Sword");
++        addCard(Zone.HAND, playerA, "Expedition Envoy");
++        addCard(Zone.HAND, playerA, "Universal Automaton");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Expedition Envoy");
++        addTarget(playerA, "Short Sword");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Universal Automaton");
++        addTarget(playerA, TestPlayer.TARGET_SKIP);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertAttachedTo(playerA, "Short Sword", "Expedition Envoy", true);
++        assertAttachedTo(playerA, "Short Sword", "Universal Automaton", false);
++    }
++
++    @Test
++    public void sokkaEquipmentEntryCreatesAllyThenAttachesToThatToken() {
++        addCard(Zone.BATTLEFIELD, playerA, SOKKA_AND_SUKI);
++        addCard(Zone.HAND, playerA, "Short Sword");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Short Sword");
++        addTarget(playerA, "Short Sword");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Ally Token", 1);
++        assertAttachedTo(playerA, "Short Sword", "Ally Token", true);
++    }
++
++    @Test
++    public void talionMatchingSpellUsesChosenSourceZccForLifeLossAndDraw() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.HAND, playerA, TALION);
++        addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 2);
++        addCard(Zone.HAND, playerB, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerB, "Forest", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, TALION);
++        setChoiceAmount(playerA, 2);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertLife(playerB, 18);
++        assertHandCount(playerA, "Mountain", 1);
++    }
++
++    @Test
++    public void talionZoneChangeIgnoresStaleChosenNumber() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.HAND, playerA, TALION);
++        addCard(Zone.HAND, playerA, "Cloudshift");
++        addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 3);
++        addCard(Zone.HAND, playerB, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerB, "Forest", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, TALION);
++        setChoiceAmount(playerA, 2);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cloudshift", TALION);
++        setChoiceAmount(playerA, 3);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertLife(playerB, 20);
++        assertHandCount(playerA, 0);
++    }
++
++    @Test
++    public void sibsigReducesCastCreatureThenDestroysItAndCreatesZombieDruid() {
++        addCard(Zone.BATTLEFIELD, playerA, SIBSIG_CEREMONY);
++        addCard(Zone.HAND, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Forest");
++
++        checkPlayableAbility(
++                "generic-two reduction must make Grizzly Bears cost one green",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                "Cast Grizzly Bears", true
++        );
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertGraveyardCount(playerA, "Grizzly Bears", 1);
++        assertPermanentCount(playerA, "Grizzly Bears", 0);
++        assertPermanentCount(playerA, "Zombie Druid Token", 1);
++    }
++
++    @Test
++    public void sibsigIgnoresCreatureTokensThatWereNotCast() {
++        addCard(Zone.BATTLEFIELD, playerA, SIBSIG_CEREMONY);
++        addCard(Zone.HAND, playerA, "Raise the Alarm");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Raise the Alarm");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Soldier Token", 2);
++        assertPermanentCount(playerA, "Zombie Druid Token", 0);
++    }
++
++    @Test
++    public void sibsigRecognizesCreatureCopiedAsACardThenCast() {
++        addCard(Zone.BATTLEFIELD, playerA, SIBSIG_CEREMONY);
++        addCard(Zone.BATTLEFIELD, playerA, "Baron Helmut Zemo");
++        addCard(Zone.GRAVEYARD, playerA, "Doomsday Excruciator", 3);
++        addCard(Zone.GRAVEYARD, playerA, "Walking Corpse");
++
++        attack(1, playerA, "Baron Helmut Zemo");
++        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Boast");
++        setChoice(playerA, "Doomsday Excruciator", 3);
++        setChoice(playerA, "Walking Corpse");
++        setChoice(playerA, "Walking Corpse");
++        setChoice(playerA, true);
++        setChoice(playerA, TestPlayer.CHOICE_SKIP);
++        setChoice(playerA, false);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.END_TURN);
++        execute();
++
++        assertPermanentCount(playerA, "Walking Corpse", 0);
++        assertPermanentCount(playerA, "Zombie Druid Token", 1);
++    }
++
++    @Test
++    public void mandateOfPeaceQuarantineReproducesResidualOriginalSpellAfterConcurrentRemoval() {
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Walking Ballista");
++        addCard(Zone.BATTLEFIELD, playerA, "Glorious Anthem");
++        addCounters(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Walking Ballista", CounterType.P1P1, 2);
++        addCard(Zone.HAND, playerA, "Lightning Bolt");
++        addCard(Zone.HAND, playerA, "Fork");
++        addCard(Zone.HAND, playerA, MANDATE_OF_PEACE);
++        addCard(Zone.HAND, playerB, "Opt");
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 3);
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++        addCard(Zone.BATTLEFIELD, playerB, "Island");
++
++        attack(1, playerA, "Grizzly Bears");
++        castSpell(1, PhaseStep.DECLARE_ATTACKERS, playerA, "Lightning Bolt", playerB);
++        castSpell(
++                1, PhaseStep.DECLARE_ATTACKERS, playerA,
++                "Fork", "Lightning Bolt", "Lightning Bolt", StackClause.WHILE_ON_STACK
++        );
++        setChoice(playerA, false);
++        waitStackResolved(1, PhaseStep.DECLARE_ATTACKERS, 1);
++        activateAbility(
++                1, PhaseStep.DECLARE_ATTACKERS, playerA,
++                "Remove a +1/+1 counter", "Grizzly Bears",
++                "Lightning Bolt", StackClause.WHILE_COPY_ON_STACK
++        );
++        activateAbility(
++                1, PhaseStep.DECLARE_ATTACKERS, playerA,
++                "Remove a +1/+1 counter", "Grizzly Bears",
++                "Remove a +1/+1 counter", StackClause.WHILE_ON_STACK
++        );
++        castSpell(
++                1, PhaseStep.DECLARE_ATTACKERS, playerA,
++                MANDATE_OF_PEACE, TestPlayer.NO_TARGET,
++                "Remove a +1/+1 counter", StackClause.WHILE_ON_STACK
++        );
++        checkPlayableAbility(
++                "Mandate must prevent the opponent from casting after combat",
++                1, PhaseStep.POSTCOMBAT_MAIN, playerB,
++                "Cast Opt", false
++        );
++        checkStackSize(
++                "Mandate must leave no original, copy, or activated ability on the stack",
++                1, PhaseStep.POSTCOMBAT_MAIN, playerA, 0
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.END_TURN);
++        execute();
++
++        // Quarantine evidence for TODO #12911: one original Bolt incorrectly survives and resolves.
++        assertLife(playerB, 17);
++        assertGraveyardCount(playerA, "Lightning Bolt", 1);
++        assertExileCount(playerA, "Lightning Bolt", 0);
++        assertGraveyardCount(playerA, "Fork", 1);
++        assertExileCount(playerA, MANDATE_OF_PEACE, 1);
++        assertDamageReceived(playerA, "Grizzly Bears", 0);
++        assertHandCount(playerB, "Opt", 1);
++    }
++
++    @Test
++    public void venomGraveyardAbilityObservesSorceryTimingAndAddsTwoCounters() {
++        addCard(Zone.GRAVEYARD, playerA, VENOM);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 3);
++
++        checkPlayableAbility(
++                "Venom graveyard ability must not be playable during upkeep",
++                1, PhaseStep.UPKEEP, playerA,
++                "{2}{B}, Exile this card from your graveyard", false
++        );
++        checkPlayableAbility(
++                "Venom graveyard ability must be playable in own empty-stack main phase",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                "{2}{B}, Exile this card from your graveyard", true
++        );
++        activateAbility(
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                "{2}{B}, Exile this card from your graveyard",
++                "Grizzly Bears"
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertGraveyardCount(playerA, VENOM, 0);
++        assertExileCount(playerA, VENOM, 1);
++        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 2);
++        assertAbility(playerA, "Grizzly Bears", DeathtouchAbility.getInstance(), true);
++    }
++
++    @Test
++    public void planetariumQuarantineConfirmsMandatoryTriggerBecameOptional() {
++        Card card = CardRepository.instance.findCard(PLANETARIUM).createCard();
++        Ability ability = card.getAbilities().stream()
++                .filter(ScryOrSurveilTriggeredAbility.class::isInstance)
++                .findFirst()
++                .orElseThrow(() -> new AssertionError("Planetarium scry/surveil trigger not found"));
++
++        Assert.assertTrue(
++                "Quarantine evidence: the transition helper currently makes Planetarium's mandatory trigger optional",
++                ((TriggeredAbility) ability).isOptional()
++        );
++    }
++}

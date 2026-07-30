@@ -321,7 +321,9 @@ def _validate_local_source_policy(
         repo_root / "docs/hermes-analysis/manaloom-knowledge/scripts",
     )
     suffixes = {".py", ".sh", ".dart", ".java"}
-    machine_home_prefix = "/" + "Users/"
+    machine_home_pattern = re.compile(
+        re.escape("/" + "Users/") + r"[A-Za-z0-9._-]+(?:/|\b)"
+    )
     legacy_xmage_path = "Downloads/" + "mage-master"
     violations: list[str] = []
     for root in roots:
@@ -337,7 +339,7 @@ def _validate_local_source_policy(
                 source = path.read_text(encoding="utf-8", errors="ignore")
             except OSError:
                 continue
-            if machine_home_prefix in source or legacy_xmage_path in source:
+            if machine_home_pattern.search(source) or legacy_xmage_path in source:
                 violations.append(relative.as_posix())
     _check(
         checks,

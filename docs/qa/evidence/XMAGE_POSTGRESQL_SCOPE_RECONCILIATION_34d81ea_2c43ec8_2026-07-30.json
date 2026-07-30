@@ -1,0 +1,2267 @@
+{
+  "ambiguity_count": 0,
+  "boundary": "PostgreSQL decides product exposure. A miss, future deferment, or runtime catalog hit is never semantic proof for the card.",
+  "canonical_wrapper": "server/bin/with_new_server_pg.sh",
+  "card_results": [
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Advancing the Spirit",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Ajani Resolute",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Alicia Masters, Skilled Sculptor"
+      ],
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSC"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Amok Time",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Ant-Man, Colony Commander"
+      ],
+      "card_name": "Ant-Man, Colony Commander",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Ant-Man, Elusive Avenger",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Ant-Man, Reformed Rogue",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Aunt May"
+      ],
+      "card_name": "Aunt May",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Avengers Tower"
+      ],
+      "card_name": "Avengers Tower",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bag End Banquet",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bast, Panther Goddess",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Baxter Building"
+      ],
+      "card_name": "Baxter Building",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Beckett Mariner, Impetuous Ensign",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Benjamin Sisko, Besieged",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bilbo, Fellow Conspirator",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bilbo, Luckwearer",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bio-Asset Allocator",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Black Panther, Most Dangerous",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Black Panther, Vanguard"
+      ],
+      "card_name": "Black Panther, Vanguard",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Black Widow, Deadly Hunter",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Black Widow, Intel Expert",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bothersome Noisemaker",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Brawn, Amadeus Cho",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bucky Barnes, Eager Ally",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Bullseye, Death Dealer",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Burn, Burn, Tree and Fern",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Captain America, Liberator",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Captain America, Wings of Freedom"
+      ],
+      "card_name": "Captain America, Wings of Freedom",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Captain James T. Kirk",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Captain Kathryn Janeway",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Claim the Kingdom"
+      ],
+      "card_name": "Claim the Kingdom",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Consider the Prime Directive",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Count Nefaria",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Craterclaw Colossus",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Crimson Cowl, Master of Evil",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Crossbones, Malicious Mercenary"
+      ],
+      "card_name": "Crossbones, Malicious Mercenary",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Crossover Collaboration",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Crystalline Entity",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Currency Converter"
+      ],
+      "card_name": "Currency Converter",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-08-19"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "AA2"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Darksteel Angel",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Darwin, Adaptive Mutant",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Desolation of Smaug",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Desolation Prowler",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Devil Dinosaur",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Doctor Doom, Unrivaled",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Doctor Strange, Surgeon",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Donald Blake, Guise of Thor",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Doorman",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Dora Milaje Elite",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Dr. Beverly Crusher",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Eerie Gravestone"
+      ],
+      "card_name": "Eerie Gravestone",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Endless Ranks of HYDRA",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Falcon's Wing Harness"
+      ],
+      "card_name": "Falcon's Wing Harness",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Falcon, Joaquin Torres",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Fili and Kili, Joyous",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Garruk, Veiled Butcher",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Gathering of Darkness",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Gert and Old Lace, Runaways",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Haktos the Unscarred"
+      ],
+      "card_name": "Haktos the Unscarred",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2002-06-24"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "PRM"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hatut Zeraze Strike Force",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hawkeye, Bowslinger",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hawkeye, Trick Shot",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Heroes' Hangout"
+      ],
+      "card_name": "Heroes' Hangout",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hex Magic",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Highly Illogical",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hire a Crew",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hulkbuster Armor",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "HYDRA Troopers"
+      ],
+      "card_name": "HYDRA Troopers",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Hyperion's Atomic Vision",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "I Am Iron Man",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "In the Pale Moonlight",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Iron Fist, Hero for Hire",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Iron Man, Armored Avenger"
+      ],
+      "card_name": "Iron Man, Armored Avenger",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSC"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Iron Man, Tony Stark",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Jocasta, Automaton Avenger",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Killmonger, Ruthless Usurper",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "King T'Challa",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Kirk, Enterprising Captain",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Klingon Strike Force",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Krark, the Thumbless",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Light-Paws, Emperor's Voice"
+      ],
+      "card_name": "Light-Paws, Emperor's Voice",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2022-02-18"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "NEO"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Liliana the Faultless",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Liliana the Repentant",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Living Lightning, Charged Up",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "MACH-1, Swooping Scoundrel",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Machine Man, Model X-51",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Mandate of Peace"
+      ],
+      "card_name": "Mandate of Peace",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "external_runtime_gap",
+      "release_dates": [
+        "2019-08-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "unsupported",
+      "set_codes": [
+        "C19"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Matoya, Archon Elder"
+      ],
+      "card_name": "Matoya, Archon Elder",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-06-13"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "FIN"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Metallic Mimic"
+      ],
+      "card_name": "Metallic Mimic",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2017-01-20"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "AER"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Midnight Angel Armor",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Mikey & Don, Party Planners"
+      ],
+      "card_name": "Mikey & Don, Party Planners",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-03-06"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "TMT"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Mirkwood Pathmaker",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Mirror of Life Trapping"
+      ],
+      "card_name": "Mirror of Life Trapping",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2022-06-10"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "CLB"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Misty Mountains Raider",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Mjolnir, Hammer of Thor",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Munitions Enthusiast",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "My Precious",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Namor the Sub-Mariner"
+      ],
+      "card_name": "Namor the Sub-Mariner",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Nick Fury, Agent of S.H.I.E.L.D."
+      ],
+      "card_name": "Nick Fury, Agent of S.H.I.E.L.D.",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Okoye, Dora Milaje Leader",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Operations Officer",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Origin of Captain America",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Origin of the Avengers"
+      ],
+      "card_name": "Origin of the Avengers",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Origin of the Hulk",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Origin of Thor",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Photon Blast Barrage"
+      ],
+      "card_name": "Photon Blast Barrage",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Picard, Steadfast Captain",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Planetarium of Wan Shi Tong"
+      ],
+      "card_name": "Planetarium of Wan Shi Tong",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "external_runtime_gap",
+      "release_dates": [
+        "2025-11-21"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "unsupported",
+      "set_codes": [
+        "PTLA"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Prudent Fateseer",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "unsupported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Quicksilver, Speedster",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Raft Security Officer",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Ratchet, Field Medic",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Ravenhill Flock",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Red Ghost, Intangible Genius",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Red Guardian, Super-Soldier",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Red Hulk",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Repulsor Bots",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Restless Bloodseeker",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Restorative Technique",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Scout the City"
+      ],
+      "card_name": "Scout the City",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Secure Detention",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Selfless Police Captain"
+      ],
+      "card_name": "Selfless Police Captain",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Set Phasers to...",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "She-Hulk, Wallbreaker",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Shuri's Fabricator",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Shuri, Vibranium Technologist",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Sky Cycle",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Sokka and Suki"
+      ],
+      "card_name": "Sokka and Suki",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-11-21"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "TLE"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "SP//dr, Piloted by Peni"
+      ],
+      "card_name": "SP//dr, Piloted by Peni",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Spock, Logical Choice",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Stark's Ingenuity",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Stick, Fearless Mentor",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Sting, Bilbo's Sword",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Stunning Shot",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Swordsman's Steel",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Swordsman, Sharp Scoundrel",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Talion, the Kindly Lord"
+      ],
+      "card_name": "Talion, the Kindly Lord",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2023-09-08"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "PWOE"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Team Transmitter",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Tenacious Tosk",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Chief Warg",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Great Mound",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Lonely Mountain",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Queen of Dale",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "The Ruinous Wrecking Crew"
+      ],
+      "card_name": "The Ruinous Wrecking Crew",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "The Sibsig Ceremony"
+      ],
+      "card_name": "The Sibsig Ceremony",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-04-11"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "PTDM"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Squadron Sinister",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Theorist, Jace Beleren",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "The Wasp, Janet Van Dyne",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Thing Swing",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Tiger Shark, Abyssal Hunter",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Tinybones, Pocket Nuisance",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Titanbones, Towering Heart",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Trelane, Squire of Gothos",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "TVA Bureaucrat",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "U.S.S. Enterprise-D, Galaxy-Class",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "future_deferred",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "future_only",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Ultron, Machine Overlord",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Unstable Molecule Suit",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Venom, Evil Unleashed"
+      ],
+      "card_name": "Venom, Evil Unleashed",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2025-09-23"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "OM1"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Vibranium Strike Gauntlets",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Villainous Hideout",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Visions of Villainy",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Wakandan Tusker",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "War Machine, Avenging Arsenal",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Winter Soldier, Reborn Avenger",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Wolverine, Claws Out",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [
+        "Wolverine, Fierce Fighter"
+      ],
+      "card_name": "Wolverine, Fierce Fighter",
+      "postgresql_match_count": 1,
+      "postgresql_printing_count": 1,
+      "product_scope_status": "product_in_scope",
+      "release_dates": [
+        "2026-06-26"
+      ],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": [
+        "MSH"
+      ]
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Wondrous Revival",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "X-23, Deadly Weapon",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    },
+    {
+      "ambiguous": false,
+      "canonical_names": [],
+      "card_name": "Yellowjacket, Heartless Marauder",
+      "postgresql_match_count": 0,
+      "postgresql_printing_count": 0,
+      "product_scope_status": "released_missing_from_postgresql",
+      "release_dates": [],
+      "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
+      "runtime_catalog_status": "supported",
+      "set_codes": []
+    }
+  ],
+  "generated_at_utc": "2026-07-30T04:33:15+00:00",
+  "queries_executed": 2,
+  "reconciled_card_count": 169,
+  "requested_card_count": 169,
+  "rows_sha256": "7ed18075c34b0a4b7f3c3206f250aeb86879f7ea568f648586dd696ad2d412dc",
+  "schema_version": "manaloom_xmage_postgresql_scope_reconciliation_v1_2026-07-28",
+  "scope_counts": {
+    "external_runtime_gap": 2,
+    "future_deferred": 45,
+    "product_in_scope": 34,
+    "released_missing_from_postgresql": 88
+  },
+  "status": "pass",
+  "transaction_mode": "read_only",
+  "transaction_read_only": true,
+  "writes_performed": false
+}

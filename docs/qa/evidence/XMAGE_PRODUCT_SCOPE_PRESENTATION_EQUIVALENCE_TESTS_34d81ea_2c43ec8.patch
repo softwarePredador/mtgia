@@ -1,0 +1,327 @@
+diff --git a/Mage.Tests/src/test/java/org/mage/test/cards/single/XmageProductInScopePresentationEquivalenceTest.java b/Mage.Tests/src/test/java/org/mage/test/cards/single/XmageProductInScopePresentationEquivalenceTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b5435148ba825a39d06dcb5977b09f8ff1eee62c
+--- /dev/null
++++ b/Mage.Tests/src/test/java/org/mage/test/cards/single/XmageProductInScopePresentationEquivalenceTest.java
+@@ -0,0 +1,321 @@
++package org.mage.test.cards.single;
++
++import mage.abilities.keyword.FlyingAbility;
++import mage.abilities.keyword.HasteAbility;
++import mage.abilities.keyword.WardAbility;
++import mage.constants.PhaseStep;
++import mage.constants.Zone;
++import mage.counters.CounterType;
++import org.junit.Assert;
++import org.junit.Test;
++import org.mage.test.serverside.base.CardTestPlayerBase;
++
++import java.util.List;
++import java.util.stream.Collectors;
++
++/**
++ * Behavioral equivalence evidence for product-scope cards whose transition
++ * changes are presentation/data-flow only. The exact same class is executed
++ * against both ManaLoom XMage pins (34d81ea and 2c43ec8).
++ */
++public class XmageProductInScopePresentationEquivalenceTest extends CardTestPlayerBase {
++
++    private static final String ANT_MAN = "Ant-Man, Colony Commander";
++    private static final String AUNT_MAY = "Aunt May";
++    private static final String CAPTAIN_AMERICA = "Captain America, Wings of Freedom";
++    private static final String CLAIM_THE_KINGDOM = "Claim the Kingdom";
++    private static final String CROSSBONES = "Crossbones, Malicious Mercenary";
++    private static final String EERIE_GRAVESTONE = "Eerie Gravestone";
++    private static final String FALCONS_WING_HARNESS = "Falcon's Wing Harness";
++    private static final String MIKEY_AND_DON = "Mikey & Don, Party Planners";
++    private static final String NAMOR = "Namor the Sub-Mariner";
++    private static final String SCOUT_THE_CITY = "Scout the City";
++    private static final String WOLVERINE = "Wolverine, Fierce Fighter";
++
++    private WardAbility getOnlyWard(String permanentName) {
++        List<WardAbility> wards = getPermanent(permanentName, playerA)
++                .getAbilities(currentGame)
++                .stream()
++                .filter(WardAbility.class::isInstance)
++                .map(WardAbility.class::cast)
++                .collect(Collectors.toList());
++        Assert.assertEquals(permanentName + " must have exactly one ward ability", 1, wards.size());
++        return wards.get(0);
++    }
++
++    @Test
++    public void antManPaysAttackCostAddsCounterAndCreatesOnlyOneInsect() {
++        addCard(Zone.BATTLEFIELD, playerA, ANT_MAN);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Wastes");
++
++        attack(1, playerA, ANT_MAN);
++        setChoice(playerA, true);
++        addTarget(playerA, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 1);
++        assertPermanentCount(playerA, "Insect Token", 1);
++    }
++
++    @Test
++    public void auntMayRewardsOwnSpiderAndIgnoresOpponentsSpider() {
++        addCard(Zone.BATTLEFIELD, playerA, AUNT_MAY);
++        addCard(Zone.HAND, playerA, "Giant Spider");
++        addCard(Zone.BATTLEFIELD, playerA, "Forest", 4);
++        addCard(Zone.HAND, playerB, "Giant Spider");
++        addCard(Zone.BATTLEFIELD, playerB, "Forest", 4);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Giant Spider");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Giant Spider");
++
++        setStrictChooseMode(true);
++        setStopAt(2, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertLife(playerA, 21);
++        assertLife(playerB, 20);
++        assertCounterCount(playerA, "Giant Spider", CounterType.P1P1, 1);
++        assertCounterCount(playerB, "Giant Spider", CounterType.P1P1, 0);
++    }
++
++    @Test
++    public void captainAmericaBoostsOnlyOtherHeroesByItsToughness() {
++        addCard(Zone.BATTLEFIELD, playerA, CAPTAIN_AMERICA);
++        addCard(Zone.BATTLEFIELD, playerA, "Universal Automaton");
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++
++        attack(1, playerA, CAPTAIN_AMERICA);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertPowerToughness(playerA, CAPTAIN_AMERICA, 3, 1);
++        assertPowerToughness(playerA, "Universal Automaton", 2, 2);
++        assertPowerToughness(playerA, "Grizzly Bears", 2, 2);
++        Assert.assertEquals("Captain America must retain ward {1}", "ward {1}", getOnlyWard(CAPTAIN_AMERICA).getRuleWithoutHint());
++    }
++
++    @Test
++    public void claimTheKingdomFourthPlanSacrificesAndGrantsIndestructibleCounter() {
++        addCard(Zone.BATTLEFIELD, playerA, CLAIM_THE_KINGDOM);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.HAND, playerA, "Forest", 4);
++
++        playLand(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Forest");
++        addTarget(playerA, "Grizzly Bears");
++        playLand(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Forest");
++        addTarget(playerA, "Grizzly Bears");
++        playLand(5, PhaseStep.PRECOMBAT_MAIN, playerA, "Forest");
++        addTarget(playerA, "Grizzly Bears");
++        playLand(7, PhaseStep.PRECOMBAT_MAIN, playerA, "Forest");
++        addTarget(playerA, "Grizzly Bears");
++        addTarget(playerA, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(7, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertGraveyardCount(playerA, CLAIM_THE_KINGDOM, 1);
++        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 4);
++        assertCounterCount(playerA, "Grizzly Bears", CounterType.INDESTRUCTIBLE, 1);
++    }
++
++    @Test
++    public void crossbonesTriggersOnlyOnceForTwoOtherVillainsInOneTurn() {
++        addCard(Zone.BATTLEFIELD, playerA, CROSSBONES);
++        addCard(Zone.HAND, playerA, "Universal Automaton", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Wastes", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Universal Automaton");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Universal Automaton");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertCounterCount(playerA, CROSSBONES, CounterType.P1P1, 1);
++        assertLife(playerB, 18);
++        assertPermanentCount(playerA, "Universal Automaton", 2);
++    }
++
++    @Test
++    public void eerieGravestoneDrawsThenMillsFourAndReturnsCreature() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Devilthorn Fox");
++        addCard(Zone.LIBRARY, playerA, "Opt");
++        addCard(Zone.LIBRARY, playerA, "Forest");
++        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
++        addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.HAND, playerA, EERIE_GRAVESTONE);
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 4);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, EERIE_GRAVESTONE);
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{1}{B}, Sacrifice");
++        setChoice(playerA, "Grizzly Bears");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertHandCount(playerA, "Mountain", 1);
++        assertHandCount(playerA, "Grizzly Bears", 1);
++        assertGraveyardCount(playerA, EERIE_GRAVESTONE, 1);
++        assertGraveyardCount(playerA, "Lightning Bolt", 1);
++        assertGraveyardCount(playerA, "Forest", 1);
++        assertGraveyardCount(playerA, "Opt", 1);
++    }
++
++    @Test
++    public void falconsWingHarnessAttachesThenReequipsWithBoostAndFlying() {
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion");
++        addCard(Zone.HAND, playerA, FALCONS_WING_HARNESS);
++        addCard(Zone.BATTLEFIELD, playerA, "Island", 5);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, FALCONS_WING_HARNESS);
++        addTarget(playerA, "Grizzly Bears");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Equip {2}{U}", "Silvercoat Lion");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertAttachedTo(playerA, FALCONS_WING_HARNESS, "Silvercoat Lion", true);
++        assertAttachedTo(playerA, FALCONS_WING_HARNESS, "Grizzly Bears", false);
++        assertPowerToughness(playerA, "Grizzly Bears", 2, 2);
++        assertPowerToughness(playerA, "Silvercoat Lion", 3, 3);
++        assertAbility(playerA, "Silvercoat Lion", FlyingAbility.getInstance(), true);
++        Assert.assertEquals(
++                "Falcon's Wing Harness must grant exactly ward {1}",
++                "ward {1}", getOnlyWard("Silvercoat Lion").getRuleWithoutHint()
++        );
++    }
++
++    @Test
++    public void mikeyAndDonCastTribalCreatureFromTopWithAdditionalCounter() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Devilthorn Fox");
++        addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
++        addCard(Zone.LIBRARY, playerA, "Universal Automaton");
++        addCard(Zone.BATTLEFIELD, playerA, MIKEY_AND_DON);
++        addCard(Zone.BATTLEFIELD, playerA, "Wastes");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Universal Automaton");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        checkPlayableAbility(
++                "non-Mutant, non-Ninja, non-Turtle creature must remain uncastable from top",
++                1, PhaseStep.PRECOMBAT_MAIN, playerA,
++                "Cast Grizzly Bears", false
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Universal Automaton", 1);
++        assertCounterCount(playerA, "Universal Automaton", CounterType.P1P1, 1);
++        Assert.assertEquals("Mikey & Don must retain ward {2}", "ward {2}", getOnlyWard(MIKEY_AND_DON).getRuleWithoutHint());
++    }
++
++    @Test
++    public void namorCountsBlueSymbolsAndUpdatesPowerWithCreatedMerfolk() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Devilthorn Fox");
++        addCard(Zone.LIBRARY, playerA, "Canopy Gorger");
++        addCard(Zone.LIBRARY, playerA, "Barbtooth Wurm");
++        addCard(Zone.LIBRARY, playerA, "Alaborn Trooper");
++        addCard(Zone.BATTLEFIELD, playerA, NAMOR);
++        addCard(Zone.HAND, playerA, "Concentrate");
++        addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Concentrate");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Merfolk Token", 2);
++        assertPowerToughness(playerA, NAMOR, 3, 4);
++        assertHandCount(playerA, 3);
++    }
++
++    @Test
++    public void scoutTheCityLookAroundReturnsPermanentAndGainsLife() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Devilthorn Fox");
++        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
++        addCard(Zone.LIBRARY, playerA, "Opt");
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.HAND, playerA, SCOUT_THE_CITY);
++        addCard(Zone.BATTLEFIELD, playerA, "Forest", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, SCOUT_THE_CITY);
++        setModeChoice(playerA, "1");
++        setChoice(playerA, "Mountain");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertLife(playerA, 23);
++        assertHandCount(playerA, "Mountain", 1);
++        assertGraveyardCount(playerA, "Lightning Bolt", 1);
++        assertGraveyardCount(playerA, "Opt", 1);
++    }
++
++    @Test
++    public void scoutTheCityBringDownDestroysOnlyTargetedFlyer() {
++        addCard(Zone.HAND, playerA, SCOUT_THE_CITY);
++        addCard(Zone.BATTLEFIELD, playerA, "Forest", 2);
++        addCard(Zone.BATTLEFIELD, playerB, "Serra Angel");
++        addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, SCOUT_THE_CITY);
++        setModeChoice(playerA, "2");
++        addTarget(playerA, "Serra Angel");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertGraveyardCount(playerB, "Serra Angel", 1);
++        assertPermanentCount(playerB, "Grizzly Bears", 1);
++    }
++
++    @Test
++    public void wolverineFightThenNewDamageHealsPreviouslyMarkedDamage() {
++        addCard(Zone.HAND, playerA, WOLVERINE);
++        addCard(Zone.HAND, playerA, "Lightning Bolt");
++        addCard(Zone.BATTLEFIELD, playerA, "Forest", 2);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 4);
++        addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, WOLVERINE);
++        addTarget(playerA, "Hill Giant");
++        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Lightning Bolt", WOLVERINE);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertGraveyardCount(playerB, "Hill Giant", 1);
++        assertPermanentCount(playerA, WOLVERINE, 1);
++        assertDamageReceived(playerA, WOLVERINE, 3);
++        assertAbility(playerA, WOLVERINE, HasteAbility.getInstance(), true);
++    }
++}

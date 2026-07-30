@@ -173,10 +173,32 @@ final class XmageBattleServiceTest {
     @Test
     void cardQualificationPolicyIsPinnedAndFailClosed() {
         assertEquals(
+                "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+                XmageCardQualificationPolicy.FROM_ENGINE_COMMIT
+        );
+        assertEquals(
+                "64f2175bc4b1c040ccb352f8e3647a11d0c1088d591b5a7b5ec8a08603ced3cb",
+                XmageCardQualificationPolicy.POSTGRES_RECONCILIATION_SHA256
+        );
+        assertEquals(
+                "7ed18075c34b0a4b7f3c3206f250aeb86879f7ea568f648586dd696ad2d412dc",
+                XmageCardQualificationPolicy.POSTGRES_ROWS_SHA256
+        );
+        assertEquals(
                 SidecarMain.XMAGE_COMMIT,
                 XmageCardQualificationPolicy.ENGINE_COMMIT
         );
-        assertEquals(2, XmageCardQualificationPolicy.restrictionCount());
+        assertEquals(135, XmageCardQualificationPolicy.restrictionCount());
+        assertEquals(
+                133,
+                XmageCardQualificationPolicy.activationRestrictionCount()
+        );
+        assertEquals(
+                169,
+                XmageCardQualificationPolicy.transitionCardNames().size()
+        );
+        assertEquals(45, XmageCardQualificationPolicy.futureDeferredCount());
+        assertEquals(88, XmageCardQualificationPolicy.releasedMissingCount());
         assertNotNull(
                 XmageCardQualificationPolicy.restrictionFor(
                         "Planetarium of Wan Shi Tong"
@@ -187,12 +209,150 @@ final class XmageBattleServiceTest {
                         "Prudent Fateseer"
                 )
         );
+        assertNotNull(
+                XmageCardQualificationPolicy.restrictionFor(
+                        "Mandate of Peace"
+                )
+        );
+        assertTrue(
+                XmageCardQualificationPolicy.isTransitionActivationRestricted(
+                        "Ajani Resolute"
+                )
+        );
+        assertTrue(
+                XmageCardQualificationPolicy.isTransitionActivationRestricted(
+                        "Advancing the Spirit"
+                )
+        );
+        assertFalse(
+                XmageCardQualificationPolicy.isTransitionActivationRestricted(
+                        "Metallic Mimic"
+                )
+        );
         assertThrows(
                 IllegalStateException.class,
                 () -> XmageCardQualificationPolicy.requireEngineCommit(
                         "0000000000000000000000000000000000000000"
                 )
         );
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void cardCoverageQuarantinesKnownCopyLkiGapWithNeutralReason() {
+        XmageBattleService service = new XmageBattleService(
+                "127.0.0.1",
+                17171
+        );
+        JsonObject request = new JsonObject();
+        JsonArray cards = new JsonArray();
+        cards.add(card("Mandate of Peace", 1, false));
+        request.add("cards", cards);
+
+        Map<String, Object> coverage = service.cardCoverage(request);
+        List<Map<String, Object>> unsupported =
+                (List<Map<String, Object>>) coverage.get("unsupported_cards");
+
+        assertEquals("unsupported", coverage.get("status"));
+        assertEquals(1, unsupported.size());
+        assertEquals(
+                "xmage_upstream_copy_lki_gap",
+                unsupported.get(0).get("reason_code")
+        );
+        assertEquals(
+                "quarantined",
+                unsupported.get(0).get("support_status")
+        );
+        assertEquals(
+                "magefree/mage#12911",
+                unsupported.get(0).get("upstream_reference")
+        );
+        assertFalse(
+                unsupported.get(0).get("reason").toString()
+                        .toLowerCase()
+                        .contains("xmage")
+        );
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void cardCoverageBlocksDeferredActivationWithEngineNeutralReason() {
+        XmageBattleService service = new XmageBattleService(
+                "127.0.0.1",
+                17171
+        );
+        JsonObject request = new JsonObject();
+        JsonArray cards = new JsonArray();
+        cards.add(card("Ajani Resolute", 1, false));
+        cards.add(card("Advancing the Spirit", 1, false));
+        request.add("cards", cards);
+
+        Map<String, Object> coverage = service.cardCoverage(request);
+        List<Map<String, Object>> unsupported =
+                (List<Map<String, Object>>) coverage.get("unsupported_cards");
+
+        assertEquals("unsupported", coverage.get("status"));
+        assertEquals(2, unsupported.size());
+        assertEquals(
+                "battle_card_activation_review_required",
+                unsupported.get(0).get("reason_code")
+        );
+        assertEquals(
+                "activation_blocked",
+                unsupported.get(0).get("support_status")
+        );
+        assertEquals(
+                "future_deferred",
+                unsupported.get(0).get("product_scope_status")
+        );
+        assertFalse(
+                unsupported.get(0).get("reason").toString()
+                        .toLowerCase()
+                        .contains("xmage")
+        );
+        assertEquals(
+                "released_missing_from_postgresql",
+                unsupported.get(1).get("product_scope_status")
+        );
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void cardCoverageReconcilesTheEntirePinTransitionInventory() {
+        XmageBattleService service = new XmageBattleService(
+                "127.0.0.1",
+                17171
+        );
+        JsonObject request = new JsonObject();
+        JsonArray cards = new JsonArray();
+        for (String cardName
+                : XmageCardQualificationPolicy.transitionCardNames()) {
+            cards.add(card(cardName, 1, false));
+        }
+        request.add("cards", cards);
+
+        Map<String, Object> coverage = service.cardCoverage(request);
+        List<Map<String, Object>> unsupported =
+                (List<Map<String, Object>>) coverage.get("unsupported_cards");
+        Set<String> unsupportedNames = new HashSet<>();
+        for (Map<String, Object> row : unsupported) {
+            unsupportedNames.add(row.get("name").toString());
+        }
+
+        assertEquals("unsupported", coverage.get("status"));
+        assertEquals(169, coverage.get("total"));
+        assertEquals(34, coverage.get("supported"));
+        assertEquals(135, coverage.get("unsupported"));
+        assertEquals(135, unsupportedNames.size());
+        assertTrue(unsupportedNames.contains("Planetarium of Wan Shi Tong"));
+        assertTrue(unsupportedNames.contains("Mandate of Peace"));
+        for (String cardName
+                : XmageCardQualificationPolicy.transitionCardNames()) {
+            if (XmageCardQualificationPolicy
+                    .isTransitionActivationRestricted(cardName)) {
+                assertTrue(unsupportedNames.contains(cardName));
+            }
+        }
     }
 
     @Test

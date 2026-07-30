@@ -1,0 +1,404 @@
+diff --git a/Mage.Tests/src/test/java/org/mage/test/cards/single/manaloom/ManaLoomProductInScopeMarvelCardsTest.java b/Mage.Tests/src/test/java/org/mage/test/cards/single/manaloom/ManaLoomProductInScopeMarvelCardsTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f5d26a4c0eb1acc5ae44812e80fe29cd3e7395e8
+--- /dev/null
++++ b/Mage.Tests/src/test/java/org/mage/test/cards/single/manaloom/ManaLoomProductInScopeMarvelCardsTest.java
+@@ -0,0 +1,398 @@
++package org.mage.test.cards.single.manaloom;
++
++import mage.abilities.keyword.MenaceAbility;
++import mage.abilities.keyword.VigilanceAbility;
++import mage.constants.PhaseStep;
++import mage.constants.Zone;
++import mage.counters.CounterType;
++import org.junit.Test;
++import org.mage.test.player.TestPlayer;
++import org.mage.test.serverside.base.CardTestPlayerBase;
++
++/**
++ * Focused rules coverage for the Marvel cards promoted to ManaLoom's
++ * product-in-scope catalog.
++ */
++public class ManaLoomProductInScopeMarvelCardsTest extends CardTestPlayerBase {
++
++    private static final String ALICIA = "Alicia Masters, Skilled Sculptor";
++    private static final String HYDRA = "HYDRA Troopers";
++    private static final String NICK = "Nick Fury, Agent of S.H.I.E.L.D.";
++    private static final String ORIGIN = "Origin of the Avengers";
++    private static final String PHOTON = "Photon Blast Barrage";
++    private static final String SPDR = "SP//dr, Piloted by Peni";
++
++    private static final String CARD_A = "Alaborn Trooper";
++    private static final String CARD_B = "Barbtooth Wurm";
++    private static final String CARD_C = "Canopy Gorger";
++    private static final String CARD_D = "Devilthorn Fox";
++
++    private void prepareFourCardLibrary() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        // Bottom D C B A Top.
++        addCard(Zone.LIBRARY, playerA, CARD_D);
++        addCard(Zone.LIBRARY, playerA, CARD_C);
++        addCard(Zone.LIBRARY, playerA, CARD_B);
++        addCard(Zone.LIBRARY, playerA, CARD_A);
++    }
++
++    private void prepareNickMana() {
++        addCard(Zone.BATTLEFIELD, playerA, "Plains");
++        addCard(Zone.BATTLEFIELD, playerA, "Island");
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp");
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain");
++        addCard(Zone.BATTLEFIELD, playerA, "Forest");
++    }
++
++    private void prepareNickLibrary(String eligibleCard) {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        // This eighth card must stay above the six rejected cards after the
++        // selected card leaves the top seven.
++        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
++        addCard(Zone.LIBRARY, playerA, "Healing Salve");
++        addCard(Zone.LIBRARY, playerA, "Unsummon");
++        addCard(Zone.LIBRARY, playerA, "Dark Ritual");
++        addCard(Zone.LIBRARY, playerA, "Giant Growth");
++        addCard(Zone.LIBRARY, playerA, "Shock");
++        addCard(Zone.LIBRARY, playerA, "Disenchant");
++        addCard(Zone.LIBRARY, playerA, eligibleCard);
++    }
++
++    @Test
++    public void testAliciaTreasureRequiresNoncreatureSpellThisTurn() {
++        addCard(Zone.BATTLEFIELD, playerA, ALICIA);
++        addCard(Zone.HAND, playerA, "Memnite");
++        addCard(Zone.HAND, playerA, "Accorder's Shield");
++
++        // A creature spell must not satisfy the intervening-if condition.
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
++        // The watcher must reset between turns; this noncreature spell is the
++        // only event that may make a Treasure.
++        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Accorder's Shield");
++
++        setStrictChooseMode(true);
++        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertPermanentCount(playerA, "Treasure Token", 1);
++        assertPermanentCount(playerA, "Memnite", 1);
++        assertPermanentCount(playerA, "Accorder's Shield", 1);
++    }
++
++    @Test
++    public void testAliciaReturnsOwnedCreaturesDuringEndStep() {
++        addCard(Zone.BATTLEFIELD, playerA, ALICIA);
++        addCard(Zone.BATTLEFIELD, playerB, "Silvercoat Lion");
++        addCard(Zone.HAND, playerA, "Act of Treason");
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 3);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Act of Treason", "Silvercoat Lion");
++
++        // Stop in the end step, before Act of Treason expires in cleanup, so
++        // only Alicia can have returned the creature to its owner.
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.END_TURN);
++        execute();
++
++        assertPermanentCount(playerA, "Silvercoat Lion", 0);
++        assertPermanentCount(playerB, "Silvercoat Lion", 1);
++    }
++
++    @Test
++    public void testHydraTroopersMillsBelowCreatureThreshold() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Island");
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
++        addCard(Zone.HAND, playerA, HYDRA);
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 3);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, HYDRA);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertGraveyardCount(playerA, "Island", 1);
++        assertGraveyardCount(playerA, "Mountain", 1);
++        assertLibraryCount(playerA, 0);
++        assertPermanentCount(playerA, "Villain Token", 0);
++    }
++
++    @Test
++    public void testHydraTroopersCreatesTappedMenaceTokenAtThreshold() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
++        addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
++        addCard(Zone.GRAVEYARD, playerA, "Silvercoat Lion");
++        addCard(Zone.HAND, playerA, HYDRA);
++        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 3);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, HYDRA);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertPermanentCount(playerA, "Villain Token", 1);
++        assertTapped("Villain Token", true);
++        assertPowerToughness(playerA, "Villain Token", 2, 1);
++        assertAbilityCount(playerA, "Villain Token", MenaceAbility.class, 1);
++        assertLibraryCount(playerA, "Lightning Bolt", 1);
++        assertGraveyardCount(playerA, "Lightning Bolt", 0);
++    }
++
++    @Test
++    public void testNickFuryPowerUpReductionEquipmentAndOncePerGame() {
++        addCard(Zone.BATTLEFIELD, playerA, NICK);
++        prepareNickMana();
++        prepareNickLibrary("Bonesplitter");
++
++        // On the turn Nick enters, his {W} mana cost reduces Power-up to
++        // {U}{B}{R}{G}; the untapped Plains is deliberately unnecessary.
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Power-up");
++        setChoice(playerA, "Bonesplitter");
++        // With all five colors untapped again, the same known ability prefix
++        // must still be unavailable because Power-up is once per game.
++        checkPlayableAbility(
++                "Power-up cannot be activated twice",
++                3, PhaseStep.PRECOMBAT_MAIN, playerA, "Power-up", false
++        );
++
++        setStrictChooseMode(true);
++        setStopAt(3, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertCounterCount(playerA, NICK, CounterType.P1P1, 2);
++        assertPowerToughness(playerA, NICK, 4, 3);
++        assertPermanentCount(playerA, "Bonesplitter", 1);
++        assertHandCount(playerA, "Lightning Bolt", 1);
++    }
++
++    @Test
++    public void testNickFuryMayDeclineAndPutsLookedCardsBelowEighthCard() {
++        addCard(Zone.BATTLEFIELD, playerA, NICK);
++        prepareNickMana();
++        prepareNickLibrary("Bonesplitter");
++
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Power-up");
++        setChoice(playerA, TestPlayer.CHOICE_SKIP);
++
++        setStrictChooseMode(true);
++        setStopAt(3, PhaseStep.PRECOMBAT_MAIN);
++        execute();
++
++        assertCounterCount(playerA, NICK, CounterType.P1P1, 2);
++        assertPermanentCount(playerA, "Bonesplitter", 0);
++        // The former eighth card is drawn before any of the seven cards that
++        // were put on the bottom in random order.
++        assertHandCount(playerA, "Lightning Bolt", 1);
++        assertLibraryCount(playerA, 7);
++    }
++
++    @Test
++    public void testNickFuryMayTransformChosenDoubleFacedHero() {
++        addCard(Zone.BATTLEFIELD, playerA, NICK);
++        prepareNickMana();
++        prepareNickLibrary("Peter Parker");
++
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Power-up");
++        setChoice(playerA, "Peter Parker");
++        setChoice(playerA, true);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertCounterCount(playerA, NICK, CounterType.P1P1, 2);
++        assertPermanentCount(playerA, "Peter Parker", 0);
++        assertPermanentCount(playerA, "Amazing Spider-Man", 1);
++        assertLibraryCount(playerA, 7);
++    }
++
++    @Test
++    public void testNickFuryMayLeaveChosenDoubleFacedHeroUntransformed() {
++        addCard(Zone.BATTLEFIELD, playerA, NICK);
++        prepareNickMana();
++        prepareNickLibrary("Peter Parker");
++
++        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Power-up");
++        setChoice(playerA, "Peter Parker");
++        setChoice(playerA, false);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertCounterCount(playerA, NICK, CounterType.P1P1, 2);
++        assertPermanentCount(playerA, "Peter Parker", 1);
++        assertPermanentCount(playerA, "Amazing Spider-Man", 0);
++        assertLibraryCount(playerA, 7);
++    }
++
++    @Test
++    public void testOriginScryAndDeclinedChapterTwoDraw() {
++        prepareFourCardLibrary();
++        addCard(Zone.HAND, playerA, ORIGIN);
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, ORIGIN);
++        addTarget(playerA, CARD_A); // Scry A to the bottom; B stays on top.
++        setChoice(playerA, false); // Decline chapter II and draw.
++
++        setStrictChooseMode(true);
++        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertHandCount(playerA, CARD_B, 1); // Draw step.
++        assertHandCount(playerA, CARD_C, 1); // Chapter II fallback.
++        assertCounterCount(playerA, ORIGIN, CounterType.LORE, 2);
++        assertLibraryCount(playerA, 2);
++    }
++
++    @Test
++    public void testOriginFiltersChapterTwoAndCountersOnlyControlledCreatures() {
++        prepareFourCardLibrary();
++        addCard(Zone.HAND, playerA, ORIGIN);
++        addCard(Zone.HAND, playerA, NICK); // Eligible Hero, mana value 1.
++        addCard(Zone.HAND, playerA, "Wolverine, Claws Out"); // Hero, mana value 4.
++        addCard(Zone.HAND, playerA, "Centaur Courser"); // Mana value 3, not a Hero.
++        addCard(Zone.BATTLEFIELD, playerA, "Memnite");
++        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
++        addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, ORIGIN);
++        addTarget(playerA, CARD_A); // Keep the draw sequence deterministic.
++        setChoice(playerA, true);
++        setChoice(playerA, NICK);
++
++        setStrictChooseMode(true);
++        setStopAt(5, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertPermanentCount(playerA, NICK, 1);
++        assertHandCount(playerA, "Wolverine, Claws Out", 1);
++        assertHandCount(playerA, "Centaur Courser", 1);
++        // No chapter-II fallback draw occurred: only the turn-three and
++        // turn-five draw-step cards join the two rejected cards in hand.
++        assertHandCount(playerA, 4);
++        assertCounterCount(playerA, NICK, CounterType.P1P1, 1);
++        assertCounterCount(playerA, "Memnite", CounterType.P1P1, 1);
++        assertCounterCount(playerB, "Grizzly Bears", CounterType.P1P1, 0);
++        assertPermanentCount(playerA, ORIGIN, 0);
++        assertGraveyardCount(playerA, ORIGIN, 1);
++    }
++
++    @Test
++    public void testPhotonBlastXZeroResolvesOnlyOriginal() {
++        addCard(Zone.HAND, playerA, PHOTON);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
++        addCard(Zone.BATTLEFIELD, playerB, "Pillarfield Ox");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, PHOTON, "Pillarfield Ox");
++        setChoice(playerA, "X=0");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertDamageReceived(playerB, "Pillarfield Ox", 1);
++        assertGraveyardCount(playerA, PHOTON, 1);
++    }
++
++    @Test
++    public void testPhotonBlastXTwoMayRetargetEachCopy() {
++        addCard(Zone.HAND, playerA, PHOTON);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 4);
++        addCard(Zone.BATTLEFIELD, playerB, "Pillarfield Ox");
++        addCard(Zone.BATTLEFIELD, playerB, "Giant Spider");
++        addCard(Zone.BATTLEFIELD, playerB, "Indomitable Ancients");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, PHOTON, "Pillarfield Ox");
++        setChoice(playerA, "X=2");
++        setChoice(playerA, true);
++        addTarget(playerA, "Giant Spider");
++        setChoice(playerA, true);
++        addTarget(playerA, "Indomitable Ancients");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        assertDamageReceived(playerB, "Pillarfield Ox", 1);
++        assertDamageReceived(playerB, "Giant Spider", 1);
++        assertDamageReceived(playerB, "Indomitable Ancients", 1);
++    }
++
++    @Test
++    public void testPhotonBlastXTwoMayKeepOriginalTargetForBothCopies() {
++        addCard(Zone.HAND, playerA, PHOTON);
++        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 4);
++        addCard(Zone.BATTLEFIELD, playerB, "Centaur Courser");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, PHOTON, "Centaur Courser");
++        setChoice(playerA, "X=2");
++        setChoice(playerA, false, 2);
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.BEGIN_COMBAT);
++        execute();
++
++        // Original plus two copies deal exactly the creature's 3 toughness.
++        assertPermanentCount(playerB, "Centaur Courser", 0);
++        assertGraveyardCount(playerB, "Centaur Courser", 1);
++    }
++
++    @Test
++    public void testSpdrEtbCounterAndVigilance() {
++        addCard(Zone.HAND, playerA, SPDR);
++        addCard(Zone.BATTLEFIELD, playerA, "Tundra", 5);
++        addCard(Zone.BATTLEFIELD, playerB, "Indomitable Ancients");
++
++        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, SPDR);
++        addTarget(playerA, SPDR);
++        attack(3, playerA, SPDR, playerB);
++        block(3, playerB, "Indomitable Ancients", SPDR);
++
++        setStrictChooseMode(true);
++        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertCounterCount(playerA, SPDR, CounterType.P1P1, 1);
++        assertPowerToughness(playerA, SPDR, 5, 5);
++        assertAbilityCount(playerA, SPDR, VigilanceAbility.class, 1);
++        assertTapped(SPDR, false);
++        assertLife(playerB, 20);
++    }
++
++    @Test
++    public void testSpdrDrawsOncePerModifiedCreatureAndIgnoresUnmodified() {
++        skipInitShuffling();
++        removeAllCardsFromLibrary(playerA);
++        addCard(Zone.LIBRARY, playerA, "Mountain");
++        addCard(Zone.LIBRARY, playerA, "Island");
++        addCard(Zone.BATTLEFIELD, playerA, SPDR);
++        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
++        addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion");
++        addCard(Zone.BATTLEFIELD, playerA, "Pillarfield Ox");
++
++        addCounters(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears", CounterType.P1P1, 1);
++        addCounters(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Silvercoat Lion", CounterType.P1P1, 1);
++        attack(1, playerA, "Grizzly Bears", playerB);
++        attack(1, playerA, "Silvercoat Lion", playerB);
++        attack(1, playerA, "Pillarfield Ox", playerB);
++        setChoice(playerA, "Whenever a modified creature you control deals combat damage");
++
++        setStrictChooseMode(true);
++        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
++        execute();
++
++        assertHandCount(playerA, 2);
++        assertLibraryCount(playerA, 0);
++        assertLife(playerB, 12);
++    }
++}

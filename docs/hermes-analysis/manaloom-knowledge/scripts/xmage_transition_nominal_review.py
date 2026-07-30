@@ -7,7 +7,8 @@ evidence. Catalog resolution is never accepted as semantic proof.
 
 An automatic transition clearance is intentionally narrower than general
 semantic approval. It is allowed only by an explicit card-specific policy whose
-exact diff hash, source shape, nominal tests and warning boundaries all match.
+full blob OIDs, source hashes, canonical full-index diff, normalized source
+tokens, tests (when declared) and warning boundaries all match.
 """
 
 from __future__ import annotations
@@ -34,11 +35,11 @@ DEFAULT_POLICY = (
     REPO_ROOT
     / "docs/hermes-analysis/XMAGE_PIN_TRANSITION_NOMINAL_REVIEW_POLICY.json"
 )
-SCHEMA_VERSION = "manaloom_xmage_transition_nominal_review_v1_2026-07-29"
+SCHEMA_VERSION = "manaloom_xmage_transition_nominal_review_v2_2026-07-30"
 POLICY_SCHEMA_VERSION = (
-    "manaloom_xmage_transition_nominal_review_policy_v1_2026-07-29"
+    "manaloom_xmage_transition_nominal_review_policy_v2_2026-07-30"
 )
-CLEARANCE_DISPOSITION = "presentation_hunk_nominal_tests_passed"
+CLEARANCE_DISPOSITION = "exact_non_executable_tokens_passed"
 REVIEW_DISPOSITIONS = {
     "focused_upstream_test_passed_card_data_warning_review_required",
     "catalog_supported_semantic_review_required",
@@ -52,6 +53,7 @@ SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 SourceLookup = Callable[[str, str], str | None]
 DiffLookup = Callable[[str, str, str], bytes]
+BlobLookup = Callable[[str, str], str | None]
 
 
 def utc_now() -> str:
@@ -126,15 +128,82 @@ def compact_java_tokens(source: str) -> str:
     return re.sub(r"\s+", "", strip_java_comments(source))
 
 
-def sources_match_after_allowed_presentation_changes(
+IMPORT_PATTERN = re.compile(r"(?m)^[ \t]*import[ \t]+[^;\n]+;[ \t]*(?:\n|$)")
+
+
+def extract_java_imports(source: str) -> list[str]:
+    return [
+        match.group(0).strip()
+        for match in IMPORT_PATTERN.finditer(strip_java_comments(source))
+    ]
+
+
+def _remove_counter_items(
+    values: list[str],
+    removals: Counter[str],
+) -> list[str]:
+    remaining = removals.copy()
+    result: list[str] = []
+    for value in values:
+        if remaining[value] > 0:
+            remaining[value] -= 1
+        else:
+            result.append(value)
+    return result
+
+
+def sources_match_after_exact_non_executable_changes(
     old_source: str,
     new_source: str,
-    changes: list[dict[str, Any]],
-) -> tuple[bool, list[str]]:
+    *,
+    literal_changes: list[dict[str, Any]],
+    allowed_import_delta: dict[str, Any],
+    allow_import_reordering: bool,
+) -> tuple[bool, list[str], str | None]:
     old_normalized = strip_java_comments(old_source)
     new_normalized = strip_java_comments(new_source)
     failures: list[str] = []
-    for index, raw_change in enumerate(changes):
+    old_imports = extract_java_imports(old_source)
+    new_imports = extract_java_imports(new_source)
+    observed_removed = Counter(old_imports) - Counter(new_imports)
+    observed_added = Counter(new_imports) - Counter(old_imports)
+
+    if not isinstance(allowed_import_delta, dict):
+        failures.append("allowed_import_delta_not_object")
+        allowed_removed: list[str] = []
+        allowed_added: list[str] = []
+    else:
+        raw_removed = allowed_import_delta.get("removed")
+        raw_added = allowed_import_delta.get("added")
+        allowed_removed = raw_removed if isinstance(raw_removed, list) else []
+        allowed_added = raw_added if isinstance(raw_added, list) else []
+        if (
+            not isinstance(raw_removed, list)
+            or not isinstance(raw_added, list)
+            or not all(isinstance(value, str) for value in allowed_removed)
+            or not all(isinstance(value, str) for value in allowed_added)
+        ):
+            failures.append("allowed_import_delta_invalid")
+
+    if observed_removed != Counter(allowed_removed):
+        failures.append("removed_imports_mismatch")
+    if observed_added != Counter(allowed_added):
+        failures.append("added_imports_mismatch")
+
+    common_old = _remove_counter_items(old_imports, observed_removed)
+    common_new = _remove_counter_items(new_imports, observed_added)
+    observed_reordering = common_old != common_new
+    if not isinstance(allow_import_reordering, bool):
+        failures.append("allow_import_reordering_not_boolean")
+    elif allow_import_reordering != observed_reordering:
+        failures.append("import_reordering_policy_mismatch")
+
+    old_normalized = IMPORT_PATTERN.sub("", old_normalized)
+    new_normalized = IMPORT_PATTERN.sub("", new_normalized)
+    if not isinstance(literal_changes, list) or not literal_changes:
+        failures.append("presentation_literal_policy_missing")
+        literal_changes = []
+    for index, raw_change in enumerate(literal_changes):
         if not isinstance(raw_change, dict):
             failures.append(f"literal_change_{index}_not_object")
             continue
@@ -159,14 +228,15 @@ def sources_match_after_allowed_presentation_changes(
         marker = f'"__MANALOOM_PRESENTATION_LITERAL_{index}__"'
         old_normalized = old_normalized.replace(old_literal, marker)
         new_normalized = new_normalized.replace(new_literal, marker)
-    equivalent = (
-        not failures
-        and re.sub(r"\s+", "", old_normalized)
-        == re.sub(r"\s+", "", new_normalized)
-    )
+    old_tokens = re.sub(r"\s+", "", old_normalized)
+    new_tokens = re.sub(r"\s+", "", new_normalized)
+    equivalent = not failures and old_tokens == new_tokens
     if not equivalent and not failures:
-        failures.append("non_presentation_tokens_changed")
-    return equivalent, failures
+        failures.append("non_executable_tokens_changed")
+    normalized_sha256 = (
+        sha256_bytes(old_tokens.encode("utf-8")) if equivalent else None
+    )
+    return equivalent, failures, normalized_sha256
 
 
 def _scope_for_class(evidence: dict[str, Any], card_class: str) -> str:
@@ -209,7 +279,7 @@ def _card_lane(
     has_warnings = bool(row.get("source_warning_markers"))
     has_card_data_finding = row.get("card_name") in actionable_card_names
     if clearance_rule_id:
-        return "exact_presentation_hunk_and_nominal_tests_clearance"
+        return "exact_non_executable_tokens_clearance"
     if disposition == "focused_upstream_test_passed":
         return "added_nominal_test_already_passed"
     if disposition == "focused_upstream_test_passed_card_data_warning_review_required":
@@ -237,20 +307,32 @@ def build_report(
     *,
     source_lookup: SourceLookup,
     diff_lookup: DiffLookup,
+    blob_lookup: BlobLookup,
 ) -> dict[str, Any]:
     failures: list[dict[str, Any]] = []
     transition_id = str(evidence.get("transition_id") or "")
     from_pin = str(evidence.get("from_pin") or "")
     to_pin = str(evidence.get("to_pin") or "")
-    if (
+    policy_identity_valid = not (
         policy.get("schema_version") != POLICY_SCHEMA_VERSION
         or policy.get("transition_id") != transition_id
         or policy.get("from_pin") != from_pin
         or policy.get("to_pin") != to_pin
         or policy.get("catalog_resolution_is_semantic_proof") is not False
+        or policy.get("canonical_diff_hash_mode")
+        != "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+        or policy.get("requires_full_blob_oids") is not True
+        or policy.get("requires_source_sha256") is not True
+        or policy.get("unlisted_token_changes_allowed") is not False
+        or policy.get("filter_predicate_normalization_allowed") is not False
+        or policy.get("string_literal_changes_require_explicit_map") is not True
+        or policy.get("import_changes_require_exact_delta") is not True
+        or policy.get("automatic_clearance_does_not_activate_runtime_card")
+        is not True
         or not SHA_PATTERN.fullmatch(from_pin)
         or not SHA_PATTERN.fullmatch(to_pin)
-    ):
+    )
+    if not policy_identity_valid:
         failures.append(
             {
                 "id": "policy_identity",
@@ -271,6 +353,20 @@ def build_report(
                 "message": "Every clearance rule must be an object.",
             }
         )
+    rule_ids = [str(row.get("id") or "") for row in rules]
+    rule_card_names = [str(row.get("card_name") or "") for row in rules]
+    if (
+        not rule_ids
+        or any(not value for value in rule_ids + rule_card_names)
+        or len(rule_ids) != len(set(rule_ids))
+        or len(rule_card_names) != len(set(rule_card_names))
+    ):
+        failures.append(
+            {
+                "id": "policy_rule_identity",
+                "message": "Clearance rule ids and card names must be non-empty and unique.",
+            }
+        )
 
     clearance_by_name: dict[str, str] = {}
     rule_results: list[dict[str, Any]] = []
@@ -279,6 +375,8 @@ def build_report(
         card_name = str(rule.get("card_name") or "")
         row = by_name.get(card_name)
         rule_failures: list[str] = []
+        if not policy_identity_valid:
+            rule_failures.append("policy_identity_invalid")
         if not rule_id or row is None:
             rule_failures.append("card_or_rule_missing")
             row = {}
@@ -286,28 +384,49 @@ def build_report(
         source_path = str(row.get("source_path") or "")
         old_source = source_lookup(from_pin, source_path) if source_path else None
         new_source = source_lookup(to_pin, source_path) if source_path else None
+        old_blob_oid = (
+            blob_lookup(from_pin, source_path) if source_path else None
+        )
+        new_blob_oid = (
+            blob_lookup(to_pin, source_path) if source_path else None
+        )
         raw_diff = (
             diff_lookup(from_pin, to_pin, source_path) if source_path else b""
         )
         diff_sha256 = sha256_bytes(raw_diff)
+        old_source_sha256 = (
+            sha256_bytes(old_source.encode("utf-8"))
+            if old_source is not None
+            else None
+        )
+        new_source_sha256 = (
+            sha256_bytes(new_source.encode("utf-8"))
+            if new_source is not None
+            else None
+        )
         required_tests = rule.get("required_direct_test_references")
         source_scope = _scope_for_class(evidence, card_class)
         literal_changes = rule.get("allowed_presentation_literal_changes")
-        literal_equivalent = False
-        literal_failures: list[str] = []
+        tokens_equivalent = False
+        normalized_token_sha256: str | None = None
+        token_failures: list[str] = []
         if old_source is None or new_source is None:
             rule_failures.append("git_blob_missing")
-        elif isinstance(literal_changes, list) and literal_changes:
-            literal_equivalent, literal_failures = (
-                sources_match_after_allowed_presentation_changes(
-                    old_source,
-                    new_source,
-                    literal_changes,
-                )
-            )
-            rule_failures.extend(literal_failures)
         else:
-            rule_failures.append("presentation_literal_policy_missing")
+            (
+                tokens_equivalent,
+                token_failures,
+                normalized_token_sha256,
+            ) = sources_match_after_exact_non_executable_changes(
+                old_source,
+                new_source,
+                literal_changes=literal_changes,
+                allowed_import_delta=rule.get("allowed_import_delta"),
+                allow_import_reordering=rule.get(
+                    "allow_import_reordering"
+                ),
+            )
+            rule_failures.extend(token_failures)
         if rule.get("class") != card_class:
             rule_failures.append("class_mismatch")
         if rule.get("source_path") != source_path:
@@ -317,12 +436,52 @@ def build_report(
         if rule.get("required_change_scope") != source_scope:
             rule_failures.append("change_scope_mismatch")
         if (
-            not SHA256_PATTERN.fullmatch(str(rule.get("exact_diff_sha256") or ""))
-            or rule.get("exact_diff_sha256") != diff_sha256
+            rule.get("diff_hash_mode")
+            != "git_diff_no_ext_diff_no_textconv_unified0_full_index"
         ):
-            rule_failures.append("exact_diff_sha256_mismatch")
+            rule_failures.append("canonical_diff_hash_mode_mismatch")
+        if (
+            not SHA256_PATTERN.fullmatch(
+                str(rule.get("canonical_diff_sha256") or "")
+            )
+            or rule.get("canonical_diff_sha256") != diff_sha256
+        ):
+            rule_failures.append("canonical_diff_sha256_mismatch")
+        if (
+            not SHA_PATTERN.fullmatch(str(rule.get("from_blob_oid_sha1") or ""))
+            or rule.get("from_blob_oid_sha1") != old_blob_oid
+        ):
+            rule_failures.append("from_blob_oid_mismatch")
+        if (
+            not SHA_PATTERN.fullmatch(str(rule.get("to_blob_oid_sha1") or ""))
+            or rule.get("to_blob_oid_sha1") != new_blob_oid
+        ):
+            rule_failures.append("to_blob_oid_mismatch")
+        if (
+            not SHA256_PATTERN.fullmatch(
+                str(rule.get("from_source_sha256") or "")
+            )
+            or rule.get("from_source_sha256") != old_source_sha256
+        ):
+            rule_failures.append("from_source_sha256_mismatch")
+        if (
+            not SHA256_PATTERN.fullmatch(
+                str(rule.get("to_source_sha256") or "")
+            )
+            or rule.get("to_source_sha256") != new_source_sha256
+        ):
+            rule_failures.append("to_source_sha256_mismatch")
+        if (
+            not SHA256_PATTERN.fullmatch(
+                str(rule.get("normalized_token_sha256") or "")
+            )
+            or rule.get("normalized_token_sha256")
+            != normalized_token_sha256
+        ):
+            rule_failures.append("normalized_token_sha256_mismatch")
         if (
             not isinstance(required_tests, list)
+            or not all(isinstance(reference, str) for reference in required_tests)
             or sorted(required_tests)
             != sorted(row.get("direct_test_references") or [])
         ):
@@ -341,8 +500,11 @@ def build_report(
             or card_name in actionable_names
         ):
             rule_failures.append("card_data_actionable_finding_present")
-        if row.get("runtime_catalog_status") != "supported":
-            rule_failures.append("runtime_not_supported")
+        if row.get("runtime_catalog_status") not in {
+            "supported",
+            "unsupported",
+        }:
+            rule_failures.append("runtime_catalog_status_invalid")
         if rule_failures:
             failures.append(
                 {
@@ -359,9 +521,20 @@ def build_report(
                 "card_name": card_name,
                 "source_path": source_path,
                 "source_scope": source_scope,
-                "diff_sha256": diff_sha256,
-                "presentation_tokens_equivalent": literal_equivalent,
+                "from_blob_oid_sha1": old_blob_oid,
+                "to_blob_oid_sha1": new_blob_oid,
+                "from_source_sha256": old_source_sha256,
+                "to_source_sha256": new_source_sha256,
+                "canonical_diff_sha256": diff_sha256,
+                "diff_hash_mode": (
+                    "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+                ),
+                "normalized_token_sha256": normalized_token_sha256,
+                "non_executable_tokens_equivalent": tokens_equivalent,
+                "required_direct_test_references": required_tests,
                 "required_test_case_count": row.get("focused_test_case_count"),
+                "runtime_catalog_status": row.get("runtime_catalog_status"),
+                "runtime_activation_promoted": False,
                 "status": "pass" if not rule_failures else "fail",
                 "failures": sorted(set(rule_failures)),
             }
@@ -375,6 +548,7 @@ def build_report(
         "modified_presentation_or_metadata": [],
         "modified_comment_only": [],
     }
+    exact_clearance_without_nominal_reference: list[str] = []
     for row in cards:
         card_name = str(row.get("card_name") or "")
         card_class = str(row.get("class") or "")
@@ -416,7 +590,7 @@ def build_report(
                     "source_path": source_path,
                     "source_scope": source_scope,
                     "comment_only_proven": comment_only_proven,
-                    "diff_sha256": diff_sha256,
+                    "canonical_diff_sha256": diff_sha256,
                     "direct_test_references": direct_tests,
                     "focused_test_case_count": row.get(
                         "focused_test_case_count"
@@ -430,11 +604,14 @@ def build_report(
                 }
             )
         else:
-            if row.get("change_kind") == "added":
+            if clearance_rule_id:
+                exact_clearance_without_nominal_reference.append(card_name)
+            elif row.get("change_kind") == "added":
                 group = "added"
+                no_reference_groups.setdefault(group, []).append(card_name)
             else:
                 group = f"modified_{source_scope}"
-            no_reference_groups.setdefault(group, []).append(card_name)
+                no_reference_groups.setdefault(group, []).append(card_name)
 
     disposition_counts = Counter(
         str(row.get("disposition") or "") for row in cards
@@ -471,6 +648,13 @@ def build_report(
             "postgres_queries": 0,
             "postgres_writes": False,
             "catalog_resolution_used_as_semantic_proof": False,
+            "canonical_diff_hash_mode": (
+                "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+            ),
+            "full_blob_oids_required": True,
+            "source_sha256_required": True,
+            "unlisted_token_changes_allowed": False,
+            "automatic_clearance_does_not_activate_runtime_card": True,
         },
         "summary": {
             "changed_card_count": len(cards),
@@ -481,6 +665,10 @@ def build_report(
             "lane_counts": dict(sorted(lane_counts.items())),
         },
         "exact_clearance_cards": sorted(clearance_by_name),
+        "exact_clearance_cards_without_direct_nominal_reference": sorted(
+            exact_clearance_without_nominal_reference,
+            key=str.casefold,
+        ),
         "clearance_rule_results": rule_results,
         "existing_nominal_cards": sorted(
             nominal_rows,
@@ -491,6 +679,11 @@ def build_report(
             for key, values in sorted(no_reference_groups.items())
         },
         "next_actions": [
+            {
+                "priority": 1,
+                "card_name": "Swordsman, Sharp Scoundrel",
+                "action": "Keep the card executable/review-required and add controller-boundary scenarios: an equipped creature you control must trigger once, while an opponent's equipped attacker must not trigger."
+            },
             {
                 "priority": 1,
                 "card_name": "Mjolnir, Hammer of Thor",
@@ -533,6 +726,10 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"`{summary.get('existing_nominal_reference_card_count')}`"
         ),
         (
+            "- Exact non-executable clearances: "
+            f"`{summary.get('exact_clearance_card_count')}`"
+        ),
+        (
             "- Reviews before exact clearance: "
             f"`{summary.get('review_required_before_exact_clearance')}`"
         ),
@@ -541,10 +738,29 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"`{summary.get('review_required_after_exact_clearance')}`"
         ),
         "- Catalog resolution used as semantic proof: `false`",
+        "- Exact semantic clearance activates a runtime card: `false`",
         "",
-        "## Existing nominal cards",
+        "## Exact non-executable clearances",
         "",
     ]
+    without_nominal = set(
+        report.get("exact_clearance_cards_without_direct_nominal_reference")
+        or []
+    )
+    for card_name in report.get("exact_clearance_cards") or []:
+        basis = (
+            "exact token proof; no direct nominal reference"
+            if card_name in without_nominal
+            else "exact token proof plus pinned nominal references"
+        )
+        lines.append(f"- `{card_name}`: {basis}")
+    lines.extend(
+        [
+            "",
+            "## Existing nominal reference cards",
+            "",
+        ]
+    )
     for row in report.get("existing_nominal_cards") or []:
         lines.append(
             f"- `{row.get('card_name')}`: `{row.get('lane')}` "
@@ -606,6 +822,7 @@ def _git_diff_lookup(root: Path) -> DiffLookup:
                 "--no-ext-diff",
                 "--no-textconv",
                 "--unified=0",
+                "--full-index",
                 from_pin,
                 to_pin,
                 "--",
@@ -617,6 +834,31 @@ def _git_diff_lookup(root: Path) -> DiffLookup:
         if result.returncode != 0:
             raise ValueError(f"Unable to diff {source_path}")
         return result.stdout
+
+    return lookup
+
+
+def _git_blob_oid_lookup(root: Path) -> BlobLookup:
+    def lookup(commit: str, source_path: str) -> str | None:
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "rev-parse",
+                "--verify",
+                f"{commit}:{source_path}",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if result.returncode != 0:
+            return None
+        oid = result.stdout.strip()
+        return oid if SHA_PATTERN.fullmatch(oid) else None
 
     return lookup
 
@@ -644,6 +886,7 @@ def main() -> int:
             policy,
             source_lookup=_git_source_lookup(xmage_root),
             diff_lookup=_git_diff_lookup(xmage_root),
+            blob_lookup=_git_blob_oid_lookup(xmage_root),
         )
         write_outputs(
             report,

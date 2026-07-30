@@ -89,6 +89,7 @@ run_shell_contracts() {
     "$ROOT_DIR/scripts/manaloom_external_engine_delta_weekly.sh" \
     "$ROOT_DIR/scripts/manaloom_install_external_engine_delta_schedule.sh" \
     "$ROOT_DIR/scripts/manaloom_xmage_pin_transition_audit.sh" \
+    "$ROOT_DIR/services/xmage-sidecar/bin/verify_product_scope_semantic_tests.sh" \
     "$ROOT_DIR/.githooks/pre-commit" \
     "$ROOT_DIR/.githooks/pre-push"
   "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" --check
@@ -128,7 +129,9 @@ run_guardrail_audits() {
     "$scripts_dir/operational_surface_alignment_audit.py" \
     "$scripts_dir/report_retention_audit.py" \
     "$scripts_dir/xmage_pin_transition_audit.py" \
+    "$scripts_dir/xmage_transition_activation_policy.py" \
     "$scripts_dir/xmage_transition_nominal_review.py" \
+    "$scripts_dir/xmage_transition_postgresql_scope_reconciliation.py" \
     "$scripts_dir/xmage_test_scenario_miner.py"
   (
     cd "$scripts_dir"
@@ -140,7 +143,9 @@ run_guardrail_audits() {
       test_operational_surface_alignment_audit.py \
       test_report_retention_audit.py \
       test_xmage_pin_transition_audit.py \
+      test_xmage_transition_activation_policy.py \
       test_xmage_transition_nominal_review.py \
+      test_xmage_transition_postgresql_scope_reconciliation.py \
       test_xmage_test_scenario_miner.py
   )
 
@@ -188,6 +193,7 @@ run_release_contracts() {
 run_battle_gate() {
   print_header "Battle canônico local"
   "$ROOT_DIR/services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh"
+  "$ROOT_DIR/services/xmage-sidecar/bin/verify_product_scope_semantic_tests.sh"
   "$ROOT_DIR/scripts/quality_gate.sh" battle
 }
 

@@ -1,0 +1,2964 @@
+{
+  "schema_version": "manaloom_xmage_active_scope_semantic_matrix_v1_2026-07-30",
+  "generated_at_utc": "2026-07-30T05:22:03Z",
+  "status": "pass",
+  "transition": {
+    "repository": "https://github.com/magefree/mage",
+    "from_commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+    "from_tree": "432fa199b9172af87bb082f1b31da0794a20587d",
+    "to_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "to_tree": "d1e187cdc72b3bed329715cb35b359c80ec40c6e",
+    "identity": "34d81ea_2c43ec8"
+  },
+  "scope": {
+    "matrix_card_count": 36,
+    "product_in_scope_card_count": 34,
+    "external_runtime_gap_quarantine_card_count": 2,
+    "direct_focused_product_card_count": 29,
+    "exact_non_executable_product_card_count": 5
+  },
+  "status_summary": {
+    "cleared": 34,
+    "quarantined": 2,
+    "blocked_activation": 0,
+    "partial": 0,
+    "gap": 0
+  },
+  "boundaries": {
+    "postgresql_is_product_truth": true,
+    "postgresql_is_gameplay_semantic_proof": false,
+    "semantic_review_inventory_is_clearance": false,
+    "catalog_resolution_is_semantic_proof": false,
+    "quarantine_reproduction_is_promotion_evidence": false
+  },
+  "evidence_registry": [
+    {
+      "id": "transition_audit_169",
+      "path": "docs/qa/evidence/XMAGE_PIN_TRANSITION_34d81ea_2c43ec8.json",
+      "sha256": "4d5c4711e1e6790d6a6bc5405ad2f07243d72923a04c4bdb3267705119fa8639",
+      "scope": "versioned transition inventory and source-review consolidation"
+    },
+    {
+      "id": "postgresql_scope_reconciliation",
+      "path": "docs/qa/evidence/XMAGE_POSTGRESQL_SCOPE_RECONCILIATION_34d81ea_2c43ec8_2026-07-30.json",
+      "sha256": "64f2175bc4b1c040ccb352f8e3647a11d0c1088d591b5a7b5ec8a08603ced3cb",
+      "rows_sha256": "7ed18075c34b0a4b7f3c3206f250aeb86879f7ea568f648586dd696ad2d412dc",
+      "scope": "authoritative product identity, Oracle text, legality and scope; not gameplay proof"
+    },
+    {
+      "id": "focused_product_scope_tests",
+      "path": "docs/qa/evidence/XMAGE_PRODUCT_SCOPE_FOCUSED_TEST_EVIDENCE_34d81ea_2c43ec8_2026-07-30.json",
+      "sha256": "072733572f51c80496dc112f186eee428e27d63c809af4d5b19dc98934245f5b",
+      "scope": "68-test focused execution, presentation equivalence and two quarantine reproductions"
+    },
+    {
+      "id": "activation_policy",
+      "path": "services/xmage-sidecar/src/main/resources/xmage-transition-activation-policy.json",
+      "sha256": "b2371b5f81ceb051fc995a685bad9fa95ba24576c31a0162ea21379b504a127f",
+      "scope": "exact deny-by-default list for 133 inactive transition cards"
+    },
+    {
+      "id": "qualification_policy",
+      "path": "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+      "sha256": "4a87a77ec62164464ff6241dcb9678c23295d2a4feacdb307dcefa210b85dc2e",
+      "scope": "runtime-neutral qualification boundary including two quarantines"
+    },
+    {
+      "id": "nominal_review_v2",
+      "path": "docs/qa/evidence/XMAGE_TRANSITION_NOMINAL_REVIEW_34d81EA_2c43ec8.json",
+      "sha256": "8e85a1c7c863571d0602893e665b1544c6eeaaf62944e3ed80c7b1d652b89819",
+      "scope": "exact non-executable token equivalence review"
+    },
+    {
+      "id": "nominal_review_policy_v2",
+      "path": "docs/hermes-analysis/XMAGE_PIN_TRANSITION_NOMINAL_REVIEW_POLICY.json",
+      "sha256": "b6a569aab546dce0569b6243c53821ecbd019bb272e07a727104cdc0daa7e0e8",
+      "scope": "versioned exact-clearance rules"
+    },
+    {
+      "id": "focused_added_patch",
+      "path": "docs/qa/evidence/XMAGE_PRODUCT_SCOPE_ADDED_CARDS_TESTS_34d81ea_2c43ec8.patch",
+      "sha256": "b780f68d61d06f4c16e63c9a562f22b5e1f7ea187fef9f46242be00fb81b7133",
+      "scope": "portable full-index patch for six added in-scope cards"
+    },
+    {
+      "id": "focused_executable_patch",
+      "path": "docs/qa/evidence/XMAGE_PRODUCT_SCOPE_EXECUTABLE_TESTS_34d81ea_2c43ec8.patch",
+      "sha256": "5bf913c5224d495e5fa702097833e3fb9db7a12dbc7472e0229ad76a3206ce0b",
+      "scope": "portable full-index patch for executable transition and quarantine assertions"
+    },
+    {
+      "id": "presentation_equivalence_patch",
+      "path": "docs/qa/evidence/XMAGE_PRODUCT_SCOPE_PRESENTATION_EQUIVALENCE_TESTS_34d81ea_2c43ec8.patch",
+      "sha256": "796b7952d77f5e72cecc0c0f6792cd55ae393562944b41334179c80f345861f9",
+      "scope": "portable full-index patch for 11 presentation-equivalence cards"
+    },
+    {
+      "id": "focused_verifier",
+      "path": "services/xmage-sidecar/bin/verify_product_scope_semantic_tests.sh",
+      "sha256": "b6ad6a9a251a19163fc08c6251ab5301ec5701d051f710c77322c3d9a6f6f956",
+      "scope": "isolated Java 17 verifier with normalized work directory"
+    }
+  ],
+  "focused_execution": {
+    "combined_tests": 68,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "status": "pass",
+    "execution_report_count": 4,
+    "reports": [
+      {
+        "run_id": "added_product_scope_marvel_cards",
+        "pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "java_version": "17.0.10",
+        "surefire_report": "TEST-org.mage.test.cards.single.manaloom.ManaLoomProductInScopeMarvelCardsTest.xml",
+        "surefire_sha256": "bd710dc510a4f80840cd8ef975342a03b62726a7274005190b0f123b513a3570"
+      },
+      {
+        "run_id": "modified_product_scope_executable_cards",
+        "pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "java_version": "17.0.10",
+        "surefire_report": "TEST-org.mage.test.cards.single.XmagePinProductScopeTransitionTest.xml",
+        "surefire_sha256": "3988e3c1a67b7ab1bcbbd8a09236eacf25ad28eab8d0d19e378372ad773c17c4"
+      },
+      {
+        "run_id": "presentation_equivalence_to_pin",
+        "pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "java_version": "17.0.10",
+        "surefire_report": "TEST-org.mage.test.cards.single.XmageProductInScopePresentationEquivalenceTest.xml",
+        "surefire_sha256": "9585b8383d99497a5b9a547f6af1e781caa66278d1e1368347aa21bc538c94ed"
+      },
+      {
+        "run_id": "presentation_equivalence_from_pin",
+        "pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "java_version": "17.0.10",
+        "surefire_report": "TEST-org.mage.test.cards.single.XmageProductInScopePresentationEquivalenceTest.xml",
+        "surefire_sha256": "1553fd9a6f67774778489f802ae12abdc246a0d472fd53ebf52d3725e88c31d0"
+      }
+    ]
+  },
+  "presentation_equivalence_critical_review": {
+    "test_class": "org.mage.test.cards.single.XmageProductInScopePresentationEquivalenceTest",
+    "test_source": "Mage.Tests/src/test/java/org/mage/test/cards/single/XmageProductInScopePresentationEquivalenceTest.java",
+    "test_source_sha256": "9270f7dce337b943c6b3979b1e27a8b7a68cc81042beccbe2cf1280057859369",
+    "from_pin_status": "pass",
+    "to_pin_status": "pass",
+    "card_count": 11,
+    "test_method_count": 12,
+    "behavior_assertion_pass_count": 11,
+    "behavior_assertion_gap_count": 0,
+    "cards": [
+      {
+        "card_name": "Ant-Man, Colony Commander",
+        "source_path": "Mage.Sets/src/mage/cards/a/AntManColonyCommander.java",
+        "test_methods": [
+          "antManPaysAttackCostAddsCounterAndCreatesOnlyOneInsect"
+        ],
+        "affected_behavior_review": "The counter-trigger path resolves and the once-per-turn Insect creation limit remains enforced.",
+        "concrete_assertions": [
+          "+1/+1 counter count",
+          "exactly one Insect token"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Aunt May",
+        "source_path": "Mage.Sets/src/mage/cards/a/AuntMay.java",
+        "test_methods": [
+          "auntMayRewardsOwnSpiderAndIgnoresOpponentsSpider"
+        ],
+        "affected_behavior_review": "The changed controlled/generic filter remains bounded by the enclosing controller gate.",
+        "concrete_assertions": [
+          "own Spider gains life/counter",
+          "opponent Spider gains neither"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Captain America, Wings of Freedom",
+        "source_path": "Mage.Sets/src/mage/cards/c/CaptainAmericaWingsOfFreedom.java",
+        "test_methods": [
+          "captainAmericaBoostsOnlyOtherHeroesByItsToughness"
+        ],
+        "affected_behavior_review": "The Ward constructor delta remains non-executable; the card still owns exactly one ward {1} ability.",
+        "concrete_assertions": [
+          "exactly one WardAbility",
+          "getRuleWithoutHint equals ward {1}"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Claim the Kingdom",
+        "source_path": "Mage.Sets/src/mage/cards/c/ClaimTheKingdom.java",
+        "test_methods": [
+          "claimTheKingdomFourthPlanSacrificesAndGrantsIndestructibleCounter"
+        ],
+        "affected_behavior_review": "The counter effect whose text composition changed still places plan-linked counters and resolves the fourth-plan payoff.",
+        "concrete_assertions": [
+          "four +1/+1 counters",
+          "one indestructible counter",
+          "enchantment sacrificed"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Crossbones, Malicious Mercenary",
+        "source_path": "Mage.Sets/src/mage/cards/c/CrossbonesMaliciousMercenary.java",
+        "test_methods": [
+          "crossbonesTriggersOnlyOnceForTwoOtherVillainsInOneTurn"
+        ],
+        "affected_behavior_review": "The DamagePlayersEffect source-name text delta leaves damage and trigger limiting unchanged.",
+        "concrete_assertions": [
+          "opponent loses exactly 2 life",
+          "Crossbones gains one counter",
+          "two Villains resolve"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Eerie Gravestone",
+        "source_path": "Mage.Sets/src/mage/cards/e/EerieGravestone.java",
+        "test_methods": [
+          "eerieGravestoneDrawsThenMillsFourAndReturnsCreature"
+        ],
+        "affected_behavior_review": "withTextOptions changes only generated text; mill, choice and hand/graveyard movement still execute.",
+        "concrete_assertions": [
+          "drawn card in hand",
+          "selected creature in hand",
+          "three nonselected milled cards in graveyard",
+          "source sacrificed"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Falcon's Wing Harness",
+        "source_path": "Mage.Sets/src/mage/cards/f/FalconsWingHarness.java",
+        "test_methods": [
+          "falconsWingHarnessAttachesThenReequipsWithBoostAndFlying"
+        ],
+        "affected_behavior_review": "Equip reminder and Ward display deltas leave attach/equip and granted Ward cost intact.",
+        "concrete_assertions": [
+          "attachment moved to selected creature",
+          "boost and flying granted",
+          "exactly one ward {1} ability"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Mikey & Don, Party Planners",
+        "source_path": "Mage.Sets/src/mage/cards/m/MikeyAndDonPartyPlanners.java",
+        "test_methods": [
+          "mikeyAndDonCastTribalCreatureFromTopWithAdditionalCounter"
+        ],
+        "affected_behavior_review": "The Ward hint delta is non-executable; the card retains exactly one ward {2} ability while its top-library contract remains live.",
+        "concrete_assertions": [
+          "exactly one WardAbility",
+          "getRuleWithoutHint equals ward {2}",
+          "tribal card castable and countered",
+          "nontribal card unavailable"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Namor the Sub-Mariner",
+        "source_path": "Mage.Sets/src/mage/cards/n/NamorTheSubMariner.java",
+        "test_methods": [
+          "namorCountsBlueSymbolsAndUpdatesPowerWithCreatedMerfolk"
+        ],
+        "affected_behavior_review": "CreateTokenEffect setText does not change token quantity derived from blue mana symbols.",
+        "concrete_assertions": [
+          "exactly two Merfolk tokens",
+          "Namor power updates to three",
+          "draw spell resolves"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Scout the City",
+        "source_path": "Mage.Sets/src/mage/cards/s/ScoutTheCity.java",
+        "test_methods": [
+          "scoutTheCityLookAroundReturnsPermanentAndGainsLife",
+          "scoutTheCityBringDownDestroysOnlyTargetedFlyer"
+        ],
+        "affected_behavior_review": "withTextOptions changes only mode text; both Look Around selection and Bring Down targeting still execute.",
+        "concrete_assertions": [
+          "permanent returned after mill and life gained",
+          "targeted flyer destroyed",
+          "nonflyer remains"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      },
+      {
+        "card_name": "Wolverine, Fierce Fighter",
+        "source_path": "Mage.Sets/src/mage/cards/w/WolverineFierceFighter.java",
+        "test_methods": [
+          "wolverineFightThenNewDamageHealsPreviouslyMarkedDamage"
+        ],
+        "affected_behavior_review": "FightTargetSourceEffect setText leaves target fight execution and the separate damage replacement contract intact.",
+        "concrete_assertions": [
+          "fight target dies",
+          "Wolverine remains",
+          "new damage amount and haste asserted"
+        ],
+        "behavior_assertion_review": "pass",
+        "residual_issue": null
+      }
+    ]
+  },
+  "talion_stability": {
+    "pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "test_method": "talionZoneChangeIgnoresStaleChosenNumber",
+    "reason": "The fixture reserves an additional white source; three isolated Java 17 reruns prove stability after the deterministic mana-fixture adjustment.",
+    "java_version": "17.0.10",
+    "consecutive_passes": 3,
+    "included_in_combined_68_test_count": false,
+    "additional_coverage_cases_claimed": 0,
+    "runs": [
+      {
+        "run": 1,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "status": "pass",
+        "surefire_sha256": "da036bff69c6342a30fe9d94e7cce4af428f71d74f2d2a292aa68f2da84e2ed4"
+      },
+      {
+        "run": 2,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "status": "pass",
+        "surefire_sha256": "f38457041fa7114b14b9aa97bf36f0da2a5b44dcbc372ad0a22af7380774c703"
+      },
+      {
+        "run": 3,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "status": "pass",
+        "surefire_sha256": "564f695140b8d1f0371abd5733cfa121a9fcc87784d4d845a6c0d60d0a1dc1a9"
+      }
+    ]
+  },
+  "cards": [
+    {
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "class_name": "AliciaMastersSkilledSculptor",
+      "source_path": "Mage.Sets/src/mage/cards/a/AliciaMastersSkilledSculptor.java",
+      "source_provenance": {
+        "change_kind": "added",
+        "from_source": null,
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "9630deedec5f038eac08a301937535fe7b2c4751",
+          "source_sha256": "3a262f1fa68c65af14a7b4fe1ea8373d09c20498d6be6ca29e26ace170bdb38d"
+        },
+        "canonical_diff_sha256_full_index": "dc154262482700d7710bca7543ce1ba3adf3081a250f0b7c28a90d8b87afb863",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "added_full_implementation",
+        "inventory_ids": [
+          "added_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "added_semantic_review",
+            "sha256": "1fc8de0ef166271307973fbfb6fec5dd4c576663d64717707c49f3b444577c1f"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_added_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_added",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_added",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "ALICIA-COMBAT-NONCREATURE-THIS-TURN",
+            "test_methods": [
+              "testAliciaTreasureRequiresNoncreatureSpellThisTurn"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "ALICIA-ENDSTEP-OWNERSHIP",
+            "test_methods": [
+              "testAliciaReturnsOwnedCreaturesDuringEndStep"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Ant-Man, Colony Commander",
+      "class_name": "AntManColonyCommander",
+      "source_path": "Mage.Sets/src/mage/cards/a/AntManColonyCommander.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "14d6495474305564d6f7965275498ad28cdafcc9",
+          "source_sha256": "bdeaf45f0ea944026cd5009bd95aef92ba512f7aa908b463a842b76e81fdf9ed"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "e2cdb63c062ebc25f2423a9aaa3c30872bc3a93c",
+          "source_sha256": "7e806afbf89ea24fb1d976a13cf7cfa9ebffe68d64648b633aad5e53264754a9"
+        },
+        "canonical_diff_sha256_full_index": "9c36007ea6a8b224940525e2d2397f6d880a0944ddeeae372d6fdaa0cf7c9953",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "ant_man_colony_commander_behavioral_equivalence",
+            "test_methods": [
+              "antManPaysAttackCostAddsCounterAndCreatesOnlyOneInsect"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Aunt May",
+      "class_name": "AuntMay",
+      "source_path": "Mage.Sets/src/mage/cards/a/AuntMay.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "0756a23e7c37dc50f37b48915e81abbcc2ded7ff",
+          "source_sha256": "5194f9a5c60f2ca2e5d712f2e7fcc308eaeb87e7693c7aa9564994572779bb8a"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "2ac423d0949178bbdaae14495fcb4ca4707135df",
+          "source_sha256": "f39ce0363ba55135c2d7a5ee7e34cff6eb23c4de44426b472a9e61f737c6b22d"
+        },
+        "canonical_diff_sha256_full_index": "3a8fa7ba7e8a819bae2c2e23cd36211e2467bbf88b358a621c528627539d4f15",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "filter_change_redundant_in_enclosing_control_scope",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "aunt_may_behavioral_equivalence",
+            "test_methods": [
+              "auntMayRewardsOwnSpiderAndIgnoresOpponentsSpider"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Avengers Tower",
+      "class_name": "AvengersTower",
+      "source_path": "Mage.Sets/src/mage/cards/a/AvengersTower.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "5637781ed54e62a7c3939c8c29ec760b33d02446",
+          "source_sha256": "cfbf97f8c328e896c30b528992654a9d6af992635ae001f3eb5123082f59ce89"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "9fcbd12e2396283017dce1abda976647cde9e969",
+          "source_sha256": "8b2589f50dd8214ff29332c1cb79006ded5b562018ed8e25cffbde21302d4def"
+        },
+        "canonical_diff_sha256_full_index": "9430fab9d2f2143e2a6644a3fb83bfb412f856d55b69a4db6c1ef29899ccb11b",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "ast_equivalent_after_import_and_string_literal_normalization",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "nominal_review_v2",
+        "nominal_review_policy_v2"
+      ],
+      "clearance_basis": "exact_non_executable_tokens_v2",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "exact_non_executable_tokens_v2",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "rule_id": "avengers_tower_exact_non_executable_tokens_v2",
+        "non_executable_tokens_equivalent": true,
+        "normalized_token_sha256": "c2036786c10591bd60974dbf736b95082bd14a6d4f004257d737eef420ad586c",
+        "required_direct_test_references": [],
+        "required_test_case_count": 0
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Baxter Building",
+      "class_name": "BaxterBuilding",
+      "source_path": "Mage.Sets/src/mage/cards/b/BaxterBuilding.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "cd9900b243bf992fa1dce6b01dcd19828078521b",
+          "source_sha256": "c997aa78da1ab3d16a2f6eaafc760de6d23deabe924d5d7db3a6dbe45d1bce64"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "7aed4820807c5dd23f37c36d44d4b8f19731190b",
+          "source_sha256": "7544eb45ba1f54419d88a9f45de7287788b5fdc626f8ec0c1406929dcb0f5e19"
+        },
+        "canonical_diff_sha256_full_index": "b52dfbc50b23776d74bd36110c4ba78c07dac8ed5e7fa42d365fbec27de8d6ed",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Baxter Building",
+            "test_methods": [
+              "baxterDrawIsUnavailableWhenToughnessConditionIsFalse",
+              "baxterDrawDefinitionRetainsGenericFourManaCost",
+              "baxterDrawPaysFourTapsSourceAndDrawsExactlyOne"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Black Panther, Vanguard",
+      "class_name": "BlackPantherVanguard",
+      "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherVanguard.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "836767c466c6862a4612a1ed46d01343992d1c31",
+          "source_sha256": "95d73bcd85f1418a089edc5f20b09d9bf2d07050d7ef4e03c39e6f3909ba0818"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "5ce60f8faf9b54de1c56ec8b92a800fbb01f7ab4",
+          "source_sha256": "674faa2b58d333edf2be0660d0d9f4b490c75605b3ce37d8aeba702221e16a4c"
+        },
+        "canonical_diff_sha256_full_index": "df2f001825d82d85263fdad164a76b7db780f83453734abc6b621c8734fb4741",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "ast_equivalent_after_import_and_string_literal_normalization",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "nominal_review_v2",
+        "nominal_review_policy_v2"
+      ],
+      "clearance_basis": "exact_non_executable_tokens_v2",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "exact_non_executable_tokens_v2",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "rule_id": "black_panther_vanguard_exact_non_executable_tokens_v2",
+        "non_executable_tokens_equivalent": true,
+        "normalized_token_sha256": "22e178c48f3e7c67efd444e52c4c90aad8bf9f82ed2f38103e29bc00ecc2e9d5",
+        "required_direct_test_references": [],
+        "required_test_case_count": 0
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Captain America, Wings of Freedom",
+      "class_name": "CaptainAmericaWingsOfFreedom",
+      "source_path": "Mage.Sets/src/mage/cards/c/CaptainAmericaWingsOfFreedom.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "7d03f8b34429e044b629cea42546ea8f96355143",
+          "source_sha256": "94120ecb5d0dbda7f3480b73fe5556a7a848cffcd2b28cf1c9ae7bf253795ea3"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "dbca1f72633f77d2c7f34c794bf5cfa9d75e920d",
+          "source_sha256": "57d8a6fd7f795eb2c39a2a20fc8848bfc1577b8a1b63bdc00861e1c16c50e254"
+        },
+        "canonical_diff_sha256_full_index": "7480d515258b95b5a84541d8d6ac1ac9f456a819bc00b84eaf550ee8c0b61035",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "captain_america_wings_of_freedom_behavioral_equivalence",
+            "test_methods": [
+              "captainAmericaBoostsOnlyOtherHeroesByItsToughness"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Claim the Kingdom",
+      "class_name": "ClaimTheKingdom",
+      "source_path": "Mage.Sets/src/mage/cards/c/ClaimTheKingdom.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "33477019bb2e9810683ed03cc2287001fd34abc8",
+          "source_sha256": "5f8b37959cda44ecab4eee940c8abadd7c07ddf01d30900e42a8de15374d8314"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "8cfc6889a228f15bdbe041bf47e1b54bd8acad74",
+          "source_sha256": "76a06c37c10d54aeb4c2fe7254ad4aa14bebbf83d114576a0e41f8889ccac555"
+        },
+        "canonical_diff_sha256_full_index": "8e9278dbbc0871029675afcce8aca9e2033f6255a65d76732858472784278840",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "claim_the_kingdom_behavioral_equivalence",
+            "test_methods": [
+              "claimTheKingdomFourthPlanSacrificesAndGrantsIndestructibleCounter"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Crossbones, Malicious Mercenary",
+      "class_name": "CrossbonesMaliciousMercenary",
+      "source_path": "Mage.Sets/src/mage/cards/c/CrossbonesMaliciousMercenary.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "72c1e86c8551575aca5ebe96dae6248715a8548d",
+          "source_sha256": "c650dac948127e93c40d7f8364e05fbee8eed5d53647acb8e608347b1da593e4"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "3dafd86049aae48c791b071965b6b1e792747d3e",
+          "source_sha256": "dc2b4e3cee6f5a09678ad9a0585aa76598cf39604c76a8225b9c5ff4e9b153d3"
+        },
+        "canonical_diff_sha256_full_index": "db28217547a23730e38192a982e9a145771c6328a585245df844d77e8e13d7dd",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "crossbones_malicious_mercenary_behavioral_equivalence",
+            "test_methods": [
+              "crossbonesTriggersOnlyOnceForTwoOtherVillainsInOneTurn"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Currency Converter",
+      "class_name": "CurrencyConverter",
+      "source_path": "Mage.Sets/src/mage/cards/c/CurrencyConverter.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "4ab44451afcf2fa79abe3a4638ec3c89af18dcbc",
+          "source_sha256": "cd5badbce3dc93267a50bd37de8e492a84d6d54cbc21af4c832fd7732d5955f4"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "4372662d1f9db19c326510db5b0e5f1d7fb80fee",
+          "source_sha256": "b52a6df2c2c932619ace765673d4fa208f4f52f8c41856a978aab9843f23dfe3"
+        },
+        "canonical_diff_sha256_full_index": "ee858b26f110b1c383851a83068b3eab0c3070bf67cd31825758e08d04497895",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "ast_equivalent_after_import_and_string_literal_normalization",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "nominal_review_v2",
+        "nominal_review_policy_v2"
+      ],
+      "clearance_basis": "exact_non_executable_tokens_v2",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "exact_non_executable_tokens_v2",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "rule_id": "currency_converter_exact_non_executable_tokens_v2",
+        "non_executable_tokens_equivalent": true,
+        "normalized_token_sha256": "39300cbbf604bebe4e2db755b2c83b09ef33e177784920979bbfd8fda745a75d",
+        "required_direct_test_references": [],
+        "required_test_case_count": 0
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Eerie Gravestone",
+      "class_name": "EerieGravestone",
+      "source_path": "Mage.Sets/src/mage/cards/e/EerieGravestone.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "e30d9e2b4bf5f29aaeb99c078e04b3df58e190ca",
+          "source_sha256": "f2a23dac61e01b8ed6841f43bb8c6588ba33bc4a2c5a5380e52b2f4e7b4b8652"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "28979e3768a17ba116fe02673ea22b2290add82e",
+          "source_sha256": "5a3e8a32eb98439126f4ca9f20ee0f62a3b5c81cf62004a918e0dc52f81fef55"
+        },
+        "canonical_diff_sha256_full_index": "6cd7e1648794473994bb3cffdd545efcb0720d3b2a60965a8608ad1b84c744b7",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "eerie_gravestone_behavioral_equivalence",
+            "test_methods": [
+              "eerieGravestoneDrawsThenMillsFourAndReturnsCreature"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Falcon's Wing Harness",
+      "class_name": "FalconsWingHarness",
+      "source_path": "Mage.Sets/src/mage/cards/f/FalconsWingHarness.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "68471841b3932adcc634978f1266bdeec7b9fbff",
+          "source_sha256": "f75fb9afb5e40a903ed5b23bbe14510b633a8232b90c99da4fb260452bf13494"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "a7f8162cf110907ced57d5f558c25682ac79ff08",
+          "source_sha256": "404640665b29afc421f201ca783e909d90cd96c9c6af1da7136d6fa233198fc1"
+        },
+        "canonical_diff_sha256_full_index": "5628612dd0f085211078e7f3e657b11893a81eb8d3cd7142ea680585f127c3f9",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "falcons_wing_harness_behavioral_equivalence",
+            "test_methods": [
+              "falconsWingHarnessAttachesThenReequipsWithBoostAndFlying"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Haktos the Unscarred",
+      "class_name": "HaktosTheUnscarred",
+      "source_path": "Mage.Sets/src/mage/cards/h/HaktosTheUnscarred.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "dc4c3aebd7349bea26d37c28d6969b3d8d2f8133",
+          "source_sha256": "26fba86a62b5300cb46c561482200d5bc6ee99981c966c6dd5c7adce5742aa91"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "aad1d19ba8925aa6996f68f36a4a9e890b00f51f",
+          "source_sha256": "f08aafd4b08a28f5f463df5d1d91b28fc2d65b07559acb0889c31e472dfba237"
+        },
+        "canonical_diff_sha256_full_index": "3e993172a83342dee6d20cae4c1b7f42679d1408135262af5d5b5bd6e8706c9f",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Haktos the Unscarred",
+            "test_methods": [
+              "haktosProtectionReadsTheChosenNumberFromItsSourceZcc",
+              "haktosZoneChangeUsesFreshZccStateInsteadOfStaleChoice"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Heroes' Hangout",
+      "class_name": "HeroesHangout",
+      "source_path": "Mage.Sets/src/mage/cards/h/HeroesHangout.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "64bca996badc82a1962ed53cd07a4bcd2a1d2431",
+          "source_sha256": "4345bf3b2a07eacbfea4801fe2a752eb43a468fc9b0c84c64f484ffceabe639a"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "150051ab7a4164f6cb4d3bc674ed7e076f3ba9bc",
+          "source_sha256": "32d51c5731167ae2521c44e02d22fd6cac67e9d8040947d9bb7692d0601af765"
+        },
+        "canonical_diff_sha256_full_index": "76e0bfd68a099cf3c6c1b935b3bc50a6e412b5d189b59c22f8a05624d8b136e0",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Heroes' Hangout",
+            "test_methods": [
+              "heroesHangoutPatrolNightBoostsTwoTargetsAndGrantsFirstStrike",
+              "heroesHangoutDateNightPlaysOnlyTheChosenExiledCardThroughNextTurn"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "HYDRA Troopers",
+      "class_name": "HYDRATroopers",
+      "source_path": "Mage.Sets/src/mage/cards/h/HYDRATroopers.java",
+      "source_provenance": {
+        "change_kind": "added",
+        "from_source": null,
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "8b64ef4bfd291e55db2473edf30fb8c816e28566",
+          "source_sha256": "f6332b7ef17c65e584d24b4951c36328d431bb243c6ca761c4d7243caf8f2a62"
+        },
+        "canonical_diff_sha256_full_index": "3697ed9bac99ac1b19b110afe53c92855ac3d8339b0e15cf6efb176c56bc61b3",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "added_full_implementation",
+        "inventory_ids": [
+          "added_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "added_semantic_review",
+            "sha256": "1fc8de0ef166271307973fbfb6fec5dd4c576663d64717707c49f3b444577c1f"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_added_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_added",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_added",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "HYDRA-ETB-BELOW-TWO-MILL",
+            "test_methods": [
+              "testHydraTroopersMillsBelowCreatureThreshold"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "HYDRA-ETB-AT-THRESHOLD-TOKEN",
+            "test_methods": [
+              "testHydraTroopersCreatesTappedMenaceTokenAtThreshold"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Iron Man, Armored Avenger",
+      "class_name": "IronManArmoredAvenger",
+      "source_path": "Mage.Sets/src/mage/cards/i/IronManArmoredAvenger.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "c2a1a090eac6303828453c8f8c2436f781016a9b",
+          "source_sha256": "1f1ddddd34c7a77ad9ed2c0caa2cdf56a01ada9b03f8ad67a324bc695b6698a2"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "6237408adefce4809b7e03e1fa27d779aaf6c477",
+          "source_sha256": "c8e5b0dda88d21bbb64f0123605a9add327e2a24dc22a84ff244b08f36d49b32"
+        },
+        "canonical_diff_sha256_full_index": "040d54ba1633d59404a8e135403929739397c9856d1035fe49f2e6f779d8b1cc",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Iron Man, Armored Avenger",
+            "test_methods": [
+              "ironManOnlyGrantsFlyingToOtherAttackingModifiedCreature",
+              "ironManFlyingDefinitionExplicitlyExcludesItsSource"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Light-Paws, Emperor's Voice",
+      "class_name": "LightPawsEmperorsVoice",
+      "source_path": "Mage.Sets/src/mage/cards/l/LightPawsEmperorsVoice.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "f477729d9bc3efa8539c87b37689d48df2418a36",
+          "source_sha256": "b95ec185b299ea1e23317ad00260feb08c4bf050e898bd946d0c07799cfa626f"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "a478639e4e7579e33b5f9cc7d857e0ef53fc47d8",
+          "source_sha256": "bac5139a1f78dc25a44c6f2243d2f3ead23f876b9422f958f718def958eefe7e"
+        },
+        "canonical_diff_sha256_full_index": "90e3100f99a89bd792e95f17695e9fad97b5b157ba1166780e0613f0be6ef09c",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Light-Paws, Emperor's Voice",
+            "test_methods": [
+              "lightPawsRecognizesNormallyCastAuraThroughStackLki",
+              "lightPawsIgnoresAuraPutOntoBattlefieldWithoutBeingCast",
+              "lightPawsRecognizesAuraCopiedAsACardThenCast"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Mandate of Peace",
+      "class_name": "MandateOfPeace",
+      "source_path": "Mage.Sets/src/mage/cards/m/MandateOfPeace.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "a61bdd26217895dfff4d707a75ac0bab590b33ce",
+          "source_sha256": "ac956492c074727a3e6db6ce49528a05c62a99b3645fea34318268a9d05f08c8"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "65304089cc477c24fa38576e479ace375b819ed6",
+          "source_sha256": "c29ae9f550c4161fb317552ca85b61fe0825381e81a037ee99ae318b6b35a4fa"
+        },
+        "canonical_diff_sha256_full_index": "e70fde4319b27dd5b1f7e17ffa1d257cb442e30055fea62f2e0724e1abeb94b1",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "external_runtime_gap",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "unsupported",
+        "effective_runtime_catalog_status": "unsupported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "comment_only_known_copy_lki_risk",
+        "inventory_ids": [
+          "modified_ast_audit",
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          },
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier",
+        "qualification_policy"
+      ],
+      "clearance_basis": null,
+      "status": "quarantined",
+      "status_reasons": [
+        "postgresql_external_runtime_gap",
+        "quarantine_confirmed",
+        "focused_reproduction_is_not_promotion_evidence",
+        "effective_runtime_catalog_unsupported"
+      ],
+      "clearance_details": null,
+      "quarantine_details": {
+        "obligation_id": "mandate_of_peace_concurrent_stack_removal",
+        "coverage_status": "quarantine_confirmed",
+        "test_methods": [
+          "mandateOfPeaceQuarantineReproducesResidualOriginalSpellAfterConcurrentRemoval"
+        ],
+        "test_is_promotion_evidence": false,
+        "residual_issue": "#12911",
+        "observed_behavior": "copy_and_two_activated_abilities_removed_but_original_spell_resolves",
+        "residual_condition_before_promotion": "Mandate must remove every original spell, spell copy, and ability atomically before promotion."
+      },
+      "review_state": "quarantine_confirmed_no_promotion"
+    },
+    {
+      "card_name": "Matoya, Archon Elder",
+      "class_name": "MatoyaArchonElder",
+      "source_path": "Mage.Sets/src/mage/cards/m/MatoyaArchonElder.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "bff96bb6db8d813b131bc6825e43e92646877e7f",
+          "source_sha256": "f11e9444cbac13117f9b5a89fd01fa332fa2bac0517b5da3c94ca367747e9ffd"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "c588122286ec6676176246c89addaa443403bbb8",
+          "source_sha256": "a4543e4d148b6efe601307f6ee04a05efd63f6c839b9683797e09a0ee5362031"
+        },
+        "canonical_diff_sha256_full_index": "4fc8d8d425e40aa0a57d0ac62fc2048677fcf83c6ca834dba892ba81dabbe356",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Matoya, Archon Elder",
+            "test_methods": [
+              "matoyaControllerScryDrawsExactlyOneAdditionalCard",
+              "matoyaControllerSurveilDrawsExactlyOneAdditionalCard",
+              "matoyaIgnoresOpponentScry"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Metallic Mimic",
+      "class_name": "MetallicMimic",
+      "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "f9041e595b1bfb2b799f25569879e994dee1684d",
+          "source_sha256": "1114f92f66e8f2459b13bd35b6f88b9eea32a1a6a7397f6546b91342e839cf1e"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "d91dc5e4168e826af88385abd15e12b32dfe97ff",
+          "source_sha256": "00a6746969828ce49058632f097ff1fcd2855890b4e0125e04eef2981ea4951a"
+        },
+        "canonical_diff_sha256_full_index": "fac66314b4541d6b0460ae81a8dff5aeba9fc6dac3f8fe7250c2e270c1500bf3",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "ast_equivalent_after_import_and_string_literal_normalization",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "nominal_review_v2",
+        "nominal_review_policy_v2"
+      ],
+      "clearance_basis": "exact_non_executable_tokens_v2",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "exact_non_executable_tokens_v2",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "rule_id": "metallic_mimic_exact_non_executable_tokens_v2",
+        "non_executable_tokens_equivalent": true,
+        "normalized_token_sha256": "9e183cdfd76800124400125c88afd8c3c6f1df77ffac2b22456b7c545c4b6566",
+        "required_direct_test_references": [
+          "Mage.Tests/src/test/java/org/mage/test/cards/continuous/ChangelingTest.java",
+          "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
+          "Mage.Tests/src/test/java/org/mage/test/cards/replacement/entersBattlefield/HardenedScaleTest.java"
+        ],
+        "required_test_case_count": 6
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Mikey & Don, Party Planners",
+      "class_name": "MikeyAndDonPartyPlanners",
+      "source_path": "Mage.Sets/src/mage/cards/m/MikeyAndDonPartyPlanners.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "5b1fb86c06b7cc335be0e0ce51e82e4ab93b27a5",
+          "source_sha256": "b887d40d25c31dc3514b78dde0805bcb0b0bbaaa22df1cdba3ac6d2f32a85f4b"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "fd9708ce99e1a42042acfb0096d59f8395dcc83a",
+          "source_sha256": "3b4194110cac8a330f348fa5f7d52834c56c11cd5427e8bb5a1a2fca9980c775"
+        },
+        "canonical_diff_sha256_full_index": "0b83b2edb57a172e09b3965c3feba88d241be968c36da1492962ee5ddaa87edb",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "mikey_and_don_party_planners_behavioral_equivalence",
+            "test_methods": [
+              "mikeyAndDonCastTribalCreatureFromTopWithAdditionalCounter"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Mirror of Life Trapping",
+      "class_name": "MirrorOfLifeTrapping",
+      "source_path": "Mage.Sets/src/mage/cards/m/MirrorOfLifeTrapping.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "29d51b6d59417fd3f6a99253db276cc325f8e40d",
+          "source_sha256": "5ba18891d3636ba25176f4546e16f746b96ce7e14d8ef2ce51a89e1e8a4b5a3b"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "589e560e723ba8f94bbfd1dad5a70a3160ec394f",
+          "source_sha256": "13dcc02cd5af531e63745a6537fe2bdf740d21f2739eb1656a67ef0051ead66a"
+        },
+        "canonical_diff_sha256_full_index": "e5072ca435bb64ed24b062a27c6aada5fe5107facca9421a7cde425be56dbebb",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Mirror of Life Trapping",
+            "test_methods": [
+              "mirrorRotatesCastCreaturesThroughItsDedicatedExileZone",
+              "mirrorIgnoresCreatureTokensThatWereNotCast",
+              "mirrorRecognizesCreatureCopiedAsACardThenCast"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Namor the Sub-Mariner",
+      "class_name": "NamorTheSubMariner",
+      "source_path": "Mage.Sets/src/mage/cards/n/NamorTheSubMariner.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "f1dfef46e5a17720445081560190ead2171dd924",
+          "source_sha256": "b763c44286f120d0728cd012cc403fedbabf7552f0c6bb332bc1d70c3006bc6f"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "a92b76c1875e640322d01fc5c15b3dabfc1085ac",
+          "source_sha256": "a07fb0ba75ecb0790dc36ab5449c2600386d88b7103a9011551034375106357a"
+        },
+        "canonical_diff_sha256_full_index": "ffb76402f9808996c620d0adea9c2c15a34569268a1b07d4ef818ef967a12dc2",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "namor_the_sub_mariner_behavioral_equivalence",
+            "test_methods": [
+              "namorCountsBlueSymbolsAndUpdatesPowerWithCreatedMerfolk"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Nick Fury, Agent of S.H.I.E.L.D.",
+      "class_name": "NickFuryAgentOfSHIELD",
+      "source_path": "Mage.Sets/src/mage/cards/n/NickFuryAgentOfSHIELD.java",
+      "source_provenance": {
+        "change_kind": "added",
+        "from_source": null,
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "68d19a2906a36ddeba503838973a48b91200ff81",
+          "source_sha256": "cba3def6aad71a463b0dbfd9d7129891f73bd6bf3eee68340335c10100deea6c"
+        },
+        "canonical_diff_sha256_full_index": "6d94378687332b01dd679ca04f7d30cd2ff0a4b08575349593e78ae1dbbf3d20",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "added_full_implementation",
+        "inventory_ids": [
+          "added_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "added_semantic_review",
+            "sha256": "1fc8de0ef166271307973fbfb6fec5dd4c576663d64717707c49f3b444577c1f"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_added_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_added",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_added",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "NICK-POWERUP-REDUCTION-EQUIPMENT-ONCE",
+            "test_methods": [
+              "testNickFuryPowerUpReductionEquipmentAndOncePerGame"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "NICK-POWERUP-OPTIONAL-SELECTION",
+            "test_methods": [
+              "testNickFuryMayDeclineAndPutsLookedCardsBelowEighthCard"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "NICK-DOUBLE-FACED-TRANSFORM-YES",
+            "test_methods": [
+              "testNickFuryMayTransformChosenDoubleFacedHero"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "NICK-DOUBLE-FACED-TRANSFORM-NO",
+            "test_methods": [
+              "testNickFuryMayLeaveChosenDoubleFacedHeroUntransformed"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Origin of the Avengers",
+      "class_name": "OriginOfTheAvengers",
+      "source_path": "Mage.Sets/src/mage/cards/o/OriginOfTheAvengers.java",
+      "source_provenance": {
+        "change_kind": "added",
+        "from_source": null,
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "f7a8d9936b55aa5fc2dc506efa583651b815acf2",
+          "source_sha256": "0bc8e0d89340e480bb30f5d92f79aa20eb8fd5bc13145b210a55a1499e874373"
+        },
+        "canonical_diff_sha256_full_index": "f8ae6be7527842332f4c9b997b9af0fcd61f6495aa550696ff2463e55f79abff",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "added_full_implementation",
+        "inventory_ids": [
+          "added_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "added_semantic_review",
+            "sha256": "1fc8de0ef166271307973fbfb6fec5dd4c576663d64717707c49f3b444577c1f"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_added_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_added",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_added",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "ORIGIN-CHAPTER-I-II-DECLINE",
+            "test_methods": [
+              "testOriginScryAndDeclinedChapterTwoDraw"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "ORIGIN-CHAPTER-II-FILTER-CHAPTER-III-SCOPE",
+            "test_methods": [
+              "testOriginFiltersChapterTwoAndCountersOnlyControlledCreatures"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Photon Blast Barrage",
+      "class_name": "PhotonBlastBarrage",
+      "source_path": "Mage.Sets/src/mage/cards/p/PhotonBlastBarrage.java",
+      "source_provenance": {
+        "change_kind": "added",
+        "from_source": null,
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "f8ba7d4a599aceff87abd2f490e5c76a48820940",
+          "source_sha256": "4a7b2235020996da5ecf4b2fe8a9d2b7cf754e03243577a15971b896fb6f9c9a"
+        },
+        "canonical_diff_sha256_full_index": "1c2bb4ff2c12780b40569924acdf1d76c398303deba1e548d382f64a9455cf26",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "added_full_implementation",
+        "inventory_ids": [
+          "added_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "added_semantic_review",
+            "sha256": "1fc8de0ef166271307973fbfb6fec5dd4c576663d64717707c49f3b444577c1f"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_added_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_added",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_added",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "PHOTON-X-ZERO",
+            "test_methods": [
+              "testPhotonBlastXZeroResolvesOnlyOriginal"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "PHOTON-X-TWO-RETARGET",
+            "test_methods": [
+              "testPhotonBlastXTwoMayRetargetEachCopy"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "PHOTON-X-TWO-KEEP-TARGET",
+            "test_methods": [
+              "testPhotonBlastXTwoMayKeepOriginalTargetForBothCopies"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Planetarium of Wan Shi Tong",
+      "class_name": "PlanetariumOfWanShiTong",
+      "source_path": "Mage.Sets/src/mage/cards/p/PlanetariumOfWanShiTong.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "0c6c9d526fe41558bed98c05401eccbf1d203142",
+          "source_sha256": "f2d2d2c9f5c4d1a67d468adbfc7f371205bea3b6219a2609d77a26ccc6e19db0"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "abf7d40d86e0fa3bbacaef856158660d454ffbef",
+          "source_sha256": "1395f5e432c0c067543762b7ca0b030d8fb3cba5cbbbea22f81018134ac57398"
+        },
+        "canonical_diff_sha256_full_index": "a310ed979fbaa1c26a69a00c6be07165aa6254dd645e06e15e34939ee07918d1",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "external_runtime_gap",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "unsupported",
+        "effective_runtime_catalog_status": "unsupported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "confirmed_executable_semantic_defect",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier",
+        "qualification_policy"
+      ],
+      "clearance_basis": null,
+      "status": "quarantined",
+      "status_reasons": [
+        "postgresql_external_runtime_gap",
+        "quarantine_confirmed",
+        "focused_reproduction_is_not_promotion_evidence",
+        "effective_runtime_catalog_unsupported"
+      ],
+      "clearance_details": null,
+      "quarantine_details": {
+        "obligation_id": "planetarium_mandatory_once_per_turn_trigger",
+        "coverage_status": "quarantine_confirmed",
+        "test_methods": [
+          "planetariumQuarantineConfirmsMandatoryTriggerBecameOptional"
+        ],
+        "test_is_promotion_evidence": false,
+        "residual_issue": null,
+        "observed_behavior": "Definition-level executable assertion confirms that the transition helper currently marks the mandatory scry/surveil trigger optional.",
+        "residual_condition_before_promotion": "Source fix and mandatory/once-per-turn runtime tests remain required before promotion."
+      },
+      "review_state": "quarantine_confirmed_no_promotion"
+    },
+    {
+      "card_name": "Scout the City",
+      "class_name": "ScoutTheCity",
+      "source_path": "Mage.Sets/src/mage/cards/s/ScoutTheCity.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "609dc961bbdc776d30990a21596aaf3079bae276",
+          "source_sha256": "43b368901f000bf0e096a22efc406f39d1e268ab8d71fb31cdda7e0cb734a702"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "252e324fd964c5a6abc6f83c0d0bb0206fe94881",
+          "source_sha256": "b6056ecd85f4d26675b752f250ae48cc66c609cf38b10995ac014e32599402ad"
+        },
+        "canonical_diff_sha256_full_index": "32946cbf354b593cfaa2e7ce0a8801741c39837df92d166b5c03e7b3f624a62b",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "scout_the_city_behavioral_equivalence",
+            "test_methods": [
+              "scoutTheCityLookAroundReturnsPermanentAndGainsLife",
+              "scoutTheCityBringDownDestroysOnlyTargetedFlyer"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Selfless Police Captain",
+      "class_name": "SelflessPoliceCaptain",
+      "source_path": "Mage.Sets/src/mage/cards/s/SelflessPoliceCaptain.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "4e3f6986dd798f50bea80a7939adb1fa6077a6eb",
+          "source_sha256": "b006f6d7b184d6d1a1581e8b4588e87ce651023fa19001a1ed3058e5e86f16df"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "0abd6dfea5559c9c18513a13406776e100e4022d",
+          "source_sha256": "e7abfd13781717b2ff4b6b06ff1cfc9c1a51e0d8c4a2764e09a4299d140ef674"
+        },
+        "canonical_diff_sha256_full_index": "3574764e3268d39d9a811316dce0868b30710b9d87d76e2688cfc288fb1f2274",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Selfless Police Captain",
+            "test_methods": [
+              "selflessCaptainBounceTransfersCountersUsingLastKnownInformation"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Sokka and Suki",
+      "class_name": "SokkaAndSuki",
+      "source_path": "Mage.Sets/src/mage/cards/s/SokkaAndSuki.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "bab01efc15207c615883a807fccbf073f23e7af5",
+          "source_sha256": "2638c6d0fae778e520858bafb99fcd62339d4dc706fc8c588c2fe07776bdedaa"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "a7dc040256a640adecbb5df0ccffd5ec8bd6ef23",
+          "source_sha256": "1effd429b1505bd64e55a0cc15df16b22f7e61e961e14e5bf228888481d621ab"
+        },
+        "canonical_diff_sha256_full_index": "bbb0d0039ae5db851712ad3e867d7a0fd9d8577d7f535da6d131627d0a575540",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Sokka and Suki",
+            "test_methods": [
+              "sokkaAttachesChosenEquipmentAndAllowsZeroTargets",
+              "sokkaEquipmentEntryCreatesAllyThenAttachesToThatToken"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "SP//dr, Piloted by Peni",
+      "class_name": "SPDrPilotedByPeni",
+      "source_path": "Mage.Sets/src/mage/cards/s/SPDrPilotedByPeni.java",
+      "source_provenance": {
+        "change_kind": "added",
+        "from_source": null,
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "e21dd19f2f87325d7e31e11dcced799880c9dfc2",
+          "source_sha256": "81545f0c9911d380cec911b9056746c86a042c9e94c405796df0412857083609"
+        },
+        "canonical_diff_sha256_full_index": "265513c07af1aa4f6059c214d6f3a12d0005bb1011dbd238f6d733349d4d9928",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "added_full_implementation",
+        "inventory_ids": [
+          "added_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "added_semantic_review",
+            "sha256": "1fc8de0ef166271307973fbfb6fec5dd4c576663d64717707c49f3b444577c1f"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_added_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_added",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_added",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "SPDR-ETB-COUNTER-VIGILANCE",
+            "test_methods": [
+              "testSpdrEtbCounterAndVigilance"
+            ],
+            "coverage_status": "focused_pass"
+          },
+          {
+            "run_id": "added_product_scope_marvel_cards",
+            "obligation_id": "SPDR-MODIFIED-COMBAT-DAMAGE-DRAW-COUNT",
+            "test_methods": [
+              "testSpdrDrawsOncePerModifiedCreatureAndIgnoresUnmodified"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Talion, the Kindly Lord",
+      "class_name": "TalionTheKindlyLord",
+      "source_path": "Mage.Sets/src/mage/cards/t/TalionTheKindlyLord.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "bb9e7e6c6d6e92c177b895e93374d728c623670f",
+          "source_sha256": "c7003c1b4f613e68153ef1fe09b0ea8a761a44219f29db4a31cc2417c783c670"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "6492df13deae630448ea6e6068754d87c27adc57",
+          "source_sha256": "81fd83760c0d7fcb38f6295acb89e4f5eee8db2a417da608757dd68d6cf9c5d0"
+        },
+        "canonical_diff_sha256_full_index": "fac3540b12aacf2b7cb7b7c4bf00bf1f77273a6d28dd07aa378789180773f3dd",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Talion, the Kindly Lord",
+            "test_methods": [
+              "talionMatchingSpellUsesChosenSourceZccForLifeLossAndDraw",
+              "talionZoneChangeIgnoresStaleChosenNumber"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "The Ruinous Wrecking Crew",
+      "class_name": "TheRuinousWreckingCrew",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheRuinousWreckingCrew.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "2b1fea654f0aa7885913503c48172e5f519a4083",
+          "source_sha256": "d6464d51ef301f52c5025cf46f881d56cbe815d561929df2cff691be27517b76"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "b8d151bbe9a4d7075e673da0271fa885e80b355d",
+          "source_sha256": "615ac7aef53c1f8bcfca8d02c4569d327b2a4ed7de6e8975f246ae7a543034ea"
+        },
+        "canonical_diff_sha256_full_index": "31e76cd5bdf6dfd34280cd4ca72042039653ef5aa8138c946fdad0a856cd9224",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "ast_equivalent_after_import_and_string_literal_normalization",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "nominal_review_v2",
+        "nominal_review_policy_v2"
+      ],
+      "clearance_basis": "exact_non_executable_tokens_v2",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "exact_non_executable_tokens_v2",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "rule_id": "ruinous_wrecking_crew_exact_non_executable_tokens_v2",
+        "non_executable_tokens_equivalent": true,
+        "normalized_token_sha256": "7caa0b884b28df86bceb3ad0e81a8a784c50ced295f2b4bdb23be85b22e2d1cd",
+        "required_direct_test_references": [],
+        "required_test_case_count": 0
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "The Sibsig Ceremony",
+      "class_name": "TheSibsigCeremony",
+      "source_path": "Mage.Sets/src/mage/cards/t/TheSibsigCeremony.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "cf5c66c47fc0ade1991502cd6a6e9b97c0ca9168",
+          "source_sha256": "3dc966c760536d6d462eb33f8b632922d0b83f19c42bd83f6f82127016af9a57"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "b861146ff91bc6742cf4e7953ab1aba49c633a04",
+          "source_sha256": "3fdc04bee18c8a743d373fad0eb79606afe1cc0f1f79247df95679c01b73653a"
+        },
+        "canonical_diff_sha256_full_index": "4ea85333769e2609e02be431ec8bc781bf6b0a4fcb1d03bd54830fee2da74862",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:The Sibsig Ceremony",
+            "test_methods": [
+              "sibsigReducesCastCreatureThenDestroysItAndCreatesZombieDruid",
+              "sibsigIgnoresCreatureTokensThatWereNotCast",
+              "sibsigRecognizesCreatureCopiedAsACardThenCast"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Venom, Evil Unleashed",
+      "class_name": "VenomEvilUnleashed",
+      "source_path": "Mage.Sets/src/mage/cards/v/VenomEvilUnleashed.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "b58c7a5c5750093f32b1423584cc454f1d537a55",
+          "source_sha256": "18cc7c3496f542d47e2d024b0fd8c0034ed154c9d9a07220bb50af800a82c8d5"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "a6595ddcb6058153dac836dbed49fff9abd250c6",
+          "source_sha256": "72d8fb28cc07f86a37f082a63b013512c68707507e1b61fb56ab8b28c350e107"
+        },
+        "canonical_diff_sha256_full_index": "350436f556cda30de1ad167be9f7c86ffb5fc1521845e62ab8071af16529c5ee",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "executable_or_mixed",
+        "inventory_ids": [
+          "executable_semantic_review"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "executable_semantic_review",
+            "sha256": "d6211141c6d358ce8d14901574d6517fda748945f834ab5501b61cb6c24e6207"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "focused_executable_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "focused_runtime_executable_transition",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "focused_runtime_executable_transition",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "modified_product_scope_executable_cards",
+            "obligation_id": "modified_product_scope_executable_cards:Venom, Evil Unleashed",
+            "test_methods": [
+              "venomGraveyardAbilityObservesSorceryTimingAndAddsTwoCounters"
+            ],
+            "coverage_status": "focused_pass"
+          }
+        ],
+        "behavior_assertion_review": null
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    },
+    {
+      "card_name": "Wolverine, Fierce Fighter",
+      "class_name": "WolverineFierceFighter",
+      "source_path": "Mage.Sets/src/mage/cards/w/WolverineFierceFighter.java",
+      "source_provenance": {
+        "change_kind": "modified",
+        "from_source": {
+          "commit": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+          "git_blob_oid_sha1": "c715d47f05b4e562907ee56c1a9cbfee74f5310a",
+          "source_sha256": "98a9b76842f76722bbd1da1bd4236aa0f19a174f1e34fb503293f2e871e685fe"
+        },
+        "to_source": {
+          "commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+          "git_blob_oid_sha1": "ba62a5547c7c61cdee7937eac5a4597fdb384fce",
+          "source_sha256": "6d1e7c36435a29d1c02c2ff8ddaa1f50f6e54e3843820f21553eee8fbeefe073"
+        },
+        "canonical_diff_sha256_full_index": "f15f3b53db2ae8bb9e5495970296da283f3befdb437ce9b52b2a417ba55871a0",
+        "diff_hash_mode": "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+      },
+      "scope": {
+        "lane": "product_in_scope",
+        "release_scope": "has_current_or_prior_registration",
+        "reconciliation_runtime_catalog_status": "supported",
+        "effective_runtime_catalog_status": "supported",
+        "postgresql_match_count": 1,
+        "postgresql_printing_count": 1
+      },
+      "semantic_review": {
+        "category": "presentation_api_or_static_text_dataflow_only",
+        "inventory_ids": [
+          "modified_ast_audit"
+        ],
+        "inventory_sha256": [
+          {
+            "id": "modified_ast_audit",
+            "sha256": "ce6b3f855d485525aefb04fc62e253c7b73f1ac9742d9352101da74da4b894cd"
+          }
+        ],
+        "review_is_clearance": false
+      },
+      "evidence_refs": [
+        "transition_audit_169",
+        "postgresql_scope_reconciliation",
+        "focused_product_scope_tests",
+        "presentation_equivalence_patch",
+        "focused_verifier"
+      ],
+      "clearance_basis": "presentation_equivalence_both_pins",
+      "status": "cleared",
+      "status_reasons": [
+        "postgresql_product_scope_confirmed",
+        "presentation_equivalence_both_pins",
+        "effective_runtime_catalog_supported"
+      ],
+      "clearance_details": {
+        "focused_obligations": [
+          {
+            "run_id": "product_scope_presentation_equivalence",
+            "obligation_id": "wolverine_fierce_fighter_behavioral_equivalence",
+            "test_methods": [
+              "wolverineFightThenNewDamageHealsPreviouslyMarkedDamage"
+            ],
+            "coverage_status": "behavioral_equivalence_pass"
+          }
+        ],
+        "behavior_assertion_review": "pass"
+      },
+      "quarantine_details": null,
+      "review_state": "cleared_by_current_versioned_evidence"
+    }
+  ],
+  "validation": {
+    "matrix_card_count_matches": true,
+    "product_partition_is_exact": true,
+    "direct_focused_plus_exact_non_executable_equals_34": true,
+    "status_vocabulary": [
+      "cleared",
+      "quarantined"
+    ],
+    "forbidden_status_count": 0,
+    "behavior_assertion_review_count": 11,
+    "behavior_assertion_gap_count": 0,
+    "talion_three_isolated_runs_pass": true,
+    "talion_runs_do_not_increase_combined_coverage": true,
+    "no_machine_local_paths": true,
+    "evidence_paths_are_repository_relative": true,
+    "evidence_sha256_verified": true,
+    "primary_dispositions_match": true
+  },
+  "transition_audit_qualification": {
+    "evidence_ref": "transition_audit_169",
+    "status": "pass",
+    "deployment_allowed": true,
+    "blocking_reasons": [],
+    "disposition_counts": {
+      "activation_blocked_pending_product_semantic_review": 133,
+      "exact_non_executable_tokens_passed": 5,
+      "external_runtime_quarantine_known_upstream_gap": 1,
+      "external_runtime_quarantine_semantic_defect": 1,
+      "product_scope_focused_semantic_tests_passed": 29
+    }
+  }
+}

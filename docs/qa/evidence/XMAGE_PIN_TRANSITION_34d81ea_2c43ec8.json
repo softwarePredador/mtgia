@@ -20,37 +20,50 @@
         "card_name": "Ajani Resolute",
         "evidence": "Token quoted rules text loses its final period.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       },
       {
         "card_name": "Consider the Prime Directive",
         "evidence": "The Interfere flavor word is attached to Choose one instead of the first mode.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       },
       {
         "card_name": "Crimson Cowl, Master of Evil",
         "evidence": "Generated rules omit you before create and omit the menace reminder.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       },
       {
         "card_name": "Falcon's Wing Harness",
-        "evidence": "VerifyCardDataTest reports the required ward reminder as absent.",
+        "evidence": "VerifyCardDataTest reports a generated reminder-text difference in both pins. Focused behavioral equivalence covers attach, re-equip, +1/+1, flying and ward {1}; this does not claim an upstream text fix.",
+        "runtime_boundary": {
+          "classification": "generated_card_information_only",
+          "behavioral_equivalence_obligation_id": "falcons_wing_harness_behavioral_equivalence",
+          "replay_card_projection_path": "services/xmage-sidecar/src/main/java/com/manaloom/xmage/ReplayNormalizer.java",
+          "replay_card_projection_method": "card(CardView)",
+          "replay_projection_includes_rules_text": false,
+          "replay_sanitizer_path": "server/lib/battle/battle_replay_payload_sanitizer.dart",
+          "battle_card_input_path": "server/lib/battle/battle_preflight_service.dart",
+          "battle_card_input_source": "postgresql_backend",
+          "battle_card_input_includes_oracle_text": false,
+          "product_oracle_text_contract_path": "docs/hermes-analysis/DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md",
+          "upstream_fix_claimed": false
+        },
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "non_runtime_presentation_finding"
       },
       {
         "card_name": "Hire a Crew",
         "evidence": "VerifyCardDataTest reports the required menace reminder as absent.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       },
       {
         "card_name": "My Precious",
         "evidence": "Generated equip rule joins Pay 2 life and {2} in the wrong order and punctuation.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       },
       {
         "card_name": "Planetarium of Wan Shi Tong",
@@ -62,17 +75,19 @@
         "card_name": "Sky Cycle",
         "evidence": "Generated rule says deals 2 damage and then describes twice the Vehicle count; gameplay calculates the intended dynamic amount.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       },
       {
         "card_name": "Sting, Bilbo's Sword",
         "evidence": "Three printings render an Equip reminder absent from the reference and omit the hone reminder.",
         "severity": "visible_rules_text",
-        "status": "upstream_fix_required"
+        "status": "activation_blocked"
       }
     ],
+    "activation_blocked_finding_count": 7,
     "cataloged_classes_checked": 168,
     "comparison_boundary": "The detailed comparison checks generated card information against the available reference corpus. Equivalent rendering differences are not promoted to defects.",
+    "deployment_blocking_finding_count": 0,
     "good_face_count": 154,
     "known_engine_risks": [
       {
@@ -97,7 +112,9 @@
       "Set Phasers to..."
     ],
     "missing_reference_face_count": 3,
-    "status": "review_required",
+    "non_runtime_presentation_finding_count": 1,
+    "quarantined_finding_count": 1,
+    "status": "pass",
     "wrong_face_count": 16
   },
   "card_summary": {
@@ -113,14 +130,11 @@
       "modified": 82
     },
     "dispositions": {
-      "catalog_supported_nominal_test_passed_semantic_review_required": 2,
-      "catalog_supported_regression_only_review_required": 78,
-      "catalog_supported_semantic_review_required": 84,
+      "activation_blocked_pending_product_semantic_review": 133,
+      "exact_non_executable_tokens_passed": 5,
+      "external_runtime_quarantine_known_upstream_gap": 1,
       "external_runtime_quarantine_semantic_defect": 1,
-      "external_residual_upstream_unfinished": 1,
-      "focused_upstream_test_passed": 1,
-      "focused_upstream_test_passed_card_data_warning_review_required": 1,
-      "presentation_hunk_nominal_tests_passed": 1
+      "product_scope_focused_semantic_tests_passed": 29
     },
     "modified_with_direct_nominal_test_reference": 3,
     "modified_with_source_todo_for_missing_copy_tests": 2,
@@ -129,8 +143,8 @@
       "has_current_or_prior_registration": 124
     },
     "runtime_catalog_statuses": {
-      "supported": 167,
-      "unsupported": 2
+      "supported": 34,
+      "unsupported": 135
     },
     "total_changed": 169
   },
@@ -141,10 +155,10 @@
       "change_kind": "added",
       "class": "AdvancingTheSpirit",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Advancing the Spirit",
@@ -155,7 +169,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/a/AdvancingTheSpirit.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -163,10 +179,10 @@
       "change_kind": "added",
       "class": "AjaniResolute",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Ajani Resolute",
@@ -177,7 +193,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/a/AjaniResolute.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -185,7 +203,7 @@
       "change_kind": "added",
       "class": "AliciaMastersSkilledSculptor",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -207,10 +225,10 @@
       "change_kind": "added",
       "class": "AmokTime",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Amok Time",
@@ -221,7 +239,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/a/AmokTime.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -229,10 +249,10 @@
       "change_kind": "added",
       "class": "BagEndBanquet",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bag End Banquet",
@@ -243,7 +263,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BagEndBanquet.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -251,10 +273,10 @@
       "change_kind": "added",
       "class": "BastPantherGoddess",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bast, Panther Goddess",
@@ -265,7 +287,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BastPantherGoddess.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -273,10 +297,10 @@
       "change_kind": "added",
       "class": "BeckettMarinerImpetuousEnsign",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Beckett Mariner, Impetuous Ensign",
@@ -287,7 +311,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BeckettMarinerImpetuousEnsign.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -295,10 +321,10 @@
       "change_kind": "added",
       "class": "BenjaminSiskoBesieged",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Benjamin Sisko, Besieged",
@@ -309,7 +335,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BenjaminSiskoBesieged.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -317,10 +345,10 @@
       "change_kind": "added",
       "class": "BilboFellowConspirator",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bilbo, Fellow Conspirator",
@@ -331,7 +359,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BilboFellowConspirator.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -339,10 +369,10 @@
       "change_kind": "added",
       "class": "BioAssetAllocator",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bio-Asset Allocator",
@@ -353,7 +383,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BioAssetAllocator.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -361,10 +393,10 @@
       "change_kind": "added",
       "class": "BlackPantherMostDangerous",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Black Panther, Most Dangerous",
@@ -375,7 +407,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherMostDangerous.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -383,10 +417,10 @@
       "change_kind": "added",
       "class": "BothersomeNoisemaker",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bothersome Noisemaker",
@@ -397,7 +431,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BothersomeNoisemaker.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -405,10 +441,10 @@
       "change_kind": "added",
       "class": "BrawnAmadeusCho",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Brawn, Amadeus Cho",
@@ -419,7 +455,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BrawnAmadeusCho.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -427,10 +465,10 @@
       "change_kind": "added",
       "class": "BuckyBarnesEagerAlly",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bucky Barnes, Eager Ally",
@@ -441,7 +479,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BuckyBarnesEagerAlly.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -449,10 +489,10 @@
       "change_kind": "added",
       "class": "BurnBurnTreeAndFern",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Burn, Burn, Tree and Fern",
@@ -463,7 +503,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BurnBurnTreeAndFern.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -471,10 +513,10 @@
       "change_kind": "added",
       "class": "CaptainAmericaLiberator",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Captain America, Liberator",
@@ -485,7 +527,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CaptainAmericaLiberator.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -493,10 +537,10 @@
       "change_kind": "added",
       "class": "CaptainJamesTKirk",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Captain James T. Kirk",
@@ -507,7 +551,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CaptainJamesTKirk.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -515,10 +561,10 @@
       "change_kind": "added",
       "class": "CaptainKathrynJaneway",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Captain Kathryn Janeway",
@@ -529,7 +575,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CaptainKathrynJaneway.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -537,10 +585,10 @@
       "change_kind": "added",
       "class": "ConsiderThePrimeDirective",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Consider the Prime Directive",
@@ -551,7 +599,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/ConsiderThePrimeDirective.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -559,10 +609,10 @@
       "change_kind": "added",
       "class": "CraterclawColossus",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Craterclaw Colossus",
@@ -573,7 +623,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CraterclawColossus.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -581,10 +633,10 @@
       "change_kind": "added",
       "class": "CrossoverCollaboration",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Crossover Collaboration",
@@ -595,7 +647,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CrossoverCollaboration.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -603,10 +657,10 @@
       "change_kind": "added",
       "class": "CrystallineEntity",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Crystalline Entity",
@@ -617,7 +671,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CrystallineEntity.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -625,10 +681,10 @@
       "change_kind": "added",
       "class": "DarksteelAngel",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Darksteel Angel",
@@ -639,7 +695,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DarksteelAngel.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -647,10 +705,10 @@
       "change_kind": "added",
       "class": "DesolationOfSmaug",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Desolation of Smaug",
@@ -661,7 +719,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DesolationOfSmaug.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -669,10 +729,10 @@
       "change_kind": "added",
       "class": "DesolationProwler",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Desolation Prowler",
@@ -683,7 +743,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DesolationProwler.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -691,10 +753,10 @@
       "change_kind": "added",
       "class": "DonaldBlakeGuiseOfThor",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Donald Blake, Guise of Thor",
@@ -705,7 +767,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DonaldBlakeGuiseOfThor.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -713,10 +777,10 @@
       "change_kind": "added",
       "class": "DrBeverlyCrusher",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Dr. Beverly Crusher",
@@ -727,7 +791,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DrBeverlyCrusher.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -735,10 +801,10 @@
       "change_kind": "added",
       "class": "EndlessRanksOfHYDRA",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Endless Ranks of HYDRA",
@@ -749,7 +815,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/e/EndlessRanksOfHYDRA.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -757,10 +825,10 @@
       "change_kind": "added",
       "class": "FiliAndKiliJoyous",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Fili and Kili, Joyous",
@@ -771,7 +839,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/f/FiliAndKiliJoyous.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -779,10 +849,10 @@
       "change_kind": "added",
       "class": "GarrukVeiledButcher",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Garruk, Veiled Butcher",
@@ -793,7 +863,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/g/GarrukVeiledButcher.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -801,10 +873,10 @@
       "change_kind": "added",
       "class": "GatheringOfDarkness",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Gathering of Darkness",
@@ -815,7 +887,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/g/GatheringOfDarkness.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -823,7 +897,7 @@
       "change_kind": "added",
       "class": "HYDRATroopers",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -845,10 +919,10 @@
       "change_kind": "added",
       "class": "HatutZerazeStrikeForce",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hatut Zeraze Strike Force",
@@ -859,7 +933,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HatutZerazeStrikeForce.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -867,10 +943,10 @@
       "change_kind": "added",
       "class": "HawkeyeBowslinger",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hawkeye, Bowslinger",
@@ -881,7 +957,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HawkeyeBowslinger.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -889,10 +967,10 @@
       "change_kind": "added",
       "class": "HexMagic",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hex Magic",
@@ -910,7 +988,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HexMagic.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -918,10 +998,10 @@
       "change_kind": "added",
       "class": "HighlyIllogical",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Highly Illogical",
@@ -939,7 +1019,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HighlyIllogical.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -947,10 +1029,10 @@
       "change_kind": "added",
       "class": "HyperionsAtomicVision",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hyperion's Atomic Vision",
@@ -961,7 +1043,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HyperionsAtomicVision.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -969,10 +1053,10 @@
       "change_kind": "added",
       "class": "InThePaleMoonlight",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "In the Pale Moonlight",
@@ -983,7 +1067,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/i/InThePaleMoonlight.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -991,10 +1077,10 @@
       "change_kind": "added",
       "class": "IronFistHeroForHire",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Iron Fist, Hero for Hire",
@@ -1005,7 +1091,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/i/IronFistHeroForHire.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1013,10 +1101,10 @@
       "change_kind": "added",
       "class": "JocastaAutomatonAvenger",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Jocasta, Automaton Avenger",
@@ -1027,7 +1115,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/j/JocastaAutomatonAvenger.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1035,10 +1125,10 @@
       "change_kind": "added",
       "class": "KillmongerRuthlessUsurper",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Killmonger, Ruthless Usurper",
@@ -1049,7 +1139,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/k/KillmongerRuthlessUsurper.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1057,10 +1149,10 @@
       "change_kind": "added",
       "class": "KirkEnterprisingCaptain",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Kirk, Enterprising Captain",
@@ -1071,7 +1163,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/k/KirkEnterprisingCaptain.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1079,10 +1173,10 @@
       "change_kind": "added",
       "class": "KlingonStrikeForce",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Klingon Strike Force",
@@ -1093,7 +1187,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/k/KlingonStrikeForce.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1101,10 +1197,10 @@
       "change_kind": "added",
       "class": "LilianaTheFaultless",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Liliana the Faultless",
@@ -1115,7 +1211,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/l/LilianaTheFaultless.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1123,10 +1221,10 @@
       "change_kind": "added",
       "class": "LilianaTheRepentant",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Liliana the Repentant",
@@ -1137,7 +1235,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/l/LilianaTheRepentant.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1145,10 +1245,10 @@
       "change_kind": "added",
       "class": "MACH1SwoopingScoundrel",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "MACH-1, Swooping Scoundrel",
@@ -1159,7 +1259,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MACH1SwoopingScoundrel.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1167,10 +1269,10 @@
       "change_kind": "added",
       "class": "MirkwoodPathmaker",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Mirkwood Pathmaker",
@@ -1181,7 +1283,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MirkwoodPathmaker.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1189,10 +1293,10 @@
       "change_kind": "added",
       "class": "MistyMountainsRaider",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Misty Mountains Raider",
@@ -1203,7 +1307,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MistyMountainsRaider.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1211,10 +1317,10 @@
       "change_kind": "added",
       "class": "MunitionsEnthusiast",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Munitions Enthusiast",
@@ -1225,7 +1331,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MunitionsEnthusiast.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1233,7 +1341,7 @@
       "change_kind": "added",
       "class": "NickFuryAgentOfSHIELD",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -1255,10 +1363,10 @@
       "change_kind": "added",
       "class": "OperationsOfficer",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Operations Officer",
@@ -1269,7 +1377,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/o/OperationsOfficer.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1277,10 +1387,10 @@
       "change_kind": "added",
       "class": "OriginOfCaptainAmerica",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Origin of Captain America",
@@ -1291,7 +1401,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/o/OriginOfCaptainAmerica.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1299,7 +1411,7 @@
       "change_kind": "added",
       "class": "OriginOfTheAvengers",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -1321,10 +1433,10 @@
       "change_kind": "added",
       "class": "OriginOfTheHulk",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Origin of the Hulk",
@@ -1335,7 +1447,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/o/OriginOfTheHulk.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1343,10 +1457,10 @@
       "change_kind": "added",
       "class": "OriginOfThor",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Origin of Thor",
@@ -1357,7 +1471,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/o/OriginOfThor.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1365,7 +1481,7 @@
       "change_kind": "added",
       "class": "PhotonBlastBarrage",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -1387,10 +1503,10 @@
       "change_kind": "added",
       "class": "PicardSteadfastCaptain",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Picard, Steadfast Captain",
@@ -1401,7 +1517,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/p/PicardSteadfastCaptain.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1409,7 +1527,7 @@
       "change_kind": "added",
       "class": "PrudentFateseer",
       "direct_test_references": [],
-      "disposition": "external_residual_upstream_unfinished",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "external_residual": {
         "forge_exact_match_count": 0,
         "forge_pin": "a62915f500c2411484689294659c6bb84ea215f8",
@@ -1433,7 +1551,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/p/PrudentFateseer.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "external_residual_upstream_unfinished",
+      "catalog_status_before_activation": "unsupported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1441,10 +1561,10 @@
       "change_kind": "added",
       "class": "QuicksilverSpeedster",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Quicksilver, Speedster",
@@ -1455,7 +1575,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/q/QuicksilverSpeedster.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1463,10 +1585,10 @@
       "change_kind": "added",
       "class": "RaftSecurityOfficer",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Raft Security Officer",
@@ -1477,7 +1599,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RaftSecurityOfficer.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1485,10 +1609,10 @@
       "change_kind": "added",
       "class": "RavenhillFlock",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Ravenhill Flock",
@@ -1499,7 +1623,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RavenhillFlock.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1507,10 +1633,10 @@
       "change_kind": "added",
       "class": "RedGuardianSuperSoldier",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Red Guardian, Super-Soldier",
@@ -1521,7 +1647,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RedGuardianSuperSoldier.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1529,10 +1657,10 @@
       "change_kind": "added",
       "class": "RedHulk",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Red Hulk",
@@ -1543,7 +1671,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RedHulk.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1553,7 +1683,7 @@
       "direct_test_references": [
         "Mage.Tests/src/test/java/org/mage/test/cards/single/spm/SPDrPilotedByPeniTest.java"
       ],
-      "disposition": "focused_upstream_test_passed",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 1,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -1575,10 +1705,10 @@
       "change_kind": "added",
       "class": "SetPhasersTo",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Set Phasers to...",
@@ -1589,7 +1719,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SetPhasersTo.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1597,10 +1729,10 @@
       "change_kind": "added",
       "class": "SheHulkWallbreaker",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "She-Hulk, Wallbreaker",
@@ -1611,7 +1743,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SheHulkWallbreaker.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1619,10 +1753,10 @@
       "change_kind": "added",
       "class": "SkyCycle",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Sky Cycle",
@@ -1633,7 +1767,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SkyCycle.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1641,10 +1777,10 @@
       "change_kind": "added",
       "class": "SpockLogicalChoice",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Spock, Logical Choice",
@@ -1655,7 +1791,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SpockLogicalChoice.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1663,10 +1801,10 @@
       "change_kind": "added",
       "class": "StarksIngenuity",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Stark's Ingenuity",
@@ -1677,7 +1815,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/StarksIngenuity.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1685,10 +1825,10 @@
       "change_kind": "added",
       "class": "StickFearlessMentor",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Stick, Fearless Mentor",
@@ -1699,7 +1839,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/StickFearlessMentor.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1716,10 +1858,10 @@
           "summary": "Equip reminder is rendered although the reference omits it; the hone reminder is absent."
         }
       ],
-      "disposition": "focused_upstream_test_passed_card_data_warning_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 2,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Sting, Bilbo's Sword",
@@ -1730,7 +1872,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/StingBilbosSword.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "focused_upstream_test_passed_card_data_warning_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1738,10 +1882,10 @@
       "change_kind": "added",
       "class": "StunningShot",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Stunning Shot",
@@ -1752,7 +1896,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/StunningShot.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1760,10 +1906,10 @@
       "change_kind": "added",
       "class": "SwordsmansSteel",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Swordsman's Steel",
@@ -1774,7 +1920,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SwordsmansSteel.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1782,10 +1930,10 @@
       "change_kind": "added",
       "class": "TenaciousTosk",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Tenacious Tosk",
@@ -1796,7 +1944,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TenaciousTosk.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1804,10 +1954,10 @@
       "change_kind": "added",
       "class": "TheChiefWarg",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Chief Warg",
@@ -1818,7 +1968,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheChiefWarg.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1826,10 +1978,10 @@
       "change_kind": "added",
       "class": "TheLonelyMountain",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Lonely Mountain",
@@ -1840,7 +1992,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheLonelyMountain.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1848,10 +2002,10 @@
       "change_kind": "added",
       "class": "TheQueenOfDale",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Queen of Dale",
@@ -1862,7 +2016,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheQueenOfDale.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1870,10 +2026,10 @@
       "change_kind": "added",
       "class": "TheTheoristJaceBeleren",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Theorist, Jace Beleren",
@@ -1884,7 +2040,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheTheoristJaceBeleren.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1892,10 +2050,10 @@
       "change_kind": "added",
       "class": "ThingSwing",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Thing Swing",
@@ -1906,7 +2064,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/ThingSwing.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1914,10 +2074,10 @@
       "change_kind": "added",
       "class": "TinybonesPocketNuisance",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Tinybones, Pocket Nuisance",
@@ -1928,7 +2088,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TinybonesPocketNuisance.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1936,10 +2098,10 @@
       "change_kind": "added",
       "class": "TitanbonesToweringHeart",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Titanbones, Towering Heart",
@@ -1950,7 +2112,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TitanbonesToweringHeart.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1958,10 +2122,10 @@
       "change_kind": "added",
       "class": "TrelaneSquireOfGothos",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Trelane, Squire of Gothos",
@@ -1972,7 +2136,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TrelaneSquireOfGothos.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -1980,10 +2146,10 @@
       "change_kind": "added",
       "class": "USSEnterpriseDGalaxyClass",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "U.S.S. Enterprise-D, Galaxy-Class",
@@ -1994,7 +2160,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/u/USSEnterpriseDGalaxyClass.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2002,10 +2170,10 @@
       "change_kind": "added",
       "class": "VibraniumStrikeGauntlets",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Vibranium Strike Gauntlets",
@@ -2016,7 +2184,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/v/VibraniumStrikeGauntlets.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2024,10 +2194,10 @@
       "change_kind": "added",
       "class": "WarMachineAvengingArsenal",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "War Machine, Avenging Arsenal",
@@ -2038,7 +2208,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/w/WarMachineAvengingArsenal.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2046,10 +2218,10 @@
       "change_kind": "added",
       "class": "WinterSoldierRebornAvenger",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Winter Soldier, Reborn Avenger",
@@ -2060,7 +2232,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/w/WinterSoldierRebornAvenger.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2068,10 +2242,10 @@
       "change_kind": "added",
       "class": "WolverineClawsOut",
       "direct_test_references": [],
-      "disposition": "catalog_supported_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Wolverine, Claws Out",
@@ -2082,7 +2256,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/w/WolverineClawsOut.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2090,7 +2266,7 @@
       "change_kind": "modified",
       "class": "AntManColonyCommander",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2112,10 +2288,10 @@
       "change_kind": "modified",
       "class": "AntManElusiveAvenger",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Ant-Man, Elusive Avenger",
@@ -2126,7 +2302,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/a/AntManElusiveAvenger.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2134,10 +2312,10 @@
       "change_kind": "modified",
       "class": "AntManReformedRogue",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Ant-Man, Reformed Rogue",
@@ -2148,7 +2326,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/a/AntManReformedRogue.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2156,7 +2336,7 @@
       "change_kind": "modified",
       "class": "AuntMay",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2185,7 +2365,7 @@
       "change_kind": "modified",
       "class": "AvengersTower",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "exact_non_executable_tokens_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2199,7 +2379,8 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/a/AvengersTower.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "avengers_tower_exact_non_executable_tokens_v2"
     },
     {
       "canonical_8073_snapshot_exact_name_match": true,
@@ -2207,7 +2388,7 @@
       "change_kind": "modified",
       "class": "BaxterBuilding",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2236,10 +2417,10 @@
       "change_kind": "modified",
       "class": "BilboLuckwearer",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bilbo, Luckwearer",
@@ -2257,7 +2438,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BilboLuckwearer.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2265,7 +2448,7 @@
       "change_kind": "modified",
       "class": "BlackPantherVanguard",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "exact_non_executable_tokens_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2279,7 +2462,8 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BlackPantherVanguard.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "black_panther_vanguard_exact_non_executable_tokens_v2"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2287,10 +2471,10 @@
       "change_kind": "modified",
       "class": "BlackWidowDeadlyHunter",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Black Widow, Deadly Hunter",
@@ -2301,7 +2485,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BlackWidowDeadlyHunter.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2309,10 +2495,10 @@
       "change_kind": "modified",
       "class": "BlackWidowIntelExpert",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Black Widow, Intel Expert",
@@ -2323,7 +2509,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BlackWidowIntelExpert.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2331,10 +2519,10 @@
       "change_kind": "modified",
       "class": "BullseyeDeathDealer",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Bullseye, Death Dealer",
@@ -2345,7 +2533,10 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/b/BullseyeDeathDealer.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "bullseye_death_dealer_exact_non_executable_tokens_v2",
+      "underlying_transition_disposition": "exact_non_executable_tokens_passed",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2353,7 +2544,7 @@
       "change_kind": "modified",
       "class": "CaptainAmericaWingsOfFreedom",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2375,7 +2566,7 @@
       "change_kind": "modified",
       "class": "ClaimTheKingdom",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2397,10 +2588,10 @@
       "change_kind": "modified",
       "class": "CountNefaria",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Count Nefaria",
@@ -2411,7 +2602,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CountNefaria.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2419,10 +2612,10 @@
       "change_kind": "modified",
       "class": "CrimsonCowlMasterOfEvil",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Crimson Cowl, Master of Evil",
@@ -2433,7 +2626,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CrimsonCowlMasterOfEvil.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2441,7 +2636,7 @@
       "change_kind": "modified",
       "class": "CrossbonesMaliciousMercenary",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2463,7 +2658,7 @@
       "change_kind": "modified",
       "class": "CurrencyConverter",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "exact_non_executable_tokens_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2498,7 +2693,8 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/c/CurrencyConverter.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "currency_converter_exact_non_executable_tokens_v2"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2506,10 +2702,10 @@
       "change_kind": "modified",
       "class": "DarwinAdaptiveMutant",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Darwin, Adaptive Mutant",
@@ -2520,7 +2716,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DarwinAdaptiveMutant.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2528,10 +2726,10 @@
       "change_kind": "modified",
       "class": "DevilDinosaur",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Devil Dinosaur",
@@ -2542,7 +2740,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DevilDinosaur.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2550,10 +2750,10 @@
       "change_kind": "modified",
       "class": "DoctorDoomUnrivaled",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Doctor Doom, Unrivaled",
@@ -2564,7 +2764,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DoctorDoomUnrivaled.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2572,10 +2774,10 @@
       "change_kind": "modified",
       "class": "DoctorStrangeSurgeon",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Doctor Strange, Surgeon",
@@ -2586,7 +2788,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DoctorStrangeSurgeon.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2594,10 +2798,10 @@
       "change_kind": "modified",
       "class": "Doorman",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Doorman",
@@ -2608,7 +2812,10 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/Doorman.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "doorman_exact_non_executable_tokens_v2",
+      "underlying_transition_disposition": "exact_non_executable_tokens_passed",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2616,10 +2823,10 @@
       "change_kind": "modified",
       "class": "DoraMilajeElite",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Dora Milaje Elite",
@@ -2630,7 +2837,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/d/DoraMilajeElite.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2638,7 +2847,7 @@
       "change_kind": "modified",
       "class": "EerieGravestone",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2667,10 +2876,10 @@
       "change_kind": "modified",
       "class": "FalconJoaquinTorres",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Falcon, Joaquin Torres",
@@ -2681,7 +2890,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/f/FalconJoaquinTorres.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2689,7 +2900,7 @@
       "change_kind": "modified",
       "class": "FalconsWingHarness",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2711,10 +2922,10 @@
       "change_kind": "modified",
       "class": "GertAndOldLaceRunaways",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Gert and Old Lace, Runaways",
@@ -2725,7 +2936,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/g/GertAndOldLaceRunaways.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2733,7 +2946,7 @@
       "change_kind": "modified",
       "class": "HaktosTheUnscarred",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2769,10 +2982,10 @@
       "change_kind": "modified",
       "class": "HawkeyeTrickShot",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hawkeye, Trick Shot",
@@ -2783,7 +2996,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HawkeyeTrickShot.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2791,7 +3006,7 @@
       "change_kind": "modified",
       "class": "HeroesHangout",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2820,10 +3035,10 @@
       "change_kind": "modified",
       "class": "HireACrew",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hire a Crew",
@@ -2834,7 +3049,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HireACrew.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2842,10 +3059,10 @@
       "change_kind": "modified",
       "class": "HulkbusterArmor",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Hulkbuster Armor",
@@ -2856,7 +3073,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/h/HulkbusterArmor.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2864,10 +3083,10 @@
       "change_kind": "modified",
       "class": "IAmIronMan",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "I Am Iron Man",
@@ -2878,7 +3097,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/i/IAmIronMan.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2886,7 +3107,7 @@
       "change_kind": "modified",
       "class": "IronManArmoredAvenger",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -2908,10 +3129,10 @@
       "change_kind": "modified",
       "class": "IronManTonyStark",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Iron Man, Tony Stark",
@@ -2922,7 +3143,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/i/IronManTonyStark.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2930,10 +3153,10 @@
       "change_kind": "modified",
       "class": "KingTChalla",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "King T'Challa",
@@ -2944,7 +3167,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/k/KingTChalla.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2954,10 +3179,10 @@
       "direct_test_references": [
         "Mage.Tests/src/test/java/org/mage/test/cards/single/cmr/KrarkTheThumblessTest.java"
       ],
-      "disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 1,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Krark, the Thumbless",
@@ -2987,7 +3212,9 @@
           "line": 82,
           "marker": "TODO: need copy tests, see #12911"
         }
-      ]
+      ],
+      "underlying_transition_disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -2995,7 +3222,7 @@
       "change_kind": "modified",
       "class": "LightPawsEmperorsVoice",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3031,10 +3258,10 @@
       "change_kind": "modified",
       "class": "LivingLightningChargedUp",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Living Lightning, Charged Up",
@@ -3045,7 +3272,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/l/LivingLightningChargedUp.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3053,10 +3282,10 @@
       "change_kind": "modified",
       "class": "MachineManModelX51",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Machine Man, Model X-51",
@@ -3067,7 +3296,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MachineManModelX51.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3075,10 +3306,19 @@
       "change_kind": "modified",
       "class": "MandateOfPeace",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "external_runtime_quarantine_known_upstream_gap",
+      "external_residual": {
+        "policy_path": "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+        "qualification_engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+        "reason": "pinned_xmage_known_upstream_gap_quarantined",
+        "reason_code": "xmage_upstream_copy_lki_gap",
+        "release_condition": "blocked_until_copy_lki_fix_and_focused_qualification",
+        "upstream_issue": "magefree/mage#12911",
+        "upstream_issue_status": "OPEN"
+      },
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Mandate of Peace",
@@ -3102,7 +3342,7 @@
       "change_kind": "modified",
       "class": "MatoyaArchonElder",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3128,7 +3368,7 @@
         "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
         "Mage.Tests/src/test/java/org/mage/test/cards/replacement/entersBattlefield/HardenedScaleTest.java"
       ],
-      "disposition": "presentation_hunk_nominal_tests_passed",
+      "disposition": "exact_non_executable_tokens_passed",
       "focused_test_case_count": 6,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3192,7 +3432,7 @@
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
       "source_warning_markers": [],
-      "transition_review_rule_id": "metallic_mimic_presentation_literal_v1"
+      "transition_review_rule_id": "metallic_mimic_exact_non_executable_tokens_v2"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3200,10 +3440,10 @@
       "change_kind": "modified",
       "class": "MidnightAngelArmor",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Midnight Angel Armor",
@@ -3214,7 +3454,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MidnightAngelArmor.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3222,7 +3464,7 @@
       "change_kind": "modified",
       "class": "MikeyAndDonPartyPlanners",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3244,7 +3486,7 @@
       "change_kind": "modified",
       "class": "MirrorOfLifeTrapping",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3268,10 +3510,10 @@
       "direct_test_references": [
         "Mage.Tests/src/test/java/org/mage/test/cards/single/msh/MjolnirHammerOfThorTest.java"
       ],
-      "disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 1,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Mjolnir, Hammer of Thor",
@@ -3282,7 +3524,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MjolnirHammerOfThor.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3290,10 +3534,10 @@
       "change_kind": "modified",
       "class": "MyPrecious",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "future_only",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "My Precious",
@@ -3304,7 +3548,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MyPrecious.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3312,7 +3558,7 @@
       "change_kind": "modified",
       "class": "NamorTheSubMariner",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3334,10 +3580,10 @@
       "change_kind": "modified",
       "class": "OkoyeDoraMilajeLeader",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Okoye, Dora Milaje Leader",
@@ -3348,7 +3594,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/o/OkoyeDoraMilajeLeader.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": true,
@@ -3386,10 +3634,10 @@
       "change_kind": "modified",
       "class": "RatchetFieldMedic",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Ratchet, Field Medic",
@@ -3400,7 +3648,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RatchetFieldMedic.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3408,10 +3658,10 @@
       "change_kind": "modified",
       "class": "RedGhostIntangibleGenius",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Red Ghost, Intangible Genius",
@@ -3422,7 +3672,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RedGhostIntangibleGenius.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3430,10 +3682,10 @@
       "change_kind": "modified",
       "class": "RepulsorBots",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Repulsor Bots",
@@ -3444,7 +3696,10 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RepulsorBots.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "repulsor_bots_exact_non_executable_tokens_v2",
+      "underlying_transition_disposition": "exact_non_executable_tokens_passed",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3452,10 +3707,10 @@
       "change_kind": "modified",
       "class": "RestlessBloodseeker",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Restless Bloodseeker",
@@ -3480,7 +3735,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RestlessBloodseeker.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3488,10 +3745,10 @@
       "change_kind": "modified",
       "class": "RestorativeTechnique",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Restorative Technique",
@@ -3502,7 +3759,10 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/r/RestorativeTechnique.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "restorative_technique_exact_non_executable_tokens_v2",
+      "underlying_transition_disposition": "exact_non_executable_tokens_passed",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3510,7 +3770,7 @@
       "change_kind": "modified",
       "class": "ScoutTheCity",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3539,10 +3799,10 @@
       "change_kind": "modified",
       "class": "SecureDetention",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Secure Detention",
@@ -3553,7 +3813,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SecureDetention.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3561,7 +3823,7 @@
       "change_kind": "modified",
       "class": "SelflessPoliceCaptain",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3590,10 +3852,10 @@
       "change_kind": "modified",
       "class": "ShuriVibraniumTechnologist",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Shuri, Vibranium Technologist",
@@ -3604,7 +3866,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/ShuriVibraniumTechnologist.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3612,10 +3876,10 @@
       "change_kind": "modified",
       "class": "ShurisFabricator",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Shuri's Fabricator",
@@ -3626,7 +3890,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/ShurisFabricator.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3634,7 +3900,7 @@
       "change_kind": "modified",
       "class": "SokkaAndSuki",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3656,10 +3922,10 @@
       "change_kind": "modified",
       "class": "SwordsmanSharpScoundrel",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Swordsman, Sharp Scoundrel",
@@ -3670,7 +3936,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/s/SwordsmanSharpScoundrel.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3678,10 +3946,10 @@
       "change_kind": "modified",
       "class": "TVABureaucrat",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "TVA Bureaucrat",
@@ -3692,7 +3960,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TVABureaucrat.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": true,
@@ -3700,7 +3970,7 @@
       "change_kind": "modified",
       "class": "TalionTheKindlyLord",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3722,10 +3992,10 @@
       "change_kind": "modified",
       "class": "TeamTransmitter",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Team Transmitter",
@@ -3736,7 +4006,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TeamTransmitter.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3744,10 +4016,10 @@
       "change_kind": "modified",
       "class": "TheGreatMound",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Great Mound",
@@ -3758,7 +4030,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheGreatMound.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3766,7 +4040,7 @@
       "change_kind": "modified",
       "class": "TheRuinousWreckingCrew",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "exact_non_executable_tokens_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3780,7 +4054,8 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheRuinousWreckingCrew.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "ruinous_wrecking_crew_exact_non_executable_tokens_v2"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3788,7 +4063,7 @@
       "change_kind": "modified",
       "class": "TheSibsigCeremony",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3810,10 +4085,10 @@
       "change_kind": "modified",
       "class": "TheSquadronSinister",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Squadron Sinister",
@@ -3824,7 +4099,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheSquadronSinister.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3832,10 +4109,10 @@
       "change_kind": "modified",
       "class": "TheWaspJanetVanDyne",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "The Wasp, Janet Van Dyne",
@@ -3846,7 +4123,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TheWaspJanetVanDyne.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3854,10 +4133,10 @@
       "change_kind": "modified",
       "class": "TigerSharkAbyssalHunter",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Tiger Shark, Abyssal Hunter",
@@ -3868,7 +4147,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/t/TigerSharkAbyssalHunter.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3876,10 +4157,10 @@
       "change_kind": "modified",
       "class": "UltronMachineOverlord",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Ultron, Machine Overlord",
@@ -3890,7 +4171,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/u/UltronMachineOverlord.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3898,10 +4181,10 @@
       "change_kind": "modified",
       "class": "UnstableMoleculeSuit",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Unstable Molecule Suit",
@@ -3912,7 +4195,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/u/UnstableMoleculeSuit.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3920,7 +4205,7 @@
       "change_kind": "modified",
       "class": "VenomEvilUnleashed",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3949,10 +4234,10 @@
       "change_kind": "modified",
       "class": "VillainousHideout",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Villainous Hideout",
@@ -3963,7 +4248,10 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/v/VillainousHideout.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "villainous_hideout_exact_non_executable_tokens_v2",
+      "underlying_transition_disposition": "exact_non_executable_tokens_passed",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3971,10 +4259,10 @@
       "change_kind": "modified",
       "class": "VisionsOfVillainy",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Visions of Villainy",
@@ -3985,7 +4273,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/v/VisionsOfVillainy.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -3993,10 +4283,10 @@
       "change_kind": "modified",
       "class": "WakandanTusker",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Wakandan Tusker",
@@ -4007,7 +4297,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/w/WakandanTusker.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -4015,7 +4307,7 @@
       "change_kind": "modified",
       "class": "WolverineFierceFighter",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "product_scope_focused_semantic_tests_passed",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -4037,10 +4329,10 @@
       "change_kind": "modified",
       "class": "WondrousRevival",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Wondrous Revival",
@@ -4051,7 +4343,10 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/w/WondrousRevival.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "wondrous_revival_exact_non_executable_tokens_v2",
+      "underlying_transition_disposition": "exact_non_executable_tokens_passed",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -4059,10 +4354,10 @@
       "change_kind": "modified",
       "class": "X23DeadlyWeapon",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "X-23, Deadly Weapon",
@@ -4073,7 +4368,9 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/x/X23DeadlyWeapon.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -4081,10 +4378,10 @@
       "change_kind": "modified",
       "class": "YellowjacketHeartlessMarauder",
       "direct_test_references": [],
-      "disposition": "catalog_supported_regression_only_review_required",
+      "disposition": "activation_blocked_pending_product_semantic_review",
       "focused_test_case_count": 0,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
-      "runtime_catalog_status": "supported",
+      "runtime_catalog_status": "unsupported",
       "set_registrations": [
         {
           "card_name": "Yellowjacket, Heartless Marauder",
@@ -4095,14 +4392,30 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/y/YellowjacketHeartlessMarauder.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "underlying_transition_disposition": "catalog_supported_regression_only_review_required",
+      "catalog_status_before_activation": "supported"
     }
   ],
   "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
   "future_release_activation_gate": {
+    "blocked_card_count": 133,
+    "engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "enforced_by": [
+      "services/xmage-sidecar/src/main/resources/xmage-transition-activation-policy.json",
+      "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
+      "services/xmage-sidecar/src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java"
+    ],
     "future_only_card_count": 45,
-    "reason": "no_versioned_product_release_activation_gate_evidence",
-    "status": "missing"
+    "released_missing_card_count": 88,
+    "resource_path": "services/xmage-sidecar/src/main/resources/xmage-transition-activation-policy.json",
+    "resource_sha256": "b2371b5f81ceb051fc995a685bad9fa95ba24576c31a0162ea21379b504a127f",
+    "result": "pass",
+    "schema_version": "manaloom_future_card_activation_gate_v1_2026-07-28",
+    "status": "pass",
+    "tests": 16,
+    "transition_card_count": 169,
+    "user_facing_reason_must_be_engine_neutral": true
   },
   "generated_at_utc": "2026-07-28T09:22:06+00:00",
   "input_artifact_digests": {
@@ -4114,10 +4427,17 @@
     "changed_169_coverage_exchange_sha256": "04b8d775ad2e9413fba563d565536982d9d66d38ce29dd19f330ef3d97e182bc",
     "corrected_added_87_test_scenario_miner_sha256": "4bc40bc3ecd659404a3f71aeda12d9ae1a01bac52d131fc645d3c7f35a6b0cf4",
     "exact_delta_report_sha256": "0bb7368758bfd662329d10e4ad71599205c56af95d4a7b2cc71f7e30c40dfaff",
-    "transition_nominal_review_v1_sha256": "06a7e374b336858fea2fd55f9a5dd90c6ad56105e7b33f7526a092974620ea17"
+    "postgresql_scope_reconciliation_v1_sha256": "64f2175bc4b1c040ccb352f8e3647a11d0c1088d591b5a7b5ec8a08603ced3cb",
+    "product_scope_focused_test_evidence_v2_sha256": "072733572f51c80496dc112f186eee428e27d63c809af4d5b19dc98934245f5b",
+    "sidecar_transition_coverage_surefire_sha256": "79921cd6246b4cbd8ea8362ebb31b9992c1de26b4300826e4044b66aa793325d",
+    "transition_activation_policy_v1_sha256": "b2371b5f81ceb051fc995a685bad9fa95ba24576c31a0162ea21379b504a127f",
+    "transition_active_scope_semantic_matrix_v1_sha256": "b0d58139a081afe2592cedd74cad04387c8c4b3b3ef4b8ed2af0f4063237636c",
+    "transition_compact_review_index_v1_sha256": "4a1fbbb2d87b27476ce82eaa42ebef0afdec989a89d0cbccb2c5254b4a70dc35",
+    "transition_nominal_review_policy_v2_sha256": "b6a569aab546dce0569b6243c53821ecbd019bb272e07a727104cdc0daa7e0e8",
+    "transition_nominal_review_v2_sha256": "8e85a1c7c863571d0602893e665b1544c6eeaaf62944e3ed80c7b1d652b89819"
   },
   "modified_change_scope": {
-    "boundary": "Presentation/metadata includes generated text, hints, filter descriptions, imports and formatting. It is not automatically gameplay proof and remains review-required where the card disposition says so.",
+    "boundary": "Presentation/metadata includes generated text, hints, filter descriptions, imports and formatting. It is not automatically gameplay proof. Eleven exact non-executable token-equivalent hunks are cleared only by the versioned v2 policy; SwordsmanSharpScoundrel is executable because its attacker-controller predicate was removed.",
     "classification_method": "exact_git_hunk_manual_review",
     "comment_only_classes": [
       "KrarkTheThumbless",
@@ -4125,8 +4445,8 @@
     ],
     "counts": {
       "comment_only": 2,
-      "executable_or_mixed": 27,
-      "presentation_or_metadata": 53,
+      "executable_or_mixed": 28,
+      "presentation_or_metadata": 52,
       "total_modified": 82
     },
     "executable_or_mixed_classes": [
@@ -4151,6 +4471,7 @@
       "SelflessPoliceCaptain",
       "ShuriVibraniumTechnologist",
       "SokkaAndSuki",
+      "SwordsmanSharpScoundrel",
       "TalionTheKindlyLord",
       "TheGreatMound",
       "TheSibsigCeremony",
@@ -4158,47 +4479,91 @@
       "UltronMachineOverlord",
       "VenomEvilUnleashed"
     ],
-    "presentation_or_metadata_count": 53
+    "presentation_or_metadata_count": 52
   },
   "transition_nominal_review": {
     "artifact_path": "docs/qa/evidence/XMAGE_TRANSITION_NOMINAL_REVIEW_34d81EA_2c43ec8.json",
-    "artifact_sha256": "06a7e374b336858fea2fd55f9a5dd90c6ad56105e7b33f7526a092974620ea17",
+    "artifact_sha256": "8e85a1c7c863571d0602893e665b1544c6eeaaf62944e3ed80c7b1d652b89819",
     "catalog_resolution_used_as_semantic_proof": false,
     "exact_clearance_cards": [
-      "Metallic Mimic"
+      "Avengers Tower",
+      "Black Panther, Vanguard",
+      "Bullseye, Death Dealer",
+      "Currency Converter",
+      "Doorman",
+      "Metallic Mimic",
+      "Repulsor Bots",
+      "Restorative Technique",
+      "The Ruinous Wrecking Crew",
+      "Villainous Hideout",
+      "Wondrous Revival"
     ],
-    "review_required_after": 167,
+    "review_required_after": 157,
     "review_required_before": 168,
-    "schema_version": "manaloom_xmage_transition_nominal_review_v1_2026-07-29"
+    "schema_version": "manaloom_xmage_transition_nominal_review_v2_2026-07-30",
+    "policy_path": "docs/hermes-analysis/XMAGE_PIN_TRANSITION_NOMINAL_REVIEW_POLICY.json",
+    "policy_schema_version": "manaloom_xmage_transition_nominal_review_policy_v2_2026-07-30",
+    "policy_sha256": "b6a569aab546dce0569b6243c53821ecbd019bb272e07a727104cdc0daa7e0e8",
+    "automatic_clearance_activates_runtime_card": false
   },
   "postgresql_scope_reconciliation": {
-    "boundary": "PostgreSQL remains truth for product identity, Oracle text and legality; no fingerprint was guessed.",
+    "ambiguity_count": 0,
+    "artifact_path": "docs/qa/evidence/XMAGE_POSTGRESQL_SCOPE_RECONCILIATION_34d81ea_2c43ec8_2026-07-30.json",
+    "artifact_sha256": "64f2175bc4b1c040ccb352f8e3647a11d0c1088d591b5a7b5ec8a08603ced3cb",
+    "boundary": "PostgreSQL remains truth for product identity, Oracle text and legality. The approved SSH fingerprint was matched and both queries ran in a read-only transaction.",
     "canonical_wrapper": "server/bin/with_new_server_pg.sh",
-    "queries_executed": 0,
-    "reason": "missing_approved_ssh_host_key_sha256",
-    "required_environment_key": "MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256",
-    "status": "blocked",
+    "queries_executed": 2,
+    "reconciled_card_count": 169,
+    "requested_card_count": 169,
+    "rows_sha256": "7ed18075c34b0a4b7f3c3206f250aeb86879f7ea568f648586dd696ad2d412dc",
+    "schema_version": "manaloom_xmage_postgresql_scope_reconciliation_v1_2026-07-28",
+    "scope_counts": {
+      "external_runtime_gap": 2,
+      "future_deferred": 45,
+      "product_in_scope": 34,
+      "released_missing_from_postgresql": 88
+    },
+    "status": "pass",
+    "transaction_mode": "read_only",
+    "transaction_read_only": true,
     "writes_performed": false
   },
+  "product_scope_focused_test_evidence": {
+    "artifact_path": "docs/qa/evidence/XMAGE_PRODUCT_SCOPE_FOCUSED_TEST_EVIDENCE_34d81ea_2c43ec8_2026-07-30.json",
+    "artifact_sha256": "072733572f51c80496dc112f186eee428e27d63c809af4d5b19dc98934245f5b",
+    "combined_test_count": 68,
+    "direct_card_count": 31,
+    "execution_report_count": 4,
+    "mandate_of_peace_test_is_promotion_evidence": false,
+    "partial_tests_are_complete_clearance": false,
+    "planetarium_test_is_promotion_evidence": false,
+    "schema_version": "manaloom_xmage_product_scope_focused_test_evidence_v2_2026-07-30",
+    "upstream_card_source_modified": false
+  },
+  "transition_review_derivatives": {
+    "schema_version": "manaloom_xmage_transition_review_derivative_links_v1_2026-07-30",
+    "source_primary_snapshot_sha256": "4d5c4711e1e6790d6a6bc5405ad2f07243d72923a04c4bdb3267705119fa8639",
+    "focused_test_evidence_sha256": "072733572f51c80496dc112f186eee428e27d63c809af4d5b19dc98934245f5b",
+    "active_scope_semantic_matrix": {
+      "artifact_path": "docs/qa/evidence/XMAGE_ACTIVE_SCOPE_SEMANTIC_MATRIX_36_34d81ea_2c43ec8_2026-07-30.json",
+      "artifact_sha256": "b0d58139a081afe2592cedd74cad04387c8c4b3b3ef4b8ed2af0f4063237636c",
+      "schema_version": "manaloom_xmage_active_scope_semantic_matrix_v1_2026-07-30",
+      "card_count": 36
+    },
+    "transition_compact_review_index": {
+      "artifact_path": "docs/qa/evidence/XMAGE_TRANSITION_COMPACT_REVIEW_INDEX_169_34d81ea_2c43ec8_2026-07-30.json",
+      "artifact_sha256": "4a1fbbb2d87b27476ce82eaa42ebef0afdec989a89d0cbccb2c5254b4a70dc35",
+      "schema_version": "manaloom_xmage_transition_compact_review_index_v1_2026-07-30",
+      "card_count": 169
+    }
+  },
   "qualification": {
-    "blocking_reasons": [
-      "changed_card_semantic_reviews_or_residuals_pending",
-      "card_data_diagnostics_not_passed",
-      "postgresql_product_scope_reconciliation_not_passed",
-      "future_only_card_activation_gate_not_passed",
-      "external_runtime_unsupported_cards_present",
-      "84_added_cards_are_catalog_supported_without_direct_nominal_semantic_proof",
-      "81_modified_cards_require_transition_specific_semantic_review",
-      "planetarium_of_wan_shi_tong_is_quarantined_for_a_confirmed_semantic_defect",
-      "prudent_fateseer_is_unfinished_in_xmage_and_absent_from_pinned_forge",
-      "postgresql_product_scope_reconciliation_blocked_missing_approved_ssh_host_key_sha256",
-      "45_changed_cards_are_registered_only_in_future_dated_sets_as_of_2026_07_28"
-    ],
-    "deployment_allowed": false,
-    "status": "review_required"
+    "blocking_reasons": [],
+    "deployment_allowed": true,
+    "status": "pass"
   },
   "repository": "https://github.com/magefree/mage",
-  "revised_at_utc": "2026-07-28T11:46:56Z",
+  "revised_at_utc": "2026-07-30T04:35:00Z",
   "runtime_catalog": {
     "catalog_ready": true,
     "catalog_resolved_before_qualification": 168,
@@ -4211,7 +4576,11 @@
     "hermes_sqlite_writes": false,
     "indexed_name_count": 32561,
     "postgresql_writes": false,
-    "probe_scope": "all_169_added_and_modified_card_implementation_names",
+    "probe_scope": "all_169_transition_cards_after_product_scope_activation_policy",
+    "activation_policy_resource_path": "services/xmage-sidecar/src/main/resources/xmage-transition-activation-policy.json",
+    "activation_policy_resource_sha256": "b2371b5f81ceb051fc995a685bad9fa95ba24576c31a0162ea21379b504a127f",
+    "activation_restricted": 133,
+    "external_runtime_gap_restricted": 2,
     "qualification_policy_engine_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
     "qualification_policy_path": "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java",
     "qualification_policy_test": {
@@ -4219,17 +4588,16 @@
       "errors": 0,
       "failures": 0,
       "skipped": 0,
-      "tests": 13
+      "surefire_sha256": "79921cd6246b4cbd8ea8362ebb31b9992c1de26b4300826e4044b66aa793325d",
+      "tests": 16
     },
     "sidecar_build_identity": "xmage-sidecar-v2@2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
     "sidecar_protocol_version": "external_battle_sidecar_v2",
-    "supported": 167,
+    "supported": 34,
     "total": 169,
-    "unsupported": 2,
-    "unsupported_card_names": [
-      "Planetarium of Wan Shi Tong",
-      "Prudent Fateseer"
-    ]
+    "unsupported": 135,
+    "unsupported_identity_source": "133 exact activation restrictions plus the exact Planetarium and Mandate quarantines",
+    "unsupported_names_embedded": false
   },
   "safety": {
     "deck_promotions": false,

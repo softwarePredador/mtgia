@@ -10,7 +10,8 @@ the pinned engine are also rejected by a pin-scoped qualification policy.
 - `GET /health`: engine version, pinned commit, `catalog_ready=true`, indexed
   name count, bounded Live buffer metrics, `sidecar_process_id`, and
   `sidecar_started_at` after the card catalog has been loaded, plus the card
-  qualification policy commit and restriction count.
+  qualification policy commit, the 169-card transition inventory, and its
+  restriction counts.
 - `POST /coverage`: validates two 100-card, one-commander decks and returns
   `ready` plus structured `unsupported_cards`.
 - `POST /cards/coverage`: batch-checks arbitrary catalog rows without requiring
@@ -39,20 +40,49 @@ coverage request while retaining a bounded memory contract.
 ### Pin-scoped card qualification
 
 `XmageCardQualificationPolicy` is tied to the exact `XMAGE_COMMIT`. A pin
-change without reviewing the policy fails closed. At the current pin:
+change without reviewing the policy fails closed. The versioned activation
+resource is also bound to the prior pin, the current pin, and the SHA-256
+digests of the read-only PostgreSQL reconciliation. At the current pin:
 
 - `Planetarium of Wan Shi Tong` is quarantined with
   `reason_code=xmage_pin_semantic_defect` because a mandatory trigger action is
   incorrectly optional;
 - `Prudent Fateseer` is quarantined with
   `reason_code=xmage_upstream_mechanic_unfinished` because Prepare is
-  unfinished and upstream removes the card from its catalog.
+  unfinished and upstream removes the card from its catalog;
+- `Mandate of Peace` is quarantined with
+  `reason_code=xmage_upstream_copy_lki_gap` while copied-spell
+  last-known-information handling remains an open upstream gap;
+- 133 transition cards not exposed by current PostgreSQL product truth remain
+  activation-blocked until a new identity, legality, and semantic review is
+  versioned. This includes 45 future cards and 88 released names absent from
+  the product catalog.
+
+The complete transition probe therefore resolves 34 product-in-scope cards
+and rejects 135 rows fail-closed: the 133 activation restrictions plus the
+Planetarium and Mandate quarantines. Catalog presence or absence is never
+treated as gameplay proof.
 
 Coverage responses preserve the submitted card row and add
 `support_status=quarantined`, the reason, upstream reference, qualification
 commit, and release condition. In `auto` mode this is a structured XMage
 coverage gap, so the reviewed Forge/native order may still handle the complete
 deck; strict `xmage` mode remains blocked.
+
+Application surfaces must translate this internal provenance into
+engine-neutral Battle language; external engine names and technical reason
+tokens are not player-facing copy.
+
+The pin-scoped product review tests are stored as two full-index patches and
+can be reproduced without modifying this repository's runtime sources:
+
+```bash
+services/xmage-sidecar/bin/verify_product_scope_semantic_tests.sh
+```
+
+The verifier checks both patch digests, the versioned evidence digest, the
+exact pin, and the two-file test-only scope before running all 37 focused
+scenarios. It refuses a changed pin or any non-test source mutation.
 
 The request contains `request_id`, `seed`, `timeout_ms`, `deck_a`, and `deck_b`.
 Each deck contains `id`, `name`, and card rows with `name`, `set_code`,

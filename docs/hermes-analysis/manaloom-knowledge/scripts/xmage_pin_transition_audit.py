@@ -6,8 +6,9 @@ that every added or modified card implementation in the declared transition is
 classified without treating catalog resolution as semantic proof.
 
 ``--require-deployable`` is intentionally stricter: it fails while any
-card-level review, external residual, or PostgreSQL scope reconciliation is
-pending.
+product-scope card review or required PostgreSQL/runtime evidence is pending.
+Exact quarantines and activation-blocked cards remain unavailable without
+becoming an unrelated global-deployment blocker.
 """
 
 from __future__ import annotations
@@ -33,10 +34,37 @@ EVIDENCE_SCHEMA_VERSION = "manaloom_xmage_pin_transition_evidence_v2_2026-07-28"
 POSTGRES_SCHEMA_VERSION = (
     "manaloom_xmage_postgresql_scope_reconciliation_v1_2026-07-28"
 )
-NOMINAL_REVIEW_SCHEMA_VERSION = (
-    "manaloom_xmage_transition_nominal_review_v1_2026-07-29"
+ACTIVATION_POLICY_SCHEMA_VERSION = (
+    "manaloom_xmage_transition_activation_policy_v1_2026-07-30"
 )
-CLEARANCE_DISPOSITION = "presentation_hunk_nominal_tests_passed"
+FUTURE_ACTIVATION_GATE_SCHEMA_VERSION = (
+    "manaloom_future_card_activation_gate_v1_2026-07-28"
+)
+PRODUCT_SCOPE_FOCUSED_TEST_SCHEMA_VERSION = (
+    "manaloom_xmage_product_scope_focused_test_evidence_v2_2026-07-30"
+)
+REVIEW_DERIVATIVE_LINK_SCHEMA_VERSION = (
+    "manaloom_xmage_transition_review_derivative_links_v1_2026-07-30"
+)
+ACTIVE_SCOPE_MATRIX_SCHEMA_VERSION = (
+    "manaloom_xmage_active_scope_semantic_matrix_v1_2026-07-30"
+)
+COMPACT_REVIEW_INDEX_SCHEMA_VERSION = (
+    "manaloom_xmage_transition_compact_review_index_v1_2026-07-30"
+)
+NOMINAL_REVIEW_SCHEMA_VERSION = (
+    "manaloom_xmage_transition_nominal_review_v2_2026-07-30"
+)
+NOMINAL_POLICY_SCHEMA_VERSION = (
+    "manaloom_xmage_transition_nominal_review_policy_v2_2026-07-30"
+)
+CLEARANCE_DISPOSITION = "exact_non_executable_tokens_passed"
+PRODUCT_FOCUSED_CLEARANCE_DISPOSITION = (
+    "product_scope_focused_semantic_tests_passed"
+)
+ACTIVATION_BLOCKED_DISPOSITION = (
+    "activation_blocked_pending_product_semantic_review"
+)
 SCOPE_AS_OF = date(2026, 7, 28)
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -48,15 +76,17 @@ ALLOWED_DISPOSITIONS = {
     "catalog_supported_nominal_test_passed_semantic_review_required",
     "catalog_supported_regression_only_review_required",
     "external_runtime_quarantine_semantic_defect",
+    "external_runtime_quarantine_known_upstream_gap",
     "external_residual_upstream_unfinished",
+    ACTIVATION_BLOCKED_DISPOSITION,
     CLEARANCE_DISPOSITION,
+    PRODUCT_FOCUSED_CLEARANCE_DISPOSITION,
 }
 REVIEW_DISPOSITIONS = {
     "focused_upstream_test_passed_card_data_warning_review_required",
     "catalog_supported_semantic_review_required",
     "catalog_supported_nominal_test_passed_semantic_review_required",
     "catalog_supported_regression_only_review_required",
-    "external_runtime_quarantine_semantic_defect",
     "external_residual_upstream_unfinished",
 }
 EXPECTED_POLICY = {
@@ -98,27 +128,64 @@ EXPECTED_INPUT_ARTIFACT_DIGEST_KEYS = {
     "changed_169_coverage_exchange_sha256",
     "corrected_added_87_test_scenario_miner_sha256",
     "exact_delta_report_sha256",
-    "transition_nominal_review_v1_sha256",
+    "postgresql_scope_reconciliation_v1_sha256",
+    "product_scope_focused_test_evidence_v2_sha256",
+    "sidecar_transition_coverage_surefire_sha256",
+    "transition_activation_policy_v1_sha256",
+    "transition_active_scope_semantic_matrix_v1_sha256",
+    "transition_compact_review_index_v1_sha256",
+    "transition_nominal_review_policy_v2_sha256",
+    "transition_nominal_review_v2_sha256",
 }
-EXPECTED_EXACT_CLEARANCES = {
-    "Metallic Mimic": {
-        "rule_id": "metallic_mimic_presentation_literal_v1",
-        "class": "MetallicMimic",
-        "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
-        "source_scope": "presentation_or_metadata",
-        "diff_sha256": (
-            "be680a3ba2ce6015b34b8e19900bca8d7e22da8a55c9056248c48b3049f1fe44"
-        ),
-        "direct_test_references": [
-            "Mage.Tests/src/test/java/org/mage/test/cards/continuous/ChangelingTest.java",
-            "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
-            (
-                "Mage.Tests/src/test/java/org/mage/test/cards/replacement/"
-                "entersBattlefield/HardenedScaleTest.java"
-            ),
-        ],
-        "required_test_case_count": 6,
-    }
+ACTIVATION_BLOCKED_SCOPE_STATUSES = {
+    "future_deferred",
+    "released_missing_from_postgresql",
+}
+EXPECTED_ACTIVATION_POLICY = {
+    "catalog_absence_is_semantic_proof": False,
+    "future_release_is_semantic_proof": False,
+    "activation_requires_new_versioned_review": True,
+    "user_facing_reason_must_be_engine_neutral": True,
+}
+EXPECTED_ACTIVATION_ENFORCERS = {
+    "services/xmage-sidecar/src/main/resources/"
+    "xmage-transition-activation-policy.json",
+    "services/xmage-sidecar/src/main/java/com/manaloom/xmage/"
+    "XmageCardQualificationPolicy.java",
+    "services/xmage-sidecar/src/test/java/com/manaloom/xmage/"
+    "XmageBattleServiceTest.java",
+}
+EXPECTED_NON_BLOCKING_QUARANTINES = {
+    "external_runtime_quarantine_semantic_defect": {
+        "Planetarium of Wan Shi Tong"
+    },
+    "external_runtime_quarantine_known_upstream_gap": {
+        "Mandate of Peace"
+    },
+}
+EXPECTED_FALCON_RUNTIME_BOUNDARY = {
+    "classification": "generated_card_information_only",
+    "behavioral_equivalence_obligation_id": (
+        "falcons_wing_harness_behavioral_equivalence"
+    ),
+    "replay_card_projection_path": (
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/"
+        "ReplayNormalizer.java"
+    ),
+    "replay_card_projection_method": "card(CardView)",
+    "replay_projection_includes_rules_text": False,
+    "replay_sanitizer_path": (
+        "server/lib/battle/battle_replay_payload_sanitizer.dart"
+    ),
+    "battle_card_input_path": (
+        "server/lib/battle/battle_preflight_service.dart"
+    ),
+    "battle_card_input_source": "postgresql_backend",
+    "battle_card_input_includes_oracle_text": False,
+    "product_oracle_text_contract_path": (
+        "docs/hermes-analysis/DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md"
+    ),
+    "upstream_fix_claimed": False,
 }
 
 
@@ -139,6 +206,16 @@ def file_sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def canonical_json_sha256(value: Any) -> str:
+    encoded = json.dumps(
+        value,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _safe_repo_path(repo_root: Path, relative_path: str) -> Path | None:
@@ -218,6 +295,7 @@ def _postgres_pass_shape_valid(
         or postgres.get("reconciled_card_count") != len(expected_card_names)
         or postgres.get("ambiguity_count") != 0
         or not SHA256_PATTERN.fullmatch(str(postgres.get("rows_sha256") or ""))
+        or canonical_json_sha256(rows) != postgres.get("rows_sha256")
         or len(object_rows) != len(rows)
         or not object_rows
         or set(row_names) != expected_card_names
@@ -250,6 +328,1407 @@ def _postgres_pass_shape_valid(
     )
 
 
+def _activation_policy_shape_valid(
+    policy: dict[str, Any],
+    *,
+    evidence_cards: list[dict[str, Any]],
+    postgres: dict[str, Any],
+    postgres_artifact_sha256: str,
+    transition_id: str,
+    from_pin: str,
+    to_pin: str,
+) -> bool:
+    raw_policy_cards = policy.get("cards")
+    transition_names = policy.get("transition_card_names")
+    postgres_rows = postgres.get("card_results")
+    if (
+        not isinstance(raw_policy_cards, list)
+        or not isinstance(transition_names, list)
+        or not isinstance(postgres_rows, list)
+        or not all(
+            isinstance(name, str) and bool(name) for name in transition_names
+        )
+    ):
+        return False
+    policy_cards = [
+        row for row in raw_policy_cards if isinstance(row, dict)
+    ]
+    postgres_objects = [
+        row for row in postgres_rows if isinstance(row, dict)
+    ]
+    evidence_by_name = {
+        str(row.get("card_name") or ""): row for row in evidence_cards
+    }
+    postgres_by_name = {
+        str(row.get("card_name") or ""): row for row in postgres_objects
+    }
+    policy_by_name = {
+        str(row.get("card_name") or ""): row for row in policy_cards
+    }
+    scope_counts = (
+        postgres.get("scope_counts")
+        if isinstance(postgres.get("scope_counts"), dict)
+        else {}
+    )
+    expected_names = set(evidence_by_name)
+    blocked_names = {
+        name
+        for name, row in postgres_by_name.items()
+        if row.get("product_scope_status")
+        in ACTIVATION_BLOCKED_SCOPE_STATUSES
+    }
+    activation_lane_names = {
+        name
+        for name, row in evidence_by_name.items()
+        if row.get("disposition") == ACTIVATION_BLOCKED_DISPOSITION
+    }
+    postgres_reference = (
+        policy.get("postgresql_reconciliation")
+        if isinstance(policy.get("postgresql_reconciliation"), dict)
+        else {}
+    )
+    if (
+        len(evidence_by_name) != len(evidence_cards)
+        or len(postgres_by_name) != len(postgres_objects)
+        or len(policy_by_name) != len(policy_cards)
+        or set(postgres_by_name) != expected_names
+        or activation_lane_names != blocked_names
+        or set(transition_names) != expected_names
+        or len(transition_names) != len(set(transition_names))
+        or set(policy_by_name) != blocked_names
+        or policy.get("schema_version")
+        != ACTIVATION_POLICY_SCHEMA_VERSION
+        or policy.get("transition_id") != transition_id
+        or policy.get("from_engine_commit") != from_pin
+        or policy.get("engine_commit") != to_pin
+        or policy.get("transition_card_count") != len(expected_names)
+        or policy.get("blocked_card_count") != len(blocked_names)
+        or policy.get("future_deferred_count")
+        != scope_counts.get("future_deferred")
+        or policy.get("released_missing_count")
+        != scope_counts.get("released_missing_from_postgresql")
+        or policy.get("policy") != EXPECTED_ACTIVATION_POLICY
+        or postgres_reference.get("schema_version")
+        != POSTGRES_SCHEMA_VERSION
+        or postgres_reference.get("artifact_sha256")
+        != postgres_artifact_sha256
+        or postgres_reference.get("rows_sha256")
+        != postgres.get("rows_sha256")
+        or postgres_reference.get("transaction_read_only") is not True
+        or postgres_reference.get("writes_performed") is not False
+    ):
+        return False
+
+    for name, policy_row in policy_by_name.items():
+        evidence_row = evidence_by_name[name]
+        postgres_row = postgres_by_name[name]
+        registrations = evidence_row.get("set_registrations")
+        if not isinstance(registrations, list):
+            return False
+        release_dates = sorted(
+            {
+                str(row.get("release_date"))
+                for row in registrations
+                if isinstance(row, dict) and row.get("release_date")
+            }
+        )
+        if (
+            policy_row.get("class") != evidence_row.get("class")
+            or evidence_row.get("runtime_catalog_status") != "unsupported"
+            or policy_row.get("source_path")
+            != evidence_row.get("source_path")
+            or policy_row.get("product_scope_status")
+            != postgres_row.get("product_scope_status")
+            or policy_row.get("release_scope_as_of_2026_07_28")
+            != evidence_row.get("release_scope_as_of_2026_07_28")
+            or policy_row.get("declared_release_dates") != release_dates
+            or policy_row.get("reason_code")
+            != "battle_card_activation_review_required"
+            or policy_row.get("release_condition")
+            != (
+                "repeat_product_identity_oracle_legality_and_semantic_review"
+            )
+        ):
+            return False
+    return True
+
+
+def _presentation_maven_repositories_are_isolated(
+    from_result: dict[str, Any],
+    to_result: dict[str, Any],
+) -> bool:
+    from_repository = str(from_result.get("maven_repository") or "")
+    to_repository = str(to_result.get("maven_repository") or "")
+    return (
+        bool(from_repository)
+        and bool(to_repository)
+        and from_repository != to_repository
+        and Path(from_repository).name == "m2-from"
+        and Path(to_repository).name == "m2-to"
+    )
+
+
+def _presentation_equivalence_artifact(
+    focused_artifact: dict[str, Any],
+    *,
+    repo_root: Path,
+    focused_artifact_path: str,
+    from_pin: str,
+    to_pin: str,
+) -> tuple[dict[str, Any], bool]:
+    artifact = (
+        focused_artifact.get("presentation_equivalence")
+        if isinstance(
+            focused_artifact.get("presentation_equivalence"), dict
+        )
+        else {}
+    )
+    artifact_path_value = str(artifact.get("artifact_path") or "")
+    artifact_path = _safe_repo_path(repo_root, artifact_path_value)
+    patch_path_value = str(artifact.get("patch_path") or "")
+    patch_path = _safe_repo_path(repo_root, patch_path_value)
+    if (
+        artifact_path is None
+        or patch_path is None
+        or artifact_path_value != focused_artifact_path
+    ):
+        return {}, False
+    try:
+        patch_sha256 = file_sha256(patch_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {}, False
+
+    from_result = (
+        artifact.get("from_pin_result")
+        if isinstance(artifact.get("from_pin_result"), dict)
+        else {}
+    )
+    to_result = (
+        artifact.get("to_pin_result")
+        if isinstance(artifact.get("to_pin_result"), dict)
+        else {}
+    )
+    obligations = (
+        artifact.get("obligations")
+        if isinstance(artifact.get("obligations"), list)
+        else []
+    )
+    validation = (
+        artifact.get("validation")
+        if isinstance(artifact.get("validation"), dict)
+        else {}
+    )
+
+    def result_valid(
+        result: dict[str, Any],
+        pin: str,
+        expected_maven_repository_name: str,
+    ) -> bool:
+        maven_repository = str(result.get("maven_repository") or "")
+        return (
+            result.get("pin") == pin
+            and result.get("tests") == 12
+            and result.get("failures") == 0
+            and result.get("errors") == 0
+            and result.get("skipped") == 0
+            and isinstance(result.get("time_seconds"), (int, float))
+            and not isinstance(result.get("time_seconds"), bool)
+            and result.get("time_seconds") >= 0
+            and result.get("status") == "pass"
+            and str(result.get("java_version") or "").startswith("17.")
+            and bool(result.get("surefire_report"))
+            and SHA256_PATTERN.fullmatch(
+                str(result.get("surefire_sha256") or "")
+            )
+            is not None
+            and SHA256_PATTERN.fullmatch(
+                str(result.get("mage_jar_sha256") or "")
+            )
+            is not None
+            and SHA256_PATTERN.fullmatch(
+                str(result.get("mage_sets_jar_sha256") or "")
+            )
+            is not None
+            and bool(maven_repository)
+            and Path(maven_repository).name
+            == expected_maven_repository_name
+        )
+
+    obligation_rows = [
+        row for row in obligations if isinstance(row, dict)
+    ]
+    obligation_ids = {
+        str(row.get("obligation_id") or "") for row in obligation_rows
+    }
+    test_methods = {
+        method
+        for row in obligation_rows
+        for method in (
+            row.get("test_methods")
+            if isinstance(row.get("test_methods"), list)
+            else []
+        )
+        if isinstance(method, str) and method
+    }
+    valid = (
+        artifact.get("test_class")
+        == (
+            "org.mage.test.cards.single."
+            "XmageProductInScopePresentationEquivalenceTest"
+        )
+        and str(artifact.get("test_source") or "").startswith(
+            "Mage.Tests/"
+        )
+        and SHA256_PATTERN.fullmatch(
+            str(artifact.get("test_source_sha256") or "")
+        )
+        is not None
+        and SHA_PATTERN.fullmatch(
+            str(artifact.get("test_source_blob_sha1") or "")
+        )
+        is not None
+        and patch_path_value
+        == (
+            "docs/qa/evidence/"
+            "XMAGE_PRODUCT_SCOPE_PRESENTATION_EQUIVALENCE_TESTS_"
+            "34d81ea_2c43ec8.patch"
+        )
+        and SHA256_PATTERN.fullmatch(
+            str(artifact.get("patch_sha256") or "")
+        )
+        is not None
+        and artifact.get("patch_sha256") == patch_sha256
+        and artifact.get("obligations_path")
+        == "presentation_equivalence.obligations"
+        and result_valid(from_result, from_pin, "m2-from")
+        and result_valid(to_result, to_pin, "m2-to")
+        and _presentation_maven_repositories_are_isolated(
+            from_result,
+            to_result,
+        )
+        and len(obligation_rows) == len(obligations) == 11
+        and len(obligation_ids) == 11
+        and "" not in obligation_ids
+        and len(test_methods) == 12
+        and all(
+            row.get("card_name")
+            and row.get("source_path")
+            and isinstance(row.get("test_methods"), list)
+            and bool(row.get("test_methods"))
+            and isinstance(row.get("affected_behavior"), list)
+            and bool(row.get("affected_behavior"))
+            and row.get("coverage_status")
+            == "behavioral_equivalence_pass"
+            and row.get("test_is_promotion_evidence") is True
+            and row.get("residual_gap") is None
+            for row in obligation_rows
+        )
+        and validation.get("same_test_source_sha256_on_both_pins")
+        is True
+        and validation.get("separate_maven_repositories_per_pin") is True
+        and validation.get("same_java_major_version") == 17
+        and validation.get("java_runtime_isolated") is True
+        and validation.get("from_pin_status") == "pass"
+        and validation.get("to_pin_status") == "pass"
+        and validation.get("obligation_count") == 11
+        and validation.get("test_method_count") == 12
+        and validation.get("ward_cost_assertions")
+        == [
+            "Captain America, Wings of Freedom: ward {1}",
+            "Falcon's Wing Harness: ward {1}",
+            "Mikey & Don, Party Planners: ward {2}",
+        ]
+        and artifact.get("obligation_count") == 11
+        and artifact.get("test_method_count") == 12
+    )
+    return artifact, valid
+
+
+def _product_scope_focused_test_shape_valid(
+    artifact: dict[str, Any],
+    *,
+    focused_artifact_path: str,
+    evidence_cards: list[dict[str, Any]],
+    postgres: dict[str, Any],
+    postgres_artifact_path: str,
+    postgres_artifact_sha256: str,
+    repo_root: Path,
+    from_pin: str,
+    to_pin: str,
+    expected_test_count: int | None,
+    expected_direct_card_count: int | None,
+    expected_patch_count: int | None,
+    expected_execution_report_count: int | None,
+) -> bool:
+    transition = (
+        artifact.get("transition")
+        if isinstance(artifact.get("transition"), dict)
+        else {}
+    )
+    product_scope = (
+        artifact.get("product_scope")
+        if isinstance(artifact.get("product_scope"), dict)
+        else {}
+    )
+    combined = (
+        artifact.get("combined_execution")
+        if isinstance(artifact.get("combined_execution"), dict)
+        else {}
+    )
+    conclusions = (
+        artifact.get("conclusions")
+        if isinstance(artifact.get("conclusions"), dict)
+        else {}
+    )
+    safety = (
+        artifact.get("safety")
+        if isinstance(artifact.get("safety"), dict)
+        else {}
+    )
+    focused_runs = artifact.get("focused_runs")
+    direct_names = product_scope.get("direct_focused_test_cards")
+    surefire_reports = combined.get("reports")
+    postgres_rows = postgres.get("card_results")
+    presentation_artifact, presentation_artifact_valid = (
+        _presentation_equivalence_artifact(
+            artifact,
+            repo_root=repo_root,
+            focused_artifact_path=focused_artifact_path,
+            from_pin=from_pin,
+            to_pin=to_pin,
+        )
+    )
+    presentation_obligations = (
+        [
+            row
+            for row in presentation_artifact.get("obligations", [])
+            if isinstance(row, dict)
+        ]
+        if presentation_artifact_valid
+        else []
+    )
+    presentation_card_names = {
+        str(row.get("card_name") or "")
+        for row in presentation_obligations
+    }
+    if (
+        not isinstance(focused_runs, list)
+        or not isinstance(direct_names, list)
+        or not isinstance(surefire_reports, list)
+        or not isinstance(postgres_rows, list)
+        or not all(
+            isinstance(name, str) and bool(name) for name in direct_names
+        )
+    ):
+        return False
+    runs = [row for row in focused_runs if isinstance(row, dict)]
+    reports = [row for row in surefire_reports if isinstance(row, dict)]
+    evidence_by_name = {
+        str(row.get("card_name") or ""): row for row in evidence_cards
+    }
+    postgres_by_name = {
+        str(row.get("card_name") or ""): row
+        for row in postgres_rows
+        if isinstance(row, dict)
+    }
+    direct_name_set = set(direct_names)
+    quarantine_names_raw = product_scope.get(
+        "external_runtime_gap_quarantine_cards"
+    )
+    exact_non_executable_names_raw = product_scope.get(
+        "exact_non_executable_cards"
+    )
+    quarantine_name_set = (
+        set(quarantine_names_raw)
+        if isinstance(quarantine_names_raw, list)
+        and all(isinstance(name, str) for name in quarantine_names_raw)
+        else set()
+    )
+    exact_non_executable_name_set = (
+        set(exact_non_executable_names_raw)
+        if isinstance(exact_non_executable_names_raw, list)
+        and all(
+            isinstance(name, str)
+            for name in exact_non_executable_names_raw
+        )
+        else set()
+    )
+    direct_product_name_set = direct_name_set - quarantine_name_set
+    evidence_product_clearance_name_set = {
+        name
+        for name, row in evidence_by_name.items()
+        if row.get("disposition")
+        == PRODUCT_FOCUSED_CLEARANCE_DISPOSITION
+    }
+    postgres_product_name_set = {
+        name
+        for name, row in postgres_by_name.items()
+        if row.get("product_scope_status") == "product_in_scope"
+    }
+    if (
+        artifact.get("schema_version")
+        != PRODUCT_SCOPE_FOCUSED_TEST_SCHEMA_VERSION
+        or transition.get("from_pin") != from_pin
+        or transition.get("to_pin") != to_pin
+        or transition.get("repository") != "https://github.com/magefree/mage"
+        or transition.get("exact_pin_checkout_required") is not True
+        or product_scope.get("source_of_truth")
+        != "postgresql_backend"
+        or product_scope.get("reconciliation_path")
+        != postgres_artifact_path
+        or product_scope.get("reconciliation_sha256")
+        != postgres_artifact_sha256
+        or product_scope.get("product_in_scope_card_count")
+        != postgres.get("scope_counts", {}).get("product_in_scope")
+        or product_scope.get("direct_focused_test_card_count")
+        != expected_direct_card_count
+        or len(direct_names) != expected_direct_card_count
+        or len(direct_names) != len(direct_name_set)
+        or not direct_name_set <= set(evidence_by_name)
+        or product_scope.get(
+            "product_in_scope_direct_focused_test_card_count"
+        )
+        != 29
+        or product_scope.get(
+            "external_runtime_gap_quarantine_card_count"
+        )
+        != 2
+        or quarantine_name_set
+        != {"Mandate of Peace", "Planetarium of Wan Shi Tong"}
+        or len(quarantine_names_raw or []) != len(quarantine_name_set)
+        or product_scope.get("exact_non_executable_card_count") != 5
+        or len(exact_non_executable_names_raw or [])
+        != len(exact_non_executable_name_set)
+        or len(exact_non_executable_name_set) != 5
+        or evidence_product_clearance_name_set != direct_product_name_set
+        or direct_product_name_set & exact_non_executable_name_set
+        or direct_product_name_set | exact_non_executable_name_set
+        != postgres_product_name_set
+        or product_scope.get("catalog_resolution_used_as_semantic_proof")
+        is not False
+        or len(runs) != len(focused_runs)
+        or len(runs) != expected_patch_count
+        or len(reports) != len(surefire_reports)
+        or len(reports) != expected_execution_report_count
+        or combined.get("tests") != expected_test_count
+        or combined.get("failures") != 0
+        or combined.get("errors") != 0
+        or combined.get("skipped") != 0
+        or combined.get("status") != "pass"
+        or combined.get("execution_report_count")
+        != expected_execution_report_count
+        or sum(_integer(row.get("tests")) or 0 for row in reports)
+        != expected_test_count
+        or any(
+            (_integer(row.get("tests")) or 0) <= 0
+            or row.get("failures") != 0
+            or row.get("errors") != 0
+            or row.get("skipped") != 0
+            or SHA256_PATTERN.fullmatch(
+                str(row.get("surefire_sha256") or "")
+            )
+            is None
+            for row in reports
+        )
+        or conclusions.get(
+            "planetarium_quarantine_confirmed_by_executable_assertion"
+        )
+        is not True
+        or conclusions.get("planetarium_test_is_promotion_evidence")
+        is not False
+        or conclusions.get(
+            "mandate_of_peace_quarantine_confirmed_by_executable_assertion"
+        )
+        is not True
+        or conclusions.get("mandate_of_peace_test_is_promotion_evidence")
+        is not False
+        or conclusions.get(
+            "presentation_equivalence_passed_on_both_pins"
+        )
+        is not True
+        or conclusions.get("isolated_java17_matrix_passed") is not True
+        or conclusions.get("all_68_tests_passed") is not True
+        or conclusions.get("no_card_source_modified") is not True
+        or not presentation_artifact_valid
+        or safety.get("postgresql_writes") is not False
+        or safety.get("hermes_sqlite_writes") is not False
+        or safety.get("production_runtime_mutations") is not False
+        or safety.get("upstream_card_source_mutations") is not False
+    ):
+        return False
+
+    allowed_direct_statuses = {"product_in_scope"}
+    run_card_names: set[str] = set()
+    isolated_test_total = 0
+    observed_obligations: list[dict[str, Any]] = []
+    for run in runs:
+        run_cards = run.get("cards")
+        obligations = run.get("obligations")
+        isolated = (
+            run.get("isolated_execution")
+            if isinstance(run.get("isolated_execution"), dict)
+            else {}
+        )
+        is_presentation_run = (
+            str(run.get("test_source") or "")
+            == presentation_artifact.get("test_source")
+        )
+        patch_path_value = str(run.get("patch_path") or "")
+        patch_path = _safe_repo_path(repo_root, patch_path_value)
+        if (
+            not isinstance(run_cards, list)
+            or not isinstance(obligations, list)
+            or not all(
+                isinstance(name, str) and bool(name) for name in run_cards
+            )
+            or not str(run.get("test_source") or "").startswith(
+                "Mage.Tests/"
+            )
+            or SHA256_PATTERN.fullmatch(
+                str(run.get("test_source_sha256") or "")
+            )
+            is None
+            or SHA_PATTERN.fullmatch(
+                str(run.get("test_source_blob_sha1") or "")
+            )
+            is None
+            or patch_path is None
+            or SHA256_PATTERN.fullmatch(
+                str(run.get("patch_sha256") or "")
+            )
+            is None
+        ):
+            return False
+        try:
+            patch_sha256 = file_sha256(patch_path)
+            patch_text = patch_path.read_text(encoding="utf-8")
+        except OSError:
+            return False
+        patch_headers = re.findall(
+            r"^diff --git a/(\S+) b/(\S+)$",
+            patch_text,
+            flags=re.MULTILINE,
+        )
+        if (
+            patch_sha256 != run.get("patch_sha256")
+            or not patch_headers
+            or any(
+                not old_path.startswith("Mage.Tests/")
+                or not new_path.startswith("Mage.Tests/")
+                for old_path, new_path in patch_headers
+            )
+        ):
+            return False
+        if is_presentation_run:
+            if (
+                run.get("test_source_sha256")
+                != presentation_artifact.get("test_source_sha256")
+                or set(run_cards) != presentation_card_names
+            ):
+                return False
+        else:
+            isolated_tests = _integer(isolated.get("tests"))
+            isolated_result = isolated.get(
+                "result", isolated.get("status")
+            )
+            if (
+                isolated_tests is None
+                or isolated_tests <= 0
+                or isolated.get("failures") != 0
+                or isolated.get("errors") != 0
+                or isolated.get("skipped") != 0
+                or isolated_result != "pass"
+                or SHA256_PATTERN.fullmatch(
+                    str(isolated.get("surefire_sha256") or "")
+                )
+                is None
+            ):
+                return False
+            isolated_test_total += isolated_tests
+        run_card_names.update(run_cards)
+        observed_obligations.extend(
+            row for row in obligations if isinstance(row, dict)
+        )
+    observed_obligations.extend(presentation_obligations)
+    presentation_from_tests = _integer(
+        presentation_artifact.get("from_pin_result", {}).get("tests")
+    )
+    presentation_to_tests = _integer(
+        presentation_artifact.get("to_pin_result", {}).get("tests")
+    )
+    if (
+        presentation_from_tests is None
+        or presentation_to_tests is None
+        or isolated_test_total
+        + presentation_from_tests
+        + presentation_to_tests
+        != expected_test_count
+        or run_card_names != direct_name_set
+    ):
+        return False
+
+    obligations_by_card: dict[str, list[dict[str, Any]]] = {}
+    for obligation in observed_obligations:
+        obligation_card = str(
+            obligation.get("card_name", obligation.get("card")) or ""
+        )
+        if obligation_card:
+            obligations_by_card.setdefault(obligation_card, []).append(
+                obligation
+            )
+    for card_name in direct_product_name_set:
+        card_obligations = obligations_by_card.get(card_name, [])
+        if (
+            evidence_by_name.get(card_name, {}).get("disposition")
+            != PRODUCT_FOCUSED_CLEARANCE_DISPOSITION
+            or not card_obligations
+            or not any(
+                obligation.get("result") == "PASS"
+                or obligation.get("coverage_status")
+                in {"focused_pass", "behavioral_equivalence_pass"}
+                for obligation in card_obligations
+            )
+            or any(
+                obligation.get("coverage_status")
+                == "quarantine_confirmed"
+                or obligation.get("test_is_promotion_evidence") is False
+                for obligation in card_obligations
+            )
+        ):
+            return False
+    if any(
+        evidence_by_name.get(card_name, {}).get("disposition")
+        != CLEARANCE_DISPOSITION
+        for card_name in exact_non_executable_name_set
+    ):
+        return False
+
+    quarantine_dispositions = {
+        "Planetarium of Wan Shi Tong": (
+            "external_runtime_quarantine_semantic_defect"
+        ),
+        "Mandate of Peace": (
+            "external_runtime_quarantine_known_upstream_gap"
+        ),
+    }
+    for card_name in direct_name_set:
+        postgres_status = postgres_by_name.get(card_name, {}).get(
+            "product_scope_status"
+        )
+        if card_name in quarantine_dispositions:
+            if (
+                postgres_status != "external_runtime_gap"
+                or evidence_by_name.get(card_name, {}).get("disposition")
+                != quarantine_dispositions[card_name]
+            ):
+                return False
+        elif postgres_status not in allowed_direct_statuses:
+            return False
+
+    partial_or_quarantine_names = {
+        str(row.get("card_name", row.get("card")) or "")
+        for row in observed_obligations
+        if row.get("coverage_status")
+        in {"partial_focused_pass", "quarantine_confirmed"}
+    }
+    if any(
+        evidence_by_name.get(name, {}).get("disposition")
+        in {
+            CLEARANCE_DISPOSITION,
+            PRODUCT_FOCUSED_CLEARANCE_DISPOSITION,
+        }
+        for name in partial_or_quarantine_names
+    ):
+        return False
+    planetarium_obligation = next(
+        (
+            row
+            for row in observed_obligations
+            if row.get("card_name") == "Planetarium of Wan Shi Tong"
+        ),
+        {},
+    )
+    mandate_obligation = next(
+        (
+            row
+            for row in observed_obligations
+            if row.get("card_name") == "Mandate of Peace"
+        ),
+        {},
+    )
+    falcon_obligation = next(
+        (
+            row
+            for row in observed_obligations
+            if row.get("card_name") == "Falcon's Wing Harness"
+        ),
+        {},
+    )
+    return (
+        planetarium_obligation.get("coverage_status")
+        == "quarantine_confirmed"
+        and bool(planetarium_obligation.get("residual_gap"))
+        and planetarium_obligation.get("test_is_promotion_evidence")
+        is False
+        and mandate_obligation.get("obligation_id")
+        == "mandate_of_peace_concurrent_stack_removal"
+        and mandate_obligation.get("coverage_status")
+        == "quarantine_confirmed"
+        and mandate_obligation.get("residual_issue") == "#12911"
+        and mandate_obligation.get("test_is_promotion_evidence") is False
+        and mandate_obligation.get("observed_behavior")
+        == (
+            "copy_and_two_activated_abilities_removed_but_original_"
+            "spell_resolves"
+        )
+        and mandate_obligation.get("test_methods")
+        == [
+            (
+                "mandateOfPeaceQuarantineReproducesResidualOriginalSpell"
+                "AfterConcurrentRemoval"
+            )
+        ]
+        and falcon_obligation.get("obligation_id")
+        == "falcons_wing_harness_behavioral_equivalence"
+        and falcon_obligation.get("source_path")
+        == "Mage.Sets/src/mage/cards/f/FalconsWingHarness.java"
+        and falcon_obligation.get("test_methods")
+        == ["falconsWingHarnessAttachesThenReequipsWithBoostAndFlying"]
+        and falcon_obligation.get("affected_behavior")
+        == [
+            "etb_attach",
+            "equip_cost_2U",
+            "attachment_transfer",
+            "boost_1_1",
+            "flying",
+            "ward_1",
+        ]
+        and falcon_obligation.get("coverage_status")
+        == "behavioral_equivalence_pass"
+        and falcon_obligation.get("test_is_promotion_evidence") is True
+        and falcon_obligation.get("residual_gap") is None
+    )
+
+
+def _review_registry_entry(
+    artifact: dict[str, Any],
+    entry_id: str,
+) -> dict[str, Any]:
+    raw_registry = artifact.get("evidence_registry")
+    if not isinstance(raw_registry, list):
+        return {}
+    registry = [row for row in raw_registry if isinstance(row, dict)]
+    ids = [str(row.get("id") or "") for row in registry]
+    if not all(ids) or len(ids) != len(set(ids)):
+        return {}
+    matches = [row for row in registry if row.get("id") == entry_id]
+    return matches[0] if len(matches) == 1 else {}
+
+
+def _review_status_for_disposition(disposition: str) -> str:
+    if disposition in {
+        CLEARANCE_DISPOSITION,
+        PRODUCT_FOCUSED_CLEARANCE_DISPOSITION,
+    }:
+        return "cleared"
+    if disposition == ACTIVATION_BLOCKED_DISPOSITION:
+        return "blocked_activation"
+    if disposition in EXPECTED_NON_BLOCKING_QUARANTINES:
+        return "quarantined"
+    return ""
+
+
+def _transition_review_artifacts_shape_valid(
+    matrix: dict[str, Any],
+    index: dict[str, Any],
+    *,
+    evidence_cards: list[dict[str, Any]],
+    postgres: dict[str, Any],
+    qualification: dict[str, Any],
+    primary_evidence_path: str,
+    source_primary_snapshot_sha256: str,
+    focused_artifact_path: str,
+    focused_artifact_sha256: str,
+    from_pin: str,
+    to_pin: str,
+) -> bool:
+    postgres_rows = postgres.get("card_results")
+    matrix_cards = matrix.get("cards")
+    index_cards = index.get("cards")
+    if (
+        not isinstance(postgres_rows, list)
+        or not isinstance(matrix_cards, list)
+        or not isinstance(index_cards, list)
+        or not all(isinstance(row, dict) for row in evidence_cards)
+        or not all(isinstance(row, dict) for row in postgres_rows)
+        or not all(isinstance(row, dict) for row in matrix_cards)
+        or not all(isinstance(row, dict) for row in index_cards)
+    ):
+        return False
+
+    primary_by_name = {
+        str(row.get("card_name") or ""): row for row in evidence_cards
+    }
+    postgres_by_name = {
+        str(row.get("card_name") or ""): row for row in postgres_rows
+    }
+    if (
+        "" in primary_by_name
+        or "" in postgres_by_name
+        or len(primary_by_name) != len(evidence_cards)
+        or len(postgres_by_name) != len(postgres_rows)
+        or set(primary_by_name) != set(postgres_by_name)
+    ):
+        return False
+
+    expected_rows: dict[str, tuple[str, str, str, str, str]] = {}
+    for card_name, primary_row in primary_by_name.items():
+        postgres_row = postgres_by_name[card_name]
+        expected_status = _review_status_for_disposition(
+            str(primary_row.get("disposition") or "")
+        )
+        lane = str(postgres_row.get("product_scope_status") or "")
+        if not expected_status or lane not in POSTGRES_SCOPE_STATUSES:
+            return False
+        expected_rows[card_name] = (
+            card_name,
+            str(primary_row.get("class") or ""),
+            str(primary_row.get("source_path") or ""),
+            lane,
+            expected_status,
+        )
+    if any(not value for row in expected_rows.values() for value in row):
+        return False
+
+    def observed_rows(
+        rows: list[dict[str, Any]],
+    ) -> tuple[set[tuple[str, str, str, str, str]], bool]:
+        identities: set[tuple[str, str, str, str, str]] = set()
+        valid = True
+        for row in rows:
+            card_name = str(row.get("card_name") or "")
+            scope = row.get("scope")
+            primary_row = primary_by_name.get(card_name, {})
+            postgres_row = postgres_by_name.get(card_name, {})
+            if not isinstance(scope, dict):
+                return set(), False
+            identity = (
+                card_name,
+                str(row.get("class_name") or ""),
+                str(row.get("source_path") or ""),
+                str(scope.get("lane") or ""),
+                str(row.get("status") or ""),
+            )
+            disposition = str(primary_row.get("disposition") or "")
+            clearance_basis = row.get("clearance_basis")
+            expected_clearance_basis = {
+                CLEARANCE_DISPOSITION: {
+                    "exact_non_executable_tokens_v2",
+                },
+                PRODUCT_FOCUSED_CLEARANCE_DISPOSITION: {
+                    "focused_runtime_added",
+                    "focused_runtime_executable_transition",
+                    "presentation_equivalence_both_pins",
+                },
+            }.get(disposition, {None})
+            valid = (
+                valid
+                and card_name in expected_rows
+                and identity == expected_rows.get(card_name)
+                and scope.get("release_scope")
+                == postgres_row.get("release_scope_as_of_2026_07_28")
+                and scope.get("reconciliation_runtime_catalog_status")
+                == postgres_row.get("runtime_catalog_status")
+                and scope.get("effective_runtime_catalog_status")
+                == primary_row.get("runtime_catalog_status")
+                and clearance_basis in expected_clearance_basis
+            )
+            identities.add(identity)
+        return identities, valid and len(identities) == len(rows)
+
+    matrix_identity_set, matrix_rows_valid = observed_rows(matrix_cards)
+    index_identity_set, index_rows_valid = observed_rows(index_cards)
+    expected_index_set = set(expected_rows.values())
+    expected_matrix_set = {
+        row
+        for row in expected_index_set
+        if row[3] in {"product_in_scope", "external_runtime_gap"}
+    }
+
+    expected_dispositions = dict(
+        sorted(
+            Counter(
+                str(row.get("disposition") or "")
+                for row in evidence_cards
+            ).items()
+        )
+    )
+    expected_qualification = {
+        "evidence_ref": "transition_audit_169",
+        "status": qualification.get("status"),
+        "deployment_allowed": qualification.get("deployment_allowed"),
+        "blocking_reasons": qualification.get("blocking_reasons"),
+        "disposition_counts": expected_dispositions,
+    }
+    expected_scope_counts = dict(
+        sorted(
+            Counter(
+                str(row.get("product_scope_status") or "")
+                for row in postgres_rows
+            ).items()
+        )
+    )
+    expected_matrix_status_summary = {
+        "cleared": 34,
+        "quarantined": 2,
+        "blocked_activation": 0,
+        "partial": 0,
+        "gap": 0,
+    }
+    expected_index_status_summary = {
+        "cleared": 34,
+        "blocked_activation": 133,
+        "quarantined": 2,
+        "partial": 0,
+        "gap": 0,
+    }
+
+    def transition_valid(artifact: dict[str, Any]) -> bool:
+        value = artifact.get("transition")
+        return (
+            isinstance(value, dict)
+            and value.get("repository") == "https://github.com/magefree/mage"
+            and value.get("from_commit") == from_pin
+            and value.get("to_commit") == to_pin
+            and value.get("identity") == "34d81ea_2c43ec8"
+        )
+
+    def registry_valid(artifact: dict[str, Any]) -> bool:
+        primary_entry = _review_registry_entry(
+            artifact, "transition_audit_169"
+        )
+        focused_entry = _review_registry_entry(
+            artifact, "focused_product_scope_tests"
+        )
+        return (
+            primary_entry.get("path") == primary_evidence_path
+            and primary_entry.get("sha256")
+            == source_primary_snapshot_sha256
+            and focused_entry.get("path") == focused_artifact_path
+            and focused_entry.get("sha256") == focused_artifact_sha256
+        )
+
+    matrix_validation = matrix.get("validation")
+    index_validation = index.get("validation")
+    matrix_valid = (
+        matrix.get("schema_version") == ACTIVE_SCOPE_MATRIX_SCHEMA_VERSION
+        and matrix.get("status") == "pass"
+        and transition_valid(matrix)
+        and matrix.get("scope")
+        == {
+            "matrix_card_count": 36,
+            "product_in_scope_card_count": 34,
+            "external_runtime_gap_quarantine_card_count": 2,
+            "direct_focused_product_card_count": 29,
+            "exact_non_executable_product_card_count": 5,
+        }
+        and matrix.get("status_summary") == expected_matrix_status_summary
+        and matrix.get("transition_audit_qualification")
+        == expected_qualification
+        and matrix_rows_valid
+        and matrix_identity_set == expected_matrix_set
+        and registry_valid(matrix)
+        and isinstance(matrix_validation, dict)
+        and matrix_validation.get("status_vocabulary")
+        == ["cleared", "quarantined"]
+        and matrix_validation.get("forbidden_status_count") == 0
+        and all(
+            matrix_validation.get(key) is True
+            for key in {
+                "matrix_card_count_matches",
+                "product_partition_is_exact",
+                "direct_focused_plus_exact_non_executable_equals_34",
+                "evidence_sha256_verified",
+                "primary_dispositions_match",
+            }
+        )
+    )
+    index_coverage = index.get("coverage")
+    index_valid = (
+        index.get("schema_version") == COMPACT_REVIEW_INDEX_SCHEMA_VERSION
+        and index.get("status") == "pass"
+        and transition_valid(index)
+        and index.get("scope_counts") == expected_scope_counts
+        and index.get("status_summary") == expected_index_status_summary
+        and index.get("transition_audit_qualification")
+        == expected_qualification
+        and isinstance(index_coverage, dict)
+        and index_coverage.get("transition_card_count") == len(evidence_cards)
+        and index_coverage.get("postgresql_reconciled_card_count")
+        == len(postgres_rows)
+        and index_coverage.get("review_union_card_count")
+        == len(evidence_cards)
+        and index_coverage.get("identity_cross_check_failure_count") == 0
+        and index_rows_valid
+        and index_identity_set == expected_index_set
+        and registry_valid(index)
+        and isinstance(index_validation, dict)
+        and index_validation.get("status_vocabulary")
+        == ["cleared", "blocked_activation", "quarantined"]
+        and index_validation.get("forbidden_status_count") == 0
+        and all(
+            index_validation.get(key) is True
+            for key in {
+                "card_count_matches",
+                "postgresql_identity_set_matches",
+                "semantic_review_union_matches",
+                "status_counts_match",
+                "blocked_policy_identity_set_matches",
+                "no_review_only_card_promoted",
+                "evidence_sha256_verified",
+                "primary_dispositions_match",
+            }
+        )
+    )
+    return matrix_valid and index_valid
+
+
+def _falcon_runtime_boundary_valid(
+    finding: dict[str, Any],
+    *,
+    focused_artifact: dict[str, Any],
+    focused_artifact_path: str,
+    repo_root: Path,
+) -> bool:
+    boundary = (
+        finding.get("runtime_boundary")
+        if isinstance(finding.get("runtime_boundary"), dict)
+        else {}
+    )
+    if boundary != EXPECTED_FALCON_RUNTIME_BOUNDARY:
+        return False
+
+    transition = (
+        focused_artifact.get("transition")
+        if isinstance(focused_artifact.get("transition"), dict)
+        else {}
+    )
+    presentation_artifact, presentation_valid = (
+        _presentation_equivalence_artifact(
+            focused_artifact,
+            repo_root=repo_root,
+            focused_artifact_path=focused_artifact_path,
+            from_pin=str(transition.get("from_pin") or ""),
+            to_pin=str(transition.get("to_pin") or ""),
+        )
+    )
+    if not presentation_valid:
+        return False
+    obligations = [
+        obligation
+        for obligation in (
+            presentation_artifact.get("obligations")
+            if isinstance(presentation_artifact.get("obligations"), list)
+            else []
+        )
+        if isinstance(obligation, dict)
+    ]
+    falcon_obligations = [
+        obligation
+        for obligation in obligations
+        if obligation.get("obligation_id")
+        == "falcons_wing_harness_behavioral_equivalence"
+    ]
+    if len(falcon_obligations) != 1:
+        return False
+    obligation = falcon_obligations[0]
+    if (
+        obligation.get("card_name") != "Falcon's Wing Harness"
+        or obligation.get("source_path")
+        != "Mage.Sets/src/mage/cards/f/FalconsWingHarness.java"
+        or obligation.get("test_methods")
+        != ["falconsWingHarnessAttachesThenReequipsWithBoostAndFlying"]
+        or obligation.get("affected_behavior")
+        != [
+            "etb_attach",
+            "equip_cost_2U",
+            "attachment_transfer",
+            "boost_1_1",
+            "flying",
+            "ward_1",
+        ]
+        or obligation.get("coverage_status")
+        != "behavioral_equivalence_pass"
+        or obligation.get("test_is_promotion_evidence") is not True
+        or obligation.get("residual_gap") is not None
+    ):
+        return False
+
+    source_paths = {
+        key: _safe_repo_path(repo_root, str(boundary.get(key) or ""))
+        for key in {
+            "replay_card_projection_path",
+            "replay_sanitizer_path",
+            "battle_card_input_path",
+            "product_oracle_text_contract_path",
+        }
+    }
+    if any(path is None for path in source_paths.values()):
+        return False
+    try:
+        replay_source = source_paths[
+            "replay_card_projection_path"
+        ].read_text(encoding="utf-8")
+        sanitizer_source = source_paths["replay_sanitizer_path"].read_text(
+            encoding="utf-8"
+        )
+        battle_input_source = source_paths["battle_card_input_path"].read_text(
+            encoding="utf-8"
+        )
+        oracle_contract = source_paths[
+            "product_oracle_text_contract_path"
+        ].read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+    replay_start = replay_source.find(
+        "private static Map<String, Object> card(CardView card)"
+    )
+    replay_end = replay_source.find(
+        "private static List<Map<String, Object>> counters(",
+        replay_start,
+    )
+    battle_start = battle_input_source.find(
+        "Future<BattlePreflightDeck?> _loadDeck("
+    )
+    battle_end = battle_input_source.find(
+        "Future<int> _availableOpponentCount(",
+        battle_start,
+    )
+    if min(replay_start, replay_end, battle_start, battle_end) < 0:
+        return False
+    replay_card_method = replay_source[replay_start:replay_end]
+    battle_card_input_method = battle_input_source[battle_start:battle_end]
+    expected_projection_fields = {
+        'result.put("id"',
+        'result.put("name"',
+        'result.put("set_code"',
+        'result.put("card_number"',
+        'result.put("is_ability"',
+        'result.put("object_type"',
+        'result.put("source_card_id"',
+        'result.put("source_card_name"',
+        'result.put("tapped"',
+        'result.put("damage"',
+        'result.put("controller_name"',
+        'result.put("counters"',
+    }
+    expected_battle_input_fields = {
+        "c.name",
+        "c.set_code",
+        "c.collector_number",
+        "'name': row[6]",
+        "'set_code': row[7]",
+        "'collector_number': row[8]",
+        "'quantity': row[9]",
+        "'is_commander': row[10]",
+    }
+    return (
+        all(token in replay_card_method for token in expected_projection_fields)
+        and "oracle" not in replay_card_method.lower()
+        and "rules_text" not in replay_card_method.lower()
+        and all(
+            token in battle_card_input_method
+            for token in expected_battle_input_fields
+        )
+        and "oracle_text" not in battle_card_input_method.lower()
+        and "sanitizeBattleReplayForStorage" in sanitizer_source
+        and "'oracle_text'" in sanitizer_source
+        and "| Oracle text | `oracle_text` from PostgreSQL/"
+        in oracle_contract
+    )
+
+
+def _card_data_diagnostics_shape_valid(
+    diagnostics: dict[str, Any],
+    *,
+    evidence_cards: list[dict[str, Any]],
+    postgres: dict[str, Any],
+    focused_artifact: dict[str, Any],
+    focused_artifact_path: str,
+    focused_artifact_valid: bool,
+    repo_root: Path,
+) -> bool:
+    raw_findings = diagnostics.get("actionable_findings")
+    postgres_rows = postgres.get("card_results")
+    if (
+        not isinstance(raw_findings, list)
+        or not isinstance(postgres_rows, list)
+        or not focused_artifact_valid
+    ):
+        return False
+    findings = [row for row in raw_findings if isinstance(row, dict)]
+    evidence_by_name = {
+        str(row.get("card_name") or ""): row for row in evidence_cards
+    }
+    postgres_by_name = {
+        str(row.get("card_name") or ""): row
+        for row in postgres_rows
+        if isinstance(row, dict)
+    }
+    findings_by_name = {
+        str(row.get("card_name") or ""): row for row in findings
+    }
+    if (
+        diagnostics.get("status") != "pass"
+        or diagnostics.get("cataloged_classes_checked") != 168
+        or diagnostics.get("good_face_count") != 154
+        or diagnostics.get("wrong_face_count") != 16
+        or diagnostics.get("missing_reference_face_count") != 3
+        or len(findings) != len(raw_findings)
+        or len(findings_by_name) != len(findings)
+        or set(findings_by_name) != EXPECTED_ACTIONABLE_CARD_FINDINGS
+        or diagnostics.get("activation_blocked_finding_count") != 7
+        or diagnostics.get("quarantined_finding_count") != 1
+        or diagnostics.get("non_runtime_presentation_finding_count") != 1
+        or diagnostics.get("deployment_blocking_finding_count") != 0
+    ):
+        return False
+
+    falcon = findings_by_name["Falcon's Wing Harness"]
+    planetarium = findings_by_name["Planetarium of Wan Shi Tong"]
+    if (
+        falcon.get("severity") != "visible_rules_text"
+        or falcon.get("status") != "non_runtime_presentation_finding"
+        or not falcon.get("evidence")
+        or postgres_by_name.get("Falcon's Wing Harness", {}).get(
+            "product_scope_status"
+        )
+        != "product_in_scope"
+        or not _falcon_runtime_boundary_valid(
+            falcon,
+            focused_artifact=focused_artifact,
+            focused_artifact_path=focused_artifact_path,
+            repo_root=repo_root,
+        )
+        or planetarium.get("severity") != "mechanical"
+        or planetarium.get("status") != "quarantined"
+        or not planetarium.get("evidence")
+        or postgres_by_name.get("Planetarium of Wan Shi Tong", {}).get(
+            "product_scope_status"
+        )
+        != "external_runtime_gap"
+        or evidence_by_name.get("Planetarium of Wan Shi Tong", {}).get(
+            "disposition"
+        )
+        != "external_runtime_quarantine_semantic_defect"
+    ):
+        return False
+
+    for card_name in (
+        EXPECTED_ACTIONABLE_CARD_FINDINGS
+        - {"Falcon's Wing Harness", "Planetarium of Wan Shi Tong"}
+    ):
+        finding = findings_by_name[card_name]
+        if (
+            finding.get("severity") != "visible_rules_text"
+            or finding.get("status") != "activation_blocked"
+            or not finding.get("evidence")
+            or postgres_by_name.get(card_name, {}).get(
+                "product_scope_status"
+            )
+            not in ACTIVATION_BLOCKED_SCOPE_STATUSES
+            or evidence_by_name.get(card_name, {}).get("disposition")
+            != ACTIVATION_BLOCKED_DISPOSITION
+        ):
+            return False
+    return True
+
+
+def _exact_clearances_from_policy(
+    policy: dict[str, Any],
+) -> tuple[dict[str, dict[str, Any]], bool]:
+    raw_rules = policy.get("automatic_transition_clearance_rules")
+    if not isinstance(raw_rules, list) or not raw_rules:
+        return {}, False
+    rules = [row for row in raw_rules if isinstance(row, dict)]
+    expected: dict[str, dict[str, Any]] = {}
+    rule_ids: set[str] = set()
+    valid = len(rules) == len(raw_rules)
+    for rule in rules:
+        card_name = str(rule.get("card_name") or "")
+        rule_id = str(rule.get("id") or "")
+        direct_tests = rule.get("required_direct_test_references")
+        test_count = _integer(rule.get("required_focused_test_case_count"))
+        rule_valid = (
+            bool(card_name)
+            and bool(rule_id)
+            and card_name not in expected
+            and rule_id not in rule_ids
+            and rule.get("change_kind") == "modified"
+            and rule.get("required_change_scope")
+            == "presentation_or_metadata"
+            and rule.get("diff_hash_mode")
+            == "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+            and SHA256_PATTERN.fullmatch(
+                str(rule.get("canonical_diff_sha256") or "")
+            )
+            is not None
+            and SHA_PATTERN.fullmatch(
+                str(rule.get("from_blob_oid_sha1") or "")
+            )
+            is not None
+            and SHA_PATTERN.fullmatch(
+                str(rule.get("to_blob_oid_sha1") or "")
+            )
+            is not None
+            and SHA256_PATTERN.fullmatch(
+                str(rule.get("from_source_sha256") or "")
+            )
+            is not None
+            and SHA256_PATTERN.fullmatch(
+                str(rule.get("to_source_sha256") or "")
+            )
+            is not None
+            and SHA256_PATTERN.fullmatch(
+                str(rule.get("normalized_token_sha256") or "")
+            )
+            is not None
+            and isinstance(direct_tests, list)
+            and all(isinstance(reference, str) for reference in direct_tests)
+            and test_count is not None
+            and test_count >= 0
+            and rule.get("require_no_source_warning_markers") is True
+            and rule.get("require_no_card_data_actionable_finding") is True
+            and isinstance(
+                rule.get("allowed_presentation_literal_changes"),
+                list,
+            )
+            and bool(rule.get("allowed_presentation_literal_changes"))
+            and isinstance(rule.get("allowed_import_delta"), dict)
+            and isinstance(rule.get("allow_import_reordering"), bool)
+        )
+        valid = valid and rule_valid
+        if not rule_valid:
+            continue
+        rule_ids.add(rule_id)
+        expected[card_name] = {
+            "rule_id": rule_id,
+            "class": str(rule.get("class") or ""),
+            "source_path": str(rule.get("source_path") or ""),
+            "source_scope": str(rule.get("required_change_scope") or ""),
+            "canonical_diff_sha256": rule["canonical_diff_sha256"],
+            "from_blob_oid_sha1": rule["from_blob_oid_sha1"],
+            "to_blob_oid_sha1": rule["to_blob_oid_sha1"],
+            "from_source_sha256": rule["from_source_sha256"],
+            "to_source_sha256": rule["to_source_sha256"],
+            "normalized_token_sha256": rule["normalized_token_sha256"],
+            "direct_test_references": direct_tests,
+            "required_test_case_count": test_count,
+        }
+    return expected, valid and len(expected) == len(rules)
+
+
 def _validate_transition_nominal_review(
     evidence: dict[str, Any],
     expected: dict[str, Any],
@@ -260,7 +1739,9 @@ def _validate_transition_nominal_review(
     from_pin: str,
     to_pin: str,
     input_digests: dict[str, Any],
-) -> dict[str, str]:
+    nominal_policy: dict[str, Any],
+    nominal_policy_sha256: str,
+) -> dict[str, dict[str, Any]]:
     pointer = (
         evidence.get("transition_nominal_review")
         if isinstance(evidence.get("transition_nominal_review"), dict)
@@ -305,7 +1786,10 @@ def _validate_transition_nominal_review(
         if isinstance(raw_rule_results, list)
         else []
     )
-    expected_clearance_cards = set(EXPECTED_EXACT_CLEARANCES)
+    expected_clearances, policy_rules_valid = (
+        _exact_clearances_from_policy(nominal_policy)
+    )
+    expected_clearance_cards = set(expected_clearances)
     observed_clearance_cards = {
         str(card_name) for card_name in clearance_cards if card_name
     }
@@ -321,41 +1805,82 @@ def _validate_transition_nominal_review(
     nominal_by_card = {
         str(row.get("card_name") or ""): row for row in nominal_cards
     }
+    raw_without_nominal = artifact.get(
+        "exact_clearance_cards_without_direct_nominal_reference"
+    )
+    without_nominal = (
+        [str(value) for value in raw_without_nominal if value]
+        if isinstance(raw_without_nominal, list)
+        else []
+    )
+    expected_without_nominal = {
+        card_name
+        for card_name, rule in expected_clearances.items()
+        if not rule["direct_test_references"]
+    }
     exact_rules_valid = (
-        len(rule_results) == len(raw_rule_results or [])
-        == len(EXPECTED_EXACT_CLEARANCES)
+        policy_rules_valid
+        and len(rule_results) == len(raw_rule_results or [])
+        == len(expected_clearances)
         and set(rules_by_card) == expected_clearance_cards
+        and len(without_nominal) == len(set(without_nominal))
+        and set(without_nominal) == expected_without_nominal
     )
     if exact_rules_valid:
-        for card_name, rule_expected in EXPECTED_EXACT_CLEARANCES.items():
+        for card_name, rule_expected in expected_clearances.items():
             row = rules_by_card[card_name]
             nominal_row = nominal_by_card.get(card_name, {})
-            exact_rules_valid = exact_rules_valid and (
+            rule_valid = (
                 row.get("status") == "pass"
                 and row.get("failures") == []
                 and row.get("rule_id") == rule_expected["rule_id"]
                 and row.get("source_path") == rule_expected["source_path"]
                 and row.get("source_scope") == rule_expected["source_scope"]
-                and row.get("diff_sha256") == rule_expected["diff_sha256"]
-                and row.get("presentation_tokens_equivalent") is True
+                and row.get("diff_hash_mode")
+                == "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+                and row.get("canonical_diff_sha256")
+                == rule_expected["canonical_diff_sha256"]
+                and row.get("from_blob_oid_sha1")
+                == rule_expected["from_blob_oid_sha1"]
+                and row.get("to_blob_oid_sha1")
+                == rule_expected["to_blob_oid_sha1"]
+                and row.get("from_source_sha256")
+                == rule_expected["from_source_sha256"]
+                and row.get("to_source_sha256")
+                == rule_expected["to_source_sha256"]
+                and row.get("normalized_token_sha256")
+                == rule_expected["normalized_token_sha256"]
+                and row.get("non_executable_tokens_equivalent") is True
+                and sorted(
+                    row.get("required_direct_test_references") or []
+                )
+                == sorted(rule_expected["direct_test_references"])
                 and row.get("required_test_case_count")
                 == rule_expected["required_test_case_count"]
-                and nominal_row.get("class") == rule_expected["class"]
-                and nominal_row.get("source_path")
-                == rule_expected["source_path"]
-                and nominal_row.get("source_scope")
-                == rule_expected["source_scope"]
-                and nominal_row.get("diff_sha256")
-                == rule_expected["diff_sha256"]
-                and nominal_row.get("clearance_rule_id")
-                == rule_expected["rule_id"]
-                and nominal_row.get("lane")
-                == "exact_presentation_hunk_and_nominal_tests_clearance"
-                and sorted(nominal_row.get("direct_test_references") or [])
-                == sorted(rule_expected["direct_test_references"])
-                and nominal_row.get("focused_test_case_count")
-                == rule_expected["required_test_case_count"]
             )
+            if rule_expected["direct_test_references"]:
+                rule_valid = rule_valid and (
+                    nominal_row.get("class") == rule_expected["class"]
+                    and nominal_row.get("source_path")
+                    == rule_expected["source_path"]
+                    and nominal_row.get("source_scope")
+                    == rule_expected["source_scope"]
+                    and nominal_row.get("canonical_diff_sha256")
+                    == rule_expected["canonical_diff_sha256"]
+                    and nominal_row.get("clearance_rule_id")
+                    == rule_expected["rule_id"]
+                    and nominal_row.get("lane")
+                    == "exact_non_executable_tokens_clearance"
+                    and sorted(
+                        nominal_row.get("direct_test_references") or []
+                    )
+                    == sorted(rule_expected["direct_test_references"])
+                    and nominal_row.get("focused_test_case_count")
+                    == rule_expected["required_test_case_count"]
+                )
+            else:
+                rule_valid = rule_valid and card_name not in nominal_by_card
+            exact_rules_valid = exact_rules_valid and rule_valid
 
     expected_clearance_count = _integer(
         expected.get("exact_transition_clearance_card_count")
@@ -363,10 +1888,15 @@ def _validate_transition_nominal_review(
     expected_review_before = _integer(
         expected.get("review_required_before_exact_clearance")
     )
-    expected_review_after = _integer(expected.get("review_required_card_count"))
+    expected_review_after = _integer(
+        expected.get("review_required_after_exact_clearance")
+    )
     declared_digest = str(pointer.get("artifact_sha256") or "")
     input_digest = str(
-        input_digests.get("transition_nominal_review_v1_sha256") or ""
+        input_digests.get("transition_nominal_review_v2_sha256") or ""
+    )
+    policy_input_digest = str(
+        input_digests.get("transition_nominal_review_policy_v2_sha256") or ""
     )
     valid = (
         not load_error
@@ -398,7 +1928,16 @@ def _validate_transition_nominal_review(
         and safety.get("source_mutations") is False
         and safety.get("postgres_writes") is False
         and safety.get("catalog_resolution_used_as_semantic_proof") is False
+        and safety.get("canonical_diff_hash_mode")
+        == "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+        and safety.get("full_blob_oids_required") is True
+        and safety.get("source_sha256_required") is True
+        and safety.get("unlisted_token_changes_allowed") is False
         and pointer.get("schema_version") == NOMINAL_REVIEW_SCHEMA_VERSION
+        and pointer.get("policy_schema_version")
+        == NOMINAL_POLICY_SCHEMA_VERSION
+        and pointer.get("policy_sha256") == nominal_policy_sha256
+        and nominal_policy_sha256 == policy_input_digest
         and pointer.get("exact_clearance_cards")
         == sorted(expected_clearance_cards)
         and pointer.get("review_required_before") == expected_review_before
@@ -417,6 +1956,8 @@ def _validate_transition_nominal_review(
             "artifact_sha256": artifact_sha256,
             "declared_sha256": declared_digest,
             "input_digest": input_digest,
+            "policy_sha256": nominal_policy_sha256,
+            "policy_input_digest": policy_input_digest,
             "load_error": load_error,
             "clearance_cards": sorted(observed_clearance_cards),
         },
@@ -424,9 +1965,113 @@ def _validate_transition_nominal_review(
     if not valid:
         return {}
     return {
-        card_name: str(rules_by_card[card_name]["rule_id"])
+        card_name: dict(expected_clearances[card_name])
         for card_name in sorted(expected_clearance_cards)
     }
+
+
+def _activation_underlying_disposition_valid(
+    row: dict[str, Any],
+    *,
+    actionable_card_names: set[str],
+    exact_clearance_rules: dict[str, dict[str, Any]],
+) -> bool:
+    disposition = row.get("underlying_transition_disposition")
+    catalog_status = row.get("catalog_status_before_activation")
+    kind = row.get("change_kind")
+    card_name = str(row.get("card_name") or "")
+    card_class = str(row.get("class") or "")
+    direct_tests = row.get("direct_test_references")
+    focused_cases = _integer(row.get("focused_test_case_count"))
+    if (
+        not isinstance(direct_tests, list)
+        or focused_cases is None
+        or focused_cases < 0
+        or catalog_status not in {"supported", "unsupported"}
+    ):
+        return False
+    valid = False
+    if disposition == "focused_upstream_test_passed":
+        valid = (
+            kind == "added"
+            and catalog_status == "supported"
+            and bool(direct_tests)
+            and focused_cases > 0
+        )
+    elif (
+        disposition
+        == "focused_upstream_test_passed_card_data_warning_review_required"
+    ):
+        valid = (
+            kind == "added"
+            and catalog_status == "supported"
+            and bool(direct_tests)
+            and focused_cases > 0
+            and isinstance(row.get("card_data_warnings"), list)
+            and bool(row.get("card_data_warnings"))
+        )
+    elif disposition == "catalog_supported_semantic_review_required":
+        valid = (
+            kind == "added"
+            and catalog_status == "supported"
+            and not direct_tests
+            and focused_cases == 0
+        )
+    elif (
+        disposition
+        == "catalog_supported_nominal_test_passed_semantic_review_required"
+    ):
+        valid = (
+            kind == "modified"
+            and catalog_status == "supported"
+            and bool(direct_tests)
+            and focused_cases > 0
+        )
+    elif disposition == "catalog_supported_regression_only_review_required":
+        valid = (
+            kind == "modified"
+            and catalog_status == "supported"
+            and not direct_tests
+            and focused_cases == 0
+        )
+    elif disposition == "external_residual_upstream_unfinished":
+        residual = row.get("external_residual")
+        valid = (
+            kind == "added"
+            and catalog_status == "unsupported"
+            and isinstance(residual, dict)
+            and residual.get("reason")
+            == "removed_from_xmage_catalog_as_unfinished"
+            and residual.get("forge_exact_match_count") == 0
+        )
+    elif disposition == CLEARANCE_DISPOSITION:
+        clearance_expected = exact_clearance_rules.get(card_name, {})
+        source_warning_markers = row.get("source_warning_markers")
+        valid = (
+            kind == "modified"
+            and all(
+                isinstance(reference, str) for reference in direct_tests
+            )
+            and sorted(direct_tests)
+            == sorted(clearance_expected.get("direct_test_references", []))
+            and focused_cases
+            == clearance_expected.get("required_test_case_count")
+            and card_class == clearance_expected.get("class")
+            and row.get("source_path")
+            == clearance_expected.get("source_path")
+            and isinstance(source_warning_markers, list)
+            and not source_warning_markers
+            and card_name not in actionable_card_names
+            and row.get("transition_review_rule_id")
+            == clearance_expected.get("rule_id")
+            and card_name in exact_clearance_rules
+        )
+    if (
+        disposition != CLEARANCE_DISPOSITION
+        and row.get("transition_review_rule_id") is not None
+    ):
+        return False
+    return valid
 
 
 def _validate_card_rows(
@@ -434,7 +2079,7 @@ def _validate_card_rows(
     expected: dict[str, Any],
     checks: list[dict[str, Any]],
     *,
-    exact_clearance_rules: dict[str, str],
+    exact_clearance_rules: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     raw_cards = evidence.get("cards")
     cards = raw_cards if isinstance(raw_cards, list) else []
@@ -536,7 +2181,7 @@ def _validate_card_rows(
         direct_tests = row.get("direct_test_references")
         focused_cases = _integer(row.get("focused_test_case_count"))
         card_name = str(row.get("card_name") or "")
-        clearance_expected = EXPECTED_EXACT_CLEARANCES.get(card_name, {})
+        clearance_expected = exact_clearance_rules.get(card_name, {})
         valid = (
             kind in {"added", "modified"}
             and isinstance(registrations, list)
@@ -587,6 +2232,12 @@ def _validate_card_rows(
                 and not direct_tests
                 and focused_cases == 0
             )
+        elif disposition == PRODUCT_FOCUSED_CLEARANCE_DISPOSITION:
+            valid = (
+                valid
+                and kind in {"added", "modified"}
+                and catalog_status == "supported"
+            )
         elif (
             disposition
             == "catalog_supported_nominal_test_passed_semantic_review_required"
@@ -603,8 +2254,7 @@ def _validate_card_rows(
             valid = (
                 valid
                 and kind == "modified"
-                and catalog_status == "supported"
-                and bool(direct_tests)
+                and catalog_status in {"supported", "unsupported"}
                 and all(isinstance(reference, str) for reference in direct_tests)
                 and sorted(direct_tests)
                 == sorted(clearance_expected.get("direct_test_references", []))
@@ -617,7 +2267,7 @@ def _validate_card_rows(
                 and not source_warning_markers
                 and card_name not in actionable_card_names
                 and row.get("transition_review_rule_id")
-                == exact_clearance_rules.get(card_name)
+                == clearance_expected.get("rule_id")
                 and card_name in exact_clearance_rules
             )
         elif disposition == "catalog_supported_regression_only_review_required":
@@ -627,6 +2277,16 @@ def _validate_card_rows(
                 and catalog_status == "supported"
                 and not direct_tests
                 and focused_cases == 0
+            )
+        elif disposition == ACTIVATION_BLOCKED_DISPOSITION:
+            valid = (
+                valid
+                and catalog_status == "unsupported"
+                and _activation_underlying_disposition_valid(
+                    row,
+                    actionable_card_names=actionable_card_names,
+                    exact_clearance_rules=exact_clearance_rules,
+                )
             )
         elif disposition == "external_residual_upstream_unfinished":
             residual = row.get("external_residual")
@@ -644,6 +2304,10 @@ def _validate_card_rows(
                 valid
                 and kind == "modified"
                 and catalog_status == "unsupported"
+                and card_name
+                in EXPECTED_NON_BLOCKING_QUARANTINES[
+                    "external_runtime_quarantine_semantic_defect"
+                ]
                 and isinstance(residual, dict)
                 and residual.get("reason")
                 == "pinned_xmage_semantic_defect_quarantined"
@@ -657,22 +2321,80 @@ def _validate_card_rows(
                     "XmageCardQualificationPolicy.java"
                 )
             )
+        elif (
+            disposition
+            == "external_runtime_quarantine_known_upstream_gap"
+        ):
+            residual = row.get("external_residual")
+            source_warning_markers = row.get("source_warning_markers")
+            valid = (
+                valid
+                and kind == "modified"
+                and catalog_status == "unsupported"
+                and card_name
+                in EXPECTED_NON_BLOCKING_QUARANTINES[
+                    "external_runtime_quarantine_known_upstream_gap"
+                ]
+                and not direct_tests
+                and focused_cases == 0
+                and isinstance(source_warning_markers, list)
+                and any(
+                    isinstance(marker, dict)
+                    and "#12911" in str(marker.get("marker") or "")
+                    for marker in source_warning_markers
+                )
+                and isinstance(residual, dict)
+                and residual.get("reason")
+                == "pinned_xmage_known_upstream_gap_quarantined"
+                and residual.get("reason_code")
+                == "xmage_upstream_copy_lki_gap"
+                and residual.get("qualification_engine_commit")
+                == evidence.get("to_pin")
+                and residual.get("upstream_issue")
+                == "magefree/mage#12911"
+                and residual.get("upstream_issue_status") == "OPEN"
+                and residual.get("release_condition")
+                == "blocked_until_copy_lki_fix_and_focused_qualification"
+                and residual.get("policy_path")
+                == (
+                    "services/xmage-sidecar/src/main/java/com/manaloom/xmage/"
+                    "XmageCardQualificationPolicy.java"
+                )
+            )
         else:
             valid = False
         if (
-            disposition != CLEARANCE_DISPOSITION
+            disposition
+            not in {CLEARANCE_DISPOSITION, ACTIVATION_BLOCKED_DISPOSITION}
             and row.get("transition_review_rule_id") is not None
         ):
             valid = False
         if not valid:
             malformed.append(card_class)
 
+    observed_non_blocking_quarantines = {
+        disposition: {
+            str(row.get("card_name") or "")
+            for row in rows
+            if row.get("disposition") == disposition
+        }
+        for disposition in EXPECTED_NON_BLOCKING_QUARANTINES
+    }
+
     _check(
         checks,
         "card_disposition_evidence",
-        not malformed,
+        not malformed
+        and observed_non_blocking_quarantines
+        == EXPECTED_NON_BLOCKING_QUARANTINES,
         "Each disposition must carry the evidence required by its exact meaning.",
-        details={"malformed_classes": malformed},
+        details={
+            "malformed_classes": malformed,
+            "non_blocking_quarantines": {
+                key: sorted(value)
+                for key, value in observed_non_blocking_quarantines.items()
+            },
+        },
     )
     _check(
         checks,
@@ -713,20 +2435,21 @@ def _validate_card_rows(
         modified_scope.get("classification_method")
         == "exact_git_hunk_manual_review"
         and isinstance(scope_counts, dict)
-        and len(executable_set) == len(executable_classes or []) == 27
+        and len(executable_set) == len(executable_classes or []) == 28
         and len(comment_only_set) == len(comment_only_classes or []) == 2
         and not (executable_set & comment_only_set)
         and executable_set | comment_only_set <= modified_class_set
         and "MjolnirHammerOfThor" in executable_set
+        and "SwordsmanSharpScoundrel" in executable_set
         and "MetallicMimic" in presentation_set
         and comment_only_set == {"KrarkTheThumbless", "MandateOfPeace"}
-        and len(presentation_set) == 53
-        and modified_scope.get("presentation_or_metadata_count") == 53
+        and len(presentation_set) == 52
+        and modified_scope.get("presentation_or_metadata_count") == 52
         and scope_counts
         == {
             "comment_only": 2,
-            "executable_or_mixed": 27,
-            "presentation_or_metadata": 53,
+            "executable_or_mixed": 28,
+            "presentation_or_metadata": 52,
             "total_modified": 82,
         },
         "All modified cards must be classified by executable, presentation/metadata or comment-only source change.",
@@ -856,6 +2579,66 @@ def build_report(
         "Evidence schema, transition id and pins must match the active contract.",
     )
 
+    nominal_policy_path_value = str(
+        transition.get("nominal_review_policy_path") or ""
+    )
+    nominal_policy_path = _safe_repo_path(
+        repo_root,
+        nominal_policy_path_value,
+    )
+    nominal_policy: dict[str, Any] = {}
+    nominal_policy_sha256 = ""
+    nominal_policy_load_error = ""
+    if nominal_policy_path is None:
+        nominal_policy_load_error = "policy_path_invalid"
+    else:
+        try:
+            nominal_policy = load_json(nominal_policy_path)
+            nominal_policy_sha256 = file_sha256(nominal_policy_path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            nominal_policy_load_error = type(exc).__name__
+    nominal_policy_contract_valid = (
+        not nominal_policy_load_error
+        and nominal_policy.get("schema_version")
+        == NOMINAL_POLICY_SCHEMA_VERSION
+        and nominal_policy.get("transition_id") == transition_id
+        and nominal_policy.get("from_pin") == from_pin
+        and nominal_policy.get("to_pin") == to_pin
+        and nominal_policy.get("catalog_resolution_is_semantic_proof")
+        is False
+        and nominal_policy.get("canonical_diff_hash_mode")
+        == "git_diff_no_ext_diff_no_textconv_unified0_full_index"
+        and nominal_policy.get("requires_full_blob_oids") is True
+        and nominal_policy.get("requires_source_sha256") is True
+        and nominal_policy.get("unlisted_token_changes_allowed") is False
+        and nominal_policy.get("filter_predicate_normalization_allowed")
+        is False
+        and nominal_policy.get(
+            "automatic_clearance_does_not_activate_runtime_card"
+        )
+        is True
+        and SHA256_PATTERN.fullmatch(
+            str(transition.get("nominal_review_policy_sha256") or "")
+        )
+        is not None
+        and nominal_policy_sha256
+        == transition.get("nominal_review_policy_sha256")
+    )
+    _check(
+        checks,
+        "transition_nominal_review_policy",
+        nominal_policy_contract_valid,
+        "The exact non-executable transition policy must be versioned and digest-pinned.",
+        details={
+            "policy_path": nominal_policy_path_value,
+            "policy_sha256": nominal_policy_sha256,
+            "declared_sha256": transition.get(
+                "nominal_review_policy_sha256"
+            ),
+            "load_error": nominal_policy_load_error,
+        },
+    )
+
     input_digests = (
         evidence.get("input_artifact_digests")
         if isinstance(evidence.get("input_artifact_digests"), dict)
@@ -880,6 +2663,10 @@ def build_report(
         from_pin=from_pin,
         to_pin=to_pin,
         input_digests=input_digests,
+        nominal_policy=nominal_policy if nominal_policy_contract_valid else {},
+        nominal_policy_sha256=(
+            nominal_policy_sha256 if nominal_policy_contract_valid else ""
+        ),
     )
 
     source_delta = (
@@ -918,6 +2705,445 @@ def build_report(
         exact_clearance_rules=exact_clearance_rules,
     )
     expected_card_names = set(card_summary.pop("card_names"))
+    _check(
+        checks,
+        "deployment_blocking_review_count",
+        card_summary["review_required_count"]
+        == expected.get("deployment_blocking_review_required_card_count"),
+        "Deployment-blocking reviews must exclude only explicitly quarantined non-promotional cards.",
+        details={
+            "observed": card_summary["review_required_count"],
+            "expected": expected.get(
+                "deployment_blocking_review_required_card_count"
+            ),
+        },
+    )
+    evidence_cards = [
+        row
+        for row in (
+            evidence.get("cards")
+            if isinstance(evidence.get("cards"), list)
+            else []
+        )
+        if isinstance(row, dict)
+    ]
+
+    postgres_pointer = (
+        evidence.get("postgresql_scope_reconciliation")
+        if isinstance(evidence.get("postgresql_scope_reconciliation"), dict)
+        else {}
+    )
+    postgres_status = postgres_pointer.get("status")
+    postgres_path_value = str(postgres_pointer.get("artifact_path") or "")
+    postgres_path = _safe_repo_path(repo_root, postgres_path_value)
+    postgres_artifact: dict[str, Any] = {}
+    postgres_artifact_sha256 = ""
+    postgres_load_error = ""
+    if postgres_status == "pass":
+        if postgres_path is None:
+            postgres_load_error = "artifact_path_invalid"
+        else:
+            try:
+                postgres_artifact = load_json(postgres_path)
+                postgres_artifact_sha256 = file_sha256(postgres_path)
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                postgres_load_error = type(exc).__name__
+    postgres_pointer_fields = {
+        "schema_version",
+        "status",
+        "canonical_wrapper",
+        "transaction_mode",
+        "transaction_read_only",
+        "writes_performed",
+        "queries_executed",
+        "requested_card_count",
+        "reconciled_card_count",
+        "ambiguity_count",
+        "scope_counts",
+        "rows_sha256",
+    }
+    postgres_pointer_matches_artifact = all(
+        postgres_pointer.get(key) == postgres_artifact.get(key)
+        for key in postgres_pointer_fields
+    )
+    postgres_pass_shape_valid = (
+        postgres_status == "pass"
+        and not postgres_load_error
+        and _postgres_pass_shape_valid(
+            postgres_artifact,
+            expected_card_names=expected_card_names,
+        )
+        and postgres_pointer_matches_artifact
+        and SHA256_PATTERN.fullmatch(
+            str(postgres_pointer.get("artifact_sha256") or "")
+        )
+        is not None
+        and postgres_artifact_sha256
+        == postgres_pointer.get("artifact_sha256")
+        == input_digests.get(
+            "postgresql_scope_reconciliation_v1_sha256"
+        )
+    )
+    postgres_blocked_shape_valid = (
+        postgres_status == "blocked"
+        and postgres_pointer.get("reason")
+        == "missing_approved_ssh_host_key_sha256"
+        and postgres_pointer.get("queries_executed") == 0
+        and postgres_pointer.get("writes_performed") is False
+        and not postgres_path_value
+    )
+    postgres_shape_valid = (
+        postgres_pass_shape_valid or postgres_blocked_shape_valid
+    )
+    _check(
+        checks,
+        "postgresql_reconciliation_evidence",
+        postgres_shape_valid,
+        "PostgreSQL reconciliation must be an exact digest-pinned read-only artifact or record the exact safe preflight block.",
+        details={
+            "artifact_path": postgres_path_value,
+            "artifact_sha256": postgres_artifact_sha256,
+            "declared_sha256": postgres_pointer.get("artifact_sha256"),
+            "load_error": postgres_load_error,
+        },
+    )
+
+    future_gate = (
+        evidence.get("future_release_activation_gate")
+        if isinstance(evidence.get("future_release_activation_gate"), dict)
+        else {}
+    )
+    future_only_count = card_summary["release_scopes"].get("future_only", 0)
+    future_gate_status = future_gate.get("status")
+    activation_path_value = str(future_gate.get("resource_path") or "")
+    activation_path = _safe_repo_path(repo_root, activation_path_value)
+    activation_policy: dict[str, Any] = {}
+    activation_policy_sha256 = ""
+    activation_load_error = ""
+    if future_gate_status == "pass":
+        if activation_path is None:
+            activation_load_error = "resource_path_invalid"
+        else:
+            try:
+                activation_policy = load_json(activation_path)
+                activation_policy_sha256 = file_sha256(activation_path)
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                activation_load_error = type(exc).__name__
+    activation_policy_valid = (
+        postgres_pass_shape_valid
+        and not activation_load_error
+        and SHA256_PATTERN.fullmatch(
+            str(future_gate.get("resource_sha256") or "")
+        )
+        is not None
+        and activation_policy_sha256
+        == future_gate.get("resource_sha256")
+        == input_digests.get("transition_activation_policy_v1_sha256")
+        and _activation_policy_shape_valid(
+            activation_policy,
+            evidence_cards=evidence_cards,
+            postgres=postgres_artifact,
+            postgres_artifact_sha256=postgres_artifact_sha256,
+            transition_id=transition_id,
+            from_pin=from_pin,
+            to_pin=to_pin,
+        )
+    )
+    postgres_scope_counts = (
+        postgres_artifact.get("scope_counts")
+        if isinstance(postgres_artifact.get("scope_counts"), dict)
+        else {}
+    )
+    future_gate_pass_shape_valid = (
+        future_gate_status == "pass"
+        and future_gate.get("schema_version")
+        == FUTURE_ACTIVATION_GATE_SCHEMA_VERSION
+        and future_gate.get("engine_commit") == to_pin
+        and future_gate.get("transition_card_count")
+        == expected.get("changed_card_implementations")
+        and future_gate.get("blocked_card_count")
+        == expected.get("activation_policy_blocked_card_count")
+        == (
+            postgres_scope_counts.get("future_deferred", 0)
+            + postgres_scope_counts.get(
+                "released_missing_from_postgresql", 0
+            )
+        )
+        and future_gate.get("future_only_card_count")
+        == future_only_count
+        == postgres_scope_counts.get("future_deferred")
+        == expected.get("postgresql_future_deferred")
+        and future_gate.get("released_missing_card_count")
+        == postgres_scope_counts.get("released_missing_from_postgresql")
+        == expected.get("postgresql_released_missing")
+        and isinstance(future_gate.get("enforced_by"), list)
+        and all(
+            isinstance(value, str)
+            for value in future_gate.get("enforced_by")
+        )
+        and set(future_gate.get("enforced_by"))
+        == EXPECTED_ACTIVATION_ENFORCERS
+        and future_gate.get("tests")
+        == expected.get("qualified_policy_test_count")
+        and future_gate.get("result") == "pass"
+        and future_gate.get("user_facing_reason_must_be_engine_neutral")
+        is True
+        and activation_policy_valid
+    )
+    future_gate_missing_shape_valid = (
+        future_gate_status == "missing"
+        and future_gate.get("reason")
+        == "no_versioned_product_release_activation_gate_evidence"
+        and future_gate.get("future_only_card_count") == future_only_count
+        and not activation_path_value
+    )
+    future_gate_shape_valid = (
+        future_gate_pass_shape_valid or future_gate_missing_shape_valid
+    )
+    _check(
+        checks,
+        "future_release_activation_gate",
+        future_gate_shape_valid,
+        "Future-only and PostgreSQL-absent cards require an exact digest-pinned fail-closed activation policy or an explicit safe block.",
+        details={
+            "resource_path": activation_path_value,
+            "resource_sha256": activation_policy_sha256,
+            "declared_sha256": future_gate.get("resource_sha256"),
+            "load_error": activation_load_error,
+        },
+    )
+
+    focused_test_pointer = (
+        evidence.get("product_scope_focused_test_evidence")
+        if isinstance(
+            evidence.get("product_scope_focused_test_evidence"), dict
+        )
+        else {}
+    )
+    focused_test_path_value = str(
+        focused_test_pointer.get("artifact_path") or ""
+    )
+    focused_test_path = _safe_repo_path(
+        repo_root, focused_test_path_value
+    )
+    focused_test_artifact: dict[str, Any] = {}
+    focused_test_artifact_sha256 = ""
+    focused_test_load_error = ""
+    if focused_test_path is None:
+        focused_test_load_error = "artifact_path_invalid"
+    else:
+        try:
+            focused_test_artifact = load_json(focused_test_path)
+            focused_test_artifact_sha256 = file_sha256(
+                focused_test_path
+            )
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            focused_test_load_error = type(exc).__name__
+    focused_test_shape_valid = (
+        postgres_pass_shape_valid
+        and not focused_test_load_error
+        and focused_test_pointer.get("schema_version")
+        == PRODUCT_SCOPE_FOCUSED_TEST_SCHEMA_VERSION
+        and SHA256_PATTERN.fullmatch(
+            str(focused_test_pointer.get("artifact_sha256") or "")
+        )
+        is not None
+        and focused_test_artifact_sha256
+        == focused_test_pointer.get("artifact_sha256")
+        == input_digests.get(
+            "product_scope_focused_test_evidence_v2_sha256"
+        )
+        and focused_test_pointer.get("combined_test_count")
+        == expected.get("product_scope_focused_test_count")
+        and focused_test_pointer.get("direct_card_count")
+        == expected.get("product_scope_direct_focused_card_count")
+        and focused_test_pointer.get("execution_report_count")
+        == expected.get("product_scope_focused_execution_report_count")
+        and focused_test_pointer.get(
+            "partial_tests_are_complete_clearance"
+        )
+        is False
+        and focused_test_pointer.get(
+            "planetarium_test_is_promotion_evidence"
+        )
+        is False
+        and focused_test_pointer.get(
+            "mandate_of_peace_test_is_promotion_evidence"
+        )
+        is False
+        and focused_test_pointer.get("upstream_card_source_modified")
+        is False
+        and _product_scope_focused_test_shape_valid(
+            focused_test_artifact,
+            focused_artifact_path=focused_test_path_value,
+            evidence_cards=evidence_cards,
+            postgres=postgres_artifact,
+            postgres_artifact_path=postgres_path_value,
+            postgres_artifact_sha256=postgres_artifact_sha256,
+            repo_root=repo_root,
+            from_pin=from_pin,
+            to_pin=to_pin,
+            expected_test_count=_integer(
+                expected.get("product_scope_focused_test_count")
+            ),
+            expected_direct_card_count=_integer(
+                expected.get(
+                    "product_scope_direct_focused_card_count"
+                )
+            ),
+            expected_patch_count=_integer(
+                expected.get("product_scope_focused_patch_count")
+            ),
+            expected_execution_report_count=_integer(
+                expected.get(
+                    "product_scope_focused_execution_report_count"
+                )
+            ),
+        )
+    )
+    _check(
+        checks,
+        "product_scope_focused_test_evidence",
+        focused_test_shape_valid,
+        "Product-scope focused tests must be versioned, digest-pinned and preserve partial-test and quarantine boundaries.",
+        details={
+            "artifact_path": focused_test_path_value,
+            "artifact_sha256": focused_test_artifact_sha256,
+            "declared_sha256": focused_test_pointer.get(
+                "artifact_sha256"
+            ),
+            "load_error": focused_test_load_error,
+        },
+    )
+
+    contract_review_links = (
+        transition.get("review_artifacts")
+        if isinstance(transition.get("review_artifacts"), dict)
+        else {}
+    )
+    evidence_review_links = (
+        evidence.get("transition_review_derivatives")
+        if isinstance(evidence.get("transition_review_derivatives"), dict)
+        else {}
+    )
+    matrix_pointer = (
+        evidence_review_links.get("active_scope_semantic_matrix")
+        if isinstance(
+            evidence_review_links.get("active_scope_semantic_matrix"), dict
+        )
+        else {}
+    )
+    index_pointer = (
+        evidence_review_links.get("transition_compact_review_index")
+        if isinstance(
+            evidence_review_links.get("transition_compact_review_index"),
+            dict,
+        )
+        else {}
+    )
+    matrix_path_value = str(matrix_pointer.get("artifact_path") or "")
+    index_path_value = str(index_pointer.get("artifact_path") or "")
+    matrix_path = _safe_repo_path(repo_root, matrix_path_value)
+    index_path = _safe_repo_path(repo_root, index_path_value)
+    matrix_artifact: dict[str, Any] = {}
+    index_artifact: dict[str, Any] = {}
+    matrix_sha256 = ""
+    index_sha256 = ""
+    review_artifact_load_errors: list[str] = []
+    for artifact_id, artifact_path in (
+        ("active_scope_semantic_matrix", matrix_path),
+        ("transition_compact_review_index", index_path),
+    ):
+        if artifact_path is None:
+            review_artifact_load_errors.append(
+                f"{artifact_id}:artifact_path_invalid"
+            )
+            continue
+        try:
+            loaded = load_json(artifact_path)
+            loaded_sha256 = file_sha256(artifact_path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            review_artifact_load_errors.append(
+                f"{artifact_id}:{type(exc).__name__}"
+            )
+            continue
+        if artifact_id == "active_scope_semantic_matrix":
+            matrix_artifact = loaded
+            matrix_sha256 = loaded_sha256
+        else:
+            index_artifact = loaded
+            index_sha256 = loaded_sha256
+
+    review_qualification = (
+        evidence.get("qualification")
+        if isinstance(evidence.get("qualification"), dict)
+        else {}
+    )
+    source_primary_snapshot_sha256 = str(
+        evidence_review_links.get("source_primary_snapshot_sha256") or ""
+    )
+    review_links_valid = (
+        not review_artifact_load_errors
+        and evidence_review_links == contract_review_links
+        and evidence_review_links.get("schema_version")
+        == REVIEW_DERIVATIVE_LINK_SCHEMA_VERSION
+        and SHA256_PATTERN.fullmatch(source_primary_snapshot_sha256)
+        is not None
+        and evidence_review_links.get("focused_test_evidence_sha256")
+        == focused_test_artifact_sha256
+        == focused_test_pointer.get("artifact_sha256")
+        and matrix_pointer.get("schema_version")
+        == ACTIVE_SCOPE_MATRIX_SCHEMA_VERSION
+        and matrix_pointer.get("card_count") == 36
+        and matrix_sha256
+        == matrix_pointer.get("artifact_sha256")
+        == input_digests.get(
+            "transition_active_scope_semantic_matrix_v1_sha256"
+        )
+        and index_pointer.get("schema_version")
+        == COMPACT_REVIEW_INDEX_SCHEMA_VERSION
+        and index_pointer.get("card_count") == 169
+        and index_sha256
+        == index_pointer.get("artifact_sha256")
+        == input_digests.get(
+            "transition_compact_review_index_v1_sha256"
+        )
+    )
+    review_artifacts_valid = (
+        review_links_valid
+        and postgres_pass_shape_valid
+        and focused_test_shape_valid
+        and _transition_review_artifacts_shape_valid(
+            matrix_artifact,
+            index_artifact,
+            evidence_cards=evidence_cards,
+            postgres=postgres_artifact,
+            qualification=review_qualification,
+            primary_evidence_path=str(
+                transition.get("evidence_path") or ""
+            ),
+            source_primary_snapshot_sha256=(
+                source_primary_snapshot_sha256
+            ),
+            focused_artifact_path=focused_test_path_value,
+            focused_artifact_sha256=focused_test_artifact_sha256,
+            from_pin=from_pin,
+            to_pin=to_pin,
+        )
+    )
+    _check(
+        checks,
+        "transition_review_artifacts",
+        review_artifacts_valid,
+        "The 36-card semantic matrix and 169-card review index must remain digest-pinned and match exact primary identities and statuses.",
+        details={
+            "matrix_path": matrix_path_value,
+            "matrix_sha256": matrix_sha256,
+            "index_path": index_path_value,
+            "index_sha256": index_sha256,
+            "load_errors": review_artifact_load_errors,
+        },
+    )
 
     runtime = (
         evidence.get("runtime_catalog")
@@ -947,35 +3173,84 @@ def build_report(
         and '"xmage_pin_semantic_defect"' in policy_source
         and '"Prudent Fateseer"' in policy_source
         and '"xmage_upstream_mechanic_unfinished"' in policy_source
+        and '"Mandate of Peace"' in policy_source
+        and '"xmage_upstream_copy_lki_gap"' in policy_source
+        and '"magefree/mage#12911"' in policy_source
         and "requireEngineCommit" in policy_source,
         "The pin-scoped card qualification policy source must match the transition evidence.",
     )
-    _check(
-        checks,
-        "runtime_catalog_proof",
-        runtime.get("engine_commit") == to_pin
+    runtime_supported = _integer(runtime.get("supported"))
+    runtime_unsupported = _integer(runtime.get("unsupported"))
+    activation_restricted = _integer(
+        runtime.get("activation_restricted")
+    )
+    external_gap_restricted = _integer(
+        runtime.get("external_runtime_gap_restricted")
+    )
+    runtime_total = _integer(runtime.get("total"))
+    runtime_activation_shape_valid = (
+        postgres_pass_shape_valid
+        and future_gate_pass_shape_valid
+        and runtime.get("engine_commit") == to_pin
         and runtime.get("catalog_ready") is True
-        and runtime.get("total") == expected.get("changed_card_implementations")
+        and runtime.get("total")
+        == expected.get("changed_card_implementations")
         and runtime.get("catalog_resolved_before_qualification")
         == expected.get("runtime_catalog_resolved_before_qualification")
         and runtime.get("catalog_unresolved_before_qualification")
         == expected.get("runtime_catalog_unresolved_before_qualification")
-        and runtime.get("supported") == expected.get("runtime_catalog_supported")
-        and runtime.get("unsupported") == expected.get("runtime_catalog_unsupported")
+        and runtime_supported
+        == expected.get("runtime_after_activation_supported")
+        == postgres_scope_counts.get("product_in_scope")
+        == expected.get("postgresql_product_in_scope")
+        and runtime_unsupported
+        == expected.get("runtime_after_activation_unsupported")
+        and activation_restricted
+        == expected.get("runtime_activation_restricted")
+        == future_gate.get("blocked_card_count")
+        and external_gap_restricted
+        == expected.get("runtime_external_gap_restricted")
+        == postgres_scope_counts.get("external_runtime_gap")
+        == expected.get("postgresql_external_runtime_gap")
+        and runtime_unsupported is not None
+        and activation_restricted is not None
+        and external_gap_restricted is not None
+        and runtime_unsupported
+        == activation_restricted + external_gap_restricted
+        and runtime_supported is not None
+        and runtime_total is not None
+        and runtime_supported + runtime_unsupported == runtime_total
+        and runtime.get("activation_policy_resource_path")
+        == activation_path_value
+        and runtime.get("activation_policy_resource_sha256")
+        == activation_policy_sha256
+        and runtime.get("unsupported_names_embedded") is False
         and runtime.get("qualification_policy_engine_commit") == to_pin
         and runtime.get("qualification_policy_path")
         == (
             "services/xmage-sidecar/src/main/java/com/manaloom/xmage/"
             "XmageCardQualificationPolicy.java"
         )
-        and runtime.get("unsupported_card_names")
-        == ["Planetarium of Wan Shi Tong", "Prudent Fateseer"]
-        and policy_test.get("tests") == expected.get("qualified_policy_test_count")
+        and policy_test.get("tests")
+        == expected.get("qualified_policy_test_count")
         and policy_test.get("failures") == 0
         and policy_test.get("errors") == 0
         and policy_test.get("skipped") == 0
-        and runtime.get("catalog_resolution_is_semantic_proof") is False,
-        "Runtime coverage must reconcile all changed cards without claiming semantic proof.",
+        and SHA256_PATTERN.fullmatch(
+            str(policy_test.get("surefire_sha256") or "")
+        )
+        is not None
+        and policy_test.get("surefire_sha256")
+        == input_digests.get(
+            "sidecar_transition_coverage_surefire_sha256"
+        )
+        and runtime.get("catalog_resolution_is_semantic_proof") is False
+    )
+    _check(
+        checks,
+        "runtime_catalog_proof",
+        runtime_activation_shape_valid,
+        "Runtime coverage must exactly apply PostgreSQL scope and the activation policy without claiming semantic proof.",
     )
 
     tests = (
@@ -1094,42 +3369,22 @@ def build_report(
         if isinstance(diagnostics.get("actionable_findings"), list)
         else []
     )
-    actionable_rows = [
-        row for row in actionable_findings if isinstance(row, dict)
-    ]
-    actionable_names = {
-        str(row.get("card_name") or "") for row in actionable_rows
-    }
-    planetarium_finding = next(
-        (
-            row
-            for row in actionable_rows
-            if row.get("card_name") == "Planetarium of Wan Shi Tong"
-        ),
-        {},
+    diagnostics_shape_valid = _card_data_diagnostics_shape_valid(
+        diagnostics,
+        evidence_cards=evidence_cards,
+        postgres=postgres_artifact,
+        focused_artifact=focused_test_artifact,
+        focused_artifact_path=focused_test_path_value,
+        focused_artifact_valid=focused_test_shape_valid,
+        repo_root=repo_root,
     )
     _check(
         checks,
         "card_data_diagnostics",
-        diagnostics.get("status") in {"pass", "review_required"}
-        and diagnostics.get("cataloged_classes_checked") == 168
-        and diagnostics.get("good_face_count") == 154
-        and diagnostics.get("wrong_face_count") == 16
-        and diagnostics.get("missing_reference_face_count") == 3
-        and len(actionable_rows) == len(actionable_findings)
-        == expected.get("card_data_actionable_finding_count")
-        and actionable_names == EXPECTED_ACTIONABLE_CARD_FINDINGS
-        and actionable_names <= expected_card_names
-        and len(actionable_names) == len(actionable_rows)
-        and all(
-            row.get("severity") in {"mechanical", "visible_rules_text"}
-            and row.get("status") in {"quarantined", "upstream_fix_required"}
-            and row.get("evidence")
-            for row in actionable_rows
-        )
-        and planetarium_finding.get("severity") == "mechanical"
-        and planetarium_finding.get("status") == "quarantined",
-        "Detailed card-data findings must preserve every actionable warning and the mechanical quarantine.",
+        diagnostics_shape_valid
+        and len(actionable_findings)
+        == expected.get("card_data_actionable_finding_count"),
+        "Detailed card-data findings must be activation-blocked, exactly quarantined, or proven outside the runtime presentation boundary.",
     )
 
     snapshot = (
@@ -1146,67 +3401,6 @@ def build_report(
         "The prior canonical snapshot must remain classified as regression-only evidence.",
     )
 
-    postgres = (
-        evidence.get("postgresql_scope_reconciliation")
-        if isinstance(evidence.get("postgresql_scope_reconciliation"), dict)
-        else {}
-    )
-    postgres_status = postgres.get("status")
-    postgres_shape_valid = (
-        (
-            postgres_status == "pass"
-            and _postgres_pass_shape_valid(
-                postgres,
-                expected_card_names=expected_card_names,
-            )
-        )
-        or (
-            postgres_status == "blocked"
-            and postgres.get("reason")
-            == "missing_approved_ssh_host_key_sha256"
-            and postgres.get("queries_executed") == 0
-            and postgres.get("writes_performed") is False
-        )
-    )
-    _check(
-        checks,
-        "postgresql_reconciliation_evidence",
-        postgres_shape_valid,
-        "PostgreSQL reconciliation must pass or record the exact safe preflight block.",
-    )
-
-    future_gate = (
-        evidence.get("future_release_activation_gate")
-        if isinstance(evidence.get("future_release_activation_gate"), dict)
-        else {}
-    )
-    future_only_count = card_summary["release_scopes"].get("future_only", 0)
-    future_gate_status = future_gate.get("status")
-    future_gate_shape_valid = (
-        (
-            future_gate_status == "pass"
-            and future_gate.get("schema_version")
-            == "manaloom_future_card_activation_gate_v1_2026-07-28"
-            and future_gate.get("future_only_card_count") == future_only_count
-            and isinstance(future_gate.get("enforced_by"), list)
-            and bool(future_gate.get("enforced_by"))
-            and (_integer(future_gate.get("tests")) or 0) > 0
-            and future_gate.get("result") == "pass"
-        )
-        or (
-            future_gate_status == "missing"
-            and future_gate.get("reason")
-            == "no_versioned_product_release_activation_gate_evidence"
-            and future_gate.get("future_only_card_count") == future_only_count
-        )
-    )
-    _check(
-        checks,
-        "future_release_activation_gate",
-        future_gate_shape_valid,
-        "Future-only scope requires a versioned release-activation gate or an explicit safe block.",
-    )
-
     qualification = (
         evidence.get("qualification")
         if isinstance(evidence.get("qualification"), dict)
@@ -1214,12 +3408,14 @@ def build_report(
     )
     proof_ready = (
         card_summary["review_required_count"] == 0
-        and diagnostics.get("status") == "pass"
+        and diagnostics_shape_valid
         and postgres_status == "pass"
         and postgres_shape_valid
         and (future_only_count == 0 or future_gate_status == "pass")
         and future_gate_shape_valid
-        and runtime.get("unsupported") == 0
+        and runtime_activation_shape_valid
+        and focused_test_shape_valid
+        and review_artifacts_valid
     )
     computed_deployable = proof_ready
     required_blocking_reasons: set[str] = set()
@@ -1227,7 +3423,7 @@ def build_report(
         required_blocking_reasons.add(
             "changed_card_semantic_reviews_or_residuals_pending"
         )
-    if diagnostics.get("status") != "pass":
+    if not diagnostics_shape_valid:
         required_blocking_reasons.add("card_data_diagnostics_not_passed")
     if postgres_status != "pass" or not postgres_shape_valid:
         required_blocking_reasons.add(
@@ -1237,9 +3433,17 @@ def build_report(
         required_blocking_reasons.add(
             "future_only_card_activation_gate_not_passed"
         )
-    if runtime.get("unsupported") != 0:
+    if not runtime_activation_shape_valid:
         required_blocking_reasons.add(
-            "external_runtime_unsupported_cards_present"
+            "runtime_activation_scope_inconsistent"
+        )
+    if not focused_test_shape_valid:
+        required_blocking_reasons.add(
+            "product_scope_focused_test_evidence_invalid"
+        )
+    if not review_artifacts_valid:
+        required_blocking_reasons.add(
+            "transition_review_artifacts_invalid"
         )
     declared_blocking_reasons = qualification.get("blocking_reasons")
     blocking_reason_set = (
@@ -1254,7 +3458,7 @@ def build_report(
         qualification.get("status")
         == ("pass" if proof_ready else "review_required")
         and qualification.get("deployment_allowed") is computed_deployable
-        and required_blocking_reasons <= blocking_reason_set
+        and required_blocking_reasons == blocking_reason_set
         and (not computed_deployable or not blocking_reason_set),
         "Deployment permission must be derived from card review, residual and PostgreSQL evidence.",
         details={

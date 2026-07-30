@@ -6,3 +6,10 @@ useDefault = true
 [[allowlists]]
 description = "Scanner configuration is policy, not a credential"
 paths = ['''(^|/)\.gitleaks\.toml$''']
+
+[[allowlists]]
+description = "Versioned SHA-256 evidence digests are fingerprints, not credentials"
+regexTarget = "match"
+regexes = [
+  '''(?i)[a-z0-9_]*sha256["']?\s*[:=]\s*["'][0-9a-f]{64}["']''',
+]
