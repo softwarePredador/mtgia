@@ -677,8 +677,10 @@ git archive "$sha" -- services/xmage-sidecar services/forge-sidecar |
 
 # Tags are publication handles only. Deployment starts only after both registry
 # RepoDigests have been resolved and validated locally.
+# Capture raw stdout because hosts may prepend a login banner. The release
+# identity is extracted locally from exact repo@sha256 lines before mutation.
 # shellcheck disable=SC2029,SC2087
-digest_pair="$(ssh "${ssh_args[@]}" "$ssh_target" <<REMOTE
+raw_digest_output="$(ssh "${ssh_args[@]}" "$ssh_target" 'bash -se' <<REMOTE
 set -euo pipefail
 cd '$remote_dir'
 DOCKER_BUILDKIT=1 docker build \
@@ -717,7 +719,7 @@ for attempt in \$(seq 1 15); do
         "\$forge_digest_ref" == '$FORGE_IMAGE_REPO@sha256:'"\$forge_digest" &&
         "\$xmage_digest" =~ ^[0-9a-f]{64}$ &&
         "\$forge_digest" =~ ^[0-9a-f]{64}$ ]]; then
-    printf '%s|%s\n' "\$xmage_digest_ref" "\$forge_digest_ref"
+    printf '%s\n%s\n' "\$xmage_digest_ref" "\$forge_digest_ref"
     exit 0
   fi
   sleep 1
@@ -726,14 +728,25 @@ echo 'push remoto nao produziu RepoDigests SHA-256 validos para os sidecars' >&2
 exit 2
 REMOTE
 )"
-IFS='|' read -r XMAGE_IMAGE_DIGEST_REF FORGE_IMAGE_DIGEST_REF <<<"$digest_pair"
+if ! XMAGE_IMAGE_DIGEST_REF="$(
+  printf '%s\n' "$raw_digest_output" |
+    extract_manaloom_repo_digest_ref "$XMAGE_IMAGE_REPO"
+)" ||
+   ! FORGE_IMAGE_DIGEST_REF="$(
+     printf '%s\n' "$raw_digest_output" |
+       extract_manaloom_repo_digest_ref "$FORGE_IMAGE_REPO"
+   )"; then
+  echo "push remoto nao retornou RepoDigests SHA-256 validos para os sidecars" >&2
+  exit 2
+fi
+unset raw_digest_output
 xmage_digest="${XMAGE_IMAGE_DIGEST_REF#"$XMAGE_IMAGE_REPO@sha256:"}"
 forge_digest="${FORGE_IMAGE_DIGEST_REF#"$FORGE_IMAGE_REPO@sha256:"}"
 if [[ "$XMAGE_IMAGE_DIGEST_REF" != "$XMAGE_IMAGE_REPO@sha256:$xmage_digest" ||
       "$FORGE_IMAGE_DIGEST_REF" != "$FORGE_IMAGE_REPO@sha256:$forge_digest" ||
       ! "$xmage_digest" =~ ^[0-9a-f]{64}$ ||
       ! "$forge_digest" =~ ^[0-9a-f]{64}$ ]]; then
-  echo "push remoto retornou RepoDigests invalidos: $digest_pair" >&2
+  echo "push remoto retornou RepoDigests invalidos para os sidecars" >&2
   exit 2
 fi
 readonly XMAGE_IMAGE_DIGEST_REF FORGE_IMAGE_DIGEST_REF

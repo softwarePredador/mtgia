@@ -129,6 +129,25 @@ void main() {
       expect(sidecars, contains('.RepoDigests'));
       expect(
         sidecars,
+        contains(
+          'extract_manaloom_repo_digest_ref "\$XMAGE_IMAGE_REPO"',
+        ),
+      );
+      expect(
+        sidecars,
+        contains(
+          'extract_manaloom_repo_digest_ref "\$FORGE_IMAGE_REPO"',
+        ),
+      );
+      expect(
+        sidecars,
+        contains(
+          '"\$ssh_target" \'bash -se\' <<REMOTE',
+        ),
+      );
+      expect(sidecars, contains('unset raw_digest_output'));
+      expect(
+        sidecars,
         contains('readonly XMAGE_IMAGE_DIGEST_REF FORGE_IMAGE_DIGEST_REF'),
       );
       expect(sidecars, contains(r'! "$xmage_digest" =~ ^[0-9a-f]{64}$'));
