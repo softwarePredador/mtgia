@@ -70,6 +70,27 @@ void main() {
     expect(deploy, contains('pub get --enforce-lockfile'));
     expect(deploy, contains(r'"$MANALOOM_FLUTTER_BIN_RESOLVED" build'));
     expect(deploy, contains('--no-pub'));
+    expect(
+      deploy,
+      contains(
+        r'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"',
+      ),
+    );
+    expect(
+      deploy,
+      contains(
+        r'--dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"',
+      ),
+    );
+    expect(
+      deploy,
+      contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+    );
+    expect(
+      deploy,
+      isNot(contains('--dart-define="ENABLE_INTERACTIVE_BATTLE=true"')),
+    );
+    expect(deploy, contains('interactive_battle_enabled'));
 
     const approvalCall =
         'require_live_mutation_approval "ManaLoom Flutter Web deployment"';
@@ -142,6 +163,17 @@ void main() {
       expect(
         buildOnly.stderr,
         contains('ferramenta obrigatoria ausente: Flutter 3.44.6'),
+      );
+
+      final invalidInteractiveFlag = Process.runSync(
+        '/bin/bash',
+        [File('../scripts/manaloom_deploy_flutter_web.sh').absolute.path],
+        environment: {'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE': 'yes'},
+      );
+      expect(invalidInteractiveFlag.exitCode, 2);
+      expect(
+        invalidInteractiveFlag.stderr,
+        contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
       );
     } finally {
       fixture.deleteSync(recursive: true);

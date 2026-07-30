@@ -7,6 +7,20 @@ KEYSTORE="${MANALOOM_ANDROID_KEYSTORE:-$HOME/.manaloom/signing/android/manaloom-
 KEY_ALIAS="${MANALOOM_ANDROID_KEY_ALIAS:-manaloom-upload}"
 STORE_PASSWORD_SERVICE="${MANALOOM_ANDROID_STORE_PASSWORD_SERVICE:-manaloom-android-upload-store-password}"
 KEY_PASSWORD_SERVICE="${MANALOOM_ANDROID_KEY_PASSWORD_SERVICE:-manaloom-android-upload-key-password}"
+# This release decision is accepted only from the invoking process. It is
+# intentionally opt-in and is never inferred from an app/server environment.
+RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
+      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+  exit 2
+fi
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
+  INTERACTIVE_BATTLE_DART_DEFINE=true
+else
+  INTERACTIVE_BATTLE_DART_DEFINE=false
+fi
+readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_BATTLE_DART_DEFINE
 
 require_tool() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -118,12 +132,14 @@ jq -n \
   --arg android_build_tools_version "$MANALOOM_ANDROID_BUILD_TOOLS_VERSION" \
   --arg apksigner_sha256 "$APKSIGNER_SHA256" \
   --arg aapt_sha256 "$AAPT_SHA256" \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '{
     schema_version: 1,
     status: "release",
     release_identity_embedded: true,
     features: {
-      scanner_release_enabled: false
+      scanner_release_enabled: false,
+      interactive_battle_enabled: $interactive_battle_enabled
     },
     git_sha: $git_sha,
     version: $version,
@@ -155,7 +171,7 @@ build_args=(
   --dart-define="RELEASE_IDENTITY_SHA256=$EMBEDDED_IDENTITY_SOURCE_SHA256"
   --dart-define="RELEASE_STARTUP_PROOF=true"
   --dart-define="ENABLE_SCANNER_RELEASE=false"
-  --dart-define="ENABLE_INTERACTIVE_BATTLE=false"
+  --dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"
   --no-version-check
   --no-pub
 )
@@ -254,6 +270,7 @@ jq -n \
   --arg embedded_identity_sha256 "$EMBEDDED_IDENTITY_SHA256" \
   --arg certificate_sha256 "$APK_CERT" \
   --argjson sentry_configured "$([[ -n "$SENTRY_RELEASE_DSN" ]] && printf true || printf false)" \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '{
     schema_version: 1,
     product: "manaloom",
@@ -263,6 +280,9 @@ jq -n \
     short_sha: $short_sha,
     source_committed_at: $source_committed_at,
     api_base_url: $api_base_url,
+    features: {
+      interactive_battle_enabled: $interactive_battle_enabled
+    },
     sentry_release: $sentry_release,
     sentry_configured: $sentry_configured,
     sentry_dsn_sha256: (if ($sentry_dsn_sha256 | length) > 0 then $sentry_dsn_sha256 else null end),

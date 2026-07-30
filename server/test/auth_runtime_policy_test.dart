@@ -106,6 +106,47 @@ void main() {
       expect(() => AccountEmailDeliveryPolicy.validate(valid), returnsNormally);
     });
 
+    test('accepts Resend with a verified configurable sender domain', () {
+      expect(
+        () => AccountEmailDeliveryPolicy.validate(const {
+          'MANALOOM_EMAIL_DELIVERY_PROVIDER': 'resend',
+          'PASSWORD_RESET_APP_URL': 'https://app.example/#/reset-password',
+          'EMAIL_VERIFICATION_APP_URL': 'https://app.example/#/verify-email',
+          'RESEND_API_KEY': 're_test_only_never_real_123456789',
+          'RESEND_FROM_EMAIL': 'conta@mail.example.test',
+          'RESEND_FROM_NAME': 'ManaLoom Conta',
+          'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
+        }),
+        returnsNormally,
+      );
+    });
+
+    test('Resend fails closed for missing key or sender-domain mismatch', () {
+      const resend = {
+        'MANALOOM_EMAIL_DELIVERY_PROVIDER': 'resend',
+        'PASSWORD_RESET_APP_URL': 'https://app.example/#/reset-password',
+        'EMAIL_VERIFICATION_APP_URL': 'https://app.example/#/verify-email',
+        'RESEND_API_KEY': 're_test_only_never_real_123456789',
+        'RESEND_FROM_EMAIL': 'conta@mail.example.test',
+        'RESEND_FROM_NAME': 'ManaLoom Conta',
+        'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
+      };
+      expect(
+        () => AccountEmailDeliveryPolicy.validate({
+          ...resend,
+          'RESEND_API_KEY': '',
+        }),
+        throwsStateError,
+      );
+      expect(
+        () => AccountEmailDeliveryPolicy.validate({
+          ...resend,
+          'RESEND_VERIFIED_DOMAIN': 'different.example.test',
+        }),
+        throwsStateError,
+      );
+    });
+
     test('rejects absent, insecure or test-token configuration', () {
       expect(
         () => AccountEmailDeliveryPolicy.validate({

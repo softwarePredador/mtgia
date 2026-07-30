@@ -25,11 +25,19 @@ void main() {
     expect(deploy, contains('--env-add SENTRY_DSN='));
     expect(deploy, contains('--env-add SENTRY_ENVIRONMENT=production'));
     expect(deploy, contains('MANALOOM_PRODUCTION_SENTRY_DSN_SHA256'));
+    expect(deploy, contains('MANALOOM_EMAIL_DELIVERY_PROVIDER'));
+    expect(deploy, contains('--env-add RESEND_API_KEY='));
+    expect(deploy, contains('--env-add RESEND_FROM_EMAIL='));
+    expect(deploy, contains('--env-add RESEND_FROM_NAME='));
+    expect(deploy, contains('--env-add RESEND_VERIFIED_DOMAIN='));
+    expect(deploy, contains('spec_resend_api_key_sha256'));
+    expect(deploy, contains('runtime_resend_api_key_sha256'));
     expect(deploy, contains('jwt_secret_configured'));
     expect(deploy, contains('MANALOOM_JWT_SECRET_KEYCHAIN_SERVICE'));
     expect(deploy, contains('MANALOOM_JWT_SECRET_KEYCHAIN_ACCOUNT'));
     expect(deploy, contains('read_manaloom_keychain_secret'));
     expect(deploy, isNot(contains('echo \"\$JWT_SECRET\"')));
+    expect(deploy, isNot(contains('echo \"\$RESEND_API_KEY\"')));
     expect(preflight, contains('jwt_secret=validated'));
     expect(preflight, isNot(contains("Platform.environment['JWT_SECRET']")));
     expect(

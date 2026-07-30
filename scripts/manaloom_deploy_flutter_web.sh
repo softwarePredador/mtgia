@@ -4,6 +4,20 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 BUILD_ONLY="${MANALOOM_RELEASE_BUILD_ONLY:-0}"
+# Capture the release decision before loading the persistent server
+# environment. Only the invoking process may opt this public artifact in.
+RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
+      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+  exit 2
+fi
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
+  INTERACTIVE_BATTLE_DART_DEFINE=true
+else
+  INTERACTIVE_BATTLE_DART_DEFINE=false
+fi
+readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_BATTLE_DART_DEFINE
 
 # Approval must come from the process invoking this release, never from the
 # persistent server environment loaded below.
@@ -296,7 +310,7 @@ build_args=(
   --dart-define="PUBLIC_API_BASE_URL=$API_BASE_URL"
   --dart-define="SENTRY_ENVIRONMENT=production"
   --dart-define="SENTRY_RELEASE=manaloom-web@$SHORT_SHA"
-  --dart-define="ENABLE_INTERACTIVE_BATTLE=false"
+  --dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"
   --no-version-check
   --no-pub
 )
@@ -374,6 +388,7 @@ jq -n \
   --arg lotus_app_sha256 "$LOTUS_APP_SHA256" \
   --arg lotus_styles_sha256 "$LOTUS_STYLES_SHA256" \
   --argjson sentry_configured "$([[ -n "$SENTRY_RELEASE_DSN" ]] && printf true || printf false)" \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '{
     schema_version: 1,
     product: "manaloom",
@@ -384,6 +399,9 @@ jq -n \
     built_at: $built_at,
     source_committed_at: $source_committed_at,
     api_base_url: $api_base_url,
+    features: {
+      interactive_battle_enabled: $interactive_battle_enabled
+    },
     build_mode: "release",
     base_href: "/app/",
     flutter_version: $flutter_version,
@@ -405,7 +423,9 @@ jq -n \
     }
   }' > "$WORKTREE_DIR/app/build/web/release.json"
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
-  '.git_sha == $sha and .version == $version and .platform == "web"' \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
+  '.git_sha == $sha and .version == $version and .platform == "web" and
+   .features.interactive_battle_enabled == $interactive_battle_enabled' \
   "$WORKTREE_DIR/app/build/web/release.json" >/dev/null
 
 if [[ "$BUILD_ONLY" == "1" ]]; then
@@ -614,7 +634,9 @@ ROOT_CODE="$(curl -sS -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL/")"
 [[ "$ROOT_CODE" == "200" ]]
 grep -Fq '<base href="/app/">' /tmp/manaloom_app_web_deep.html
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
-  '.git_sha == $sha and .version == $version and .platform == "web"' \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
+  '.git_sha == $sha and .version == $version and .platform == "web" and
+   .features.interactive_battle_enabled == $interactive_battle_enabled' \
   /tmp/manaloom_app_release.json >/dev/null
 grep -Eqi '^cache-control:[[:space:]]*no-cache, no-store, must-revalidate' "$RELEASE_HEADERS"
 APP_HEADERS="$(mktemp /tmp/manaloom_app_headers.XXXXXX)"

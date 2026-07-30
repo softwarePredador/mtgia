@@ -1,3 +1,4 @@
+import 'account_email_delivery_config.dart';
 import 'runtime_environment.dart';
 
 const requireVerifiedEmailEnvironment = 'MANALOOM_REQUIRE_VERIFIED_EMAIL';
@@ -41,6 +42,7 @@ Map<String, String> _environmentValues() {
       'EMAIL_VERIFICATION_WEBHOOK_URL',
       'EMAIL_VERIFICATION_WEBHOOK_TOKEN',
       'EMAIL_VERIFICATION_APP_URL',
+      ...accountEmailDeliveryEnvironmentKeys,
     ])
       if (runtime[key] case final String value) key: value,
   };

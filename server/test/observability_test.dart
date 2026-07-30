@@ -26,7 +26,11 @@ void main() {
       final sanitized = sanitizeObservedMap({
         'email': 'qa@example.com',
         'safe': 'ok',
-        'nested': {'refresh_token': 'refresh-secret', 'input_tokens': 42},
+        'nested': {
+          'refresh_token': 'refresh-secret',
+          'resend_api_key': 're_test_only_never_real_123456789',
+          'input_tokens': 42,
+        },
       });
 
       expect(sanitized['email'], equals('[REDACTED_EMAIL]'));
@@ -38,6 +42,10 @@ void main() {
       expect(
         (sanitized['nested'] as Map<String, Object?>)['input_tokens'],
         equals(42),
+      );
+      expect(
+        (sanitized['nested'] as Map<String, Object?>)['resend_api_key'],
+        equals(observedFilteredValue),
       );
     });
 

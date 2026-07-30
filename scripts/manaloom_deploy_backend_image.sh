@@ -54,6 +54,8 @@ load_manaloom_env_keys "$ENV_FILE" \
   MANALOOM_EXPECTED_FORGE_URL MANALOOM_EXPECTED_NATIVE_URL \
   MANALOOM_EXPECTED_XMAGE_URL MANALOOM_REMOTE_BUILD_ROOT \
   MANALOOM_TRUSTED_PROXY_HOPS MANALOOM_TRUSTED_PROXY_PEERS JWT_SECRET \
+  MANALOOM_EMAIL_DELIVERY_PROVIDER RESEND_API_KEY RESEND_FROM_EMAIL \
+  RESEND_FROM_NAME RESEND_VERIFIED_DOMAIN \
   PASSWORD_RESET_WEBHOOK_URL PASSWORD_RESET_WEBHOOK_TOKEN \
   PASSWORD_RESET_APP_URL EMAIL_VERIFICATION_WEBHOOK_URL \
   EMAIL_VERIFICATION_WEBHOOK_TOKEN EMAIL_VERIFICATION_APP_URL SENTRY_DSN
@@ -157,6 +159,25 @@ fi
 readonly HEALTH_PROBE_IMAGE XMAGE_EXPECTED_COMMIT XMAGE_EXPECTED_VERSION
 MANALOOM_ALLOWED_ORIGINS="${MANALOOM_ALLOWED_ORIGINS:-$REQUIRED_WEB_ORIGIN}"
 ENVIRONMENT="${ENVIRONMENT:-production}"
+MANALOOM_EMAIL_DELIVERY_PROVIDER="${MANALOOM_EMAIL_DELIVERY_PROVIDER:-webhook}"
+RESEND_FROM_NAME="${RESEND_FROM_NAME:-ManaLoom}"
+case "$MANALOOM_EMAIL_DELIVERY_PROVIDER" in
+  resend)
+    PASSWORD_RESET_WEBHOOK_URL="${PASSWORD_RESET_WEBHOOK_URL:-}"
+    PASSWORD_RESET_WEBHOOK_TOKEN="${PASSWORD_RESET_WEBHOOK_TOKEN:-}"
+    EMAIL_VERIFICATION_WEBHOOK_URL="${EMAIL_VERIFICATION_WEBHOOK_URL:-}"
+    EMAIL_VERIFICATION_WEBHOOK_TOKEN="${EMAIL_VERIFICATION_WEBHOOK_TOKEN:-}"
+    ;;
+  webhook)
+    RESEND_API_KEY="${RESEND_API_KEY:-}"
+    RESEND_FROM_EMAIL="${RESEND_FROM_EMAIL:-}"
+    RESEND_VERIFIED_DOMAIN="${RESEND_VERIFIED_DOMAIN:-}"
+    ;;
+  *)
+    echo "MANALOOM_EMAIL_DELIVERY_PROVIDER deve ser webhook ou resend" >&2
+    exit 2
+    ;;
+esac
 MANALOOM_TRUSTED_PROXY_HOPS="${MANALOOM_TRUSTED_PROXY_HOPS:-$MANALOOM_PRODUCTION_TRUSTED_PROXY_HOPS}"
 MANALOOM_TRUSTED_PROXY_PEERS="${MANALOOM_TRUSTED_PROXY_PEERS:-$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS}"
 validate_manaloom_exact_coordinate trusted_proxy_hops \
@@ -238,6 +259,11 @@ require_auth_runtime_contract() {
       JWT_SECRET="$JWT_SECRET" \
       MANALOOM_TRUSTED_PROXY_HOPS="$MANALOOM_TRUSTED_PROXY_HOPS" \
       MANALOOM_TRUSTED_PROXY_PEERS="$MANALOOM_TRUSTED_PROXY_PEERS" \
+      MANALOOM_EMAIL_DELIVERY_PROVIDER="$MANALOOM_EMAIL_DELIVERY_PROVIDER" \
+      RESEND_API_KEY="$RESEND_API_KEY" \
+      RESEND_FROM_EMAIL="$RESEND_FROM_EMAIL" \
+      RESEND_FROM_NAME="$RESEND_FROM_NAME" \
+      RESEND_VERIFIED_DOMAIN="$RESEND_VERIFIED_DOMAIN" \
       PASSWORD_RESET_WEBHOOK_URL="$PASSWORD_RESET_WEBHOOK_URL" \
       PASSWORD_RESET_WEBHOOK_TOKEN="$PASSWORD_RESET_WEBHOOK_TOKEN" \
       PASSWORD_RESET_APP_URL="$PASSWORD_RESET_APP_URL" \
@@ -916,12 +942,35 @@ SQL
   fi
 }
 
-for key in SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL MANALOOM_ALLOWED_ORIGINS ENVIRONMENT JWT_SECRET MANALOOM_TRUSTED_PROXY_HOPS MANALOOM_TRUSTED_PROXY_PEERS PASSWORD_RESET_WEBHOOK_URL PASSWORD_RESET_WEBHOOK_TOKEN PASSWORD_RESET_APP_URL EMAIL_VERIFICATION_WEBHOOK_URL EMAIL_VERIFICATION_WEBHOOK_TOKEN EMAIL_VERIFICATION_APP_URL SENTRY_DSN; do
+required_keys=(
+  SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN
+  DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL
+  MANALOOM_ALLOWED_ORIGINS ENVIRONMENT JWT_SECRET
+  MANALOOM_TRUSTED_PROXY_HOPS MANALOOM_TRUSTED_PROXY_PEERS
+  MANALOOM_EMAIL_DELIVERY_PROVIDER PASSWORD_RESET_APP_URL
+  EMAIL_VERIFICATION_APP_URL SENTRY_DSN
+)
+if [[ "$MANALOOM_EMAIL_DELIVERY_PROVIDER" == "resend" ]]; then
+  required_keys+=(
+    RESEND_API_KEY RESEND_FROM_EMAIL RESEND_FROM_NAME RESEND_VERIFIED_DOMAIN
+  )
+else
+  required_keys+=(
+    PASSWORD_RESET_WEBHOOK_URL PASSWORD_RESET_WEBHOOK_TOKEN
+    EMAIL_VERIFICATION_WEBHOOK_URL EMAIL_VERIFICATION_WEBHOOK_TOKEN
+  )
+fi
+for key in "${required_keys[@]}"; do
   if [[ -z "${!key:-}" ]]; then
     echo "variavel obrigatoria ausente: $key" >&2
     exit 2
   fi
 done
+unset required_keys
+
+RESEND_API_KEY_SHA256="$(
+  printf '%s' "$RESEND_API_KEY" | shasum -a 256 | awk '{print $1}'
+)"
 
 ALLOWED_ORIGINS_CANONICAL="$(
   MANALOOM_ALLOWED_ORIGINS="$MANALOOM_ALLOWED_ORIGINS" \
@@ -1270,6 +1319,11 @@ docker service update \
   --env-add MANALOOM_ALLOWED_ORIGINS='$ALLOWED_ORIGINS_CANONICAL' \
   --env-add MANALOOM_TRUSTED_PROXY_HOPS='$MANALOOM_TRUSTED_PROXY_HOPS' \
   --env-add MANALOOM_TRUSTED_PROXY_PEERS='$MANALOOM_TRUSTED_PROXY_PEERS' \
+  --env-add MANALOOM_EMAIL_DELIVERY_PROVIDER='$MANALOOM_EMAIL_DELIVERY_PROVIDER' \
+  --env-add RESEND_API_KEY='$RESEND_API_KEY' \
+  --env-add RESEND_FROM_EMAIL='$RESEND_FROM_EMAIL' \
+  --env-add RESEND_FROM_NAME='$RESEND_FROM_NAME' \
+  --env-add RESEND_VERIFIED_DOMAIN='$RESEND_VERIFIED_DOMAIN' \
   --env-add PASSWORD_RESET_WEBHOOK_URL='$PASSWORD_RESET_WEBHOOK_URL' \
   --env-add PASSWORD_RESET_WEBHOOK_TOKEN='$PASSWORD_RESET_WEBHOOK_TOKEN' \
   --env-add PASSWORD_RESET_APP_URL='$PASSWORD_RESET_APP_URL' \
@@ -1335,6 +1389,28 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
 expected_interactive_contract="1|$INTERACTIVE_BATTLE_ENABLED|1|$XMAGE_INTERACTIVE_URL|1|$INTERACTIVE_PER_USER_ACTIVE_LIMIT|1|$INTERACTIVE_MAX_ACTIVE"
 if [[ "$spec_interactive_contract" != "$expected_interactive_contract" ]]; then
   echo "deploy convergiu sem o contrato interativo exato na spec" >&2
+  exit 2
+fi
+spec_email_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '
+    /^MANALOOM_EMAIL_DELIVERY_PROVIDER=/{provider_count++; provider=substr(\$0,index(\$0,\"=\")+1)}
+    /^RESEND_FROM_EMAIL=/{from_count++; from_email=substr(\$0,index(\$0,\"=\")+1)}
+    /^RESEND_FROM_NAME=/{name_count++; from_name=substr(\$0,index(\$0,\"=\")+1)}
+    /^RESEND_VERIFIED_DOMAIN=/{domain_count++; domain=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",provider_count,provider,from_count,from_email,name_count,from_name,domain_count,domain}'
+")"
+expected_email_contract="1|$MANALOOM_EMAIL_DELIVERY_PROVIDER|1|$RESEND_FROM_EMAIL|1|$RESEND_FROM_NAME|1|$RESEND_VERIFIED_DOMAIN"
+spec_resend_api_key_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '
+    /^RESEND_API_KEY=/{count++; value=substr(\$0,index(\$0,\"=\")+1)}
+    END{if(count==1) printf \"%s\",value; else printf \"__invalid_count_%d__\",count}' |
+  sha256sum | awk '{print \$1}'
+")"
+if [[ "$spec_email_contract" != "$expected_email_contract" ||
+      "$spec_resend_api_key_sha256" != "$RESEND_API_KEY_SHA256" ]]; then
+  echo "deploy convergiu sem o contrato exato de entrega de email" >&2
   exit 2
 fi
 spec_proxy_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
@@ -1421,6 +1497,24 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     /^INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=/{global_count++; global_limit=substr(\$0,index(\$0,\"=\")+1)}
     END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit}'
 ")"
+runtime_email_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
+docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
+  awk '
+    /^MANALOOM_EMAIL_DELIVERY_PROVIDER=/{provider_count++; provider=substr(\$0,index(\$0,\"=\")+1)}
+    /^RESEND_FROM_EMAIL=/{from_count++; from_email=substr(\$0,index(\$0,\"=\")+1)}
+    /^RESEND_FROM_NAME=/{name_count++; from_name=substr(\$0,index(\$0,\"=\")+1)}
+    /^RESEND_VERIFIED_DOMAIN=/{domain_count++; domain=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",provider_count,provider,from_count,from_email,name_count,from_name,domain_count,domain}'
+")"
+runtime_resend_api_key_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
+docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
+  awk '
+    /^RESEND_API_KEY=/{count++; value=substr(\$0,index(\$0,\"=\")+1)}
+    END{if(count==1) printf \"%s\",value; else printf \"__invalid_count_%d__\",count}' |
+  sha256sum | awk '{print \$1}'
+")"
 runtime_sentry_dsn_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -1450,6 +1544,8 @@ if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_
       "$runtime_proxy_peers" != "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" ||
       "$runtime_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ||
       "$runtime_interactive_contract" != "$expected_interactive_contract" ||
+      "$runtime_email_contract" != "$expected_email_contract" ||
+      "$runtime_resend_api_key_sha256" != "$RESEND_API_KEY_SHA256" ||
       "$runtime_sentry_dsn_sha256" != "$MANALOOM_PRODUCTION_SENTRY_DSN_SHA256" ||
       "$runtime_sentry_metadata" != "1|production|1|manaloom-backend@$short_sha" ]]; then
   echo "deploy convergiu com SHA ou contrato PostgreSQL/battle/IA/auth/CORS/Sentry divergente" >&2

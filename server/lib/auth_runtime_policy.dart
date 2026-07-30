@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'account_email_delivery_config.dart';
+
 const jwtSecretMinimumProductionBytes = 32;
 const jwtSecretMinimumProductionCharacters = 32;
 const maximumTrustedProxyHops = 5;
@@ -19,6 +21,7 @@ const authRuntimeEnvironmentKeys = <String>{
   'EMAIL_VERIFICATION_APP_URL',
   'MANALOOM_PASSWORD_RESET_TEST_RESPONSE',
   'MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE',
+  ...accountEmailDeliveryEnvironmentKeys,
 };
 
 Map<String, String> authRuntimeEnvironmentValues(
@@ -62,32 +65,46 @@ class AccountEmailDeliveryPolicy {
 
   static void validate(Map<String, String> environment) {
     for (final key in const [
-      'PASSWORD_RESET_WEBHOOK_URL',
       'PASSWORD_RESET_APP_URL',
-      'EMAIL_VERIFICATION_WEBHOOK_URL',
       'EMAIL_VERIFICATION_APP_URL',
     ]) {
-      final value = environment[key]?.trim();
-      final uri = value == null ? null : Uri.tryParse(value);
-      if (uri == null ||
-          uri.scheme.toLowerCase() != 'https' ||
-          uri.host.isEmpty ||
-          uri.userInfo.isNotEmpty) {
-        throw StateError('$key deve ser uma URL HTTPS sem credenciais.');
-      }
+      _validateHttpsUrl(environment, key);
     }
-    for (final key in const [
-      'PASSWORD_RESET_WEBHOOK_TOKEN',
-      'EMAIL_VERIFICATION_WEBHOOK_TOKEN',
-    ]) {
-      final value = environment[key];
-      if (value == null || value.trim() != value || value.length < 16) {
-        throw StateError('$key não atende ao contrato de produção.');
-      }
+
+    switch (accountEmailDeliveryProvider(environment)) {
+      case AccountEmailDeliveryProvider.webhook:
+        for (final key in const [
+          'PASSWORD_RESET_WEBHOOK_URL',
+          'EMAIL_VERIFICATION_WEBHOOK_URL',
+        ]) {
+          _validateHttpsUrl(environment, key);
+        }
+        for (final key in const [
+          'PASSWORD_RESET_WEBHOOK_TOKEN',
+          'EMAIL_VERIFICATION_WEBHOOK_TOKEN',
+        ]) {
+          final value = environment[key];
+          if (value == null || value.trim() != value || value.length < 16) {
+            throw StateError('$key não atende ao contrato de produção.');
+          }
+        }
+      case AccountEmailDeliveryProvider.resend:
+        ResendEmailConfiguration.fromEnvironment(environment);
     }
     if (environment['MANALOOM_PASSWORD_RESET_TEST_RESPONSE'] != null ||
         environment['MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE'] != null) {
       throw StateError('Exposição de tokens de teste é proibida em produção.');
+    }
+  }
+
+  static void _validateHttpsUrl(Map<String, String> environment, String key) {
+    final value = environment[key]?.trim();
+    final uri = value == null ? null : Uri.tryParse(value);
+    if (uri == null ||
+        uri.scheme.toLowerCase() != 'https' ||
+        uri.host.isEmpty ||
+        uri.userInfo.isNotEmpty) {
+      throw StateError('$key deve ser uma URL HTTPS sem credenciais.');
     }
   }
 }

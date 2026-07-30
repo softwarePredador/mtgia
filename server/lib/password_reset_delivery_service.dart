@@ -1,6 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'account_email_delivery_config.dart';
+import 'account_email_delivery_transport.dart';
 import 'runtime_environment.dart';
 
 const passwordResetWebhookUrlEnvironment = 'PASSWORD_RESET_WEBHOOK_URL';
@@ -20,16 +19,23 @@ bool mayExposePasswordResetTokenForTesting(Map<String, String> environment) {
           passwordResetTestResponseApproval;
 }
 
-/// Delivers a reset link through a deployment-owned HTTPS webhook.
+/// Delivers a reset link through the configured account-email provider.
 ///
 /// ManaLoom never logs or persists the raw token. Production rejects an absent
-/// or non-HTTPS delivery target; local development may omit delivery and use
-/// the explicitly guarded test response instead.
+/// or invalid delivery target; local development may omit delivery and use the
+/// explicitly guarded test response instead.
 class PasswordResetDeliveryService {
-  PasswordResetDeliveryService({Map<String, String>? environment})
-    : _environment = environment ?? _loadEnvironment();
+  PasswordResetDeliveryService({
+    Map<String, String>? environment,
+    AccountEmailHttpClientFactory? clientFactory,
+    Duration requestTimeout = const Duration(seconds: 10),
+  }) : _environment = environment ?? _loadEnvironment(),
+       _clientFactory = clientFactory,
+       _requestTimeout = requestTimeout;
 
   final Map<String, String> _environment;
+  final AccountEmailHttpClientFactory? _clientFactory;
+  final Duration _requestTimeout;
 
   static Map<String, String> _loadEnvironment() {
     final environment = loadRuntimeEnvironment();
@@ -40,6 +46,7 @@ class PasswordResetDeliveryService {
         passwordResetWebhookTokenEnvironment,
         passwordResetAppUrlEnvironment,
         passwordResetTestResponseEnvironment,
+        ...accountEmailDeliveryEnvironmentKeys,
       ])
         if (environment[key] case final String value) key: value,
     };
@@ -50,58 +57,25 @@ class PasswordResetDeliveryService {
     required String token,
     required DateTime expiresAt,
   }) async {
-    final production =
-        (_environment['ENVIRONMENT'] ?? 'development').trim().toLowerCase() ==
-        'production';
-    final rawWebhook = _environment[passwordResetWebhookUrlEnvironment]?.trim();
-    if (rawWebhook == null || rawWebhook.isEmpty) {
-      if (production) {
-        throw StateError('Entrega de recuperação não configurada.');
-      }
-      return false;
-    }
-    final webhook = Uri.tryParse(rawWebhook);
-    if (webhook == null ||
-        !webhook.hasScheme ||
-        (production && webhook.scheme.toLowerCase() != 'https')) {
-      throw StateError('Destino de recuperação inválido.');
-    }
     final resetBase =
         _environment[passwordResetAppUrlEnvironment]?.trim() ??
         'http://localhost:8088/app/#/reset-password';
     final separator = resetBase.contains('?') ? '&' : '?';
     final resetUrl =
         '$resetBase${separator}token=${Uri.encodeQueryComponent(token)}';
-
-    final client = HttpClient();
-    try {
-      client.connectionTimeout = const Duration(seconds: 8);
-      final request = await client.postUrl(webhook);
-      request.headers.contentType = ContentType.json;
-      final bearer = _environment[passwordResetWebhookTokenEnvironment]?.trim();
-      if (bearer != null && bearer.isNotEmpty) {
-        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $bearer');
-      }
-      final payload = utf8.encode(
-        jsonEncode({
-          'template': 'password_reset',
-          'recipient': email,
-          'reset_url': resetUrl,
-          'expires_at': expiresAt.toUtc().toIso8601String(),
-        }),
-      );
-      request.contentLength = payload.length;
-      request.add(payload);
-      final response = await request.close().timeout(
-        const Duration(seconds: 10),
-      );
-      await response.drain<void>();
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw StateError('Provedor de recuperação recusou a entrega.');
-      }
-      return true;
-    } finally {
-      client.close(force: true);
-    }
+    return AccountEmailDeliveryTransport(
+      environment: _environment,
+      clientFactory: _clientFactory,
+      requestTimeout: _requestTimeout,
+    ).deliver(
+      message: AccountEmailDeliveryMessage(
+        template: AccountEmailTemplate.passwordReset,
+        recipient: email,
+        actionUrl: resetUrl,
+        expiresAt: expiresAt,
+      ),
+      webhookUrlEnvironment: passwordResetWebhookUrlEnvironment,
+      webhookTokenEnvironment: passwordResetWebhookTokenEnvironment,
+    );
   }
 }

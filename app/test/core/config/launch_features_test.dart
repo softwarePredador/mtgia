@@ -84,7 +84,7 @@ void main() {
     expect(build, isNot(contains('scanner_release_enabled: true')));
   });
 
-  test('release build scripts pin interactive Battle off', () {
+  test('release build scripts keep interactive Battle caller-only', () {
     for (final path in const [
       '../scripts/manaloom_build_android_release.sh',
       '../scripts/manaloom_deploy_flutter_web.sh',
@@ -92,12 +92,28 @@ void main() {
       final source = File(path).readAsStringSync();
       expect(
         source,
-        contains('--dart-define="ENABLE_INTERACTIVE_BATTLE=false"'),
+        contains(
+          'RELEASE_ENABLE_INTERACTIVE_BATTLE='
+          '"\${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"',
+        ),
         reason: path,
       );
       expect(
         source,
-        isNot(contains('ENABLE_INTERACTIVE_BATTLE=true')),
+        contains(
+          '--dart-define="ENABLE_INTERACTIVE_BATTLE='
+          '\$INTERACTIVE_BATTLE_DART_DEFINE"',
+        ),
+        reason: path,
+      );
+      expect(
+        source,
+        contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+        reason: path,
+      );
+      expect(
+        source,
+        isNot(contains('--dart-define="ENABLE_INTERACTIVE_BATTLE=true"')),
         reason: path,
       );
     }

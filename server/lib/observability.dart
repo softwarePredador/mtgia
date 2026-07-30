@@ -74,6 +74,7 @@ bool isSensitiveObservedKey(String key) {
       .replaceAll(RegExp(r'^_+|_+$'), '');
   return _sensitiveObservedKeys.contains(normalized) ||
       normalized == 'token' ||
+      normalized.endsWith('_api_key') ||
       normalized.endsWith('_token') ||
       normalized.endsWith('_secret') ||
       normalized.endsWith('_password');
