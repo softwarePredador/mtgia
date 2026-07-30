@@ -21,6 +21,13 @@ class ExternalEngineCapabilityAlignmentAuditTests(unittest.TestCase):
         self.assertEqual(report["summary"]["adopted_capability_count"], 13)
         self.assertEqual(report["source_inventory"]["xmage"]["status"], "not_requested")
         self.assertEqual(report["source_inventory"]["forge"]["status"], "not_requested")
+        qualification_check = next(
+            row
+            for row in report["checks"]
+            if row["id"] == "xmage_qualification_policy_documentation"
+        )
+        self.assertEqual(qualification_check["status"], "pass")
+        self.assertEqual(qualification_check["details"]["restriction_count"], 3)
 
     def test_missing_required_capability_fails_closed(self) -> None:
         contract = copy.deepcopy(self.contract)
@@ -119,6 +126,51 @@ class ExternalEngineCapabilityAlignmentAuditTests(unittest.TestCase):
             )
             self.assertEqual(machine_check["status"], "fail")
             self.assertEqual(machine_check["details"]["violations"], ["scripts/rogue.py"])
+
+    def test_qualification_policy_documentation_drift_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            policy = (
+                root
+                / "services/xmage-sidecar/src/main/java/com/manaloom/xmage/"
+                "XmageCardQualificationPolicy.java"
+            )
+            readme = root / "services/xmage-sidecar/README.md"
+            contract = (
+                root
+                / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+            )
+            policy.parent.mkdir(parents=True)
+            readme.parent.mkdir(parents=True, exist_ok=True)
+            contract.parent.mkdir(parents=True, exist_ok=True)
+            policy.write_text(
+                'new Restriction("Card A", "reason_a", "detail", "ref", "gate");\n'
+                'new Restriction("Card B", "reason_b", "detail", "ref", "gate");\n',
+                encoding="utf-8",
+            )
+            readme.write_text(
+                "`Card A` has `reason_code=reason_a`.\n"
+                "`Card B` has `reason_code=reason_b`.\n",
+                encoding="utf-8",
+            )
+            contract.write_text(
+                "`Card A` has `reason_code=reason_a`.\n",
+                encoding="utf-8",
+            )
+            checks: list[dict[str, object]] = []
+
+            audit._validate_qualification_policy_documentation(root, checks)
+
+            self.assertEqual(len(checks), 1)
+            self.assertEqual(checks[0]["status"], "fail")
+            self.assertEqual(
+                checks[0]["details"]["missing"],
+                {
+                    "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md": [
+                        "Card B:reason_b"
+                    ]
+                },
+            )
 
 
 if __name__ == "__main__":

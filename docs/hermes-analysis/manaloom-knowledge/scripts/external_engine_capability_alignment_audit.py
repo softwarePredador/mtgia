@@ -22,6 +22,10 @@ DEFAULT_CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_
 SCHEMA_VERSION = "manaloom_external_engine_capability_audit_v1_2026-07-22"
 CONTRACT_SCHEMA_VERSION = "manaloom_external_engine_capabilities_v1_2026-07-22"
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+QUALIFICATION_RESTRICTION_PATTERN = re.compile(
+    r'new\s+Restriction\(\s*"([^"]+)"\s*,\s*"([^"]+)"',
+    re.DOTALL,
+)
 
 ALLOWED_DISPOSITIONS = {
     "adopted_runtime",
@@ -350,6 +354,63 @@ def _validate_local_source_policy(
     )
 
 
+def _validate_qualification_policy_documentation(
+    repo_root: Path,
+    checks: list[dict[str, Any]],
+) -> None:
+    policy_path = (
+        repo_root
+        / "services/xmage-sidecar/src/main/java/com/manaloom/xmage/"
+        "XmageCardQualificationPolicy.java"
+    )
+    documentation_paths = (
+        repo_root / "services/xmage-sidecar/README.md",
+        repo_root / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+    )
+    try:
+        policy_source = policy_path.read_text(encoding="utf-8")
+        documentation = {
+            path.relative_to(repo_root).as_posix(): path.read_text(encoding="utf-8")
+            for path in documentation_paths
+        }
+    except OSError as exc:
+        _check(
+            checks,
+            "xmage_qualification_policy_documentation",
+            False,
+            "Every pin-scoped XMage quarantine must be documented with its exact reason code.",
+            details={"error": f"{exc.__class__.__name__}:{exc.filename}"},
+        )
+        return
+
+    restrictions = QUALIFICATION_RESTRICTION_PATTERN.findall(policy_source)
+    missing: dict[str, list[str]] = {}
+    for relative_path, content in documentation.items():
+        absent = []
+        for card_name, reason_code in restrictions:
+            documented = re.search(
+                rf"`{re.escape(card_name)}`.{{0,500}}"
+                rf"`reason_code={re.escape(reason_code)}`",
+                content,
+                re.DOTALL,
+            )
+            if documented is None:
+                absent.append(f"{card_name}:{reason_code}")
+        if absent:
+            missing[relative_path] = absent
+
+    _check(
+        checks,
+        "xmage_qualification_policy_documentation",
+        bool(restrictions) and not missing,
+        "Every pin-scoped XMage quarantine must be documented with its exact reason code.",
+        details={
+            "restriction_count": len(restrictions),
+            "missing": missing,
+        },
+    )
+
+
 def tracked_source_inventory(source_root: Path, engine_id: str) -> dict[str, Any]:
     try:
         revision = subprocess.run(
@@ -490,6 +551,7 @@ def build_report(
     capabilities = _validate_capabilities(contract, repo_root, engine_map, checks)
     _validate_import_boundaries(repo_root, engine_map, checks)
     _validate_local_source_policy(contract, repo_root, checks)
+    _validate_qualification_policy_documentation(repo_root, checks)
     sources = _validate_source_roots(
         {"xmage": xmage_root, "forge": forge_root},
         engine_map,

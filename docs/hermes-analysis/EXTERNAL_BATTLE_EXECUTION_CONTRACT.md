@@ -223,7 +223,11 @@ structured `unsupported_cards` for:
   incorrectly exposes a mandatory trigger action as optional;
 - `Prudent Fateseer`, with
   `reason_code=xmage_upstream_mechanic_unfinished`, because Prepare is
-  unfinished and upstream removes the card from its catalog.
+  unfinished and upstream removes the card from its catalog;
+- `Mandate of Peace`, with
+  `reason_code=xmage_upstream_copy_lki_gap`, because copied-spell and
+  last-known-information handling still leaves the original spell on the
+  stack in the focused concurrent-removal scenario.
 
 The qualification policy carries the exact engine SHA and fails closed if the
 runtime pin moves without reviewing the restrictions. A catalog hit cannot
