@@ -401,7 +401,20 @@ grep -Fq 'Scanner DEFERRED_BY_SCOPE' "$ROOT_DIR/scripts/manaloom_verify_android_
 grep -Fq 'manaloom_build_android_release.sh' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
 grep -Fq 'run_battle_gate' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
 [[ ! -e "$ROOT_DIR/.github/workflows/manaloom-guardrails.yml" ]]
-grep -Fq -- "--env-add MANALOOM_ALLOWED_ORIGINS='\$ALLOWED_ORIGINS_CANONICAL'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+BACKEND_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'allowed_origins_b64="$(encode_remote_value "$ALLOWED_ORIGINS_CANONICAL")"' \
+  "$BACKEND_DEPLOY"
+grep -Fq 'resend_api_key_b64="$(encode_remote_value "$RESEND_API_KEY")"' \
+  "$BACKEND_DEPLOY"
+grep -Fq -- '--env-add MANALOOM_ALLOWED_ORIGINS="\$allowed_origins"' \
+  "$BACKEND_DEPLOY"
+grep -Fq -- '--env-add RESEND_API_KEY="\$resend_api_key"' \
+  "$BACKEND_DEPLOY"
+if grep -Fq -- "--env-add RESEND_API_KEY='\$RESEND_API_KEY'" \
+  "$BACKEND_DEPLOY"; then
+  echo "deploy backend voltou a interpolar segredo Resend no shell remoto" >&2
+  exit 1
+fi
 grep -Fq -- '--env-add BATTLE_LIVE_SPECTATOR_ENABLED=false' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq -- "--env-add INTERACTIVE_BATTLE_ENABLED='\$INTERACTIVE_BATTLE_ENABLED'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
