@@ -390,6 +390,29 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('empty deck actions stay compact and centered on wide screens', (
+    tester,
+  ) async {
+    await _pumpDecks(tester, const Size(1880, 1000), decks: const <Deck>[]);
+
+    final actionsRect = tester.getRect(
+      find.byKey(const Key('deck-list-empty-actions')),
+    );
+    final createRect = tester.getRect(
+      find.byKey(const Key('deck-list-empty-create-button')),
+    );
+    final generateRect = tester.getRect(
+      find.byKey(const Key('deck-list-empty-generate-button')),
+    );
+
+    expect(actionsRect.width, lessThanOrEqualTo(380));
+    expect(createRect.width, closeTo(actionsRect.width, 0.1));
+    expect(generateRect.width, closeTo(actionsRect.width, 0.1));
+    expect(actionsRect.center.dx, closeTo(940, 1));
+    expect(generateRect.top, greaterThan(createRect.bottom));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'phone landscape deck list stays usable and exposes its create actions',
     (tester) async {
@@ -739,6 +762,66 @@ void main() {
   );
 
   testWidgets(
+    'create dialog remains scrollable above a tall software keyboard',
+    (tester) async {
+      tester.view.viewInsets = const FakeViewPadding(bottom: 430);
+      addTearDown(tester.view.resetViewInsets);
+      await _pumpDecks(tester, const Size(390, 844), decks: const <Deck>[]);
+      await _openCreateDialog(tester);
+
+      final name = find.byKey(const Key('deck-create-name-field'));
+      await tester.tap(name);
+      await tester.showKeyboard(name);
+      await tester.pumpAndSettle();
+      expect(tester.testTextInput.isVisible, isTrue);
+      expect(tester.takeException(), isNull);
+
+      final commander = find.byKey(const Key('deck-create-commander-select'));
+      await tester.ensureVisible(commander);
+      await tester.pumpAndSettle();
+
+      final dialogRect = tester.getRect(
+        find.byKey(const Key('deck-create-dialog')),
+      );
+      final commanderRect = tester.getRect(commander);
+      expect(dialogRect.contains(commanderRect.topLeft), isTrue);
+      expect(dialogRect.contains(commanderRect.bottomRight), isTrue);
+      expect(commanderRect.bottom, lessThanOrEqualTo(844 - 430));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'commander picker keeps search usable when keyboard leaves little height',
+    (tester) async {
+      addTearDown(tester.view.resetViewInsets);
+      await _pumpDecks(
+        tester,
+        const Size(390, 600),
+        decks: const <Deck>[],
+        cardProvider: _CommanderCardProvider([_atraxa]),
+      );
+      await _openCreateDialog(tester);
+      final commander = find.byKey(const Key('deck-create-commander-select'));
+      await tester.ensureVisible(commander);
+      await tester.tap(commander);
+      await tester.pumpAndSettle();
+
+      tester.view.viewInsets = const FakeViewPadding(bottom: 430);
+      await tester.pumpAndSettle();
+
+      final picker = find.byKey(const Key('commander-picker-dialog'));
+      final search = find.byKey(
+        const Key('deck-create-commander-search-field'),
+      );
+      expect(picker, findsOneWidget);
+      expect(search, findsOneWidget);
+      expect(tester.getRect(search).bottom, lessThanOrEqualTo(600 - 430));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'commander picker and selected state fit 320x568 at 200 percent text',
     (tester) async {
       tester.platformDispatcher.textScaleFactorTestValue = 2;
@@ -870,8 +953,17 @@ void main() {
 
     final dialogRect = tester.getRect(dialog);
     final errorRect = tester.getRect(error);
+    final errorTextRect = tester.getRect(
+      find.text('Não foi possível criar este deck agora.'),
+    );
+    final submitRect = tester.getRect(
+      find.byKey(const Key('deck-create-submit-button')),
+    );
     expect(dialogRect.contains(errorRect.topLeft), isTrue);
     expect(dialogRect.contains(errorRect.bottomRight), isTrue);
+    expect(errorRect.contains(errorTextRect.topLeft), isTrue);
+    expect(errorRect.contains(errorTextRect.bottomRight), isTrue);
+    expect(errorRect.bottom, lessThan(submitRect.top));
     expect(tester.takeException(), isNull);
   });
 

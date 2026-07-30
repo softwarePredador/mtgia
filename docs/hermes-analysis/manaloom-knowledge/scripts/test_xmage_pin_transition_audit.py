@@ -43,16 +43,17 @@ class XMagePinTransitionAuditTests(unittest.TestCase):
         self.assertEqual(
             report["card_summary"]["dispositions"],
             {
-                "catalog_supported_nominal_test_passed_semantic_review_required": 3,
+                "catalog_supported_nominal_test_passed_semantic_review_required": 2,
                 "catalog_supported_regression_only_review_required": 78,
                 "catalog_supported_semantic_review_required": 84,
                 "external_runtime_quarantine_semantic_defect": 1,
                 "external_residual_upstream_unfinished": 1,
                 "focused_upstream_test_passed": 1,
                 "focused_upstream_test_passed_card_data_warning_review_required": 1,
+                "presentation_hunk_nominal_tests_passed": 1,
             },
         )
-        self.assertEqual(report["card_summary"]["review_required_count"], 168)
+        self.assertEqual(report["card_summary"]["review_required_count"], 167)
 
     def test_strict_deployment_gate_fails_while_reviews_are_pending(self) -> None:
         report = self._report(require_deployable=True)
@@ -84,6 +85,73 @@ class XMagePinTransitionAuditTests(unittest.TestCase):
 
         self.assertIn(
             "input_artifact_digests",
+            {failure["id"] for failure in report["failures"]},
+        )
+
+    def test_nominal_review_artifact_digest_mismatch_fails_closed(self) -> None:
+        evidence = copy.deepcopy(self.evidence)
+        evidence["input_artifact_digests"][
+            "transition_nominal_review_v1_sha256"
+        ] = "0" * 64
+
+        report = self._report(evidence=evidence)
+
+        failure_ids = {failure["id"] for failure in report["failures"]}
+        self.assertIn("transition_nominal_review_evidence", failure_ids)
+        self.assertIn("card_disposition_evidence", failure_ids)
+
+    def test_clearance_rule_id_cannot_diverge_from_exact_artifact(self) -> None:
+        evidence = copy.deepcopy(self.evidence)
+        row = next(
+            card
+            for card in evidence["cards"]
+            if card["card_name"] == "Metallic Mimic"
+        )
+        row["transition_review_rule_id"] = "unversioned_rule"
+
+        report = self._report(evidence=evidence)
+
+        self.assertIn(
+            "card_disposition_evidence",
+            {failure["id"] for failure in report["failures"]},
+        )
+
+    def test_clearance_test_references_cannot_be_substituted(self) -> None:
+        evidence = copy.deepcopy(self.evidence)
+        row = next(
+            card
+            for card in evidence["cards"]
+            if card["card_name"] == "Metallic Mimic"
+        )
+        row["direct_test_references"] = ["unversioned/SubstituteTest.java"]
+
+        report = self._report(evidence=evidence)
+
+        self.assertIn(
+            "card_disposition_evidence",
+            {failure["id"] for failure in report["failures"]},
+        )
+
+    def test_catalog_resolution_cannot_claim_exact_clearance(self) -> None:
+        evidence = copy.deepcopy(self.evidence)
+        row = next(
+            card
+            for card in evidence["cards"]
+            if card["disposition"]
+            == "catalog_supported_semantic_review_required"
+        )
+        row["disposition"] = audit.CLEARANCE_DISPOSITION
+        row["direct_test_references"] = ["unversioned/CatalogOnlyTest.java"]
+        row["focused_test_case_count"] = 1
+        row["source_warning_markers"] = []
+        row["transition_review_rule_id"] = (
+            "metallic_mimic_presentation_literal_v1"
+        )
+
+        report = self._report(evidence=evidence)
+
+        self.assertIn(
+            "card_disposition_evidence",
             {failure["id"] for failure in report["failures"]},
         )
 

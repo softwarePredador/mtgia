@@ -106,6 +106,26 @@ version, and the patched SQLite JDBC version. Cached jars without the matching
 fingerprint are rebuilt. The local gate validates `XMAGE_COMMIT` before reusing
 the Maven cache.
 
+### Lorehold candidate patch
+
+Lorehold is not present in the canonical pin. A minimal, non-deployable patch
+is versioned only for reproducible qualification. It contains the public
+dynamic-Miracle and Lorehold changes from XMage PR 15591 plus three direct
+tests; it deliberately excludes the unrelated cards in that PR.
+
+Run the isolated verifier with Java 17:
+
+```bash
+services/xmage-sidecar/bin/verify_lorehold_candidate_patch.sh
+```
+
+The verifier fetches the official canonical pin into a temporary checkout,
+checks the patch digest, applies it and runs `MiracleTest`. It does not change
+`XMAGE_COMMIT`, install a candidate into the canonical Maven fingerprint,
+mutate PostgreSQL or authorize deployment. Promotion still requires publishing
+the exact patch as a fetchable commit in a governed fork and passing the
+pin-transition contract.
+
 The Docker image clones and verifies the pinned XMage commit, upgrades only the
 SQLite JDBC runtime for arm64 compatibility, builds the XMage server, and runs
 the server and sidecar in one isolated container.

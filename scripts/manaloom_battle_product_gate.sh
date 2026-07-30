@@ -711,6 +711,8 @@ run_static_gate() {
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_pin_transition_audit.py
   PYTHONWARNINGS=error::ResourceWarning \
+    python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_transition_nominal_review.py
+  PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py
@@ -904,7 +906,7 @@ run_isolated_e2e() {
   ) >"$RUN_DIR/api.log" 2>&1 &
   API_PID="$!"
   wait_for_json_contract \
-    "$api_url/health/ready" "ready" "mtgia-server" "$API_PID" "$RUN_DIR/api.log"
+    "$api_url/health/live" "alive" "" "$API_PID" "$RUN_DIR/api.log"
   assert_loopback_listener "$api_port" "mutable API"
   API_LISTENER_PIDS="$(capture_listener_pids "$api_port" | tr '\n' ' ')"
   if [[ -z "$API_LISTENER_PIDS" ]]; then

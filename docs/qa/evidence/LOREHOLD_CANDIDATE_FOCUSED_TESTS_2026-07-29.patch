@@ -1,11 +1,82 @@
+diff --git a/Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java b/Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java
+new file mode 100644
+index 000000000..0c600b7bd
+--- /dev/null
++++ b/Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java
+@@ -0,0 +1,61 @@
++package mage.cards.l;
++
++import mage.MageInt;
++import mage.abilities.Ability;
++import mage.abilities.common.MiracleGrantedAbility;
++import mage.abilities.costs.common.DiscardCardCost;
++import mage.abilities.costs.mana.ManaCost;
++import mage.abilities.costs.mana.ManaCosts;
++import mage.abilities.costs.mana.ManaCostsImpl;
++import mage.abilities.effects.common.DoIfCostPaid;
++import mage.abilities.effects.common.DrawCardSourceControllerEffect;
++import mage.abilities.effects.common.cost.MiracleCostModifierFlat;
++import mage.abilities.keyword.FlyingAbility;
++import mage.abilities.keyword.HasteAbility;
++import mage.abilities.triggers.BeginningOfUpkeepTriggeredAbility;
++import mage.cards.CardImpl;
++import mage.cards.CardSetInfo;
++import mage.constants.CardType;
++import mage.constants.CostModificationType;
++import mage.constants.Outcome;
++import mage.constants.SubType;
++import mage.constants.SuperType;
++import mage.constants.TargetController;
++import mage.filter.StaticFilters;
++import mage.game.Game;
++
++import java.util.UUID;
++
++public final class LoreholdTheHistorian extends CardImpl {
++
++    public LoreholdTheHistorian(UUID ownerId, CardSetInfo setInfo) {
++        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{3}{R}{W}");
++
++        this.supertype.add(SuperType.LEGENDARY);
++        this.subtype.add(SubType.ELDER);
++        this.subtype.add(SubType.DRAGON);
++        this.power = new MageInt(5);
++        this.toughness = new MageInt(5);
++
++        // Flying
++        this.addAbility(FlyingAbility.getInstance());
++
++        // Haste
++        this.addAbility(HasteAbility.getInstance());
++
++        // Instant and sorcery cards in your hand have miracle {2}.
++        this.addAbility(new MiracleGrantedAbility(StaticFilters.FILTER_CARDS_INSTANT_AND_SORCERY, () -> new MiracleCostModifierFlat("{2}"), "{2}"));
++
++        // At the beginning of each opponent’s upkeep, you may discard a card. If you do, draw a card.
++        this.addAbility(new BeginningOfUpkeepTriggeredAbility(TargetController.OPPONENT, new DoIfCostPaid(new DrawCardSourceControllerEffect(1), new DiscardCardCost()), false));
++    }
++
++    private LoreholdTheHistorian(final LoreholdTheHistorian card) {
++        super(card);
++    }
++
++    @Override
++    public LoreholdTheHistorian copy() {
++        return new LoreholdTheHistorian(this);
++    }
++}
+diff --git a/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java b/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
+index ee3db25c8..b941a093f 100644
+--- a/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
++++ b/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
+@@ -195,0 +196,2 @@ public final class SecretsOfStrixhaven extends ExpansionSet {
++        cards.add(new SetCardInfo("Lorehold, the Historian", 201, Rarity.MYTHIC, mage.cards.l.LoreholdTheHistorian.class, NON_FULL_USE_VARIOUS));
++        cards.add(new SetCardInfo("Lorehold, the Historian", 284, Rarity.MYTHIC, mage.cards.l.LoreholdTheHistorian.class, NON_FULL_USE_VARIOUS));
 diff --git a/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java b/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
-index d821d2bce..011ce4502 100644
+index f3795d52c..237834ee0 100644
 --- a/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
 +++ b/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
-@@ -296,4 +296,58 @@ public class MiracleTest extends CardTestPlayerBase {
-         assertPermanentCount(playerB, "Astartes Warrior Token", 2);
-         assertTapped("Plains", true);
-     }
+@@ -89,0 +90,54 @@ public class MiracleTest extends CardTestPlayerBase {
 +
 +    @Test
 +    public void testLoreholdGrantsMiracleOnlyToInstantAndSorceryCards() {
@@ -60,4 +131,374 @@ index d821d2bce..011ce4502 100644
 +        assertGraveyardCount(playerA, "Mountain", 1);
 +        assertHandCount(playerA, "Island", 1);
 +    }
- }
+diff --git a/Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java b/Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java
+new file mode 100644
+index 000000000..bb4fcc314
+--- /dev/null
++++ b/Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java
+@@ -0,0 +1,61 @@
++package mage.abilities.common;
++
++import mage.abilities.Ability;
++import mage.abilities.effects.ContinuousEffectImpl;
++import mage.abilities.common.SimpleStaticAbility;
++import mage.constants.Duration;
++import mage.constants.Layer;
++import mage.constants.Outcome;
++import mage.constants.SubLayer;
++import mage.filter.FilterCard;
++import mage.game.Game;
++import mage.util.functions.MiracleCostModifierCreator;
++import mage.watchers.common.MiracleGrantedWatcher;
++
++public class MiracleGrantedAbility extends SimpleStaticAbility {
++
++    private static final String staticRule = " <i>(You may cast that card for its miracle cost when you draw it if it's the first card you drew this turn.)</i>";
++    private final String ruleText;
++
++    public MiracleGrantedAbility(FilterCard filter, MiracleCostModifierCreator miracleCostModifierCreator, String costText) {
++        super(new MiracleGrantedEffect());
++        this.ruleText = filter.getMessage() + " in your hand have miracle. Its miracle cost is equal to " + costText + staticRule;
++        this.addWatcher(new MiracleGrantedWatcher(this.zone, filter, miracleCostModifierCreator, costText));
++    }
++
++    private MiracleGrantedAbility(final MiracleGrantedAbility ability) {
++        super(ability);
++        this.ruleText = ability.ruleText;
++    }
++
++    @Override
++    public MiracleGrantedAbility copy() {
++        return new MiracleGrantedAbility(this);
++    }
++
++    @Override
++    public String getRule() {
++        return this.ruleText;
++    }
++}
++
++class MiracleGrantedEffect extends ContinuousEffectImpl {
++
++    public MiracleGrantedEffect() {
++        super(Duration.WhileOnBattlefield, Layer.AbilityAddingRemovingEffects_6, SubLayer.NA, Outcome.AddAbility);
++    }
++
++    private MiracleGrantedEffect(final MiracleGrantedEffect effect) {
++        super(effect);
++    }
++
++    @Override
++    public MiracleGrantedEffect copy() {
++        return new MiracleGrantedEffect(this);
++    }
++
++    @Override
++    public boolean apply(Game game, Ability source) {
++        return true;
++    }
++}
+diff --git a/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java
+new file mode 100644
+index 000000000..fcfcdcbd9
+--- /dev/null
++++ b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java
+@@ -0,0 +1,32 @@
++package mage.abilities.effects.common.cost;
++
++import mage.abilities.Ability;
++import mage.abilities.SpellAbility;
++import mage.constants.CostModificationType;
++import mage.constants.Duration;
++import mage.constants.Outcome;
++import mage.game.Game;
++
++public abstract class MiracleCostModifier extends CostModificationEffectImpl {
++
++    private SpellAbility castToModify;
++
++    public MiracleCostModifier(Outcome outcome, CostModificationType type) {
++        super(Duration.Custom, outcome, type);
++    }
++
++    protected MiracleCostModifier(MiracleCostModifier effect) {
++        super(effect);
++        this.castToModify = effect.castToModify;
++    }
++
++    public MiracleCostModifier setCastToModify(SpellAbility castToModify) {
++        this.castToModify = castToModify;
++        return this;
++    }
++
++    @Override
++    public boolean applies(Ability abilityToModify, Ability source, Game game) {
++        return abilityToModify != null && abilityToModify.getId().equals(this.castToModify.getId());
++    }
++}
+diff --git a/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java
+new file mode 100644
+index 000000000..98db50a94
+--- /dev/null
++++ b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java
+@@ -0,0 +1,38 @@
++package mage.abilities.effects.common.cost;
++
++import mage.abilities.Ability;
++import mage.abilities.costs.mana.ManaCost;
++import mage.abilities.costs.mana.ManaCosts;
++import mage.abilities.costs.mana.ManaCostsImpl;
++import mage.constants.CostModificationType;
++import mage.constants.Outcome;
++import mage.game.Game;
++
++public class MiracleCostModifierFlat extends MiracleCostModifier {
++
++    final private String costs;
++
++    public MiracleCostModifierFlat(String costs) {
++        super(Outcome.Benefit, CostModificationType.SET_COST);
++        this.costs = costs;
++    }
++
++    private MiracleCostModifierFlat(MiracleCostModifierFlat effect) {
++        super(effect);
++        this.costs = effect.costs;
++    }
++
++    @Override
++    public MiracleCostModifierFlat copy() {
++        return new MiracleCostModifierFlat(this);
++    }
++
++    @Override
++    public boolean apply(Game game, Ability source, Ability abilityToModify) {
++        final ManaCosts<ManaCost> costRef = abilityToModify.getManaCostsToPay();
++        // replace with the new cost
++        costRef.clear();
++        costRef.add(new ManaCostsImpl<>(this.costs));
++        return true;
++    }
++}
+diff --git a/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java b/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java
+index 2857294f9..855f268fc 100644
+--- a/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java
++++ b/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java
+@@ -7,3 +6,0 @@ import mage.abilities.TriggeredAbilityImpl;
+-import mage.abilities.costs.mana.ManaCost;
+-import mage.abilities.costs.mana.ManaCosts;
+-import mage.abilities.costs.mana.ManaCostsImpl;
+@@ -10,0 +8,2 @@ import mage.abilities.effects.OneShotEffect;
++import mage.abilities.effects.common.cost.MiracleCostModifier;
++import mage.abilities.effects.common.cost.MiracleCostModifierFlat;
+@@ -17,0 +17 @@ import mage.target.targetpointer.FixedTarget;
++import mage.util.functions.MiracleCostModifierCreator;
+@@ -77,0 +78,8 @@ public class MiracleAbility extends TriggeredAbilityImpl {
++    private final MiracleCostModifierCreator miracleCostModifierCreator;
++
++    public MiracleAbility(MiracleCostModifierCreator miracleCostModifierCreator, String costText) {
++        super(Zone.HAND, new MiracleEffect(miracleCostModifierCreator), true);
++        this.addWatcher(new MiracleWatcher());
++        this.ruleText = "Miracle " + costText + staticRule;
++        this.miracleCostModifierCreator = miracleCostModifierCreator;
++    }
+@@ -80,3 +88 @@ public class MiracleAbility extends TriggeredAbilityImpl {
+-        super(Zone.HAND, new MiracleEffect(miracleCosts), true);
+-        addWatcher(new MiracleWatcher());
+-        ruleText = "Miracle " + miracleCosts + staticRule;
++        this(() -> new MiracleCostModifierFlat(miracleCosts), miracleCosts);
+@@ -87,0 +94 @@ public class MiracleAbility extends TriggeredAbilityImpl {
++        this.miracleCostModifierCreator = ability.miracleCostModifierCreator;
+@@ -118 +125 @@ class MiracleEffect extends OneShotEffect {
+-    private final ManaCosts<ManaCost> miracleCosts;
++    private final MiracleCostModifierCreator miracleCostModifierCreator;
+@@ -120 +127 @@ class MiracleEffect extends OneShotEffect {
+-    public MiracleEffect(String miracleCosts) {
++    public MiracleEffect(MiracleCostModifierCreator miracleCostModifierCreator) {
+@@ -122,2 +129 @@ class MiracleEffect extends OneShotEffect {
+-        this.staticText = "cast this card for its miracle cost";
+-        this.miracleCosts = new ManaCostsImpl<>(miracleCosts);
++        this.miracleCostModifierCreator = miracleCostModifierCreator;
+@@ -128 +134 @@ class MiracleEffect extends OneShotEffect {
+-        this.miracleCosts = effect.miracleCosts;
++        this.miracleCostModifierCreator = effect.miracleCostModifierCreator;
+@@ -143,4 +149,2 @@ class MiracleEffect extends OneShotEffect {
+-            ManaCosts<ManaCost> costRef = abilityToCast.getManaCostsToPay();
+-            // replace with the new cost
+-            costRef.clear();
+-            costRef.add(miracleCosts);
++            final MiracleCostModifier effect = this.miracleCostModifierCreator.get().setCastToModify(abilityToCast);
++            game.getState().getContinuousEffects().addEffect(effect, source);
+@@ -147,0 +152 @@ class MiracleEffect extends OneShotEffect {
++            effect.discard();
+diff --git a/Mage/src/main/java/mage/game/permanent/PermanentCard.java b/Mage/src/main/java/mage/game/permanent/PermanentCard.java
+index c2f808b09..89cb491e1 100644
+--- a/Mage/src/main/java/mage/game/permanent/PermanentCard.java
++++ b/Mage/src/main/java/mage/game/permanent/PermanentCard.java
+@@ -170,0 +171,4 @@ public class PermanentCard extends PermanentImpl {
++        this.abilities.stream().flatMap(ability -> ability.getWatchers().stream().map(watcher -> watcher.getKey())).map(game.getState()::getWatcher).distinct().forEach(watcher -> {
++            watcher.setControllerId(this.controllerId);
++            watcher.setSourceId(objectId);
++        });
+diff --git a/Mage/src/main/java/mage/game/permanent/PermanentImpl.java b/Mage/src/main/java/mage/game/permanent/PermanentImpl.java
+index 10585d52e..fff65460c 100644
+--- a/Mage/src/main/java/mage/game/permanent/PermanentImpl.java
++++ b/Mage/src/main/java/mage/game/permanent/PermanentImpl.java
+@@ -46 +45,0 @@ import java.util.*;
+-import java.util.stream.Collectors;
+@@ -965,0 +965,4 @@ public abstract class PermanentImpl extends CardImpl implements Permanent {
++
++        // and watchers
++        this.getAbilities().stream().flatMap(ability -> ability.getWatchers().stream().map(watcher -> watcher.getKey())).map(game.getState()::getWatcher).distinct().forEach(watcher -> watcher.setControllerId(newControllerId));
++
+diff --git a/Mage/src/main/java/mage/util/CardUtil.java b/Mage/src/main/java/mage/util/CardUtil.java
+index bea833610..3c2e125ef 100644
+--- a/Mage/src/main/java/mage/util/CardUtil.java
++++ b/Mage/src/main/java/mage/util/CardUtil.java
+@@ -54,0 +55,8 @@ import org.apache.log4j.Logger;
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.IOException;
++import java.io.ObjectInput;
++import java.io.ObjectOutput;
++import java.io.ObjectInputStream;
++import java.io.ObjectOutputStream;
++import java.io.Serializable;
+@@ -2044,0 +2053,14 @@ public final class CardUtil {
++        } else if (value instanceof Serializable) {
++            try {
++                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
++                try (final ObjectOutput out = new ObjectOutputStream(bos)) {
++                    out.writeObject(value);
++                    out.flush();
++                }
++                try (final ObjectInput in = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray().clone()))) {
++                    return (T)in.readObject();
++                }
++            }
++            catch (ClassNotFoundException|IOException ex) {
++                throw new IllegalStateException("Failed copying serializable object " + value.getClass().getSimpleName() + " during deep copy", ex);
++            }
+diff --git a/Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java b/Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java
+new file mode 100644
+index 000000000..6735f8c00
+--- /dev/null
++++ b/Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java
+@@ -0,0 +1,8 @@
++package mage.util.functions;
++
++import mage.abilities.effects.common.cost.MiracleCostModifier;
++
++import java.io.Serializable;
++import java.util.function.Supplier;
++
++public interface MiracleCostModifierCreator extends Supplier<MiracleCostModifier>, Serializable { }
+diff --git a/Mage/src/main/java/mage/watchers/Watcher.java b/Mage/src/main/java/mage/watchers/Watcher.java
+index 490e7b3bd..1beebf5be 100644
+--- a/Mage/src/main/java/mage/watchers/Watcher.java
++++ b/Mage/src/main/java/mage/watchers/Watcher.java
+@@ -26,0 +27,5 @@ public abstract class Watcher implements Serializable {
++    // if a watcher can dynamically add other watchers to the game state, set this flag.
++    // this will protect it from modifying the watchers map inside its own watch(),
++    // which would cause a ConcurrentModificationException.
++    protected final boolean isolated;
++
+@@ -27,0 +33,4 @@ public abstract class Watcher implements Serializable {
++        this(scope, false);
++    }
++
++    public Watcher(WatcherScope scope, boolean isolated) {
+@@ -28,0 +38 @@ public abstract class Watcher implements Serializable {
++        this.isolated = isolated;
+@@ -35,0 +46 @@ public abstract class Watcher implements Serializable {
++        this.isolated = watcher.isolated;
+@@ -127,0 +139,4 @@ public abstract class Watcher implements Serializable {
++
++    public boolean isolated() {
++        return this.isolated;
++    }
+diff --git a/Mage/src/main/java/mage/watchers/Watchers.java b/Mage/src/main/java/mage/watchers/Watchers.java
+index c907997f3..7a6660bd7 100644
+--- a/Mage/src/main/java/mage/watchers/Watchers.java
++++ b/Mage/src/main/java/mage/watchers/Watchers.java
+@@ -8,0 +9 @@ import java.util.HashMap;
++import java.util.stream.Stream;
+@@ -36,3 +37,7 @@ public class Watchers extends HashMap<String, Watcher> {
+-        for (Watcher watcher : this.values()) {
+-            watcher.watch(event, game);
+-        }
++        final Watchers isolated = new Watchers();
++        this.values().stream().filter(Watcher::isolated).forEach(isolated::add);
++        Stream.concat(
++            this.values().stream().filter(watcher -> !watcher.isolated()),
++            isolated.values().stream()
++        ).forEach(watcher -> watcher.watch(event, game));
++        isolated.entrySet().stream().forEach(entry -> this.put(entry.getKey(), entry.getValue()));
+diff --git a/Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java b/Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java
+new file mode 100644
+index 000000000..ac10b8db3
+--- /dev/null
++++ b/Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java
+@@ -0,0 +1,62 @@
++package mage.watchers.common;
++
++import mage.abilities.Ability;
++import mage.abilities.keyword.MiracleAbility;
++import mage.cards.Card;
++import mage.cards.Cards;
++import mage.cards.CardsImpl;
++import mage.constants.Outcome;
++import mage.constants.WatcherScope;
++import mage.constants.Zone;
++import mage.filter.FilterCard;
++import mage.game.Game;
++import mage.game.events.GameEvent;
++import mage.players.Player;
++import mage.watchers.Watcher;
++import mage.watchers.common.CardsDrawnThisTurnWatcher;
++import mage.util.functions.MiracleCostModifierCreator;
++
++import java.util.UUID;
++
++public class MiracleGrantedWatcher extends Watcher {
++
++    final private Zone zone;
++    final private FilterCard filter;
++    final private MiracleCostModifierCreator miracleCostModifierCreator;
++    final private String costText;
++
++    public MiracleGrantedWatcher(Zone zone, FilterCard filter, MiracleCostModifierCreator miracleCostModifierCreator, String costText) {
++        super(WatcherScope.CARD, true);
++        this.zone = zone;
++        this.filter = filter;
++        this.miracleCostModifierCreator = miracleCostModifierCreator;
++        this.costText = costText;
++    }
++
++    @Override
++    public void watch(GameEvent event, Game game) {
++        if (event.getType() == GameEvent.EventType.UNTAP_STEP_PRE) {
++            this.reset();
++            return;
++        }
++
++        // inital card draws do not trigger miracle so check that phase != null
++        if (game.getPhase() != null && event.getType() == GameEvent.EventType.DREW_CARD && this.zone.match(game.getState().getZone(this.getSourceId()))) {
++            final UUID playerId = event.getPlayerId();
++            final Card card = game.getCard(event.getTargetId());
++            if (playerId != null && card != null && playerId.equals(this.getControllerId()) && game.getState().getWatcher(CardsDrawnThisTurnWatcher.class).getCardsDrawnThisTurn(playerId) == 1 && this.filter.match(card, game)) {
++                final Player controller = game.getPlayer(playerId);
++                if (controller != null) {
++                    final Cards cards = new CardsImpl(card);
++                    controller.lookAtCards("Miracle", cards, game);
++                    final Ability ability = new MiracleAbility(this.miracleCostModifierCreator, this.costText);
++                    if (controller.chooseUse(Outcome.Benefit, "Reveal " + card.getLogName() + " to be able to use Miracle?", ability, game)) {
++                        game.getState().addOtherAbility(card, ability);
++                        controller.revealCards("Miracle", cards, game);
++                        game.fireEvent(GameEvent.getEvent(GameEvent.EventType.MIRACLE_CARD_REVEALED, card.getId(), ability, controller.getId()));
++                    }
++                }
++            }
++        }
++    }
++}

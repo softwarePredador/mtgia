@@ -46,8 +46,12 @@ forma silenciosa.
    sessão, prompt, ação ou replay.
 10. Backend e app permanecem protegidos, respectivamente, por
     `INTERACTIVE_BATTLE_ENABLED=false` e
-    `ENABLE_INTERACTIVE_BATTLE=false`. Os scripts de release fixam esses
-    valores em `false`.
+    `ENABLE_INTERACTIVE_BATTLE=false`. O release do backend continua
+    default-off e só aceita habilitação quando o processo chamador fornece
+    `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1`. Antes de alterar a flag, o
+    deploy prova um serviço XMage privado separado do batch, no mesmo SHA,
+    pinado por digest e com identidade, modo e capacidade exatos. O bundle do
+    app continua fora deste opt-in e permanece desabilitado.
 
 ## Lifecycle
 
@@ -68,6 +72,9 @@ persiste a tentativa/replay Battle sanitizado e referencia o replay na sessão.
   release.
 - Há custo de manter dois deployments/pools XMage, mas batch não sofre
   contenção silenciosa de partidas humanas.
+- O deploy dos sidecars apenas prepara o runtime interativo e mantém o backend
+  desabilitado; uma segunda etapa explícita no deploy do backend é necessária
+  para ativar a capacidade.
 - Queda irreversível do processo ainda termina como `process_lost`; não se
   promete restaurar um game state completo.
 - BL10 continua necessário para carga integrada, Android físico/TalkBack,

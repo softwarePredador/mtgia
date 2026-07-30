@@ -113,313 +113,295 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     maxWidth: 420,
                     maxHeight: 720,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppTheme.space20,
-                          AppTheme.space16,
-                          AppTheme.space12,
-                          0,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Novo Deck',
-                                style: Theme.of(dialogContext)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: AppTheme.textPrimary,
-                                      fontWeight: FontWeight.w800,
-                                      fontFamily: AppTheme.displayFontFamily,
+                  child: LayoutBuilder(
+                    builder: (context, dialogConstraints) {
+                      final keyboardCramped = dialogConstraints.maxHeight < 220;
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (!keyboardCramped)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                AppTheme.space20,
+                                AppTheme.space16,
+                                AppTheme.space12,
+                                0,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Novo Deck',
+                                      style: Theme.of(dialogContext)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            color: AppTheme.textPrimary,
+                                            fontWeight: FontWeight.w800,
+                                            fontFamily:
+                                                AppTheme.displayFontFamily,
+                                          ),
                                     ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () =>
+                                        Navigator.pop(dialogContext),
+                                    icon: const Icon(Icons.close_rounded),
+                                    color: AppTheme.textSecondary,
+                                    tooltip: 'Fechar',
+                                  ),
+                                ],
                               ),
                             ),
-                            IconButton(
-                              onPressed: () => Navigator.pop(dialogContext),
-                              icon: const Icon(Icons.close_rounded),
-                              color: AppTheme.textSecondary,
-                              tooltip: 'Fechar',
-                            ),
-                          ],
-                        ),
-                      ),
-                      Flexible(
-                        child: Scrollbar(
-                          controller: scrollController,
-                          thumbVisibility: true,
-                          interactive: true,
-                          child: SingleChildScrollView(
-                            controller: scrollController,
-                            padding: const EdgeInsets.fromLTRB(
-                              AppTheme.space20,
-                              AppTheme.space14,
-                              AppTheme.space20,
-                              AppTheme.space18,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextField(
-                                  key: const Key('deck-create-name-field'),
-                                  controller: nameController,
-                                  focusNode: nameFocusNode,
-                                  decoration: InputDecoration(
-                                    labelText: 'Nome do deck',
-                                    hintText: 'Ex.: meu deck lorehold',
-                                    error: nameError == null
-                                        ? null
-                                        : Semantics(
-                                            liveRegion: true,
-                                            child: Text(
-                                              nameError!,
-                                              key: const Key(
-                                                'deck-create-name-error',
+                          Flexible(
+                            child: Scrollbar(
+                              controller: scrollController,
+                              thumbVisibility: true,
+                              interactive: true,
+                              child: SingleChildScrollView(
+                                controller: scrollController,
+                                padding: const EdgeInsets.fromLTRB(
+                                  AppTheme.space20,
+                                  AppTheme.space14,
+                                  AppTheme.space20,
+                                  AppTheme.space18,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextField(
+                                      key: const Key('deck-create-name-field'),
+                                      controller: nameController,
+                                      focusNode: nameFocusNode,
+                                      decoration: InputDecoration(
+                                        labelText: 'Nome do deck',
+                                        hintText: 'Ex.: meu deck lorehold',
+                                        error: nameError == null
+                                            ? null
+                                            : Semantics(
+                                                liveRegion: true,
+                                                child: Text(
+                                                  nameError!,
+                                                  key: const Key(
+                                                    'deck-create-name-error',
+                                                  ),
+                                                ),
+                                              ),
+                                      ),
+                                      onChanged: (_) {
+                                        if (nameError != null ||
+                                            submitError != null) {
+                                          setState(() {
+                                            nameError = null;
+                                            submitError = null;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                    const SizedBox(height: AppTheme.space14),
+                                    DropdownButtonFormField<String>(
+                                      key: const Key(
+                                        'deck-create-format-field',
+                                      ),
+                                      initialValue: selectedFormat,
+                                      isExpanded: true,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Formato',
+                                      ),
+                                      items: formats
+                                          .map(
+                                            (f) => DropdownMenuItem(
+                                              value: f,
+                                              child: Text(
+                                                f[0].toUpperCase() +
+                                                    f.substring(1),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                          ),
-                                  ),
-                                  onChanged: (_) {
-                                    if (nameError != null ||
-                                        submitError != null) {
-                                      setState(() {
-                                        nameError = null;
-                                        submitError = null;
-                                      });
-                                    }
-                                  },
-                                ),
-                                const SizedBox(height: AppTheme.space14),
-                                DropdownButtonFormField<String>(
-                                  key: const Key('deck-create-format-field'),
-                                  initialValue: selectedFormat,
-                                  isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Formato',
-                                  ),
-                                  items: formats
-                                      .map(
-                                        (f) => DropdownMenuItem(
-                                          value: f,
-                                          child: Text(
-                                            f[0].toUpperCase() + f.substring(1),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                  onChanged: (value) {
-                                    if (value != null &&
-                                        value != selectedFormat) {
-                                      setState(() {
-                                        selectedFormat = value;
-                                        selectedCommander = null;
-                                        submitError = null;
-                                      });
-                                    }
-                                  },
-                                ),
-                                if (isCommanderStyleDeckFormat(
-                                  selectedFormat,
-                                )) ...[
-                                  const SizedBox(height: AppTheme.space14),
-                                  DeckCommanderSelector(
-                                    format: selectedFormat,
-                                    selectedCard: selectedCommander,
-                                    onChanged: (card) {
-                                      setState(() {
-                                        selectedCommander = card;
-                                        submitError = null;
-                                      });
-                                    },
-                                  ),
-                                ],
-                                const SizedBox(height: AppTheme.space14),
-                                TextField(
-                                  key: const Key(
-                                    'deck-create-description-field',
-                                  ),
-                                  controller: descriptionController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Descrição (opcional)',
-                                    hintText: 'Sobre o que é este deck?',
-                                  ),
-                                  maxLines: 3,
-                                  onChanged: (_) {
-                                    if (submitError != null) {
-                                      setState(() => submitError = null);
-                                    }
-                                  },
-                                ),
-                                const SizedBox(height: AppTheme.space12),
-                                SwitchListTile(
-                                  key: const Key('deck-create-public-switch'),
-                                  title: const Text('Deck público'),
-                                  subtitle: const Text('Visível na comunidade'),
-                                  value: isPublic,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      isPublic = value;
-                                      submitError = null;
-                                    });
-                                  },
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                if (submitError != null) ...[
-                                  const SizedBox(height: AppTheme.space12),
-                                  Semantics(
-                                    container: true,
-                                    liveRegion: true,
-                                    label: submitError,
-                                    child: Container(
-                                      key: const Key(
-                                        'deck-create-submit-error',
-                                      ),
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(
-                                        AppTheme.space12,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.error.withValues(
-                                          alpha: 0.12,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          AppTheme.radiusSm,
-                                        ),
-                                        border: Border.all(
-                                          color: AppTheme.error.withValues(
-                                            alpha: 0.4,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.error_outline_rounded,
-                                            color: AppTheme.error,
-                                            size: 20,
-                                          ),
-                                          const SizedBox(
-                                            width: AppTheme.space8,
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              submitError!,
-                                              style: Theme.of(dialogContext)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: AppTheme.textPrimary,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                          )
+                                          .toList(),
+                                      onChanged: (value) {
+                                        if (value != null &&
+                                            value != selectedFormat) {
+                                          setState(() {
+                                            selectedFormat = value;
+                                            selectedCommander = null;
+                                            submitError = null;
+                                          });
+                                        }
+                                      },
                                     ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(
-                          AppTheme.space20,
-                          AppTheme.space12,
-                          AppTheme.space20,
-                          AppTheme.space16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated,
-                          border: Border(
-                            top: BorderSide(
-                              color: AppTheme.outlineMuted.withValues(
-                                alpha: 0.7,
+                                    if (isCommanderStyleDeckFormat(
+                                      selectedFormat,
+                                    )) ...[
+                                      const SizedBox(height: AppTheme.space14),
+                                      DeckCommanderSelector(
+                                        format: selectedFormat,
+                                        selectedCard: selectedCommander,
+                                        onChanged: (card) {
+                                          setState(() {
+                                            selectedCommander = card;
+                                            submitError = null;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                    const SizedBox(height: AppTheme.space14),
+                                    TextField(
+                                      key: const Key(
+                                        'deck-create-description-field',
+                                      ),
+                                      controller: descriptionController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Descrição (opcional)',
+                                        hintText: 'Sobre o que é este deck?',
+                                      ),
+                                      maxLines: 3,
+                                      onChanged: (_) {
+                                        if (submitError != null) {
+                                          setState(() => submitError = null);
+                                        }
+                                      },
+                                    ),
+                                    const SizedBox(height: AppTheme.space12),
+                                    SwitchListTile(
+                                      key: const Key(
+                                        'deck-create-public-switch',
+                                      ),
+                                      title: const Text('Deck público'),
+                                      subtitle: const Text(
+                                        'Visível na comunidade',
+                                      ),
+                                      value: isPublic,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isPublic = value;
+                                          submitError = null;
+                                        });
+                                      },
+                                      contentPadding: EdgeInsets.zero,
+                                    ),
+                                    if (submitError != null &&
+                                        keyboardCramped) ...[
+                                      const SizedBox(height: AppTheme.space8),
+                                      _DeckCreateSubmitError(
+                                        message: submitError!,
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        child: _DeckCreateDialogActions(
-                          isSubmitting: isSubmitting,
-                          onCancel: () => Navigator.pop(dialogContext),
-                          onSubmit: () async {
-                            final trimmedName = nameController.text.trim();
-                            final trimmedDescription = descriptionController
-                                .text
-                                .trim();
-
-                            if (trimmedName.isEmpty) {
-                              setState(() {
-                                nameError = 'Informe o nome do deck.';
-                                submitError = null;
-                              });
-                              nameFocusNode.requestFocus();
-                              return;
-                            }
-
-                            final deckProvider = dialogContext
-                                .read<DeckProvider>();
-                            setState(() {
-                              nameError = null;
-                              submitError = null;
-                              isSubmitting = true;
-                            });
-
-                            final success = await deckProvider.createDeck(
-                              name: trimmedName,
-                              format: selectedFormat,
-                              description: trimmedDescription.isEmpty
-                                  ? null
-                                  : trimmedDescription,
-                              isPublic: isPublic,
-                              cards:
-                                  isCommanderStyleDeckFormat(selectedFormat) &&
-                                      selectedCommander != null
-                                  ? [
-                                      {
-                                        'card_id': selectedCommander!.id,
-                                        'quantity': 1,
-                                        'is_commander': true,
-                                      },
-                                    ]
-                                  : null,
-                            );
-
-                            if (!dialogContext.mounted) return;
-
-                            if (success) {
-                              Navigator.pop(dialogContext);
-                              if (parentContext.mounted) {
-                                ScaffoldMessenger.of(
-                                  parentContext,
-                                ).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Deck criado com sucesso!'),
+                          if (submitError != null && !keyboardCramped)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                AppTheme.space20,
+                                AppTheme.space4,
+                                AppTheme.space20,
+                                AppTheme.space8,
+                              ),
+                              child: _DeckCreateSubmitError(
+                                message: submitError!,
+                              ),
+                            ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.fromLTRB(
+                              AppTheme.space20,
+                              AppTheme.space12,
+                              AppTheme.space20,
+                              AppTheme.space16,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceElevated,
+                              border: Border(
+                                top: BorderSide(
+                                  color: AppTheme.outlineMuted.withValues(
+                                    alpha: 0.7,
                                   ),
+                                ),
+                              ),
+                            ),
+                            child: _DeckCreateDialogActions(
+                              isSubmitting: isSubmitting,
+                              onCancel: () => Navigator.pop(dialogContext),
+                              onSubmit: () async {
+                                final trimmedName = nameController.text.trim();
+                                final trimmedDescription = descriptionController
+                                    .text
+                                    .trim();
+
+                                if (trimmedName.isEmpty) {
+                                  setState(() {
+                                    nameError = 'Informe o nome do deck.';
+                                    submitError = null;
+                                  });
+                                  nameFocusNode.requestFocus();
+                                  return;
+                                }
+
+                                final deckProvider = dialogContext
+                                    .read<DeckProvider>();
+                                setState(() {
+                                  nameError = null;
+                                  submitError = null;
+                                  isSubmitting = true;
+                                });
+
+                                final success = await deckProvider.createDeck(
+                                  name: trimmedName,
+                                  format: selectedFormat,
+                                  description: trimmedDescription.isEmpty
+                                      ? null
+                                      : trimmedDescription,
+                                  isPublic: isPublic,
+                                  cards:
+                                      isCommanderStyleDeckFormat(
+                                            selectedFormat,
+                                          ) &&
+                                          selectedCommander != null
+                                      ? [
+                                          {
+                                            'card_id': selectedCommander!.id,
+                                            'quantity': 1,
+                                            'is_commander': true,
+                                          },
+                                        ]
+                                      : null,
                                 );
-                              }
-                            } else {
-                              setState(() {
-                                isSubmitting = false;
-                                submitError =
-                                    deckProvider.errorMessage ??
-                                    'Erro ao criar deck';
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+
+                                if (!dialogContext.mounted) return;
+
+                                if (success) {
+                                  Navigator.pop(dialogContext);
+                                  if (parentContext.mounted) {
+                                    ScaffoldMessenger.of(
+                                      parentContext,
+                                    ).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Deck criado com sucesso!',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  setState(() {
+                                    isSubmitting = false;
+                                    submitError =
+                                        deckProvider.errorMessage ??
+                                        'Erro ao criar deck';
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -2015,23 +1997,26 @@ class _DeckEmptyState extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppTheme.space22),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  key: const Key('deck-list-empty-create-button'),
-                  onPressed: onCreate,
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Criar novo deck'),
-                ),
-              ),
-              const SizedBox(height: AppTheme.space10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  key: const Key('deck-list-empty-generate-button'),
-                  onPressed: onGenerate,
-                  icon: const Icon(Icons.auto_fix_high, size: 18),
-                  label: const Text('Gerar com IA'),
+              ConstrainedBox(
+                key: const Key('deck-list-empty-actions'),
+                constraints: const BoxConstraints(maxWidth: 380),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton.icon(
+                      key: const Key('deck-list-empty-create-button'),
+                      onPressed: onCreate,
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('Criar novo deck'),
+                    ),
+                    const SizedBox(height: AppTheme.space10),
+                    OutlinedButton.icon(
+                      key: const Key('deck-list-empty-generate-button'),
+                      onPressed: onGenerate,
+                      icon: const Icon(Icons.auto_fix_high, size: 18),
+                      label: const Text('Gerar com IA'),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -2225,6 +2210,51 @@ class _DeckCreateDialogActions extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _DeckCreateSubmitError extends StatelessWidget {
+  const _DeckCreateSubmitError({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: message,
+      child: Container(
+        key: const Key('deck-create-submit-error'),
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppTheme.space12),
+        decoration: BoxDecoration(
+          color: AppTheme.error.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          border: Border.all(color: AppTheme.error.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppTheme.error,
+              size: 20,
+            ),
+            const SizedBox(width: AppTheme.space8),
+            Expanded(
+              child: Text(
+                message,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

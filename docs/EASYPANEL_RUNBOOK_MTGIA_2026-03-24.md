@@ -33,18 +33,52 @@ O runtime global de regras usa dois serviços internos, sem domínio público:
 - `evolution/xmage-sidecar`: executor primário pinado;
 - `evolution/forge-sidecar`: executor secundário para gaps estruturados XMage.
 
-O deploy coordenado é:
+O Battle Coach pode usar um terceiro serviço privado e independente:
+
+- `evolution_xmage-interactive`, alias interno `xmage-interactive`;
+- source gerenciado diretamente pelo Swarm, sem domínio ou porta publicada;
+- mesma imagem XMage imutável do batch, com
+  `XMAGE_RUNTIME_MODE=interactive`;
+- capacidade default `XMAGE_INTERACTIVE_MAX_ACTIVE=4`.
+
+Esse terceiro serviço e o backend permanecem desligados por padrão. O deploy
+coordenado normal continua:
 
 ```bash
-MANALOOM_EASYPANEL_INSECURE_TLS=1 \
-  scripts/manaloom_deploy_battle_sidecars.sh
-scripts/manaloom_deploy_backend_image.sh
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+  ./scripts/manaloom_deploy_battle_sidecars.sh
+
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+  ./scripts/manaloom_deploy_backend_image.sh
 ```
 
 O primeiro script só configura o backend com `BATTLE_ENGINE=auto` depois de os
 dois health checks internos passarem. As URLs internas são
 `http://xmage-sidecar:8080` e `http://forge-sidecar:8080`; os sidecars não devem
 ser publicados na internet.
+
+Para preparar e depois habilitar o Battle Coach, a mesma intenção caller-only
+deve ser fornecida separadamente nas duas etapas:
+
+```bash
+MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1 \
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+  ./scripts/manaloom_deploy_battle_sidecars.sh
+
+MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1 \
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+  ./scripts/manaloom_deploy_backend_image.sh
+```
+
+A primeira etapa publica/prova o serviço privado, mas mantém
+`INTERACTIVE_BATTLE_ENABLED=false` no backend. A segunda recusa habilitar até
+provar digest, label de SHA, ausência de porta pública, alias privado,
+identidade XMage, `runtime_mode=interactive`,
+`batch_simulation_available=false` e capacidade exata. O bundle Flutter
+continua com sua flag própria desabilitada; habilitar o backend não publica a
+entrada de UI.
 
 Comportamento atual:
 

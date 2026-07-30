@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "a34427b9079ff8c3df6848372b04caf8692200fded2900aa27b5f26e8ef24b05",
+  "x-manaloom-source-digest-sha256": "dc3fb4afdbc1d74fa17779c533eedfd71a83d818a2b25f9eebe9eff806ecb2b4",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1355,6 +1355,7 @@
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
           "server/test/binder_item_contract_test.dart",
           "server/test/binder_route_test.dart"
         ],
@@ -1384,6 +1385,7 @@
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
           "server/test/binder_item_contract_test.dart",
           "server/test/binder_route_test.dart"
         ],
@@ -1415,6 +1417,7 @@
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
           "server/test/binder_item_contract_test.dart",
           "server/test/binder_route_test.dart"
         ],
@@ -1454,6 +1457,7 @@
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
           "server/test/binder_item_contract_test.dart",
           "server/test/binder_route_test.dart"
         ],
@@ -1493,6 +1497,7 @@
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
           "server/test/binder_item_contract_test.dart",
           "server/test/binder_route_test.dart"
         ],

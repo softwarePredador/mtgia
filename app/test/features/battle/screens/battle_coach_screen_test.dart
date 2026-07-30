@@ -1,4 +1,7 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
@@ -194,6 +197,137 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'shows a strong focus halo for keyboard navigation without touch residue',
+    (tester) async {
+      final previousHighlightStrategy = FocusManager.instance.highlightStrategy;
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTraditional;
+      addTearDown(() {
+        FocusManager.instance.highlightStrategy = previousHighlightStrategy;
+      });
+      final semantics = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme.copyWith(
+            splashFactory: InkRipple.splashFactory,
+          ),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Center(
+                child: FilledButton(
+                  key: const Key('open-battle-coach'),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => BattleCoachScreen(
+                        deckId: '00000000-0000-4000-8000-000000000001',
+                        gateway: _FakeInteractiveGateway(),
+                        opponentGateway: _FakeOpponentGateway(),
+                        pollInterval: const Duration(hours: 1),
+                      ),
+                    ),
+                  ),
+                  child: const Text('Abrir Coach'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(const Key('open-battle-coach')));
+      await tester.pumpAndSettle();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+
+      BoxDecoration haloDecoration(Key key) =>
+          tester.widget<Container>(find.byKey(key)).decoration!
+              as BoxDecoration;
+
+      const backHaloKey = Key('battle-coach-back-focus-halo');
+      const backButtonKey = Key('battle-coach-back-button');
+      const historyHaloKey = Key('battle-coach-history-focus-halo');
+      const historyButtonKey = Key('battle-coach-history-button');
+      const chooseHaloKey = Key('battle-coach-choose-opponent-focus-halo');
+      const chooseButtonKey = Key('battle-coach-choose-opponent-button');
+
+      expect(haloDecoration(backHaloKey).boxShadow, isEmpty);
+      expect(haloDecoration(historyHaloKey).boxShadow, isEmpty);
+      expect(haloDecoration(chooseHaloKey).boxShadow, isEmpty);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      final backButton = tester.widget<IconButton>(find.byKey(backButtonKey));
+      expect(backButton.focusNode?.hasFocus, isTrue);
+      expect(
+        haloDecoration(backHaloKey).boxShadow,
+        contains(
+          isA<BoxShadow>()
+              .having((shadow) => shadow.color, 'color', AppTheme.frost400)
+              .having((shadow) => shadow.spreadRadius, 'spreadRadius', 4),
+        ),
+      );
+      expect(haloDecoration(backHaloKey).border, isA<Border>());
+      expect(
+        tester
+            .getSemantics(find.byKey(backButtonKey))
+            .flagsCollection
+            .isFocused,
+        Tristate.isTrue,
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      final historyButton = tester.widget<IconButton>(
+        find.byKey(historyButtonKey),
+      );
+      expect(historyButton.focusNode?.hasFocus, isTrue);
+      expect(
+        haloDecoration(historyHaloKey).boxShadow,
+        contains(
+          isA<BoxShadow>()
+              .having((shadow) => shadow.color, 'color', AppTheme.frost400)
+              .having((shadow) => shadow.spreadRadius, 'spreadRadius', 4),
+        ),
+      );
+      final historyBorder = haloDecoration(historyHaloKey).border! as Border;
+      expect(historyBorder.top.color, AppTheme.frost400);
+      expect(historyBorder.top.width, 2);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      final chooseButton = tester.widget<FilledButton>(
+        find.byKey(chooseButtonKey),
+      );
+      expect(chooseButton.focusNode?.hasFocus, isTrue);
+      expect(
+        haloDecoration(chooseHaloKey).boxShadow,
+        contains(
+          isA<BoxShadow>()
+              .having((shadow) => shadow.color, 'color', AppTheme.frost400)
+              .having((shadow) => shadow.spreadRadius, 'spreadRadius', 4),
+        ),
+      );
+      final chooseSemantics = tester.getSemantics(find.byKey(chooseButtonKey));
+      expect(chooseSemantics.flagsCollection.isButton, isTrue);
+      expect(chooseSemantics.flagsCollection.isFocused, Tristate.isTrue);
+
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTouch;
+      await tester.pump();
+
+      expect(chooseButton.focusNode?.hasFocus, isTrue);
+      expect(haloDecoration(chooseHaloKey).boxShadow, isEmpty);
+      expect(haloDecoration(chooseHaloKey).border, isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      semantics.dispose();
+    },
+  );
 
   testWidgets(
     'runs an explicitly selected automatic fallback and opens its replay',

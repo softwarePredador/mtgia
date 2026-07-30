@@ -50,6 +50,25 @@ void main() {
       );
     });
 
+    test('keeps legitimate Mystery Booster 2 reprints eligible', () {
+      expect(
+        isMainDeckCardEligible(
+          typeLine: "Enchantment Land — Urza's Saga",
+          setCode: 'mb2',
+          layout: 'normal',
+        ),
+        isTrue,
+      );
+      expect(
+        mainDeckCardIneligibilityReason(
+          typeLine: 'Artifact — Attraction',
+          setCode: 'mb2',
+          layout: 'normal',
+        ),
+        'supplemental_game_object',
+      );
+    });
+
     test('SQL and runtime guards reject the same core fields', () {
       final sql = mainDeckCardEligibilitySql(tableAlias: 'card');
       expect(sql, contains('card.type_line'));

@@ -609,6 +609,8 @@ $metaContext
         referenceGuidanceBudget: openAiTimeoutSelection.referenceGuidanceBudget,
       );
     } catch (error) {
+      final transportFailure =
+          error is http.ClientException || error is IOException;
       await recordAiProviderCall(
         db: pool,
         endpoint: 'generate',
@@ -616,8 +618,20 @@ $metaContext
         latencyMs: openAiStopwatch.elapsedMilliseconds,
         success: false,
         userId: userId,
-        failureCode: 'provider_transport_${error.runtimeType}',
+        failureCode:
+            transportFailure
+                ? 'provider_transport_error'
+                : 'provider_unexpected_${error.runtimeType}',
       );
+      if (transportFailure) {
+        timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
+        timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+        return buildAiGenerateProviderFailureResponse(
+          cacheKey: cacheKey,
+          timings: timings,
+          contract: aiProviderTransportFailureContract,
+        );
+      }
       rethrow;
     } finally {
       cancellationMonitor?.stop();
@@ -679,9 +693,20 @@ $metaContext
         return Response.json(body: responseBody);
       }
 
-      return apiError(
-        mapAiProviderHttpStatus(response.statusCode),
-        aiProviderUnavailableMessage,
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      final failureContract = classifyAiProviderHttpFailure(
+        response.statusCode,
+      );
+      return buildAiGenerateProviderFailureResponse(
+        cacheKey: cacheKey,
+        timings: timings,
+        contract: failureContract,
+        retryAfterSeconds:
+            failureContract.category == AiProviderFailureCategory.rateLimited
+                ? parseAiProviderRetryAfterSeconds(
+                  response.headers[HttpHeaders.retryAfterHeader],
+                )
+                : null,
       );
     }
 
@@ -1099,6 +1124,42 @@ Response buildAiGenerateProviderCancelledResponse({
           'name': 'openai',
           'operation': 'generate',
           'status': 'cancelled',
+        },
+      },
+      cacheKey: cacheKey,
+      cacheHit: false,
+      timings: timings,
+    ),
+  );
+}
+
+Response buildAiGenerateProviderFailureResponse({
+  required String cacheKey,
+  required Map<String, int> timings,
+  required AiProviderFailureContract contract,
+  int? retryAfterSeconds,
+}) {
+  return Response.json(
+    statusCode: contract.httpStatus,
+    headers: {
+      'Cache-Control': 'no-store',
+      if (retryAfterSeconds != null)
+        HttpHeaders.retryAfterHeader: retryAfterSeconds.toString(),
+    },
+    body: withAiGenerateRuntimeMetadata(
+      payload: {
+        'error': aiProviderUnavailableMessage,
+        'error_code': contract.errorCode,
+        'outcome_code': 'provider_unavailable',
+        'retryable': contract.retryable,
+        'can_save': false,
+        'learning_eligible': false,
+        'generated_deck': null,
+        if (retryAfterSeconds != null) 'retry_after_seconds': retryAfterSeconds,
+        'provider': {
+          'name': 'openai',
+          'operation': 'generate',
+          'status': contract.providerStatus,
         },
       },
       cacheKey: cacheKey,

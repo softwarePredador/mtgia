@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../cards/providers/card_provider.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
@@ -84,7 +85,9 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
   late String _language;
   late TextEditingController _priceController;
   late TextEditingController _notesController;
+  late FocusNode _priceFocusNode;
   bool _saving = false;
+  String? _saveError;
 
   /// Edições disponíveis da carta (só para adição)
   List<Map<String, dynamic>> _printings = [];
@@ -123,6 +126,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       text: item?.price?.toStringAsFixed(2) ?? '',
     );
     _notesController = TextEditingController(text: item?.notes ?? '');
+    _priceFocusNode = FocusNode();
 
     // Buscar edições se estiver adicionando (não editando)
     if (widget.item == null && widget.cardName != null) {
@@ -212,18 +216,36 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
   void dispose() {
     _priceController.dispose();
     _notesController.dispose();
+    _priceFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     if (_saving) return;
     if (widget.item == null && (_effectiveCardId ?? '').isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione uma edição válida da carta.')),
-      );
+      setState(() {
+        _saveError = 'Selecione uma edição válida da carta.';
+      });
       return;
     }
-    setState(() => _saving = true);
+
+    final priceText = _priceController.text.trim();
+    final parsedPrice = !_forSale || priceText.isEmpty
+        ? null
+        : double.tryParse(priceText.replaceAll(',', '.'));
+    if (_forSale &&
+        (parsedPrice == null || !parsedPrice.isFinite || parsedPrice <= 0)) {
+      setState(() {
+        _saveError = 'Informe um preço válido maior que zero.';
+      });
+      _priceFocusNode.requestFocus();
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _saveError = null;
+    });
 
     final data = <String, dynamic>{
       'quantity': _quantity,
@@ -238,30 +260,37 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
           : _notesController.text.trim(),
     };
 
-    // Parse price
-    final priceText = _priceController.text.trim();
-    if (priceText.isNotEmpty) {
-      final parsed = double.tryParse(priceText.replaceAll(',', '.'));
-      data['price'] = parsed;
-    } else {
-      data['price'] = null;
-    }
+    data['price'] = parsedPrice;
 
     // Se adicionando, incluir card_id (da edição selecionada)
     if (widget.item == null) {
       data['card_id'] = _effectiveCardId;
     }
 
-    final ok = await widget.onSave?.call(data) ?? false;
-    if (!mounted) return;
+    try {
+      final ok = await widget.onSave?.call(data) ?? false;
+      if (!mounted) return;
 
-    if (ok) {
-      Navigator.pop(context);
-    } else {
-      setState(() => _saving = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Erro ao salvar')));
+      if (ok) {
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _saving = false;
+          _saveError =
+              'Não foi possível salvar esta carta. Revise os dados e tente novamente.';
+        });
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _saveError = FriendlyErrorMapper.fromException(
+          error,
+          context: FriendlyErrorContext.binder,
+          fallback:
+              'Não foi possível salvar esta carta agora. Tente novamente.',
+        );
+      });
     }
   }
 
@@ -892,7 +921,12 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 color: _forSale ? AppTheme.mythicGold : AppTheme.outlineMuted,
               ),
               value: _forSale,
-              onChanged: (v) => setState(() => _forSale = v),
+              onChanged: (v) {
+                setState(() {
+                  _forSale = v;
+                  if (!v) _saveError = null;
+                });
+              },
               activeThumbColor: AppTheme.mythicGold,
             ),
 
@@ -902,9 +936,15 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
               TextField(
                 key: const Key('binder-editor-price-field'),
                 controller: _priceController,
+                focusNode: _priceFocusNode,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
+                onChanged: (_) {
+                  if (_saveError != null) {
+                    setState(() => _saveError = null);
+                  }
+                },
                 style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Preço (R\$)',
@@ -944,6 +984,33 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
               ),
             ),
             const SizedBox(height: AppTheme.space24),
+
+            if (_saveError != null) ...[
+              Semantics(
+                liveRegion: true,
+                container: true,
+                child: Container(
+                  key: const Key('binder-editor-save-error'),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppTheme.space12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.error.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
+                      color: AppTheme.error.withValues(alpha: 0.65),
+                    ),
+                  ),
+                  child: Text(
+                    _saveError!,
+                    style: const TextStyle(
+                      color: AppTheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.space12),
+            ],
 
             // Botões
             Row(

@@ -1,0 +1,34 @@
+{
+  "schema_version": "manaloom_xmage_transition_nominal_review_policy_v1_2026-07-29",
+  "transition_id": "xmage_34d81ea4995c_to_2c43ec8cdb5c_2026_07_28",
+  "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
+  "to_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+  "catalog_resolution_is_semantic_proof": false,
+  "automatic_transition_clearance_rules": [
+    {
+      "id": "metallic_mimic_presentation_literal_v1",
+      "card_name": "Metallic Mimic",
+      "class": "MetallicMimic",
+      "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
+      "change_kind": "modified",
+      "required_change_scope": "presentation_or_metadata",
+      "exact_diff_sha256": "be680a3ba2ce6015b34b8e19900bca8d7e22da8a55c9056248c48b3049f1fe44",
+      "required_direct_test_references": [
+        "Mage.Tests/src/test/java/org/mage/test/cards/continuous/ChangelingTest.java",
+        "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
+        "Mage.Tests/src/test/java/org/mage/test/cards/replacement/entersBattlefield/HardenedScaleTest.java"
+      ],
+      "required_focused_test_case_count": 6,
+      "require_no_source_warning_markers": true,
+      "require_no_card_data_actionable_finding": true,
+      "allowed_presentation_literal_changes": [
+        {
+          "old": "\"Each other creature you control of the chosen type enters the battlefield with an additional +1/+1 counter on it\"",
+          "new": "\"Each other creature you control of the chosen type enters with an additional +1/+1 counter on it\"",
+          "occurrences": 1
+        }
+      ],
+      "review_basis": "After Java comments and the one exact staticText literal are normalized, the old and new card sources are byte-token equivalent. Six exact nominal upstream scenarios pass. Catalog resolution is not used as semantic proof."
+    }
+  ]
+}

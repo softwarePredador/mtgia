@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 
+import '../../lib/e2e_validation_policy.dart';
 import '../../lib/http_responses.dart';
 
 /// GET /health - Liveness check (básico, sem dependências externas)
-/// 
+///
 /// Usado para verificar se o servidor está respondendo.
 /// Retorna 200 OK se o processo está vivo.
 Response onRequest(RequestContext context) {
@@ -21,10 +22,10 @@ Response onRequest(RequestContext context) {
       'environment': Platform.environment['ENVIRONMENT'] ?? 'development',
       'version': Platform.environment['APP_VERSION'] ?? '1.0.0',
       'git_sha': Platform.environment['GIT_SHA'],
+      'e2e_isolated_runtime': isManaloomE2eIsolatedRuntime(),
       'checks': {
-        'process': {'status': 'healthy'}
+        'process': {'status': 'healthy'},
       },
     },
   );
 }
-

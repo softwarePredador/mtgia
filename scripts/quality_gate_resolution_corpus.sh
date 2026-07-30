@@ -17,6 +17,8 @@ VALIDATION_CORPUS_OFFSET="${VALIDATION_CORPUS_OFFSET:-0}"
 RUN_STAMP="$(date -u +%Y%m%d%H%M%S)"
 RUN_NONCE="$(python3 -c 'import secrets; print(secrets.token_hex(6))')"
 RUN_TOKEN="${MANALOOM_RESOLUTION_RUN_TOKEN:-${RUN_STAMP}_$$_${RUN_NONCE}}"
+CLEANUP_ONLY="${MANALOOM_RESOLUTION_CLEANUP_ONLY:-0}"
+CLEANUP_RUN_STARTED_AT="${MANALOOM_RESOLUTION_CLEANUP_RUN_STARTED_AT:-}"
 VALIDATION_RUN_DIR="${VALIDATION_RUN_DIR:-/tmp/manaloom_resolution_corpus/${RUN_TOKEN}}"
 VALIDATION_ARTIFACT_DIR="${VALIDATION_ARTIFACT_DIR:-${VALIDATION_RUN_DIR}/decks}"
 VALIDATION_SUMMARY_JSON_PATH="${VALIDATION_SUMMARY_JSON_PATH:-${VALIDATION_RUN_DIR}/summary.json}"
@@ -55,7 +57,7 @@ api_ready() {
     rm -f "$headers_file" "$body_file"
   }
 
-  local probe_url="${API_BASE_URL%/}/health/ready"
+  local probe_url="${API_BASE_URL%/}/health"
   curl -sS -m 5 -D "$headers_file" -o "$body_file" "$probe_url" >/dev/null 2>&1 || true
 
   local content_type status
@@ -75,7 +77,7 @@ except (OSError, ValueError):
     raise SystemExit(1)
 
 if (
-    payload.get("status") != "ready"
+    payload.get("status") != "healthy"
     or payload.get("service") != "mtgia-server"
     or payload.get("e2e_isolated_runtime") is not True
 ):
@@ -258,7 +260,7 @@ stop_local_server() {
   return 0
 }
 
-cleanup_validation_identity() {
+cleanup_validation_identity_once() {
   if [[ "$MUTATION_ARMED" -ne 1 ]]; then
     return 0
   fi
@@ -690,6 +692,26 @@ SQL
   return 1
 }
 
+cleanup_validation_identity() {
+  if [[ "$MUTATION_ARMED" -ne 1 ]]; then
+    return 0
+  fi
+
+  local attempt
+  for attempt in 1 2 3; do
+    if cleanup_validation_identity_once; then
+      return 0
+    fi
+
+    if [[ "$attempt" -lt 3 ]]; then
+      echo "⚠️ Cleanup exato falhou na tentativa ${attempt}/3; renovando o túnel seguro..." >&2
+      sleep "$attempt"
+    fi
+  done
+
+  return 1
+}
+
 cleanup() {
   set +e
   stop_local_server
@@ -739,6 +761,100 @@ database_clock() {
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -c "SELECT clock_timestamp()::text;"
+}
+
+run_cleanup_recovery() {
+  if [[ ! "$RUN_TOKEN" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{7,127}$ ]]; then
+    echo "BLOCKED: MANALOOM_RESOLUTION_RUN_TOKEN inválido para cleanup exato." >&2
+    return 2
+  fi
+
+  if [[ -z "$CLEANUP_RUN_STARTED_AT" ]] || ! python3 - "$CLEANUP_RUN_STARTED_AT" <<'PY'
+from datetime import datetime
+import sys
+
+value = sys.argv[1].replace("Z", "+00:00")
+try:
+    parsed = datetime.fromisoformat(value)
+except ValueError:
+    raise SystemExit(1)
+if parsed.tzinfo is None:
+    raise SystemExit(1)
+PY
+  then
+    echo "BLOCKED: MANALOOM_RESOLUTION_CLEANUP_RUN_STARTED_AT deve ser um timestamp ISO-8601 com fuso." >&2
+    return 2
+  fi
+
+  require_live_mutation_approval "Resolution corpus exact cleanup recovery"
+  require_postgres_write_approval "Resolution corpus exact cleanup recovery"
+
+  mkdir -p "$VALIDATION_RUN_DIR"
+  local identity_before decks_before identity_after decks_after
+  identity_before="$(validation_identity_count | tr -d '[:space:]')"
+  decks_before="$(generated_deck_count | tr -d '[:space:]')"
+
+  DB_RUN_STARTED_AT="$CLEANUP_RUN_STARTED_AT"
+  MUTATION_ARMED=1
+  if ! cleanup_validation_identity; then
+    echo "❌ Cleanup exato não concluiu após três túneis independentes." >&2
+    return 2
+  fi
+
+  identity_after="$(validation_identity_count | tr -d '[:space:]')"
+  decks_after="$(generated_deck_count | tr -d '[:space:]')"
+  if [[ "$identity_after" != "0" || "$decks_after" != "0" ]]; then
+    echo "❌ Cleanup exato deixou resíduos: identities=${identity_after}, decks=${decks_after}." >&2
+    return 2
+  fi
+
+  python3 - \
+    "${VALIDATION_RUN_DIR}/cleanup_recovery.json" \
+    "$RUN_TOKEN" \
+    "$DB_RUN_STARTED_AT" \
+    "$identity_before" \
+    "$decks_before" \
+    "$identity_after" \
+    "$decks_after" \
+    "$TELEMETRY_CLEANUP_JSON" <<'PY'
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+(
+    output_path,
+    run_token,
+    run_started_at,
+    identity_before,
+    decks_before,
+    identity_after,
+    decks_after,
+    telemetry_cleanup_raw,
+) = sys.argv[1:]
+
+payload = {
+    "schema_version": 1,
+    "run_token": run_token,
+    "run_started_at": run_started_at,
+    "recovered_at": datetime.now(timezone.utc).isoformat(),
+    "identity_before": int(identity_before),
+    "generated_decks_before": int(decks_before),
+    "identity_after": int(identity_after),
+    "generated_decks_after": int(decks_after),
+    "telemetry_cleanup": json.loads(telemetry_cleanup_raw),
+    "pass": int(identity_after) == 0 and int(decks_after) == 0,
+}
+Path(output_path).write_text(
+    json.dumps(payload, indent=2, sort_keys=True) + "\n",
+    encoding="utf-8",
+)
+PY
+
+  print_header "Cleanup de recuperação concluído"
+  echo "✅ Identidade e decks temporários removidos: ${identity_before} identidade(s), ${decks_before} deck(s)."
+  echo "✅ Pós-verificação: identities=0, decks=0."
+  echo "📊 Evidência: ${VALIDATION_RUN_DIR}/cleanup_recovery.json"
 }
 
 persistent_telemetry_snapshot() {
@@ -979,6 +1095,12 @@ Variaveis uteis:
   VALIDATION_SUMMARY_JSON_PATH resumo JSON final
   VALIDATION_SUMMARY_MD_PATH   resumo Markdown final
   VALIDATION_PREFLIGHT_ONLY    use 1/true/yes para validar o corpus sem subir API nem criar dados
+  MANALOOM_RESOLUTION_CLEANUP_ONLY
+                              use 1/true/yes para recuperar apenas o cleanup de uma execução interrompida
+  MANALOOM_RESOLUTION_RUN_TOKEN
+                              token exato da execução interrompida (obrigatório no cleanup-only)
+  MANALOOM_RESOLUTION_CLEANUP_RUN_STARTED_AT
+                              início DB ISO-8601 com fuso da execução interrompida (obrigatório no cleanup-only)
 
 Este gate:
   1. sobe uma API local propria, vinculada somente a 127.0.0.1, em porta livre
@@ -993,6 +1115,14 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" || "${1:-}" == "help" ]]; then
   print_usage
   exit 0
 fi
+
+case "$CLEANUP_ONLY" in
+  1|true|TRUE|yes|YES)
+    print_header "Resolution Corpus - recuperação de cleanup"
+    run_cleanup_recovery
+    exit 0
+    ;;
+esac
 
 if [[ ! -f "$SERVER_DIR/$VALIDATION_CORPUS_PATH" ]]; then
   echo "❌ Corpus não encontrado: $SERVER_DIR/$VALIDATION_CORPUS_PATH"
@@ -1264,6 +1394,7 @@ if not isinstance(outcomes, dict):
     sys.exit(2)
 
 contract_accepted = int(outcomes.get("contract_accepted_http_200") or 0)
+safe_non_actionable = int(outcomes.get("safe_non_actionable_http_200") or 0)
 contract_rejected = int(outcomes.get("contract_rejected_http_200") or 0)
 mock_responses = int(outcomes.get("mock_responses") or 0)
 mock_non_actionable = int(outcomes.get("mock_non_actionable_outcomes") or 0)
@@ -1331,6 +1462,11 @@ if contract_accepted != direct_optimizations:
         "contract_accepted_http_200="
         f"{contract_accepted}, direct_optimizations={direct_optimizations}"
     )
+if safe_non_actionable > int(summary.get("safe_no_change") or 0):
+    outcome_errors.append(
+        "safe_non_actionable_http_200="
+        f"{safe_non_actionable} maior que safe_no_change={summary.get('safe_no_change')}"
+    )
 if unknown_origin_results != 0:
     outcome_errors.append(
         f"unknown_origin_results={unknown_origin_results}, esperado=0"
@@ -1368,6 +1504,7 @@ print(
     f"passed={passed}, failed={failed}, unresolved={unresolved}, total={total}, "
     f"direct_optimizations={direct_optimizations}, "
     f"contract_accepted_http_200={contract_accepted}, "
+    f"safe_non_actionable_http_200={safe_non_actionable}, "
     f"candidate_swap_pairs={candidate_swap_pairs}, "
     f"rejected_candidate_swap_pairs={rejected_candidate_swap_pairs}, "
     f"actionable_swap_pairs={actionable_swap_pairs}, "

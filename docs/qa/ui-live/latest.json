@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "f883da79de7531d168c5fd3c182b10456dc602bebe03deae87d602c151771a84",
+  "source_digest": "5462c1aca4d3754a8406fe8fd805fd325b501779e8c3be972c4f25c9f55295a9",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-29T14:08:08Z",
+    "verified_at": "2026-07-29T22:45:02Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
       "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on physical Samsung SM-A135M, including native Life Counter landscape)",
@@ -29,39 +29,44 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "46add2a5d534800d804b38d4dc1d1a0a5c7267fb08c4f4fd493cb131969622e1"
+        "sha256": "5ef5d51ff9f42c2c3ca9edb24774688557325f14d31fb66e067540da7308bed1"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "95afd2469e81c3268540e55dac6e0679fbeca9ef24b3839a7ec6733d0bbb8162"
+        "sha256": "6ad547ba4ce83a3331bfa2efc3be728ac6bfb5fbb197c99f54a1fadc6197ad49"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "622bec4db039bad8aefe90fd330d2dfa665090cf8043ef6fb69845ac7b7059d8"
+        "sha256": "0be528cf350079ab362c99cf993b1d8bb11f7ff437b7089a923de26b184fbaf6"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "f8d60c628e8bedf8acabf6f82e007173d23635be858c919a969f60a49c44e832"
+        "sha256": "01c4a260fb1a8d011579a04f0b0e3a0c04c5e12b997b1d2131db9fbea69ecced"
+      },
+      {
+        "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
+        "sha256": "7da31e678abb0cb19062af9097d05124c5430ced23062eb004e4eba2dc7af9d2"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "7df4aaf6527b322d4a07ec5934f585940cd280e904790bfd6c3d8fe90059f465"
+        "sha256": "f4a488cbb32f3d6077164b2d98d331a3bf61c0def8d12df1f27fb30cc748ce40"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "fb0c4c511bab8f29739eecc771daab7676300735b4ee855f3d819acf5285c5be"
+        "sha256": "83118e977a1de4f04cad7d80e4ac8e88f8c8868fa42a99de2ef5bd23247fb9c8"
       }
     ],
     "evidence_notes": [
       "As 160 capturas Web e as 54 capturas Android da matriz P0 foram recapturadas integralmente no digest atual, sem carry-forward.",
       "O Samsung SM-A135M físico concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2408×1080.",
+      "A jornada Android dedicada de coleção, criação de Commander e otimização concluiu 12/12 estados, incluindo validação inline, retry de persistência e correção segura de terrenos de 9 para 36.",
       "O Battle Coach ganhou prova dedicada de 7 estados no Android físico e 9 estados Web com teclado real, foco visível, modal, filtro e preflight interativo positivo.",
-      "A fixture positiva usou PostgreSQL/API loopback descartáveis, dois decks Commander válidos de 100 cartas e cobertura pronta do sidecar XMage pinado; nenhum dado de produção foi alterado."
+      "A fixture positiva usou PostgreSQL/API loopback descartáveis, dois decks Commander válidos de 100 cartas e cobertura pronta do motor de regras pinado; nenhum dado de produção foi alterado."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-29T14:08:08Z",
+    "reviewed_at": "2026-07-29T22:45:02Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -72,7 +77,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 230 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca e detalhes de deck mantêm foco e camadas previsíveis."
+        "note": "As 242 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca, criação, otimização e detalhes de deck mantêm foco e camadas previsíveis."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -92,7 +97,7 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, 7 estados dedicados do Battle Coach Android e 9 estados de teclado Web. O Life Counter permanece validado em landscape 2408×1080 e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, 12 estados Android do produto principal, 7 estados dedicados do Battle Coach Android e 9 estados de teclado Web. O Life Counter permanece validado em landscape 2408×1080 e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
@@ -112,28 +117,27 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "46add2a5d534800d804b38d4dc1d1a0a5c7267fb08c4f4fd493cb131969622e1",
-      "95afd2469e81c3268540e55dac6e0679fbeca9ef24b3839a7ec6733d0bbb8162",
-      "622bec4db039bad8aefe90fd330d2dfa665090cf8043ef6fb69845ac7b7059d8",
-      "f8d60c628e8bedf8acabf6f82e007173d23635be858c919a969f60a49c44e832",
-      "7df4aaf6527b322d4a07ec5934f585940cd280e904790bfd6c3d8fe90059f465",
-      "fb0c4c511bab8f29739eecc771daab7676300735b4ee855f3d819acf5285c5be"
+      "5ef5d51ff9f42c2c3ca9edb24774688557325f14d31fb66e067540da7308bed1",
+      "6ad547ba4ce83a3331bfa2efc3be728ac6bfb5fbb197c99f54a1fadc6197ad49",
+      "0be528cf350079ab362c99cf993b1d8bb11f7ff437b7089a923de26b184fbaf6",
+      "01c4a260fb1a8d011579a04f0b0e3a0c04c5e12b997b1d2131db9fbea69ecced",
+      "7da31e678abb0cb19062af9097d05124c5430ced23062eb004e4eba2dc7af9d2",
+      "f4a488cbb32f3d6077164b2d98d331a3bf61c0def8d12df1f27fb30cc748ce40",
+      "83118e977a1de4f04cad7d80e4ac8e88f8c8868fa42a99de2ef5bd23247fb9c8"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
       "web_desktop_1440x900",
       "web_mobile_390x844",
       "web_wide_1920x1080",
+      "android_core_product",
       "android_phone",
       "web_in_app_1280x720"
     ],
-    "reviewed_screenshot_count": 230,
+    "reviewed_screenshot_count": 242,
     "blocking_findings": [],
     "follow_up_findings": [
-      "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
-      "O carrossel de ações rápidas pode deixar fragmentos laterais após scroll em telas estreitas; avaliar snap e padding de borda.",
-      "Os CTAs do estado vazio de decks ficam largos demais em desktop/wide; limitar largura numa rodada visual dedicada.",
-      "A captura Web do harness preserva a superfície Flutter correta, mas inclui margens externas do host; adicionar recorte físico por viewport numa evolução do contrato."
+      "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial."
     ]
   },
   "release_checks": {

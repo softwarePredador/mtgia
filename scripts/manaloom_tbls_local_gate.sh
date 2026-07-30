@@ -118,12 +118,14 @@ if ! (
   DB_PASS='' \
   DB_NAME=manaloom_tbls \
   RUN_BATTLE_JOB_DB_TESTS=1 \
+  RUN_BATTLE_JOB_LOAD_DB_TESTS=1 \
   RUN_BATTLE_LIVE_DB_TESTS=1 \
   RUN_INTERACTIVE_BATTLE_DB_TESTS=1 \
   RUN_OPTIMIZE_BASIC_LAND_DB_TESTS=1 \
   MANALOOM_DISPOSABLE_POSTGRES="$APPROVAL_PHRASE" \
     "$DART_BIN" test --reporter compact -j 1 \
       test/battle_job_store_live_test.dart \
+      test/battle_job_integrated_load_live_test.dart \
       test/battle_live_store_live_test.dart \
       test/interactive_battle_store_live_test.dart \
       test/optimize_basic_land_resolution_live_test.dart
@@ -131,6 +133,15 @@ if ! (
   tail -200 "$RUN_DIR/battle-db-tests.log" >&2
   exit 1
 fi
+load_evidence_line="$(
+  grep -F 'BATTLE_JOB_INTEGRATED_LOCAL_LOAD ' \
+    "$RUN_DIR/battle-db-tests.log" | tail -1 || true
+)"
+if [[ -z "$load_evidence_line" ]]; then
+  echo "evidência estruturada da carga Battle não foi emitida" >&2
+  exit 1
+fi
+printf '%s\n' "$load_evidence_line"
 
 DSN="postgres://postgres@127.0.0.1:$PORT/manaloom_tbls?sslmode=disable"
 tbls out "$DSN" \
@@ -254,5 +265,5 @@ print(
 )
 PY
 
-printf 'PASS: Battle e aliases de terrenos exercitados no PostgreSQL descartável.\n'
+printf 'PASS: Battle, carga integrada e aliases de terrenos exercitados no PostgreSQL descartável.\n'
 printf 'PASS: PostgreSQL/tbls local descartável, sem conexão externa.\n'

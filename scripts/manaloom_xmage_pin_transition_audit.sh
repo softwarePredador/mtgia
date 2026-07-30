@@ -9,6 +9,7 @@ OUTPUT_PREFIX="${MANALOOM_XMAGE_PIN_TRANSITION_OUT:-/tmp/manaloom_xmage_pin_tran
 cd "$SCRIPTS_DIR"
 PYTHONWARNINGS=error::ResourceWarning python3 -m unittest \
   test_xmage_pin_transition_audit.py \
+  test_xmage_transition_nominal_review.py \
   test_xmage_test_scenario_miner.py
 
 cd "$ROOT_DIR"

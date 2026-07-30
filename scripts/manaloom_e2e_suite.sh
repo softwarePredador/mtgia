@@ -238,12 +238,12 @@ run_resolution_corpus_e2e() {
 
   if [[ "${MANALOOM_RUN_MUTATING_RESOLUTION_E2E:-0}" == "1" ]]; then
     run_step "Commander resolution corpus E2E" \
-      "\"$ROOT_DIR/scripts/quality_gate.sh\" resolution"
+      "env -u TEST_API_BASE_URL -u API_BASE_URL \"$ROOT_DIR/scripts/quality_gate.sh\" resolution"
     return
   fi
 
   run_step "Commander resolution corpus read-only preflight" \
-    "VALIDATION_PREFLIGHT_ONLY=1 \"$ROOT_DIR/scripts/quality_gate.sh\" resolution"
+    "env -u TEST_API_BASE_URL -u API_BASE_URL VALIDATION_PREFLIGHT_ONLY=1 \"$ROOT_DIR/scripts/quality_gate.sh\" resolution"
   skip_step \
     "Commander resolution corpus mutating E2E" \
     "set MANALOOM_RUN_MUTATING_RESOLUTION_E2E=1 plus the textual PostgreSQL approval token only after explicit approval"
@@ -258,7 +258,7 @@ run_battle_product_e2e() {
       return
     fi
     run_step "Battle product isolated mutating E2E" \
-      "\"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh\" --isolated-e2e"
+      "env -u TEST_API_BASE_URL -u API_BASE_URL \"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh\" --isolated-e2e"
     return
   fi
 
@@ -428,7 +428,7 @@ main() {
   run_ramp_and_data_foundation_contracts
 
   run_postgres_runner_step "Optimizer mana floor isolated E2E" \
-    "\"$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh\" test/deck_optimization_mana_floor_live_test.dart"
+    "env -u TEST_API_BASE_URL -u API_BASE_URL \"$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh\" test/deck_optimization_mana_floor_live_test.dart"
 
   run_step "Canonical battle product gate" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" battle"

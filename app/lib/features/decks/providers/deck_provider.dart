@@ -463,6 +463,10 @@ class DeckProvider extends ChangeNotifier {
       );
 
       if (result.isSuccess) {
+        // A retry bem-sucedida deve remover o erro anterior imediatamente.
+        // O refresh silencioso abaixo é complementar e pode falhar sem voltar
+        // a contaminar o estado já persistido.
+        _errorMessage = null;
         final created = (result.deck != null)
             ? result.deck!.copyWith(
                 description: description,
@@ -474,8 +478,8 @@ class DeckProvider extends ChangeNotifier {
         if (created != null) {
           // Update otimista: evita depender do GET /decks (que pode time-outar no emulador).
           _decks = [created, ..._decks.where((deck) => deck.id != created.id)];
-          notifyListeners();
         }
+        notifyListeners();
 
         // Recarrega em background para hidratar campos faltantes (ex.: card_count, description, etc).
         unawaited(fetchDecks(silent: true));

@@ -29,6 +29,21 @@ void main() {
       isTrue,
     );
     expect(File('../docs/qa/ui-live/latest.json').existsSync(), isTrue);
+
+    final crop = gate['web_host_margin_crop'] as Map<String, dynamic>;
+    expect(crop['strategy'], 'crop_only_symmetric_near_white_host_margins');
+    expect(crop['keeps_full_surface_when_uncertain'], isTrue);
+    final driver = File('test_driver/integration_test.dart').readAsStringSync();
+    final digest = File(
+      '../scripts/manaloom_ui_source_digest.sh',
+    ).readAsStringSync();
+    expect(driver, contains("import 'runtime_screenshot_crop.dart';"));
+    expect(driver, contains('SCREENSHOT_VIEWPORT_CROP'));
+    expect(
+      File('test_driver/runtime_screenshot_crop.dart').existsSync(),
+      isTrue,
+    );
+    expect(digest, contains('app/test_driver/runtime_screenshot_crop.dart'));
   });
 
   test(

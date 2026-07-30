@@ -11,7 +11,7 @@
 |---|---|---|---|
 | BL10-01 | `PASS_LOCAL` | auth/owner scope, 404 uniforme, IDs opacos, body bounded, quotas, idempotência, rejeição stale e payload fechado | repetir contra ambiente homologado |
 | BL10-02 | `PASS_LOCAL` | request/process correlation, runtime inválido, duplicate, timeout/concede terminal e process lost fail-closed | fault injection no deployment alvo |
-| BL10-03 | `PARTIAL_LOCAL` | capacidade interativa 1..32 e modos batch/interativo isolados | carga integrada concorrente com budgets de API, PostgreSQL e batch |
+| BL10-03 | `PASS_LOCAL_PRE_HOMOLOGATION` | capacidade interativa 1..32, isolamento batch/interativo e carga integrada descartável com 24 jobs e budgets de rota/PostgreSQL/batch | repetir carga com HTTP, sidecars e recursos do ambiente alvo |
 | BL10-04 | `PARTIAL_LOCAL` | partida XMage real, reconexão por polling/deep link e build Web release | Android físico, background/foreground real e smoke same-SHA |
 | BL10-05 | `PARTIAL_LOCAL` | semântica, teclado de widget, live state, reduced motion, texto 200% e viewports 390/1440 automatizados | teclado completo no navegador, TalkBack e texto 200% no aparelho físico |
 | BL10-06 | `PARTIAL_LOCAL` | erros/correlação bounded, redaction, readiness opt-in e nenhum ID privado em health | alertas, painel e runbook de sessão travada/abandonada |
@@ -46,6 +46,15 @@ build do site público. A repetição com Node `26.0.0` e Flutter `3.44.6`
 explicitamente selecionados passou por completo; não foi classificada como
 regressão de produto.
 
+Complemento de 2026-07-29:
+
+- `quality_gate.sh performance`: `PASS`, incluindo a matriz controlada de
+  falha do provedor;
+- `manaloom_tbls_local_gate.sh`: `PASS`, incluindo 24 jobs concorrentes,
+  listagem, PostgreSQL, lane batch e cancelamento com zero job ativo ao final;
+- medições, budgets e limites de crédito estão documentados em
+  `docs/qa/MANALOOM_S8_BL10_RESILIENCE_FOLLOWUP_2026-07-29.md`.
+
 ## Controles de rollout
 
 - backend: `INTERACTIVE_BATTLE_ENABLED=false`;
@@ -62,6 +71,7 @@ backup/restore; nenhum cleanup automático apaga sessão para simular rollback.
 ## Janela restante
 
 Com aparelho Android, ambiente homologado e autorização para migration/deploy,
-estima-se 5–10 dias úteis para carga integrada, alertas/runbook, acessibilidade
-física, smoke same-SHA, correções e decisão final. Espera por esses recursos não
-é tempo de engenharia e mantém o status bloqueado externamente.
+estima-se 5–10 dias úteis para repetir carga na infraestrutura alvo,
+alertas/runbook, acessibilidade física, smoke same-SHA, correções e decisão
+final. Espera por esses recursos não é tempo de engenharia e mantém o status
+bloqueado externamente.

@@ -7,6 +7,14 @@ readonly MANALOOM_PRODUCTION_PUBLIC_HOST="evolution-manaloom-web-public.2ta7qx.e
 readonly MANALOOM_PRODUCTION_EASYPANEL_PROJECT="evolution"
 # shellcheck disable=SC2034 # consumed by release scripts after sourcing
 readonly MANALOOM_PRODUCTION_REMOTE_BUILD_ROOT="/opt/manaloom/deploy"
+# The interactive XMage runtime is a private, direct Swarm service. Its
+# network alias is intentionally different from the batch executor so the
+# backend configuration cannot silently share process capacity.
+# shellcheck disable=SC2034 # consumed by release scripts after sourcing
+readonly MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE="evolution_xmage-interactive"
+readonly MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS="xmage-interactive"
+# shellcheck disable=SC2034 # consumed by release scripts after sourcing
+readonly MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL="http://${MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS}:8080"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_HOPS="1"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK="easypanel"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_SUBNET="10.11.0.0/16"
@@ -18,7 +26,7 @@ readonly MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP="10.11.0.202"
 # unrelated service on the shared network to forge X-Forwarded-For.
 readonly MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.4"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS="${MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4}/32"
-readonly MANALOOM_PRODUCTION_SENTRY_DSN_SHA256="2e1cc23c01e5b7d989edc2f1d046c3e7de34a3fa57e995c0f2e6252902153e49"
+readonly MANALOOM_PRODUCTION_SENTRY_DSN_SHA256="2e1cc23c01e5b7d989edc2f1d046c3e7de34a3fa57e995c0f2e6252902153e49" # gitleaks:allow -- one-way DSN fingerprint, not a credential
 readonly MANALOOM_PRODUCTION_SENTRY_ORG_SLUG="rafa-pz"
 readonly MANALOOM_PRODUCTION_SENTRY_PROJECT_SLUG="manaloom"
 readonly MANALOOM_SENTRY_DSN_KEYCHAIN_SERVICE="manaloom-sentry-dsn"

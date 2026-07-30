@@ -2,19 +2,26 @@
 
 ## Resultado
 
-O conjunto que pode iniciar Battle hoje ficou coberto no runtime candidato:
+O conjunto que pode iniciar Battle ficou coberto em um runtime local histórico:
 
 - 6 decks Commander validados, com exatamente 100 cartas e 1 comandante;
 - 336 nomes únicos entre esses decks;
-- 336/336 resolvidos;
-- `Lorehold` contra `Animar`: preflight interativo `ready`, sem bloqueadores;
+- 336/336 resolvidos nesse runtime local;
+- `Lorehold` contra `Animar`: preflight interativo local `ready`, sem
+  bloqueadores;
 - uma sessão real chegou ao prompt, aceitou uma decisão e foi encerrada por
   concessão de QA;
 - nenhum nome de fornecedor de motor de regras é apresentado ao usuário no app.
 
-O pin canônico não foi promovido. A cobertura foi homologada em runtime local
-isolado, mas a implantação continua bloqueada pelo contrato de transição ativo,
-que ainda está em `review_required`. Resolução de catálogo não substitui revisão
+O pin canônico não foi promovido e ainda não contém Lorehold. A cobertura de
+runtime acima usou o SHA sintético local
+`3ac810da650a51c33142175d6191693c3a077131`, que não é buscável no repositório
+oficial nem em um fork governado e, portanto, não é implantável. A solução
+mínima foi reconstruída como patch aplicável diretamente ao pin e validada com
+Java 17; isso prova o código, mas não cria por si só um commit publicável.
+
+A implantação continua bloqueada pelo contrato de transição ativo, que ainda
+está em `review_required`. Resolução de catálogo não substitui revisão
 semântica nem autoriza contornar esse gate.
 
 ## Escopo auditado
@@ -28,8 +35,8 @@ semântica nem autoriza contornar esse gate.
 No pin canônico `2c43ec8cdb5cd475d47e6b555a4077151f476a3b`, o
 único nome não resolvido nesse confronto era `Lorehold, the Historian`.
 
-No candidato `3ac810da650a51c33142175d6191693c3a077131`, a mesma
-requisição retornou:
+No runtime local histórico identificado por
+`3ac810da650a51c33142175d6191693c3a077131`, a mesma requisição retornou:
 
 ```text
 status=ready
@@ -54,7 +61,8 @@ blockers=[]
 
 `internal_primary` acima é apenas a representação neutra deste relatório. O
 contrato técnico continua guardando a identidade real internamente para
-reprodutibilidade.
+auditoria. Esse SHA é uma identidade histórica local, não um alvo válido de
+bootstrap, deploy ou transição de pin.
 
 ### Pool Battle elegível
 
@@ -66,7 +74,9 @@ simultaneamente a:
 - soma de quantidades igual a 100;
 - soma de comandantes igual a 1.
 
-Resultado: 6 decks, 336 nomes únicos, 336 suportados e 0 ausentes no candidato.
+Resultado no runtime local histórico: 6 decks, 336 nomes únicos, 336 suportados
+e 0 ausentes. No pin canônico, Lorehold continua sendo o único nome ausente
+desse par.
 
 ### Corpus amplo
 
@@ -118,24 +128,46 @@ preflight deixou de consultar cobertura quando já existe bloqueio estrutural e
 só conta adversários realmente aptos. Assim, uma chamada direta não consegue
 executar um deck `unknown`.
 
-## Implementação candidata de Lorehold
+## Patch mínimo reprodutível de Lorehold
 
-O candidato é uma cadeia linear sobre o pin canônico:
+O SHA `3ac810da6` veio de uma cadeia de cherry-picks criada somente no checkout
+temporário da auditoria. Ele incorporava, além de Lorehold, `Molecule Man` e
+`Aminatou, Veil Piercer`. Como esse objeto não foi publicado, ele não pode ser
+usado como candidato de release.
 
-1. `af5e10ed6` — infraestrutura dinâmica de Miracle;
-2. `348b4966a` — `Molecule Man`;
-3. `f08b501a2` — `Lorehold, the Historian`;
-4. `3ac810da6` — `Aminatou, Veil Piercer`.
+A reconstrução atual parte do pin canônico
+`2c43ec8cdb5cd475d47e6b555a4077151f476a3b` e usa somente dois commits públicos
+do [PR oficial #15591](https://github.com/magefree/mage/pull/15591):
 
-Foram adicionados três testes focados ao `MiracleTest`:
+1. `03cc893d7c982c195ffc3f8e3083e9123b5c17d0` — infraestrutura dinâmica de
+   Miracle;
+2. `0e6ca9cacaf612d00f18d68d39531c0666f570c1` — `Lorehold, the Historian`.
+
+Os commits do mesmo PR referentes a `Molecule Man` e `Aminatou` foram
+deliberadamente excluídos. O patch completo muda 14 arquivos, com 391 inserções
+e 19 remoções, e tem SHA-256
+`ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812`.
+O artefato usa diff de contexto zero porque está preso ao SHA-base exato; assim
+ele não incorpora os espaços finais preexistentes nas linhas de contexto do
+upstream e permanece compatível com `git diff --check`.
+
+Foram adicionados três testes diretos ao `MiracleTest`:
 
 1. Lorehold concede Miracle `{2}` a instantâneas e feitiços;
 2. Lorehold não concede Miracle a criaturas;
 3. o descarte e a compra na manutenção do oponente são opcionais e funcionam.
 
-Resultado da suíte focada: 14 testes, 0 falhas, 0 erros e 0 ignorados. O patch
-reprodutível está em
+Resultado reproduzido sobre o pin: 6 testes, 0 falhas, 0 erros e 0 ignorados;
+os 34 módulos do reactor concluíram com `BUILD SUCCESS` em Java 17. A contagem
+histórica de 14 testes pertencia à árvore sintética maior e não é usada como
+prova do patch mínimo.
+
+O patch completo está em
 `docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch`.
+O verificador
+`services/xmage-sidecar/bin/verify_lorehold_candidate_patch.sh` cria um checkout
+temporário do pin oficial, confere o hash, aplica o patch e repete a suíte sem
+alterar `XMAGE_COMMIT`, PostgreSQL ou qualquer runtime live.
 
 ## Sessão real
 
@@ -185,9 +217,9 @@ Revalidação final da cópia pública e elegibilidade: 13/13
 Análise estática Dart/Flutter: sem erros
 Contratos operacionais de release: 27/27
 Smoke do Web público: pass
-Regras do candidato: 14/14
-Preflight real Lorehold x Animar: ready
-Pool Commander Battle elegível: 336/336
+Patch mínimo de Lorehold: 6/6, 34/34 módulos
+Preflight histórico local Lorehold x Animar: ready
+Pool Commander Battle elegível no runtime histórico: 336/336
 Catálogo primário: 31.045/34.071 nomes
 Fallback compatível: 1.784/3.026 nomes
 Regras nativas do resíduo: 187/187, oracle_hash presente
@@ -198,7 +230,9 @@ Web release: app/build/web
 ```
 
 A evidência compacta e os hashes dos artefatos de entrada estão em
-`docs/qa/evidence/BATTLE_CARD_COVERAGE_CLOSURE_2026-07-29.json`.
+`docs/qa/evidence/BATTLE_CARD_COVERAGE_CLOSURE_2026-07-29.json`. A reprodução
+isolada do patch está em
+`docs/qa/evidence/LOREHOLD_CANDIDATE_PATCH_VERIFICATION_2026-07-29.json`.
 
 ## Prova viva da apresentação neutra
 
@@ -227,16 +261,21 @@ Web + Android físico e nova revisão visual desse mesmo digest.
 
 ## Pendência de promoção
 
-A promoção do candidato requer, nesta ordem:
+A promoção requer, nesta ordem:
 
-1. encerrar a qualificação nominal da transição canônica já ativa;
-2. criar evidência versionada da transição
-   `2c43ec8cdb5cd475d47e6b555a4077151f476a3b` →
-   `3ac810da650a51c33142175d6191693c3a077131`;
-3. revisar a política de quarentena vinculada ao novo commit;
-4. obter `qualification.status=pass` e `deployment_allowed=true`;
-5. então alterar o pin, reconstruir os dois runtimes e executar o gate de
+1. publicar exatamente o patch validado em um fork governado, gerando um commit
+   buscável;
+2. provar que o bootstrap consegue buscar esse novo SHA e reproduzir os 6/6
+   testes;
+3. encerrar a qualificação nominal da transição canônica já ativa;
+4. criar evidência versionada da transição
+   `2c43ec8cdb5cd475d47e6b555a4077151f476a3b` → `<SHA publicado>`;
+5. revisar a política de quarentena vinculada ao novo commit;
+6. obter `qualification.status=pass` e `deployment_allowed=true`;
+7. somente então alterar o pin, reconstruir os runtimes e executar o gate de
    release.
 
-Até lá, o resultado correto é “cobertura candidata localmente concluída,
-promoção pendente”, não “implantado em produção”.
+Não deve ser criada uma transição para `3ac810da6`, porque esse objeto local não
+é buscável. Até a publicação e qualificação do patch, o resultado correto é
+“implementação mínima reproduzida e validada; runtime canônico ainda sem
+Lorehold”, não “implantado em produção”.

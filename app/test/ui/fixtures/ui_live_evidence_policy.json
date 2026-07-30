@@ -18,7 +18,13 @@
     "p0_index_command": "MANALOOM_P0_*_DIR=<REPO_CAPTURE_DIR> MANALOOM_P0_*_LOG=<RUNTIME_LOG> ../scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
     "current_review": "../docs/qa/ui-live/latest.json",
     "reviewer_must_open_every_screenshot": true,
-    "widget_or_golden_alone_can_pass_visual": false
+    "widget_or_golden_alone_can_pass_visual": false,
+    "web_host_margin_crop": {
+      "driver": "test_driver/integration_test.dart",
+      "strategy": "crop_only_symmetric_near_white_host_margins",
+      "keeps_full_surface_when_uncertain": true,
+      "runtime_log_marker": "SCREENSHOT_VIEWPORT_CROP"
+    }
   },
   "required_review_criteria": [
     "visual_hierarchy",

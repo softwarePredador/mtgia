@@ -380,7 +380,8 @@ def build_report() -> dict[str, object]:
                 "_registerUniqueIdentity",
                 "intruderToken",
                 "_expectSanitizedNotFound",
-                "contains(natural['replay_id'].toString())",
+                "contains(naturalBattle['replay_id'].toString())",
+                "seed < 32",
                 "Battle Product E2E Candidate $runToken",
             ),
             absent=(

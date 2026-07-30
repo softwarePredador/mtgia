@@ -26,6 +26,10 @@ class NativeBattleInputError(ValueError):
     pass
 
 
+def _normalize_name(value: Any) -> str:
+    return " ".join(str(value or "").strip().casefold().split())
+
+
 def _deck_rows(payload: dict[str, Any], deck_key: str) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     deck = payload.get(deck_key)
     if not isinstance(deck, dict):
@@ -99,6 +103,8 @@ def _native_replay_event(
     *,
     deck_a_player: str,
     deck_b_player: str,
+    deck_a_card_names: set[str] | None = None,
+    deck_b_card_names: set[str] | None = None,
 ) -> dict[str, Any]:
     row = {"event_type": event, **dict(data)}
     explicit = str(row.get("subject_deck_key") or "").strip().lower()
@@ -131,6 +137,16 @@ def _native_replay_event(
             if matches_b and not matches_a
             else ""
         )
+        if not subject:
+            card_name = _normalize_name(row.get("card"))
+            in_deck_a = bool(
+                card_name and card_name in (deck_a_card_names or set())
+            )
+            in_deck_b = bool(
+                card_name and card_name in (deck_b_card_names or set())
+            )
+            if in_deck_a != in_deck_b:
+                subject = "deck_a" if in_deck_a else "deck_b"
         if actor:
             row["actor"] = actor
     if subject:
@@ -159,6 +175,12 @@ def simulate(payload: dict[str, Any]) -> dict[str, Any]:
     previous_target = os.environ.get(battle.EVALUATION_TARGET_ENV)
     deck_a_player = battle.target_player_name_for_commander(commander_a)
     deck_b_player = battle.target_player_name_for_commander(commander_b)
+    deck_a_card_names = {
+        _normalize_name(card.get("name")) for card in [commander_a, *cards_a]
+    }
+    deck_b_card_names = {
+        _normalize_name(card.get("name")) for card in [commander_b, *cards_b]
+    }
     try:
         os.environ[battle.EVALUATION_TARGET_ENV] = deck_a_player
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append(
@@ -167,6 +189,8 @@ def simulate(payload: dict[str, Any]) -> dict[str, Any]:
                 dict(data),
                 deck_a_player=deck_a_player,
                 deck_b_player=deck_b_player,
+                deck_a_card_names=deck_a_card_names,
+                deck_b_card_names=deck_b_card_names,
             )
         )
         battle.DECISION_TRACE_HANDLER = lambda row: decisions.append(dict(row))

@@ -33,6 +33,10 @@ EVIDENCE_SCHEMA_VERSION = "manaloom_xmage_pin_transition_evidence_v2_2026-07-28"
 POSTGRES_SCHEMA_VERSION = (
     "manaloom_xmage_postgresql_scope_reconciliation_v1_2026-07-28"
 )
+NOMINAL_REVIEW_SCHEMA_VERSION = (
+    "manaloom_xmage_transition_nominal_review_v1_2026-07-29"
+)
+CLEARANCE_DISPOSITION = "presentation_hunk_nominal_tests_passed"
 SCOPE_AS_OF = date(2026, 7, 28)
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -45,6 +49,7 @@ ALLOWED_DISPOSITIONS = {
     "catalog_supported_regression_only_review_required",
     "external_runtime_quarantine_semantic_defect",
     "external_residual_upstream_unfinished",
+    CLEARANCE_DISPOSITION,
 }
 REVIEW_DISPOSITIONS = {
     "focused_upstream_test_passed_card_data_warning_review_required",
@@ -93,6 +98,27 @@ EXPECTED_INPUT_ARTIFACT_DIGEST_KEYS = {
     "changed_169_coverage_exchange_sha256",
     "corrected_added_87_test_scenario_miner_sha256",
     "exact_delta_report_sha256",
+    "transition_nominal_review_v1_sha256",
+}
+EXPECTED_EXACT_CLEARANCES = {
+    "Metallic Mimic": {
+        "rule_id": "metallic_mimic_presentation_literal_v1",
+        "class": "MetallicMimic",
+        "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
+        "source_scope": "presentation_or_metadata",
+        "diff_sha256": (
+            "be680a3ba2ce6015b34b8e19900bca8d7e22da8a55c9056248c48b3049f1fe44"
+        ),
+        "direct_test_references": [
+            "Mage.Tests/src/test/java/org/mage/test/cards/continuous/ChangelingTest.java",
+            "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
+            (
+                "Mage.Tests/src/test/java/org/mage/test/cards/replacement/"
+                "entersBattlefield/HardenedScaleTest.java"
+            ),
+        ],
+        "required_test_case_count": 6,
+    }
 }
 
 
@@ -224,10 +250,191 @@ def _postgres_pass_shape_valid(
     )
 
 
+def _validate_transition_nominal_review(
+    evidence: dict[str, Any],
+    expected: dict[str, Any],
+    checks: list[dict[str, Any]],
+    *,
+    repo_root: Path,
+    transition_id: str,
+    from_pin: str,
+    to_pin: str,
+    input_digests: dict[str, Any],
+) -> dict[str, str]:
+    pointer = (
+        evidence.get("transition_nominal_review")
+        if isinstance(evidence.get("transition_nominal_review"), dict)
+        else {}
+    )
+    artifact_path_value = str(pointer.get("artifact_path") or "")
+    artifact_path = _safe_repo_path(repo_root, artifact_path_value)
+    artifact: dict[str, Any] = {}
+    artifact_sha256 = ""
+    load_error = ""
+    if artifact_path is None:
+        load_error = "artifact_path_invalid"
+    else:
+        try:
+            artifact = load_json(artifact_path)
+            artifact_sha256 = file_sha256(artifact_path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            load_error = type(exc).__name__
+
+    transition = (
+        artifact.get("transition")
+        if isinstance(artifact.get("transition"), dict)
+        else {}
+    )
+    summary = (
+        artifact.get("summary")
+        if isinstance(artifact.get("summary"), dict)
+        else {}
+    )
+    safety = (
+        artifact.get("safety")
+        if isinstance(artifact.get("safety"), dict)
+        else {}
+    )
+    raw_clearance_cards = artifact.get("exact_clearance_cards")
+    clearance_cards = (
+        raw_clearance_cards if isinstance(raw_clearance_cards, list) else []
+    )
+    raw_rule_results = artifact.get("clearance_rule_results")
+    rule_results = (
+        [row for row in raw_rule_results if isinstance(row, dict)]
+        if isinstance(raw_rule_results, list)
+        else []
+    )
+    expected_clearance_cards = set(EXPECTED_EXACT_CLEARANCES)
+    observed_clearance_cards = {
+        str(card_name) for card_name in clearance_cards if card_name
+    }
+    rules_by_card = {
+        str(row.get("card_name") or ""): row for row in rule_results
+    }
+    raw_nominal_cards = artifact.get("existing_nominal_cards")
+    nominal_cards = (
+        [row for row in raw_nominal_cards if isinstance(row, dict)]
+        if isinstance(raw_nominal_cards, list)
+        else []
+    )
+    nominal_by_card = {
+        str(row.get("card_name") or ""): row for row in nominal_cards
+    }
+    exact_rules_valid = (
+        len(rule_results) == len(raw_rule_results or [])
+        == len(EXPECTED_EXACT_CLEARANCES)
+        and set(rules_by_card) == expected_clearance_cards
+    )
+    if exact_rules_valid:
+        for card_name, rule_expected in EXPECTED_EXACT_CLEARANCES.items():
+            row = rules_by_card[card_name]
+            nominal_row = nominal_by_card.get(card_name, {})
+            exact_rules_valid = exact_rules_valid and (
+                row.get("status") == "pass"
+                and row.get("failures") == []
+                and row.get("rule_id") == rule_expected["rule_id"]
+                and row.get("source_path") == rule_expected["source_path"]
+                and row.get("source_scope") == rule_expected["source_scope"]
+                and row.get("diff_sha256") == rule_expected["diff_sha256"]
+                and row.get("presentation_tokens_equivalent") is True
+                and row.get("required_test_case_count")
+                == rule_expected["required_test_case_count"]
+                and nominal_row.get("class") == rule_expected["class"]
+                and nominal_row.get("source_path")
+                == rule_expected["source_path"]
+                and nominal_row.get("source_scope")
+                == rule_expected["source_scope"]
+                and nominal_row.get("diff_sha256")
+                == rule_expected["diff_sha256"]
+                and nominal_row.get("clearance_rule_id")
+                == rule_expected["rule_id"]
+                and nominal_row.get("lane")
+                == "exact_presentation_hunk_and_nominal_tests_clearance"
+                and sorted(nominal_row.get("direct_test_references") or [])
+                == sorted(rule_expected["direct_test_references"])
+                and nominal_row.get("focused_test_case_count")
+                == rule_expected["required_test_case_count"]
+            )
+
+    expected_clearance_count = _integer(
+        expected.get("exact_transition_clearance_card_count")
+    )
+    expected_review_before = _integer(
+        expected.get("review_required_before_exact_clearance")
+    )
+    expected_review_after = _integer(expected.get("review_required_card_count"))
+    declared_digest = str(pointer.get("artifact_sha256") or "")
+    input_digest = str(
+        input_digests.get("transition_nominal_review_v1_sha256") or ""
+    )
+    valid = (
+        not load_error
+        and artifact.get("schema_version") == NOMINAL_REVIEW_SCHEMA_VERSION
+        and artifact.get("status") == "pass"
+        and artifact.get("failures") == []
+        and transition.get("id") == transition_id
+        and transition.get("from_pin") == from_pin
+        and transition.get("to_pin") == to_pin
+        and summary.get("changed_card_count")
+        == expected.get("changed_card_implementations")
+        and summary.get("existing_nominal_reference_card_count")
+        == expected.get("direct_test_reference_card_count")
+        and len(nominal_cards) == len(raw_nominal_cards or [])
+        == expected.get("direct_test_reference_card_count")
+        and len(nominal_by_card) == len(nominal_cards)
+        and expected_clearance_count == len(expected_clearance_cards)
+        and summary.get("exact_clearance_card_count")
+        == expected_clearance_count
+        and summary.get("review_required_before_exact_clearance")
+        == expected_review_before
+        and summary.get("review_required_after_exact_clearance")
+        == expected_review_after
+        and observed_clearance_cards == expected_clearance_cards
+        and len(clearance_cards) == len(observed_clearance_cards)
+        and exact_rules_valid
+        and safety.get("read_only") is True
+        and safety.get("network_used") is False
+        and safety.get("source_mutations") is False
+        and safety.get("postgres_writes") is False
+        and safety.get("catalog_resolution_used_as_semantic_proof") is False
+        and pointer.get("schema_version") == NOMINAL_REVIEW_SCHEMA_VERSION
+        and pointer.get("exact_clearance_cards")
+        == sorted(expected_clearance_cards)
+        and pointer.get("review_required_before") == expected_review_before
+        and pointer.get("review_required_after") == expected_review_after
+        and pointer.get("catalog_resolution_used_as_semantic_proof") is False
+        and SHA256_PATTERN.fullmatch(declared_digest) is not None
+        and artifact_sha256 == declared_digest == input_digest
+    )
+    _check(
+        checks,
+        "transition_nominal_review_evidence",
+        valid,
+        "Exact nominal clearance must be backed by the pinned, read-only transition artifact.",
+        details={
+            "artifact_path": artifact_path_value,
+            "artifact_sha256": artifact_sha256,
+            "declared_sha256": declared_digest,
+            "input_digest": input_digest,
+            "load_error": load_error,
+            "clearance_cards": sorted(observed_clearance_cards),
+        },
+    )
+    if not valid:
+        return {}
+    return {
+        card_name: str(rules_by_card[card_name]["rule_id"])
+        for card_name in sorted(expected_clearance_cards)
+    }
+
+
 def _validate_card_rows(
     evidence: dict[str, Any],
     expected: dict[str, Any],
     checks: list[dict[str, Any]],
+    *,
+    exact_clearance_rules: dict[str, str],
 ) -> dict[str, Any]:
     raw_cards = evidence.get("cards")
     cards = raw_cards if isinstance(raw_cards, list) else []
@@ -249,6 +456,21 @@ def _validate_card_rows(
         if isinstance(row.get("direct_test_references"), list)
         and bool(row.get("direct_test_references"))
     )
+    diagnostics = (
+        evidence.get("card_data_diagnostics")
+        if isinstance(evidence.get("card_data_diagnostics"), dict)
+        else {}
+    )
+    actionable_findings = (
+        diagnostics.get("actionable_findings")
+        if isinstance(diagnostics.get("actionable_findings"), list)
+        else []
+    )
+    actionable_card_names = {
+        str(row.get("card_name") or "")
+        for row in actionable_findings
+        if isinstance(row, dict) and row.get("card_name")
+    }
 
     _check(
         checks,
@@ -313,6 +535,8 @@ def _validate_card_rows(
         registrations = row.get("set_registrations")
         direct_tests = row.get("direct_test_references")
         focused_cases = _integer(row.get("focused_test_case_count"))
+        card_name = str(row.get("card_name") or "")
+        clearance_expected = EXPECTED_EXACT_CLEARANCES.get(card_name, {})
         valid = (
             kind in {"added", "modified"}
             and isinstance(registrations, list)
@@ -374,6 +598,28 @@ def _validate_card_rows(
                 and bool(direct_tests)
                 and focused_cases > 0
             )
+        elif disposition == CLEARANCE_DISPOSITION:
+            source_warning_markers = row.get("source_warning_markers")
+            valid = (
+                valid
+                and kind == "modified"
+                and catalog_status == "supported"
+                and bool(direct_tests)
+                and all(isinstance(reference, str) for reference in direct_tests)
+                and sorted(direct_tests)
+                == sorted(clearance_expected.get("direct_test_references", []))
+                and focused_cases
+                == clearance_expected.get("required_test_case_count")
+                and card_class == clearance_expected.get("class")
+                and row.get("source_path")
+                == clearance_expected.get("source_path")
+                and isinstance(source_warning_markers, list)
+                and not source_warning_markers
+                and card_name not in actionable_card_names
+                and row.get("transition_review_rule_id")
+                == exact_clearance_rules.get(card_name)
+                and card_name in exact_clearance_rules
+            )
         elif disposition == "catalog_supported_regression_only_review_required":
             valid = (
                 valid
@@ -412,6 +658,11 @@ def _validate_card_rows(
                 )
             )
         else:
+            valid = False
+        if (
+            disposition != CLEARANCE_DISPOSITION
+            and row.get("transition_review_rule_id") is not None
+        ):
             valid = False
         if not valid:
             malformed.append(card_class)
@@ -462,17 +713,20 @@ def _validate_card_rows(
         modified_scope.get("classification_method")
         == "exact_git_hunk_manual_review"
         and isinstance(scope_counts, dict)
-        and len(executable_set) == len(executable_classes or []) == 26
+        and len(executable_set) == len(executable_classes or []) == 27
         and len(comment_only_set) == len(comment_only_classes or []) == 2
         and not (executable_set & comment_only_set)
         and executable_set | comment_only_set <= modified_class_set
-        and len(presentation_set) == 54
-        and modified_scope.get("presentation_or_metadata_count") == 54
+        and "MjolnirHammerOfThor" in executable_set
+        and "MetallicMimic" in presentation_set
+        and comment_only_set == {"KrarkTheThumbless", "MandateOfPeace"}
+        and len(presentation_set) == 53
+        and modified_scope.get("presentation_or_metadata_count") == 53
         and scope_counts
         == {
             "comment_only": 2,
-            "executable_or_mixed": 26,
-            "presentation_or_metadata": 54,
+            "executable_or_mixed": 27,
+            "presentation_or_metadata": 53,
             "total_modified": 82,
         },
         "All modified cards must be classified by executable, presentation/metadata or comment-only source change.",
@@ -617,6 +871,16 @@ def build_report(
         ),
         "Every transition input artifact must have one explicit SHA-256 digest.",
     )
+    exact_clearance_rules = _validate_transition_nominal_review(
+        evidence,
+        expected,
+        checks,
+        repo_root=repo_root,
+        transition_id=transition_id,
+        from_pin=from_pin,
+        to_pin=to_pin,
+        input_digests=input_digests,
+    )
 
     source_delta = (
         evidence.get("source_delta")
@@ -647,7 +911,12 @@ def build_report(
         details={"observed": source_delta, "expected": exact_expected},
     )
 
-    card_summary = _validate_card_rows(evidence, expected, checks)
+    card_summary = _validate_card_rows(
+        evidence,
+        expected,
+        checks,
+        exact_clearance_rules=exact_clearance_rules,
+    )
     expected_card_names = set(card_summary.pop("card_names"))
 
     runtime = (

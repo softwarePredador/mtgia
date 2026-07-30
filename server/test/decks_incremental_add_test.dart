@@ -20,6 +20,14 @@ void main() {
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
+  final requireDeterministicFixtures =
+      Platform.environment['MANALOOM_ISOLATED_CONTRACT_E2E'] == '1';
+
+  void requireFixture(bool condition, String description) {
+    if (!condition && requireDeterministicFixtures) {
+      fail('Fixture E2E isolada ausente ou inválida: $description');
+    }
+  }
 
   const testUser = {
     'email': 'test_deck_incremental@example.com',
@@ -266,6 +274,7 @@ void main() {
         ],
       );
       if (commander == null || !isCommanderEligible(commander)) {
+        requireFixture(false, 'comandante elegível');
         return;
       }
 
@@ -273,6 +282,7 @@ void main() {
       final commanderIdentity =
           identityOf(commander).map((e) => e.toUpperCase()).toSet();
       if (commanderIdentity.isEmpty) {
+        requireFixture(false, 'identidade colorida do comandante');
         return;
       }
 
@@ -293,7 +303,10 @@ void main() {
         token,
         names: ['Lightning Bolt', 'Shock'],
       );
-      if (outside == null) return;
+      if (outside == null) {
+        requireFixture(false, 'carta fora da identidade de cor');
+        return;
+      }
 
       final outsideId = outside['id'] as String;
       final outsideIdentity =
@@ -301,7 +314,10 @@ void main() {
       final outsideIsOutside = outsideIdentity.any(
         (c) => !commanderIdentity.contains(c),
       );
-      if (!outsideIsOutside) return;
+      if (!outsideIsOutside) {
+        requireFixture(false, 'contraste de identidade de cor');
+        return;
+      }
 
       final addOutsideRes = await addCard(
         token,
@@ -330,6 +346,7 @@ void main() {
         ],
       );
       if (commander == null || !isCommanderEligible(commander)) {
+        requireFixture(false, 'comandante para validação incompleta');
         return;
       }
 
@@ -371,6 +388,7 @@ void main() {
       if (commander == null ||
           !isCommanderEligible(commander) ||
           wastes == null) {
+        requireFixture(false, 'comandante e Wastes para limite de 100 cartas');
         return;
       }
 
@@ -409,6 +427,7 @@ void main() {
         ],
       );
       if (commander == null || !isCommanderEligible(commander)) {
+        requireFixture(false, 'comandante para troca de edição');
         return;
       }
 
@@ -417,6 +436,7 @@ void main() {
         commander['name'] as String,
       );
       if (printings.length < 2) {
+        requireFixture(false, 'duas edições do mesmo comandante');
         return;
       }
 
@@ -427,7 +447,10 @@ void main() {
                 orElse: () => printings.last,
               )['id']
               as String;
-      if (firstId == secondId) return;
+      if (firstId == secondId) {
+        requireFixture(false, 'IDs distintos para as edições do comandante');
+        return;
+      }
 
       final deckId = await createDeck(token, format: 'commander');
       final addCommanderRes = await addCard(
@@ -485,6 +508,7 @@ void main() {
         ],
       );
       if (commander == null || !isCommanderEligible(commander)) {
+        requireFixture(false, 'comandante para substituição atômica');
         return;
       }
 
@@ -493,6 +517,7 @@ void main() {
         commander['name'] as String,
       );
       if (printings.length < 2) {
+        requireFixture(false, 'duas edições para substituição atômica');
         return;
       }
 
@@ -503,7 +528,10 @@ void main() {
                 orElse: () => printings.last,
               )['id']
               as String;
-      if (firstId == secondId) return;
+      if (firstId == secondId) {
+        requireFixture(false, 'IDs distintos para substituição atômica');
+        return;
+      }
 
       final deckId = await createDeck(token, format: 'commander');
       final addFirstRes = await addCard(
@@ -556,6 +584,7 @@ void main() {
         ],
       );
       if (commander == null || !isCommanderEligible(commander)) {
+        requireFixture(false, 'comandante para teste de duplicidade');
         return;
       }
 
@@ -615,6 +644,7 @@ void main() {
               .toList();
 
       if (printings.length < 2) {
+        requireFixture(false, 'duas edições completas de Lorehold');
         return;
       }
 

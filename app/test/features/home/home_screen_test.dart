@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -442,16 +444,61 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Construir deck'), findsOneWidget);
-    expect(find.text('Meus Decks'), findsOneWidget);
+    expect(
+      find.byKey(const Key('home-quick-action-2'), skipOffstage: false),
+      findsOneWidget,
+    );
 
     final quickActionsList = find.byKey(const Key('home-quick-actions-list'));
     expect(quickActionsList, findsOneWidget);
+    final listRect = tester.getRect(quickActionsList);
+    final firstRect = tester.getRect(
+      find.byKey(const Key('home-quick-action-0')),
+    );
+    final secondRect = tester.getRect(
+      find.byKey(const Key('home-quick-action-1')),
+    );
+    final itemStride = secondRect.left - firstRect.left;
 
-    await tester.drag(quickActionsList, const Offset(-260, 0));
+    expect(firstRect.left, greaterThanOrEqualTo(listRect.left + 3.5));
+    expect(secondRect.right, lessThanOrEqualTo(listRect.right - 3.5));
+
+    await tester.drag(quickActionsList, const Offset(-800, 0));
     await tester.pumpAndSettle();
 
     expect(find.text('Coleção'), findsOneWidget);
     expect(find.text('Trocas'), findsOneWidget);
+    final scrollable = find.descendant(
+      of: quickActionsList,
+      matching: find.byType(Scrollable),
+    );
+    final position = tester.state<ScrollableState>(scrollable).position;
+    final remainder = position.pixels % itemStride;
+    expect(
+      math.min(remainder, itemStride - remainder),
+      lessThan(0.6),
+      reason: 'quick actions must settle on complete card boundaries',
+    );
+
+    for (var index = 0; index < 5; index++) {
+      final item = find.byKey(
+        Key('home-quick-action-$index'),
+        skipOffstage: false,
+      );
+      if (item.evaluate().isEmpty) continue;
+      final rect = tester.getRect(item);
+      if (!rect.overlaps(listRect.deflate(3.5))) continue;
+      expect(
+        rect.left,
+        greaterThanOrEqualTo(listRect.left + 3.5),
+        reason: 'card $index left fragment remained after snap',
+      );
+      expect(
+        rect.right,
+        lessThanOrEqualTo(listRect.right - 3.5),
+        reason: 'card $index right fragment remained after snap',
+      );
+    }
     expect(tester.takeException(), isNull);
   });
 

@@ -316,27 +316,63 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
     return Scaffold(
       key: const Key('battle-coach-screen'),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: ModalRoute.canPopOf(context) == true
+            ? _BattleCoachKeyboardFocusHalo(
+                haloKey: const Key('battle-coach-back-focus-halo'),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                debugLabel: 'Battle Coach back',
+                builder: (focusNode) => IconButton(
+                  key: const Key('battle-coach-back-button'),
+                  focusNode: focusNode,
+                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                  onPressed: () => Navigator.maybePop(context),
+                  icon: const BackButtonIcon(),
+                ),
+              )
+            : null,
         title: const Text('Battle Coach'),
         actions: [
-          IconButton(
-            key: const Key('battle-coach-history-button'),
-            tooltip: 'Abrir replays',
-            onPressed: _openReplay,
-            icon: const ManaLoomGlyph(ManaLoomGlyphKind.battleReplay, size: 22),
+          _BattleCoachKeyboardFocusHalo(
+            haloKey: const Key('battle-coach-history-focus-halo'),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+            debugLabel: 'Battle Coach replays',
+            builder: (focusNode) => IconButton(
+              key: const Key('battle-coach-history-button'),
+              focusNode: focusNode,
+              tooltip: 'Abrir replays',
+              onPressed: _openReplay,
+              icon: const ManaLoomGlyph(
+                ManaLoomGlyphKind.battleReplay,
+                size: 22,
+              ),
+            ),
           ),
           if (session != null && !session.isTerminal)
-            IconButton(
-              key: const Key('battle-coach-refresh-button'),
-              tooltip: 'Reconectar à mesa',
-              onPressed: _fetching || _submitting ? null : _refresh,
-              icon: const Icon(Icons.sync_rounded),
+            _BattleCoachKeyboardFocusHalo(
+              haloKey: const Key('battle-coach-refresh-focus-halo'),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+              debugLabel: 'Battle Coach reconnect',
+              builder: (focusNode) => IconButton(
+                key: const Key('battle-coach-refresh-button'),
+                focusNode: focusNode,
+                tooltip: 'Reconectar à mesa',
+                onPressed: _fetching || _submitting ? null : _refresh,
+                icon: const Icon(Icons.sync_rounded),
+              ),
             ),
           if (session != null && !session.isTerminal)
-            IconButton(
-              key: const Key('battle-coach-concede-button'),
-              tooltip: 'Conceder partida',
-              onPressed: _submitting ? null : _confirmConcede,
-              icon: const Icon(Icons.flag_outlined),
+            _BattleCoachKeyboardFocusHalo(
+              haloKey: const Key('battle-coach-concede-focus-halo'),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+              debugLabel: 'Battle Coach concede',
+              builder: (focusNode) => IconButton(
+                key: const Key('battle-coach-concede-button'),
+                focusNode: focusNode,
+                tooltip: 'Conceder partida',
+                onPressed: _submitting ? null : _confirmConcede,
+                icon: const Icon(Icons.flag_outlined),
+              ),
             ),
         ],
       ),
@@ -618,20 +654,28 @@ class _BattleCoachWelcome extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: AppTheme.space24),
-                  FilledButton.icon(
-                    key: const Key('battle-coach-choose-opponent-button'),
-                    onPressed: starting ? null : onChooseOpponent,
-                    icon: starting
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const ManaLoomGlyph(
-                            ManaLoomGlyphKind.commander,
-                            size: 20,
-                          ),
-                    label: Text(
-                      starting ? 'Preparando a mesa…' : 'Escolher adversário',
+                  _BattleCoachKeyboardFocusHalo(
+                    haloKey: const Key(
+                      'battle-coach-choose-opponent-focus-halo',
+                    ),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    debugLabel: 'Battle Coach choose opponent',
+                    builder: (focusNode) => FilledButton.icon(
+                      key: const Key('battle-coach-choose-opponent-button'),
+                      focusNode: focusNode,
+                      onPressed: starting ? null : onChooseOpponent,
+                      icon: starting
+                          ? const SizedBox.square(
+                              dimension: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const ManaLoomGlyph(
+                              ManaLoomGlyphKind.commander,
+                              size: 20,
+                            ),
+                      label: Text(
+                        starting ? 'Preparando a mesa…' : 'Escolher adversário',
+                      ),
                     ),
                   ),
                 ],
@@ -642,6 +686,81 @@ class _BattleCoachWelcome extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BattleCoachKeyboardFocusHalo extends StatefulWidget {
+  const _BattleCoachKeyboardFocusHalo({
+    this.haloKey,
+    required this.borderRadius,
+    required this.debugLabel,
+    required this.builder,
+  });
+
+  final Key? haloKey;
+  final BorderRadius borderRadius;
+  final String debugLabel;
+  final Widget Function(FocusNode focusNode) builder;
+
+  @override
+  State<_BattleCoachKeyboardFocusHalo> createState() =>
+      _BattleCoachKeyboardFocusHaloState();
+}
+
+class _BattleCoachKeyboardFocusHaloState
+    extends State<_BattleCoachKeyboardFocusHalo> {
+  late final FocusNode _focusNode;
+  bool _showHalo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode(debugLabel: widget.debugLabel)
+      ..addListener(_syncHalo);
+    FocusManager.instance.addHighlightModeListener(_handleHighlightMode);
+    _syncHalo();
+  }
+
+  void _handleHighlightMode(FocusHighlightMode _) => _syncHalo();
+
+  void _syncHalo() {
+    final showHalo =
+        _focusNode.hasFocus &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    if (showHalo == _showHalo) return;
+    if (!mounted) {
+      _showHalo = showHalo;
+      return;
+    }
+    setState(() => _showHalo = showHalo);
+  }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeHighlightModeListener(_handleHighlightMode);
+    _focusNode
+      ..removeListener(_syncHalo)
+      ..dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+    key: widget.haloKey,
+    decoration: BoxDecoration(
+      borderRadius: widget.borderRadius,
+      color: _showHalo
+          ? AppTheme.frost400.withValues(alpha: 0.12)
+          : Colors.transparent,
+      border: _showHalo ? Border.all(color: AppTheme.frost400, width: 2) : null,
+      boxShadow: _showHalo
+          ? const [
+              BoxShadow(color: AppTheme.frost400, spreadRadius: 4),
+              BoxShadow(color: AppTheme.backgroundAbyss, spreadRadius: 2),
+            ]
+          : const [],
+    ),
+    child: widget.builder(_focusNode),
+  );
 }
 
 class _CoachTrustChip extends StatelessWidget {

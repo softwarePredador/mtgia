@@ -23,4 +23,15 @@ void main() {
     expect(source, contains('await _db.connect();'));
     expect(source, contains('processLiveness\n              ? await handler'));
   });
+
+  test('basic health proves an explicitly isolated E2E process', () {
+    final source = File('routes/health/index.dart').readAsStringSync();
+
+    expect(source, contains("import '../../lib/e2e_validation_policy.dart'"));
+    expect(source, contains("'service': 'mtgia-server'"));
+    expect(
+      source,
+      contains("'e2e_isolated_runtime': isManaloomE2eIsolatedRuntime()"),
+    );
+  });
 }

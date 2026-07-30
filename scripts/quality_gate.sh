@@ -160,6 +160,7 @@ run_runtime_performance_contract() {
       JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
       "$DART_BIN" test \
         --reporter compact \
+        test/ai_generate_provider_failure_matrix_e2e_test.dart \
         test/battle_live_local_load_homologation_test.dart
   )
   (
@@ -365,7 +366,8 @@ Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
   O modo 'full' é determinístico e exclui tags live/live_backend/live_db_write/live_external.
   O modo 'performance' valida os harnesses e seus orçamentos, incluindo o
-  preflight sintético Battle no host, sem exigir browser, device ou fixture
+  preflight sintético Battle no host e uma fixture HTTP exclusivamente
+  loopback para falhas do provedor, sem exigir browser, device ou fixture
   autenticada. Ele não prova Android físico, TalkBack, CPU/RSS alvo nem carga
   live. Use 'web-image-memory' para a prova real e fail-closed com Chrome/CDP.
   Use o perfil E2E live guardado para chamadas contra uma API real.

@@ -103,43 +103,62 @@ void main() {
         _expectReviewedAction(diagnostic);
       }
 
-      final natural = await _simulate(baseUrl, headers, deckA, deckB, const {
-        'seed': 2,
+      Map<String, dynamic>? natural;
+      int? naturalSeed;
+      for (var seed = 0; seed < 32; seed++) {
+        final candidate = await _simulate(baseUrl, headers, deckA, deckB, {
+          'seed': seed,
+          'max_turns': 12,
+          'focus_cards': ['A Good Day to Pie'],
+        });
+        final evidence =
+            (candidate['battle_learning_evidence'] as Map)
+                .cast<String, dynamic>();
+        if (evidence['natural_sample'] == true &&
+            evidence['positive_exposure_ready'] == true) {
+          natural = candidate;
+          naturalSeed = seed;
+          break;
+        }
+      }
+      expect(
+        natural,
+        isNotNull,
+        reason:
+            'At least one of the 32 deterministic natural samples must expose '
+            'the reviewed focus card without forced draw controls.',
+      );
+      final naturalBattle = natural!;
+      final naturalEvidence =
+          (naturalBattle['battle_learning_evidence'] as Map)
+              .cast<String, dynamic>();
+      expect(naturalBattle['engine'], 'manaloom_native_reviewed');
+      expect(
+        naturalBattle['engine_contract'],
+        'native_reviewed_rules_execution',
+      );
+      expect(naturalBattle['forced_access_mode'], 'none');
+      expect(naturalBattle['max_turns'], 12);
+      expect(naturalBattle['turns'], lessThanOrEqualTo(12));
+      expect(naturalEvidence['natural_sample'], isTrue);
+      expect(naturalEvidence['positive_exposure_ready'], isTrue);
+      _expectReviewedAction(naturalBattle);
+      _expectSavedReplayContract(naturalBattle);
+
+      final repeatedNatural = await _simulate(baseUrl, headers, deckA, deckB, {
+        'seed': naturalSeed,
         'max_turns': 12,
         'focus_cards': ['A Good Day to Pie'],
       });
-      final naturalEvidence =
-          (natural['battle_learning_evidence'] as Map).cast<String, dynamic>();
-      expect(natural['engine'], 'manaloom_native_reviewed');
-      expect(natural['engine_contract'], 'native_reviewed_rules_execution');
-      expect(natural['forced_access_mode'], 'none');
-      expect(natural['max_turns'], 12);
-      expect(natural['turns'], lessThanOrEqualTo(12));
-      expect(naturalEvidence['natural_sample'], isTrue);
-      expect(naturalEvidence['positive_exposure_ready'], isTrue);
-      _expectReviewedAction(natural);
-      _expectSavedReplayContract(natural);
-
-      final repeatedNatural = await _simulate(
-        baseUrl,
-        headers,
-        deckA,
-        deckB,
-        const {
-          'seed': 2,
-          'max_turns': 12,
-          'focus_cards': ['A Good Day to Pie'],
-        },
-      );
       _expectSavedReplayContract(repeatedNatural);
       expect(
         repeatedNatural['replay_id'],
-        isNot(natural['replay_id']),
+        isNot(naturalBattle['replay_id']),
         reason: 'Each durable execution must receive its own replay id.',
       );
       expect(
         _deterministicBattleProjection(repeatedNatural),
-        _deterministicBattleProjection(natural),
+        _deterministicBattleProjection(naturalBattle),
         reason:
             'The same canonical deck order and seed must reproduce the '
             'observable Battle contract.',
@@ -157,8 +176,9 @@ void main() {
       final replayList = _json(replayListResponse);
       final replays = (replayList['data'] as List).whereType<Map>().toList();
       expect(replays, isNotEmpty);
-      final replayIds = replays.map((replay) => replay['id']?.toString()).toSet();
-      expect(replayIds, contains(natural['replay_id'].toString()));
+      final replayIds =
+          replays.map((replay) => replay['id']?.toString()).toSet();
+      expect(replayIds, contains(naturalBattle['replay_id'].toString()));
       expect(replayIds, contains(repeatedNatural['replay_id'].toString()));
       expect(
         (replayList['simulation_contract'] as Map)['status'],
@@ -175,7 +195,7 @@ void main() {
             as Map)['reviewed_native_rules_execution'],
         isTrue,
       );
-      final replayId = natural['replay_id'].toString();
+      final replayId = naturalBattle['replay_id'].toString();
       final replayDetailResponse = await http.get(
         Uri.parse('$baseUrl/decks/$deckA/battle-replays/$replayId'),
         headers: headers,

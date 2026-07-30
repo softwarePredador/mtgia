@@ -2,6 +2,7 @@
   "schema_version": "manaloom_battle_card_coverage_evidence_v1",
   "captured_at": "2026-07-29",
   "status": "pass",
+  "release_status": "blocked_non_fetchable_candidate",
   "method": {
     "read_only": true,
     "catalog_grain": "normalized_unique_card_name",
@@ -17,13 +18,44 @@
   },
   "engine_identity": {
     "canonical_primary_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
-    "primary_candidate_commit": "3ac810da650a51c33142175d6191693c3a077131",
-    "primary_candidate_version": "1.4.60",
+    "historical_local_runtime_commit": "3ac810da650a51c33142175d6191693c3a077131",
+    "historical_local_runtime_commit_origin": "synthetic_local_cherry_pick_chain",
+    "historical_local_runtime_commit_fetchable": false,
+    "historical_local_runtime_commit_deployable": false,
+    "historical_local_runtime_version": "1.4.60",
     "compatible_fallback_commit": "a62915f500c2411484689294659c6bb84ea215f8",
     "compatible_fallback_version": "2.0.14-SNAPSHOT",
     "canonical_pin_promoted": false
   },
+  "candidate_patch": {
+    "status": "pass_local_reproduction",
+    "base_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "path": "docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch",
+    "sha256": "ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812",
+    "unified_context_lines": 0,
+    "source_pull_request": "https://github.com/magefree/mage/pull/15591",
+    "source_commits": {
+      "dynamic_miracle": "03cc893d7c982c195ffc3f8e3083e9123b5c17d0",
+      "lorehold": "0e6ca9cacaf612d00f18d68d39531c0666f570c1"
+    },
+    "unrelated_pull_request_commits_excluded": [
+      "29c51572724042dd5026954b1fa97731a86018fb",
+      "1a5d6060a840a81c2842b07cd7492280ea1784fd"
+    ],
+    "applies_cleanly_to_base": true,
+    "java_major": 17,
+    "reactor_modules": 34,
+    "focused_tests": 6,
+    "focused_test_failures": 0,
+    "focused_test_errors": 0,
+    "focused_test_skipped": 0,
+    "canonical_pin_changed": false,
+    "postgres_mutations": [],
+    "deployable": false,
+    "deployable_reason": "The validated artifact is a patch, not a commit published in a governed fork."
+  },
   "catalog": {
+    "metric_scope": "historical_local_runtime_commit",
     "total_unique_names": 34071,
     "primary_candidate_exact": 31045,
     "primary_candidate_residual": 3026,
@@ -88,11 +120,12 @@
     "native.json": "c64f614234a563f3e98b5385ff87386d5a8d7c4545496ef6f597f556565bb5f3",
     "forge_response.json": "a3c89b111d1f88e3c2031c78e4700a79995e11dc3f7a982e25cae87a87434f8b",
     "deck_cards.json": "0e18595c0fac85ea24b12d96b45ec6a24ae355c6090c4e2e1d920d26b57b9625",
-    "xmage_strategy_consistency.json": "74a22163848cd06da8c22db52189288b578265045dfaf749d50b406cd073de4b"
+    "xmage_strategy_consistency.json": "74a22163848cd06da8c22db52189288b578265045dfaf749d50b406cd073de4b",
+    "LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch": "ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812"
   },
   "decision": {
     "implement_3026_as_native_rules": false,
     "reason": "The number is the primary-engine residual; all normal product scope closes through the complete execution funnel.",
-    "remaining_release_gate": "Primary candidate promotion remains governed by the independent pin-transition qualification."
+    "remaining_release_gate": "Publish the exact validated patch as a fetchable commit in a governed fork, then run the independent pin-transition qualification before any pin change."
   }
 }

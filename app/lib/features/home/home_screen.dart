@@ -492,21 +492,84 @@ class _QuickActions extends StatelessWidget {
           );
         }
 
+        const gap = AppTheme.space10;
+        const edgePadding = AppTheme.space4;
+        final visibleItemCount = constraints.maxWidth >= 520 ? 3 : 2;
+        final availableWidth =
+            constraints.maxWidth -
+            (edgePadding * 2) -
+            (gap * (visibleItemCount - 1));
+        final itemWidth = availableWidth / visibleItemCount;
+        final itemStride = itemWidth + gap;
+
         return SizedBox(
           height: AppTheme.space72,
           child: ListView.separated(
             key: const Key('home-quick-actions-list'),
+            padding: const EdgeInsets.symmetric(horizontal: edgePadding),
             scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
+            physics: _QuickActionSnapPhysics(
+              itemExtent: itemStride,
+              parent: const BouncingScrollPhysics(),
+            ),
             itemCount: actions.length,
-            separatorBuilder: (_, _) => const SizedBox(width: AppTheme.space10),
+            separatorBuilder: (_, _) => const SizedBox(width: gap),
             itemBuilder: (context, index) => SizedBox(
-              width: 136,
+              key: Key('home-quick-action-$index'),
+              width: itemWidth,
               child: _QuickActionCard(data: actions[index]),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _QuickActionSnapPhysics extends ScrollPhysics {
+  const _QuickActionSnapPhysics({required this.itemExtent, super.parent});
+
+  final double itemExtent;
+
+  @override
+  _QuickActionSnapPhysics applyTo(ScrollPhysics? ancestor) {
+    return _QuickActionSnapPhysics(
+      itemExtent: itemExtent,
+      parent: buildParent(ancestor),
+    );
+  }
+
+  @override
+  Simulation? createBallisticSimulation(
+    ScrollMetrics position,
+    double velocity,
+  ) {
+    if ((velocity <= 0 && position.pixels <= position.minScrollExtent) ||
+        (velocity >= 0 && position.pixels >= position.maxScrollExtent)) {
+      return super.createBallisticSimulation(position, velocity);
+    }
+
+    final parentSimulation = super.createBallisticSimulation(
+      position,
+      velocity,
+    );
+    final projectedPixels =
+        parentSimulation?.x(double.infinity) ?? position.pixels;
+    final targetPixels = (projectedPixels / itemExtent).round() * itemExtent;
+    final boundedTarget = targetPixels
+        .clamp(position.minScrollExtent, position.maxScrollExtent)
+        .toDouble();
+    final tolerance = toleranceFor(position);
+    if ((boundedTarget - position.pixels).abs() <= tolerance.distance) {
+      return null;
+    }
+
+    return ScrollSpringSimulation(
+      spring,
+      position.pixels,
+      boundedTarget,
+      velocity,
+      tolerance: tolerance,
     );
   }
 }

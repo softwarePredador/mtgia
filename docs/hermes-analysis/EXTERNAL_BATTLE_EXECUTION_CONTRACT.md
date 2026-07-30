@@ -53,6 +53,17 @@ coordinates, the sidecar deploy also runs the active XMage pin-transition
 auditor with `--require-deployable`; a structurally valid
 `review_required` card audit blocks deployment.
 
+Interactive XMage release is a separate, default-off lane. When the invoking
+process supplies `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1`, the sidecar
+deploy may create or update the private direct-Swarm service
+`evolution_xmage-interactive` from the same immutable XMage digest. It publishes
+no port or Traefik route and proves the private network alias, image revision,
+engine identity, `runtime_mode=interactive`,
+`batch_simulation_available=false`, and bounded capacity. That first stage
+keeps `INTERACTIVE_BATTLE_ENABLED=false`; only a second backend deploy with the
+same caller-only flag may enable it, after proving the service is same-SHA and
+ready. Neither persistent dotenv nor a healthy batch executor can opt in.
+
 All three battle deploy scripts execute
 `scripts/manaloom_battle_product_gate.sh` before deployment. The live product
 proof is `server/test/battle_product_e2e_test.dart`; it must be run after deploy

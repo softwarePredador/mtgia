@@ -17,7 +17,7 @@
     "from_pin": "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec",
     "to_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
     "evidence_path": "docs/qa/evidence/XMAGE_PIN_TRANSITION_34d81ea_2c43ec8.json",
-    "evidence_sha256": "a84fa60bf812de063d7443861b07da214805f536c43038177f86e98120693e37",
+    "evidence_sha256": "9da1ad20d6083fd4497b7924b8629381b2894bb9963c218fbb3e4c6a684af664",
     "expected": {
       "commit_count": 152,
       "changed_path_count": 356,
@@ -31,6 +31,9 @@
       "qualified_policy_test_count": 13,
       "direct_test_reference_card_count": 5,
       "transition_nominal_test_count": 15,
+      "exact_transition_clearance_card_count": 1,
+      "review_required_before_exact_clearance": 168,
+      "review_required_card_count": 167,
       "card_data_actionable_finding_count": 9,
       "upstream_focused_test_count": 72
     }

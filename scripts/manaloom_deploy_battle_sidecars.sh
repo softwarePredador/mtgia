@@ -4,6 +4,28 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 
+# Interactive capacity is caller-owned release intent. These values are
+# captured before server/.env is read and are deliberately absent from the
+# dotenv allowlist below, so a persistent file cannot enable the capability.
+RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
+INTERACTIVE_MAX_ACTIVE="${MANALOOM_RELEASE_XMAGE_INTERACTIVE_MAX_ACTIVE:-4}"
+INTERACTIVE_PER_USER_ACTIVE_LIMIT="${MANALOOM_RELEASE_INTERACTIVE_PER_USER_ACTIVE_LIMIT:-1}"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
+      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+  exit 2
+fi
+if [[ ! "$INTERACTIVE_MAX_ACTIVE" =~ ^[1-9][0-9]*$ ||
+      "$INTERACTIVE_MAX_ACTIVE" -gt 32 ||
+      ! "$INTERACTIVE_PER_USER_ACTIVE_LIMIT" =~ ^[1-9][0-9]*$ ||
+      "$INTERACTIVE_PER_USER_ACTIVE_LIMIT" -gt 4 ||
+      "$INTERACTIVE_PER_USER_ACTIVE_LIMIT" -gt "$INTERACTIVE_MAX_ACTIVE" ]]; then
+  echo "limites do XMage interativo sao invalidos" >&2
+  exit 2
+fi
+readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_MAX_ACTIVE
+readonly INTERACTIVE_PER_USER_ACTIVE_LIMIT
+
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
 source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 require_live_mutation_approval "deploy dos battle sidecars"
@@ -52,6 +74,9 @@ FORGE_SERVICE="${MANALOOM_FORGE_SERVICE:-forge-sidecar}"
 NATIVE_SERVICE="${MANALOOM_NATIVE_BATTLE_SERVICE:-manaloom-ops}"
 NATIVE_SERVICE_DNS="${MANALOOM_NATIVE_BATTLE_SERVICE_DNS:-${PROJECT}_${NATIVE_SERVICE}}"
 PROJECT_NETWORK="${MANALOOM_PROJECT_NETWORK:-easypanel-$PROJECT}"
+XMAGE_INTERACTIVE_SERVICE="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE"
+XMAGE_INTERACTIVE_DNS="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS"
+XMAGE_INTERACTIVE_URL="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL"
 XMAGE_MEMORY_LIMIT_MB="${MANALOOM_XMAGE_MEMORY_LIMIT_MB:-4096}"
 FORGE_MEMORY_LIMIT_MB="${MANALOOM_FORGE_MEMORY_LIMIT_MB:-2560}"
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-${EASYPANEL_SSH_USER:-root}@${EASYPANEL_SERVER_IP:-}}"
@@ -92,6 +117,14 @@ validate_manaloom_exact_coordinate \
 validate_manaloom_exact_coordinate \
   "backend EasyPanel" "$BACKEND_SERVICE" "cartinhas"
 validate_manaloom_exact_coordinate "servico XMage" "$XMAGE_SERVICE" "xmage-sidecar"
+validate_manaloom_exact_coordinate \
+  "servico XMage interativo" "$XMAGE_INTERACTIVE_SERVICE" \
+  "evolution_xmage-interactive"
+validate_manaloom_exact_coordinate \
+  "DNS XMage interativo" "$XMAGE_INTERACTIVE_DNS" "xmage-interactive"
+validate_manaloom_exact_coordinate \
+  "URL XMage interativo" "$XMAGE_INTERACTIVE_URL" \
+  "http://xmage-interactive:8080"
 validate_manaloom_exact_coordinate "servico Forge" "$FORGE_SERVICE" "forge-sidecar"
 validate_manaloom_exact_coordinate "servico nativo" "$NATIVE_SERVICE" "manaloom-ops"
 validate_manaloom_exact_coordinate \
@@ -146,11 +179,19 @@ DEPLOY_MUTATION_STARTED=0
 DEPLOY_COMMITTED=0
 XMAGE_MUTATION_STARTED=0
 FORGE_MUTATION_STARTED=0
+XMAGE_INTERACTIVE_MUTATION_STARTED=0
+XMAGE_INTERACTIVE_PREVIOUS_EXISTS=0
 XMAGE_PREVIOUS_SOURCE_IMAGE=""
 XMAGE_ROLLBACK_SOURCE_IMAGE=""
 XMAGE_PREVIOUS_SPEC_IMAGE=""
 XMAGE_PREVIOUS_RUNNING_IMAGE=""
 XMAGE_PREVIOUS_UPDATE_STATE=""
+XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE=""
+XMAGE_INTERACTIVE_PREVIOUS_RUNNING_IMAGE=""
+XMAGE_INTERACTIVE_PREVIOUS_UPDATE_STATE=""
+XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE=""
+XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT=""
+XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION=""
 FORGE_PREVIOUS_SOURCE_IMAGE=""
 FORGE_ROLLBACK_SOURCE_IMAGE=""
 FORGE_PREVIOUS_SPEC_IMAGE=""
@@ -233,6 +274,19 @@ xmage_tag="$XMAGE_IMAGE_REPO:$short_sha"
 forge_tag="$FORGE_IMAGE_REPO:$short_sha"
 XMAGE_IMAGE_DIGEST_REF=""
 FORGE_IMAGE_DIGEST_REF=""
+XMAGE_EXPECTED_COMMIT="$(
+  tr -d '[:space:]' <"$SOURCE_WORKTREE/services/xmage-sidecar/XMAGE_COMMIT"
+)"
+XMAGE_EXPECTED_VERSION="$(
+  sed -n 's/.*XMAGE_VERSION = "\([^"]*\)";.*/\1/p' \
+    "$SOURCE_WORKTREE/services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java"
+)"
+if [[ ! "$XMAGE_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ||
+      ! "$XMAGE_EXPECTED_VERSION" =~ ^[0-9]+(\.[0-9]+){2}$ ]]; then
+  echo "identidade XMage pinada nao pode ser resolvida do snapshot aprovado" >&2
+  exit 2
+fi
+readonly XMAGE_EXPECTED_COMMIT XMAGE_EXPECTED_VERSION
 
 curl_args=(-fsS --proto '=https' --tlsv1.2)
 
@@ -318,12 +372,166 @@ docker run --rm --network \"\$network_name\" --entrypoint sh '$HEALTH_PROBE_IMAG
 "
 }
 
+interactive_service_exists_remote() {
+  # The service coordinate is intentionally expanded locally from the
+  # validated release contract; no remote environment controls it.
+  # shellcheck disable=SC2029
+  ssh "${ssh_args[@]}" "$ssh_target" \
+    "docker service inspect '$XMAGE_INTERACTIVE_SERVICE' >/dev/null 2>&1"
+}
+
+interactive_private_topology() {
+  # shellcheck disable=SC2029
+  ssh "${ssh_args[@]}" "$ssh_target" "
+set -euo pipefail
+network_id=\$(docker network inspect '$PROJECT_NETWORK' --format '{{.Id}}')
+ports=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{if .Endpoint.Spec.Ports}}{{len .Endpoint.Spec.Ports}}{{else}}0{{end}}')
+network_count=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{len .Spec.TaskTemplate.Networks}}')
+network_attached=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}' | awk -v expected=\"\$network_id\" '\$0 == expected {found=1} END{print found+0}')
+alias_attached=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range .Spec.TaskTemplate.Networks}}{{range .Aliases}}{{println .}}{{end}}{{end}}' | awk -v expected='$XMAGE_INTERACTIVE_DNS' '\$0 == expected {found=1} END{print found+0}')
+traefik_labels=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range \$key, \$value := .Spec.Labels}}{{println \$key}}{{end}}' | awk '/^traefik\\./{count++} END{print count+0}')
+printf '%s|%s|%s|%s|%s' \"\$ports\" \"\$network_count\" \"\$network_attached\" \"\$alias_attached\" \"\$traefik_labels\"
+"
+}
+
+validate_xmage_interactive_health_payload() {
+  local payload="$1"
+  local expected_maximum_active="${2:-$INTERACTIVE_MAX_ACTIVE}"
+  local expected_commit="${3:-$XMAGE_EXPECTED_COMMIT}"
+  local expected_version="${4:-$XMAGE_EXPECTED_VERSION}"
+  jq -e \
+    --arg commit "$expected_commit" \
+    --arg version "$expected_version" \
+    --argjson maximum_active "$expected_maximum_active" '
+      .status == "ok" and
+      .schema_version == "external_battle_execution_v2" and
+      .engine == "xmage" and
+      .engine_version == $version and
+      .engine_commit == $commit and
+      .sidecar_protocol_version == "external_battle_sidecar_v2" and
+      .sidecar_build_identity == ("xmage-sidecar-v2@" + $commit) and
+      .ai_profile == "computer_mad" and
+      .normalizer_version == "xmage_replay_normalizer_v2" and
+      .seed_semantics ==
+        "request_correlation_only_server_rng_uncontrolled" and
+      .deterministic == false and
+      (.sidecar_process_id | type == "string" and length > 0) and
+      (.sidecar_started_at | type == "string" and length > 0) and
+      .catalog_ready == true and
+      .runtime_mode == "interactive" and
+      .batch_simulation_available == false and
+      .interactive_battle.schema_version ==
+        "interactive_battle_runtime_v1" and
+      .interactive_battle.runtime_mode == "interactive" and
+      .interactive_battle.batch_simulation_available == false and
+      .interactive_battle.maximum_active == $maximum_active and
+      (.interactive_battle.active | type == "number") and
+      .interactive_battle.active >= 0 and
+      .interactive_battle.active <= $maximum_active and
+      (.interactive_battle.retained | type == "number") and
+      .interactive_battle.retained >= 0
+    ' >/dev/null <<<"$payload"
+}
+
+wait_for_xmage_interactive_health() {
+  local expected_maximum_active="${1:-$INTERACTIVE_MAX_ACTIVE}"
+  local expected_commit="${2:-$XMAGE_EXPECTED_COMMIT}"
+  local expected_version="${3:-$XMAGE_EXPECTED_VERSION}"
+  local payload
+  payload="$(wait_for_sidecar_health \
+    "$XMAGE_INTERACTIVE_SERVICE" \
+    "$XMAGE_INTERACTIVE_DNS" \
+    '"runtime_mode":"interactive"')"
+  if ! validate_xmage_interactive_health_payload \
+    "$payload" "$expected_maximum_active" \
+    "$expected_commit" "$expected_version"; then
+    echo "XMage interativo recusado: identidade, modo ou capacidade divergente" >&2
+    return 1
+  fi
+  printf '%s' "$payload"
+}
+
+interactive_environment_contract() {
+  # shellcheck disable=SC2029
+  ssh "${ssh_args[@]}" "$ssh_target" "
+docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk -F= '
+    /^PORT=/{port_count++; port=\$2}
+    /^XMAGE_RUNTIME_MODE=/{mode_count++; mode=\$2}
+    /^XMAGE_INTERACTIVE_MAX_ACTIVE=/{capacity_count++; capacity=\$2}
+    END{printf \"%d|%s|%d|%s|%d|%s\",port_count,port,mode_count,mode,capacity_count,capacity}'
+"
+}
+
+prove_backend_interactive_staging_disabled() {
+  local contract
+  # This stage intentionally does not require the currently deployed backend
+  # binary to know the interactive readiness schema. It proves only that its
+  # exact service configuration remains disabled until the same-SHA backend
+  # release performs the runtime preflight and explicit opt-in.
+  # shellcheck disable=SC2029
+  contract="$(ssh "${ssh_args[@]}" "$ssh_target" "
+docker service inspect '${PROJECT}_${BACKEND_SERVICE}' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '
+    /^INTERACTIVE_BATTLE_ENABLED=/{enabled_count++; enabled=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_INTERACTIVE_SIDECAR_URL=/{url_count++; url=substr(\$0,index(\$0,\"=\")+1)}
+    /^INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=/{user_count++; user_limit=substr(\$0,index(\$0,\"=\")+1)}
+    /^INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=/{global_count++; global_limit=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit}'
+")"
+  if [[ "$contract" != \
+        "1|false|1|$XMAGE_INTERACTIVE_URL|1|$INTERACTIVE_PER_USER_ACTIVE_LIMIT|1|$INTERACTIVE_MAX_ACTIVE" ]]; then
+    echo "backend nao permaneceu fail-closed ao preparar XMage interativo: $contract" >&2
+    return 1
+  fi
+}
+
+xmage_interactive_release_proof() {
+  local expected_image="$1"
+  local runtime_state topology environment_contract image_revision health
+
+  wait_for_service "$XMAGE_INTERACTIVE_SERVICE" "$expected_image"
+  runtime_state="$(sidecar_runtime_state "$XMAGE_INTERACTIVE_SERVICE")"
+  IFS='|' read -r proof_replicas proof_spec_image proof_running_image \
+    proof_update_state <<<"$runtime_state"
+  topology="$(interactive_private_topology)"
+  # shellcheck disable=SC2029
+  environment_contract="$(interactive_environment_contract)"
+  # shellcheck disable=SC2029
+  image_revision="$(ssh "${ssh_args[@]}" "$ssh_target" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$XMAGE_INTERACTIVE_SERVICE' -q | head -1)
+test -n \"\$container\"
+docker inspect \"\$container\" --format '{{index .Config.Labels \"org.opencontainers.image.revision\"}}'
+")"
+  health="$(wait_for_xmage_interactive_health)"
+
+  if [[ "$proof_replicas" != "1/1" ||
+        "$proof_spec_image" != "$expected_image" ||
+        "$proof_running_image" != "$expected_image" ||
+        ( -n "$proof_update_state" && "$proof_update_state" != "completed" &&
+          "$proof_update_state" != "rollback_completed" ) ||
+        "$topology" != "0|1|1|1|0" ||
+        "$environment_contract" != "1|8080|1|interactive|1|$INTERACTIVE_MAX_ACTIVE" ||
+        "$image_revision" != "$sha" ||
+        -z "$health" ]]; then
+    echo "XMage interativo sem prova digest/privacidade/identidade/modo/capacidade: runtime=$runtime_state topology=$topology env=$environment_contract revision=$image_revision" >&2
+    return 1
+  fi
+  printf '%s|%s|private=1|mode=interactive|maximum_active=%s' \
+    "$proof_spec_image" "$proof_running_image" "$INTERACTIVE_MAX_ACTIVE"
+}
+
 for required_service in "$XMAGE_SERVICE" "$FORGE_SERVICE"; do
   if ! service_exists "$required_service"; then
     echo "deploy recusado: sidecar EasyPanel existente e obrigatorio: $required_service" >&2
     exit 2
   fi
 done
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]] &&
+   service_exists "$XMAGE_INTERACTIVE_DNS"; then
+  echo "deploy recusado: XMage interativo deve permanecer direct Swarm sem source EasyPanel concorrente" >&2
+  exit 2
+fi
 
 sidecar_runtime_state() {
   local swarm_service="$1"
@@ -393,6 +601,61 @@ if [[ "$XMAGE_PREVIOUS_SOURCE_IMAGE" != "$XMAGE_ROLLBACK_SOURCE_IMAGE" ]]; then
 fi
 if [[ "$FORGE_PREVIOUS_SOURCE_IMAGE" != "$FORGE_ROLLBACK_SOURCE_IMAGE" ]]; then
   echo "origem Forge anterior sera normalizada para o digest imutavel durante eventual rollback" >&2
+fi
+
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]] &&
+   interactive_service_exists_remote; then
+  XMAGE_INTERACTIVE_PREVIOUS_EXISTS=1
+  XMAGE_INTERACTIVE_PREVIOUS_RUNTIME_STATE="$(
+    sidecar_runtime_state "$XMAGE_INTERACTIVE_SERVICE"
+  )"
+  IFS='|' read -r interactive_previous_replicas \
+    XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE \
+    XMAGE_INTERACTIVE_PREVIOUS_RUNNING_IMAGE \
+    XMAGE_INTERACTIVE_PREVIOUS_UPDATE_STATE \
+    <<<"$XMAGE_INTERACTIVE_PREVIOUS_RUNTIME_STATE"
+  validate_sidecar_baseline \
+    "$XMAGE_INTERACTIVE_SERVICE" "$XMAGE_IMAGE_REPO" \
+    "$XMAGE_INTERACTIVE_PREVIOUS_RUNTIME_STATE" \
+    "$interactive_previous_replicas" \
+    "$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE" \
+    "$XMAGE_INTERACTIVE_PREVIOUS_RUNNING_IMAGE" \
+    "$XMAGE_INTERACTIVE_PREVIOUS_UPDATE_STATE"
+  if [[ "$(interactive_private_topology)" != "0|1|1|1|0" ]]; then
+    echo "deploy recusado: baseline XMage interativo nao e privado" >&2
+    exit 2
+  fi
+  interactive_previous_environment="$(
+    interactive_environment_contract
+  )"
+  XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE="${interactive_previous_environment##*|}"
+  if [[ "$interactive_previous_environment" != \
+        "1|8080|1|interactive|1|$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" ||
+        ! "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" =~ ^[1-9][0-9]*$ ||
+        "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" -gt 32 ]]; then
+    echo "deploy recusado: baseline XMage interativo sem capacidade valida" >&2
+    exit 2
+  fi
+  interactive_previous_health="$(wait_for_sidecar_health \
+    "$XMAGE_INTERACTIVE_SERVICE" \
+    "$XMAGE_INTERACTIVE_DNS" \
+    '"runtime_mode":"interactive"')"
+  XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT="$(
+    jq -er '.engine_commit' <<<"$interactive_previous_health"
+  )"
+  XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION="$(
+    jq -er '.engine_version' <<<"$interactive_previous_health"
+  )"
+  if [[ ! "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" =~ ^[0-9a-f]{40}$ ||
+        ! "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION" =~ ^[0-9]+(\.[0-9]+){2}$ ]] ||
+     ! validate_xmage_interactive_health_payload \
+       "$interactive_previous_health" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION"; then
+    echo "deploy recusado: baseline XMage interativo sem identidade valida" >&2
+    exit 2
+  fi
 fi
 
 REMOTE_DIR_CLEANUP_REQUIRED=1
@@ -533,6 +796,65 @@ docker service update \\
   wait_for_service "$swarm_service" "$image_digest_ref"
 }
 
+deploy_xmage_interactive_digest() {
+  local image_digest_ref="$1"
+
+  DEPLOY_MUTATION_STARTED=1
+  XMAGE_INTERACTIVE_MUTATION_STARTED=1
+  if [[ "$XMAGE_INTERACTIVE_PREVIOUS_EXISTS" == "1" ]]; then
+    # The baseline proof above already guarantees a private network attachment
+    # and alias. Updating the existing service preserves that topology.
+    # shellcheck disable=SC2029
+    ssh "${ssh_args[@]}" "$ssh_target" "
+set -euo pipefail
+docker service update \\
+  --update-order stop-first \\
+  --update-failure-action rollback \\
+  --update-monitor 30s \\
+  --rollback-order stop-first \\
+  --rollback-failure-action pause \\
+  --rollback-monitor 30s \\
+  --detach=true \\
+  --image '$image_digest_ref' \\
+  --env-add 'PORT=8080' \\
+  --env-add 'XMAGE_RUNTIME_MODE=interactive' \\
+  --env-add 'XMAGE_INTERACTIVE_MAX_ACTIVE=$INTERACTIVE_MAX_ACTIVE' \\
+  --env-add 'XMAGE_SERVER_JAVA_OPTS=-Xms256m -Xmx2g' \\
+  --env-add 'XMAGE_SIDECAR_JAVA_OPTS=-Xms128m -Xmx512m' \\
+  '$XMAGE_INTERACTIVE_SERVICE' >/dev/null
+"
+  else
+    # No port is published and no Traefik label is installed. The only
+    # reachable name is the explicit alias on the private project network.
+    # shellcheck disable=SC2029
+    ssh "${ssh_args[@]}" "$ssh_target" "
+set -euo pipefail
+docker service create \\
+  --name '$XMAGE_INTERACTIVE_SERVICE' \\
+  --network 'name=$PROJECT_NETWORK,alias=$XMAGE_INTERACTIVE_DNS' \\
+  --replicas 1 \\
+  --restart-condition any \\
+  --limit-cpu 2 \\
+  --reserve-cpu 0.25 \\
+  --limit-memory '${XMAGE_MEMORY_LIMIT_MB}M' \\
+  --reserve-memory 512M \\
+  --update-order stop-first \\
+  --update-failure-action rollback \\
+  --update-monitor 30s \\
+  --rollback-order stop-first \\
+  --rollback-failure-action pause \\
+  --rollback-monitor 30s \\
+  --env 'PORT=8080' \\
+  --env 'XMAGE_RUNTIME_MODE=interactive' \\
+  --env 'XMAGE_INTERACTIVE_MAX_ACTIVE=$INTERACTIVE_MAX_ACTIVE' \\
+  --env 'XMAGE_SERVER_JAVA_OPTS=-Xms256m -Xmx2g' \\
+  --env 'XMAGE_SIDECAR_JAVA_OPTS=-Xms128m -Xmx512m' \\
+  '$image_digest_ref' >/dev/null
+"
+  fi
+  wait_for_service "$XMAGE_INTERACTIVE_SERVICE" "$image_digest_ref"
+}
+
 prove_sidecar_release() {
   local service_name="$1"
   local image_digest_ref="$2"
@@ -625,9 +947,81 @@ docker service update \\
   return 1
 }
 
+rollback_xmage_interactive() {
+  local runtime_state topology
+  if [[ "$XMAGE_INTERACTIVE_PREVIOUS_EXISTS" == "0" ]]; then
+    # A first install has no prior image to restore. Its rollback is complete
+    # only after the newly created private service is absent again.
+    if ! interactive_service_exists_remote; then
+      echo "rollback XMage interativo comprovado: nenhum servico inicial persistiu" >&2
+      return 0
+    fi
+    # shellcheck disable=SC2029
+    if ! ssh "${ssh_args[@]}" "$ssh_target" \
+      "docker service rm '$XMAGE_INTERACTIVE_SERVICE' >/dev/null"; then
+      echo "CRITICAL: rollback nao removeu o novo XMage interativo" >&2
+      return 1
+    fi
+    for _ in $(seq 1 45); do
+      if ! interactive_service_exists_remote; then
+        echo "rollback XMage interativo comprovado: servico inicial removido" >&2
+        return 0
+      fi
+      sleep 2
+    done
+    echo "CRITICAL: rollback XMage interativo nao comprovou remocao" >&2
+    return 1
+  fi
+
+  # Docker restores the full previous spec, including environment, resources
+  # and image. The following checks additionally prove digest, topology and
+  # the exact interactive health contract.
+  runtime_state="$(sidecar_runtime_state "$XMAGE_INTERACTIVE_SERVICE")"
+  topology="$(interactive_private_topology)"
+  if [[ "$runtime_state" == \
+        "1/1|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|completed" ||
+        "$runtime_state" == \
+        "1/1|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|rollback_completed" ]] &&
+     [[ "$topology" == "0|1|1|1|0" ]] &&
+     wait_for_xmage_interactive_health \
+       "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION" >/dev/null; then
+    echo "rollback automatico XMage interativo comprovado" >&2
+    return 0
+  fi
+  # shellcheck disable=SC2029
+  if ! ssh "${ssh_args[@]}" "$ssh_target" \
+    "docker service update --detach=true --rollback '$XMAGE_INTERACTIVE_SERVICE' >/dev/null" ||
+     ! wait_for_service \
+       "$XMAGE_INTERACTIVE_SERVICE" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE"; then
+    echo "CRITICAL: rollback XMage interativo nao convergiu" >&2
+    return 1
+  fi
+  runtime_state="$(sidecar_runtime_state "$XMAGE_INTERACTIVE_SERVICE")"
+  topology="$(interactive_private_topology)"
+  if [[ "$runtime_state" != \
+        "1/1|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|completed" &&
+        "$runtime_state" != \
+        "1/1|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|$XMAGE_INTERACTIVE_PREVIOUS_SPEC_IMAGE|rollback_completed" ]] ||
+     [[ "$topology" != "0|1|1|1|0" ]] ||
+     ! wait_for_xmage_interactive_health \
+       "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION" >/dev/null; then
+    echo "CRITICAL: rollback XMage interativo nao comprovou digest/privacidade/health" >&2
+    return 1
+  fi
+  echo "rollback XMage interativo comprovado: spec, digest e health restaurados" >&2
+}
+
 rollback_battle_sidecars() {
   local rollback_status=0
   echo "deploy dos battle sidecars falhou; restaurando digests anteriores" >&2
+  if [[ "$XMAGE_INTERACTIVE_MUTATION_STARTED" == "1" ]]; then
+    rollback_xmage_interactive || rollback_status=1
+  fi
   if [[ "$FORGE_MUTATION_STARTED" == "1" ]]; then
     rollback_one_sidecar \
       "$FORGE_SERVICE" "$FORGE_PREVIOUS_SPEC_IMAGE" \
@@ -648,6 +1042,13 @@ deploy_sidecar_digest \
 prove_sidecar_release \
   "$XMAGE_SERVICE" "$XMAGE_IMAGE_DIGEST_REF" "$XMAGE_SERVICE" catalog_ready \
   >/dev/null
+interactive_release_proof="disabled"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
+  deploy_xmage_interactive_digest "$XMAGE_IMAGE_DIGEST_REF"
+  interactive_release_proof="$(
+    xmage_interactive_release_proof "$XMAGE_IMAGE_DIGEST_REF"
+  )"
+fi
 deploy_sidecar_digest \
   "$FORGE_SERVICE" "$FORGE_IMAGE_DIGEST_REF" \
   $'PORT=8080\nFORGE_JAVA_COMMAND=xvfb-run -a java -Xms128m -Xmx1536m\n' \
@@ -661,6 +1062,8 @@ wait_for_sidecar_health \
 
 services_json="$(trpc_post projects.listProjectsAndServices null)"
 backend_env="$(jq -er --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .env' <<<"$services_json")"
+INTERACTIVE_BATTLE_ENABLED=false
+readonly INTERACTIVE_BATTLE_ENABLED
 
 upsert_env() {
   local current="$1"
@@ -687,6 +1090,10 @@ backend_env="$(upsert_env "$backend_env" BATTLE_ENGINE auto)"
 backend_env="$(upsert_env "$backend_env" XMAGE_SIDECAR_URL "http://$XMAGE_SERVICE:8080")"
 backend_env="$(upsert_env "$backend_env" FORGE_SIDECAR_URL "http://$FORGE_SERVICE:8080")"
 backend_env="$(upsert_env "$backend_env" NATIVE_BATTLE_SIDECAR_URL "http://$NATIVE_SERVICE_DNS:8080")"
+backend_env="$(upsert_env "$backend_env" INTERACTIVE_BATTLE_ENABLED "$INTERACTIVE_BATTLE_ENABLED")"
+backend_env="$(upsert_env "$backend_env" XMAGE_INTERACTIVE_SIDECAR_URL "$XMAGE_INTERACTIVE_URL")"
+backend_env="$(upsert_env "$backend_env" INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT "$INTERACTIVE_PER_USER_ACTIVE_LIMIT")"
+backend_env="$(upsert_env "$backend_env" INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT "$INTERACTIVE_MAX_ACTIVE")"
 backend_env="$(upsert_env "$backend_env" DB_HOST "$DB_HOST")"
 backend_env="$(upsert_env "$backend_env" DB_PORT "$DB_PORT")"
 backend_env="$(upsert_env "$backend_env" DB_NAME "$DB_NAME")"
@@ -729,6 +1136,10 @@ update_args=(
   --env-add 'XMAGE_SIDECAR_URL=http://$XMAGE_SERVICE:8080'
   --env-add 'FORGE_SIDECAR_URL=http://$FORGE_SERVICE:8080'
   --env-add 'NATIVE_BATTLE_SIDECAR_URL=http://$NATIVE_SERVICE_DNS:8080'
+  --env-add 'INTERACTIVE_BATTLE_ENABLED=$INTERACTIVE_BATTLE_ENABLED'
+  --env-add 'XMAGE_INTERACTIVE_SIDECAR_URL=$XMAGE_INTERACTIVE_URL'
+  --env-add 'INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=$INTERACTIVE_PER_USER_ACTIVE_LIMIT'
+  --env-add 'INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=$INTERACTIVE_MAX_ACTIVE'
   --env-add \"DB_HOST=\$db_host\"
   --env-add \"DB_PORT=\$db_port\"
   --env-add \"DB_NAME=\$db_name\"
@@ -740,6 +1151,9 @@ update_args=(
 \"\${update_args[@]}\" '$backend_swarm_service' >/dev/null
 "
 wait_for_service "$backend_swarm_service"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
+  prove_backend_interactive_staging_disabled
+fi
 
 xmage_release_proof="$(prove_sidecar_release \
   "$XMAGE_SERVICE" "$XMAGE_IMAGE_DIGEST_REF" "$XMAGE_SERVICE" catalog_ready)"
@@ -749,11 +1163,18 @@ wait_for_sidecar_health \
   "${PROJECT}_${NATIVE_SERVICE}" \
   "$NATIVE_SERVICE_DNS" \
   native_reviewed_rules_execution >/dev/null
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
+  interactive_release_proof="$(
+    xmage_interactive_release_proof "$XMAGE_IMAGE_DIGEST_REF"
+  )"
+fi
 DEPLOY_COMMITTED=1
 
 cleanup_remote_build_dir
 
-printf '{"status":"deployed","git_sha":"%s","xmage_service":"%s","xmage_image_digest_ref":"%s","xmage_release_proof":"%s","forge_service":"%s","forge_image_digest_ref":"%s","forge_release_proof":"%s","native_service":"%s","backend_service":"%s","remote_cleanup_proof":"%s"}\n' \
+printf '{"status":"deployed","git_sha":"%s","xmage_service":"%s","xmage_image_digest_ref":"%s","xmage_release_proof":"%s","xmage_interactive_release_selected":%s,"xmage_interactive_service":"%s","xmage_interactive_release_proof":"%s","backend_interactive_enabled":false,"forge_service":"%s","forge_image_digest_ref":"%s","forge_release_proof":"%s","native_service":"%s","backend_service":"%s","remote_cleanup_proof":"%s"}\n' \
   "$sha" "$XMAGE_SERVICE" "$XMAGE_IMAGE_DIGEST_REF" "$xmage_release_proof" \
+  "$([[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]] && printf true || printf false)" \
+  "$XMAGE_INTERACTIVE_SERVICE" "$interactive_release_proof" \
   "$FORGE_SERVICE" "$FORGE_IMAGE_DIGEST_REF" "$forge_release_proof" \
   "$NATIVE_SERVICE" "$BACKEND_SERVICE" "$REMOTE_CLEANUP_PROOF"

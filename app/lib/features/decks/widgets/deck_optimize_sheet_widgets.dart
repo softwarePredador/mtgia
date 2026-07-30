@@ -288,6 +288,18 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     return '-';
   }
 
+  String _metricChange({
+    required Map<String, dynamic> before,
+    required Map<String, dynamic> after,
+    required List<String> keys,
+  }) {
+    final beforeValue = _metric(before, keys);
+    final afterValue = _metric(after, keys);
+    if (beforeValue == '-') return afterValue;
+    if (afterValue == '-' || beforeValue == afterValue) return beforeValue;
+    return '$beforeValue → $afterValue';
+  }
+
   String get _planLabel {
     if (widget.mode == 'complete') return 'Completar lista';
     if (widget.metaReferenceContext.isNotEmpty) {
@@ -768,15 +780,16 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                       label: 'Terrenos',
                       value: _isPartialSelection
                           ? 'Recalcular'
-                          : _metric(widget.postAnalysis, const [
-                              'lands',
-                              'land_count',
-                            ]),
+                          : _metricChange(
+                              before: widget.deckAnalysis,
+                              after: widget.postAnalysis,
+                              keys: const ['lands', 'land_count'],
+                            ),
                       icon: Icons.terrain_outlined,
                     ),
                     if (_automaticLandFloorText case final floorText?)
                       _TrustSignal(
-                        label: 'Piso automático',
+                        label: 'Piso mínimo',
                         value: floorText,
                         icon: Icons.foundation_outlined,
                       ),
@@ -1493,52 +1506,144 @@ class _TrustSignalGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: signals
-          .map(
-            (signal) => Container(
-              width: 118,
-              padding: const EdgeInsets.all(AppTheme.space10),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(
-                  color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = AppTheme.space8;
+        final availableWidth = constraints.maxWidth;
+        final columnCount = availableWidth >= 520
+            ? 3
+            : availableWidth >= 300
+            ? 2
+            : 1;
+        final signalWidth =
+            (availableWidth - (spacing * (columnCount - 1))) / columnCount;
+        final useCompactRow = columnCount == 1;
+
+        return Wrap(
+          key: const Key('optimization-preview-trust-signal-grid'),
+          spacing: spacing,
+          runSpacing: spacing,
+          children: signals
+              .map(
+                (signal) => Container(
+                  key: ValueKey(
+                    'optimization-preview-trust-signal-${signal.label}',
+                  ),
+                  width: signalWidth,
+                  padding: const EdgeInsets.all(AppTheme.space10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+                    ),
+                  ),
+                  child: useCompactRow
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              signal.icon,
+                              size: 18,
+                              color: AppTheme.frost400,
+                            ),
+                            const SizedBox(width: AppTheme.space10),
+                            Expanded(
+                              child: _TrustSignalCopy(
+                                signal: signal,
+                                horizontal: true,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              signal.icon,
+                              size: 16,
+                              color: AppTheme.frost400,
+                            ),
+                            const SizedBox(height: AppTheme.space6),
+                            _TrustSignalCopy(signal: signal),
+                          ],
+                        ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(signal.icon, size: 16, color: AppTheme.frost400),
-                  const SizedBox(height: AppTheme.space6),
-                  Text(
-                    signal.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: AppTheme.fontXs,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppTheme.space2),
-                  Text(
-                    signal.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontSize: AppTheme.fontSm,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
+              )
+              .toList(),
+        );
+      },
+    );
+  }
+}
+
+class _TrustSignalCopy extends StatelessWidget {
+  final _TrustSignal signal;
+  final bool horizontal;
+
+  const _TrustSignalCopy({required this.signal, this.horizontal = false});
+
+  @override
+  Widget build(BuildContext context) {
+    if (horizontal) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              signal.label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontXs,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          )
-          .toList(),
+          ),
+          const SizedBox(width: AppTheme.space8),
+          Flexible(
+            child: Text(
+              signal.value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontSm,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          signal.label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: AppTheme.fontXs,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppTheme.space2),
+        Text(
+          signal.value,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: AppTheme.textPrimary,
+            fontSize: AppTheme.fontSm,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -536,9 +536,10 @@ local foi compilado com a flag ativa; os scripts de release a fixam em `false`.
 - BL10-02 possui prova local de correlação divergente, processo perdido,
   timeout, concessão terminal, repetição e falha de runtime sem resultado
   fabricado.
-- BL10-03 comprova limite local de capacidade e isolamento batch/interativo,
-  mas ainda não possui ensaio integrado de carga contra os budgets de API e
-  PostgreSQL.
+- BL10-03 comprova limite local de capacidade, isolamento batch/interativo e
+  ensaio integrado descartável com 24 jobs contra budgets de rota,
+  PostgreSQL e batch; HTTP/sidecars/recursos do ambiente alvo ainda precisam
+  ser medidos na mesma SHA publicada.
 - BL10-04 possui partida XMage real e build Web local; Android físico,
   background/foreground real e ambiente homologado permanecem abertos.
 - BL10-05 possui semântica, viewports, texto responsivo e reduced motion

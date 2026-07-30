@@ -113,13 +113,14 @@
       "modified": 82
     },
     "dispositions": {
-      "catalog_supported_nominal_test_passed_semantic_review_required": 3,
+      "catalog_supported_nominal_test_passed_semantic_review_required": 2,
       "catalog_supported_regression_only_review_required": 78,
       "catalog_supported_semantic_review_required": 84,
       "external_runtime_quarantine_semantic_defect": 1,
       "external_residual_upstream_unfinished": 1,
       "focused_upstream_test_passed": 1,
-      "focused_upstream_test_passed_card_data_warning_review_required": 1
+      "focused_upstream_test_passed_card_data_warning_review_required": 1,
+      "presentation_hunk_nominal_tests_passed": 1
     },
     "modified_with_direct_nominal_test_reference": 3,
     "modified_with_source_todo_for_missing_copy_tests": 2,
@@ -3127,7 +3128,7 @@
         "Mage.Tests/src/test/java/org/mage/test/cards/continuous/MetallicMiminTest.java",
         "Mage.Tests/src/test/java/org/mage/test/cards/replacement/entersBattlefield/HardenedScaleTest.java"
       ],
-      "disposition": "catalog_supported_nominal_test_passed_semantic_review_required",
+      "disposition": "presentation_hunk_nominal_tests_passed",
       "focused_test_case_count": 6,
       "release_scope_as_of_2026_07_28": "has_current_or_prior_registration",
       "runtime_catalog_status": "supported",
@@ -3190,7 +3191,8 @@
         }
       ],
       "source_path": "Mage.Sets/src/mage/cards/m/MetallicMimic.java",
-      "source_warning_markers": []
+      "source_warning_markers": [],
+      "transition_review_rule_id": "metallic_mimic_presentation_literal_v1"
     },
     {
       "canonical_8073_snapshot_exact_name_match": false,
@@ -4111,7 +4113,8 @@
     "card_data_warning_inventory_sha256": "b2603b897a14a5fa681ae2aed9dfb809d48264d4c90ac1a6284aa955c7345dda",
     "changed_169_coverage_exchange_sha256": "04b8d775ad2e9413fba563d565536982d9d66d38ce29dd19f330ef3d97e182bc",
     "corrected_added_87_test_scenario_miner_sha256": "4bc40bc3ecd659404a3f71aeda12d9ae1a01bac52d131fc645d3c7f35a6b0cf4",
-    "exact_delta_report_sha256": "0bb7368758bfd662329d10e4ad71599205c56af95d4a7b2cc71f7e30c40dfaff"
+    "exact_delta_report_sha256": "0bb7368758bfd662329d10e4ad71599205c56af95d4a7b2cc71f7e30c40dfaff",
+    "transition_nominal_review_v1_sha256": "06a7e374b336858fea2fd55f9a5dd90c6ad56105e7b33f7526a092974620ea17"
   },
   "modified_change_scope": {
     "boundary": "Presentation/metadata includes generated text, hints, filter descriptions, imports and formatting. It is not automatically gameplay proof and remains review-required where the card disposition says so.",
@@ -4122,8 +4125,8 @@
     ],
     "counts": {
       "comment_only": 2,
-      "executable_or_mixed": 26,
-      "presentation_or_metadata": 54,
+      "executable_or_mixed": 27,
+      "presentation_or_metadata": 53,
       "total_modified": 82
     },
     "executable_or_mixed_classes": [
@@ -4141,6 +4144,7 @@
       "LightPawsEmperorsVoice",
       "MatoyaArchonElder",
       "MirrorOfLifeTrapping",
+      "MjolnirHammerOfThor",
       "OkoyeDoraMilajeLeader",
       "PlanetariumOfWanShiTong",
       "RestlessBloodseeker",
@@ -4154,7 +4158,18 @@
       "UltronMachineOverlord",
       "VenomEvilUnleashed"
     ],
-    "presentation_or_metadata_count": 54
+    "presentation_or_metadata_count": 53
+  },
+  "transition_nominal_review": {
+    "artifact_path": "docs/qa/evidence/XMAGE_TRANSITION_NOMINAL_REVIEW_34d81EA_2c43ec8.json",
+    "artifact_sha256": "06a7e374b336858fea2fd55f9a5dd90c6ad56105e7b33f7526a092974620ea17",
+    "catalog_resolution_used_as_semantic_proof": false,
+    "exact_clearance_cards": [
+      "Metallic Mimic"
+    ],
+    "review_required_after": 167,
+    "review_required_before": 168,
+    "schema_version": "manaloom_xmage_transition_nominal_review_v1_2026-07-29"
   },
   "postgresql_scope_reconciliation": {
     "boundary": "PostgreSQL remains truth for product identity, Oracle text and legality; no fingerprint was guessed.",
@@ -4173,7 +4188,7 @@
       "future_only_card_activation_gate_not_passed",
       "external_runtime_unsupported_cards_present",
       "84_added_cards_are_catalog_supported_without_direct_nominal_semantic_proof",
-      "82_modified_cards_require_transition_specific_semantic_review",
+      "81_modified_cards_require_transition_specific_semantic_review",
       "planetarium_of_wan_shi_tong_is_quarantined_for_a_confirmed_semantic_defect",
       "prudent_fateseer_is_unfinished_in_xmage_and_absent_from_pinned_forge",
       "postgresql_product_scope_reconciliation_blocked_missing_approved_ssh_host_key_sha256",

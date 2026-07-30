@@ -194,6 +194,10 @@ bool qualifiesAsSafeNoChangeOutcome({
   required String outcomeCode,
   required String qualityCode,
   required String deckStateStatus,
+  required bool? isMock,
+  required bool? canApply,
+  required bool? learningEligible,
+  required bool responseFlagsWellTyped,
 }) {
   const safeQualityCodes = {
     'OPTIMIZE_NO_SAFE_SWAPS',
@@ -201,10 +205,24 @@ bool qualifiesAsSafeNoChangeOutcome({
     'OPTIMIZE_QUALITY_REJECTED',
     'OPTIMIZE_SEMANTIC_V2_REJECTED',
   };
+  const safeOutcomeCodes = {
+    'near_peak',
+    'no_safe_upgrade_found',
+    'commander_same_lane_evidence_required',
+  };
+  if (deckStateStatus != 'healthy' ||
+      !responseFlagsWellTyped ||
+      isMock == true ||
+      canApply != false ||
+      learningEligible != false ||
+      !safeOutcomeCodes.contains(outcomeCode)) {
+    return false;
+  }
+  if (httpStatus == HttpStatus.ok) {
+    return qualityCode.isEmpty;
+  }
   return httpStatus == HttpStatus.unprocessableEntity &&
-      const {'near_peak', 'no_safe_upgrade_found'}.contains(outcomeCode) &&
-      safeQualityCodes.contains(qualityCode) &&
-      deckStateStatus == 'healthy';
+      safeQualityCodes.contains(qualityCode);
 }
 
 class OptimizeOutcomeEvidence {
@@ -807,12 +825,22 @@ Future<void> main() async {
                       r.optimizeOutcome.directApplyAccepted,
                 )
                 .length,
+        'safe_non_actionable_http_200':
+            results
+                .where(
+                  (r) =>
+                      r.optimizeStatus == HttpStatus.ok &&
+                      !r.optimizeOutcome.directApplyAccepted &&
+                      r.flowPath == 'safe_no_change',
+                )
+                .length,
         'contract_rejected_http_200':
             results
                 .where(
                   (r) =>
                       r.optimizeStatus == HttpStatus.ok &&
-                      !r.optimizeOutcome.directApplyAccepted,
+                      !r.optimizeOutcome.directApplyAccepted &&
+                      r.flowPath != 'safe_no_change',
                 )
                 .length,
         'mock_responses':
@@ -976,6 +1004,29 @@ Future<ResolutionRunResult> _runResolutionForDeck({
     httpStatus: optimizeResponse.statusCode,
     responseBody: optimizeBody,
   );
+  final optimizeQualityError =
+      optimizeBody['quality_error'] is Map
+          ? (optimizeBody['quality_error'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+  final optimizeQualityCode =
+      optimizeQualityError['code']?.toString().trim() ?? '';
+  final optimizeOutcomeCode =
+      optimizeBody['outcome_code']?.toString().trim().toLowerCase() ?? '';
+  final optimizeDeckState =
+      optimizeBody['deck_state'] is Map
+          ? (optimizeBody['deck_state'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+  final safeNoChangeOutcome = qualifiesAsSafeNoChangeOutcome(
+    httpStatus: optimizeResponse.statusCode,
+    outcomeCode: optimizeOutcomeCode,
+    qualityCode: optimizeQualityCode,
+    deckStateStatus:
+        optimizeDeckState['status']?.toString().trim().toLowerCase() ?? '',
+    isMock: optimizeOutcome.isMock,
+    canApply: optimizeOutcome.canApply,
+    learningEligible: optimizeOutcome.learningEligible,
+    responseFlagsWellTyped: optimizeOutcome.responseFlagsWellTyped,
+  );
 
   String flowPath = 'unresolved_rejection';
   int? rebuildStatus;
@@ -1037,22 +1088,19 @@ Future<ResolutionRunResult> _runResolutionForDeck({
         }
       }
     }
+  } else if (safeNoChangeOutcome) {
+    flowPath = 'safe_no_change';
+    warnings.add(
+      optimizeOutcomeCode == 'commander_same_lane_evidence_required'
+          ? 'A sugestão ficou apenas para revisão: faltou evidência de troca na mesma função; deck original preservado.'
+          : 'Nenhuma troca segura encontrada; deck original preservado em estado saudável.',
+    );
   } else if (optimizeResponse.statusCode == HttpStatus.ok) {
     warnings.add(
       'Optimize 200 rejeitado pelo contrato de resolucao: '
       '${optimizeOutcome.rejectionReasons.join(', ')}.',
     );
   } else {
-    final qualityError =
-        optimizeBody['quality_error'] is Map
-            ? (optimizeBody['quality_error'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
-    final qualityCode = qualityError['code']?.toString() ?? '';
-    final outcomeCode = optimizeBody['outcome_code']?.toString() ?? '';
-    final deckState =
-        optimizeBody['deck_state'] is Map
-            ? (optimizeBody['deck_state'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
     final nextAction =
         optimizeBody['next_action'] is Map
             ? (optimizeBody['next_action'] as Map).cast<String, dynamic>()
@@ -1062,18 +1110,8 @@ Future<ResolutionRunResult> _runResolutionForDeck({
             ? (nextAction['payload'] as Map).cast<String, dynamic>()
             : const <String, dynamic>{};
 
-    if (qualifiesAsSafeNoChangeOutcome(
-      httpStatus: optimizeResponse.statusCode,
-      outcomeCode: outcomeCode,
-      qualityCode: qualityCode,
-      deckStateStatus: deckState['status']?.toString() ?? '',
-    )) {
-      flowPath = 'safe_no_change';
-      warnings.add(
-        'Nenhuma troca segura encontrada; deck original preservado em estado saudável.',
-      );
-    } else if (optimizeResponse.statusCode == 422 &&
-        qualityCode == 'OPTIMIZE_NEEDS_REPAIR' &&
+    if (optimizeResponse.statusCode == 422 &&
+        optimizeQualityCode == 'OPTIMIZE_NEEDS_REPAIR' &&
         nextAction['type']?.toString() == 'rebuild_guided') {
       final rebuildPayload = {
         'deck_id': nextPayload['deck_id']?.toString() ?? cloneDeckId,
@@ -1210,10 +1248,19 @@ Future<ResolutionRunResult> _runResolutionForDeck({
   );
 
   if (optimizeResponse.statusCode == HttpStatus.ok) {
-    expectCheck(
-      'optimize 200 retornou pares acionaveis e nao-mock',
-      optimizeOutcome.directApplyAccepted,
-    );
+    if (safeNoChangeOutcome) {
+      expectCheck(
+        'optimize 200 não acionável preservou explicitamente um deck saudável',
+        flowPath == 'safe_no_change' &&
+            optimizeOutcome.canApply == false &&
+            optimizeOutcome.learningEligible == false,
+      );
+    } else {
+      expectCheck(
+        'optimize 200 retornou pares acionaveis e nao-mock',
+        optimizeOutcome.directApplyAccepted,
+      );
+    }
     if (optimizeOutcome.directApplyAccepted) {
       expectCheck(
         'optimize direto alterou a assinatura do deck antes do PUT',
@@ -1323,17 +1370,14 @@ Future<bool> _ensureServerIsReachable(
   }
 
   try {
+    final normalizedBaseUrl = apiBaseUrl.replaceFirst(RegExp(r'/$'), '');
     final response = await http
-        .get(
-          Uri.parse(
-            '${apiBaseUrl.replaceFirst(RegExp(r'/$'), '')}/health/ready',
-          ),
-        )
+        .get(Uri.parse('$normalizedBaseUrl/health'))
         .timeout(const Duration(seconds: 5));
     if (response.statusCode != HttpStatus.ok) return false;
     final payload = jsonDecode(response.body);
     return payload is Map &&
-        payload['status'] == 'ready' &&
+        payload['status'] == 'healthy' &&
         payload['service'] == 'mtgia-server' &&
         (!requireIsolatedRuntime || payload['e2e_isolated_runtime'] == true);
   } catch (_) {
@@ -2497,6 +2541,10 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
         ..writeln(
           '- Optimize 200 aceitos pelo contrato: '
           '`${optimizeOutcomeSummary['contract_accepted_http_200'] ?? 0}`',
+        )
+        ..writeln(
+          '- Optimize 200 seguros sem aplicação: '
+          '`${optimizeOutcomeSummary['safe_non_actionable_http_200'] ?? 0}`',
         )
         ..writeln(
           '- Optimize 200 rejeitados pelo contrato: '

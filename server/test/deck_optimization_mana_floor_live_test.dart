@@ -153,8 +153,8 @@ void main() {
         scryfall_id, oracle_id, name, mana_cost, type_line, oracle_text,
         colors, color_identity, set_code, rarity, power, toughness
       ) VALUES (
-        '10000000-0000-4000-8000-000000000001'::uuid,
-        '10000000-0000-4000-8000-000000000002'::uuid,
+        'f1000000-0000-4000-8000-000000000001'::uuid,
+        'f1000000-0000-4000-8000-000000000002'::uuid,
         'Mana Floor Captain', '{2}{W}',
         'Legendary Creature — Human Advisor',
         'Vigilance', ARRAY['W']::text[], ARRAY['W']::text[],
@@ -201,7 +201,7 @@ void main() {
     final cardRows = await pool.execute('''
       SELECT id::text, name
       FROM cards
-      WHERE scryfall_id = '10000000-0000-4000-8000-000000000001'::uuid
+      WHERE scryfall_id = 'f1000000-0000-4000-8000-000000000001'::uuid
          OR scryfall_id = '00000000-0000-4000-8000-000000000003'::uuid
          OR set_code = 'MFL'
       ORDER BY name

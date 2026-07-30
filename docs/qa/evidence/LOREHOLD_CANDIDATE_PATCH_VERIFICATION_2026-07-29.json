@@ -1,0 +1,46 @@
+{
+  "schema_version": "manaloom_lorehold_candidate_patch_verification_v1",
+  "captured_at": "2026-07-29T14:10:51-03:00",
+  "status": "pass_local_reproduction",
+  "scope": "isolated_temporary_checkout",
+  "upstream": {
+    "repository": "https://github.com/magefree/mage.git",
+    "base_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "source_pull_request": "https://github.com/magefree/mage/pull/15591",
+    "source_commits": {
+      "dynamic_miracle": "03cc893d7c982c195ffc3f8e3083e9123b5c17d0",
+      "lorehold": "0e6ca9cacaf612d00f18d68d39531c0666f570c1"
+    }
+  },
+  "patch": {
+    "path": "docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch",
+    "sha256": "ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812",
+    "unified_context_lines": 0,
+    "changed_files": 14,
+    "insertions": 391,
+    "deletions": 19,
+    "unrelated_cards_included": []
+  },
+  "runtime": {
+    "java": "17",
+    "maven_command": "mvn -B -pl Mage.Tests -am -Dtest=MiracleTest -Dsurefire.failIfNoSpecifiedTests=false -Djacoco.skip=true test",
+    "reactor_modules": 34,
+    "reactor_failures": 0,
+    "focused_tests": 6,
+    "focused_test_failures": 0,
+    "focused_test_errors": 0,
+    "focused_test_skipped": 0,
+    "total_time_seconds": 108,
+    "result": "BUILD SUCCESS"
+  },
+  "governance": {
+    "canonical_pin_changed": false,
+    "postgres_mutations": [],
+    "live_runtime_mutations": [],
+    "deployable_commit_available": false,
+    "historical_local_runtime_commit": "3ac810da650a51c33142175d6191693c3a077131",
+    "historical_local_runtime_commit_fetchable": false,
+    "historical_local_runtime_commit_deployable": false,
+    "next_required_gate": "Publish the exact patch in a governed fork and qualify the resulting fetchable commit through the canonical pin-transition contract."
+  }
+}

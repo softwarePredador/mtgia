@@ -85,7 +85,7 @@ void main() {
       );
       final identityPrecheck = source.indexOf('IDENTITY_BEFORE=');
       final serverStart = source.indexOf(r'SERVER_PID="$!"');
-      final mutationArmed = source.indexOf('MUTATION_ARMED=1');
+      final mutationArmed = source.indexOf('MUTATION_ARMED=1', serverStart);
       final runner = source.indexOf(
         'dart run bin/run_three_commander_resolution_validation.dart',
         mutationArmed,
@@ -246,6 +246,14 @@ void main() {
       expect(isolatedSource, contains('dart run build/bin/server.dart'));
       expect(
         isolatedSource,
+        contains(r'"$api_url/health/live" "alive" ""'),
+        reason:
+            'The isolated product runner does not start the production Battle '
+            'job worker, so process startup must use liveness; the product '
+            'test itself verifies PostgreSQL and the selected native engine.',
+      );
+      expect(
+        isolatedSource,
         contains('final address = InternetAddress.loopbackIPv4;'),
       );
       expect(isolatedSource, isNot(contains('dart_frog dev')));
@@ -335,6 +343,23 @@ void main() {
         battleFunction,
         isNot(contains('MANALOOM_RUN_MUTATING_RESOLUTION_E2E')),
       );
+    });
+
+    test('E2E suite never leaks reusable API URLs into isolated runners', () {
+      final source = scriptSource('scripts/manaloom_e2e_suite.sh');
+      const scrubbedEnvironment = 'env -u TEST_API_BASE_URL -u API_BASE_URL';
+
+      for (final isolatedRunner in const [
+        r'\"$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh\"',
+        r'\"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh\" --isolated-e2e',
+        r'\"$ROOT_DIR/scripts/quality_gate.sh\" resolution',
+      ]) {
+        expect(
+          source,
+          contains('$scrubbedEnvironment $isolatedRunner'),
+          reason: isolatedRunner,
+        );
+      }
     });
 
     test('E2E suite pins ramp, foundation and rules safety contracts', () {

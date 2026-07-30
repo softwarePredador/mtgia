@@ -25,6 +25,8 @@ EMPTY_USER_ID=""
 SEED_PEER_USER_ID=""
 SEED_PEER_USERNAME=""
 SEED_CARD_ID=""
+SEED_BASIC_LAND_CARD_ID=""
+SEED_COMMANDER_CARD_ID=""
 SEED_DECK_ID=""
 readonly SEED_PASSWORD='VisualQA!2026-Deck'
 
@@ -218,13 +220,18 @@ card_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $seed_token" \
   "$API_BASE_URL/cards?name=Sol%20Ring&limit=1")"
 SEED_CARD_ID="$(jq -er '.data[0].id' <<<"$card_response")"
-cards_response="$(curl -fsS --max-time 20 \
+basic_land_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $seed_token" \
-  "$API_BASE_URL/cards?limit=50")"
+  "$API_BASE_URL/cards?name=Wastes&limit=10")"
+SEED_BASIC_LAND_CARD_ID="$(jq -er \
+  'first(.data[] | select(.name == "Wastes") | .id)' \
+  <<<"$basic_land_response")"
+commander_response="$(curl -fsS --max-time 20 \
+  -H "Authorization: Bearer $seed_token" \
+  "$API_BASE_URL/cards?name=Talrand%2C%20Sky%20Summoner&limit=10")"
 SEED_COMMANDER_CARD_ID="$(jq -er \
-  --arg card_id "$SEED_CARD_ID" \
-  'first(.data[] | select(.id != $card_id) | .id)' \
-  <<<"$cards_response")"
+  'first(.data[] | select(.name == "Talrand, Sky Summoner") | .id)' \
+  <<<"$commander_response")"
 
 deck_response="$(curl -fsS --max-time 20 \
   -H 'Content-Type: application/json' \
@@ -265,6 +272,7 @@ PY
 fixture_image_url="http://127.0.0.1:$WEB_PORT/app/assets/assets/branding/visual_fixture_arcane_ring.webp"
 psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -d "$DATABASE" \
   -v card_id="$SEED_CARD_ID" \
+  -v basic_land_card_id="$SEED_BASIC_LAND_CARD_ID" \
   -v commander_card_id="$SEED_COMMANDER_CARD_ID" \
   -v deck_id="$SEED_DECK_ID" \
   -v peer_deck_id="$SEED_PEER_DECK_ID" \
@@ -291,28 +299,42 @@ SET image_url = :'image_url';
 
 UPDATE cards
 SET set_code = 'TST'
-WHERE id IN (:'card_id'::uuid, :'commander_card_id'::uuid);
+WHERE id IN (
+  :'card_id'::uuid,
+  :'basic_land_card_id'::uuid,
+  :'commander_card_id'::uuid
+);
 
-UPDATE deck_cards
-SET quantity = 99,
-    is_commander = FALSE
-WHERE deck_id IN (:'deck_id'::uuid, :'peer_deck_id'::uuid)
-  AND card_id = :'card_id'::uuid;
+DELETE FROM deck_cards
+WHERE deck_id IN (:'deck_id'::uuid, :'peer_deck_id'::uuid);
 
 INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander)
 VALUES
+  (:'deck_id'::uuid, :'basic_land_card_id'::uuid, 99, FALSE),
   (:'deck_id'::uuid, :'commander_card_id'::uuid, 1, TRUE),
+  (:'peer_deck_id'::uuid, :'basic_land_card_id'::uuid, 99, FALSE),
   (:'peer_deck_id'::uuid, :'commander_card_id'::uuid, 1, TRUE)
 ON CONFLICT (deck_id, card_id) DO UPDATE SET
   quantity = EXCLUDED.quantity,
   is_commander = EXCLUDED.is_commander;
-
-UPDATE decks
-SET validation_state = 'validated',
-    validation_reasons = '[]'::jsonb,
-    validation_updated_at = NOW()
-WHERE id IN (:'deck_id'::uuid, :'peer_deck_id'::uuid);
 SQL
+
+deck_validation_response="$(curl -fsS --max-time 20 \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $seed_token" \
+  -d '{}' \
+  "$API_BASE_URL/decks/$SEED_DECK_ID/validate")"
+peer_deck_validation_response="$(curl -fsS --max-time 20 \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $peer_token" \
+  -d '{}' \
+  "$API_BASE_URL/decks/$SEED_PEER_DECK_ID/validate")"
+jq -e '.ok == true or .is_valid == true or .valid == true' \
+  <<<"$deck_validation_response" >/dev/null
+jq -e '.ok == true or .is_valid == true or .valid == true' \
+  <<<"$peer_deck_validation_response" >/dev/null
 
 (
   cd "$APP_DIR"
@@ -373,6 +395,8 @@ jq -n \
   --arg seed_peer_user_id "$SEED_PEER_USER_ID" \
   --arg seed_peer_username "$SEED_PEER_USERNAME" \
   --arg seed_card_id "$SEED_CARD_ID" \
+  --arg seed_basic_land_card_id "$SEED_BASIC_LAND_CARD_ID" \
+  --arg seed_commander_card_id "$SEED_COMMANDER_CARD_ID" \
   --arg seed_deck_id "$SEED_DECK_ID" \
   --arg seed_peer_deck_id "$SEED_PEER_DECK_ID" \
   --arg bundle_sha256 "$bundle_sha256" \
@@ -392,6 +416,8 @@ jq -n \
     seed_peer_user_id: $seed_peer_user_id,
     seed_peer_username: $seed_peer_username,
     seed_card_id: $seed_card_id,
+    seed_basic_land_card_id: $seed_basic_land_card_id,
+    seed_commander_card_id: $seed_commander_card_id,
     seed_deck_id: $seed_deck_id,
     seed_peer_deck_id: $seed_peer_deck_id,
     bundle_sha256: $bundle_sha256,

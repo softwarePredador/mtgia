@@ -383,6 +383,68 @@ void main() {
         expect(provider.decks.single.bracket, 3);
       },
     );
+
+    test(
+      'successful retry clears the previous error before silent refresh',
+      () async {
+        var attempts = 0;
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/decks': (_) {
+              attempts += 1;
+              if (attempts == 1) {
+                return ApiResponse(503, {
+                  'error': 'temporary deck persistence failure',
+                });
+              }
+              return ApiResponse(201, {
+                'id': 'deck-retry',
+                'name': 'Retry Deck',
+                'format': 'commander',
+                'description': null,
+                'is_public': false,
+                'created_at': '2026-07-29T12:00:00.000Z',
+                'card_count': 0,
+                'color_identity': const <String>[],
+              });
+            },
+          },
+          getHandlers: {
+            '/decks': () =>
+                throw TimeoutException('silent refresh remains unavailable'),
+          },
+        );
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          trackActivationEvent:
+              (
+                String eventName, {
+                String? format,
+                String? deckId,
+                String source = 'app',
+                Map<String, dynamic>? metadata,
+              }) async {},
+        );
+
+        expect(
+          await provider.createDeck(name: 'Retry Deck', format: 'commander'),
+          isFalse,
+        );
+        expect(provider.errorMessage, isNotNull);
+
+        expect(
+          await provider.createDeck(name: 'Retry Deck', format: 'commander'),
+          isTrue,
+        );
+        expect(
+          provider.errorMessage,
+          isNull,
+          reason:
+              'A falha do refresh silencioso não pode ressuscitar o erro da tentativa anterior.',
+        );
+        expect(provider.decks.single.id, 'deck-retry');
+      },
+    );
   });
 
   group('DeckProvider AI deck flows', () {

@@ -90,7 +90,8 @@ teste nominal e disposição:
 | `focused_upstream_test_passed` | 1 | `SP//dr, Piloted by Peni`; cenário nominal aprovado sem finding conhecido |
 | `focused_upstream_test_passed_card_data_warning_review_required` | 1 | os 2 testes de `Sting, Bilbo's Sword` passam, mas o texto de regras ainda possui reminder divergente |
 | `catalog_supported_semantic_review_required` | 84 | carta nova resolve no runtime, mas não tem prova nominal individual |
-| `catalog_supported_nominal_test_passed_semantic_review_required` | 3 | `Krark`, `Metallic Mimic` e `Mjolnir` têm testes nominais, mas eles não fecham todo o hunk da transição |
+| `presentation_hunk_nominal_tests_passed` | 1 | `Metallic Mimic`; o diff exato contém somente comentário e uma troca literal de `staticText`, e os 6 cenários nominais passam |
+| `catalog_supported_nominal_test_passed_semantic_review_required` | 2 | `Krark` e `Mjolnir` têm testes nominais, mas eles não fecham os ramos alterados ou explicitamente pendentes |
 | `catalog_supported_regression_only_review_required` | 78 | implementação modificada resolve, mas só possui evidência de regressão compartilhada |
 | `external_runtime_quarantine_semantic_defect` | 1 | `Planetarium of Wan Shi Tong` resolve no catálogo, porém está bloqueada por defeito mecânico confirmado |
 | `external_residual_upstream_unfinished` | 1 | `Prudent Fateseer` é removida do catálogo XMage como `unfinished` e não existe no Forge pinado |
@@ -118,11 +119,25 @@ A política também declara explicitamente `Prudent Fateseer` como
 `xmage_upstream_mechanic_unfinished`. Ela é amarrada ao SHA do engine e o
 sidecar falha fechado se um próximo avanço de pin não revisar essa lista.
 
-Nas 82 classes modificadas, a revisão dos hunks classificou 26 mudanças
-executáveis ou mistas, 54 de apresentação/metadados e 2 somente de comentário.
+Nas 82 classes modificadas, a revisão dos hunks classificou 27 mudanças
+executáveis ou mistas, 53 de apresentação/metadados e 2 somente de comentário.
 Os dois comentários (`Krark` e `Mandate of Peace`) apontam para o issue upstream
 de cópias/LKI e permanecem dívida de qualificação; não foram tratados como
 correção de comportamento.
+
+O classificador exato e sem rede em
+`docs/qa/evidence/XMAGE_TRANSITION_NOMINAL_REVIEW_34d81EA_2c43ec8.json`
+reduziu as revisões pendentes de 168 para 167. A única baixa foi
+`Metallic Mimic`: removidos os comentários e normalizada a única troca literal
+permitida, os tokens Java dos dois pins são equivalentes. Essa conclusão exige
+o hash exato do diff e os 6 cenários upstream; resolução no catálogo não entra
+como prova semântica.
+
+`Mjolnir, Hammer of Thor` foi corrigida na taxonomia para mudança executável:
+o hunk altera o `ChannelAbility` para `TimingRule.INSTANT`, enquanto o teste
+nominal existente cobre equipar e dobrar dano. Ela continua pendente até haver
+um cenário específico de timing de Channel. `Krark` também continua pendente
+porque seu teste nominal não cobre a dívida de cópia/LKI marcada no fonte.
 
 O comparador detalhado encontrou ainda findings acionáveis de texto/regras em
 `Ajani Resolute`, `Consider the Prime Directive`, `Sky Cycle`, `Sting`,
@@ -185,7 +200,7 @@ pastas protegidas ou depois de uma concessão explícita e comprovada de acesso:
 
 ## Limite operacional
 
-Fonte, build, runtime loopback e inventário nominal foram auditados, mas 168
+Fonte, build, runtime loopback e inventário nominal foram auditados, mas 167
 cartas ainda têm revisão semântica, finding de dados ou residual pendente; a
 reconciliação de escopo PostgreSQL não foi executada; e o gate de ativação de
 cartas futuras ainda não existe. Por isso o pin não está qualificado para

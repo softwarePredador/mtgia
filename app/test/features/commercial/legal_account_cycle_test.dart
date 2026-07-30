@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' show SemanticsAction, Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,8 +44,66 @@ void main() {
 
     expect(find.text('Termos de uso'), findsOneWidget);
     expect(find.text('Privacidade'), findsOneWidget);
-    expect(find.textContaining(currentTermsVersion), findsOneWidget);
+    expect(find.textContaining(currentTermsVersion), findsNWidgets(2));
+    expect(find.byKey(const Key('legal-review-status')), findsOneWidget);
+    expect(
+      find.textContaining('revisão jurídica externa permanece pendente'),
+      findsOneWidget,
+    );
   });
+
+  testWidgets(
+    'legal navigation stacks at 200 percent text and exposes selected state',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1;
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CommercialLegalScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final terms = find.byKey(const Key('legal-show-terms-button'));
+      final privacy = find.byKey(const Key('legal-show-privacy-button'));
+      expect(
+        tester.getRect(privacy).top,
+        greaterThan(tester.getRect(terms).bottom),
+      );
+
+      final termsSemantics = tester.getSemantics(terms);
+      expect(termsSemantics.label, 'Abrir Termos de uso');
+      expect(termsSemantics.flagsCollection.isSelected, Tristate.isTrue);
+      expect(
+        termsSemantics.getSemanticsData().hasAction(SemanticsAction.tap),
+        isTrue,
+        reason:
+            'O rótulo customizado não pode remover a ativação por leitor de tela.',
+      );
+      expect(
+        tester.getSemantics(privacy).flagsCollection.isSelected,
+        Tristate.isFalse,
+      );
+
+      await tester.ensureVisible(privacy);
+      await tester.pumpAndSettle();
+      await tester.tap(privacy);
+      await tester.pumpAndSettle();
+      expect(
+        tester.getSemantics(privacy).flagsCollection.isSelected,
+        Tristate.isTrue,
+      );
+      expect(tester.takeException(), isNull);
+      semantics.dispose();
+    },
+  );
 
   testWidgets('unchecked consent blocks registration before API mutation', (
     tester,

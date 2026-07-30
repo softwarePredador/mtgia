@@ -59,7 +59,7 @@ Arquivos centrais:
 
 ## S8-02 — Orçamento de desempenho do core
 
-Resultado: `IN_PROGRESS`
+Resultado: `PASS_LOCAL / IN_PROGRESS_EXTERNAL`
 
 `PerformanceService` e o harness de Web/device estão implementados, mas a
 matriz completa de cold/warm start, Home, listas, busca, detalhe, deck,
@@ -190,10 +190,15 @@ Resultado: `IN_PROGRESS`
   `ai-bridge` passou `114/114` e o gate local `full` passou no commit técnico
   `b84302e1e7b1d19da23bb2d1cc6e4605f9703d6b`.
 
-A task permanece `IN_PROGRESS`: o residual local de abort físico e propagação
-foi fechado, mas ainda falta executar, na SHA final e contra um endpoint
-controlado, a matriz E2E integral de indisponibilidade/cancelamento
-(`429`, `5xx`, queda de conexão, timeout e cancelamento durante o request).
+Em 2026-07-29, a matriz controlada loopback passou para `429`, `5xx`, queda de
+conexão, timeout com abort físico e cancelamento com abort físico. O contrato
+público sanitizado também foi exercitado e entrou no gate `performance`; a
+evidência e as medições estão em
+`docs/qa/MANALOOM_S8_BL10_RESILIENCE_FOLLOWUP_2026-07-29.md`.
+
+O residual local foi fechado, mas a task continua `IN_PROGRESS_EXTERNAL` até a
+repetição contra o serviço externo de homologação, com observabilidade,
+alertas e artefato da mesma SHA.
 
 ## S8-05 — Observabilidade acionável
 

@@ -47,6 +47,37 @@ class NativeBattleWorkerTest(unittest.TestCase):
         self.assertEqual(deck_b["subject_deck_key"], "deck_b")
         self.assertNotIn("subject_deck_key", unknown)
 
+    def test_mirror_match_attributes_only_cards_unique_to_one_deck(self) -> None:
+        module = _load_module()
+        unique_a = module._native_replay_event(
+            "spell_resolved",
+            {"player": "Lorehold", "card": "A Good Day to Pie"},
+            deck_a_player="Lorehold",
+            deck_b_player="Lorehold",
+            deck_a_card_names={"a good day to pie", "sol ring"},
+            deck_b_card_names={"aetherflux reservoir", "sol ring"},
+        )
+        unique_b = module._native_replay_event(
+            "spell_resolved",
+            {"player": "Lorehold", "card": "Aetherflux Reservoir"},
+            deck_a_player="Lorehold",
+            deck_b_player="Lorehold",
+            deck_a_card_names={"a good day to pie", "sol ring"},
+            deck_b_card_names={"aetherflux reservoir", "sol ring"},
+        )
+        shared = module._native_replay_event(
+            "spell_resolved",
+            {"player": "Lorehold", "card": "Sol Ring"},
+            deck_a_player="Lorehold",
+            deck_b_player="Lorehold",
+            deck_a_card_names={"a good day to pie", "sol ring"},
+            deck_b_card_names={"aetherflux reservoir", "sol ring"},
+        )
+
+        self.assertEqual(unique_a["subject_deck_key"], "deck_a")
+        self.assertEqual(unique_b["subject_deck_key"], "deck_b")
+        self.assertNotIn("subject_deck_key", shared)
+
     def test_runtime_max_turns_reads_worker_environment(self) -> None:
         module = _load_module()
         with mock.patch.dict(os.environ, {"MANALOOM_BATTLE_MAX_TURNS": "9"}):

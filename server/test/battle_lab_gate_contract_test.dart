@@ -33,6 +33,10 @@ void main() {
     );
     expect(
       source,
+      contains('test/ai_generate_provider_failure_matrix_e2e_test.dart'),
+    );
+    expect(
+      source,
       contains('test/features/battle/battle_local_homologation_test.dart'),
     );
     expect(source, contains('run_battle_product_gate'));

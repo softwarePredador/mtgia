@@ -126,6 +126,8 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                         selected: _selectedSection,
                         onSelected: _scrollTo,
                       ),
+                      const SizedBox(height: AppTheme.space20),
+                      const _LegalReviewStatus(),
                       const SizedBox(height: AppTheme.space28),
                       _LegalDocumentSection(
                         key: _termsKey,
@@ -210,26 +212,45 @@ class _LegalHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppTheme.space14),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(
-              Icons.verified_outlined,
-              size: 18,
-              color: AppTheme.brass400,
-            ),
-            const SizedBox(width: AppTheme.space8),
-            Expanded(
-              child: Text(
-                'Versões vigentes: Termos $currentTermsVersion • '
-                'Privacidade $currentPrivacyVersion',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                  height: AppTheme.lineHeightCompact,
+        Semantics(
+          label:
+              'Versões vigentes. Termos $currentTermsVersion. '
+              'Privacidade $currentPrivacyVersion.',
+          child: ExcludeSemantics(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.verified_outlined,
+                  size: 18,
+                  color: AppTheme.brass400,
                 ),
-              ),
+                const SizedBox(width: AppTheme.space8),
+                Expanded(
+                  child: Wrap(
+                    spacing: AppTheme.space14,
+                    runSpacing: AppTheme.space6,
+                    children: [
+                      Text(
+                        'Termos · $currentTermsVersion',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                          height: AppTheme.lineHeightCompact,
+                        ),
+                      ),
+                      Text(
+                        'Privacidade · $currentPrivacyVersion',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                          height: AppTheme.lineHeightCompact,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ],
     );
@@ -247,28 +268,44 @@ class _LegalSectionNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _LegalNavigationButton(
-            key: const Key('legal-show-terms-button'),
-            label: 'Termos',
-            icon: Icons.description_outlined,
-            selected: selected == _LegalSectionTarget.terms,
-            onPressed: () => onSelected(_LegalSectionTarget.terms),
-          ),
-        ),
-        const SizedBox(width: AppTheme.space8),
-        Expanded(
-          child: _LegalNavigationButton(
-            key: const Key('legal-show-privacy-button'),
-            label: 'Privacidade',
-            icon: Icons.privacy_tip_outlined,
-            selected: selected == _LegalSectionTarget.privacy,
-            onPressed: () => onSelected(_LegalSectionTarget.privacy),
-          ),
-        ),
-      ],
+    final terms = _LegalNavigationButton(
+      key: const Key('legal-show-terms-button'),
+      label: 'Termos',
+      semanticLabel: 'Abrir Termos de uso',
+      icon: Icons.description_outlined,
+      selected: selected == _LegalSectionTarget.terms,
+      onPressed: () => onSelected(_LegalSectionTarget.terms),
+    );
+    final privacy = _LegalNavigationButton(
+      key: const Key('legal-show-privacy-button'),
+      label: 'Privacidade',
+      semanticLabel: 'Abrir Política de privacidade',
+      icon: Icons.privacy_tip_outlined,
+      selected: selected == _LegalSectionTarget.privacy,
+      onPressed: () => onSelected(_LegalSectionTarget.privacy),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textScale = MediaQuery.textScalerOf(context).scale(1);
+        if (constraints.maxWidth < 360 || textScale >= 1.5) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              terms,
+              const SizedBox(height: AppTheme.space8),
+              privacy,
+            ],
+          );
+        }
+        return Row(
+          children: [
+            Expanded(child: terms),
+            const SizedBox(width: AppTheme.space8),
+            Expanded(child: privacy),
+          ],
+        );
+      },
     );
   }
 }
@@ -277,35 +314,106 @@ class _LegalNavigationButton extends StatelessWidget {
   const _LegalNavigationButton({
     super.key,
     required this.label,
+    required this.semanticLabel,
     required this.icon,
     required this.selected,
     required this.onPressed,
   });
 
   final String label;
+  final String semanticLabel;
   final IconData icon;
   final bool selected;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(0, AppTheme.touchTargetMin),
-        foregroundColor: selected
-            ? AppTheme.backgroundAbyss
-            : AppTheme.brass400,
-        backgroundColor: selected ? AppTheme.brass400 : AppTheme.transparent,
-        side: BorderSide(
-          color: selected
-              ? AppTheme.brass400
-              : AppTheme.brass400.withValues(alpha: 0.64),
-          width: 1,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      onTap: onPressed,
+      excludeSemantics: true,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, AppTheme.touchTargetMin),
+          foregroundColor: selected
+              ? AppTheme.backgroundAbyss
+              : AppTheme.brass400,
+          backgroundColor: selected ? AppTheme.brass400 : AppTheme.transparent,
+          side: BorderSide(
+            color: selected
+                ? AppTheme.brass400
+                : AppTheme.brass400.withValues(alpha: 0.64),
+            width: 1,
+          ),
+        ),
+        icon: Icon(icon, size: 18),
+        label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      ),
+    );
+  }
+}
+
+class _LegalReviewStatus extends StatelessWidget {
+  const _LegalReviewStatus();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const status =
+        'Conteúdo informativo da beta. A revisão jurídica externa permanece '
+        'pendente antes do lançamento comercial.';
+    return Semantics(
+      container: true,
+      label: 'Status jurídico. $status',
+      child: ExcludeSemantics(
+        child: Container(
+          key: const Key('legal-review-status'),
+          padding: const EdgeInsets.all(AppTheme.space14),
+          decoration: BoxDecoration(
+            color: AppTheme.frost600.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.frost400.withValues(alpha: 0.34),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.gavel_outlined,
+                color: AppTheme.frost400,
+                size: 20,
+              ),
+              const SizedBox(width: AppTheme.space10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Status do documento',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.space4),
+                    Text(
+                      status,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: AppTheme.lineHeightComfortable,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      icon: Icon(icon, size: 18),
-      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
     );
   }
 }

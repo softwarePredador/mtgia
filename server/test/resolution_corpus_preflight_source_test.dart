@@ -119,8 +119,10 @@ void main() {
       expect(source, contains('SERVER_BUILD_LOG='));
       expect(source, isNot(contains('dart_frog dev')));
       expect(source, isNot(contains('--dart-vm-service-port')));
-      expect(source, contains('payload.get("status") != "ready"'));
+      expect(source, contains('/health"'));
+      expect(source, contains('payload.get("status") != "healthy"'));
       expect(source, contains('payload.get("service") != "mtgia-server"'));
+      expect(source, contains('payload.get("e2e_isolated_runtime")'));
       expect(source, contains('VALIDATION_SUMMARY_JSON_ABS='));
       expect(source, contains(r'if [[ "$path" == /* ]]'));
       expect(source, contains(r'python3 - "$VALIDATION_SUMMARY_JSON_ABS"'));
@@ -134,7 +136,6 @@ void main() {
       expect(source, contains('VALIDATION_DEFER_CLEANUP_TO_HARNESS=1'));
       expect(source, contains('RATE_LIMIT_DISTRIBUTED=false'));
       expect(source, contains('MANALOOM_E2E_ISOLATED_RUNTIME=1'));
-      expect(source, contains('payload.get("e2e_isolated_runtime")'));
       expect(source, contains("POSITION(:'validation_run_token' IN name)"));
       expect(source, contains('mock_responses != 0'));
       expect(source, contains('mock_non_actionable != 0'));
@@ -183,9 +184,10 @@ void main() {
         expect(mainSource, isNot(contains('if (authSession != null)')));
         expect(source, contains('LOWER(email) = LOWER(@email)'));
         expect(source, contains('LOWER(username) = LOWER(@username)'));
-        expect(source, contains("payload['status'] == 'ready'"));
+        expect(source, contains("payload['status'] == 'healthy'"));
         expect(source, contains("payload['service'] == 'mtgia-server'"));
         expect(source, contains("payload['e2e_isolated_runtime'] == true"));
+        expect(source, contains(r"'$normalizedBaseUrl/health'"));
         expect(
           source,
           contains("e2eValidation['product_learning_writes_suppressed']"),
@@ -299,6 +301,38 @@ void main() {
         );
       }
     });
+
+    test(
+      'interrupted cleanup can be recovered by exact run identity with retries',
+      () {
+        final source =
+            File(
+              '../scripts/quality_gate_resolution_corpus.sh',
+            ).readAsStringSync();
+        final recoveryStart = source.indexOf('run_cleanup_recovery()');
+        final normalGateStart = source.indexOf(
+          'print_header "Quality Gate - Resolution Corpus"',
+        );
+
+        expect(recoveryStart, greaterThanOrEqualTo(0));
+        expect(recoveryStart, lessThan(normalGateStart));
+        expect(source, contains('MANALOOM_RESOLUTION_CLEANUP_ONLY'));
+        expect(source, contains('MANALOOM_RESOLUTION_RUN_TOKEN'));
+        expect(source, contains('MANALOOM_RESOLUTION_CLEANUP_RUN_STARTED_AT'));
+        expect(
+          source.substring(recoveryStart, normalGateStart),
+          allOf(
+            contains('require_live_mutation_approval'),
+            contains('require_postgres_write_approval'),
+            contains('cleanup_validation_identity'),
+            contains(r'if [[ "$identity_after" != "0"'),
+            contains(r'"${VALIDATION_RUN_DIR}/cleanup_recovery.json"'),
+          ),
+        );
+        expect(source, contains('for attempt in 1 2 3'));
+        expect(source, contains('cleanup_validation_identity_once'));
+      },
+    );
 
     test('fixture keeps 19 valid UUID-shaped stable corpus entries', () {
       final decoded =
@@ -676,72 +710,81 @@ void main() {
       );
     });
 
-    test('runner wires rejected HTTP 200 to unresolved summary evidence', () {
-      final source =
-          File(
-            'bin/run_three_commander_resolution_validation.dart',
-          ).readAsStringSync();
-      final runSource = source.substring(
-        source.indexOf('Future<ResolutionRunResult> _runResolutionForDeck'),
-        source.indexOf('Future<bool> _ensureServerIsReachable'),
-      );
+    test(
+      'runner distinguishes safe blocked HTTP 200 from unresolved evidence',
+      () {
+        final source =
+            File(
+              'bin/run_three_commander_resolution_validation.dart',
+            ).readAsStringSync();
+        final runSource = source.substring(
+          source.indexOf('Future<ResolutionRunResult> _runResolutionForDeck'),
+          source.indexOf('Future<bool> _ensureServerIsReachable'),
+        );
 
-      expect(runSource, contains("String flowPath = 'unresolved_rejection';"));
-      expect(runSource, contains('optimizeOutcome.directApplyAccepted'));
-      final proposalChanged = runSource.indexOf(
-        'optimizeProposalChangedDeck = beforeSignature != proposedSignature;',
-      );
-      final putRequest = runSource.indexOf(
-        'final putResponse = await http.put(',
-      );
-      final persistedReload = runSource.indexOf(
-        'final persistedCards = await _loadDeckCards(pool, cloneDeckId);',
-      );
-      final persistedConfirmation = runSource.indexOf(
-        'persistedSignature == proposedSignature',
-      );
-      final optimizedDirectly = runSource.indexOf(
-        "flowPath = 'optimized_directly';",
-      );
-      expect(proposalChanged, greaterThanOrEqualTo(0));
-      expect(putRequest, greaterThan(proposalChanged));
-      expect(persistedReload, greaterThan(putRequest));
-      expect(persistedConfirmation, greaterThan(persistedReload));
-      expect(optimizedDirectly, greaterThan(persistedConfirmation));
-      expect(
-        runSource.substring(persistedReload, optimizedDirectly),
-        contains('persistedSignature != beforeSignature'),
-      );
-      expect(
-        runSource,
-        contains("'optimize_outcome': optimizeOutcome.toJson()"),
-      );
-      expect(
-        runSource,
-        contains(
-          "'persisted_signature_confirmed': optimizePersistedDeckConfirmed",
-        ),
-      );
-      expect(
-        runSource,
-        contains("'ai_logs deck_id + endpoint provider:optimize + run window'"),
-      );
-      expect(source, contains("AND endpoint = 'provider:optimize'"));
-      expect(
-        runSource,
-        contains(
-          "candidate.expectedFlowContract == 'runtime_terminal_non_mock'",
-        ),
-      );
-      expect(source, contains("'contract_rejected_http_200':"));
-      expect(source, contains("'mock_non_actionable_outcomes':"));
-      expect(source, contains("'candidate_swap_pairs':"));
-      expect(source, contains("'rejected_candidate_swap_pairs':"));
-      expect(source, contains("'provider_evidence_summary':"));
-      expect(source, contains("'runtime_provenance_summary':"));
-      expect(runSource, contains('qualifiesAsSafeNoChangeOutcome('));
-      expect(runSource, contains("runtimeOrigin != 'unknown'"));
-    });
+        expect(
+          runSource,
+          contains("String flowPath = 'unresolved_rejection';"),
+        );
+        expect(runSource, contains('optimizeOutcome.directApplyAccepted'));
+        final proposalChanged = runSource.indexOf(
+          'optimizeProposalChangedDeck = beforeSignature != proposedSignature;',
+        );
+        final putRequest = runSource.indexOf(
+          'final putResponse = await http.put(',
+        );
+        final persistedReload = runSource.indexOf(
+          'final persistedCards = await _loadDeckCards(pool, cloneDeckId);',
+        );
+        final persistedConfirmation = runSource.indexOf(
+          'persistedSignature == proposedSignature',
+        );
+        final optimizedDirectly = runSource.indexOf(
+          "flowPath = 'optimized_directly';",
+        );
+        expect(proposalChanged, greaterThanOrEqualTo(0));
+        expect(putRequest, greaterThan(proposalChanged));
+        expect(persistedReload, greaterThan(putRequest));
+        expect(persistedConfirmation, greaterThan(persistedReload));
+        expect(optimizedDirectly, greaterThan(persistedConfirmation));
+        expect(
+          runSource.substring(persistedReload, optimizedDirectly),
+          contains('persistedSignature != beforeSignature'),
+        );
+        expect(
+          runSource,
+          contains("'optimize_outcome': optimizeOutcome.toJson()"),
+        );
+        expect(
+          runSource,
+          contains(
+            "'persisted_signature_confirmed': optimizePersistedDeckConfirmed",
+          ),
+        );
+        expect(
+          runSource,
+          contains(
+            "'ai_logs deck_id + endpoint provider:optimize + run window'",
+          ),
+        );
+        expect(source, contains("AND endpoint = 'provider:optimize'"));
+        expect(
+          runSource,
+          contains(
+            "candidate.expectedFlowContract == 'runtime_terminal_non_mock'",
+          ),
+        );
+        expect(source, contains("'contract_rejected_http_200':"));
+        expect(source, contains("'safe_non_actionable_http_200':"));
+        expect(source, contains("'mock_non_actionable_outcomes':"));
+        expect(source, contains("'candidate_swap_pairs':"));
+        expect(source, contains("'rejected_candidate_swap_pairs':"));
+        expect(source, contains("'provider_evidence_summary':"));
+        expect(source, contains("'runtime_provenance_summary':"));
+        expect(runSource, contains('qualifiesAsSafeNoChangeOutcome('));
+        expect(runSource, contains("runtimeOrigin != 'unknown'"));
+      },
+    );
 
     test('runtime origin is explicit and does not invent provider evidence', () {
       final providerCall = resolution_runner.ProviderCallEvidence(
@@ -808,6 +851,23 @@ void main() {
             outcomeCode: 'no_safe_upgrade_found',
             qualityCode: 'OPTIMIZE_QUALITY_REJECTED',
             deckStateStatus: 'healthy',
+            isMock: null,
+            canApply: false,
+            learningEligible: false,
+            responseFlagsWellTyped: true,
+          ),
+          isTrue,
+        );
+        expect(
+          resolution_runner.qualifiesAsSafeNoChangeOutcome(
+            httpStatus: HttpStatus.ok,
+            outcomeCode: 'commander_same_lane_evidence_required',
+            qualityCode: '',
+            deckStateStatus: 'healthy',
+            isMock: null,
+            canApply: false,
+            learningEligible: false,
+            responseFlagsWellTyped: true,
           ),
           isTrue,
         );
@@ -817,6 +877,10 @@ void main() {
             outcomeCode: 'no_safe_upgrade_found',
             qualityCode: 'OPTIMIZE_EXECUTION_FAILED',
             deckStateStatus: 'healthy',
+            isMock: null,
+            canApply: false,
+            learningEligible: false,
+            responseFlagsWellTyped: true,
           ),
           isFalse,
         );
@@ -826,6 +890,23 @@ void main() {
             outcomeCode: 'no_safe_upgrade_found',
             qualityCode: 'OPTIMIZE_QUALITY_REJECTED',
             deckStateStatus: 'healthy',
+            isMock: null,
+            canApply: false,
+            learningEligible: false,
+            responseFlagsWellTyped: true,
+          ),
+          isFalse,
+        );
+        expect(
+          resolution_runner.qualifiesAsSafeNoChangeOutcome(
+            httpStatus: HttpStatus.ok,
+            outcomeCode: 'commander_same_lane_evidence_required',
+            qualityCode: '',
+            deckStateStatus: 'healthy',
+            isMock: null,
+            canApply: true,
+            learningEligible: false,
+            responseFlagsWellTyped: true,
           ),
           isFalse,
         );

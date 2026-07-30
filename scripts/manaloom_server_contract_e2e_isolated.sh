@@ -179,7 +179,7 @@ psql -X -v ON_ERROR_STOP=1 \
     INSERT INTO card_legalities (card_id, format, status)
     SELECT id, format, 'legal'
     FROM cards
-    CROSS JOIN (VALUES ('standard'), ('modern')) AS formats(format)
+    CROSS JOIN (VALUES ('standard'), ('modern'), ('commander')) AS formats(format)
     WHERE name = 'Plains'
     ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status;
     INSERT INTO cards (
@@ -196,10 +196,83 @@ psql -X -v ON_ERROR_STOP=1 \
     INSERT INTO card_legalities (card_id, format, status)
     SELECT id, format, 'legal'
     FROM cards
-    CROSS JOIN (VALUES ('standard'), ('modern')) AS formats(format)
+    CROSS JOIN (VALUES ('standard'), ('modern'), ('commander')) AS formats(format)
     WHERE name = 'Island'
     ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status;
+    INSERT INTO cards (
+      scryfall_id, oracle_id, name, mana_cost, type_line, oracle_text,
+      colors, color_identity, power, toughness, set_code, rarity,
+      price_usd, collector_number, foil, layout, cmc
+    ) VALUES
+    (
+      '10000000-0000-4000-8000-000000000001'::uuid,
+      '10000000-0000-4000-8000-000000000010'::uuid,
+      'Talrand, Sky Summoner', '{2}{U}{U}',
+      'Legendary Creature — Merfolk Wizard',
+      'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+      ARRAY['U']::text[], ARRAY['U']::text[], '2', '2',
+      'M13', 'rare', 0.50, '72', FALSE, 'normal', 4
+    ),
+    (
+      '10000000-0000-4000-8000-000000000002'::uuid,
+      '10000000-0000-4000-8000-000000000010'::uuid,
+      'Talrand, Sky Summoner', '{2}{U}{U}',
+      'Legendary Creature — Merfolk Wizard',
+      'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+      ARRAY['U']::text[], ARRAY['U']::text[], '2', '2',
+      'CMM', 'rare', 0.75, '125', TRUE, 'normal', 4
+    ),
+    (
+      '10000000-0000-4000-8000-000000000003'::uuid,
+      '10000000-0000-4000-8000-000000000011'::uuid,
+      'Lightning Bolt', '{R}', 'Instant',
+      'Lightning Bolt deals 3 damage to any target.',
+      ARRAY['R']::text[], ARRAY['R']::text[], NULL, NULL,
+      'M11', 'common', 1.00, '149', FALSE, 'normal', 1
+    ),
+    (
+      '10000000-0000-4000-8000-000000000004'::uuid,
+      '10000000-0000-4000-8000-000000000012'::uuid,
+      'Wastes', NULL, 'Basic Land — Wastes',
+      '{T}: Add {C}.',
+      ARRAY[]::text[], ARRAY[]::text[], NULL, NULL,
+      'OGW', 'common', 0.25, '184', FALSE, 'normal', 0
+    ),
+    (
+      '10000000-0000-4000-8000-000000000005'::uuid,
+      '10000000-0000-4000-8000-000000000013'::uuid,
+      'Lorehold, the Historian', '{3}{R}{W}',
+      'Legendary Creature — Elder Dragon',
+      'Flying, haste. Lorehold, the Historian can be your commander.',
+      ARRAY['R','W']::text[], ARRAY['R','W']::text[], '4', '4',
+      'SOS', 'mythic', 3.00, '201', FALSE, 'normal', 5
+    ),
+    (
+      '10000000-0000-4000-8000-000000000006'::uuid,
+      '10000000-0000-4000-8000-000000000013'::uuid,
+      'Lorehold, the Historian', '{3}{R}{W}',
+      'Legendary Creature — Elder Dragon',
+      'Flying, haste. Lorehold, the Historian can be your commander.',
+      ARRAY['R','W']::text[], ARRAY['R','W']::text[], '4', '4',
+      'PSOS', 'mythic', 5.00, '201p', TRUE, 'normal', 5
+    )
+    ON CONFLICT (scryfall_id) DO NOTHING;
+    INSERT INTO card_legalities (card_id, format, status)
+    SELECT id, 'commander', 'legal'
+    FROM cards
+    WHERE name IN (
+      'Talrand, Sky Summoner',
+      'Lightning Bolt',
+      'Wastes',
+      'Lorehold, the Historian'
+    )
+    ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status;
   " >"$RUN_DIR/fixture.log" 2>&1
+
+CARD_CATALOG_COUNT="$(
+  psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+    -d "$DATABASE" -c 'SELECT COUNT(*) FROM cards'
+)"
 
 (
   cd "$SERVER_DIR"
@@ -223,6 +296,12 @@ psql -X -v ON_ERROR_STOP=1 \
     MANALOOM_ALLOW_DEV_ORIGINS="${MANALOOM_ALLOW_DEV_ORIGINS:-false}" \
     MANALOOM_REQUIRE_LEGAL_ACCEPTANCE="${MANALOOM_REQUIRE_LEGAL_ACCEPTANCE:-false}" \
     MANALOOM_REQUIRE_VERIFIED_EMAIL="${MANALOOM_REQUIRE_VERIFIED_EMAIL:-false}" \
+    INTERACTIVE_BATTLE_ENABLED="${INTERACTIVE_BATTLE_ENABLED:-false}" \
+    XMAGE_SIDECAR_URL="${XMAGE_SIDECAR_URL:-}" \
+    XMAGE_INTERACTIVE_SIDECAR_URL="${XMAGE_INTERACTIVE_SIDECAR_URL:-}" \
+    XMAGE_EXPECTED_COMMIT="${XMAGE_EXPECTED_COMMIT:-}" \
+    XMAGE_EXPECTED_VERSION="${XMAGE_EXPECTED_VERSION:-}" \
+    BATTLE_ALLOW_LEGACY_SIDECAR_IDENTITY="${BATTLE_ALLOW_LEGACY_SIDECAR_IDENTITY:-false}" \
     ENVIRONMENT="$ISOLATED_ENVIRONMENT" PORT="$PORT" \
     exec dart build/bin/server.dart
 ) >"$SERVER_LOG" 2>&1 &
@@ -292,6 +371,10 @@ migration_count="$(
   psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
     -d "$DATABASE" -c 'SELECT COUNT(*) FROM schema_migrations'
 )"
+latest_migration="$(
+  psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+    -d "$DATABASE" -c 'SELECT COALESCE(MAX(version), '\''none'\'') FROM schema_migrations'
+)"
 email_delivery_count="$(
   (wc -l <"$EMAIL_FIXTURE_LOG" 2>/dev/null || printf '0') | tr -d '[:space:]'
 )"
@@ -324,11 +407,11 @@ fi
   printf 'scope=server_contract_e2e_isolated_loopback\n'
   printf 'tests=%s\n' "${tests[*]}"
   printf 'migration_count=%s\n' "$migration_count"
-  printf 'card_catalog_count=%s\n' "$FULL_CARD_COUNT"
+  printf 'card_catalog_count=%s\n' "$CARD_CATALOG_COUNT"
   printf 'server_environment=%s\n' "$ISOLATED_ENVIRONMENT"
   printf 'openai_profile=%s\n' "${OPENAI_PROFILE:-default}"
   printf 'full_card_catalog_enabled=%s\n' "${MANALOOM_ISOLATED_FULL_CARD_CATALOG:-0}"
-  printf 'latest_migration=054\n'
+  printf 'latest_migration=%s\n' "$latest_migration"
   printf 'email_delivery_count=%s\n' "$email_delivery_count"
   printf 'email_delivery_templates=%s\n' "$email_delivery_templates"
   printf 'email_delivery_log=sanitized_without_links_or_tokens\n'

@@ -514,13 +514,90 @@ void main() {
     expect(find.textContaining('não como cópia cega'), findsOneWidget);
     expect(find.text('Validação da recomendação'), findsOneWidget);
     expect(find.text('Preview seguro'), findsAtLeastNWidgets(1));
-    expect(find.text('Piso automático'), findsOneWidget);
+    expect(find.text('Piso mínimo'), findsOneWidget);
     expect(find.text('≥ 36 terrenos'), findsOneWidget);
     expect(find.text('Battle pendente'), findsOneWidget);
     expect(find.text('#1 Talrand Tempo'), findsOneWidget);
     expect(find.text('Mystic Remora'), findsAtLeastNWidgets(1));
     expect(find.text('Ajuste competitivo guiado'), findsOneWidget);
   });
+
+  testWidgets(
+    'optimization preview keeps land summary compact on narrow modals',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        _TestMaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: TextButton(
+                  onPressed: () => showOptimizationPreviewDialog(
+                    context,
+                    mode: 'optimize',
+                    archetype: 'midrange',
+                    keepTheme: true,
+                    preservedTheme: null,
+                    reasoning: 'Corrigir a fundação de mana.',
+                    intensity: OptimizeIntensity.focused,
+                    optimizeIntensity: const <String, dynamic>{},
+                    qualityWarning: null,
+                    deckAnalysis: const {'total_cards': 72, 'land_count': 9},
+                    postAnalysis: const {'total_cards': 100, 'land_count': 36},
+                    warnings: const <String, dynamic>{},
+                    metaReferenceContext: const <String, dynamic>{},
+                    optimizationContract: const {
+                      'mana_foundation': {'minimum_land_count': 33},
+                    },
+                    displayRemovals: const [
+                      {'name': 'Cancel'},
+                    ],
+                    displayAdditions: const [
+                      {'name': 'Plains', 'quantity': 27},
+                    ],
+                  ),
+                  child: const Text('preview-land-transition'),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('preview-land-transition'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Terrenos'), findsOneWidget);
+      expect(find.text('9 → 36'), findsOneWidget);
+      expect(find.text('≥ 33 terrenos'), findsOneWidget);
+
+      final grid = find.byKey(
+        const Key('optimization-preview-trust-signal-grid'),
+      );
+      final gridWidth = tester.getSize(grid).width;
+      for (final label in const ['Terrenos', 'Piso mínimo', 'Validação']) {
+        final signal = find.byKey(
+          ValueKey('optimization-preview-trust-signal-$label'),
+        );
+        expect(signal, findsOneWidget);
+        expect(
+          tester.getSize(signal).width,
+          closeTo(gridWidth, 0.1),
+          reason: '$label must use the full compact grid width.',
+        );
+        expect(
+          tester.getSize(signal).height,
+          lessThan(72),
+          reason: '$label must remain a compact horizontal summary.',
+        );
+      }
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('optimization preview allows deselecting suggestions', (
     tester,

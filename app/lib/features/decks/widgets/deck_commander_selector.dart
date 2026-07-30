@@ -369,174 +369,186 @@ class _CommanderPickerDialogState extends State<_CommanderPickerDialog> {
   @override
   Widget build(BuildContext context) {
     final mediaSize = MediaQuery.sizeOf(context);
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     final availableHeight = math.max(288.0, mediaSize.height - 32);
     final dialogHeight = math.min(640.0, availableHeight);
 
-    return Dialog(
-      key: const Key('commander-picker-dialog'),
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.space12,
-        vertical: AppTheme.space16,
-      ),
-      backgroundColor: AppTheme.surfaceElevated,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        side: BorderSide(color: AppTheme.outlineMuted.withValues(alpha: 0.72)),
-      ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 620),
-        child: SizedBox(
-          height: dialogHeight,
-          child: Padding(
-            padding: const EdgeInsets.all(AppTheme.space18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 38,
-                      height: 38,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppTheme.brass400.withValues(alpha: 0.12),
+    // Keep the picker at a useful height while the software keyboard is open.
+    // Results remain scrollable above it through the bottom list padding.
+    return MediaQuery.removeViewInsets(
+      context: context,
+      removeBottom: true,
+      child: Dialog(
+        key: const Key('commander-picker-dialog'),
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space16,
+        ),
+        backgroundColor: AppTheme.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          side: BorderSide(
+            color: AppTheme.outlineMuted.withValues(alpha: 0.72),
+          ),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: SizedBox(
+            height: dialogHeight,
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.space18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppTheme.brass400.withValues(alpha: 0.12),
+                        ),
+                        child: const ManaLoomGlyph(
+                          ManaLoomGlyphKind.commander,
+                          size: 22,
+                          color: AppTheme.brass400,
+                        ),
                       ),
-                      child: const ManaLoomGlyph(
-                        ManaLoomGlyphKind.commander,
-                        size: 22,
-                        color: AppTheme.brass400,
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.space10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Escolher comandante',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: AppTheme.displayFontFamily,
-                                ),
-                          ),
-                          Text(
-                            widget.format.toLowerCase() == 'brawl'
-                                ? 'Candidatos para Brawl'
-                                : 'Candidatos para Commander',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: AppTheme.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      key: const Key('commander-picker-close'),
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded),
-                      tooltip: 'Fechar busca',
-                      color: AppTheme.textSecondary,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTheme.space14),
-                TextField(
-                  key: const Key('deck-create-commander-search-field'),
-                  controller: _searchController,
-                  focusNode: _searchFocusNode,
-                  textInputAction: TextInputAction.search,
-                  decoration: InputDecoration(
-                    labelText: 'Nome da carta',
-                    hintText: 'Ex.: Atraxa',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _query.isEmpty
-                        ? null
-                        : IconButton(
-                            key: const Key('commander-picker-clear-search'),
-                            onPressed: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                              _searchFocusNode.requestFocus();
-                            },
-                            icon: const Icon(Icons.close_rounded),
-                            tooltip: 'Limpar busca',
-                          ),
-                  ),
-                  onChanged: _onSearchChanged,
-                  onSubmitted: (_) => _retry(),
-                ),
-                const SizedBox(height: AppTheme.space12),
-                Expanded(
-                  child: Consumer<CardProvider>(
-                    builder: (context, provider, _) {
-                      if (_query.length < 3) {
-                        return const _CommanderPickerMessage(
-                          key: Key('deck-create-commander-empty'),
-                          glyph: ManaLoomGlyphKind.commander,
-                          title: 'Encontre seu comandante',
-                          message:
-                              'Digite pelo menos 3 letras. A busca mostra apenas comandantes elegíveis para o formato.',
-                        );
-                      }
-                      if (provider.isLoading) {
-                        return const Center(
-                          key: Key('deck-create-commander-loading'),
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (provider.errorMessage != null) {
-                        return Semantics(
-                          container: true,
-                          liveRegion: true,
-                          child: _CommanderPickerMessage(
-                            key: const Key('deck-create-commander-error'),
-                            glyph: ManaLoomGlyphKind.card,
-                            title: 'Busca indisponível',
-                            message: provider.errorMessage!,
-                            accent: AppTheme.error,
-                            action: TextButton.icon(
-                              key: const Key('commander-picker-retry'),
-                              onPressed: _retry,
-                              icon: const Icon(Icons.refresh_rounded),
-                              label: const Text('Tentar novamente'),
+                      const SizedBox(width: AppTheme.space10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Escolher comandante',
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: AppTheme.textPrimary,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: AppTheme.displayFontFamily,
+                                  ),
                             ),
-                          ),
-                        );
-                      }
-
-                      final cards = _eligibleCandidates(provider.searchResults);
-                      if (cards.isEmpty) {
-                        return const _CommanderPickerMessage(
-                          key: Key('deck-create-commander-empty'),
-                          glyph: ManaLoomGlyphKind.card,
-                          title: 'Nenhum comandante elegível',
-                          message:
-                              'Revise a grafia ou busque outro comandante pelo nome em inglês.',
-                          accent: AppTheme.warning,
-                        );
-                      }
-
-                      return ListView.separated(
-                        key: const Key('deck-create-commander-results'),
-                        itemCount: cards.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: AppTheme.space8),
-                        itemBuilder: (context, index) {
-                          final card = cards[index];
-                          return _CommanderCandidateTile(
-                            card: card,
-                            format: widget.format,
-                            selected: widget.selectedCardId == card.id,
-                            onSelected: () => Navigator.pop(context, card),
-                          );
-                        },
-                      );
-                    },
+                            Text(
+                              widget.format.toLowerCase() == 'brawl'
+                                  ? 'Candidatos para Brawl'
+                                  : 'Candidatos para Commander',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: AppTheme.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        key: const Key('commander-picker-close'),
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close_rounded),
+                        tooltip: 'Fechar busca',
+                        color: AppTheme.textSecondary,
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppTheme.space10),
+                  TextField(
+                    key: const Key('deck-create-commander-search-field'),
+                    controller: _searchController,
+                    focusNode: _searchFocusNode,
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      labelText: 'Nome da carta',
+                      hintText: 'Ex.: Atraxa',
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      suffixIcon: _query.isEmpty
+                          ? null
+                          : IconButton(
+                              key: const Key('commander-picker-clear-search'),
+                              onPressed: () {
+                                _searchController.clear();
+                                _onSearchChanged('');
+                                _searchFocusNode.requestFocus();
+                              },
+                              icon: const Icon(Icons.close_rounded),
+                              tooltip: 'Limpar busca',
+                            ),
+                    ),
+                    onChanged: _onSearchChanged,
+                    onSubmitted: (_) => _retry(),
+                  ),
+                  const SizedBox(height: AppTheme.space12),
+                  Expanded(
+                    child: Consumer<CardProvider>(
+                      builder: (context, provider, _) {
+                        if (_query.length < 3) {
+                          return const _CommanderPickerMessage(
+                            key: Key('deck-create-commander-empty'),
+                            glyph: ManaLoomGlyphKind.commander,
+                            title: 'Encontre seu comandante',
+                            message:
+                                'Digite pelo menos 3 letras. A busca mostra apenas comandantes elegíveis para o formato.',
+                          );
+                        }
+                        if (provider.isLoading) {
+                          return const Center(
+                            key: Key('deck-create-commander-loading'),
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (provider.errorMessage != null) {
+                          return Semantics(
+                            container: true,
+                            liveRegion: true,
+                            child: _CommanderPickerMessage(
+                              key: const Key('deck-create-commander-error'),
+                              glyph: ManaLoomGlyphKind.card,
+                              title: 'Busca indisponível',
+                              message: provider.errorMessage!,
+                              accent: AppTheme.error,
+                              action: TextButton.icon(
+                                key: const Key('commander-picker-retry'),
+                                onPressed: _retry,
+                                icon: const Icon(Icons.refresh_rounded),
+                                label: const Text('Tentar novamente'),
+                              ),
+                            ),
+                          );
+                        }
+
+                        final cards = _eligibleCandidates(
+                          provider.searchResults,
+                        );
+                        if (cards.isEmpty) {
+                          return const _CommanderPickerMessage(
+                            key: Key('deck-create-commander-empty'),
+                            glyph: ManaLoomGlyphKind.card,
+                            title: 'Nenhum comandante elegível',
+                            message:
+                                'Revise a grafia ou busque outro comandante pelo nome em inglês.',
+                            accent: AppTheme.warning,
+                          );
+                        }
+
+                        return ListView.separated(
+                          key: const Key('deck-create-commander-results'),
+                          padding: EdgeInsets.only(bottom: keyboardInset),
+                          itemCount: cards.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppTheme.space8),
+                          itemBuilder: (context, index) {
+                            final card = cards[index];
+                            return _CommanderCandidateTile(
+                              card: card,
+                              format: widget.format,
+                              selected: widget.selectedCardId == card.id,
+                              onSelected: () => Navigator.pop(context, card),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

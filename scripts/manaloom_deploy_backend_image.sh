@@ -4,6 +4,27 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 
+# This is release intent from the invoking process, not persistent
+# configuration. The keys are intentionally not loaded from server/.env.
+RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
+INTERACTIVE_MAX_ACTIVE="${MANALOOM_RELEASE_XMAGE_INTERACTIVE_MAX_ACTIVE:-4}"
+INTERACTIVE_PER_USER_ACTIVE_LIMIT="${MANALOOM_RELEASE_INTERACTIVE_PER_USER_ACTIVE_LIMIT:-1}"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
+      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+  exit 2
+fi
+if [[ ! "$INTERACTIVE_MAX_ACTIVE" =~ ^[1-9][0-9]*$ ||
+      "$INTERACTIVE_MAX_ACTIVE" -gt 32 ||
+      ! "$INTERACTIVE_PER_USER_ACTIVE_LIMIT" =~ ^[1-9][0-9]*$ ||
+      "$INTERACTIVE_PER_USER_ACTIVE_LIMIT" -gt 4 ||
+      "$INTERACTIVE_PER_USER_ACTIVE_LIMIT" -gt "$INTERACTIVE_MAX_ACTIVE" ]]; then
+  echo "limites do XMage interativo sao invalidos" >&2
+  exit 2
+fi
+readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_MAX_ACTIVE
+readonly INTERACTIVE_PER_USER_ACTIVE_LIMIT
+
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
 source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 
@@ -90,6 +111,17 @@ fi
 # vindas do mesmo .env que carrega credenciais.
 # shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
+XMAGE_INTERACTIVE_SERVICE="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE"
+XMAGE_INTERACTIVE_DNS="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS"
+XMAGE_INTERACTIVE_URL="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL"
+PROJECT_NETWORK="easypanel-$EASYPANEL_PROJECT"
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
+  INTERACTIVE_BATTLE_ENABLED=true
+else
+  INTERACTIVE_BATTLE_ENABLED=false
+fi
+readonly XMAGE_INTERACTIVE_SERVICE XMAGE_INTERACTIVE_DNS
+readonly XMAGE_INTERACTIVE_URL PROJECT_NETWORK INTERACTIVE_BATTLE_ENABLED
 validate_manaloom_release_api_base_url "$API_BASE_URL"
 validate_manaloom_exact_coordinate project "$EASYPANEL_PROJECT" \
   "$MANALOOM_PRODUCTION_EASYPANEL_PROJECT"
@@ -101,6 +133,28 @@ validate_manaloom_exact_coordinate backend_image_repo "$IMAGE_REPO" \
   localhost:5000/manaloom/cartinhas
 validate_manaloom_exact_coordinate remote_build_root "$REMOTE_BUILD_ROOT" \
   "$MANALOOM_PRODUCTION_REMOTE_BUILD_ROOT"
+validate_manaloom_exact_coordinate xmage_interactive_service \
+  "$XMAGE_INTERACTIVE_SERVICE" evolution_xmage-interactive
+validate_manaloom_exact_coordinate xmage_interactive_dns \
+  "$XMAGE_INTERACTIVE_DNS" xmage-interactive
+validate_manaloom_exact_coordinate xmage_interactive_url \
+  "$XMAGE_INTERACTIVE_URL" http://xmage-interactive:8080
+validate_manaloom_exact_coordinate project_network \
+  "$PROJECT_NETWORK" easypanel-evolution
+HEALTH_PROBE_IMAGE="curlimages/curl:8.10.1@sha256:d9b4541e214bcd85196d6e92e2753ac6d0ea699f0af5741f8c6cccbfcf00ef4b"
+XMAGE_EXPECTED_COMMIT="$(
+  tr -d '[:space:]' <"$ROOT_DIR/services/xmage-sidecar/XMAGE_COMMIT"
+)"
+XMAGE_EXPECTED_VERSION="$(
+  sed -n 's/.*XMAGE_VERSION = "\([^"]*\)";.*/\1/p' \
+    "$ROOT_DIR/services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java"
+)"
+if [[ ! "$XMAGE_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ||
+      ! "$XMAGE_EXPECTED_VERSION" =~ ^[0-9]+(\.[0-9]+){2}$ ]]; then
+  echo "identidade XMage pinada nao pode ser resolvida" >&2
+  exit 2
+fi
+readonly HEALTH_PROBE_IMAGE XMAGE_EXPECTED_COMMIT XMAGE_EXPECTED_VERSION
 MANALOOM_ALLOWED_ORIGINS="${MANALOOM_ALLOWED_ORIGINS:-$REQUIRED_WEB_ORIGIN}"
 ENVIRONMENT="${ENVIRONMENT:-production}"
 MANALOOM_TRUSTED_PROXY_HOPS="${MANALOOM_TRUSTED_PROXY_HOPS:-$MANALOOM_PRODUCTION_TRUSTED_PROXY_HOPS}"
@@ -225,6 +279,96 @@ raise SystemExit(0 if valid else 1)
 PY
   then
     echo "deploy recusado: topologia Traefik/backend diverge dos enderecos logico ou de transporte aprovados" >&2
+    exit 2
+  fi
+}
+
+require_xmage_interactive_release_contract() {
+  local expected_sha="$1"
+  local runtime_contract replicas spec_image running_image update_state
+  local ports network_count network_attached alias_attached traefik_labels
+  local image_revision health_payload
+
+  if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
+    return 0
+  fi
+
+  runtime_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+set -euo pipefail
+network_id=\$(docker network inspect '$PROJECT_NETWORK' --format '{{.Id}}')
+replicas=\$(docker service ls --filter name='$XMAGE_INTERACTIVE_SERVICE' --format '{{.Replicas}}' | head -1)
+spec_image=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+running_image=\$(docker service ps '$XMAGE_INTERACTIVE_SERVICE' --filter desired-state=running --format '{{.Image}}' | head -1)
+update_state=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{end}}')
+ports=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{if .Endpoint.Spec.Ports}}{{len .Endpoint.Spec.Ports}}{{else}}0{{end}}')
+network_count=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{len .Spec.TaskTemplate.Networks}}')
+network_attached=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}' | awk -v expected=\"\$network_id\" '\$0 == expected {found=1} END{print found+0}')
+alias_attached=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range .Spec.TaskTemplate.Networks}}{{range .Aliases}}{{println .}}{{end}}{{end}}' | awk -v expected='$XMAGE_INTERACTIVE_DNS' '\$0 == expected {found=1} END{print found+0}')
+traefik_labels=\$(docker service inspect '$XMAGE_INTERACTIVE_SERVICE' --format '{{range \$key, \$value := .Spec.Labels}}{{println \$key}}{{end}}' | awk '/^traefik\\./{count++} END{print count+0}')
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$XMAGE_INTERACTIVE_SERVICE' -q | head -1)
+test -n \"\$container\"
+image_revision=\$(docker inspect \"\$container\" --format '{{index .Config.Labels \"org.opencontainers.image.revision\"}}')
+printf '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s' \"\$replicas\" \"\$spec_image\" \"\$running_image\" \"\$update_state\" \"\$ports\" \"\$network_count\" \"\$network_attached\" \"\$alias_attached\" \"\$traefik_labels\" \"\$image_revision\"
+")"
+  IFS='|' read -r replicas spec_image running_image update_state ports \
+    network_count network_attached alias_attached traefik_labels image_revision \
+    <<<"$runtime_contract"
+  if [[ "$replicas" != "1/1" ||
+        "$spec_image" != "$running_image" ||
+        ! "$spec_image" =~ ^localhost:5000/manaloom/xmage-sidecar@sha256:[0-9a-f]{64}$ ||
+        ( -n "$update_state" && "$update_state" != "completed" &&
+          "$update_state" != "rollback_completed" ) ||
+        "$ports" != "0" ||
+        "$network_count" != "1" ||
+        "$network_attached" != "1" ||
+        "$alias_attached" != "1" ||
+        "$traefik_labels" != "0" ||
+        "$image_revision" != "$expected_sha" ]]; then
+    echo "deploy recusado: XMage interativo nao prova digest privado same-SHA: $runtime_contract" >&2
+    exit 2
+  fi
+
+  health_payload="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker run --rm --network '$PROJECT_NETWORK' --entrypoint sh '$HEALTH_PROBE_IMAGE' -c '
+  for attempt in \$(seq 1 90); do
+    if response=\$(curl -fsS --connect-timeout 2 --max-time 10 http://$XMAGE_INTERACTIVE_DNS:8080/health); then
+      printf \"%s\" \"\$response\"
+      exit 0
+    fi
+    sleep 2
+  done
+  exit 1
+'
+")"
+  if ! jq -e \
+    --arg commit "$XMAGE_EXPECTED_COMMIT" \
+    --arg version "$XMAGE_EXPECTED_VERSION" \
+    --argjson maximum_active "$INTERACTIVE_MAX_ACTIVE" '
+      .status == "ok" and
+      .schema_version == "external_battle_execution_v2" and
+      .engine == "xmage" and
+      .engine_version == $version and
+      .engine_commit == $commit and
+      .sidecar_protocol_version == "external_battle_sidecar_v2" and
+      .sidecar_build_identity == ("xmage-sidecar-v2@" + $commit) and
+      .ai_profile == "computer_mad" and
+      .normalizer_version == "xmage_replay_normalizer_v2" and
+      .seed_semantics ==
+        "request_correlation_only_server_rng_uncontrolled" and
+      .deterministic == false and
+      .catalog_ready == true and
+      .runtime_mode == "interactive" and
+      .batch_simulation_available == false and
+      .interactive_battle.schema_version ==
+        "interactive_battle_runtime_v1" and
+      .interactive_battle.runtime_mode == "interactive" and
+      .interactive_battle.batch_simulation_available == false and
+      .interactive_battle.maximum_active == $maximum_active and
+      .interactive_battle.active >= 0 and
+      .interactive_battle.active <= $maximum_active and
+      .interactive_battle.retained >= 0
+    ' >/dev/null <<<"$health_payload"; then
+    echo "deploy recusado: readiness XMage interativo diverge de identidade/modo/capacidade" >&2
     exit 2
   fi
 }
@@ -955,6 +1099,8 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master 2>/dev/null || tr
   exit 2
 fi
 
+require_xmage_interactive_release_contract "$sha"
+
 if [[ "$LIVE_MUTATION_APPROVED" != "1" ]]; then
   echo "deploy recusado: aprovacao live do processo chamador nao foi preservada" >&2
   exit 2
@@ -1135,7 +1281,10 @@ docker service update \
   --env-add SENTRY_RELEASE='manaloom-backend@$short_sha' \
   --env-add BATTLE_JOB_WORKER_ENABLED=true \
   --env-add BATTLE_LIVE_SPECTATOR_ENABLED=false \
-  --env-add INTERACTIVE_BATTLE_ENABLED=false \
+  --env-add INTERACTIVE_BATTLE_ENABLED='$INTERACTIVE_BATTLE_ENABLED' \
+  --env-add XMAGE_INTERACTIVE_SIDECAR_URL='$XMAGE_INTERACTIVE_URL' \
+  --env-add INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT='$INTERACTIVE_PER_USER_ACTIVE_LIMIT' \
+  --env-add INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT='$INTERACTIVE_MAX_ACTIVE' \
   '$SERVICE'
 
 for attempt in \$(seq 1 45); do
@@ -1172,6 +1321,20 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
 ")"
 if [[ "$spec_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ]]; then
   echo "deploy convergiu sem a allowlist CORS exata na spec do servico" >&2
+  exit 2
+fi
+spec_interactive_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '
+    /^INTERACTIVE_BATTLE_ENABLED=/{enabled_count++; enabled=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_INTERACTIVE_SIDECAR_URL=/{url_count++; url=substr(\$0,index(\$0,\"=\")+1)}
+    /^INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=/{user_count++; user_limit=substr(\$0,index(\$0,\"=\")+1)}
+    /^INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=/{global_count++; global_limit=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit}'
+")"
+expected_interactive_contract="1|$INTERACTIVE_BATTLE_ENABLED|1|$XMAGE_INTERACTIVE_URL|1|$INTERACTIVE_PER_USER_ACTIVE_LIMIT|1|$INTERACTIVE_MAX_ACTIVE"
+if [[ "$spec_interactive_contract" != "$expected_interactive_contract" ]]; then
+  echo "deploy convergiu sem o contrato interativo exato na spec" >&2
   exit 2
 fi
 spec_proxy_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
@@ -1248,6 +1411,16 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     END{if(count==1) printf \"%s\",value; else printf \"__invalid_count_%d__\",count}' |
   sha256sum | awk '{print \$1}'
 ")"
+runtime_interactive_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
+docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
+  awk '
+    /^INTERACTIVE_BATTLE_ENABLED=/{enabled_count++; enabled=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_INTERACTIVE_SIDECAR_URL=/{url_count++; url=substr(\$0,index(\$0,\"=\")+1)}
+    /^INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=/{user_count++; user_limit=substr(\$0,index(\$0,\"=\")+1)}
+    /^INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=/{global_count++; global_limit=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit}'
+")"
 runtime_sentry_dsn_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -1276,6 +1449,7 @@ if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_
       "$runtime_proxy_peers_count" != "1" ||
       "$runtime_proxy_peers" != "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" ||
       "$runtime_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ||
+      "$runtime_interactive_contract" != "$expected_interactive_contract" ||
       "$runtime_sentry_dsn_sha256" != "$MANALOOM_PRODUCTION_SENTRY_DSN_SHA256" ||
       "$runtime_sentry_metadata" != "1|production|1|manaloom-backend@$short_sha" ]]; then
   echo "deploy convergiu com SHA ou contrato PostgreSQL/battle/IA/auth/CORS/Sentry divergente" >&2
@@ -1290,7 +1464,9 @@ if ! [[ "$readiness_attempts" =~ ^[1-9][0-9]*$ ]]; then
 fi
 for attempt in $(seq 1 "$readiness_attempts"); do
   if readiness_payload="$(curl -fsS "$API_BASE_URL/health/ready" 2>/dev/null)" &&
-     jq -e '
+     jq -e \
+       --arg interactive_enabled "$INTERACTIVE_BATTLE_ENABLED" \
+       --argjson interactive_maximum_active "$INTERACTIVE_MAX_ACTIVE" '
        .status == "ready" and
        .environment == "production" and
        .checks.release_schema.status == "healthy" and
@@ -1299,8 +1475,24 @@ for attempt in $(seq 1 "$readiness_attempts"); do
        .checks.battle_job_schema.status == "healthy" and
        (.checks.battle_live_spectator.status == "disabled" or
         .checks.battle_live_spectator.status == "ready") and
-       (.checks.interactive_battle.status == "disabled" or
-        .checks.interactive_battle.status == "ready") and
+       (
+         if $interactive_enabled == "true" then
+           .checks.interactive_battle.status == "ready" and
+           .checks.interactive_battle.enabled == true and
+           .checks.interactive_battle.runtime_isolation ==
+             "dedicated_interactive_sidecar" and
+           .checks.interactive_battle.runtime_schema_version ==
+             "interactive_battle_runtime_v1" and
+           .checks.interactive_battle.maximum_active ==
+             $interactive_maximum_active and
+           .checks.interactive_battle.database == "ready" and
+           .checks.interactive_battle.source == "ready" and
+           .checks.interactive_battle.configuration == "ready"
+         else
+           .checks.interactive_battle.status == "disabled" and
+           .checks.interactive_battle.enabled == false
+         end
+       ) and
        .checks.ai_runtime.status == "healthy" and
        .checks.ai_runtime.provider_configured == true and
        .checks.ai_runtime.mock_fallbacks_allowed == false and
@@ -1356,12 +1548,14 @@ jq -cn \
   --arg image_digest_ref "$image_digest_ref" \
   --arg git_sha "$sha" \
   --arg remote_dir_removed "$remote_dir" \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_ENABLED" \
   '{
     status: "deployed",
     service: $service,
     image: $image,
     image_digest_ref: $image_digest_ref,
     git_sha: $git_sha,
+    interactive_battle_enabled: $interactive_battle_enabled,
     cors_allowlist: "verified",
     remote_dir_removed: $remote_dir_removed
   }'

@@ -23,11 +23,13 @@ const _nonDeckLayouts = <String>{
   'vanguard',
 };
 
-// Mystery Booster playtest and unknown/playtest products can contain imported
-// legality false positives. Unfinity itself is intentionally not listed:
-// ordinary Eternal-legal UNF cards remain valid, while its supplemental
-// objects are rejected by type/layout.
-const _playtestSetCodes = <String>{'cmb1', 'cmb2', 'mb2', 'unk'};
+// Dedicated Mystery Booster playtest and unknown/playtest products can contain
+// imported legality false positives. MB2 is intentionally not listed because
+// Mystery Booster 2 mixes legitimate reprints with playtest/acorn cards; its
+// ordinary reprints retain their existing format legality, while supplemental
+// objects are rejected by type/layout and the remaining cards by legality.
+// Unfinity is likewise not listed for the same type/layout + legality split.
+const _playtestSetCodes = <String>{'cmb1', 'cmb2', 'unk'};
 
 String? mainDeckCardIneligibilityReason({
   required String typeLine,
