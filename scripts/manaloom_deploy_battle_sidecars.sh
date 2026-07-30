@@ -361,6 +361,15 @@ wait_for_sidecar_health() {
   local swarm_service="$1"
   local service_alias="$2"
   local expected_fragment="${3:-}"
+  local expected_fragment_b64
+
+  expected_fragment_b64="$(
+    printf '%s' "$expected_fragment" | base64 | tr -d '\r\n'
+  )"
+  if [[ ! "$expected_fragment_b64" =~ ^[A-Za-z0-9+/]*={0,2}$ ]]; then
+    echo "fragmento esperado do health nao pode ser transportado com seguranca" >&2
+    return 2
+  fi
 
   # shellcheck disable=SC2140
   ssh "${ssh_args[@]}" "$ssh_target" "
@@ -368,10 +377,14 @@ set -euo pipefail
 docker service inspect '$swarm_service' >/dev/null
 docker network inspect '$PROJECT_NETWORK' >/dev/null
 network_name='$PROJECT_NETWORK'
-docker run --rm --network \"\$network_name\" --entrypoint sh '$HEALTH_PROBE_IMAGE' -c '
+docker run --rm --network \"\$network_name\" \\
+  --env 'EXPECTED_FRAGMENT_B64=$expected_fragment_b64' \\
+  --entrypoint sh '$HEALTH_PROBE_IMAGE' -c '
+  expected_fragment=\$(printf '%s' \"\$EXPECTED_FRAGMENT_B64\" | base64 -d)
   for attempt in \$(seq 1 180); do
     if response=\$(curl -fsS --connect-timeout 2 --max-time 5 http://$service_alias:8080/health); then
-      if [ -z '$expected_fragment' ] || printf '%s' "\$response" | grep -Fq '$expected_fragment'; then
+      if [ -z \"\$expected_fragment\" ] ||
+        printf '%s' \"\$response\" | grep -Fq \"\$expected_fragment\"; then
         printf '%s\n' "\$response"
         exit 0
       fi

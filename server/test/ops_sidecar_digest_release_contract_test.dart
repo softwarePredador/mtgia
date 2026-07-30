@@ -88,10 +88,7 @@ void main() {
     });
 
     test('resolves user and relative SSH key paths before validation', () {
-      expect(
-        sidecars,
-        contains('candidate = Path(sys.argv[2]).expanduser()'),
-      );
+      expect(sidecars, contains('candidate = Path(sys.argv[2]).expanduser()'));
       expect(sidecars, contains('if not candidate.is_absolute():'));
       expect(sidecars, contains('candidate = root / candidate'));
 
@@ -129,22 +126,13 @@ void main() {
       expect(sidecars, contains('.RepoDigests'));
       expect(
         sidecars,
-        contains(
-          'extract_manaloom_repo_digest_ref "\$XMAGE_IMAGE_REPO"',
-        ),
+        contains('extract_manaloom_repo_digest_ref "\$XMAGE_IMAGE_REPO"'),
       );
       expect(
         sidecars,
-        contains(
-          'extract_manaloom_repo_digest_ref "\$FORGE_IMAGE_REPO"',
-        ),
+        contains('extract_manaloom_repo_digest_ref "\$FORGE_IMAGE_REPO"'),
       );
-      expect(
-        sidecars,
-        contains(
-          '"\$ssh_target" \'bash -se\' <<REMOTE',
-        ),
-      );
+      expect(sidecars, contains('"\$ssh_target" \'bash -se\' <<REMOTE'));
       expect(sidecars, contains('unset raw_digest_output'));
       expect(
         sidecars,
@@ -183,6 +171,19 @@ void main() {
         sidecars,
         isNot(contains('entrypoint sh curlimages/curl:8.10.1 -c')),
       );
+    });
+
+    test('preserves exact JSON fragments across the SSH health probe', () {
+      expect(sidecars, contains('expected_fragment_b64='));
+      expect(sidecars, contains('EXPECTED_FRAGMENT_B64='));
+      expect(
+        sidecars,
+        contains(
+          r'''expected_fragment=\$(printf '%s' \"\$EXPECTED_FRAGMENT_B64\" | base64 -d)''',
+        ),
+      );
+      expect(sidecars, contains(r'''grep -Fq \"\$expected_fragment\"'''));
+      expect(sidecars, isNot(contains(r'''[ -z '$expected_fragment' ]''')));
     });
 
     test('rollback restores both origins and runtime digests with health', () {
