@@ -164,6 +164,40 @@ void main() {
     expect(persistence.started, 0);
     expect(runtime.createdRequests, isEmpty);
   });
+
+  test('concede persists and links the partial public replay', () async {
+    final store = _Store();
+    final runtime = _Runtime();
+    final persistence = _Persistence();
+    final service = _service(
+      store: store,
+      runtime: runtime,
+      persistence: persistence,
+    );
+
+    final created = await service.create(
+      userId: _userId,
+      input: const InteractiveBattleCreateInput(
+        deckId: _deckAId,
+        opponentDeckId: _deckBId,
+        ttlSeconds: 600,
+        promptTimeoutSeconds: 60,
+        idempotencyKey: 'create-before-concede',
+      ),
+    );
+    final conceded = await service.concede(
+      userId: _userId,
+      id: created.session.id,
+      idempotencyKey: 'concede-service-1',
+    );
+
+    expect(conceded.status, InteractiveBattleStatus.conceded);
+    expect(conceded.replayId, _replayId);
+    expect(persistence.persistedReplays, hasLength(1));
+    expect(persistence.persistedReplays.single['status'], 'conceded');
+    expect(persistence.finishedStatuses, [InteractiveBattleStatus.conceded]);
+    expect(persistence.finishedReplayIds, [_replayId]);
+  });
 }
 
 InteractiveBattleService _service({
@@ -234,6 +268,25 @@ class _Runtime implements InteractiveBattleRuntime {
   }
 
   @override
+  Future<InteractiveBattleRuntimeSnapshot> concede(
+    String runtimeSessionId, {
+    required String actionId,
+  }) async {
+    final request = createdRequests.single;
+    return _snapshot(
+      requestId: request['request_id'] as String,
+      requestHash: request['request_hash'] as String,
+      status: InteractiveBattleStatus.conceded,
+      publicReplay: const {
+        'status': 'conceded',
+        'winner': null,
+        'events': <Map<String, dynamic>>[],
+        'snapshots': <Map<String, dynamic>>[],
+      },
+    );
+  }
+
+  @override
   void close() {}
 
   @override
@@ -243,6 +296,8 @@ class _Runtime implements InteractiveBattleRuntime {
 class _Persistence implements InteractiveBattlePersistence {
   int started = 0;
   final List<InteractiveBattleStatus> finishedStatuses = [];
+  final List<String?> finishedReplayIds = [];
+  final List<Map<String, dynamic>> persistedReplays = [];
 
   @override
   Future<String> startAttempt({
@@ -270,6 +325,7 @@ class _Persistence implements InteractiveBattlePersistence {
     String? errorCode,
   }) async {
     finishedStatuses.add(status);
+    finishedReplayIds.add(replayId);
   }
 
   @override
@@ -277,7 +333,10 @@ class _Persistence implements InteractiveBattlePersistence {
     required String deckAId,
     required String deckBId,
     required Map<String, dynamic> replay,
-  }) async => _replayId;
+  }) async {
+    persistedReplays.add(Map<String, dynamic>.from(replay));
+    return _replayId;
+  }
 }
 
 class _Store implements InteractiveBattleStoreApi {
@@ -338,6 +397,15 @@ class _Store implements InteractiveBattleStoreApi {
     );
     return current!;
   }
+
+  @override
+  Future<InteractiveBattleConcedeReservation> reserveConcede({
+    required String userId,
+    required String id,
+    required String idempotencyKey,
+    required String requestFingerprint,
+  }) async =>
+      InteractiveBattleConcedeReservation(session: current!, duplicate: false);
 
   @override
   Future<InteractiveBattleSession> terminalize({
@@ -430,39 +498,46 @@ InteractiveBattleSession _copy(
 InteractiveBattleRuntimeSnapshot _snapshot({
   required String requestId,
   required String requestHash,
+  InteractiveBattleStatus status = InteractiveBattleStatus.waitingForAction,
+  Map<String, dynamic>? publicReplay,
 }) => InteractiveBattleRuntimeSnapshot(
   runtimeSessionId: 'ibsrt_abcdefghijklmnop',
   requestId: requestId,
   requestHash: requestHash,
-  status: InteractiveBattleStatus.waitingForAction,
+  status: status,
   stateVersion: 4,
   privateState: const {
     'schema_version': interactiveBattlePrivateStateSchema,
     'own_hand': [],
     'players': [],
   },
-  prompt: InteractiveBattlePrompt(
-    id: 'p_abcdefghijklmnop',
-    stateVersion: 4,
-    kind: 'mulligan',
-    inputMode: 'options',
-    title: 'Mulligan',
-    message: 'Manter?',
-    deadlineAt: DateTime.parse('2026-07-27T12:01:00Z'),
-    options: const [
-      InteractiveBattlePromptOption(
-        id: 'o_abcdefghijklmnop',
-        label: 'Manter',
-        role: 'keep',
-      ),
-    ],
-  ),
+  prompt:
+      status == InteractiveBattleStatus.waitingForAction
+          ? InteractiveBattlePrompt(
+            id: 'p_abcdefghijklmnop',
+            stateVersion: 4,
+            kind: 'mulligan',
+            inputMode: 'options',
+            title: 'Mulligan',
+            message: 'Manter?',
+            deadlineAt: DateTime.parse('2026-07-27T12:01:00Z'),
+            options: const [
+              InteractiveBattlePromptOption(
+                id: 'o_abcdefghijklmnop',
+                label: 'Manter',
+                role: 'keep',
+              ),
+            ],
+          )
+          : null,
   engineVersion: pinnedXmageVersion,
   engineCommit: pinnedXmageCommit,
   engineBuild: 'xmage-sidecar-v2@$pinnedXmageCommit',
   engineProcessId: 'process-1',
   engineProcessStartedAt: DateTime.parse('2026-07-27T11:59:00Z'),
   lastActivityAt: DateTime.parse('2026-07-27T12:00:01Z'),
+  terminalReason: status.isTerminal ? 'user_conceded' : null,
+  publicReplay: publicReplay,
 );
 
 const _deckA = BattleJobDeckSnapshot(

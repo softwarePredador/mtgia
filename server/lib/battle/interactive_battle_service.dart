@@ -506,8 +506,7 @@ class InteractiveBattleService {
     }
     String? replayId;
     try {
-      if (snapshot.status == InteractiveBattleStatus.completed ||
-          snapshot.status == InteractiveBattleStatus.censored) {
+      if (snapshot.status.requiresPersistedReplay) {
         final sourceReplay = snapshot.publicReplay;
         if (sourceReplay == null ||
             session.deckAId == null ||

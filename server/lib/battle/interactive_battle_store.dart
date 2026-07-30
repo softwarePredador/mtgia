@@ -619,8 +619,7 @@ class InteractiveBattleStore implements InteractiveBattleStoreApi {
           'interactive_battle_runtime_state_regressed',
         );
       }
-      if ((snapshot.status == InteractiveBattleStatus.completed ||
-              snapshot.status == InteractiveBattleStatus.censored) &&
+      if (snapshot.status.requiresPersistedReplay &&
           (attemptId == null || replayId == null)) {
         throw const InteractiveBattlePersistenceException(
           'interactive_battle_terminal_replay_missing',

@@ -86,6 +86,13 @@ extension InteractiveBattleStatusValue on InteractiveBattleStatus {
     InteractiveBattleStatus.persistenceError => true,
     _ => false,
   };
+
+  bool get requiresPersistedReplay => switch (this) {
+    InteractiveBattleStatus.completed ||
+    InteractiveBattleStatus.censored ||
+    InteractiveBattleStatus.conceded => true,
+    _ => false,
+  };
 }
 
 InteractiveBattleStatus parseInteractiveBattleStatus(Object? raw) {

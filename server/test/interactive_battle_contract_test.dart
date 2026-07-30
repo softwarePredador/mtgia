@@ -172,6 +172,17 @@ void main() {
       );
     });
   });
+
+  test('completed, censored, and conceded sessions require a replay', () {
+    expect(InteractiveBattleStatus.completed.requiresPersistedReplay, isTrue);
+    expect(InteractiveBattleStatus.censored.requiresPersistedReplay, isTrue);
+    expect(InteractiveBattleStatus.conceded.requiresPersistedReplay, isTrue);
+    expect(InteractiveBattleStatus.timeout.requiresPersistedReplay, isFalse);
+    expect(
+      InteractiveBattleStatus.engineError.requiresPersistedReplay,
+      isFalse,
+    );
+  });
 }
 
 const _deckA = '11111111-1111-4111-8111-111111111111';
