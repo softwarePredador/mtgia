@@ -361,7 +361,7 @@ wait_for_sidecar_health() {
   local swarm_service="$1"
   local service_alias="$2"
   local expected_fragment="${3:-}"
-  local expected_fragment_b64
+  local expected_fragment_b64 health_probe_script_b64
   local raw_health_output health_count health_line health_payload_b64
   local health_payload health_frame_attempt
   local health_failure_reason="resposta enquadrada ausente"
@@ -371,6 +371,28 @@ wait_for_sidecar_health() {
   )"
   if [[ ! "$expected_fragment_b64" =~ ^[A-Za-z0-9+/]*={0,2}$ ]]; then
     echo "fragmento esperado do health nao pode ser transportado com seguranca" >&2
+    return 2
+  fi
+  health_probe_script_b64="$(
+    base64 <<'HEALTH_PROBE_SCRIPT' | tr -d '\r\n'
+set -eu
+expected_fragment="$(printf '%s' "$EXPECTED_FRAGMENT_B64" | base64 -d)"
+for attempt in $(seq 1 180); do
+  if response="$(curl -fsS --connect-timeout 2 --max-time 5 "http://${SERVICE_ALIAS}:8080/health")"; then
+    if [ -z "$expected_fragment" ] ||
+      printf '%s' "$response" | grep -Fq "$expected_fragment"; then
+      response_b64="$(printf '%s' "$response" | base64 | tr -d '\r\n')"
+      printf 'MANALOOM_HEALTH_B64=%s\n' "$response_b64"
+      exit 0
+    fi
+  fi
+  sleep 2
+done
+exit 1
+HEALTH_PROBE_SCRIPT
+  )"
+  if [[ ! "$health_probe_script_b64" =~ ^[A-Za-z0-9+/]+={0,2}$ ]]; then
+    echo "script do health nao pode ser transportado com seguranca" >&2
     return 2
   fi
 
@@ -383,20 +405,10 @@ docker network inspect '$PROJECT_NETWORK' >/dev/null
 network_name='$PROJECT_NETWORK'
 docker run --rm --network \"\$network_name\" \\
   --env 'EXPECTED_FRAGMENT_B64=$expected_fragment_b64' \\
+  --env 'SERVICE_ALIAS=$service_alias' \\
+  --env 'HEALTH_PROBE_SCRIPT_B64=$health_probe_script_b64' \\
   --entrypoint sh '$HEALTH_PROBE_IMAGE' -c '
-  expected_fragment=\$(printf '%s' \"\$EXPECTED_FRAGMENT_B64\" | base64 -d)
-  for attempt in \$(seq 1 180); do
-    if response=\$(curl -fsS --connect-timeout 2 --max-time 5 http://$service_alias:8080/health); then
-      if [ -z \"\$expected_fragment\" ] ||
-        printf '%s' \"\$response\" | grep -Fq \"\$expected_fragment\"; then
-        response_b64=\$(printf '%s' \"\$response\" | base64 | tr -d '\r\n')
-        printf 'MANALOOM_HEALTH_B64=%s\n' \"\$response_b64\"
-        exit 0
-      fi
-    fi
-    sleep 2
-  done
-  exit 1
+  printf %s \"\$HEALTH_PROBE_SCRIPT_B64\" | base64 -d | sh
 '
 ")"; then
       return 1

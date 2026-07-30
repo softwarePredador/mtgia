@@ -176,13 +176,26 @@ void main() {
     test('preserves exact JSON fragments across the SSH health probe', () {
       expect(sidecars, contains('expected_fragment_b64='));
       expect(sidecars, contains('EXPECTED_FRAGMENT_B64='));
+      expect(sidecars, contains('health_probe_script_b64='));
+      expect(sidecars, contains('HEALTH_PROBE_SCRIPT_B64='));
+      expect(sidecars, contains('SERVICE_ALIAS='));
       expect(
         sidecars,
         contains(
-          r'''expected_fragment=\$(printf '%s' \"\$EXPECTED_FRAGMENT_B64\" | base64 -d)''',
+          r'''expected_fragment="$(printf '%s' "$EXPECTED_FRAGMENT_B64" | base64 -d)"''',
         ),
       );
-      expect(sidecars, contains(r'''grep -Fq \"\$expected_fragment\"'''));
+      expect(
+        sidecars,
+        contains(r'''"http://${SERVICE_ALIAS}:8080/health"'''),
+      );
+      expect(sidecars, contains(r'''grep -Fq "$expected_fragment"'''));
+      expect(
+        sidecars,
+        contains(
+          r'''printf %s \"\$HEALTH_PROBE_SCRIPT_B64\" | base64 -d | sh''',
+        ),
+      );
       expect(sidecars, contains('MANALOOM_HEALTH_B64='));
       expect(sidecars, contains('health_count='));
       expect(sidecars, contains('for health_frame_attempt in 1 2 3'));
