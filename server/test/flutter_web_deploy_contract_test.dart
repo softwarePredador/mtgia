@@ -12,6 +12,13 @@ void main() {
         File('../scripts/manaloom_deploy_flutter_web.sh').readAsStringSync();
 
     expect(dockerfile, contains('COPY build/web /usr/share/nginx/html/app'));
+    expect(
+      dockerfile,
+      contains('chmod -R a+rX /usr/share/nginx/html/app'),
+      reason:
+          'the public bundle must remain readable by the unprivileged nginx '
+          'worker even when the release shell uses umask 077',
+    );
     expect(dockerignore, startsWith('**\n'));
     expect(dockerignore, contains('!Dockerfile.web'));
     expect(dockerignore, contains('!web/nginx.conf'));
