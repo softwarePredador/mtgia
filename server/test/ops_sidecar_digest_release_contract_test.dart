@@ -183,6 +183,16 @@ void main() {
         ),
       );
       expect(sidecars, contains(r'''grep -Fq \"\$expected_fragment\"'''));
+      expect(sidecars, contains('MANALOOM_HEALTH_B64='));
+      expect(sidecars, contains('health_count='));
+      expect(
+        sidecars,
+        contains(r'''jq -s -e 'length == 1 and (.[0] | type == "object")' '''),
+      );
+      expect(
+        sidecars,
+        contains(r'''"$health_payload" != *"$expected_fragment"*'''),
+      );
       expect(sidecars, isNot(contains(r'''[ -z '$expected_fragment' ]''')));
     });
 

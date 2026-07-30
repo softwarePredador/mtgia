@@ -362,6 +362,8 @@ wait_for_sidecar_health() {
   local service_alias="$2"
   local expected_fragment="${3:-}"
   local expected_fragment_b64
+  local raw_health_output health_count health_line health_payload_b64
+  local health_payload
 
   expected_fragment_b64="$(
     printf '%s' "$expected_fragment" | base64 | tr -d '\r\n'
@@ -372,7 +374,7 @@ wait_for_sidecar_health() {
   fi
 
   # shellcheck disable=SC2140
-  ssh "${ssh_args[@]}" "$ssh_target" "
+  if ! raw_health_output="$(ssh "${ssh_args[@]}" "$ssh_target" "
 set -euo pipefail
 docker service inspect '$swarm_service' >/dev/null
 docker network inspect '$PROJECT_NETWORK' >/dev/null
@@ -385,7 +387,8 @@ docker run --rm --network \"\$network_name\" \\
     if response=\$(curl -fsS --connect-timeout 2 --max-time 5 http://$service_alias:8080/health); then
       if [ -z \"\$expected_fragment\" ] ||
         printf '%s' \"\$response\" | grep -Fq \"\$expected_fragment\"; then
-        printf '%s\n' "\$response"
+        response_b64=\$(printf '%s' \"\$response\" | base64 | tr -d '\r\n')
+        printf 'MANALOOM_HEALTH_B64=%s\n' \"\$response_b64\"
         exit 0
       fi
     fi
@@ -393,7 +396,39 @@ docker run --rm --network \"\$network_name\" \\
   done
   exit 1
 '
-"
+")"; then
+    return 1
+  fi
+
+  health_count="$(
+    printf '%s\n' "$raw_health_output" |
+      awk '/^MANALOOM_HEALTH_B64=[A-Za-z0-9+\/]+={0,2}$/ {count++} END {print count+0}'
+  )"
+  health_line="$(
+    printf '%s\n' "$raw_health_output" |
+      awk '/^MANALOOM_HEALTH_B64=[A-Za-z0-9+\/]+={0,2}$/ {print; exit}'
+  )"
+  if [[ "$health_count" != "1" || -z "$health_line" ]]; then
+    echo "health remoto nao produziu uma unica resposta enquadrada" >&2
+    return 1
+  fi
+  health_payload_b64="${health_line#MANALOOM_HEALTH_B64=}"
+  if [[ ! "$health_payload_b64" =~ ^[A-Za-z0-9+/]+={0,2}$ ]] ||
+     ! health_payload="$(printf '%s' "$health_payload_b64" | base64 -d)"; then
+    echo "health remoto nao pode ser decodificado com seguranca" >&2
+    return 1
+  fi
+  if ! jq -s -e 'length == 1 and (.[0] | type == "object")' \
+    >/dev/null <<<"$health_payload"; then
+    echo "health remoto nao e um unico objeto JSON valido" >&2
+    return 1
+  fi
+  if [[ -n "$expected_fragment" &&
+        "$health_payload" != *"$expected_fragment"* ]]; then
+    echo "health remoto perdeu o fragmento semantico esperado" >&2
+    return 1
+  fi
+  printf '%s' "$health_payload"
 }
 
 interactive_service_exists_remote() {
