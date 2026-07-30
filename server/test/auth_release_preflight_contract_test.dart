@@ -20,7 +20,7 @@ void main() {
     expect(deploy, contains('--env-add MANALOOM_TRUSTED_PROXY_HOPS='));
     expect(deploy, contains('--env-add MANALOOM_TRUSTED_PROXY_PEERS='));
     expect(deploy, contains('require_trusted_proxy_topology'));
-    expect(deploy, contains('easypanel-traefik'));
+    expect(deploy, contains('MANALOOM_PRODUCTION_TRAEFIK_SERVICE'));
     expect(deploy, contains('JWT_SECRET nao foi fornecido'));
     expect(deploy, contains('--env-add SENTRY_DSN='));
     expect(deploy, contains('--env-add SENTRY_ENVIRONMENT=production'));
@@ -42,7 +42,11 @@ void main() {
     expect(preflight, isNot(contains("Platform.environment['JWT_SECRET']")));
     expect(
       releaseContract,
-      contains('MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP="10.11.0.202"'),
+      contains('MANALOOM_PRODUCTION_TRAEFIK_SERVICE="easypanel-traefik"'),
+    );
+    expect(
+      releaseContract,
+      isNot(contains('MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP')),
     );
     expect(
       releaseContract,

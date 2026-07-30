@@ -18,12 +18,14 @@ readonly MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL="http://${MANALOOM_PRODUCTION
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_HOPS="1"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK="easypanel"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_SUBNET="10.11.0.0/16"
-readonly MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP="10.11.0.202"
-# Docker Swarm preserves the client-facing Traefik task address above for
-# routing, but connections received by backend tasks originate from the
-# overlay network load-balancer endpoint. Keep the transport trust boundary
-# separate and exact: widening this value to the overlay subnet would allow an
-# unrelated service on the shared network to forge X-Forwarded-For.
+readonly MANALOOM_PRODUCTION_TRAEFIK_SERVICE="easypanel-traefik"
+# A Swarm task address is ephemeral and can change whenever Traefik is
+# rescheduled. The deploy gate therefore proves that the running task belongs
+# to the approved service and network instead of pinning that task address.
+# Connections received by backend tasks originate from the stable overlay
+# load-balancer endpoint below. Keep that transport trust boundary exact:
+# widening this value to the overlay subnet would allow an unrelated service
+# on the shared network to forge X-Forwarded-For.
 readonly MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.4"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS="${MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4}/32"
 readonly MANALOOM_PRODUCTION_SENTRY_DSN_SHA256="2e1cc23c01e5b7d989edc2f1d046c3e7de34a3fa57e995c0f2e6252902153e49" # gitleaks:allow -- one-way DSN fingerprint, not a credential

@@ -275,30 +275,61 @@ require_auth_runtime_contract() {
 }
 
 require_trusted_proxy_topology() {
-  local topology proxy_ip backend_ip proxy_subnet transport_peer_ip
-  topology="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+  local topology topology_output topology_marker proxy_service backend_service
+  local proxy_ip backend_ip proxy_subnet transport_peer_ip
+  topology_marker="MANALOOM_PROXY_TOPOLOGY"
+  topology_output="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 set -euo pipefail
-proxy_cid=\$(docker ps --filter label=com.docker.swarm.service.name=easypanel-traefik -q | head -1)
-backend_cid=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
-test -n \"\$proxy_cid\" && test -n \"\$backend_cid\"
+proxy_cids=\$(docker ps --filter label=com.docker.swarm.service.name='$MANALOOM_PRODUCTION_TRAEFIK_SERVICE' --format '{{.ID}}')
+backend_cids=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' --format '{{.ID}}')
+test \"\$(printf '%s\n' \"\$proxy_cids\" | awk 'NF { count += 1 } END { print count + 0 }')\" = 1
+test \"\$(printf '%s\n' \"\$backend_cids\" | awk 'NF { count += 1 } END { print count + 0 }')\" = 1
+proxy_cid=\$(printf '%s\n' \"\$proxy_cids\" | awk 'NF { print; exit }')
+backend_cid=\$(printf '%s\n' \"\$backend_cids\" | awk 'NF { print; exit }')
+proxy_service=\$(docker inspect \"\$proxy_cid\" --format '{{index .Config.Labels \"com.docker.swarm.service.name\"}}')
+backend_service=\$(docker inspect \"\$backend_cid\" --format '{{index .Config.Labels \"com.docker.swarm.service.name\"}}')
 proxy_ip=\$(docker inspect \"\$proxy_cid\" --format '{{.NetworkSettings.Networks.easypanel.IPAddress}}')
 backend_ip=\$(docker inspect \"\$backend_cid\" --format '{{.NetworkSettings.Networks.easypanel.IPAddress}}')
 proxy_subnet=\$(docker network inspect '$MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK' --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}')
-transport_peer_ip=\$(docker network inspect '$MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK' --format '{{range \$id, \$container := .Containers}}{{if eq \$id \"lb-easypanel\"}}{{\$container.IPv4Address}}{{end}}{{end}}')
+transport_peer_ip=\$(docker network inspect '$MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK' --format '{{with index .Containers \"lb-easypanel\"}}{{.IPv4Address}}{{end}}')
 transport_peer_ip=\${transport_peer_ip%/*}
-printf '%s|%s|%s|%s' \"\$proxy_ip\" \"\$backend_ip\" \"\$proxy_subnet\" \"\$transport_peer_ip\"
+printf '$topology_marker|%s|%s|%s|%s|%s|%s\n' \
+  \"\$proxy_service\" \"\$backend_service\" \"\$proxy_ip\" \"\$backend_ip\" \
+  \"\$proxy_subnet\" \"\$transport_peer_ip\"
 ")"
-  IFS='|' read -r proxy_ip backend_ip proxy_subnet transport_peer_ip <<<"$topology"
-  if [[ "$proxy_ip" != "$MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP" ||
+  topology="$(
+    printf '%s\n' "$topology_output" |
+      awk -F '|' -v marker="$topology_marker" '
+        $1 == marker { topology = $0 }
+        END {
+          if (topology == "") exit 1
+          print topology
+        }
+      '
+  )"
+  unset topology_output
+  IFS='|' read -r _ proxy_service backend_service proxy_ip backend_ip \
+    proxy_subnet transport_peer_ip <<<"$topology"
+  if [[ "$proxy_service" != "$MANALOOM_PRODUCTION_TRAEFIK_SERVICE" ||
+        "$backend_service" != "$SERVICE" ||
         "$transport_peer_ip" != "$MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4" ||
         "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" != "${transport_peer_ip}/32" ||
         "$proxy_subnet" != "$MANALOOM_PRODUCTION_TRUSTED_PROXY_SUBNET" ]] ||
-     ! python3 - "$backend_ip" "$proxy_subnet" <<'PY'
+     ! python3 - "$proxy_ip" "$backend_ip" "$transport_peer_ip" \
+       "$proxy_subnet" <<'PY'
 import ipaddress
 import sys
 
 try:
-    valid = ipaddress.ip_address(sys.argv[1]) in ipaddress.ip_network(sys.argv[2])
+    proxy_ip = ipaddress.ip_address(sys.argv[1])
+    backend_ip = ipaddress.ip_address(sys.argv[2])
+    transport_peer_ip = ipaddress.ip_address(sys.argv[3])
+    proxy_subnet = ipaddress.ip_network(sys.argv[4])
+    valid = (
+        proxy_ip in proxy_subnet
+        and backend_ip in proxy_subnet
+        and len({proxy_ip, backend_ip, transport_peer_ip}) == 3
+    )
 except ValueError:
     valid = False
 raise SystemExit(0 if valid else 1)
