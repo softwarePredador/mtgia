@@ -37,6 +37,11 @@ for web_deploy in \
     exit 1
   fi
 done
+if ! grep -Fq 'extract_manaloom_repo_digest_ref "$IMAGE_REPO"' \
+  "$ROOT_DIR/scripts/manaloom_deploy_ops_image.sh"; then
+  echo "deploy manaloom-ops nao filtra o MOTD antes de validar RepoDigest" >&2
+  exit 1
+fi
 grep -Fq 'flutter_web_release_marker()' \
   "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'printf '\''flutter_bootstrap.js:%s'\''' \

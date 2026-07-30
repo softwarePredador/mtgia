@@ -259,7 +259,9 @@ git archive HEAD server docs/hermes-analysis/manaloom-knowledge scripts/lib tool
 # Build/push uses mutable publication tags only long enough to obtain the
 # registry's immutable RepoDigest. No tag is promoted to the Swarm service.
 # shellcheck disable=SC2087
-IMAGE_DIGEST_REF="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
+IMAGE_DIGEST_REF="$(
+  ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE |
+  extract_manaloom_repo_digest_ref "$IMAGE_REPO"
 set -euo pipefail
 cd '$remote_dir'
 docker build \
