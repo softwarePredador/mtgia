@@ -87,6 +87,22 @@ void main() {
       expect(archive, greaterThan(baselineHealth));
     });
 
+    test('resolves user and relative SSH key paths before validation', () {
+      expect(
+        sidecars,
+        contains('candidate = Path(sys.argv[2]).expanduser()'),
+      );
+      expect(sidecars, contains('if not candidate.is_absolute():'));
+      expect(sidecars, contains('candidate = root / candidate'));
+
+      final resolution = sidecars.indexOf(
+        'candidate = Path(sys.argv[2]).expanduser()',
+      );
+      final fileCheck = sidecars.indexOf(r'if [[ ! -f "$SSH_KEY" ]]');
+      expect(resolution, greaterThanOrEqualTo(0));
+      expect(fileCheck, greaterThan(resolution));
+    });
+
     test('tests and publishes the same immutable source snapshot', () {
       expect(sidecars, contains('manaloom_release_identity.sh'));
       expect(sidecars, contains('worktree add --detach'));

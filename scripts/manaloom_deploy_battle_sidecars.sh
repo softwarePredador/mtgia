@@ -103,6 +103,17 @@ for key in "${required[@]}"; do
   fi
 done
 
+SSH_KEY="$(python3 - "$ROOT_DIR" "$SSH_KEY" <<'PY'
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1]).resolve()
+candidate = Path(sys.argv[2]).expanduser()
+if not candidate.is_absolute():
+    candidate = root / candidate
+print(candidate.resolve())
+PY
+)"
 if [[ ! -f "$SSH_KEY" ]]; then
   echo "SSH key not found: $SSH_KEY" >&2
   exit 2
