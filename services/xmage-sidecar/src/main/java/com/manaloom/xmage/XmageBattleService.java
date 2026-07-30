@@ -95,6 +95,7 @@ final class XmageBattleService {
         result.put("engine", "xmage");
         result.put("engine_version", SidecarMain.XMAGE_VERSION);
         result.put("engine_commit", SidecarMain.XMAGE_COMMIT);
+        result.put("engine_patch_commit", SidecarMain.XMAGE_PATCH_COMMIT);
         result.put("ready", unsupported.isEmpty());
         result.put("decks", decks);
         result.put("unsupported_cards", unsupported);
@@ -132,6 +133,7 @@ final class XmageBattleService {
         result.put("engine", "xmage");
         result.put("engine_version", SidecarMain.XMAGE_VERSION);
         result.put("engine_commit", SidecarMain.XMAGE_COMMIT);
+        result.put("engine_patch_commit", SidecarMain.XMAGE_PATCH_COMMIT);
         result.put("total", rows.size());
         result.put("supported", supported);
         result.put("unsupported", unsupported.size());
@@ -349,6 +351,7 @@ final class XmageBattleService {
         result.put("engine", "xmage");
         result.put("engine_version", SidecarMain.XMAGE_VERSION);
         result.put("engine_commit", SidecarMain.XMAGE_COMMIT);
+        result.put("engine_patch_commit", SidecarMain.XMAGE_PATCH_COMMIT);
         result.put("started_at", Instant.ofEpochMilli(System.currentTimeMillis() - durationMs).toString());
         result.put("duration_ms", durationMs);
         result.put("turns", turns);

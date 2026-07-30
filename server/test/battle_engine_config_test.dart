@@ -120,6 +120,11 @@ void main() {
 
     expect(config.allowLegacySidecarIdentity, isFalse);
     expect(config.xmageIdentity.commit, pinnedXmageCommit);
+    expect(config.xmageIdentity.patchCommit, pinnedXmagePatchCommit);
+    expect(
+      config.xmageIdentity.buildIdentity,
+      'xmage-sidecar-v2@$pinnedXmageCommit+patch.$pinnedXmagePatchCommit',
+    );
     expect(config.xmageIdentity.deterministic, isFalse);
     expect(
       config.xmageIdentity.seedSemantics,
@@ -128,6 +133,12 @@ void main() {
     expect(
       File('../services/xmage-sidecar/XMAGE_COMMIT').readAsStringSync().trim(),
       pinnedXmageCommit,
+    );
+    expect(
+      File(
+        '../services/xmage-sidecar/XMAGE_PATCH_COMMIT',
+      ).readAsStringSync().trim(),
+      pinnedXmagePatchCommit,
     );
     expect(
       File('../services/forge-sidecar/FORGE_COMMIT').readAsStringSync().trim(),

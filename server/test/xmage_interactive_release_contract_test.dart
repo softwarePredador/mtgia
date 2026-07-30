@@ -110,7 +110,8 @@ void main() {
         'XMAGE_RUNTIME_MODE=interactive',
         'XMAGE_INTERACTIVE_MAX_ACTIVE=\$INTERACTIVE_MAX_ACTIVE',
         '.schema_version == "external_battle_execution_v2"',
-        '.sidecar_build_identity == ("xmage-sidecar-v2@" + \$commit)',
+        '.engine_patch_commit == \$patch_commit',
+        '"xmage-sidecar-v2@" + \$commit + "+patch." + \$patch_commit',
         '.runtime_mode == "interactive"',
         '.batch_simulation_available == false',
         '.interactive_battle.schema_version ==',
@@ -139,6 +140,20 @@ void main() {
           r'"$INTERACTIVE_PER_USER_ACTIVE_LIMIT" -gt "$INTERACTIVE_MAX_ACTIVE"',
         ),
       );
+    });
+
+    test('requires the governed patch proof before building or deploying', () {
+      expect(sidecars, contains('xmage_governed_patch_audit.py'));
+      expect(sidecars, contains('--require-deployable'));
+      expect(
+        sidecars,
+        contains(
+          'docs/qa/evidence/'
+          'LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch',
+        ),
+      );
+      expect(sidecars, contains('XMAGE_EXPECTED_PATCH_COMMIT'));
+      expect(backend, contains('XMAGE_EXPECTED_PATCH_COMMIT'));
     });
 
     test('rolls back updates and removes an uncommitted first install', () {
@@ -214,6 +229,13 @@ void main() {
         contains(
           "--env-add XMAGE_INTERACTIVE_SIDECAR_URL="
           "'\$XMAGE_INTERACTIVE_URL'",
+        ),
+      );
+      expect(
+        backend,
+        contains(
+          "--env-add XMAGE_EXPECTED_PATCH_COMMIT="
+          "'\$XMAGE_EXPECTED_PATCH_COMMIT'",
         ),
       );
       expect(backend, contains('expected_interactive_contract='));

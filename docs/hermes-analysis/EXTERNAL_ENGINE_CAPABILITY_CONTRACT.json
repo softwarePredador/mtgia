@@ -24,6 +24,8 @@
       "id": "xmage",
       "official_repository": "https://github.com/magefree/mage",
       "canonical_pin_file": "services/xmage-sidecar/XMAGE_COMMIT",
+      "governed_patch_commit_file": "services/xmage-sidecar/XMAGE_PATCH_COMMIT",
+      "governed_patch_contract": "docs/hermes-analysis/XMAGE_GOVERNED_RUNTIME_PATCH_CONTRACT.json",
       "license": "MIT",
       "runtime_role": "primary_external_rules_executor",
       "integration_boundary": "isolated_sidecar_api",

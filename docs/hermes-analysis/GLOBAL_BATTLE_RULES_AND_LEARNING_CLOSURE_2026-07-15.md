@@ -24,6 +24,14 @@ catalog must resolve the exact product identity or an audited unique Unicode
 normalization that preserves punctuation. This rule prevents class-name
 collisions such as `Clear, the Mind` being associated with `ClearTheMind.java`.
 
+The upstream pin may have one active governed runtime patch identified by
+`services/xmage-sidecar/XMAGE_PATCH_COMMIT`. That patch counts as executable
+coverage only after the governed patch contract proves its direct parent,
+complete delta, reproducible tree, focused runtime scenarios and read-only
+PostgreSQL product scope. Health and replay provenance retain both the upstream
+commit and patch commit; this does not create or promote a PostgreSQL battle
+rule.
+
 ## One entrypoint
 
 ```bash

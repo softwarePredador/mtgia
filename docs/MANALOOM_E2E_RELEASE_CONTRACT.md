@@ -81,6 +81,13 @@ pinados do sidecar: uma carta com defeito confirmado deve retornar
 `XMAGE_COMMIT` precisa revisar a política antes de os testes aceitarem o novo
 runtime.
 
+Quando `XMAGE_PATCH_COMMIT` estiver presente, o patch governado é uma segunda
+identidade obrigatória, não uma edição local implícita. O Battle gate e o
+deploy executam `xmage_governed_patch_audit.py --require-deployable`; o build
+reproduz a árvore a partir do patch versionado, confirma pai/commit/árvore no
+repositório governado e o runtime publica `engine_patch_commit`. Backend,
+sidecar batch e sidecar interativo precisam concordar com essa identidade.
+
 A etapa focada da suíte E2E executa explicitamente os classificadores de ramp
 em Dart e Python, o piso estrutural do optimizer, os contratos de segurança da
 fundação de qualidade de candidatos e da sincronização das Comprehensive Rules.
@@ -145,6 +152,9 @@ Além da conclusão local, exige:
 7. toda transição ativa de pin XMage está com qualificação
    `pass`/`deployment_allowed=true`, sem carta residual ou reconciliação
    PostgreSQL pendente.
+8. todo patch XMage governado ativo está fetchable, reproduzível, com testes
+   focados verdes, escopo PostgreSQL read-only reconciliado e identidade
+   confirmada em health/readiness/replay.
 
 Sem esses itens, o resultado correto é “localmente concluído, release
 pendente”, e não “produção concluída”.

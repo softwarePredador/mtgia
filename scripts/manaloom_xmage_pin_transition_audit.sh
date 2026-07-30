@@ -9,6 +9,7 @@ OUTPUT_PREFIX="${MANALOOM_XMAGE_PIN_TRANSITION_OUT:-/tmp/manaloom_xmage_pin_tran
 cd "$SCRIPTS_DIR"
 PYTHONWARNINGS=error::ResourceWarning python3 -m unittest \
   test_xmage_pin_transition_audit.py \
+  test_xmage_governed_patch_audit.py \
   test_xmage_transition_activation_policy.py \
   test_xmage_transition_nominal_review.py \
   test_xmage_transition_postgresql_scope_reconciliation.py \
@@ -16,3 +17,6 @@ PYTHONWARNINGS=error::ResourceWarning python3 -m unittest \
 
 cd "$ROOT_DIR"
 python3 "$AUDITOR" --output-prefix "$OUTPUT_PREFIX" "$@"
+python3 "$SCRIPTS_DIR/xmage_governed_patch_audit.py" \
+  --require-deployable \
+  --output "${OUTPUT_PREFIX}_governed_patch.json"

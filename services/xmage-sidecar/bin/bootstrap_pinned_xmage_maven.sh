@@ -3,12 +3,18 @@ set -euo pipefail
 
 SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
 SIDECAR_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
+REPOSITORY_ROOT="$(CDPATH='' cd -- "$SIDECAR_DIR/../.." && pwd)"
 XMAGE_COMMIT="$(tr -d '[:space:]' < "$SIDECAR_DIR/XMAGE_COMMIT")"
+XMAGE_PATCH_COMMIT="$(tr -d '[:space:]' < "$SIDECAR_DIR/XMAGE_PATCH_COMMIT")"
 XMAGE_VERSION="1.4.60"
 SQLITE_JDBC_VERSION="3.53.2.0"
+XMAGE_PATCH_REPOSITORY="https://github.com/softwarePredador/mage.git"
+XMAGE_PATCH_FILE="$REPOSITORY_ROOT/docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch"
+XMAGE_PATCH_SHA256="ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812"
+XMAGE_PATCH_TREE="ba94fb4c1522a5a00d951d76b354cc83eab1687c"
 MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-${HOME:?HOME is required}/.m2/repository}"
 PIN_MARKER="$MAVEN_REPO_LOCAL/.manaloom-xmage-pin"
-PIN_FINGERPRINT="$XMAGE_COMMIT xmage=$XMAGE_VERSION sqlite-jdbc=$SQLITE_JDBC_VERSION"
+PIN_FINGERPRINT="$XMAGE_COMMIT patch=$XMAGE_PATCH_COMMIT xmage=$XMAGE_VERSION sqlite-jdbc=$SQLITE_JDBC_VERSION"
 
 case "$MAVEN_REPO_LOCAL" in
   /*) ;;
@@ -39,18 +45,43 @@ fi
 
 require_command git
 require_command mvn
+require_command shasum
+
+OBSERVED_XMAGE_PATCH_SHA256="$(
+  shasum -a 256 "$XMAGE_PATCH_FILE" | awk '{print $1}'
+)"
+if [[ ! "$XMAGE_COMMIT" =~ ^[0-9a-f]{40}$ ||
+      ! "$XMAGE_PATCH_COMMIT" =~ ^[0-9a-f]{40}$ ||
+      "$OBSERVED_XMAGE_PATCH_SHA256" != "$XMAGE_PATCH_SHA256" ]]; then
+  echo "Governed XMage patch identity is invalid" >&2
+  exit 2
+fi
 
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-xmage-bootstrap.XXXXXX")"
 cleanup() {
-  rm -rf "$WORK_DIR"
+  find "$WORK_DIR" -depth -delete 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
 git -C "$WORK_DIR" init -q xmage
-git -C "$WORK_DIR/xmage" remote add origin https://github.com/magefree/mage.git
-git -C "$WORK_DIR/xmage" fetch --depth 1 origin "$XMAGE_COMMIT"
+git -C "$WORK_DIR/xmage" remote add upstream https://github.com/magefree/mage.git
+git -C "$WORK_DIR/xmage" fetch --depth 1 upstream "$XMAGE_COMMIT"
 git -C "$WORK_DIR/xmage" checkout --detach FETCH_HEAD
 test "$(git -C "$WORK_DIR/xmage" rev-parse HEAD)" = "$XMAGE_COMMIT"
+git -C "$WORK_DIR/xmage" apply --check --unidiff-zero "$XMAGE_PATCH_FILE"
+git -C "$WORK_DIR/xmage" apply \
+  --unidiff-zero --whitespace=nowarn "$XMAGE_PATCH_FILE"
+git -C "$WORK_DIR/xmage" add -A
+test "$(git -C "$WORK_DIR/xmage" write-tree)" = "$XMAGE_PATCH_TREE"
+git -C "$WORK_DIR/xmage" reset --hard -q "$XMAGE_COMMIT"
+git -C "$WORK_DIR/xmage" remote add governed "$XMAGE_PATCH_REPOSITORY"
+git -C "$WORK_DIR/xmage" fetch --depth 2 governed "$XMAGE_PATCH_COMMIT"
+test "$(git -C "$WORK_DIR/xmage" rev-parse FETCH_HEAD)" = \
+  "$XMAGE_PATCH_COMMIT"
+test "$(git -C "$WORK_DIR/xmage" rev-parse FETCH_HEAD^)" = "$XMAGE_COMMIT"
+test "$(git -C "$WORK_DIR/xmage" rev-parse FETCH_HEAD^{tree})" = \
+  "$XMAGE_PATCH_TREE"
+git -C "$WORK_DIR/xmage" checkout -q --detach FETCH_HEAD
 
 # Fail closed if the dependency graph at the exact pin differs from the
 # reviewed production build. Do not rewrite an upstream dependency downward.
@@ -76,4 +107,4 @@ if ! artifact_ready; then
   exit 1
 fi
 
-echo "Installed pinned XMage $XMAGE_COMMIT artifacts in $MAVEN_REPO_LOCAL"
+echo "Installed pinned XMage $XMAGE_COMMIT with governed patch $XMAGE_PATCH_COMMIT in $MAVEN_REPO_LOCAL"

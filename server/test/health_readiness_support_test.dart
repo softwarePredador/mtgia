@@ -544,8 +544,12 @@ Map<String, dynamic> _battleHealth(String engine) {
     'engine': engine,
     'engine_version': isXmage ? pinnedXmageVersion : pinnedForgeVersion,
     'engine_commit': commit,
+    if (isXmage) 'engine_patch_commit': pinnedXmagePatchCommit,
     'sidecar_protocol_version': externalBattleSidecarProtocol,
-    'sidecar_build_identity': '$engine-sidecar-v2@$commit',
+    'sidecar_build_identity':
+        isXmage
+            ? '$engine-sidecar-v2@$commit+patch.$pinnedXmagePatchCommit'
+            : '$engine-sidecar-v2@$commit',
     'sidecar_process_id': '$engine-process',
     'sidecar_started_at': '2026-07-22T12:00:00Z',
     'ai_profile': isXmage ? 'computer_mad' : 'forge_default_ai',

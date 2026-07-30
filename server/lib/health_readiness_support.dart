@@ -892,6 +892,8 @@ Future<BattleLiveSpectatorReadiness> evaluateBattleLiveSpectatorReadiness(
       'XMAGE_SIDECAR_URL': sourceUrl,
       if (env['XMAGE_EXPECTED_COMMIT'] case final String value)
         'XMAGE_EXPECTED_COMMIT': value,
+      if (env['XMAGE_EXPECTED_PATCH_COMMIT'] case final String value)
+        'XMAGE_EXPECTED_PATCH_COMMIT': value,
       if (env['XMAGE_EXPECTED_VERSION'] case final String value)
         'XMAGE_EXPECTED_VERSION': value,
     });
@@ -1145,6 +1147,7 @@ Future<InteractiveBattleReadiness> evaluateInteractiveBattleReadiness(
         'XMAGE_SIDECAR_URL',
         'XMAGE_EXPECTED_VERSION',
         'XMAGE_EXPECTED_COMMIT',
+        'XMAGE_EXPECTED_PATCH_COMMIT',
         'INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT',
         'INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT',
       ])
@@ -1446,6 +1449,7 @@ Future<BattleRuntimeReadiness> evaluateBattleRuntimeReadiness(
         'FORGE_SIDECAR_URL',
         'NATIVE_BATTLE_SIDECAR_URL',
         'XMAGE_EXPECTED_COMMIT',
+        'XMAGE_EXPECTED_PATCH_COMMIT',
         'FORGE_EXPECTED_COMMIT',
         'XMAGE_EXPECTED_VERSION',
         'FORGE_EXPECTED_VERSION',

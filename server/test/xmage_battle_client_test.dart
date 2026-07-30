@@ -18,6 +18,18 @@ const _identity = ExternalBattleEngineIdentity(
   deterministic: false,
 );
 
+const _patchedIdentity = ExternalBattleEngineIdentity(
+  engine: 'xmage',
+  version: pinnedXmageVersion,
+  commit: pinnedXmageCommit,
+  patchCommit: pinnedXmagePatchCommit,
+  aiProfile: 'computer_mad',
+  telemetryField: 'normalizer_version',
+  telemetryVersion: 'xmage_replay_normalizer_v2',
+  seedSemantics: 'request_correlation_only_server_rng_uncontrolled',
+  deterministic: false,
+);
+
 void main() {
   test('checks XMage deck coverage without starting a battle', () async {
     final client = XmageBattleClient(
@@ -49,6 +61,38 @@ void main() {
 
     expect(result['ready'], isFalse);
     expect((result['unsupported_cards'] as List), hasLength(1));
+    client.close();
+  });
+
+  test('rejects coverage without the governed XMage patch identity', () async {
+    final client = XmageBattleClient(
+      baseUrl: 'http://xmage.internal:8080/',
+      expectedIdentity: _patchedIdentity,
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({
+            'status': 'ok',
+            'ready': true,
+            'engine': 'xmage',
+            'engine_version': pinnedXmageVersion,
+            'engine_commit': pinnedXmageCommit,
+          }),
+          200,
+        ),
+      ),
+    );
+
+    await expectLater(
+      client.coverage({
+        'deck_a': const <String, dynamic>{},
+        'deck_b': const <String, dynamic>{},
+      }),
+      throwsA(
+        isA<XmageServiceException>()
+            .having((error) => error.statusCode, 'status', 502)
+            .having((error) => error.message, 'message', contains('identity')),
+      ),
+    );
     client.close();
   });
 
@@ -227,13 +271,13 @@ void main() {
   test(
     'validates the strict identity, request hash and returned seed',
     () async {
-      final request = _strictRequest(_identity);
+      final request = _strictRequest(_patchedIdentity);
       final client = XmageBattleClient(
         baseUrl: 'http://xmage.internal:8080',
-        expectedIdentity: _identity,
+        expectedIdentity: _patchedIdentity,
         client: MockClient(
           (_) async => http.Response(
-            jsonEncode(_strictResponse(request, _identity, turns: 7)),
+            jsonEncode(_strictResponse(request, _patchedIdentity, turns: 7)),
             200,
           ),
         ),
@@ -439,6 +483,8 @@ Map<String, dynamic> _strictResponse(
     'engine': identity.engine,
     'engine_version': identity.version,
     'engine_commit': identity.commit,
+    if (identity.patchCommit != null)
+      'engine_patch_commit': identity.patchCommit,
     'sidecar_protocol_version': externalBattleSidecarProtocol,
     'sidecar_build_identity': identity.buildIdentity,
     'sidecar_process_id': 'xmage-process',

@@ -190,7 +190,8 @@ class XmageBattleClient {
   void _validateCoverageIdentity(Map<String, dynamic> body) {
     if (body['engine'] != _expectedIdentity.engine ||
         body['engine_version'] != _expectedIdentity.version ||
-        body['engine_commit'] != _expectedIdentity.commit) {
+        body['engine_commit'] != _expectedIdentity.commit ||
+        body['engine_patch_commit'] != _expectedIdentity.patchCommit) {
       throw XmageServiceException(
         'XMage coverage identity rejected',
         statusCode: 502,

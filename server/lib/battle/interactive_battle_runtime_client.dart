@@ -36,6 +36,10 @@ class InteractiveBattleConfiguration {
           environment['XMAGE_EXPECTED_COMMIT']?.trim().isNotEmpty == true
               ? environment['XMAGE_EXPECTED_COMMIT']!.trim().toLowerCase()
               : pinnedXmageCommit,
+      patchCommit:
+          environment['XMAGE_EXPECTED_PATCH_COMMIT']?.trim().isNotEmpty == true
+              ? environment['XMAGE_EXPECTED_PATCH_COMMIT']!.trim().toLowerCase()
+              : pinnedXmagePatchCommit,
       aiProfile: 'computer_mad',
       telemetryField: 'normalizer_version',
       telemetryVersion: 'xmage_replay_normalizer_v2',

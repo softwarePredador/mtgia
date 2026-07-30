@@ -1,15 +1,15 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "5462c1aca4d3754a8406fe8fd805fd325b501779e8c3be972c4f25c9f55295a9",
+  "source_digest": "dc57c8ddcb84141016c08422801bf5ddf67bbf9c67ec1ccb5be86dd0f33eb18d",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-29T22:45:02Z",
+    "verified_at": "2026-07-30T16:09:19Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
       "flutter drive --profile -d R58T300SREH --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on physical Samsung SM-A135M, including native Life Counter landscape)",
-      "flutter test integration_test/battle_coach_live_evidence_test.dart -d R58T300SREH (7 Battle Coach runtime states on physical Android)",
-      "in-app browser physical keyboard audit at 1280x720 (9 Battle Coach focus/modal/filter/preflight checkpoints; positive XMage-backed preflight)",
+      "flutter test integration_test/battle_coach_visual_runtime_proof_test.dart -d R58T300SREH (7 Battle Coach runtime states on physical Android)",
+      "in-app browser physical keyboard audit at 1280x720 (9 Battle Coach focus/modal/filter/preflight checkpoints; positive rules-engine-backed preflight)",
       "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
       "dart test <focused optimizer suites> (173 broad cases, plus 107 final format/cache/rebuild regressions) and flutter test <focused optimizer suites> (121 passed)",
       "./scripts/manaloom_local_ci.sh full (41 deterministic backend batches passed; flutter test 1352 passed with 1 conditional skip)",
@@ -20,7 +20,7 @@
       "./scripts/manaloom_performance_gate.sh",
       "./scripts/manaloom_local_ci.sh schema",
       "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
-      "./scripts/manaloom_web_gate.sh (Node 26, zero vulnerabilities)",
+      "./scripts/quality_gate.sh web (Node 26, zero vulnerabilities)",
       "flutter build web --release --no-pub --base-href /app/ --no-web-resources-cdn"
     ]
   },
@@ -29,31 +29,31 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "5ef5d51ff9f42c2c3ca9edb24774688557325f14d31fb66e067540da7308bed1"
+        "sha256": "f720e8405e4fbad6517e13845e0d93cab04c085c89a3f0d14c5bdce4bb0b100a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "6ad547ba4ce83a3331bfa2efc3be728ac6bfb5fbb197c99f54a1fadc6197ad49"
+        "sha256": "8a61d7807641a0479319bfb5351ba3ff8b87d562ba992388bade7e8499e1ef1a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "0be528cf350079ab362c99cf993b1d8bb11f7ff437b7089a923de26b184fbaf6"
+        "sha256": "33794c4700216cb615e2a16b88662c6737593287260152395c998b13b6acd481"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "01c4a260fb1a8d011579a04f0b0e3a0c04c5e12b997b1d2131db9fbea69ecced"
+        "sha256": "2a9025d6b2c3d0e75ce7656d49eb991af71864123e48253892b36f80cdd0065b"
       },
       {
         "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
-        "sha256": "7da31e678abb0cb19062af9097d05124c5430ced23062eb004e4eba2dc7af9d2"
+        "sha256": "48a12a0942d1adf54c76f3253e5339f0bd64eadeefe22f4997f79611dd69da89"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "f4a488cbb32f3d6077164b2d98d331a3bf61c0def8d12df1f27fb30cc748ce40"
+        "sha256": "ae410778d8de03015a4480160ccadd8ecf5a82f130c6bdbda6e916b271fa3c7b"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "83118e977a1de4f04cad7d80e4ac8e88f8c8868fa42a99de2ef5bd23247fb9c8"
+        "sha256": "f2c46213dc40a897af9b8ddef721db8fbfad5b7bd53002cbbe648a2faace0d7e"
       }
     ],
     "evidence_notes": [
@@ -61,12 +61,12 @@
       "O Samsung SM-A135M físico concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2408×1080.",
       "A jornada Android dedicada de coleção, criação de Commander e otimização concluiu 12/12 estados, incluindo validação inline, retry de persistência e correção segura de terrenos de 9 para 36.",
       "O Battle Coach ganhou prova dedicada de 7 estados no Android físico e 9 estados Web com teclado real, foco visível, modal, filtro e preflight interativo positivo.",
-      "A fixture positiva usou PostgreSQL/API loopback descartáveis, dois decks Commander válidos de 100 cartas e cobertura pronta do motor de regras pinado; nenhum dado de produção foi alterado."
+      "A matriz P0 e as provas Android usaram PostgreSQL/API loopback descartáveis. A prova Web de teclado usou duas contas e dois decks Commander temporários na API pública; os artefatos foram identificados para remoção ao final do E2E."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-29T22:45:02Z",
+    "reviewed_at": "2026-07-30T16:09:19Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -117,13 +117,13 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "5ef5d51ff9f42c2c3ca9edb24774688557325f14d31fb66e067540da7308bed1",
-      "6ad547ba4ce83a3331bfa2efc3be728ac6bfb5fbb197c99f54a1fadc6197ad49",
-      "0be528cf350079ab362c99cf993b1d8bb11f7ff437b7089a923de26b184fbaf6",
-      "01c4a260fb1a8d011579a04f0b0e3a0c04c5e12b997b1d2131db9fbea69ecced",
-      "7da31e678abb0cb19062af9097d05124c5430ced23062eb004e4eba2dc7af9d2",
-      "f4a488cbb32f3d6077164b2d98d331a3bf61c0def8d12df1f27fb30cc748ce40",
-      "83118e977a1de4f04cad7d80e4ac8e88f8c8868fa42a99de2ef5bd23247fb9c8"
+      "f720e8405e4fbad6517e13845e0d93cab04c085c89a3f0d14c5bdce4bb0b100a",
+      "8a61d7807641a0479319bfb5351ba3ff8b87d562ba992388bade7e8499e1ef1a",
+      "33794c4700216cb615e2a16b88662c6737593287260152395c998b13b6acd481",
+      "2a9025d6b2c3d0e75ce7656d49eb991af71864123e48253892b36f80cdd0065b",
+      "48a12a0942d1adf54c76f3253e5339f0bd64eadeefe22f4997f79611dd69da89",
+      "ae410778d8de03015a4480160ccadd8ecf5a82f130c6bdbda6e916b271fa3c7b",
+      "f2c46213dc40a897af9b8ddef721db8fbfad5b7bd53002cbbe648a2faace0d7e"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",

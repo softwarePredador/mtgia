@@ -1,9 +1,11 @@
 # ManaLoom XMage Sidecar
 
-Executes Commander battles with the official XMage runtime pinned by
-[`XMAGE_COMMIT`](XMAGE_COMMIT). The service is strict: unresolved cards are
-reported and are never removed from a deck. Cards with a confirmed defect in
-the pinned engine are also rejected by a pin-scoped qualification policy.
+Executes Commander battles with the official XMage baseline pinned by
+[`XMAGE_COMMIT`](XMAGE_COMMIT), plus the exact governed runtime patch pinned by
+[`XMAGE_PATCH_COMMIT`](XMAGE_PATCH_COMMIT). The service is strict: unresolved
+cards are reported and are never removed from a deck. Cards with a confirmed
+defect in the pinned engine are also rejected by a pin-scoped qualification
+policy.
 
 ## HTTP contract
 
@@ -136,12 +138,14 @@ version, and the patched SQLite JDBC version. Cached jars without the matching
 fingerprint are rebuilt. The local gate validates `XMAGE_COMMIT` before reusing
 the Maven cache.
 
-### Lorehold candidate patch
+### Governed Lorehold runtime patch
 
-Lorehold is not present in the canonical pin. A minimal, non-deployable patch
-is versioned only for reproducible qualification. It contains the public
-dynamic-Miracle and Lorehold changes from XMage PR 15591 plus three direct
-tests; it deliberately excludes the unrelated cards in that PR.
+Lorehold is not present in the canonical upstream pin. The minimal patch
+contains the public dynamic-Miracle and Lorehold changes from XMage PR 15591
+plus three direct tests; it deliberately excludes the unrelated cards in that
+PR. Its exact resulting tree is published as commit
+`95f0ff69968159025998dcbecb59be5f3c1b67e2` in the governed
+`softwarePredador/mage` fork, with the canonical pin as its direct parent.
 
 Run the isolated verifier with Java 17:
 
@@ -150,11 +154,20 @@ services/xmage-sidecar/bin/verify_lorehold_candidate_patch.sh
 ```
 
 The verifier fetches the official canonical pin into a temporary checkout,
-checks the patch digest, applies it and runs `MiracleTest`. It does not change
-`XMAGE_COMMIT`, install a candidate into the canonical Maven fingerprint,
-mutate PostgreSQL or authorize deployment. Promotion still requires publishing
-the exact patch as a fetchable commit in a governed fork and passing the
-pin-transition contract.
+checks the patch digest, applies it and runs `MiracleTest`. The separate
+governance auditor binds the published commit, parent, tree, complete 14-path
+diff, six focused tests and read-only PostgreSQL product scope:
+
+```bash
+python3 \
+  docs/hermes-analysis/manaloom-knowledge/scripts/xmage_governed_patch_audit.py \
+  --require-deployable
+```
+
+The image build independently reapplies the versioned patch, verifies the
+resulting Git tree, fetches the governed commit and rejects any parent or tree
+divergence. Runtime health and replays expose `engine_patch_commit`; player
+copy remains engine-neutral.
 
 The Docker image clones and verifies the pinned XMage commit, upgrades only the
 SQLite JDBC runtime for arm64 compatibility, builds the XMage server, and runs

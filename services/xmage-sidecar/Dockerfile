@@ -1,16 +1,37 @@
 FROM maven:3.9.16-eclipse-temurin-17-noble@sha256:1ed5d1f54416b706707b4f3238f63a20bb06aab27c6d240090a2bb9ad895ed45 AS build
 
 ARG XMAGE_COMMIT=2c43ec8cdb5cd475d47e6b555a4077151f476a3b
+ARG XMAGE_PATCH_COMMIT=95f0ff69968159025998dcbecb59be5f3c1b67e2
+ARG XMAGE_PATCH_TREE=ba94fb4c1522a5a00d951d76b354cc83eab1687c
+ARG XMAGE_PATCH_SHA256=ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812
+ARG XMAGE_PATCH_REPOSITORY=https://github.com/softwarePredador/mage.git
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git unzip \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
-RUN git clone https://github.com/magefree/mage.git xmage \
+COPY docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch /tmp/lorehold.patch
+RUN test "$(sha256sum /tmp/lorehold.patch | awk '{print $1}')" = "$XMAGE_PATCH_SHA256" \
+    && git init -q xmage \
     && cd xmage \
-    && git checkout "$XMAGE_COMMIT" \
-    && test "$(git rev-parse HEAD)" = "$XMAGE_COMMIT"
+    && git remote add upstream https://github.com/magefree/mage.git \
+    && git fetch --depth 1 upstream "$XMAGE_COMMIT" \
+    && git checkout -q --detach FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "$XMAGE_COMMIT" \
+    && git apply --check --unidiff-zero /tmp/lorehold.patch \
+    && git apply --unidiff-zero --whitespace=nowarn /tmp/lorehold.patch \
+    && git add -A \
+    && test "$(git write-tree)" = "$XMAGE_PATCH_TREE" \
+    && git reset --hard -q "$XMAGE_COMMIT" \
+    && git remote add governed "$XMAGE_PATCH_REPOSITORY" \
+    && git fetch --depth 2 governed "$XMAGE_PATCH_COMMIT" \
+    && test "$(git rev-parse FETCH_HEAD)" = "$XMAGE_PATCH_COMMIT" \
+    && test "$(git rev-parse FETCH_HEAD^)" = "$XMAGE_COMMIT" \
+    && test "$(git rev-parse FETCH_HEAD^{tree})" = "$XMAGE_PATCH_TREE" \
+    && git checkout -q --detach FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "$XMAGE_PATCH_COMMIT" \
+    && rm /tmp/lorehold.patch
 
 WORKDIR /build/xmage
 RUN grep -A2 '<artifactId>sqlite-jdbc</artifactId>' Mage.Server/pom.xml | grep '3.53.2.0' \

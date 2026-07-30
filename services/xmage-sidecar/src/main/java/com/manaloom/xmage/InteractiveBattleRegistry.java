@@ -809,6 +809,10 @@ final class InteractiveBattleRegistry {
             replay.put("engine", "xmage");
             replay.put("engine_version", SidecarMain.XMAGE_VERSION);
             replay.put("engine_commit", SidecarMain.XMAGE_COMMIT);
+            replay.put(
+                    "engine_patch_commit",
+                    SidecarMain.XMAGE_PATCH_COMMIT
+            );
             replay.put("request_schema_version", REQUEST_SCHEMA);
             replay.put("request_hash", request.requestHash);
             replay.put("request_id", request.requestId);

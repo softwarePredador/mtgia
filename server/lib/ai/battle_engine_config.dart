@@ -8,6 +8,7 @@ const externalBattleDeckHashSchema = 'external_battle_deck_hash_v1';
 const externalBattleSidecarProtocol = 'external_battle_sidecar_v2';
 
 const pinnedXmageCommit = '2c43ec8cdb5cd475d47e6b555a4077151f476a3b';
+const pinnedXmagePatchCommit = '95f0ff69968159025998dcbecb59be5f3c1b67e2';
 const pinnedForgeCommit = 'a62915f500c2411484689294659c6bb84ea215f8';
 const pinnedXmageVersion = '1.4.60';
 const pinnedForgeVersion = '2.0.14-SNAPSHOT';
@@ -32,6 +33,7 @@ final class ExternalBattleEngineIdentity {
     required this.telemetryVersion,
     required this.seedSemantics,
     required this.deterministic,
+    this.patchCommit,
   });
 
   final String engine;
@@ -42,8 +44,12 @@ final class ExternalBattleEngineIdentity {
   final String telemetryVersion;
   final String seedSemantics;
   final bool deterministic;
+  final String? patchCommit;
 
-  String get buildIdentity => '$engine-sidecar-v2@$commit';
+  String get buildIdentity =>
+      patchCommit == null
+          ? '$engine-sidecar-v2@$commit'
+          : '$engine-sidecar-v2@$commit+patch.$patchCommit';
 }
 
 final class BattleEngineConfig {
@@ -100,6 +106,11 @@ final class BattleEngineConfig {
       key: 'FORGE_EXPECTED_COMMIT',
       fallback: pinnedForgeCommit,
     );
+    final xmagePatchCommit = _expectedCommit(
+      environment,
+      key: 'XMAGE_EXPECTED_PATCH_COMMIT',
+      fallback: pinnedXmagePatchCommit,
+    );
     final xmageVersion = _expectedVersion(
       environment,
       key: 'XMAGE_EXPECTED_VERSION',
@@ -130,6 +141,7 @@ final class BattleEngineConfig {
         telemetryVersion: 'xmage_replay_normalizer_v2',
         seedSemantics: 'request_correlation_only_server_rng_uncontrolled',
         deterministic: false,
+        patchCommit: xmagePatchCommit,
       ),
       forgeIdentity: ExternalBattleEngineIdentity(
         engine: 'forge',
@@ -270,6 +282,9 @@ String? externalBattleIdentityValidationError(
         body['engine_commit'] != expected.commit) {
       return 'legacy response commit mismatch';
     }
+    if (expected.patchCommit != null) {
+      return 'legacy response patch identity unsupported';
+    }
     return null;
   }
   if (body['engine'] != expected.engine) return 'engine mismatch';
@@ -277,6 +292,13 @@ String? externalBattleIdentityValidationError(
     return 'engine version mismatch';
   }
   if (body['engine_commit'] != expected.commit) return 'engine commit mismatch';
+  if (expected.patchCommit == null) {
+    if (body['engine_patch_commit'] != null) {
+      return 'unexpected engine patch identity';
+    }
+  } else if (body['engine_patch_commit'] != expected.patchCommit) {
+    return 'engine patch commit mismatch';
+  }
   if (body['sidecar_protocol_version'] != externalBattleSidecarProtocol) {
     return 'sidecar protocol mismatch';
   }

@@ -685,6 +685,9 @@ run_static_gate() {
     --output-prefix "$STATIC_AUDIT_DIR/external_engine_capability_alignment"
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py \
     --output-prefix "$STATIC_AUDIT_DIR/xmage_pin_transition"
+  python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_governed_patch_audit.py \
+    --require-deployable \
+    --output "$STATIC_AUDIT_DIR/xmage_governed_patch.json"
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py \
     --output-prefix "$STATIC_AUDIT_DIR/xmage_execution_contract"
   python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py \
@@ -710,6 +713,8 @@ run_static_gate() {
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_external_engine_capability_alignment_audit.py
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_pin_transition_audit.py
+  PYTHONWARNINGS=error::ResourceWarning \
+    python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_governed_patch_audit.py
   PYTHONWARNINGS=error::ResourceWarning \
     python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_transition_activation_policy.py
   PYTHONWARNINGS=error::ResourceWarning \

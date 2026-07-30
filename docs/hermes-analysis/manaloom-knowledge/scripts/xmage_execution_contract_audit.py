@@ -21,6 +21,7 @@ CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.
 CLOSURE = REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 RULE_SYNC = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
 XMAGE_PIN = "2c43ec8cdb5cd475d47e6b555a4077151f476a3b"
+XMAGE_PATCH_PIN = "95f0ff69968159025998dcbecb59be5f3c1b67e2"
 FORGE_PIN = "a62915f500c2411484689294659c6bb84ea215f8"
 
 
@@ -177,8 +178,13 @@ def build_report() -> dict[str, object]:
             SIDECAR / "Dockerfile",
             [
                 f"ARG XMAGE_COMMIT={XMAGE_PIN}",
-                'git checkout "$XMAGE_COMMIT"',
+                f"ARG XMAGE_PATCH_COMMIT={XMAGE_PATCH_PIN}",
+                'git checkout -q --detach FETCH_HEAD',
                 'test "$(git rev-parse HEAD)" = "$XMAGE_COMMIT"',
+                'test "$(git rev-parse FETCH_HEAD^)" = "$XMAGE_COMMIT"',
+                'test "$(git rev-parse HEAD)" = "$XMAGE_PATCH_COMMIT"',
+                'test "$(git rev-parse FETCH_HEAD^{tree})" = "$XMAGE_PATCH_TREE"',
+                "XMAGE_PATCH_SHA256",
                 "sqlite-jdbc",
                 "mage-server.zip",
             ],

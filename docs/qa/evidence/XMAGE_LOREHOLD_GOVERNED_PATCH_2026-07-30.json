@@ -1,0 +1,104 @@
+{
+  "schema_version": "manaloom_xmage_governed_patch_evidence_v1_2026-07-30",
+  "captured_at_utc": "2026-07-30T14:53:55Z",
+  "status": "pass",
+  "patch_id": "xmage_lorehold_historian_2c43ec8_95f0ff6_2026_07_30",
+  "source": {
+    "upstream_repository": "https://github.com/magefree/mage.git",
+    "upstream_base_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "governed_repository": "https://github.com/softwarePredador/mage.git",
+    "governed_branch": "manaloom-lorehold-historian",
+    "patch_commit": "95f0ff69968159025998dcbecb59be5f3c1b67e2",
+    "patch_parent": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "patch_tree": "ba94fb4c1522a5a00d951d76b354cc83eab1687c",
+    "fetchable": true,
+    "verified_via": "github_git_commit_api_and_fresh_git_fetch",
+    "commit_message": "Add Lorehold the Historian with dynamic Miracle support"
+  },
+  "exact_delta": {
+    "audit_mode": "read_only_local_git_object_diff",
+    "old_is_direct_parent": true,
+    "changed_path_count": 14,
+    "changed_card_implementation_count": 1,
+    "added_card_implementations": [
+      "Lorehold, the Historian"
+    ],
+    "unrelated_card_implementations": [],
+    "raw_diff_sha256": "fc94374d923b88c7c31d9a65605c23309b92ea7903865b030c93c62dc9844ef0",
+    "name_status_sha256": "a8cb9207f38eda271cc17efd27be732941eae0377ad893da82347c1948e9af39",
+    "sorted_paths_sha256": "8c5cd517e644a08bec69dccc8a9b022caec88a15610cfb0850be4f5caaac949e",
+    "changed_paths": [
+      "Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java",
+      "Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java",
+      "Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java",
+      "Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java",
+      "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java",
+      "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java",
+      "Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java",
+      "Mage/src/main/java/mage/game/permanent/PermanentCard.java",
+      "Mage/src/main/java/mage/game/permanent/PermanentImpl.java",
+      "Mage/src/main/java/mage/util/CardUtil.java",
+      "Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java",
+      "Mage/src/main/java/mage/watchers/Watcher.java",
+      "Mage/src/main/java/mage/watchers/Watchers.java",
+      "Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java"
+    ]
+  },
+  "versioned_patch": {
+    "path": "docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch",
+    "sha256": "ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812",
+    "applies_to_upstream_base": true,
+    "result_tree_matches_governed_commit": true,
+    "source_pull_request": "https://github.com/magefree/mage/pull/15591",
+    "source_commits": [
+      "03cc893d7c982c195ffc3f8e3083e9123b5c17d0",
+      "0e6ca9cacaf612d00f18d68d39531c0666f570c1"
+    ]
+  },
+  "focused_verification": {
+    "artifact_path": "docs/qa/evidence/LOREHOLD_CANDIDATE_PATCH_VERIFICATION_2026-07-29.json",
+    "artifact_sha256": "b045fc9247b60100e8d1efe4bf74f1ca71b43e760b46443b978ffe85635eee01",
+    "java_major": 17,
+    "reactor_modules": 34,
+    "focused_tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "result": "pass"
+  },
+  "postgresql_product_scope": {
+    "canonical_wrapper": "server/bin/with_new_server_pg.sh",
+    "transaction_mode": "read_only",
+    "transaction_read_only": true,
+    "writes_performed": false,
+    "queries_executed": 1,
+    "card_name": "Lorehold, the Historian",
+    "printing_match_count": 4,
+    "distinct_oracle_ids": 1,
+    "commander_statuses": [
+      "legal"
+    ],
+    "legendary_creature_rows": 4,
+    "product_scope_status": "product_in_scope"
+  },
+  "runtime_policy": {
+    "catalog_resolution_is_semantic_proof": false,
+    "focused_tests_are_required": true,
+    "patch_identity_is_public_in_health_and_replays": true,
+    "user_facing_copy_is_engine_neutral": true,
+    "fallback_or_card_removal_allowed": false
+  },
+  "qualification": {
+    "status": "pass",
+    "deployment_allowed": true,
+    "blocking_reasons": [],
+    "remaining_review_required": 0
+  },
+  "safety": {
+    "postgres_writes": false,
+    "hermes_or_sqlite_writes": false,
+    "deck_mutations": false,
+    "rule_promotions": false,
+    "credentials_recorded": false
+  }
+}

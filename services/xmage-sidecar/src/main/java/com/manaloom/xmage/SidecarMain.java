@@ -26,6 +26,7 @@ import java.util.UUID;
 
 public final class SidecarMain {
     static final String XMAGE_COMMIT = "2c43ec8cdb5cd475d47e6b555a4077151f476a3b";
+    static final String XMAGE_PATCH_COMMIT = "95f0ff69968159025998dcbecb59be5f3c1b67e2";
     static final String XMAGE_VERSION = "1.4.60";
     static final String EXECUTION_SCHEMA = "external_battle_execution_v2";
     static final String REQUEST_SCHEMA = "external_battle_request_v2";
@@ -33,7 +34,10 @@ public final class SidecarMain {
     static final String SIDECAR_PROTOCOL = "external_battle_sidecar_v2";
     static final String AI_PROFILE = "computer_mad";
     static final String SEED_SEMANTICS = "request_correlation_only_server_rng_uncontrolled";
-    static final String BUILD_IDENTITY = "xmage-sidecar-v2@" + XMAGE_COMMIT;
+    static final String BUILD_IDENTITY = "xmage-sidecar-v2@"
+            + XMAGE_COMMIT
+            + "+patch."
+            + XMAGE_PATCH_COMMIT;
 
     private static final Gson GSON = new Gson();
     static final int MAX_REQUEST_BYTES = 8 * 1024 * 1024;
@@ -89,6 +93,7 @@ public final class SidecarMain {
             body.put("engine", "xmage");
             body.put("engine_version", XMAGE_VERSION);
             body.put("engine_commit", XMAGE_COMMIT);
+            body.put("engine_patch_commit", XMAGE_PATCH_COMMIT);
             body.put("xmage_host", xmageHost);
             body.put("xmage_port", xmagePort);
             body.put("catalog_ready", true);
@@ -543,6 +548,7 @@ public final class SidecarMain {
         result.put("engine", "xmage");
         result.put("engine_version", XMAGE_VERSION);
         result.put("engine_commit", XMAGE_COMMIT);
+        result.put("engine_patch_commit", XMAGE_PATCH_COMMIT);
         result.put("sidecar_protocol_version", SIDECAR_PROTOCOL);
         result.put("sidecar_build_identity", BUILD_IDENTITY);
         result.put("sidecar_process_id", PROCESS_ID);

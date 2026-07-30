@@ -147,16 +147,21 @@ HEALTH_PROBE_IMAGE="curlimages/curl:8.10.1@sha256:d9b4541e214bcd85196d6e92e2753a
 XMAGE_EXPECTED_COMMIT="$(
   tr -d '[:space:]' <"$ROOT_DIR/services/xmage-sidecar/XMAGE_COMMIT"
 )"
+XMAGE_EXPECTED_PATCH_COMMIT="$(
+  tr -d '[:space:]' <"$ROOT_DIR/services/xmage-sidecar/XMAGE_PATCH_COMMIT"
+)"
 XMAGE_EXPECTED_VERSION="$(
   sed -n 's/.*XMAGE_VERSION = "\([^"]*\)";.*/\1/p' \
     "$ROOT_DIR/services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java"
 )"
 if [[ ! "$XMAGE_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ||
+      ! "$XMAGE_EXPECTED_PATCH_COMMIT" =~ ^[0-9a-f]{40}$ ||
       ! "$XMAGE_EXPECTED_VERSION" =~ ^[0-9]+(\.[0-9]+){2}$ ]]; then
   echo "identidade XMage pinada nao pode ser resolvida" >&2
   exit 2
 fi
-readonly HEALTH_PROBE_IMAGE XMAGE_EXPECTED_COMMIT XMAGE_EXPECTED_VERSION
+readonly HEALTH_PROBE_IMAGE XMAGE_EXPECTED_COMMIT
+readonly XMAGE_EXPECTED_PATCH_COMMIT XMAGE_EXPECTED_VERSION
 MANALOOM_ALLOWED_ORIGINS="${MANALOOM_ALLOWED_ORIGINS:-$REQUIRED_WEB_ORIGIN}"
 ENVIRONMENT="${ENVIRONMENT:-production}"
 MANALOOM_EMAIL_DELIVERY_PROVIDER="${MANALOOM_EMAIL_DELIVERY_PROVIDER:-webhook}"
@@ -399,6 +404,7 @@ docker run --rm --network '$PROJECT_NETWORK' --entrypoint sh '$HEALTH_PROBE_IMAG
 ")"
   if ! jq -e \
     --arg commit "$XMAGE_EXPECTED_COMMIT" \
+    --arg patch_commit "$XMAGE_EXPECTED_PATCH_COMMIT" \
     --arg version "$XMAGE_EXPECTED_VERSION" \
     --argjson maximum_active "$INTERACTIVE_MAX_ACTIVE" '
       .status == "ok" and
@@ -406,8 +412,10 @@ docker run --rm --network '$PROJECT_NETWORK' --entrypoint sh '$HEALTH_PROBE_IMAG
       .engine == "xmage" and
       .engine_version == $version and
       .engine_commit == $commit and
+      .engine_patch_commit == $patch_commit and
       .sidecar_protocol_version == "external_battle_sidecar_v2" and
-      .sidecar_build_identity == ("xmage-sidecar-v2@" + $commit) and
+      .sidecar_build_identity ==
+        ("xmage-sidecar-v2@" + $commit + "+patch." + $patch_commit) and
       .ai_profile == "computer_mad" and
       .normalizer_version == "xmage_replay_normalizer_v2" and
       .seed_semantics ==
@@ -1370,6 +1378,9 @@ docker service update \
   --env-add XMAGE_INTERACTIVE_SIDECAR_URL='$XMAGE_INTERACTIVE_URL' \
   --env-add INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT='$INTERACTIVE_PER_USER_ACTIVE_LIMIT' \
   --env-add INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT='$INTERACTIVE_MAX_ACTIVE' \
+  --env-add XMAGE_EXPECTED_COMMIT='$XMAGE_EXPECTED_COMMIT' \
+  --env-add XMAGE_EXPECTED_PATCH_COMMIT='$XMAGE_EXPECTED_PATCH_COMMIT' \
+  --env-add XMAGE_EXPECTED_VERSION='$XMAGE_EXPECTED_VERSION' \
   '$SERVICE'
 
 for attempt in \$(seq 1 45); do
@@ -1415,9 +1426,12 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
     /^XMAGE_INTERACTIVE_SIDECAR_URL=/{url_count++; url=substr(\$0,index(\$0,\"=\")+1)}
     /^INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=/{user_count++; user_limit=substr(\$0,index(\$0,\"=\")+1)}
     /^INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=/{global_count++; global_limit=substr(\$0,index(\$0,\"=\")+1)}
-    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit}'
+    /^XMAGE_EXPECTED_COMMIT=/{commit_count++; commit=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_EXPECTED_PATCH_COMMIT=/{patch_count++; patch=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_EXPECTED_VERSION=/{version_count++; version=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit,commit_count,commit,patch_count,patch,version_count,version}'
 ")"
-expected_interactive_contract="1|$INTERACTIVE_BATTLE_ENABLED|1|$XMAGE_INTERACTIVE_URL|1|$INTERACTIVE_PER_USER_ACTIVE_LIMIT|1|$INTERACTIVE_MAX_ACTIVE"
+expected_interactive_contract="1|$INTERACTIVE_BATTLE_ENABLED|1|$XMAGE_INTERACTIVE_URL|1|$INTERACTIVE_PER_USER_ACTIVE_LIMIT|1|$INTERACTIVE_MAX_ACTIVE|1|$XMAGE_EXPECTED_COMMIT|1|$XMAGE_EXPECTED_PATCH_COMMIT|1|$XMAGE_EXPECTED_VERSION"
 if [[ "$spec_interactive_contract" != "$expected_interactive_contract" ]]; then
   echo "deploy convergiu sem o contrato interativo exato na spec" >&2
   exit 2
@@ -1526,7 +1540,10 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     /^XMAGE_INTERACTIVE_SIDECAR_URL=/{url_count++; url=substr(\$0,index(\$0,\"=\")+1)}
     /^INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=/{user_count++; user_limit=substr(\$0,index(\$0,\"=\")+1)}
     /^INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=/{global_count++; global_limit=substr(\$0,index(\$0,\"=\")+1)}
-    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit}'
+    /^XMAGE_EXPECTED_COMMIT=/{commit_count++; commit=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_EXPECTED_PATCH_COMMIT=/{patch_count++; patch=substr(\$0,index(\$0,\"=\")+1)}
+    /^XMAGE_EXPECTED_VERSION=/{version_count++; version=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s|%d|%s|%d|%s|%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit,commit_count,commit,patch_count,patch,version_count,version}'
 ")"
 runtime_email_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
@@ -1674,6 +1691,8 @@ jq -cn \
   --arg image "$IMAGE_REPO:$short_sha" \
   --arg image_digest_ref "$image_digest_ref" \
   --arg git_sha "$sha" \
+  --arg xmage_engine_commit "$XMAGE_EXPECTED_COMMIT" \
+  --arg xmage_patch_commit "$XMAGE_EXPECTED_PATCH_COMMIT" \
   --arg remote_dir_removed "$remote_dir" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_ENABLED" \
   '{
@@ -1682,6 +1701,8 @@ jq -cn \
     image: $image,
     image_digest_ref: $image_digest_ref,
     git_sha: $git_sha,
+    xmage_engine_commit: $xmage_engine_commit,
+    xmage_patch_commit: $xmage_patch_commit,
     interactive_battle_enabled: $interactive_battle_enabled,
     cors_allowlist: "verified",
     remote_dir_removed: $remote_dir_removed

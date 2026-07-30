@@ -45,6 +45,9 @@ done
 python3 \
   "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pin_transition_audit.py" \
   --require-deployable
+python3 \
+  "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_governed_patch_audit.py" \
+  --require-deployable
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "env file not found: $ENV_FILE" >&2
@@ -202,6 +205,7 @@ XMAGE_INTERACTIVE_PREVIOUS_RUNNING_IMAGE=""
 XMAGE_INTERACTIVE_PREVIOUS_UPDATE_STATE=""
 XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE=""
 XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT=""
+XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT=""
 XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION=""
 FORGE_PREVIOUS_SOURCE_IMAGE=""
 FORGE_ROLLBACK_SOURCE_IMAGE=""
@@ -288,16 +292,21 @@ FORGE_IMAGE_DIGEST_REF=""
 XMAGE_EXPECTED_COMMIT="$(
   tr -d '[:space:]' <"$SOURCE_WORKTREE/services/xmage-sidecar/XMAGE_COMMIT"
 )"
+XMAGE_EXPECTED_PATCH_COMMIT="$(
+  tr -d '[:space:]' <"$SOURCE_WORKTREE/services/xmage-sidecar/XMAGE_PATCH_COMMIT"
+)"
 XMAGE_EXPECTED_VERSION="$(
   sed -n 's/.*XMAGE_VERSION = "\([^"]*\)";.*/\1/p' \
     "$SOURCE_WORKTREE/services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java"
 )"
 if [[ ! "$XMAGE_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ||
+      ! "$XMAGE_EXPECTED_PATCH_COMMIT" =~ ^[0-9a-f]{40}$ ||
       ! "$XMAGE_EXPECTED_VERSION" =~ ^[0-9]+(\.[0-9]+){2}$ ]]; then
   echo "identidade XMage pinada nao pode ser resolvida do snapshot aprovado" >&2
   exit 2
 fi
-readonly XMAGE_EXPECTED_COMMIT XMAGE_EXPECTED_VERSION
+readonly XMAGE_EXPECTED_COMMIT XMAGE_EXPECTED_PATCH_COMMIT
+readonly XMAGE_EXPECTED_VERSION
 
 curl_args=(-fsS --proto '=https' --tlsv1.2)
 
@@ -472,22 +481,32 @@ printf '%s|%s|%s|%s|%s' \"\$ports\" \"\$network_count\" \"\$network_attached\" \
 "
 }
 
-validate_xmage_interactive_health_payload() {
+validate_xmage_runtime_identity_payload() {
   local payload="$1"
-  local expected_maximum_active="${2:-$INTERACTIVE_MAX_ACTIVE}"
-  local expected_commit="${3:-$XMAGE_EXPECTED_COMMIT}"
+  local expected_commit="${2:-$XMAGE_EXPECTED_COMMIT}"
+  local expected_patch_commit="${3-$XMAGE_EXPECTED_PATCH_COMMIT}"
   local expected_version="${4:-$XMAGE_EXPECTED_VERSION}"
   jq -e \
     --arg commit "$expected_commit" \
+    --arg patch_commit "$expected_patch_commit" \
     --arg version "$expected_version" \
-    --argjson maximum_active "$expected_maximum_active" '
+    '
       .status == "ok" and
       .schema_version == "external_battle_execution_v2" and
       .engine == "xmage" and
       .engine_version == $version and
       .engine_commit == $commit and
+      (
+        if $patch_commit == "" then
+          .engine_patch_commit == null and
+          .sidecar_build_identity == ("xmage-sidecar-v2@" + $commit)
+        else
+          .engine_patch_commit == $patch_commit and
+          .sidecar_build_identity ==
+            ("xmage-sidecar-v2@" + $commit + "+patch." + $patch_commit)
+        end
+      ) and
       .sidecar_protocol_version == "external_battle_sidecar_v2" and
-      .sidecar_build_identity == ("xmage-sidecar-v2@" + $commit) and
       .ai_profile == "computer_mad" and
       .normalizer_version == "xmage_replay_normalizer_v2" and
       .seed_semantics ==
@@ -495,7 +514,20 @@ validate_xmage_interactive_health_payload() {
       .deterministic == false and
       (.sidecar_process_id | type == "string" and length > 0) and
       (.sidecar_started_at | type == "string" and length > 0) and
-      .catalog_ready == true and
+      .catalog_ready == true
+    ' >/dev/null <<<"$payload"
+}
+
+validate_xmage_interactive_health_payload() {
+  local payload="$1"
+  local expected_maximum_active="${2:-$INTERACTIVE_MAX_ACTIVE}"
+  local expected_commit="${3:-$XMAGE_EXPECTED_COMMIT}"
+  local expected_patch_commit="${4-$XMAGE_EXPECTED_PATCH_COMMIT}"
+  local expected_version="${5:-$XMAGE_EXPECTED_VERSION}"
+  validate_xmage_runtime_identity_payload \
+    "$payload" "$expected_commit" "$expected_patch_commit" "$expected_version" &&
+    jq -e \
+      --argjson maximum_active "$expected_maximum_active" '
       .runtime_mode == "interactive" and
       .batch_simulation_available == false and
       .interactive_battle.schema_version ==
@@ -514,7 +546,8 @@ validate_xmage_interactive_health_payload() {
 wait_for_xmage_interactive_health() {
   local expected_maximum_active="${1:-$INTERACTIVE_MAX_ACTIVE}"
   local expected_commit="${2:-$XMAGE_EXPECTED_COMMIT}"
-  local expected_version="${3:-$XMAGE_EXPECTED_VERSION}"
+  local expected_patch_commit="${3-$XMAGE_EXPECTED_PATCH_COMMIT}"
+  local expected_version="${4:-$XMAGE_EXPECTED_VERSION}"
   local payload
   payload="$(wait_for_sidecar_health \
     "$XMAGE_INTERACTIVE_SERVICE" \
@@ -522,7 +555,7 @@ wait_for_xmage_interactive_health() {
     '"runtime_mode":"interactive"')"
   if ! validate_xmage_interactive_health_payload \
     "$payload" "$expected_maximum_active" \
-    "$expected_commit" "$expected_version"; then
+    "$expected_commit" "$expected_patch_commit" "$expected_version"; then
     echo "XMage interativo recusado: identidade, modo ou capacidade divergente" >&2
     return 1
   fi
@@ -721,15 +754,21 @@ if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]] &&
   XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT="$(
     jq -er '.engine_commit' <<<"$interactive_previous_health"
   )"
+  XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT="$(
+    jq -er '.engine_patch_commit // ""' <<<"$interactive_previous_health"
+  )"
   XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION="$(
     jq -er '.engine_version' <<<"$interactive_previous_health"
   )"
   if [[ ! "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" =~ ^[0-9a-f]{40}$ ||
+        ( -n "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT" &&
+          ! "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT" =~ ^[0-9a-f]{40}$ ) ||
         ! "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION" =~ ^[0-9]+(\.[0-9]+){2}$ ]] ||
      ! validate_xmage_interactive_health_payload \
        "$interactive_previous_health" \
        "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" \
        "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT" \
        "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION"; then
     echo "deploy recusado: baseline XMage interativo sem identidade valida" >&2
     exit 2
@@ -738,7 +777,10 @@ fi
 
 REMOTE_DIR_CLEANUP_REQUIRED=1
 # shellcheck disable=SC2029
-git archive "$sha" -- services/xmage-sidecar services/forge-sidecar |
+git archive "$sha" -- \
+  services/xmage-sidecar \
+  services/forge-sidecar \
+  docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch |
   ssh "${ssh_args[@]}" "$ssh_target" \
     "rm -rf '$remote_dir' && mkdir -p '$remote_dir' && tar -x -C '$remote_dir'"
 
@@ -961,6 +1003,15 @@ prove_sidecar_release() {
     echo "sidecar $service_name retornou health vazio" >&2
     return 1
   fi
+  if [[ "$service_name" == "$XMAGE_SERVICE" ]] &&
+     ! validate_xmage_runtime_identity_payload \
+       "$health_payload" \
+       "$XMAGE_EXPECTED_COMMIT" \
+       "$XMAGE_EXPECTED_PATCH_COMMIT" \
+       "$XMAGE_EXPECTED_VERSION"; then
+    echo "sidecar XMage sem identidade exata do patch governado" >&2
+    return 1
+  fi
   configured_image="$(configured_sidecar_image "$service_name")"
   runtime_state="$(sidecar_runtime_state "$swarm_service")"
   IFS='|' read -r proof_replicas proof_spec_image proof_running_image \
@@ -1077,6 +1128,7 @@ rollback_xmage_interactive() {
      wait_for_xmage_interactive_health \
        "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" \
        "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT" \
        "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION" >/dev/null; then
     echo "rollback automatico XMage interativo comprovado" >&2
     return 0
@@ -1100,6 +1152,7 @@ rollback_xmage_interactive() {
      ! wait_for_xmage_interactive_health \
        "$XMAGE_INTERACTIVE_PREVIOUS_MAX_ACTIVE" \
        "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_COMMIT" \
+       "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_PATCH_COMMIT" \
        "$XMAGE_INTERACTIVE_PREVIOUS_ENGINE_VERSION" >/dev/null; then
     echo "CRITICAL: rollback XMage interativo nao comprovou digest/privacidade/health" >&2
     return 1
@@ -1179,6 +1232,9 @@ upsert_env() {
 
 backend_env="$(upsert_env "$backend_env" BATTLE_ENGINE auto)"
 backend_env="$(upsert_env "$backend_env" XMAGE_SIDECAR_URL "http://$XMAGE_SERVICE:8080")"
+backend_env="$(upsert_env "$backend_env" XMAGE_EXPECTED_COMMIT "$XMAGE_EXPECTED_COMMIT")"
+backend_env="$(upsert_env "$backend_env" XMAGE_EXPECTED_PATCH_COMMIT "$XMAGE_EXPECTED_PATCH_COMMIT")"
+backend_env="$(upsert_env "$backend_env" XMAGE_EXPECTED_VERSION "$XMAGE_EXPECTED_VERSION")"
 backend_env="$(upsert_env "$backend_env" FORGE_SIDECAR_URL "http://$FORGE_SERVICE:8080")"
 backend_env="$(upsert_env "$backend_env" NATIVE_BATTLE_SIDECAR_URL "http://$NATIVE_SERVICE_DNS:8080")"
 backend_env="$(upsert_env "$backend_env" INTERACTIVE_BATTLE_ENABLED "$INTERACTIVE_BATTLE_ENABLED")"
@@ -1231,6 +1287,9 @@ update_args=(
   --env-add 'XMAGE_INTERACTIVE_SIDECAR_URL=$XMAGE_INTERACTIVE_URL'
   --env-add 'INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT=$INTERACTIVE_PER_USER_ACTIVE_LIMIT'
   --env-add 'INTERACTIVE_BATTLE_GLOBAL_ACTIVE_LIMIT=$INTERACTIVE_MAX_ACTIVE'
+  --env-add 'XMAGE_EXPECTED_COMMIT=$XMAGE_EXPECTED_COMMIT'
+  --env-add 'XMAGE_EXPECTED_PATCH_COMMIT=$XMAGE_EXPECTED_PATCH_COMMIT'
+  --env-add 'XMAGE_EXPECTED_VERSION=$XMAGE_EXPECTED_VERSION'
   --env-add \"DB_HOST=\$db_host\"
   --env-add \"DB_PORT=\$db_port\"
   --env-add \"DB_NAME=\$db_name\"
@@ -1263,8 +1322,10 @@ DEPLOY_COMMITTED=1
 
 cleanup_remote_build_dir
 
-printf '{"status":"deployed","git_sha":"%s","xmage_service":"%s","xmage_image_digest_ref":"%s","xmage_release_proof":"%s","xmage_interactive_release_selected":%s,"xmage_interactive_service":"%s","xmage_interactive_release_proof":"%s","backend_interactive_enabled":false,"forge_service":"%s","forge_image_digest_ref":"%s","forge_release_proof":"%s","native_service":"%s","backend_service":"%s","remote_cleanup_proof":"%s"}\n' \
-  "$sha" "$XMAGE_SERVICE" "$XMAGE_IMAGE_DIGEST_REF" "$xmage_release_proof" \
+printf '{"status":"deployed","git_sha":"%s","xmage_service":"%s","xmage_engine_commit":"%s","xmage_patch_commit":"%s","xmage_image_digest_ref":"%s","xmage_release_proof":"%s","xmage_interactive_release_selected":%s,"xmage_interactive_service":"%s","xmage_interactive_release_proof":"%s","backend_interactive_enabled":false,"forge_service":"%s","forge_image_digest_ref":"%s","forge_release_proof":"%s","native_service":"%s","backend_service":"%s","remote_cleanup_proof":"%s"}\n' \
+  "$sha" "$XMAGE_SERVICE" "$XMAGE_EXPECTED_COMMIT" \
+  "$XMAGE_EXPECTED_PATCH_COMMIT" "$XMAGE_IMAGE_DIGEST_REF" \
+  "$xmage_release_proof" \
   "$([[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]] && printf true || printf false)" \
   "$XMAGE_INTERACTIVE_SERVICE" "$interactive_release_proof" \
   "$FORGE_SERVICE" "$FORGE_IMAGE_DIGEST_REF" "$forge_release_proof" \

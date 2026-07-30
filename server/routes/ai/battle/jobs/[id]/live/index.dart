@@ -106,6 +106,9 @@ BattleLiveService _service(
   final expectedCommit =
       environment['XMAGE_EXPECTED_COMMIT']?.trim().toLowerCase() ??
       pinnedXmageCommit;
+  final expectedPatchCommit =
+      environment['XMAGE_EXPECTED_PATCH_COMMIT']?.trim().toLowerCase() ??
+      pinnedXmagePatchCommit;
   final expectedVersion =
       environment['XMAGE_EXPECTED_VERSION']?.trim() ?? pinnedXmageVersion;
   BattleLiveSource? source;
@@ -119,6 +122,7 @@ BattleLiveService _service(
         engine: 'xmage',
         version: expectedVersion,
         commit: expectedCommit,
+        patchCommit: expectedPatchCommit,
         aiProfile: 'computer_mad',
         telemetryField: 'normalizer_version',
         telemetryVersion: 'xmage_replay_normalizer_v2',

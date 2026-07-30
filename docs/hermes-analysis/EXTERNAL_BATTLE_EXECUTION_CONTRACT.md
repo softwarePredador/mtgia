@@ -53,6 +53,18 @@ coordinates, the sidecar deploy also runs the active XMage pin-transition
 auditor with `--require-deployable`; a structurally valid
 `review_required` card audit blocks deployment.
 
+The canonical upstream pin can be complemented by one active governed runtime
+patch. The current patch identity is stored in
+`services/xmage-sidecar/XMAGE_PATCH_COMMIT` and governed by
+`XMAGE_GOVERNED_RUNTIME_PATCH_CONTRACT.json`. Deployment requires all of the
+following before any remote mutation: the patch commit is fetchable, its direct
+parent is the canonical upstream pin, the committed versioned patch reproduces
+the exact Git tree, the complete delta and every added card are classified,
+focused runtime tests pass without skips, and PostgreSQL product scope was
+reconciled read-only. Runtime health, coverage, simulations and interactive
+replays publish `engine_patch_commit`; the backend rejects a missing or
+different patch identity. Product UI remains engine-neutral.
+
 Interactive XMage release is a separate, default-off lane. When the invoking
 process supplies `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1`, the sidecar
 deploy may create or update the private direct-Swarm service
@@ -136,6 +148,11 @@ only with 169 card-level results, a proved read-only transaction, nonzero
 queries, zero ambiguities and a row digest. The weekly upstream delta is
 discovery input only. `review_required` is a valid integrity result but is not
 deployable.
+
+An active governed patch has an independent fail-closed gate:
+`xmage_governed_patch_audit.py --require-deployable`. A green upstream
+pin-transition does not authorize an ungoverned local edit, and a green patch
+audit does not advance the upstream pin.
 
 Current boundaries:
 

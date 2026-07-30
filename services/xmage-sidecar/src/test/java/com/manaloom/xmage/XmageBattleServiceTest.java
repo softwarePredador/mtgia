@@ -25,6 +25,13 @@ final class XmageBattleServiceTest {
     @Test
     void sidecarPublishesAProcessIdentityAndAcceptsGlobalCorpusPayloads() {
         assertEquals(8 * 1024 * 1024, SidecarMain.MAX_REQUEST_BYTES);
+        assertEquals(
+                "xmage-sidecar-v2@"
+                        + SidecarMain.XMAGE_COMMIT
+                        + "+patch."
+                        + SidecarMain.XMAGE_PATCH_COMMIT,
+                SidecarMain.BUILD_IDENTITY
+        );
         assertNotNull(SidecarMain.PROCESS_ID);
         assertFalse(SidecarMain.PROCESS_ID.trim().isEmpty());
         assertNotNull(SidecarMain.STARTED_AT);
@@ -377,6 +384,10 @@ final class XmageBattleServiceTest {
 
         assertFalse((Boolean) coverage.get("ready"));
         assertEquals("unsupported", coverage.get("status"));
+        assertEquals(
+                SidecarMain.XMAGE_PATCH_COMMIT,
+                coverage.get("engine_patch_commit")
+        );
         assertEquals(1, unsupported.size());
         assertEquals("deck_a", unsupported.get(0).get("deck_key"));
         assertEquals("Molecule Man", unsupported.get(0).get("name"));
@@ -402,6 +413,10 @@ final class XmageBattleServiceTest {
                 (List<Map<String, Object>>) coverage.get("unsupported_cards");
 
         assertEquals("unsupported", coverage.get("status"));
+        assertEquals(
+                SidecarMain.XMAGE_PATCH_COMMIT,
+                coverage.get("engine_patch_commit")
+        );
         assertEquals(3, coverage.get("total"));
         assertEquals(1, coverage.get("supported"));
         assertEquals(2, coverage.get("unsupported"));

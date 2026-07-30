@@ -119,6 +119,17 @@ void main() {
     expect(disabled.enabled, isFalse);
     expect(disabled.maximumActivePerUser, 1);
     expect(disabled.maximumActiveGlobal, 4);
+    final enabled = InteractiveBattleConfiguration.fromEnvironment(const {
+      'INTERACTIVE_BATTLE_ENABLED': 'true',
+      'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+      'XMAGE_INTERACTIVE_SIDECAR_URL': 'http://interactive-xmage:8080',
+    });
+    expect(enabled.enabled, isTrue);
+    expect(enabled.identity.patchCommit, pinnedXmagePatchCommit);
+    expect(
+      enabled.identity.buildIdentity,
+      'xmage-sidecar-v2@$pinnedXmageCommit+patch.$pinnedXmagePatchCommit',
+    );
     expect(
       interactiveBattleFeatureEnabled({
         'INTERACTIVE_BATTLE_ENABLED': 'true',
