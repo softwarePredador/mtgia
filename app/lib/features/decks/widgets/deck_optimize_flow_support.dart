@@ -296,9 +296,11 @@ class OptimizePreviewData {
   final Map<String, dynamic> optimizeIntensity;
   final String? outcomeCode;
   final OptimizeSwapIntegrityPayload? swapIntegrity;
+  final Map<String, dynamic> applyAuthorization;
   final Map<String, dynamic> optimizationContract;
   final Map<String, dynamic> battleValidation;
   final Map<String, dynamic> commanderContract;
+  final Map<String, dynamic> bracketPolicy;
   final int? targetAdditions;
   final bool canApply;
   final List<String> applyBlockers;
@@ -323,9 +325,11 @@ class OptimizePreviewData {
     required this.optimizeIntensity,
     required this.outcomeCode,
     required this.swapIntegrity,
+    this.applyAuthorization = const <String, dynamic>{},
     required this.optimizationContract,
     required this.battleValidation,
     required this.commanderContract,
+    this.bracketPolicy = const <String, dynamic>{},
     required this.targetAdditions,
     required this.canApply,
     required this.applyBlockers,
@@ -431,6 +435,9 @@ class OptimizePreviewData {
       optimizeIntensity: optimizeIntensity,
       outcomeCode: outcomeCode,
       swapIntegrity: swapIntegrity,
+      applyAuthorization: (result['apply_authorization'] is Map)
+          ? (result['apply_authorization'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
       optimizationContract: (result['optimization_contract'] is Map)
           ? (result['optimization_contract'] as Map).cast<String, dynamic>()
           : const <String, dynamic>{},
@@ -439,6 +446,9 @@ class OptimizePreviewData {
           : const <String, dynamic>{},
       commanderContract: (result['commander_contract'] is Map)
           ? (result['commander_contract'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      bracketPolicy: (result['bracket_policy'] is Map)
+          ? (result['bracket_policy'] as Map).cast<String, dynamic>()
           : const <String, dynamic>{},
       targetAdditions: targetAdditions,
       canApply:
@@ -940,6 +950,8 @@ Map<String, dynamic> buildOptimizeMutationContext(
     'meta_reference_context': preview.metaReferenceContext,
     'optimization_contract': preview.optimizationContract,
     'commander_contract': preview.commanderContract,
+    if (preview.bracketPolicy.isNotEmpty)
+      'bracket_policy': preview.bracketPolicy,
     'battle_validation': preview.battleValidation,
     if (preview.swapIntegrity?.deckSignature.trim().isNotEmpty == true)
       'expected_deck_signature': preview.swapIntegrity!.deckSignature.trim(),
@@ -951,6 +963,10 @@ Map<String, dynamic> buildOptimizeMutationContext(
         'removal_count': preview.swapIntegrity!.removalCount,
         'addition_count': preview.swapIntegrity!.additionCount,
       },
+    if (preview.applyAuthorization.isNotEmpty)
+      'apply_authorization': Map<String, dynamic>.from(
+        preview.applyAuthorization,
+      ),
   };
 }
 

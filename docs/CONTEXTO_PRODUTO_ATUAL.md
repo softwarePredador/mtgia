@@ -3,6 +3,29 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
+## Segurança do optimizer Commander — 2026-07-30
+
+- a causa do deck `cb6c078f-de57-4231-988f-2a5a69aad99f` foi isolada: o fluxo
+  antigo aceitava sinais fortes de ramp/popularidade sem repetir a política
+  oficial de Game Changers em todos os loaders, no payload final e no apply;
+- Bracket 2 passa a bloquear Lion's Eye Diamond, Grim Monolith, Mox Diamond e
+  qualquer outro Game Changer oficial. Cori-Steel Cutter permanece legal, mas
+  recebe penalidade temática quando não sustenta `Miracle Big Spells`;
+- Complete e Optimize compartilham gates de bracket, identidade, fundação de
+  mana, wipes, orçamento/coleção e qualidade final. Cache anterior é
+  invalidado pelo contrato `v16`;
+- todos os cinco brackets mantêm intenção distinta: B1/B2/B3/B4 projetam
+  janelas 9+/8+/6+/4+ e apenas B5 usa automaticamente o metagame cEDH;
+- Generate e Rebuild também falham fechado na avaliação final, e impressões
+  repetidas da mesma carta consomem apenas uma identidade no limite B3;
+- a aplicação do preview passa a exigir autorização HMAC expirável, ligada ao
+  deck, assinatura, bracket e quantidades permitidas, antes de qualquer
+  substituição de `deck_cards`;
+- ADR e contrato: `docs/adr/0006-commander-optimizer-bracket-and-apply-safety.md`
+  e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A implementação é local até
+  concluir todos os gates, commit/push e implantação da mesma SHA; o deck live
+  não deve ser considerado corrigido antes de uma nova otimização após deploy.
+
 ## Execução Battle Lab — 2026-07-26
 
 - a ampliação local de escopo foi autorizada e implementou BL0–BL6: Battle Lab
@@ -527,7 +550,8 @@ Se um pedido novo nao disser o contrario:
 
 - `BracketCategory` enum expandido: +5 categorias (boardWipe, cardAdvantage, stax, protection, valueEngine)
 - Heuristicas de deteccao para cada nova categoria
-- Limites por bracket (1-4) para todas as categorias
+- apenas Game Changers têm limite duro oficial por bracket (`0/0/3/sem
+  limite/sem limite`); as demais categorias são sinais consultivos
 
 ### Seguranca
 

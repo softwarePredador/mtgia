@@ -325,6 +325,27 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('dispatchAccessibleTap'));
       expect(
         lotusInjectedVisualSkinScript,
+        contains('.commander-damage-card-inner'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('manaloomCommanderSpinbuttonBound'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("'dano de comandante de ' + playerName"),
+      );
+      expect(lotusInjectedVisualSkinScript, contains("removeAttribute('role')"));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("'aria-label', 'Voltar ao jogo'"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("'Mostrar dano do próprio comandante'"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
         contains("event.key === 'ArrowUp'"),
       );
       expect(lotusInjectedVisualSkinScript, contains("event.key === 'Escape'"));

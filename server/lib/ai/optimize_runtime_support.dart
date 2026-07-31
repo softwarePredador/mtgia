@@ -173,6 +173,8 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
   required Pool pool,
   required Set<String> excludeNames,
   Set<String> commanderColorIdentity = const <String>{},
+  List<Map<String, dynamic>> currentDeckCards = const <Map<String, dynamic>>[],
+  int? bracket,
   required int limit,
   String deckFormat = 'commander',
 }) async {
@@ -227,7 +229,11 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
           )
           .toList();
 
-  return dedupeCandidatesByName(mapped).take(limit).toList();
+  return filterCandidatesByBracketPolicy(
+    candidates: dedupeCandidatesByName(mapped),
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+  ).take(limit).toList();
 }
 
 Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
@@ -236,6 +242,8 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
   required String targetArchetype,
   required String? detectedTheme,
   required Set<String> excludeNames,
+  List<Map<String, dynamic>> currentDeckCards = const <Map<String, dynamic>>[],
+  int? bracket,
   required int limit,
   String deckFormat = 'commander',
 }) async {
@@ -314,7 +322,11 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
       (b['name'] as String?) ?? '',
     );
   });
-  return deduped.take(limit).toList();
+  return filterCandidatesByBracketPolicy(
+    candidates: deduped,
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+  ).take(limit).toList();
 }
 
 Future<List<String>> loadCommanderCompetitivePriorities({
@@ -435,7 +447,7 @@ String? resolveCommanderOptimizeMetaScope({
   if (deckFormat.trim().toLowerCase() != 'commander') {
     return null;
   }
-  if ((bracket ?? 0) >= 3) {
+  if (bracket == 5) {
     return 'competitive_commander';
   }
   return null;

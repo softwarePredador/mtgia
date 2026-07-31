@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 const String lifeCounterRoutePath = '/life-counter';
@@ -86,6 +86,10 @@ Future<T?> openLifeCounterRoute<T extends Object?>(
   String? deckSnapshotHash,
   int? deckVersionAtEpochMs,
 }) {
+  final scaffoldMessenger = ScaffoldMessenger.maybeOf(context);
+  scaffoldMessenger?.clearSnackBars();
+  scaffoldMessenger?.removeCurrentSnackBar();
+
   return context.push<T>(
     lifeCounterRouteLocation(
       deckId: deckId,

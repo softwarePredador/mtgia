@@ -25,90 +25,168 @@ void main() {
   });
 
   test(
-      'evaluateOptimizeRouteQualityGate skips complete mode and approved swaps',
-      () {
-    final report = _validationReport(score: 88, verdict: 'aprovado');
+    'evaluateOptimizeRouteQualityGate skips complete mode and approved swaps',
+    () {
+      final report = _validationReport(score: 88, verdict: 'aprovado');
 
-    expect(
-      evaluateOptimizeRouteQualityGate(
-        isComplete: true,
-        validationReport: _validationReport(score: 20, verdict: 'reprovado'),
-        archetype: 'control',
-        preCurve: 3.0,
-        postCurve: 4.0,
-        preManaAssessment: 'ok',
-        postManaAssessment: 'critical',
-      ).rejected,
-      isFalse,
-    );
+      expect(
+        evaluateOptimizeRouteQualityGate(
+          isComplete: true,
+          validationReport: _validationReport(score: 20, verdict: 'reprovado'),
+          archetype: 'control',
+          preCurve: 3.0,
+          postCurve: 4.0,
+          preManaAssessment: 'ok',
+          postManaAssessment: 'critical',
+        ).rejected,
+        isFalse,
+      );
 
-    expect(
-      evaluateOptimizeRouteQualityGate(
+      expect(
+        evaluateOptimizeRouteQualityGate(
+          isComplete: false,
+          validationReport: report,
+          archetype: 'control',
+          preCurve: 3.0,
+          postCurve: 3.0,
+          preManaAssessment: 'ok',
+          postManaAssessment: 'ok',
+        ).rejected,
+        isFalse,
+      );
+    },
+  );
+
+  test(
+    'evaluateSerializedOptimizeValidation rejects stale serialized failure',
+    () {
+      final decision = evaluateSerializedOptimizeValidation(
         isComplete: false,
-        validationReport: report,
+        serializedValidation: const {
+          'validation_score': 69,
+          'verdict': 'aprovado',
+        },
+        validationReport: null,
         archetype: 'control',
         preCurve: 3.0,
         postCurve: 3.0,
         preManaAssessment: 'ok',
         postManaAssessment: 'ok',
-      ).rejected,
-      isFalse,
-    );
-  });
+      );
 
-  test('evaluateSerializedOptimizeValidation rejects stale serialized failure',
-      () {
-    final decision = evaluateSerializedOptimizeValidation(
-      isComplete: false,
-      serializedValidation: const {
-        'validation_score': 69,
-        'verdict': 'aprovado',
-      },
-      validationReport: null,
-      archetype: 'control',
-      preCurve: 3.0,
-      postCurve: 3.0,
-      preManaAssessment: 'ok',
-      postManaAssessment: 'ok',
-    );
+      expect(decision.rejected, isTrue);
+      expect(decision.validation['validation_score'], 69);
+      expect(decision.reasons.single, contains('69/100'));
+    },
+  );
 
-    expect(decision.rejected, isTrue);
-    expect(decision.validation['validation_score'], 69);
-    expect(decision.reasons.single, contains('69/100'));
-  });
-
-  test('evaluateOptimizeRouteSemanticV2Gate blocks critical losses in partial',
-      () {
-    final report = _validationReport(
-      score: 90,
-      verdict: 'aprovado',
-      semanticLayerV2: const {
-        'role_delta': {
-          'draw': -1,
-          'protection': -1,
+  test(
+    'evaluateOptimizeRouteSemanticV2Gate blocks critical losses in partial',
+    () {
+      final report = _validationReport(
+        score: 90,
+        verdict: 'aprovado',
+        semanticLayerV2: const {
+          'role_delta': {'draw': -1, 'protection': -1},
         },
-      },
-    );
+      );
 
-    final decision = evaluateOptimizeRouteSemanticV2Gate(
-      isComplete: false,
-      validationReport: report,
-      enforcementMode: SemanticV2OptimizeEnforcementMode.partial,
-      expandedCriticalRoles: false,
-    );
-
-    expect(decision.rejected, isTrue);
-    expect(decision.semanticLayerV2['role_delta'], isA<Map>());
-
-    expect(
-      evaluateOptimizeRouteSemanticV2Gate(
+      final decision = evaluateOptimizeRouteSemanticV2Gate(
         isComplete: false,
         validationReport: report,
-        enforcementMode: SemanticV2OptimizeEnforcementMode.disabled,
+        enforcementMode: SemanticV2OptimizeEnforcementMode.partial,
         expandedCriticalRoles: false,
-      ).rejected,
-      isFalse,
+      );
+
+      expect(decision.rejected, isTrue);
+      expect(decision.semanticLayerV2['role_delta'], isA<Map>());
+
+      expect(
+        evaluateOptimizeRouteSemanticV2Gate(
+          isComplete: false,
+          validationReport: report,
+          enforcementMode: SemanticV2OptimizeEnforcementMode.disabled,
+          expandedCriticalRoles: false,
+        ).rejected,
+        isFalse,
+      );
+    },
+  );
+
+  test('projected Commander role gate rejects a full deck without wipes', () {
+    final assessment = assessOptimizeProjectedCommanderRoleFloors(
+      projectedDeck: [
+        const {
+          'name': 'Plains',
+          'type_line': 'Basic Land — Plains',
+          'quantity': 36,
+        },
+        const {
+          'name': 'Fair Creature',
+          'type_line': 'Creature',
+          'oracle_text': 'Vigilance.',
+          'quantity': 64,
+        },
+      ],
+      archetype: 'midrange',
     );
+
+    expect(assessment.applies, isTrue);
+    expect(assessment.satisfied, isFalse);
+    expect(assessment.deficits['wipe'], 2);
+
+    final body = buildOptimizeRoleFloorRejectedBody(
+      assessment: assessment,
+      removals: const ['Fair Creature'],
+      additions: const ['Another Creature'],
+      deckAnalysis: const {},
+      postAnalysis: null,
+      validationWarnings: const [],
+    );
+    expect(
+      (body['quality_error'] as Map)['code'],
+      'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
+    );
+    expect(body['can_apply'], isFalse);
+    expect(
+      body['apply_blockers'],
+      contains('commander_functional_role_floor_not_met'),
+    );
+  });
+
+  test('projected Commander role gate accepts the archetype wipe floor', () {
+    final assessment = assessOptimizeProjectedCommanderRoleFloors(
+      projectedDeck: [
+        const {
+          'name': 'Plains',
+          'type_line': 'Basic Land — Plains',
+          'quantity': 36,
+        },
+        const {
+          'name': 'Fair Creature',
+          'type_line': 'Creature',
+          'oracle_text': 'Vigilance.',
+          'quantity': 62,
+        },
+        const {
+          'name': 'Wrath of God',
+          'type_line': 'Sorcery',
+          'oracle_text': 'Destroy all creatures.',
+          'quantity': 1,
+        },
+        const {
+          'name': 'Blasphemous Act',
+          'type_line': 'Sorcery',
+          'oracle_text': 'Blasphemous Act deals 13 damage to each creature.',
+          'quantity': 1,
+        },
+      ],
+      archetype: 'midrange',
+    );
+
+    expect(assessment.applies, isTrue);
+    expect(assessment.satisfied, isTrue);
+    expect(assessment.actualCounts['wipe'], 2);
   });
 }
 

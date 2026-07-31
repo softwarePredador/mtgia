@@ -42,6 +42,17 @@ void main() {
         'status': 'pending_after_apply',
         'label': 'Battle pendente',
       },
+      'bracket_policy': const {
+        'bracket': 3,
+        'label': 'Upgraded',
+        'hard_compliant': true,
+        'game_changer_count': 2,
+        'game_changer_cap': 3,
+        'intent_profile': {
+          'minimum_turns_played': 6,
+          'competitive_lane': false,
+        },
+      },
     });
 
     expect(preview.hasChanges, isTrue);
@@ -60,6 +71,11 @@ void main() {
       isA<Map<String, dynamic>>(),
     );
     expect(preview.battleValidation['status'], 'pending_after_apply');
+    expect(preview.bracketPolicy['bracket'], 3);
+    expect(
+      (preview.bracketPolicy['intent_profile'] as Map)['minimum_turns_played'],
+      6,
+    );
   });
 
   test('requestOptimizePreview validates swap integrity payload', () async {
@@ -106,6 +122,12 @@ void main() {
                 'removal_count': 1,
                 'addition_count': 1,
               },
+              'apply_authorization': const {
+                'version': 'v1',
+                'algo': 'hmac-sha256',
+                'token': 'signed-preview-token',
+                'expires_at': '2026-07-31T12:00:00.000Z',
+              },
             };
           },
       onProgressUpdate: (_) {},
@@ -120,6 +142,11 @@ void main() {
     expect(
       (outcome.applyPlan.mutationContext['swap_integrity'] as Map)['hash'],
       hash,
+    );
+    expect(
+      (outcome.applyPlan.mutationContext['apply_authorization']
+          as Map)['token'],
+      'signed-preview-token',
     );
   });
 
@@ -658,6 +685,13 @@ void main() {
         'status': 'pending_after_apply',
         'label': 'Battle pendente',
       },
+      'bracket_policy': const {
+        'bracket': 4,
+        'label': 'Optimized',
+        'hard_compliant': true,
+        'game_changer_count': 4,
+        'game_changer_cap': 99,
+      },
     });
 
     final plan = buildOptimizeApplyPlan(preview);
@@ -672,6 +706,7 @@ void main() {
       (plan.mutationContext['battle_validation'] as Map)['label'],
       'Battle pendente',
     );
+    expect((plan.mutationContext['bracket_policy'] as Map)['bracket'], 4);
   });
 
   test('buildOptimizeApplyPlan refuses a backend-blocked preview', () {

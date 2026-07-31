@@ -24,6 +24,7 @@ import '../../../lib/ai/commander_learned_deck_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
+import '../../../lib/ai/generate_bracket_support.dart';
 import '../../../lib/ai/generate_provider_repair_policy.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
@@ -39,7 +40,7 @@ import '../../../lib/openai_structured_output_support.dart';
 import '../../../lib/runtime_environment.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
-    'ai_generate_reference_prompt_v6';
+    'ai_generate_reference_prompt_v7';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -79,7 +80,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final totalStopwatch = Stopwatch()..start();
     final timings = <String, int>{};
-    final bracket = body['bracket'];
+    final requestedBracket = body['bracket'] as int?;
     final requestedCommanderName = input.commanderName;
     final pool = context.read<Pool>();
     final generationConstraints = input.constraints;
@@ -105,12 +106,19 @@ Future<Response> onRequest(RequestContext context) async {
         responseBody: payload,
         constraints: generationConstraints,
       );
-      if (generationConstraintGuidance.diagnostics.isEmpty) return constrained;
-      return {
-        ...constrained,
-        'generation_constraint_guidance':
-            generationConstraintGuidance.diagnostics,
-      };
+      final withGuidance =
+          generationConstraintGuidance.diagnostics.isEmpty
+              ? constrained
+              : {
+                ...constrained,
+                'generation_constraint_guidance':
+                    generationConstraintGuidance.diagnostics,
+              };
+      return applyAiGenerateCommanderBracketContract(
+        format: format,
+        requestedBracket: requestedBracket,
+        responseBody: withGuidance,
+      );
     }
 
     Map<String, dynamic>? referenceProfile;
@@ -194,11 +202,28 @@ Future<Response> onRequest(RequestContext context) async {
     final cacheKey = buildAiGenerateCacheKey(
       prompt: prompt,
       format: format,
-      bracket: bracket,
+      bracket: requestedBracket,
       commanderName: referenceGuidanceEnabled ? requestedCommanderName : null,
       referenceProfileVersion: referenceProfileVersion,
       constraints: generationConstraints,
     );
+
+    Response buildBracketViolationResponse(
+      Map<String, dynamic> payload, {
+      bool cacheHit = false,
+    }) {
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      return Response.json(
+        statusCode: HttpStatus.unprocessableEntity,
+        headers: const {'Cache-Control': 'no-store'},
+        body: withAiGenerateRuntimeMetadata(
+          payload: buildAiGenerateCommanderBracketViolationPayload(payload),
+          cacheKey: cacheKey,
+          cacheHit: cacheHit,
+          timings: timings,
+        ),
+      );
+    }
 
     final cacheLookupStopwatch = Stopwatch()..start();
     final cachedBody =
@@ -207,10 +232,21 @@ Future<Response> onRequest(RequestContext context) async {
             : readAiGenerateCache(cacheKey);
     timings['cache_lookup_ms'] = cacheLookupStopwatch.elapsedMilliseconds;
     if (cachedBody != null) {
+      final bracketCheckedCachedBody = applyAiGenerateCommanderBracketContract(
+        format: format,
+        requestedBracket: requestedBracket,
+        responseBody: cachedBody,
+      );
+      if (aiGenerateCommanderBracketMustReject(bracketCheckedCachedBody)) {
+        return buildBracketViolationResponse(
+          bracketCheckedCachedBody,
+          cacheHit: true,
+        );
+      }
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       return Response.json(
         body: withAiGenerateRuntimeMetadata(
-          payload: cachedBody,
+          payload: bracketCheckedCachedBody,
           cacheKey: cacheKey,
           cacheHit: true,
           timings: timings,
@@ -261,6 +297,9 @@ Future<Response> onRequest(RequestContext context) async {
               'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
         ),
       );
+      if (aiGenerateCommanderBracketMustReject(mockBody)) {
+        return buildBracketViolationResponse(mockBody);
+      }
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       final responseBody = withAiGenerateRuntimeMetadata(
         payload: mockBody,
@@ -346,9 +385,13 @@ Future<Response> onRequest(RequestContext context) async {
       final normalizedFormat = format.trim().toLowerCase();
       final isCommanderFormat =
           normalizedFormat == 'commander' || normalizedFormat == 'edh';
+      // The explicit bracket is canonical. Text such as "cEDH" must not
+      // silently inject competitive references into a B1-B4 request.
       final commanderMetaScope =
           isCommanderFormat
-              ? resolveCommanderMetaScopeFromPromptText(prompt)
+              ? requestedBracket == 5
+                  ? 'competitive_commander'
+                  : null
               : null;
       final shouldUseMeta =
           metaKeywordPatterns.isNotEmpty &&
@@ -399,9 +442,11 @@ Future<Response> onRequest(RequestContext context) async {
 
     const systemPromptPrefix = '''
 You are a world-class Magic: The Gathering deck builder and Level 3 judge.
-Your goal is to build a competitive, consistent, and fully legal deck for the format
-provided by the user.
-Think like a judge verifying legality and a pro player maximizing consistency.
+Your goal is to build a consistent, fully legal deck that matches the format and
+the exact Commander Bracket requested by the user.
+Think like a judge verifying legality and an expert deck builder maximizing
+coherence inside the requested power intent. Never treat every Commander deck
+as competitive or cEDH by default.
 
 Return ONLY a JSON object (no markdown). Use this schema:
 {
@@ -447,7 +492,8 @@ Deck construction guidelines:
 - For 60-card formats: 22-26 lands, 4+ removal, adequate draw.
 - Include 2-3 distinct win conditions.
 - Keep the mana curve smooth.
-- Prioritize instant-speed interaction when available.
+- For Commander, apply these ratios and interaction choices without overriding
+  the selected bracket's theme, speed, telegraphing, and competitiveness.
 - Use exact real card names in English.
 ''';
 
@@ -476,10 +522,16 @@ Deck construction guidelines:
               sourceCommanderNames: archetypeSourceCommanderNames,
             )
             : '';
+    final commanderBracketPrompt = buildAiGenerateCommanderBracketPrompt(
+      format: format,
+      requestedBracket: requestedBracket,
+    );
 
     final userMessage = '''
 Build a deck based on this description: "$prompt".
 Format: $format.
+
+$commanderBracketPrompt
 
 $referenceProfilePrompt
 
@@ -675,6 +727,9 @@ $metaContext
                 'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
           ),
         );
+        if (aiGenerateCommanderBracketMustReject(mockBody)) {
+          return buildBracketViolationResponse(mockBody);
+        }
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
         final responseBody = withAiGenerateRuntimeMetadata(
           payload: mockBody,
@@ -939,10 +994,14 @@ $metaContext
       };
     }
 
+    final bracketPolicyViolation = aiGenerateCommanderBracketMustReject(
+      responseBody,
+    );
     final providerOutputMustBeRejected =
         !validation.isValid ||
         (validation.invalidCards.isNotEmpty &&
-            !providerRepairDecision.eligible);
+            !providerRepairDecision.eligible) ||
+        bracketPolicyViolation;
     if (providerOutputMustBeRejected) {
       Log.w(
         'AI generate returned invalid or unresolved deck. '
@@ -953,6 +1012,9 @@ $metaContext
 
       if (!aiConfig.allowsMockFallbacks) {
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+        if (bracketPolicyViolation) {
+          return buildBracketViolationResponse(responseBody);
+        }
         return Response.json(
           statusCode: 422,
           body: withAiGenerateRuntimeMetadata(
@@ -970,11 +1032,15 @@ $metaContext
       }
 
       final fallbackWarningCode =
-          validation.isValid
+          bracketPolicyViolation
+              ? 'ai_generate_bracket_fallback'
+              : validation.isValid
               ? 'ai_generate_invalid_card_fallback'
               : 'ai_generate_validation_fallback';
       final fallbackWarningMessage =
-          validation.isValid
+          bracketPolicyViolation
+              ? 'A geracao principal excedeu o limite estrito do bracket. Retornando fallback deterministico compativel.'
+              : validation.isValid
               ? 'A geracao principal retornou cartas nao resolvidas. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.'
               : 'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.';
       final fallbackBody = await enforceGenerationConstraints(
@@ -1023,6 +1089,9 @@ $metaContext
         return Response.json(body: validFallbackBody);
       }
 
+      if (aiGenerateCommanderBracketMustReject(fallbackBody)) {
+        return buildBracketViolationResponse(fallbackBody);
+      }
       return Response.json(
         statusCode: 422,
         body: {'error': 'Generated deck failed validation', ...responseBody},
@@ -1578,6 +1647,7 @@ bool _shouldUseReferenceGuidedDeterministicFastPath({
 
 bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
   if (body['can_save'] == false) return false;
+  if (aiGenerateCommanderBracketMustReject(body)) return false;
   final validation = body['validation'];
   if (validation is! Map || validation['is_valid'] != true) return false;
 

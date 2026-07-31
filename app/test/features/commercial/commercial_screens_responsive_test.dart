@@ -100,7 +100,37 @@ void main() {
       find.byKey(const Key('legal-privacy-section')),
     );
     expect(privacy.top, greaterThanOrEqualTo(kToolbarHeight));
-    expect(privacy.top, lessThanOrEqualTo(kToolbarHeight + 24));
+    expect(privacy.top, closeTo(kToolbarHeight, 0.1));
+    final previousSection = tester.getRect(
+      find.byKey(const Key('legal-monetization-section')),
+    );
+    expect(previousSection.bottom, lessThanOrEqualTo(kToolbarHeight + 0.1));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('privacy deep link hides the previous section on wide screens', (
+    tester,
+  ) async {
+    await _pumpAt(
+      tester,
+      const Size(1920, 1080),
+      const CommercialLegalScreen(initialSection: 'terms'),
+    );
+
+    await _pumpAt(
+      tester,
+      const Size(1920, 1080),
+      const CommercialLegalScreen(initialSection: 'privacy'),
+    );
+
+    final privacy = tester.getRect(
+      find.byKey(const Key('legal-privacy-section')),
+    );
+    final previousSection = tester.getRect(
+      find.byKey(const Key('legal-monetization-section')),
+    );
+    expect(privacy.top, closeTo(kToolbarHeight, 0.1));
+    expect(previousSection.bottom, lessThanOrEqualTo(kToolbarHeight + 0.1));
     expect(tester.takeException(), isNull);
   });
 

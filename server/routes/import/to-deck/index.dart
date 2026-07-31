@@ -9,6 +9,10 @@ import '../../../lib/import_list_service.dart';
 import '../../../lib/import_to_deck_merge_support.dart';
 import '../../../lib/http_responses.dart';
 
+class _ImportDeckChangedDuringPreparation implements Exception {
+  const _ImportDeckChangedDuringPreparation();
+}
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method == HttpMethod.post) {
     return _importToDeck(context);
@@ -207,6 +211,25 @@ Future<Response> _importToDeck(RequestContext context) async {
     );
     var finalTotalCards = sumImportToDeckQuantities(consolidatedCards);
     await pool.runTx((session) async {
+      final lockedDeck = await session.execute(
+        Sql.named('''
+          SELECT format
+          FROM decks
+          WHERE id = @deckId
+            AND user_id = @userId
+            AND LOWER(format) = @normalizedFormat
+          FOR UPDATE
+        '''),
+        parameters: {
+          'deckId': deckId,
+          'userId': userId,
+          'normalizedFormat': normalizedFormat,
+        },
+      );
+      if (lockedDeck.isEmpty) {
+        throw const _ImportDeckChangedDuringPreparation();
+      }
+
       final existingCards = <Map<String, dynamic>>[];
 
       if (!replaceAll) {
@@ -215,6 +238,7 @@ Future<Response> _importToDeck(RequestContext context) async {
             SELECT card_id::text, quantity::int, is_commander, condition
             FROM deck_cards
             WHERE deck_id = @deckId
+            FOR UPDATE
           '''),
           parameters: {'deckId': deckId},
         );
@@ -236,6 +260,7 @@ Future<Response> _importToDeck(RequestContext context) async {
             SELECT card_id::text, quantity::int, is_commander, condition
             FROM deck_cards
             WHERE deck_id = @deckId AND is_commander = TRUE
+            FOR UPDATE
           '''),
           parameters: {'deckId': deckId},
         );
@@ -311,6 +336,15 @@ Future<Response> _importToDeck(RequestContext context) async {
         commanderDetected: commanderDetected,
         commanderPreserved: commanderPreserved,
       ),
+    );
+  } on _ImportDeckChangedDuringPreparation {
+    return Response.json(
+      statusCode: 409,
+      body: {
+        'error':
+            'Deck changed while the import was being prepared. Review and retry.',
+        'error_code': 'import_deck_changed',
+      },
     );
   } on DeckRulesException catch (e) {
     return badRequest(e.message);

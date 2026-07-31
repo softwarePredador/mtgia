@@ -55,7 +55,14 @@ void main() {
     final png = img.encodePng(img.Image(width: 390, height: 844));
     File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
     final log = File('${temp.path}/web-mobile.log')
-      ..writeAsStringSync('All tests passed.\n');
+      ..writeAsStringSync(
+        _directoryRuntimeLog(
+          profile: 'web_mobile_390x844',
+          target: 'web_real_build',
+          deviceContract: 'Chrome 150',
+          checkpoints: const ['login_empty'],
+        ),
+      );
 
     final result = indexUiRuntimeScreenshotDirectory(
       screenshotDirectory: screenshotDirectory,
@@ -65,7 +72,7 @@ void main() {
       expectedSourceDigest: _digest,
       surface: 'authenticated_p0_matrix',
       profile: 'web_mobile_390x844',
-      runtime: 'flutter_drive_release',
+      runtime: 'flutter_drive',
       target: 'web_real_build',
       deviceContract: 'Chrome 150',
       generatedAt: DateTime.utc(2026, 7, 27, 18),
@@ -78,6 +85,75 @@ void main() {
     expect(
       screenshots.single['path'],
       'app/test/ui/goldens/runtime/web_mobile/login_empty.png',
+    );
+  });
+
+  test('rejects stale directory evidence instead of relabeling its digest', () {
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/web_mobile',
+    )..createSync(recursive: true);
+    final png = img.encodePng(img.Image(width: 390, height: 844));
+    File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+    final log = File('${temp.path}/web-mobile.log')
+      ..writeAsStringSync(
+        _directoryRuntimeLog(
+          profile: 'web_mobile_390x844',
+          target: 'web_real_build',
+          deviceContract: 'Chrome real Web build',
+          checkpoints: const ['login_empty'],
+          sourceDigest:
+              'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+        ),
+      );
+
+    expect(
+      () => indexUiRuntimeScreenshotDirectory(
+        screenshotDirectory: screenshotDirectory,
+        runtimeLog: log,
+        repoRoot: temp,
+        manifestRelativePath:
+            'docs/qa/ui-live/current/p0-matrix/web-mobile.json',
+        expectedSourceDigest: _digest,
+        surface: 'authenticated_p0_matrix',
+        profile: 'web_mobile_390x844',
+        runtime: 'flutter_drive',
+        target: 'web_real_build',
+        deviceContract: 'Chrome real Web build',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+  });
+
+  test('rejects an Android target that contradicts its device contract', () {
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/android_emulator',
+    )..createSync(recursive: true);
+    final png = img.encodePng(img.Image(width: 1080, height: 2400));
+    File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+    final log = File('${temp.path}/android.log')
+      ..writeAsStringSync(
+        _directoryRuntimeLog(
+          profile: 'android_emulator_manaloom_api34',
+          target: 'android_physical',
+          deviceContract: 'Pixel 6, Android 14, emulator runtime',
+          checkpoints: const ['login_empty'],
+        ),
+      );
+
+    expect(
+      () => indexUiRuntimeScreenshotDirectory(
+        screenshotDirectory: screenshotDirectory,
+        runtimeLog: log,
+        repoRoot: temp,
+        manifestRelativePath: 'docs/qa/ui-live/current/p0-matrix/android.json',
+        expectedSourceDigest: _digest,
+        surface: 'authenticated_p0_matrix',
+        profile: 'android_emulator_manaloom_api34',
+        runtime: 'flutter_drive',
+        target: 'android_physical',
+        deviceContract: 'Pixel 6, Android 14, emulator runtime',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
     );
   });
 
@@ -181,7 +257,6 @@ void main() {
         },
       }),
     );
-
     final verification = verifyUiLiveEvidence(
       reviewFile: review,
       repoRoot: temp,
@@ -200,13 +275,24 @@ void main() {
   test('verifies multiple runtime profiles through their manifest hashes', () {
     final png = img.encodePng(img.Image(width: 8, height: 10));
     final references = <Map<String, Object>>[];
-    for (final profile in const ['web_mobile', 'android_physical']) {
+    for (final profile in const ['web_mobile', 'android_emulator']) {
       final screenshotDirectory = Directory(
         '${temp.path}/app/test/ui/goldens/runtime/$profile',
       )..createSync(recursive: true);
       File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
       final log = File('${temp.path}/$profile.log')
-        ..writeAsStringSync('All tests passed.\n');
+        ..writeAsStringSync(
+          _directoryRuntimeLog(
+            profile: profile,
+            target: profile == 'android_emulator'
+                ? 'android_emulator'
+                : 'web_real_build',
+            deviceContract: profile == 'android_emulator'
+                ? 'Pixel 6, Android 14, emulator runtime'
+                : 'Chrome real Web build',
+            checkpoints: const ['login_empty'],
+          ),
+        );
       final extraction = indexUiRuntimeScreenshotDirectory(
         screenshotDirectory: screenshotDirectory,
         runtimeLog: log,
@@ -216,10 +302,12 @@ void main() {
         surface: 'authenticated_p0_matrix',
         profile: profile,
         runtime: 'flutter_drive',
-        target: profile == 'android_physical'
-            ? 'android_physical'
+        target: profile == 'android_emulator'
+            ? 'android_emulator'
             : 'web_real_build',
-        deviceContract: profile,
+        deviceContract: profile == 'android_emulator'
+            ? 'Pixel 6, Android 14, emulator runtime'
+            : 'Chrome real Web build',
         generatedAt: DateTime.utc(2026, 7, 27, 18),
       );
       references.add(<String, Object>{
@@ -259,10 +347,30 @@ void main() {
           'reviewed_capture_manifest_sha256': references
               .map((reference) => reference['sha256']!)
               .toList(),
-          'reviewed_profiles': const ['web_mobile', 'android_physical'],
+          'reviewed_profiles': const ['web_mobile', 'android_emulator'],
           'reviewed_screenshot_count': 2,
           'blocking_findings': const <String>[],
         },
+      }),
+    );
+    final policy = File(
+      '${temp.path}/app/test/ui/fixtures/ui_live_evidence_policy.json',
+    );
+    policy.parent.createSync(recursive: true);
+    policy.writeAsStringSync(
+      const JsonEncoder.withIndent('  ').convert(<String, Object>{
+        'schema_version': 'manaloom_ui_live_evidence_policy_v1',
+        'surfaces': [
+          {
+            'id': 'authenticated_p0_matrix',
+            'required_profiles': {'web_mobile': 1, 'android_emulator': 1},
+            'android_runtime_contract': {
+              'accepted_targets': ['android_emulator', 'android_physical'],
+              'emulator_must_not_be_reported_as_physical': true,
+              'current_profile': 'android_emulator',
+            },
+          },
+        ],
       }),
     );
 
@@ -274,6 +382,155 @@ void main() {
 
     expect(verification.screenshotCount, 2);
     expect(verification.surface, 'authenticated_p0_matrix');
+
+    policy.writeAsStringSync(
+      const JsonEncoder.withIndent('  ').convert(<String, Object>{
+        'schema_version': 'manaloom_ui_live_evidence_policy_v1',
+        'surfaces': [
+          {
+            'id': 'authenticated_p0_matrix',
+            'required_profiles': {
+              'web_mobile': 1,
+              'web_desktop': 1,
+              'android_emulator': 1,
+            },
+            'android_runtime_contract': {
+              'accepted_targets': ['android_emulator'],
+              'emulator_must_not_be_reported_as_physical': true,
+              'current_profile': 'android_emulator',
+            },
+          },
+        ],
+      }),
+    );
+    expect(
+      () => verifyUiLiveEvidence(
+        reviewFile: review,
+        repoRoot: temp,
+        expectedSourceDigest: _digest,
+      ),
+      throwsA(
+        isA<UiRuntimeEvidenceException>().having(
+          (error) => error.message,
+          'message',
+          contains('web_desktop must contain exactly 1 screenshots'),
+        ),
+      ),
+    );
+  });
+
+  test('rejects physical release credit backed only by emulator captures', () {
+    final png = img.encodePng(img.Image(width: 8, height: 10));
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/android_emulator',
+    )..createSync(recursive: true);
+    File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+    final log = File('${temp.path}/android.log')
+      ..writeAsStringSync(
+        _directoryRuntimeLog(
+          profile: 'android_emulator',
+          target: 'android_emulator',
+          deviceContract: 'Pixel 6, Android 14, emulator runtime',
+          checkpoints: const ['login_empty'],
+        ),
+      );
+    final extraction = indexUiRuntimeScreenshotDirectory(
+      screenshotDirectory: screenshotDirectory,
+      runtimeLog: log,
+      repoRoot: temp,
+      manifestRelativePath:
+          'docs/qa/ui-live/current/p0-matrix/android_emulator.json',
+      expectedSourceDigest: _digest,
+      surface: 'authenticated_p0_matrix',
+      profile: 'android_emulator',
+      runtime: 'flutter_drive',
+      target: 'android_emulator',
+      deviceContract: 'Pixel 6, Android 14, emulator runtime',
+      generatedAt: DateTime.utc(2026, 7, 27, 18),
+    );
+    final manifestHash = sha256
+        .convert(extraction.manifestFile.readAsBytesSync())
+        .toString();
+    final review = File('${temp.path}/docs/qa/ui-live/latest.json');
+    review.parent.createSync(recursive: true);
+    review.writeAsStringSync(
+      const JsonEncoder.withIndent('  ').convert(<String, Object>{
+        'schema_version': 'manaloom_ui_live_review_v1',
+        'status': 'PASS',
+        'source_digest': _digest,
+        'automated': {
+          'status': 'PASS_AUTOMATED',
+          'verified_at': '2026-07-27T18:00:00Z',
+          'commands': ['flutter test'],
+        },
+        'runtime': {
+          'status': 'PASS_RUNTIME',
+          'capture_manifest': {
+            'path':
+                'docs/qa/ui-live/current/p0-matrix/'
+                'android_emulator.json',
+            'sha256': manifestHash,
+          },
+        },
+        'visual_review': {
+          'status': 'PASS_VISUAL_REVIEWED',
+          'reviewed_at': '2026-07-27T18:05:00Z',
+          'reviewer': {'kind': 'agent', 'name': 'Codex'},
+          'visual_thesis': 'Coherent emulator runtime.',
+          'content_plan': 'One representative state.',
+          'interaction_thesis': 'The action remains explicit.',
+          'criteria': {
+            for (final criterion in uiLiveEvidenceCriteria)
+              criterion: {'status': 'pass', 'note': 'Inspected.'},
+          },
+          'reviewed_checkpoints': ['login_empty'],
+          'reviewed_screenshot_sha256': [
+            (extraction.manifest['screenshots'] as List)
+                .cast<Map>()
+                .single['sha256'],
+          ],
+          'blocking_findings': const <String>[],
+        },
+        'release_checks': {
+          'battle_coach_android_physical': 'pass_current_digest',
+        },
+      }),
+    );
+    final policy = File(
+      '${temp.path}/app/test/ui/fixtures/ui_live_evidence_policy.json',
+    );
+    policy.parent.createSync(recursive: true);
+    policy.writeAsStringSync(
+      const JsonEncoder.withIndent('  ').convert(<String, Object>{
+        'schema_version': 'manaloom_ui_live_evidence_policy_v1',
+        'surfaces': [
+          {
+            'id': 'authenticated_p0_matrix',
+            'required_profiles': {'android_emulator': 1},
+            'android_runtime_contract': {
+              'accepted_targets': ['android_emulator', 'android_physical'],
+              'emulator_must_not_be_reported_as_physical': true,
+              'current_profile': 'android_emulator',
+            },
+          },
+        ],
+      }),
+    );
+
+    expect(
+      () => verifyUiLiveEvidence(
+        reviewFile: review,
+        repoRoot: temp,
+        expectedSourceDigest: _digest,
+      ),
+      throwsA(
+        isA<UiRuntimeEvidenceException>().having(
+          (error) => error.message,
+          'message',
+          contains('without a physical capture'),
+        ),
+      ),
+    );
   });
 
   test('rejects a review whose inspected hashes do not cover the capture', () {
@@ -313,4 +570,24 @@ String _runtimeLog(
       ..add('SCREENSHOT_END ${entry.key}');
   }
   return '${lines.join('\n')}\n';
+}
+
+String _directoryRuntimeLog({
+  required String profile,
+  required String target,
+  required String deviceContract,
+  required List<String> checkpoints,
+  String sourceDigest = _digest,
+}) {
+  final context = <String, Object>{
+    'schema_version': 'manaloom_ui_runtime_context_v1',
+    'surface': 'authenticated_p0_matrix',
+    'source_digest': sourceDigest,
+    'profile': profile,
+    'runtime': 'flutter_drive',
+    'target': target,
+    'device_contract': deviceContract,
+    'required_checkpoints': checkpoints,
+  };
+  return 'VISUAL_PROOF_CONTEXT ${jsonEncode(context)}\nAll tests passed.\n';
 }

@@ -38,9 +38,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
   final cardId = body['card_id']?.toString();
   final quantityRaw = body['quantity'];
-  final quantity = quantityRaw is int
-      ? quantityRaw
-      : int.tryParse(quantityRaw?.toString() ?? '');
+  final quantity =
+      quantityRaw is int
+          ? quantityRaw
+          : int.tryParse(quantityRaw?.toString() ?? '');
   final replaceSameName = body['replace_same_name'] == true;
   final targetIsCommander = body['is_commander'] == true;
   final condition = _validateCondition(body['condition']?.toString());
@@ -68,7 +69,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     final result = await pool.runTx((session) async {
       final deckResult = await session.execute(
         Sql.named(
-          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1',
+          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1 FOR UPDATE',
         ),
         parameters: {'deckId': deckId, 'userId': userId},
       );
@@ -79,9 +80,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       validateNoUnsupportedDeckSections(cards: [body]);
 
       final cardInfo = await session.execute(
-        Sql.named(
-          'SELECT name, type_line FROM cards WHERE id = @id LIMIT 1',
-        ),
+        Sql.named('SELECT name, type_line FROM cards WHERE id = @id LIMIT 1'),
         parameters: {'id': cardId},
       );
       if (cardInfo.isEmpty) {
@@ -166,19 +165,20 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         'name': cardName,
       };
 
-      final validatedCards = nextCards.values
-          .map((card) => {
-                'card_id': card['card_id'],
-                'quantity': card['quantity'],
-                'is_commander': card['is_commander'],
-              })
-          .toList();
+      final validatedCards =
+          nextCards.values
+              .map(
+                (card) => {
+                  'card_id': card['card_id'],
+                  'quantity': card['quantity'],
+                  'is_commander': card['is_commander'],
+                },
+              )
+              .toList();
 
-      await DeckRulesService(session).validateAndThrow(
-        format: format,
-        cards: validatedCards,
-        strict: false,
-      );
+      await DeckRulesService(
+        session,
+      ).validateAndThrow(format: format, cards: validatedCards, strict: false);
 
       await session.execute(
         Sql.named('DELETE FROM deck_cards WHERE deck_id = @deckId'),

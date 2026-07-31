@@ -1,3 +1,4 @@
+import 'optimize_functional_role_support.dart';
 import 'optimization_functional_roles.dart';
 import 'optimization_quality_gate.dart';
 import 'optimization_validator.dart';
@@ -20,6 +21,48 @@ class OptimizeRouteQualityGateDecision {
   );
 }
 
+CommanderFunctionalRoleFloorAssessment
+assessOptimizeProjectedCommanderRoleFloors({
+  required List<Map<String, dynamic>> projectedDeck,
+  required String archetype,
+}) {
+  return assessCommanderFunctionalRoleFloors(
+    cards: projectedDeck,
+    targetArchetype: archetype,
+  );
+}
+
+Map<String, dynamic> buildOptimizeRoleFloorRejectedBody({
+  required CommanderFunctionalRoleFloorAssessment assessment,
+  required List<String> removals,
+  required List<String> additions,
+  required Map<String, dynamic> deckAnalysis,
+  required Map<String, dynamic>? postAnalysis,
+  required List<String> validationWarnings,
+}) {
+  return {
+    'error':
+        'A otimização foi bloqueada porque a lista projetada não cobre '
+        'funções estruturais mínimas de Commander.',
+    'quality_error': {
+      'code': 'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
+      'message':
+          'A lista projetada ainda está abaixo do piso estrutural de wipes.',
+      'functional_role_policy': assessment.toJson(),
+    },
+    'mode': 'optimize',
+    'functional_role_policy': assessment.toJson(),
+    'removals': removals,
+    'additions': additions,
+    'deck_analysis': deckAnalysis,
+    'post_analysis': postAnalysis,
+    'validation_warnings': validationWarnings,
+    'can_apply': false,
+    'learning_eligible': false,
+    'apply_blockers': const ['commander_functional_role_floor_not_met'],
+  };
+}
+
 OptimizeRouteQualityGateDecision evaluateOptimizeRouteQualityGate({
   required bool isComplete,
   required ValidationReport? validationReport,
@@ -36,17 +79,18 @@ OptimizeRouteQualityGateDecision evaluateOptimizeRouteQualityGate({
 
   final hardRejected =
       validationReport.verdict != 'aprovado' || validationReport.score < 70;
-  final reasons = hardRejected
-      ? buildOptimizationRejectionReasons(
-          validationReport: validationReport,
-          archetype: archetype,
-          preCurve: preCurve,
-          postCurve: postCurve,
-          preManaAssessment: preManaAssessment,
-          postManaAssessment: postManaAssessment,
-          profileRoleTargets: profileRoleTargets,
-        )
-      : const <String>[];
+  final reasons =
+      hardRejected
+          ? buildOptimizationRejectionReasons(
+            validationReport: validationReport,
+            archetype: archetype,
+            preCurve: preCurve,
+            postCurve: postCurve,
+            preManaAssessment: preManaAssessment,
+            postManaAssessment: postManaAssessment,
+            profileRoleTargets: profileRoleTargets,
+          )
+          : const <String>[];
 
   return OptimizeRouteQualityGateDecision(
     rejected: hardRejected || reasons.isNotEmpty,
@@ -88,7 +132,8 @@ OptimizeRouteSerializedValidationDecision evaluateSerializedOptimizeValidation({
     return OptimizeRouteSerializedValidationDecision.none;
   }
 
-  final score = (serializedValidation['validation_score'] as num?)?.toInt() ??
+  final score =
+      (serializedValidation['validation_score'] as num?)?.toInt() ??
       (serializedValidation['score'] as num?)?.toInt() ??
       0;
   final verdict = serializedValidation['verdict']?.toString() ?? '';
@@ -96,19 +141,20 @@ OptimizeRouteSerializedValidationDecision evaluateSerializedOptimizeValidation({
     return OptimizeRouteSerializedValidationDecision.none;
   }
 
-  final reasons = validationReport != null
-      ? buildOptimizationRejectionReasons(
-          validationReport: validationReport,
-          archetype: archetype,
-          preCurve: preCurve,
-          postCurve: postCurve,
-          preManaAssessment: preManaAssessment,
-          postManaAssessment: postManaAssessment,
-          profileRoleTargets: profileRoleTargets,
-        )
-      : <String>[
-          'A validação final não fechou como "aprovado" (score $score/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
-        ];
+  final reasons =
+      validationReport != null
+          ? buildOptimizationRejectionReasons(
+            validationReport: validationReport,
+            archetype: archetype,
+            preCurve: preCurve,
+            postCurve: postCurve,
+            preManaAssessment: preManaAssessment,
+            postManaAssessment: postManaAssessment,
+            profileRoleTargets: profileRoleTargets,
+          )
+          : <String>[
+            'A validação final não fechou como "aprovado" (score $score/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
+          ];
 
   return OptimizeRouteSerializedValidationDecision(
     rejected: true,

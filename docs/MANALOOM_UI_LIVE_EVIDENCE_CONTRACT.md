@@ -11,9 +11,10 @@ presentes e vinculados ao mesmo digest de código:
 
 1. `PASS_AUTOMATED`: analyzer, widget/golden, overflow, viewport,
    acessibilidade automatizada e contratos de estado aplicáveis passaram.
-2. `PASS_RUNTIME`: a implementação corrente rodou em Android físico ou build
-   Web real, executou a interação relevante e produziu PNGs íntegros, com
-   dimensões e SHA-256 registrados.
+2. `PASS_RUNTIME`: a implementação corrente rodou em runtime Android atestado
+   (`emulator` ou `physical`) ou build Web real, executou a interação relevante
+   e produziu PNGs íntegros, com dimensões e SHA-256 registrados. O manifesto
+   nunca pode apresentar emulador como aparelho físico.
 3. `PASS_VISUAL_REVIEWED`: um agente ou pessoa abriu **todas** as capturas e
    registrou decisão explícita sobre hierarquia, identidade MTG, cor/contraste,
    tipografia, espaçamento/densidade, adaptação, clareza de interação, estados,
@@ -48,14 +49,16 @@ Revalidar somente a prova já revisada:
 ./scripts/manaloom_ui_live_evidence_gate.sh --check
 ```
 
-Capturar o Battle Coach no Android físico:
+Capturar o Battle Coach em runtime Android conectado:
 
 ```bash
-MANALOOM_UI_PROOF_DEVICE=<ANDROID_DEVICE_ID> \
+MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> \
+MANALOOM_UI_ANDROID_RUNTIME_KIND=auto \
 ./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach
 ```
 
 O capture executa analyzer e testes focados, roda o integration test no device,
+atesta por ADB se o alvo é emulador ou aparelho físico,
 extrai os PNGs emitidos pelo runtime e grava
 `docs/qa/ui-live/current/battle-coach-android/capture-manifest.json`. Capturar
 não aprova visualmente: depois disso o revisor abre cada PNG, corrige a UI se
@@ -64,7 +67,7 @@ necessário, recaptura e somente então atualiza `docs/qa/ui-live/latest.json`.
 A prova corrente também agrega a matriz P0 ampla em quatro perfis:
 
 - Web real mobile, desktop e wide;
-- Android profile em Samsung SM-A135M, Android 14;
+- Android em Pixel 6 AVD, API 34, explicitamente identificado como emulador;
 - Battle Coach Android em sete estados;
 - Battle Coach Web em nove checkpoints de teclado físico.
 
@@ -79,7 +82,7 @@ O Life Counter é uma platform view Android. Screenshot produzida pela surface
 Flutter não comprova sua composição nativa e pode resultar em frame preto.
 Nesse checkpoint o harness anuncia prontidão e
 `scripts/manaloom_capture_android_platform_view.sh` usa `adb screencap` no
-aparelho, valida assinatura PNG, dimensão landscape e tamanho mínimo antes de
+runtime Android, valida assinatura PNG, dimensão landscape e tamanho mínimo antes de
 promover o arquivo. Captura preta, frame de transição e conversão da surface
 Flutter são recusados.
 
@@ -98,8 +101,10 @@ resources Android, contrato de superfícies e o próprio harness de prova.
 - A fixture do Battle Coach não chama API, não autentica, não escreve em
   PostgreSQL e não promove regra de carta; ela prova somente UI e interação.
 - Revisão visual por agente não substitui TalkBack humano em Android físico
-  nem smoke live de release. Teclado Web real só recebe crédito quando o
-  manifesto físico correspondente está presente.
+  nem smoke de hardware/release. Prova em emulador valida o runtime Android,
+  mas não recebe crédito por sensores, desempenho, fabricante ou comportamento
+  específico de hardware. Teclado Web real só recebe crédito quando o
+  manifesto de runtime correspondente está presente.
 - Uma captura Android não prova a composição Web. Mudança específica de Web
   exige sua própria captura em build real quando o Browser/harness permitido
   estiver disponível.

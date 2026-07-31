@@ -28,6 +28,39 @@ void main() {
       File('../scripts/manaloom_ui_live_evidence_gate.sh').existsSync(),
       isTrue,
     );
+    final p0Runner = File(
+      '../scripts/manaloom_p0_runtime_capture.sh',
+    ).readAsStringSync();
+    final liveGate = File(
+      '../scripts/manaloom_ui_live_evidence_gate.sh',
+    ).readAsStringSync();
+    final runtimeContract = File(
+      '../scripts/lib/manaloom_ui_runtime_contract.sh',
+    ).readAsStringSync();
+    expect(p0Runner, contains('android_emulator_manaloom_api34'));
+    expect(p0Runner, contains('NATIVE_SCREENSHOT_READY'));
+    expect(p0Runner, contains('ADB_SCREENSHOT_CAPTURED'));
+    expect(p0Runner, contains('MANALOOM_CHROMEDRIVER_BIN'));
+    expect(p0Runner, contains('ChromeDriver major'));
+    expect(p0Runner, contains('chromedriver_pid'));
+    expect(p0Runner, contains('VISUAL_PROOF_CONTEXT'));
+    expect(p0Runner, contains('required_checkpoints'));
+    expect(p0Runner, contains('runtime-without-context.log'));
+    expect(p0Runner, contains("sed '/VISUAL_PROOF_CONTEXT /d'"));
+    expect(p0Runner, contains('manaloom_ui_runtime_contract.sh'));
+    expect(liveGate, contains('manaloom_ui_runtime_contract.sh'));
+    expect(runtimeContract, contains('manaloom_web_runtime_device_contract'));
+    expect(
+      runtimeContract,
+      contains('manaloom_android_runtime_device_contract'),
+    );
+    expect(runtimeContract, contains(r'display $display_size'));
+    expect(p0Runner, contains('--profile'));
+    expect(p0Runner, contains('--ready-manifest'));
+    expect(
+      gate['p0_capture_command'],
+      contains('manaloom_p0_runtime_capture.sh'),
+    );
     expect(File('../docs/qa/ui-live/latest.json').existsSync(), isTrue);
 
     final crop = gate['web_host_margin_crop'] as Map<String, dynamic>;
@@ -44,6 +77,8 @@ void main() {
       isTrue,
     );
     expect(digest, contains('app/test_driver/runtime_screenshot_crop.dart'));
+    expect(digest, contains('scripts/manaloom_p0_runtime_capture.sh'));
+    expect(digest, contains('scripts/lib/manaloom_ui_runtime_contract.sh'));
   });
 
   test(
@@ -100,8 +135,23 @@ void main() {
         'web_mobile_390x844': 54,
         'web_desktop_1440x900': 53,
         'web_wide_1920x1080': 53,
-        'android_physical_sm_a135m': 54,
+        'android_emulator_manaloom_api34': 54,
       });
+      final androidRuntime =
+          p0Matrix['android_runtime_contract'] as Map<String, dynamic>;
+      expect((androidRuntime['accepted_targets'] as List).toSet(), {
+        'android_emulator',
+        'android_physical',
+      });
+      expect(androidRuntime['must_be_attested_from_adb'], isTrue);
+      expect(
+        androidRuntime['emulator_must_not_be_reported_as_physical'],
+        isTrue,
+      );
+      expect(
+        androidRuntime['current_profile'],
+        'android_emulator_manaloom_api34',
+      );
       final p0Checkpoints = (p0Matrix['required_checkpoints'] as List)
           .cast<String>()
           .toSet();
@@ -134,6 +184,11 @@ void main() {
     final accessibility =
         policy['release_accessibility'] as Map<String, dynamic>;
     expect(accessibility['android_talkback'], 'pending_physical_human_review');
+    expect(accessibility['android_hardware_smoke'], 'pending_physical_device');
+    expect(
+      accessibility['emulator_runtime_is_valid_for_current_scope'],
+      isTrue,
+    );
     expect(
       accessibility['agent_visual_review_does_not_replace_screen_reader'],
       isTrue,

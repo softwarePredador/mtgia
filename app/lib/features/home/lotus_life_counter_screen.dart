@@ -3047,6 +3047,73 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     await _applyNativeCommanderDamage(updatedSession, source: source);
   }
 
+  Future<void> _openLotusCommanderDamageSurface({
+    required String source,
+    required int targetPlayerIndex,
+  }) async {
+    if (!mounted) {
+      return;
+    }
+
+    Map<String, dynamic>? result;
+    for (var attempt = 0; attempt < 3; attempt += 1) {
+      if (attempt > 0) {
+        await Future<void>.delayed(Duration(milliseconds: 140 * attempt));
+      }
+      try {
+        final rawResult = await _hostController.runJavaScriptReturningResult('''
+(() => {
+  try {
+    const bridge = window.__ManaLoomNativeSurfaceBridge;
+    if (!bridge || typeof bridge.openCommanderDamage !== 'function') {
+      return JSON.stringify({ ok: false, reason: 'bridge_missing' });
+    }
+    bridge.sync?.();
+    const opened = bridge.openCommanderDamage($targetPlayerIndex) === true;
+    return JSON.stringify({
+      ok: opened,
+      reason: opened ? null : 'lotus_surface_unavailable',
+      targetPlayerIndex: $targetPlayerIndex,
+    });
+  } catch (error) {
+    return JSON.stringify({
+      ok: false,
+      reason: String(error?.message || error || 'open_failed'),
+    });
+  }
+})();
+''');
+        final decoded = _decodeJavaScriptResult(rawResult);
+        if (decoded is Map<String, dynamic>) {
+          result = decoded;
+        }
+      } catch (error) {
+        result = <String, dynamic>{
+          'ok': false,
+          'reason': error.runtimeType.toString(),
+        };
+      }
+      if (result?['ok'] == true) {
+        break;
+      }
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        result?['ok'] == true
+            ? 'lotus_commander_damage_opened'
+            : 'lotus_commander_damage_open_failed',
+        category: 'life_counter.commander_damage',
+        data: {
+          'source': source,
+          'surface_strategy': 'lotus_tabletop',
+          'target_player_index': targetPlayerIndex,
+          if (result?['reason'] != null) 'reason': result!['reason'],
+        },
+      ),
+    );
+  }
+
   Future<LifeCounterSettings> _loadOwnedLifeCounterSettings() async {
     return await _settingsStore.load() ?? LifeCounterSettings.defaults;
   }
@@ -3973,15 +4040,29 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       ),
     );
 
+    int? requestedCommanderDamageTargetIndex;
     final updatedSession = await showLifeCounterNativePlayerStateSheet(
       context,
       initialSession: session,
       initialTargetPlayerIndex: normalizedTargetIndex,
+      onCommanderDamageRequested: (playerIndex) {
+        requestedCommanderDamageTargetIndex = playerIndex;
+      },
     );
     _isNativePlayerStateSheetOpen = false;
     final shouldResetLotusSurface = _playerStateSurfaceResetSources.contains(
       source,
     );
+    Future<void> openRequestedCommanderDamage() async {
+      final requestedTargetIndex = requestedCommanderDamageTargetIndex;
+      if (!mounted || requestedTargetIndex == null) {
+        return;
+      }
+      await _openLotusCommanderDamageSurface(
+        source: 'player_state_commander_damage_requested',
+        targetPlayerIndex: requestedTargetIndex,
+      );
+    }
 
     if (!mounted || updatedSession == null) {
       final surfaceResetStrategy = await _applyPlayerStateSurfaceResetStrategy(
@@ -4004,8 +4085,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         ),
       );
       if (surfaceResetStrategy == 'bundle_reload') {
-        unawaited(_reloadLotusBundleFromOwnedSnapshot());
+        if (requestedCommanderDamageTargetIndex != null) {
+          await _reloadLotusBundleFromOwnedSnapshot();
+        } else {
+          unawaited(_reloadLotusBundleFromOwnedSnapshot());
+        }
       }
+      await openRequestedCommanderDamage();
       return;
     }
 
@@ -4030,8 +4116,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         ),
       );
       if (surfaceResetStrategy == 'bundle_reload') {
-        unawaited(_reloadLotusBundleFromOwnedSnapshot());
+        if (requestedCommanderDamageTargetIndex != null) {
+          await _reloadLotusBundleFromOwnedSnapshot();
+        } else {
+          unawaited(_reloadLotusBundleFromOwnedSnapshot());
+        }
       }
+      await openRequestedCommanderDamage();
       return;
     }
 
@@ -4040,6 +4131,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       source: source,
       targetPlayerIndex: normalizedTargetIndex,
     );
+    await openRequestedCommanderDamage();
   }
 
   Future<void> _applyNativePlayerState(

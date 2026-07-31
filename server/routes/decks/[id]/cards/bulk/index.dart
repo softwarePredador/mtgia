@@ -7,6 +7,9 @@ import '../../../../../lib/deck_cards_bulk_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
 import '../../../../../lib/deck_validation_state_support.dart';
 import '../../../../../lib/decks/deck_applied_analysis_support.dart';
+import '../../../../../lib/decks/optimization_apply_authorization_support.dart';
+import '../../../../../lib/decks/optimization_bracket_support.dart';
+import '../../../../../lib/decks/optimization_functional_role_floor_support.dart';
 import '../../../../../lib/decks/optimization_mana_floor_support.dart';
 import '../../../../../lib/decks/deck_optimization_history_service.dart';
 
@@ -121,7 +124,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       // Carrega estado atual
       final existingResult = await session.execute(
         Sql.named(
-          'SELECT card_id::text, quantity::int, is_commander, condition FROM deck_cards WHERE deck_id = @deckId',
+          'SELECT card_id::text, quantity::int, is_commander, condition FROM deck_cards WHERE deck_id = @deckId FOR UPDATE',
         ),
         parameters: {'deckId': deckId},
       );
@@ -163,6 +166,20 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final normalizedAfterCards = normalized
           .map((card) => Map<String, dynamic>.from(card))
           .toList(growable: false);
+      final applyAuthorizationVerification =
+          isOptimizationMutation
+              ? validateOptimizationApplyAuthorization(
+                deckId: deckId,
+                currentDeckSignature:
+                    DeckOptimizationHistoryService.buildDeckSignature(current),
+                beforeCards: current,
+                afterCards: normalizedAfterCards,
+                mutationContext: mutationContext,
+              )
+              : null;
+      final applyTargetBracket =
+          optimizationApplyAuthorizedBracket(applyAuthorizationVerification) ??
+          existingBracket;
 
       // Valida regras (inclui identidade/banlist/limites)
       await DeckRulesService(session).validateAndThrow(
@@ -171,6 +188,22 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         strict: isOptimizationMutation,
       );
       if (isOptimizationMutation) {
+        final functionalRoleFloorAssessment =
+            await assessOptimizationApplyCommanderFunctionalRoleFloor(
+              session: session,
+              format: format,
+              cards: normalized,
+              mutationContext: mutationContext,
+              authorizationVerification: applyAuthorizationVerification,
+              storedArchetype: existingArchetype,
+            );
+        if (functionalRoleFloorAssessment != null &&
+            !functionalRoleFloorAssessment.satisfied) {
+          throw OptimizationFunctionalRoleFloorViolation(
+            reason: 'commander_functional_role_floor_not_met',
+            assessment: functionalRoleFloorAssessment,
+          );
+        }
         final manaFloorAssessment = await assessOptimizationCommanderManaFloor(
           session: session,
           format: format,
@@ -179,6 +212,16 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         );
         if (!manaFloorAssessment.satisfied) {
           throw OptimizationLandFloorViolation(manaFloorAssessment);
+        }
+        final bracketAssessment = await assessOptimizationCommanderBracket(
+          session: session,
+          format: format,
+          cards: normalized,
+          mutationContext: mutationContext,
+          storedBracket: applyTargetBracket,
+        );
+        if (bracketAssessment != null && !bracketAssessment.hardCompliant) {
+          throw OptimizationBracketViolation(bracketAssessment);
         }
       }
 
@@ -238,8 +281,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       };
       final optimizationArchetype =
           mutationContext['archetype']?.toString().trim() ?? '';
-      final optimizationBracket = int.tryParse(
-        mutationContext['bracket']?.toString() ?? '',
+      final optimizationBracket = optimizationApplyAuthorizedBracket(
+        applyAuthorizationVerification,
       );
       if (optimizationArchetype.isNotEmpty ||
           (optimizationBracket != null &&
@@ -325,6 +368,17 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     return Response.json(body: {'ok': true, ...result});
   } on OptimizationLandFloorViolation catch (e) {
     print('[WARN] Optimization mana floor blocked bulk deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
+  } on OptimizationFunctionalRoleFloorViolation catch (e) {
+    print('[WARN] Optimization role floor blocked bulk deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
+  } on OptimizationBracketViolation catch (e) {
+    print('[WARN] Optimization bracket blocked bulk deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
+  } on OptimizationApplyAuthorizationViolation catch (e) {
+    print(
+      '[WARN] Optimization authorization blocked bulk deck update: ${e.code}',
+    );
     return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
   } on DeckRulesException catch (e) {
     print('[ERROR] handler: $e');

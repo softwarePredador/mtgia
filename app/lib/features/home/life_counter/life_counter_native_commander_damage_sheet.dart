@@ -409,7 +409,7 @@ class _CommanderDamageSourceCard extends StatelessWidget {
             ),
             const SizedBox(height: AppTheme.space10),
             _CommanderDamageStepper(
-              label: hasPartnerCommander ? 'Commander 1' : 'Commander',
+              label: hasPartnerCommander ? 'Comandante 1' : 'Comandante',
               value: detail.commanderOneDamage,
               decrementKey: Key(
                 'life-counter-native-commander-damage-minus-$sourceIndex-c1',
@@ -426,7 +426,7 @@ class _CommanderDamageSourceCard extends StatelessWidget {
             if (hasPartnerCommander) ...[
               const SizedBox(height: AppTheme.space10),
               _CommanderDamageStepper(
-                label: 'Commander 2',
+                label: 'Comandante 2',
                 value: detail.commanderTwoDamage,
                 decrementKey: Key(
                   'life-counter-native-commander-damage-minus-$sourceIndex-c2',

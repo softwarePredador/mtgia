@@ -526,6 +526,7 @@ void main() {
             '/ai/generate': (body) {
               expect(body['prompt'], 'Talrand spellslinger');
               expect(body['format'], 'commander');
+              expect(body['bracket'], 4);
               expect(body['async'], isTrue);
               return ApiResponse(202, {
                 'job_id': 'job-async-1',
@@ -577,11 +578,13 @@ void main() {
         final result = await provider.generateDeck(
           prompt: 'Talrand spellslinger',
           format: 'Commander',
+          bracket: 4,
           pollInterval: Duration.zero,
           onProgress: (progress) => progressMessages.add(progress.message),
         );
 
         expect(result['generated_deck'], isA<Map>());
+        expect(result['bracket'], 4);
         expect(apiClient.postCalls, equals(['/ai/generate']));
         expect(apiClient.getCalls, [
           '/ai/generate/jobs/job-async-1',
@@ -608,6 +611,7 @@ void main() {
               postCount += 1;
               expect(body['prompt'], 'Boros miracle big spells');
               expect(body['format'], 'commander');
+              expect(body['bracket'], 3);
               expect(body['commander_name'], 'Lorehold, the Historian');
               if (postCount == 1) {
                 expect(body['async'], isTrue);
@@ -626,13 +630,83 @@ void main() {
         final result = await provider.generateDeck(
           prompt: 'Boros miracle big spells',
           format: 'Commander',
+          bracket: 3,
           commanderName: '  Lorehold, the Historian  ',
         );
 
         expect(result['generated_deck'], isA<Map>());
+        expect(result['bracket'], 3);
         expect(apiClient.postCalls, equals(['/ai/generate', '/ai/generate']));
       },
     );
+
+    test('generateDeck omits Commander bracket contract for Brawl', () async {
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/generate': (body) {
+            expect(body['format'], 'brawl');
+            expect(body.containsKey('bracket'), isFalse);
+            return ApiResponse(200, generatedDeckPayload());
+          },
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      final result = await provider.generateDeck(
+        prompt: 'Brawl value deck',
+        format: 'Brawl',
+        bracket: null,
+      );
+
+      expect(result.containsKey('bracket'), isFalse);
+      expect(apiClient.postCalls, equals(['/ai/generate']));
+    });
+
+    test('generateDeck rejects Commander without a bracket before POST', () {
+      final apiClient = _FakeApiClient();
+      final provider = DeckProvider(apiClient: apiClient);
+
+      expect(
+        () => provider.generateDeck(
+          prompt: 'Commander sem faixa de potência',
+          format: 'Commander',
+          bracket: null,
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (error) => error.toString(),
+            'message',
+            contains('Bracket Commander válido'),
+          ),
+        ),
+      );
+      expect(apiClient.postCalls, isEmpty);
+    });
+
+    test('generateDeck rejects a different bracket returned by backend', () {
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/generate': (_) =>
+              ApiResponse(200, {...generatedDeckPayload(), 'bracket': 5}),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      expect(
+        () => provider.generateDeck(
+          prompt: 'Commander Core',
+          format: 'Commander',
+          bracket: 2,
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (error) => error.toString(),
+            'message',
+            contains('diferente do solicitado'),
+          ),
+        ),
+      );
+    });
 
     test('generateDeck retries async polling after 429 rate limit', () async {
       var pollCount = 0;
@@ -669,6 +743,7 @@ void main() {
       final result = await provider.generateDeck(
         prompt: 'Talrand spellslinger',
         format: 'Commander',
+        bracket: 2,
         pollInterval: Duration.zero,
         onProgress: (progress) => progressMessages.add(progress.message),
       );
@@ -714,6 +789,7 @@ void main() {
         provider.generateDeck(
           prompt: 'invalid commander list',
           format: 'Commander',
+          bracket: 2,
           pollInterval: Duration.zero,
           onProgress: (progress) => progressMessages.add(progress.message),
         ),
@@ -758,6 +834,7 @@ void main() {
           provider.generateDeck(
             prompt: 'retry after terminal failure',
             format: 'Commander',
+            bracket: 2,
             pollInterval: Duration.zero,
           ),
           throwsA(
@@ -807,6 +884,7 @@ void main() {
         provider.generateDeck(
           prompt: 'malformed async fixture',
           format: 'Commander',
+          bracket: 2,
           pollInterval: Duration.zero,
           onProgress: (progress) => progressMessages.add(progress.message),
         ),
@@ -843,6 +921,7 @@ void main() {
         final result = await provider.generateDeck(
           prompt: 'Talrand spellslinger',
           format: 'Commander',
+          bracket: 2,
         );
 
         expect(result['generated_deck'], isA<Map>());
@@ -866,6 +945,7 @@ void main() {
         final result = await provider.generateDeck(
           prompt: 'Talrand spellslinger',
           format: 'Commander',
+          bracket: 2,
         );
 
         expect(result['generated_deck'], isA<Map>());
@@ -891,6 +971,7 @@ void main() {
           provider.generateDeck(
             prompt: 'Talrand spellslinger',
             format: 'Commander',
+            bracket: 2,
           ),
           throwsA(
             isA<Exception>().having(
@@ -928,6 +1009,7 @@ void main() {
           provider.generateDeck(
             prompt: 'Talrand spellslinger',
             format: 'Commander',
+            bracket: 2,
             pollInterval: Duration.zero,
           ),
           throwsA(isA<Exception>()),
@@ -961,6 +1043,7 @@ void main() {
         () => provider.generateDeck(
           prompt: 'Talrand spellslinger',
           format: 'Commander',
+          bracket: 2,
           pollTimeout: const Duration(milliseconds: 1),
           pollInterval: const Duration(milliseconds: 1),
         ),
@@ -982,6 +1065,7 @@ void main() {
         () => provider.generateDeck(
           prompt: 'Talrand spellslinger',
           format: 'Commander',
+          bracket: 2,
         ),
         throwsA(
           isA<Exception>().having(
@@ -1005,6 +1089,7 @@ void main() {
         () => provider.generateDeck(
           prompt: 'Talrand spellslinger',
           format: 'Commander',
+          bracket: 2,
         ),
         throwsA(
           isA<Exception>().having(
@@ -1048,6 +1133,7 @@ void main() {
           provider.generateDeck(
             prompt: 'Talrand spellslinger',
             format: 'Commander',
+            bracket: 2,
             cancellation: cancellation,
             onProgress: (progress) {
               if (progress.step == 1) {

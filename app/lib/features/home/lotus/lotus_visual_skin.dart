@@ -2816,6 +2816,21 @@ textarea:focus-visible {
     const playerCards = Array.from(document.querySelectorAll(
       ${jsonEncode(LotusDomSelectors.playerCard)},
     ));
+    const playerNames = playerCards.map((card, index) => {
+      const fallbackName = 'Jogador ' + String(index + 1);
+      if (!(card instanceof HTMLElement)) {
+        return fallbackName;
+      }
+      const nameNode = card.querySelector('.player-name, .player-name-input');
+      return readableText(nameNode) || fallbackName;
+    });
+    const commanderDamageTargetIndex = playerCards.findIndex((card) => {
+      return card instanceof HTMLElement &&
+        card.querySelector(':scope > .info-card') instanceof HTMLElement;
+    });
+    const commanderDamageTargetName = commanderDamageTargetIndex >= 0
+      ? playerNames[commanderDamageTargetIndex]
+      : 'jogador alvo';
     syncTabletopSeatLayout(playerCards);
     playerCards.forEach((card, index) => {
       if (!(card instanceof HTMLElement)) {
@@ -2845,13 +2860,17 @@ textarea:focus-visible {
           );
         }
       }
-      const fallbackName = 'Jogador ' + String(index + 1);
-      const nameNode = card.querySelector('.player-name, .player-name-input');
-      const playerName = readableText(nameNode) || fallbackName;
+      const playerName = playerNames[index];
       setAttributeIfChanged(card, 'role', 'group');
       setAttributeIfChanged(card, 'aria-label', 'Controles de ' + playerName);
 
       const lifeNode = card.querySelector('.player-life-count');
+      const commanderDamageCards = Array.from(
+        card.querySelectorAll('.commander-damage-card'),
+      );
+      const hasCommanderDamageSurface =
+        commanderDamageCards.length > 0 ||
+        card.querySelector(':scope > .info-card') instanceof HTMLElement;
       if (lifeNode instanceof HTMLElement) {
         const lifeValue =
           decodeVisualNumber(lifeNode) || readableText(lifeNode) || 'desconhecida';
@@ -2892,6 +2911,19 @@ textarea:focus-visible {
           );
           bindKeyboardAction(decreaseButton, () => dispatchAccessibleTap(decreaseButton));
         }
+        const lifeControls = [lifeNode, increaseButton, decreaseButton].filter(
+          (node) => node instanceof HTMLElement,
+        );
+        if (hasCommanderDamageSurface) {
+          lifeControls.forEach((node) => {
+            setAttributeIfChanged(node, 'aria-hidden', 'true');
+            node.removeAttribute('role');
+            node.removeAttribute('aria-label');
+            node.removeAttribute('tabindex');
+          });
+        } else {
+          lifeControls.forEach((node) => node.removeAttribute('aria-hidden'));
+        }
         if (lifeNode.dataset.manaloomSpinbuttonBound !== 'true') {
           lifeNode.dataset.manaloomSpinbuttonBound = 'true';
           lifeNode.addEventListener('keydown', (event) => {
@@ -2909,6 +2941,133 @@ textarea:focus-visible {
         }
       }
 
+      commanderDamageCards.forEach((surface) => {
+        if (!(surface instanceof HTMLElement)) {
+          return;
+        }
+        const commanderPanels = Array.from(
+          surface.querySelectorAll('.commander-damage-card-inner'),
+        );
+        setAttributeIfChanged(surface, 'role', 'group');
+        setAttributeIfChanged(
+          surface,
+          'aria-label',
+          'Dano de comandante de ' + playerName +
+            ' em ' + commanderDamageTargetName,
+        );
+        commanderPanels.forEach((panel, commanderIndex) => {
+          if (!(panel instanceof HTMLElement)) {
+            return;
+          }
+          const commanderSuffix = commanderPanels.length > 1
+            ? ', comandante ' + String(commanderIndex + 1)
+            : '';
+          const valueNode = panel.querySelector('.damage-display');
+          const increaseButton = panel.querySelector(
+            '.increase-button.commander-damage',
+          );
+          const decreaseButton = panel.querySelector(
+            '.decrease-button.commander-damage',
+          );
+          const damageValue =
+            decodeVisualNumber(valueNode) || readableText(valueNode) || '0';
+          const numericDamage = Number.parseInt(damageValue, 10);
+          const damageContext =
+            'dano de comandante de ' + playerName +
+            ' em ' + commanderDamageTargetName +
+            commanderSuffix;
+          const valueLabel =
+            damageContext.substring(0, 1).toUpperCase() +
+            damageContext.substring(1) + ': ' + damageValue;
+
+          if (valueNode instanceof HTMLElement) {
+            setAttributeIfChanged(valueNode, 'role', 'spinbutton');
+            setAttributeIfChanged(valueNode, 'tabindex', '0');
+            setAttributeIfChanged(valueNode, 'aria-live', 'polite');
+            setAttributeIfChanged(valueNode, 'aria-atomic', 'true');
+            setAttributeIfChanged(valueNode, 'aria-label', valueLabel);
+            setAttributeIfChanged(valueNode, 'aria-valuemin', '0');
+            setAttributeIfChanged(valueNode, 'aria-valuemax', '999');
+            if (Number.isFinite(numericDamage)) {
+              setAttributeIfChanged(
+                valueNode,
+                'aria-valuenow',
+                String(numericDamage),
+              );
+            }
+          }
+          if (increaseButton instanceof HTMLElement) {
+            setAttributeIfChanged(increaseButton, 'role', 'button');
+            setAttributeIfChanged(increaseButton, 'tabindex', '0');
+            setAttributeIfChanged(
+              increaseButton,
+              'aria-label',
+              'Aumentar ' + damageContext,
+            );
+            bindKeyboardAction(
+              increaseButton,
+              () => dispatchAccessibleTap(increaseButton),
+            );
+          }
+          if (decreaseButton instanceof HTMLElement) {
+            setAttributeIfChanged(decreaseButton, 'role', 'button');
+            setAttributeIfChanged(decreaseButton, 'tabindex', '0');
+            setAttributeIfChanged(
+              decreaseButton,
+              'aria-label',
+              'Diminuir ' + damageContext,
+            );
+            bindKeyboardAction(
+              decreaseButton,
+              () => dispatchAccessibleTap(decreaseButton),
+            );
+          }
+          if (
+            valueNode instanceof HTMLElement &&
+            valueNode.dataset.manaloomCommanderSpinbuttonBound !== 'true'
+          ) {
+            valueNode.dataset.manaloomCommanderSpinbuttonBound = 'true';
+            valueNode.addEventListener('keydown', (event) => {
+              if (
+                event.key === 'ArrowUp' &&
+                increaseButton instanceof HTMLElement
+              ) {
+                event.preventDefault();
+                dispatchAccessibleTap(increaseButton);
+              } else if (
+                event.key === 'ArrowDown' &&
+                decreaseButton instanceof HTMLElement
+              ) {
+                event.preventDefault();
+                dispatchAccessibleTap(decreaseButton);
+              }
+            });
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('.return-to-game-button').forEach((node) => {
+      if (!(node instanceof HTMLElement)) {
+        return;
+      }
+      setAttributeIfChanged(node, 'role', 'button');
+      setAttributeIfChanged(node, 'tabindex', '0');
+      setAttributeIfChanged(node, 'aria-label', 'Voltar ao jogo');
+      bindKeyboardAction(node, () => node.click());
+    });
+    document.querySelectorAll('.switch-to-own-damage').forEach((node) => {
+      if (!(node instanceof HTMLElement)) {
+        return;
+      }
+      setAttributeIfChanged(node, 'role', 'button');
+      setAttributeIfChanged(node, 'tabindex', '0');
+      setAttributeIfChanged(
+        node,
+        'aria-label',
+        'Mostrar dano do próprio comandante',
+      );
+      bindKeyboardAction(node, () => node.click());
     });
 
     const menuButton = document.querySelector(

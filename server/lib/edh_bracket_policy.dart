@@ -7,6 +7,8 @@ library;
 
 import 'basic_land_utils.dart' as land_utils;
 
+const commanderBracketPolicyVersion = 'commander_brackets_2026_02_09_v1';
+
 enum BracketCategory {
   fastMana,
   tutor,
@@ -42,6 +44,99 @@ class BracketPolicy {
       },
     );
   }
+}
+
+class CommanderBracketIntentProfile {
+  const CommanderBracketIntentProfile({
+    required this.bracket,
+    required this.label,
+    required this.minimumTurnsPlayed,
+    required this.intent,
+    required this.gameChangerCap,
+    required this.competitiveLane,
+  });
+
+  final int bracket;
+  final String label;
+  final int? minimumTurnsPlayed;
+  final String intent;
+  final int gameChangerCap;
+  final bool competitiveLane;
+
+  Map<String, dynamic> toJson() => {
+    'bracket': bracket,
+    'label': label,
+    'minimum_turns_played': minimumTurnsPlayed,
+    'intent': intent,
+    'game_changer_cap': commanderBracketNumericGameChangerCap(bracket),
+    'numeric_game_changer_cap_applies': bracket <= 3,
+    'competitive_lane': competitiveLane,
+  };
+}
+
+/// Returns the official numeric Game Changer cap exposed by the product.
+///
+/// Brackets 4 and 5 have no numeric cap. The internal policy still uses a
+/// deck-sized sentinel so the same filtering code can operate without a
+/// second unbounded representation, but that implementation detail must not
+/// leak into API or UI contracts.
+int? commanderBracketNumericGameChangerCap(int bracket) {
+  return switch (bracket.clamp(1, 5)) {
+    1 || 2 => 0,
+    3 => 3,
+    _ => null,
+  };
+}
+
+CommanderBracketIntentProfile commanderBracketIntentProfile(int bracket) {
+  final policy = BracketPolicy.forBracket(bracket);
+  return switch (policy.bracket) {
+    1 => CommanderBracketIntentProfile(
+      bracket: 1,
+      label: 'Exhibition',
+      minimumTurnsPlayed: 9,
+      intent: 'Tema acima de poder e vitórias deliberadamente subótimas.',
+      gameChangerCap: policy.maxCounts[BracketCategory.gameChanger] ?? 0,
+      competitiveLane: false,
+    ),
+    2 => CommanderBracketIntentProfile(
+      bracket: 2,
+      label: 'Core',
+      minimumTurnsPlayed: 8,
+      intent:
+          'Construção direta, não otimizada e com vitórias incrementais, '
+          'telegrafadas e interrompíveis.',
+      gameChangerCap: policy.maxCounts[BracketCategory.gameChanger] ?? 0,
+      competitiveLane: false,
+    ),
+    3 => CommanderBracketIntentProfile(
+      bracket: 3,
+      label: 'Upgraded',
+      minimumTurnsPlayed: 6,
+      intent:
+          'Alta sinergia e qualidade, com grandes turnos construídos por '
+          'recursos acumulados.',
+      gameChangerCap: policy.maxCounts[BracketCategory.gameChanger] ?? 3,
+      competitiveLane: false,
+    ),
+    4 => CommanderBracketIntentProfile(
+      bracket: 4,
+      label: 'Optimized',
+      minimumTurnsPlayed: 4,
+      intent:
+          'Construção rápida, consistente e letal, sem exigir o metagame cEDH.',
+      gameChangerCap: policy.maxCounts[BracketCategory.gameChanger] ?? 99,
+      competitiveLane: false,
+    ),
+    _ => CommanderBracketIntentProfile(
+      bracket: 5,
+      label: 'cEDH',
+      minimumTurnsPlayed: null,
+      intent: 'Metagame cEDH e vitória acima de qualquer outra prioridade.',
+      gameChangerCap: policy.maxCounts[BracketCategory.gameChanger] ?? 99,
+      competitiveLane: true,
+    ),
+  };
 }
 
 /// Bracket tags other than Game Changers are advisory signals, not hard caps.
@@ -172,7 +267,7 @@ Map<BracketCategory, int> countBracketCategories(
     final oracle = (c['oracle_text'] as String?) ?? '';
     if (name.isEmpty) continue;
 
-    final qty = (c['quantity'] as int?) ?? 1;
+    final qty = _positiveCardQuantity(c['quantity']);
     final tags = tagCardForBracket(
       name: name,
       typeLine: typeLine,
@@ -202,6 +297,109 @@ class BracketFilterDecision {
   final BracketPolicy policy;
 }
 
+class BracketDeckAssessment {
+  const BracketDeckAssessment({
+    required this.policy,
+    required this.intentProfile,
+    required this.counts,
+    required this.violations,
+    required this.intentWarnings,
+  });
+
+  final BracketPolicy policy;
+  final CommanderBracketIntentProfile intentProfile;
+  final Map<BracketCategory, int> counts;
+  final List<Map<String, dynamic>> violations;
+  final List<Map<String, dynamic>> intentWarnings;
+
+  bool get hardCompliant => violations.isEmpty;
+
+  Map<String, dynamic> toJson() => {
+    'bracket': policy.bracket,
+    'label': intentProfile.label,
+    'hard_compliant': hardCompliant,
+    'game_changer_count': counts[BracketCategory.gameChanger] ?? 0,
+    'game_changer_cap': commanderBracketNumericGameChangerCap(policy.bracket),
+    'numeric_game_changer_cap_applies': policy.bracket <= 3,
+    'violations': violations,
+    'intent_warnings': intentWarnings,
+    'intent_profile': intentProfile.toJson(),
+  };
+}
+
+BracketDeckAssessment assessDeckAgainstBracketPolicy({
+  required int bracket,
+  required Iterable<Map<String, dynamic>> cards,
+}) {
+  final normalizedCards = cards
+      .map((card) => Map<String, dynamic>.from(card))
+      .toList(growable: false);
+  final policy = BracketPolicy.forBracket(bracket);
+  final intentProfile = commanderBracketIntentProfile(policy.bracket);
+  final counts = countBracketCategories(normalizedCards);
+  final gameChangerCap = policy.maxCounts[BracketCategory.gameChanger] ?? 0;
+  final gameChangerCount = counts[BracketCategory.gameChanger] ?? 0;
+  final violations = <Map<String, dynamic>>[];
+
+  if (gameChangerCount > gameChangerCap) {
+    var remainingExcess = gameChangerCount - gameChangerCap;
+    for (final card in normalizedCards) {
+      if (remainingExcess <= 0) break;
+      final name = card['name']?.toString().trim() ?? '';
+      if (name.isEmpty) continue;
+      final tags = tagCardForBracket(
+        name: name,
+        typeLine: card['type_line']?.toString() ?? '',
+        oracleText: card['oracle_text']?.toString() ?? '',
+      );
+      if (!tags.categories.contains(BracketCategory.gameChanger)) continue;
+      final cardQuantity = _positiveCardQuantity(card['quantity']);
+      final violatingQuantity =
+          cardQuantity < remainingExcess ? cardQuantity : remainingExcess;
+      violations.add({
+        'name': name,
+        'quantity': violatingQuantity,
+        'category': BracketCategory.gameChanger.name,
+        'reason':
+            'Game Changer não permitido pela política estrita do '
+            'Bracket ${policy.bracket}.',
+      });
+      remainingExcess -= violatingQuantity;
+    }
+  }
+
+  final intentWarnings = <Map<String, dynamic>>[];
+  if (policy.bracket <= 3) {
+    final signals = <BracketCategory>[
+      BracketCategory.fastMana,
+      BracketCategory.freeInteraction,
+      BracketCategory.extraTurns,
+      BracketCategory.infiniteCombo,
+      BracketCategory.stax,
+    ];
+    for (final category in signals) {
+      final count = counts[category] ?? 0;
+      if (count <= 0) continue;
+      intentWarnings.add({
+        'category': category.name,
+        'count': count,
+        'severity': 'advisory',
+        'message':
+            'Sinal consultivo de velocidade/consistência; avaliar se a '
+            'experiência continua coerente com ${intentProfile.label}.',
+      });
+    }
+  }
+
+  return BracketDeckAssessment(
+    policy: policy,
+    intentProfile: intentProfile,
+    counts: counts,
+    violations: violations,
+    intentWarnings: intentWarnings,
+  );
+}
+
 BracketFilterDecision applyBracketPolicyToAdditions({
   required int bracket,
   required Iterable<Map<String, dynamic>> currentDeckCards,
@@ -221,7 +419,7 @@ BracketFilterDecision applyBracketPolicyToAdditions({
   final allowed = <String>[];
   final blocked = <Map<String, dynamic>>[];
 
-  for (final c in additionsCardsData) {
+  for (final c in _deduplicateBracketAdditionCandidates(additionsCardsData)) {
     final name = (c['name'] as String?) ?? '';
     final typeLine = (c['type_line'] as String?) ?? '';
     final oracle = (c['oracle_text'] as String?) ?? '';
@@ -233,11 +431,12 @@ BracketFilterDecision applyBracketPolicyToAdditions({
       oracleText: oracle,
     );
     final categories = tags.categories.toList();
+    final quantity = _positiveCardQuantity(c['quantity']);
 
     var canAdd = true;
-    for (final cat in tags.categories) {
+    for (final cat in tags.categories.where(_isHardBracketCategory)) {
       final budget = remaining[cat] ?? 0;
-      if (budget <= 0) {
+      if (budget < quantity) {
         canAdd = false;
         break;
       }
@@ -252,10 +451,11 @@ BracketFilterDecision applyBracketPolicyToAdditions({
       continue;
     }
 
-    // Consome budget de cada categoria (intermediário: bloqueia o excedente,
-    // mas não impede cartas “normais” de completar o deck).
-    for (final cat in tags.categories) {
-      remaining[cat] = ((remaining[cat] ?? 0) - 1).clamp(0, 999);
+    // Apenas Game Changers são hard caps oficiais. As demais categorias
+    // continuam disponíveis em `remainingBudget` como diagnóstico, sem virar
+    // proibições inventadas pelo produto.
+    for (final cat in tags.categories.where(_isHardBracketCategory)) {
+      remaining[cat] = ((remaining[cat] ?? 0) - quantity).clamp(0, 999);
     }
     allowed.add(name);
   }
@@ -267,6 +467,84 @@ BracketFilterDecision applyBracketPolicyToAdditions({
     currentCounts: counts,
     policy: policy,
   );
+}
+
+bool _isHardBracketCategory(BracketCategory category) =>
+    category == BracketCategory.gameChanger;
+
+List<Map<String, dynamic>> _deduplicateBracketAdditionCandidates(
+  Iterable<Map<String, dynamic>> cards,
+) {
+  final unique = <Map<String, dynamic>>[];
+  final indexByIdentity = <String, int>{};
+  final indexByName = <String, int>{};
+
+  for (final rawCard in cards) {
+    final card = Map<String, dynamic>.from(rawCard);
+    final name = card['name']?.toString().trim() ?? '';
+    if (name.isEmpty) continue;
+
+    final normalizedName = _normalizedPlayableCardName(name);
+    final identityKeys = <String>[
+      for (final field in const ['oracle_id', 'playable_card_id'])
+        if ((card[field]?.toString().trim().toLowerCase() ?? '').isNotEmpty)
+          '$field:${card[field].toString().trim().toLowerCase()}',
+    ];
+    int? existingIndex = indexByName[normalizedName];
+    for (final identity in identityKeys) {
+      existingIndex ??= indexByIdentity[identity];
+    }
+
+    if (existingIndex == null) {
+      final index = unique.length;
+      unique.add({...card, 'name': name});
+      indexByName[normalizedName] = index;
+      for (final identity in identityKeys) {
+        indexByIdentity[identity] = index;
+      }
+      continue;
+    }
+
+    final existing = unique[existingIndex];
+    final existingQuantity = _positiveCardQuantity(existing['quantity']);
+    final incomingQuantity = _positiveCardQuantity(card['quantity']);
+    if (incomingQuantity > existingQuantity) {
+      existing['quantity'] = incomingQuantity;
+    }
+    for (final field in const [
+      'type_line',
+      'oracle_text',
+      'oracle_id',
+      'playable_card_id',
+    ]) {
+      final existingValue = existing[field]?.toString().trim() ?? '';
+      final incomingValue = card[field]?.toString().trim() ?? '';
+      if (existingValue.isEmpty && incomingValue.isNotEmpty) {
+        existing[field] = card[field];
+      }
+    }
+    indexByName[normalizedName] = existingIndex;
+    for (final identity in identityKeys) {
+      indexByIdentity[identity] = existingIndex;
+    }
+  }
+
+  return unique;
+}
+
+String _normalizedPlayableCardName(String name) {
+  final normalized = name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  return normalized.split('//').first.trim();
+}
+
+int _positiveCardQuantity(Object? raw) {
+  final parsed = switch (raw) {
+    int value => value,
+    num value => value.toInt(),
+    String value => int.tryParse(value.trim()) ?? 1,
+    _ => 1,
+  };
+  return parsed > 0 ? parsed : 1;
 }
 
 const _fastManaNames = <String>{

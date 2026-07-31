@@ -142,7 +142,7 @@ void main() {
       expect(optimize, contains('swap_integrity'));
       expect(contracts, contains('card_id:quantity:condition:role'));
       expect(contracts, contains('Changing which physical card is the'));
-      expect(contracts, contains('cache contract is\n`v12`'));
+      expect(contracts, contains('cache contract is\n`v16`'));
       expect(optimize, contains('optimize_cache_support_test.dart'));
     });
 

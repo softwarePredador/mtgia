@@ -27,10 +27,30 @@ void main() {
           ).readAsStringSync();
 
       expect(source, contains('CAST(@prefer_collection AS boolean)'));
+      expect(source, contains('CAST(@check_collection AS boolean)'));
       expect(source, contains("NULLIF(CAST(@user_id AS text), '')"));
       expect(
         source,
         contains("CAST(NULLIF(CAST(@user_id AS text), '') AS uuid)"),
+      );
+      expect(source, contains('commander_card_synergy'));
+      expect(source, contains('@commander_names::text[]'));
+      expect(source, contains('AS minimum_bracket'));
+      expect(
+        source,
+        matches(
+          RegExp(
+            "crs\\.subformat = 'competitive_commander'.*"
+            "crs\\.bracket_scope = 'bracket_5' THEN 5",
+            dotAll: true,
+          ),
+        ),
+      );
+      expect(
+        source,
+        matches(
+          RegExp("'bracket_4_plus', 'bracket_4_5'.*THEN 4", dotAll: true),
+        ),
       );
     });
 
@@ -179,6 +199,82 @@ void main() {
       );
     });
 
+    test('keeps Miracle Big Spells candidates aligned with the deck theme', () {
+      final topDeckSpell = {
+        'name': 'Mystical Tutor',
+        'type_line': 'Instant',
+        'oracle_text':
+            'Search your library for an instant or sorcery card, reveal it, then put it on top of your library.',
+        'functional_tags': const ['tutor'],
+      };
+      final offPlanEquipment = {
+        'name': 'Cori-Steel Cutter',
+        'type_line': 'Artifact — Equipment',
+        'oracle_text':
+            'Whenever you cast your second spell each turn, create a 1/1 Monk creature token.',
+        'functional_tags': const ['token', 'payoff', 'engine'],
+      };
+
+      expect(
+        scoreOptimizeThemeAffinity(
+          candidate: topDeckSpell,
+          detectedTheme: 'Miracle Big Spells',
+          keepTheme: true,
+        ),
+        greaterThan(200),
+      );
+      expect(
+        scoreOptimizeThemeAffinity(
+          candidate: offPlanEquipment,
+          detectedTheme: 'Miracle Big Spells',
+          keepTheme: true,
+        ),
+        lessThan(0),
+      );
+      expect(
+        scoreOptimizeThemeAffinity(
+          candidate: offPlanEquipment,
+          detectedTheme: 'Miracle Big Spells',
+          keepTheme: false,
+        ),
+        0,
+      );
+    });
+
+    test(
+      'deprioritizes candidates whose reviewed scope starts above bracket',
+      () {
+        expect(
+          scoreOptimizeBracketScopeAffinity(
+            candidate: const {'minimum_bracket': 3},
+            bracket: 2,
+          ),
+          -220,
+        );
+        expect(
+          scoreOptimizeBracketScopeAffinity(
+            candidate: const {'minimum_bracket': 2},
+            bracket: 2,
+          ),
+          0,
+        );
+        expect(
+          scoreOptimizeBracketScopeAffinity(
+            candidate: const {'minimum_bracket': 4},
+            bracket: 1,
+          ),
+          -660,
+        );
+        expect(
+          scoreOptimizeBracketScopeAffinity(
+            candidate: const {'minimum_bracket': 5},
+            bracket: 4,
+          ),
+          -220,
+        );
+      },
+    );
+
     test('pairs replacements by functional lane instead of list position', () {
       final pairs = buildSameLaneOptimizeSwapPairs(
         removalCandidates: const [
@@ -232,6 +328,33 @@ void main() {
       expect(pairs, isEmpty);
     });
 
+    test('allows a traced cross-lane swap only for role-floor repair', () {
+      final pairs = buildSameLaneOptimizeSwapPairs(
+        removalCandidates: const [
+          {
+            'name': 'Expensive Filler',
+            'role': 'utility',
+            'functional_role_repair': true,
+            'functional_role_repair_target': 'wipe',
+          },
+        ],
+        replacements: const [
+          {
+            'name': 'Wrath of God',
+            'functional_need': 'wipe',
+            'purchase_required': false,
+          },
+        ],
+      );
+
+      expect(pairs, hasLength(1));
+      expect(pairs.single['same_lane'], isFalse);
+      expect(pairs.single['functional_role_repair'], isTrue);
+      expect(pairs.single['functional_role_repair_target'], 'wipe');
+      expect(pairs.single['add_role'], 'wipe');
+      expect(pairs.single['reason'], contains('piso funcional'));
+    });
+
     test('budget gate fails closed for unknown prices', () {
       expect(
         isOptimizeCandidateWithinBudget(
@@ -255,6 +378,24 @@ void main() {
         isOptimizeCandidateWithinBudget(
           budgetLimitBrl: 100,
           budgetUsedBrl: 90,
+          availableQuantity: 1,
+          estimatedPriceBrl: null,
+        ),
+        isTrue,
+      );
+      expect(
+        isOptimizeCandidateWithinBudget(
+          budgetLimitBrl: 0,
+          budgetUsedBrl: 0,
+          availableQuantity: 0,
+          estimatedPriceBrl: 0.01,
+        ),
+        isFalse,
+      );
+      expect(
+        isOptimizeCandidateWithinBudget(
+          budgetLimitBrl: 0,
+          budgetUsedBrl: 0,
           availableQuantity: 1,
           estimatedPriceBrl: null,
         ),

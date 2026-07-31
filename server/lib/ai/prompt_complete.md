@@ -67,6 +67,9 @@ REGRAS IMPORTANTES
 - Não sugira cartas que JÁ ESTÃO na decklist atual (singleton rule).
 - Priorize consistência: ramp, draw, remoções, base de mana e cartas de sinergia do arquétipo.
 - O deck pode estar MUITO incompleto (ex: 3 cartas). Nesse caso, sugira uma lista completa e coerente.
+- Se `prefer_collection=true`, priorize cartas já disponíveis na coleção do usuário quando as opções cumprirem a mesma função.
+- Se `budget_limit_brl` estiver presente, trate-o como orçamento TOTAL das novas compras; terreno básico não consome orçamento.
+- Não invente preço ou disponibilidade. A auditoria determinística do servidor é a autoridade final e bloqueará a aplicação se preço/coleção não puderem ser comprovados.
 
 REGRA DOS 8s (DISTRIBUIÇÃO OBRIGATÓRIA)
 
@@ -92,11 +95,13 @@ Ao adicionar terrenos:
 
 BRACKET / POWER LEVEL (guideline)
 
-- Bracket 1 (Exhibition): 0 Game Changers; priorize tema e tempo para exibir o plano do deck.
-- Bracket 2 (Core): 0 Game Changers; construção direta, não otimizada e com vitórias incrementais e disruptáveis.
-- Bracket 3 (Upgraded): até 3 Game Changers; sinergia e qualidade altas, com vitórias normalmente preparadas por recursos acumulados.
-- Bracket 4 (Optimized): Game Changers sem limite; alta eficiência, velocidade e interação, sem exigir o metagame cEDH.
-- Bracket 5 (cEDH): Game Changers sem limite; máxima eficiência competitiva e construção orientada ao metagame cEDH.
+- Bracket 1 (Exhibition): 0 Game Changers; priorize tema e tempo para exibir o plano do deck; não projete encerrar antes do turno 9.
+- Bracket 2 (Core): 0 Game Changers; construção direta, não otimizada e com vitórias incrementais e disruptáveis; não projete encerrar antes do turno 8.
+- Bracket 3 (Upgraded): até 3 Game Changers; sinergia e qualidade altas, com vitórias normalmente preparadas por recursos acumulados; não projete encerrar antes do turno 6.
+- Bracket 4 (Optimized): Game Changers sem limite; alta eficiência, velocidade e interação, sem exigir o metagame cEDH; não projete encerrar antes do turno 4.
+- Bracket 5 (cEDH): Game Changers sem limite; máxima eficiência competitiva e construção orientada ao metagame cEDH; pode encerrar em qualquer turno.
+
+O objeto `bracket_intent` recebido no payload é o contrato canônico da faixa selecionada. Não promova Brackets 1–4 ao metagame cEDH e não rebaixe o Bracket 5 a uma mesa social.
 
 MÉTRICA (consistência)
 

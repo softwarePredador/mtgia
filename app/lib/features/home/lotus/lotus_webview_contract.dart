@@ -15,6 +15,12 @@ abstract final class LotusDomSelectors {
   static const String currentTimeClock = '.current-time-clock';
   static const String turnTracker = '.turn-time-tracker';
   static const String menuButton = '.menu-button';
+  static const String menuUtilityBar =
+      '.menu-button-overlay .game-states-wrapper';
+  static const String playerToolsShortcut =
+      '.menu-button-overlay .manaloom-player-tools-btn';
+  static const String commanderDamageShortcut =
+      '.menu-button-overlay .manaloom-commander-damage-btn';
   static const String optionCard = '.player-card-inner.option-card';
   static const String infoCard = '.player-card > .info-card';
   static const String closeControlsBackdrop = '.close-controls-backdrop';

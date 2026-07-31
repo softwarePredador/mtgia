@@ -67,7 +67,7 @@ void main() {
         ],
       });
 
-      expect(role, equals('removal'));
+      expect(role, equals('wipe'));
     });
 
     test(
@@ -228,8 +228,8 @@ void main() {
       );
 
       expect(light, isNot(equals(aggressive)));
-      expect(light, startsWith('v12:'));
-      expect(aggressive, startsWith('v12:'));
+      expect(light, startsWith('v16:'));
+      expect(aggressive, startsWith('v16:'));
     });
   });
 
@@ -667,13 +667,17 @@ void main() {
   });
 
   group('resolveCommanderOptimizeMetaScope', () {
-    test('uses competitive commander references only for bracket 3+', () {
+    test('uses competitive commander references only for cEDH bracket 5', () {
       expect(
         resolveCommanderOptimizeMetaScope(deckFormat: 'commander', bracket: 3),
-        equals('competitive_commander'),
+        isNull,
       );
       expect(
         resolveCommanderOptimizeMetaScope(deckFormat: 'commander', bracket: 4),
+        isNull,
+      );
+      expect(
+        resolveCommanderOptimizeMetaScope(deckFormat: 'commander', bracket: 5),
         equals('competitive_commander'),
       );
     });

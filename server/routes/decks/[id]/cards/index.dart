@@ -52,7 +52,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     final result = await pool.runTx((session) async {
       final deckResult = await session.execute(
         Sql.named(
-          'SELECT id::text, format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1',
+          'SELECT id::text, format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1 FOR UPDATE',
         ),
         parameters: {'deckId': deckId, 'userId': userId},
       );

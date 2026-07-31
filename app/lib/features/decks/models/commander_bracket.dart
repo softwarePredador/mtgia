@@ -26,14 +26,22 @@ String commanderBracketLabel(int value) {
 }
 
 String commanderBracketGuidance(int value) {
-  if (value == 5) {
-    return 'cEDH: prioriza eficiência competitiva e referências de meta quando '
-        'existirem, mantendo legalidade, identidade e segurança.';
-  }
-  if (value == 4) {
-    return 'Optimized: busca alta eficiência sem tratar a mesa como cEDH; '
-        'legalidade, identidade e Game Changers continuam validados.';
-  }
-  return 'Faixa social: preserva a experiência do bracket escolhido e oferece '
-      'rebuild guiado quando trocas pontuais não forem seguras.';
+  return switch (value) {
+    1 =>
+      'Exhibition: tema acima de poder, 0 Game Changers e partidas pensadas '
+          'para chegar ao turno 9 ou além.',
+    2 =>
+      'Core: plano direto e não otimizado, 0 Game Changers e vitórias '
+          'telegrafadas e interrompíveis a partir do turno 8.',
+    3 =>
+      'Upgraded: alta sinergia, até 3 Game Changers e grandes turnos '
+          'construídos por recursos acumulados a partir do turno 6.',
+    4 =>
+      'Optimized: alta eficiência e consistência a partir do turno 4, sem '
+          'tratar a mesa como cEDH; Game Changers não têm limite numérico.',
+    5 =>
+      'cEDH: metagame competitivo, vitória como prioridade e sem piso de '
+          'turno; Game Changers não têm limite numérico.',
+    _ => 'Selecione um Bracket Commander válido entre 1 e 5.',
+  };
 }

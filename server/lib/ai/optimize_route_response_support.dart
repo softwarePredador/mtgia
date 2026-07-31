@@ -51,12 +51,37 @@ Map<String, dynamic>? buildCachedOptimizeResponse({
   required bool hasKeepThemeOverride,
   required bool keepTheme,
   required Map<String, dynamic> userPreferences,
+  int? bracket,
 }) {
   if (!isReusableCachedOptimizeResponse(
     cachedResponse,
     effectiveMode: effectiveMode,
   )) {
     return null;
+  }
+  if (bracket != null) {
+    final rawBracketPolicy = cachedResponse['bracket_policy'];
+    if (rawBracketPolicy is! Map) return null;
+    final bracketPolicy = rawBracketPolicy.cast<String, dynamic>();
+    final cachedBracket = switch (bracketPolicy['bracket']) {
+      int value => value,
+      num value => value.toInt(),
+      String value => int.tryParse(value.trim()),
+      _ => null,
+    };
+    if (cachedBracket != bracket || bracketPolicy['hard_compliant'] != true) {
+      return null;
+    }
+    final actionableOptimize =
+        effectiveMode == 'optimize' &&
+        cachedResponse['outcome_code'] == 'optimized' &&
+        cachedResponse['can_apply'] != false;
+    if (actionableOptimize &&
+        !isSatisfiedReusableFunctionalRolePolicy(
+          cachedResponse['functional_role_policy'],
+        )) {
+      return null;
+    }
   }
   final response = Map<String, dynamic>.from(cachedResponse);
   response['cache'] = {'hit': true, 'cache_key': cacheKey};
@@ -76,6 +101,46 @@ Map<String, dynamic>? buildCachedOptimizeResponse({
   };
   return response;
 }
+
+bool isSatisfiedReusableFunctionalRolePolicy(Object? raw) {
+  if (raw is! Map) return false;
+  final policy = raw.cast<Object?, Object?>();
+  if (policy['policy'] != 'commander_functional_role_floors_v1' ||
+      policy['archetype']?.toString().trim().isEmpty != false ||
+      policy['applies'] != true ||
+      policy['satisfied'] != true ||
+      (_readOptimizePolicyInt(policy['total_cards']) ?? 0) < 90) {
+    return false;
+  }
+  final minimumCounts = _readOptimizePolicyCounts(policy['minimum_counts']);
+  final actualCounts = _readOptimizePolicyCounts(policy['actual_counts']);
+  final deficits = _readOptimizePolicyCounts(policy['deficits']);
+  if (minimumCounts.isEmpty || deficits.isNotEmpty) return false;
+  for (final entry in minimumCounts.entries) {
+    if ((actualCounts[entry.key] ?? -1) < entry.value) return false;
+  }
+  return true;
+}
+
+Map<String, int> _readOptimizePolicyCounts(Object? raw) {
+  if (raw is! Map) return const <String, int>{};
+  final counts = <String, int>{};
+  for (final entry in raw.entries) {
+    final key = entry.key.toString().trim().toLowerCase();
+    final value = _readOptimizePolicyInt(entry.value);
+    if (key.isNotEmpty && value != null && value >= 0) {
+      counts[key] = value;
+    }
+  }
+  return counts;
+}
+
+int? _readOptimizePolicyInt(Object? raw) => switch (raw) {
+  int value => value,
+  num value => value.toInt(),
+  String value => int.tryParse(value.trim()),
+  _ => null,
+};
 
 void mergeOptimizeReasonBuckets(
   Map<String, int> target,

@@ -9,41 +9,34 @@ import 'package:manaloom/features/home/life_counter/life_counter_settings_store.
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
-Future<Map<String, dynamic>> _readCommanderDamageState(
-  WidgetTester tester,
-  LotusStorageSnapshotStore snapshotStore,
+import 'visual_capture_helpers.dart';
+
+Future<Map<String, dynamic>> _readLotusCommanderSurface(
   dynamic screenState,
 ) async {
-  const storageKey = '__manaloom_test_commander_damage_hub';
-  const nonceKey = '__manaloom_test_commander_damage_hub_nonce';
-  final nonce = DateTime.now().microsecondsSinceEpoch.toString();
-
-  await screenState.debugRunJavaScript('''
-(() => {
-  try {
-    localStorage.setItem('$storageKey', JSON.stringify({
-      probe: window.__manaloomCommanderDamageHubProbe ?? null
-    }));
-    localStorage.setItem('$nonceKey', '$nonce');
-  } catch (_) {}
-})()
+  dynamic decoded = await screenState.debugRunJavaScriptReturningResult('''
+JSON.stringify({
+  infoCards: document.querySelectorAll('.info-card').length,
+  commanderCards: document.querySelectorAll('.commander-damage-card').length,
+  damageValues: Array.from(
+    document.querySelectorAll('.damage-display')
+  ).map((node) => node.getAttribute('aria-valuenow')),
+  returnToGameLabel:
+    document.querySelector('.return-to-game-button')
+      ?.getAttribute('aria-label') ?? null,
+  lifeValues: Array.from(
+    document.querySelectorAll('.player-life-count')
+  ).map((node) => node.getAttribute('aria-valuenow')),
+  killedPlayers: Array.from(
+    document.querySelectorAll('.player-card')
+  ).filter((card) => card.querySelector('.killed')).length,
+})
 ''');
 
-  String? encodedState;
-  for (var attempt = 0; attempt < 20 && encodedState == null; attempt += 1) {
-    await tester.pump(const Duration(milliseconds: 300));
-    final snapshot = await snapshotStore.load();
-    if (snapshot == null) {
-      continue;
-    }
-    if (snapshot.values[nonceKey] != nonce) {
-      continue;
-    }
-    encodedState = snapshot.values[storageKey];
+  for (var attempt = 0; attempt < 2 && decoded is String; attempt += 1) {
+    decoded = jsonDecode(decoded);
   }
-
-  expect(encodedState, isNotNull);
-  final decoded = jsonDecode(encodedState!);
+  expect(decoded, isA<Map>());
   return Map<String, dynamic>.from(decoded as Map);
 }
 
@@ -66,112 +59,142 @@ Future<LifeCounterSession?> _pumpUntilCommanderDamageApplied(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-  testWidgets(
-    'opens the ManaLoom-owned commander damage shell on the live WebView path',
-    (tester) async {
-      final snapshotStore = LotusStorageSnapshotStore();
+  testWidgets('opens the original Lotus commander surface and applies damage', (
+    tester,
+  ) async {
+    final snapshotStore = LotusStorageSnapshotStore();
 
-      await snapshotStore.clear();
-      await LifeCounterSettingsStore().clear();
-      await LifeCounterSessionStore().save(
-        const LifeCounterSession(
-          playerCount: 4,
-          startingLifeTwoPlayer: 20,
-          startingLifeMultiPlayer: 40,
-          lives: [40, 32, 25, 11],
-          poison: [0, 0, 0, 0],
-          energy: [0, 0, 0, 0],
-          experience: [0, 0, 0, 0],
-          commanderCasts: [0, 0, 0, 0],
-          partnerCommanders: [false, true, false, false],
-          playerSpecialStates: [
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-          ],
-          lastPlayerRolls: [null, null, null, null],
-          lastHighRolls: [null, null, null, null],
-          commanderDamage: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          stormCount: 0,
-          monarchPlayer: null,
-          initiativePlayer: null,
-          firstPlayerIndex: null,
-          turnTrackerActive: false,
-          turnTrackerOngoingGame: false,
-          turnTrackerAutoHighRoll: false,
-          currentTurnPlayerIndex: null,
-          currentTurnNumber: 1,
-          turnTimerActive: false,
-          turnTimerSeconds: 0,
-          lastTableEvent: null,
-        ),
-      );
+    await snapshotStore.clear();
+    await LifeCounterSettingsStore().clear();
+    await LifeCounterSessionStore().save(
+      const LifeCounterSession(
+        playerCount: 4,
+        startingLifeTwoPlayer: 20,
+        startingLifeMultiPlayer: 40,
+        lives: [40, 32, 25, 11],
+        poison: [0, 0, 0, 0],
+        energy: [0, 0, 0, 0],
+        experience: [0, 0, 0, 0],
+        commanderCasts: [0, 0, 0, 0],
+        partnerCommanders: [false, true, false, false],
+        playerSpecialStates: [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+        ],
+        lastPlayerRolls: [null, null, null, null],
+        lastHighRolls: [null, null, null, null],
+        commanderDamage: [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ],
+        stormCount: 0,
+        monarchPlayer: null,
+        initiativePlayer: null,
+        firstPlayerIndex: null,
+        turnTrackerActive: false,
+        turnTrackerOngoingGame: false,
+        turnTrackerAutoHighRoll: false,
+        currentTurnPlayerIndex: null,
+        currentTurnNumber: 1,
+        turnTimerActive: false,
+        turnTimerSeconds: 0,
+        lastTableEvent: null,
+      ),
+    );
 
-      await tester.pumpWidget(
-        const MaterialApp(home: LotusLifeCounterScreen()),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 8));
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 8));
 
-      final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
-      await state.debugRunJavaScript('''
+    final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+    await state.debugRunJavaScript('''
 (() => {
-  window.__manaloomCommanderDamageHubProbe = 'alive';
+  document.querySelector('.menu-button')?.click();
 })()
 ''');
-      await state.debugHandleShellMessage(
-        '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
-      );
-      await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
+    await state.debugRunJavaScript('''
+(() => {
+  document.querySelector('.manaloom-commander-damage-btn')?.click();
+})()
+''');
+    await tester.pump(const Duration(milliseconds: 900));
 
-      expect(find.text('Dano de comandante'), findsOneWidget);
+    expect(find.text('Dano de comandante'), findsNothing);
+    final openedSurface = await _readLotusCommanderSurface(state);
+    expect(openedSurface['infoCards'], 1);
+    expect(openedSurface['commanderCards'], 3);
+    expect(openedSurface['damageValues'], ['0', '0', '0', '0']);
+    expect(openedSurface['returnToGameLabel'], 'Voltar ao jogo');
+    expect(openedSurface['lifeValues'], ['40', '32', '25', '11']);
+    expect(openedSurface['killedPlayers'], 0);
+    await captureVisualProof(
+      binding,
+      tester,
+      'life_counter_commander_damage_sheet',
+    );
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-commander-damage-apply')),
-      );
-      await tester.pumpAndSettle();
-
-      final session = await _pumpUntilCommanderDamageApplied(
-        tester,
-        LifeCounterSessionStore(),
-      );
-      expect(session, isNotNull);
-      expect(
-        session!.resolvedCommanderDamageDetails[0][1],
-        const LifeCounterCommanderDamageDetail(
-          commanderOneDamage: 1,
-          commanderTwoDamage: 0,
-        ),
-      );
-
-      final commanderDamageState = await _readCommanderDamageState(
-        tester,
-        snapshotStore,
-        state,
-      );
-      expect(commanderDamageState['probe'], isNull);
-    },
+    await state.debugRunJavaScript('''
+(() => {
+  const sourceCard = document.querySelectorAll('.player-card')[1];
+  const button = sourceCard?.querySelector(
+    '.commander-damage-card .increase-button.commander-damage'
   );
+  const bounds = button?.getBoundingClientRect();
+  if (button && bounds) {
+    const eventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 41,
+      pointerType: 'touch',
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2,
+    };
+    button.dispatchEvent(new PointerEvent('pointerdown', eventInit));
+    button.dispatchEvent(new PointerEvent('pointerup', {
+      ...eventInit,
+      buttons: 0,
+    }));
+  }
+})()
+''');
+    await tester.pump(const Duration(seconds: 2));
+
+    final session = await _pumpUntilCommanderDamageApplied(
+      tester,
+      LifeCounterSessionStore(),
+    );
+    expect(session, isNotNull);
+    expect(
+      session!.resolvedCommanderDamageDetails[0][1],
+      const LifeCounterCommanderDamageDetail(
+        commanderOneDamage: 1,
+        commanderTwoDamage: 0,
+      ),
+    );
+    expect(session.lives[0], 39);
+
+    final appliedSurface = await _readLotusCommanderSurface(state);
+    expect(appliedSurface['damageValues'], ['1', '0', '0', '0']);
+    expect(appliedSurface['lifeValues'], ['39', '32', '25', '11']);
+    expect(appliedSurface['killedPlayers'], 0);
+
+    await state.debugRunJavaScript(
+      "document.querySelector('.return-to-game-button')?.click()",
+    );
+    await tester.pump(const Duration(milliseconds: 700));
+    final closedSurface = await _readLotusCommanderSurface(state);
+    expect(closedSurface['infoCards'], 0);
+    expect(closedSurface['commanderCards'], 0);
+  });
 }

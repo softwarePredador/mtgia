@@ -40,6 +40,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   final _previewKey = GlobalKey();
 
   String _selectedFormat = 'Commander';
+  int _selectedBracket = 2;
   bool _isGenerating = false;
   bool _isLoadingLearnedDeck = false;
   bool _preferCollection = false;
@@ -93,6 +94,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final normalized = _selectedFormat.trim().toLowerCase();
     return normalized == 'commander' || normalized == 'brawl';
   }
+
+  bool get _usesCommanderBracket =>
+      _selectedFormat.trim().toLowerCase() == 'commander';
 
   Map<String, dynamic>? get _selectedLearnedDeckSummary {
     final commander = _selectedCommanderName();
@@ -174,6 +178,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         if (_collectionOnly) _preferCollection = true;
         _activeGenerateJobId = draft['active_job_id']?.trim();
         _activeGenerateRequestKey = draft['request_key']?.trim();
+        final draftBracket = int.tryParse(draft['bracket'] ?? '');
+        if (isCommanderBracket(draftBracket)) {
+          _selectedBracket = draftBracket!;
+        }
         final draftFormat = _normalizeFormat(draft['format']);
         if (_normalizeFormat(widget.initialFormat) == null &&
             draftFormat != null) {
@@ -210,6 +218,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final commander = _commanderController.text;
     final prompt = _promptController.text;
     final deckName = _deckNameController.text;
+    final bracket = _usesCommanderBracket ? _selectedBracket : null;
     final activeJobId = _activeGenerateJobId;
     final requestKey = _activeGenerateRequestKey;
     final preferCollection = _preferCollection;
@@ -223,6 +232,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             commander: commander,
             prompt: prompt,
             deckName: deckName,
+            bracket: bracket,
             activeJobId: activeJobId,
             requestKey: requestKey,
             preferCollection: preferCollection,
@@ -291,6 +301,18 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return;
     }
 
+    final bracket = _usesCommanderBracket ? _selectedBracket : null;
+    if (_usesCommanderBracket && !isCommanderBracket(bracket)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Selecione um Bracket Commander válido antes de gerar.',
+          ),
+        ),
+      );
+      return;
+    }
+
     final budgetRaw = _budgetController.text.trim();
     final budgetLimit = budgetRaw.isEmpty ? null : int.tryParse(budgetRaw);
     if (budgetRaw.isNotEmpty &&
@@ -333,6 +355,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       final result = await deckProvider.generateDeck(
         prompt: _promptController.text.trim(),
         format: _selectedFormat,
+        bracket: bracket,
         commanderName: _selectedCommanderName(),
         cancellation: cancellation,
         requestKey: requestKey,
@@ -362,6 +385,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       _logReferenceDiagnostics(result, _selectedCommanderName());
       setState(() {
         _generatedDeck = result;
+        final returnedBracket = _generatedDeckBracket(result);
+        if (_usesCommanderBracket && isCommanderBracket(returnedBracket)) {
+          _selectedBracket = returnedBracket!;
+        }
         _isGenerating = false;
         _generationProgressStep = 4;
         _generationProgressMessage = 'Pronto para revisar.';
@@ -459,6 +486,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (!mounted || _generateCancellation != cancellation) return;
       setState(() {
         _generatedDeck = result;
+        final returnedBracket = _generatedDeckBracket(result);
+        if (_usesCommanderBracket && isCommanderBracket(returnedBracket)) {
+          _selectedBracket = returnedBracket!;
+        }
         _isGenerating = false;
         _generationProgressStep = 4;
         _generationProgressMessage = 'Pronto para revisar.';
@@ -561,27 +592,32 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       }
 
       final deckName = recommendedDeck['deck_name']?.toString().trim();
+      final generatedResult = <String, dynamic>{
+        'generated_deck': {'commander': commander, 'cards': cards},
+        'validation':
+            recommendedDeck['validation'] ??
+            recommendedDeck['legality'] ??
+            const {
+              'is_valid': false,
+              'errors': ['Legalidade não confirmada pelo servidor.'],
+            },
+        'diagnostics': {
+          'source': 'commander_learning',
+          'promoted_deck': learning['promoted_deck'],
+          'recommended_deck': recommendedDeck,
+          'readiness': learning['readiness'],
+        },
+        'warnings': const {'invalid_cards': []},
+      };
       setState(() {
         _deckNameController.text = deckName == null || deckName.isEmpty
             ? 'Deck Aprendido'
             : deckName;
-        _generatedDeck = {
-          'generated_deck': {'commander': commander, 'cards': cards},
-          'validation':
-              recommendedDeck['validation'] ??
-              recommendedDeck['legality'] ??
-              const {
-                'is_valid': false,
-                'errors': ['Legalidade não confirmada pelo servidor.'],
-              },
-          'diagnostics': {
-            'source': 'commander_learning',
-            'promoted_deck': learning['promoted_deck'],
-            'recommended_deck': recommendedDeck,
-            'readiness': learning['readiness'],
-          },
-          'warnings': const {'invalid_cards': []},
-        };
+        _generatedDeck = generatedResult;
+        final returnedBracket = _generatedDeckBracket(generatedResult);
+        if (_usesCommanderBracket && isCommanderBracket(returnedBracket)) {
+          _selectedBracket = returnedBracket!;
+        }
         _isLoadingLearnedDeck = false;
         _generationProgressStep = 4;
         _generationProgressMessage = 'Deck aprendido pronto para revisar.';
@@ -664,8 +700,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     return null;
   }
 
-  int? _generatedDeckBracket() {
-    final root = _generatedDeck;
+  int? _generatedDeckBracket([Map<String, dynamic>? result]) {
+    final root = result ?? _generatedDeck;
     if (root == null) return null;
     final diagnostics = root['diagnostics'];
 
@@ -687,6 +723,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     return null;
   }
 
+  int? _resolvedCommanderBracketForSave() {
+    if (!_usesCommanderBracket) return null;
+    final generatedBracket = _generatedDeckBracket();
+    if (isCommanderBracket(generatedBracket)) return generatedBracket;
+    return isCommanderBracket(_selectedBracket) ? _selectedBracket : null;
+  }
+
   Future<void> _saveDeck() async {
     if (_generatedDeck == null) return;
     if (!_isGeneratedDeckValid()) {
@@ -697,6 +740,17 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           ),
         );
       }
+      return;
+    }
+    final bracketToSave = _resolvedCommanderBracketForSave();
+    if (_usesCommanderBracket && !isCommanderBracket(bracketToSave)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'O deck Commander está sem Bracket válido. Gere a proposta novamente.',
+          ),
+        ),
+      );
       return;
     }
 
@@ -789,7 +843,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         format: _selectedFormat.toLowerCase(),
         description: _promptController.text.trim(),
         archetype: _generatedDeckArchetype(),
-        bracket: _generatedDeckBracket(),
+        bracket: bracketToSave,
         cards: cardsToAdd.cast<Map<String, dynamic>>(),
       );
 
@@ -984,6 +1038,76 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           },
         ),
         const SizedBox(height: AppTheme.space20),
+        if (_usesCommanderBracket) ...[
+          Text('Bracket Commander:', style: theme.textTheme.titleMedium),
+          const SizedBox(height: AppTheme.space8),
+          KeyedSubtree(
+            key: const Key('deck-generate-bracket-field'),
+            child: DropdownButtonFormField<int>(
+              key: ValueKey<int>(_selectedBracket),
+              initialValue: _selectedBracket,
+              isExpanded: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                ),
+                filled: true,
+                fillColor: theme.colorScheme.surface,
+              ),
+              items: commanderBracketOptions
+                  .map(
+                    (option) => DropdownMenuItem<int>(
+                      value: option.value,
+                      child: Text(
+                        option.menuLabel,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                  .toList(growable: false),
+              onChanged: _isGenerating || _isLoadingLearnedDeck
+                  ? null
+                  : (value) {
+                      if (!isCommanderBracket(value)) return;
+                      setState(() => _selectedBracket = value!);
+                      _scheduleDraftSave();
+                    },
+            ),
+          ),
+          const SizedBox(height: AppTheme.space8),
+          Semantics(
+            liveRegion: true,
+            label:
+                'Orientação do Bracket $_selectedBracket: '
+                '${commanderBracketGuidance(_selectedBracket)}',
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              child: Row(
+                key: ValueKey<int>(_selectedBracket),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.shield_outlined,
+                    size: 18,
+                    color: AppTheme.frost400,
+                  ),
+                  const SizedBox(width: AppTheme.space8),
+                  Expanded(
+                    child: Text(
+                      commanderBracketGuidance(_selectedBracket),
+                      key: const Key('deck-generate-bracket-guidance'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: AppTheme.lineHeightCompact,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppTheme.space20),
+        ],
         if (_usesCommanderField) ...[
           Text('Comandante (opcional):', style: theme.textTheme.titleMedium),
           const SizedBox(height: AppTheme.space8),

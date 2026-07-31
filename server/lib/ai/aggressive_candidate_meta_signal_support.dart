@@ -99,7 +99,13 @@ String bracketScopeForMetaSignal({
 }) {
   final normalizedSubformat = subformat.trim().toLowerCase();
   final existingMinimum = candidateBracketScopeMinimum(existingBracketScope);
-  if (normalizedSubformat == 'competitive_commander' || existingMinimum == 3) {
+  if (normalizedSubformat == 'competitive_commander' || existingMinimum == 5) {
+    return 'bracket_5';
+  }
+  if (existingMinimum == 4) {
+    return 'bracket_4_plus';
+  }
+  if (existingMinimum == 3) {
     return 'bracket_3_plus';
   }
   if (score >= 82 || existingMinimum == 2) {
@@ -112,6 +118,8 @@ int? candidateBracketScopeMinimum(String bracketScope) {
   return switch (bracketScope.trim().toLowerCase()) {
     'bracket_2_plus' || 'bracket_2_5' || 'bracket_2_4' => 2,
     'bracket_3_plus' || 'bracket_3_5' || 'bracket_3_4' => 3,
+    'bracket_4_plus' || 'bracket_4_5' => 4,
+    'bracket_5' => 5,
     _ => null,
   };
 }

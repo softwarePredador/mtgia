@@ -181,6 +181,111 @@ void main() {
 
       expect(response, isNull);
     });
+
+    test('reuses only a matching hard-compliant bracket policy', () {
+      const satisfiedFunctionalRolePolicy = {
+        'policy': 'commander_functional_role_floors_v1',
+        'archetype': 'midrange',
+        'applies': true,
+        'total_cards': 100,
+        'minimum_counts': {'wipe': 2},
+        'actual_counts': {'wipe': 2},
+        'deficits': <String, int>{},
+        'satisfied': true,
+      };
+      Map<String, dynamic> cachedWithPolicy(
+        Map<String, dynamic> policy, {
+        Object? functionalRolePolicy = satisfiedFunctionalRolePolicy,
+      }) => {
+        'mode': 'optimize',
+        'strategy_source': 'deterministic_first',
+        'outcome_code': 'optimized',
+        'removals': ['A'],
+        'additions': ['B'],
+        'removals_detailed': const [
+          {'name': 'A', 'card_id': 'card-a', 'quantity': 1},
+        ],
+        'additions_detailed': const [
+          {'name': 'B', 'card_id': 'card-b', 'quantity': 1},
+        ],
+        'bracket_policy': policy,
+        if (functionalRolePolicy != null)
+          'functional_role_policy': functionalRolePolicy,
+      };
+
+      Map<String, dynamic>? hydrate(Map<String, dynamic> cached) =>
+          buildCachedOptimizeResponse(
+            cachedResponse: cached,
+            cacheKey: 'bracket-cache',
+            intensity: focused,
+            effectiveMode: 'optimize',
+            timings: const {'total_ms': 1},
+            hasBracketOverride: false,
+            hasKeepThemeOverride: false,
+            keepTheme: true,
+            userPreferences: const {'preferred_bracket': 2},
+            bracket: 2,
+          );
+
+      expect(
+        hydrate(cachedWithPolicy(const {'bracket': 2, 'hard_compliant': true})),
+        isNotNull,
+      );
+      expect(
+        hydrate(cachedWithPolicy(const {'bracket': 3, 'hard_compliant': true})),
+        isNull,
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(const {'bracket': 2, 'hard_compliant': false}),
+        ),
+        isNull,
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(const {
+            'bracket': 2,
+            'hard_compliant': true,
+          }, functionalRolePolicy: null),
+        ),
+        isNull,
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(
+            const {'bracket': 2, 'hard_compliant': true},
+            functionalRolePolicy: {
+              ...satisfiedFunctionalRolePolicy,
+              'actual_counts': {'wipe': 1},
+            },
+          ),
+        ),
+        isNull,
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(
+            const {'bracket': 2, 'hard_compliant': true},
+            functionalRolePolicy: {
+              ...satisfiedFunctionalRolePolicy,
+              'satisfied': false,
+              'deficits': {'wipe': 1},
+            },
+          ),
+        ),
+        isNull,
+      );
+      expect(
+        hydrate({
+          'mode': 'optimize',
+          'strategy_source': 'deterministic_first',
+          'outcome_code': 'optimized',
+          'removals': ['A'],
+          'additions': ['B'],
+        }),
+        isNull,
+      );
+    });
   });
 
   group('buildAggressiveCandidateQualityDiagnostics', () {

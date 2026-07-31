@@ -10,40 +10,30 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
 Future<Map<String, dynamic>> _readCommanderDamageHubState(
-  WidgetTester tester,
-  LotusStorageSnapshotStore snapshotStore,
   dynamic screenState,
 ) async {
-  const storageKey = '__manaloom_test_player_state_commander_damage_hub';
-  const nonceKey = '__manaloom_test_player_state_commander_damage_hub_nonce';
-  final nonce = DateTime.now().microsecondsSinceEpoch.toString();
-
-  await screenState.debugRunJavaScript('''
-(() => {
-  try {
-    localStorage.setItem('$storageKey', JSON.stringify({
-      probe: window.__manaloomPlayerStateCommanderDamageHubProbe ?? null
-    }));
-    localStorage.setItem('$nonceKey', '$nonce');
-  } catch (_) {}
-})()
+  dynamic decoded = await screenState.debugRunJavaScriptReturningResult('''
+JSON.stringify({
+  infoCards: document.querySelectorAll('.info-card').length,
+  commanderCards: document.querySelectorAll('.commander-damage-card').length,
+  damageValues: Array.from(
+    document.querySelectorAll('.damage-display')
+  ).map((node) => node.getAttribute('aria-valuenow')),
+  returnToGameLabel:
+    document.querySelector('.return-to-game-button')
+      ?.getAttribute('aria-label') ?? null,
+  lifeValues: Array.from(
+    document.querySelectorAll('.player-life-count')
+  ).map((node) => node.getAttribute('aria-valuenow')),
+  killedPlayers: Array.from(
+    document.querySelectorAll('.player-card')
+  ).filter((card) => card.querySelector('.killed')).length,
+})
 ''');
-
-  String? encodedState;
-  for (var attempt = 0; attempt < 20 && encodedState == null; attempt += 1) {
-    await tester.pump(const Duration(milliseconds: 300));
-    final snapshot = await snapshotStore.load();
-    if (snapshot == null) {
-      continue;
-    }
-    if (snapshot.values[nonceKey] != nonce) {
-      continue;
-    }
-    encodedState = snapshot.values[storageKey];
+  for (var attempt = 0; attempt < 2 && decoded is String; attempt += 1) {
+    decoded = jsonDecode(decoded);
   }
-
-  expect(encodedState, isNotNull);
-  final decoded = jsonDecode(encodedState!);
+  expect(decoded, isA<Map>());
   return Map<String, dynamic>.from(decoded as Map);
 }
 
@@ -123,12 +113,48 @@ void main() {
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
       await state.debugRunJavaScript('''
 (() => {
-  window.__manaloomPlayerStateCommanderDamageHubProbe = 'alive';
+  const card = document.querySelector('.player-card');
+  const surface = card?.querySelector('.increase-button') ??
+    card?.querySelector('.player-card-inner') ??
+    card;
+  const bounds = surface?.getBoundingClientRect();
+  if (surface && bounds) {
+    surface.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2,
+    }));
+    surface.dispatchEvent(new MouseEvent('mousemove', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2 + 100,
+    }));
+  }
 })()
 ''');
-      await state.debugHandleShellMessage(
-        '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":0}',
-      );
+      await tester.pump(const Duration(milliseconds: 100));
+      await state.debugRunJavaScript('''
+(() => {
+  const card = document.querySelector('.player-card');
+  const surface = card?.querySelector('.increase-button') ??
+    card?.querySelector('.player-card-inner') ??
+    card;
+  const bounds = surface?.getBoundingClientRect();
+  if (surface && bounds) {
+    surface.dispatchEvent(new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2 + 100,
+    }));
+  }
+})()
+''');
       await tester.pumpAndSettle();
 
       expect(find.text('Estado do jogador'), findsOneWidget);
@@ -151,42 +177,49 @@ void main() {
           const Key('life-counter-native-player-state-manage-commander-damage'),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
 
+      expect(find.text('Estado do jogador'), findsNothing);
       expect(
         find.byKey(const Key('life-counter-native-commander-damage-apply')),
-        findsOneWidget,
+        findsNothing,
       );
+      final openedSurface = await _readCommanderDamageHubState(state);
+      expect(openedSurface['infoCards'], 1);
+      expect(openedSurface['commanderCards'], 3);
+      expect(openedSurface['damageValues'], ['0', '0', '0', '0']);
+      expect(openedSurface['returnToGameLabel'], 'Voltar ao jogo');
+      expect(openedSurface['lifeValues'], ['40', '32', '25', '11']);
+      expect(openedSurface['killedPlayers'], 0);
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-commander-damage-apply')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-commander-damage-apply')),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Estado do jogador'), findsOneWidget);
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-player-state-apply')),
-      );
-      await tester.pumpAndSettle();
+      await state.debugRunJavaScript('''
+(() => {
+  const sourceCard = document.querySelectorAll('.player-card')[1];
+  const button = sourceCard?.querySelector(
+    '.commander-damage-card .increase-button.commander-damage'
+  );
+  const bounds = button?.getBoundingClientRect();
+  if (button && bounds) {
+    const eventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 43,
+      pointerType: 'touch',
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2,
+    };
+    button.dispatchEvent(new PointerEvent('pointerdown', eventInit));
+    button.dispatchEvent(new PointerEvent('pointerup', {
+      ...eventInit,
+      buttons: 0,
+    }));
+  }
+})()
+''');
+      await tester.pump(const Duration(seconds: 2));
 
       final session = await _pumpUntilCommanderDamageApplied(
         tester,
@@ -200,13 +233,12 @@ void main() {
           commanderTwoDamage: 0,
         ),
       );
+      expect(session.lives[0], 39);
 
-      final commanderDamageHubState = await _readCommanderDamageHubState(
-        tester,
-        snapshotStore,
-        state,
-      );
-      expect(commanderDamageHubState['probe'], isNull);
+      final commanderDamageHubState = await _readCommanderDamageHubState(state);
+      expect(commanderDamageHubState['damageValues'], ['1', '0', '0', '0']);
+      expect(commanderDamageHubState['lifeValues'], ['39', '32', '25', '11']);
+      expect(commanderDamageHubState['killedPlayers'], 0);
     },
   );
 }

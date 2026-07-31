@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import '../basic_land_utils.dart' as basic_lands;
 import '../commander_mana_floor.dart';
+import '../edh_bracket_policy.dart';
 import 'cmc_safety.dart';
 import 'functional_card_tags.dart';
+import 'optimize_functional_role_support.dart';
 import 'optimization_functional_roles.dart';
 import 'optimization_ramp_profile.dart';
 import 'optimization_validator.dart';
@@ -32,6 +34,7 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   String? commanderName,
   Map<String, Map<String, dynamic>>? cardDeckProfiles,
   Map<String, dynamic>? profileRoleTargets,
+  int? bracket,
 }) {
   final pairCount = [
     removals.length,
@@ -67,6 +70,26 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
       formatMinimumLandCount != null &&
       (landTrimContext.totalCards >= minimumDeckSizeForFloor ||
           profileMinimumLandCount != null);
+  final bracketAssessment =
+      deckFormat.trim().toLowerCase() == 'commander' && bracket != null
+          ? assessDeckAgainstBracketPolicy(
+            bracket: bracket,
+            cards: originalDeck,
+          )
+          : null;
+  final bracketRepairRequired =
+      bracketAssessment != null && !bracketAssessment.hardCompliant;
+  final functionalRoleFloorAssessment =
+      deckFormat.trim().toLowerCase() == 'commander'
+          ? assessCommanderFunctionalRoleFloors(
+            cards: originalDeck,
+            targetArchetype: archetype,
+          )
+          : null;
+  final remainingFunctionalRoleFloorDeficits =
+      functionalRoleFloorAssessment?.applies == true
+          ? Map<String, int>.from(functionalRoleFloorAssessment!.deficits)
+          : <String, int>{};
 
   for (var i = 0; i < pairCount; i++) {
     final removalName = removals[i];
@@ -163,6 +186,32 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
         removedRole != 'ramp';
     final unsafeLandToNonLand =
         removedIsLand && !addedIsLand && !landTrimUpgrade;
+    final removesBracketViolation =
+        bracketRepairRequired &&
+        tagCardForBracket(
+          name: removedCard['name']?.toString() ?? removalName,
+          typeLine: removedCard['type_line']?.toString() ?? '',
+          oracleText: removedCard['oracle_text']?.toString() ?? '',
+        ).categories.contains(BracketCategory.gameChanger);
+    final bracketRepairUpgrade =
+        removesBracketViolation &&
+        !unsafeLandToNonLand &&
+        !nonStructuralLandSwap;
+    String? suppliedFloorRole;
+    for (final entry in remainingFunctionalRoleFloorDeficits.entries) {
+      if (entry.value <= 0) continue;
+      if (!addedRoles.contains(entry.key) || removedRoles.contains(entry.key)) {
+        continue;
+      }
+      suppliedFloorRole = entry.key;
+      break;
+    }
+    final functionalRoleFloorUpgrade =
+        suppliedFloorRole != null &&
+        !removedIsLand &&
+        !addedIsLand &&
+        !losesGenericRampFloor &&
+        removedCriticalRoles.isEmpty;
 
     final shouldDrop =
         unsafeLandToNonLand ||
@@ -178,7 +227,11 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
           archetype: archetype,
         );
 
-    if (shouldDrop && !structuralRecoveryUpgrade && !landTrimUpgrade) {
+    if (shouldDrop &&
+        !structuralRecoveryUpgrade &&
+        !landTrimUpgrade &&
+        !bracketRepairUpgrade &&
+        !functionalRoleFloorUpgrade) {
       final rampFloorDetail =
           losesGenericRampFloor
               ? ', perda relativa de ramp estrutural (ramp_floor)'
@@ -194,6 +247,10 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
     safeRemovals.add(removalName);
     safeAdditions.add(additionName);
+    if (suppliedFloorRole != null) {
+      remainingFunctionalRoleFloorDeficits[suppliedFloorRole] =
+          (remainingFunctionalRoleFloorDeficits[suppliedFloorRole] ?? 1) - 1;
+    }
   }
 
   var projectedLandCount = landTrimContext.landCount;
@@ -363,6 +420,7 @@ String? _gateRoleForFunctionalTag(String tag) {
     'payoff' => 'engine',
     'enabler' => 'utility',
     'land' ||
+    'wipe' ||
     'ramp' ||
     'draw' ||
     'tutor' ||

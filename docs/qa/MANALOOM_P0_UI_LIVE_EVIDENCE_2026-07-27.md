@@ -1,12 +1,12 @@
 # ManaLoom — prova viva P0 Web + Android
 
-**Data:** 2026-07-28
+**Data da recertificação corrente:** 2026-07-31
 
 **Branch:** `codex/free-beta-release-candidate-2026-07-17`
 
 **Toolchain:** Flutter `3.44.6`, Dart `3.12.2`
 
-**Digest visual:** `591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a`
+**Digest visual:** `718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15`
 **Decisão:** `PASS` para S3-05 e S3-07; TalkBack humano continua pendente em S3-04
 
 ## Escopo realmente comprovado
@@ -26,16 +26,15 @@ Foram produzidas e abertas as seguintes capturas:
 | Web mobile | build release real | 54 | viewport 390×844; raster 500×844 |
 | Web desktop | build release real | 53 | 1440×900 |
 | Web wide | build release real | 53 | 1920×1080 |
-| Android físico | profile, `kDebugMode=false` | 54 | 1080×2408; Life Counter 2408×1080 |
-| Battle Coach Android | integration test físico | 7 | 1080×2408 |
+| Android emulator | profile, `kDebugMode=false` | 54 | 1080×2400; Life Counter 2400×1080 |
+| Core Product Android | integration test no emulator | 12 | 1080×2337 |
+| Battle Coach Android | integration test no emulator | 7 | 1080×2337 |
 | Battle Coach teclado Web | build release + teclado físico | 9 | 1280×720 |
-| Fallback de arte Web | build release real | 1 | 1280×720 |
-| Preview → detalhe de carta Web | build release real | 3 | 1280×720 |
-| **Total revisado** |  | **234** |  |
+| **Total revisado** |  | **242** |  |
 
-As 214 imagens da matriz foram inspecionadas em contact sheets e resolução
-original, além das folhas dedicadas ao Battle Coach Android, teclado Web e
-fallback de arte e navegação do preview. A revisão verificou hierarquia,
+As 242 imagens correntes foram inspecionadas em contact sheets e resolução
+original, incluindo as folhas dedicadas ao Core Product, Battle Coach Android
+e teclado Web. A revisão verificou hierarquia,
 identidade MTG, contraste, tipografia, espaçamento, adaptação, clareza de
 ação, estados, acessibilidade visual e atratividade. Não restou finding visual
 bloqueante para esta correção.
@@ -130,9 +129,9 @@ esticada mesmo com o DOM do Life pronto. Essa imagem também foi recusada.
 A correção restaurou explicitamente a surface Flutter real antes de montar a
 WebView. A prova válida aguardou skin visual, quatro jogadores, viewport
 landscape, `document.fonts.ready` e overflow zero; só então capturou o
-compositor do Samsung via `adb screencap`. O PNG final:
+compositor do emulador Android via `adb screencap`. O PNG final:
 
-- possui 2408×1080 em landscape;
+- possui 2400×1080 em landscape;
 - contém 559.443 bytes;
 - mostra a mesa de quatro jogadores sem overflow;
 - passou alvo/semântica automatizados;
@@ -157,10 +156,11 @@ callbacks Flutter:
 8. digitação física filtra o rival público;
 9. Enter seleciona e executa o preflight real.
 
-O preflight final bloqueia corretamente a simulação porque o motor do fixture
-não está configurado; o CTA fica disabled em vez de iniciar uma operação
-inválida. O log sanitizado contém 9/9 `PASS`, nenhuma credencial e zero entrada
-proibida.
+O preflight final conclui como pronto com dois decks Commander validados,
+100 cartas verificadas e CTA habilitado. A mesma fixture completou criação de
+sessão, ação e concessão no runtime de regras fixado. O log sanitizado contém
+9/9 `PASS`, nenhuma credencial e zero entrada proibida; o único 404 permitido
+é a consulta opcional de job de otimização inexistente no deck descartável.
 
 Os nove arquivos finais são PNG reais em 1280×720, foram reindexados pelo
 digest corrente e abertos na folha dedicada; somente esse conjunto entrou no
@@ -214,15 +214,11 @@ do gate.
   `docs/qa/ui-live/current/battle-coach-android`;
 - Battle Coach Web:
   `docs/qa/ui-live/current/battle-coach-web-keyboard`;
-- fallback de arte:
-  `docs/qa/ui-live/current/card-back-fallback-web`;
-- navegação preview → detalhe:
-  `docs/qa/ui-live/current/card-details-navigation-web`;
 - baselines: `app/test/ui/goldens/runtime`;
 - matriz: `app/test/ui/fixtures/ui_authenticated_visual_matrix.json`;
 - teclado: `app/test/ui/fixtures/ui_keyboard_focus_matrix.json`.
 
-O aggregate foi verificado com 234 screenshots e os três níveis:
+O aggregate foi verificado com 242 screenshots e os três níveis:
 `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
 
 ## Findings de acompanhamento
@@ -232,49 +228,27 @@ Não bloqueiam a correção do modal, mas ficaram registrados no aggregate:
 - o conteúdo de Privacidade ainda é conciso para um documento jurídico
   completo e deve passar por revisão de conteúdo/governança antes de promoção
   comercial;
-- o carrossel de ações rápidas pode deixar fragmentos laterais após scroll em
-  telas estreitas;
-- os CTAs do estado vazio de decks devem receber largura máxima em
-  desktop/wide;
-- o raster Web do harness mantém margens externas do host; uma evolução deve
-  recortar e certificar também o viewport físico de cada perfil.
 
 ## Pendência honesta
 
-S3-04 continua `BLOCKED` somente pelo roteiro humano TalkBack no Samsung alvo.
-A revisão de imagem e os testes de semantics não substituem uma pessoa
-navegando com o leitor ligado. VoiceOver/iOS permanece
+S3-04 continua `BLOCKED` somente pelo roteiro humano TalkBack. A revisão de
+imagem e os testes de semantics não substituem uma pessoa navegando com o
+leitor ligado. O emulador é aceito como `PASS_RUNTIME` neste escopo, mas não
+recebe crédito de aparelho físico nem de smoke de hardware. VoiceOver/iOS permanece
 `DEFERRED_BY_SCOPE` para a beta Web + Android e não é apresentado como
 executado.
 
 ## Validação final
 
-A recertificação deste digest fechou com:
+A recertificação deste digest fechou inicialmente com:
 
-- 314/314 testes do domínio Deck aprovados;
-- 129/129 testes do domínio Battle aprovados;
-- 126/126 testes focados das superfícies anteriores e 10/10 testes focados do
-  diálogo de detalhes aprovados;
-- 91 testes focados do backend aprovados e uma integração de alias delegada
-  ao schema descartável;
-- 1.342 testes Flutter completos aprovados e um skip declarado;
-- 12/12 checks focados de orientação e responsividade aprovados;
-- `flutter analyze` sem issues;
-- 53/53 testes do gate `ui-audit` e 54 checkpoints na matriz de captura;
-- 234/234 screenshots aceitos pelo gate `ui-proof`;
-- 9/9 passos físicos de teclado/foco do Battle Coach Web;
-- sete estados visuais e dois testes de runtime do Battle Coach no Samsung;
-- `manaloom_project_logic --write` e `--check` sincronizados;
-- CI local `quick` aprovada;
-- CI local `full` aprovada, incluindo 62 auditorias determinísticas, 27
-  contratos de release, 9 jornadas Patrol e auditoria de dependências;
-- schema descartável aprovado com 79 tabelas, 6 views, 98 FKs e 56 migrations;
-- build Web release e smoke test em `/app/` aprovados.
+- 54/54 checkpoints P0 no emulador Android;
+- 54/54 Web mobile, 53/53 Web desktop e 53/53 Web wide;
+- 12/12 estados Core Product e 7/7 estados Battle Coach no emulador;
+- 9/9 passos reais de teclado/foco do Battle Coach Web;
+- preflight positivo e sessão interativa completa;
+- 242/242 screenshots abertas e aprovadas na revisão visual.
 
-O mesmo gate `full` permanece obrigatório no `pre-push`; a execução acima é a
-prova prévia e o hook repete a proteção no envio Git.
-
-O `main.dart.js` do Web release validado tem SHA-256
-`a044b90d0c9ac2fc9fd6d99776d85726aa7b70639b647265c0d52c448842901d`.
-O digest definitivo das fontes da UI é
-`591dab359d13ea87eb06a60a7c9fc81470fda1cf1123029be69380621ebb083a`.
+Os gates determinísticos finais e seus números são registrados pelo hook da
+mesma árvore antes do push. O digest definitivo das fontes da UI desta rodada é
+`718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15`.

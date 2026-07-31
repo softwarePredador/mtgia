@@ -43,6 +43,109 @@ void main() {
       );
     });
 
+    test('keeps the complete Bracket 1-5 intent and limit matrix aligned', () {
+      const cases = <Map<String, Object?>>[
+        {
+          'bracket': 1,
+          'label': 'Exhibition',
+          'minimum_turns': 9,
+          'cap': 0,
+          'public_cap': 0,
+          'competitive': false,
+          'allowed': 0,
+        },
+        {
+          'bracket': 2,
+          'label': 'Core',
+          'minimum_turns': 8,
+          'cap': 0,
+          'public_cap': 0,
+          'competitive': false,
+          'allowed': 0,
+        },
+        {
+          'bracket': 3,
+          'label': 'Upgraded',
+          'minimum_turns': 6,
+          'cap': 3,
+          'public_cap': 3,
+          'competitive': false,
+          'allowed': 3,
+        },
+        {
+          'bracket': 4,
+          'label': 'Optimized',
+          'minimum_turns': 4,
+          'cap': 99,
+          'public_cap': null,
+          'competitive': false,
+          'allowed': 4,
+        },
+        {
+          'bracket': 5,
+          'label': 'cEDH',
+          'minimum_turns': null,
+          'cap': 99,
+          'public_cap': null,
+          'competitive': true,
+          'allowed': 4,
+        },
+      ];
+      const candidateGameChangers = <Map<String, dynamic>>[
+        {'name': 'Mana Vault', 'type_line': 'Artifact'},
+        {'name': 'Mox Diamond', 'type_line': 'Artifact'},
+        {'name': 'Grim Monolith', 'type_line': 'Artifact'},
+        {'name': 'Chrome Mox', 'type_line': 'Artifact'},
+      ];
+
+      for (final caseData in cases) {
+        final bracket = caseData['bracket']! as int;
+        final profile = commanderBracketIntentProfile(bracket);
+        final decision = applyBracketPolicyToAdditions(
+          bracket: bracket,
+          currentDeckCards: const [],
+          additionsCardsData: candidateGameChangers,
+        );
+
+        expect(profile.label, caseData['label'], reason: 'bracket=$bracket');
+        expect(
+          profile.minimumTurnsPlayed,
+          caseData['minimum_turns'],
+          reason: 'bracket=$bracket',
+        );
+        expect(
+          profile.gameChangerCap,
+          caseData['cap'],
+          reason: 'bracket=$bracket',
+        );
+        expect(
+          profile.toJson()['game_changer_cap'],
+          caseData['public_cap'],
+          reason: 'public bracket contract=$bracket',
+        );
+        expect(
+          profile.toJson()['numeric_game_changer_cap_applies'],
+          bracket <= 3,
+          reason: 'numeric cap marker=$bracket',
+        );
+        expect(
+          profile.competitiveLane,
+          caseData['competitive'],
+          reason: 'bracket=$bracket',
+        );
+        expect(
+          decision.allowed,
+          hasLength(caseData['allowed']! as int),
+          reason: 'bracket=$bracket',
+        );
+        expect(
+          decision.blocked,
+          hasLength(4 - (caseData['allowed']! as int)),
+          reason: 'bracket=$bracket',
+        );
+      }
+    });
+
     test('hard-caps only Game Changers and keeps every other tag advisory', () {
       const expectedGameChangerCaps = <int, int>{
         1: 0,
@@ -295,6 +398,159 @@ void main() {
           reason: card['name'],
         );
       }
+    });
+
+    test(
+      'blocks the screenshot fast mana in Core while keeping Cori-Steel Cutter advisory',
+      () {
+        final decision = applyBracketPolicyToAdditions(
+          bracket: 2,
+          currentDeckCards: const [],
+          additionsCardsData: const [
+            {
+              'name': "Lion's Eye Diamond",
+              'type_line': 'Artifact',
+              'oracle_text': '',
+            },
+            {
+              'name': 'Grim Monolith',
+              'type_line': 'Artifact',
+              'oracle_text': '',
+            },
+            {'name': 'Mox Diamond', 'type_line': 'Artifact', 'oracle_text': ''},
+            {
+              'name': 'Cori-Steel Cutter',
+              'type_line': 'Artifact — Equipment',
+              'oracle_text': '',
+            },
+          ],
+        );
+
+        expect(decision.allowed, ['Cori-Steel Cutter']);
+        expect(decision.blocked.map((card) => card['name']), [
+          "Lion's Eye Diamond",
+          'Grim Monolith',
+          'Mox Diamond',
+        ]);
+      },
+    );
+
+    test('assesses every Game Changer leaked into the Lore Core deck', () {
+      final assessment = assessDeckAgainstBracketPolicy(
+        bracket: 2,
+        cards: const [
+          {'name': 'Chrome Mox', 'type_line': 'Artifact'},
+          {'name': 'Enlightened Tutor', 'type_line': 'Instant'},
+          {'name': 'Grim Monolith', 'type_line': 'Artifact'},
+          {'name': "Lion's Eye Diamond", 'type_line': 'Artifact'},
+          {'name': 'Mana Vault', 'type_line': 'Artifact'},
+          {'name': 'Mox Diamond', 'type_line': 'Artifact'},
+          {'name': 'The One Ring', 'type_line': 'Legendary Artifact'},
+          {'name': 'Cori-Steel Cutter', 'type_line': 'Artifact — Equipment'},
+        ],
+      );
+
+      expect(assessment.hardCompliant, isFalse);
+      expect(assessment.counts[BracketCategory.gameChanger], 7);
+      expect(assessment.violations.map((card) => card['name']).toSet(), {
+        'Chrome Mox',
+        'Enlightened Tutor',
+        'Grim Monolith',
+        "Lion's Eye Diamond",
+        'Mana Vault',
+        'Mox Diamond',
+        'The One Ring',
+      });
+      expect(
+        assessment.violations.map((card) => card['name']),
+        isNot(contains('Cori-Steel Cutter')),
+      );
+      for (final violation in assessment.violations) {
+        expect(violation['reason'], contains('política estrita'));
+        expect(violation['reason'], isNot(contains('acordo')));
+      }
+    });
+
+    test(
+      'counts duplicate printings once in the Upgraded candidate budget',
+      () {
+        final decision = applyBracketPolicyToAdditions(
+          bracket: 3,
+          currentDeckCards: const [
+            {'name': 'Mana Vault', 'type_line': 'Artifact'},
+          ],
+          additionsCardsData: const [
+            {
+              'name': 'Mox Diamond',
+              'oracle_id': 'oracle-mox-diamond',
+              'card_id': 'printing-a',
+              'type_line': 'Artifact',
+            },
+            {
+              'name': 'Mox Diamond',
+              'oracle_id': 'oracle-mox-diamond',
+              'card_id': 'printing-b',
+              'type_line': 'Artifact',
+            },
+            {'name': 'Grim Monolith', 'type_line': 'Artifact'},
+          ],
+        );
+
+        expect(decision.allowed, ['Mox Diamond', 'Grim Monolith']);
+        expect(decision.blocked, isEmpty);
+        expect(decision.remainingBudget[BracketCategory.gameChanger], 0);
+      },
+    );
+
+    test('consumes the Upgraded Game Changer cap by physical quantity', () {
+      final decision = applyBracketPolicyToAdditions(
+        bracket: 3,
+        currentDeckCards: const [
+          {'name': 'Mana Vault', 'type_line': 'Artifact', 'quantity': 2},
+        ],
+        additionsCardsData: const [
+          {
+            'name': "Lion's Eye Diamond",
+            'type_line': 'Artifact',
+            'quantity': 1,
+          },
+          {'name': 'Grim Monolith', 'type_line': 'Artifact', 'quantity': 1},
+        ],
+      );
+
+      expect(decision.allowed, ["Lion's Eye Diamond"]);
+      expect(decision.blocked.single['name'], 'Grim Monolith');
+      expect(decision.remainingBudget[BracketCategory.gameChanger], 0);
+    });
+
+    test('reports only the Game Changer excess in Upgraded', () {
+      final assessment = assessDeckAgainstBracketPolicy(
+        bracket: 3,
+        cards: const [
+          {'name': 'Mana Vault', 'type_line': 'Artifact'},
+          {'name': 'Mox Diamond', 'type_line': 'Artifact'},
+          {'name': 'Grim Monolith', 'type_line': 'Artifact'},
+          {'name': 'Chrome Mox', 'type_line': 'Artifact'},
+        ],
+      );
+
+      expect(assessment.hardCompliant, isFalse);
+      expect(assessment.counts[BracketCategory.gameChanger], 4);
+      expect(assessment.violations, hasLength(1));
+      expect(assessment.violations.single['quantity'], 1);
+    });
+
+    test('reports only the excess physical quantity in Upgraded', () {
+      final assessment = assessDeckAgainstBracketPolicy(
+        bracket: 3,
+        cards: const [
+          {'name': 'Mana Vault', 'type_line': 'Artifact', 'quantity': 4},
+        ],
+      );
+
+      expect(assessment.counts[BracketCategory.gameChanger], 4);
+      expect(assessment.violations, hasLength(1));
+      expect(assessment.violations.single['quantity'], 1);
     });
   });
 }

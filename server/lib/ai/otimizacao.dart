@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../ai_provider_runtime_support.dart';
 import '../ai_log_service.dart';
 import '../basic_land_utils.dart' as land_utils;
+import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import '../ml_knowledge_service.dart';
 import '../openai_runtime_config.dart';
@@ -324,6 +325,8 @@ class DeckOptimizerService {
     String? metaEvidenceContext,
     String? userId,
     String? deckId,
+    bool preferCollection = false,
+    int? budgetLimitBrl,
   }) async {
     final List<dynamic> currentCards = deckData['cards'];
     final List<String> colors = List<String>.from(deckData['colors']);
@@ -469,6 +472,8 @@ class DeckOptimizerService {
       metaEvidenceContext: metaEvidenceContext,
       userId: userId,
       deckId: deckId,
+      preferCollection: preferCollection,
+      budgetLimitBrl: budgetLimitBrl,
       mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
     );
 
@@ -847,6 +852,12 @@ class DeckOptimizerService {
         if (mlContext != null) "ml_knowledge": mlContext,
       },
       "current_decklist": deckList,
+      if (buildCommanderBracketPromptContext(
+            deckFormat: deckFormat,
+            bracket: bracket,
+          )
+          case final bracketIntent?)
+        "bracket_intent": bracketIntent,
     };
 
     // Adicionar perfil do commander se disponível
@@ -986,6 +997,8 @@ class DeckOptimizerService {
     String? userId,
     String? deckId,
     String? mlContext,
+    bool preferCollection = false,
+    int? budgetLimitBrl,
   }) async {
     final stopwatch = Stopwatch()..start();
     final env = loadRuntimeEnvironment();
@@ -1003,9 +1016,13 @@ class DeckOptimizerService {
       "commander": commanders.join(" & "),
       "format": deckFormat,
       "archetype": archetype,
+      "bracket": bracket,
       "target_additions": targetAdditions,
       "constraints": {
         "keep_theme": keepTheme,
+        "prefer_collection": preferCollection,
+        if (budgetLimitBrl != null) "budget_limit_brl": budgetLimitBrl,
+        if (bracket != null) "commander_bracket": bracket,
         if (detectedTheme != null) "deck_theme": detectedTheme,
         if (coreCards != null && coreCards.isNotEmpty) "core_cards": coreCards,
       },
@@ -1017,6 +1034,12 @@ class DeckOptimizerService {
         if (mlContext != null) "ml_knowledge": mlContext,
       },
       "current_decklist": deckList,
+      if (buildCommanderBracketPromptContext(
+            deckFormat: deckFormat,
+            bracket: bracket,
+          )
+          case final bracketIntent?)
+        "bracket_intent": bracketIntent,
     });
 
     try {
@@ -1127,6 +1150,22 @@ String _normalizeOptimizeDeckFormat(String deckFormat) {
   final normalized = deckFormat.trim().toLowerCase();
   if (normalized.isEmpty || normalized == 'edh') return 'commander';
   return normalized;
+}
+
+Map<String, dynamic>? buildCommanderBracketPromptContext({
+  required String deckFormat,
+  required int? bracket,
+}) {
+  if (_normalizeOptimizeDeckFormat(deckFormat) != 'commander' ||
+      bracket == null ||
+      bracket < 1 ||
+      bracket > 5) {
+    return null;
+  }
+  return {
+    'policy_version': commanderBracketPolicyVersion,
+    ...commanderBracketIntentProfile(bracket).toJson(),
+  };
 }
 
 String _withOptimizeFormatDirective(String basePrompt, String deckFormat) {

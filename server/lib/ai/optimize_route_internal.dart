@@ -15,6 +15,9 @@ import 'optimization_validator.dart';
 import 'otimizacao.dart';
 import 'optimize_state_support.dart' as optimize_state;
 import 'optimize_route_request_support.dart';
+import 'optimize_route_recommendation_context_support.dart'
+    as optimize_recommendation_context;
+import 'optimize_route_resilience_support.dart' as optimize_route_resilience;
 import 'optimize_swap_integrity.dart';
 import '../ai_generate_internal_url_support.dart';
 import '../internal_ai_request_token.dart';
@@ -356,6 +359,8 @@ Future<void> processCompleteModeAsync({
           state: state,
           deckId: deckId,
           userId: userId,
+          preferCollection: recommendationContext.preferCollection == true,
+          budgetLimitBrl: recommendationContext.budgetLimitBrl,
         ),
       );
     } else {
@@ -375,6 +380,15 @@ Future<void> processCompleteModeAsync({
         state: state,
         maxTotal: maxTotal,
         deckFormat: deckFormat,
+      ),
+    );
+    telemetry.trackSync(
+      'complete.rebalance_functional_role_deficits',
+      () => optimize_complete.rebalanceCompleteDeckForFunctionalRoleDeficits(
+        state: state,
+        maxTotal: maxTotal,
+        deckFormat: deckFormat,
+        targetArchetype: targetArchetype,
       ),
     );
 
@@ -409,6 +423,9 @@ Future<void> processCompleteModeAsync({
         coreCards: themeProfile.coreCards,
         maxTotal: maxTotal,
         state: state,
+        userId: userId,
+        preferCollection: recommendationContext.preferCollection == true,
+        budgetLimitBrl: recommendationContext.budgetLimitBrl,
       ),
     );
 
@@ -420,6 +437,7 @@ Future<void> processCompleteModeAsync({
         currentTotalCards: currentTotalCards,
         targetArchetype: targetArchetype,
         deckFormat: deckFormat,
+        bracket: bracket,
       ),
     );
 
@@ -462,12 +480,22 @@ Future<void> processCompleteModeAsync({
           intensity: intensity.selected,
         ),
       );
+      await telemetry.trackAsync(
+        'complete.recommendation_constraints',
+        () => optimize_recommendation_context
+            .auditCompleteRecommendationConstraints(
+              pool: pool,
+              userId: userId ?? '',
+              responseBody: responseBody,
+              context: recommendationContext,
+            ),
+      );
       final finalQualityError = responseBody['quality_error'];
       if (finalQualityError is Map) {
         await OptimizeJobStore.fail(
           pool,
           jobId,
-          error: 'Complete mode não atingiu o piso seguro de terrenos.',
+          error: 'Complete mode não atingiu os critérios finais de qualidade.',
           qualityError: finalQualityError.cast<String, dynamic>(),
         );
         return;
@@ -522,49 +550,24 @@ Future<void> processCompleteModeAsync({
           payload: responseBody,
         );
       }
+      attachOptimizeApplyAuthorizationToResponse(
+        deckId: deckId,
+        deckSignature: deckSignature,
+        responseBody: responseBody,
+        bracket: bracket,
+      );
       await OptimizeJobStore.complete(pool, jobId, result: responseBody);
     } else {
-      // Fallback: se por algum motivo não veio como complete
-      jsonResponse['strategy_source'] ??= 'complete_pipeline_fallback';
-      optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(
-        jsonResponse,
-      );
-      if (cacheKey != null && cacheKey.isNotEmpty) {
-        jsonResponse['cache'] = {'hit': false, 'cache_key': cacheKey};
-      }
-      jsonResponse['intensity'] = intensity.selected;
-      jsonResponse['optimize_intensity'] = intensity.toJson(
-        returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
-          responseBody: jsonResponse,
-          effectiveMode: 'complete',
-        ),
-      );
-      jsonResponse['timings'] = telemetry.snapshot();
-      jsonResponse['stage_telemetry'] = jsonResponse['timings'];
-      attachRecommendationContextToOptimizeResponse(
-        jsonResponse,
-        recommendationContext,
-      );
-      if (!await OptimizeJobStore.progress(
+      final qualityError = optimize_route_resilience
+          .buildUnexpectedCompleteAsyncPayloadQualityError(jsonResponse);
+      await OptimizeJobStore.fail(
         pool,
         jobId,
-        stage: 'Finalizando preview...',
-        stageNumber: 6,
-      )) {
-        return;
-      }
-      telemetry.logSummary();
-      if (cacheKey != null && cacheKey.isNotEmpty) {
-        await saveOptimizeCache(
-          pool: pool,
-          cacheKey: cacheKey,
-          userId: userId,
-          deckId: deckId,
-          deckSignature: deckSignature,
-          payload: jsonResponse,
-        );
-      }
-      await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
+        error:
+            'Complete mode produziu um resultado incompatível com a validação final.',
+        qualityError: qualityError,
+      );
+      return;
     }
   } catch (e) {
     Log.e('Background optimize job $jobId failed type=${e.runtimeType}');

@@ -523,6 +523,80 @@ void main() {
   });
 
   testWidgets(
+    'optimization preview explains bracket intent without exposing numeric unlimited cap',
+    (tester) async {
+      tester.view.physicalSize = const Size(1000, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        _TestMaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: TextButton(
+                  onPressed: () => showOptimizationPreviewDialog(
+                    context,
+                    mode: 'optimize',
+                    archetype: 'midrange',
+                    keepTheme: true,
+                    preservedTheme: null,
+                    reasoning: 'Ajuste coerente com a faixa escolhida.',
+                    intensity: OptimizeIntensity.focused,
+                    optimizeIntensity: const <String, dynamic>{},
+                    qualityWarning: null,
+                    deckAnalysis: const <String, dynamic>{},
+                    postAnalysis: const <String, dynamic>{},
+                    warnings: const <String, dynamic>{},
+                    metaReferenceContext: const <String, dynamic>{},
+                    bracketPolicy: const {
+                      'bracket': 4,
+                      'label': 'Optimized',
+                      'hard_compliant': true,
+                      'game_changer_count': 4,
+                      'game_changer_cap': null,
+                      'numeric_game_changer_cap_applies': false,
+                      'intent_profile': {
+                        'minimum_turns_played': 4,
+                        'intent':
+                            'Construção rápida, consistente e letal, sem exigir o metagame cEDH.',
+                        'competitive_lane': false,
+                      },
+                    },
+                    displayRemovals: const [
+                      {'name': 'Mind Stone'},
+                    ],
+                    displayAdditions: const [
+                      {'name': 'Arcane Signet'},
+                    ],
+                  ),
+                  child: const Text('preview-bracket-policy'),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('preview-bracket-policy'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('optimization-preview-bracket-policy')),
+        findsOneWidget,
+      );
+      expect(find.text('Bracket 4 • Optimized'), findsOneWidget);
+      expect(find.text('Janela: turno 4+'), findsOneWidget);
+      expect(find.text('Game Changers: 4 • sem limite'), findsOneWidget);
+      expect(find.text('Otimizado não-cEDH'), findsOneWidget);
+      expect(find.textContaining('Game Changers: 4 de 99'), findsNothing);
+      expect(find.textContaining('Metagame cEDH'), findsNothing);
+      expect(find.textContaining('não possui limite numérico'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'optimization preview keeps land summary compact on narrow modals',
     (tester) async {
       tester.view.physicalSize = const Size(360, 900);

@@ -14,7 +14,8 @@
   },
   "gate": {
     "command": "../scripts/manaloom_ui_live_evidence_gate.sh --check",
-    "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_DEVICE_ID> ../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+    "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> MANALOOM_UI_ANDROID_RUNTIME_KIND=auto ../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+    "p0_capture_command": "../scripts/manaloom_p0_runtime_capture.sh --profile <PROFILE> --ready-manifest <READY_JSON> --runtime-log <LOG> [--device <ANDROID_RUNTIME_ID>]",
     "p0_index_command": "MANALOOM_P0_*_DIR=<REPO_CAPTURE_DIR> MANALOOM_P0_*_LOG=<RUNTIME_LOG> ../scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
     "current_review": "../docs/qa/ui-live/latest.json",
     "reviewer_must_open_every_screenshot": true,
@@ -84,7 +85,16 @@
         "web_mobile_390x844": 54,
         "web_desktop_1440x900": 53,
         "web_wide_1920x1080": 53,
-        "android_physical_sm_a135m": 54
+        "android_emulator_manaloom_api34": 54
+      },
+      "android_runtime_contract": {
+        "accepted_targets": [
+          "android_emulator",
+          "android_physical"
+        ],
+        "must_be_attested_from_adb": true,
+        "emulator_must_not_be_reported_as_physical": true,
+        "current_profile": "android_emulator_manaloom_api34"
       },
       "required_checkpoints": [
         "splash_boot",
@@ -146,6 +156,8 @@
   ],
   "release_accessibility": {
     "android_talkback": "pending_physical_human_review",
+    "android_hardware_smoke": "pending_physical_device",
+    "emulator_runtime_is_valid_for_current_scope": true,
     "agent_visual_review_does_not_replace_screen_reader": true,
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }

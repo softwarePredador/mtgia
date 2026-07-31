@@ -50,6 +50,8 @@ SOURCE_ROOTS=(
   "app/test/ui/fixtures/ui_live_evidence_policy.json"
   "server/config/premium_visual_qa_surfaces.json"
   "scripts/manaloom_authenticated_visual_qa_isolated.sh"
+  "scripts/lib/manaloom_ui_runtime_contract.sh"
+  "scripts/manaloom_p0_runtime_capture.sh"
   "scripts/manaloom_server_contract_e2e_isolated.sh"
   "scripts/manaloom_ui_live_evidence_gate.sh"
   "scripts/manaloom_ui_source_digest.sh"

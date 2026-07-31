@@ -84,13 +84,27 @@ void main() {
       await captureVisualProof(binding, tester, 'life_counter_01_lotus_table');
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
-      await state.debugHandleShellMessage(
-        '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":1}',
-      );
+      await state.debugRunJavaScript('''
+(() => {
+  document.querySelector('.menu-button')?.click();
+})()
+''');
+      await tester.pump(const Duration(milliseconds: 500));
+      await captureVisualProof(binding, tester, 'life_counter_01b_table_menu');
+      await state.debugRunJavaScript('''
+(() => {
+  document.querySelector('.manaloom-player-tools-btn')?.click();
+})()
+''');
       await tester.pumpAndSettle();
 
       expect(find.text('Estado do jogador'), findsOneWidget);
       await captureVisualProof(binding, tester, 'life_counter_02_player_state');
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-target-1')),
+      );
+      await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(
         find.byKey(

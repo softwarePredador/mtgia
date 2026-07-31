@@ -51,7 +51,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     final res = await pool.runTx((session) async {
       final deckResult = await session.execute(
         Sql.named(
-          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1',
+          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1 FOR UPDATE',
         ),
         parameters: {'deckId': deckId, 'userId': userId},
       );
@@ -92,11 +92,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           'name': r[1] as String,
           'type_line': r[2] as String? ?? '',
           'oracle_text': r[3] as String?,
-          'colors': (r[4] as List?)?.map((e) => e.toString()).toList() ??
+          'colors':
+              (r[4] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[],
           'color_identity':
               (r[5] as List?)?.map((e) => e.toString()).toList() ??
-                  const <String>[],
+              const <String>[],
         };
         if (id == oldCardId) oldInfo = m;
         if (id == newCardId) newInfo = m;
@@ -110,7 +111,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final newName = (newInfo['name'] as String).trim();
       if (oldName.toLowerCase() != newName.toLowerCase()) {
         throw DeckRulesException(
-            'Só é permitido trocar edição da mesma carta.');
+          'Só é permitido trocar edição da mesma carta.',
+        );
       }
 
       final newExisting = await session.execute(
@@ -159,11 +161,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         });
       }
 
-      await DeckRulesService(session).validateAndThrow(
-        format: format,
-        cards: next,
-        strict: false,
-      );
+      await DeckRulesService(
+        session,
+      ).validateAndThrow(format: format, cards: next, strict: false);
 
       // Aplica a troca
       if (newExisting.isNotEmpty) {
@@ -198,7 +198,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           parameters: {
             'deckId': deckId,
             'oldId': oldCardId,
-            'newId': newCardId
+            'newId': newCardId,
           },
         );
       }

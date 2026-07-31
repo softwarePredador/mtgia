@@ -13,6 +13,7 @@ void main() {
       commander: 'Lorehold, the Historian',
       prompt: 'Artefatos e mágicas históricas',
       deckName: 'Lorehold Draft',
+      bracket: 4,
       activeJobId: 'job-1',
       requestKey: 'generate:request-1',
       preferCollection: true,
@@ -28,6 +29,7 @@ void main() {
     final restored = await store.loadGenerate('user-a');
     expect(restored?['active_job_id'], 'job-1');
     expect(restored?['request_key'], 'generate:request-1');
+    expect(restored?['bracket'], '4');
     expect(restored?['prefer_collection'], 'true');
     expect(restored?['collection_only'], 'true');
     expect(restored?['budget_limit_brl'], '250');

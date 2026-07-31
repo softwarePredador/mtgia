@@ -266,7 +266,45 @@ void main() {
 
     expect(find.text('Modern'), findsOneWidget);
     expect(find.text('Commander'), findsNothing);
+    expect(find.byKey(const Key('deck-generate-bracket-field')), findsNothing);
   });
+
+  testWidgets(
+    'DeckGenerateScreen mostra Bracket 2 por padrão só em Commander',
+    (tester) async {
+      await tester.pumpWidget(wrapSimple(const DeckGenerateScreen()));
+      await tester.pump();
+
+      final bracketField = find.byKey(const Key('deck-generate-bracket-field'));
+      expect(bracketField, findsOneWidget);
+      expect(
+        tester
+            .widget<DropdownButtonFormField<int>>(
+              find.descendant(
+                of: bracketField,
+                matching: find.byType(DropdownButtonFormField<int>),
+              ),
+            )
+            .initialValue,
+        2,
+      );
+      expect(find.textContaining('Core: plano direto'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('deck-generate-format-field')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Brawl').last);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-generate-bracket-field')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('deck-generate-commander-field')),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('DeckGenerateScreen mantém CTA e conteúdo fluidos em 390px', (
     tester,
@@ -288,8 +326,12 @@ void main() {
     final ctaSize = tester.getSize(
       find.byKey(const Key('deck-generate-submit-cta-frame')),
     );
+    final bracketSize = tester.getSize(
+      find.byKey(const Key('deck-generate-bracket-field')),
+    );
     expect(frameSize.width, closeTo(358, 0.1));
     expect(ctaSize.width, closeTo(frameSize.width, 0.1));
+    expect(bracketSize.width, closeTo(frameSize.width, 0.1));
   });
 
   testWidgets('DeckGenerateScreen usa dois panes limitados em 1280px', (
@@ -442,6 +484,18 @@ void main() {
       expect(find.text('Score: 136.5'), findsOneWidget);
       expect(find.text('Legalidade: commander_legal'), findsOneWidget);
       expect(find.text('Confiança: high'), findsOneWidget);
+      final bracketField = find.byKey(const Key('deck-generate-bracket-field'));
+      expect(
+        tester
+            .widget<DropdownButtonFormField<int>>(
+              find.descendant(
+                of: bracketField,
+                matching: find.byType(DropdownButtonFormField<int>),
+              ),
+            )
+            .initialValue,
+        3,
+      );
     },
   );
 
@@ -544,6 +598,40 @@ void main() {
       find.byKey(const Key('deck-generate-commander-field')),
       findsNothing,
     );
+  });
+
+  testWidgets('DeckGenerateScreen restores the saved Commander bracket', (
+    tester,
+  ) async {
+    const owner = 'draft-owner-generate-bracket';
+    await DeckEntryDraftStore().saveGenerate(
+      owner,
+      format: 'Commander',
+      commander: 'Lorehold, the Historian',
+      prompt: 'Mágicas históricas',
+      deckName: '',
+      bracket: 4,
+    );
+
+    await tester.pumpWidget(
+      wrapSimple(const DeckGenerateScreen(draftOwnerId: owner)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    final bracketField = find.byKey(const Key('deck-generate-bracket-field'));
+    expect(
+      tester
+          .widget<DropdownButtonFormField<int>>(
+            find.descendant(
+              of: bracketField,
+              matching: find.byType(DropdownButtonFormField<int>),
+            ),
+          )
+          .initialValue,
+      4,
+    );
+    expect(find.textContaining('Optimized: alta eficiência'), findsOneWidget);
   });
 
   testWidgets('DeckGenerateScreen resumes and can cancel a persisted job', (

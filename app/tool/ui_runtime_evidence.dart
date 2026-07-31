@@ -120,6 +120,13 @@ UiRuntimeExtractionResult extractUiRuntimeEvidence({
       '$expectedSourceDigest.',
     );
   }
+  final target = _requiredText(context, 'target');
+  final deviceContract = _requiredText(context, 'device_contract');
+  if (!_runtimeTargetContractIsCoherent(target, deviceContract)) {
+    throw UiRuntimeEvidenceException(
+      'Runtime target $target contradicts its device contract.',
+    );
+  }
 
   final requiredCheckpoints = _stringList(
     context['required_checkpoints'],
@@ -181,8 +188,8 @@ UiRuntimeExtractionResult extractUiRuntimeEvidence({
     'surface': _requiredText(context, 'surface'),
     'profile': _requiredText(context, 'profile'),
     'runtime': _requiredText(context, 'runtime'),
-    'target': _requiredText(context, 'target'),
-    'device_contract': _requiredText(context, 'device_contract'),
+    'target': target,
+    'device_contract': deviceContract,
     'runtime_console': const <String, Object>{
       'status': 'pass',
       'forbidden_entries': 0,
@@ -250,6 +257,48 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
   final logBytes = runtimeLog.readAsBytesSync();
   final log = utf8.decode(logBytes, allowMalformed: false);
   _expectCleanRuntimeLog(log);
+  final context = _parseRuntimeContextMarker(log);
+  if (context['schema_version'] != 'manaloom_ui_runtime_context_v1') {
+    throw const UiRuntimeEvidenceException(
+      'Unsupported or missing VISUAL_PROOF_CONTEXT schema.',
+    );
+  }
+  if (context['source_digest'] != expectedSourceDigest) {
+    throw UiRuntimeEvidenceException(
+      'Runtime source digest ${context['source_digest']} does not match '
+      '$expectedSourceDigest.',
+    );
+  }
+  final expectedContext = <String, String>{
+    'surface': surface,
+    'profile': profile,
+    'runtime': runtime,
+    'target': target,
+    'device_contract': deviceContract,
+  };
+  for (final entry in expectedContext.entries) {
+    if (_requiredText(context, entry.key) != entry.value) {
+      throw UiRuntimeEvidenceException(
+        'Runtime context ${entry.key} does not match the indexed '
+        '${entry.key}.',
+      );
+    }
+  }
+  if (!_runtimeTargetContractIsCoherent(target, deviceContract)) {
+    throw UiRuntimeEvidenceException(
+      'Runtime target $target contradicts its device contract.',
+    );
+  }
+  final requiredCheckpoints = _stringList(
+    context['required_checkpoints'],
+    'required_checkpoints',
+  );
+  if (requiredCheckpoints.isEmpty ||
+      requiredCheckpoints.toSet().length != requiredCheckpoints.length) {
+    throw const UiRuntimeEvidenceException(
+      'Runtime context must declare unique required checkpoints.',
+    );
+  }
 
   final pngFiles =
       screenshotDirectory
@@ -261,6 +310,20 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
   if (pngFiles.isEmpty) {
     throw const UiRuntimeEvidenceException(
       'Indexed runtime directory contains no PNG screenshots.',
+    );
+  }
+  final indexedCheckpoints = pngFiles
+      .map(
+        (file) => file.uri.pathSegments.last.replaceFirst(
+          RegExp(r'\.png$', caseSensitive: false),
+          '',
+        ),
+      )
+      .toSet();
+  if (!_sameSet(indexedCheckpoints, requiredCheckpoints.toSet())) {
+    throw UiRuntimeEvidenceException(
+      'Indexed checkpoints ${indexedCheckpoints.toList()..sort()} do not '
+      'match runtime checkpoints ${requiredCheckpoints.toList()..sort()}.',
     );
   }
 
@@ -305,9 +368,7 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
     },
     'log_sha256': sha256.convert(logBytes).toString(),
     'checkpoint_count': screenshotEntries.length,
-    'required_checkpoints': screenshotEntries
-        .map((entry) => entry['checkpoint'])
-        .toList(growable: false),
+    'required_checkpoints': requiredCheckpoints,
     'screenshots': screenshotEntries,
   };
   final manifestFile = File('$repoPath/$relativeManifest');
@@ -383,6 +444,9 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
   final captureHashes = <String>{};
   final captureProfiles = <String>{};
   final captureSurfaces = <String>{};
+  final captureTargets = <String>{};
+  final captureCountsByProfile = <String, int>{};
+  final captureTargetsByProfile = <String, String>{};
   var screenshotCount = 0;
   final hasMultipleCaptures = captureReferences.length > 1;
   for (final captureReference in captureReferences) {
@@ -416,6 +480,10 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
       );
 
       expect(
+        capture['schema_version'] == 'manaloom_ui_runtime_capture_v1',
+        'unsupported runtime capture schema',
+      );
+      expect(
         capture['status'] == 'PASS_RUNTIME',
         'capture status is not PASS_RUNTIME',
       );
@@ -425,8 +493,15 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
       );
       expect(
         capture['target'] == 'android_physical' ||
+            capture['target'] == 'android_emulator' ||
             capture['target'] == 'web_real_build',
-        'capture target is not a real Android or Web runtime',
+        'capture target is not an attested Android or real Web runtime',
+      );
+      final target = capture['target']?.toString() ?? '';
+      final deviceContract = capture['device_contract']?.toString() ?? '';
+      expect(
+        _runtimeTargetContractIsCoherent(target, deviceContract),
+        'capture target contradicts its device contract',
       );
       final runtimeConsole = _objectOrEmpty(capture['runtime_console']);
       expect(
@@ -441,8 +516,11 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
       expect(surface.trim().isNotEmpty, 'capture surface is missing');
       captureProfiles.add(profile);
       captureSurfaces.add(surface);
+      captureTargets.add(target);
       final screenshotEntries = _objectListOrEmpty(capture['screenshots']);
       expect(screenshotEntries.isNotEmpty, 'capture contains no screenshots');
+      captureCountsByProfile[profile] = screenshotEntries.length;
+      captureTargetsByProfile[profile] = target;
       screenshotCount += screenshotEntries.length;
       for (final screenshot in screenshotEntries) {
         final checkpoint = screenshot['checkpoint']?.toString() ?? '';
@@ -483,6 +561,21 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
     } on UiRuntimeEvidenceException catch (error) {
       findings.add(error.message);
     }
+  }
+
+  final evidencePolicyFile = File(
+    '${repoRoot.absolute.path}/'
+    'app/test/ui/fixtures/ui_live_evidence_policy.json',
+  );
+  if (evidencePolicyFile.existsSync()) {
+    _validateUiLiveEvidencePolicy(
+      policyFile: evidencePolicyFile,
+      review: review,
+      captureCountsByProfile: captureCountsByProfile,
+      captureTargetsByProfile: captureTargetsByProfile,
+      captureTargets: captureTargets,
+      expect: expect,
+    );
   }
 
   final visual = _objectOrEmpty(review['visual_review']);
@@ -586,11 +679,138 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
   );
 }
 
+void _validateUiLiveEvidencePolicy({
+  required File policyFile,
+  required Map<String, dynamic> review,
+  required Map<String, int> captureCountsByProfile,
+  required Map<String, String> captureTargetsByProfile,
+  required Set<String> captureTargets,
+  required void Function(bool condition, String message) expect,
+}) {
+  final policy = _readJsonObject(policyFile, 'live UI evidence policy');
+  expect(
+    policy['schema_version'] == 'manaloom_ui_live_evidence_policy_v1',
+    'unsupported live UI evidence policy schema',
+  );
+  final surfaces = _objectListOrEmpty(policy['surfaces']);
+  final p0Surface = surfaces.cast<Map<String, dynamic>?>().firstWhere(
+    (surface) => surface?['id'] == 'authenticated_p0_matrix',
+    orElse: () => null,
+  );
+  expect(
+    p0Surface != null,
+    'live UI evidence policy has no authenticated P0 surface',
+  );
+  if (p0Surface != null) {
+    final requiredProfiles = _objectOrEmpty(p0Surface['required_profiles']);
+    for (final entry in requiredProfiles.entries) {
+      final requiredCount = switch (entry.value) {
+        int count => count,
+        num count => count.toInt(),
+        String value => int.tryParse(value.trim()),
+        _ => null,
+      };
+      expect(
+        requiredCount != null && requiredCount > 0,
+        'policy profile ${entry.key} has an invalid checkpoint count',
+      );
+      expect(
+        captureCountsByProfile[entry.key] == requiredCount,
+        'runtime profile ${entry.key} must contain exactly '
+        '$requiredCount screenshots',
+      );
+    }
+
+    final androidContract = _objectOrEmpty(
+      p0Surface['android_runtime_contract'],
+    );
+    final currentAndroidProfile =
+        androidContract['current_profile']?.toString().trim() ?? '';
+    if (currentAndroidProfile.isNotEmpty) {
+      final acceptedTargets = _stringListOrEmpty(
+        androidContract['accepted_targets'],
+      ).toSet();
+      final observedTarget = captureTargetsByProfile[currentAndroidProfile];
+      expect(
+        observedTarget != null,
+        'current Android runtime profile is missing',
+      );
+      expect(
+        observedTarget != null && acceptedTargets.contains(observedTarget),
+        'current Android runtime profile target is not accepted by policy',
+      );
+      if (androidContract['emulator_must_not_be_reported_as_physical'] ==
+          true) {
+        expect(
+          !currentAndroidProfile.toLowerCase().contains('emulator') ||
+              observedTarget == 'android_emulator',
+          'emulator profile is not attested as android_emulator',
+        );
+      }
+    }
+  }
+
+  final releaseChecks = _objectOrEmpty(review['release_checks']);
+  final claimsPhysicalPass = releaseChecks.entries.any(
+    (entry) =>
+        entry.key.toLowerCase().contains('android_physical') &&
+        entry.value.toString().toLowerCase().startsWith('pass'),
+  );
+  expect(
+    !claimsPhysicalPass || captureTargets.contains('android_physical'),
+    'release checks claim Android physical evidence without a physical capture',
+  );
+}
+
 class _ParsedRuntimeLog {
   const _ParsedRuntimeLog({required this.context, required this.screenshots});
 
   final Map<String, dynamic> context;
   final Map<String, Uint8List> screenshots;
+}
+
+Map<String, dynamic> _parseRuntimeContextMarker(String log) {
+  Map<String, dynamic>? context;
+  for (final rawLine in const LineSplitter().convert(log)) {
+    final contextOffset = rawLine.indexOf('VISUAL_PROOF_CONTEXT ');
+    if (contextOffset < 0) continue;
+    if (context != null) {
+      throw const UiRuntimeEvidenceException(
+        'Runtime log contains more than one VISUAL_PROOF_CONTEXT.',
+      );
+    }
+    final payload = rawLine.substring(
+      contextOffset + 'VISUAL_PROOF_CONTEXT '.length,
+    );
+    final decoded = jsonDecode(payload);
+    if (decoded is! Map) {
+      throw const UiRuntimeEvidenceException(
+        'VISUAL_PROOF_CONTEXT is not a JSON object.',
+      );
+    }
+    context = decoded.map((key, value) => MapEntry(key.toString(), value));
+  }
+  if (context == null) {
+    throw const UiRuntimeEvidenceException(
+      'Runtime log has no VISUAL_PROOF_CONTEXT.',
+    );
+  }
+  return context;
+}
+
+bool _runtimeTargetContractIsCoherent(String target, String deviceContract) {
+  final normalized = deviceContract.toLowerCase();
+  return switch (target) {
+    'android_emulator' =>
+      normalized.contains('emulator') && !normalized.contains('physical'),
+    'android_physical' =>
+      normalized.contains('physical') && !normalized.contains('emulator'),
+    'web_real_build' =>
+      normalized.contains('web') ||
+          normalized.contains('chrome') ||
+          normalized.contains('browser'),
+    _ => false,
+  };
 }
 
 _ParsedRuntimeLog _parseRuntimeLog(String log) {

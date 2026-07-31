@@ -971,6 +971,89 @@ void main() {
       expect(result.droppedReasons.single, contains('papel wipe ->'));
     });
 
+    test('allows a non-critical filler to repair the Commander wipe floor', () {
+      final originalDeck = [
+        _card(
+          name: 'Plains',
+          typeLine: 'Basic Land — Plains',
+          manaCost: '',
+          cmc: 0,
+          oracleText: '{T}: Add {W}.',
+          quantity: 36,
+        ),
+        _card(
+          name: 'Low-impact Filler',
+          typeLine: 'Enchantment',
+          manaCost: '{1}',
+          cmc: 1,
+          oracleText: 'At the beginning of your upkeep, scry 1.',
+          quantity: 64,
+        ),
+      ];
+      final decree = _card(
+        name: 'Decree of Pain',
+        typeLine: 'Sorcery',
+        manaCost: '{6}{B}{B}',
+        cmc: 8,
+        oracleText:
+            "Destroy all creatures. They can't be regenerated. Draw a card for each creature destroyed this way.",
+      );
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Low-impact Filler'],
+        additions: const ['Decree of Pain'],
+        originalDeck: originalDeck,
+        additionsData: [decree],
+        archetype: 'midrange',
+        deckFormat: 'commander',
+      );
+
+      expect(result.droppedReasons, isEmpty);
+      expect(result.removals, const ['Low-impact Filler']);
+      expect(result.additions, const ['Decree of Pain']);
+    });
+
+    test('does not sacrifice critical ramp to repair the wipe floor', () {
+      final originalDeck = [
+        _card(
+          name: 'Plains',
+          typeLine: 'Basic Land — Plains',
+          manaCost: '',
+          cmc: 0,
+          oracleText: '{T}: Add {W}.',
+          quantity: 36,
+        ),
+        _card(
+          name: 'Arcane Signet',
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText: '{T}: Add one mana of any color.',
+          quantity: 64,
+        ),
+      ];
+      final decree = _card(
+        name: 'Decree of Pain',
+        typeLine: 'Sorcery',
+        manaCost: '{6}{B}{B}',
+        cmc: 8,
+        oracleText: 'Destroy all creatures.',
+      );
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Arcane Signet'],
+        additions: const ['Decree of Pain'],
+        originalDeck: originalDeck,
+        additionsData: [decree],
+        archetype: 'midrange',
+        deckFormat: 'commander',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons, hasLength(1));
+    });
+
     test('drops temporary ritual swaps and non-structural land swaps in aggro', () {
       final originalDeck = [
         _card(

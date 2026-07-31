@@ -1,4 +1,5 @@
 import '../basic_land_utils.dart' as basic_lands;
+import '../edh_bracket_policy.dart';
 import 'optimize_filler_loader_support.dart';
 import 'optimize_functional_role_support.dart';
 import 'optimization_ramp_profile.dart';
@@ -11,6 +12,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required bool keepTheme,
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
+  int? bracket,
   int swapLimit = 6,
 }) {
   final effectiveSwapLimit = swapLimit.clamp(1, 60).toInt();
@@ -43,6 +45,57 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
 
     final currentRoleCounts = <String, int>{};
     final roleTargets = buildRoleTargetProfile(targetArchetype);
+    final bracketViolationRemovalNames = <String>{};
+    if (bracket != null) {
+      final assessment = assessDeckAgainstBracketPolicy(
+        bracket: bracket,
+        cards: allCardData,
+      );
+      final gameChangerCount =
+          assessment.counts[BracketCategory.gameChanger] ?? 0;
+      final gameChangerCap =
+          assessment.policy.maxCounts[BracketCategory.gameChanger] ?? 0;
+      final excess = (gameChangerCount - gameChangerCap).clamp(0, 99);
+      if (excess > 0) {
+        final removableGameChangers =
+            allCardData.where((card) {
+              final name = card['name']?.toString().trim() ?? '';
+              if (name.isEmpty || commanderLower.contains(name.toLowerCase())) {
+                return false;
+              }
+              return tagCardForBracket(
+                name: name,
+                typeLine: card['type_line']?.toString() ?? '',
+                oracleText: card['oracle_text']?.toString() ?? '',
+              ).categories.contains(BracketCategory.gameChanger);
+            }).toList();
+        removableGameChangers.sort((a, b) {
+          int preservationPenalty(Map<String, dynamic> card) {
+            final lower = card['name']?.toString().trim().toLowerCase() ?? '';
+            return (coreLower.contains(lower) ? 2 : 0) +
+                (preferredNames.contains(lower) ? 1 : 0);
+          }
+
+          final byPreservation = preservationPenalty(
+            a,
+          ).compareTo(preservationPenalty(b));
+          if (byPreservation != 0) return byPreservation;
+          final cmcA = (a['cmc'] as num?)?.toDouble() ?? 0;
+          final cmcB = (b['cmc'] as num?)?.toDouble() ?? 0;
+          final byCmc = cmcB.compareTo(cmcA);
+          if (byCmc != 0) return byCmc;
+          return (a['name']?.toString() ?? '').compareTo(
+            b['name']?.toString() ?? '',
+          );
+        });
+        bracketViolationRemovalNames.addAll(
+          removableGameChangers
+              .take(excess)
+              .map((card) => card['name']?.toString().toLowerCase() ?? '')
+              .where((name) => name.isNotEmpty),
+        );
+      }
+    }
     final structuralRecoveryScenario = isOptimizeStructuralRecoveryScenario(
       allCardData: allCardData,
       commanderColorIdentity: commanderColorIdentity,
@@ -79,13 +132,33 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       if (commanderLower.contains(lower)) continue;
 
       final isCore = keepTheme && coreLower.contains(lower);
-      if (isCore && !allowCoreTradeoffs) continue;
+      final resolvesBracketViolation = bracketViolationRemovalNames.contains(
+        lower,
+      );
+      if (isCore && !allowCoreTradeoffs && !resolvesBracketViolation) {
+        continue;
+      }
 
       final typeLine = (card['type_line'] as String?) ?? '';
       final isLand = basic_lands.isLandTypeLine(typeLine);
       if (isLand) continue;
 
       final role = inferFunctionalRoleForCard(card);
+      if (resolvesBracketViolation) {
+        final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+        removalCandidates.add({
+          'name': name,
+          'role': role,
+          'cmc': cmc,
+          'score': 1000000 + (cmc * 10).round(),
+          'type_line': typeLine,
+          'oracle_text': (card['oracle_text'] as String?) ?? '',
+          'bracket_violation': true,
+          'bracket': bracket,
+          ...anchorMetadata(lower, role),
+        });
+        continue;
+      }
       if (role == 'ramp' &&
           !optimizationRampProfileForCard(card).countsTowardGenericFloor) {
         continue;
@@ -247,12 +320,16 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       return ((a['name'] as String)).compareTo(b['name'] as String);
     });
 
-    final takeLimit =
+    final structuralTakeLimit =
         structuralRecoveryScenario
             ? (structuralRecoverySwapTarget < effectiveSwapLimit
                 ? structuralRecoverySwapTarget
                 : effectiveSwapLimit)
             : effectiveSwapLimit;
+    final takeLimit =
+        bracketViolationRemovalNames.length > structuralTakeLimit
+            ? bracketViolationRemovalNames.length.clamp(1, effectiveSwapLimit)
+            : structuralTakeLimit;
     return removalCandidates
         .where((candidate) => (candidate['score'] as int) > 0)
         .take(takeLimit)
@@ -301,9 +378,17 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
             targetArchetype: targetArchetype,
           )
           : effectiveSwapLimit;
-  final takeCount =
+  final bracketRepairCount =
+      merged
+          .where((candidate) => candidate['bracket_violation'] == true)
+          .length;
+  final baseTakeCount =
       structuralTakeCount < effectiveSwapLimit
           ? structuralTakeCount
           : effectiveSwapLimit;
+  final takeCount =
+      bracketRepairCount > baseTakeCount
+          ? bracketRepairCount.clamp(1, effectiveSwapLimit)
+          : baseTakeCount;
   return merged.take(takeCount).toList();
 }

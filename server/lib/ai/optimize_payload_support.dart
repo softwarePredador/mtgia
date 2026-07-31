@@ -313,6 +313,7 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
               if (candidate['add_role'] != null)
                 'add_role': candidate['add_role'],
               'same_lane': candidate['same_lane'] == true,
+              if (candidate['bracket_repair'] == true) 'bracket_repair': true,
               if (candidate['same_lane_hypothesis'] != null)
                 'same_lane_hypothesis': candidate['same_lane_hypothesis'],
               'priority': intensity?.selected == 'light' ? 'Medium' : 'High',

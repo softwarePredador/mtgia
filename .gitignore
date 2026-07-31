@@ -81,6 +81,9 @@ server/test/artifacts/*
 server/test/artifacts/*.pid
 server/test/artifacts/*.port
 
+# Local XMage/H2 runtime database created by sidecar test executions
+/db/
+
 # Legacy root-level Commander resolution reports (generated test output)
 /RELATORIO_RESOLUCAO_SUITE_COMMANDER_*.md
 

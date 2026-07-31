@@ -45,6 +45,12 @@ const _nativeDeckDetailCapture = bool.fromEnvironment(
 const _interactiveBattleEnabled = bool.fromEnvironment(
   'ENABLE_INTERACTIVE_BATTLE',
 );
+const _uiSourceDigest = String.fromEnvironment('MANALOOM_UI_SOURCE_DIGEST');
+const _uiProofProfile = String.fromEnvironment('MANALOOM_UI_PROOF_PROFILE');
+const _uiProofTarget = String.fromEnvironment('MANALOOM_UI_PROOF_TARGET');
+const _uiProofDeviceContract = String.fromEnvironment(
+  'MANALOOM_UI_PROOF_DEVICE_CONTRACT',
+);
 const _auditWidth = int.fromEnvironment(
   'MANALOOM_VISUAL_WIDTH',
   defaultValue: 390,
@@ -73,6 +79,63 @@ const _supportedIsolatedCheckpoints = <String>{
   'card_search_empty',
   'card_search_results',
 };
+
+List<String> get _p0ProofCheckpoints => <String>[
+  'battle_coach_welcome',
+  'battle_live_disabled',
+  'battle_replays_empty',
+  'card_detail_error',
+  'card_detail_success',
+  'card_search_empty',
+  'card_search_results',
+  'chat_unavailable',
+  'checkout_success',
+  'collection_empty',
+  'community_deck_success',
+  'community_public_decks',
+  'community_tab_1',
+  'community_tab_2',
+  'community_tab_3',
+  'deck_create_modal',
+  'deck_detail_below_fold',
+  'deck_detail_top',
+  'deck_generate_empty',
+  'deck_import_detected',
+  'decks_empty',
+  'decks_seeded',
+  'forgot_password_empty',
+  if (_auditWidth < 900) 'home_quick_actions_scrolled',
+  'home_top',
+  'latest_set',
+  'legal_privacy',
+  'legal_success',
+  'legal_terms',
+  'life_counter_initial',
+  'login_empty',
+  'messages_inbox',
+  'notifications',
+  'onboarding_core_flow',
+  'plans_success',
+  'post_game_empty',
+  'profile_success',
+  'register_consent_accepted',
+  'register_consent_error',
+  'register_consent_unchecked',
+  'register_empty',
+  'reset_password_invalid_link',
+  'set_detail_tst',
+  'sets_catalog',
+  'sets_catalog_route',
+  'splash_boot',
+  'trade_create',
+  'trade_detail_unavailable',
+  'trades_inbox',
+  'upgrade_success',
+  'user_profile_success',
+  'user_search_empty',
+  'user_search_results',
+  'verify_email_signed_out',
+];
 
 bool get _capturesBoot =>
     _auditSegment == 'all' || _auditSegment == 'auth_home';
@@ -191,6 +254,26 @@ void main() {
           'The P0 live matrix must compile the gated Battle Coach route so '
           'its welcome state and real Web focus can be audited.',
     );
+    if (_auditSegment == 'all') {
+      expect(
+        _uiSourceDigest,
+        matches(RegExp(r'^[0-9a-f]{64}$')),
+        reason: 'The full P0 proof must be bound to the current UI digest.',
+      );
+      expect(_uiProofProfile, isNotEmpty);
+      expect(const {
+        'android_emulator',
+        'android_physical',
+        'web_real_build',
+      }, contains(_uiProofTarget));
+      expect(_uiProofDeviceContract, isNotEmpty);
+      // Consumed by tool/ui_runtime_evidence.dart before existing PNGs can be
+      // indexed into a current manifest.
+      // ignore: avoid_print
+      print(
+        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'authenticated_p0_matrix', 'source_digest': _uiSourceDigest, 'profile': _uiProofProfile, 'runtime': 'flutter_drive', 'target': _uiProofTarget, 'device_contract': _uiProofDeviceContract, 'required_checkpoints': _p0ProofCheckpoints})}',
+      );
+    }
     expect(
       _auditCheckpoint.isEmpty ||
           (_auditSegment == 'deck_detail' &&
@@ -488,6 +571,10 @@ void main() {
         tester.element(find.byKey(const Key('deck-create-dialog'))),
       ).pop();
       await tester.pumpAndSettle();
+      await pumpUntilAbsent(
+        tester,
+        find.byKey(const Key('deck-create-dialog')),
+      );
     }
 
     if (_auditSegment == 'deck_list') return;
@@ -901,10 +988,14 @@ Future<void> _captureDeckDetailRuntimeCheckpoint(
   String name,
 ) async {
   if (!kIsWeb && _nativeDeckDetailCapture) {
-    // The Samsung physical-device renderer can keep the complex deck-detail
-    // frame responsive while Flutter's surface conversion never completes.
+    // Flutter's screenshot API replaces Android's live rendering surface with
+    // an ImageView. Restore the live surface before every host-side screencap;
+    // otherwise a later route can be recorded with the previous checkpoint's
+    // pixels even while the widget tree is already correct.
+    await restoreVisualCaptureSurface();
+    await tester.pump(const Duration(milliseconds: 500));
     // Announce a bounded host-side adb screencap window so the proof uses the
-    // real device framebuffer instead of timing out or accepting no image.
+    // actual Android framebuffer instead of timing out or accepting no image.
     // ignore: avoid_print
     print('NATIVE_SCREENSHOT_READY $name');
     await Future<void>.delayed(const Duration(seconds: 8));

@@ -2,13 +2,13 @@
 
 **Data:** 2026-07-29
 **Branch:** `codex/free-beta-release-candidate-2026-07-17`
-**Digest visual:** `91f4d5af5d61a1e7b9c244f6656ab2d3cf95e9ff23072f202ad040e343c60b34`
-**Dispositivo:** Samsung SM-A135M físico, Android 14, 1080×2408, portrait-up
+**Digest visual:** `718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15`
+**Runtime:** emulador Android 14, 1080×2400, portrait-up
 **Decisão deste escopo:** `PASS_AUTOMATED` + `PASS_RUNTIME` + `PASS_VISUAL_REVIEWED`
 
 ## Escopo comprovado
 
-O fluxo físico corrente cobre três jornadas do produto:
+O fluxo corrente no emulador cobre três jornadas do produto:
 
 1. **Coleção:** abrir o editor de Sol Ring, escolher uma impressão, alternar
    lista/quantidade/condição/idioma/venda, impedir preço inválido dentro do
@@ -23,7 +23,8 @@ O fluxo físico corrente cobre três jornadas do produto:
 
 Os providers de persistência usados nesta prova são controlados e
 determinísticos. Portanto, esta rodada comprova a UI Flutter e suas transições
-no aparelho físico; ela não é apresentada como E2E de API/PostgreSQL.
+no emulador Android; ela não é apresentada como E2E de API/PostgreSQL nem como
+prova de aparelho físico.
 
 ## Resultado automatizado
 
@@ -34,8 +35,8 @@ executou, no digest acima:
 - três testes de integração da jornada core: 3/3;
 - testes focados de Binder, DeckProvider, modal responsivo e otimização:
   90/90;
-- captura física: 12/12 checkpoints;
-- atestado fail-closed: aparelho físico, Android 14, 1080×2408 e todas as
+- captura no emulador: 12/12 checkpoints;
+- atestado fail-closed: emulador, Android 14, 1080×2400 e todas as
   imagens em portrait.
 
 ## Evidência runtime
@@ -44,24 +45,24 @@ Manifesto:
 `docs/qa/ui-live/current/core-product-android/capture-manifest.json`
 
 SHA-256 do manifesto:
-`345204c10a435adb03161982d6eb6bb8bf109bb38273b59ec091dc91f209294e`
+`606269ddceea37d2c106f99c766c50aed53d76a2928bcb6d5934b49848791ba3`
 
-Todas as capturas possuem 1080×2408:
+Todas as capturas possuem 1080×2337:
 
 | Checkpoint | Resultado visível | SHA-256 |
 | --- | --- | --- |
-| `core_01_collection_editor` | impressão, verso autoral, mercado e cadastro | `e0b64f2e1ef51d4cfd0f37d9d5032e2c1b361fb000033759561dfa5542842f3d` |
-| `core_02_collection_inline_validation` | preço inválido dentro do editor | `18bc0cfdd9d34cc1ffeeda41aa8cb890d848ffac7e974b5c8be90faafabe8c03` |
-| `core_03_collection_persistence_failure` | falha sanitizada e dados preservados | `7996c6b114366b90d990eed0743e824f0dc8b12479042f64f77332107d8d1fd5` |
-| `core_04_collection_retry_success` | Sol Ring salvo por R$ 12,50 | `29e3e4686deea011fb3b8f65df96d45ea9bbed006c993ea7ca30842a79470b1b` |
-| `core_05_deck_inline_validation` | nome obrigatório dentro do modal | `099a2f9673abcf716011b0f8e55463a9746ba30256256ef1714385b059ce169e` |
-| `core_06_deck_commander_filtered` | somente Lorehold elegível; Sol Ring ausente | `0805672fb4ef990c79dafc6344f527117ccbd3c383bbd31bc39d07350f37fd94` |
-| `core_07_deck_persistence_failure` | erro fixado no modal e formulário preservado | `26eaba9068b88ad5e7113f0a7c9b6a14dd2df8efafd713ef76592c01c195017e` |
-| `core_08_deck_retry_success` | Lorehold Lessons aparece imediatamente e como “agora” | `fec1fa3302dfa217ada5531960bd2d5138ef3665bae68f17d9e8a18e36a98c8e` |
-| `core_09_optimization_safe_mana_preview` | `Terrenos 9 → 36` e `Piso mínimo ≥ 33` | `1256790720707e8e925c20ce769315abaf56ecbb4d5760fe6b19ddc93d3c4e6c` |
-| `core_10_optimization_partial_selection` | remoção/adição parcial e recálculo explícito | `430bb0f10950794b6655afd3ccd3989daf56e99735acf75222f8b9e8543dff61` |
-| `core_11_optimization_applied` | duas mudanças e ação Desfazer | `f4f87d6270fd035bbaa750cd02127b47988d803d4d5b6bf6b0a0427ab88cdd8d` |
-| `core_12_optimization_undo` | confirmação de reversão | `ec4c9262854c67cc3e014f7d840c47ba44205644a112164ae3e69b3ec0e4fe49` |
+| `core_01_collection_editor` | impressão, verso autoral, mercado e cadastro | `3350a4b215b6a4559d67ebbc904d28b9d05e7e875f2b6ed24840804416b71fd8` |
+| `core_02_collection_inline_validation` | preço inválido dentro do editor | `306fb7af74eb80cb5604d3bcd337fb144c6696293bc70ccd59c817ac77631a9b` |
+| `core_03_collection_persistence_failure` | falha sanitizada e dados preservados | `8448833cbc39e28e633989513474fe5398d9ea4f3ccfddabd52d8ff92d3fdfff` |
+| `core_04_collection_retry_success` | Sol Ring salvo por R$ 12,50 | `3f2f3c061bf4366de8700c05baada06c314d5dc2c678290a88a1fc1c3991f9fd` |
+| `core_05_deck_inline_validation` | nome obrigatório dentro do modal | `f22a1e1fe621c129126bffa004d521be36a9ddfa80310ea3e2f7a77c7a9fa235` |
+| `core_06_deck_commander_filtered` | somente Lorehold elegível; Sol Ring ausente | `5afa43441380a0b7a41b7b1a24c9cc13a8ea849ef56b754635828cc73de3782b` |
+| `core_07_deck_persistence_failure` | erro fixado no modal e formulário preservado | `2723e764d397b26f6b8c24fb4e05e42417e6d690004e1985de8617ef330e19cd` |
+| `core_08_deck_retry_success` | Lorehold Lessons aparece imediatamente e como “agora” | `0eb35547bf7fb67900308b73bf84873a358c31a37524ccd4596185ce163bc8bb` |
+| `core_09_optimization_safe_mana_preview` | `Terrenos 9 → 36` e `Piso mínimo ≥ 33` | `7adf3bc27b3fbaa96b7e23cad02ccae69fd0251f6b37824086f4b38e57a4d116` |
+| `core_10_optimization_partial_selection` | remoção/adição parcial e recálculo explícito | `695f95c106d7584c939511a47b12d4d5b38bcaeaf8f4cf15a14325314e59d0c7` |
+| `core_11_optimization_applied` | duas mudanças e ação Desfazer | `d81b227ba67bf4ce18b2d400bc37df0ed5bed5a0e9747cb3371415022119e907` |
+| `core_12_optimization_undo` | confirmação de reversão | `b5aa1079f7bbaff9502fbd9f9aa10b1c587ad396731734bffaf26d341fff7bac` |
 
 ## Revisão visual
 
@@ -103,9 +104,8 @@ mostra o deck criado, timestamp coerente, `Terrenos 9 → 36`, `Piso mínimo` e
 - O conjunto usa clientes/providers controlados e não substitui o E2E mutante
   autenticado de cadastro, deck e otimização contra API/PostgreSQL.
 - O teclado físico Web e o TalkBack humano são gates separados.
-- O aggregate P0 Web mobile/desktop/wide + Android anterior pertence a outro
-  digest. Mudanças correntes em Home, Legal e Deck vazio exigem recaptura
-  integral, sem carry-forward, antes de `ui-proof` voltar a `PASS`.
+- O aggregate P0 Web mobile/desktop/wide + Android foi recapturado
+  integralmente no mesmo digest; nenhum screenshot anterior recebeu crédito.
 - Escritas na fixture PostgreSQL/API, mesmo exclusivamente loopback e
   descartável, permanecem bloqueadas pelo contrato até a confirmação literal
   de uma execução específica.

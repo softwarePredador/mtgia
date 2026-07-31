@@ -356,14 +356,19 @@ bool looksLikeOptimizationBoardWipeText(String oracleText) {
       oracle.contains('each creature you control'))
     return false;
   if (oracle.contains('assigns combat damage')) return false;
-  return oracle.contains('destroy all') ||
-      oracle.contains('exile all') ||
+  final massPermanentRemoval = RegExp(
+    r'\b(?:destroy|exile)\s+all\b[^.\n;]{0,96}'
+    r'\b(?:creatures?|permanents?|artifacts?|enchantments?|'
+    r'planeswalkers?|battles?|lands?|tokens?)\b(?!\s+cards?\b)',
+  ).hasMatch(oracle);
+  return massPermanentRemoval ||
       oracle.contains('return all nonland permanents') ||
       oracle.contains('return all creatures') ||
       (oracle.contains("return to their owners' hands all") &&
           (oracle.contains('creatures') ||
               oracle.contains('nonland permanents'))) ||
       oracle.contains('all creatures get -') ||
+      oracle.contains('each creature gets -') ||
       oracle.contains('all colored permanents') ||
       oracle.contains('each player sacrifices all') ||
       oracle.contains('each opponent sacrifices all') ||

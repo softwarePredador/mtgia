@@ -74,6 +74,8 @@ final class InteractiveBattleRegistry {
             TimeUnit.MINUTES.toMillis(10);
     private static final long CONCEDE_GRACE_MS =
             TimeUnit.SECONDS.toMillis(10);
+    static final long CONNECT_READY_TIMEOUT_MS =
+            TimeUnit.SECONDS.toMillis(15);
     private static final int MAX_ACTION_HISTORY = 256;
     private static final Gson GSON = new Gson();
 
@@ -324,7 +326,8 @@ final class InteractiveBattleRegistry {
             connection.setPort(port);
             connection.setProxyType(Connection.ProxyType.NONE);
             boolean accepted = session.connectStart(connection);
-            long deadline = System.currentTimeMillis() + 5_000L;
+            long deadline =
+                    System.currentTimeMillis() + CONNECT_READY_TIMEOUT_MS;
             while (accepted
                     && (!session.isConnected()
                     || !Boolean.TRUE.equals(session.isServerReady()))

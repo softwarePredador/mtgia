@@ -2,6 +2,109 @@ import '../basic_land_utils.dart' as basic_lands;
 import 'optimization_functional_roles.dart';
 import 'optimization_ramp_profile.dart';
 
+class CommanderFunctionalRoleFloorAssessment {
+  const CommanderFunctionalRoleFloorAssessment({
+    required this.archetype,
+    required this.totalCards,
+    required this.minimumCounts,
+    required this.actualCounts,
+  });
+
+  final String archetype;
+  final int totalCards;
+  final Map<String, int> minimumCounts;
+  final Map<String, int> actualCounts;
+
+  bool get applies => totalCards >= 90;
+
+  Map<String, int> get deficits => {
+    for (final entry in minimumCounts.entries)
+      if ((actualCounts[entry.key] ?? 0) < entry.value)
+        entry.key: entry.value - (actualCounts[entry.key] ?? 0),
+  };
+
+  bool get satisfied => !applies || deficits.isEmpty;
+
+  Map<String, dynamic> toJson() => {
+    'policy': 'commander_functional_role_floors_v1',
+    'archetype': archetype,
+    'applies': applies,
+    'total_cards': totalCards,
+    'minimum_counts': minimumCounts,
+    'actual_counts': actualCounts,
+    'deficits': deficits,
+    'satisfied': satisfied,
+  };
+}
+
+int minimumCommanderWipeCountForArchetype(String targetArchetype) {
+  final archetype = targetArchetype.trim().toLowerCase();
+  if (archetype.contains('control')) return 3;
+  if (archetype.contains('aggro')) return 1;
+  return 2;
+}
+
+int countOptimizationFunctionalRole(
+  Iterable<Map<String, dynamic>> cards, {
+  required String role,
+}) {
+  var count = 0;
+  for (final card in cards) {
+    if (inferFunctionalRoleForCard(card) != role) continue;
+    final quantity = switch (card['quantity']) {
+      int value => value,
+      num value => value.toInt(),
+      String value => int.tryParse(value.trim()) ?? 1,
+      _ => 1,
+    };
+    if (quantity > 0) count += quantity;
+  }
+  return count;
+}
+
+CommanderFunctionalRoleFloorAssessment assessCommanderFunctionalRoleFloors({
+  required Iterable<Map<String, dynamic>> cards,
+  required String targetArchetype,
+}) {
+  final materialized = cards.toList(growable: false);
+  final totalCards = materialized.fold<int>(0, (sum, card) {
+    final quantity = switch (card['quantity']) {
+      int value => value,
+      num value => value.toInt(),
+      String value => int.tryParse(value.trim()) ?? 1,
+      _ => 1,
+    };
+    return sum + (quantity > 0 ? quantity : 0);
+  });
+  final minimumWipes = minimumCommanderWipeCountForArchetype(targetArchetype);
+  return CommanderFunctionalRoleFloorAssessment(
+    archetype: targetArchetype.trim().toLowerCase(),
+    totalCards: totalCards,
+    minimumCounts: {'wipe': minimumWipes},
+    actualCounts: {
+      'wipe': countOptimizationFunctionalRole(materialized, role: 'wipe'),
+    },
+  );
+}
+
+List<String> buildCommanderCriticalRoleFloorNeeds({
+  required Iterable<Map<String, dynamic>> cards,
+  required String targetArchetype,
+  required int limit,
+}) {
+  if (limit <= 0) return const [];
+  final assessment = assessCommanderFunctionalRoleFloors(
+    cards: cards,
+    targetArchetype: targetArchetype,
+  );
+  final wipeDeficit = assessment.deficits['wipe'] ?? 0;
+  return List<String>.filled(
+    wipeDeficit.clamp(0, limit).toInt(),
+    'wipe',
+    growable: false,
+  );
+}
+
 String inferFunctionalRole({
   required String name,
   required String typeLine,
@@ -11,6 +114,12 @@ String inferFunctionalRole({
   String? manaCost,
   Object? cmc,
 }) {
+  // A função de reset é estrutural e pode coexistir com compra/ramp. Ela deve
+  // continuar visível mesmo quando tags persistidas parciais omitem "wipe".
+  if (looksLikeBoardWipe(oracleText)) {
+    return 'wipe';
+  }
+
   if (functionalTags != null || semanticTagsV2 != null) {
     final resolved = resolveCardFunctionalRoles(
       functionalTags: functionalTags,
@@ -96,15 +205,13 @@ String inferFunctionalRoleForCard(Map<String, dynamic> card) {
 }
 
 String _legacyOptimizeRoleForResolvedRoles(Set<String> roles) {
+  if (roles.contains('wipe') || roles.contains('board_wipe')) return 'wipe';
   if (roles.contains('ramp') || roles.contains('ritual')) return 'ramp';
   if (roles.contains('draw') ||
       roles.contains('loot') ||
       roles.contains('exile_value'))
     return 'draw';
-  if (roles.contains('removal') ||
-      roles.contains('wipe') ||
-      roles.contains('board_wipe'))
-    return 'removal';
+  if (roles.contains('removal')) return 'removal';
   if (roles.contains('interaction') ||
       roles.contains('counterspell') ||
       roles.contains('protection'))
@@ -131,13 +238,7 @@ String _legacyOptimizeRoleForResolvedRoles(Set<String> roles) {
 }
 
 bool looksLikeBoardWipe(String oracleText) {
-  final oracle = oracleText.toLowerCase();
-  return oracle.contains('destroy all') ||
-      oracle.contains('exile all') ||
-      oracle.contains('each creature') ||
-      oracle.contains('each player sacrifices') ||
-      oracle.contains('all colored permanents') ||
-      oracle.contains('all creatures get');
+  return looksLikeOptimizationBoardWipeText(oracleText);
 }
 
 bool looksLikeProtectionEffect({

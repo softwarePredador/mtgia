@@ -32,6 +32,10 @@ const _proofDeviceContract = String.fromEnvironment(
   'MANALOOM_UI_PROOF_DEVICE_CONTRACT',
   defaultValue: 'physical_android',
 );
+const _proofRuntimeTarget = String.fromEnvironment(
+  'MANALOOM_UI_PROOF_TARGET',
+  defaultValue: 'android_physical',
+);
 const _proofCheckpoints = <String>[
   'core_01_collection_editor',
   'core_02_collection_inline_validation',
@@ -453,7 +457,7 @@ void main() {
     // endpoints, dados pessoais nem payloads reais do usuário.
     // ignore: avoid_print
     print(
-      'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'core_product_runtime_ui_acceptance', 'source_digest': _sourceDigest, 'profile': _proofProfile, 'runtime': 'flutter_integration_test', 'target': 'android_physical', 'device_contract': _proofDeviceContract, 'required_checkpoints': _proofCheckpoints})}',
+      'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'core_product_runtime_ui_acceptance', 'source_digest': _sourceDigest, 'profile': _proofProfile, 'runtime': 'flutter_integration_test', 'target': _proofRuntimeTarget, 'device_contract': _proofDeviceContract, 'required_checkpoints': _proofCheckpoints})}',
     );
   });
 

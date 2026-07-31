@@ -60,6 +60,26 @@ void main() {
         expect(input.format, equals('Commander'));
         expect(input.commanderName, isNull);
         expect(input.body.containsKey('commander_name'), isFalse);
+        expect(input.body['bracket'], equals(2));
+      });
+
+      test('defaults only Commander and EDH requests to Core B2', () {
+        final commander = parseAiGenerateRequestInput({
+          'prompt': 'deck temático',
+          'format': 'Commander',
+        });
+        final edh = parseAiGenerateRequestInput({
+          'prompt': 'deck temático',
+          'format': 'EDH',
+        });
+        final standard = parseAiGenerateRequestInput({
+          'prompt': 'midrange',
+          'format': 'Standard',
+        });
+
+        expect(commander.body['bracket'], equals(2));
+        expect(edh.body['bracket'], equals(2));
+        expect(standard.body.containsKey('bracket'), isFalse);
       });
 
       test(
@@ -145,7 +165,7 @@ void main() {
 
         expect(first, equals(second));
         expect(first, isNot(equals(differentBracket)));
-        expect(first, startsWith('ai_generate:v3:'));
+        expect(first, startsWith('ai_generate:v4:'));
         expect(first, isNot(contains('mono red')));
       },
     );
@@ -197,7 +217,7 @@ void main() {
       );
 
       expect(v5, isNot(equals(v4)));
-      expect(v5, startsWith('ai_generate:v3:'));
+      expect(v5, startsWith('ai_generate:v4:'));
     });
 
     test('generation constraints participate in the cache key', () {

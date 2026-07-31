@@ -65,7 +65,13 @@ void main() {
         resolveCommanderMetaScopeFromPromptText(
           'Build me a high power Kraum and Tymna list for bracket 4',
         ),
-        'competitive_commander',
+        isNull,
+      );
+      expect(
+        resolveCommanderMetaScopeFromPromptText(
+          'Build me an upgraded bracket 3 Kraum and Tymna list',
+        ),
+        isNull,
       );
       expect(
         resolveCommanderMetaScopeFromPromptText(

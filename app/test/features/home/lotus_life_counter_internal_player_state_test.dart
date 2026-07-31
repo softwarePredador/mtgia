@@ -54,7 +54,8 @@ class _FakeLotusHost implements LotusHost, LotusCanonicalStorageRebaser {
     if (script.contains('.increase-button.life') ||
         script.contains('.decrease-button.life') ||
         script.contains('.player-card') ||
-        script.contains('.player-card-inner.option-card')) {
+        script.contains('.player-card-inner.option-card') ||
+        script.contains('openCommanderDamage')) {
       return jsonEncode(<String, Object>{'ok': true});
     }
 
@@ -170,15 +171,16 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    )..completeSuccessfulLoad();
+                    return host;
+                  },
             ),
           ),
         );
@@ -316,15 +318,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -424,15 +427,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -503,15 +507,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -572,15 +577,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -642,15 +648,16 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    )..completeSuccessfulLoad();
+                    return host;
+                  },
             ),
           ),
         );
@@ -754,15 +761,16 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    )..completeSuccessfulLoad();
+                    return host;
+                  },
             ),
           ),
         );
@@ -884,15 +892,16 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    )..completeSuccessfulLoad();
+                    return host;
+                  },
             ),
           ),
         );
@@ -997,15 +1006,16 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    )..completeSuccessfulLoad();
+                    return host;
+                  },
             ),
           ),
         );
@@ -1114,15 +1124,16 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                    )..completeSuccessfulLoad();
+                    return host;
+                  },
             ),
           ),
         );
@@ -1264,15 +1275,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -1406,15 +1418,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -1560,15 +1573,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -1646,7 +1660,7 @@ void main() {
     );
 
     testWidgets(
-      'resets the Lotus option-card surface after hidden commander damage canonical sync apply',
+      'resets the option card before opening the Lotus commander damage surface',
       (tester) async {
         late _FakeLotusHost host;
         await _captureDebugLogs((logs) async {
@@ -1704,15 +1718,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -1751,60 +1766,37 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.scrollUntilVisible(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-            250,
-            scrollable: find.byType(Scrollable).first,
-          );
-          await tester.ensureVisible(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-          );
-          await tester.pumpAndSettle();
-          await tester.tap(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-          );
-          await tester.pumpAndSettle();
-
-          await tester.tap(
-            find.byKey(const Key('life-counter-native-commander-damage-apply')),
-          );
-          await tester.pumpAndSettle();
-
-          expect(find.text('Estado do jogador'), findsOneWidget);
-
-          await tester.tap(
-            find.byKey(const Key('life-counter-native-player-state-apply')),
-          );
-          await tester.pumpAndSettle();
-
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
-          expect(session!.commanderDamage[0][1], 1);
+          expect(session!.commanderDamage[0][1], 0);
+          expect(find.text('Estado do jogador'), findsNothing);
+          expect(
+            find.byKey(const Key('life-counter-native-commander-damage-sheet')),
+            findsNothing,
+          );
           expect(host.loadBundleCallCount, 1);
-          expect(host.canonicalRebaseCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 0);
           expect(
             host.executedScripts.any(
               (script) => script.contains('.player-card-inner.option-card'),
             ),
-            isFalse,
+            isTrue,
+          );
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains('openCommanderDamage(0)') &&
+                  script.contains('window.__ManaLoomNativeSurfaceBridge'),
+            ),
+            isTrue,
           );
           expect(
             logs.any(
               (message) =>
-                  message.contains('message=native_player_state_applied') &&
-                  message.contains('apply_strategy: canonical_store_sync') &&
-                  message.contains('reload_required: false') &&
+                  message.contains('message=native_player_state_dismissed') &&
+                  message.contains('source: player_option_card_presented') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains(
-                    'surface_reset_strategy: canonical_rebase_reload',
-                  ) &&
-                  message.contains('sync_blockers: []'),
+                  message.contains('surface_reset_strategy: live_dom_reset'),
             ),
             isTrue,
           );
@@ -1813,7 +1805,7 @@ void main() {
     );
 
     testWidgets(
-      'keeps hidden commander damage canonical sync through the player state hub',
+      'opens the Lotus commander damage surface from the player state hub',
       (tester) async {
         late _FakeLotusHost host;
         await _captureDebugLogs((logs) async {
@@ -1871,15 +1863,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -1918,43 +1911,31 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.scrollUntilVisible(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-            250,
-            scrollable: find.byType(Scrollable).first,
-          );
-          await tester.tap(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-          );
-          await tester.pumpAndSettle();
-
-          await tester.tap(
-            find.byKey(const Key('life-counter-native-commander-damage-apply')),
-          );
-          await tester.pumpAndSettle();
-
-          expect(find.text('Estado do jogador'), findsOneWidget);
-
-          await tester.tap(
-            find.byKey(const Key('life-counter-native-player-state-apply')),
-          );
-          await tester.pumpAndSettle();
-
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
-          expect(session!.commanderDamage[0][1], 1);
+          expect(session!.commanderDamage[0][1], 0);
+          expect(find.text('Estado do jogador'), findsNothing);
+          expect(
+            find.byKey(const Key('life-counter-native-commander-damage-sheet')),
+            findsNothing,
+          );
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 0);
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains('openCommanderDamage(0)') &&
+                  script.contains('window.__ManaLoomNativeSurfaceBridge'),
+            ),
+            isTrue,
+          );
           expect(
             logs.any(
               (message) =>
-                  message.contains('message=native_player_state_applied') &&
-                  message.contains('apply_strategy: canonical_store_sync') &&
-                  message.contains('reload_required: false') &&
-                  message.contains('sync_blockers: []'),
+                  message.contains('message=native_player_state_dismissed') &&
+                  message.contains('source: player_state_surface_pressed') &&
+                  message.contains('surface_reset_required: false') &&
+                  message.contains('surface_reset_strategy: none'),
             ),
             isTrue,
           );
@@ -1963,7 +1944,7 @@ void main() {
     );
 
     testWidgets(
-      'keeps hidden commander damage canonical sync through the player state hub when player cards stay on but commander damage counters stay hidden',
+      'opens the Lotus commander surface when only damage counters are hidden',
       (tester) async {
         late _FakeLotusHost host;
         await _captureDebugLogs((logs) async {
@@ -2021,15 +2002,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );
@@ -2068,43 +2050,31 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.scrollUntilVisible(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-            250,
-            scrollable: find.byType(Scrollable).first,
-          );
-          await tester.tap(
-            find.byKey(
-              const Key('life-counter-native-commander-damage-plus-1-c1'),
-            ),
-          );
-          await tester.pumpAndSettle();
-
-          await tester.tap(
-            find.byKey(const Key('life-counter-native-commander-damage-apply')),
-          );
-          await tester.pumpAndSettle();
-
-          expect(find.text('Estado do jogador'), findsOneWidget);
-
-          await tester.tap(
-            find.byKey(const Key('life-counter-native-player-state-apply')),
-          );
-          await tester.pumpAndSettle();
-
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
-          expect(session!.commanderDamage[0][1], 1);
+          expect(session!.commanderDamage[0][1], 0);
+          expect(find.text('Estado do jogador'), findsNothing);
+          expect(
+            find.byKey(const Key('life-counter-native-commander-damage-sheet')),
+            findsNothing,
+          );
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 0);
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains('openCommanderDamage(0)') &&
+                  script.contains('window.__ManaLoomNativeSurfaceBridge'),
+            ),
+            isTrue,
+          );
           expect(
             logs.any(
               (message) =>
-                  message.contains('message=native_player_state_applied') &&
-                  message.contains('apply_strategy: canonical_store_sync') &&
-                  message.contains('reload_required: false') &&
-                  message.contains('sync_blockers: []'),
+                  message.contains('message=native_player_state_dismissed') &&
+                  message.contains('source: player_state_surface_pressed') &&
+                  message.contains('surface_reset_required: false') &&
+                  message.contains('surface_reset_strategy: none'),
             ),
             isTrue,
           );
@@ -2124,15 +2094,16 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               home: LotusLifeCounterScreen(
-                hostFactory: ({
-                  required onAppReviewRequested,
-                  required onShellMessageRequested,
-                }) {
-                  host = _FakeLotusHost(
-                    onShellMessageRequested: onShellMessageRequested,
-                  )..completeSuccessfulLoad();
-                  return host;
-                },
+                hostFactory:
+                    ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                      )..completeSuccessfulLoad();
+                      return host;
+                    },
               ),
             ),
           );

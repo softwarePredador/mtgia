@@ -175,6 +175,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
   final Map<String, dynamic> metaReferenceContext;
   final Map<String, dynamic> optimizationContract;
   final Map<String, dynamic> battleValidation;
+  final Map<String, dynamic> bracketPolicy;
   final bool canApply;
   final List<String> applyBlockers;
   final List<Map<String, dynamic>> displayRemovals;
@@ -202,6 +203,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
     required this.metaReferenceContext,
     required this.optimizationContract,
     required this.battleValidation,
+    this.bracketPolicy = const <String, dynamic>{},
     required this.canApply,
     required this.applyBlockers,
     required this.displayRemovals,
@@ -461,6 +463,8 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
       if (_isPartialSelection) 'post_analysis_status': 'recompute_after_apply',
       'warnings': widget.warnings,
       'meta_reference_context': widget.metaReferenceContext,
+      if (widget.bracketPolicy.isNotEmpty)
+        'bracket_policy': widget.bracketPolicy,
       'optimization_contract': widget.optimizationContract,
       'battle_validation': widget.battleValidation,
       'removals': selected(widget.displayRemovals, _selectedRemovalIndexes),
@@ -488,6 +492,8 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
       'ManaLoom - Relatório antes/depois',
       'Plano: $_planLabel',
       'Estratégia: ${widget.archetype}',
+      if (widget.bracketPolicy.isNotEmpty)
+        'Bracket: ${widget.bracketPolicy['bracket'] ?? '-'} • ${widget.bracketPolicy['label'] ?? '-'}',
       'Intensidade: $_intensityLabel',
       'Cartas selecionadas: $_selectedPhysicalChangeCount',
       'Remover: ${names(widget.displayRemovals, _selectedRemovalIndexes)}',
@@ -700,6 +706,10 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                     ),
                   ),
                 ),
+              ],
+              if (widget.bracketPolicy.isNotEmpty) ...[
+                const SizedBox(height: AppTheme.space16),
+                _BracketPolicySection(policy: widget.bracketPolicy),
               ],
               if (widget.qualityWarning != null) ...[
                 const SizedBox(height: AppTheme.space16),
@@ -1146,6 +1156,126 @@ class _MetaReferenceSection extends StatelessWidget {
               );
             }),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _BracketPolicySection extends StatelessWidget {
+  final Map<String, dynamic> policy;
+
+  const _BracketPolicySection({required this.policy});
+
+  int? _integer(Object? value) {
+    return switch (value) {
+      int number => number,
+      num number => number.toInt(),
+      String text => int.tryParse(text.trim()),
+      _ => null,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final rawIntent = policy['intent_profile'];
+    final intent = rawIntent is Map
+        ? rawIntent.cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final bracket = _integer(policy['bracket'] ?? intent['bracket']);
+    final label =
+        policy['label']?.toString().trim() ??
+        intent['label']?.toString().trim() ??
+        '';
+    final minimumTurns = _integer(intent['minimum_turns_played']);
+    final gameChangerCount = _integer(policy['game_changer_count']) ?? 0;
+    final gameChangerCap = _integer(
+      policy['game_changer_cap'] ?? intent['game_changer_cap'],
+    );
+    final hardCompliant = policy['hard_compliant'] != false;
+    final competitiveLane = intent['competitive_lane'] == true;
+    final intentCopy = intent['intent']?.toString().trim() ?? '';
+    final bracketTitle = [
+      if (bracket != null) 'Bracket $bracket',
+      if (label.isNotEmpty) label,
+    ].join(' • ');
+    final gameChangerLimit = gameChangerCap == null || gameChangerCap >= 99
+        ? '$gameChangerCount • sem limite'
+        : '$gameChangerCount de $gameChangerCap';
+    final laneLabel = competitiveLane
+        ? 'Metagame cEDH'
+        : bracket == 4
+        ? 'Otimizado não-cEDH'
+        : 'Mesa social';
+
+    return DialogSectionCard(
+      title: 'Adequação ao bracket',
+      accent: hardCompliant ? AppTheme.success : AppTheme.error,
+      icon: hardCompliant ? Icons.rule_folder_outlined : Icons.gpp_bad_outlined,
+      child: Column(
+        key: const Key('optimization-preview-bracket-policy'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            bracketTitle.isEmpty ? 'Política de Commander' : bracketTitle,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          if (intentCopy.isNotEmpty) ...[
+            const SizedBox(height: AppTheme.space6),
+            Text(
+              intentCopy,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: AppTheme.lineHeightCompact,
+              ),
+            ),
+          ],
+          const SizedBox(height: AppTheme.space10),
+          Wrap(
+            spacing: AppTheme.space8,
+            runSpacing: AppTheme.space8,
+            children: [
+              DeckMetaChip(
+                label: minimumTurns == null
+                    ? 'Sem piso de turno'
+                    : 'Janela: turno $minimumTurns+',
+                color: AppTheme.frost400,
+                icon: Icons.schedule_outlined,
+              ),
+              DeckMetaChip(
+                label: 'Game Changers: $gameChangerLimit',
+                color: hardCompliant ? AppTheme.success : AppTheme.error,
+                icon: Icons.auto_awesome_outlined,
+              ),
+              DeckMetaChip(
+                label: laneLabel,
+                color: competitiveLane
+                    ? AppTheme.mythicGold
+                    : AppTheme.textSecondary,
+                icon: competitiveLane
+                    ? Icons.emoji_events_outlined
+                    : Icons.groups_outlined,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.space10),
+          Text(
+            gameChangerCap == null
+                ? 'Este bracket não possui limite numérico de Game Changers; '
+                      'os demais sinais de potência continuam consultivos.'
+                : hardCompliant
+                ? 'A lista projetada respeita o limite automático deste bracket.'
+                : 'A lista projetada excede o limite automático deste bracket e não pode ser aplicada.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: hardCompliant ? AppTheme.success : AppTheme.error,
+              fontWeight: FontWeight.w700,
+              height: AppTheme.lineHeightCompact,
+            ),
+          ),
         ],
       ),
     );

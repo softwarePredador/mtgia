@@ -7,10 +7,15 @@ import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import '../../support/list_tile_material_test_support.dart';
 
 class _Host extends StatelessWidget {
-  const _Host({required this.initialSession, required this.onResult});
+  const _Host({
+    required this.initialSession,
+    required this.onResult,
+    this.onCommanderDamageRequested,
+  });
 
   final LifeCounterSession initialSession;
   final ValueChanged<LifeCounterSession?> onResult;
+  final ValueChanged<int>? onCommanderDamageRequested;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +30,7 @@ class _Host extends StatelessWidget {
                     context,
                     initialSession: initialSession,
                     initialTargetPlayerIndex: 0,
+                    onCommanderDamageRequested: onCommanderDamageRequested,
                   );
                   onResult(result);
                 },
@@ -317,10 +323,11 @@ void main() {
       expect(result, isNotNull);
     });
 
-    testWidgets('opens the nested commander damage hub and returns to state', (
+    testWidgets('returns commander damage to the Lotus tabletop surface', (
       tester,
     ) async {
       LifeCounterSession? result;
+      int? requestedTargetIndex;
       await tester.binding.setSurfaceSize(const Size(900, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -330,6 +337,7 @@ void main() {
             playerCount: 4,
           ).copyWith(partnerCommanders: const [false, true, false, false]),
           onResult: (value) => result = value,
+          onCommanderDamageRequested: (value) => requestedTargetIndex = value,
         ),
       );
 
@@ -358,22 +366,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      expect(find.text('Estado do jogador'), findsNothing);
       expect(
         find.byKey(const Key('life-counter-native-commander-damage-apply')),
-        findsOneWidget,
+        findsNothing,
       );
-
-      await tester.tap(find.text('Cancelar').last);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Estado do jogador'), findsOneWidget);
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-player-state-apply')),
-      );
-      await tester.pumpAndSettle();
-
       expect(result, isNotNull);
+      expect(requestedTargetIndex, 0);
     });
 
     testWidgets('applies split commander damage through the native shell', (

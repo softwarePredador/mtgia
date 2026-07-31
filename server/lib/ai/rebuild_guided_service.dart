@@ -10,9 +10,10 @@ import '../deck_schema_support.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import 'deck_state_analysis.dart';
-import 'rebuild_guided_land_support.dart';
 import 'edhrec_service.dart';
 import 'optimization_ramp_profile.dart';
+import 'rebuild_bracket_guard.dart';
+import 'rebuild_guided_land_support.dart';
 
 class RebuildTargetProfile {
   const RebuildTargetProfile({
@@ -273,6 +274,11 @@ class RebuildGuidedService {
       basicLandCatalog: basicLandCatalog,
     );
     _assertResolvedCardIds(rebuiltCards);
+    _assertFinalCommanderBracket(
+      deckFormat: deckFormat,
+      bracket: bracket,
+      cards: rebuiltCards,
+    );
     final manaFoundation = assessCommanderManaFloor(
       format: deckFormat,
       cards: rebuiltCards,
@@ -410,6 +416,11 @@ class RebuildGuidedService {
     required String resolvedTheme,
     required String selectedScope,
   }) async {
+    _assertFinalCommanderBracket(
+      deckFormat: deckFormat,
+      bracket: bracket,
+      cards: rebuiltCards,
+    );
     final manaFoundation = assessCommanderManaFloor(
       format: deckFormat,
       cards: rebuiltCards,
@@ -478,6 +489,21 @@ class RebuildGuidedService {
       }
       return deckMap.cast<String, dynamic>();
     });
+  }
+
+  void _assertFinalCommanderBracket({
+    required String deckFormat,
+    required int? bracket,
+    required Iterable<Map<String, dynamic>> cards,
+  }) {
+    final decision = assessFinalRebuildCommanderBracket(
+      deckFormat: deckFormat,
+      bracket: bracket,
+      cards: cards,
+    );
+    if (!decision.allowed) {
+      throw RebuildException(decision.message!);
+    }
   }
 
   RebuildTargetProfile _buildTargetProfile({

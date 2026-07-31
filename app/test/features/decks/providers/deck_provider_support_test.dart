@@ -1697,6 +1697,7 @@ void main() {
         apiClient,
         prompt: 'Lorehold artifacts',
         format: 'Commander',
+        bracket: 4,
         requestKey: 'generate:request-1',
         preferCollection: true,
         collectionOnly: true,
@@ -1705,6 +1706,7 @@ void main() {
       throwsA(isA<Exception>()),
     );
     expect(capturedBody?['request_key'], 'generate:request-1');
+    expect(capturedBody?['bracket'], 4);
     expect(capturedBody?['generation_constraints'], {
       'prefer_collection': true,
       'collection_only': true,
@@ -1793,6 +1795,7 @@ void main() {
         apiClient,
         prompt: 'mono blue artifacts',
         format: 'commander',
+        bracket: 2,
       ),
       throwsA(isA<Exception>()),
     );
@@ -1808,6 +1811,7 @@ void main() {
           apiClient,
           prompt: '   ',
           format: 'commander',
+          bracket: 2,
         ),
         throwsA(
           isA<Exception>().having(
@@ -1822,6 +1826,7 @@ void main() {
           apiClient,
           prompt: 'x' * (maxAiGeneratePromptLength + 1),
           format: 'commander',
+          bracket: 2,
         ),
         throwsA(isA<Exception>()),
       );
@@ -1830,6 +1835,7 @@ void main() {
           apiClient,
           prompt: 'artifacts',
           format: 'commander',
+          bracket: 2,
           commanderName: 'x' * (maxAiGenerateCommanderNameLength + 1),
         ),
         throwsA(isA<Exception>()),
@@ -1852,6 +1858,7 @@ void main() {
         apiClient,
         prompt: 'invalid commander list',
         format: 'commander',
+        bracket: 2,
       ),
       throwsA(
         isA<Exception>().having(
@@ -1878,6 +1885,7 @@ void main() {
         apiClient,
         prompt: 'empty response fixture',
         format: 'commander',
+        bracket: 2,
       ),
       throwsA(
         isA<Exception>().having(

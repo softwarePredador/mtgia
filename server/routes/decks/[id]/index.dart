@@ -12,6 +12,9 @@ import '../../../lib/deck_schema_support.dart';
 import '../../../lib/deck_validation_state_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
 import '../../../lib/decks/deck_applied_analysis_support.dart';
+import '../../../lib/decks/optimization_apply_authorization_support.dart';
+import '../../../lib/decks/optimization_bracket_support.dart';
+import '../../../lib/decks/optimization_functional_role_floor_support.dart';
 import '../../../lib/decks/optimization_mana_floor_support.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/card_identity_support.dart';
@@ -219,6 +222,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
                   SELECT card_id::text, quantity::int, is_commander, condition
                   FROM deck_cards
                   WHERE deck_id = @deckId
+                  FOR UPDATE
                 '''),
                   parameters: {'deckId': deckId},
                 )
@@ -321,12 +325,47 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           }
         }
 
+        final applyAuthorizationVerification =
+            isOptimizationMutation
+                ? validateOptimizationApplyAuthorization(
+                  deckId: deckId,
+                  currentDeckSignature:
+                      DeckOptimizationHistoryService.buildDeckSignature(
+                        beforeCards,
+                      ),
+                  beforeCards: beforeCards,
+                  afterCards: dedupedList,
+                  mutationContext: mutationContext,
+                )
+                : null;
+        final applyTargetBracket =
+            optimizationApplyAuthorizedBracket(
+              applyAuthorizationVerification,
+            ) ??
+            nextBracket;
+
         await DeckRulesService(session).validateAndThrow(
           format: currentFormat,
           cards: dedupedList,
           strict: isOptimizationMutation,
         );
         if (isOptimizationMutation) {
+          final functionalRoleFloorAssessment =
+              await assessOptimizationApplyCommanderFunctionalRoleFloor(
+                session: session,
+                format: currentFormat,
+                cards: dedupedList,
+                mutationContext: mutationContext,
+                authorizationVerification: applyAuthorizationVerification,
+                storedArchetype: existingArchetype,
+              );
+          if (functionalRoleFloorAssessment != null &&
+              !functionalRoleFloorAssessment.satisfied) {
+            throw OptimizationFunctionalRoleFloorViolation(
+              reason: 'commander_functional_role_floor_not_met',
+              assessment: functionalRoleFloorAssessment,
+            );
+          }
           final manaFloorAssessment =
               await assessOptimizationCommanderManaFloor(
                 session: session,
@@ -336,6 +375,16 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
               );
           if (!manaFloorAssessment.satisfied) {
             throw OptimizationLandFloorViolation(manaFloorAssessment);
+          }
+          final bracketAssessment = await assessOptimizationCommanderBracket(
+            session: session,
+            format: currentFormat,
+            cards: dedupedList,
+            mutationContext: mutationContext,
+            storedBracket: applyTargetBracket,
+          );
+          if (bracketAssessment != null && !bracketAssessment.hardCompliant) {
+            throw OptimizationBracketViolation(bracketAssessment);
           }
         }
 
@@ -400,8 +449,8 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           };
           final optimizationArchetype =
               mutationContext['archetype']?.toString().trim() ?? '';
-          final optimizationBracket = int.tryParse(
-            mutationContext['bracket']?.toString() ?? '',
+          final optimizationBracket = optimizationApplyAuthorizedBracket(
+            applyAuthorizationVerification,
           );
           if (hasMeta &&
               (optimizationArchetype.isNotEmpty ||
@@ -527,6 +576,15 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
     return Response.json(body: {'success': true, ...updateResult});
   } on OptimizationLandFloorViolation catch (e) {
     print('[WARN] Optimization mana floor blocked deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
+  } on OptimizationFunctionalRoleFloorViolation catch (e) {
+    print('[WARN] Optimization role floor blocked deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
+  } on OptimizationBracketViolation catch (e) {
+    print('[WARN] Optimization bracket blocked deck update: $e');
+    return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
+  } on OptimizationApplyAuthorizationViolation catch (e) {
+    print('[WARN] Optimization authorization blocked deck update: ${e.code}');
     return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
   } on DeckRulesException catch (e) {
     print('[ERROR] Failed to update deck: $e');

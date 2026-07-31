@@ -963,6 +963,7 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> generateDeck({
     required String prompt,
     required String format,
+    required int? bracket,
     String? commanderName,
     GenerateDeckProgressCallback? onProgress,
     GenerateDeckCancellation? cancellation,
@@ -977,6 +978,7 @@ class DeckProvider extends ChangeNotifier {
       _apiClient,
       prompt: prompt,
       format: format,
+      bracket: bracket,
       commanderName: commanderName,
       onProgress: onProgress,
       cancellation: cancellation,
@@ -994,6 +996,7 @@ class DeckProvider extends ChangeNotifier {
       metadata: {
         'prompt_length': prompt.trim().length,
         'commander_selected': commanderName?.trim().isNotEmpty == true,
+        if (bracket != null) 'bracket': bracket,
         'prefer_collection': preferCollection || collectionOnly,
         'collection_only': collectionOnly,
         'budget_requested': budgetLimitBrl != null,

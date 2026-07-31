@@ -1,11 +1,12 @@
 import 'package:postgres/postgres.dart';
 
 import '../e2e_validation_policy.dart';
+import '../edh_bracket_policy.dart';
 
 // Bump whenever the player-facing optimize response contract changes. Cached
 // payloads are returned as-is, so reusing an older schema can omit safety fields
 // such as optimization_contract and battle_validation for up to six hours.
-const optimizeCacheContractVersion = 'v12';
+const optimizeCacheContractVersion = 'v16';
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   final entries = <String>[];
@@ -44,6 +45,7 @@ String buildOptimizeCacheKey({
     archetype.toLowerCase().trim(),
     '${bracket ?? 'none'}',
     keepTheme ? 'keep' : 'free',
+    commanderBracketPolicyVersion,
     deckSignature,
   ];
   final contextSignature = recommendationContextSignature.trim();

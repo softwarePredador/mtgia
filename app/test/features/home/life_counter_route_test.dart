@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/features/home/life_counter_route.dart';
 
 void main() {
@@ -76,4 +78,70 @@ void main() {
     expect(completed.deckVersionAtEpochMs, 500);
     expect(invalid.duration, isNull);
   });
+
+  testWidgets(
+    'opening the life counter removes the active snackbar and its queue',
+    (tester) async {
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => Scaffold(
+              body: Column(
+                children: [
+                  FilledButton(
+                    onPressed: () {
+                      final messenger = ScaffoldMessenger.of(context);
+                      messenger.showSnackBar(
+                        SnackBar(
+                          duration: const Duration(days: 1),
+                          content: const Text('Otimização em andamento'),
+                          action: SnackBarAction(
+                            label: 'Retomar',
+                            onPressed: () {},
+                          ),
+                        ),
+                      );
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          duration: Duration(days: 1),
+                          content: Text('Mensagem enfileirada'),
+                        ),
+                      );
+                    },
+                    child: const Text('mostrar-feedback'),
+                  ),
+                  FilledButton(
+                    onPressed: () => openLifeCounterRoute(context),
+                    child: const Text('jogar-agora'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          GoRoute(
+            path: lifeCounterRoutePath,
+            builder: (context, state) =>
+                const Scaffold(body: Text('mesa-life-counter')),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('mostrar-feedback'));
+      await tester.pump();
+      expect(find.text('Otimização em andamento'), findsOneWidget);
+
+      await tester.tap(find.text('jogar-agora'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('mesa-life-counter'), findsOneWidget);
+      expect(find.text('Otimização em andamento'), findsNothing);
+      expect(find.text('Mensagem enfileirada'), findsNothing);
+      expect(find.text('Retomar'), findsNothing);
+    },
+  );
 }

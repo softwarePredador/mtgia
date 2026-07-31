@@ -233,6 +233,41 @@ Todo deck Commander gerado/otimizado exige:
 9. Battle para promoção estrutural;
 10. drawn/cast/used ou teste focado para conclusão de carta.
 
+## Optimizer Enforcement Amendment — 2026-07-30
+
+O optimizer deve manter separadas quatro decisões:
+
+1. legalidade/identidade e Game Changers do bracket são gates hard;
+2. floors de mana, wipes e demais lanes críticas são gates estruturais;
+3. intenção do commander, arquétipo e tema são ranking, não banlist;
+4. coleção/orçamento são restrições do pedido e recebem auditoria final.
+
+Para Brackets 1/2 o limite oficial é zero Game Changers; para Bracket 3 é três;
+Brackets 4/5 não têm cap. Fast mana, tutor, combo, stax e sinais semânticos que
+não pertencem à lista oficial continuam consultivos.
+
+O cap não torna as faixas equivalentes. O perfil canônico de intenção é:
+
+| Bracket | Rótulo | Janela mínima pretendida | Referência |
+|---|---|---:|---|
+| 1 | Exhibition | turno 9+ | tema acima de poder |
+| 2 | Core | turno 8+ | plano direto, telegrafado e interrompível |
+| 3 | Upgraded | turno 6+ | sinergia alta e recursos acumulados |
+| 4 | Optimized | turno 4+ | alta eficiência sem assumir cEDH |
+| 5 | cEDH | sem piso | metagame competitivo e vitória prioritária |
+
+Somente o Bracket 5 ativa automaticamente referências do metagame cEDH.
+Complete, Optimize, Generate e Rebuild recebem esse perfil e repetem a
+avaliação determinística no deck final. Uma impressão alternativa não conta
+como um segundo Game Changer: limites usam a identidade jogável pelo nome
+normalizado.
+
+Todo preview acionável é ligado ao deck, assinatura, bracket e deltas permitidos
+por autorização HMAC expirável. `PUT /decks/:id` e
+`POST /decks/:id/cards/bulk` repetem autorização, legalidade, mana e bracket
+antes de substituir `deck_cards`. Um preview estruturalmente válido ainda não é
+promoção aprendida: Battle/replay e exposição natural continuam obrigatórios.
+
 ## Lorehold Promotion Gate
 
 Um candidato só substitui 607 se:

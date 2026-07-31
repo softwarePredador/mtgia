@@ -19,6 +19,9 @@ void main() {
     expect(localCi, contains('manaloom_release_ops_contract_test.sh'));
     expect(localCi, contains('manaloom_tbls_local_gate.sh'));
     expect(localCi, contains('manaloom_build_android_release.sh'));
+    expect(localCi, contains('sync_game_changers_to_dart.py'));
+    expect(localCi, contains('run_commander_game_changer_source'));
+    expect(localCi, contains('--check'));
     expect(preCommit, contains('manaloom_local_ci.sh" quick'));
     expect(prePush, contains('manaloom_local_ci.sh" full'));
     expect(installer, contains('core.hooksPath .githooks'));

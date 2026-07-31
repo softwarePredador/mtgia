@@ -492,6 +492,8 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
         _swapPairKey(candidate): candidate,
   };
   var sameLaneCount = 0;
+  var bracketRepairCount = 0;
+  var lanePolicySatisfiedCount = 0;
   var explicitHypothesisCount = 0;
   var protectedAnchorCount = 0;
   var protectedAnchorSatisfiedCount = 0;
@@ -515,6 +517,9 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
         candidateRemoveRole.isNotEmpty &&
         candidateRemoveRole == candidateAddRole;
     final sameLane = outputRolesMatch || candidateRolesMatch;
+    final bracketRepair =
+        pair['bracket_repair'] == true || candidate?['bracket_repair'] == true;
+    final lanePolicySatisfied = sameLane || bracketRepair;
     final explicitHypothesis =
         _nonEmpty(pair['hypothesis']) ||
         _nonEmpty(pair['same_lane_hypothesis']) ||
@@ -523,8 +528,10 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
         pair['protected_anchor'] == true ||
         candidate?['protected_anchor'] == true;
     final anchorPolicySatisfied =
-        !protectedAnchor || (sameLane && explicitHypothesis);
+        !protectedAnchor || (lanePolicySatisfied && explicitHypothesis);
     if (sameLane) sameLaneCount++;
+    if (bracketRepair) bracketRepairCount++;
+    if (lanePolicySatisfied) lanePolicySatisfiedCount++;
     if (explicitHypothesis) explicitHypothesisCount++;
     if (protectedAnchor) {
       protectedAnchorCount++;
@@ -534,18 +541,24 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
       'remove': pair['remove'],
       'add': pair['add'],
       'same_lane': sameLane,
+      'bracket_repair': bracketRepair,
+      'lane_policy_satisfied': lanePolicySatisfied,
       'explicit_hypothesis': explicitHypothesis,
       'protected_anchor': protectedAnchor,
       'anchor_policy_satisfied': anchorPolicySatisfied,
-      'gate_ready': sameLane && explicitHypothesis,
+      'gate_ready': lanePolicySatisfied && explicitHypothesis,
     });
   }
   final allSwapsSameLane =
       outputPairs.isEmpty || sameLaneCount == outputPairs.length;
+  final allSwapsLanePolicySatisfied =
+      outputPairs.isEmpty || lanePolicySatisfiedCount == outputPairs.length;
   final allHypothesesExplicit =
       outputPairs.isNotEmpty && explicitHypothesisCount == outputPairs.length;
   final sameLaneGateReady =
-      outputPairs.isNotEmpty && allSwapsSameLane && allHypothesesExplicit;
+      outputPairs.isNotEmpty &&
+      allSwapsLanePolicySatisfied &&
+      allHypothesesExplicit;
   final anchorGateReady = protectedAnchorCount == protectedAnchorSatisfiedCount;
   final publicSource = _publicOptimizePrioritySource(prioritySource);
 
@@ -595,8 +608,11 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
       'required': true,
       'output_swap_count': outputPairs.length,
       'same_lane_count': sameLaneCount,
+      'bracket_repair_count': bracketRepairCount,
+      'lane_policy_satisfied_count': lanePolicySatisfiedCount,
       'explicit_hypothesis_count': explicitHypothesisCount,
       'all_swaps_same_lane': allSwapsSameLane,
+      'all_swaps_lane_policy_satisfied': allSwapsLanePolicySatisfied,
       'all_hypotheses_explicit': allHypothesesExplicit,
       'gate_ready': sameLaneGateReady,
       'pairs': pairEvidence,

@@ -17,6 +17,7 @@ class DeckEntryDraftStore {
     required String commander,
     required String prompt,
     required String deckName,
+    int? bracket,
     String? activeJobId,
     String? requestKey,
     bool preferCollection = false,
@@ -27,6 +28,7 @@ class DeckEntryDraftStore {
     'commander': commander,
     'prompt': prompt,
     'deck_name': deckName,
+    if (bracket != null) 'bracket': bracket.toString(),
     'prefer_collection': preferCollection.toString(),
     'collection_only': collectionOnly.toString(),
     if (budgetLimitBrl.trim().isNotEmpty)

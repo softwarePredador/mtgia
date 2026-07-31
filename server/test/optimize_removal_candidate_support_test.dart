@@ -225,5 +225,68 @@ void main() {
         isTrue,
       );
     });
+
+    test('prioritizes all seven Core violations from the Lore deck', () {
+      const leakedGameChangers = [
+        'Chrome Mox',
+        'Enlightened Tutor',
+        'Grim Monolith',
+        "Lion's Eye Diamond",
+        'Mana Vault',
+        'Mox Diamond',
+        'The One Ring',
+      ];
+      final removals = buildDeterministicOptimizeRemovalCandidates(
+        allCardData: [
+          const {
+            'name': 'Lorehold, the Historian',
+            'type_line': 'Legendary Creature — Elder Dragon',
+            'quantity': 1,
+            'cmc': 7.0,
+          },
+          const {
+            'name': 'Plains',
+            'type_line': 'Basic Land — Plains',
+            'quantity': 36,
+            'cmc': 0.0,
+          },
+          for (final name in leakedGameChangers)
+            {
+              'name': name,
+              'type_line': name == 'Enlightened Tutor' ? 'Instant' : 'Artifact',
+              'quantity': 1,
+              'cmc': 2.0,
+            },
+          const {
+            'name': 'Cori-Steel Cutter',
+            'type_line': 'Artifact — Equipment',
+            'quantity': 1,
+            'cmc': 2.0,
+          },
+        ],
+        commanders: const ['Lorehold, the Historian'],
+        commanderColorIdentity: const {'W', 'R'},
+        targetArchetype: 'midrange',
+        keepTheme: true,
+        coreCards: const ['The One Ring'],
+        commanderPriorityNames: const ['Enlightened Tutor'],
+        bracket: 2,
+        swapLimit: 20,
+      );
+
+      final bracketRepairs =
+          removals
+              .where((candidate) => candidate['bracket_violation'] == true)
+              .map((candidate) => candidate['name'])
+              .toSet();
+      expect(bracketRepairs, leakedGameChangers.toSet());
+      expect(bracketRepairs, isNot(contains('Cori-Steel Cutter')));
+      expect(
+        removals
+            .take(7)
+            .every((candidate) => candidate['bracket_violation'] == true),
+        isTrue,
+      );
+    });
   });
 }

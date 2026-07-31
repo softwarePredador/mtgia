@@ -35,6 +35,8 @@ import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
 import '../../../lib/ai/optimize_route_recommendation_context_support.dart'
     as optimize_route_recommendation_context;
+import '../../../lib/ai/optimize_route_resilience_support.dart'
+    as optimize_route_resilience;
 import '../../../lib/ai/optimize_route_rebalance_support.dart'
     as optimize_route_rebalance;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
@@ -191,6 +193,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required bool keepTheme,
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
+  int? bracket,
   int swapLimit = 6,
 }) => optimize_support.buildDeterministicOptimizeRemovalCandidates(
   allCardData: allCardData,
@@ -200,6 +203,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   keepTheme: keepTheme,
   coreCards: coreCards,
   commanderPriorityNames: commanderPriorityNames,
+  bracket: bracket,
   swapLimit: swapLimit,
 );
 
@@ -598,10 +602,23 @@ Future<Response> onRequest(RequestContext context) async {
       'request.user_preferences',
       () => loadUserAiPreferences(pool: pool, userId: userId),
     );
+    final storedDeckSettings = await telemetry.trackAsync(
+      'request.stored_deck_settings',
+      () => optimize_request.loadOptimizeStoredDeckSettings(
+        pool: pool,
+        deckId: deckId,
+        userId: authenticatedUserId,
+      ),
+    );
+    final safeCommanderDefaultBracket =
+        storedDeckSettings?.format == 'commander' ? 2 : null;
     final bracket =
         hasBracketOverride
             ? parsedBracket
-            : (userPreferences['preferred_bracket'] as int? ?? parsedBracket);
+            : (storedDeckSettings?.bracket ??
+                userPreferences['preferred_bracket'] as int? ??
+                safeCommanderDefaultBracket ??
+                parsedBracket);
     final keepTheme =
         hasKeepThemeOverride
             ? (parsedKeepTheme ?? true)
@@ -658,34 +675,65 @@ Future<Response> onRequest(RequestContext context) async {
         hasKeepThemeOverride: hasKeepThemeOverride,
         keepTheme: keepTheme,
         userPreferences: userPreferences,
+        bracket: bracket,
       );
       if (responseBody != null) {
-        optimize_route_request.attachRecommendationContextToOptimizeResponse(
-          responseBody,
-          recommendationContext,
+        var constraintsStillValid = false;
+        try {
+          constraintsStillValid = await telemetry.trackAsync(
+            'request.cache_recommendation_constraints',
+            () => optimize_route_resilience
+                .revalidateCachedOptimizeRecommendationConstraints(
+                  pool: pool,
+                  userId: authenticatedUserId,
+                  responseBody: responseBody,
+                  context: recommendationContext,
+                ),
+          );
+        } catch (error) {
+          Log.w(
+            'Falha ao revalidar restrições de cache; recomputando preview '
+            'type=${error.runtimeType}',
+          );
+        }
+        if (constraintsStillValid) {
+          optimize_route_request.attachRecommendationContextToOptimizeResponse(
+            responseBody,
+            recommendationContext,
+          );
+          responseBody['commander_contract'] =
+              buildCommanderOptimizePlanningSummary(
+                format: deckContext.deckFormat,
+                commanderName:
+                    deckContext.commanders.isEmpty
+                        ? ''
+                        : deckContext.commanders.first,
+                totalCards: deckContext.currentTotalCards,
+                deckStateStatus: deckContext.deckState.status,
+                prioritySource: 'cached_response',
+                priorityCardCount: 0,
+                metaReferencesAvailable:
+                    responseBody['meta_reference_context'] is Map,
+                roleTargetsAvailable: false,
+                candidateSwaps: const [],
+                responseBody: responseBody,
+                preferCollection:
+                    recommendationContext.preferCollection == true,
+                budgetLimitBrl: recommendationContext.budgetLimitBrl,
+              );
+          _enforceCommanderSameLanePreviewSafety(responseBody);
+          attachOptimizeApplyAuthorizationToResponse(
+            deckId: deckId,
+            deckSignature: deckSignature,
+            responseBody: responseBody,
+            bracket: bracket,
+          );
+          telemetry.logSummary();
+          return Response.json(body: responseBody);
+        }
+        Log.i(
+          'Cache optimize descartado após reauditoria de coleção/orçamento.',
         );
-        responseBody['commander_contract'] =
-            buildCommanderOptimizePlanningSummary(
-              format: deckContext.deckFormat,
-              commanderName:
-                  deckContext.commanders.isEmpty
-                      ? ''
-                      : deckContext.commanders.first,
-              totalCards: deckContext.currentTotalCards,
-              deckStateStatus: deckContext.deckState.status,
-              prioritySource: 'cached_response',
-              priorityCardCount: 0,
-              metaReferencesAvailable:
-                  responseBody['meta_reference_context'] is Map,
-              roleTargetsAvailable: false,
-              candidateSwaps: const [],
-              responseBody: responseBody,
-              preferCollection: recommendationContext.preferCollection == true,
-              budgetLimitBrl: recommendationContext.budgetLimitBrl,
-            );
-        _enforceCommanderSameLanePreviewSafety(responseBody);
-        telemetry.logSummary();
-        return Response.json(body: responseBody);
       }
     }
 
@@ -888,6 +936,12 @@ Future<Response> onRequest(RequestContext context) async {
         );
         if (integrity != null) responseBody['swap_integrity'] = integrity;
       }
+      attachOptimizeApplyAuthorizationToResponse(
+        deckId: deckId,
+        deckSignature: deckSignature,
+        responseBody: responseBody,
+        bracket: bracket,
+      );
 
       if (persistOutcome) {
         await recordOptimizeAnalysisOutcome(
@@ -1391,12 +1445,20 @@ Future<Response> onRequest(RequestContext context) async {
           targetArchetype: targetArchetype,
           intensity: intensity.selected,
         );
+        await optimize_route_recommendation_context
+            .auditCompleteRecommendationConstraints(
+              pool: pool,
+              userId: authenticatedUserId,
+              responseBody: responseBody,
+              context: recommendationContext,
+            );
         final finalQualityError = responseBody['quality_error'];
         if (finalQualityError is Map) {
           return Response.json(
             statusCode: HttpStatus.unprocessableEntity,
             body: {
-              'error': 'Complete mode não atingiu o piso seguro de terrenos.',
+              'error':
+                  'Complete mode não atingiu os critérios finais de qualidade.',
               'quality_error': finalQualityError,
               'mode': 'complete',
               'target_additions': jsonResponse['target_additions'],
@@ -1702,6 +1764,7 @@ Future<Response> onRequest(RequestContext context) async {
               currentDeckCards: allCardData,
               additionsCardsData: additionsInfo,
               validAdditions: validAdditions,
+              projectedRemovals: validRemovals,
             );
 
         blockedByBracket.addAll(bracketFilter.blockedByBracket);
@@ -1922,16 +1985,14 @@ Future<Response> onRequest(RequestContext context) async {
           recommendationConstraintDiagnostics =
               recommendationConstraintResult.diagnostics;
         }
-        validAdditions = recommendationConstraintResult.additions;
-        if (validAdditions.length < validRemovals.length) {
-          final trimResult = optimize_route_rebalance
-              .trimOptimizeRebalanceToPairs(
-                removals: validRemovals,
-                additions: validAdditions,
-              );
-          validRemovals = trimResult.removals;
-          validAdditions = trimResult.additions;
-        }
+        final constrainedPairs = optimize_route_resilience
+            .preserveOptimizePairsAfterConstraintFilter(
+              removals: validRemovals,
+              additions: validAdditions,
+              allowedAdditions: recommendationConstraintResult.additions,
+            );
+        validRemovals = constrainedPairs.removals;
+        validAdditions = constrainedPairs.additions;
       }
 
       if (!isComplete && (validRemovals.isEmpty || validAdditions.isEmpty)) {
@@ -2042,6 +2103,8 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       ValidationReport? optimizationValidationReport;
+      Map<String, dynamic>? finalBracketPolicy;
+      Map<String, dynamic>? finalFunctionalRolePolicy;
       final qualityGateWarnings = <String>[];
       var qualityGateDroppedCount = 0;
 
@@ -2066,6 +2129,7 @@ Future<Response> onRequest(RequestContext context) async {
                   deckFormat == 'commander'
                       ? optimizeCommanderRoleTargets
                       : null,
+              bracket: bracket,
             );
 
             if (gateResult.changed) {
@@ -2179,6 +2243,66 @@ Future<Response> onRequest(RequestContext context) async {
           final virtualDeck = virtualPostAnalysis.virtualDeck;
           postAnalysis = virtualPostAnalysis.postAnalysis;
           validationWarnings.addAll(virtualPostAnalysis.validationWarnings);
+
+          if (deckFormat == 'commander' && bracket != null) {
+            final finalBracketAssessment = optimize_route_bracket_policy_filter
+                .assessOptimizeProjectedDeckBracket(
+                  bracket: bracket,
+                  projectedDeckCards: virtualDeck,
+                );
+            finalBracketPolicy = finalBracketAssessment.toJson();
+            if (!finalBracketAssessment.hardCompliant) {
+              return respondWithOptimizeTelemetry(
+                statusCode: HttpStatus.unprocessableEntity,
+                body: optimize_route_bracket_policy_filter
+                    .buildOptimizeBracketRejectedBody(
+                      assessment: finalBracketAssessment,
+                      removals: validRemovals,
+                      additions: validAdditions,
+                      deckAnalysis: deckAnalysis,
+                      postAnalysis: postAnalysis,
+                      validationWarnings: validationWarnings,
+                    ),
+                postAnalysisOverride: postAnalysis,
+                removalsOverride: validRemovals,
+                additionsOverride: validAdditions,
+                validationWarningsOverride: validationWarnings,
+                blockedByColorIdentityOverride: filteredByColorIdentity,
+                blockedByBracketOverride: [
+                  ...blockedByBracket,
+                  ...finalBracketAssessment.violations,
+                ],
+              );
+            }
+          }
+          if (deckFormat == 'commander' && !isComplete) {
+            final roleFloorAssessment = optimize_route_final_gate
+                .assessOptimizeProjectedCommanderRoleFloors(
+                  projectedDeck: virtualDeck,
+                  archetype: effectiveOptimizeArchetype,
+                );
+            finalFunctionalRolePolicy = roleFloorAssessment.toJson();
+            if (!roleFloorAssessment.satisfied) {
+              return respondWithOptimizeTelemetry(
+                statusCode: HttpStatus.unprocessableEntity,
+                body: optimize_route_final_gate
+                    .buildOptimizeRoleFloorRejectedBody(
+                      assessment: roleFloorAssessment,
+                      removals: validRemovals,
+                      additions: validAdditions,
+                      deckAnalysis: deckAnalysis,
+                      postAnalysis: postAnalysis,
+                      validationWarnings: validationWarnings,
+                    ),
+                postAnalysisOverride: postAnalysis,
+                removalsOverride: validRemovals,
+                additionsOverride: validAdditions,
+                validationWarningsOverride: validationWarnings,
+                blockedByColorIdentityOverride: filteredByColorIdentity,
+                blockedByBracketOverride: blockedByBracket,
+              );
+            }
+          }
 
           // 6. VALIDAÇÃO AUTOMÁTICA (Monte Carlo + Funcional + Critic IA)
           try {
@@ -2640,6 +2764,86 @@ Future<Response> onRequest(RequestContext context) async {
         isComplete: isComplete,
       );
 
+      if (deckFormat == 'commander' && !isComplete) {
+        final finalRemovalNames = ((responseBody['removals'] as List?) ??
+                const [])
+            .map((entry) => entry.toString())
+            .toList(growable: false);
+        final finalAdditionNames = ((responseBody['additions'] as List?) ??
+                const [])
+            .map((entry) => entry.toString())
+            .toList(growable: false);
+        final finalAdditionCards = finalAdditionNames
+            .map((name) => validByNameLower[name.toLowerCase()])
+            .whereType<Map<String, dynamic>>()
+            .toList(growable: false);
+        final finalProjectedDeck = optimize_route_bracket_policy_filter
+            .buildOptimizeProjectedDeckForBracket(
+              originalDeckCards: allCardData,
+              removals: finalRemovalNames,
+              additionsCardsData: finalAdditionCards,
+            );
+        if (bracket != null) {
+          final finalPayloadBracketAssessment =
+              optimize_route_bracket_policy_filter
+                  .assessOptimizeProjectedDeckBracket(
+                    bracket: bracket,
+                    projectedDeckCards: finalProjectedDeck,
+                  );
+          finalBracketPolicy = finalPayloadBracketAssessment.toJson();
+          if (!finalPayloadBracketAssessment.hardCompliant) {
+            return respondWithOptimizeTelemetry(
+              statusCode: HttpStatus.unprocessableEntity,
+              body: optimize_route_bracket_policy_filter
+                  .buildOptimizeBracketRejectedBody(
+                    assessment: finalPayloadBracketAssessment,
+                    removals: finalRemovalNames,
+                    additions: finalAdditionNames,
+                    deckAnalysis: deckAnalysis,
+                    postAnalysis: postAnalysis,
+                    validationWarnings: validationWarnings,
+                  ),
+              postAnalysisOverride: postAnalysis,
+              validationReport: optimizationValidationReport,
+              removalsOverride: finalRemovalNames,
+              additionsOverride: finalAdditionNames,
+              validationWarningsOverride: validationWarnings,
+              blockedByColorIdentityOverride: filteredByColorIdentity,
+              blockedByBracketOverride: [
+                ...blockedByBracket,
+                ...finalPayloadBracketAssessment.violations,
+              ],
+            );
+          }
+        }
+        final finalRoleFloorAssessment = optimize_route_final_gate
+            .assessOptimizeProjectedCommanderRoleFloors(
+              projectedDeck: finalProjectedDeck,
+              archetype: effectiveOptimizeArchetype,
+            );
+        finalFunctionalRolePolicy = finalRoleFloorAssessment.toJson();
+        if (!finalRoleFloorAssessment.satisfied) {
+          return respondWithOptimizeTelemetry(
+            statusCode: HttpStatus.unprocessableEntity,
+            body: optimize_route_final_gate.buildOptimizeRoleFloorRejectedBody(
+              assessment: finalRoleFloorAssessment,
+              removals: finalRemovalNames,
+              additions: finalAdditionNames,
+              deckAnalysis: deckAnalysis,
+              postAnalysis: postAnalysis,
+              validationWarnings: validationWarnings,
+            ),
+            postAnalysisOverride: postAnalysis,
+            validationReport: optimizationValidationReport,
+            removalsOverride: finalRemovalNames,
+            additionsOverride: finalAdditionNames,
+            validationWarningsOverride: validationWarnings,
+            blockedByColorIdentityOverride: filteredByColorIdentity,
+            blockedByBracketOverride: blockedByBracket,
+          );
+        }
+      }
+
       responseBody['optimization_contract'] = {
         ...buildOptimizeDecisionContract(
           mode: effectiveMode,
@@ -2671,6 +2875,12 @@ Future<Response> onRequest(RequestContext context) async {
       };
       responseBody['battle_validation'] =
           (responseBody['optimization_contract'] as Map)['battle_validation'];
+      if (finalBracketPolicy != null) {
+        responseBody['bracket_policy'] = finalBracketPolicy;
+      }
+      if (finalFunctionalRolePolicy != null) {
+        responseBody['functional_role_policy'] = finalFunctionalRolePolicy;
+      }
       optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(
         responseBody,
       );

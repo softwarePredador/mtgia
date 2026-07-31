@@ -49,14 +49,14 @@
       "capture_count": 53
     },
     {
-      "id": "android_physical",
-      "kind": "android_physical_profile",
-      "width": 384,
-      "height": 856,
+      "id": "android_emulator",
+      "kind": "android_emulator_profile",
+      "width": 411,
+      "height": 914,
       "capture_width": 1080,
-      "capture_height": 2408,
+      "capture_height": 2400,
       "capture_count": 54,
-      "device_contract": "Samsung SM-A135M, Android 14",
+      "device_contract": "ManaLoom_API34 Pixel 6 hardware profile, Android 14, emulator runtime",
       "runner_constraint": "flutter drive does not support non-Web --release; profile keeps kDebugMode=false"
     }
   ],
@@ -518,7 +518,7 @@
       "web_mobile": 54,
       "web_desktop": 53,
       "web_wide": 53,
-      "android_physical": 54
+      "android_emulator": 54
     }
   }
 }

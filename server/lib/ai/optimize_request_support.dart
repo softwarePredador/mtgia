@@ -50,6 +50,43 @@ class OptimizeDeckContextData {
   });
 }
 
+class OptimizeStoredDeckSettings {
+  const OptimizeStoredDeckSettings({
+    required this.format,
+    required this.bracket,
+  });
+
+  final String format;
+  final int? bracket;
+}
+
+Future<OptimizeStoredDeckSettings?> loadOptimizeStoredDeckSettings({
+  required Pool pool,
+  required String deckId,
+  required String userId,
+}) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT format, bracket
+      FROM decks
+      WHERE id = CAST(@id AS uuid)
+        AND user_id = CAST(@user_id AS uuid)
+      LIMIT 1
+    '''),
+    parameters: {'id': deckId, 'user_id': userId},
+  );
+  if (result.isEmpty) return null;
+  return OptimizeStoredDeckSettings(
+    format: result.first[0]?.toString().trim().toLowerCase() ?? '',
+    bracket: switch (result.first[1]) {
+      int value => value,
+      num value => value.toInt(),
+      String value => int.tryParse(value.trim()),
+      _ => null,
+    },
+  );
+}
+
 Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   required Pool pool,
   required String deckId,

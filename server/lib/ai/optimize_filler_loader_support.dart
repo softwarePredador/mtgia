@@ -75,6 +75,8 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
   required Pool pool,
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
+  List<Map<String, dynamic>> currentDeckCards = const <Map<String, dynamic>>[],
+  int? bracket,
   required int limit,
   String deckFormat = 'commander',
 }) async {
@@ -195,7 +197,11 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
     );
   });
 
-  return dedupeCandidatesByName(candidates).take(limit).toList();
+  return filterCandidatesByBracketPolicy(
+    candidates: dedupeCandidatesByName(candidates),
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+  ).take(limit).toList();
 }
 
 int recommendedLandCountForOptimizeArchetype(String targetArchetype) {
@@ -300,6 +306,7 @@ List<String> buildStructuralRecoveryFunctionalNeeds({
       'draw': 14,
       'ramp': 12,
       'tutor': 8,
+      'wipe': 2,
       'protection': 6,
       'utility': 18,
     },
@@ -308,6 +315,7 @@ List<String> buildStructuralRecoveryFunctionalNeeds({
       'ramp': 8,
       'draw': 8,
       'removal': 8,
+      'wipe': 1,
       'protection': 4,
       'utility': 14,
     },
@@ -315,6 +323,7 @@ List<String> buildStructuralRecoveryFunctionalNeeds({
       'draw': 12,
       'ramp': 10,
       'removal': 8,
+      'wipe': 2,
       'creature': 8,
       'protection': 4,
       'utility': 16,
@@ -387,6 +396,7 @@ Map<String, int> buildRoleTargetProfile(String targetArchetype) {
     'ramp': 10,
     'draw': 10,
     'removal': 8,
+    'wipe': minimumCommanderWipeCountForArchetype(targetArchetype),
     'interaction': 6,
     'engine': 8,
     'wincon': 4,
@@ -423,6 +433,7 @@ Map<String, int> buildSlotNeedsForDeck({
     'ramp': 0,
     'draw': 0,
     'removal': 0,
+    'wipe': 0,
     'interaction': 0,
     'engine': 0,
     'wincon': 0,
@@ -453,10 +464,175 @@ Map<String, int> buildSlotNeedsForDeck({
 
   if (nonLandTotal < 58) {
     final missingNonLand = 58 - nonLandTotal;
-    needs['utility'] = (needs['utility'] ?? 0) + missingNonLand;
+    final coveredByRoleDeficits = needs.values.fold<int>(
+      0,
+      (sum, value) => sum + value,
+    );
+    final uncoveredSlots = (missingNonLand - coveredByRoleDeficits).clamp(
+      0,
+      58,
+    );
+    needs['utility'] = (needs['utility'] ?? 0) + uncoveredSlots;
   }
 
   return needs;
+}
+
+List<Map<String, dynamic>> selectDeterministicSlotCandidates({
+  required List<Map<String, dynamic>> candidates,
+  required Map<String, int> slotNeeds,
+  required int limit,
+  int? bracket,
+  Set<String> preferredNames = const <String>{},
+}) {
+  if (limit <= 0 || candidates.isEmpty) return const [];
+
+  final normalizedPreferred =
+      preferredNames
+          .map((name) => name.trim().toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toSet();
+  final enriched = <Map<String, dynamic>>[];
+  for (var index = 0; index < candidates.length; index++) {
+    final candidate = candidates[index];
+    final role = inferFunctionalRoleForCard(candidate);
+    final countsTowardRole =
+        role != 'ramp' ||
+        optimizationRampProfileForCard(candidate).countsTowardGenericFloor;
+    enriched.add({
+      ...candidate,
+      '_slot_role': countsTowardRole ? role : 'utility',
+      '_slot_order': index,
+      '_slot_preferred': normalizedPreferred.contains(
+        candidate['name']?.toString().trim().toLowerCase() ?? '',
+      ),
+      '_slot_intent_penalty': commanderBracketIntentPenalty(
+        candidate,
+        bracket: bracket,
+      ),
+    });
+  }
+
+  int compareCandidates(Map<String, dynamic> a, Map<String, dynamic> b) {
+    final penaltyA = (a['_slot_intent_penalty'] as int?) ?? 0;
+    final penaltyB = (b['_slot_intent_penalty'] as int?) ?? 0;
+    final byPenalty = penaltyA.compareTo(penaltyB);
+    if (byPenalty != 0) return byPenalty;
+
+    final preferredA = a['_slot_preferred'] == true ? 1 : 0;
+    final preferredB = b['_slot_preferred'] == true ? 1 : 0;
+    final byPreferred = preferredB.compareTo(preferredA);
+    if (byPreferred != 0) return byPreferred;
+
+    final orderA = (a['_slot_order'] as int?) ?? 0;
+    final orderB = (b['_slot_order'] as int?) ?? 0;
+    final byOrder = orderA.compareTo(orderB);
+    if (byOrder != 0) return byOrder;
+    return (a['name']?.toString() ?? '').compareTo(b['name']?.toString() ?? '');
+  }
+
+  final byRole = <String, List<Map<String, dynamic>>>{};
+  for (final candidate in enriched) {
+    final role = candidate['_slot_role'] as String? ?? 'utility';
+    byRole.putIfAbsent(role, () => <Map<String, dynamic>>[]).add(candidate);
+  }
+  for (final roleCandidates in byRole.values) {
+    roleCandidates.sort(compareCandidates);
+  }
+
+  final remainingNeeds = <String, int>{
+    for (final entry in slotNeeds.entries)
+      if (entry.value > 0) entry.key: entry.value,
+  };
+  final roleOrder =
+      remainingNeeds.keys.toList()..sort((a, b) {
+        final byNeed = (remainingNeeds[b] ?? 0).compareTo(
+          remainingNeeds[a] ?? 0,
+        );
+        if (byNeed != 0) return byNeed;
+        return a.compareTo(b);
+      });
+  final selected = <Map<String, dynamic>>[];
+  final selectedNames = <String>{};
+
+  while (selected.length < limit) {
+    var addedInRound = false;
+    for (final role in roleOrder) {
+      if (selected.length >= limit) break;
+      final remaining = remainingNeeds[role] ?? 0;
+      if (remaining <= 0) continue;
+      final pool = byRole[role];
+      if (pool == null || pool.isEmpty) continue;
+
+      Map<String, dynamic>? next;
+      while (pool.isNotEmpty && next == null) {
+        final candidate = pool.removeAt(0);
+        final name = candidate['name']?.toString().trim().toLowerCase() ?? '';
+        if (name.isEmpty || selectedNames.contains(name)) continue;
+        next = candidate;
+      }
+      if (next == null) continue;
+
+      selected.add(next);
+      selectedNames.add(next['name']?.toString().trim().toLowerCase() ?? '');
+      remainingNeeds[role] = remaining - 1;
+      addedInRound = true;
+    }
+    if (!addedInRound) break;
+  }
+
+  if (selected.length < limit) {
+    final remaining =
+        enriched.where((candidate) {
+            final name =
+                candidate['name']?.toString().trim().toLowerCase() ?? '';
+            return name.isNotEmpty && !selectedNames.contains(name);
+          }).toList()
+          ..sort(compareCandidates);
+    for (final candidate in remaining) {
+      if (selected.length >= limit) break;
+      final name = candidate['name']?.toString().trim().toLowerCase() ?? '';
+      if (!selectedNames.add(name)) continue;
+      selected.add(candidate);
+    }
+  }
+
+  return selected
+      .take(limit)
+      .map((candidate) {
+        final result =
+            Map<String, dynamic>.from(candidate)
+              ..remove('_slot_role')
+              ..remove('_slot_order')
+              ..remove('_slot_preferred')
+              ..remove('_slot_intent_penalty');
+        return result;
+      })
+      .toList(growable: false);
+}
+
+int commanderBracketIntentPenalty(
+  Map<String, dynamic> candidate, {
+  required int? bracket,
+}) {
+  if (bracket == null || bracket >= 4) return 0;
+  final tags =
+      tagCardForBracket(
+        name: candidate['name']?.toString() ?? '',
+        typeLine: candidate['type_line']?.toString() ?? '',
+        oracleText: candidate['oracle_text']?.toString() ?? '',
+      ).categories;
+  final multiplier = bracket == 1 ? 2 : 1;
+  var penalty = 0;
+  if (tags.contains(BracketCategory.gameChanger)) penalty += 10000;
+  if (tags.contains(BracketCategory.infiniteCombo)) penalty += 160 * multiplier;
+  if (tags.contains(BracketCategory.extraTurns)) penalty += 100 * multiplier;
+  if (tags.contains(BracketCategory.freeInteraction)) {
+    penalty += 80 * multiplier;
+  }
+  if (tags.contains(BracketCategory.stax)) penalty += 70 * multiplier;
+  if (tags.contains(BracketCategory.fastMana)) penalty += 50 * multiplier;
+  return penalty;
 }
 
 Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
@@ -489,40 +665,15 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
 
   if (candidates.isEmpty) return const [];
 
-  final scored =
-      candidates.map((c) {
-        final name = (c['name'] as String?) ?? '';
-        final role = inferFunctionalRoleForCard(c);
+  final selected = selectDeterministicSlotCandidates(
+    candidates: candidates,
+    slotNeeds: slotNeeds,
+    limit: limit,
+    bracket: bracket,
+    preferredNames: preferredNames ?? const <String>{},
+  );
 
-        final countsTowardRequestedRole =
-            role != 'ramp' ||
-            optimizationRampProfileForCard(c).countsTowardGenericFloor;
-        final primaryNeed =
-            countsTowardRequestedRole ? (slotNeeds[role] ?? 0) : 0;
-        final utilityNeed = slotNeeds['utility'] ?? 0;
-        final fromAiSuggestion = (preferredNames ?? const <String>{}).contains(
-          name.toLowerCase(),
-        );
-        final aiBoost = fromAiSuggestion ? 35 : 0;
-        final score =
-            primaryNeed * 100 +
-            (role == 'utility' ? utilityNeed * 10 : 0) +
-            aiBoost;
-
-        return {...c, '_role': role, '_score': score};
-      }).toList();
-
-  scored.sort((a, b) {
-    final scoreA = (a['_score'] as int?) ?? 0;
-    final scoreB = (b['_score'] as int?) ?? 0;
-    final byScore = scoreB.compareTo(scoreA);
-    if (byScore != 0) return byScore;
-    final nameA = (a['name'] as String?) ?? '';
-    final nameB = (b['name'] as String?) ?? '';
-    return nameA.compareTo(nameB);
-  });
-
-  return scored.take(limit).map((e) {
+  return selected.map((e) {
     return {
       'id': e['id'],
       'name': e['name'],
@@ -788,6 +939,10 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
 
   final aggregated = <Map<String, dynamic>>[];
   final seen = <String>{};
+  List<Map<String, dynamic>> bracketSnapshot() => [
+    ...currentDeckCards,
+    ...aggregated,
+  ];
 
   void addUnique(Iterable<Map<String, dynamic>> items) {
     for (final item in items) {
@@ -815,7 +970,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
   if (aggregated.length < limit && bracket == null) {
     final noBracket = await loadDeterministicSlotFillers(
       pool: pool,
-      currentDeckCards: currentDeckCards,
+      currentDeckCards: bracketSnapshot(),
       targetArchetype: targetArchetype,
       commanderColorIdentity: commanderColorIdentity,
       bracket: null,
@@ -836,10 +991,10 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       deckFormat: deckFormat,
     );
     addUnique(
-      _filterCandidatesByBracketPolicy(
+      filterCandidatesByBracketPolicy(
         candidates: metaFillers,
         bracket: bracket,
-        currentDeckCards: currentDeckCards,
+        currentDeckCards: bracketSnapshot(),
       ),
     );
   }
@@ -847,7 +1002,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
   if (aggregated.length < limit) {
     final broadWithBracket = await loadBroadCommanderNonLandFillers(
       pool: pool,
-      currentDeckCards: currentDeckCards,
+      currentDeckCards: bracketSnapshot(),
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: excludeNames.union(seen),
       bracket: bracket,
@@ -860,7 +1015,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
   if (aggregated.length < limit && bracket == null) {
     final broadNoBracket = await loadBroadCommanderNonLandFillers(
       pool: pool,
-      currentDeckCards: currentDeckCards,
+      currentDeckCards: bracketSnapshot(),
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: excludeNames.union(seen),
       bracket: null,
@@ -1035,6 +1190,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
 Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
   required Pool pool,
   required List<Map<String, dynamic>> currentDeckCards,
+  required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
   required int? bracket,
   required int limit,
@@ -1078,15 +1234,18 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
               'name': row[1] as String,
               'type_line': (row[2] as String?) ?? '',
               'oracle_text': (row[3] as String?) ?? '',
-              'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+              'mana_cost': (row[4] as String?) ?? '',
+              'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
               'color_identity':
-                  (row[5] as List?)?.cast<String>() ?? const <String>[],
+                  (row[6] as List?)?.cast<String>() ?? const <String>[],
             },
           )
           .where(
             (candidate) => shouldKeepCommanderFillerCandidate(
               candidate: candidate,
               excludeNames: excludeNames,
+              commanderColorIdentity: commanderColorIdentity,
+              enforceCommanderIdentity: true,
             ),
           )
           .toList();
@@ -1118,7 +1277,7 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
   return dedupeCandidatesByName(candidates).take(limit).toList();
 }
 
-List<Map<String, dynamic>> _filterCandidatesByBracketPolicy({
+List<Map<String, dynamic>> filterCandidatesByBracketPolicy({
   required List<Map<String, dynamic>> candidates,
   required int? bracket,
   required List<Map<String, dynamic>> currentDeckCards,
@@ -1147,6 +1306,8 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
   required Pool pool,
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
+  List<Map<String, dynamic>> currentDeckCards = const <Map<String, dynamic>>[],
+  int? bracket,
   required int limit,
   String deckFormat = 'commander',
 }) async {
@@ -1229,7 +1390,11 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
 
   Log.d('  [identity-safe] filtered rows=${filtered.length}');
 
-  return dedupeCandidatesByName(filtered).take(limit).toList();
+  return filterCandidatesByBracketPolicy(
+    candidates: dedupeCandidatesByName(filtered),
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+  ).take(limit).toList();
 }
 
 Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
@@ -1237,6 +1402,8 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
   required Set<String> preferredNames,
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
+  List<Map<String, dynamic>> currentDeckCards = const <Map<String, dynamic>>[],
+  int? bracket,
   required int limit,
   String deckFormat = 'commander',
 }) async {
@@ -1343,5 +1510,9 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
           .toList();
   final source = qualityFiltered.isNotEmpty ? qualityFiltered : filtered;
 
-  return dedupeCandidatesByName(source).take(limit).toList();
+  return filterCandidatesByBracketPolicy(
+    candidates: dedupeCandidatesByName(source),
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+  ).take(limit).toList();
 }

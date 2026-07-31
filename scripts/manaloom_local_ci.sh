@@ -109,6 +109,13 @@ run_project_logic() {
   )
 }
 
+run_commander_game_changer_source() {
+  print_header "Fonte oficial de Commander Game Changers"
+  python3 \
+    "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py" \
+    --check
+}
+
 run_ui_live_evidence() {
   print_header "Prova UI viva e revisada"
   "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" --check
@@ -199,6 +206,7 @@ run_battle_gate() {
 
 run_quick() {
   run_shell_contracts
+  run_commander_game_changer_source
   run_mcp_preflight
   run_secret_scan
   run_project_logic
@@ -207,6 +215,7 @@ run_quick() {
 
 run_full() {
   run_shell_contracts
+  run_commander_game_changer_source
   run_mcp_preflight
   run_secret_scan
   run_guardrail_audits
@@ -221,6 +230,7 @@ case "$MODE" in
     ;;
   schema)
     run_shell_contracts
+    run_commander_game_changer_source
     run_project_logic
     run_schema_gate
     ;;

@@ -77,13 +77,9 @@ class OptimizeRecommendationContext {
       if (unknownKeys.isNotEmpty) 'unknown_keys': unknownKeys,
       'server_support': {
         'prefer_collection':
-            preferCollection == true
-                ? 'accepted_for_binder_priority'
-                : 'accepted',
+            preferCollection == true ? 'requested' : 'not_requested',
         'budget_limit_brl':
-            budgetLimitBrl == null
-                ? 'not_requested'
-                : 'accepted_for_budget_filter',
+            budgetLimitBrl == null ? 'not_requested' : 'requested',
         'rebuild_intent': rebuildIntent == null ? 'not_requested' : 'accepted',
         'report': report == null ? 'not_requested' : 'accepted',
         'explain_swaps': explainSwaps == true ? 'requested' : 'not_requested',

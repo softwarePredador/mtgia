@@ -10,7 +10,7 @@ import 'ai_job_lifecycle.dart';
 // Bump whenever the player-facing generate response contract changes. Cached
 // payloads are returned as-is, so an older key could omit safety diagnostics
 // such as deckbuilding_contract until its TTL expires.
-const aiGenerateCacheContractVersion = 'v3';
+const aiGenerateCacheContractVersion = 'v4';
 const aiGenerateMaxPromptLength = 8000;
 const aiGenerateMaxFormatLength = 80;
 const aiGenerateMaxCommanderNameLength = 300;
@@ -144,10 +144,17 @@ AiGenerateRequestInput parseAiGenerateRequestInput(Object? decoded) {
   } else {
     body['commander_name'] = commanderName;
   }
-  if (bracketResult.value == null) {
+  final normalizedFormatForBracket = format.trim().toLowerCase();
+  final effectiveBracket =
+      bracketResult.value ??
+      (normalizedFormatForBracket == 'commander' ||
+              normalizedFormatForBracket == 'edh'
+          ? 2
+          : null);
+  if (effectiveBracket == null) {
     body.remove('bracket');
   } else {
-    body['bracket'] = bracketResult.value;
+    body['bracket'] = effectiveBracket;
   }
   if (constraints.isRequested) {
     body['generation_constraints'] = constraints.toJson();

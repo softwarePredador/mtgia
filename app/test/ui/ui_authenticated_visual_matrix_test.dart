@@ -24,7 +24,7 @@ void main() {
           'web_mobile',
           'web_desktop',
           'web_wide',
-          'android_physical',
+          'android_emulator',
         }),
       );
       expect(
@@ -33,7 +33,7 @@ void main() {
       );
       expect(
         platforms.where(
-          (platform) => platform['kind'] == 'android_physical_profile',
+          (platform) => platform['kind'] == 'android_emulator_profile',
         ),
         hasLength(1),
       );
@@ -47,18 +47,18 @@ void main() {
           'web_mobile': 54,
           'web_desktop': 53,
           'web_wide': 53,
-          'android_physical': 54,
+          'android_emulator': 54,
         },
       );
 
       final android = platforms.singleWhere(
-        (platform) => platform['id'] == 'android_physical',
+        (platform) => platform['id'] == 'android_emulator',
       );
-      expect(android['width'], 384);
-      expect(android['height'], 856);
+      expect(android['width'], 411);
+      expect(android['height'], 914);
       expect(android['capture_width'], 1080);
-      expect(android['capture_height'], 2408);
-      expect(android['device_contract'], contains('SM-A135M'));
+      expect(android['capture_height'], 2400);
+      expect(android['device_contract'], contains('emulator runtime'));
       expect(android['runner_constraint'], contains('kDebugMode=false'));
 
       final requiredStates = (matrix['required_states'] as List).cast<String>();
@@ -191,7 +191,7 @@ void main() {
       'web_mobile': 54,
       'web_desktop': 53,
       'web_wide': 53,
-      'android_physical': 54,
+      'android_emulator': 54,
     });
 
     final checkpointIds = (matrix['checkpoints'] as List)
@@ -203,7 +203,7 @@ void main() {
       'web_mobile': checkpointIds,
       'web_desktop': checkpointIds.difference({'home_quick_actions_scrolled'}),
       'web_wide': checkpointIds.difference({'home_quick_actions_scrolled'}),
-      'android_physical': checkpointIds,
+      'android_emulator': checkpointIds,
     };
     for (final entry in expectedByProfile.entries) {
       final profileDirectory = Directory('${baseline.path}/${entry.key}');

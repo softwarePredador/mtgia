@@ -81,10 +81,10 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
       targetContext,
       duration: animate ? const Duration(milliseconds: 220) : Duration.zero,
       curve: Curves.easeOutCubic,
-      // Keep the requested section immediately below the fixed app bar.
-      // A larger alignment leaves the tail of the previous section (or the
-      // navigation buttons) clipped beneath the bar on compact devices.
-      alignment: 0.02,
+      // The scrollable viewport already starts below the fixed app bar. Align
+      // the requested section with its exact leading edge so no line from the
+      // previous legal section remains visibly clipped below the bar.
+      alignment: 0,
     );
   }
 
@@ -106,10 +106,11 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                     AppTheme.space32 +
                     MediaQuery.of(context).padding.bottom +
                     // The privacy section is the final document block. Keep
-                    // enough trailing extent for its deep link to align below
-                    // the app bar instead of exposing a clipped line from the
-                    // preceding section at the top of compact viewports.
-                    viewport.maxHeight * 0.82,
+                    // one viewport of trailing extent so its deep link can
+                    // align exactly below the app bar even on wide screens,
+                    // where the short, single-line document blocks otherwise
+                    // leave too little scroll range.
+                    viewport.maxHeight,
               ),
               children: [
                 ResponsivePageFrame(
@@ -156,6 +157,7 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                             'ManaLoom coordena propostas e conversas, mas não recebe, guarda ou protege pagamentos e não garante entrega, estado ou autenticidade das cartas. Os usuários devem verificar os itens e combinar pagamento e envio diretamente entre si.',
                       ),
                       const _LegalDocumentSection(
+                        anchorKey: Key('legal-monetization-section'),
                         title: 'Monetização',
                         icon: Icons.payments_outlined,
                         body:

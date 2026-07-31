@@ -330,6 +330,7 @@ void main() {
           },
           '/ai/generate': (body) {
             expect(body['format'], 'commander');
+            expect(body['bracket'], 2);
             expect(body['async'], isTrue);
             expect(body['commander_name'], 'Talrand, Sky Summoner');
             expect(
@@ -377,6 +378,7 @@ void main() {
             deckCreated = true;
             expect(body['name'], 'Runtime Talrand');
             expect(body['format'], 'commander');
+            expect(body['bracket'], 2);
             expect(
               body['cards'],
               equals([

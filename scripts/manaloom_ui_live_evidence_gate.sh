@@ -10,6 +10,7 @@ CORE_PRODUCT_CAPTURE_OUTPUT="docs/qa/ui-live/current/core-product-android"
 P0_CAPTURE_OUTPUT="docs/qa/ui-live/current/p0-matrix"
 
 source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
+source "$ROOT_DIR/scripts/lib/manaloom_ui_runtime_contract.sh"
 resolve_manaloom_dart
 DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
 
@@ -23,6 +24,95 @@ fi
 
 print_header() {
   printf '\n== %s ==\n' "$1"
+}
+
+attest_android_runtime() {
+  local device_id="$1"
+  local capture_posture="${2:-portrait-up}"
+  local kernel_qemu boot_qemu serial device_model device_android_version
+  local device_size emulator_signal physical_signal flutter_devices_json
+  local flutter_device_record flutter_reports_emulator
+  local requested_kind="${MANALOOM_UI_ANDROID_RUNTIME_KIND:-auto}"
+
+  if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]] ||
+     ! command -v jq >/dev/null 2>&1; then
+    echo "Flutter and jq are required to cross-check Android attestation" >&2
+    exit 2
+  fi
+  adb -s "$device_id" get-state | grep -qx device || {
+    echo "Android runtime is not ready: $device_id" >&2
+    exit 1
+  }
+  kernel_qemu="$(adb -s "$device_id" shell getprop ro.kernel.qemu | tr -d '\r')"
+  boot_qemu="$(adb -s "$device_id" shell getprop ro.boot.qemu | tr -d '\r')"
+  serial="$(adb -s "$device_id" get-serialno | tr -d '\r')"
+  device_model="$(adb -s "$device_id" shell getprop ro.product.model | tr -d '\r')"
+  device_android_version="$(
+    adb -s "$device_id" shell getprop ro.build.version.release | tr -d '\r'
+  )"
+  device_size="$(adb -s "$device_id" shell wm size | tr -d '\r' | tail -n 1)"
+  if [[ -z "$serial" || "$serial" == "unknown" ||
+        -z "$device_model" || -z "$device_android_version" || -z "$device_size" ]]; then
+    echo "Could not attest the Android runtime contract" >&2
+    exit 1
+  fi
+
+  emulator_signal="false"
+  physical_signal="false"
+  if [[ "$kernel_qemu" == "1" || "$boot_qemu" == "1" ||
+        "$serial" == emulator-* ]]; then
+    emulator_signal="true"
+  fi
+  if [[ ( -z "$kernel_qemu" || "$kernel_qemu" == "0" ) &&
+        ( -z "$boot_qemu" || "$boot_qemu" == "0" ) &&
+        "$serial" != emulator-* ]]; then
+    physical_signal="true"
+  fi
+  if [[ "$emulator_signal" == "$physical_signal" ]]; then
+    echo "Android runtime kind is ambiguous; refusing evidence attestation" >&2
+    exit 1
+  fi
+
+  flutter_devices_json="$(
+    "$FLUTTER_BIN" devices --machine --no-version-check 2>/dev/null
+  )"
+  flutter_device_record="$(
+    jq -c --arg device_id "$device_id" \
+      '[.[] | select(.id == $device_id)] | if length == 1 then .[0] else empty end' \
+      <<<"$flutter_devices_json"
+  )"
+  flutter_reports_emulator="$(
+    jq -r '.emulator | if . == true then "true" elif . == false then "false" else empty end' \
+      <<<"$flutter_device_record"
+  )"
+  if [[ -z "$flutter_device_record" || -z "$flutter_reports_emulator" ||
+        "$flutter_reports_emulator" != "$emulator_signal" ]]; then
+    echo "ADB and Flutter disagree about Android runtime kind" >&2
+    exit 1
+  fi
+
+  if [[ "$emulator_signal" == "true" ]]; then
+    MANALOOM_ATTESTED_ANDROID_KIND="emulator"
+    MANALOOM_ATTESTED_ANDROID_TARGET="android_emulator"
+  else
+    MANALOOM_ATTESTED_ANDROID_KIND="physical"
+    MANALOOM_ATTESTED_ANDROID_TARGET="android_physical"
+  fi
+  if [[ "$requested_kind" != "auto" &&
+        "$requested_kind" != "$MANALOOM_ATTESTED_ANDROID_KIND" ]]; then
+    echo "Requested Android runtime kind '$requested_kind' does not match attested '$MANALOOM_ATTESTED_ANDROID_KIND'" >&2
+    exit 1
+  fi
+
+  MANALOOM_ATTESTED_ANDROID_CONTRACT="$(
+    manaloom_android_runtime_device_contract \
+      "$device_model" \
+      "$device_android_version" \
+      "$MANALOOM_ATTESTED_ANDROID_KIND" \
+      "$serial" \
+      "$device_size" \
+      "$capture_posture"
+  )"
 }
 
 verify_current_evidence() {
@@ -45,7 +135,7 @@ capture_battle_coach() {
     exit 2
   fi
   command -v adb >/dev/null 2>&1 || {
-    echo "adb is required for physical Android runtime capture" >&2
+    echo "adb is required for Android runtime capture" >&2
     exit 2
   }
   command -v python3 >/dev/null 2>&1 || {
@@ -54,10 +144,13 @@ capture_battle_coach() {
   }
   local device_id="${MANALOOM_UI_PROOF_DEVICE:-}"
   if [[ -z "$device_id" ]]; then
-    echo "MANALOOM_UI_PROOF_DEVICE must identify a connected physical Android device" >&2
+    echo "MANALOOM_UI_PROOF_DEVICE must identify a connected Android runtime" >&2
     exit 2
   fi
-  local device_contract="${MANALOOM_UI_PROOF_DEVICE_CONTRACT:-physical_android}"
+  attest_android_runtime "$device_id" "portrait-up"
+  local device_contract="$MANALOOM_ATTESTED_ANDROID_CONTRACT"
+  local runtime_target="$MANALOOM_ATTESTED_ANDROID_TARGET"
+  local proof_profile="${MANALOOM_UI_PROOF_PROFILE:-android_${MANALOOM_ATTESTED_ANDROID_KIND}_phone}"
   local source_digest run_dir runtime_log status image_port image_server_pid
   source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
   run_dir="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_ui_proof.XXXXXX")"
@@ -91,10 +184,6 @@ PY
     --directory "$ROOT_DIR/app/assets/branding" \
     >"$run_dir/card-image-fixture.log" 2>&1 &
   image_server_pid="$!"
-  adb -s "$device_id" get-state | grep -qx device || {
-    echo "Android device is not ready: $device_id" >&2
-    exit 1
-  }
   adb -s "$device_id" reverse "tcp:$image_port" "tcp:$image_port" >/dev/null
   for _ in $(seq 1 40); do
     if curl -fsS --max-time 1 \
@@ -122,7 +211,7 @@ PY
       --no-pub --no-version-check --reporter compact
   )
 
-  print_header "Battle Coach physical Android runtime capture"
+  print_header "Battle Coach $MANALOOM_ATTESTED_ANDROID_KIND Android runtime capture"
   set +e
   (
     cd "$ROOT_DIR/app"
@@ -130,7 +219,8 @@ PY
       integration_test/battle_coach_visual_runtime_proof_test.dart \
       -d "$device_id" \
       --dart-define=MANALOOM_UI_SOURCE_DIGEST="$source_digest" \
-      --dart-define=MANALOOM_UI_PROOF_PROFILE=android_phone \
+      --dart-define=MANALOOM_UI_PROOF_PROFILE="$proof_profile" \
+      --dart-define=MANALOOM_UI_PROOF_TARGET="$runtime_target" \
       --dart-define=MANALOOM_UI_PROOF_DEVICE_CONTRACT="$device_contract" \
       --dart-define=MANALOOM_UI_PROOF_CARD_IMAGE_BASE_URL="http://127.0.0.1:$image_port" \
       --dart-define=MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES=true \
@@ -171,7 +261,7 @@ capture_core_product() {
     exit 2
   fi
   command -v adb >/dev/null 2>&1 || {
-    echo "adb is required for physical Android runtime capture" >&2
+    echo "adb is required for Android runtime capture" >&2
     exit 2
   }
   command -v jq >/dev/null 2>&1 || {
@@ -180,28 +270,14 @@ capture_core_product() {
   }
   local device_id="${MANALOOM_UI_PROOF_DEVICE:-}"
   if [[ -z "$device_id" ]]; then
-    echo "MANALOOM_UI_PROOF_DEVICE must identify a connected physical Android device" >&2
+    echo "MANALOOM_UI_PROOF_DEVICE must identify a connected Android runtime" >&2
     exit 2
   fi
-  adb -s "$device_id" get-state | grep -qx device || {
-    echo "Android device is not ready: $device_id" >&2
-    exit 1
-  }
-  local is_emulator device_model device_android_version device_size
-  is_emulator="$(adb -s "$device_id" shell getprop ro.kernel.qemu | tr -d '\r')"
-  if [[ "$is_emulator" == "1" ]]; then
-    echo "Core product proof requires a physical Android device" >&2
-    exit 1
-  fi
-  device_model="$(adb -s "$device_id" shell getprop ro.product.model | tr -d '\r')"
-  device_android_version="$(adb -s "$device_id" shell getprop ro.build.version.release | tr -d '\r')"
-  device_size="$(adb -s "$device_id" shell wm size | tr -d '\r' | tail -n 1)"
-  if [[ -z "$device_model" || -z "$device_android_version" || -z "$device_size" ]]; then
-    echo "Could not attest the physical Android device contract" >&2
-    exit 1
-  fi
+  attest_android_runtime "$device_id" "portrait-up"
   local device_contract source_digest run_dir runtime_log status
-  device_contract="$device_model, Android $device_android_version, physical device, $device_size; capture posture: portrait-up"
+  local runtime_target="$MANALOOM_ATTESTED_ANDROID_TARGET"
+  local proof_profile="${MANALOOM_UI_PROOF_PROFILE:-android_${MANALOOM_ATTESTED_ANDROID_KIND}_core_product}"
+  device_contract="$MANALOOM_ATTESTED_ANDROID_CONTRACT"
   source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
   run_dir="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_core_product_proof.XXXXXX")"
   runtime_log="$run_dir/core-product-runtime.log"
@@ -241,7 +317,7 @@ capture_core_product() {
       --no-pub --no-version-check --reporter compact
   )
 
-  print_header "Core product physical Android runtime capture"
+  print_header "Core product $MANALOOM_ATTESTED_ANDROID_KIND Android runtime capture"
   set +e
   (
     cd "$ROOT_DIR/app"
@@ -249,7 +325,8 @@ capture_core_product() {
       integration_test/core_product_acceptance_runtime_test.dart \
       -d "$device_id" \
       --dart-define=MANALOOM_UI_SOURCE_DIGEST="$source_digest" \
-      --dart-define=MANALOOM_UI_PROOF_PROFILE=android_core_product \
+      --dart-define=MANALOOM_UI_PROOF_PROFILE="$proof_profile" \
+      --dart-define=MANALOOM_UI_PROOF_TARGET="$runtime_target" \
       --dart-define=MANALOOM_UI_PROOF_DEVICE_CONTRACT="$device_contract" \
       --dart-define=DISABLE_FIREBASE_STARTUP=true \
       --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
@@ -289,8 +366,27 @@ capture_core_product() {
 }
 
 index_p0_matrix() {
-  local source_digest
+  local source_digest android_profile android_target android_device_contract
+  local device_id="${MANALOOM_UI_PROOF_DEVICE:-}"
   source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
+  if [[ -z "$device_id" ]]; then
+    echo "MANALOOM_UI_PROOF_DEVICE is required to attest the indexed Android runtime" >&2
+    exit 2
+  fi
+  attest_android_runtime \
+    "$device_id" \
+    "portrait-up with native Life Counter landscape checkpoint"
+  android_target="$MANALOOM_ATTESTED_ANDROID_TARGET"
+  android_device_contract="$MANALOOM_ATTESTED_ANDROID_CONTRACT"
+  if [[ "$MANALOOM_ATTESTED_ANDROID_KIND" == "emulator" ]]; then
+    android_profile="${MANALOOM_P0_ANDROID_PROFILE:-android_emulator_manaloom_api34}"
+  else
+    android_profile="${MANALOOM_P0_ANDROID_PROFILE:-android_physical_sm_a135m}"
+  fi
+  if [[ "$android_profile" != android_"$MANALOOM_ATTESTED_ANDROID_KIND"_* ]]; then
+    echo "Android P0 profile '$android_profile' contradicts attested runtime kind '$MANALOOM_ATTESTED_ANDROID_KIND'" >&2
+    exit 2
+  fi
 
   index_profile() {
     local profile="$1"
@@ -330,25 +426,25 @@ index_p0_matrix() {
   index_profile \
     web_mobile_390x844 \
     web_real_build \
-    "Chrome real build; Flutter surface requested at 390x844; symmetric near-white host margins cropped by the driver when present" \
+    "$(manaloom_web_runtime_device_contract web_mobile_390x844)" \
     "${MANALOOM_P0_WEB_MOBILE_DIR:-}" \
     "${MANALOOM_P0_WEB_MOBILE_LOG:-}"
   index_profile \
     web_desktop_1440x900 \
     web_real_build \
-    "Chrome real build; Flutter surface requested at 1440x900; symmetric near-white host margins cropped by the driver when present" \
+    "$(manaloom_web_runtime_device_contract web_desktop_1440x900)" \
     "${MANALOOM_P0_WEB_DESKTOP_DIR:-}" \
     "${MANALOOM_P0_WEB_DESKTOP_LOG:-}"
   index_profile \
     web_wide_1920x1080 \
     web_real_build \
-    "Chrome real build; Flutter surface requested at 1920x1080; symmetric near-white host margins cropped by the driver when present" \
+    "$(manaloom_web_runtime_device_contract web_wide_1920x1080)" \
     "${MANALOOM_P0_WEB_WIDE_DIR:-}" \
     "${MANALOOM_P0_WEB_WIDE_LOG:-}"
   index_profile \
-    android_physical_sm_a135m \
-    android_physical \
-    "Samsung SM-A135M, Android 14, profile mode, 1080x2408" \
+    "$android_profile" \
+    "$android_target" \
+    "$android_device_contract" \
     "${MANALOOM_P0_ANDROID_DIR:-}" \
     "${MANALOOM_P0_ANDROID_LOG:-}"
 }
@@ -369,9 +465,9 @@ case "$MODE" in
   -h|--help|help)
     printf '%s\n' \
       "usage: $0 --check" \
-      "       MANALOOM_UI_PROOF_DEVICE=<id> $0 --capture-battle-coach" \
-      "       MANALOOM_UI_PROOF_DEVICE=<id> $0 --capture-core-product" \
-      "       MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
+      "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-battle-coach" \
+      "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-core-product" \
+      "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
     ;;
   *)
     echo "unknown mode: $MODE" >&2

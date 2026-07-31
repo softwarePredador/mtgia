@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart';
 
 import '../color_identity.dart';
+import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import 'optimize_candidate_quality_support.dart';
 import 'optimize_filler_loader_support.dart';
@@ -32,6 +33,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   int? budgetLimitBrl,
   double usdToBrlRate = defaultOptimizeUsdToBrlRate,
   String deckFormat = 'commander',
+  OptimizeRecommendationConstraintLedger? recommendationLedger,
 }) async {
   final results = <Map<String, dynamic>>[];
 
@@ -96,7 +98,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
 
   final colorIdentityArr = commanderColorIdentity.toList();
   final normalizedPreferredNames =
-      preferredNames
+      <String>{...preferredNames, if (keepTheme) ...?coreCards}
           .map((name) => name.trim().toLowerCase())
           .where((name) => name.isNotEmpty)
           .toSet();
@@ -115,7 +117,9 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
              sub.colors, sub.color_identity, sub.pop_score,
              sub.functional_tags, sub.semantic_tags_v2, sub.best_role_score,
              sub.price_usd, sub.price_usd_foil,
-             sub.owned_quantity, sub.available_quantity
+             sub.owned_quantity, sub.available_quantity,
+             sub.best_commander_synergy_score,
+             sub.minimum_bracket
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
@@ -133,17 +137,51 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           c.price_usd,
           c.price_usd_foil,
           COALESCE(availability.owned_quantity, 0)::int AS owned_quantity,
-          COALESCE(availability.free_quantity, 0)::int AS available_quantity
+          COALESCE(availability.free_quantity, 0)::int AS available_quantity,
+          COALESCE(commander_synergy.best_score, 0)::int
+            AS best_commander_synergy_score,
+          COALESCE(bracket_scope.minimum_bracket, 1)::int AS minimum_bracket
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
+        LEFT JOIN LATERAL (
+          SELECT MAX(ccs.score)::int AS best_score
+          FROM commander_card_synergy ccs
+          WHERE LOWER(ccs.card_name) = LOWER(c.name)
+            AND (
+              CARDINALITY(@commander_names::text[]) = 0
+              OR ccs.commander_name_normalized =
+                 ANY(@commander_names::text[])
+            )
+        ) commander_synergy ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT MAX(
+            CASE
+              WHEN crs.subformat = 'competitive_commander'
+                OR crs.bracket_scope = 'bracket_5' THEN 5
+              WHEN crs.bracket_scope IN (
+                'bracket_4_plus', 'bracket_4_5'
+              ) THEN 4
+              WHEN crs.bracket_scope IN (
+                'bracket_3_plus', 'bracket_3_4', 'bracket_3_5'
+              ) THEN 3
+              WHEN crs.bracket_scope IN (
+                'bracket_2_plus', 'bracket_2_4', 'bracket_2_5'
+              ) THEN 2
+              ELSE 1
+            END
+          )::int AS minimum_bracket
+          FROM card_role_scores crs
+          WHERE crs.card_id = c.id
+            AND crs.format = 'commander'
+        ) bracket_scope ON TRUE
         LEFT JOIN collection_availability_snapshot availability
           ON availability.playable_card_id = COALESCE(c.oracle_id, c.id)
          AND availability.user_id =
              CAST(NULLIF(CAST(@user_id AS text), '') AS uuid)
-         AND CAST(@prefer_collection AS boolean) = TRUE
+         AND CAST(@check_collection AS boolean) = TRUE
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
@@ -163,7 +201,12 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                  COALESCE(availability.owned_quantity, 0) DESC,
                  COALESCE(cmi.usage_count, 0) DESC
       ) sub
-      ORDER BY CASE WHEN sub.available_quantity > 0 THEN 1 ELSE 0 END DESC,
+      ORDER BY CASE
+                 WHEN CAST(@prefer_collection AS boolean) = TRUE
+                      AND sub.available_quantity > 0 THEN 1
+                 ELSE 0
+               END DESC,
+               sub.best_commander_synergy_score DESC,
                sub.pop_score DESC,
                LOWER(sub.name) ASC
       LIMIT 300
@@ -171,7 +214,15 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     parameters: {
       'exclude': excludeNames.toList(),
       'identity': colorIdentityArr,
+      'commander_names': commanders
+          .map((name) => name.trim().toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toList(growable: false),
       'prefer_collection': preferCollection,
+      'check_collection':
+          userId != null &&
+          userId.trim().isNotEmpty &&
+          (preferCollection || budgetLimitBrl != null),
       'user_id': userId,
       'legality_format': deckFormat.trim().toLowerCase(),
     },
@@ -179,7 +230,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
 
   final candidatePool = <Map<String, dynamic>>[];
   final effectiveBudgetLimit =
-      (budgetLimitBrl != null && budgetLimitBrl > 0) ? budgetLimitBrl : null;
+      (budgetLimitBrl != null && budgetLimitBrl >= 0) ? budgetLimitBrl : null;
   for (final row in candidatesResult) {
     final id = row[0] as String;
     final name = row[1] as String;
@@ -198,15 +249,23 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     final priceUsdFoil = row[12];
     final ownedQuantity = (row[13] as num?)?.toInt() ?? 0;
     final availableQuantity = (row[14] as num?)?.toInt() ?? 0;
+    final bestCommanderSynergyScore = (row[15] as num?)?.toInt() ?? 0;
+    final minimumBracket = (row[16] as num?)?.toInt() ?? 1;
     final estimatedPriceBrl = estimateOptimizePriceBrl(
       priceUsd: priceUsd,
       priceUsdFoil: priceUsdFoil,
       usdToBrlRate: usdToBrlRate,
     );
+    final ledgerAvailable =
+        recommendationLedger?.remainingAvailable(
+          name,
+          initialAvailableQuantity: availableQuantity,
+        ) ??
+        availableQuantity;
     if (!isOptimizeCandidateWithinBudget(
       budgetLimitBrl: effectiveBudgetLimit,
-      budgetUsedBrl: 0,
-      availableQuantity: availableQuantity,
+      budgetUsedBrl: recommendationLedger?.budgetUsedBrl ?? 0,
+      availableQuantity: ledgerAvailable,
       estimatedPriceBrl: estimatedPriceBrl,
     )) {
       continue;
@@ -240,29 +299,51 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       'estimated_price_brl': estimatedPriceBrl,
       'owned_quantity': ownedQuantity,
       'available_quantity': availableQuantity,
+      'best_commander_synergy_score': bestCommanderSynergyScore,
+      'minimum_bracket': minimumBracket,
     });
   }
 
+  final eligibleCandidatePool = filterCandidatesByBracketPolicy(
+    candidates: candidatePool,
+    bracket: bracket,
+    currentDeckCards: allCardData,
+  );
   final usedNames = <String>{};
   var budgetUsedBrl = 0.0;
 
   bool canUseCandidate(Map<String, dynamic> candidate) {
+    final name = candidate['name']?.toString() ?? '';
+    final initialAvailable =
+        (candidate['available_quantity'] as num?)?.toInt() ?? 0;
     return isOptimizeCandidateWithinBudget(
       budgetLimitBrl: effectiveBudgetLimit,
-      budgetUsedBrl: budgetUsedBrl,
+      budgetUsedBrl: recommendationLedger?.budgetUsedBrl ?? budgetUsedBrl,
       availableQuantity:
-          (candidate['available_quantity'] as num?)?.toInt() ?? 0,
+          recommendationLedger?.remainingAvailable(
+            name,
+            initialAvailableQuantity: initialAvailable,
+          ) ??
+          initialAvailable,
       estimatedPriceBrl: (candidate['estimated_price_brl'] as num?)?.toDouble(),
     );
   }
 
   void consumeCandidateBudget(Map<String, dynamic> candidate) {
-    if (effectiveBudgetLimit == null) return;
+    final name = candidate['name']?.toString() ?? '';
     final availableQuantity =
         (candidate['available_quantity'] as num?)?.toInt() ?? 0;
-    if (availableQuantity > 0) return;
     final estimatedPrice =
         (candidate['estimated_price_brl'] as num?)?.toDouble();
+    if (recommendationLedger != null) {
+      recommendationLedger.reserve(
+        name: name,
+        initialAvailableQuantity: availableQuantity,
+        budgetCostBrl: estimatedPrice,
+      );
+      return;
+    }
+    if (effectiveBudgetLimit == null || availableQuantity > 0) return;
     if (estimatedPrice == null || estimatedPrice <= 0) return;
     budgetUsedBrl += estimatedPrice;
   }
@@ -279,7 +360,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     Map<String, dynamic>? best;
     var bestScore = -0x7fffffff;
 
-    for (final candidate in candidatePool) {
+    for (final candidate in eligibleCandidatePool) {
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
       if (!canUseCandidate(candidate)) continue;
@@ -299,6 +380,17 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
             functionalNeed: need,
             candidate: candidate,
           ) +
+          scoreOptimizeThemeAffinity(
+            candidate: candidate,
+            detectedTheme: detectedTheme,
+            keepTheme: keepTheme,
+          ) +
+          scoreOptimizeBracketScopeAffinity(
+            candidate: candidate,
+            bracket: bracket,
+          ) +
+          (((candidate['best_commander_synergy_score'] as num?)?.toInt() ?? 0) *
+              3) +
           ((preferCollection &&
                   ((candidate['available_quantity'] as num?)?.toInt() ?? 0) > 0)
               ? 220
@@ -323,7 +415,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
 
   if (results.length < missingCount) {
     final rankedRemaining =
-        candidatePool.where((candidate) {
+        eligibleCandidatePool.where((candidate) {
             final name = (candidate['name'] as String).toLowerCase();
             return !usedNames.contains(name);
           }).toList()
@@ -343,7 +435,18 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                 semanticReplacementScoreBoost(
                   functionalNeed: 'utility',
                   candidate: a,
-                );
+                ) +
+                scoreOptimizeThemeAffinity(
+                  candidate: a,
+                  detectedTheme: detectedTheme,
+                  keepTheme: keepTheme,
+                ) +
+                scoreOptimizeBracketScopeAffinity(
+                  candidate: a,
+                  bracket: bracket,
+                ) +
+                (((a['best_commander_synergy_score'] as num?)?.toInt() ?? 0) *
+                    3);
             final scoreB =
                 scoreOptimizeReplacementCandidate(
                   functionalNeed: 'utility',
@@ -359,7 +462,18 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                 semanticReplacementScoreBoost(
                   functionalNeed: 'utility',
                   candidate: b,
-                );
+                ) +
+                scoreOptimizeThemeAffinity(
+                  candidate: b,
+                  detectedTheme: detectedTheme,
+                  keepTheme: keepTheme,
+                ) +
+                scoreOptimizeBracketScopeAffinity(
+                  candidate: b,
+                  bracket: bracket,
+                ) +
+                (((b['best_commander_synergy_score'] as num?)?.toInt() ?? 0) *
+                    3);
             final byScore = scoreB.compareTo(scoreA);
             if (byScore != 0) return byScore;
             final nameA = (a['name'] as String? ?? '').toLowerCase();
@@ -395,6 +509,14 @@ Map<String, dynamic> _buildReplacementResult(
   return {
     'id': candidate['id'],
     'name': candidate['name'],
+    'type_line': candidate['type_line'] ?? '',
+    'oracle_text': candidate['oracle_text'] ?? '',
+    'mana_cost': candidate['mana_cost'] ?? '',
+    'colors': candidate['colors'] ?? const <String>[],
+    'color_identity': candidate['color_identity'] ?? const <String>[],
+    'functional_tags': candidate['functional_tags'] ?? const <String>[],
+    'semantic_tags_v2':
+        candidate['semantic_tags_v2'] ?? const <Map<String, dynamic>>[],
     'functional_need': _normalizeReplacementNeed(functionalNeed),
     'owned_quantity': ownedQuantity,
     'available_quantity': availableQuantity,
@@ -453,6 +575,138 @@ int semanticReplacementScoreBoost({
   return 90 + (roleScore ~/ 3);
 }
 
+int scoreOptimizeThemeAffinity({
+  required Map<String, dynamic> candidate,
+  required String? detectedTheme,
+  required bool keepTheme,
+}) {
+  if (!keepTheme) return 0;
+  final theme = (detectedTheme ?? '').trim().toLowerCase();
+  if (theme.isEmpty || theme == 'unknown') return 0;
+
+  final name = candidate['name']?.toString().toLowerCase() ?? '';
+  final typeLine = candidate['type_line']?.toString().toLowerCase() ?? '';
+  final oracle = candidate['oracle_text']?.toString().toLowerCase() ?? '';
+  final roles =
+      optimizationFunctionalRolesForCard(
+        candidate,
+      ).map((role) => role.trim().toLowerCase()).toSet();
+  var score = 0;
+
+  bool hasAnyRole(Iterable<String> expected) =>
+      roles.intersection(expected.toSet()).isNotEmpty;
+
+  final isMiracleBigSpells =
+      theme.contains('miracle') ||
+      theme.contains('big spell') ||
+      theme.contains('spellslinger');
+  if (isMiracleBigSpells) {
+    final isSpell =
+        typeLine.contains('instant') || typeLine.contains('sorcery');
+    final supportsTopDeck =
+        oracle.contains('miracle') ||
+        oracle.contains('top of your library') ||
+        oracle.contains('top card of your library') ||
+        oracle.contains('scry') ||
+        oracle.contains('surveil');
+    final supportsHandTiming =
+        oracle.contains('draw') &&
+        (oracle.contains('discard') || oracle.contains('first card'));
+    final supportsBigSpellPlan = hasAnyRole(const [
+      'big_spell',
+      'spellslinger',
+      'exile_value',
+      'loot',
+    ]);
+
+    if (isSpell) score += 110;
+    if (supportsTopDeck) score += 170;
+    if (supportsHandTiming) score += 80;
+    if (supportsBigSpellPlan) score += 120;
+    if (oracle.contains('miracle')) score += 180;
+
+    final isUnalignedPermanent =
+        !isSpell &&
+        !supportsTopDeck &&
+        !supportsHandTiming &&
+        !supportsBigSpellPlan &&
+        (typeLine.contains('equipment') ||
+            typeLine.contains('creature') ||
+            typeLine.contains('artifact'));
+    if (isUnalignedPermanent) score -= 100;
+  }
+
+  if (theme.contains('artifact')) {
+    if (typeLine.contains('artifact') ||
+        hasAnyRole(const ['artifact_synergy'])) {
+      score += 120;
+    }
+  }
+  if (theme.contains('token')) {
+    if (oracle.contains('token') ||
+        hasAnyRole(const ['token_maker', 'token'])) {
+      score += 120;
+    }
+  }
+  if (theme.contains('graveyard') ||
+      theme.contains('reanimator') ||
+      theme.contains('recursion')) {
+    if (hasAnyRole(const ['graveyard_synergy', 'recursion']) ||
+        oracle.contains('graveyard')) {
+      score += 120;
+    }
+  }
+  if (theme.contains('voltron') || theme.contains('equipment')) {
+    if (typeLine.contains('equipment') ||
+        hasAnyRole(const ['protection', 'equipment'])) {
+      score += 120;
+    }
+  }
+  if (theme.contains('counter') || theme.contains('proliferate')) {
+    if (oracle.contains('counter') || oracle.contains('proliferate')) {
+      score += 110;
+    }
+  }
+
+  final normalizedThemeTokens =
+      theme
+          .split(RegExp(r'[^a-z0-9]+'))
+          .where(
+            (token) =>
+                token.length >= 5 &&
+                !const {
+                  'spells',
+                  'cards',
+                  'commander',
+                  'midrange',
+                  'control',
+                }.contains(token),
+          )
+          .toSet();
+  final searchable = '$name $typeLine $oracle ${roles.join(' ')}';
+  for (final token in normalizedThemeTokens) {
+    if (searchable.contains(token)) score += 30;
+  }
+
+  return score.clamp(-200, 600).toInt();
+}
+
+int scoreOptimizeBracketScopeAffinity({
+  required Map<String, dynamic> candidate,
+  required int? bracket,
+}) {
+  if (bracket == null) return 0;
+  final minimumBracket = switch (candidate['minimum_bracket']) {
+    int value => value,
+    num value => value.toInt(),
+    String value => int.tryParse(value.trim()) ?? 1,
+    _ => 1,
+  };
+  if (minimumBracket <= bracket) return 0;
+  final distance = minimumBracket - bracket;
+  return -(distance * 220).clamp(0, 660).toInt();
+}
+
 String _normalizeReplacementNeed(String value) {
   return switch (value.trim().toLowerCase()) {
     'board_wipe' || 'wipe' => 'wipe',
@@ -472,10 +726,10 @@ bool isOptimizeCandidateWithinBudget({
   required int availableQuantity,
   required double? estimatedPriceBrl,
 }) {
-  if (budgetLimitBrl == null || budgetLimitBrl <= 0) return true;
+  if (budgetLimitBrl == null) return true;
   if (availableQuantity > 0) return true;
   if (estimatedPriceBrl == null || estimatedPriceBrl <= 0) return false;
-  return budgetUsedBrl + estimatedPriceBrl <= budgetLimitBrl + 0.01;
+  return budgetUsedBrl + estimatedPriceBrl <= budgetLimitBrl + 0.0001;
 }
 
 List<Map<String, dynamic>> buildSameLaneOptimizeSwapPairs({
@@ -504,11 +758,27 @@ List<Map<String, dynamic>> buildSameLaneOptimizeSwapPairs({
         break;
       }
     }
+    final bracketRepair = removal['bracket_violation'] == true;
+    final functionalRoleRepair = removal['functional_role_repair'] == true;
+    if (replacementIndex == null && (bracketRepair || functionalRoleRepair)) {
+      for (var index = 0; index < replacements.length; index++) {
+        if (usedReplacementIndexes.contains(index)) continue;
+        final additionName =
+            replacements[index]['name']?.toString().trim() ?? '';
+        if (additionName.isEmpty) continue;
+        replacementIndex = index;
+        break;
+      }
+    }
     if (replacementIndex == null) continue;
 
     usedReplacementIndexes.add(replacementIndex);
     final replacement = replacements[replacementIndex];
     final additionName = replacement['name']?.toString().trim() ?? '';
+    final additionRole = _normalizeReplacementNeed(
+      replacement['functional_need']?.toString() ?? removalRole,
+    );
+    final sameLane = additionRole == removalRole;
     final protectedAnchor = removal['protected_anchor'] == true;
     final anchorReasons =
         (removal['anchor_reasons'] as List?)
@@ -521,14 +791,26 @@ List<Map<String, dynamic>> buildSameLaneOptimizeSwapPairs({
       'remove': removalName,
       'add': additionName,
       'remove_role': removalRole,
-      'add_role': removalRole,
-      'same_lane': true,
+      'add_role': additionRole,
+      'same_lane': sameLane,
+      'bracket_repair': bracketRepair,
+      'functional_role_repair': functionalRoleRepair,
+      if (functionalRoleRepair)
+        'functional_role_repair_target':
+            removal['functional_role_repair_target'],
       'protected_anchor': protectedAnchor,
       'anchor_reasons': anchorReasons,
       'anchor_policy': 'same_lane_replacement_or_battle_gate',
-      'anchor_policy_satisfied': !protectedAnchor || removalRole.isNotEmpty,
+      'anchor_policy_satisfied':
+          bracketRepair || functionalRoleRepair || !protectedAnchor || sameLane,
       'same_lane_hypothesis':
-          'Substituir uma carta de $removalRole por outra da mesma função antes do battle gate independente.',
+          sameLane
+              ? 'Substituir uma carta de $removalRole por outra da mesma função antes do battle gate independente.'
+              : bracketRepair
+              ? 'Remover uma violação objetiva de bracket e realocar a vaga '
+                  'para $additionRole antes do battle gate independente.'
+              : 'Reparar o piso funcional de $additionRole sem remover '
+                  'terreno ou outra função crítica antes do battle gate.',
       'remove_score': removal['score'],
       'owned_quantity': replacement['owned_quantity'],
       'available_quantity': replacement['available_quantity'],
@@ -537,7 +819,15 @@ List<Map<String, dynamic>> buildSameLaneOptimizeSwapPairs({
       if (replacement['estimated_price_brl'] != null)
         'estimated_price_brl': replacement['estimated_price_brl'],
       'reason':
-          'Swap determinístico na mesma função $removalRole; superioridade ainda depende de evidência natural e battle gate independente.',
+          bracketRepair
+              ? 'Swap determinístico obrigatório para adequar o bracket; a '
+                  'vaga foi direcionada à necessidade $additionRole.'
+              : functionalRoleRepair
+              ? 'Swap determinístico para reparar o piso funcional de '
+                  '$additionRole; a validação final confirma a lista projetada.'
+              : 'Swap determinístico na mesma função $removalRole; '
+                  'superioridade ainda depende de evidência natural e battle '
+                  'gate independente.',
     });
   }
   return pairs;
@@ -564,7 +854,40 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   String deckFormat = 'commander',
 }) async {
   if (allCardData.isEmpty) return const [];
-  final effectiveSwapLimit = swapLimit.clamp(1, 20).toInt();
+  final requestedSwapLimit = swapLimit.clamp(1, 20).toInt();
+  final roleFloorAssessment =
+      deckFormat.trim().toLowerCase() == 'commander'
+          ? assessCommanderFunctionalRoleFloors(
+            cards: allCardData,
+            targetArchetype: targetArchetype,
+          )
+          : null;
+  final criticalRoleFloorNeeds =
+      roleFloorAssessment?.applies == true
+          ? buildCommanderCriticalRoleFloorNeeds(
+            cards: allCardData,
+            targetArchetype: targetArchetype,
+            limit: 20,
+          )
+          : const <String>[];
+  final bracketRepairSwapCount =
+      bracket == null
+          ? 0
+          : (() {
+            final assessment = assessDeckAgainstBracketPolicy(
+              bracket: bracket,
+              cards: allCardData,
+            );
+            final count = assessment.counts[BracketCategory.gameChanger] ?? 0;
+            final cap =
+                assessment.policy.maxCounts[BracketCategory.gameChanger] ?? 0;
+            return (count - cap).clamp(0, 20).toInt();
+          })();
+  final effectiveSwapLimit = [
+    requestedSwapLimit,
+    bracketRepairSwapCount,
+    criticalRoleFloorNeeds.length,
+  ].reduce((a, b) => a > b ? a : b);
   final isAggressive = intensity.trim().toLowerCase() == 'aggressive';
   final candidateSearchLimit =
       isAggressive
@@ -577,7 +900,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     allCardData: allCardData,
     commanderColorIdentity: commanderColorIdentity,
   );
-  final removalCandidates = buildDeterministicOptimizeRemovalCandidates(
+  final rawRemovalCandidates = buildDeterministicOptimizeRemovalCandidates(
     allCardData: allCardData,
     commanders: commanders,
     commanderColorIdentity: commanderColorIdentity,
@@ -585,8 +908,21 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     keepTheme: keepTheme,
     coreCards: coreCards,
     commanderPriorityNames: commanderPriorityNames,
+    bracket: bracket,
     swapLimit: candidateSearchLimit,
   );
+  final pendingRoleNeeds = [...criticalRoleFloorNeeds];
+  final removalCandidates = <Map<String, dynamic>>[];
+  for (final rawCandidate in rawRemovalCandidates) {
+    final candidate = Map<String, dynamic>.from(rawCandidate);
+    final role = candidate['role']?.toString() ?? 'utility';
+    if (pendingRoleNeeds.isNotEmpty && role != 'land' && role != 'wipe') {
+      candidate
+        ..['functional_role_repair'] = true
+        ..['functional_role_repair_target'] = pendingRoleNeeds.removeAt(0);
+    }
+    removalCandidates.add(candidate);
+  }
   final removalList =
       removalCandidates
           .map((candidate) => candidate['name'] as String)
@@ -603,14 +939,45 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     }
     return const [];
   }
-  final functionalNeedsOverride =
-      structuralRecoveryScenario
-          ? buildStructuralRecoveryFunctionalNeeds(
-            allCardData: allCardData,
-            targetArchetype: targetArchetype,
-            limit: removalList.length,
-          )
-          : null;
+  final bracketViolationCount =
+      removalCandidates
+          .where((candidate) => candidate['bracket_violation'] == true)
+          .length;
+  final functionalRoleRepairCount =
+      removalCandidates
+          .where((candidate) => candidate['functional_role_repair'] == true)
+          .length;
+  List<String>? functionalNeedsOverride;
+  if (structuralRecoveryScenario ||
+      bracketViolationCount > 0 ||
+      functionalRoleRepairCount > 0) {
+    final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
+      allCardData: allCardData,
+      targetArchetype: targetArchetype,
+      limit:
+          structuralRecoveryScenario
+              ? removalList.length
+              : bracketViolationCount,
+    );
+    if (bracketViolationCount > 0 || functionalRoleRepairCount > 0) {
+      var bracketNeedIndex = 0;
+      functionalNeedsOverride = [
+        for (final removal in removalCandidates)
+          if (removal['functional_role_repair'] == true)
+            removal['functional_role_repair_target']?.toString() ?? 'wipe'
+          else if (removal['bracket_violation'] == true)
+            structuralNeeds.isEmpty
+                ? 'utility'
+                : structuralNeeds[(bracketNeedIndex++)
+                    .clamp(0, structuralNeeds.length - 1)
+                    .toInt()]
+          else
+            removal['role']?.toString() ?? 'utility',
+      ];
+    } else {
+      functionalNeedsOverride = structuralNeeds;
+    }
+  }
 
   final deckNamesLower =
       allCardData
@@ -685,7 +1052,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   }
 
   // Em decks ja saudaveis, reduzir o numero de swaps diminui risco de regressao.
-  final maxPairs =
+  final structuralPairLimit =
       structuralRecoveryScenario
           ? computeOptimizeStructuralRecoverySwapTarget(
             allCardData: allCardData,
@@ -693,6 +1060,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
             targetArchetype: targetArchetype,
           ).clamp(1, effectiveSwapLimit).toInt()
           : effectiveSwapLimit;
+  final maxPairs =
+      bracketRepairSwapCount > structuralPairLimit
+          ? bracketRepairSwapCount.clamp(1, effectiveSwapLimit).toInt()
+          : structuralPairLimit;
 
   final responsePairLimit =
       isAggressive ? (maxPairs * 2).clamp(maxPairs, 40).toInt() : maxPairs;

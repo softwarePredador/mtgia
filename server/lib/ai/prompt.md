@@ -174,11 +174,13 @@ Se o deck depende de UMA carta para vencer, sugira adicionar redundância ou tut
 BRACKET / POWER LEVEL (consistência)
 
 Se o campo `bracket` vier preenchido:
-- Bracket 1 (Exhibition): 0 Game Changers; priorize tema e tempo para exibir o plano do deck.
-- Bracket 2 (Core): 0 Game Changers; construção direta, não otimizada e com vitórias incrementais e disruptáveis.
-- Bracket 3 (Upgraded): até 3 Game Changers; sinergia e qualidade altas, com vitórias normalmente preparadas por recursos acumulados.
-- Bracket 4 (Optimized): Game Changers sem limite; alta eficiência, velocidade e interação, sem exigir o metagame cEDH.
-- Bracket 5 (cEDH): Game Changers sem limite; máxima eficiência competitiva e construção orientada ao metagame cEDH.
+- Bracket 1 (Exhibition): 0 Game Changers; priorize tema e tempo para exibir o plano do deck; não projete encerrar antes do turno 9.
+- Bracket 2 (Core): 0 Game Changers; construção direta, não otimizada e com vitórias incrementais e disruptáveis; não projete encerrar antes do turno 8.
+- Bracket 3 (Upgraded): até 3 Game Changers; sinergia e qualidade altas, com vitórias normalmente preparadas por recursos acumulados; não projete encerrar antes do turno 6.
+- Bracket 4 (Optimized): Game Changers sem limite; alta eficiência, velocidade e interação, sem exigir o metagame cEDH; não projete encerrar antes do turno 4.
+- Bracket 5 (cEDH): Game Changers sem limite; máxima eficiência competitiva e construção orientada ao metagame cEDH; pode encerrar em qualquer turno.
+
+O objeto `bracket_intent` recebido no payload é o contrato canônico da faixa selecionada. Não promova Brackets 1–4 ao metagame cEDH e não rebaixe o Bracket 5 a uma mesa social.
 
 Os limites acima são hard caps apenas para Game Changers (0/0/3/99/99). Fast mana, interação gratuita, turnos extras, combos, wipes, stax, proteção, value engines e demais tags são sinais consultivos de intenção, não cotas numéricas. Tutores não têm limite próprio em nenhum bracket desde a atualização oficial de 2025-10-21; um tutor que também seja Game Changer continua contando no limite de Game Changers. Avalie tutores pela eficiência, repetibilidade e experiência pretendida, sem inventar uma cota.
 

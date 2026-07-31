@@ -22,6 +22,10 @@ const _deviceContract = String.fromEnvironment(
   'MANALOOM_UI_PROOF_DEVICE_CONTRACT',
   defaultValue: 'physical_android',
 );
+const _runtimeTarget = String.fromEnvironment(
+  'MANALOOM_UI_PROOF_TARGET',
+  defaultValue: 'android_physical',
+);
 const _proofCardImageBaseUrl = String.fromEnvironment(
   'MANALOOM_UI_PROOF_CARD_IMAGE_BASE_URL',
 );
@@ -69,12 +73,16 @@ void main() {
       );
       expect(_profile, isNotEmpty);
       expect(_deviceContract, isNotEmpty);
+      expect(const {
+        'android_emulator',
+        'android_physical',
+      }, contains(_runtimeTarget));
 
       // Consumed by tool/ui_runtime_evidence.dart. This contains no credential,
       // API URL, user data or private gameplay payload.
       // ignore: avoid_print
       print(
-        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'battle_coach', 'source_digest': _sourceDigest, 'profile': _profile, 'runtime': 'flutter_integration_test', 'target': 'android_physical', 'device_contract': _deviceContract, 'required_checkpoints': _checkpoints})}',
+        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'battle_coach', 'source_digest': _sourceDigest, 'profile': _profile, 'runtime': 'flutter_integration_test', 'target': _runtimeTarget, 'device_contract': _deviceContract, 'required_checkpoints': _checkpoints})}',
       );
 
       final gateway = _BattleCoachProofGateway();

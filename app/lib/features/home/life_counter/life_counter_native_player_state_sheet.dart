@@ -15,6 +15,7 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerStateSheet(
   BuildContext context, {
   required LifeCounterSession initialSession,
   required int initialTargetPlayerIndex,
+  ValueChanged<int>? onCommanderDamageRequested,
 }) {
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
@@ -24,6 +25,7 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerStateSheet(
       return _LifeCounterNativePlayerStateSheet(
         initialSession: initialSession,
         initialTargetPlayerIndex: initialTargetPlayerIndex,
+        onCommanderDamageRequested: onCommanderDamageRequested,
       );
     },
   );
@@ -33,10 +35,12 @@ class _LifeCounterNativePlayerStateSheet extends StatefulWidget {
   const _LifeCounterNativePlayerStateSheet({
     required this.initialSession,
     required this.initialTargetPlayerIndex,
+    this.onCommanderDamageRequested,
   });
 
   final LifeCounterSession initialSession;
   final int initialTargetPlayerIndex;
+  final ValueChanged<int>? onCommanderDamageRequested;
 
   @override
   State<_LifeCounterNativePlayerStateSheet> createState() =>
@@ -111,6 +115,15 @@ class _LifeCounterNativePlayerStateSheetState
   }
 
   Future<void> _openManageCommanderDamage() async {
+    final onCommanderDamageRequested = widget.onCommanderDamageRequested;
+    if (onCommanderDamageRequested != null) {
+      onCommanderDamageRequested(_targetPlayerIndex);
+      if (mounted) {
+        Navigator.of(context).pop(_buildUpdatedSession());
+      }
+      return;
+    }
+
     final updatedSession = await showLifeCounterNativeCommanderDamageSheet(
       context,
       initialSession: _buildUpdatedSession(),

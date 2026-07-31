@@ -256,6 +256,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
   ApiClient apiClient, {
   required String prompt,
   required String format,
+  required int? bracket,
   String? commanderName,
   GenerateDeckProgressCallback? onProgress,
   GenerateDeckCancellation? cancellation,
@@ -276,6 +277,10 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     );
   }
   final normalizedFormat = format.trim().toLowerCase();
+  final normalizedBracket = _normalizeGenerateCommanderBracket(
+    normalizedFormat: normalizedFormat,
+    bracket: bracket,
+  );
   final normalizedCommanderName = _normalizeGenerateCommanderName(
     commanderName,
   );
@@ -308,6 +313,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     'format': normalizedFormat,
     'async': true,
     'request_key': requestKey ?? createAiJobRequestKey('generate'),
+    if (normalizedBracket != null) 'bracket': normalizedBracket,
     if (normalizedCommanderName != null)
       'commander_name': normalizedCommanderName,
     if (generationConstraints.isNotEmpty)
@@ -320,7 +326,10 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     AppLogger.info(
       '[DeckGenerate] backend returned legacy sync status=${response.statusCode}',
     );
-    return legacyResult;
+    return _preserveRequestedGenerateBracket(
+      legacyResult,
+      requestedBracket: normalizedBracket,
+    );
   }
 
   if (response.statusCode == 202) {
@@ -360,7 +369,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       ),
     );
 
-    return _pollGeneratedDeckJob(
+    final result = await _pollGeneratedDeckJob(
       apiClient,
       pollUrl: pollUrl,
       jobId: jobId,
@@ -375,6 +384,10 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
           pollIntervalFromGenerateAccepted(accepted) ??
           _defaultGeneratePollInterval,
     );
+    return _preserveRequestedGenerateBracket(
+      result,
+      requestedBracket: normalizedBracket,
+    );
   }
 
   if (_shouldFallbackToSyncGenerate(response)) {
@@ -386,6 +399,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       apiClient,
       prompt: normalizedPrompt,
       normalizedFormat: normalizedFormat,
+      bracket: normalizedBracket,
       commanderName: normalizedCommanderName,
       generationConstraints: generationConstraints,
       reason: 'async_not_supported',
@@ -461,6 +475,7 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
   ApiClient apiClient, {
   required String prompt,
   required String normalizedFormat,
+  required int? bracket,
   required String? commanderName,
   required Map<String, dynamic> generationConstraints,
   required String reason,
@@ -469,6 +484,7 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
   final response = await apiClient.post('/ai/generate', {
     'prompt': prompt,
     'format': normalizedFormat,
+    if (bracket != null) 'bracket': bracket,
     if (commanderName != null) 'commander_name': commanderName,
     if (generationConstraints.isNotEmpty)
       'generation_constraints': generationConstraints,
@@ -476,7 +492,7 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
 
   final data = _tryParseLegacyGenerateResponse(response);
   if (data != null) {
-    return data;
+    return _preserveRequestedGenerateBracket(data, requestedBracket: bracket);
   }
 
   throw _generateFriendlyException(response);
@@ -780,6 +796,50 @@ String? _normalizeGenerateCommanderName(String? commanderName) {
     return null;
   }
   return trimmed;
+}
+
+int? _normalizeGenerateCommanderBracket({
+  required String normalizedFormat,
+  required int? bracket,
+}) {
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'edh';
+  if (!isCommander) return null;
+  if (bracket == null || bracket < 1 || bracket > 5) {
+    throw Exception(
+      'Selecione um Bracket Commander válido entre 1 e 5 antes de gerar.',
+    );
+  }
+  return bracket;
+}
+
+Map<String, dynamic> _preserveRequestedGenerateBracket(
+  Map<String, dynamic> result, {
+  required int? requestedBracket,
+}) {
+  if (requestedBracket == null) return result;
+
+  final rawBracket = result['bracket'];
+  if (rawBracket == null) {
+    return {...result, 'bracket': requestedBracket};
+  }
+
+  final returnedBracket = rawBracket is int
+      ? rawBracket
+      : int.tryParse(rawBracket.toString());
+  if (returnedBracket == null || returnedBracket < 1 || returnedBracket > 5) {
+    throw Exception(
+      'A geração terminou sem um Bracket Commander válido. Gere novamente '
+      'antes de salvar.',
+    );
+  }
+  if (returnedBracket != requestedBracket) {
+    throw Exception(
+      'A geração retornou um Bracket Commander diferente do solicitado. '
+      'Gere novamente antes de salvar.',
+    );
+  }
+  return result;
 }
 
 Map<String, dynamic> _asStringMap(dynamic value) {

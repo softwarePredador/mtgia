@@ -89,7 +89,7 @@ void main() {
           existingBracketScope: 'any',
           score: 70,
         ),
-        equals('bracket_3_plus'),
+        equals('bracket_5'),
       );
       expect(
         bracketScopeForMetaSignal(
@@ -99,8 +99,18 @@ void main() {
         ),
         equals('bracket_2_plus'),
       );
+      expect(
+        bracketScopeForMetaSignal(
+          subformat: 'commander',
+          existingBracketScope: 'bracket_4_5',
+          score: 70,
+        ),
+        equals('bracket_4_plus'),
+      );
       expect(candidateBracketScopeMinimum('bracket_3_4'), equals(3));
       expect(candidateBracketScopeMinimum('bracket_3_plus'), equals(3));
+      expect(candidateBracketScopeMinimum('bracket_4_plus'), equals(4));
+      expect(candidateBracketScopeMinimum('bracket_5'), equals(5));
       expect(candidateBracketScopeMinimum('any'), isNull);
     });
 

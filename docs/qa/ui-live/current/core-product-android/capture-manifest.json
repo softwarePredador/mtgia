@@ -1,18 +1,18 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-30T15:50:08.689807Z",
-  "source_digest": "dc57c8ddcb84141016c08422801bf5ddf67bbf9c67ec1ccb5be86dd0f33eb18d",
+  "generated_at": "2026-07-31T05:57:23.104915Z",
+  "source_digest": "718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15",
   "surface": "core_product_runtime_ui_acceptance",
-  "profile": "android_core_product",
+  "profile": "android_emulator_core_product",
   "runtime": "flutter_integration_test",
-  "target": "android_physical",
-  "device_contract": "SM-A135M, Android 14, physical device, Physical size: 1080x2408; capture posture: portrait-up",
+  "target": "android_emulator",
+  "device_contract": "sdk_gphone64_arm64, Android 14, emulator runtime, serial emulator-5554, display 1080x2400; capture posture: portrait-up",
   "runtime_console": {
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "3eea350bdbf9eb4a3cf26f1ac5f9152757a8e26f1b68720b94ae8b3307a410df",
+  "log_sha256": "a02e3946583b0fb226cb5e21cfc9f4cf675183370c2aadc4a1b6db05aba2d1d3",
   "checkpoint_count": 12,
   "required_checkpoints": [
     "core_01_collection_editor",
@@ -32,98 +32,98 @@
     {
       "checkpoint": "core_01_collection_editor",
       "path": "docs/qa/ui-live/current/core-product-android/core_01_collection_editor.png",
-      "sha256": "e0b64f2e1ef51d4cfd0f37d9d5032e2c1b361fb000033759561dfa5542842f3d",
-      "bytes": 326886,
+      "sha256": "3350a4b215b6a4559d67ebbc904d28b9d05e7e875f2b6ed24840804416b71fd8",
+      "bytes": 172436,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_02_collection_inline_validation",
       "path": "docs/qa/ui-live/current/core-product-android/core_02_collection_inline_validation.png",
-      "sha256": "18bc0cfdd9d34cc1ffeeda41aa8cb890d848ffac7e974b5c8be90faafabe8c03",
-      "bytes": 134744,
+      "sha256": "306fb7af74eb80cb5604d3bcd337fb144c6696293bc70ccd59c817ac77631a9b",
+      "bytes": 136981,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_03_collection_persistence_failure",
       "path": "docs/qa/ui-live/current/core-product-android/core_03_collection_persistence_failure.png",
-      "sha256": "7996c6b114366b90d990eed0743e824f0dc8b12479042f64f77332107d8d1fd5",
-      "bytes": 147937,
+      "sha256": "8448833cbc39e28e633989513474fe5398d9ea4f3ccfddabd52d8ff92d3fdfff",
+      "bytes": 151149,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_04_collection_retry_success",
       "path": "docs/qa/ui-live/current/core-product-android/core_04_collection_retry_success.png",
-      "sha256": "29e3e4686deea011fb3b8f65df96d45ea9bbed006c993ea7ca30842a79470b1b",
-      "bytes": 47283,
+      "sha256": "3f2f3c061bf4366de8700c05baada06c314d5dc2c678290a88a1fc1c3991f9fd",
+      "bytes": 45235,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_05_deck_inline_validation",
       "path": "docs/qa/ui-live/current/core-product-android/core_05_deck_inline_validation.png",
-      "sha256": "099a2f9673abcf716011b0f8e55463a9746ba30256256ef1714385b059ce169e",
-      "bytes": 155258,
+      "sha256": "f22a1e1fe621c129126bffa004d521be36a9ddfa80310ea3e2f7a77c7a9fa235",
+      "bytes": 136938,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_06_deck_commander_filtered",
       "path": "docs/qa/ui-live/current/core-product-android/core_06_deck_commander_filtered.png",
-      "sha256": "0805672fb4ef990c79dafc6344f527117ccbd3c383bbd31bc39d07350f37fd94",
-      "bytes": 97511,
+      "sha256": "5afa43441380a0b7a41b7b1a24c9cc13a8ea849ef56b754635828cc73de3782b",
+      "bytes": 84073,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_07_deck_persistence_failure",
       "path": "docs/qa/ui-live/current/core-product-android/core_07_deck_persistence_failure.png",
-      "sha256": "26eaba9068b88ad5e7113f0a7c9b6a14dd2df8efafd713ef76592c01c195017e",
-      "bytes": 190216,
+      "sha256": "2723e764d397b26f6b8c24fb4e05e42417e6d690004e1985de8617ef330e19cd",
+      "bytes": 167491,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_08_deck_retry_success",
       "path": "docs/qa/ui-live/current/core-product-android/core_08_deck_retry_success.png",
-      "sha256": "fec1fa3302dfa217ada5531960bd2d5138ef3665bae68f17d9e8a18e36a98c8e",
-      "bytes": 442201,
+      "sha256": "0eb35547bf7fb67900308b73bf84873a358c31a37524ccd4596185ce163bc8bb",
+      "bytes": 172406,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_09_optimization_safe_mana_preview",
       "path": "docs/qa/ui-live/current/core-product-android/core_09_optimization_safe_mana_preview.png",
-      "sha256": "213c755fc8d3f54a2e85b6d10523b5d9a07dceb1b2f3dbd437b0b31fe903115c",
-      "bytes": 201323,
+      "sha256": "7adf3bc27b3fbaa96b7e23cad02ccae69fd0251f6b37824086f4b38e57a4d116",
+      "bytes": 189871,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_10_optimization_partial_selection",
       "path": "docs/qa/ui-live/current/core-product-android/core_10_optimization_partial_selection.png",
-      "sha256": "430bb0f10950794b6655afd3ccd3989daf56e99735acf75222f8b9e8543dff61",
-      "bytes": 193469,
+      "sha256": "695f95c106d7584c939511a47b12d4d5b38bcaeaf8f4cf15a14325314e59d0c7",
+      "bytes": 167963,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_11_optimization_applied",
       "path": "docs/qa/ui-live/current/core-product-android/core_11_optimization_applied.png",
-      "sha256": "f4f87d6270fd035bbaa750cd02127b47988d803d4d5b6bf6b0a0427ab88cdd8d",
-      "bytes": 69123,
+      "sha256": "d81b227ba67bf4ce18b2d400bc37df0ed5bed5a0e9747cb3371415022119e907",
+      "bytes": 63589,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     },
     {
       "checkpoint": "core_12_optimization_undo",
       "path": "docs/qa/ui-live/current/core-product-android/core_12_optimization_undo.png",
-      "sha256": "ec4c9262854c67cc3e014f7d840c47ba44205644a112164ae3e69b3ec0e4fe49",
-      "bytes": 47713,
+      "sha256": "b5aa1079f7bbaff9502fbd9f9aa10b1c587ad396731734bffaf26d341fff7bac",
+      "bytes": 45865,
       "width": 1080,
-      "height": 2408
+      "height": 2337
     }
   ]
 }

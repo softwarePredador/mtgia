@@ -88,10 +88,6 @@ String? resolveCommanderMetaScopeFromPromptText(String prompt) {
   if (normalized.contains('cedh') ||
       normalized.contains('competitive edh') ||
       normalized.contains('competitive commander') ||
-      normalized.contains('high power') ||
-      normalized.contains('high-power') ||
-      normalized.contains('bracket 3') ||
-      normalized.contains('bracket 4') ||
       normalized.contains('bracket 5')) {
     return 'competitive_commander';
   }

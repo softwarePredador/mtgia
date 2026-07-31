@@ -2070,6 +2070,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             metaReferenceContext: preview.metaReferenceContext,
             optimizationContract: preview.optimizationContract,
             battleValidation: preview.battleValidation,
+            bracketPolicy: preview.bracketPolicy,
             canApply: preview.canApply,
             applyBlockers: preview.applyBlockers,
             displayRemovals: preview.displayRemovals,

@@ -48,6 +48,14 @@ final class InteractiveBattleRegistryTest {
     }
 
     @Test
+    void connectionBudgetCoversTheObservedServerReadyHandshake() {
+        assertEquals(
+                15_000L,
+                InteractiveBattleRegistry.CONNECT_READY_TIMEOUT_MS
+        );
+    }
+
+    @Test
     void registryRejectsUnsafeCapacityBeforeAllocatingThreads() {
         assertThrows(
                 IllegalArgumentException.class,

@@ -818,19 +818,20 @@ vinculada ao source atual. O documento detalhado é
   Tab, Shift+Tab, Enter, Space, Escape, foco visível, restauração, digitação,
   filtro, seleção e preflight real.
 - S3-07 voltou a `PASS`: a matriz P0 passou em 54 Web mobile, 53 desktop,
-  53 wide e 54 Android físico. Somados os sete estados Battle Coach Android,
-  os nove checkpoints Web e a prova do verso autoral, 231/231 PNGs foram
-  abertos e revisados.
+  53 wide e 54 no emulador Android. Somados 12 estados Core Product Android,
+  sete estados Battle Coach Android e nove checkpoints Web, 242/242 PNGs
+  foram abertos e revisados.
 - O aggregate `docs/qa/ui-live/latest.json` liga os sete manifestos ao digest
-  `78010fd9a852bb72cf3c668af9dbc2f91de8945f1ae325c6d36fee88b32acf59`
+  `718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15`
   e fecha `PASS_AUTOMATED`, `PASS_RUNTIME` e `PASS_VISUAL_REVIEWED`.
 - Cadastro, links de Termos/Privacidade, documentos legais, navegação filha de
   Community, retorno de Mensagens/Notificações, composer indisponível, ação de
   salvar Perfil e retorno de orientação do Life Counter receberam correções e
   regressões antes da captura definitiva.
-- A platform view do Life Counter foi capturada pelo compositor físico com
-  `adb screencap`; imagens pretas ou frames de transição da surface Flutter
-  foram explicitamente recusados.
+- A platform view do Life Counter foi capturada pelo compositor do emulador
+  Android com `adb screencap`; imagens pretas ou frames de transição da
+  surface Flutter foram explicitamente recusados. Esta rodada não reivindica
+  aparelho físico.
 
 ## Próxima task
 

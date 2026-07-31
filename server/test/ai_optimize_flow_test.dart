@@ -1277,10 +1277,47 @@ void main() {
             }
 
             final gotBracket = body['bracket'];
-            if (gotBracket is int) {
-              if (gotBracket != bracket) {
+            if (gotBracket != bracket) {
+              failures.add(
+                'contract size=$size bracket=$bracket returnedBracket=$gotBracket',
+              );
+            }
+            final bracketPolicy = body['bracket_policy'];
+            if (bracketPolicy is! Map) {
+              failures.add(
+                'contract size=$size bracket=$bracket bracket_policy ausente',
+              );
+            } else {
+              final policy = bracketPolicy.cast<String, dynamic>();
+              final expectedCap = switch (bracket) {
+                1 || 2 => 0,
+                3 => 3,
+                _ => null,
+              };
+              final expectedLabel = switch (bracket) {
+                1 => 'Exhibition',
+                2 => 'Core',
+                3 => 'Upgraded',
+                4 => 'Optimized',
+                _ => 'cEDH',
+              };
+              final expectedMinimumTurns = switch (bracket) {
+                1 => 9,
+                2 => 8,
+                3 => 6,
+                4 => 4,
+                _ => null,
+              };
+              final intent = policy['intent_profile'];
+              if (policy['bracket'] != bracket ||
+                  policy['label'] != expectedLabel ||
+                  policy['hard_compliant'] != true ||
+                  policy['game_changer_cap'] != expectedCap ||
+                  intent is! Map ||
+                  intent['minimum_turns_played'] != expectedMinimumTurns ||
+                  intent['competitive_lane'] != (bracket == 5)) {
                 failures.add(
-                  'contract size=$size bracket=$bracket returnedBracket=$gotBracket',
+                  'bracket-policy size=$size bracket=$bracket policy=${jsonEncode(policy)}',
                 );
               }
             }
@@ -1336,9 +1373,7 @@ void main() {
               'Falhas na matriz completa (${failures.length}): ${failures.take(20).join(' | ')}',
         );
       },
-      skip:
-          skipIntegration ??
-          'Fase 2: matriz completa será reativada após estabilizar size=1.',
+      skip: skipIntegration,
       timeout: const Timeout(Duration(minutes: 12)),
     );
   });
