@@ -26,6 +26,7 @@ import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
 import '../../../lib/ai/generate_bracket_support.dart';
 import '../../../lib/ai/generate_provider_repair_policy.dart';
+import '../../../lib/ai/generate_structural_quality_support.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -225,6 +226,23 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
+    Response buildStructuralViolationResponse(
+      Map<String, dynamic> payload, {
+      bool cacheHit = false,
+    }) {
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      return Response.json(
+        statusCode: HttpStatus.unprocessableEntity,
+        headers: const {'Cache-Control': 'no-store'},
+        body: withAiGenerateRuntimeMetadata(
+          payload: buildAiGenerateCommanderStructuralViolationPayload(payload),
+          cacheKey: cacheKey,
+          cacheHit: cacheHit,
+          timings: timings,
+        ),
+      );
+    }
+
     final cacheLookupStopwatch = Stopwatch()..start();
     final cachedBody =
         generationConstraints.isRequested
@@ -239,6 +257,12 @@ Future<Response> onRequest(RequestContext context) async {
       );
       if (aiGenerateCommanderBracketMustReject(bracketCheckedCachedBody)) {
         return buildBracketViolationResponse(
+          bracketCheckedCachedBody,
+          cacheHit: true,
+        );
+      }
+      if (aiGenerateCommanderStructuralMustReject(bracketCheckedCachedBody)) {
+        return buildStructuralViolationResponse(
           bracketCheckedCachedBody,
           cacheHit: true,
         );
@@ -281,6 +305,7 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           prompt: prompt,
           format: format,
+          requestedBracket: requestedBracket,
           requestedCommanderName: requestedCommanderName,
           referenceProfile: referenceProfile,
           referenceCardStats: referenceCardStats,
@@ -299,6 +324,9 @@ Future<Response> onRequest(RequestContext context) async {
       );
       if (aiGenerateCommanderBracketMustReject(mockBody)) {
         return buildBracketViolationResponse(mockBody);
+      }
+      if (aiGenerateCommanderStructuralMustReject(mockBody)) {
+        return buildStructuralViolationResponse(mockBody);
       }
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       final responseBody = withAiGenerateRuntimeMetadata(
@@ -332,6 +360,7 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           prompt: prompt,
           format: format,
+          requestedBracket: requestedBracket,
           requestedCommanderName: requestedCommanderName,
           referenceProfile: referenceProfile,
           referenceCardStats: referenceCardStats,
@@ -712,6 +741,7 @@ $metaContext
             pool: pool,
             prompt: prompt,
             format: format,
+            requestedBracket: requestedBracket,
             requestedCommanderName: requestedCommanderName,
             referenceProfile: referenceProfile,
             referenceCardStats: referenceCardStats,
@@ -729,6 +759,9 @@ $metaContext
         );
         if (aiGenerateCommanderBracketMustReject(mockBody)) {
           return buildBracketViolationResponse(mockBody);
+        }
+        if (aiGenerateCommanderStructuralMustReject(mockBody)) {
+          return buildStructuralViolationResponse(mockBody);
         }
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
         final responseBody = withAiGenerateRuntimeMetadata(
@@ -971,6 +1004,13 @@ $metaContext
             ),
     };
     responseBody = await enforceGenerationConstraints(responseBody);
+    responseBody = applyAiGenerateCommanderStructuralContract(
+      format: format,
+      requestedBracket: requestedBracket,
+      prompt: prompt,
+      responseBody: responseBody,
+      resolvedCards: validation.resolvedCards,
+    );
 
     // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
     if (format.toLowerCase() == 'commander' &&
@@ -997,11 +1037,15 @@ $metaContext
     final bracketPolicyViolation = aiGenerateCommanderBracketMustReject(
       responseBody,
     );
+    final structuralQualityViolation = aiGenerateCommanderStructuralMustReject(
+      responseBody,
+    );
     final providerOutputMustBeRejected =
         !validation.isValid ||
         (validation.invalidCards.isNotEmpty &&
             !providerRepairDecision.eligible) ||
-        bracketPolicyViolation;
+        bracketPolicyViolation ||
+        structuralQualityViolation;
     if (providerOutputMustBeRejected) {
       Log.w(
         'AI generate returned invalid or unresolved deck. '
@@ -1014,6 +1058,9 @@ $metaContext
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
         if (bracketPolicyViolation) {
           return buildBracketViolationResponse(responseBody);
+        }
+        if (structuralQualityViolation) {
+          return buildStructuralViolationResponse(responseBody);
         }
         return Response.json(
           statusCode: 422,
@@ -1034,12 +1081,16 @@ $metaContext
       final fallbackWarningCode =
           bracketPolicyViolation
               ? 'ai_generate_bracket_fallback'
+              : structuralQualityViolation
+              ? 'ai_generate_structural_quality_fallback'
               : validation.isValid
               ? 'ai_generate_invalid_card_fallback'
               : 'ai_generate_validation_fallback';
       final fallbackWarningMessage =
           bracketPolicyViolation
               ? 'A geracao principal excedeu o limite estrito do bracket. Retornando fallback deterministico compativel.'
+              : structuralQualityViolation
+              ? 'A geracao principal nao atingiu a estrutura minima de Commander. Retornando fallback deterministico validado.'
               : validation.isValid
               ? 'A geracao principal retornou cartas nao resolvidas. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.'
               : 'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.';
@@ -1048,6 +1099,7 @@ $metaContext
           pool: pool,
           prompt: prompt,
           format: format,
+          requestedBracket: requestedBracket,
           requestedCommanderName: requestedCommanderName,
           referenceProfile: referenceProfile,
           referenceCardStats: referenceCardStats,
@@ -1091,6 +1143,9 @@ $metaContext
 
       if (aiGenerateCommanderBracketMustReject(fallbackBody)) {
         return buildBracketViolationResponse(fallbackBody);
+      }
+      if (aiGenerateCommanderStructuralMustReject(fallbackBody)) {
+        return buildStructuralViolationResponse(fallbackBody);
       }
       return Response.json(
         statusCode: 422,
@@ -1648,6 +1703,7 @@ bool _shouldUseReferenceGuidedDeterministicFastPath({
 bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
   if (body['can_save'] == false) return false;
   if (aiGenerateCommanderBracketMustReject(body)) return false;
+  if (aiGenerateCommanderStructuralMustReject(body)) return false;
   final validation = body['validation'];
   if (validation is! Map || validation['is_valid'] != true) return false;
 
@@ -1819,6 +1875,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   required Pool pool,
   required String prompt,
   required String format,
+  required int? requestedBracket,
   String? requestedCommanderName,
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
@@ -1946,7 +2003,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           generationMode: generationMode,
         );
 
-    return {
+    final responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
       'generated_deck': validation.generatedDeck,
@@ -1985,6 +2042,13 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         ),
       if (warnings.isNotEmpty) 'warnings': warnings,
     };
+    return applyAiGenerateCommanderStructuralContract(
+      format: format,
+      requestedBracket: requestedBracket,
+      prompt: prompt,
+      responseBody: responseBody,
+      resolvedCards: validation.resolvedCards,
+    );
   } catch (e) {
     Log.w('Falha ao validar deck fallback type=${e.runtimeType}');
     final fallbackValidationSummary = {
@@ -2020,7 +2084,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
               referenceDeterministicDeckDiagnostics,
           generationMode: generationMode,
         );
-    return {
+    final responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
       'generated_deck': mockDeck,
@@ -2060,6 +2124,13 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           if (warningMessage != null) 'message': warningMessage,
         },
     };
+    return applyAiGenerateCommanderStructuralContract(
+      format: format,
+      requestedBracket: requestedBracket,
+      prompt: prompt,
+      responseBody: responseBody,
+      resolvedCards: const <Map<String, dynamic>>[],
+    );
   }
 }
 

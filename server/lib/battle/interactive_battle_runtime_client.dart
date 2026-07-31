@@ -285,7 +285,6 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
       throw const InteractiveBattleRuntimeException(
         'runtime_transport_failed',
         retryable: true,
-        processLost: true,
       );
     }
 

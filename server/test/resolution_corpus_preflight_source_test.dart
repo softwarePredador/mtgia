@@ -858,6 +858,24 @@ void main() {
           ),
           isTrue,
         );
+        for (final qualityCode in const [
+          'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
+          'OPTIMIZE_BRACKET_VIOLATION',
+        ]) {
+          expect(
+            resolution_runner.qualifiesAsSafeNoChangeOutcome(
+              httpStatus: HttpStatus.unprocessableEntity,
+              outcomeCode: 'no_safe_upgrade_found',
+              qualityCode: qualityCode,
+              deckStateStatus: 'healthy',
+              isMock: null,
+              canApply: false,
+              learningEligible: false,
+              responseFlagsWellTyped: true,
+            ),
+            isTrue,
+          );
+        }
         expect(
           resolution_runner.qualifiesAsSafeNoChangeOutcome(
             httpStatus: HttpStatus.ok,

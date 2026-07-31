@@ -10,6 +10,20 @@ import '../../tool/ui_runtime_evidence.dart';
 const _digest =
     'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
+List<int> _proofPng(int width, int height) {
+  final image = img.Image(width: width, height: height);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      if ((x + y).isEven) {
+        image.setPixelRgba(x, y, 15, 17, 21, 255);
+      } else {
+        image.setPixelRgba(x, y, 220, 160, 35, 255);
+      }
+    }
+  }
+  return img.encodePng(image);
+}
+
 void main() {
   late Directory temp;
 
@@ -22,7 +36,7 @@ void main() {
   });
 
   test('extracts complete PNG checkpoints and binds them to source digest', () {
-    final png = img.encodePng(img.Image(width: 4, height: 6));
+    final png = _proofPng(4, 6);
     final log = File('${temp.path}/runtime.log')
       ..writeAsStringSync(
         _runtimeLog(<String, List<int>>{
@@ -52,7 +66,7 @@ void main() {
     final screenshotDirectory = Directory(
       '${temp.path}/app/test/ui/goldens/runtime/web_mobile',
     )..createSync(recursive: true);
-    final png = img.encodePng(img.Image(width: 390, height: 844));
+    final png = _proofPng(390, 844);
     File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
     final log = File('${temp.path}/web-mobile.log')
       ..writeAsStringSync(
@@ -88,11 +102,54 @@ void main() {
     );
   });
 
+  test('rejects visually blank screenshots before runtime credit', () {
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/android_emulator',
+    )..createSync(recursive: true);
+    File(
+      '${screenshotDirectory.path}/life_counter_initial.png',
+    ).writeAsBytesSync(img.encodePng(img.Image(width: 1080, height: 2400)));
+
+    expect(
+      () => validateRuntimeScreenshotDirectory(screenshotDirectory),
+      throwsA(
+        isA<UiRuntimeEvidenceException>().having(
+          (error) => error.message,
+          'message',
+          contains('visually blank or uniform'),
+        ),
+      ),
+    );
+  });
+
+  test('rejects an otherwise uniform screenshot with one outlier pixel', () {
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/android_emulator',
+    )..createSync(recursive: true);
+    final image = img.Image(width: 1080, height: 2400);
+    img.fill(image, color: img.ColorRgb8(15, 17, 21));
+    image.setPixelRgba(1079, 2399, 220, 160, 35, 255);
+    File(
+      '${screenshotDirectory.path}/life_counter_initial.png',
+    ).writeAsBytesSync(img.encodePng(image));
+
+    expect(
+      () => validateRuntimeScreenshotDirectory(screenshotDirectory),
+      throwsA(
+        isA<UiRuntimeEvidenceException>().having(
+          (error) => error.message,
+          'message',
+          contains('visually blank or uniform'),
+        ),
+      ),
+    );
+  });
+
   test('rejects stale directory evidence instead of relabeling its digest', () {
     final screenshotDirectory = Directory(
       '${temp.path}/app/test/ui/goldens/runtime/web_mobile',
     )..createSync(recursive: true);
-    final png = img.encodePng(img.Image(width: 390, height: 844));
+    final png = _proofPng(390, 844);
     File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
     final log = File('${temp.path}/web-mobile.log')
       ..writeAsStringSync(
@@ -128,7 +185,7 @@ void main() {
     final screenshotDirectory = Directory(
       '${temp.path}/app/test/ui/goldens/runtime/android_emulator',
     )..createSync(recursive: true);
-    final png = img.encodePng(img.Image(width: 1080, height: 2400));
+    final png = _proofPng(1080, 2400);
     File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
     final log = File('${temp.path}/android.log')
       ..writeAsStringSync(
@@ -158,7 +215,7 @@ void main() {
   });
 
   test('rejects missing checkpoints instead of accepting partial proof', () {
-    final png = img.encodePng(img.Image(width: 2, height: 2));
+    final png = _proofPng(2, 2);
     final log = File('${temp.path}/runtime.log')
       ..writeAsStringSync(
         _runtimeLog(
@@ -179,7 +236,7 @@ void main() {
   });
 
   test('rejects runtime image failures even when screenshots exist', () {
-    final png = img.encodePng(img.Image(width: 2, height: 2));
+    final png = _proofPng(2, 2);
     final log = File('${temp.path}/runtime.log')
       ..writeAsStringSync(
         '${_runtimeLog(<String, List<int>>{'battle_coach_00_welcome': png})}[🖼️ CachedCardImage] falha ao carregar fixture\n',
@@ -197,7 +254,7 @@ void main() {
   });
 
   test('verifies all three evidence levels and every reviewed screenshot', () {
-    final png = img.encodePng(img.Image(width: 5, height: 7));
+    final png = _proofPng(5, 7);
     final log = File('${temp.path}/runtime.log')
       ..writeAsStringSync(
         _runtimeLog(<String, List<int>>{
@@ -273,7 +330,7 @@ void main() {
   });
 
   test('verifies multiple runtime profiles through their manifest hashes', () {
-    final png = img.encodePng(img.Image(width: 8, height: 10));
+    final png = _proofPng(8, 10);
     final references = <Map<String, Object>>[];
     for (final profile in const ['web_mobile', 'android_emulator']) {
       final screenshotDirectory = Directory(
@@ -420,7 +477,7 @@ void main() {
   });
 
   test('rejects physical release credit backed only by emulator captures', () {
-    final png = img.encodePng(img.Image(width: 8, height: 10));
+    final png = _proofPng(8, 10);
     final screenshotDirectory = Directory(
       '${temp.path}/app/test/ui/goldens/runtime/android_emulator',
     )..createSync(recursive: true);

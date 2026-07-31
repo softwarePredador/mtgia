@@ -304,6 +304,16 @@ class ProjectLogicGenerator {
     final paths = <String>{
       ...(contracts['canonical_documents'] as List<dynamic>).cast<String>(),
     };
+    final routeAliases =
+        (contracts['api_route_aliases'] as Map<String, dynamic>? ??
+        const <String, dynamic>{});
+    for (final alias in routeAliases.values) {
+      final map = alias as Map<String, dynamic>;
+      final source = map['source'];
+      if (source is String && source.isNotEmpty) {
+        paths.add(source);
+      }
+    }
     for (final flow in (contracts['flows'] as List<dynamic>)) {
       final map = flow as Map<String, dynamic>;
       for (final key in ['implementation', 'tests', 'gates']) {
@@ -960,6 +970,104 @@ class ProjectLogicGenerator {
             : 'source',
       });
     }
+
+    final knownPaths = result.map((route) => route['path']! as String).toSet();
+    final aliases =
+        (contracts['api_route_aliases'] as Map<String, dynamic>? ??
+        const <String, dynamic>{});
+    final sortedAliases = aliases.entries.toList()
+      ..sort((left, right) => left.key.compareTo(right.key));
+    const allowedMethods = <String>{
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS',
+      'HEAD',
+    };
+    for (final alias in sortedAliases) {
+      final aliasPath = alias.key.trim();
+      if (!aliasPath.startsWith('/') ||
+          aliasPath.length > 1 && aliasPath.endsWith('/')) {
+        throw ProjectLogicException(
+          'Declared API route alias must be an absolute normalized path: '
+          '${alias.key}',
+        );
+      }
+      if (!knownPaths.add(aliasPath)) {
+        throw ProjectLogicException(
+          'Declared API route alias conflicts with an indexed route: '
+          '$aliasPath',
+        );
+      }
+
+      final declaration = alias.value as Map<String, dynamic>;
+      final sourcePath = declaration['source'];
+      if (sourcePath is! String ||
+          sourcePath.isEmpty ||
+          !p.posix.isWithin('server/routes', sourcePath)) {
+        throw ProjectLogicException(
+          'Declared API route alias $aliasPath must reference a source below '
+          'server/routes.',
+        );
+      }
+      final sourceFile = _file(sourcePath);
+      if (!sourceFile.existsSync()) {
+        throw ProjectLogicException(
+          'Declared API route alias source does not exist: $sourcePath',
+        );
+      }
+
+      final declaredMethods = declaration['methods'];
+      if (declaredMethods is! List || declaredMethods.isEmpty) {
+        throw ProjectLogicException(
+          'Declared API route alias $aliasPath must declare at least one '
+          'HTTP method.',
+        );
+      }
+      final methods =
+          declaredMethods
+              .map((method) {
+                if (method is! String ||
+                    method != method.toUpperCase() ||
+                    !allowedMethods.contains(method)) {
+                  throw ProjectLogicException(
+                    'Declared API route alias $aliasPath has an invalid HTTP method: '
+                    '$method',
+                  );
+                }
+                return method;
+              })
+              .toSet()
+              .toList()
+            ..sort();
+      final segment = aliasPath
+          .split('/')
+          .where((part) => part.isNotEmpty && !part.startsWith('{'))
+          .firstOrNull;
+      final matchingTests = segment == null
+          ? <String>[]
+          : testFiles
+                .where(
+                  (test) => p
+                      .basename(test.path)
+                      .toLowerCase()
+                      .contains(segment.toLowerCase()),
+                )
+                .map(_relative)
+                .take(12)
+                .toList();
+      result.add({
+        'path': aliasPath,
+        'methods': methods,
+        'source': sourcePath,
+        'middleware': _middlewareFor(sourceFile),
+        'tests': matchingTests,
+        'method_contract': 'declared_alias',
+      });
+    }
+
     return result
       ..sort((a, b) => (a['path'] as String).compareTo(b['path'] as String));
   }

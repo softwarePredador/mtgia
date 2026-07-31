@@ -9,12 +9,12 @@ import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/scryfall_image_url.dart';
 import '../../../../lib/community_request_auth.dart';
-import '../following/index.dart' as following_route;
+import '../../../../lib/community_following_feed_route.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
-  // Dart Frog mounts /community/decks/<id> before the static /following route.
-  // This dispatch contains no feed logic; it delegates to the canonical route.
-  if (id == 'following') return following_route.onRequest(context);
+  // Keep this alias inside the dynamic route. A second static route would
+  // compile to the same Dart Frog pattern and make route selection ambiguous.
+  if (id == 'following') return handleCommunityFollowingFeed(context);
 
   if (context.request.method == HttpMethod.get) {
     return _getPublicDeck(context, id);

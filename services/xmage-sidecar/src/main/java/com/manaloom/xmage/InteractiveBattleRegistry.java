@@ -787,6 +787,9 @@ final class InteractiveBattleRegistry {
             }
             List<Map<String, Object>> snapshots =
                     ReplayNormalizer.snapshots(copiedViews);
+            for (Map<String, Object> snapshot : snapshots) {
+                normalizePlayerPresentation(snapshot);
+            }
             List<Map<String, Object>> events =
                     ReplayNormalizer.events(
                             Collections.<Map<String, Object>>emptyList(),
@@ -884,6 +887,7 @@ final class InteractiveBattleRegistry {
                     );
             if (!snapshots.isEmpty()) {
                 state.putAll(snapshots.get(0));
+                normalizePlayerPresentation(state);
             }
             CardsView hand = view.getMyHand();
             state.put(
@@ -895,10 +899,74 @@ final class InteractiveBattleRegistry {
             PlayerView mine = view.getMyPlayer();
             state.put(
                     "own_player",
-                    mine == null ? null : mine.getName()
+                    mine == null
+                            ? null
+                            : productPlayerName(
+                                    mine.getName(),
+                                    request.deckA.name,
+                                    request.deckB.name
+                            )
             );
             state.put("priority_time_seconds", view.getPriorityTime());
             return state;
+        }
+
+        @SuppressWarnings("unchecked")
+        private void normalizePlayerPresentation(
+                Map<String, Object> state
+        ) {
+            state.put(
+                    "active_player",
+                    productPlayerName(
+                            nullableText(state.get("active_player")),
+                            request.deckA.name,
+                            request.deckB.name
+                    )
+            );
+            state.put(
+                    "priority_player",
+                    productPlayerName(
+                            nullableText(state.get("priority_player")),
+                            request.deckA.name,
+                            request.deckB.name
+                    )
+            );
+            Object rawPlayers = state.get("players");
+            if (rawPlayers instanceof List) {
+                for (Object rawPlayer : (List<?>) rawPlayers) {
+                    if (!(rawPlayer instanceof Map)) {
+                        continue;
+                    }
+                    Map<String, Object> player =
+                            (Map<String, Object>) rawPlayer;
+                    player.put(
+                            "name",
+                            productPlayerName(
+                                    nullableText(player.get("name")),
+                                    request.deckA.name,
+                                    request.deckB.name
+                            )
+                    );
+                }
+            }
+            Object rawCombat = state.get("combat");
+            if (rawCombat instanceof List) {
+                for (Object rawGroup : (List<?>) rawCombat) {
+                    if (!(rawGroup instanceof Map)) {
+                        continue;
+                    }
+                    Map<String, Object> group =
+                            (Map<String, Object>) rawGroup;
+                    group.put(
+                            "defender_name",
+                            productPlayerName(
+                                    nullableText(group.get("defender_name")),
+                                    request.deckA.name,
+                                    request.deckB.name
+                            )
+                    );
+                }
+            }
         }
 
         private void openPrompt(ClientCallback callback) {
@@ -1068,10 +1136,23 @@ final class InteractiveBattleRegistry {
                         message.getGameView(),
                         id
                 );
+                PlayerView player = findPlayer(
+                        message.getGameView(),
+                        id
+                );
                 options.add(new OptionDescriptor(
-                        card == null
-                                ? "Alvo legal"
-                                : String.valueOf(card.get("name")),
+                        card != null
+                                ? String.valueOf(card.get("name"))
+                                : player == null
+                                        ? "Alvo legal"
+                                        : playerTargetLabel(
+                                                player.getControlled(),
+                                                productPlayerName(
+                                                        player.getName(),
+                                                        request.deckA.name,
+                                                        request.deckB.name
+                                                )
+                                        ),
                         "target",
                         card
                 ));
@@ -1248,7 +1329,10 @@ final class InteractiveBattleRegistry {
             result.put("kind", snake(prompt.kind.name()));
             result.put("input_mode", snake(prompt.inputMode.name()));
             result.put("title", promptTitle(prompt.kind));
-            result.put("message", boundedText(message, 1000));
+            result.put(
+                    "message",
+                    productPromptMessage(prompt.kind, message)
+            );
             result.put(
                     "deadline_at",
                     Instant.ofEpochMilli(deadlineMillis).toString()
@@ -1864,6 +1948,101 @@ final class InteractiveBattleRegistry {
             );
         }
         return result;
+    }
+
+    private static PlayerView findPlayer(GameView view, UUID id) {
+        if (view == null || id == null || view.getPlayers() == null) {
+            return null;
+        }
+        for (PlayerView player : view.getPlayers()) {
+            if (player != null && id.equals(player.getPlayerId())) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    static String playerTargetLabel(
+            boolean controlled,
+            String playerName
+    ) {
+        if (controlled) {
+            return "Você";
+        }
+        String safeName = Jsoup.parse(
+                playerName == null ? "" : playerName
+        ).text().trim();
+        if (safeName.isEmpty()) {
+            return "Adversário";
+        }
+        return bounded("Adversário — " + safeName, 160);
+    }
+
+    static String productPlayerName(
+            String playerName,
+            String deckAName,
+            String deckBName
+    ) {
+        if (playerName == null) {
+            return null;
+        }
+        if ("deck_a".equals(playerName)) {
+            return safeProductName(deckAName, "Seu deck");
+        }
+        if ("deck_b".equals(playerName)) {
+            return safeProductName(deckBName, "Deck adversário");
+        }
+        return safeProductName(playerName, "Jogador");
+    }
+
+    static String productPromptMessage(
+            HumanVsAiSpikeHarness.PromptKind kind,
+            String ignoredEngineMessage
+    ) {
+        switch (kind) {
+            case MULLIGAN:
+                return "Escolha se deseja manter esta mão ou fazer mulligan.";
+            case MAIN_ACTION:
+                return "Jogue uma mágica, ative uma habilidade "
+                        + "ou passe a prioridade.";
+            case TARGET:
+                return "Escolha um alvo legal para continuar.";
+            case COMBAT:
+                return "Escolha como conduzir esta etapa de combate.";
+            case ABILITY:
+                return "Escolha uma habilidade para continuar.";
+            case PILE:
+                return "Escolha uma das pilhas disponíveis.";
+            case CHOICE:
+                return "Escolha uma das opções disponíveis.";
+            case MANA:
+                return "Escolha como produzir o mana necessário.";
+            case X_MANA:
+                return "Defina o valor de X.";
+            case AMOUNT:
+                return "Escolha uma quantidade válida.";
+            case MULTI_AMOUNT:
+                return "Distribua as quantidades solicitadas.";
+            default:
+                return "Escolha uma ação legal para continuar.";
+        }
+    }
+
+    private static String safeProductName(
+            String value,
+            String fallback
+    ) {
+        String safeValue = Jsoup.parse(
+                value == null ? "" : value
+        ).text().trim();
+        return bounded(
+                safeValue.isEmpty() ? fallback : safeValue,
+                160
+        );
+    }
+
+    private static String nullableText(Object value) {
+        return value == null ? null : String.valueOf(value);
     }
 
     private static CardView findCard(GameView view, UUID id) {

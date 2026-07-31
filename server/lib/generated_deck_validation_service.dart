@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import 'ai/canonical_card_role_metadata_support.dart';
 import 'ai/cmc_safety.dart';
 import 'basic_land_utils.dart' as basic_lands;
 import 'card_validation_service.dart';
@@ -38,12 +39,27 @@ class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
   @override
   Future<Map<String, Map<String, dynamic>>> resolveCardNames(
     List<Map<String, dynamic>> parsedItems,
-  ) {
-    return resolveImportCardNames(
+  ) async {
+    final resolved = await resolveImportCardNames(
       _pool,
       parsedItems,
       preferredFormat: _preferredFormat,
     );
+    final roleMetadata = await loadCanonicalCardRoleMetadataByCardId(
+      pool: _pool,
+      cardIds: resolved.values.map(
+        (card) => card['id']?.toString().trim() ?? '',
+      ),
+    );
+    if (roleMetadata.isEmpty) return resolved;
+
+    return {
+      for (final entry in resolved.entries)
+        entry.key: {
+          ...entry.value,
+          ...?roleMetadata[entry.value['id']?.toString() ?? ''],
+        },
+    };
   }
 
   @override
@@ -62,6 +78,7 @@ class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
 class GeneratedDeckValidationResult {
   const GeneratedDeckValidationResult({
     required this.generatedDeck,
+    required this.resolvedCards,
     required this.errors,
     required this.invalidCards,
     required this.suggestions,
@@ -73,6 +90,12 @@ class GeneratedDeckValidationResult {
   });
 
   final Map<String, dynamic> generatedDeck;
+
+  /// Canonical resolved rows retained for backend-owned structural gates.
+  ///
+  /// The player-facing [generatedDeck] intentionally remains compact, while
+  /// quality checks need type line, Oracle text and mana metadata.
+  final List<Map<String, dynamic>> resolvedCards;
   final List<String> errors;
   final List<String> invalidCards;
   final Map<String, List<String>> suggestions;
@@ -159,6 +182,7 @@ class GeneratedDeckValidationService {
     if (unsupportedSections.isNotEmpty) {
       return GeneratedDeckValidationResult(
         generatedDeck: const {'cards': <Map<String, dynamic>>[]},
+        resolvedCards: const <Map<String, dynamic>>[],
         errors: [unsupportedDeckSectionsMessage(unsupportedSections)],
         invalidCards: const [],
         suggestions: const {},
@@ -235,6 +259,8 @@ class GeneratedDeckValidationService {
         'oracle_text': resolved['oracle_text'],
         'mana_cost': resolved['mana_cost'],
         'cmc': resolved['cmc'],
+        'functional_tags': resolved['functional_tags'],
+        'semantic_tags_v2': resolved['semantic_tags_v2'],
         'quantity': card['quantity'],
         'is_commander': false,
       });
@@ -256,6 +282,8 @@ class GeneratedDeckValidationService {
           'oracle_text': commanderCard['oracle_text'],
           'mana_cost': commanderCard['mana_cost'],
           'cmc': commanderCard['cmc'],
+          'functional_tags': commanderCard['functional_tags'],
+          'semantic_tags_v2': commanderCard['semantic_tags_v2'],
           'quantity': 1,
           'is_commander': true,
         };
@@ -381,6 +409,10 @@ class GeneratedDeckValidationService {
 
     return GeneratedDeckValidationResult(
       generatedDeck: generatedDeck,
+      resolvedCards: [
+        for (final card in consolidatedCards)
+          Map<String, dynamic>.unmodifiable(card),
+      ],
       errors: errors,
       invalidCards: invalidCards,
       suggestions: suggestions,

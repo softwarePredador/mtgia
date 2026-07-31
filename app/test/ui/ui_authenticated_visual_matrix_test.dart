@@ -128,7 +128,13 @@ void main() {
     final backendHarness = File(
       '../scripts/manaloom_server_contract_e2e_isolated.sh',
     ).readAsStringSync();
-    expect(backendHarness, contains('exec dart build/bin/server.dart'));
+    expect(
+      backendHarness,
+      contains('exec "\${EGRESS_GUARD[@]}" env'),
+    );
+    expect(backendHarness, contains('dart build/bin/server.dart'));
+    expect(backendHarness, contains('EGRESS_POLICY="deny_non_loopback"'));
+    expect(backendHarness, contains('OPENAI_API_KEY='));
   });
 
   test(

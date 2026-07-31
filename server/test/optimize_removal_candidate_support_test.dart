@@ -288,5 +288,84 @@ void main() {
         isTrue,
       );
     });
+
+    test('cumulative removals cannot consume the final role-floor copies', () {
+      final removals = buildDeterministicOptimizeRemovalCandidates(
+        allCardData: [
+          const {
+            'name': 'Commander Card',
+            'type_line': 'Legendary Creature',
+            'oracle_text': 'Vigilance.',
+            'quantity': 1,
+            'cmc': 4.0,
+          },
+          const {
+            'name': 'Plains',
+            'type_line': 'Basic Land — Plains',
+            'oracle_text': '({T}: Add {W}.)',
+            'quantity': 36,
+            'cmc': 0.0,
+          },
+          const {
+            'name': 'Arcane Signet',
+            'type_line': 'Artifact',
+            'oracle_text':
+                '{T}: Add one mana of any color in your commander color identity.',
+            'quantity': 8,
+            'cmc': 2.0,
+          },
+          const {
+            'name': 'Draw Engine',
+            'type_line': 'Enchantment',
+            'oracle_text': 'At the beginning of your upkeep, draw a card.',
+            'quantity': 8,
+            'cmc': 3.0,
+          },
+          const {
+            'name': 'Removal Spell',
+            'type_line': 'Instant',
+            'oracle_text': 'Exile target creature.',
+            'quantity': 6,
+            'cmc': 2.0,
+          },
+          for (final name in const [
+            'Wrath of God',
+            'Damnation',
+            'Day of Judgment',
+          ])
+            {
+              'name': name,
+              'type_line': 'Sorcery',
+              'oracle_text': 'Destroy all creatures.',
+              'quantity': 1,
+              'cmc': 4.0,
+            },
+          const {
+            'name': 'Expensive Filler',
+            'type_line': 'Creature',
+            'oracle_text': 'Vigilance.',
+            'quantity': 38,
+            'cmc': 8.0,
+          },
+        ],
+        commanders: const ['Commander Card'],
+        commanderColorIdentity: const {'W'},
+        targetArchetype: 'midrange',
+        keepTheme: false,
+        coreCards: const [],
+        commanderPriorityNames: const [],
+        bracket: 2,
+        swapLimit: 20,
+      );
+
+      final wipeRemovals = removals
+          .where((candidate) => candidate['role'] == 'wipe')
+          .toList(growable: false);
+      expect(wipeRemovals, hasLength(1));
+      expect(
+        wipeRemovals.single['critical_role_contributions'],
+        containsPair('wipe', 1),
+      );
+    });
   });
 }

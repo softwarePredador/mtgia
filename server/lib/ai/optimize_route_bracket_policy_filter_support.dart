@@ -106,6 +106,8 @@ Map<String, dynamic> buildOptimizeBracketRejectedBody({
   required Map<String, dynamic> deckAnalysis,
   required Map<String, dynamic>? postAnalysis,
   required List<String> validationWarnings,
+  String? strategySource,
+  String? fallbackTrigger,
 }) {
   return {
     'error':
@@ -119,6 +121,10 @@ Map<String, dynamic> buildOptimizeBracketRejectedBody({
       'bracket_policy': assessment.toJson(),
     },
     'mode': 'optimize',
+    if (strategySource?.trim().isNotEmpty == true)
+      'strategy_source': strategySource!.trim(),
+    if (fallbackTrigger?.trim().isNotEmpty == true)
+      'fallback_trigger': fallbackTrigger!.trim(),
     'bracket': assessment.policy.bracket,
     'bracket_policy': assessment.toJson(),
     'removals': removals,

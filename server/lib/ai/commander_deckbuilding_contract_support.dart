@@ -493,6 +493,7 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
   };
   var sameLaneCount = 0;
   var bracketRepairCount = 0;
+  var functionalRoleRepairCount = 0;
   var lanePolicySatisfiedCount = 0;
   var explicitHypothesisCount = 0;
   var protectedAnchorCount = 0;
@@ -519,7 +520,17 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
     final sameLane = outputRolesMatch || candidateRolesMatch;
     final bracketRepair =
         pair['bracket_repair'] == true || candidate?['bracket_repair'] == true;
-    final lanePolicySatisfied = sameLane || bracketRepair;
+    final functionalRoleRepair =
+        pair['functional_role_repair'] == true ||
+        candidate?['functional_role_repair'] == true;
+    final functionalRoleRepairTarget =
+        pair['functional_role_repair_target']?.toString().trim() ??
+        candidate?['functional_role_repair_target']?.toString().trim() ??
+        '';
+    final lanePolicySatisfied =
+        sameLane ||
+        bracketRepair ||
+        (functionalRoleRepair && functionalRoleRepairTarget.isNotEmpty);
     final explicitHypothesis =
         _nonEmpty(pair['hypothesis']) ||
         _nonEmpty(pair['same_lane_hypothesis']) ||
@@ -531,6 +542,7 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
         !protectedAnchor || (lanePolicySatisfied && explicitHypothesis);
     if (sameLane) sameLaneCount++;
     if (bracketRepair) bracketRepairCount++;
+    if (functionalRoleRepair) functionalRoleRepairCount++;
     if (lanePolicySatisfied) lanePolicySatisfiedCount++;
     if (explicitHypothesis) explicitHypothesisCount++;
     if (protectedAnchor) {
@@ -542,6 +554,9 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
       'add': pair['add'],
       'same_lane': sameLane,
       'bracket_repair': bracketRepair,
+      'functional_role_repair': functionalRoleRepair,
+      if (functionalRoleRepairTarget.isNotEmpty)
+        'functional_role_repair_target': functionalRoleRepairTarget,
       'lane_policy_satisfied': lanePolicySatisfied,
       'explicit_hypothesis': explicitHypothesis,
       'protected_anchor': protectedAnchor,
@@ -609,6 +624,7 @@ Map<String, dynamic> buildCommanderOptimizePlanningSummary({
       'output_swap_count': outputPairs.length,
       'same_lane_count': sameLaneCount,
       'bracket_repair_count': bracketRepairCount,
+      'functional_role_repair_count': functionalRoleRepairCount,
       'lane_policy_satisfied_count': lanePolicySatisfiedCount,
       'explicit_hypothesis_count': explicitHypothesisCount,
       'all_swaps_same_lane': allSwapsSameLane,

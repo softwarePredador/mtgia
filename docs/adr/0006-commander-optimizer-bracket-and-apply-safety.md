@@ -44,8 +44,10 @@ Use defense in depth with explicit boundaries:
 4. Other power signals are advisory. They may affect ranking and user
    diagnostics but do not create a product ban.
 5. Functional floors are evaluated on the quantity-aware projected/final deck.
-   Complete reserves or repairs slots for wipes and mana before accepting a
-   result.
+   Generate, Complete, Optimize and Rebuild share a versioned minimum matrix
+   for structural ramp, draw, interaction and wipes, in addition to the mana
+   foundation. B4 requires at least one wipe and B5 does not force a wipe;
+   this is a product playability floor, not an invented official bracket ban.
 6. Commander-specific synergy and theme affinity rank legal candidates before
    generic popularity. Lorehold's Miracle plan favors top-deck setup,
    hand-filtering, instant/sorcery and big-spell conversion.
@@ -57,12 +59,25 @@ Use defense in depth with explicit boundaries:
    role floor. Both mutation routes validate the actual before/after delta,
    forbid condition/commander-role drift and recompute the role floor inside
    the owner transaction before destructive writes.
-9. The persistent optimize cache contract advances to `v16`. Actionable
+9. The persistent optimize cache contract advances to `v17`. Actionable
    Commander cache hits require internally satisfied bracket and
-   functional-role policies, then receive a fresh apply authorization.
+   `commander_functional_role_floors_v2` policies with all four critical
+   roles, then receive a fresh apply authorization. Older wipe-only
+   authorizations and cached previews are rejected.
 10. Apply signing is fail-closed. Runtime secrets follow the shared `.env` plus
-   process-environment precedence; all deck-card writers lock the owner deck
-   row so the signed signature cannot race a concurrent mutation.
+    process-environment precedence; all deck-card writers lock the owner deck
+    row so the signed signature cannot race a concurrent mutation.
+11. A source deck that already violates the selected bracket or the shared
+    structural floors cannot terminate as `safe_no_change`. Every early
+    no-actionable/no-safe-swap path first promotes the result to
+    `OPTIMIZE_NEEDS_REPAIR` with `/ai/rebuild`; bracket contamination requests
+    `full_non_commander_rebuild` so disallowed cards are not preserved by a
+    partial rebuild.
+12. Rebuild candidate selection uses the verified reference set first and a
+    legal, color-identity-safe PostgreSQL catalog fallback second. It fills the
+    exact shared ramp/draw/interaction/wipe lanes before generic role ranking,
+    and repeats bracket, mana, role-floor and strict-rules checks before a
+    draft transaction.
 
 The intent matrix follows the Wizards Commander Brackets update of
 2025-10-21. The Game Changer set follows the official 2026-02-09 update,
@@ -81,10 +96,13 @@ Official references:
   off-plan for Miracle Big Spells.
 - An already contaminated deck must remove every excess Game Changer before a
   B2 preview becomes actionable.
+- A rejected micro-swap cannot mask a contaminated or structurally incomplete
+  source deck as healthy; the response exposes the guided repair instead.
 - B3/B4 cannot silently inherit cEDH reference lists; B5 remains the explicit
   competitive lane.
 - Complete, Optimize, Generate and Rebuild return or persist only a final deck
-  that passes the selected bracket policy.
+  that passes the selected bracket policy, mana foundation and shared
+  structural role floors.
 - Provider, fallback and stale-cache mistakes fail closed at final payload and
   apply.
 - Secret rotation invalidates outstanding preview tokens. The dedicated

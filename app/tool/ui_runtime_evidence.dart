@@ -166,6 +166,7 @@ UiRuntimeExtractionResult extractUiRuntimeEvidence({
         'Checkpoint $name is not a valid non-empty PNG.',
       );
     }
+    _expectVisuallyMeaningfulScreenshot(image, name);
     final fileName = '$name.png';
     final relativePath = '$relativeOutput/$fileName';
     File('${output.path}/$fileName').writeAsBytesSync(bytes, flush: true);
@@ -341,6 +342,7 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
         'Checkpoint $checkpoint is not a valid non-empty PNG.',
       );
     }
+    _expectVisuallyMeaningfulScreenshot(image, checkpoint);
     screenshotEntries.add(<String, Object>{
       'checkpoint': checkpoint,
       'path': '$screenshotRelativeRoot/${file.uri.pathSegments.last}',
@@ -377,6 +379,110 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
     manifestFile: manifestFile,
     manifest: manifest,
   );
+}
+
+int validateRuntimeScreenshotDirectory(Directory screenshotDirectory) {
+  if (!screenshotDirectory.existsSync()) {
+    throw UiRuntimeEvidenceException(
+      'Screenshot directory does not exist: ${screenshotDirectory.path}',
+    );
+  }
+  final pngFiles =
+      screenshotDirectory
+          .listSync(followLinks: false)
+          .whereType<File>()
+          .where((file) => file.path.toLowerCase().endsWith('.png'))
+          .toList(growable: false)
+        ..sort((left, right) => left.path.compareTo(right.path));
+  if (pngFiles.isEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'Runtime screenshot directory contains no PNG screenshots.',
+    );
+  }
+  for (final file in pngFiles) {
+    final checkpoint = file.uri.pathSegments.last.replaceFirst(
+      RegExp(r'\.png$', caseSensitive: false),
+      '',
+    );
+    _expectCheckpointName(checkpoint);
+    final image = img.decodePng(file.readAsBytesSync());
+    if (image == null || image.width <= 0 || image.height <= 0) {
+      throw UiRuntimeEvidenceException(
+        'Checkpoint $checkpoint is not a valid non-empty PNG.',
+      );
+    }
+    _expectVisuallyMeaningfulScreenshot(image, checkpoint);
+  }
+  return pngFiles.length;
+}
+
+void _expectVisuallyMeaningfulScreenshot(img.Image image, String checkpoint) {
+  const maximumSamplesPerAxis = 64;
+  const quantizationStep = 16;
+  const minimumRgbSpread = 8;
+  const minimumNonDominantSampleRatio = 0.005;
+  final columns = image.width < maximumSamplesPerAxis
+      ? image.width
+      : maximumSamplesPerAxis;
+  final rows = image.height < maximumSamplesPerAxis
+      ? image.height
+      : maximumSamplesPerAxis;
+  var minimumRed = 255;
+  var maximumRed = 0;
+  var minimumGreen = 255;
+  var maximumGreen = 0;
+  var minimumBlue = 255;
+  var maximumBlue = 0;
+  final quantizedColorCounts = <int, int>{};
+
+  for (var row = 0; row < rows; row++) {
+    final y = rows == 1 ? 0 : (row * (image.height - 1)) ~/ (rows - 1);
+    for (var column = 0; column < columns; column++) {
+      final x = columns == 1
+          ? 0
+          : (column * (image.width - 1)) ~/ (columns - 1);
+      final pixel = image.getPixel(x, y);
+      final red = pixel.r.toInt();
+      final green = pixel.g.toInt();
+      final blue = pixel.b.toInt();
+      if (red < minimumRed) minimumRed = red;
+      if (red > maximumRed) maximumRed = red;
+      if (green < minimumGreen) minimumGreen = green;
+      if (green > maximumGreen) maximumGreen = green;
+      if (blue < minimumBlue) minimumBlue = blue;
+      if (blue > maximumBlue) maximumBlue = blue;
+      final quantizedColor =
+          ((red ~/ quantizationStep) << 8) |
+          ((green ~/ quantizationStep) << 4) |
+          (blue ~/ quantizationStep);
+      quantizedColorCounts.update(
+        quantizedColor,
+        (count) => count + 1,
+        ifAbsent: () => 1,
+      );
+    }
+  }
+
+  final widestChannelSpread = <int>[
+    maximumRed - minimumRed,
+    maximumGreen - minimumGreen,
+    maximumBlue - minimumBlue,
+  ].reduce((left, right) => left > right ? left : right);
+  final sampleCount = rows * columns;
+  final dominantColorCount = quantizedColorCounts.values.reduce(
+    (left, right) => left > right ? left : right,
+  );
+  final nonDominantSampleCount = sampleCount - dominantColorCount;
+  final minimumNonDominantSampleCount =
+      (sampleCount * minimumNonDominantSampleRatio).ceil();
+  if (widestChannelSpread < minimumRgbSpread ||
+      quantizedColorCounts.length < 2 ||
+      nonDominantSampleCount < minimumNonDominantSampleCount) {
+    throw UiRuntimeEvidenceException(
+      'Checkpoint $checkpoint is visually blank or uniform; '
+      'runtime proof requires rendered interface content.',
+    );
+  }
 }
 
 UiLiveEvidenceVerification verifyUiLiveEvidence({
@@ -1026,6 +1132,8 @@ Never _usage([String? message]) {
     '--manifest <relative-json> --source-digest <sha256> '
     '--surface <id> --profile <id> --runtime <id> --target <id> '
     '--device-contract <text>\n'
+    '  dart run tool/ui_runtime_evidence.dart validate-directory '
+    '--screenshots <directory>\n'
     '  dart run tool/ui_runtime_evidence.dart verify '
     '--repo-root <dir> --review <file> --source-digest <sha256>',
   );
@@ -1047,6 +1155,28 @@ void main(List<String> args) {
       _usage('Invalid argument: $name');
     }
     values[name] = args[++index];
+  }
+
+  if (command == 'validate-directory') {
+    final screenshotPath = values['--screenshots'];
+    if (screenshotPath == null || screenshotPath.trim().isEmpty) {
+      _usage('validate-directory is missing --screenshots');
+    }
+    try {
+      final count = validateRuntimeScreenshotDirectory(
+        Directory(screenshotPath),
+      );
+      stdout.writeln(
+        const JsonEncoder.withIndent('  ').convert(<String, Object>{
+          'status': 'PASS_RUNTIME_SCREENSHOTS',
+          'screenshot_count': count,
+        }),
+      );
+    } on Object catch (error) {
+      stderr.writeln(error);
+      exitCode = 1;
+    }
+    return;
   }
 
   final repoRootPath = values['--repo-root'];

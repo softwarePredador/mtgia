@@ -74,4 +74,73 @@ final class InteractiveBattleRegistryTest {
                 )
         );
     }
+
+    @Test
+    void playerTargetsAreDistinctAndDoNotExposeMarkup() {
+        assertEquals(
+                "Você",
+                InteractiveBattleRegistry.playerTargetLabel(
+                        true,
+                        "Internal human player"
+                )
+        );
+        assertEquals(
+                "Adversário",
+                InteractiveBattleRegistry.playerTargetLabel(false, " ")
+        );
+        assertEquals(
+                "Adversário — Rival",
+                InteractiveBattleRegistry.playerTargetLabel(
+                        false,
+                        "<strong>Rival</strong>"
+                )
+        );
+    }
+
+    @Test
+    void productPlayerNamesReplaceTechnicalSeatKeys() {
+        assertEquals(
+                "Lorehold Lessons",
+                InteractiveBattleRegistry.productPlayerName(
+                        "deck_a",
+                        "<strong>Lorehold Lessons</strong>",
+                        "Rival"
+                )
+        );
+        assertEquals(
+                "Rival",
+                InteractiveBattleRegistry.productPlayerName(
+                        "deck_b",
+                        "Lorehold Lessons",
+                        "Rival"
+                )
+        );
+        assertEquals(
+                "Deck adversário",
+                InteractiveBattleRegistry.productPlayerName(
+                        "deck_b",
+                        "Lorehold Lessons",
+                        " "
+                )
+        );
+    }
+
+    @Test
+    void productPromptMessagesNeverForwardEngineCopy() {
+        assertEquals(
+                "Jogue uma mágica, ative uma habilidade "
+                        + "ou passe a prioridade.",
+                InteractiveBattleRegistry.productPromptMessage(
+                        HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
+                        "Play instants and activated abilities"
+                )
+        );
+        assertEquals(
+                "Escolha um alvo legal para continuar.",
+                InteractiveBattleRegistry.productPromptMessage(
+                        HumanVsAiSpikeHarness.PromptKind.TARGET,
+                        "Select a starting player"
+                )
+        );
+    }
 }

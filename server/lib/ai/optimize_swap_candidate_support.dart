@@ -732,6 +732,98 @@ bool isOptimizeCandidateWithinBudget({
   return budgetUsedBrl + estimatedPriceBrl <= budgetLimitBrl + 0.0001;
 }
 
+int _positiveOptimizeQuantity(Object? raw) => switch (raw) {
+  int value when value > 0 => value,
+  num value when value > 0 => value.toInt(),
+  String value => int.tryParse(value.trim()) ?? 1,
+  _ => 1,
+};
+
+Map<String, int> _criticalRoleContributionsForRemoval(
+  Map<String, dynamic> removal,
+) {
+  final persisted = removal['critical_role_contributions'];
+  if (persisted is Map) {
+    return {
+      for (final role in commanderCriticalFunctionalRoleNames)
+        role: switch (persisted[role]) {
+          int value => value,
+          num value => value.toInt(),
+          String value => int.tryParse(value.trim()) ?? 0,
+          _ => 0,
+        },
+    };
+  }
+  return {
+    for (final role in commanderCriticalFunctionalRoleNames)
+      role: countOptimizationFunctionalRole([
+        {...removal, 'quantity': 1},
+      ], role: role),
+  };
+}
+
+List<String> _criticalRoleNeedsAfterOptimizeRemovals({
+  required CommanderFunctionalRoleFloorAssessment assessment,
+  required List<Map<String, dynamic>> removals,
+}) {
+  if (!assessment.applies) return const [];
+  final counts = Map<String, int>.from(assessment.actualCounts);
+  for (final removal in removals) {
+    final contributions = _criticalRoleContributionsForRemoval(removal);
+    for (final entry in contributions.entries) {
+      counts[entry.key] = (counts[entry.key] ?? 0) - entry.value;
+    }
+  }
+
+  final needs = <String>[];
+  for (final role in const ['ramp', 'draw', 'interaction', 'wipe']) {
+    final deficit = ((assessment.minimumCounts[role] ?? 0) -
+            (counts[role] ?? 0))
+        .clamp(0, 99);
+    needs.addAll(List<String>.filled(deficit, role));
+  }
+  return needs;
+}
+
+List<Map<String, dynamic>> _buildProjectedDeckFromOptimizePairs({
+  required List<Map<String, dynamic>> allCardData,
+  required List<Map<String, dynamic>> pairs,
+  required List<Map<String, dynamic>> replacements,
+}) {
+  final projected = allCardData
+      .map((card) => Map<String, dynamic>.from(card))
+      .toList(growable: true);
+  final replacementByName = <String, Map<String, dynamic>>{
+    for (final replacement in replacements)
+      if (replacement['name']?.toString().trim().isNotEmpty == true)
+        replacement['name'].toString().trim().toLowerCase(): replacement,
+  };
+
+  for (final pair in pairs) {
+    final removalName = pair['remove']?.toString().trim().toLowerCase() ?? '';
+    final removalIndex = projected.indexWhere(
+      (card) => card['name']?.toString().trim().toLowerCase() == removalName,
+    );
+    if (removalIndex >= 0) {
+      final quantity = _positiveOptimizeQuantity(
+        projected[removalIndex]['quantity'],
+      );
+      if (quantity > 1) {
+        projected[removalIndex]['quantity'] = quantity - 1;
+      } else {
+        projected.removeAt(removalIndex);
+      }
+    }
+
+    final additionName = pair['add']?.toString().trim().toLowerCase() ?? '';
+    final replacement = replacementByName[additionName];
+    if (replacement != null) {
+      projected.add({...replacement, 'quantity': 1});
+    }
+  }
+  return projected;
+}
+
 List<Map<String, dynamic>> buildSameLaneOptimizeSwapPairs({
   required List<Map<String, dynamic>> removalCandidates,
   required List<Map<String, dynamic>> replacements,
@@ -860,6 +952,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
           ? assessCommanderFunctionalRoleFloors(
             cards: allCardData,
             targetArchetype: targetArchetype,
+            bracket: bracket,
           )
           : null;
   final criticalRoleFloorNeeds =
@@ -868,6 +961,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
             cards: allCardData,
             targetArchetype: targetArchetype,
             limit: 20,
+            bracket: bracket,
           )
           : const <String>[];
   final bracketRepairSwapCount =
@@ -883,14 +977,19 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
                 assessment.policy.maxCounts[BracketCategory.gameChanger] ?? 0;
             return (count - cap).clamp(0, 20).toInt();
           })();
-  final effectiveSwapLimit = [
-    requestedSwapLimit,
-    bracketRepairSwapCount,
-    criticalRoleFloorNeeds.length,
-  ].reduce((a, b) => a > b ? a : b);
+  final repairMode =
+      bracketRepairSwapCount > 0 || criticalRoleFloorNeeds.isNotEmpty;
+  final requiredRepairSlots =
+      (bracketRepairSwapCount + criticalRoleFloorNeeds.length)
+          .clamp(1, 20)
+          .toInt();
+  final effectiveSwapLimit =
+      repairMode ? requiredRepairSlots : requestedSwapLimit;
   final isAggressive = intensity.trim().toLowerCase() == 'aggressive';
   final candidateSearchLimit =
-      isAggressive
+      repairMode
+          ? 20
+          : isAggressive
           ? (effectiveSwapLimit * 3).clamp(effectiveSwapLimit, 60).toInt()
           : effectiveSwapLimit;
 
@@ -911,12 +1010,48 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     bracket: bracket,
     swapLimit: candidateSearchLimit,
   );
-  final pendingRoleNeeds = [...criticalRoleFloorNeeds];
+  final selectedRawRemovals = <Map<String, dynamic>>[];
+  if (repairMode) {
+    selectedRawRemovals.addAll(
+      rawRemovalCandidates.where(
+        (candidate) => candidate['bracket_violation'] == true,
+      ),
+    );
+    final initialNeeds =
+        roleFloorAssessment == null
+            ? const <String>[]
+            : _criticalRoleNeedsAfterOptimizeRemovals(
+              assessment: roleFloorAssessment,
+              removals: selectedRawRemovals,
+            );
+    final requiredCount =
+        [
+          selectedRawRemovals.length,
+          initialNeeds.length,
+        ].reduce((a, b) => a > b ? a : b).clamp(1, 20).toInt();
+    for (final candidate in rawRemovalCandidates) {
+      if (selectedRawRemovals.length >= requiredCount) break;
+      if (candidate['bracket_violation'] == true) continue;
+      selectedRawRemovals.add(candidate);
+    }
+    if (selectedRawRemovals.length < requiredCount) return const [];
+  } else {
+    selectedRawRemovals.addAll(rawRemovalCandidates.take(effectiveSwapLimit));
+  }
+
+  final pendingRoleNeeds =
+      roleFloorAssessment == null
+          ? <String>[]
+          : _criticalRoleNeedsAfterOptimizeRemovals(
+            assessment: roleFloorAssessment,
+            removals: selectedRawRemovals,
+          );
+  if (pendingRoleNeeds.length > selectedRawRemovals.length) return const [];
+
   final removalCandidates = <Map<String, dynamic>>[];
-  for (final rawCandidate in rawRemovalCandidates) {
+  for (final rawCandidate in selectedRawRemovals) {
     final candidate = Map<String, dynamic>.from(rawCandidate);
-    final role = candidate['role']?.toString() ?? 'utility';
-    if (pendingRoleNeeds.isNotEmpty && role != 'land' && role != 'wipe') {
+    if (pendingRoleNeeds.isNotEmpty) {
       candidate
         ..['functional_role_repair'] = true
         ..['functional_role_repair_target'] = pendingRoleNeeds.removeAt(0);
@@ -954,10 +1089,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
       allCardData: allCardData,
       targetArchetype: targetArchetype,
-      limit:
-          structuralRecoveryScenario
-              ? removalList.length
-              : bracketViolationCount,
+      limit: removalList.length,
     );
     if (bracketViolationCount > 0 || functionalRoleRepairCount > 0) {
       var bracketNeedIndex = 0;
@@ -1010,6 +1142,9 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     removalCandidates: removalCandidates,
     replacements: replacements,
   );
+  if (repairMode && pairs.length != removalCandidates.length) {
+    return const [];
+  }
 
   if (isAggressive && pairs.isNotEmpty) {
     final signals = await loadAggressiveCandidateQualitySignals(
@@ -1061,13 +1196,39 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
           ).clamp(1, effectiveSwapLimit).toInt()
           : effectiveSwapLimit;
   final maxPairs =
-      bracketRepairSwapCount > structuralPairLimit
+      repairMode
+          ? removalCandidates.length
+          : bracketRepairSwapCount > structuralPairLimit
           ? bracketRepairSwapCount.clamp(1, effectiveSwapLimit).toInt()
           : structuralPairLimit;
 
   final responsePairLimit =
       isAggressive ? (maxPairs * 2).clamp(maxPairs, 40).toInt() : maxPairs;
-  return pairs.take(responsePairLimit).toList();
+  final selectedPairs = pairs.take(responsePairLimit).toList(growable: false);
+  if (repairMode && deckFormat.trim().toLowerCase() == 'commander') {
+    final projected = _buildProjectedDeckFromOptimizePairs(
+      allCardData: allCardData,
+      pairs: selectedPairs,
+      replacements: replacements,
+    );
+    final projectedRoleFloors = assessCommanderFunctionalRoleFloors(
+      cards: projected,
+      targetArchetype: targetArchetype,
+      bracket: bracket,
+    );
+    final projectedBracket =
+        bracket == null
+            ? null
+            : assessDeckAgainstBracketPolicy(
+              bracket: bracket,
+              cards: projected,
+            );
+    if (!projectedRoleFloors.satisfied ||
+        projectedBracket?.hardCompliant == false) {
+      return const [];
+    }
+  }
+  return selectedPairs;
 }
 
 Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({

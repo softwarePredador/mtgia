@@ -86,6 +86,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
   late TextEditingController _priceController;
   late TextEditingController _notesController;
   late FocusNode _priceFocusNode;
+  final GlobalKey _saveErrorKey = GlobalKey();
   bool _saving = false;
   String? _saveError;
 
@@ -220,6 +221,23 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
     super.dispose();
   }
 
+  void _showSaveError(String message) {
+    setState(() {
+      _saving = false;
+      _saveError = message;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final errorContext = _saveErrorKey.currentContext;
+      if (!mounted || errorContext == null) return;
+      Scrollable.ensureVisible(
+        errorContext,
+        alignment: 0.85,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
   Future<void> _save() async {
     if (_saving) return;
     if (widget.item == null && (_effectiveCardId ?? '').isEmpty) {
@@ -274,23 +292,20 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       if (ok) {
         Navigator.pop(context);
       } else {
-        setState(() {
-          _saving = false;
-          _saveError =
-              'Não foi possível salvar esta carta. Revise os dados e tente novamente.';
-        });
+        _showSaveError(
+          'Não foi possível salvar esta carta. Revise os dados e tente novamente.',
+        );
       }
     } catch (error) {
       if (!mounted) return;
-      setState(() {
-        _saving = false;
-        _saveError = FriendlyErrorMapper.fromException(
+      _showSaveError(
+        FriendlyErrorMapper.fromException(
           error,
           context: FriendlyErrorContext.binder,
           fallback:
               'Não foi possível salvar esta carta agora. Tente novamente.',
-        );
-      });
+        ),
+      );
     }
   }
 
@@ -987,10 +1002,11 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
 
             if (_saveError != null) ...[
               Semantics(
+                key: const Key('binder-editor-save-error'),
                 liveRegion: true,
                 container: true,
                 child: Container(
-                  key: const Key('binder-editor-save-error'),
+                  key: _saveErrorKey,
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppTheme.space12),
                   decoration: BoxDecoration(

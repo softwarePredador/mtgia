@@ -22,10 +22,17 @@ DB_USER="${DB_USER:-$(id -un)}"
 DB_PASS="${DB_PASS:-}"
 DB_ADMIN="${MANALOOM_S1_PG_ADMIN_DB:-postgres}"
 ISOLATED_ENVIRONMENT="${MANALOOM_ISOLATED_SERVER_ENVIRONMENT:-development}"
+if [[ -z "${INTERACTIVE_BATTLE_ENABLED+x}" ]]; then
+  INTERACTIVE_BATTLE_ENABLED=false
+fi
 
 case "$ISOLATED_ENVIRONMENT" in
   development|test|staging|production) ;;
   *) echo "ambiente isolado inválido: $ISOLATED_ENVIRONMENT" >&2; exit 2 ;;
+esac
+case "$INTERACTIVE_BATTLE_ENABLED" in
+  true|false) ;;
+  *) echo "INTERACTIVE_BATTLE_ENABLED deve ser true ou false" >&2; exit 2 ;;
 esac
 
 case "$DB_HOST" in
@@ -33,8 +40,54 @@ case "$DB_HOST" in
   *) echo "BLOCKED: harness aceita somente PostgreSQL loopback" >&2; exit 2 ;;
 esac
 
+EGRESS_POLICY="deny_non_loopback"
+EGRESS_GUARD_KIND=""
+EGRESS_SANDBOX_PROFILE=""
+EGRESS_GUARD=()
+case "$(uname -s)" in
+  Darwin)
+    command -v sandbox-exec >/dev/null 2>&1 || {
+      echo "BLOCKED: sandbox-exec é obrigatório para o harness sem egress" >&2
+      exit 2
+    }
+    EGRESS_GUARD_KIND="macos_sandbox_exec_loopback_only"
+    EGRESS_SANDBOX_PROFILE='(version 1)
+(allow default)
+(deny network*)
+(allow network-outbound (remote ip "localhost:*"))
+(allow network-inbound (local ip "localhost:*"))'
+    EGRESS_GUARD=(sandbox-exec -p "$EGRESS_SANDBOX_PROFILE")
+    ;;
+  *)
+    echo "BLOCKED: não há guard de egress loopback-only suportado neste sistema" >&2
+    exit 2
+    ;;
+esac
+
+run_no_egress() {
+  "${EGRESS_GUARD[@]}" "$@"
+}
+
+if run_no_egress python3 -c \
+  'import socket; socket.socket(socket.AF_INET, socket.SOCK_DGRAM).connect(("1.1.1.1", 53))' \
+  >/dev/null 2>&1; then
+  echo "BLOCKED: o guard de egress permitiu conexão não-loopback" >&2
+  exit 2
+fi
+EGRESS_GUARD_SELF_TEST="pass"
+
+if [[ "${MANALOOM_ISOLATED_FULL_CARD_CATALOG:-0}" == "1" ]]; then
+  echo "BLOCKED: catálogo remoto é incompatível com o harness sem egress" >&2
+  exit 2
+fi
+
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)_$$"
 OPS_KEY="manaloom-isolated-ops-${RUN_ID}-key-material"
+ISOLATED_JWT_SECRET="manaloom-isolated-contract-${RUN_ID}-not-production"
+ISOLATED_OPTIMIZATION_SIGNING_SECRET="$(
+  run_no_egress python3 -c \
+    'import secrets; print("manaloom-isolated-optimization-" + secrets.token_hex(32))'
+)"
 DATABASE="manaloom_s1_api_${RUN_ID}"
 RUN_DIR="${TMPDIR:-/tmp}/manaloom_server_contract_e2e_${RUN_ID}"
 SERVER_LOG="$RUN_DIR/server.log"
@@ -76,19 +129,21 @@ cleanup() {
     kill "$EMAIL_FIXTURE_PID" >/dev/null 2>&1 || true
     wait "$EMAIL_FIXTURE_PID" >/dev/null 2>&1 || true
   fi
-  dropdb --if-exists --force \
+  run_no_egress dropdb --if-exists --force \
     -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DATABASE" \
     >/dev/null 2>&1 || true
 }
 trap cleanup EXIT INT TERM
 
-MANALOOM_EMAIL_FIXTURE_PORT="$EMAIL_FIXTURE_PORT" \
+run_no_egress env \
+  MANALOOM_EMAIL_FIXTURE_PORT="$EMAIL_FIXTURE_PORT" \
   MANALOOM_EMAIL_FIXTURE_LOG="$EMAIL_FIXTURE_LOG" \
   python3 "$ROOT_DIR/scripts/testing/manaloom_email_webhook_fixture.py" \
   >"$RUN_DIR/email-fixture.log" 2>&1 &
 EMAIL_FIXTURE_PID=$!
 for _ in $(seq 1 40); do
-  if curl -fsS "http://127.0.0.1:$EMAIL_FIXTURE_PORT/health" >/dev/null 2>&1; then
+  if run_no_egress curl -fsS \
+    "http://127.0.0.1:$EMAIL_FIXTURE_PORT/health" >/dev/null 2>&1; then
     break
   fi
   if ! kill -0 "$EMAIL_FIXTURE_PID" >/dev/null 2>&1; then
@@ -98,15 +153,16 @@ for _ in $(seq 1 40); do
   sleep 0.1
 done
 
-createdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+run_no_egress createdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
   --maintenance-db="$DB_ADMIN" "$DATABASE"
-psql -X -v ON_ERROR_STOP=1 \
+run_no_egress psql -X -v ON_ERROR_STOP=1 \
   -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DATABASE" \
   -f "$SERVER_DIR/database_setup.sql" >"$RUN_DIR/bootstrap.log" 2>&1
 
 (
   cd "$SERVER_DIR"
-  DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
+  run_no_egress env \
+    DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
     DB_PASS="$DB_PASS" DB_NAME="$DATABASE" \
     MANALOOM_CONFIRM_POSTGRES_WRITES="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
     MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
@@ -114,33 +170,10 @@ psql -X -v ON_ERROR_STOP=1 \
 ) >"$RUN_DIR/migrate.log" 2>&1
 
 FULL_CARD_COUNT=0
-if [[ "${MANALOOM_ISOLATED_FULL_CARD_CATALOG:-0}" == "1" ]]; then
-  ATOMIC_CARDS="$RUN_DIR/AtomicCards.json"
-  curl -fsSL --retry 3 --retry-delay 2 \
-    https://mtgjson.com/api/v5/AtomicCards.json \
-    -o "$ATOMIC_CARDS"
-  (
-    cd "$SERVER_DIR"
-    DATABASE_URL= DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
-      DB_PASS="$DB_PASS" DB_NAME="$DATABASE" \
-      python3 bin/sync_cards_full_fast.py \
-        --atomic-cards "$ATOMIC_CARDS" \
-        --batch-size 10000
-  ) >"$RUN_DIR/full-card-catalog.json" 2>"$RUN_DIR/full-card-catalog.log"
-  rm -f "$ATOMIC_CARDS"
-  FULL_CARD_COUNT="$(
-    psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
-      -d "$DATABASE" -c 'SELECT COUNT(*) FROM cards'
-  )"
-  if [[ ! "$FULL_CARD_COUNT" =~ ^[0-9]+$ || "$FULL_CARD_COUNT" -lt 30000 ]]; then
-    echo "catálogo MTGJSON isolado incompleto: $FULL_CARD_COUNT" >&2
-    exit 1
-  fi
-fi
 
 # Deterministic product fixture used by card, deck, community and trade flows.
 # It exists only in the disposable database and is removed with that database.
-psql -X -v ON_ERROR_STOP=1 \
+run_no_egress psql -X -v ON_ERROR_STOP=1 \
   -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DATABASE" \
   -c "
     INSERT INTO cards (
@@ -270,20 +303,31 @@ psql -X -v ON_ERROR_STOP=1 \
   " >"$RUN_DIR/fixture.log" 2>&1
 
 CARD_CATALOG_COUNT="$(
-  psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+  run_no_egress psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
     -d "$DATABASE" -c 'SELECT COUNT(*) FROM cards'
 )"
 
 (
   cd "$SERVER_DIR"
-  dart_frog build
+  run_no_egress dart_frog build
 ) >"$RUN_DIR/build.log" 2>&1
 
 (
   cd "$SERVER_DIR"
-  DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
+  exec "${EGRESS_GUARD[@]}" env \
+    DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
     DB_PASS="$DB_PASS" DB_NAME="$DATABASE" \
-    JWT_SECRET="manaloom-isolated-contract-${RUN_ID}-not-production" \
+    JWT_SECRET="$ISOLATED_JWT_SECRET" \
+    OPTIMIZATION_APPLY_SIGNING_SECRET="$ISOLATED_OPTIMIZATION_SIGNING_SECRET" \
+    OPENAI_API_KEY= \
+    OPENAI_BASE_URL= \
+    OPENAI_PROFILE="isolated_no_provider" \
+    OPTIMIZE_COMPLETE_DISABLE_OPENAI=1 \
+    MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED= \
+    HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= \
+    NO_PROXY="localhost,127.0.0.1,::1" \
+    AI_GENERATE_INTERNAL_BASE_URL="http://127.0.0.1:$PORT" \
+    AI_OPTIMIZE_INTERNAL_BASE_URL="http://127.0.0.1:$PORT" \
     MANALOOM_PASSWORD_RESET_TEST_RESPONSE="I_UNDERSTAND_RESET_TOKENS_ARE_TEST_ONLY" \
     MANALOOM_EMAIL_VERIFICATION_TEST_RESPONSE="I_UNDERSTAND_VERIFICATION_TOKENS_ARE_TEST_ONLY" \
     PASSWORD_RESET_WEBHOOK_URL="http://127.0.0.1:$EMAIL_FIXTURE_PORT/deliver" \
@@ -296,21 +340,25 @@ CARD_CATALOG_COUNT="$(
     MANALOOM_ALLOW_DEV_ORIGINS="${MANALOOM_ALLOW_DEV_ORIGINS:-false}" \
     MANALOOM_REQUIRE_LEGAL_ACCEPTANCE="${MANALOOM_REQUIRE_LEGAL_ACCEPTANCE:-false}" \
     MANALOOM_REQUIRE_VERIFIED_EMAIL="${MANALOOM_REQUIRE_VERIFIED_EMAIL:-false}" \
+    BATTLE_JOB_WORKER_ENABLED=false \
     INTERACTIVE_BATTLE_ENABLED="${INTERACTIVE_BATTLE_ENABLED:-false}" \
     XMAGE_SIDECAR_URL="${XMAGE_SIDECAR_URL:-}" \
     XMAGE_INTERACTIVE_SIDECAR_URL="${XMAGE_INTERACTIVE_SIDECAR_URL:-}" \
+    FORGE_SIDECAR_URL= \
+    NATIVE_BATTLE_SIDECAR_URL= \
     XMAGE_EXPECTED_COMMIT="${XMAGE_EXPECTED_COMMIT:-}" \
     XMAGE_EXPECTED_PATCH_COMMIT="${XMAGE_EXPECTED_PATCH_COMMIT:-}" \
     XMAGE_EXPECTED_VERSION="${XMAGE_EXPECTED_VERSION:-}" \
     BATTLE_ALLOW_LEGACY_SIDECAR_IDENTITY="${BATTLE_ALLOW_LEGACY_SIDECAR_IDENTITY:-false}" \
     ENVIRONMENT="$ISOLATED_ENVIRONMENT" PORT="$PORT" \
-    exec dart build/bin/server.dart
+    dart build/bin/server.dart
 ) >"$SERVER_LOG" 2>&1 &
 SERVER_PID=$!
 
 ready=0
 for _ in $(seq 1 80); do
-  if curl -fsS "http://127.0.0.1:$PORT/health/live" >/dev/null 2>&1; then
+  if run_no_egress curl -fsS \
+    "http://127.0.0.1:$PORT/health/live" >/dev/null 2>&1; then
     ready=1
     break
   fi
@@ -337,6 +385,9 @@ if [[ "${MANALOOM_HOLD_FOR_BROWSER_QA:-0}" == "1" ]]; then
     printf 'api_base_url=http://127.0.0.1:%s\n' "$PORT"
     printf 'database=%s\n' "$DATABASE"
     printf 'run_dir=%s\n' "$RUN_DIR"
+    printf 'egress_policy=%s\n' "$EGRESS_POLICY"
+    printf 'egress_guard=%s\n' "$EGRESS_GUARD_KIND"
+    printf 'egress_guard_self_test=%s\n' "$EGRESS_GUARD_SELF_TEST"
     printf 'cleanup=trap_registered\n'
   } >"$BROWSER_READY"
   printf 'READY: isolated browser QA fixture\n'
@@ -357,30 +408,37 @@ else
 fi
 (
   cd "$SERVER_DIR"
-  DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
+  run_no_egress env \
+    DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
     DB_PASS="$DB_PASS" DB_NAME="$DATABASE" \
+    OPTIMIZATION_APPLY_SIGNING_SECRET="$ISOLATED_OPTIMIZATION_SIGNING_SECRET" \
+    OPENAI_API_KEY= \
+    OPTIMIZE_COMPLETE_DISABLE_OPENAI=1 \
+    MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED= \
+    HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= \
+    NO_PROXY="localhost,127.0.0.1,::1" \
     RUN_INTEGRATION_TESTS=1 \
     MANALOOM_ISOLATED_CONTRACT_E2E=1 \
     MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
     MANALOOM_CONFIRM_POSTGRES_WRITES="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
     MANALOOM_TEST_OPS_API_KEY="$OPS_KEY" \
     TEST_API_BASE_URL="http://127.0.0.1:$PORT" \
-    dart test "${tests[@]}"
+    dart test -j 1 "${tests[@]}"
 ) 2>&1 | tee "$TEST_LOG"
 
 migration_count="$(
-  psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+  run_no_egress psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
     -d "$DATABASE" -c 'SELECT COUNT(*) FROM schema_migrations'
 )"
 latest_migration="$(
-  psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+  run_no_egress psql -X -A -t -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
     -d "$DATABASE" -c 'SELECT COALESCE(MAX(version), '\''none'\'') FROM schema_migrations'
 )"
 email_delivery_count="$(
   (wc -l <"$EMAIL_FIXTURE_LOG" 2>/dev/null || printf '0') | tr -d '[:space:]'
 )"
 email_delivery_templates="$(
-  python3 - "$EMAIL_FIXTURE_LOG" <<'PY'
+  run_no_egress python3 - "$EMAIL_FIXTURE_LOG" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -394,6 +452,10 @@ if path.exists():
 print(",".join(sorted(templates)))
 PY
 )"
+battle_sidecars_enabled=0
+if [[ "$INTERACTIVE_BATTLE_ENABLED" == "true" ]]; then
+  battle_sidecars_enabled=1
+fi
 if [[ -n "${MANALOOM_EXPECT_EMAIL_TEMPLATES:-}" ]]; then
   IFS=',' read -r -a expected_templates <<<"$MANALOOM_EXPECT_EMAIL_TEMPLATES"
   for template in "${expected_templates[@]}"; do
@@ -410,7 +472,14 @@ fi
   printf 'migration_count=%s\n' "$migration_count"
   printf 'card_catalog_count=%s\n' "$CARD_CATALOG_COUNT"
   printf 'server_environment=%s\n' "$ISOLATED_ENVIRONMENT"
-  printf 'openai_profile=%s\n' "${OPENAI_PROFILE:-default}"
+  printf 'egress_policy=%s\n' "$EGRESS_POLICY"
+  printf 'egress_guard=%s\n' "$EGRESS_GUARD_KIND"
+  printf 'egress_guard_self_test=%s\n' "$EGRESS_GUARD_SELF_TEST"
+  printf 'openai_profile=isolated_no_provider\n'
+  printf 'openai_provider_enabled=0\n'
+  printf 'edhrec_collection_enabled=0\n'
+  printf 'battle_sidecars_enabled=%s\n' "$battle_sidecars_enabled"
+  printf 'optimization_apply_signing=isolated_ephemeral\n'
   printf 'full_card_catalog_enabled=%s\n' "${MANALOOM_ISOLATED_FULL_CARD_CATALOG:-0}"
   printf 'latest_migration=%s\n' "$latest_migration"
   printf 'email_delivery_count=%s\n' "$email_delivery_count"

@@ -377,8 +377,8 @@ class InteractiveBattleService {
       id: id,
       action: action,
     );
-    if (reservation.duplicate) {
-      return get(userId, id);
+    if (reservation.duplicate && reservation.session.status.isTerminal) {
+      return reservation.session;
     }
     final runtimeId = reservation.session.runtimeSessionId;
     if (runtimeId == null) {
@@ -436,7 +436,6 @@ class InteractiveBattleService {
       requestFingerprint: fingerprint,
     );
     if (reservation.session.status.isTerminal) return reservation.session;
-    if (reservation.duplicate) return get(userId, id);
     final runtimeId = reservation.session.runtimeSessionId;
     if (runtimeId == null) {
       return _processLost(userId, reservation.session);

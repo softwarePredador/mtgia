@@ -184,12 +184,13 @@ void main() {
 
     test('reuses only a matching hard-compliant bracket policy', () {
       const satisfiedFunctionalRolePolicy = {
-        'policy': 'commander_functional_role_floors_v1',
+        'policy': 'commander_functional_role_floors_v2',
         'archetype': 'midrange',
+        'bracket': 2,
         'applies': true,
         'total_cards': 100,
-        'minimum_counts': {'wipe': 2},
-        'actual_counts': {'wipe': 2},
+        'minimum_counts': {'ramp': 8, 'draw': 8, 'interaction': 6, 'wipe': 2},
+        'actual_counts': {'ramp': 8, 'draw': 8, 'interaction': 6, 'wipe': 2},
         'deficits': <String, int>{},
         'satisfied': true,
       };
@@ -261,6 +262,70 @@ void main() {
           ),
         ),
         isNull,
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(
+            const {'bracket': 2, 'hard_compliant': true},
+            functionalRolePolicy: {
+              ...satisfiedFunctionalRolePolicy,
+              'policy': 'commander_functional_role_floors_v1',
+            },
+          ),
+        ),
+        isNull,
+        reason: 'pre-v2 wipe-only cache contracts must never be reusable',
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(
+            const {'bracket': 2, 'hard_compliant': true},
+            functionalRolePolicy: {
+              ...satisfiedFunctionalRolePolicy,
+              'minimum_counts': {'wipe': 2},
+              'actual_counts': {'wipe': 2},
+            },
+          ),
+        ),
+        isNull,
+        reason: 'v2 must prove every critical role, not only wipes',
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(
+            const {'bracket': 2, 'hard_compliant': true},
+            functionalRolePolicy: {
+              ...satisfiedFunctionalRolePolicy,
+              'bracket': 5,
+            },
+          ),
+        ),
+        isNull,
+        reason: 'role policy and bracket policy must be bound together',
+      );
+      expect(
+        hydrate(
+          cachedWithPolicy(
+            const {'bracket': 2, 'hard_compliant': true},
+            functionalRolePolicy: {
+              ...satisfiedFunctionalRolePolicy,
+              'minimum_counts': {
+                'ramp': 0,
+                'draw': 0,
+                'interaction': 0,
+                'wipe': 0,
+              },
+              'actual_counts': {
+                'ramp': 0,
+                'draw': 0,
+                'interaction': 0,
+                'wipe': 0,
+              },
+            },
+          ),
+        ),
+        isNull,
+        reason: 'cache cannot weaken the canonical v2 minimum matrix',
       );
       expect(
         hydrate(
@@ -361,6 +426,58 @@ void main() {
         'spellslinger',
       );
       expect((outcome['theme'] as Map)['confidence'], 'high');
+    });
+
+    test('promotes structural rejection to an explicit rebuild action', () {
+      const deckState = DeckOptimizationStateResult(
+        status: 'healthy',
+        recommendedMode: 'optimize',
+        suggestedScope: 'micro_swaps',
+        reasons: [],
+        severityScore: 0,
+      );
+      const theme = DeckThemeProfileResult(
+        theme: 'artifacts',
+        confidence: 'high',
+        matchScore: 0.91,
+        coreCards: ['Urza, Lord High Artificer'],
+      );
+
+      final outcome = buildOptimizeStructuralRebuildGuidedOutcome(
+        explanation: 'Bracket repair requires a rebuild.',
+        trigger: 'commander_bracket_repair_incomplete',
+        policyKey: 'bracket_policy',
+        policy: const {'bracket': 2, 'hard_compliant': false},
+        applyBlocker: 'commander_bracket_policy_violation',
+        intensity: focused,
+        deckState: deckState,
+        deckId: 'deck-2',
+        bracket: 2,
+        archetype: 'midrange',
+        themeProfile: theme,
+        deckAnalysis: const {'total_cards': 100},
+      );
+
+      expect(
+        (outcome['quality_error'] as Map)['code'],
+        'OPTIMIZE_NEEDS_REPAIR',
+      );
+      expect((outcome['quality_error'] as Map), contains('bracket_policy'));
+      expect((outcome['deck_state'] as Map)['status'], 'needs_repair');
+      expect(
+        (outcome['deck_state'] as Map)['recommended_mode'],
+        'rebuild_guided',
+      );
+      expect((outcome['next_action'] as Map)['type'], 'rebuild_guided');
+      expect(
+        ((outcome['next_action'] as Map)['payload'] as Map)['rebuild_scope'],
+        'full_non_commander_rebuild',
+      );
+      expect(outcome['can_apply'], isFalse);
+      expect(
+        outcome['apply_blockers'],
+        contains('commander_bracket_policy_violation'),
+      );
     });
   });
 }

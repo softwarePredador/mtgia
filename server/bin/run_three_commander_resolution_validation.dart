@@ -204,6 +204,8 @@ bool qualifiesAsSafeNoChangeOutcome({
     'OPTIMIZE_NO_ACTIONABLE_SWAPS',
     'OPTIMIZE_QUALITY_REJECTED',
     'OPTIMIZE_SEMANTIC_V2_REJECTED',
+    'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
+    'OPTIMIZE_BRACKET_VIOLATION',
   };
   const safeOutcomeCodes = {
     'near_peak',

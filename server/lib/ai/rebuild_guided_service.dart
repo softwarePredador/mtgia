@@ -9,8 +9,10 @@ import '../deck_rules_service.dart';
 import '../deck_schema_support.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
+import 'canonical_card_role_metadata_support.dart';
 import 'deck_state_analysis.dart';
 import 'edhrec_service.dart';
+import 'optimize_functional_role_support.dart';
 import 'optimization_ramp_profile.dart';
 import 'rebuild_bracket_guard.dart';
 import 'rebuild_guided_land_support.dart';
@@ -127,6 +129,29 @@ int rebuildGuidedEdhrecTopCardWeight(EdhrecCard card, int index) {
       (card.inclusionRate * 20).round();
 }
 
+List<Map<String, dynamic>> mergeRebuildGuidedCandidateCards({
+  required Iterable<Map<String, dynamic>> referenceCards,
+  required Iterable<Map<String, dynamic>> catalogCards,
+}) {
+  final cardsByName = <String, Map<String, dynamic>>{};
+  for (final card in [...referenceCards, ...catalogCards]) {
+    final name = card['name']?.toString().trim() ?? '';
+    if (name.isEmpty) continue;
+    cardsByName.putIfAbsent(
+      name.toLowerCase(),
+      () => Map<String, dynamic>.from(card),
+    );
+  }
+  return cardsByName.values.toList(growable: false);
+}
+
+Map<String, int> rebuildGuidedStructuralRoleContributions(
+  Map<String, dynamic> card,
+) => {
+  for (final role in commanderCriticalFunctionalRoleNames)
+    role: countOptimizationFunctionalRole([card], role: role),
+};
+
 class RebuildGuidedService {
   RebuildGuidedService(this._pool, {EdhrecService? edhrecService})
     : _edhrecService = edhrecService ?? EdhrecService();
@@ -209,6 +234,7 @@ class RebuildGuidedService {
       deckFormat: deckFormat,
       requestedArchetype: resolvedArchetype,
       resolvedTheme: resolvedTheme,
+      bracket: bracket,
       commanderData: commanderData,
       cachedProfile: cachedProfile,
     );
@@ -247,7 +273,15 @@ class RebuildGuidedService {
     );
 
     final candidateNames = candidateWeights.keys.toSet().toList();
-    final candidateCards = await _loadCardsByNames(candidateNames);
+    final referenceCandidateCards = await _loadCardsByNames(candidateNames);
+    final catalogCandidateCards = await _loadSafeCatalogFallbackCards(
+      deckFormat: deckFormat,
+      commanderColorIdentity: commanderColorIdentity,
+    );
+    final candidateCards = mergeRebuildGuidedCandidateCards(
+      referenceCards: referenceCandidateCards,
+      catalogCards: catalogCandidateCards,
+    );
     final basicLandCatalog = await _loadBasicLandCatalog();
     final weightedCandidates = _weightCandidateCards(
       candidateCards: candidateCards,
@@ -302,6 +336,13 @@ class RebuildGuidedService {
         '${targetProfile.totalCards}. Nenhum draft foi criado.',
       );
     }
+    final functionalRoleAssessment = _assertCommanderFunctionalRoleFloors(
+      deckFormat: deckFormat,
+      bracket: bracket,
+      archetype: resolvedArchetype,
+      cards: rebuiltCards,
+      operationLabel: 'rebuild',
+    );
 
     await _pool.runTx(
       (session) => DeckRulesService(session).validateAndThrow(
@@ -389,6 +430,8 @@ class RebuildGuidedService {
         'used_edhrec_top_cards': commanderData != null,
         'used_cached_commander_profile': cachedProfile != null,
         'candidate_pool_size': weightedCandidates.length,
+        'reference_candidate_pool_size': referenceCandidateCards.length,
+        'safe_catalog_fallback_size': catalogCandidateCards.length,
         'mana_foundation': {
           ...buildOptimizationManaFoundationContract(
             format: deckFormat,
@@ -401,6 +444,8 @@ class RebuildGuidedService {
         },
         'ramp_profile_before': rampProfileBefore.toJson(),
         'ramp_profile_after': rampProfileAfter.toJson(),
+        if (functionalRoleAssessment != null)
+          'functional_role_policy': functionalRoleAssessment.toJson(),
       },
     );
   }
@@ -436,6 +481,13 @@ class RebuildGuidedService {
         '${manaFoundation.minimumLandCount} e $maximumLandCount.',
       );
     }
+    _assertCommanderFunctionalRoleFloors(
+      deckFormat: deckFormat,
+      bracket: bracket,
+      archetype: resolvedArchetype,
+      cards: rebuiltCards,
+      operationLabel: 'draft',
+    );
 
     final hasMeta = await hasDeckMetaColumns(_pool);
     final draftName = 'Rebuild Draft - $sourceDeckName';
@@ -506,10 +558,41 @@ class RebuildGuidedService {
     }
   }
 
+  CommanderFunctionalRoleFloorAssessment? _assertCommanderFunctionalRoleFloors({
+    required String deckFormat,
+    required int? bracket,
+    required String archetype,
+    required Iterable<Map<String, dynamic>> cards,
+    required String operationLabel,
+  }) {
+    if (deckFormat.trim().toLowerCase() != 'commander') return null;
+    final assessment = assessCommanderFunctionalRoleFloors(
+      cards: cards,
+      targetArchetype: archetype,
+      bracket: bracket,
+    );
+    if (assessment.satisfied) return assessment;
+
+    final deficits = assessment.deficits.entries
+        .map(
+          (entry) =>
+              '${entry.key}: faltam ${entry.value} '
+              '(atual ${assessment.actualCounts[entry.key] ?? 0}, '
+              'mínimo ${assessment.minimumCounts[entry.key] ?? 0})',
+        )
+        .join('; ');
+    throw RebuildException(
+      'O $operationLabel foi bloqueado porque a lista final não atingiu os '
+      'pisos estruturais do Bracket ${bracket ?? 2}: $deficits. '
+      'Nenhum draft foi criado.',
+    );
+  }
+
   RebuildTargetProfile _buildTargetProfile({
     required String deckFormat,
     required String requestedArchetype,
     required String resolvedTheme,
+    required int? bracket,
     required EdhrecCommanderData? commanderData,
     required Map<String, dynamic>? cachedProfile,
   }) {
@@ -616,16 +699,35 @@ class RebuildGuidedService {
       wincons = 6;
     }
 
+    final functionalMinimums =
+        deckFormat.trim().toLowerCase() == 'commander'
+            ? commanderFunctionalRoleMinimumCounts(
+              targetArchetype: requestedArchetype,
+              bracket: bracket,
+            )
+            : const <String, int>{};
+
     return RebuildTargetProfile(
       totalCards: totalCards,
       landCount: recommendedLands,
-      ramp: math.max(ramp, categoryTargetsRaw['ramp'] ?? 0),
-      drawSelection: math.max(
-        drawSelection,
-        categoryTargetsRaw['card_draw'] ?? 0,
+      ramp: math.max(
+        math.max(ramp, categoryTargetsRaw['ramp'] ?? 0),
+        functionalMinimums['ramp'] ?? 0,
       ),
-      interaction: interaction,
-      wipes: wipes,
+      drawSelection: math.max(
+        math.max(drawSelection, categoryTargetsRaw['card_draw'] ?? 0),
+        functionalMinimums['draw'] ?? 0,
+      ),
+      interaction: math.max(
+        interaction,
+        functionalMinimums['interaction'] ?? 0,
+      ),
+      wipes:
+          functionalMinimums.isEmpty
+              ? wipes
+              : (bracket != null && bracket >= 4)
+              ? math.min(wipes, functionalMinimums['wipe'] ?? wipes)
+              : math.max(wipes, functionalMinimums['wipe'] ?? 0),
       payoffs: payoffs,
       wincons: wincons,
       rawCategoryTargets: categoryTargetsRaw,
@@ -960,7 +1062,97 @@ class RebuildGuidedService {
       parameters: {'names': normalized},
     );
 
-    return result
+    final cards =
+        result
+            .map(
+              (row) => <String, dynamic>{
+                'card_id': row[0] as String,
+                'name': row[1] as String? ?? '',
+                'type_line': row[2] as String? ?? '',
+                'mana_cost': row[3] as String? ?? '',
+                'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+                'color_identity': (row[5] as List?)?.cast<String>(),
+                'cmc': (row[6] as num?)?.toDouble() ?? 0.0,
+                'oracle_text': row[7] as String? ?? '',
+                'quantity': 1,
+                'is_commander': false,
+              },
+            )
+            .toList();
+    final roleMetadata = await loadCanonicalCardRoleMetadataByCardId(
+      pool: _pool,
+      cardIds: cards.map((card) => card['card_id']?.toString() ?? ''),
+    );
+    return [
+      for (final card in cards)
+        {...card, ...?roleMetadata[card['card_id']?.toString() ?? '']},
+    ];
+  }
+
+  Future<List<Map<String, dynamic>>> _loadSafeCatalogFallbackCards({
+    required String deckFormat,
+    required Set<String> commanderColorIdentity,
+  }) async {
+    final result = await _pool.execute(
+      Sql.named(r'''
+        SELECT ranked.id,
+               ranked.name,
+               ranked.type_line,
+               ranked.mana_cost,
+               ranked.colors,
+               ranked.color_identity,
+               ranked.cmc,
+               ranked.oracle_text
+        FROM (
+          SELECT DISTINCT ON (LOWER(c.name))
+                 c.id::text AS id,
+                 c.name,
+                 COALESCE(c.type_line, '') AS type_line,
+                 COALESCE(c.mana_cost, '') AS mana_cost,
+                 COALESCE(c.colors, ARRAY[]::text[]) AS colors,
+                 c.color_identity,
+                 COALESCE(c.cmc, 0)::double precision AS cmc,
+                 COALESCE(c.oracle_text, '') AS oracle_text,
+                 COALESCE(cmi.usage_count, 0) AS usage_count,
+                 COALESCE(cis.best_role_score, 0) AS best_role_score
+          FROM cards c
+          JOIN card_legalities cl
+            ON cl.card_id = c.id
+           AND cl.format = @format
+           AND cl.status IN ('legal', 'restricted')
+          LEFT JOIN card_meta_insights cmi
+            ON LOWER(cmi.card_name) = LOWER(c.name)
+          LEFT JOIN card_intelligence_snapshot cis
+            ON cis.card_id = c.id
+          WHERE NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|$)')
+            AND c.name NOT LIKE 'A-%'
+            AND c.name NOT LIKE '\_%' ESCAPE '\'
+            AND c.name NOT LIKE '%World Champion%'
+            AND c.name NOT LIKE '%Heroes of the Realm%'
+            AND c.oracle_text IS NOT NULL
+            AND LENGTH(TRIM(c.oracle_text)) > 0
+            AND (
+              c.color_identity <@ @identity::text[]
+              OR c.color_identity = '{}'
+              OR c.color_identity IS NULL
+            )
+          ORDER BY LOWER(c.name),
+                   COALESCE(cmi.usage_count, 0) DESC,
+                   COALESCE(cis.best_role_score, 0) DESC,
+                   c.id
+        ) ranked
+        ORDER BY ranked.usage_count DESC,
+                 ranked.best_role_score DESC,
+                 LOWER(ranked.name)
+        LIMIT 800
+      '''),
+      parameters: {
+        'format': deckFormat.trim().toLowerCase(),
+        'identity': commanderColorIdentity.toList(growable: false),
+      },
+    );
+
+    final cards = result
         .map(
           (row) => <String, dynamic>{
             'card_id': row[0] as String,
@@ -975,7 +1167,15 @@ class RebuildGuidedService {
             'is_commander': false,
           },
         )
-        .toList();
+        .toList(growable: false);
+    final roleMetadata = await loadCanonicalCardRoleMetadataByCardId(
+      pool: _pool,
+      cardIds: cards.map((card) => card['card_id']?.toString() ?? ''),
+    );
+    return [
+      for (final card in cards)
+        {...card, ...?roleMetadata[card['card_id']?.toString() ?? '']},
+    ];
   }
 
   List<_WeightedCard> _weightCandidateCards({
@@ -1148,6 +1348,31 @@ class RebuildGuidedService {
         .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 1));
     final nonCommanderTarget = maxTotal - commanderCount;
     final nonLandTarget = nonCommanderTarget - targetProfile.landCount;
+
+    final structuralTargets = <String, int>{
+      'ramp': targetProfile.ramp,
+      'draw': targetProfile.drawSelection,
+      'interaction': targetProfile.interaction,
+      'wipe': targetProfile.wipes,
+    };
+    for (final target in structuralTargets.entries) {
+      final floorKey = '${target.key}_floor';
+      for (final candidate in nonLandCandidates) {
+        if ((roleCounts[floorKey] ?? 0) >= target.value ||
+            _totalNonCommanderNonLand(selected.values.toList()) >=
+                nonLandTarget) {
+          break;
+        }
+        final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
+        if (selected.containsKey(lower)) continue;
+        final contributions = rebuildGuidedStructuralRoleContributions(
+          candidate.card,
+        );
+        if ((contributions[target.key] ?? 0) <= 0) continue;
+        _addCardToSelection(selected, candidate.card);
+        _incrementRoleForCard(roleCounts, candidate.role, candidate.card);
+      }
+    }
 
     for (final candidate in nonLandCandidates) {
       if (_totalCards(selected.values.toList()) >= maxTotal) break;
@@ -1402,10 +1627,18 @@ class RebuildGuidedService {
     required int nonLandTarget,
   }) {
     if (selectedTotal >= nonLandTarget) return false;
-    final rampProfile = optimizationRampProfileForCard(card);
-    if (rampProfile.countsTowardGenericFloor &&
-        (roleCounts['ramp_floor'] ?? 0) < targetProfile.ramp) {
-      return true;
+    final structuralTargets = <String, int>{
+      'ramp': targetProfile.ramp,
+      'draw': targetProfile.drawSelection,
+      'interaction': targetProfile.interaction,
+      'wipe': targetProfile.wipes,
+    };
+    final contributions = rebuildGuidedStructuralRoleContributions(card);
+    for (final target in structuralTargets.entries) {
+      if ((contributions[target.key] ?? 0) > 0 &&
+          (roleCounts['${target.key}_floor'] ?? 0) < target.value) {
+        return true;
+      }
     }
     switch (role) {
       case 'ramp':
@@ -1443,10 +1676,13 @@ class RebuildGuidedService {
       );
       final quantity = (card['quantity'] as int?) ?? 1;
       counts[role] = (counts[role] ?? 0) + quantity;
+      final contributions = rebuildGuidedStructuralRoleContributions(card);
+      for (final role in commanderCriticalFunctionalRoleNames) {
+        counts['${role}_floor'] =
+            (counts['${role}_floor'] ?? 0) + (contributions[role] ?? 0);
+      }
       final rampProfile = optimizationRampProfileForCard(card);
-      if (rampProfile.countsTowardGenericFloor) {
-        counts['ramp_floor'] = (counts['ramp_floor'] ?? 0) + quantity;
-      } else if (rampProfile.requiresContextualPolicy) {
+      if (rampProfile.requiresContextualPolicy) {
         counts['ramp_contextual'] = (counts['ramp_contextual'] ?? 0) + quantity;
       }
     }
@@ -1681,10 +1917,14 @@ class RebuildGuidedService {
     Map<String, dynamic> card,
   ) {
     _incrementRole(roleCounts, role);
+    final contributions = rebuildGuidedStructuralRoleContributions(card);
+    for (final structuralRole in commanderCriticalFunctionalRoleNames) {
+      roleCounts['${structuralRole}_floor'] =
+          (roleCounts['${structuralRole}_floor'] ?? 0) +
+          (contributions[structuralRole] ?? 0);
+    }
     final rampProfile = optimizationRampProfileForCard(card);
-    if (rampProfile.countsTowardGenericFloor) {
-      _incrementRole(roleCounts, 'ramp_floor');
-    } else if (rampProfile.requiresContextualPolicy) {
+    if (rampProfile.requiresContextualPolicy) {
       _incrementRole(roleCounts, 'ramp_contextual');
     }
   }

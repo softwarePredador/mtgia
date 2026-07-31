@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-31T05:57:23.104915Z",
-  "source_digest": "718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15",
+  "generated_at": "2026-07-31T16:08:37.026228Z",
+  "source_digest": "7a2491801f7401c924f2f2788096169d1c325b4a61dfd7bcf34c9ea0a8af401d",
   "surface": "core_product_runtime_ui_acceptance",
   "profile": "android_emulator_core_product",
   "runtime": "flutter_integration_test",
@@ -12,8 +12,8 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "a02e3946583b0fb226cb5e21cfc9f4cf675183370c2aadc4a1b6db05aba2d1d3",
-  "checkpoint_count": 12,
+  "log_sha256": "5f50910fc1b8e4e68edda88659a5eae246efa59fe2d0b841a25f7f26612b3356",
+  "checkpoint_count": 18,
   "required_checkpoints": [
     "core_01_collection_editor",
     "core_02_collection_inline_validation",
@@ -26,7 +26,13 @@
     "core_09_optimization_safe_mana_preview",
     "core_10_optimization_partial_selection",
     "core_11_optimization_applied",
-    "core_12_optimization_undo"
+    "core_12_optimization_undo",
+    "core_13_commander_brackets_menu",
+    "core_14_commander_bracket_b1",
+    "core_15_commander_bracket_b2",
+    "core_16_commander_bracket_b3",
+    "core_17_commander_bracket_b4",
+    "core_18_commander_bracket_b5"
   ],
   "screenshots": [
     {
@@ -48,8 +54,8 @@
     {
       "checkpoint": "core_03_collection_persistence_failure",
       "path": "docs/qa/ui-live/current/core-product-android/core_03_collection_persistence_failure.png",
-      "sha256": "8448833cbc39e28e633989513474fe5398d9ea4f3ccfddabd52d8ff92d3fdfff",
-      "bytes": 151149,
+      "sha256": "8e11fc9b51b8b3a1848af9c28b6d59a2abb623919a3592798e31d4e591de0997",
+      "bytes": 120104,
       "width": 1080,
       "height": 2337
     },
@@ -122,6 +128,54 @@
       "path": "docs/qa/ui-live/current/core-product-android/core_12_optimization_undo.png",
       "sha256": "b5aa1079f7bbaff9502fbd9f9aa10b1c587ad396731734bffaf26d341fff7bac",
       "bytes": 45865,
+      "width": 1080,
+      "height": 2337
+    },
+    {
+      "checkpoint": "core_13_commander_brackets_menu",
+      "path": "docs/qa/ui-live/current/core-product-android/core_13_commander_brackets_menu.png",
+      "sha256": "6443cc200884b0d9ae66785926a87b31c5b55ab567bedba2f9d14e8594fb82a9",
+      "bytes": 195244,
+      "width": 1080,
+      "height": 2337
+    },
+    {
+      "checkpoint": "core_14_commander_bracket_b1",
+      "path": "docs/qa/ui-live/current/core-product-android/core_14_commander_bracket_b1.png",
+      "sha256": "8b6e7752848ba1995e67bb84542a9a8588987eb3e68d152f681e32b6b4edfa80",
+      "bytes": 232121,
+      "width": 1080,
+      "height": 2337
+    },
+    {
+      "checkpoint": "core_15_commander_bracket_b2",
+      "path": "docs/qa/ui-live/current/core-product-android/core_15_commander_bracket_b2.png",
+      "sha256": "0b560f827a6a9c0ebe7f4122c70cc4e7a6d0f9e817a31c9e8ecaa36f49b31048",
+      "bytes": 233656,
+      "width": 1080,
+      "height": 2337
+    },
+    {
+      "checkpoint": "core_16_commander_bracket_b3",
+      "path": "docs/qa/ui-live/current/core-product-android/core_16_commander_bracket_b3.png",
+      "sha256": "7b167e9fb1a50b53766b35e4519cb20e1635b3e0c76008b0fc852b7ffaee65a5",
+      "bytes": 233395,
+      "width": 1080,
+      "height": 2337
+    },
+    {
+      "checkpoint": "core_17_commander_bracket_b4",
+      "path": "docs/qa/ui-live/current/core-product-android/core_17_commander_bracket_b4.png",
+      "sha256": "d0733ee2913aa672a65fe6c556a0e4cab2ea1453ffbd08edf08f8ee41f20087f",
+      "bytes": 234483,
+      "width": 1080,
+      "height": 2337
+    },
+    {
+      "checkpoint": "core_18_commander_bracket_b5",
+      "path": "docs/qa/ui-live/current/core-product-android/core_18_commander_bracket_b5.png",
+      "sha256": "b54dac6f5265ced687d6c3253717f385c76fa6eb9e2d840c14df586b95f9124d",
+      "bytes": 229569,
       "width": 1080,
       "height": 2337
     }

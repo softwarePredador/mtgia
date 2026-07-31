@@ -395,6 +395,13 @@ String deriveOptimizeOutcomeCode({
 );
 
 void _enforceCommanderSameLanePreviewSafety(Map<String, dynamic> responseBody) {
+  final outcomeCode =
+      responseBody['outcome_code']?.toString().trim().toLowerCase() ?? '';
+  if (outcomeCode != 'optimized' ||
+      responseBody['quality_error'] is Map ||
+      responseBody['can_apply'] == false) {
+    return;
+  }
   final contract = responseBody['commander_contract'];
   if (contract is! Map || contract['is_commander_applicable'] != true) return;
   final sameLaneGate = contract['same_lane_gate'];
@@ -779,6 +786,76 @@ Future<Response> onRequest(RequestContext context) async {
         themeProfile: themeProfile,
         deckAnalysis: deckAnalysis,
       );
+    }
+
+    Map<String, dynamic> buildStructuralRebuildGuidedOutcome({
+      required String explanation,
+      required String trigger,
+      required String policyKey,
+      required Map<String, dynamic> policy,
+      required String applyBlocker,
+    }) {
+      return optimize_route_response
+          .buildOptimizeStructuralRebuildGuidedOutcome(
+            explanation: explanation,
+            trigger: trigger,
+            policyKey: policyKey,
+            policy: policy,
+            applyBlocker: applyBlocker,
+            intensity: intensity,
+            deckState: deckState,
+            deckId: deckId,
+            bracket: bracket,
+            archetype: effectiveOptimizeArchetype,
+            themeProfile: themeProfile,
+            deckAnalysis: deckAnalysis,
+          );
+    }
+
+    final sourceBracketAssessment =
+        deckFormat == 'commander' && bracket != null
+            ? optimize_route_bracket_policy_filter
+                .assessOptimizeProjectedDeckBracket(
+                  bracket: bracket,
+                  projectedDeckCards: allCardData,
+                )
+            : null;
+    final sourceFunctionalRoleAssessment =
+        deckFormat == 'commander'
+            ? optimize_route_final_gate
+                .assessOptimizeProjectedCommanderRoleFloors(
+                  projectedDeck: allCardData,
+                  archetype: effectiveOptimizeArchetype,
+                  bracket: bracket,
+                )
+            : null;
+
+    Map<String, dynamic>? buildSourceStructuralRebuildGuidedOutcome() {
+      if (sourceBracketAssessment?.hardCompliant == false) {
+        return buildStructuralRebuildGuidedOutcome(
+          explanation:
+              'O deck original ainda exige uma reconstrução estrutural para '
+              'respeitar o bracket escolhido; a proposta de micro-swaps não '
+              'passou em todos os gates finais.',
+          trigger: 'commander_bracket_repair_incomplete',
+          policyKey: 'bracket_policy',
+          policy: sourceBracketAssessment!.toJson(),
+          applyBlocker: 'commander_bracket_policy_violation',
+        );
+      }
+      if (sourceFunctionalRoleAssessment?.satisfied == false) {
+        return buildStructuralRebuildGuidedOutcome(
+          explanation:
+              'O deck original ainda exige uma reconstrução estrutural para '
+              'cobrir ramp, compra, interação e wipes; a proposta de '
+              'micro-swaps não passou em todos os gates finais.',
+          trigger: 'commander_functional_role_repair_incomplete',
+          policyKey: 'functional_role_policy',
+          policy: sourceFunctionalRoleAssessment!.toJson(),
+          applyBlocker: 'commander_functional_role_floor_not_met',
+        );
+      }
+      return null;
     }
 
     final commanderNameForLogs =
@@ -1996,6 +2073,18 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       if (!isComplete && (validRemovals.isEmpty || validAdditions.isEmpty)) {
+        final structuralRebuildOutcome =
+            buildSourceStructuralRebuildGuidedOutcome();
+        if (structuralRebuildOutcome != null) {
+          return respondWithOptimizeTelemetry(
+            statusCode: HttpStatus.unprocessableEntity,
+            body: structuralRebuildOutcome,
+            removalsOverride: validRemovals,
+            additionsOverride: validAdditions,
+            blockedByColorIdentityOverride: filteredByColorIdentity,
+            blockedByBracketOverride: blockedByBracket,
+          );
+        }
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
           body: {
@@ -2107,6 +2196,7 @@ Future<Response> onRequest(RequestContext context) async {
       Map<String, dynamic>? finalFunctionalRolePolicy;
       final qualityGateWarnings = <String>[];
       var qualityGateDroppedCount = 0;
+      var resolvedAdditionCards = <Map<String, dynamic>>[];
 
       if (validAdditions.isNotEmpty) {
         try {
@@ -2116,6 +2206,7 @@ Future<Response> onRequest(RequestContext context) async {
                 validAdditions: validAdditions,
                 validByNameLower: validByNameLower,
               );
+          resolvedAdditionCards = additionsData;
 
           if (!isComplete) {
             final gateResult = filterUnsafeOptimizeSwapsByCardData(
@@ -2157,6 +2248,7 @@ Future<Response> onRequest(RequestContext context) async {
                     final name = (card['name'] as String?)?.toLowerCase() ?? '';
                     return safeAdditionNames.contains(name);
                   }).toList();
+              resolvedAdditionCards = additionsData;
             }
 
             if (intensity.selected == 'aggressive' &&
@@ -2176,6 +2268,7 @@ Future<Response> onRequest(RequestContext context) async {
                     final name = (card['name'] as String?)?.toLowerCase() ?? '';
                     return safeAdditionNames.contains(name);
                   }).toList();
+              resolvedAdditionCards = additionsData;
             }
 
             if (validRemovals.isEmpty || validAdditions.isEmpty) {
@@ -2199,6 +2292,19 @@ Future<Response> onRequest(RequestContext context) async {
                 }
               }
 
+              final structuralRebuildOutcome =
+                  buildSourceStructuralRebuildGuidedOutcome();
+              if (structuralRebuildOutcome != null) {
+                return respondWithOptimizeTelemetry(
+                  statusCode: HttpStatus.unprocessableEntity,
+                  body: structuralRebuildOutcome,
+                  removalsOverride: validRemovals,
+                  additionsOverride: validAdditions,
+                  validationWarningsOverride: qualityGateWarnings,
+                  blockedByColorIdentityOverride: filteredByColorIdentity,
+                  blockedByBracketOverride: blockedByBracket,
+                );
+              }
               return respondWithOptimizeTelemetry(
                 statusCode: HttpStatus.unprocessableEntity,
                 body: optimize_route_quality_rejection
@@ -2252,6 +2358,30 @@ Future<Response> onRequest(RequestContext context) async {
                 );
             finalBracketPolicy = finalBracketAssessment.toJson();
             if (!finalBracketAssessment.hardCompliant) {
+              if (sourceBracketAssessment?.hardCompliant == false) {
+                return respondWithOptimizeTelemetry(
+                  statusCode: HttpStatus.unprocessableEntity,
+                  body: buildStructuralRebuildGuidedOutcome(
+                    explanation:
+                        'O deck atual contém mais Game Changers do que uma '
+                        'micro-otimização consegue remover com segurança. '
+                        'Revise a reconstrução guiada para o bracket escolhido.',
+                    trigger: 'commander_bracket_repair_incomplete',
+                    policyKey: 'bracket_policy',
+                    policy: finalBracketAssessment.toJson(),
+                    applyBlocker: 'commander_bracket_policy_violation',
+                  ),
+                  postAnalysisOverride: postAnalysis,
+                  removalsOverride: validRemovals,
+                  additionsOverride: validAdditions,
+                  validationWarningsOverride: validationWarnings,
+                  blockedByColorIdentityOverride: filteredByColorIdentity,
+                  blockedByBracketOverride: [
+                    ...blockedByBracket,
+                    ...finalBracketAssessment.violations,
+                  ],
+                );
+              }
               return respondWithOptimizeTelemetry(
                 statusCode: HttpStatus.unprocessableEntity,
                 body: optimize_route_bracket_policy_filter
@@ -2262,6 +2392,13 @@ Future<Response> onRequest(RequestContext context) async {
                       deckAnalysis: deckAnalysis,
                       postAnalysis: postAnalysis,
                       validationWarnings: validationWarnings,
+                      strategySource:
+                          jsonResponse['strategy_source']?.toString() ??
+                          (deterministicFirstEnabled
+                              ? 'deterministic_first'
+                              : 'ai_primary'),
+                      fallbackTrigger:
+                          jsonResponse['fallback_trigger']?.toString(),
                     ),
                 postAnalysisOverride: postAnalysis,
                 removalsOverride: validRemovals,
@@ -2280,9 +2417,31 @@ Future<Response> onRequest(RequestContext context) async {
                 .assessOptimizeProjectedCommanderRoleFloors(
                   projectedDeck: virtualDeck,
                   archetype: effectiveOptimizeArchetype,
+                  bracket: bracket,
                 );
             finalFunctionalRolePolicy = roleFloorAssessment.toJson();
             if (!roleFloorAssessment.satisfied) {
+              if (sourceFunctionalRoleAssessment?.satisfied == false) {
+                return respondWithOptimizeTelemetry(
+                  statusCode: HttpStatus.unprocessableEntity,
+                  body: buildStructuralRebuildGuidedOutcome(
+                    explanation:
+                        'O deck atual permanece abaixo de funções estruturais '
+                        'mínimas após os swaps seguros. Revise uma reconstrução '
+                        'guiada que preserve o comandante e o bracket.',
+                    trigger: 'commander_functional_role_repair_incomplete',
+                    policyKey: 'functional_role_policy',
+                    policy: roleFloorAssessment.toJson(),
+                    applyBlocker: 'commander_functional_role_floor_not_met',
+                  ),
+                  postAnalysisOverride: postAnalysis,
+                  removalsOverride: validRemovals,
+                  additionsOverride: validAdditions,
+                  validationWarningsOverride: validationWarnings,
+                  blockedByColorIdentityOverride: filteredByColorIdentity,
+                  blockedByBracketOverride: blockedByBracket,
+                );
+              }
               return respondWithOptimizeTelemetry(
                 statusCode: HttpStatus.unprocessableEntity,
                 body: optimize_route_final_gate
@@ -2293,6 +2452,13 @@ Future<Response> onRequest(RequestContext context) async {
                       deckAnalysis: deckAnalysis,
                       postAnalysis: postAnalysis,
                       validationWarnings: validationWarnings,
+                      strategySource:
+                          jsonResponse['strategy_source']?.toString() ??
+                          (deterministicFirstEnabled
+                              ? 'deterministic_first'
+                              : 'ai_primary'),
+                      fallbackTrigger:
+                          jsonResponse['fallback_trigger']?.toString(),
                     ),
                 postAnalysisOverride: postAnalysis,
                 removalsOverride: validRemovals,
@@ -2451,6 +2617,22 @@ Future<Response> onRequest(RequestContext context) async {
           }
         }
 
+        final structuralRebuildOutcome =
+            buildSourceStructuralRebuildGuidedOutcome();
+        if (structuralRebuildOutcome != null) {
+          return respondWithOptimizeTelemetry(
+            statusCode: HttpStatus.unprocessableEntity,
+            body: structuralRebuildOutcome,
+            postAnalysisOverride: postAnalysis,
+            validationReport: optimizationValidationReport,
+            removalsOverride: validRemovals,
+            additionsOverride: validAdditions,
+            validationWarningsOverride: validationWarnings,
+            blockedByColorIdentityOverride: filteredByColorIdentity,
+            blockedByBracketOverride: blockedByBracket,
+          );
+        }
+
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
           body: optimize_route_quality_rejection.buildQualityRejectedBody(
@@ -2494,6 +2676,21 @@ Future<Response> onRequest(RequestContext context) async {
             profileRoleTargets: optimizeCommanderRoleTargets,
           );
       if (serializedValidationDecision.rejected) {
+        final structuralRebuildOutcome =
+            buildSourceStructuralRebuildGuidedOutcome();
+        if (structuralRebuildOutcome != null) {
+          return respondWithOptimizeTelemetry(
+            statusCode: HttpStatus.unprocessableEntity,
+            body: structuralRebuildOutcome,
+            postAnalysisOverride: postAnalysis,
+            validationReport: optimizationValidationReport,
+            removalsOverride: validRemovals,
+            additionsOverride: validAdditions,
+            validationWarningsOverride: validationWarnings,
+            blockedByColorIdentityOverride: filteredByColorIdentity,
+            blockedByBracketOverride: blockedByBracket,
+          );
+        }
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
           body: optimize_route_quality_rejection.buildQualityRejectedBody(
@@ -2773,10 +2970,12 @@ Future<Response> onRequest(RequestContext context) async {
                 const [])
             .map((entry) => entry.toString())
             .toList(growable: false);
-        final finalAdditionCards = finalAdditionNames
-            .map((name) => validByNameLower[name.toLowerCase()])
-            .whereType<Map<String, dynamic>>()
-            .toList(growable: false);
+        final finalAdditionCards = optimize_route_addition_data
+            .selectOptimizeAdditionDataForProjection(
+              names: finalAdditionNames,
+              resolvedCards: resolvedAdditionCards,
+              fallbackByNameLower: validByNameLower,
+            );
         final finalProjectedDeck = optimize_route_bracket_policy_filter
             .buildOptimizeProjectedDeckForBracket(
               originalDeckCards: allCardData,
@@ -2792,6 +2991,31 @@ Future<Response> onRequest(RequestContext context) async {
                   );
           finalBracketPolicy = finalPayloadBracketAssessment.toJson();
           if (!finalPayloadBracketAssessment.hardCompliant) {
+            if (sourceBracketAssessment?.hardCompliant == false) {
+              return respondWithOptimizeTelemetry(
+                statusCode: HttpStatus.unprocessableEntity,
+                body: buildStructuralRebuildGuidedOutcome(
+                  explanation:
+                      'O deck atual contém mais Game Changers do que uma '
+                      'micro-otimização consegue remover com segurança. '
+                      'Revise a reconstrução guiada para o bracket escolhido.',
+                  trigger: 'commander_bracket_repair_incomplete',
+                  policyKey: 'bracket_policy',
+                  policy: finalPayloadBracketAssessment.toJson(),
+                  applyBlocker: 'commander_bracket_policy_violation',
+                ),
+                postAnalysisOverride: postAnalysis,
+                validationReport: optimizationValidationReport,
+                removalsOverride: finalRemovalNames,
+                additionsOverride: finalAdditionNames,
+                validationWarningsOverride: validationWarnings,
+                blockedByColorIdentityOverride: filteredByColorIdentity,
+                blockedByBracketOverride: [
+                  ...blockedByBracket,
+                  ...finalPayloadBracketAssessment.violations,
+                ],
+              );
+            }
             return respondWithOptimizeTelemetry(
               statusCode: HttpStatus.unprocessableEntity,
               body: optimize_route_bracket_policy_filter
@@ -2802,6 +3026,13 @@ Future<Response> onRequest(RequestContext context) async {
                     deckAnalysis: deckAnalysis,
                     postAnalysis: postAnalysis,
                     validationWarnings: validationWarnings,
+                    strategySource:
+                        jsonResponse['strategy_source']?.toString() ??
+                        (deterministicFirstEnabled
+                            ? 'deterministic_first'
+                            : 'ai_primary'),
+                    fallbackTrigger:
+                        jsonResponse['fallback_trigger']?.toString(),
                   ),
               postAnalysisOverride: postAnalysis,
               validationReport: optimizationValidationReport,
@@ -2820,9 +3051,32 @@ Future<Response> onRequest(RequestContext context) async {
             .assessOptimizeProjectedCommanderRoleFloors(
               projectedDeck: finalProjectedDeck,
               archetype: effectiveOptimizeArchetype,
+              bracket: bracket,
             );
         finalFunctionalRolePolicy = finalRoleFloorAssessment.toJson();
         if (!finalRoleFloorAssessment.satisfied) {
+          if (sourceFunctionalRoleAssessment?.satisfied == false) {
+            return respondWithOptimizeTelemetry(
+              statusCode: HttpStatus.unprocessableEntity,
+              body: buildStructuralRebuildGuidedOutcome(
+                explanation:
+                    'O deck atual permanece abaixo de funções estruturais '
+                    'mínimas após os swaps seguros. Revise uma reconstrução '
+                    'guiada que preserve o comandante e o bracket.',
+                trigger: 'commander_functional_role_repair_incomplete',
+                policyKey: 'functional_role_policy',
+                policy: finalRoleFloorAssessment.toJson(),
+                applyBlocker: 'commander_functional_role_floor_not_met',
+              ),
+              postAnalysisOverride: postAnalysis,
+              validationReport: optimizationValidationReport,
+              removalsOverride: finalRemovalNames,
+              additionsOverride: finalAdditionNames,
+              validationWarningsOverride: validationWarnings,
+              blockedByColorIdentityOverride: filteredByColorIdentity,
+              blockedByBracketOverride: blockedByBracket,
+            );
+          }
           return respondWithOptimizeTelemetry(
             statusCode: HttpStatus.unprocessableEntity,
             body: optimize_route_final_gate.buildOptimizeRoleFloorRejectedBody(
@@ -2832,6 +3086,12 @@ Future<Response> onRequest(RequestContext context) async {
               deckAnalysis: deckAnalysis,
               postAnalysis: postAnalysis,
               validationWarnings: validationWarnings,
+              strategySource:
+                  jsonResponse['strategy_source']?.toString() ??
+                  (deterministicFirstEnabled
+                      ? 'deterministic_first'
+                      : 'ai_primary'),
+              fallbackTrigger: jsonResponse['fallback_trigger']?.toString(),
             ),
             postAnalysisOverride: postAnalysis,
             validationReport: optimizationValidationReport,

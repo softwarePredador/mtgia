@@ -37,6 +37,27 @@ void main() {
     expect(stats['flows'], 8);
   });
 
+  test('publishes the following feed as an explicit API route alias', () {
+    final routes = (result.manifest['api_routes'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+    final following = routes.singleWhere(
+      (route) => route['path'] == '/community/decks/following',
+    );
+
+    expect(following['methods'], ['GET']);
+    expect(
+      following['source'],
+      'server/routes/community/decks/[id]/index.dart',
+    );
+    expect(following['method_contract'], 'declared_alias');
+    expect(
+      File(
+        p.join(root.path, 'server/routes/community/decks/following/index.dart'),
+      ).existsSync(),
+      isFalse,
+    );
+  });
+
   test('resolves production types and calls with package:analyzer', () {
     final stats = result.manifest['statistics'] as Map<String, Object?>;
     final semantic =

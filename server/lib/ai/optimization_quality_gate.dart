@@ -84,11 +84,16 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
           ? assessCommanderFunctionalRoleFloors(
             cards: originalDeck,
             targetArchetype: archetype,
+            bracket: bracket,
           )
           : null;
-  final remainingFunctionalRoleFloorDeficits =
+  final currentFunctionalRoleCounts =
       functionalRoleFloorAssessment?.applies == true
-          ? Map<String, int>.from(functionalRoleFloorAssessment!.deficits)
+          ? Map<String, int>.from(functionalRoleFloorAssessment!.actualCounts)
+          : <String, int>{};
+  final minimumFunctionalRoleCounts =
+      functionalRoleFloorAssessment?.applies == true
+          ? Map<String, int>.from(functionalRoleFloorAssessment!.minimumCounts)
           : <String, int>{};
 
   for (var i = 0; i < pairCount; i++) {
@@ -197,21 +202,34 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
         removesBracketViolation &&
         !unsafeLandToNonLand &&
         !nonStructuralLandSwap;
-    String? suppliedFloorRole;
-    for (final entry in remainingFunctionalRoleFloorDeficits.entries) {
-      if (entry.value <= 0) continue;
-      if (!addedRoles.contains(entry.key) || removedRoles.contains(entry.key)) {
-        continue;
+    final projectedFunctionalRoleCounts = <String, int>{};
+    final suppliedFloorRoles = <String>[];
+    var degradesStructuralFloor = false;
+    for (final entry in minimumFunctionalRoleCounts.entries) {
+      final role = entry.key;
+      final before = currentFunctionalRoleCounts[role] ?? 0;
+      final removedContribution = countOptimizationFunctionalRole([
+        {...removedCard, 'quantity': 1},
+      ], role: role);
+      final addedContribution = countOptimizationFunctionalRole([
+        {...addedCard, 'quantity': 1},
+      ], role: role);
+      final projected = before - removedContribution + addedContribution;
+      projectedFunctionalRoleCounts[role] = projected;
+      if (before < entry.value && projected > before) {
+        suppliedFloorRoles.add(role);
       }
-      suppliedFloorRole = entry.key;
-      break;
+      if (projected < before) {
+        degradesStructuralFloor = true;
+      }
     }
+    final suppliedFloorRole =
+        suppliedFloorRoles.isEmpty ? null : suppliedFloorRoles.first;
     final functionalRoleFloorUpgrade =
         suppliedFloorRole != null &&
         !removedIsLand &&
         !addedIsLand &&
-        !losesGenericRampFloor &&
-        removedCriticalRoles.isEmpty;
+        !degradesStructuralFloor;
 
     final shouldDrop =
         unsafeLandToNonLand ||
@@ -247,9 +265,8 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
     safeRemovals.add(removalName);
     safeAdditions.add(additionName);
-    if (suppliedFloorRole != null) {
-      remainingFunctionalRoleFloorDeficits[suppliedFloorRole] =
-          (remainingFunctionalRoleFloorDeficits[suppliedFloorRole] ?? 1) - 1;
+    if (projectedFunctionalRoleCounts.isNotEmpty) {
+      currentFunctionalRoleCounts.addAll(projectedFunctionalRoleCounts);
     }
   }
 

@@ -115,6 +115,29 @@ void main() {
         expect(cloneGuard, greaterThanOrEqualTo(cloneStart));
         expect(cloneMetaLookup, greaterThan(cloneGuard));
         expect(cloneTransaction, greaterThan(cloneGuard));
+        expect(
+          source,
+          contains('_assertCommanderFunctionalRoleFloors('),
+          reason:
+              'Rebuild and draft persistence must fail closed on the '
+              'structural policy shared by Generate, Complete and Optimize.',
+        );
+        expect(
+          RegExp(
+            r'_assertCommanderFunctionalRoleFloors\(',
+          ).allMatches(source).length,
+          greaterThanOrEqualTo(3),
+          reason:
+              'The shared structural guard must run after rebuild and again '
+              'at the draft persistence boundary.',
+        );
+        expect(
+          source,
+          contains('commanderFunctionalRoleMinimumCounts('),
+          reason:
+              'Rebuild target construction must consume the shared B1-B5 '
+              'matrix instead of maintaining an independent wipe policy.',
+        );
       },
     );
   });

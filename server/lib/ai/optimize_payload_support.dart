@@ -314,6 +314,11 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
                 'add_role': candidate['add_role'],
               'same_lane': candidate['same_lane'] == true,
               if (candidate['bracket_repair'] == true) 'bracket_repair': true,
+              if (candidate['functional_role_repair'] == true)
+                'functional_role_repair': true,
+              if (candidate['functional_role_repair_target'] != null)
+                'functional_role_repair_target':
+                    candidate['functional_role_repair_target'],
               if (candidate['same_lane_hypothesis'] != null)
                 'same_lane_hypothesis': candidate['same_lane_hypothesis'],
               'priority': intensity?.selected == 'light' ? 'Medium' : 'High',

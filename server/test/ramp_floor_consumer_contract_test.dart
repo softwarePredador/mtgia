@@ -46,13 +46,19 @@ void main() {
       expect(source, isNot(contains("roles: const ['ramp', 'ritual']")));
     });
 
-    test('rebuild fills ramp target from ramp_floor, not inclusive role', () {
+    test('rebuild fills every exact structural floor, including ramp', () {
       final source =
           File('lib/ai/rebuild_guided_service.dart').readAsStringSync();
 
       expect(source, contains("'ramp_floor': ramp"));
-      expect(source, contains("roleCounts['ramp_floor']"));
-      expect(source, contains('rampProfile.countsTowardGenericFloor'));
+      expect(source, contains('rebuildGuidedStructuralRoleContributions('));
+      expect(
+        source,
+        contains('countOptimizationFunctionalRole([card], role: role)'),
+      );
+      expect(source, contains("final floorKey = '\${target.key}_floor';"));
+      expect(source, contains('(roleCounts[floorKey] ?? 0)'));
+      expect(source, contains("roleCounts['\${structuralRole}_floor']"));
       expect(source, contains('rampProfile.requiresContextualPolicy'));
       expect(source, contains("case 'ramp':\n        return false;"));
       expect(source, contains("'ramp_profile_before'"));

@@ -3,8 +3,9 @@ library;
 
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'package:test/test.dart';
+
 import 'package:http/http.dart' as http;
+import 'package:test/test.dart';
 
 /// Testes de integração para endpoints de CRUD de Decks
 ///
@@ -105,20 +106,37 @@ void main() {
   }
 
   /// Helper: Busca uma carta válida no banco (para usar nos testes)
-  Future<Map<String, dynamic>?> getValidCard(String token) async {
+  Future<Map<String, dynamic>> getValidCard(
+    String token, {
+    String? name,
+  }) async {
+    final query = <String, String>{
+      'limit': '1',
+      if (name != null && name.trim().isNotEmpty) 'name': name.trim(),
+    };
     final response = await http.get(
-      Uri.parse('$baseUrl/cards?limit=1'),
+      Uri.parse('$baseUrl/cards').replace(queryParameters: query),
       headers: {'Authorization': 'Bearer $token'},
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final cards = data['cards'] as List?;
-      if (cards != null && cards.isNotEmpty) {
-        return cards.first as Map<String, dynamic>;
-      }
-    }
-    return null;
+    expect(response.statusCode, equals(200), reason: response.body);
+    final decoded = jsonDecode(response.body);
+    expect(decoded, isA<Map>(), reason: 'GET /cards deve retornar um objeto.');
+    final body = (decoded as Map).cast<String, dynamic>();
+    expect(
+      body['data'],
+      isA<List>(),
+      reason: 'GET /cards deve usar o envelope atual `data`.',
+    );
+    final cards = body['data'] as List;
+    expect(
+      cards,
+      isNotEmpty,
+      reason:
+          'A fixture isolada precisa conter ao menos uma carta para o CRUD.',
+    );
+    expect(cards.first, isA<Map>());
+    return Map<String, dynamic>.from(cards.first as Map);
   }
 
   setUpAll(() async {
@@ -323,12 +341,7 @@ void main() {
     test('should validate Commander format copy limit (1 copy)', () async {
       // Arrange
       testDeckId = await createTestDeck(authToken!);
-      final validCard = await getValidCard(authToken!);
-
-      if (validCard == null) {
-        print('⚠️  Pulando teste: nenhuma carta encontrada no banco');
-        return;
-      }
+      final validCard = await getValidCard(authToken!, name: 'Sol Ring');
 
       // Act: Tenta adicionar 4 cópias em formato Commander (limite é 1)
       final response = await http.put(
@@ -426,25 +439,24 @@ void main() {
       testDeckId = await createTestDeck(authToken!);
       final validCard = await getValidCard(authToken!);
 
-      if (validCard != null) {
-        // Adiciona cartas ao deck
-        await http.put(
-          Uri.parse('$baseUrl/decks/$testDeckId'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $authToken',
-          },
-          body: jsonEncode({
-            'cards': [
-              {
-                'card_id': validCard['id'],
-                'quantity': 1,
-                'is_commander': false,
-              },
-            ],
-          }),
-        );
-      }
+      // Adiciona cartas ao deck
+      final updateResponse = await http.put(
+        Uri.parse('$baseUrl/decks/$testDeckId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+        body: jsonEncode({
+          'cards': [
+            {'card_id': validCard['id'], 'quantity': 1, 'is_commander': false},
+          ],
+        }),
+      );
+      expect(
+        updateResponse.statusCode,
+        equals(200),
+        reason: updateResponse.body,
+      );
 
       // Act: Delete do deck
       final response = await http.delete(
@@ -480,11 +492,6 @@ void main() {
       // Arrange
       testDeckId = await createTestDeck(authToken!);
       final validCard = await getValidCard(authToken!);
-
-      if (validCard == null) {
-        print('⚠️  Pulando teste: nenhuma carta encontrada');
-        return;
-      }
 
       // Act: Primeira atualização - adiciona cartas
       var response = await http.put(
@@ -549,16 +556,12 @@ void main() {
       testDeckId = await createTestDeck(authToken!);
       final validCard = await getValidCard(authToken!);
 
-      if (validCard == null) {
-        print('⚠️  Pulando teste: nenhuma carta encontrada');
-        return;
-      }
-
-      final cardName = validCard['name']?.toString();
-      if (cardName == null || cardName.trim().isEmpty) {
-        print('⚠️  Pulando teste: carta sem nome');
-        return;
-      }
+      final cardName = validCard['name']?.toString().trim() ?? '';
+      expect(
+        cardName,
+        isNotEmpty,
+        reason: 'A carta retornada pela fixture precisa ter nome.',
+      );
 
       final putResponse = await http.put(
         Uri.parse('$baseUrl/decks/$testDeckId'),

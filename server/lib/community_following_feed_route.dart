@@ -3,12 +3,16 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../../lib/community_following_feed_service.dart';
-import '../../../../lib/community_request_auth.dart';
-import '../../../../lib/logger.dart';
-import '../../../../lib/observability.dart';
+import 'community_following_feed_service.dart';
+import 'community_request_auth.dart';
+import 'logger.dart';
+import 'observability.dart';
 
-Future<Response> onRequest(RequestContext context) async {
+/// Canonical handler for `GET /community/decks/following`.
+///
+/// The public path is dispatched by the dynamic deck route so Dart Frog does
+/// not generate two competing route patterns for `following` and `[id]`.
+Future<Response> handleCommunityFollowingFeed(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
   }

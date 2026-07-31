@@ -45,7 +45,7 @@
 | `/cards/{id}/rulings` | `GET` | `server/routes/cards/[id]/rulings/index.dart` | 1 | `source` |
 | `/community/binders/{userId}` | `GET` | `server/routes/community/binders/[userId].dart` | 2 | `source` |
 | `/community/decks` | `GET` | `server/routes/community/decks/index.dart` | 2 | `source` |
-| `/community/decks/following` | `GET` | `server/routes/community/decks/following/index.dart` | 2 | `source` |
+| `/community/decks/following` | `GET` | `server/routes/community/decks/[id]/index.dart` | 2 | `declared_alias` |
 | `/community/decks/{id}` | `GET, POST` | `server/routes/community/decks/[id]/index.dart` | 2 | `source` |
 | `/community/decks/{id}/comments` | `GET, POST` | `server/routes/community/decks/[id]/comments/index.dart` | 2 | `source` |
 | `/community/decks/{id}/comments/{commentId}` | `DELETE` | `server/routes/community/decks/[id]/comments/[commentId]/index.dart` | 2 | `source` |

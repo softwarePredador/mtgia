@@ -94,6 +94,20 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(SnackBar), findsNothing);
+    await tester.pumpAndSettle();
+    final error = find.byKey(const Key('binder-editor-save-error'));
+    final logicalViewportHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(
+      tester.getBottomRight(error).dy,
+      lessThanOrEqualTo(logicalViewportHeight),
+      reason: 'O feedback de persistência deve ficar integralmente visível.',
+    );
+    expect(
+      tester.getBottomRight(save).dy,
+      lessThanOrEqualTo(logicalViewportHeight),
+      reason: 'A ação de tentar novamente deve permanecer visível.',
+    );
   });
 
   testWidgets('transport failure preserves form and exposes a friendly retry', (

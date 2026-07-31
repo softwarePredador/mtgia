@@ -603,5 +603,47 @@ void main() {
       expect((empty['same_lane_gate'] as Map)['gate_ready'], isFalse);
       expect(empty['status'], 'no_swap_hypothesis');
     });
+
+    test('optimize summary accepts an explicit structural role-floor repair', () {
+      final summary = buildCommanderOptimizePlanningSummary(
+        format: 'commander',
+        commanderName: 'Dina, Essence Brewer',
+        totalCards: 100,
+        deckStateStatus: 'healthy',
+        prioritySource: 'none',
+        priorityCardCount: 0,
+        metaReferencesAvailable: false,
+        roleTargetsAvailable: true,
+        candidateSwaps: const [
+          {
+            'remove': 'Expensive Filler',
+            'add': 'Damnation',
+            'remove_role': 'engine',
+            'add_role': 'wipe',
+            'same_lane': false,
+            'functional_role_repair': true,
+            'functional_role_repair_target': 'wipe',
+            'same_lane_hypothesis':
+                'Reparar o piso estrutural de wipes sem cortar outra função crítica.',
+          },
+        ],
+        responseBody: const {
+          'strategy_source': 'deterministic_first',
+          'swaps': [
+            {'out': 'Expensive Filler', 'in': 'Damnation'},
+          ],
+        },
+        preferCollection: false,
+      );
+
+      final gate = summary['same_lane_gate'] as Map;
+      expect(summary['status'], 'same_lane_preview_ready');
+      expect(gate['gate_ready'], isTrue);
+      expect(gate['functional_role_repair_count'], 1);
+      expect(
+        (gate['pairs'] as List).single['functional_role_repair_target'],
+        'wipe',
+      );
+    });
   });
 }

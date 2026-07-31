@@ -1,16 +1,16 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15",
+  "source_digest": "7a2491801f7401c924f2f2788096169d1c325b4a61dfd7bcf34c9ea0a8af401d",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-07-31T06:25:52Z",
+    "verified_at": "2026-07-31T16:48:07Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
       "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on Android 14 emulator, including native Life Counter landscape)",
-      "flutter test integration_test/core_product_acceptance_runtime_test.dart -d emulator-5554 (12 collection/deck/optimizer runtime states on Android emulator)",
+      "flutter test integration_test/core_product_acceptance_runtime_test.dart -d emulator-5554 (18 collection/deck/optimizer/runtime states on Android emulator, including the B1-B5 selector)",
       "flutter test integration_test/battle_coach_visual_runtime_proof_test.dart -d emulator-5554 (7 Battle Coach runtime states on Android emulator)",
-      "Chrome 150 + matching-major ChromeDriver W3C keyboard audit at 1280x720 (9 Battle Coach focus/modal/filter/preflight checkpoints; positive pinned-rules-engine-backed preflight)",
+      "Chrome 150 browser-level keyboard audit at 1280x720 (15 Battle Coach focus/modal/filter/preflight/session/reconnect/concede/replay checkpoints; positive rules-engine-backed preflight)",
       "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
       "dart test <focused Commander Brackets B1-B5 suites> (106 passed, 11 conditional skips) and flutter test <focused Commander Brackets B1-B5 suites> (146 passed)",
       "interactive Battle runtime E2E against pinned rules engine: create, action and concede passed"
@@ -21,44 +21,44 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "098ab55dd5a5c6330b444c4296a905654340be7fd91e4a31e9cdbb7026dd5d80"
+        "sha256": "21945245bf3e0b8c14694ffea09c3d8767c6aa1098a5a6f59bbb09d87a3b0f3c"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "49291ec7ec487a4fcccae42e0b4c5816f09ef95628366563c723c341bf81fea4"
+        "sha256": "92544359c0c959b5ca6b6ff5f99e93cbdf149a3940c9814d18978e02d0a7d54a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "47480d2cea8aa50b1caaa36379da17ef8e5beadb10270108b77b3b22203a103b"
+        "sha256": "223fcac6fc6a22b87f66477011c40af9b653d824cb094ca25a6669c5d187caa3"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "7984b21280c000279a1b9f90264972a4bcfb9a6d6e621fb6a5b7c363a99023b2"
+        "sha256": "3035410d1c168bf6a1df339af4db29eac832c296c9de1f91b5a81eaf4f40ee7b"
       },
       {
         "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
-        "sha256": "606269ddceea37d2c106f99c766c50aed53d76a2928bcb6d5934b49848791ba3"
+        "sha256": "facb27b5b8c43572be1e1dc90fe980e76ac89ae012d435280f1cdc5c4eb0758d"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "68d5f9af0494d8641391df716597197f7a244d3519765dab2702f4960a22709e"
+        "sha256": "91c326a75ffc70a8341bee5e13f11522425afaf19e0a127db4596e6d971a756a"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "76608651db547094582f4c5f4a9921e60cc56c72cceb2fc725f0d7ecb2581364"
+        "sha256": "873e30f2baf2d6ea68fac7b8cc82ea53e3209419cdc6d62f6ecd552fc202a7d4"
       }
     ],
     "evidence_notes": [
       "As 160 capturas Web e as 54 capturas Android da matriz P0 foram recapturadas integralmente no digest atual, sem carry-forward.",
       "O emulador Android 14 concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2400×1080; esta rodada não reivindica crédito de aparelho físico.",
-      "A jornada Android dedicada de coleção, criação de Commander e otimização concluiu 12/12 estados, incluindo validação inline, retry de persistência e correção segura de terrenos de 9 para 36.",
-      "O Battle Coach ganhou prova dedicada de 7 estados no emulador Android e 9 estados Web com teclado real, foco visível, modal, filtro e preflight interativo positivo.",
+      "A jornada Android dedicada de coleção, criação de Commander e otimização concluiu 18/18 estados, incluindo validação inline, retry de persistência, correção segura de terrenos de 9 para 36 e inspeção individual dos brackets B1-B5.",
+      "O Battle Coach ganhou prova dedicada de 7 estados no emulador Android e 15 estados Web com teclado real, foco visível, modal, filtro, preflight positivo, sessão real, falha transitória, reconexão, retry idempotente, concessão e replay persistido.",
       "A matriz P0 e as provas Android usaram PostgreSQL/API loopback descartáveis. A prova Web de teclado usou contas e decks Commander temporários descartáveis, runtime de regras fixado e cleanup auditado."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-07-31T06:25:52Z",
+    "reviewed_at": "2026-07-31T16:48:07Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -69,7 +69,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 242 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca, criação, otimização e detalhes de deck mantêm foco e camadas previsíveis."
+        "note": "As 254 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca, criação, otimização e detalhes de deck mantêm foco e camadas previsíveis."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -89,11 +89,11 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 no emulador Android, 12 estados Android do produto principal, 7 estados dedicados do Battle Coach Android e 9 estados de teclado Web. O Life Counter foi validado em landscape 2400×1080 e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 no emulador Android, 18 estados Android do produto principal, 7 estados dedicados do Battle Coach Android e 15 estados Web de teclado e sessão real. O Life Counter foi validado em landscape 2400×1080 e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; teclado físico confirmou Tab, Shift+Tab, Enter, Space, Escape, restauração de foco, filtro do rival e preflight positivo com o CTA de início habilitado."
+        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; teclado físico confirmou Tab, Shift+Tab, Enter, Space, Escape, restauração de foco, filtro e preflight. A sessão real confirmou preservação da mesa no erro, reconexão, retry idempotente, concessão e abertura do replay."
       },
       "state_coverage": {
         "status": "pass",
@@ -109,13 +109,13 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "098ab55dd5a5c6330b444c4296a905654340be7fd91e4a31e9cdbb7026dd5d80",
-      "49291ec7ec487a4fcccae42e0b4c5816f09ef95628366563c723c341bf81fea4",
-      "47480d2cea8aa50b1caaa36379da17ef8e5beadb10270108b77b3b22203a103b",
-      "7984b21280c000279a1b9f90264972a4bcfb9a6d6e621fb6a5b7c363a99023b2",
-      "606269ddceea37d2c106f99c766c50aed53d76a2928bcb6d5934b49848791ba3",
-      "68d5f9af0494d8641391df716597197f7a244d3519765dab2702f4960a22709e",
-      "76608651db547094582f4c5f4a9921e60cc56c72cceb2fc725f0d7ecb2581364"
+      "21945245bf3e0b8c14694ffea09c3d8767c6aa1098a5a6f59bbb09d87a3b0f3c",
+      "92544359c0c959b5ca6b6ff5f99e93cbdf149a3940c9814d18978e02d0a7d54a",
+      "223fcac6fc6a22b87f66477011c40af9b653d824cb094ca25a6669c5d187caa3",
+      "3035410d1c168bf6a1df339af4db29eac832c296c9de1f91b5a81eaf4f40ee7b",
+      "facb27b5b8c43572be1e1dc90fe980e76ac89ae012d435280f1cdc5c4eb0758d",
+      "91c326a75ffc70a8341bee5e13f11522425afaf19e0a127db4596e6d971a756a",
+      "873e30f2baf2d6ea68fac7b8cc82ea53e3209419cdc6d62f6ecd552fc202a7d4"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",
@@ -126,9 +126,11 @@
       "android_emulator_battle_coach",
       "web_chrome_1280x720"
     ],
-    "reviewed_screenshot_count": 242,
+    "reviewed_screenshot_count": 254,
     "blocking_findings": [],
     "follow_up_findings": [
+      "Em Android estreito, o rótulo visual 'Ler Privacidade' termina em reticências; a ação, o ícone, a semântica e o acesso ao documento permanecem inequívocos, mas o texto deve ser abreviado ou empilhado antes da promoção comercial.",
+      "A prova Web real usou o sidecar remoto anterior ao ajuste local e ainda registrou deck_a/deck_b e uma instrução decisória em inglês; o código local agora normaliza nomes de deck e mensagens em português, e a validação de produção deve confirmar essa substituição.",
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial."
     ]
   },
@@ -138,6 +140,7 @@
     "battle_coach_android_emulator": "pass_current_digest",
     "battle_coach_web_keyboard_real": "pass_current_digest",
     "battle_coach_positive_preflight": "pass_current_digest",
+    "battle_coach_runtime_copy_production": "pending_post_deploy_current_local_fix",
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }
 }

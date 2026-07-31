@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/ai/optimization_functional_roles.dart';
@@ -13,17 +15,11 @@ void main() {
             'schema_version': 'semantic_layer_v2_2026_05_18',
             'source': 'deterministic_semantic_v2',
             'mode': 'shadow',
-            'role_delta': {
-              'draw': -1,
-              'protection': -1,
-            },
+            'role_delta': {'draw': -1, 'protection': -1},
           },
           enforcementMode: SemanticV2OptimizeEnforcementMode.partial,
           expandedCriticalRoles: false,
-          validation: const {
-            'verdict': 'aprovado',
-            'score': 88,
-          },
+          validation: const {'verdict': 'aprovado', 'score': 88},
           removals: const ['Old Draw Engine'],
           additions: const ['Efficient Threat'],
           deckAnalysis: const {'average_cmc': 3.2},
@@ -57,26 +53,23 @@ void main() {
         expect(qualityError['validation'], containsPair('verdict', 'aprovado'));
         expect(body['removals'], equals(const ['Old Draw Engine']));
         expect(body['additions'], equals(const ['Efficient Threat']));
-        expect(body['validation_warnings'],
-            equals(const ['kept for contract test']));
+        expect(
+          body['validation_warnings'],
+          equals(const ['kept for contract test']),
+        );
       },
     );
 
     test('success diagnostics can expose bracket policy blocked additions', () {
       final body = <String, dynamic>{
-        'optimize_diagnostics': {
-          'existing_signal': true,
-        },
+        'optimize_diagnostics': {'existing_signal': true},
       };
 
       optimize_route.attachOptimizeBracketPolicyDiagnostics(
         body,
         bracket: 1,
         blockedByBracket: const [
-          {
-            'name': 'Mana Crypt',
-            'reason': 'fast_mana_limit',
-          },
+          {'name': 'Mana Crypt', 'reason': 'fast_mana_limit'},
         ],
       );
 
@@ -95,5 +88,45 @@ void main() {
       );
       expect(bracketPolicy['message'], contains('bloqueadas'));
     });
+
+    test(
+      'structural source repair wins over both early no-swap rejections',
+      () {
+        final source = File('routes/ai/optimize/index.dart').readAsStringSync();
+
+        final noActionableStart = source.indexOf(
+          'if (!isComplete && '
+          '(validRemovals.isEmpty || validAdditions.isEmpty))',
+        );
+        final noActionableStructural = source.indexOf(
+          'buildSourceStructuralRebuildGuidedOutcome();',
+          noActionableStart,
+        );
+        final noActionableFallback = source.indexOf(
+          "'OPTIMIZE_NO_ACTIONABLE_SWAPS'",
+          noActionableStart,
+        );
+
+        expect(noActionableStart, greaterThanOrEqualTo(0));
+        expect(noActionableStructural, greaterThan(noActionableStart));
+        expect(noActionableFallback, greaterThan(noActionableStructural));
+
+        final noSafeStart = source.indexOf(
+          "qualityErrorCode: 'OPTIMIZE_NO_SAFE_SWAPS'",
+        );
+        final noSafeStructural = source.indexOf(
+          'buildSourceStructuralRebuildGuidedOutcome();',
+          noSafeStart,
+        );
+        final noSafeFallback = source.indexOf(
+          '.buildNoSafeSwapsRejectedBody(',
+          noSafeStart,
+        );
+
+        expect(noSafeStart, greaterThanOrEqualTo(0));
+        expect(noSafeStructural, greaterThan(noSafeStart));
+        expect(noSafeFallback, greaterThan(noSafeStructural));
+      },
+    );
   });
 }

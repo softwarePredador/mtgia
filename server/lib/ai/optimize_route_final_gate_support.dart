@@ -25,10 +25,12 @@ CommanderFunctionalRoleFloorAssessment
 assessOptimizeProjectedCommanderRoleFloors({
   required List<Map<String, dynamic>> projectedDeck,
   required String archetype,
+  int? bracket,
 }) {
   return assessCommanderFunctionalRoleFloors(
     cards: projectedDeck,
     targetArchetype: archetype,
+    bracket: bracket,
   );
 }
 
@@ -39,6 +41,8 @@ Map<String, dynamic> buildOptimizeRoleFloorRejectedBody({
   required Map<String, dynamic> deckAnalysis,
   required Map<String, dynamic>? postAnalysis,
   required List<String> validationWarnings,
+  String? strategySource,
+  String? fallbackTrigger,
 }) {
   return {
     'error':
@@ -47,10 +51,15 @@ Map<String, dynamic> buildOptimizeRoleFloorRejectedBody({
     'quality_error': {
       'code': 'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
       'message':
-          'A lista projetada ainda está abaixo do piso estrutural de wipes.',
+          'A lista projetada ainda está abaixo de um ou mais pisos '
+          'estruturais de ramp, compra, interação ou wipes.',
       'functional_role_policy': assessment.toJson(),
     },
     'mode': 'optimize',
+    if (strategySource?.trim().isNotEmpty == true)
+      'strategy_source': strategySource!.trim(),
+    if (fallbackTrigger?.trim().isNotEmpty == true)
+      'fallback_trigger': fallbackTrigger!.trim(),
     'functional_role_policy': assessment.toJson(),
     'removals': removals,
     'additions': additions,

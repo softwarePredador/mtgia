@@ -83,6 +83,7 @@ GeneratedDeckValidationResult _result({
         {'name': 'Plains', 'quantity': 60},
       ],
     },
+    resolvedCards: const <Map<String, dynamic>>[],
     errors: errors,
     invalidCards: invalidCards,
     suggestions: const {},

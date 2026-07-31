@@ -9,6 +9,8 @@ import 'package:postgres/postgres.dart';
 import 'package:server/ai/edhrec_service.dart';
 import 'package:server/ai/optimize_filler_loader_support.dart';
 import 'package:server/ai/optimize_format_legality_support.dart';
+import 'package:server/ai/optimize_functional_role_support.dart';
+import 'package:server/ai/optimize_swap_integrity.dart';
 import 'package:server/ai/rebuild_guided_service.dart';
 import 'package:server/commander_mana_floor.dart';
 import 'package:server/decks/deck_optimization_history_service.dart';
@@ -34,6 +36,8 @@ void main() {
           : null;
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
+  final applySigningSecret =
+      Platform.environment['OPTIMIZATION_APPLY_SIGNING_SECRET']?.trim() ?? '';
   final suffix = DateTime.now().microsecondsSinceEpoch;
   late final Pool pool;
   String? token;
@@ -75,10 +79,10 @@ void main() {
     'condition': 'NM',
   };
 
-  Map<String, dynamic> mutationContext(String signature) => {
+  Map<String, dynamic> unsignedMutationContext(String signature) => {
     'type': 'optimization_apply',
     'source': 'optimize_preview',
-    'schema_version': 'optimize_apply_context_v1_2026-07-07',
+    'schema_version': 'optimize_apply_context_v2_2026-07-28',
     'mode': 'complete',
     'intensity': 'focused',
     'archetype': 'midrange',
@@ -103,6 +107,124 @@ void main() {
     },
     'battle_validation': const {'status': 'pending_after_apply'},
   };
+
+  List<Map<String, dynamic>> expandUnitDeltas(
+    Iterable<Map<String, dynamic>> deltas,
+  ) => [
+    for (final delta in deltas)
+      for (
+        var index = 0;
+        index < ((delta['quantity'] as num?)?.toInt() ?? 1);
+        index++
+      )
+        {'card_id': delta['card_id'], 'quantity': 1},
+  ];
+
+  Map<String, dynamic> authorizedMutationContext({
+    required String deckId,
+    required String signature,
+    required List<Map<String, dynamic>> beforeCards,
+    required List<Map<String, dynamic>> afterCards,
+    required String mode,
+  }) {
+    final removals = buildOptimizationCardDelta(
+      beforeCards: beforeCards,
+      afterCards: afterCards,
+      additions: false,
+    );
+    final additions = buildOptimizationCardDelta(
+      beforeCards: beforeCards,
+      afterCards: afterCards,
+      additions: true,
+    );
+    final optimizeLike = mode == 'optimize' || removals.isNotEmpty;
+    final detailedRemovals =
+        optimizeLike ? expandUnitDeltas(removals) : removals;
+    final detailedAdditions =
+        optimizeLike ? expandUnitDeltas(additions) : additions;
+    if (optimizeLike && detailedRemovals.length != detailedAdditions.length) {
+      throw StateError(
+        'A fixture precisa representar trocas pareadas: '
+        '${detailedRemovals.length} remoções, '
+        '${detailedAdditions.length} adições.',
+      );
+    }
+    final totalCards = afterCards.fold<int>(
+      0,
+      (sum, item) => sum + ((item['quantity'] as num?)?.toInt() ?? 1),
+    );
+    final functionalRolePolicy = {
+      'policy': commanderFunctionalRoleFloorPolicyVersion,
+      'archetype': 'midrange',
+      'bracket': 2,
+      'applies': true,
+      'total_cards': totalCards,
+      'minimum_counts': commanderFunctionalRoleMinimumCounts(
+        targetArchetype: 'midrange',
+        bracket: 2,
+      ),
+      'actual_counts': const {
+        'ramp': 8,
+        'draw': 8,
+        'interaction': 8,
+        'wipe': 8,
+      },
+      'deficits': const <String, int>{},
+      'satisfied': true,
+    };
+    final responseBody = <String, dynamic>{
+      'mode': mode,
+      'bracket': 2,
+      'can_apply': true,
+      'learning_eligible': true,
+      'removals_detailed': detailedRemovals,
+      'additions_detailed': detailedAdditions,
+      if (optimizeLike) 'functional_role_policy': functionalRolePolicy,
+    };
+    final authorization = buildOptimizeApplyAuthorizationForResponse(
+      signingSecret: applySigningSecret,
+      deckId: deckId,
+      deckSignature: signature,
+      responseBody: responseBody,
+      bracket: 2,
+    );
+    if (authorization == null) {
+      throw StateError(
+        'Não foi possível assinar a autorização de aplicação da fixture.',
+      );
+    }
+    final changeCount =
+        detailedRemovals.length > detailedAdditions.length
+            ? detailedRemovals.length
+            : detailedAdditions.length;
+    return {
+      'type': 'optimization_apply',
+      'source': 'optimize_preview',
+      'schema_version': 'optimize_apply_context_v2_2026-07-28',
+      'mode': mode,
+      'intensity': 'focused',
+      'archetype': 'midrange',
+      'bracket': 2,
+      'selected_change_count': changeCount,
+      'preview_change_count': changeCount,
+      'selection_scope': 'full_preview',
+      'expected_deck_signature': signature,
+      'removals': detailedRemovals,
+      'additions': detailedAdditions,
+      'apply_authorization': authorization,
+      'before_snapshot': const <String, dynamic>{},
+      'after_snapshot': const <String, dynamic>{},
+      'optimization_contract': const {
+        'mana_foundation': {
+          'schema_version': 'optimization_mana_foundation_v1_2026-07-28',
+          'policy': 'automatic_apply_floor',
+          'minimum_land_count': 34,
+        },
+        'deckbuilder_validation': {'status': 'passed_preview_gate'},
+      },
+      'battle_validation': const {'status': 'pending_after_apply'},
+    };
+  }
 
   Future<Map<String, dynamic>> persistedState(String deckId) async {
     final rows = await pool.execute(
@@ -138,6 +260,13 @@ void main() {
 
   setUpAll(() async {
     if (skipIntegration != null) return;
+    expect(
+      applySigningSecret,
+      isNotEmpty,
+      reason:
+          'O harness isolado deve fornecer '
+          'OPTIMIZATION_APPLY_SIGNING_SECRET.',
+    );
     pool = Pool.withEndpoints([
       Endpoint(
         host: Platform.environment['DB_HOST'] ?? '127.0.0.1',
@@ -171,7 +300,14 @@ void main() {
         md5('mana-floor-scryfall-' || index)::uuid,
         md5('mana-floor-oracle-' || index)::uuid,
         'Mana Floor Spell ' || LPAD(index::text, 3, '0'),
-        '{1}{W}', 'Creature — Citizen', 'Vigilance',
+        '{1}{W}',
+        CASE WHEN index <= 8 THEN 'Artifact' ELSE 'Creature — Citizen' END,
+        CASE
+          WHEN index <= 8 THEN
+            '{T}: Add {W}. Draw a card. Exile target creature. '
+            'Destroy all creatures.'
+          ELSE 'Vigilance'
+        END,
         ARRAY['W']::text[], ARRAY['W']::text[], 'MFL', 'common'
       FROM generate_series(1, 90) AS fixture(index)
       ON CONFLICT (scryfall_id) DO NOTHING
@@ -313,7 +449,7 @@ void main() {
   );
 
   test(
-    'rebuild reuses safe original nonlands when external candidates are absent',
+    'rebuild repairs roles from the local catalog and reuses safe original nonlands',
     () async {
       final rows = await pool.execute('''
         SELECT id::text,
@@ -373,15 +509,45 @@ void main() {
       expect(result.totalCards, 100);
       expect(assessment.landCount, result.targetProfile.landCount);
       expect(assessment.landCount, inInclusiveRange(34, 42));
+      final rebuiltNonCommanderNonlands = result.rebuiltCards
+          .where((card) {
+            if (card['is_commander'] == true) return false;
+            final typeLine = card['type_line']?.toString().toLowerCase() ?? '';
+            return !RegExp(r'(^|[^a-z])land([^a-z]|$)').hasMatch(typeLine);
+          })
+          .toList(growable: false);
+      final reusedOriginalSpells = rebuiltNonCommanderNonlands
+          .where(
+            (card) => (card['name'] as String).startsWith('Mana Floor Spell '),
+          )
+          .toList(growable: false);
+      final localCatalogSelections = rebuiltNonCommanderNonlands
+          .where(
+            (card) => !(card['name'] as String).startsWith('Mana Floor Spell '),
+          )
+          .toList(growable: false);
+      final functionalRolePolicy =
+          (result.sourceSummary['functional_role_policy'] as Map)
+              .cast<String, dynamic>();
+
+      expect(rebuiltNonCommanderNonlands.length, 99 - assessment.landCount);
+      expect(reusedOriginalSpells, isNotEmpty);
+      expect(localCatalogSelections, isNotEmpty);
       expect(
-        result.rebuiltCards
-            .where(
-              (card) =>
-                  (card['name'] as String).startsWith('Mana Floor Spell '),
-            )
-            .length,
-        99 - assessment.landCount,
+        localCatalogSelections.any(
+          (card) => rebuildGuidedStructuralRoleContributions(
+            card,
+          ).values.any((count) => count > 0),
+        ),
+        isTrue,
       );
+      expect(result.sourceSummary['used_average_deck_seed'], isFalse);
+      expect(result.sourceSummary['used_edhrec_top_cards'], isFalse);
+      expect(
+        result.sourceSummary['safe_catalog_fallback_size'],
+        greaterThan(0),
+      );
+      expect(functionalRolePolicy['satisfied'], isTrue);
     },
     skip: skipIntegration,
   );
@@ -406,7 +572,7 @@ void main() {
 
       final missingSignature = await post('/decks/$deckId/cards/bulk', {
         'cards': [for (final id in spellIds) card(id, 1)],
-        'mutation_context': mutationContext(''),
+        'mutation_context': unsignedMutationContext(''),
       });
       expect(missingSignature.statusCode, 409, reason: missingSignature.body);
       expect(
@@ -415,7 +581,7 @@ void main() {
       );
       final staleSignature = await post('/decks/$deckId/cards/bulk', {
         'cards': [for (final id in spellIds) card(id, 1)],
-        'mutation_context': mutationContext('stale-preview-signature'),
+        'mutation_context': unsignedMutationContext('stale-preview-signature'),
       });
       expect(staleSignature.statusCode, 409, reason: staleSignature.body);
       expect(
@@ -423,9 +589,19 @@ void main() {
         'optimization_preview_stale',
       );
 
+      final unsafeCompleteCards = [
+        ...sparseCards,
+        for (final id in spellIds) card(id, 1),
+      ];
       final unsafeComplete = await post('/decks/$deckId/cards/bulk', {
         'cards': [for (final id in spellIds) card(id, 1)],
-        'mutation_context': mutationContext(sparseSignature),
+        'mutation_context': authorizedMutationContext(
+          deckId: deckId,
+          signature: sparseSignature,
+          beforeCards: sparseCards,
+          afterCards: unsafeCompleteCards,
+          mode: 'complete',
+        ),
       });
       expect(unsafeComplete.statusCode, 409, reason: unsafeComplete.body);
       expect(
@@ -448,7 +624,13 @@ void main() {
           card(plainsId!, 25),
           for (final id in spellIds.take(65)) card(id, 1),
         ],
-        'mutation_context': mutationContext(sparseSignature),
+        'mutation_context': authorizedMutationContext(
+          deckId: deckId,
+          signature: sparseSignature,
+          beforeCards: sparseCards,
+          afterCards: safeCards,
+          mode: 'complete',
+        ),
       });
       expect(safeComplete.statusCode, 200, reason: safeComplete.body);
       expect(
@@ -465,13 +647,19 @@ void main() {
       );
       final unsafeOptimizeCards = [
         card(commanderId!, 1, commander: true),
-        card(plainsId!, 9),
-        for (final id in spellIds) card(id, 1),
+        card(plainsId!, 33),
+        for (final id in spellIds.take(66)) card(id, 1),
       ];
       final unsafeOptimize = await put('/decks/$deckId', {
         'name': 'Must Roll Back $suffix',
         'cards': unsafeOptimizeCards,
-        'mutation_context': mutationContext(safeSignature),
+        'mutation_context': authorizedMutationContext(
+          deckId: deckId,
+          signature: safeSignature,
+          beforeCards: safeCards,
+          afterCards: unsafeOptimizeCards,
+          mode: 'optimize',
+        ),
       });
       expect(unsafeOptimize.statusCode, 409, reason: unsafeOptimize.body);
       expect(
@@ -484,14 +672,39 @@ void main() {
       expect(state['land_count'], 34);
       expect(state['event_count'], 1);
 
-      final excessiveOptimize = await put('/decks/$deckId', {
+      final highLandSafeCards = [
+        card(commanderId!, 1, commander: true),
+        card(plainsId!, 54),
+        for (final id in spellIds.take(45)) card(id, 1),
+      ];
+      final highLandCreated = await post('/decks', {
+        'name': 'Mana Excess Atomic $suffix',
+        'format': 'commander',
+        'cards': highLandSafeCards,
+      });
+      expect(
+        highLandCreated.statusCode,
+        anyOf(200, 201),
+        reason: highLandCreated.body,
+      );
+      final highLandDeckId = decode(highLandCreated)['id'] as String;
+      final highLandSignature =
+          DeckOptimizationHistoryService.buildDeckSignature(highLandSafeCards);
+      final excessiveOptimizeCards = [
+        card(commanderId!, 1, commander: true),
+        card(plainsId!, 55),
+        for (final id in spellIds.take(44)) card(id, 1),
+      ];
+      final excessiveOptimize = await put('/decks/$highLandDeckId', {
         'name': 'Must Also Roll Back $suffix',
-        'cards': [
-          card(commanderId!, 1, commander: true),
-          card(plainsId!, 90),
-          for (final id in spellIds.take(9)) card(id, 1),
-        ],
-        'mutation_context': mutationContext(safeSignature),
+        'cards': excessiveOptimizeCards,
+        'mutation_context': authorizedMutationContext(
+          deckId: highLandDeckId,
+          signature: highLandSignature,
+          beforeCards: highLandSafeCards,
+          afterCards: excessiveOptimizeCards,
+          mode: 'optimize',
+        ),
       });
       expect(excessiveOptimize.statusCode, 409, reason: excessiveOptimize.body);
       expect(
@@ -502,11 +715,11 @@ void main() {
         (decode(excessiveOptimize)['quality_error'] as Map)['code'],
         'OPTIMIZATION_APPLY_LAND_EXCESS',
       );
-      state = await persistedState(deckId);
-      expect(state['name'], 'Mana Floor Atomic $suffix');
+      state = await persistedState(highLandDeckId);
+      expect(state['name'], 'Mana Excess Atomic $suffix');
       expect(state['total_cards'], 100);
-      expect(state['land_count'], 34);
-      expect(state['event_count'], 1);
+      expect(state['land_count'], 54);
+      expect(state['event_count'], 0);
     },
     skip: skipIntegration,
     timeout: const Timeout(Duration(minutes: 3)),

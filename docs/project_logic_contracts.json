@@ -28,6 +28,12 @@
     "/health/live": ["GET"],
     "/ready": ["GET"]
   },
+  "api_route_aliases": {
+    "/community/decks/following": {
+      "methods": ["GET"],
+      "source": "server/routes/community/decks/[id]/index.dart"
+    }
+  },
   "public_api_paths": [
     "/",
     "/ready",

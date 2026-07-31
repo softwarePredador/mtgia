@@ -82,7 +82,7 @@
 | `GET /users/:id/followers?page=&limit=` | stable | `social_provider.dart` | `server/routes/users/[id]/followers/index.dart` | Query `page`, `limit` default/capped. | `{data, page, limit, total}` user rows. | Exact row fields beyond user profile/counts are **not proven** in this summary. | `user_follows`, `users`. | DB. | Profile runtime docs. | Infinite scroll depends on stable pagination keys. |
 | `GET /users/:id/following?page=&limit=` | stable | `social_provider.dart` | `server/routes/users/[id]/following/index.dart` | Query `page`, `limit` default/capped. | `{data, page, limit, total}` user rows. | Exact row fields beyond user profile/counts are **not proven** in this summary. | `user_follows`, `users`. | DB. | Profile runtime docs. | Same pagination contract as followers. |
 | `GET /community/decks?search=&format=&page=&limit=` | stable | `community_provider.dart`, `social_provider.dart` following feed variant not fully audited | `server/routes/community/decks/index.dart` | Query `search`, `format`, `page` default 1, `limit` default 20 max 50. | `{data, page, limit, total}`; deck rows include public deck id/name/format/description/synergy/created_at, owner, commander image/name, card count. | `synergy_score`, commander image can be null. | `decks`, `deck_cards`, `cards`, `users`. | DB. | `profile_community_runtime_test.dart`, community runtime handoffs. | Only `is_public=true`; no auth secret exposure. |
-| `GET /community/decks/following?page=&limit=` | stable | `social_provider.dart` following feed | `server/routes/community/decks/following/index.dart`, `server/lib/community_following_feed_service.dart`; `[id].dart` contains only a thin dispatch to the same service because generated Dart Frog precedence can match `following` as an id | Auth required; `page`, `limit` default/capped by the shared handler. | `{data, page, limit, total}` public deck summaries from followed, unblocked users. | Same optional public deck summary fields as `/community/decks`. | `user_follows`, `user_blocks`, `decks`, `deck_cards`, `cards`, `users`. | DB feed aggregation through one canonical service. | `server/test/social_safety_live_test.dart`; app social/community tests. | Both generated route paths execute the same implementation; the dynamic dispatch is required route plumbing, not a second business contract. |
+| `GET /community/decks/following?page=&limit=` | stable | `social_provider.dart` following feed | Explicit public alias handled by `server/routes/community/decks/[id]/index.dart`, which dispatches the reserved `following` segment to `server/lib/community_following_feed_route.dart`; business queries live in `server/lib/community_following_feed_service.dart` | Auth required; `page`, `limit` default/capped by the shared handler. | `{data, page, limit, total}` public deck summaries from followed, unblocked users. | Same optional public deck summary fields as `/community/decks`. | `user_follows`, `user_blocks`, `decks`, `deck_cards`, `cards`, `users`. | DB feed aggregation through one canonical service. | `server/test/social_safety_live_test.dart`; app social/community tests; project-logic alias test. | The alias is declared in `docs/project_logic_contracts.json` so API maps retain the public route without a competing static Dart Frog route. |
 | `GET /community/decks/:id` | stable | `community_provider.dart`, import/copy support | `server/routes/community/decks/[id].dart` | Path deck id; query `page/limit` evidence for related/copy data in route. | `deck`/`data` with public deck metadata, `commander`, `main_board`, `all_cards_flat`, `stats`, `mana_curve`, `color_distribution`, pagination when listing related data. | Exact wrapper differs by branch in handler; tolerate `deck` or `data`. | `decks`, `deck_cards`, `cards`, `users`, `user_follows`. | DB. | Community runtime docs. | App must handle not found/private deck. |
 | `POST /community/decks/:id` | stable | deck import/copy support | `server/routes/community/decks/[id].dart` | Auth required; no body proven. | `{success: true, deck}` where `deck` is the copied deck map. The current route does not return `newDeckId` at the top level. | Copy side effects are route-specific. Copied cards preserve only `card_id`, `quantity`, and `is_commander`. | `decks`, `deck_cards`, `cards`. | DB transaction/copy. | `deck_pricing_export_community_contract_test.dart`; runtime docs mention public deck copy. | Must not copy private decks. Treat copied public decks as draft/review until strict validation and strategy/package review pass. |
 | `GET /community/decks/:id/comments?page=&limit=` | stable/beta | `CommunityProvider.fetchDeckComments`, community deck detail | `server/routes/community/decks/[id]/comments/index.dart`, `server/lib/community_engagement_service.dart` | Public read; `page` default 1, `limit` default 50 and capped at 100. | `{data,page,limit}`; comment fields `id`, `deck_id`, `user_id`, `body`, `created_at`, `updated_at`, nested optional `author.{id,username,display_name,avatar_url}`. | No total count in this route; public deck must exist and only `status=visible` comments are returned. | `deck_comments`, `users`, `decks`. | DB. | `community_engagement_contract_test.dart`, app community detail tests. | Public read; deleted/private deck returns 404. Client must not infer more pages from a missing `total`. |
@@ -498,9 +498,26 @@ This supersedes the older `card_id:quantity:condition` wording in the
 `POST /ai/optimize` table row above. Changing which physical card is the
 commander therefore invalidates the preview even when card IDs, quantities and
 conditions are otherwise unchanged. The persistent optimize cache contract is
-`v16`; earlier entries are not reused. Its cache key also includes the
+`v17`; earlier entries are not reused. Its cache key also includes the
 normalized deck format, so identical signatures and archetypes cannot share a
 payload across Commander and Brawl.
+
+Actionable Commander previews also carry
+`functional_role_policy.policy=commander_functional_role_floors_v2`. The
+policy must prove quantity-aware minimum and actual counts for `ramp`, `draw`,
+`interaction` and `wipe`; a legacy or partial wipe-only policy cannot be
+reused, signed or applied. Generate, Complete, Optimize and Rebuild use this
+same structural matrix. B4 has a one-wipe floor and B5 has no mandatory wipe,
+while the other critical roles remain structural playability safeguards.
+
+If the source Commander deck itself violates the selected bracket or this
+structural matrix, `POST /ai/optimize` cannot finish as a generic no-op.
+No-actionable/no-safe-swap branches return `422`, `mode=rebuild_guided`,
+`quality_error.code=OPTIMIZE_NEEDS_REPAIR` and `next_action.endpoint=/ai/rebuild`.
+Bracket repair sets
+`next_action.payload.rebuild_scope=full_non_commander_rebuild`; functional-role
+repair keeps the normal guided scope. Rebuild revalidates bracket, mana,
+functional roles and strict rules before any draft write.
 
 ## Optimize Mana and Format Foundation — 2026-07-28/29
 

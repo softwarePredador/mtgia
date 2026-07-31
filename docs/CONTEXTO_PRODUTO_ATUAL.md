@@ -12,15 +12,24 @@
   qualquer outro Game Changer oficial. Cori-Steel Cutter permanece legal, mas
   recebe penalidade temática quando não sustenta `Miracle Big Spells`;
 - Complete e Optimize compartilham gates de bracket, identidade, fundação de
-  mana, wipes, orçamento/coleção e qualidade final. Cache anterior é
-  invalidado pelo contrato `v16`;
+  mana, ramp, compra, interação, wipes, orçamento/coleção e qualidade final.
+  Cache anterior é invalidado pelo contrato `v17`;
 - todos os cinco brackets mantêm intenção distinta: B1/B2/B3/B4 projetam
   janelas 9+/8+/6+/4+ e apenas B5 usa automaticamente o metagame cEDH;
-- Generate e Rebuild também falham fechado na avaliação final, e impressões
-  repetidas da mesma carta consomem apenas uma identidade no limite B3;
+- Generate e Rebuild também falham fechado na avaliação final; o contrato
+  estrutural `commander_functional_role_floors_v2` exige os quatro papéis
+  críticos e invalida autorizações antigas que comprovavam apenas wipes.
+  Impressões repetidas da mesma carta consomem apenas uma identidade no limite
+  B3;
 - a aplicação do preview passa a exigir autorização HMAC expirável, ligada ao
   deck, assinatura, bracket e quantidades permitidas, antes de qualquer
   substituição de `deck_cards`;
+- retornos antecipados sem troca não podem mais esconder violação do deck
+  original: bracket ou piso estrutural pendente promove o fluxo para
+  `OPTIMIZE_NEEDS_REPAIR`; reparo de bracket exige rebuild integral das 99;
+- o Rebuild mantém referências verificadas como primeira fonte e completa
+  lacunas com catálogo PostgreSQL legal/compatível com a identidade, preenchendo
+  ramp, compra, interação e wipes pela mesma classificação exata do gate final;
 - ADR e contrato: `docs/adr/0006-commander-optimizer-bracket-and-apply-safety.md`
   e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A implementação é local até
   concluir todos os gates, commit/push e implantação da mesma SHA; o deck live

@@ -2,18 +2,47 @@ import '../basic_land_utils.dart' as basic_lands;
 import 'optimization_functional_roles.dart';
 import 'optimization_ramp_profile.dart';
 
+const commanderFunctionalRoleFloorPolicyVersion =
+    'commander_functional_role_floors_v2';
+const commanderCriticalFunctionalRoleNames = <String>{
+  'ramp',
+  'draw',
+  'interaction',
+  'wipe',
+};
+
+bool hasCompleteCommanderFunctionalRoleFloorMap(Map<String, int> counts) {
+  return counts.keys.toSet().containsAll(commanderCriticalFunctionalRoleNames);
+}
+
+bool hasCanonicalCommanderFunctionalRoleMinimumCounts({
+  required Map<String, int> counts,
+  required String targetArchetype,
+  required int bracket,
+}) {
+  if (bracket < 1 || bracket > 5) return false;
+  final expected = commanderFunctionalRoleMinimumCounts(
+    targetArchetype: targetArchetype,
+    bracket: bracket,
+  );
+  if (counts.length != expected.length) return false;
+  return expected.entries.every((entry) => counts[entry.key] == entry.value);
+}
+
 class CommanderFunctionalRoleFloorAssessment {
   const CommanderFunctionalRoleFloorAssessment({
     required this.archetype,
     required this.totalCards,
     required this.minimumCounts,
     required this.actualCounts,
+    this.bracket,
   });
 
   final String archetype;
   final int totalCards;
   final Map<String, int> minimumCounts;
   final Map<String, int> actualCounts;
+  final int? bracket;
 
   bool get applies => totalCards >= 90;
 
@@ -26,8 +55,9 @@ class CommanderFunctionalRoleFloorAssessment {
   bool get satisfied => !applies || deficits.isEmpty;
 
   Map<String, dynamic> toJson() => {
-    'policy': 'commander_functional_role_floors_v1',
+    'policy': commanderFunctionalRoleFloorPolicyVersion,
     'archetype': archetype,
+    if (bracket != null) 'bracket': bracket,
     'applies': applies,
     'total_cards': totalCards,
     'minimum_counts': minimumCounts,
@@ -37,26 +67,67 @@ class CommanderFunctionalRoleFloorAssessment {
   };
 }
 
-int minimumCommanderWipeCountForArchetype(String targetArchetype) {
+const _commanderCriticalRoleFloorOrder = <String>[
+  'ramp',
+  'draw',
+  'interaction',
+  'wipe',
+];
+
+const _minimumCommanderStructuralRamp = 8;
+const _minimumCommanderStructuralDraw = 8;
+const _minimumCommanderStructuralInteraction = 6;
+
+Map<String, int> commanderFunctionalRoleMinimumCounts({
+  required String targetArchetype,
+  int? bracket,
+}) {
+  final normalizedBracket = bracket?.clamp(1, 5).toInt();
+  return Map<String, int>.unmodifiable({
+    'ramp': _minimumCommanderStructuralRamp,
+    'draw': _minimumCommanderStructuralDraw,
+    'interaction': _minimumCommanderStructuralInteraction,
+    'wipe': minimumCommanderWipeCountForArchetype(
+      targetArchetype,
+      bracket: normalizedBracket,
+    ),
+  });
+}
+
+int minimumCommanderWipeCountForArchetype(
+  String targetArchetype, {
+  int? bracket,
+}) {
   final archetype = targetArchetype.trim().toLowerCase();
-  if (archetype.contains('control')) return 3;
-  if (archetype.contains('aggro')) return 1;
-  return 2;
+  final archetypeMinimum =
+      archetype.contains('control')
+          ? 3
+          : archetype.contains('aggro')
+          ? 1
+          : 2;
+  final normalizedBracket = bracket?.clamp(1, 5).toInt();
+  if (normalizedBracket == 5) return 0;
+  if (normalizedBracket == 4) {
+    return archetypeMinimum > 1 ? 1 : archetypeMinimum;
+  }
+  return archetypeMinimum;
 }
 
 int countOptimizationFunctionalRole(
   Iterable<Map<String, dynamic>> cards, {
   required String role,
 }) {
+  final normalizedRole = _normalizeCriticalRole(role);
   var count = 0;
   for (final card in cards) {
-    if (inferFunctionalRoleForCard(card) != role) continue;
-    final quantity = switch (card['quantity']) {
-      int value => value,
-      num value => value.toInt(),
-      String value => int.tryParse(value.trim()) ?? 1,
-      _ => 1,
-    };
+    final quantity = _positiveOptimizationCardQuantity(card['quantity']);
+    if (quantity <= 0 ||
+        !_cardCountsTowardOptimizationFunctionalRole(
+          card,
+          role: normalizedRole,
+        )) {
+      continue;
+    }
     if (quantity > 0) count += quantity;
   }
   return count;
@@ -65,24 +136,26 @@ int countOptimizationFunctionalRole(
 CommanderFunctionalRoleFloorAssessment assessCommanderFunctionalRoleFloors({
   required Iterable<Map<String, dynamic>> cards,
   required String targetArchetype,
+  int? bracket,
 }) {
   final materialized = cards.toList(growable: false);
   final totalCards = materialized.fold<int>(0, (sum, card) {
-    final quantity = switch (card['quantity']) {
-      int value => value,
-      num value => value.toInt(),
-      String value => int.tryParse(value.trim()) ?? 1,
-      _ => 1,
-    };
+    final quantity = _positiveOptimizationCardQuantity(card['quantity']);
     return sum + (quantity > 0 ? quantity : 0);
   });
-  final minimumWipes = minimumCommanderWipeCountForArchetype(targetArchetype);
+  final normalizedBracket = bracket?.clamp(1, 5).toInt();
+  final minimumCounts = commanderFunctionalRoleMinimumCounts(
+    targetArchetype: targetArchetype,
+    bracket: normalizedBracket,
+  );
   return CommanderFunctionalRoleFloorAssessment(
     archetype: targetArchetype.trim().toLowerCase(),
+    bracket: normalizedBracket,
     totalCards: totalCards,
-    minimumCounts: {'wipe': minimumWipes},
+    minimumCounts: minimumCounts,
     actualCounts: {
-      'wipe': countOptimizationFunctionalRole(materialized, role: 'wipe'),
+      for (final role in minimumCounts.keys)
+        role: countOptimizationFunctionalRole(materialized, role: role),
     },
   );
 }
@@ -91,18 +164,78 @@ List<String> buildCommanderCriticalRoleFloorNeeds({
   required Iterable<Map<String, dynamic>> cards,
   required String targetArchetype,
   required int limit,
+  int? bracket,
 }) {
   if (limit <= 0) return const [];
   final assessment = assessCommanderFunctionalRoleFloors(
     cards: cards,
     targetArchetype: targetArchetype,
+    bracket: bracket,
   );
-  final wipeDeficit = assessment.deficits['wipe'] ?? 0;
-  return List<String>.filled(
-    wipeDeficit.clamp(0, limit).toInt(),
-    'wipe',
-    growable: false,
-  );
+  final orderedRoles = <String>[
+    ..._commanderCriticalRoleFloorOrder,
+    ...assessment.deficits.keys
+      .where((role) => !_commanderCriticalRoleFloorOrder.contains(role))
+      .toList(growable: false)..sort(),
+  ];
+  final needs = <String>[];
+  for (final role in orderedRoles) {
+    final deficit = assessment.deficits[role] ?? 0;
+    final remaining = limit - needs.length;
+    if (deficit <= 0 || remaining <= 0) continue;
+    final count = deficit < remaining ? deficit : remaining;
+    needs.addAll(List<String>.filled(count, role));
+  }
+  return List<String>.unmodifiable(needs);
+}
+
+bool _cardCountsTowardOptimizationFunctionalRole(
+  Map<String, dynamic> card, {
+  required String role,
+}) {
+  if (role == 'ramp') {
+    return optimizationRampProfileForCard(card).countsTowardGenericFloor;
+  }
+
+  final roles =
+      optimizationFunctionalRolesForCard(
+        card,
+      ).map(_normalizeCriticalRole).toSet();
+  if (role == 'wipe' &&
+      looksLikeBoardWipe(card['oracle_text']?.toString() ?? '')) {
+    roles.add('wipe');
+  }
+
+  return switch (role) {
+    'draw' =>
+      roles.contains('draw') ||
+          roles.contains('loot') ||
+          roles.contains('exile_value') ||
+          roles.contains('card_advantage'),
+    'interaction' =>
+      roles.contains('interaction') ||
+          roles.contains('counterspell') ||
+          roles.contains('removal'),
+    'wipe' => roles.contains('wipe'),
+    _ => roles.contains(role),
+  };
+}
+
+String _normalizeCriticalRole(String value) {
+  return switch (value.trim().toLowerCase()) {
+    'board_wipe' => 'wipe',
+    _ => value.trim().toLowerCase(),
+  };
+}
+
+int _positiveOptimizationCardQuantity(Object? raw) {
+  final quantity = switch (raw) {
+    int value => value,
+    num value => value.toInt(),
+    String value => int.tryParse(value.trim()) ?? 1,
+    _ => 1,
+  };
+  return quantity > 0 ? quantity : 0;
 }
 
 String inferFunctionalRole({

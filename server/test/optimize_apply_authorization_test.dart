@@ -15,12 +15,13 @@ void main() {
     'can_apply': true,
     'learning_eligible': true,
     'functional_role_policy': {
-      'policy': 'commander_functional_role_floors_v1',
+      'policy': 'commander_functional_role_floors_v2',
       'archetype': 'midrange',
+      'bracket': 2,
       'applies': true,
       'total_cards': 100,
-      'minimum_counts': {'wipe': 2},
-      'actual_counts': {'wipe': 2},
+      'minimum_counts': {'ramp': 8, 'draw': 8, 'interaction': 6, 'wipe': 2},
+      'actual_counts': {'ramp': 8, 'draw': 8, 'interaction': 6, 'wipe': 2},
       'deficits': <String, int>{},
       'satisfied': true,
     },
@@ -73,6 +74,116 @@ void main() {
           verification.payload['functional_role_policy'],
           containsPair('satisfied', true),
         );
+      },
+    );
+
+    test('rejects legacy or incomplete structural policies before signing', () {
+      Map<String, dynamic>? signWithPolicy(Map<String, dynamic> policy) {
+        return buildOptimizeApplyAuthorizationForResponse(
+          signingSecret: secret,
+          deckId: 'deck-1',
+          deckSignature: 'signature-1',
+          responseBody: {...response, 'functional_role_policy': policy},
+          bracket: 2,
+          issuedAt: issuedAt,
+        );
+      }
+
+      final completePolicy = Map<String, dynamic>.from(
+        response['functional_role_policy']! as Map,
+      );
+      expect(
+        signWithPolicy({
+          ...completePolicy,
+          'policy': 'commander_functional_role_floors_v1',
+        }),
+        isNull,
+      );
+      expect(
+        signWithPolicy({...completePolicy, 'bracket': 5}),
+        isNull,
+        reason: 'the signed role matrix must match the outer bracket',
+      );
+      expect(
+        signWithPolicy({
+          ...completePolicy,
+          'minimum_counts': const {
+            'ramp': 0,
+            'draw': 0,
+            'interaction': 0,
+            'wipe': 0,
+          },
+          'actual_counts': const {
+            'ramp': 0,
+            'draw': 0,
+            'interaction': 0,
+            'wipe': 0,
+          },
+        }),
+        isNull,
+        reason: 'v2 cannot sign a weakened non-canonical floor matrix',
+      );
+      expect(
+        signWithPolicy({
+          ...completePolicy,
+          'minimum_counts': const {'wipe': 2},
+          'actual_counts': const {'wipe': 2},
+        }),
+        isNull,
+      );
+    });
+
+    test(
+      'apply floor distrusts a verified envelope with a weakened role policy',
+      () {
+        final completePolicy = Map<String, dynamic>.from(
+          response['functional_role_policy']! as Map,
+        );
+
+        for (final policy in [
+          {...completePolicy, 'bracket': 5},
+          {
+            ...completePolicy,
+            'minimum_counts': const {
+              'ramp': 0,
+              'draw': 0,
+              'interaction': 0,
+              'wipe': 0,
+            },
+            'actual_counts': const {
+              'ramp': 0,
+              'draw': 0,
+              'interaction': 0,
+              'wipe': 0,
+            },
+          },
+        ]) {
+          expect(
+            () => assessOptimizationApplyCommanderFunctionalRoleFloorFromCards(
+              format: 'commander',
+              cards: const <Map<String, dynamic>>[],
+              mutationContext: const {'bracket': 2},
+              authorizationVerification: OptimizeApplyAuthorizationVerification(
+                valid: true,
+                code: 'ok',
+                payload: {
+                  'mode': 'optimize',
+                  'bracket': 2,
+                  'removals': const {'old-a': 1},
+                  'functional_role_policy': policy,
+                },
+              ),
+              storedArchetype: 'midrange',
+            ),
+            throwsA(
+              isA<OptimizationFunctionalRoleFloorViolation>().having(
+                (error) => error.reason,
+                'reason',
+                'functional_role_policy_binding_missing',
+              ),
+            ),
+          );
+        }
       },
     );
 
@@ -223,12 +334,23 @@ void main() {
               'bracket': 2,
               'can_apply': true,
               'functional_role_policy': {
-                'policy': 'commander_functional_role_floors_v1',
+                'policy': 'commander_functional_role_floors_v2',
                 'archetype': 'midrange',
+                'bracket': 2,
                 'applies': true,
                 'total_cards': 100,
-                'minimum_counts': {'wipe': 2},
-                'actual_counts': {'wipe': 2},
+                'minimum_counts': {
+                  'ramp': 8,
+                  'draw': 8,
+                  'interaction': 6,
+                  'wipe': 2,
+                },
+                'actual_counts': {
+                  'ramp': 8,
+                  'draw': 8,
+                  'interaction': 6,
+                  'wipe': 2,
+                },
                 'deficits': <String, int>{},
                 'satisfied': true,
               },
@@ -300,6 +422,10 @@ void main() {
             responseBody: {
               ...response,
               'bracket': 3,
+              'functional_role_policy': {
+                ...(response['functional_role_policy']! as Map),
+                'bracket': 3,
+              },
               'removals_detailed': const [
                 {'card_id': 'old-a', 'quantity': 1},
               ],
@@ -398,12 +524,23 @@ void main() {
               'bracket': 2,
               'can_apply': true,
               'functional_role_policy': {
-                'policy': 'commander_functional_role_floors_v1',
+                'policy': 'commander_functional_role_floors_v2',
                 'archetype': 'midrange',
+                'bracket': 2,
                 'applies': true,
                 'total_cards': 100,
-                'minimum_counts': {'wipe': 2},
-                'actual_counts': {'wipe': 2},
+                'minimum_counts': {
+                  'ramp': 8,
+                  'draw': 8,
+                  'interaction': 6,
+                  'wipe': 2,
+                },
+                'actual_counts': {
+                  'ramp': 8,
+                  'draw': 8,
+                  'interaction': 6,
+                  'wipe': 2,
+                },
                 'deficits': <String, int>{},
                 'satisfied': true,
               },
@@ -452,11 +589,33 @@ void main() {
                 'quantity': 1,
               },
               {
+                'card_id': 'ramp',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'oracle_text':
+                    "{T}: Add one mana of any color in your commander's color identity.",
+                'quantity': 8,
+              },
+              {
+                'card_id': 'draw',
+                'name': 'Structural Draw',
+                'type_line': 'Sorcery',
+                'oracle_text': 'Draw a card.',
+                'quantity': 8,
+              },
+              {
+                'card_id': 'interaction',
+                'name': 'Structural Answer',
+                'type_line': 'Instant',
+                'oracle_text': 'Destroy target creature.',
+                'quantity': 6,
+              },
+              {
                 'card_id': 'filler',
                 'name': 'Filler',
                 'type_line': 'Creature',
                 'oracle_text': '',
-                'quantity': 99,
+                'quantity': 77,
               },
             ],
             mutationContext: const {'bracket': 2},
@@ -465,8 +624,18 @@ void main() {
           )!;
 
       expect(assessment.satisfied, isFalse);
-      expect(assessment.minimumCounts, {'wipe': 2});
-      expect(assessment.actualCounts, {'wipe': 0});
+      expect(assessment.minimumCounts, {
+        'ramp': 8,
+        'draw': 8,
+        'interaction': 6,
+        'wipe': 2,
+      });
+      expect(assessment.actualCounts, {
+        'ramp': 8,
+        'draw': 8,
+        'interaction': 6,
+        'wipe': 0,
+      });
       expect(assessment.deficits, {'wipe': 2});
 
       final taggedAssessment =
@@ -481,11 +650,33 @@ void main() {
                 'quantity': 1,
               },
               {
+                'card_id': 'ramp',
+                'name': 'Arcane Signet',
+                'type_line': 'Artifact',
+                'oracle_text':
+                    "{T}: Add one mana of any color in your commander's color identity.",
+                'quantity': 8,
+              },
+              {
+                'card_id': 'draw',
+                'name': 'Structural Draw',
+                'type_line': 'Sorcery',
+                'oracle_text': 'Draw a card.',
+                'quantity': 8,
+              },
+              {
+                'card_id': 'interaction',
+                'name': 'Structural Answer',
+                'type_line': 'Instant',
+                'oracle_text': 'Destroy target creature.',
+                'quantity': 6,
+              },
+              {
                 'card_id': 'filler',
                 'name': 'Filler',
                 'type_line': 'Creature',
                 'oracle_text': '',
-                'quantity': 97,
+                'quantity': 75,
               },
               {
                 'card_id': 'tagged-wipe',
@@ -503,7 +694,12 @@ void main() {
             storedArchetype: 'midrange',
           )!;
       expect(taggedAssessment.satisfied, isTrue);
-      expect(taggedAssessment.actualCounts, {'wipe': 2});
+      expect(taggedAssessment.actualCounts, {
+        'ramp': 8,
+        'draw': 8,
+        'interaction': 6,
+        'wipe': 2,
+      });
     });
 
     test('authorization and signing secret are fail-closed', () {

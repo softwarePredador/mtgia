@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 APP_DIR="$ROOT_DIR/app"
 PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
+PINNED_DART="${PINNED_FLUTTER%/flutter}/dart"
 source "$ROOT_DIR/scripts/lib/manaloom_ui_runtime_contract.sh"
 
 PROFILE=""
@@ -67,6 +68,10 @@ for tool in jq shasum xxd; do
 done
 if [[ ! -x "$PINNED_FLUTTER" ]]; then
   echo "Pinned Flutter 3.44.6 is required: $PINNED_FLUTTER" >&2
+  exit 2
+fi
+if [[ ! -x "$PINNED_DART" ]]; then
+  echo "Pinned Dart from Flutter 3.44.6 is required: $PINNED_DART" >&2
   exit 2
 fi
 if [[ -z "$READY_MANIFEST" || ! -f "$READY_MANIFEST" ]]; then
@@ -449,6 +454,11 @@ while IFS= read -r screenshot; do
     exit 1
   fi
 done < <(find "$staging_dir" -maxdepth 1 -type f -name '*.png' | sort)
+(
+  cd "$APP_DIR"
+  "$PINNED_DART" run tool/ui_runtime_evidence.dart validate-directory \
+    --screenshots "$staging_dir"
+)
 
 mkdir -p "$governed_output"
 find "$governed_output" -maxdepth 1 -type f -name '*.png' -delete

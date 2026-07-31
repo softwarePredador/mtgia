@@ -256,7 +256,10 @@ OBSERVABILITY_PLAN="$("$ROOT_DIR/scripts/manaloom_release_observability_gate.sh"
   --release-manifest /tmp/not-executed-release-manifest.json)"
 jq -e '.status == "dry_run" and .release_identity_required == true and .sentry_ingestion_required == true and .fcm_registration_required == true and .fcm_delivery_required == true and .stateful_api_write_on_execute == true and .writes_performed == false' <<<"$OBSERVABILITY_PLAN" >/dev/null
 
-if "$ROOT_DIR/scripts/manaloom_offsite_backup.sh" \
+if env \
+  -u MANALOOM_CONFIRM_LIVE_MUTATIONS \
+  -u MANALOOM_CONFIRM_POSTGRES_WRITES \
+  "$ROOT_DIR/scripts/manaloom_offsite_backup.sh" \
   --source /tmp/not-executed.dump \
   --destination s3://manaloom-contract/backups \
   --recipient age1contractonlynotarealrecipient \
@@ -264,13 +267,19 @@ if "$ROOT_DIR/scripts/manaloom_offsite_backup.sh" \
   echo "backup off-site aceitou --execute sem acknowledgement" >&2
   exit 1
 fi
-if "$ROOT_DIR/scripts/manaloom_full_restore_drill.sh" \
+if env \
+  -u MANALOOM_CONFIRM_LIVE_MUTATIONS \
+  -u MANALOOM_CONFIRM_POSTGRES_WRITES \
+  "$ROOT_DIR/scripts/manaloom_full_restore_drill.sh" \
   --backup /tmp/not-executed.dump \
   --execute >/dev/null 2>&1; then
   echo "restore drill aceitou --execute sem acknowledgement" >&2
   exit 1
 fi
-if MANALOOM_RELEASE_OBSERVABILITY_EXECUTE=1 \
+if env \
+  -u MANALOOM_CONFIRM_LIVE_MUTATIONS \
+  -u MANALOOM_CONFIRM_POSTGRES_WRITES \
+  MANALOOM_RELEASE_OBSERVABILITY_EXECUTE=1 \
   "$ROOT_DIR/scripts/manaloom_release_observability_gate.sh" \
     --device contract-device \
     --release-manifest /tmp/not-executed-release-manifest.json \
@@ -278,11 +287,17 @@ if MANALOOM_RELEASE_OBSERVABILITY_EXECUTE=1 \
   echo "observability gate aceitou escrita stateful sem acknowledgement" >&2
   exit 1
 fi
-if "$ROOT_DIR/scripts/manaloom_easypanel_backup.sh" >/dev/null 2>&1; then
+if env \
+  -u MANALOOM_CONFIRM_LIVE_MUTATIONS \
+  -u MANALOOM_CONFIRM_POSTGRES_WRITES \
+  "$ROOT_DIR/scripts/manaloom_easypanel_backup.sh" >/dev/null 2>&1; then
   echo "backup EasyPanel aceitou leitura live sem acknowledgement" >&2
   exit 1
 fi
-if "$ROOT_DIR/scripts/manaloom_install_remote_backup_cron.sh" >/dev/null 2>&1; then
+if env \
+  -u MANALOOM_CONFIRM_LIVE_MUTATIONS \
+  -u MANALOOM_CONFIRM_POSTGRES_WRITES \
+  "$ROOT_DIR/scripts/manaloom_install_remote_backup_cron.sh" >/dev/null 2>&1; then
   echo "instalador de backup aceitou mutacao live sem acknowledgement" >&2
   exit 1
 fi

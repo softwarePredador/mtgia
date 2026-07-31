@@ -362,6 +362,70 @@ void main() {
       }
     });
 
+    test(
+      'isolated server contract harness is fail-closed for external egress',
+      () {
+        final source = scriptSource(
+          'scripts/manaloom_server_contract_e2e_isolated.sh',
+        );
+        final guard = source.indexOf('EGRESS_POLICY="deny_non_loopback"');
+        final databaseCreation = source.indexOf(
+          'run_no_egress createdb',
+          guard,
+        );
+        final serverStart = source.indexOf(
+          'exec "\${EGRESS_GUARD[@]}" env',
+          guard,
+        );
+        final testRunner = source.indexOf('run_no_egress env', serverStart + 1);
+
+        expect(guard, greaterThanOrEqualTo(0));
+        expect(source, contains('(deny network*)'));
+        expect(
+          source,
+          contains('(allow network-outbound (remote ip "localhost:*"))'),
+        );
+        expect(
+          source,
+          contains('(allow network-inbound (local ip "localhost:*"))'),
+        );
+        expect(source, contains('macos_sandbox_exec_loopback_only'));
+        expect(source, contains('1.1.1.1'));
+        expect(
+          source,
+          contains('o guard de egress permitiu conexão não-loopback'),
+        );
+        expect(databaseCreation, greaterThan(guard));
+        expect(serverStart, greaterThan(databaseCreation));
+        expect(testRunner, greaterThan(serverStart));
+        expect(source, contains('dart test -j 1 "\${tests[@]}"'));
+        expect(source, contains('OPENAI_API_KEY='));
+        expect(source, contains('OPTIMIZE_COMPLETE_DISABLE_OPENAI=1'));
+        expect(
+          source,
+          contains('MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED='),
+        );
+        expect(source, contains('INTERACTIVE_BATTLE_ENABLED=false'));
+        expect(source, contains('XMAGE_SIDECAR_URL='));
+        expect(source, contains('FORGE_SIDECAR_URL='));
+        expect(source, contains('NATIVE_BATTLE_SIDECAR_URL='));
+        expect(
+          source,
+          contains(
+            'BLOCKED: catálogo remoto é incompatível '
+            'com o harness sem egress',
+          ),
+        );
+        expect(source, contains('OPTIMIZATION_APPLY_SIGNING_SECRET='));
+        expect(source, contains('egress_policy=%s'));
+        expect(source, contains('egress_guard=%s'));
+        expect(source, contains('egress_guard_self_test=%s'));
+        expect(source, contains('openai_provider_enabled=0'));
+        expect(source, contains('edhrec_collection_enabled=0'));
+        expect(source, contains('battle_sidecars_enabled=0'));
+      },
+    );
+
     test('E2E suite pins ramp, foundation and rules safety contracts', () {
       final source = scriptSource('scripts/manaloom_e2e_suite.sh');
       final runner = source.indexOf('run_ramp_and_data_foundation_contracts()');

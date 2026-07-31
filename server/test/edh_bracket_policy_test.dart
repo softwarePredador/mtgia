@@ -502,6 +502,43 @@ void main() {
       },
     );
 
+    test(
+      'deduplicates candidate printings by isolated oracle/playable identity',
+      () {
+        for (final identityField in const ['oracle_id', 'playable_card_id']) {
+          final decision = applyBracketPolicyToAdditions(
+            bracket: 3,
+            currentDeckCards: const [
+              {'name': 'Mana Vault', 'type_line': 'Artifact'},
+              {'name': 'Grim Monolith', 'type_line': 'Artifact'},
+            ],
+            additionsCardsData: [
+              {
+                'name': 'Mox Diamond',
+                identityField: 'shared-playable-identity',
+                'card_id': 'printing-a',
+                'type_line': 'Artifact',
+              },
+              {
+                'name': 'Chrome Mox',
+                identityField: 'shared-playable-identity',
+                'card_id': 'printing-b',
+                'type_line': 'Artifact',
+              },
+            ],
+          );
+
+          expect(decision.allowed, ['Mox Diamond'], reason: identityField);
+          expect(decision.blocked, isEmpty, reason: identityField);
+          expect(
+            decision.remainingBudget[BracketCategory.gameChanger],
+            0,
+            reason: identityField,
+          );
+        }
+      },
+    );
+
     test('consumes the Upgraded Game Changer cap by physical quantity', () {
       final decision = applyBracketPolicyToAdditions(
         bracket: 3,

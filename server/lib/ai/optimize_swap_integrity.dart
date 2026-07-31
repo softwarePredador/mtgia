@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 
+import 'optimize_functional_role_support.dart';
 import '../runtime_environment.dart';
 
 // ============================================================================
@@ -270,7 +271,10 @@ Map<String, dynamic>? buildOptimizeApplyAuthorizationForResponse({
   if (optimizeLike && authorizedSwaps == null) return null;
   final isCommanderOptimize = resolvedBracket != null && optimizeLike;
   if (isCommanderOptimize &&
-      !_isSatisfiedFunctionalRolePolicy(functionalRolePolicy)) {
+      !_isSatisfiedFunctionalRolePolicy(
+        functionalRolePolicy,
+        expectedBracket: resolvedBracket,
+      )) {
     return null;
   }
 
@@ -359,6 +363,7 @@ Map<String, dynamic>? _canonicalFunctionalRolePolicy(Object? raw) {
   return {
     'policy': policy['policy']?.toString().trim() ?? '',
     'archetype': policy['archetype']?.toString().trim().toLowerCase() ?? '',
+    'bracket': _readNullableInt(policy['bracket']),
     'applies': policy['applies'] == true,
     'total_cards': _readNullableInt(policy['total_cards']),
     'minimum_counts': minimumCounts,
@@ -384,10 +389,16 @@ Map<String, int> _canonicalRoleCountMap(Object? raw) {
   return result;
 }
 
-bool _isSatisfiedFunctionalRolePolicy(Map<String, dynamic>? policy) {
+bool _isSatisfiedFunctionalRolePolicy(
+  Map<String, dynamic>? policy, {
+  required int expectedBracket,
+}) {
+  final policyBracket = _readNullableInt(policy?['bracket']);
+  final archetype = policy?['archetype']?.toString().trim().toLowerCase() ?? '';
   if (policy == null ||
-      policy['policy'] != 'commander_functional_role_floors_v1' ||
-      policy['archetype']?.toString().isEmpty != false ||
+      policy['policy'] != commanderFunctionalRoleFloorPolicyVersion ||
+      archetype.isEmpty ||
+      policyBracket != expectedBracket ||
       policy['applies'] != true ||
       policy['satisfied'] != true ||
       (_readNullableInt(policy['total_cards']) ?? 0) < 90) {
@@ -396,7 +407,14 @@ bool _isSatisfiedFunctionalRolePolicy(Map<String, dynamic>? policy) {
   final minimumCounts = _canonicalRoleCountMap(policy['minimum_counts']);
   final actualCounts = _canonicalRoleCountMap(policy['actual_counts']);
   final deficits = _canonicalRoleCountMap(policy['deficits']);
-  if (minimumCounts.isEmpty || deficits.isNotEmpty) return false;
+  if (!hasCanonicalCommanderFunctionalRoleMinimumCounts(
+        counts: minimumCounts,
+        targetArchetype: archetype,
+        bracket: expectedBracket,
+      ) ||
+      deficits.isNotEmpty) {
+    return false;
+  }
   for (final entry in minimumCounts.entries) {
     if ((actualCounts[entry.key] ?? -1) < entry.value) return false;
   }

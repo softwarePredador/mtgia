@@ -99,6 +99,26 @@ void main() {
     }
   });
 
+  test(
+    'treats a transport interruption as retryable without losing the session',
+    () async {
+      final runtime = _runtime(
+        (_) async => throw http.ClientException('connection reset'),
+      );
+
+      await expectLater(
+        runtime.read(_runtimeId),
+        throwsA(
+          isA<InteractiveBattleRuntimeException>()
+              .having((error) => error.code, 'code', 'runtime_transport_failed')
+              .having((error) => error.retryable, 'retryable', isTrue)
+              .having((error) => error.processLost, 'processLost', isFalse),
+        ),
+      );
+      runtime.close();
+    },
+  );
+
   test('configuration requires a dedicated sidecar when enabled', () {
     expect(
       () => InteractiveBattleConfiguration.fromEnvironment({

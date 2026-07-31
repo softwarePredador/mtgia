@@ -51,6 +51,32 @@ List<Map<String, dynamic>> mapOptimizeAdditionDataRows(
       .toList();
 }
 
+List<Map<String, dynamic>> selectOptimizeAdditionDataForProjection({
+  required Iterable<String> names,
+  required Iterable<Map<String, dynamic>> resolvedCards,
+  Map<String, Map<String, dynamic>> fallbackByNameLower = const {},
+}) {
+  final resolvedByNameLower = <String, Map<String, dynamic>>{
+    for (final card in resolvedCards)
+      if (card['name']?.toString().trim().isNotEmpty == true)
+        card['name'].toString().trim().toLowerCase(): card,
+  };
+
+  return [
+    for (final rawName in names)
+      if (rawName.trim().isNotEmpty)
+        {
+          ...?fallbackByNameLower[rawName.trim().toLowerCase()],
+          ...?resolvedByNameLower[rawName.trim().toLowerCase()],
+          'name':
+              resolvedByNameLower[rawName.trim().toLowerCase()]?['name'] ??
+              fallbackByNameLower[rawName.trim().toLowerCase()]?['name'] ??
+              rawName.trim(),
+          'quantity': 1,
+        },
+  ];
+}
+
 Future<List<Map<String, dynamic>>> fetchOptimizeAdditionDataByIds(
   Pool pool, {
   required List<String> ids,
@@ -92,10 +118,11 @@ Future<List<Map<String, dynamic>>> fetchOptimizeAdditionDataForQualityGate(
     validAdditions: validAdditions,
     validByNameLower: validByNameLower,
   );
-  final semanticV2Select =
-      await optimize_route_internal.semanticV2SelectSql(pool);
-  final functionalTagsSelect =
-      await optimize_route_internal.functionalTagsSelectSql(pool);
+  final semanticV2Select = await optimize_route_internal.semanticV2SelectSql(
+    pool,
+  );
+  final functionalTagsSelect = await optimize_route_internal
+      .functionalTagsSelectSql(pool);
   final result = await pool.execute(
     Sql.named('''
       SELECT DISTINCT ON (LOWER(name))
@@ -119,14 +146,12 @@ Future<List<Map<String, dynamic>>> fetchOptimizeAdditionDataForQualityGate(
       ORDER BY LOWER(name), name
     '''),
     parameters: {
-      'names': correctedAdditionNames.map((name) => name.toLowerCase()).toList()
+      'names':
+          correctedAdditionNames.map((name) => name.toLowerCase()).toList(),
     },
   );
 
-  return mapOptimizeAdditionDataRows(
-    result,
-    includeSemanticFields: true,
-  );
+  return mapOptimizeAdditionDataRows(result, includeSemanticFields: true);
 }
 
 Object? _rowValue(dynamic row, int index) {

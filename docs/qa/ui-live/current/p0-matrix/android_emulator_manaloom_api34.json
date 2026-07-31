@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-31T06:04:03.750824Z",
-  "source_digest": "718d54ee3493e503e601568213c20b3a39b7df19d6c6c612f7b7091b5c86ca15",
+  "generated_at": "2026-07-31T16:06:10.077320Z",
+  "source_digest": "7a2491801f7401c924f2f2788096169d1c325b4a61dfd7bcf34c9ea0a8af401d",
   "surface": "authenticated_p0_matrix",
   "profile": "android_emulator_manaloom_api34",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "6d002c00971374f3768e03402766484c3def20eab550875cb0a4241eefd59681",
+  "log_sha256": "f6a589246af17cecf3c12dc967ae4096879d4ffff0b83ffe29b726b6be804db2",
   "checkpoint_count": 54,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -114,16 +114,16 @@
     {
       "checkpoint": "card_search_empty",
       "path": "app/test/ui/goldens/runtime/android_emulator/card_search_empty.png",
-      "sha256": "07716506199857a0d75f60f3aeef9af943176a6fcd6da9c7c9af7479d606ef64",
-      "bytes": 155791,
+      "sha256": "673cdc5d9cc5c3120d5addd729c017e20b135da92fb2da5d49813c5ac5ef1678",
+      "bytes": 155648,
       "width": 1080,
       "height": 2400
     },
     {
       "checkpoint": "card_search_results",
       "path": "app/test/ui/goldens/runtime/android_emulator/card_search_results.png",
-      "sha256": "d8ce803559fe3ae53930ad54c02a233a2ef091f0b40912fc4f0cb7c226a40198",
-      "bytes": 216288,
+      "sha256": "1d80bfb6201784b388218a3e1b0b08e87b9bfd6b76c5befa0a405e3c6dbfa086",
+      "bytes": 216295,
       "width": 1080,
       "height": 2400
     },
@@ -154,16 +154,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/android_emulator/community_deck_success.png",
-      "sha256": "360b046f935f6559ed96e241900eb1e47456f0fe52a56f33c8487e3b65b752ad",
-      "bytes": 231358,
+      "sha256": "6fd29b1e3b5b78bb8401231fdf59b8ef9e22c5aaebc10f727c49c5e3fd07c0e9",
+      "bytes": 230690,
       "width": 1080,
       "height": 2400
     },
     {
       "checkpoint": "community_public_decks",
       "path": "app/test/ui/goldens/runtime/android_emulator/community_public_decks.png",
-      "sha256": "0b661850fc338773255acb3c99e4a1f18de402635ea5275137e522942a966174",
-      "bytes": 351973,
+      "sha256": "6bee6e01efe0bb15d3ac945c14333311c8285a057b1c7d105ddb672f42d99102",
+      "bytes": 351203,
       "width": 1080,
       "height": 2400
     },
@@ -194,24 +194,24 @@
     {
       "checkpoint": "deck_create_modal",
       "path": "app/test/ui/goldens/runtime/android_emulator/deck_create_modal.png",
-      "sha256": "7a4b878c60a824d3d956c0abe4f7397ce642c5f42af7c30f18ba55bfa195682f",
-      "bytes": 124717,
+      "sha256": "9844571f82789ac65ee16714dfba2626915b1944d0dffeede2d32974c4c71fdc",
+      "bytes": 124690,
       "width": 1080,
       "height": 2400
     },
     {
       "checkpoint": "deck_detail_below_fold",
       "path": "app/test/ui/goldens/runtime/android_emulator/deck_detail_below_fold.png",
-      "sha256": "61f4d473b64f6cd6fd1fb203cab1d4fc3368c7bca11bea1569d154adda6afdf5",
-      "bytes": 287397,
+      "sha256": "afd17a07a87c6823caf6e45ad67687db88758ed94d86f415398dbec530fc7d63",
+      "bytes": 287208,
       "width": 1080,
       "height": 2400
     },
     {
       "checkpoint": "deck_detail_top",
       "path": "app/test/ui/goldens/runtime/android_emulator/deck_detail_top.png",
-      "sha256": "738df42cc0e3051aa8f85c2e4936df8200968d93674c72aebedbb2f42bb9c40f",
-      "bytes": 459452,
+      "sha256": "39e9ed927e1bc1b77f0875317ca59f55c98759961b53134731de2f8e2e4bc06d",
+      "bytes": 459287,
       "width": 1080,
       "height": 2400
     },
@@ -226,8 +226,8 @@
     {
       "checkpoint": "deck_import_detected",
       "path": "app/test/ui/goldens/runtime/android_emulator/deck_import_detected.png",
-      "sha256": "50937a0053e4bd149b3ee0b7a97afb827b33a81185b67d84e0d497ad3b10d434",
-      "bytes": 123630,
+      "sha256": "6334630ef351ed243f1e6c1571936650df46866e948ccf01bedb222206e0a28d",
+      "bytes": 187889,
       "width": 1080,
       "height": 2400
     },
@@ -274,8 +274,8 @@
     {
       "checkpoint": "latest_set",
       "path": "app/test/ui/goldens/runtime/android_emulator/latest_set.png",
-      "sha256": "d8ea253bbad4df096def02ecdb332e25e4976bd571757909b2f4e66e056244ec",
-      "bytes": 262287,
+      "sha256": "e5a905ad8e8827aaa5a223096811779a4738aa8c0f14ab1e58a497f61a8f6d43",
+      "bytes": 262897,
       "width": 1080,
       "height": 2400
     },
@@ -362,8 +362,8 @@
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/android_emulator/profile_success.png",
-      "sha256": "04b8cff120c3c9dff0397837ae273c9433f3570c9ca5de06772b9606de2cd600",
-      "bytes": 179560,
+      "sha256": "cfc318a24137bab7a63785c3d7de44b5c581e64a5bc1a2b42839de3dd78d536d",
+      "bytes": 175466,
       "width": 1080,
       "height": 2400
     },
@@ -410,8 +410,8 @@
     {
       "checkpoint": "set_detail_tst",
       "path": "app/test/ui/goldens/runtime/android_emulator/set_detail_tst.png",
-      "sha256": "935fe4f71c8ede30d2386219bdf5705b8e82ae542b370f32ff79ed360d1858e0",
-      "bytes": 257353,
+      "sha256": "3d01335b6ff80d95bd01aaec4fe3cd77f368814ec4d36702b26d43f9a32bb388",
+      "bytes": 257907,
       "width": 1080,
       "height": 2400
     },
@@ -434,7 +434,7 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/android_emulator/splash_boot.png",
-      "sha256": "b8df7c77d44ec233504665ca44713d589be98515084e07755f42d59919f5e796",
+      "sha256": "232a2e3babdde33eac7c859b49f9496d8000dc0b72ea7f95ce90b14b28de907d",
       "bytes": 396999,
       "width": 1080,
       "height": 2337
@@ -474,24 +474,24 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/android_emulator/user_profile_success.png",
-      "sha256": "1da5401f43ce33fbd283b04a94cdbb327452c0fc835a7f994016cf5ccdbe5b2a",
-      "bytes": 159035,
+      "sha256": "eee245352293a765f44a0d890cddbf6315c67b0a6e3405dc8d1c0a710eea08fc",
+      "bytes": 157064,
       "width": 1080,
       "height": 2400
     },
     {
       "checkpoint": "user_search_empty",
       "path": "app/test/ui/goldens/runtime/android_emulator/user_search_empty.png",
-      "sha256": "83facbcc36bc441fe4b239d023bb7ec8420cdf6fd37c3cd1c0002bc213d71c62",
-      "bytes": 92412,
+      "sha256": "001325356dc171dbd24258afe0d6c706b429386db2b29721d4bbc69c315b2d66",
+      "bytes": 92439,
       "width": 1080,
       "height": 2400
     },
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/android_emulator/user_search_results.png",
-      "sha256": "60401adeb16ee6e8b6c0b7d4623dab1473e0a2c45ed87a49497c12958cc682cb",
-      "bytes": 70189,
+      "sha256": "058a56f98fa010e00ed31d53c85f410977afeb03dc215cb8851a76d8f6509191",
+      "bytes": 68457,
       "width": 1080,
       "height": 2400
     },

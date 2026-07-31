@@ -265,6 +265,37 @@ void main() {
       );
     });
 
+    test(
+      'maps bracket and functional-floor rejection to a safe preserved deck',
+      () {
+        for (final code in const [
+          'OPTIMIZE_BRACKET_VIOLATION',
+          'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
+        ]) {
+          expect(
+            deriveOptimizeOutcomeCode(
+              statusCode: 422,
+              body: {
+                'quality_error': {'code': code},
+              },
+              deckState: healthyDeckState,
+            ),
+            equals('no_safe_upgrade_found'),
+          );
+          expect(
+            deriveOptimizeOutcomeCode(
+              statusCode: 422,
+              body: {
+                'quality_error': {'code': code},
+              },
+              deckState: repairDeckState,
+            ),
+            equals('needs_repair'),
+          );
+        }
+      },
+    );
+
     test('maps execution failures by deck state and HTTP class', () {
       expect(
         deriveOptimizeOutcomeCode(

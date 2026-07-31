@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:server/ai/optimize_complete_support.dart';
 import 'package:test/test.dart';
 
@@ -244,6 +246,33 @@ void main() {
     expect((payload['bracket_policy'] as Map)['game_changer_count'], 1);
   });
 
+  test('large Core completion counts a Game Changer commander', () {
+    final cards = _completeCommanderDeck(
+      includeWipes: true,
+      commanderName: 'Braids, Cabal Minion',
+    );
+    final state = _stateRepresentingCommanderCompletion(cards);
+
+    final payload = buildCompleteIntermediatePayload(
+      state: state,
+      maxTotal: 100,
+      currentTotalCards: 1,
+      targetArchetype: 'midrange',
+      deckFormat: 'commander',
+      bracket: 2,
+    );
+
+    expect(
+      (payload['quality_error'] as Map)['code'],
+      'COMPLETE_QUALITY_BRACKET_VIOLATION',
+    );
+    expect((payload['bracket_policy'] as Map)['game_changer_count'], 1);
+    expect(
+      ((payload['bracket_policy'] as Map)['violations'] as List).single,
+      containsPair('name', 'Braids, Cabal Minion'),
+    );
+  });
+
   test('large Commander completion requires the archetype wipe floor', () {
     final cards = _completeCommanderDeck(includeWipes: false);
     final state = _stateRepresentingCommanderCompletion(cards);
@@ -290,6 +319,37 @@ void main() {
     expect(error['role'], 'wipe');
     expect(error['actual'], 0);
     expect(error['minimum'], 2);
+  });
+
+  test('Complete applies the distinct B4 and B5 wipe floors', () {
+    final withoutWipes = _completeCommanderDeck(includeWipes: false);
+    final state = _stateRepresentingCommanderCompletion(withoutWipes);
+
+    final optimized = buildCompleteIntermediatePayload(
+      state: state,
+      maxTotal: 100,
+      currentTotalCards: 1,
+      targetArchetype: 'midrange',
+      deckFormat: 'commander',
+      bracket: 4,
+    );
+    final optimizedError =
+        (optimized['quality_error'] as Map).cast<String, dynamic>();
+    expect(optimizedError['code'], 'COMPLETE_QUALITY_ROLE_FLOOR');
+    expect(optimizedError['role'], 'wipe');
+    expect(optimizedError['minimum'], 1);
+
+    final competitive = buildCompleteIntermediatePayload(
+      state: state,
+      maxTotal: 100,
+      currentTotalCards: 1,
+      targetArchetype: 'midrange',
+      deckFormat: 'commander',
+      bracket: 5,
+    );
+    expect(competitive['quality_error'], isNull);
+    expect((competitive['functional_role_policy'] as Map)['satisfied'], isTrue);
+    expect((competitive['functional_role_policy'] as Map)['bracket'], 5);
   });
 
   test(
@@ -363,6 +423,61 @@ void main() {
     },
   );
 
+  test(
+    'complete preserves an at-floor multi-role card while freeing generic slots',
+    () {
+      final cards = _completeCommanderDeck(includeWipes: false);
+      final state = CompleteBuildAccumulator.fromDeck(
+        allCardData: cards,
+        originalCountsById: {
+          for (final card in cards)
+            card['card_id'] as String: card['quantity'] as int,
+        },
+        currentTotalCards: 100,
+      );
+      const structuralId = 'structural-engine';
+      final genericIds = <String>[
+        cards.last['card_id'] as String,
+        cards[cards.length - 2]['card_id'] as String,
+      ];
+      state.addedCountsById[structuralId] = 1;
+      for (final id in genericIds) {
+        state.addedCountsById[id] = 1;
+      }
+
+      final freed = rebalanceCompleteDeckForFunctionalRoleDeficits(
+        state: state,
+        maxTotal: 100,
+        deckFormat: 'commander',
+        targetArchetype: 'midrange',
+        bracket: 2,
+      );
+
+      expect(freed, 2);
+      expect(state.addedCountsById[structuralId], 1);
+      expect(
+        state.virtualDeck.any((card) => card['card_id'] == structuralId),
+        isTrue,
+      );
+      expect(
+        genericIds.every((id) => !state.addedCountsById.containsKey(id)),
+        isTrue,
+      );
+    },
+  );
+
+  test('Complete runtime propagates bracket into structural rebalancing', () {
+    final source =
+        File('lib/ai/optimize_route_internal.dart').readAsStringSync();
+    final callStart = source.indexOf(
+      'rebalanceCompleteDeckForFunctionalRoleDeficits(',
+    );
+    expect(callStart, greaterThanOrEqualTo(0));
+    final callEnd = source.indexOf('),', callStart);
+    expect(callEnd, greaterThan(callStart));
+    expect(source.substring(callStart, callEnd), contains('bracket: bracket'));
+  });
+
   test('critical Complete needs do not duplicate planned wipe deficits', () {
     expect(
       mergeCriticalCompleteFunctionalNeeds(
@@ -378,11 +493,12 @@ void main() {
 List<Map<String, dynamic>> _completeCommanderDeck({
   required bool includeWipes,
   Map<String, dynamic>? extraSpell,
+  String commanderName = 'Lorehold, the Historian',
 }) {
   final cards = <Map<String, dynamic>>[
-    const {
+    {
       'card_id': 'commander',
-      'name': 'Lorehold, the Historian',
+      'name': commanderName,
       'type_line': 'Legendary Creature — Elder Dragon',
       'quantity': 1,
       'is_commander': true,
@@ -398,6 +514,14 @@ List<Map<String, dynamic>> _completeCommanderDeck({
       'name': 'Mountain',
       'type_line': 'Basic Land — Mountain',
       'quantity': 18,
+    },
+    const {
+      'card_id': 'structural-engine',
+      'name': 'Persistent Structural Engine',
+      'type_line': 'Artifact',
+      'oracle_text': '{T}: Add one mana of any color.',
+      'functional_tags': ['ramp', 'draw', 'interaction'],
+      'quantity': 8,
     },
     if (includeWipes)
       const {

@@ -309,6 +309,11 @@ String deriveOptimizeOutcomeCode({
         return 'near_peak';
       }
       return 'no_safe_upgrade_found';
+    case 'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR':
+    case 'OPTIMIZE_BRACKET_VIOLATION':
+      return deckState.status == 'needs_repair'
+          ? 'needs_repair'
+          : 'no_safe_upgrade_found';
     case 'OPTIMIZE_EXECUTION_FAILED':
     case 'OPTIMIZE_VALIDATION_FAILED':
     case 'OPTIMIZE_POST_ANALYSIS_FAILED':

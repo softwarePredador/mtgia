@@ -79,6 +79,7 @@ Map<String, dynamic>? buildCachedOptimizeResponse({
     if (actionableOptimize &&
         !isSatisfiedReusableFunctionalRolePolicy(
           cachedResponse['functional_role_policy'],
+          expectedBracket: bracket,
         )) {
       return null;
     }
@@ -102,11 +103,18 @@ Map<String, dynamic>? buildCachedOptimizeResponse({
   return response;
 }
 
-bool isSatisfiedReusableFunctionalRolePolicy(Object? raw) {
+bool isSatisfiedReusableFunctionalRolePolicy(
+  Object? raw, {
+  int? expectedBracket,
+}) {
   if (raw is! Map) return false;
   final policy = raw.cast<Object?, Object?>();
-  if (policy['policy'] != 'commander_functional_role_floors_v1' ||
-      policy['archetype']?.toString().trim().isEmpty != false ||
+  final policyBracket = _readOptimizePolicyInt(policy['bracket']);
+  final archetype = policy['archetype']?.toString().trim().toLowerCase() ?? '';
+  if (policy['policy'] != commanderFunctionalRoleFloorPolicyVersion ||
+      archetype.isEmpty ||
+      policyBracket == null ||
+      (expectedBracket != null && policyBracket != expectedBracket) ||
       policy['applies'] != true ||
       policy['satisfied'] != true ||
       (_readOptimizePolicyInt(policy['total_cards']) ?? 0) < 90) {
@@ -115,7 +123,14 @@ bool isSatisfiedReusableFunctionalRolePolicy(Object? raw) {
   final minimumCounts = _readOptimizePolicyCounts(policy['minimum_counts']);
   final actualCounts = _readOptimizePolicyCounts(policy['actual_counts']);
   final deficits = _readOptimizePolicyCounts(policy['deficits']);
-  if (minimumCounts.isEmpty || deficits.isNotEmpty) return false;
+  if (!hasCanonicalCommanderFunctionalRoleMinimumCounts(
+        counts: minimumCounts,
+        targetArchetype: archetype,
+        bracket: policyBracket,
+      ) ||
+      deficits.isNotEmpty) {
+    return false;
+  }
   for (final entry in minimumCounts.entries) {
     if ((actualCounts[entry.key] ?? -1) < entry.value) return false;
   }
@@ -227,4 +242,65 @@ Map<String, dynamic> buildOptimizeRebuildGuidedOutcome({
     'deck_analysis': deckAnalysis,
     'theme': themeProfile.toJson(),
   };
+}
+
+Map<String, dynamic> buildOptimizeStructuralRebuildGuidedOutcome({
+  required String explanation,
+  required String trigger,
+  required String policyKey,
+  required Map<String, dynamic> policy,
+  required String applyBlocker,
+  required OptimizeIntensityConfig intensity,
+  required DeckOptimizationStateResult deckState,
+  required String deckId,
+  required int? bracket,
+  required String archetype,
+  required DeckThemeProfileResult themeProfile,
+  required Map<String, dynamic> deckAnalysis,
+}) {
+  final response = buildOptimizeRebuildGuidedOutcome(
+    explanation: explanation,
+    trigger: trigger,
+    qualityCode: 'OPTIMIZE_NEEDS_REPAIR',
+    intensity: intensity,
+    deckState: deckState,
+    deckId: deckId,
+    bracket: bracket,
+    archetype: archetype,
+    themeProfile: themeProfile,
+    deckAnalysis: deckAnalysis,
+  );
+  final qualityError =
+      (response['quality_error'] as Map).cast<String, dynamic>();
+  qualityError[policyKey] = policy;
+  final nextAction = (response['next_action'] as Map).cast<String, dynamic>();
+  final nextActionPayload =
+      (nextAction['payload'] as Map).cast<String, dynamic>();
+  if (policyKey == 'bracket_policy') {
+    nextActionPayload['rebuild_scope'] = 'full_non_commander_rebuild';
+  }
+  nextAction['payload'] = nextActionPayload;
+  response
+    ..['error'] = explanation
+    ..['quality_error'] = qualityError
+    ..['next_action'] = nextAction
+    ..[policyKey] = policy
+    ..['deck_state'] = {
+      ...deckState.toJson(),
+      'status': 'needs_repair',
+      'recommended_mode': 'rebuild_guided',
+      'suggested_scope': 'structural_rebuild',
+      'severity_score':
+          deckState.severityScore < 70 ? 70 : deckState.severityScore,
+      'reasons': {...deckState.reasons, trigger}.toList(growable: false),
+      'repair_plan': {
+        ...deckState.repairPlan,
+        'structural_trigger': trigger,
+        policyKey: policy,
+      },
+    }
+    ..['can_apply'] = false
+    ..['learning_eligible'] = false
+    ..['apply_blockers'] = [applyBlocker];
+  return response;
 }

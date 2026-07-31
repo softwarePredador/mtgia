@@ -113,7 +113,7 @@ void main() {
     },
   );
 
-  test('projected Commander role gate rejects a full deck without wipes', () {
+  test('projected Commander role gate reports every critical deficit', () {
     final assessment = assessOptimizeProjectedCommanderRoleFloors(
       projectedDeck: [
         const {
@@ -133,7 +133,12 @@ void main() {
 
     expect(assessment.applies, isTrue);
     expect(assessment.satisfied, isFalse);
-    expect(assessment.deficits['wipe'], 2);
+    expect(assessment.deficits, {
+      'ramp': 8,
+      'draw': 8,
+      'interaction': 6,
+      'wipe': 2,
+    });
 
     final body = buildOptimizeRoleFloorRejectedBody(
       assessment: assessment,
@@ -147,6 +152,10 @@ void main() {
       (body['quality_error'] as Map)['code'],
       'OPTIMIZE_FUNCTIONAL_ROLE_FLOOR',
     );
+    expect(
+      (body['quality_error'] as Map)['message'],
+      contains('ramp, compra, interação ou wipes'),
+    );
     expect(body['can_apply'], isFalse);
     expect(
       body['apply_blockers'],
@@ -154,7 +163,7 @@ void main() {
     );
   });
 
-  test('projected Commander role gate accepts the archetype wipe floor', () {
+  test('projected Commander role gate accepts every critical floor', () {
     final assessment = assessOptimizeProjectedCommanderRoleFloors(
       projectedDeck: [
         const {
@@ -166,7 +175,14 @@ void main() {
           'name': 'Fair Creature',
           'type_line': 'Creature',
           'oracle_text': 'Vigilance.',
-          'quantity': 62,
+          'quantity': 54,
+        },
+        const {
+          'name': 'Persistent Structural Engine',
+          'type_line': 'Artifact',
+          'oracle_text': '{T}: Add one mana of any color.',
+          'functional_tags': ['ramp', 'draw', 'interaction'],
+          'quantity': 8,
         },
         const {
           'name': 'Wrath of God',
@@ -186,8 +202,61 @@ void main() {
 
     expect(assessment.applies, isTrue);
     expect(assessment.satisfied, isTrue);
-    expect(assessment.actualCounts['wipe'], 2);
+    expect(assessment.actualCounts, {
+      'ramp': 8,
+      'draw': 8,
+      'interaction': 8,
+      'wipe': 2,
+    });
   });
+
+  test(
+    'projected role gate carries the B1-B5 wipe policy to the final deck',
+    () {
+      final withoutWipes = <Map<String, dynamic>>[
+        const {
+          'name': 'Plains',
+          'type_line': 'Basic Land — Plains',
+          'quantity': 36,
+        },
+        const {
+          'name': 'Persistent Structural Engine',
+          'type_line': 'Artifact',
+          'oracle_text': '{T}: Add one mana of any color.',
+          'functional_tags': ['ramp', 'draw', 'interaction'],
+          'quantity': 8,
+        },
+        const {
+          'name': 'Fair Creature',
+          'type_line': 'Creature',
+          'quantity': 56,
+        },
+      ];
+
+      for (var bracket = 1; bracket <= 4; bracket += 1) {
+        final assessment = assessOptimizeProjectedCommanderRoleFloors(
+          projectedDeck: withoutWipes,
+          archetype: 'midrange',
+          bracket: bracket,
+        );
+        expect(assessment.satisfied, isFalse, reason: 'B$bracket');
+        expect(
+          assessment.deficits['wipe'],
+          bracket == 4 ? 1 : 2,
+          reason: 'B$bracket',
+        );
+      }
+
+      final competitive = assessOptimizeProjectedCommanderRoleFloors(
+        projectedDeck: withoutWipes,
+        archetype: 'midrange',
+        bracket: 5,
+      );
+      expect(competitive.bracket, 5);
+      expect(competitive.minimumCounts['wipe'], 0);
+      expect(competitive.satisfied, isTrue);
+    },
+  );
 }
 
 ValidationReport _validationReport({

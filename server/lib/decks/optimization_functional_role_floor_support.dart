@@ -123,8 +123,13 @@ assessOptimizationApplyCommanderFunctionalRoleFloorFromCards({
   final requiresSignedPolicy =
       authorizationVerification != null &&
       (authorizedMode == 'optimize' || hasAuthorizedRemovals);
+  final authorizedBracket = _readInt(payload?['bracket']);
 
-  if (requiresSignedPolicy && !_isValidSatisfiedSignedPolicy(rawSignedPolicy)) {
+  if (requiresSignedPolicy &&
+      !_isValidSatisfiedSignedPolicy(
+        rawSignedPolicy,
+        expectedBracket: authorizedBracket,
+      )) {
     throw const OptimizationFunctionalRoleFloorViolation(
       reason: 'functional_role_policy_binding_missing',
     );
@@ -143,14 +148,16 @@ assessOptimizationApplyCommanderFunctionalRoleFloorFromCards({
   final archetype =
       rawSignedPolicy?['archetype']?.toString().trim().toLowerCase() ??
       fallbackArchetype;
+  final bracket = _readInt(
+    rawSignedPolicy?['bracket'] ?? mutationContext['bracket'],
+  );
   final minimumCounts =
       signedMinimumCounts.isNotEmpty
           ? signedMinimumCounts
-          : {
-            'wipe': minimumCommanderWipeCountForArchetype(
-              archetype.isEmpty ? 'midrange' : archetype,
-            ),
-          };
+          : commanderFunctionalRoleMinimumCounts(
+            targetArchetype: archetype.isEmpty ? 'midrange' : archetype,
+            bracket: bracket,
+          );
   final totalCards = materialized.fold<int>(
     0,
     (sum, card) => sum + _positiveQuantity(card['quantity']),
@@ -162,16 +169,24 @@ assessOptimizationApplyCommanderFunctionalRoleFloorFromCards({
 
   return CommanderFunctionalRoleFloorAssessment(
     archetype: archetype.isEmpty ? 'midrange' : archetype,
+    bracket: bracket,
     totalCards: totalCards,
     minimumCounts: minimumCounts,
     actualCounts: actualCounts,
   );
 }
 
-bool _isValidSatisfiedSignedPolicy(Map<String, dynamic>? policy) {
+bool _isValidSatisfiedSignedPolicy(
+  Map<String, dynamic>? policy, {
+  required int? expectedBracket,
+}) {
+  final policyBracket = _readInt(policy?['bracket']);
+  final archetype = policy?['archetype']?.toString().trim().toLowerCase() ?? '';
   if (policy == null ||
-      policy['policy'] != 'commander_functional_role_floors_v1' ||
-      policy['archetype']?.toString().trim().isEmpty != false ||
+      policy['policy'] != commanderFunctionalRoleFloorPolicyVersion ||
+      archetype.isEmpty ||
+      expectedBracket == null ||
+      policyBracket != expectedBracket ||
       policy['applies'] != true ||
       policy['satisfied'] != true ||
       (_readInt(policy['total_cards']) ?? 0) < 90) {
@@ -180,7 +195,14 @@ bool _isValidSatisfiedSignedPolicy(Map<String, dynamic>? policy) {
   final minimumCounts = _readRoleCountMap(policy['minimum_counts']);
   final actualCounts = _readRoleCountMap(policy['actual_counts']);
   final deficits = _readRoleCountMap(policy['deficits']);
-  if (minimumCounts.isEmpty || deficits.isNotEmpty) return false;
+  if (!hasCanonicalCommanderFunctionalRoleMinimumCounts(
+        counts: minimumCounts,
+        targetArchetype: archetype,
+        bracket: expectedBracket,
+      ) ||
+      deficits.isNotEmpty) {
+    return false;
+  }
   for (final entry in minimumCounts.entries) {
     if ((actualCounts[entry.key] ?? -1) < entry.value) return false;
   }

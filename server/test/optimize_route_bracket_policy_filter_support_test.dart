@@ -148,4 +148,26 @@ void main() {
       greaterThanOrEqualTo(0),
     );
   });
+
+  test('projected Optimize deck counts a Game Changer commander', () {
+    final assessment = assessOptimizeProjectedDeckBracket(
+      bracket: 2,
+      projectedDeckCards: const [
+        {
+          'name': 'Braids, Cabal Minion',
+          'type_line': 'Legendary Creature — Human Minion',
+          'is_commander': true,
+          'quantity': 1,
+        },
+        {'name': 'Swamp', 'type_line': 'Basic Land — Swamp', 'quantity': 99},
+      ],
+    );
+
+    expect(assessment.hardCompliant, isFalse);
+    expect(assessment.toJson()['game_changer_count'], 1);
+    expect(
+      assessment.violations.single,
+      containsPair('name', 'Braids, Cabal Minion'),
+    );
+  });
 }

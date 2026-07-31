@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/deck_rules_service.dart';
@@ -5,145 +7,227 @@ import '../lib/generated_deck_validation_service.dart';
 
 void main() {
   group('GeneratedDeckValidationService', () {
-    test('keeps a valid 60-card deck even when one unknown card is removed',
-        () async {
-      final service = GeneratedDeckValidationService(
-        _FakeGeneratedDeckRepository(
-          cardsByName: {
-            'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
-          },
-          suggestionsByName: {
-            'Mountan': ['Mountain'],
-          },
-        ),
-      );
+    test(
+      'keeps a valid 60-card deck even when one unknown card is removed',
+      () async {
+        final service = GeneratedDeckValidationService(
+          _FakeGeneratedDeckRepository(
+            cardsByName: {
+              'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
+            },
+            suggestionsByName: {
+              'Mountan': ['Mountain'],
+            },
+          ),
+        );
 
-      final result = await service.validate(
-        format: 'standard',
-        cards: [
-          {'name': 'Mountain', 'quantity': 60},
-          {'name': 'Mountan', 'quantity': 1},
-        ],
-      );
+        final result = await service.validate(
+          format: 'standard',
+          cards: [
+            {'name': 'Mountain', 'quantity': 60},
+            {'name': 'Mountan', 'quantity': 1},
+          ],
+        );
 
-      expect(result.isValid, isTrue);
-      expect(result.generatedDeck['commander'], isNull);
-      expect(result.invalidCards, equals(['Mountan']));
-      expect(result.suggestions['Mountan'], equals(['Mountain']));
-      expect(result.validationSummary(), contains('quality_evidence'));
-      final qualityEvidence = result.qualityEvidenceSummary();
-      expect(qualityEvidence['has_quality_events'], isTrue);
-      expect(qualityEvidence['has_removed_invalid_cards'], isTrue);
-      expect(qualityEvidence['invalid_cards_removed_count'], equals(1));
-      expect(qualityEvidence['input_to_resolved_card_delta'], equals(1));
-      expect(qualityEvidence['invalid_card_sample'], equals(['Mountan']));
-      expect((result.generatedDeck['cards'] as List).single, {
-        'name': 'Mountain',
-        'quantity': 60,
-      });
+        expect(result.isValid, isTrue);
+        expect(result.generatedDeck['commander'], isNull);
+        expect(result.invalidCards, equals(['Mountan']));
+        expect(result.suggestions['Mountan'], equals(['Mountain']));
+        expect(result.validationSummary(), contains('quality_evidence'));
+        final qualityEvidence = result.qualityEvidenceSummary();
+        expect(qualityEvidence['has_quality_events'], isTrue);
+        expect(qualityEvidence['has_removed_invalid_cards'], isTrue);
+        expect(qualityEvidence['invalid_cards_removed_count'], equals(1));
+        expect(qualityEvidence['input_to_resolved_card_delta'], equals(1));
+        expect(qualityEvidence['invalid_card_sample'], equals(['Mountan']));
+        expect((result.generatedDeck['cards'] as List).single, {
+          'name': 'Mountain',
+          'quantity': 60,
+        });
+        expect(result.resolvedCards.single['type_line'], contains('Land'));
+      },
+    );
+
+    test(
+      'repairs constructed deck below 60 cards with color-matched basics',
+      () async {
+        final service = GeneratedDeckValidationService(
+          _FakeGeneratedDeckRepository(
+            cardsByName: {
+              'goblin guide': {
+                'id': 'goblin-guide-id',
+                'name': 'Goblin Guide',
+                'type_line': 'Creature - Goblin Scout',
+                'color_identity': ['R'],
+                'colors': ['R'],
+                'mana_cost': '{R}',
+              },
+              'lightning bolt': {
+                'id': 'lightning-bolt-id',
+                'name': 'Lightning Bolt',
+                'type_line': 'Instant',
+                'color_identity': ['R'],
+                'colors': ['R'],
+                'mana_cost': '{R}',
+              },
+              'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
+            },
+          ),
+        );
+
+        final result = await service.validate(
+          format: 'Standard',
+          cards: [
+            {'name': 'Goblin Guide', 'quantity': 4},
+            {'name': 'Lightning Bolt', 'quantity': 4},
+            {'name': 'Mountain', 'quantity': 50},
+          ],
+        );
+
+        expect(result.isValid, isTrue);
+        expect(result.warnings.join('\n'), contains('Auto-reparo'));
+        final qualityEvidence = result.qualityEvidenceSummary();
+        expect(qualityEvidence['has_quality_events'], isTrue);
+        expect(qualityEvidence['has_auto_repair'], isTrue);
+        expect(qualityEvidence['repair_warning_count'], greaterThan(0));
+        expect(qualityEvidence['warning_count'], greaterThan(0));
+        expect(
+          qualityEvidence['repair_warning_sample'],
+          contains(contains('Auto-reparo')),
+        );
+        expect(
+          (result.generatedDeck['cards'] as List).fold<int>(
+            0,
+            (sum, card) => sum + (card['quantity'] as int),
+          ),
+          equals(60),
+        );
+        expect(
+          (result.generatedDeck['cards'] as List).whereType<Map>().singleWhere(
+            (card) => card['name'] == 'Mountain',
+          )['quantity'],
+          equals(52),
+        );
+      },
+    );
+
+    test(
+      'retains canonical multi-role metadata for structural gates',
+      () async {
+        final service = GeneratedDeckValidationService(
+          _FakeGeneratedDeckRepository(
+            cardsByName: {
+              'structural engine': {
+                'id': 'structural-engine-id',
+                'name': 'Structural Engine',
+                'type_line': 'Artifact',
+                'oracle_text': '{T}: Add {C}. Draw a card.',
+                'mana_cost': '{2}',
+                'cmc': 2,
+                'functional_tags': [
+                  {'tag': 'ramp', 'confidence': 0.98},
+                  {'tag': 'draw', 'confidence': 0.96},
+                ],
+                'semantic_tags_v2': [
+                  {
+                    'tags': ['interaction'],
+                    'role_confidence': 0.91,
+                  },
+                ],
+              },
+              'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
+            },
+          ),
+        );
+
+        final result = await service.validate(
+          format: 'standard',
+          cards: const [
+            {'name': 'Structural Engine', 'quantity': 4},
+            {'name': 'Mountain', 'quantity': 56},
+          ],
+        );
+
+        expect(result.isValid, isTrue);
+        final engine = result.resolvedCards.singleWhere(
+          (card) => card['name'] == 'Structural Engine',
+        );
+        expect(
+          (engine['functional_tags'] as List).whereType<Map>().map(
+            (tag) => tag['tag'],
+          ),
+          containsAll(<String>['ramp', 'draw']),
+        );
+        expect(
+          ((engine['semantic_tags_v2'] as List).single as Map)['tags'],
+          contains('interaction'),
+        );
+      },
+    );
+
+    test('Generate and Rebuild load the shared canonical role metadata', () {
+      final generatedRepository =
+          File('lib/generated_deck_validation_service.dart').readAsStringSync();
+      final rebuild =
+          File('lib/ai/rebuild_guided_service.dart').readAsStringSync();
+      final loader =
+          File(
+            'lib/ai/canonical_card_role_metadata_support.dart',
+          ).readAsStringSync();
+
+      expect(
+        generatedRepository,
+        contains('loadCanonicalCardRoleMetadataByCardId'),
+      );
+      expect(rebuild, contains('loadCanonicalCardRoleMetadataByCardId'));
+      expect(loader, contains('card_intelligence_snapshot'));
+      expect(loader, contains('card_function_tags'));
+      expect(loader, contains('card_semantic_tags_v2'));
     });
 
-    test('repairs constructed deck below 60 cards with color-matched basics',
-        () async {
-      final service = GeneratedDeckValidationService(
-        _FakeGeneratedDeckRepository(
-          cardsByName: {
-            'goblin guide': {
-              'id': 'goblin-guide-id',
-              'name': 'Goblin Guide',
-              'type_line': 'Creature - Goblin Scout',
-              'color_identity': ['R'],
-              'colors': ['R'],
-              'mana_cost': '{R}',
+    test(
+      'repairs constructed non-basic quantities before validation',
+      () async {
+        final service = GeneratedDeckValidationService(
+          _FakeGeneratedDeckRepository(
+            cardsByName: {
+              'goblin guide': {
+                'id': 'goblin-guide-id',
+                'name': 'Goblin Guide',
+                'type_line': 'Creature - Goblin Scout',
+                'color_identity': ['R'],
+                'colors': ['R'],
+                'mana_cost': '{R}',
+              },
+              'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
             },
-            'lightning bolt': {
-              'id': 'lightning-bolt-id',
-              'name': 'Lightning Bolt',
-              'type_line': 'Instant',
-              'color_identity': ['R'],
-              'colors': ['R'],
-              'mana_cost': '{R}',
-            },
-            'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
-          },
-        ),
-      );
+          ),
+        );
 
-      final result = await service.validate(
-        format: 'Standard',
-        cards: [
-          {'name': 'Goblin Guide', 'quantity': 4},
-          {'name': 'Lightning Bolt', 'quantity': 4},
-          {'name': 'Mountain', 'quantity': 50},
-        ],
-      );
+        final result = await service.validate(
+          format: 'standard',
+          cards: [
+            {'name': 'Goblin Guide', 'quantity': 8},
+            {'name': 'Mountain', 'quantity': 52},
+          ],
+        );
 
-      expect(result.isValid, isTrue);
-      expect(result.warnings.join('\n'), contains('Auto-reparo'));
-      final qualityEvidence = result.qualityEvidenceSummary();
-      expect(qualityEvidence['has_quality_events'], isTrue);
-      expect(qualityEvidence['has_auto_repair'], isTrue);
-      expect(qualityEvidence['repair_warning_count'], greaterThan(0));
-      expect(qualityEvidence['warning_count'], greaterThan(0));
-      expect(
-        qualityEvidence['repair_warning_sample'],
-        contains(contains('Auto-reparo')),
-      );
-      expect(
-        (result.generatedDeck['cards'] as List).fold<int>(
-          0,
-          (sum, card) => sum + (card['quantity'] as int),
-        ),
-        equals(60),
-      );
-      expect(
-        (result.generatedDeck['cards'] as List)
-            .whereType<Map>()
-            .singleWhere((card) => card['name'] == 'Mountain')['quantity'],
-        equals(52),
-      );
-    });
+        expect(result.isValid, isTrue);
+        final cards = (result.generatedDeck['cards'] as List).whereType<Map>();
+        expect(
+          cards.singleWhere(
+            (card) => card['name'] == 'Goblin Guide',
+          )['quantity'],
+          equals(4),
+        );
+        expect(
+          cards.singleWhere((card) => card['name'] == 'Mountain')['quantity'],
+          equals(56),
+        );
+      },
+    );
 
-    test('repairs constructed non-basic quantities before validation',
-        () async {
-      final service = GeneratedDeckValidationService(
-        _FakeGeneratedDeckRepository(
-          cardsByName: {
-            'goblin guide': {
-              'id': 'goblin-guide-id',
-              'name': 'Goblin Guide',
-              'type_line': 'Creature - Goblin Scout',
-              'color_identity': ['R'],
-              'colors': ['R'],
-              'mana_cost': '{R}',
-            },
-            'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
-          },
-        ),
-      );
-
-      final result = await service.validate(
-        format: 'standard',
-        cards: [
-          {'name': 'Goblin Guide', 'quantity': 8},
-          {'name': 'Mountain', 'quantity': 52},
-        ],
-      );
-
-      expect(result.isValid, isTrue);
-      final cards = (result.generatedDeck['cards'] as List).whereType<Map>();
-      expect(
-        cards.singleWhere((card) => card['name'] == 'Goblin Guide')['quantity'],
-        equals(4),
-      );
-      expect(
-        cards.singleWhere((card) => card['name'] == 'Mountain')['quantity'],
-        equals(56),
-      );
-    });
-
-    test('fails commander generation when commander field is missing',
-        () async {
+    test('fails commander generation when commander field is missing', () async {
       final service = GeneratedDeckValidationService(
         _FakeGeneratedDeckRepository(
           cardsByName: {
@@ -163,28 +247,35 @@ void main() {
       expect(
         result.errors,
         contains(
-            'Deck commander precisa de um comandante válido no campo "commander".'),
+          'Deck commander precisa de um comandante válido no campo "commander".',
+        ),
       );
     });
 
-    test('rejects unsupported sideboard payload before resolving cards',
-        () async {
-      final repository = _FakeGeneratedDeckRepository(cardsByName: const {});
-      final service = GeneratedDeckValidationService(repository);
+    test(
+      'rejects unsupported sideboard payload before resolving cards',
+      () async {
+        final repository = _FakeGeneratedDeckRepository(cardsByName: const {});
+        final service = GeneratedDeckValidationService(repository);
 
-      final result = await service.validate(
-        format: 'commander',
-        commanderName: 'Talrand, Sky Summoner',
-        cards: [
-          {'name': 'Blue Elemental Blast', 'quantity': 1, 'zone': 'sideboard'},
-        ],
-      );
+        final result = await service.validate(
+          format: 'commander',
+          commanderName: 'Talrand, Sky Summoner',
+          cards: [
+            {
+              'name': 'Blue Elemental Blast',
+              'quantity': 1,
+              'zone': 'sideboard',
+            },
+          ],
+        );
 
-      expect(result.isValid, isFalse);
-      expect(result.errors.single, contains('não suporta sideboard'));
-      expect(repository.lastResolvedItems, isEmpty);
-      expect(result.totalSuggestedCards, equals(1));
-    });
+        expect(result.isValid, isFalse);
+        expect(result.errors.single, contains('não suporta sideboard'));
+        expect(repository.lastResolvedItems, isEmpty);
+        expect(result.totalSuggestedCards, equals(1));
+      },
+    );
 
     test('ignores commander duplicated inside cards list', () async {
       final service = GeneratedDeckValidationService(
@@ -209,8 +300,9 @@ void main() {
       );
 
       expect(result.isValid, isTrue);
-      expect(result.generatedDeck['commander'],
-          {'name': 'Isamaru, Hound of Konda'});
+      expect(result.generatedDeck['commander'], {
+        'name': 'Isamaru, Hound of Konda',
+      });
       expect((result.generatedDeck['cards'] as List).single, {
         'name': 'Plains',
         'quantity': 99,
@@ -219,9 +311,7 @@ void main() {
 
     test('deduplicates card name lookup before validation', () async {
       final repository = _FakeGeneratedDeckRepository(
-        cardsByName: {
-          'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
-        },
+        cardsByName: {'mountain': _basicLand('mountain-id', 'Mountain', 'R')},
       );
       final service = GeneratedDeckValidationService(repository);
 
@@ -276,54 +366,56 @@ void main() {
     });
 
     test(
-        'fails commander generation when unresolved cards break exact deck size',
-        () async {
-      final service = GeneratedDeckValidationService(
-        _FakeGeneratedDeckRepository(
-          cardsByName: {
-            'isamaru, hound of konda': {
-              'id': 'cmdr-id',
-              'name': 'Isamaru, Hound of Konda',
+      'fails commander generation when unresolved cards break exact deck size',
+      () async {
+        final service = GeneratedDeckValidationService(
+          _FakeGeneratedDeckRepository(
+            cardsByName: {
+              'isamaru, hound of konda': {
+                'id': 'cmdr-id',
+                'name': 'Isamaru, Hound of Konda',
+              },
+              'plains': {'id': 'plains-id', 'name': 'Plains'},
             },
-            'plains': {'id': 'plains-id', 'name': 'Plains'},
-          },
-          suggestionsByName: {
-            'Plins': ['Plains'],
-          },
-        ),
-      );
+            suggestionsByName: {
+              'Plins': ['Plains'],
+            },
+          ),
+        );
 
-      final result = await service.validate(
-        format: 'commander',
-        commanderName: 'Isamaru, Hound of Konda',
-        cards: [
-          {'name': 'Plains', 'quantity': 98},
-          {'name': 'Plins', 'quantity': 1},
-        ],
-      );
+        final result = await service.validate(
+          format: 'commander',
+          commanderName: 'Isamaru, Hound of Konda',
+          cards: [
+            {'name': 'Plains', 'quantity': 98},
+            {'name': 'Plins', 'quantity': 1},
+          ],
+        );
 
-      expect(result.isValid, isFalse);
-      expect(
-        result.errors,
-        contains(
-          'Regra violada: deck commander deve ter exatamente 100 cartas (atual: 99).',
-        ),
-      );
-      expect(result.suggestions['Plins'], equals(['Plains']));
-    });
+        expect(result.isValid, isFalse);
+        expect(
+          result.errors,
+          contains(
+            'Regra violada: deck commander deve ter exatamente 100 cartas (atual: 99).',
+          ),
+        );
+        expect(result.suggestions['Plins'], equals(['Plains']));
+      },
+    );
   });
 }
 
 Map<String, dynamic> _basicLand(String id, String name, String color) {
-  final subtype = color == 'C'
-      ? ''
-      : {
-          'W': 'Plains',
-          'U': 'Island',
-          'B': 'Swamp',
-          'R': 'Mountain',
-          'G': 'Forest',
-        }[color]!;
+  final subtype =
+      color == 'C'
+          ? ''
+          : {
+            'W': 'Plains',
+            'U': 'Island',
+            'B': 'Swamp',
+            'R': 'Mountain',
+            'G': 'Forest',
+          }[color]!;
   return {
     'id': id,
     'name': name,
@@ -378,8 +470,10 @@ class _FakeGeneratedDeckRepository implements GeneratedDeckRepository {
     required List<Map<String, dynamic>> cards,
   }) async {
     final normalizedFormat = format.trim().toLowerCase();
-    final total =
-        cards.fold<int>(0, (sum, card) => sum + (card['quantity'] as int));
+    final total = cards.fold<int>(
+      0,
+      (sum, card) => sum + (card['quantity'] as int),
+    );
     final commanders =
         cards.where((card) => card['is_commander'] == true).toList();
 
@@ -414,7 +508,8 @@ class _FakeGeneratedDeckRepository implements GeneratedDeckRepository {
     for (final card in cards) {
       final name = (card['name'] ?? '').toString();
       final typeLine = (card['type_line'] ?? '').toString().toLowerCase();
-      final isBasic = typeLine.contains('basic land') ||
+      final isBasic =
+          typeLine.contains('basic land') ||
           {
             'plains',
             'island',

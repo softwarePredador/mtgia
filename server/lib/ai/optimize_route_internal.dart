@@ -389,6 +389,7 @@ Future<void> processCompleteModeAsync({
         maxTotal: maxTotal,
         deckFormat: deckFormat,
         targetArchetype: targetArchetype,
+        bracket: bracket,
       ),
     );
 

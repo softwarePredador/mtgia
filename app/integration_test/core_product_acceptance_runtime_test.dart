@@ -8,14 +8,17 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/binder/widgets/binder_item_editor.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
+import 'package:manaloom/features/decks/models/commander_bracket.dart';
 import 'package:manaloom/features/decks/models/deck.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
+import 'package:manaloom/features/decks/screens/deck_generate_screen.dart';
 import 'package:manaloom/features/decks/screens/deck_list_screen.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_dialogs.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'visual_capture_helpers.dart';
 
@@ -49,6 +52,12 @@ const _proofCheckpoints = <String>[
   'core_10_optimization_partial_selection',
   'core_11_optimization_applied',
   'core_12_optimization_undo',
+  'core_13_commander_brackets_menu',
+  'core_14_commander_bracket_b1',
+  'core_15_commander_bracket_b2',
+  'core_16_commander_bracket_b3',
+  'core_17_commander_bracket_b4',
+  'core_18_commander_bracket_b5',
 ];
 
 Future<void> _capture(
@@ -90,6 +99,10 @@ class _FlakyCreateDeckProvider extends DeckProvider {
 
   @override
   Future<void> fetchDecks({bool silent = false}) async {}
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchCommanderLearningDecks() async =>
+      const <Map<String, dynamic>>[];
 
   @override
   Future<bool> createDeck({
@@ -440,6 +453,7 @@ class _OptimizationRuntimeHarnessState
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   setUpAll(() async {
@@ -760,4 +774,48 @@ void main() {
       await _capture(binding, tester, 'core_12_optimization_undo');
     },
   );
+
+  testWidgets('Commander generation exposes and explains every B1-B5 bracket', (
+    tester,
+  ) async {
+    binding.deviceEventDispatcher = null;
+    final decks = _FlakyCreateDeckProvider();
+    await tester.pumpWidget(
+      ChangeNotifierProvider<DeckProvider>.value(
+        value: decks,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme,
+          home: const DeckGenerateScreen(draftOwnerId: 'runtime-bracket-proof'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final bracketField = find.byKey(const Key('deck-generate-bracket-field'));
+    await tester.ensureVisible(bracketField);
+    await tester.tap(bracketField);
+    await tester.pumpAndSettle();
+    for (final option in commanderBracketOptions) {
+      expect(find.text(option.menuLabel), findsWidgets);
+    }
+    await _capture(binding, tester, 'core_13_commander_brackets_menu');
+
+    for (var index = 0; index < commanderBracketOptions.length; index += 1) {
+      final option = commanderBracketOptions[index];
+      await tester.tap(find.text(option.menuLabel).last);
+      await tester.pumpAndSettle();
+      expect(find.text(commanderBracketGuidance(option.value)), findsOneWidget);
+      await _capture(
+        binding,
+        tester,
+        'core_${14 + index}_commander_bracket_b${option.value}',
+      );
+      if (index < commanderBracketOptions.length - 1) {
+        await tester.ensureVisible(bracketField);
+        await tester.tap(bracketField);
+        await tester.pumpAndSettle();
+      }
+    }
+  });
 }

@@ -739,6 +739,7 @@ Future<int> _bootstrapSparseCompleteInput({
     cards: state.virtualDeck,
     targetArchetype: targetArchetype,
     limit: spellSlotsToFill,
+    bracket: bracket,
   );
   final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
     allCardData: state.virtualDeck,
@@ -1045,6 +1046,7 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
   required int maxTotal,
   required String deckFormat,
   required String targetArchetype,
+  int? bracket,
 }) {
   if (deckFormat.trim().toLowerCase() != 'commander') return 0;
 
@@ -1052,6 +1054,7 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
     cards: state.virtualDeck,
     targetArchetype: targetArchetype,
     limit: maxTotal,
+    bracket: bracket,
   );
   final slotsAvailable = (maxTotal - state.virtualTotal).clamp(0, maxTotal);
   final slotsToFree = (needs.length - slotsAvailable).clamp(0, maxTotal);
@@ -1064,6 +1067,14 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
     final quantity = (card['quantity'] as num?)?.toInt() ?? 1;
     roleCounts[role] = (roleCounts[role] ?? 0) + quantity;
   }
+  final structuralMinimumCounts = commanderFunctionalRoleMinimumCounts(
+    targetArchetype: targetArchetype,
+    bracket: bracket,
+  );
+  final structuralActualCounts = <String, int>{
+    for (final role in structuralMinimumCounts.keys)
+      role: countOptimizationFunctionalRole(state.virtualDeck, role: role),
+  };
 
   final removable = <MapEntry<int, Map<String, dynamic>>>[];
   for (var index = 0; index < state.virtualDeck.length; index++) {
@@ -1074,7 +1085,6 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
     if (basic_lands.isLandTypeLine(card['type_line']?.toString() ?? '')) {
       continue;
     }
-    if (inferFunctionalRoleForCard(card) == 'wipe') continue;
     removable.add(MapEntry(index, card));
   }
   removable.sort((a, b) {
@@ -1106,6 +1116,18 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
     final quantity = (card['quantity'] as num?)?.toInt() ?? 1;
     final addedQuantity = state.addedCountsById[cardId] ?? 0;
     if (addedQuantity <= 0) continue;
+    final unitCard = <String, dynamic>{...card, 'quantity': 1};
+    final structuralContributions = <String, int>{
+      for (final role in structuralMinimumCounts.keys)
+        role: countOptimizationFunctionalRole([unitCard], role: role),
+    };
+    final wouldBreakStructuralFloor = structuralContributions.entries.any(
+      (entry) =>
+          entry.value > 0 &&
+          (structuralActualCounts[entry.key] ?? 0) - entry.value <
+              (structuralMinimumCounts[entry.key] ?? 0),
+    );
+    if (wouldBreakStructuralFloor) continue;
     if (_removeOneAddedCardFromVirtualDeck(
       state: state,
       cardIndex: currentIndex,
@@ -1115,13 +1137,20 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
       addedQuantity: addedQuantity,
     )) {
       freed += 1;
+      for (final entry in structuralContributions.entries) {
+        structuralActualCounts[entry.key] =
+            (structuralActualCounts[entry.key] ?? 0) - entry.value;
+      }
+      final primaryRole = inferFunctionalRoleForCard(card);
+      roleCounts[primaryRole] = (roleCounts[primaryRole] ?? 0) - 1;
     }
   }
 
   if (freed > 0) {
     Log.i(
       'Complete role-floor rebalancing: freed=$freed '
-      'required=${needs.length} role=wipe archetype=$targetArchetype',
+      'required=${needs.length} roles=${needs.toSet().join(',')} '
+      'archetype=$targetArchetype bracket=${bracket ?? 2}',
     );
   }
   return freed;
@@ -1253,6 +1282,7 @@ Future<void> fillCompleteDeckRemainder({
         cards: state.virtualDeck,
         targetArchetype: targetArchetype,
         limit: spellsNeeded,
+        bracket: bracket,
       );
       final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
         allCardData: state.virtualDeck,
@@ -1736,6 +1766,32 @@ double _calculateAverageNonLandCmc(List<Map<String, dynamic>> cards) {
       nonLandCards.length;
 }
 
+Map<String, dynamic> _buildCompleteFunctionalRoleFloorError({
+  required CommanderFunctionalRoleFloorAssessment assessment,
+  required bool finalValidation,
+}) {
+  final deficits = assessment.deficits;
+  final singleDeficit = deficits.length == 1 ? deficits.entries.first : null;
+  final stage =
+      finalValidation
+          ? 'na validação final: a lista resolvida'
+          : 'porque a lista final';
+  return {
+    'code': 'COMPLETE_QUALITY_ROLE_FLOOR',
+    'message':
+        'Complete bloqueado $stage não cobre os pisos estruturais de '
+        'ramp, compra, interação e wipes.',
+    'functional_role_policy': assessment.toJson(),
+    'deficits': deficits,
+    if (singleDeficit != null) ...{
+      // Compatibilidade com consumidores que já exibem um único déficit.
+      'role': singleDeficit.key,
+      'actual': assessment.actualCounts[singleDeficit.key] ?? 0,
+      'minimum': assessment.minimumCounts[singleDeficit.key] ?? 0,
+    },
+  };
+}
+
 Map<String, dynamic> buildCompleteIntermediatePayload({
   required CompleteBuildAccumulator state,
   required int maxTotal,
@@ -1782,14 +1838,16 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
             cards: state.virtualDeck,
           )
           : null;
-  final requiredWipes =
+  final functionalRoleAssessment =
       deckFormat.trim().toLowerCase() == 'commander' && targetTotal > 0
-          ? buildRoleTargetProfile(targetArchetype)['wipe'] ?? 2
-          : 0;
-  final wipeCount = _countCompleteFunctionalRole(
-    state.virtualDeck,
-    role: 'wipe',
-  );
+          ? assessCommanderFunctionalRoleFloors(
+            cards: state.virtualDeck,
+            targetArchetype: targetArchetype,
+            bracket: bracket,
+          )
+          : null;
+  final requiredWipes = functionalRoleAssessment?.minimumCounts['wipe'] ?? 0;
+  final wipeCount = functionalRoleAssessment?.actualCounts['wipe'] ?? 0;
   Map<String, dynamic>? qualityError;
 
   if (addedTotal < targetTotal) {
@@ -1810,16 +1868,12 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
           'incompatíveis com o Bracket ${bracketAssessment.policy.bracket}.',
       'bracket_policy': bracketAssessment.toJson(),
     };
-  } else if (requiredWipes > 0 && wipeCount < requiredWipes) {
-    qualityError = {
-      'code': 'COMPLETE_QUALITY_ROLE_FLOOR',
-      'message':
-          'Complete bloqueado: a lista final teria apenas $wipeCount wipes; '
-          'o mínimo estrutural para $targetArchetype é $requiredWipes.',
-      'role': 'wipe',
-      'actual': wipeCount,
-      'minimum': requiredWipes,
-    };
+  } else if (functionalRoleAssessment != null &&
+      !functionalRoleAssessment.satisfied) {
+    qualityError = _buildCompleteFunctionalRoleFloorError(
+      assessment: functionalRoleAssessment,
+      finalValidation: false,
+    );
   } else if (!manaFloorAssessment.meetsMinimum) {
     qualityError = manaFloorAssessment.toQualityError(
       code: 'COMPLETE_QUALITY_LAND_FLOOR',
@@ -1865,6 +1919,8 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
     'mode': 'complete',
     'mana_foundation_satisfied': manaFloorAssessment.satisfied,
     if (bracketAssessment != null) 'bracket_policy': bracketAssessment.toJson(),
+    if (functionalRoleAssessment != null)
+      'functional_role_policy': functionalRoleAssessment.toJson(),
     'target_additions': targetTotal,
     'iterations': state.iterations,
     'additions_detailed': additionsDetailed,
@@ -1889,6 +1945,8 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
     'consistency_slo': {
       'completed_target': addedTotal >= targetTotal,
       'mana_foundation_satisfied': manaFloorAssessment.satisfied,
+      if (functionalRoleAssessment != null)
+        'functional_role_floor_satisfied': functionalRoleAssessment.satisfied,
       if (bracketAssessment != null) ...{
         'bracket_hard_compliant': bracketAssessment.hardCompliant,
         'game_changer_count':
@@ -2126,14 +2184,14 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     String value => int.tryParse(value.trim()) ?? 0,
     _ => 0,
   };
-  final requiredFinalWipes =
+  final finalFunctionalRoleAssessment =
       deckFormat.trim().toLowerCase() == 'commander' && targetAdditionCount > 0
-          ? buildRoleTargetProfile(targetArchetype)['wipe'] ?? 2
-          : 0;
-  final finalWipeCount = _countCompleteFunctionalRole([
-    ...originalDeck,
-    ...resolvedAdditionsForFloor,
-  ], role: 'wipe');
+          ? assessCommanderFunctionalRoleFloors(
+            cards: [...originalDeck, ...resolvedAdditionsForFloor],
+            targetArchetype: targetArchetype,
+            bracket: bracket,
+          )
+          : null;
   final responseBody = <String, dynamic>{
     'mode': 'complete',
     'mana_foundation_satisfied': finalManaFloorAssessment.satisfied,
@@ -2142,6 +2200,8 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     'bracket': bracket,
     if (finalBracketAssessment != null)
       'bracket_policy': finalBracketAssessment.toJson(),
+    if (finalFunctionalRoleAssessment != null)
+      'functional_role_policy': finalFunctionalRoleAssessment.toJson(),
     'target_additions': jsonResponse['target_additions'],
     'iterations': jsonResponse['iterations'],
     'additions':
@@ -2179,21 +2239,16 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       ..['can_apply'] = false
       ..['learning_eligible'] = false
       ..['apply_blockers'] = ['commander_bracket_policy_violation'];
-  } else if (requiredFinalWipes > 0 && finalWipeCount < requiredFinalWipes) {
+  } else if (finalFunctionalRoleAssessment != null &&
+      !finalFunctionalRoleAssessment.satisfied) {
     responseBody
-      ..['quality_error'] = {
-        'code': 'COMPLETE_QUALITY_ROLE_FLOOR',
-        'message':
-            'Complete bloqueado na validação final: a lista resolvida teria '
-            'apenas $finalWipeCount wipes; o mínimo estrutural é '
-            '$requiredFinalWipes.',
-        'role': 'wipe',
-        'actual': finalWipeCount,
-        'minimum': requiredFinalWipes,
-      }
+      ..['quality_error'] = _buildCompleteFunctionalRoleFloorError(
+        assessment: finalFunctionalRoleAssessment,
+        finalValidation: true,
+      )
       ..['can_apply'] = false
       ..['learning_eligible'] = false
-      ..['apply_blockers'] = ['commander_wipe_floor_not_met'];
+      ..['apply_blockers'] = ['commander_functional_role_floor_not_met'];
   } else if (!finalManaFloorAssessment.satisfied) {
     final excessive = finalManaFloorAssessment.hasSevereExcess;
     responseBody
@@ -2239,6 +2294,8 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       landCount: finalManaFloorAssessment.landCount,
       satisfied: finalManaFloorAssessment.satisfied,
     ),
+    if (finalFunctionalRoleAssessment != null)
+      'functional_role_policy': finalFunctionalRoleAssessment.toJson(),
   };
   responseBody['battle_validation'] =
       (responseBody['optimization_contract'] as Map)['battle_validation'];
@@ -2267,8 +2324,13 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       'land_count': finalManaFloorAssessment.landCount,
       'minimum_land_count': finalManaFloorAssessment.minimumLandCount,
       'land_floor_satisfied': finalManaFloorAssessment.satisfied,
-      'wipe_count': finalWipeCount,
-      'minimum_wipe_count': requiredFinalWipes,
+      if (finalFunctionalRoleAssessment != null) ...{
+        'functional_role_floor_satisfied':
+            finalFunctionalRoleAssessment.satisfied,
+        'wipe_count': finalFunctionalRoleAssessment.actualCounts['wipe'] ?? 0,
+        'minimum_wipe_count':
+            finalFunctionalRoleAssessment.minimumCounts['wipe'] ?? 0,
+      },
       if (finalBracketAssessment != null) ...{
         'bracket_hard_compliant': finalBracketAssessment.hardCompliant,
         'game_changer_count':
@@ -2294,21 +2356,4 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   }
 
   return responseBody;
-}
-
-int _countCompleteFunctionalRole(
-  Iterable<Map<String, dynamic>> cards, {
-  required String role,
-}) {
-  var count = 0;
-  for (final card in cards) {
-    if (inferFunctionalRoleForCard(card) != role) continue;
-    final quantity = switch (card['quantity']) {
-      int value => value,
-      num value => value.toInt(),
-      _ => 1,
-    };
-    count += quantity > 0 ? quantity : 1;
-  }
-  return count;
 }

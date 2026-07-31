@@ -165,6 +165,124 @@ void main() {
     expect(runtime.createdRequests, isEmpty);
   });
 
+  test(
+    'transient runtime read failure preserves the active durable session',
+    () async {
+      final store = _Store();
+      final runtime = _Runtime(failReadsTransiently: true);
+      final persistence = _Persistence();
+      final service = _service(
+        store: store,
+        runtime: runtime,
+        persistence: persistence,
+      );
+
+      final created = await service.create(
+        userId: _userId,
+        input: const InteractiveBattleCreateInput(
+          deckId: _deckAId,
+          opponentDeckId: _deckBId,
+          ttlSeconds: 600,
+          promptTimeoutSeconds: 60,
+          idempotencyKey: 'create-before-transient-read',
+        ),
+      );
+
+      await expectLater(
+        service.get(_userId, created.session.id),
+        throwsA(
+          isA<InteractiveBattleRuntimeException>()
+              .having((error) => error.code, 'code', 'runtime_transport_failed')
+              .having((error) => error.processLost, 'processLost', isFalse),
+        ),
+      );
+
+      expect(store.current?.status, InteractiveBattleStatus.waitingForAction);
+      expect(persistence.finishedStatuses, isEmpty);
+    },
+  );
+
+  test(
+    'idempotent retries resend an action and concede after lost responses',
+    () async {
+      final store = _Store();
+      final runtime = _Runtime(
+        failFirstResponseTransiently: true,
+        failFirstConcedeTransiently: true,
+      );
+      final persistence = _Persistence();
+      final service = _service(
+        store: store,
+        runtime: runtime,
+        persistence: persistence,
+      );
+      final created = await service.create(
+        userId: _userId,
+        input: const InteractiveBattleCreateInput(
+          deckId: _deckAId,
+          opponentDeckId: _deckBId,
+          ttlSeconds: 600,
+          promptTimeoutSeconds: 60,
+          idempotencyKey: 'create-before-idempotent-retry',
+        ),
+      );
+      final prompt = created.session.prompt!;
+      final action = InteractiveBattleActionInput(
+        stateVersion: prompt.stateVersion,
+        promptId: prompt.id,
+        responseKind: InteractiveBattleResponseKind.option,
+        optionId: prompt.options.single.id,
+        idempotencyKey: 'action-idempotent-retry-1',
+      );
+
+      await expectLater(
+        service.respond(
+          userId: _userId,
+          id: created.session.id,
+          action: action,
+        ),
+        throwsA(
+          isA<InteractiveBattleRuntimeException>().having(
+            (error) => error.code,
+            'code',
+            'runtime_transport_failed',
+          ),
+        ),
+      );
+      final retriedAction = await service.respond(
+        userId: _userId,
+        id: created.session.id,
+        action: action,
+      );
+      expect(retriedAction.status.isTerminal, isFalse);
+      expect(runtime.responseAttempts, 2);
+
+      await expectLater(
+        service.concede(
+          userId: _userId,
+          id: created.session.id,
+          idempotencyKey: 'concede-idempotent-retry-1',
+        ),
+        throwsA(
+          isA<InteractiveBattleRuntimeException>().having(
+            (error) => error.code,
+            'code',
+            'runtime_transport_failed',
+          ),
+        ),
+      );
+      final conceded = await service.concede(
+        userId: _userId,
+        id: created.session.id,
+        idempotencyKey: 'concede-idempotent-retry-1',
+      );
+
+      expect(runtime.concedeAttempts, 2);
+      expect(conceded.status, InteractiveBattleStatus.conceded);
+      expect(conceded.replayId, _replayId);
+    },
+  );
+
   test('concede persists and links the partial public replay', () async {
     final store = _Store();
     final runtime = _Runtime();
@@ -250,10 +368,20 @@ class _DeckStore implements BattleJobStoreApi {
 }
 
 class _Runtime implements InteractiveBattleRuntime {
-  _Runtime({this.corruptRequestHash = false});
+  _Runtime({
+    this.corruptRequestHash = false,
+    this.failReadsTransiently = false,
+    this.failFirstResponseTransiently = false,
+    this.failFirstConcedeTransiently = false,
+  });
 
   final bool corruptRequestHash;
+  final bool failReadsTransiently;
+  final bool failFirstResponseTransiently;
+  final bool failFirstConcedeTransiently;
   final List<Map<String, dynamic>> createdRequests = [];
+  int responseAttempts = 0;
+  int concedeAttempts = 0;
 
   @override
   Future<InteractiveBattleRuntimeSnapshot> create(
@@ -272,6 +400,13 @@ class _Runtime implements InteractiveBattleRuntime {
     String runtimeSessionId, {
     required String actionId,
   }) async {
+    concedeAttempts += 1;
+    if (failFirstConcedeTransiently && concedeAttempts == 1) {
+      throw const InteractiveBattleRuntimeException(
+        'runtime_transport_failed',
+        retryable: true,
+      );
+    }
     final request = createdRequests.single;
     return _snapshot(
       requestId: request['request_id'] as String,
@@ -283,6 +418,40 @@ class _Runtime implements InteractiveBattleRuntime {
         'events': <Map<String, dynamic>>[],
         'snapshots': <Map<String, dynamic>>[],
       },
+    );
+  }
+
+  @override
+  Future<InteractiveBattleRuntimeSnapshot> respond(
+    String runtimeSessionId,
+    InteractiveBattleActionInput action,
+  ) async {
+    responseAttempts += 1;
+    if (failFirstResponseTransiently && responseAttempts == 1) {
+      throw const InteractiveBattleRuntimeException(
+        'runtime_transport_failed',
+        retryable: true,
+      );
+    }
+    final request = createdRequests.single;
+    return _snapshot(
+      requestId: request['request_id'] as String,
+      requestHash: request['request_hash'] as String,
+    );
+  }
+
+  @override
+  Future<InteractiveBattleRuntimeSnapshot> read(String runtimeSessionId) async {
+    if (failReadsTransiently) {
+      throw const InteractiveBattleRuntimeException(
+        'runtime_transport_failed',
+        retryable: true,
+      );
+    }
+    final request = createdRequests.single;
+    return _snapshot(
+      requestId: request['request_id'] as String,
+      requestHash: request['request_hash'] as String,
     );
   }
 
@@ -345,6 +514,12 @@ class _Store implements InteractiveBattleStoreApi {
   final bool failAttemptAttachment;
   InteractiveBattleSession? current;
   String? attachedAttemptId;
+  final Set<String> actionKeys = <String>{};
+  final Set<String> concedeKeys = <String>{};
+
+  @override
+  Future<InteractiveBattleSession?> get(String userId, String id) async =>
+      current?.id == id && current?.userId == userId ? current : null;
 
   @override
   Future<InteractiveBattleCreateResult> create(
@@ -404,8 +579,21 @@ class _Store implements InteractiveBattleStoreApi {
     required String id,
     required String idempotencyKey,
     required String requestFingerprint,
-  }) async =>
-      InteractiveBattleConcedeReservation(session: current!, duplicate: false);
+  }) async => InteractiveBattleConcedeReservation(
+    session: current!,
+    duplicate: !concedeKeys.add(idempotencyKey),
+  );
+
+  @override
+  Future<InteractiveBattleActionReservation> reserveAction({
+    required String userId,
+    required String id,
+    required InteractiveBattleActionInput action,
+  }) async => InteractiveBattleActionReservation(
+    session: current!,
+    prompt: current!.prompt,
+    duplicate: !actionKeys.add(action.idempotencyKey),
+  );
 
   @override
   Future<InteractiveBattleSession> terminalize({
@@ -433,7 +621,7 @@ InteractiveBattleSession _session({
   required String requestHash,
   required InteractiveBattleStatus status,
 }) {
-  final now = DateTime.parse('2026-07-27T12:00:00Z');
+  final now = DateTime.now().toUtc();
   return InteractiveBattleSession(
     id: id,
     userId: _userId,

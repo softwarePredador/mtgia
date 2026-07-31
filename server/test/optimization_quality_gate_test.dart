@@ -1013,6 +1013,116 @@ void main() {
       expect(result.additions, const ['Decree of Pain']);
     });
 
+    test(
+      'keeps every exact structural repair when persisted tags are partial',
+      () {
+        final originalDeck = [
+          _card(
+            name: 'Plains',
+            typeLine: 'Basic Land — Plains',
+            manaCost: '',
+            cmc: 0,
+            oracleText: '{T}: Add {W}.',
+            quantity: 36,
+          ),
+          _card(
+            name: 'Arcane Signet',
+            typeLine: 'Artifact',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: '{T}: Add one mana of any color.',
+            quantity: 6,
+          ),
+          _card(
+            name: 'Reliable Insight',
+            typeLine: 'Sorcery',
+            manaCost: '{2}{U}',
+            cmc: 3,
+            oracleText: 'Draw two cards.',
+            quantity: 8,
+          ),
+          _card(
+            name: 'Reliable Answer',
+            typeLine: 'Instant',
+            manaCost: '{1}{W}',
+            cmc: 2,
+            oracleText: 'Exile target creature.',
+            quantity: 6,
+          ),
+          for (final name in const [
+            'Expensive Finisher One',
+            'Expensive Finisher Two',
+            'Expensive Finisher Three',
+            'Expensive Finisher Four',
+          ])
+            _card(
+              name: name,
+              typeLine: 'Creature — Avatar',
+              manaCost: '{6}{G}{G}',
+              cmc: 8,
+              oracleText: 'Trample. When this enters, you win the game.',
+            ),
+          _card(
+            name: 'Plan Filler',
+            typeLine: 'Creature',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: 'Vigilance.',
+            quantity: 40,
+          ),
+        ];
+        final additions = [
+          for (final name in const ['Measured Growth', 'Patient Cultivation'])
+            _card(
+              name: name,
+              typeLine: 'Sorcery',
+              manaCost: '{2}{G}',
+              cmc: 3,
+              oracleText:
+                  'Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.',
+              functionalTags: const [
+                {'tag': 'utility', 'confidence': 0.99, 'source': 'persisted'},
+              ],
+            ),
+          for (final name in const ['Measured Reset', 'Patient Reckoning'])
+            _card(
+              name: name,
+              typeLine: 'Sorcery',
+              manaCost: '{4}{W}',
+              cmc: 5,
+              oracleText: 'Destroy all creatures.',
+              functionalTags: const [
+                {'tag': 'utility', 'confidence': 0.99, 'source': 'persisted'},
+              ],
+            ),
+        ];
+
+        final result = filterUnsafeOptimizeSwapsByCardData(
+          removals: const [
+            'Expensive Finisher One',
+            'Expensive Finisher Two',
+            'Expensive Finisher Three',
+            'Expensive Finisher Four',
+          ],
+          additions: const [
+            'Measured Growth',
+            'Patient Cultivation',
+            'Measured Reset',
+            'Patient Reckoning',
+          ],
+          originalDeck: originalDeck,
+          additionsData: additions,
+          archetype: 'midrange',
+          deckFormat: 'commander',
+          bracket: 2,
+        );
+
+        expect(result.droppedReasons, isEmpty);
+        expect(result.removals, hasLength(4));
+        expect(result.additions, hasLength(4));
+      },
+    );
+
     test('does not sacrifice critical ramp to repair the wipe floor', () {
       final originalDeck = [
         _card(

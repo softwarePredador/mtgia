@@ -4,6 +4,57 @@ import 'optimize_filler_loader_support.dart';
 import 'optimize_functional_role_support.dart';
 import 'optimization_ramp_profile.dart';
 
+Map<String, int> _criticalRoleContributions(Map<String, dynamic> card) => {
+  for (final role in commanderCriticalFunctionalRoleNames)
+    role: countOptimizationFunctionalRole([
+      {...card, 'quantity': 1},
+    ], role: role),
+};
+
+List<Map<String, dynamic>> _selectRemovalCandidatesWithoutBreakingRoleFloors({
+  required List<Map<String, dynamic>> candidates,
+  required List<Map<String, dynamic>> allCardData,
+  required String targetArchetype,
+  required int maxCount,
+  int? bracket,
+}) {
+  if (maxCount <= 0 || candidates.isEmpty) return const [];
+
+  final assessment = assessCommanderFunctionalRoleFloors(
+    cards: allCardData,
+    targetArchetype: targetArchetype,
+    bracket: bracket,
+  );
+  if (!assessment.applies) {
+    return candidates.take(maxCount).toList(growable: false);
+  }
+
+  final remainingCounts = Map<String, int>.from(assessment.actualCounts);
+  final selected = <Map<String, dynamic>>[];
+  for (final candidate in candidates) {
+    if (selected.length >= maxCount) break;
+
+    final contributions = _criticalRoleContributions(candidate);
+    final forcedBracketRepair = candidate['bracket_violation'] == true;
+    final wouldBreakFloor =
+        !forcedBracketRepair &&
+        contributions.entries.any(
+          (entry) =>
+              entry.value > 0 &&
+              (remainingCounts[entry.key] ?? 0) - entry.value <
+                  (assessment.minimumCounts[entry.key] ?? 0),
+        );
+    if (wouldBreakFloor) continue;
+
+    selected.add({...candidate, 'critical_role_contributions': contributions});
+    for (final entry in contributions.entries) {
+      remainingCounts[entry.key] =
+          (remainingCounts[entry.key] ?? 0) - entry.value;
+    }
+  }
+  return selected;
+}
+
 List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required List<Map<String, dynamic>> allCardData,
   required List<String> commanders,
@@ -330,10 +381,15 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         bracketViolationRemovalNames.length > structuralTakeLimit
             ? bracketViolationRemovalNames.length.clamp(1, effectiveSwapLimit)
             : structuralTakeLimit;
-    return removalCandidates
-        .where((candidate) => (candidate['score'] as int) > 0)
-        .take(takeLimit)
-        .toList();
+    return _selectRemovalCandidatesWithoutBreakingRoleFloors(
+      candidates: removalCandidates
+          .where((candidate) => (candidate['score'] as int) > 0)
+          .toList(growable: false),
+      allCardData: allCardData,
+      targetArchetype: targetArchetype,
+      bracket: bracket,
+      maxCount: takeLimit,
+    );
   }
 
   if (allCardData.isEmpty) return const [];
@@ -390,5 +446,11 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       bracketRepairCount > baseTakeCount
           ? bracketRepairCount.clamp(1, effectiveSwapLimit)
           : baseTakeCount;
-  return merged.take(takeCount).toList();
+  return _selectRemovalCandidatesWithoutBreakingRoleFloors(
+    candidates: merged,
+    allCardData: allCardData,
+    targetArchetype: targetArchetype,
+    bracket: bracket,
+    maxCount: takeCount,
+  );
 }
