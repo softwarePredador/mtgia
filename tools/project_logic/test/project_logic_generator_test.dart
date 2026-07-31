@@ -55,6 +55,11 @@ void main() {
       semantic['resolved_type_references_scope'],
       'workspace_targets_only',
     );
+
+    final semanticJson = jsonEncode(semantic);
+    expect(semanticJson, isNot(contains(root.absolute.path)));
+    expect(semanticJson, isNot(contains('file://')));
+    expect(semanticJson, contains('workspace:server/bin/'));
   });
 
   test('includes integration tests in inventory and source digest lineage', () {

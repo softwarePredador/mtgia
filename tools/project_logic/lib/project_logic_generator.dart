@@ -11,10 +11,11 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
-const _generatorVersion = '1.2.1';
+const _generatorVersion = '1.2.2';
 
-// These packages have versioned lockfiles. Tool-package lockfiles are ignored
-// by repository policy and must never make lineage depend on local pub state.
+// Product dependency inventory remains scoped to deployable packages.
+// Release-tool lockfiles are versioned for reproducible gates, but are not
+// presented as application/runtime dependencies in the generated system map.
 const _canonicalResolvedPubspecPaths = <String>[
   'app/pubspec.yaml',
   'pubspec.yaml',
@@ -659,6 +660,7 @@ class ProjectLogicGenerator {
           final visitor = _ProjectLogicSemanticVisitor(
             source: source,
             lineInfo: analysis.lineInfo,
+            workspaceRoot: root.absolute.path,
           );
           analysis.unit.accept(visitor);
           _mergeSemanticAggregates(resolvedCalls, visitor.resolvedCalls);
@@ -2037,10 +2039,15 @@ class _ProjectLogicAstVisitor extends RecursiveAstVisitor<void> {
 }
 
 class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
-  _ProjectLogicSemanticVisitor({required this.source, required this.lineInfo});
+  _ProjectLogicSemanticVisitor({
+    required this.source,
+    required this.lineInfo,
+    required String workspaceRoot,
+  }) : workspaceRoot = p.normalize(workspaceRoot);
 
   final String source;
   final LineInfo lineInfo;
+  final String workspaceRoot;
   final resolvedCalls = <String, Map<String, Object?>>{};
   final unresolvedCalls = <String, Map<String, Object?>>{};
   final resolvedTypes = <String, Map<String, Object?>>{};
@@ -2096,6 +2103,9 @@ class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
         keyParts: [source, node.toSource()],
       );
     } else {
+      final targetLibrary = _canonicalLibraryUri(
+        element.library?.uri.toString(),
+      );
       _upsert(
         resolvedTypes,
         {
@@ -2104,15 +2114,10 @@ class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
           'lexical_type': node.toSource(),
           'resolved_type': resolvedType,
           'target': _qualifiedElementName(element),
-          'target_library': element.library?.uri.toString(),
-          'target_scope': _targetScope(element.library?.uri.toString()),
+          'target_library': targetLibrary,
+          'target_scope': _targetScope(targetLibrary),
         },
-        keyParts: [
-          source,
-          node.toSource(),
-          resolvedType,
-          element.library?.uri.toString() ?? '',
-        ],
+        keyParts: [source, node.toSource(), resolvedType, targetLibrary ?? ''],
       );
     }
     super.visitNamedType(node);
@@ -2139,7 +2144,7 @@ class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
       );
       return;
     }
-    final targetLibrary = element.library?.uri.toString();
+    final targetLibrary = _canonicalLibraryUri(element.library?.uri.toString());
     _upsert(
       resolvedCalls,
       {
@@ -2207,9 +2212,26 @@ class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
     return parts.reversed.join('.');
   }
 
+  String? _canonicalLibraryUri(String? library) {
+    if (library == null) return null;
+    final uri = Uri.tryParse(library);
+    if (uri == null || uri.scheme != 'file') return library;
+
+    final targetPath = p.normalize(File.fromUri(uri).absolute.path);
+    if (!p.equals(targetPath, workspaceRoot) &&
+        !p.isWithin(workspaceRoot, targetPath)) {
+      return library;
+    }
+    final relative = p
+        .relative(targetPath, from: workspaceRoot)
+        .replaceAll(r'\', '/');
+    return 'workspace:$relative';
+  }
+
   String _targetScope(String? library) {
     if (library == null) return 'unknown';
     if (library.startsWith('dart:')) return 'dart_sdk';
+    if (library.startsWith('workspace:')) return 'workspace';
     if (library.startsWith('package:manaloom/') ||
         library.startsWith('package:server/')) {
       return 'workspace';
