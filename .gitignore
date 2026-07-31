@@ -71,9 +71,12 @@ app/playwright-report/
 app/test-results/
 *.xcresult/
 
-# Package lockfiles are versioned for deployable apps (root/app/server), but
-# custom lint packages are reusable libraries and keep local resolution only.
+# Package lockfiles are versioned for deployable apps (root/app/server).
+# Tool packages are ignored by default, except the two release-gate packages
+# whose scripts intentionally use `pub get --enforce-lockfile`.
 tools/*/pubspec.lock
+!tools/manaloom_lints/pubspec.lock
+!tools/project_logic/pubspec.lock
 
 # Local server test artifacts
 server/test/artifacts/*
