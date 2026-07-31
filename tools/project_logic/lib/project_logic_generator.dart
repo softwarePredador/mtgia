@@ -2043,7 +2043,9 @@ class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
     required this.source,
     required this.lineInfo,
     required String workspaceRoot,
-  }) : workspaceRoot = p.normalize(workspaceRoot);
+  }) : workspaceRoot = p.normalize(
+         Directory(workspaceRoot).resolveSymbolicLinksSync(),
+       );
 
   final String source;
   final LineInfo lineInfo;
