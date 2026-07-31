@@ -396,6 +396,7 @@ grep -Fq 'scanner_release_enabled: false' "$ROOT_DIR/scripts/manaloom_build_andr
 ! grep -Fq 'ENABLE_SCANNER_RELEASE=true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 ! grep -Fq 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'android.permission.CAMERA' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
+grep -Fq 'android.hardware.camera.any' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
 grep -Fq 'tools:node="remove"' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
 grep -Fq 'Scanner DEFERRED_BY_SCOPE' "$ROOT_DIR/scripts/manaloom_verify_android_release_artifacts.sh"
 grep -Fq 'manaloom_build_android_release.sh' "$ROOT_DIR/scripts/manaloom_local_ci.sh"

@@ -102,6 +102,7 @@ void main() {
       contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
     );
     expect(releaseManifest, contains('android.permission.CAMERA'));
+    expect(releaseManifest, contains('android.hardware.camera.any'));
     expect(releaseManifest, contains('tools:node="remove"'));
     expect(
       verifier,

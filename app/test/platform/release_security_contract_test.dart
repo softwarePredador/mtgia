@@ -43,11 +43,12 @@ void main() {
     );
     expect(
       RegExp(
-        'android:name="android\\.hardware\\.camera(?:\\.autofocus)?"\\s+'
+        'android:name="android\\.hardware\\.camera(?:\\.autofocus|\\.any)?"\\s+'
         'tools:node="remove"',
       ).allMatches(releaseManifest),
-      hasLength(2),
+      hasLength(3),
     );
+    expect(releaseManifest, contains('android.hardware.camera.any'));
     expect(
       verifier,
       contains(

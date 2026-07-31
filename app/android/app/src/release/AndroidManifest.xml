@@ -10,4 +10,7 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         tools:node="remove" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        tools:node="remove" />
 </manifest>
