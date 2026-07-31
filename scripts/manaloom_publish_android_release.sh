@@ -218,21 +218,30 @@ jq -e \
   exit 1
 }
 
-jq -e --arg aab_sha256 "$AAB_HASH" '
+jq -e \
+  --arg aab_sha256 "$AAB_HASH" \
+  --arg engine_revision "$MANALOOM_RELEASE_FLUTTER_ENGINE_REVISION" '
   ([.metadata.component.properties[] |
     select(.name == "manaloom:gradle-aab-dependency-parity") |
-    .value] == ["exact-bidirectional-match"]) and
+    .value] == ["locked-runtime-plus-pinned-flutter-engine-abis-exact-match"]) and
   ([.metadata.component.properties[] |
     select(.name == "manaloom:android-release-artifact-sha256") |
     .value] == [$aab_sha256]) and
   ([.metadata.component.properties[] |
     select(.name == "manaloom:android-release-artifact-dependency-count") |
     .value][0] | tonumber) as $aab_count |
+  ([.metadata.component.properties[] |
+    select(.name == "manaloom:flutter-native-release-component-count") |
+    .value] == ["3"]) and
+  ([.metadata.component.properties[] |
+    select(.name == "manaloom:flutter-engine-revision") |
+    .value] == [$engine_revision]) and
   ([.components[] |
     select(.scope == "required") |
     select(any(.properties[];
-      .name == "manaloom:dependency-lock" and
-      .value == "gradle.lockfile"))] | length) as $release_count |
+      .name == "manaloom:dependency-scope" and
+      (.value == "android-release-runtime" or
+       .value == "android-release-native-runtime")))] | length) as $release_count |
   $release_count > 0 and $release_count == $aab_count
 ' "$SBOM" >/dev/null || {
   echo "publicacao recusada: SBOM nao prova paridade exata entre Gradle lock e AAB" >&2

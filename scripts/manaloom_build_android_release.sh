@@ -232,6 +232,7 @@ python3 "$WORKTREE_DIR/scripts/manaloom_generate_release_sbom.py" \
   --dart-bin "$MANALOOM_RELEASE_DART_BIN_RESOLVED" \
   --gradle-lock "$WORKTREE_DIR/app/android/app/gradle.lockfile" \
   --android-release-artifact "$AAB" \
+  --flutter-engine-revision "$MANALOOM_RELEASE_FLUTTER_ENGINE_REVISION" \
   --git-sha "$SHA" \
   --source-committed-at "$SOURCE_COMMITTED_AT" \
   --output "$RELEASE_DIR/sbom.cdx.json" >/dev/null

@@ -604,6 +604,11 @@ _GRADLE_RELEASE_RUNTIME_CONFIGURATION = "releaseRuntimeClasspath"
 _AAB_DEPENDENCY_METADATA = (
     "BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb"
 )
+_FLUTTER_ANDROID_RELEASE_ABI_ARTIFACTS = (
+    ("arm64_v8a_release", "arm64-v8a"),
+    ("armeabi_v7a_release", "armeabi-v7a"),
+    ("x86_64_release", "x86_64"),
+)
 
 
 def _gradle_components(gradle_lock: Path | None) -> list[dict[str, Any]]:
@@ -834,8 +839,71 @@ def _aab_maven_coordinates(aab: Path) -> set[tuple[str, str, str]]:
     return coordinates
 
 
+def _flutter_android_release_components(
+    engine_revision: str,
+) -> list[dict[str, Any]]:
+    """Describe the ABI-specific Flutter engine artifacts shipped in the AAB.
+
+    Flutter's Gradle integration deliberately keeps the mutually-exclusive ABI
+    artifacts outside dependency lock-state matching.  The final app bundle,
+    however, records every shipped ABI in ``dependencies.pb``.  Bind those
+    components to the independently pinned Flutter engine revision so the SBOM
+    inventories them without allowing arbitrary AAB-only Maven coordinates.
+    """
+    if not re.fullmatch(r"[0-9a-f]{40}", engine_revision):
+        raise ValueError(
+            "flutter engine revision deve ser um SHA-1 completo em hexadecimal"
+        )
+
+    version = f"1.0.0-{engine_revision}"
+    components: list[dict[str, Any]] = []
+    for name, abi in _FLUTTER_ANDROID_RELEASE_ABI_ARTIFACTS:
+        encoded_name = urllib.parse.quote(name, safe="")
+        encoded_version = urllib.parse.quote(version, safe=".+_-")
+        components.append(
+            {
+                "type": "library",
+                "group": "io.flutter",
+                "name": name,
+                "version": version,
+                "scope": "required",
+                "bom-ref": f"pkg:maven/io.flutter/{encoded_name}@{encoded_version}",
+                "purl": f"pkg:maven/io.flutter/{encoded_name}@{encoded_version}",
+                "properties": [
+                    {
+                        "name": "manaloom:dependency-scope",
+                        "value": "android-release-native-runtime",
+                    },
+                    {
+                        "name": "manaloom:dependency-pin",
+                        "value": "pinned-flutter-engine-revision",
+                    },
+                    {
+                        "name": "manaloom:flutter-engine-revision",
+                        "value": engine_revision,
+                    },
+                    {
+                        "name": "manaloom:android-target-abi",
+                        "value": abi,
+                    },
+                    {
+                        "name": "manaloom:release-membership-evidence",
+                        "value": (
+                            "aab-dependencies.pb+"
+                            "pinned-flutter-engine-revision"
+                        ),
+                    },
+                ],
+            }
+        )
+    return components
+
+
 def _validate_gradle_aab_parity(
-    gradle_components: list[dict[str, Any]], aab: Path
+    gradle_components: list[dict[str, Any]],
+    aab: Path,
+    *,
+    flutter_engine_revision: str | None = None,
 ) -> int:
     gradle_release_coordinates = {
         (
@@ -846,9 +914,47 @@ def _validate_gradle_aab_parity(
         for component in gradle_components
         if component.get("scope") == "required"
     }
+    flutter_native_coordinates = (
+        {
+            (
+                str(component["group"]),
+                str(component["name"]),
+                str(component["version"]),
+            )
+            for component in _flutter_android_release_components(
+                flutter_engine_revision
+            )
+        }
+        if flutter_engine_revision is not None
+        else set()
+    )
+    if flutter_engine_revision is not None:
+        expected_embedding_coordinate = {
+            (
+                "io.flutter",
+                "flutter_embedding_release",
+                f"1.0.0-{flutter_engine_revision}",
+            )
+        }
+        locked_embedding_coordinates = {
+            coordinate
+            for coordinate in gradle_release_coordinates
+            if coordinate[0] == "io.flutter"
+            and coordinate[1] == "flutter_embedding_release"
+        }
+        if locked_embedding_coordinates != expected_embedding_coordinate:
+            raise ValueError(
+                "flutter engine revision diverge do "
+                "flutter_embedding_release no releaseRuntimeClasspath: "
+                f"esperado={sorted(expected_embedding_coordinate)}; "
+                f"encontrado={sorted(locked_embedding_coordinates)}"
+            )
+    expected_coordinates = (
+        gradle_release_coordinates | flutter_native_coordinates
+    )
     aab_coordinates = _aab_maven_coordinates(aab)
-    missing_from_aab = sorted(gradle_release_coordinates - aab_coordinates)
-    unexpected_in_aab = sorted(aab_coordinates - gradle_release_coordinates)
+    missing_from_aab = sorted(expected_coordinates - aab_coordinates)
+    unexpected_in_aab = sorted(aab_coordinates - expected_coordinates)
     if missing_from_aab or unexpected_in_aab:
         details: list[str] = []
         if missing_from_aab:
@@ -911,6 +1017,7 @@ def main() -> int:
     parser.add_argument("--package-lock", type=Path)
     parser.add_argument("--gradle-lock", type=Path)
     parser.add_argument("--android-release-artifact", type=Path)
+    parser.add_argument("--flutter-engine-revision")
     parser.add_argument("--battle-sidecars-root", type=Path)
     parser.add_argument("--include-dev", action="store_true")
     parser.add_argument("--git-sha", required=True)
@@ -951,16 +1058,36 @@ def main() -> int:
         gradle_components
     )
     aab_dependency_count: int | None = None
+    flutter_native_components: list[dict[str, Any]] = []
     if args.android_release_artifact:
         if not gradle_components:
             parser.error("android-release-artifact exige gradle-lock")
+        if not args.flutter_engine_revision:
+            parser.error(
+                "android-release-artifact exige flutter-engine-revision"
+            )
+        try:
+            flutter_native_components = (
+                _flutter_android_release_components(
+                    args.flutter_engine_revision
+                )
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
         aab_dependency_count = _validate_gradle_aab_parity(
-            gradle_components, args.android_release_artifact
+            gradle_components,
+            args.android_release_artifact,
+            flutter_engine_revision=args.flutter_engine_revision,
+        )
+    elif args.flutter_engine_revision:
+        parser.error(
+            "flutter-engine-revision exige android-release-artifact"
         )
     components = _deduplicate(
         dart_components
         + _npm_components(args.package_lock)
         + gradle_components
+        + flutter_native_components
         + sidecar_components
     )
     version = _app_version(pubspec)
@@ -978,6 +1105,11 @@ def main() -> int:
                     "flutter-dart-runtime+android-gradle-release-runtime"
                     if gradle_components
                     else "flutter-dart-runtime"
+                )
+                + (
+                    "+flutter-engine-native-runtime"
+                    if flutter_native_components
+                    else ""
                 )
                 + (
                     "+battle-sidecar-source-supply-chain"
@@ -1056,8 +1188,19 @@ def main() -> int:
                     "value": str(aab_dependency_count),
                 },
                 {
+                    "name": "manaloom:flutter-native-release-component-count",
+                    "value": str(len(flutter_native_components)),
+                },
+                {
+                    "name": "manaloom:flutter-engine-revision",
+                    "value": str(args.flutter_engine_revision),
+                },
+                {
                     "name": "manaloom:gradle-aab-dependency-parity",
-                    "value": "exact-bidirectional-match",
+                    "value": (
+                        "locked-runtime-plus-pinned-flutter-engine-abis-"
+                        "exact-match"
+                    ),
                 },
             ]
         )

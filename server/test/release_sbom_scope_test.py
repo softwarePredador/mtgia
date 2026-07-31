@@ -73,6 +73,8 @@ def _dependency_metadata(coordinates: list[tuple[str, str, str]]) -> bytes:
 
 
 class ReleaseSbomScopeTest(unittest.TestCase):
+    engine_revision = "a" * 40
+
     def setUp(self) -> None:
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary_directory.cleanup)
@@ -284,6 +286,133 @@ class ReleaseSbomScopeTest(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "diverge"):
             SBOM._validate_gradle_aab_parity(components, unexpected)
+
+    def test_aab_parity_includes_exact_pinned_flutter_native_abis(self) -> None:
+        components = self._components(
+            [
+                "com.example:runtime:1.0=releaseRuntimeClasspath",
+                (
+                    "io.flutter:flutter_embedding_release:"
+                    f"1.0.0-{self.engine_revision}=releaseRuntimeClasspath"
+                ),
+            ]
+        )
+        flutter_components = SBOM._flutter_android_release_components(
+            self.engine_revision
+        )
+        flutter_coordinates = [
+            (
+                component["group"],
+                component["name"],
+                component["version"],
+            )
+            for component in flutter_components
+        ]
+        aab = self._aab(
+            [
+                ("com.example", "runtime", "1.0"),
+                (
+                    "io.flutter",
+                    "flutter_embedding_release",
+                    f"1.0.0-{self.engine_revision}",
+                ),
+                *flutter_coordinates,
+            ]
+        )
+
+        self.assertEqual(
+            SBOM._validate_gradle_aab_parity(
+                components,
+                aab,
+                flutter_engine_revision=self.engine_revision,
+            ),
+            5,
+        )
+        self.assertEqual(
+            {component["name"] for component in flutter_components},
+            {
+                "arm64_v8a_release",
+                "armeabi_v7a_release",
+                "x86_64_release",
+            },
+        )
+        self.assertTrue(
+            all(
+                component["scope"] == "required"
+                and _property(
+                    component, "manaloom:dependency-scope"
+                )
+                == "android-release-native-runtime"
+                and _property(
+                    component, "manaloom:flutter-engine-revision"
+                )
+                == self.engine_revision
+                for component in flutter_components
+            )
+        )
+
+    def test_flutter_native_aab_parity_fails_closed_on_drift(self) -> None:
+        components = self._components(
+            [
+                "com.example:runtime:1.0=releaseRuntimeClasspath",
+                (
+                    "io.flutter:flutter_embedding_release:"
+                    f"1.0.0-{self.engine_revision}=releaseRuntimeClasspath"
+                ),
+            ]
+        )
+        version = f"1.0.0-{self.engine_revision}"
+        baseline = [
+            ("com.example", "runtime", "1.0"),
+            ("io.flutter", "flutter_embedding_release", version),
+            ("io.flutter", "arm64_v8a_release", version),
+            ("io.flutter", "armeabi_v7a_release", version),
+            ("io.flutter", "x86_64_release", version),
+        ]
+
+        for coordinates in (
+            baseline[:-1],
+            [
+                *baseline,
+                ("io.flutter", "unexpected_release", version),
+            ],
+            [
+                *baseline[:-1],
+                (
+                    "io.flutter",
+                    "x86_64_release",
+                    f"1.0.0-{'b' * 40}",
+                ),
+            ],
+        ):
+            with self.subTest(coordinates=coordinates):
+                with self.assertRaisesRegex(ValueError, "diverge"):
+                    SBOM._validate_gradle_aab_parity(
+                        components,
+                        self._aab(coordinates),
+                        flutter_engine_revision=self.engine_revision,
+                    )
+
+        with self.assertRaisesRegex(ValueError, "SHA-1 completo"):
+            SBOM._flutter_android_release_components("not-a-revision")
+
+        mismatched_embedding = self._components(
+            [
+                "com.example:runtime:1.0=releaseRuntimeClasspath",
+                (
+                    "io.flutter:flutter_embedding_release:"
+                    f"1.0.0-{'b' * 40}=releaseRuntimeClasspath"
+                ),
+            ]
+        )
+        with self.assertRaisesRegex(
+            ValueError, "diverge do flutter_embedding_release"
+        ):
+            SBOM._validate_gradle_aab_parity(
+                mismatched_embedding,
+                self._aab(baseline),
+                flutter_engine_revision=self.engine_revision,
+            )
 
     def test_non_release_vulnerabilities_are_reported_but_do_not_block(self) -> None:
         components = self._components(
