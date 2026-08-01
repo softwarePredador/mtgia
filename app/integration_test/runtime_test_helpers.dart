@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/features/commercial/legal_policy.dart';
 import 'package:manaloom/features/home/services/onboarding_state_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -114,12 +115,15 @@ Future<RuntimeAuthSession> seedAuthenticatedSession(
 }) async {
   final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
   final username = '${usernamePrefix}_$unique';
-  final email = '$username@example.com';
+  final email = '$username@example.invalid';
 
   final response = await api.post('/auth/register', {
     'username': username,
     'email': email,
     'password': password,
+    'legal_accepted': true,
+    'terms_version': currentTermsVersion,
+    'privacy_version': currentPrivacyVersion,
   });
   expect(response.statusCode, anyOf(200, 201));
 
@@ -142,6 +146,28 @@ Future<RuntimeAuthSession> seedAuthenticatedSession(
     username: username,
     password: password,
   );
+}
+
+Future<void> deleteCurrentRuntimeAccount(
+  ApiClient api, {
+  required String password,
+}) async {
+  if (!ApiClient.hasAuthenticationToken) return;
+
+  final response = await api.delete(
+    '/users/me',
+    body: {'confirmation': 'EXCLUIR MINHA CONTA', 'password': password},
+  );
+  expect(
+    response.statusCode,
+    anyOf(200, 404),
+    reason: 'runtime account cleanup must be confirmed by the backend',
+  );
+  ApiClient.setToken(null);
+}
+
+Future<void> deleteRuntimeAccount(ApiClient api, RuntimeAuthSession session) {
+  return deleteCurrentRuntimeAccount(api, password: session.password);
 }
 
 Future<void> captureRuntimeCheckpoint(

@@ -50,10 +50,12 @@ for key in SSH_HOST SSH_KEY; do
     exit 2
   fi
 done
+SSH_KEY="$(resolve_manaloom_path "$ROOT_DIR" "$SSH_KEY")"
 if [[ ! -f "$SSH_KEY" ]]; then
   echo "chave SSH ausente: $SSH_KEY" >&2
   exit 2
 fi
+load_manaloom_legal_policy_versions "$ROOT_DIR"
 if [[ ! "$SEED_COUNT" =~ ^[1-9][0-9]*$ || "$SEED_COUNT" -gt 10000 ]]; then
   echo "MANALOOM_PAYWALL_SEED_COUNT deve estar entre 1 e 10000" >&2
   exit 2
@@ -162,7 +164,16 @@ registration_payload="$(jq -n \
   --arg username "$USERNAME" \
   --arg email "$EMAIL" \
   --arg password "$PASSWORD" \
-  '{username:$username,email:$email,password:$password}')"
+  --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
+  --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
+  '{
+    username:$username,
+    email:$email,
+    password:$password,
+    legal_accepted:true,
+    terms_version:$terms_version,
+    privacy_version:$privacy_version
+  }')"
 registration_response="$(curl -fsS -X POST "$BASE/auth/register" \
   -H 'Content-Type: application/json' \
   --data "$registration_payload")"

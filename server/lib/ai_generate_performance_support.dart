@@ -328,7 +328,7 @@ AiGenerateOpenAiTimeoutSelection selectAiGenerateOpenAiTimeout({
     fallback: const Duration(seconds: 8),
     devFallback: const Duration(seconds: 8),
     stagingFallback: const Duration(seconds: 8),
-    prodFallback: const Duration(seconds: 12),
+    prodFallback: const Duration(seconds: 20),
     min: const Duration(seconds: 3),
     max: const Duration(seconds: 90),
   );

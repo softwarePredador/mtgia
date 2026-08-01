@@ -338,6 +338,22 @@ void main() {
       },
     );
 
+    test('uses the documented production generate timeout by default', () {
+      final config = OpenAiRuntimeConfig(
+        DotEnv()..addAll({'ENVIRONMENT': 'production'}),
+      );
+
+      final selection = selectAiGenerateOpenAiTimeout(
+        config: config,
+        normalizedFormat: 'commander',
+        referenceGuidanceEnabled: false,
+      );
+
+      expect(selection.timeout, equals(const Duration(seconds: 20)));
+      expect(selection.envKey, equals('OPENAI_TIMEOUT_GENERATE_SECONDS'));
+      expect(selection.referenceGuidanceBudget, isFalse);
+    });
+
     test('uses larger default timeout for Commander reference guidance', () {
       final config = OpenAiRuntimeConfig(
         DotEnv()..addAll({'ENVIRONMENT': 'staging'}),

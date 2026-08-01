@@ -11,16 +11,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'runtime_test_helpers.dart';
 
+const _emitScreenshotChunks = bool.fromEnvironment(
+  'MANALOOM_EMIT_SCREENSHOT_CHUNKS',
+  defaultValue: true,
+);
+
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
   const chunkSize = 2000;
   // ignore: avoid_print
   print('SCREENSHOT_BEGIN $name');
   for (var offset = 0; offset < encoded.length; offset += chunkSize) {
-    final end =
-        (offset + chunkSize < encoded.length)
-            ? offset + chunkSize
-            : encoded.length;
+    final end = (offset + chunkSize < encoded.length)
+        ? offset + chunkSize
+        : encoded.length;
     // ignore: avoid_print
     print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
   }
@@ -59,7 +63,9 @@ Future<void> _capture(
       .timeout(const Duration(seconds: 90));
   // ignore: avoid_print
   print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
-  _emitScreenshot(name, screenshot);
+  if (_emitScreenshotChunks) {
+    _emitScreenshot(name, screenshot);
+  }
 }
 
 void main() {
@@ -104,8 +110,10 @@ void main() {
 
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final username = 'iphone15_async_$unique';
-      final email = 'iphone15_async_$unique@example.com';
+      final email = 'iphone15_async_$unique@example.invalid';
       const password = 'BetaQa!2026-Deck';
+      final api = ApiClient();
+      addTearDown(() => deleteCurrentRuntimeAccount(api, password: password));
 
       await tester.enterText(
         find.byKey(const Key('register-username-field')),
@@ -124,10 +132,56 @@ void main() {
         password,
       );
 
+      final legalAcceptance = find.byKey(
+        const Key('register-legal-acceptance'),
+      );
+      await tester.ensureVisible(legalAcceptance);
+      await tester.tap(legalAcceptance);
+      await tester.pump();
+
       final registerSubmit = find.byKey(const Key('register-submit-button'));
       await tester.ensureVisible(registerSubmit);
       await tester.tap(registerSubmit);
       await tester.pump();
+
+      await pumpUntilAnyFound(tester, [
+        find.byKey(const Key('verify-email-resend-button')),
+        find.text('Decks'),
+      ], attempts: 120);
+      final verificationGate = find.byKey(
+        const Key('verify-email-resend-button'),
+      );
+      if (finderExists(verificationGate)) {
+        expect(find.text('Verifique seu email'), findsOneWidget);
+        expect(find.text('Voltar ao app'), findsOneWidget);
+        await _capture(binding, tester, '02a_email_verification_gate');
+        final continueReadOnly = find.text('Voltar ao app');
+        await tester.ensureVisible(continueReadOnly);
+        await tester.tap(continueReadOnly);
+        await tester.pump();
+      }
+
+      await pumpUntilAnyFound(tester, [
+        find.byKey(const Key('onboarding-format-dropdown')),
+        find.byKey(const Key('home-hero-frame')),
+      ], attempts: 120);
+      final onboardingFormat = find.byKey(
+        const Key('onboarding-format-dropdown'),
+      );
+      if (finderExists(onboardingFormat)) {
+        await _capture(binding, tester, '02b_onboarding_first_login');
+        final onboardingSkip = find.byKey(const Key('onboarding-skip-action'));
+        await tester.scrollUntilVisible(
+          onboardingSkip,
+          240,
+          scrollable: find.descendant(
+            of: find.byKey(const Key('onboarding-scroll-view')),
+            matching: find.byType(Scrollable),
+          ),
+        );
+        await tester.tap(onboardingSkip);
+        await tester.pump();
+      }
 
       await pumpUntilFound(tester, find.text('Decks'), attempts: 120);
       await _capture(binding, tester, '02_registered_home');
@@ -232,7 +286,7 @@ void main() {
       );
       await _capture(binding, tester, '07_generated_deck_saved');
 
-      final deckListResponse = await ApiClient().get('/decks');
+      final deckListResponse = await api.get('/decks');
       expect(deckListResponse.statusCode, 200);
       final deckRows = (deckListResponse.data as List).cast<Map>();
       final createdDeck = deckRows.firstWhere(
@@ -315,7 +369,10 @@ void main() {
       if (optimizeAiError.evaluate().isNotEmpty ||
           optimizeApplyError.evaluate().isNotEmpty) {
         await _capture(binding, tester, '10_friendly_optimize_failure');
-        return;
+        fail(
+          'A jornada viva recebeu uma falha de otimização; mensagem amigável '
+          'não substitui a conclusão do E2E.',
+        );
       }
 
       if (optimizeRebuild.evaluate().isNotEmpty) {

@@ -94,11 +94,19 @@ void main() {
     expect(health.statusCode, 200);
     final healthData = _asMap(health.data);
 
-    await seedAuthenticatedSession(
+    final session = await seedAuthenticatedSession(
       api,
       usernamePrefix: 'functional_tags_runtime',
     );
+    addTearDown(() => deleteRuntimeAccount(api, session));
     final deckId = await _createSmallFunctionalDeck(api);
+    addTearDown(() async {
+      try {
+        await api.delete('/decks/$deckId');
+      } catch (_) {
+        // Account cleanup remains the final fail-closed residue guard.
+      }
+    });
 
     final analysisResponse = await api.get('/decks/$deckId/analysis');
     expect(analysisResponse.statusCode, 200);
@@ -173,14 +181,13 @@ void main() {
     await tester.tap(rampBucket);
     await tester.pumpAndSettle();
 
-    expect(
-      find.textContaining('Origem da contagem: functional_tags'),
-      findsOneWidget,
-    );
+    expect(find.text('Leitura por funções do deck'), findsOneWidget);
+    expect(find.textContaining('Origem da contagem'), findsNothing);
+    expect(find.textContaining('functional_tags'), findsNothing);
     expect(find.textContaining('Sol Ring'), findsWidgets);
-    expect(find.textContaining('Conta como ramp'), findsWidgets);
-    expect(find.textContaining('Cartas consideradas:'), findsWidgets);
-    expect(find.textContaining('Como é contado:'), findsWidgets);
+    expect(find.textContaining('Ajuda a acelerar'), findsWidgets);
+    expect(find.textContaining('Cartas deste grupo:'), findsWidgets);
+    expect(find.textContaining('Mostra cartas que ajudam'), findsWidgets);
     expectNoRawTechnicalErrorText(tester);
 
     // Sanitized runtime proof: no auth token, e-mail, raw payload or decklist.

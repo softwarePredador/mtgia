@@ -35,6 +35,10 @@ source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 resolve_manaloom_flutter_root
 FLUTTER_BIN="$MANALOOM_FLUTTER_ROOT_RESOLVED/bin/flutter"
 
+# shellcheck source=scripts/lib/manaloom_safe_env.sh
+source "$ROOT_DIR/scripts/lib/manaloom_safe_env.sh"
+load_manaloom_legal_policy_versions "$ROOT_DIR"
+
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
 source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 require_postgres_write_approval \
@@ -184,7 +188,16 @@ register_response="$(curl -fsS --max-time 20 \
   -H 'Content-Type: application/json' \
   -d "$(jq -cn --arg username "$seed_username" --arg email "$SEED_EMAIL" \
     --arg password "$SEED_PASSWORD" \
-    '{username: $username, email: $email, password: $password}')" \
+    --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
+    --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
+    '{
+      username: $username,
+      email: $email,
+      password: $password,
+      legal_accepted: true,
+      terms_version: $terms_version,
+      privacy_version: $privacy_version
+    }')" \
   "$API_BASE_URL/auth/register")"
 seed_token="$(jq -er '.token' <<<"$register_response")"
 SEED_USER_ID="$(jq -er '.user.id' <<<"$register_response")"
@@ -195,7 +208,16 @@ empty_response="$(curl -fsS --max-time 20 \
   -H 'Content-Type: application/json' \
   -d "$(jq -cn --arg username "$empty_username" --arg email "$EMPTY_EMAIL" \
     --arg password "$SEED_PASSWORD" \
-    '{username: $username, email: $email, password: $password}')" \
+    --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
+    --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
+    '{
+      username: $username,
+      email: $email,
+      password: $password,
+      legal_accepted: true,
+      terms_version: $terms_version,
+      privacy_version: $privacy_version
+    }')" \
   "$API_BASE_URL/auth/register")"
 empty_token="$(jq -er '.token' <<<"$empty_response")"
 EMPTY_USER_ID="$(jq -er '.user.id' <<<"$empty_response")"
@@ -211,7 +233,16 @@ peer_response="$(curl -fsS --max-time 20 \
   -d "$(jq -cn --arg username "$SEED_PEER_USERNAME" \
     --arg email "visual-peer-$seed_suffix@example.invalid" \
     --arg password "$SEED_PASSWORD" \
-    '{username: $username, email: $email, password: $password}')" \
+    --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
+    --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
+    '{
+      username: $username,
+      email: $email,
+      password: $password,
+      legal_accepted: true,
+      terms_version: $terms_version,
+      privacy_version: $privacy_version
+    }')" \
   "$API_BASE_URL/auth/register")"
 SEED_PEER_USER_ID="$(jq -er '.user.id' <<<"$peer_response")"
 peer_token="$(jq -er '.token' <<<"$peer_response")"

@@ -112,10 +112,16 @@ Defina também `MANALOOM_API_BASE_URL`/`TEST_API_BASE_URL` para o alvo aprovado.
 MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 \
 MANALOOM_RUN_SERVER_LIVE_E2E=1 \
 MANALOOM_RUN_LIVE_PRODUCT_E2E=1 \
+MANALOOM_FLUTTER_RUNTIME_DEVICE=<flutter-device-id> \
+MANALOOM_FLUTTER_RUNTIME_API_BASE_URL=https://alvo-aprovado.example \
 MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
 MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
 ./scripts/quality_gate.sh e2e
 ```
+
+O runtime Flutter falha fechado quando o device ou a API não são explícitos;
+seleção interativa de dispositivo e `API_BASE_URL` implícita não recebem crédito
+de release. `MANALOOM_FLUTTER_BIN` pode fixar o executável pinado da rodada.
 
 Não copie esses tokens para `.env`, CI ou documentação de comando automático.
 Eles representam aprovação humana para uma execução específica.

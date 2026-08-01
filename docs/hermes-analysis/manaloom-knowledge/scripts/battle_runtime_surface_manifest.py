@@ -295,6 +295,7 @@ RECURRING_GATE_BASENAMES = {
 RULE_REGISTRY_BASENAMES = {
     "audit_handcrafted_battle_rule_canonicalization.py",
     "audit_multi_rule_runtime_readiness.py",
+    "battle_rule_test_fixture.py",
     "battle_rule_registry.py",
     "deck_card_battle_rule_coherence_audit.py",
     "derive_functional_tags_from_battle_rules.py",

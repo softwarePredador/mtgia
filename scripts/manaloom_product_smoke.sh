@@ -51,10 +51,12 @@ for key in SSH_HOST SSH_KEY; do
     exit 2
   fi
 done
+SSH_KEY="$(resolve_manaloom_path "$ROOT_DIR" "$SSH_KEY")"
 if [[ ! -f "$SSH_KEY" ]]; then
   echo "chave SSH ausente: $SSH_KEY" >&2
   exit 2
 fi
+load_manaloom_legal_policy_versions "$ROOT_DIR"
 
 validate_manaloom_release_api_base_url "$BASE"
 validate_manaloom_exact_coordinate \
@@ -162,7 +164,20 @@ jq -e '
 ' "$TMP_DIR/ready.json" >/dev/null
 curl -fsS "$WEB/sitemap.xml" >"$TMP_DIR/sitemap.xml"
 
-REG="$(jq -n --arg username "$USERNAME" --arg email "$EMAIL" --arg password "$PASSWORD" '{username:$username,email:$email,password:$password}')"
+REG="$(jq -n \
+  --arg username "$USERNAME" \
+  --arg email "$EMAIL" \
+  --arg password "$PASSWORD" \
+  --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
+  --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
+  '{
+    username:$username,
+    email:$email,
+    password:$password,
+    legal_accepted:true,
+    terms_version:$terms_version,
+    privacy_version:$privacy_version
+  }')"
 REG_RESPONSE="$(curl -fsS -X POST "$BASE/auth/register" -H 'Content-Type: application/json' --data "$REG")"
 TOKEN="$(printf '%s' "$REG_RESPONSE" | jq -r '.token')"
 USER_ID="$(printf '%s' "$REG_RESPONSE" | jq -r '.user.id')"

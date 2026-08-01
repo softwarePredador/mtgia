@@ -29,6 +29,13 @@ battle_spec = importlib.util.spec_from_file_location(
 battle = importlib.util.module_from_spec(battle_spec)
 battle_spec.loader.exec_module(battle)
 
+from battle_rule_test_fixture import temporary_canonical_battle_rule_db
+
+
+def _get_curated_effect_from_tracked_sqlite(card):
+    with temporary_canonical_battle_rule_db(battle, [card["name"]]):
+        return battle.get_card_effect(card)
+
 
 def test_supported_effects_cover_live_engine_handlers():
     assert "add_mana" in audit.SUPPORTED_EFFECTS
@@ -308,7 +315,7 @@ def test_runtime_rule_cards_do_not_use_functional_tags():
 
 
 def test_promoted_infernal_plunge_uses_curated_pg_rule_not_functional_tags():
-    infernal_plunge = battle.get_card_effect(
+    infernal_plunge = _get_curated_effect_from_tracked_sqlite(
         {
             "name": "Infernal Plunge",
             "type_line": "Sorcery",
@@ -547,7 +554,7 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
 
 
 def test_veil_of_summer_promoted_rule_has_identity_for_forensic():
-    effect = battle.get_card_effect(
+    effect = _get_curated_effect_from_tracked_sqlite(
         {
             "name": "Veil of Summer",
             "type_line": "Instant",
@@ -593,7 +600,7 @@ def test_veil_of_summer_promoted_rule_has_identity_for_forensic():
 
 
 def test_rishkar_promoted_rule_has_identity_for_forensic():
-    effect = battle.get_card_effect(
+    effect = _get_curated_effect_from_tracked_sqlite(
         {
             "name": "Rishkar, Peema Renegade",
             "type_line": "Legendary Creature - Elf Druid",
@@ -639,7 +646,7 @@ def test_rishkar_promoted_rule_has_identity_for_forensic():
 
 
 def test_aura_of_silence_promoted_rule_has_identity_for_forensic():
-    effect = battle.get_card_effect(
+    effect = _get_curated_effect_from_tracked_sqlite(
         {
             "name": "Aura of Silence",
             "type_line": "Enchantment",
@@ -776,7 +783,7 @@ def test_forensic_accepts_composite_runtime_over_primary_registry_effect():
 
 
 def test_oracle_normalized_creature_bounce_marks_effect_override():
-    flood_maw = battle.get_card_effect(
+    flood_maw = _get_curated_effect_from_tracked_sqlite(
         {
             "name": "Into the Flood Maw",
             "cmc": 1,

@@ -154,7 +154,7 @@ run_optional_flutter_runtime_e2e() {
   if [[ "${MANALOOM_RUN_FLUTTER_RUNTIME_E2E:-0}" != "1" ]]; then
     skip_step \
       "Flutter live runtime integration E2E" \
-      "set MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 with a ready API/device target to run integration_test flows"
+      "set MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1, MANALOOM_FLUTTER_RUNTIME_DEVICE and an explicit API target to run integration_test flows"
     return
   fi
 
@@ -165,12 +165,58 @@ run_optional_flutter_runtime_e2e() {
     return
   fi
 
+  local runtime_device="${MANALOOM_FLUTTER_RUNTIME_DEVICE:-${FLUTTER_DEVICE_ID:-}}"
+  if [[ -z "$runtime_device" ]]; then
+    block_step \
+      "Flutter live runtime integration E2E" \
+      "set MANALOOM_FLUTTER_RUNTIME_DEVICE to an explicit flutter device id; interactive device selection is not release evidence"
+    return
+  fi
+
+  local live_api_base="${MANALOOM_FLUTTER_RUNTIME_API_BASE_URL:-${TEST_API_BASE_URL:-${API_BASE_URL:-}}}"
+  if [[ -z "$live_api_base" ]]; then
+    block_step \
+      "Flutter live runtime integration E2E" \
+      "set MANALOOM_FLUTTER_RUNTIME_API_BASE_URL, TEST_API_BASE_URL or API_BASE_URL to the explicitly approved backend"
+    return
+  fi
+
+  local flutter_bin="${MANALOOM_FLUTTER_BIN:-flutter}"
+  if [[ "$flutter_bin" == */* ]]; then
+    if [[ ! -x "$flutter_bin" ]]; then
+      block_step \
+        "Flutter live runtime integration E2E" \
+        "MANALOOM_FLUTTER_BIN does not resolve to an executable Flutter binary"
+      return
+    fi
+  elif ! command -v "$flutter_bin" >/dev/null 2>&1; then
+    block_step \
+      "Flutter live runtime integration E2E" \
+      "Flutter is not available on PATH; set MANALOOM_FLUTTER_BIN explicitly"
+    return
+  fi
+
+  local flutter_bin_q runtime_device_q api_define_q public_api_define_q
+  local firebase_startup_q firebase_performance_q screenshot_chunks_q
+  printf -v flutter_bin_q '%q' "$flutter_bin"
+  printf -v runtime_device_q '%q' "$runtime_device"
+  printf -v api_define_q '%q' "--dart-define=API_BASE_URL=$live_api_base"
+  printf -v public_api_define_q '%q' \
+    "--dart-define=PUBLIC_API_BASE_URL=$live_api_base"
+  printf -v firebase_startup_q '%q' \
+    "--dart-define=DISABLE_FIREBASE_STARTUP=true"
+  printf -v firebase_performance_q '%q' \
+    "--dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true"
+  printf -v screenshot_chunks_q '%q' \
+    "--dart-define=MANALOOM_EMIT_SCREENSHOT_CHUNKS=${MANALOOM_FLUTTER_RUNTIME_EMIT_SCREENSHOT_CHUNKS:-false}"
+  local runtime_args="-d $runtime_device_q $api_define_q $public_api_define_q $firebase_startup_q $firebase_performance_q $screenshot_chunks_q --no-version-check --reporter compact"
+
   run_step "Flutter live runtime deck generate E2E" \
-    "cd \"$ROOT_DIR/app\" && flutter test integration_test/deck_generate_async_runtime_test.dart --no-version-check --reporter compact"
+    "cd \"$ROOT_DIR/app\" && $flutter_bin_q test integration_test/deck_generate_async_runtime_test.dart $runtime_args"
   run_step "Flutter live runtime learned deck E2E" \
-    "cd \"$ROOT_DIR/app\" && flutter test integration_test/commander_learned_deck_runtime_test.dart --no-version-check --reporter compact"
+    "cd \"$ROOT_DIR/app\" && $flutter_bin_q test integration_test/commander_learned_deck_runtime_test.dart $runtime_args"
   run_step "Flutter live runtime functional tags E2E" \
-    "cd \"$ROOT_DIR/app\" && flutter test integration_test/deck_functional_tags_runtime_test.dart --no-version-check --reporter compact"
+    "cd \"$ROOT_DIR/app\" && $flutter_bin_q test integration_test/deck_functional_tags_runtime_test.dart $runtime_args"
 }
 
 run_optional_server_live_e2e() {

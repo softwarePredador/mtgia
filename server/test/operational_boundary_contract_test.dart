@@ -108,6 +108,62 @@ void main() {
       }
     });
 
+    test('live fixture registrations follow the current legal policy', () {
+      for (final relativePath in const [
+        'scripts/manaloom_ai_paywall_e2e.sh',
+        'scripts/manaloom_product_smoke.sh',
+        'scripts/manaloom_ai_generation_benchmark.sh',
+        'scripts/manaloom_authenticated_visual_qa_isolated.sh',
+      ]) {
+        final script = source(relativePath);
+        expect(
+          script,
+          contains('load_manaloom_legal_policy_versions "\$ROOT_DIR"'),
+        );
+        expect(script, matches(RegExp(r'legal_accepted:\s*true')));
+        expect(script, contains(r'$MANALOOM_CURRENT_TERMS_VERSION'));
+        expect(script, contains(r'$MANALOOM_CURRENT_PRIVACY_VERSION'));
+        if (relativePath !=
+            'scripts/manaloom_authenticated_visual_qa_isolated.sh') {
+          expect(script, contains('resolve_manaloom_path "\$ROOT_DIR"'));
+        }
+      }
+    });
+
+    test('live AI tests use isolated accounts and prove account cleanup', () {
+      for (final relativePath in const [
+        'server/test/ai_generate_create_optimize_flow_test.dart',
+        'server/test/ai_optimize_flow_test.dart',
+        'server/test/ai_optimize_telemetry_contract_test.dart',
+      ]) {
+        final testSource = source(relativePath);
+        expect(testSource, contains("'legal_accepted': true"));
+        expect(testSource, contains('currentTermsVersion'));
+        expect(testSource, contains('currentPrivacyVersion'));
+        expect(testSource, contains('@example.invalid'));
+        expect(testSource, contains("Uri.parse('\$baseUrl/users/me')"));
+        expect(testSource, contains("'EXCLUIR MINHA CONTA'"));
+      }
+    });
+
+    test('Flutter live E2E pins device, API and executable', () {
+      final script = source('scripts/manaloom_e2e_suite.sh');
+      expect(script, contains('MANALOOM_FLUTTER_RUNTIME_DEVICE'));
+      expect(script, contains('MANALOOM_FLUTTER_RUNTIME_API_BASE_URL'));
+      expect(script, contains('MANALOOM_FLUTTER_BIN'));
+      expect(
+        script,
+        contains('interactive device selection is not release evidence'),
+      );
+      expect(script, contains('--dart-define=API_BASE_URL='));
+      expect(script, contains('--dart-define=PUBLIC_API_BASE_URL='));
+      expect(script, contains('--dart-define=DISABLE_FIREBASE_STARTUP=true'));
+      expect(
+        script,
+        contains('--dart-define=MANALOOM_EMIT_SCREENSHOT_CHUNKS='),
+      );
+    });
+
     test('EasyPanel TLS cannot be downgraded', () {
       final sidecars = source('scripts/manaloom_deploy_battle_sidecars.sh');
       final commercial = source('scripts/manaloom_commercial_quality_gate.sh');

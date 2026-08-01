@@ -46,11 +46,10 @@ void main() {
     for (var attempt = 0; attempt < 30; attempt += 1) {
       final deckListResponse = await api.get('/decks');
       expect(deckListResponse.statusCode, 200);
-      final deckRows =
-          (deckListResponse.data as List)
-              .whereType<Map>()
-              .map((deck) => deck.cast<String, dynamic>())
-              .toList();
+      final deckRows = (deckListResponse.data as List)
+          .whereType<Map>()
+          .map((deck) => deck.cast<String, dynamic>())
+          .toList();
       for (final deck in deckRows) {
         if (deck['name']?.toString() == deckName) return deck;
       }
@@ -67,13 +66,14 @@ void main() {
 
       final api = ApiClient();
       String? createdDeckId;
-      addTearDown(() => cleanupDeck(api, createdDeckId));
 
       await clearRuntimeAuth();
-      await seedAuthenticatedSession(
+      final session = await seedAuthenticatedSession(
         api,
         usernamePrefix: 'learned_lorehold_runtime',
       );
+      addTearDown(() => deleteRuntimeAccount(api, session));
+      addTearDown(() => cleanupDeck(api, createdDeckId));
 
       await tester.pumpWidget(const app.ManaLoomApp());
       await tester.pump();
@@ -160,7 +160,21 @@ void main() {
         '02_commander_learned_button_visible',
       );
 
-      await tester.tap(learnedDeckButton);
+      final generateScrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(
+        learnedDeckButton,
+        220,
+        scrollable: generateScrollable,
+      );
+      await tester.drag(generateScrollable, const Offset(0, -160));
+      await tester.pump(const Duration(milliseconds: 600));
+      final learnedDeckCallout = tester.widget<InkWell>(learnedDeckButton);
+      expect(
+        learnedDeckCallout.onTap,
+        isNotNull,
+        reason: 'O deck aprendido precisa estar disponível antes do toque.',
+      );
+      await tester.tap(find.text('Usar deck aprendido do comandante'));
       await tester.pump();
 
       await pumpUntilFound(
@@ -241,11 +255,10 @@ void main() {
       final detailResponse = await api.get('/decks/$createdDeckId');
       expect(detailResponse.statusCode, 200);
       final detail = (detailResponse.data as Map).cast<String, dynamic>();
-      final commanders =
-          ((detail['commander'] as List?) ?? const [])
-              .whereType<Map>()
-              .map((card) => card.cast<String, dynamic>())
-              .toList();
+      final commanders = ((detail['commander'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((card) => card.cast<String, dynamic>())
+          .toList();
       final mainCards = flattenMainBoard(detail).toList();
       final mainQuantity = mainCards.fold<int>(
         0,

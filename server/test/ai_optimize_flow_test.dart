@@ -6,6 +6,7 @@ import 'dart:io' show Platform, Directory, File;
 
 import 'package:http/http.dart' as http;
 import 'package:server/basic_land_utils.dart';
+import 'package:server/legal_policy.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -23,14 +24,14 @@ void main() {
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
+  final userSuffix = DateTime.now().microsecondsSinceEpoch.toRadixString(36);
   final testUserEmail =
       Platform.environment['TEST_USER_EMAIL'] ??
-      'test_optimize_flow@example.com';
+      'ai_opt_$userSuffix@example.invalid';
   final testUserPassword =
       Platform.environment['TEST_USER_PASSWORD'] ?? 'BetaQa!2026-Deck';
   final testUserUsername =
-      Platform.environment['TEST_USER_USERNAME'] ??
-      '${testUserEmail.split('@').first}_optimize_flow_user';
+      Platform.environment['TEST_USER_USERNAME'] ?? 'ai_opt_$userSuffix';
   final testUser = {
     'email': testUserEmail,
     'password': testUserPassword,
@@ -53,38 +54,21 @@ void main() {
   }
 
   Future<String> getAuthToken() async {
-    var response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
+    if (authToken != null) return authToken!;
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'email': testUser['email'],
-        'password': testUser['password'],
+        ...testUser,
+        'legal_accepted': true,
+        'terms_version': currentTermsVersion,
+        'privacy_version': currentPrivacyVersion,
       }),
     );
 
-    if (response.statusCode != 200) {
-      response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(testUser),
-      );
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('Failed to register test user: ${response.body}');
-      }
-
-      response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': testUser['email'],
-          'password': testUser['password'],
-        }),
-      );
-    }
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to login test user: ${response.body}');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to register test user: ${response.body}');
     }
 
     return decodeJson(response)['token'] as String;
@@ -119,6 +103,20 @@ void main() {
       Uri.parse('$baseUrl/decks/$deckId'),
       headers: authHeaders(),
     );
+  }
+
+  Future<void> deleteAccount() async {
+    if (authToken == null) return;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/users/me'),
+      headers: authHeaders(withContentType: true),
+      body: jsonEncode({
+        'confirmation': 'EXCLUIR MINHA CONTA',
+        'password': testUserPassword,
+      }),
+    );
+    expect(response.statusCode, anyOf(200, 404), reason: response.body);
+    authToken = null;
   }
 
   Future<http.Response> postJsonWithRetry(
@@ -445,6 +443,7 @@ void main() {
     for (final deckId in createdDeckIds) {
       await deleteDeck(deckId);
     }
+    await deleteAccount();
   });
 
   group('AI optimize flow | /ai/optimize', () {

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:http/http.dart' as http;
+import 'package:server/legal_policy.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -22,11 +23,13 @@ void main() {
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
-  const testUser = {
-    'email': 'test_optimize_telemetry@example.com',
+  final userSuffix = DateTime.now().microsecondsSinceEpoch.toRadixString(36);
+  final testUser = {
+    'email': 'ai_tel_$userSuffix@example.invalid',
     'password': 'BetaQa!2026-Deck',
-    'username': 'test_optimize_telemetry_user',
+    'username': 'ai_tel_$userSuffix',
   };
+  String? authToken;
 
   Map<String, dynamic> decodeJson(http.Response response) {
     final body = response.body.trim();
@@ -38,42 +41,45 @@ void main() {
   }
 
   Future<String> getAuthToken() async {
-    var response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
+    if (authToken != null) return authToken!;
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'email': testUser['email'],
-        'password': testUser['password'],
+        ...testUser,
+        'legal_accepted': true,
+        'terms_version': currentTermsVersion,
+        'privacy_version': currentPrivacyVersion,
       }),
     );
 
-    if (response.statusCode != 200) {
-      response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(testUser),
-      );
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('Failed to register test user: ${response.body}');
-      }
-
-      response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': testUser['email'],
-          'password': testUser['password'],
-        }),
-      );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to register test user: ${response.body}');
     }
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to login test user: ${response.body}');
-    }
-
-    return decodeJson(response)['token'] as String;
+    authToken = decodeJson(response)['token'] as String;
+    return authToken!;
   }
+
+  Future<void> deleteAccount() async {
+    if (authToken == null) return;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/users/me'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $authToken',
+      },
+      body: jsonEncode({
+        'confirmation': 'EXCLUIR MINHA CONTA',
+        'password': testUser['password'],
+      }),
+    );
+    expect(response.statusCode, anyOf(200, 404), reason: response.body);
+    authToken = null;
+  }
+
+  tearDownAll(deleteAccount);
 
   group('AI optimize telemetry contract | /ai/optimize/telemetry', () {
     test('returns 401 without token', () async {

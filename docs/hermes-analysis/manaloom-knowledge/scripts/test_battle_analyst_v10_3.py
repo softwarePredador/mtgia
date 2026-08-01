@@ -13,6 +13,8 @@ import os
 import unittest
 from pathlib import Path
 
+from battle_rule_test_fixture import temporary_canonical_battle_rule_db
+
 
 MODULE_PATH = Path(
     os.environ.get(
@@ -287,19 +289,25 @@ def test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite():
         "Swiftfoot Boots": "Artifact - Equipment",
     }
 
+    with temporary_canonical_battle_rule_db(battle, expected):
+        resolved_effects = {
+            name: battle.get_card_effect(
+                {
+                    "name": name,
+                    "cmc": 2,
+                    "type_line": type_lines[name],
+                }
+            )
+            for name in expected
+        }
+
     for name, (
         expected_effect,
         expected_scope,
         expected_key,
         expected_hash,
     ) in expected.items():
-        effect = battle.get_card_effect(
-            {
-                "name": name,
-                "cmc": 2,
-                "type_line": type_lines[name],
-            }
-        )
+        effect = resolved_effects[name]
         assert effect.get("effect") == expected_effect
         assert effect.get("battle_model_scope") == expected_scope
         assert effect.get("_rule_logical_key") == expected_key
