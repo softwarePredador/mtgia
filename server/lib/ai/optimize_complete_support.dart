@@ -20,6 +20,26 @@ import 'otimizacao.dart';
 
 export 'optimize_complete_mana_support.dart';
 
+Map<String, dynamic> mapCompleteAiSuggestionCandidateRow(ResultRow row) {
+  return {
+    'card_id': row[0] as String,
+    'name': row[1] as String,
+    'type_line': row[2] as String? ?? '',
+    'oracle_text': row[3] as String? ?? '',
+    'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+    'color_identity': (row[5] as List?)?.cast<String>() ?? const <String>[],
+    'mana_cost': (row[6] as String?) ?? '',
+    'cmc': safeToDouble(row[7]),
+    'functional_tags':
+        (row[8] as List?)
+            ?.map((entry) => entry.toString())
+            .toList(growable: false) ??
+        const <String>[],
+    'semantic_tags_v2': row[9],
+    'best_role_score': (row[10] as num?)?.toDouble() ?? 0.0,
+  };
+}
+
 class CompleteBuildAccumulator {
   final List<Map<String, dynamic>> virtualDeck;
   final Map<String, int> virtualCountsById;
@@ -624,32 +644,9 @@ Future<void> runCompleteAiSuggestionLoop({
     );
     if (additionsInfoResult.isEmpty) break;
 
-    final candidates =
-        additionsInfoResult.map((r) {
-          final id = r[0] as String;
-          final name = r[1] as String;
-          final typeLine = r[2] as String? ?? '';
-          final oracle = r[3] as String? ?? '';
-          final colors = (r[4] as List?)?.cast<String>() ?? const <String>[];
-          final identity = (r[5] as List?)?.cast<String>() ?? const <String>[];
-          return {
-            'card_id': id,
-            'name': name,
-            'type_line': typeLine,
-            'oracle_text': oracle,
-            'colors': colors,
-            'color_identity': identity,
-            'mana_cost': (r[6] as String?) ?? '',
-            'cmc': (r[7] as num?)?.toDouble() ?? 0.0,
-            'functional_tags':
-                (r[8] as List?)
-                    ?.map((entry) => entry.toString())
-                    .toList(growable: false) ??
-                const <String>[],
-            'semantic_tags_v2': r[9],
-            'best_role_score': (r[10] as num?)?.toDouble() ?? 0.0,
-          };
-        }).toList();
+    final candidates = additionsInfoResult
+        .map(mapCompleteAiSuggestionCandidateRow)
+        .toList(growable: false);
 
     final identityAllowed = <Map<String, dynamic>>[];
     for (final candidate in candidates) {
@@ -2416,7 +2413,7 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
         'type_line': (row[2] as String?) ?? '',
         'oracle_text': (row[3] as String?) ?? '',
         'mana_cost': (row[4] as String?) ?? '',
-        'cmc': (row[5] as num?)?.toDouble() ?? 0.0,
+        'cmc': safeToDouble(row[5]),
         'functional_tags':
             (row[6] as List?)
                 ?.map((entry) => entry.toString())

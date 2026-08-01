@@ -3,6 +3,16 @@ import 'package:test/test.dart';
 import '../lib/ai/optimize_filler_candidate_support.dart';
 
 void main() {
+  group('PostgreSQL numeric decoding', () {
+    test('accepts NUMERIC values returned by postgres as strings', () {
+      expect(safeToDouble('2.5'), 2.5);
+      expect(safeToDouble(3), 3.0);
+      expect(safeToNullableDouble('4.0'), 4.0);
+      expect(safeToNullableDouble(null), isNull);
+      expect(safeToNullableDouble('invalid'), isNull);
+    });
+  });
+
   group('dedupeCandidatesByName', () {
     test('keeps first non-empty candidate for each normalized name', () {
       final result = dedupeCandidatesByName([

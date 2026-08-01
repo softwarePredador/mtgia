@@ -22,6 +22,7 @@ import 'optimize_swap_integrity.dart';
 import '../ai_generate_internal_url_support.dart';
 import '../internal_ai_request_token.dart';
 import '../logger.dart';
+import '../observability.dart';
 
 Future<void> processOptimizeModeAsync({
   required Pool pool,
@@ -591,7 +592,25 @@ Future<void> processCompleteModeAsync({
       );
       return;
     }
-  } catch (e) {
+  } catch (e, stackTrace) {
+    try {
+      await captureObservedException(
+        e,
+        stackTrace: stackTrace,
+        userId: userId,
+        tags: {
+          'source': 'background_optimize_job',
+          'optimize_mode': 'complete',
+          'bracket': bracket?.toString() ?? 'unspecified',
+        },
+        extras: {'job_id': jobId, 'deck_id': deckId},
+      );
+    } catch (observabilityError) {
+      Log.w(
+        'Background optimize observability capture failed '
+        'type=${observabilityError.runtimeType}',
+      );
+    }
     Log.e('Background optimize job $jobId failed type=${e.runtimeType}');
     await OptimizeJobStore.fail(
       pool,

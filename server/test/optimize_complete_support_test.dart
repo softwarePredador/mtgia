@@ -1,8 +1,34 @@
+import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
 import '../lib/ai/optimize_complete_support.dart';
 
 void main() {
+  test('AI suggestion row accepts PostgreSQL NUMERIC CMC strings', () {
+    final candidate = mapCompleteAiSuggestionCandidateRow(
+      ResultRow(
+        values: const [
+          'card-id',
+          'Test Card',
+          'Sorcery',
+          'Draw two cards.',
+          ['U'],
+          ['U'],
+          '{2}{U}',
+          '3.0',
+          ['draw'],
+          <Map<String, dynamic>>[],
+          80,
+        ],
+        schema: ResultSchema(const []),
+      ),
+    );
+
+    expect(candidate['cmc'], 3.0);
+    expect(candidate['functional_tags'], const ['draw']);
+    expect(candidate['best_role_score'], 80.0);
+  });
+
   group('optimize complete mana balancing helpers', () {
     test('calculateCompleteMaxBasicAdditions caps basic overflow at 40', () {
       expect(calculateCompleteMaxBasicAdditions(38), equals(40));

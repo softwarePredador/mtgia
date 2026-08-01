@@ -50,6 +50,13 @@ double safeToDouble(dynamic value, [double fallback = 0.0]) {
   return fallback;
 }
 
+double? safeToNullableDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
+}
+
 int commanderFillerQualityScore(Map<String, dynamic> candidate) {
   final name = ((candidate['name'] as String?) ?? '').trim().toLowerCase();
   final typeLine = (candidate['type_line'] as String?) ?? '';

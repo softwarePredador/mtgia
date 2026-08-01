@@ -257,7 +257,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     final availableQuantity = (row[14] as num?)?.toInt() ?? 0;
     final bestCommanderSynergyScore = (row[15] as num?)?.toInt() ?? 0;
     final minimumBracket = (row[16] as num?)?.toInt() ?? 1;
-    final cmc = (row[17] as num?)?.toDouble();
+    final cmc = safeToNullableDouble(row[17]);
     final estimatedPriceBrl = estimateOptimizePriceBrl(
       priceUsd: priceUsd,
       priceUsdFoil: priceUsdFoil,
