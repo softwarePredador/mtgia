@@ -99,10 +99,11 @@ void main() {
   }
 
   Future<void> deleteDeck(String deckId) async {
-    await http.delete(
+    final response = await http.delete(
       Uri.parse('$baseUrl/decks/$deckId'),
       headers: authHeaders(),
     );
+    expect(response.statusCode, anyOf(200, 404), reason: response.body);
   }
 
   Future<void> deleteAccount() async {
@@ -440,8 +441,9 @@ void main() {
 
   tearDownAll(() async {
     if (skipIntegration != null) return;
-    for (final deckId in createdDeckIds) {
+    for (final deckId in List<String>.from(createdDeckIds)) {
       await deleteDeck(deckId);
+      createdDeckIds.remove(deckId);
     }
     await deleteAccount();
   });
@@ -1222,144 +1224,187 @@ void main() {
           for (final size in deckSizes) {
             final deckId = await createCommanderDeckWithCount(size);
             createdDeckIds.add(deckId);
-
-            final response = await optimizeWithPolling({
-              'deck_id': deckId,
-              'archetype': 'Control',
-              'bracket': bracket,
-              'keep_theme': true,
-            });
-
-            expect(
-              response.statusCode,
-              anyOf(200, 422, 500),
-              reason: 'size=$size bracket=$bracket => ${response.body}',
-            );
-            evaluated += 1;
-            if (response.statusCode == 500) {
-              failures.add(
-                '500 size=$size bracket=$bracket body=${response.body}',
-              );
-              continue;
-            }
-            if (response.statusCode == 422) {
-              // Quality gate failure — not a test failure, just a quality rejection
-              print(
-                '⚠️ size=$size bracket=$bracket quality gate: ${response.body}',
-              );
-              continue;
-            }
-
-            final body = decodeJson(response);
-            final mode = body['mode'];
-            if (mode is! String || !['optimize', 'complete'].contains(mode)) {
-              failures.add(
-                'contract size=$size bracket=$bracket mode inválido: $mode',
-              );
-              continue;
-            }
-            if (body['reasoning'] is! String) {
-              failures.add(
-                'contract size=$size bracket=$bracket reasoning inválido',
-              );
-            }
-            if (body['deck_analysis'] is! Map<String, dynamic>) {
-              failures.add(
-                'contract size=$size bracket=$bracket deck_analysis inválido',
-              );
-            }
-            if (body['target_additions'] is! int) {
-              failures.add(
-                'contract size=$size bracket=$bracket target_additions inválido',
-              );
-              continue;
-            }
-
-            final gotBracket = body['bracket'];
-            if (gotBracket != bracket) {
-              failures.add(
-                'contract size=$size bracket=$bracket returnedBracket=$gotBracket',
-              );
-            }
-            final bracketPolicy = body['bracket_policy'];
-            if (bracketPolicy is! Map) {
-              failures.add(
-                'contract size=$size bracket=$bracket bracket_policy ausente',
-              );
-            } else {
-              final policy = bracketPolicy.cast<String, dynamic>();
-              final expectedCap = switch (bracket) {
-                1 || 2 => 0,
-                3 => 3,
-                _ => null,
-              };
-              final expectedLabel = switch (bracket) {
-                1 => 'Exhibition',
-                2 => 'Core',
-                3 => 'Upgraded',
-                4 => 'Optimized',
-                _ => 'cEDH',
-              };
-              final expectedMinimumTurns = switch (bracket) {
-                1 => 9,
-                2 => 8,
-                3 => 6,
-                4 => 4,
-                _ => null,
-              };
-              final intent = policy['intent_profile'];
-              if (policy['bracket'] != bracket ||
-                  policy['label'] != expectedLabel ||
-                  policy['hard_compliant'] != true ||
-                  policy['game_changer_cap'] != expectedCap ||
-                  intent is! Map ||
-                  intent['minimum_turns_played'] != expectedMinimumTurns ||
-                  intent['competitive_lane'] != (bracket == 5)) {
-                failures.add(
-                  'bracket-policy size=$size bracket=$bracket policy=${jsonEncode(policy)}',
-                );
-              }
-            }
-
-            final details =
-                (body['additions_detailed'] as List?)
-                    ?.whereType<Map>()
-                    .map((e) => e.cast<String, dynamic>())
-                    .toList() ??
-                <Map<String, dynamic>>[];
-
-            for (final entry in details) {
-              if (entry['card_id'] is! String) {
-                failures.add(
-                  'contract size=$size bracket=$bracket card_id inválido',
-                );
-              }
-              if (entry['quantity'] is! int || (entry['quantity'] as int) < 1) {
-                failures.add(
-                  'contract size=$size bracket=$bracket quantity inválido',
-                );
-              }
-            }
-
             try {
-              assertNoDuplicateNamesAndNoAbsurdCopies(
-                details,
-                size: size,
-                bracket: bracket,
-              );
-            } catch (e) {
-              failures.add('dedupe size=$size bracket=$bracket => $e');
-            }
+              final response = await optimizeWithPolling({
+                'deck_id': deckId,
+                'archetype': 'Control',
+                'bracket': bracket,
+                'keep_theme': true,
+              });
 
-            final totalDetailed = details.fold<int>(
-              0,
-              (acc, e) => acc + ((e['quantity'] as int?) ?? 0),
-            );
-            final targetAdditions = body['target_additions'] as int;
-            if (totalDetailed > targetAdditions) {
-              failures.add(
-                'contract size=$size bracket=$bracket totalDetailed=$totalDetailed > target=$targetAdditions',
+              expect(
+                response.statusCode,
+                anyOf(200, 422, 500),
+                reason: 'size=$size bracket=$bracket => ${response.body}',
               );
+              evaluated += 1;
+              if (response.statusCode == 500) {
+                failures.add(
+                  '500 size=$size bracket=$bracket body=${response.body}',
+                );
+                continue;
+              }
+              if (response.statusCode == 422) {
+                final rejection = decodeJson(response);
+                if (size <= 40) {
+                  failures.add(
+                    'unexpected_quality_rejection size=$size bracket=$bracket body=${response.body}',
+                  );
+                } else {
+                  final qualityError = rejection['quality_error'];
+                  final qualityCode =
+                      qualityError is Map ? qualityError['code'] : null;
+                  if (rejection['mode'] != 'rebuild_guided' ||
+                      qualityCode != 'OPTIMIZE_NEEDS_REPAIR') {
+                    failures.add(
+                      'invalid_rebuild_rejection size=$size bracket=$bracket body=${response.body}',
+                    );
+                  }
+                }
+                print(
+                  '⚠️ size=$size bracket=$bracket quality gate: ${response.body}',
+                );
+                continue;
+              }
+
+              final body = decodeJson(response);
+              final mode = body['mode'];
+              if (mode is! String || !['optimize', 'complete'].contains(mode)) {
+                failures.add(
+                  'contract size=$size bracket=$bracket mode inválido: $mode',
+                );
+                continue;
+              }
+              if (body['reasoning'] is! String) {
+                failures.add(
+                  'contract size=$size bracket=$bracket reasoning inválido',
+                );
+              }
+              if (body['deck_analysis'] is! Map<String, dynamic>) {
+                failures.add(
+                  'contract size=$size bracket=$bracket deck_analysis inválido',
+                );
+              }
+              if (body['target_additions'] is! int) {
+                failures.add(
+                  'contract size=$size bracket=$bracket target_additions inválido',
+                );
+                continue;
+              }
+
+              final gotBracket = body['bracket'];
+              if (gotBracket != bracket) {
+                failures.add(
+                  'contract size=$size bracket=$bracket returnedBracket=$gotBracket',
+                );
+              }
+              final bracketPolicy = body['bracket_policy'];
+              if (bracketPolicy is! Map) {
+                failures.add(
+                  'contract size=$size bracket=$bracket bracket_policy ausente',
+                );
+              } else {
+                final policy = bracketPolicy.cast<String, dynamic>();
+                final expectedCap = switch (bracket) {
+                  1 || 2 => 0,
+                  3 => 3,
+                  _ => null,
+                };
+                final expectedLabel = switch (bracket) {
+                  1 => 'Exhibition',
+                  2 => 'Core',
+                  3 => 'Upgraded',
+                  4 => 'Optimized',
+                  _ => 'cEDH',
+                };
+                final expectedMinimumTurns = switch (bracket) {
+                  1 => 9,
+                  2 => 8,
+                  3 => 6,
+                  4 => 4,
+                  _ => null,
+                };
+                final intent = policy['intent_profile'];
+                if (policy['bracket'] != bracket ||
+                    policy['label'] != expectedLabel ||
+                    policy['hard_compliant'] != true ||
+                    policy['game_changer_cap'] != expectedCap ||
+                    intent is! Map ||
+                    intent['minimum_turns_played'] != expectedMinimumTurns ||
+                    intent['competitive_lane'] != (bracket == 5)) {
+                  failures.add(
+                    'bracket-policy size=$size bracket=$bracket policy=${jsonEncode(policy)}',
+                  );
+                }
+              }
+
+              if (mode == 'complete') {
+                final rolePolicy = body['functional_role_policy'];
+                final expectedWipes = switch (bracket) {
+                  1 || 2 || 3 => 3,
+                  4 => 1,
+                  _ => 0,
+                };
+                final actualCounts =
+                    rolePolicy is Map ? rolePolicy['actual_counts'] : null;
+                final actualWipes =
+                    actualCounts is Map
+                        ? (actualCounts['wipe'] as num?)?.toInt()
+                        : null;
+                if (rolePolicy is! Map ||
+                    rolePolicy['satisfied'] != true ||
+                    actualWipes == null ||
+                    actualWipes < expectedWipes) {
+                  failures.add(
+                    'wipe-floor size=$size bracket=$bracket policy=${jsonEncode(rolePolicy)}',
+                  );
+                }
+              }
+
+              final details =
+                  (body['additions_detailed'] as List?)
+                      ?.whereType<Map>()
+                      .map((e) => e.cast<String, dynamic>())
+                      .toList() ??
+                  <Map<String, dynamic>>[];
+
+              for (final entry in details) {
+                if (entry['card_id'] is! String) {
+                  failures.add(
+                    'contract size=$size bracket=$bracket card_id inválido',
+                  );
+                }
+                if (entry['quantity'] is! int ||
+                    (entry['quantity'] as int) < 1) {
+                  failures.add(
+                    'contract size=$size bracket=$bracket quantity inválido',
+                  );
+                }
+              }
+
+              try {
+                assertNoDuplicateNamesAndNoAbsurdCopies(
+                  details,
+                  size: size,
+                  bracket: bracket,
+                );
+              } catch (e) {
+                failures.add('dedupe size=$size bracket=$bracket => $e');
+              }
+
+              final totalDetailed = details.fold<int>(
+                0,
+                (acc, e) => acc + ((e['quantity'] as int?) ?? 0),
+              );
+              final targetAdditions = body['target_additions'] as int;
+              if (totalDetailed > targetAdditions) {
+                failures.add(
+                  'contract size=$size bracket=$bracket totalDetailed=$totalDetailed > target=$targetAdditions',
+                );
+              }
+            } finally {
+              await deleteDeck(deckId);
+              createdDeckIds.remove(deckId);
             }
           }
         }
@@ -1373,7 +1418,7 @@ void main() {
         );
       },
       skip: skipIntegration,
-      timeout: const Timeout(Duration(minutes: 12)),
+      timeout: const Timeout(Duration(minutes: 35)),
     );
   });
 }

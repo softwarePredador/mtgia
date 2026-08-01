@@ -196,15 +196,14 @@ bool _cardCountsTowardOptimizationFunctionalRole(
   if (role == 'ramp') {
     return optimizationRampProfileForCard(card).countsTowardGenericFloor;
   }
+  if (role == 'wipe') {
+    return looksLikeBoardWipe(card['oracle_text']?.toString() ?? '');
+  }
 
   final roles =
       optimizationFunctionalRolesForCard(
         card,
       ).map(_normalizeCriticalRole).toSet();
-  if (role == 'wipe' &&
-      looksLikeBoardWipe(card['oracle_text']?.toString() ?? '')) {
-    roles.add('wipe');
-  }
 
   return switch (role) {
     'draw' =>
@@ -216,7 +215,6 @@ bool _cardCountsTowardOptimizationFunctionalRole(
       roles.contains('interaction') ||
           roles.contains('counterspell') ||
           roles.contains('removal'),
-    'wipe' => roles.contains('wipe'),
     _ => roles.contains(role),
   };
 }

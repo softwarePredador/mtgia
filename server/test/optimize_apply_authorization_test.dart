@@ -638,7 +638,7 @@ void main() {
       });
       expect(assessment.deficits, {'wipe': 2});
 
-      final taggedAssessment =
+      final canonicalWipeAssessment =
           assessOptimizationApplyCommanderFunctionalRoleFloorFromCards(
             format: 'commander',
             cards: const [
@@ -679,10 +679,10 @@ void main() {
                 'quantity': 75,
               },
               {
-                'card_id': 'tagged-wipe',
-                'name': 'Silent Structural Answer',
+                'card_id': 'canonical-wipe',
+                'name': 'Canonical Structural Answer',
                 'type_line': 'Sorcery',
-                'oracle_text': '',
+                'oracle_text': 'Destroy all creatures.',
                 'functional_tags': [
                   {'tag': 'board_wipe', 'confidence': 0.95, 'source': 'test'},
                 ],
@@ -693,8 +693,8 @@ void main() {
             authorizationVerification: verification,
             storedArchetype: 'midrange',
           )!;
-      expect(taggedAssessment.satisfied, isTrue);
-      expect(taggedAssessment.actualCounts, {
+      expect(canonicalWipeAssessment.satisfied, isTrue);
+      expect(canonicalWipeAssessment.actualCounts, {
         'ramp': 8,
         'draw': 8,
         'interaction': 6,

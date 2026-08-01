@@ -1284,16 +1284,6 @@ Future<void> fillCompleteDeckRemainder({
         limit: spellsNeeded,
         bracket: bracket,
       );
-      final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
-        allCardData: state.virtualDeck,
-        targetArchetype: targetArchetype,
-        limit: spellsNeeded,
-      );
-      final functionalNeeds = _mergeCriticalCompleteFunctionalNeeds(
-        criticalNeeds: criticalRoleNeeds,
-        plannedNeeds: structuralNeeds,
-        limit: spellsNeeded,
-      );
       List<Map<String, dynamic>> bracketSnapshot() => [
         ...state.virtualDeck,
         ...selectedSpells,
@@ -1331,28 +1321,66 @@ Future<void> fillCompleteDeckRemainder({
         }
       }
 
-      final initialSynergySpells = await findSynergyReplacements(
-        pool: pool,
-        commanders: commanders,
-        commanderColorIdentity: commanderColorIdentity,
-        targetArchetype: targetArchetype,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        detectedTheme: detectedTheme,
-        coreCards: coreCards,
-        missingCount: spellsNeeded,
-        removedCards: const [],
-        functionalNeedsOverride: functionalNeeds,
-        excludeNames: existingNames,
-        allCardData: state.virtualDeck,
-        preferredNames: state.aiSuggestedNames,
-        userId: userId,
-        preferCollection: preferCollection,
-        budgetLimitBrl: budgetLimitBrl,
-        deckFormat: deckFormat,
-        recommendationLedger: state.recommendationLedger,
-      );
-      mergeUniqueSpells(dedupeCandidatesByName(initialSynergySpells));
+      final wipeFloorDeficit =
+          criticalRoleNeeds.where((role) => role == 'wipe').length;
+      if (wipeFloorDeficit > 0) {
+        final wipeFloorCandidates = await loadCommanderWipeFloorCandidates(
+          pool: pool,
+          currentDeckCards: bracketSnapshot(),
+          commanderColorIdentity: commanderColorIdentity,
+          excludeNames: existingNames,
+          bracket: bracket,
+          limit: wipeFloorDeficit,
+          deckFormat: deckFormat,
+        );
+        final reservedWipes = await reserveIncoming(wipeFloorCandidates);
+        mergeUniqueSpells(reservedWipes);
+        Log.d(
+          '  Wipe floor lane: deficit=$wipeFloorDeficit selected=${reservedWipes.length}.',
+        );
+      }
+
+      final remainingSynergySlots = spellsNeeded - selectedSpells.length;
+      if (remainingSynergySlots > 0) {
+        final refreshedCriticalNeeds = buildCommanderCriticalRoleFloorNeeds(
+          cards: bracketSnapshot(),
+          targetArchetype: targetArchetype,
+          limit: remainingSynergySlots,
+          bracket: bracket,
+        );
+        final refreshedStructuralNeeds = buildStructuralRecoveryFunctionalNeeds(
+          allCardData: bracketSnapshot(),
+          targetArchetype: targetArchetype,
+          limit: remainingSynergySlots,
+        );
+        final functionalNeeds = _mergeCriticalCompleteFunctionalNeeds(
+          criticalNeeds: refreshedCriticalNeeds,
+          plannedNeeds: refreshedStructuralNeeds,
+          limit: remainingSynergySlots,
+        );
+        final initialSynergySpells = await findSynergyReplacements(
+          pool: pool,
+          commanders: commanders,
+          commanderColorIdentity: commanderColorIdentity,
+          targetArchetype: targetArchetype,
+          bracket: bracket,
+          keepTheme: keepTheme,
+          detectedTheme: detectedTheme,
+          coreCards: coreCards,
+          missingCount: remainingSynergySlots,
+          removedCards: const [],
+          functionalNeedsOverride: functionalNeeds,
+          excludeNames: existingNames.union(selectedSpellNames),
+          allCardData: bracketSnapshot(),
+          preferredNames: state.aiSuggestedNames,
+          userId: userId,
+          preferCollection: preferCollection,
+          budgetLimitBrl: budgetLimitBrl,
+          deckFormat: deckFormat,
+          recommendationLedger: state.recommendationLedger,
+        );
+        mergeUniqueSpells(dedupeCandidatesByName(initialSynergySpells));
+      }
 
       if (selectedSpells.isEmpty) {
         final universalFallback = await loadUniversalCommanderFallbacks(

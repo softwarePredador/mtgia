@@ -87,6 +87,31 @@ void main() {
       );
     });
 
+    test('critical wipe floor rejects a stale persisted wipe tag', () {
+      expect(
+        countOptimizationFunctionalRole(const [
+          {
+            'name': 'False Persisted Wipe Tag',
+            'type_line': 'Artifact',
+            'oracle_text': 'Exile all cards from your library.',
+            'functional_tags': ['board_wipe'],
+          },
+        ], role: 'wipe'),
+        0,
+      );
+      expect(
+        countOptimizationFunctionalRole(const [
+          {
+            'name': 'Devastation Tide',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                "Return all nonland permanents to their owners' hands.",
+          },
+        ], role: 'wipe'),
+        1,
+      );
+    });
+
     test('assesses quantity-aware multi-role Commander structural floors', () {
       final assessment = assessCommanderFunctionalRoleFloors(
         cards: const [

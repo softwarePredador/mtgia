@@ -122,6 +122,71 @@ void main() {
 
       expect(filtered.map((card) => card['name']), ['Cori-Steel Cutter']);
     });
+
+    test('wipe floor lane bypasses generic ranking without bypassing bracket', () {
+      final selected = selectCommanderWipeFloorCandidates(
+        bracket: 2,
+        currentDeckCards: const [],
+        limit: 3,
+        candidates: const [
+          {
+            'name': 'Generic High Rank',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {U}.',
+            'meta_deck_count': 9999,
+          },
+          {
+            'name': 'Cyclonic Rift',
+            'type_line': 'Instant',
+            'oracle_text':
+                "Return all nonland permanents you don't control to their owners' hands.",
+            'meta_deck_count': 9998,
+          },
+          {
+            'name': 'Devastation Tide',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                "Return all nonland permanents to their owners' hands.",
+            'meta_deck_count': 30,
+          },
+          {
+            'name': 'Consuming Tide',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                'Each player chooses a nonland permanent they control. '
+                "Return all nonland permanents not chosen this way to their owners' hands.",
+            'functional_tags': ['board_wipe'],
+            'meta_deck_count': 20,
+          },
+          {
+            'name': 'Crush of Tentacles',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                "Return all nonland permanents to their owners' hands.",
+            'meta_deck_count': 10,
+          },
+          {
+            'name': 'Friendly Formation',
+            'type_line': 'Instant',
+            'oracle_text': 'All creatures you control get +2/+2.',
+            'meta_deck_count': 5000,
+          },
+          {
+            'name': 'False Persisted Wipe Tag',
+            'type_line': 'Artifact',
+            'oracle_text': 'Exile all cards from your library.',
+            'functional_tags': ['board_wipe'],
+            'meta_deck_count': 6000,
+          },
+        ],
+      );
+
+      expect(selected.map((card) => card['name']), [
+        'Devastation Tide',
+        'Consuming Tide',
+        'Crush of Tentacles',
+      ]);
+    });
   });
 
   test(
@@ -168,4 +233,33 @@ void main() {
           'The first pool starts from the actual virtual deck; later pools use the cumulative snapshot.',
     );
   });
+
+  test(
+    'Complete fills the wipe floor before generic top-ranked candidates',
+    () {
+      final fillerSource =
+          File('lib/ai/optimize_filler_loader_support.dart').readAsStringSync();
+      final completeSource =
+          File('lib/ai/optimize_complete_support.dart').readAsStringSync();
+      final remainderSource = completeSource.substring(
+        completeSource.indexOf('Future<void> fillCompleteDeckRemainder'),
+      );
+
+      expect(fillerSource, contains('loadCommanderWipeFloorCandidates'));
+      expect(fillerSource, contains('LIMIT 600'));
+      expect(
+        fillerSource,
+        isNot(contains('ORDER BY RANDOM()\\n      LIMIT 600')),
+      );
+      expect(
+        remainderSource.indexOf('loadCommanderWipeFloorCandidates'),
+        lessThan(remainderSource.indexOf('findSynergyReplacements')),
+      );
+      expect(remainderSource, contains('cards: bracketSnapshot()'));
+      expect(
+        remainderSource,
+        contains('excludeNames: existingNames.union(selectedSpellNames)'),
+      );
+    },
+  );
 }

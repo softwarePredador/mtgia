@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "2d094cf72d9532d647d4389c5a79c00bfcba761010b8368e1c40c2c6fbad42c9",
+  "x-manaloom-source-digest-sha256": "8699ab8478d54d8d54c7699fdb3d43fd07981b8962f5d960975b29599c711120",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {

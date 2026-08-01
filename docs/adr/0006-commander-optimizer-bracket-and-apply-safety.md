@@ -78,6 +78,14 @@ Use defense in depth with explicit boundaries:
     exact shared ramp/draw/interaction/wipe lanes before generic role ranking,
     and repeats bracket, mana, role-floor and strict-rules checks before a
     draft transaction.
+13. Complete reserves a deterministic, role-specific PostgreSQL candidate lane
+    for any missing wipe floor before the general synergy/popularity pool. The
+    lane applies legality, color identity, bracket, collection and budget
+    constraints, then recomputes every remaining functional need on the
+    cumulative projected deck. A persisted semantic `wipe` tag may help
+    discovery and ranking, but only Oracle text accepted by the canonical wipe
+    classifier satisfies the hard structural floor. This prevents a stale tag
+    or a generic top-N cutoff from certifying a deck with no real board wipe.
 
 The intent matrix follows the Wizards Commander Brackets update of
 2025-10-21. The Game Changer set follows the official 2026-02-09 update,
@@ -105,6 +113,9 @@ Official references:
   structural role floors.
 - Provider, fallback and stale-cache mistakes fail closed at final payload and
   apply.
+- Complete cannot lose all eligible wipes merely because they rank below the
+  generic candidate cutoff, and tag-only false positives cannot satisfy the
+  wipe floor.
 - Secret rotation invalidates outstanding preview tokens. The dedicated
   `OPTIMIZATION_APPLY_SIGNING_SECRET` is optional; `JWT_SECRET` is the runtime
   fallback, but at least one must be configured for an actionable preview.
@@ -119,6 +130,9 @@ Official references:
   outside provider control.
 - Treat popularity or engine coverage as deck fit: neither proves commander
   intent.
+- Increase the generic candidate limit until wipes happen to appear: catalog
+  growth would reintroduce the same truncation bug and make results
+  nondeterministic by role.
 - Accept an unsigned client hash: a client can recompute it after changing the
   payload.
 - Validate only after replacing `deck_cards`: this weakens atomicity and risks

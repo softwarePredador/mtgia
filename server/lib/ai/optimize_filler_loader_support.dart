@@ -924,6 +924,237 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
   return dedupeCandidatesByName(candidates).take(limit).toList();
 }
 
+List<Map<String, dynamic>> selectCommanderWipeFloorCandidates({
+  required List<Map<String, dynamic>> candidates,
+  required List<Map<String, dynamic>> currentDeckCards,
+  required int? bracket,
+  required int limit,
+}) {
+  if (limit <= 0 || candidates.isEmpty) return const [];
+
+  final exactWipes = dedupeCandidatesByName(
+    candidates
+        .where(
+          (candidate) =>
+              countOptimizationFunctionalRole([candidate], role: 'wipe') > 0,
+        )
+        .toList(growable: false),
+  ).toList(growable: true);
+  final bracketSafe = filterCandidatesByBracketPolicy(
+    candidates: exactWipes,
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+  );
+
+  bracketSafe.sort((a, b) {
+    final byIntent = commanderBracketIntentPenalty(
+      a,
+      bracket: bracket,
+    ).compareTo(commanderBracketIntentPenalty(b, bracket: bracket));
+    if (byIntent != 0) return byIntent;
+
+    final byRoleScore = ((b['best_role_score'] as num?)?.toDouble() ?? 0)
+        .compareTo((a['best_role_score'] as num?)?.toDouble() ?? 0);
+    if (byRoleScore != 0) return byRoleScore;
+
+    final byQuality = commanderFillerQualityScore(
+      b,
+    ).compareTo(commanderFillerQualityScore(a));
+    if (byQuality != 0) return byQuality;
+
+    return (a['name']?.toString() ?? '').compareTo(b['name']?.toString() ?? '');
+  });
+
+  return bracketSafe.take(limit).toList(growable: false);
+}
+
+Future<List<Map<String, dynamic>>> loadCommanderWipeFloorCandidates({
+  required Pool pool,
+  required List<Map<String, dynamic>> currentDeckCards,
+  required Set<String> commanderColorIdentity,
+  required Set<String> excludeNames,
+  required int? bracket,
+  required int limit,
+  String deckFormat = 'commander',
+}) async {
+  if (limit <= 0) return const [];
+
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT
+        ranked.id,
+        ranked.name,
+        ranked.type_line,
+        ranked.oracle_text,
+        ranked.mana_cost,
+        ranked.colors,
+        ranked.color_identity,
+        ranked.cmc,
+        ranked.meta_deck_count,
+        ranked.usage_count,
+        ranked.functional_tags,
+        ranked.semantic_tags_v2,
+        ranked.best_role_score
+      FROM (
+        SELECT DISTINCT ON (LOWER(c.name))
+          c.id::text AS id,
+          c.name,
+          c.type_line,
+          c.oracle_text,
+          c.mana_cost,
+          c.colors,
+          c.color_identity,
+          c.cmc,
+          COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
+          COALESCE(cmi.usage_count, 0) AS usage_count,
+          ARRAY(
+            SELECT DISTINCT value
+            FROM unnest(
+              COALESCE(cis.function_tags, ARRAY[]::text[]) ||
+              COALESCE(cis.scored_roles, ARRAY[]::text[])
+            ) AS role(value)
+            WHERE value IS NOT NULL AND TRIM(value) <> ''
+          ) AS functional_tags,
+          COALESCE(cis.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+          COALESCE(cis.best_role_score, 0) AS best_role_score
+        FROM cards c
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id AND cl.format = @legality_format
+        LEFT JOIN card_meta_insights cmi
+          ON LOWER(cmi.card_name) = LOWER(c.name)
+        LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
+        WHERE
+          (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          AND LOWER(c.name) NOT IN (
+            SELECT LOWER(unnest(@exclude::text[]))
+          )
+          AND NOT (
+            COALESCE(c.type_line, '') ~*
+              '(^|[^a-z])land([^a-z]|\$)'
+          )
+          AND c.name NOT LIKE 'A-%'
+          AND c.name NOT LIKE '\\_%' ESCAPE '\\'
+          AND c.name NOT LIKE '%World Champion%'
+          AND c.name NOT LIKE '%Heroes of the Realm%'
+          AND c.oracle_text IS NOT NULL
+          AND LENGTH(TRIM(c.oracle_text)) > 0
+          AND (
+            (
+              c.color_identity IS NOT NULL
+              AND (
+                c.color_identity <@ @identity::text[]
+                OR c.color_identity = '{}'
+              )
+            )
+            OR (
+              c.color_identity IS NULL
+              AND (
+                c.colors <@ @identity::text[]
+                OR c.colors = '{}'
+                OR c.colors IS NULL
+              )
+            )
+          )
+          AND (
+            COALESCE(cis.function_tags, ARRAY[]::text[]) &&
+              ARRAY['wipe', 'board_wipe']::text[]
+            OR COALESCE(cis.scored_roles, ARRAY[]::text[]) &&
+              ARRAY['wipe', 'board_wipe']::text[]
+            OR COALESCE(c.oracle_text, '') ~*
+              '(destroy|exile)[[:space:]]+all'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%return all nonland permanents%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%return all creatures%'
+            OR (
+              LOWER(COALESCE(c.oracle_text, '')) LIKE
+                '%return to their owners'' hands all%'
+              AND (
+                LOWER(COALESCE(c.oracle_text, '')) LIKE '%creatures%'
+                OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+                  '%nonland permanents%'
+              )
+            )
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%all creatures get -%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%each creature gets -%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%all colored permanents%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%each player sacrifices all%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%each opponent sacrifices all%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE
+              '%damage to each creature%'
+            OR (
+              LOWER(COALESCE(c.oracle_text, '')) LIKE '%deals%'
+              AND LOWER(COALESCE(c.oracle_text, '')) LIKE '%damage%'
+              AND LOWER(COALESCE(c.oracle_text, '')) LIKE
+                '%to each creature%'
+            )
+          )
+        ORDER BY
+          LOWER(c.name),
+          COALESCE(cmi.usage_count, 0) DESC,
+          c.id
+      ) ranked
+      ORDER BY
+        ranked.best_role_score DESC,
+        ranked.meta_deck_count DESC,
+        ranked.usage_count DESC,
+        ranked.cmc ASC NULLS LAST,
+        LOWER(ranked.name) ASC
+      LIMIT 600
+    '''),
+    parameters: {
+      'exclude': excludeNames.toList(growable: false),
+      'identity': commanderColorIdentity.toList(growable: false),
+      'legality_format': deckFormat.trim().toLowerCase(),
+    },
+  );
+
+  final candidates = result
+      .map(
+        (row) => <String, dynamic>{
+          'id': row[0] as String,
+          'name': row[1] as String,
+          'type_line': (row[2] as String?) ?? '',
+          'oracle_text': (row[3] as String?) ?? '',
+          'mana_cost': (row[4] as String?) ?? '',
+          'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
+          'color_identity':
+              (row[6] as List?)?.cast<String>() ?? const <String>[],
+          'cmc': safeToDouble(row[7]),
+          'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
+          'usage_count': (row[9] as num?)?.toInt() ?? 0,
+          'functional_tags':
+              (row[10] as List?)
+                  ?.map((entry) => entry.toString())
+                  .toList(growable: false) ??
+              const <String>[],
+          'semantic_tags_v2': row[11],
+          'best_role_score': (row[12] as num?)?.toDouble() ?? 0,
+        },
+      )
+      .where(
+        (candidate) => shouldKeepCommanderFillerCandidate(
+          candidate: candidate,
+          excludeNames: excludeNames,
+          commanderColorIdentity: commanderColorIdentity,
+          enforceCommanderIdentity: true,
+        ),
+      )
+      .toList(growable: false);
+
+  return selectCommanderWipeFloorCandidates(
+    candidates: candidates,
+    currentDeckCards: currentDeckCards,
+    bracket: bracket,
+    limit: limit,
+  );
+}
+
 Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
   required Pool pool,
   required List<Map<String, dynamic>> currentDeckCards,
