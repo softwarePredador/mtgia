@@ -103,7 +103,7 @@ void main() {
       Uri.parse('$baseUrl/decks/$deckId'),
       headers: authHeaders(),
     );
-    expect(response.statusCode, anyOf(200, 404), reason: response.body);
+    expect(response.statusCode, anyOf(204, 404), reason: response.body);
   }
 
   Future<void> deleteAccount() async {

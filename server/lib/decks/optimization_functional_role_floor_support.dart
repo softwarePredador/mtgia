@@ -122,22 +122,25 @@ assessOptimizationApplyCommanderFunctionalRoleFloorFromCards({
       payload?['removals'] is Map && (payload!['removals'] as Map).isNotEmpty;
   final requiresSignedPolicy =
       authorizationVerification != null &&
-      (authorizedMode == 'optimize' || hasAuthorizedRemovals);
+      (authorizedMode == 'complete' ||
+          authorizedMode == 'optimize' ||
+          hasAuthorizedRemovals);
   final authorizedBracket = _readInt(payload?['bracket']);
+  final signedPolicyIsValid = _isValidSatisfiedSignedPolicy(
+    rawSignedPolicy,
+    expectedBracket: authorizedBracket,
+  );
 
-  if (requiresSignedPolicy &&
-      !_isValidSatisfiedSignedPolicy(
-        rawSignedPolicy,
-        expectedBracket: authorizedBracket,
-      )) {
+  if (requiresSignedPolicy && !signedPolicyIsValid) {
     throw const OptimizationFunctionalRoleFloorViolation(
       reason: 'functional_role_policy_binding_missing',
     );
   }
 
+  final trustedSignedPolicy = signedPolicyIsValid ? rawSignedPolicy : null;
   final materialized = cards.toList(growable: false);
   final signedMinimumCounts = _readRoleCountMap(
-    rawSignedPolicy?['minimum_counts'],
+    trustedSignedPolicy?['minimum_counts'],
   );
   final fallbackArchetype =
       (storedArchetype?.trim().isNotEmpty == true
@@ -146,10 +149,10 @@ assessOptimizationApplyCommanderFunctionalRoleFloorFromCards({
           .trim()
           .toLowerCase();
   final archetype =
-      rawSignedPolicy?['archetype']?.toString().trim().toLowerCase() ??
+      trustedSignedPolicy?['archetype']?.toString().trim().toLowerCase() ??
       fallbackArchetype;
   final bracket = _readInt(
-    rawSignedPolicy?['bracket'] ?? mutationContext['bracket'],
+    trustedSignedPolicy?['bracket'] ?? mutationContext['bracket'],
   );
   final minimumCounts =
       signedMinimumCounts.isNotEmpty

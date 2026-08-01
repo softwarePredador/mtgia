@@ -269,8 +269,9 @@ Map<String, dynamic>? buildOptimizeApplyAuthorizationForResponse({
   final authorizedSwaps =
       optimizeLike ? _canonicalAuthorizedSwapPairs(removals, additions) : null;
   if (optimizeLike && authorizedSwaps == null) return null;
-  final isCommanderOptimize = resolvedBracket != null && optimizeLike;
-  if (isCommanderOptimize &&
+  final requiresCommanderFunctionalRolePolicy =
+      resolvedBracket != null && (optimizeLike || mode == 'complete');
+  if (requiresCommanderFunctionalRolePolicy &&
       !_isSatisfiedFunctionalRolePolicy(
         functionalRolePolicy,
         expectedBracket: resolvedBracket,

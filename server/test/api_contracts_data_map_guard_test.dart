@@ -142,8 +142,8 @@ void main() {
       expect(optimize, contains('swap_integrity'));
       expect(contracts, contains('card_id:quantity:condition:role'));
       expect(contracts, contains('Changing which physical card is the'));
-      expect(contracts, contains('cache contract is\n`v17`'));
-      expect(contracts, contains('commander_functional_role_floors_v2'));
+      expect(contracts, contains('cache contract is\n`v18`'));
+      expect(contracts, contains('commander_functional_role_floors_v3'));
       expect(optimize, contains('optimize_cache_support_test.dart'));
     });
 

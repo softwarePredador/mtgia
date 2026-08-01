@@ -35,6 +35,47 @@ void main() {
       );
     });
 
+    test('average CMC is quantity-weighted and recovers missing metadata', () {
+      final average = calculateCompleteAverageNonLandCmc([
+        {
+          'name': 'Known spell',
+          'type_line': 'Sorcery',
+          'mana_cost': '{1}{U}',
+          'cmc': 2,
+          'quantity': 2,
+        },
+        {
+          'name': 'Recovered spell',
+          'type_line': 'Creature',
+          'mana_cost': '{4}{G}{G}',
+          'quantity': 1,
+        },
+        {
+          'name': 'Ignored land',
+          'type_line': 'Basic Land — Forest',
+          'quantity': 30,
+        },
+      ]);
+
+      expect(average, closeTo(10 / 3, 0.0001));
+      expect(
+        calculateCompleteAverageNonLandCmc(const [
+          {'name': 'Unknown spell', 'type_line': 'Enchantment', 'quantity': 1},
+        ]),
+        4,
+      );
+      expect(
+        calculateCompleteAverageNonLandCmc(const [
+          {
+            'name': 'Plains',
+            'type_line': 'Basic Land — Plains',
+            'quantity': 20,
+          },
+        ]),
+        3.5,
+      );
+    });
+
     test('buildWeightedBasicLandPlan favors the color with highest deficit', () {
       final currentDeck = [
         _card(

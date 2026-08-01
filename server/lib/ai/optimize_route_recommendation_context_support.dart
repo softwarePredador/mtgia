@@ -4,6 +4,8 @@ import '../basic_land_utils.dart' as basic_lands;
 import 'optimize_route_request_support.dart';
 
 const defaultOptimizeUsdToBrlRate = 5.50;
+const optimizeRecommendationReservationMarker =
+    '_optimize_recommendation_reservation_active';
 
 /// Mutable reservation ledger shared by every candidate source in one
 /// Complete build.
@@ -15,6 +17,8 @@ const defaultOptimizeUsdToBrlRate = 5.50;
 /// valid candidate.
 class OptimizeRecommendationConstraintLedger {
   final Map<String, int> _remainingAvailableByName = <String, int>{};
+  final Map<String, List<_OptimizeRecommendationReservation>>
+  _reservationsByName = <String, List<_OptimizeRecommendationReservation>>{};
   double _budgetUsedBrl = 0;
 
   double get budgetUsedBrl => _budgetUsedBrl;
@@ -42,12 +46,83 @@ class OptimizeRecommendationConstraintLedger {
     );
     if (available > 0) {
       _remainingAvailableByName[normalized] = available - 1;
+      _reservationsByName
+          .putIfAbsent(normalized, () => <_OptimizeRecommendationReservation>[])
+          .add(const _OptimizeRecommendationReservation.collection());
       return;
     }
     if (budgetCostBrl != null && budgetCostBrl > 0) {
       _budgetUsedBrl += budgetCostBrl;
     }
+    _reservationsByName
+        .putIfAbsent(normalized, () => <_OptimizeRecommendationReservation>[])
+        .add(_OptimizeRecommendationReservation.purchase(budgetCostBrl ?? 0));
   }
+
+  bool release(String name) {
+    final normalized = name.trim().toLowerCase();
+    final reservations = _reservationsByName[normalized];
+    if (normalized.isEmpty || reservations == null || reservations.isEmpty) {
+      return false;
+    }
+    final reservation = reservations.removeLast();
+    if (reservations.isEmpty) _reservationsByName.remove(normalized);
+    if (reservation.usedCollection) {
+      _remainingAvailableByName[normalized] =
+          (_remainingAvailableByName[normalized] ?? 0) + 1;
+    } else {
+      _budgetUsedBrl =
+          (_budgetUsedBrl - reservation.budgetCostBrl)
+              .clamp(0, double.infinity)
+              .toDouble();
+    }
+    return true;
+  }
+}
+
+Map<String, dynamic> markOptimizeRecommendationReservation(
+  Map<String, dynamic> candidate,
+) {
+  return {...candidate, optimizeRecommendationReservationMarker: true};
+}
+
+bool settleOptimizeRecommendationReservation({
+  required OptimizeRecommendationConstraintLedger ledger,
+  required Map<String, dynamic> candidate,
+  required bool accepted,
+}) {
+  if (candidate.remove(optimizeRecommendationReservationMarker) != true) {
+    return false;
+  }
+  if (!accepted) {
+    ledger.release(candidate['name']?.toString() ?? '');
+  }
+  return true;
+}
+
+void releaseUnsettledOptimizeRecommendationReservations({
+  required OptimizeRecommendationConstraintLedger ledger,
+  required Iterable<Map<String, dynamic>> candidates,
+}) {
+  for (final candidate in candidates) {
+    settleOptimizeRecommendationReservation(
+      ledger: ledger,
+      candidate: candidate,
+      accepted: false,
+    );
+  }
+}
+
+class _OptimizeRecommendationReservation {
+  const _OptimizeRecommendationReservation.collection()
+    : usedCollection = true,
+      budgetCostBrl = 0;
+
+  const _OptimizeRecommendationReservation.purchase(this.budgetCostBrl)
+    : usedCollection = false;
+
+  final bool usedCollection;
+  final double budgetCostBrl;
 }
 
 class OptimizeRecommendationConstraintResult {

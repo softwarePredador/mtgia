@@ -680,6 +680,7 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
       'type_line': e['type_line'],
       'oracle_text': e['oracle_text'],
       'mana_cost': e['mana_cost'],
+      'cmc': e['cmc'],
       'colors': e['colors'],
       'color_identity': e['color_identity'],
     };
@@ -1273,10 +1274,12 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
   final identity = commanderColorIdentity.toList();
   final result = await pool.execute(
     Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost,
+             sub.colors, sub.color_identity, sub.cmc
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
+          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
+          c.colors, c.color_identity, c.cmc,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
         LEFT JOIN card_legalities cl
@@ -1329,6 +1332,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
               'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
               'color_identity':
                   (row[6] as List?)?.cast<String>() ?? const <String>[],
+              'cmc': safeToDouble(row[7]),
             },
           )
           .where(
@@ -1345,7 +1349,9 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
   if (candidates.length < limit) {
     final stapleResult = await pool.execute(
       Sql.named('''
-        SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
+        SELECT DISTINCT ON (LOWER(c.name))
+               c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
+               c.colors, c.color_identity, c.cmc
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
@@ -1355,6 +1361,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
             c.color_identity <@ @identity::text[]
             OR c.color_identity = '{}'
           )
+        ORDER BY LOWER(c.name), c.id
       '''),
       parameters: {
         'names': commanderCompletionStapleNames,
@@ -1370,9 +1377,11 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
                 'name': row[1] as String,
                 'type_line': (row[2] as String?) ?? '',
                 'oracle_text': (row[3] as String?) ?? '',
-                'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+                'mana_cost': (row[4] as String?) ?? '',
+                'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
                 'color_identity':
-                    (row[5] as List?)?.cast<String>() ?? const <String>[],
+                    (row[6] as List?)?.cast<String>() ?? const <String>[],
+                'cmc': safeToDouble(row[7]),
               },
             )
             .where(
@@ -1431,10 +1440,12 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
 
   final result = await pool.execute(
     Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost,
+             sub.colors, sub.color_identity, sub.cmc
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
+          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
+          c.colors, c.color_identity, c.cmc,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
         LEFT JOIN card_legalities cl
@@ -1469,6 +1480,7 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
               'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
               'color_identity':
                   (row[6] as List?)?.cast<String>() ?? const <String>[],
+              'cmc': safeToDouble(row[7]),
             },
           )
           .where(
@@ -1550,10 +1562,12 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
 
   final result = await pool.execute(
     Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost,
+             sub.colors, sub.color_identity, sub.cmc
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
+          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
+          c.colors, c.color_identity, c.cmc,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
         LEFT JOIN card_legalities cl
@@ -1587,6 +1601,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
     final manaCost = (row[4] as String?) ?? '';
     final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
     final colorIdentity = (row[6] as List?)?.cast<String>();
+    final cmc = safeToDouble(row[7]);
 
     final withinIdentity = isWithinCommanderIdentity(
       cardIdentity: resolvedCardIdentityFromParts(
@@ -1606,6 +1621,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
       'mana_cost': manaCost,
       'colors': colors,
       'color_identity': colorIdentity,
+      'cmc': cmc,
     };
     if (!shouldKeepCommanderFillerCandidate(
       candidate: candidate,

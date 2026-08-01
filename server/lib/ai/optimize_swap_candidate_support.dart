@@ -119,7 +119,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
              sub.price_usd, sub.price_usd_foil,
              sub.owned_quantity, sub.available_quantity,
              sub.best_commander_synergy_score,
-             sub.minimum_bracket
+             sub.minimum_bracket,
+             sub.cmc
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
@@ -140,7 +141,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           COALESCE(availability.free_quantity, 0)::int AS available_quantity,
           COALESCE(commander_synergy.best_score, 0)::int
             AS best_commander_synergy_score,
-          COALESCE(bracket_scope.minimum_bracket, 1)::int AS minimum_bracket
+          COALESCE(bracket_scope.minimum_bracket, 1)::int AS minimum_bracket,
+          c.cmc
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
@@ -231,6 +233,10 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   final candidatePool = <Map<String, dynamic>>[];
   final effectiveBudgetLimit =
       (budgetLimitBrl != null && budgetLimitBrl >= 0) ? budgetLimitBrl : null;
+  final effectiveRecommendationLedger =
+      preferCollection || effectiveBudgetLimit != null
+          ? recommendationLedger
+          : null;
   for (final row in candidatesResult) {
     final id = row[0] as String;
     final name = row[1] as String;
@@ -251,20 +257,21 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     final availableQuantity = (row[14] as num?)?.toInt() ?? 0;
     final bestCommanderSynergyScore = (row[15] as num?)?.toInt() ?? 0;
     final minimumBracket = (row[16] as num?)?.toInt() ?? 1;
+    final cmc = (row[17] as num?)?.toDouble();
     final estimatedPriceBrl = estimateOptimizePriceBrl(
       priceUsd: priceUsd,
       priceUsdFoil: priceUsdFoil,
       usdToBrlRate: usdToBrlRate,
     );
     final ledgerAvailable =
-        recommendationLedger?.remainingAvailable(
+        effectiveRecommendationLedger?.remainingAvailable(
           name,
           initialAvailableQuantity: availableQuantity,
         ) ??
         availableQuantity;
     if (!isOptimizeCandidateWithinBudget(
       budgetLimitBrl: effectiveBudgetLimit,
-      budgetUsedBrl: recommendationLedger?.budgetUsedBrl ?? 0,
+      budgetUsedBrl: effectiveRecommendationLedger?.budgetUsedBrl ?? 0,
       availableQuantity: ledgerAvailable,
       estimatedPriceBrl: estimatedPriceBrl,
     )) {
@@ -301,6 +308,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       'available_quantity': availableQuantity,
       'best_commander_synergy_score': bestCommanderSynergyScore,
       'minimum_bracket': minimumBracket,
+      'cmc': cmc,
     });
   }
 
@@ -318,9 +326,10 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
         (candidate['available_quantity'] as num?)?.toInt() ?? 0;
     return isOptimizeCandidateWithinBudget(
       budgetLimitBrl: effectiveBudgetLimit,
-      budgetUsedBrl: recommendationLedger?.budgetUsedBrl ?? budgetUsedBrl,
+      budgetUsedBrl:
+          effectiveRecommendationLedger?.budgetUsedBrl ?? budgetUsedBrl,
       availableQuantity:
-          recommendationLedger?.remainingAvailable(
+          effectiveRecommendationLedger?.remainingAvailable(
             name,
             initialAvailableQuantity: initialAvailable,
           ) ??
@@ -335,8 +344,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
         (candidate['available_quantity'] as num?)?.toInt() ?? 0;
     final estimatedPrice =
         (candidate['estimated_price_brl'] as num?)?.toDouble();
-    if (recommendationLedger != null) {
-      recommendationLedger.reserve(
+    if (effectiveRecommendationLedger != null) {
+      effectiveRecommendationLedger.reserve(
         name: name,
         initialAvailableQuantity: availableQuantity,
         budgetCostBrl: estimatedPrice,
@@ -398,6 +407,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       final matches = matchesFunctionalNeedForCandidate(
         need,
         candidate: candidate,
+        enforceCommanderCriticalFloor:
+            deckFormat.trim().toLowerCase() == 'commander',
       );
 
       if (matches && score > bestScore) {
@@ -407,9 +418,15 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     }
 
     if (best != null) {
-      results.add(_buildReplacementResult(best, functionalNeed: need));
-      usedNames.add((best['name'] as String).toLowerCase());
       consumeCandidateBudget(best);
+      results.add(
+        buildOptimizeReplacementResult(
+          best,
+          functionalNeed: need,
+          hasRecommendationReservation: effectiveRecommendationLedger != null,
+        ),
+      );
+      usedNames.add((best['name'] as String).toLowerCase());
     }
   }
 
@@ -487,20 +504,25 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       if (usedNames.contains(name)) continue;
       if (!canUseCandidate(candidate)) continue;
 
+      consumeCandidateBudget(candidate);
       results.add(
-        _buildReplacementResult(candidate, functionalNeed: 'utility'),
+        buildOptimizeReplacementResult(
+          candidate,
+          functionalNeed: 'utility',
+          hasRecommendationReservation: effectiveRecommendationLedger != null,
+        ),
       );
       usedNames.add(name);
-      consumeCandidateBudget(candidate);
     }
   }
 
   return results;
 }
 
-Map<String, dynamic> _buildReplacementResult(
+Map<String, dynamic> buildOptimizeReplacementResult(
   Map<String, dynamic> candidate, {
   required String functionalNeed,
+  bool hasRecommendationReservation = false,
 }) {
   final ownedQuantity = (candidate['owned_quantity'] as num?)?.toInt() ?? 0;
   final availableQuantity =
@@ -512,6 +534,7 @@ Map<String, dynamic> _buildReplacementResult(
     'type_line': candidate['type_line'] ?? '',
     'oracle_text': candidate['oracle_text'] ?? '',
     'mana_cost': candidate['mana_cost'] ?? '',
+    'cmc': candidate['cmc'],
     'colors': candidate['colors'] ?? const <String>[],
     'color_identity': candidate['color_identity'] ?? const <String>[],
     'functional_tags': candidate['functional_tags'] ?? const <String>[],
@@ -522,6 +545,8 @@ Map<String, dynamic> _buildReplacementResult(
     'available_quantity': availableQuantity,
     'collection_match': availableQuantity > 0,
     'purchase_required': availableQuantity <= 0,
+    if (hasRecommendationReservation)
+      optimizeRecommendationReservationMarker: true,
     if (estimatedPrice != null)
       'estimated_price_brl': double.parse(estimatedPrice.toStringAsFixed(2)),
   };
@@ -530,8 +555,18 @@ Map<String, dynamic> _buildReplacementResult(
 bool matchesFunctionalNeedForCandidate(
   String need, {
   required Map<String, dynamic> candidate,
+  bool enforceCommanderCriticalFloor = false,
 }) {
   final normalizedNeed = _normalizeReplacementNeed(need);
+  final commanderCriticalRole =
+      normalizedNeed == 'removal' ? 'interaction' : normalizedNeed;
+  if (enforceCommanderCriticalFloor &&
+      commanderCriticalFunctionalRoleNames.contains(commanderCriticalRole)) {
+    return countsTowardCommanderCriticalRoleFloor(
+      candidate,
+      role: commanderCriticalRole,
+    );
+  }
   if (normalizedNeed == 'ramp' &&
       !optimizationRampProfileForCard(candidate).countsTowardGenericFloor) {
     return false;

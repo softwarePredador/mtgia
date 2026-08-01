@@ -188,14 +188,15 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
 
   final result = await pool.execute(
     Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
-             c.colors, c.color_identity
+      SELECT DISTINCT ON (LOWER(c.name))
+             c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost,
+             c.colors, c.color_identity, c.cmc
       FROM cards c
       LEFT JOIN card_legalities cl
         ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE c.name = ANY(@names)
         AND (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-      ORDER BY c.name ASC
+      ORDER BY LOWER(c.name), c.id
       LIMIT @limit
     '''),
     parameters: {
@@ -217,6 +218,7 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
               'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
               'color_identity':
                   (row[6] as List?)?.cast<String>() ?? const <String>[],
+              'cmc': safeToDouble(row[7]),
             },
           )
           .where(

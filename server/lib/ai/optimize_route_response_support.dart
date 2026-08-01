@@ -72,11 +72,12 @@ Map<String, dynamic>? buildCachedOptimizeResponse({
     if (cachedBracket != bracket || bracketPolicy['hard_compliant'] != true) {
       return null;
     }
-    final actionableOptimize =
-        effectiveMode == 'optimize' &&
-        cachedResponse['outcome_code'] == 'optimized' &&
-        cachedResponse['can_apply'] != false;
-    if (actionableOptimize &&
+    final requiresFunctionalRolePolicy =
+        (effectiveMode == 'optimize' &&
+            cachedResponse['outcome_code'] == 'optimized' &&
+            cachedResponse['can_apply'] != false) ||
+        effectiveMode == 'complete';
+    if (requiresFunctionalRolePolicy &&
         !isSatisfiedReusableFunctionalRolePolicy(
           cachedResponse['functional_role_policy'],
           expectedBracket: bracket,

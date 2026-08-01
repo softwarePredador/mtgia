@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:server/ai/optimize_complete_support.dart';
 import 'package:server/ai/optimize_route_recommendation_context_support.dart';
 import 'package:server/ai/optimize_route_request_support.dart';
 import 'package:test/test.dart';
@@ -223,6 +224,106 @@ void main() {
         expect(ledger.budgetUsedBrl, 30);
       },
     );
+
+    test('shared Complete ledger releases removed collection and budget', () {
+      final ledger =
+          OptimizeRecommendationConstraintLedger()
+            ..reserve(
+              name: 'Owned Card',
+              initialAvailableQuantity: 1,
+              budgetCostBrl: null,
+            )
+            ..reserve(
+              name: 'Market Card',
+              initialAvailableQuantity: 0,
+              budgetCostBrl: 30,
+            );
+
+      expect(
+        ledger.remainingAvailable('Owned Card', initialAvailableQuantity: 1),
+        0,
+      );
+      expect(ledger.budgetUsedBrl, 30);
+      expect(ledger.release('Owned Card'), isTrue);
+      expect(ledger.release('Market Card'), isTrue);
+      expect(
+        ledger.remainingAvailable('Owned Card', initialAvailableQuantity: 1),
+        1,
+      );
+      expect(ledger.budgetUsedBrl, 0);
+      expect(ledger.release('Market Card'), isFalse);
+    });
+
+    test('Complete reserves only one printing per normalized card name', () {
+      final unique = dedupeCompleteRecommendationCandidatesForReservation(
+        const [
+          {'id': 'printing-a', 'name': 'Arcane Signet'},
+          {'id': 'printing-b', 'name': ' arcane signet '},
+        ],
+      );
+
+      expect(unique, hasLength(1));
+
+      final ledger = OptimizeRecommendationConstraintLedger();
+      final result = applyOptimizeBudgetConstraint(
+        additions:
+            unique.map((candidate) => candidate['name'] as String).toList(),
+        detailsByNameLower: {
+          'arcane signet': buildOptimizeRecommendationMarketDetail(
+            ownedQuantity: 1,
+            availableQuantity: 1,
+            estimatedPriceBrl: 25,
+            usdToBrlRate: 5.5,
+          ),
+        },
+        budgetLimitBrl: 0,
+        ledger: ledger,
+      );
+
+      expect(result.additions, hasLength(1));
+      expect(result.collectionMatchedCount, 1);
+      expect(result.purchaseRequiredCount, 0);
+      expect(result.budgetUsedBrl, 0);
+    });
+
+    test('rejected marked candidate restores its exact reservation', () {
+      final ledger =
+          OptimizeRecommendationConstraintLedger()..reserve(
+            name: 'Owned Candidate',
+            initialAvailableQuantity: 1,
+            budgetCostBrl: null,
+          );
+      final candidate = markOptimizeRecommendationReservation({
+        'name': 'Owned Candidate',
+      });
+
+      expect(
+        ledger.remainingAvailable(
+          'Owned Candidate',
+          initialAvailableQuantity: 1,
+        ),
+        0,
+      );
+      expect(
+        settleOptimizeRecommendationReservation(
+          ledger: ledger,
+          candidate: candidate,
+          accepted: false,
+        ),
+        isTrue,
+      );
+      expect(
+        ledger.remainingAvailable(
+          'Owned Candidate',
+          initialAvailableQuantity: 1,
+        ),
+        1,
+      );
+      expect(
+        candidate,
+        isNot(contains(optimizeRecommendationReservationMarker)),
+      );
+    });
 
     test('expands Complete quantities before cumulative budget audit', () {
       expect(

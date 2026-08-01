@@ -409,6 +409,7 @@ void main() {
       );
       final generatedId = cards.last['card_id'] as String;
       state.addedCountsById[generatedId] = 1;
+      state.commanderRecommendedLands = 36;
 
       final freed = rebalanceCompleteDeckForFunctionalRoleDeficits(
         state: state,
@@ -420,6 +421,85 @@ void main() {
       expect(freed, 0);
       expect(state.virtualTotal, 98);
       expect(state.addedCountsById[generatedId], 1);
+    },
+  );
+
+  test(
+    'complete does not reuse land-reserved slots for critical role floors',
+    () {
+      final cards = <Map<String, dynamic>>[
+        const {
+          'card_id': 'commander',
+          'name': 'Atraxa, Praetors\' Voice',
+          'type_line': 'Legendary Creature — Phyrexian Angel Horror',
+          'quantity': 1,
+          'is_commander': true,
+        },
+        const {
+          'card_id': 'plains',
+          'name': 'Plains',
+          'type_line': 'Basic Land — Plains',
+          'quantity': 18,
+        },
+        const {
+          'card_id': 'island',
+          'name': 'Island',
+          'type_line': 'Basic Land — Island',
+          'quantity': 18,
+        },
+        for (var index = 0; index < 63; index++)
+          {
+            'card_id': 'generic-$index',
+            'name': 'Generic Spell $index',
+            'type_line': 'Creature',
+            'oracle_text': 'Vigilance.',
+            'quantity': 1,
+          },
+      ];
+      final state = CompleteBuildAccumulator.fromDeck(
+        allCardData: cards,
+        originalCountsById: {
+          for (final card in cards)
+            card['card_id'] as String: card['quantity'] as int,
+        },
+        currentTotalCards: 100,
+      );
+      state.commanderRecommendedLands = 40;
+      for (final card in cards.where(
+        (card) => (card['card_id'] as String).startsWith('generic-'),
+      )) {
+        state.addedCountsById[card['card_id'] as String] = 1;
+      }
+
+      rebalanceCompleteDeckForLandDeficit(
+        state: state,
+        maxTotal: 100,
+        deckFormat: 'commander',
+        targetArchetype: 'control',
+        bracket: 1,
+      );
+      expect(
+        completeOutstandingLandDeficit(state: state, deckFormat: 'commander'),
+        4,
+      );
+      expect(state.virtualTotal, 96);
+
+      final roleFreed = rebalanceCompleteDeckForFunctionalRoleDeficits(
+        state: state,
+        maxTotal: 100,
+        deckFormat: 'commander',
+        targetArchetype: 'control',
+        bracket: 1,
+      );
+
+      const criticalRoleDeficit = 8 + 8 + 6 + 3;
+      expect(roleFreed, criticalRoleDeficit);
+      expect(state.virtualTotal, 100 - 4 - criticalRoleDeficit);
+      expect(
+        100 - state.virtualTotal,
+        completeOutstandingLandDeficit(state: state, deckFormat: 'commander') +
+            criticalRoleDeficit,
+      );
     },
   );
 
@@ -519,7 +599,10 @@ List<Map<String, dynamic>> _completeCommanderDeck({
       'card_id': 'structural-engine',
       'name': 'Persistent Structural Engine',
       'type_line': 'Artifact',
-      'oracle_text': '{T}: Add one mana of any color.',
+      'oracle_text':
+          '{T}: Add one mana of any color. Whenever you cast your second '
+          'spell each turn, draw a card. {2}, {T}: Exile target nonland '
+          'permanent.',
       'functional_tags': ['ramp', 'draw', 'interaction'],
       'quantity': 8,
     },

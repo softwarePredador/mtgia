@@ -184,7 +184,7 @@ void main() {
 
     test('reuses only a matching hard-compliant bracket policy', () {
       const satisfiedFunctionalRolePolicy = {
-        'policy': 'commander_functional_role_floors_v2',
+        'policy': 'commander_functional_role_floors_v3',
         'archetype': 'midrange',
         'bracket': 2,
         'applies': true,
@@ -274,7 +274,7 @@ void main() {
           ),
         ),
         isNull,
-        reason: 'pre-v2 wipe-only cache contracts must never be reusable',
+        reason: 'pre-v3 cache contracts must never be reusable',
       );
       expect(
         hydrate(
@@ -288,7 +288,7 @@ void main() {
           ),
         ),
         isNull,
-        reason: 'v2 must prove every critical role, not only wipes',
+        reason: 'v3 must prove every critical role, not only wipes',
       );
       expect(
         hydrate(
@@ -325,7 +325,7 @@ void main() {
           ),
         ),
         isNull,
-        reason: 'cache cannot weaken the canonical v2 minimum matrix',
+        reason: 'cache cannot weaken the canonical v3 minimum matrix',
       );
       expect(
         hydrate(
@@ -349,6 +349,64 @@ void main() {
           'additions': ['B'],
         }),
         isNull,
+      );
+    });
+
+    test('Complete cache requires the current functional-role policy', () {
+      Map<String, dynamic> completePayload(String policyVersion) => {
+        'mode': 'complete',
+        'strategy_source': 'deterministic_first',
+        'outcome_code': 'deck_completed',
+        'target_additions': 1,
+        'mana_foundation_satisfied': true,
+        'additions': ['Divination'],
+        'additions_detailed': const [
+          {'name': 'Divination', 'card_id': 'card-draw', 'quantity': 1},
+        ],
+        'bracket_policy': const {'bracket': 2, 'hard_compliant': true},
+        'functional_role_policy': {
+          'policy': policyVersion,
+          'archetype': 'midrange',
+          'bracket': 2,
+          'applies': true,
+          'total_cards': 100,
+          'minimum_counts': const {
+            'ramp': 8,
+            'draw': 8,
+            'interaction': 6,
+            'wipe': 2,
+          },
+          'actual_counts': const {
+            'ramp': 8,
+            'draw': 8,
+            'interaction': 6,
+            'wipe': 2,
+          },
+          'deficits': const <String, int>{},
+          'satisfied': true,
+        },
+      };
+      Map<String, dynamic>? hydrate(Map<String, dynamic> cached) =>
+          buildCachedOptimizeResponse(
+            cachedResponse: cached,
+            cacheKey: 'complete-cache',
+            intensity: focused,
+            effectiveMode: 'complete',
+            timings: const {'total_ms': 1},
+            hasBracketOverride: false,
+            hasKeepThemeOverride: false,
+            keepTheme: true,
+            userPreferences: const {'preferred_bracket': 2},
+            bracket: 2,
+          );
+
+      expect(
+        hydrate(completePayload('commander_functional_role_floors_v2')),
+        isNull,
+      );
+      expect(
+        hydrate(completePayload('commander_functional_role_floors_v3')),
+        isNotNull,
       );
     });
   });

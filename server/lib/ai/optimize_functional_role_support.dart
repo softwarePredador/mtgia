@@ -3,7 +3,7 @@ import 'optimization_functional_roles.dart';
 import 'optimization_ramp_profile.dart';
 
 const commanderFunctionalRoleFloorPolicyVersion =
-    'commander_functional_role_floors_v2';
+    'commander_functional_role_floors_v3';
 const commanderCriticalFunctionalRoleNames = <String>{
   'ramp',
   'draw',
@@ -193,30 +193,44 @@ bool _cardCountsTowardOptimizationFunctionalRole(
   Map<String, dynamic> card, {
   required String role,
 }) {
-  if (role == 'ramp') {
+  return countsTowardCommanderCriticalRoleFloor(card, role: role);
+}
+
+bool countsTowardCommanderCriticalRoleFloor(
+  Map<String, dynamic> card, {
+  required String role,
+}) {
+  final normalizedRole = _normalizeCriticalRole(role);
+  if (normalizedRole == 'ramp') {
     return optimizationRampProfileForCard(card).countsTowardGenericFloor;
   }
-  if (role == 'wipe') {
+  if (normalizedRole == 'wipe') {
     return looksLikeBoardWipe(card['oracle_text']?.toString() ?? '');
   }
 
-  final roles =
-      optimizationFunctionalRolesForCard(
-        card,
-      ).map(_normalizeCriticalRole).toSet();
+  if (normalizedRole == 'draw' || normalizedRole == 'interaction') {
+    final verifiedRoles =
+        resolveCardFunctionalRoles(
+          oracleText: card['oracle_text']?.toString() ?? '',
+          typeLine: card['type_line']?.toString() ?? '',
+          name: card['name']?.toString() ?? '',
+          manaCost: card['mana_cost']?.toString(),
+          cmc: card['cmc'],
+        ).roles.map(_normalizeCriticalRole).toSet();
+    return switch (normalizedRole) {
+      'draw' =>
+        verifiedRoles.contains('draw') || verifiedRoles.contains('loot'),
+      'interaction' =>
+        verifiedRoles.contains('interaction') ||
+            verifiedRoles.contains('counterspell') ||
+            verifiedRoles.contains('removal'),
+      _ => false,
+    };
+  }
 
-  return switch (role) {
-    'draw' =>
-      roles.contains('draw') ||
-          roles.contains('loot') ||
-          roles.contains('exile_value') ||
-          roles.contains('card_advantage'),
-    'interaction' =>
-      roles.contains('interaction') ||
-          roles.contains('counterspell') ||
-          roles.contains('removal'),
-    _ => roles.contains(role),
-  };
+  return optimizationFunctionalRolesForCard(
+    card,
+  ).map(_normalizeCriticalRole).contains(normalizedRole);
 }
 
 String _normalizeCriticalRole(String value) {

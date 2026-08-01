@@ -112,6 +112,24 @@ void main() {
       );
     });
 
+    test('critical draw floor rejects a stale persisted draw tag', () {
+      const stale = {
+        'name': 'False Persisted Draw Tag',
+        'type_line': 'Instant',
+        'oracle_text': 'Exile all cards from target player\'s graveyard.',
+        'functional_tags': ['draw', 'exile_value'],
+      };
+      const verified = {
+        'name': 'Divination',
+        'type_line': 'Sorcery',
+        'oracle_text': 'Draw two cards.',
+        'functional_tags': <String>[],
+      };
+
+      expect(countOptimizationFunctionalRole([stale], role: 'draw'), 0);
+      expect(countOptimizationFunctionalRole([verified], role: 'draw'), 1);
+    });
+
     test('assesses quantity-aware multi-role Commander structural floors', () {
       final assessment = assessCommanderFunctionalRoleFloors(
         cards: const [
@@ -123,7 +141,10 @@ void main() {
           {
             'name': 'Persistent Structural Engine',
             'type_line': 'Artifact',
-            'oracle_text': '{T}: Add one mana of any color.',
+            'oracle_text':
+                '{T}: Add one mana of any color. Whenever you cast your '
+                'second spell each turn, draw a card. {2}, {T}: Exile target '
+                'nonland permanent.',
             'functional_tags': ['ramp', 'draw', 'interaction'],
             'quantity': 8,
           },
@@ -166,7 +187,10 @@ void main() {
           {
             'name': 'Ruby Medallion',
             'type_line': 'Artifact',
-            'oracle_text': 'Red spells you cast cost {1} less to cast.',
+            'oracle_text':
+                'Red spells you cast cost {1} less to cast. Whenever you cast '
+                'your second spell each turn, draw a card. {2}, {T}: Exile '
+                'target nonland permanent.',
             'functional_tags': ['ramp', 'draw', 'interaction'],
             'quantity': 8,
           },

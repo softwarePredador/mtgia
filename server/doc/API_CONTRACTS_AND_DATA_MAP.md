@@ -498,17 +498,20 @@ This supersedes the older `card_id:quantity:condition` wording in the
 `POST /ai/optimize` table row above. Changing which physical card is the
 commander therefore invalidates the preview even when card IDs, quantities and
 conditions are otherwise unchanged. The persistent optimize cache contract is
-`v17`; earlier entries are not reused. Its cache key also includes the
+`v18`; earlier entries are not reused. Its cache key also includes the
 normalized deck format, so identical signatures and archetypes cannot share a
-payload across Commander and Brawl.
+payload across Commander and Brawl. It also binds the functional-role policy
+version, so Complete cannot reuse a preview evaluated by older floor rules.
 
 Actionable Commander previews also carry
-`functional_role_policy.policy=commander_functional_role_floors_v2`. The
+`functional_role_policy.policy=commander_functional_role_floors_v3`. The
 policy must prove quantity-aware minimum and actual counts for `ramp`, `draw`,
 `interaction` and `wipe`; a legacy or partial wipe-only policy cannot be
 reused, signed or applied. Generate, Complete, Optimize and Rebuild use this
-same structural matrix. B4 has a one-wipe floor and B5 has no mandatory wipe,
-while the other critical roles remain structural playability safeguards.
+same structural matrix. Critical-floor credit is verified from canonical
+Oracle effects instead of trusting persisted role tags in isolation. B4 has a
+one-wipe floor and B5 has no mandatory wipe, while the other critical roles
+remain structural playability safeguards.
 
 If the source Commander deck itself violates the selected bracket or this
 structural matrix, `POST /ai/optimize` cannot finish as a generic no-op.

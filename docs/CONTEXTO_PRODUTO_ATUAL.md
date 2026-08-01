@@ -13,12 +13,13 @@
   recebe penalidade temática quando não sustenta `Miracle Big Spells`;
 - Complete e Optimize compartilham gates de bracket, identidade, fundação de
   mana, ramp, compra, interação, wipes, orçamento/coleção e qualidade final.
-  Cache anterior é invalidado pelo contrato `v17`;
+  Cache anterior é invalidado pelo contrato `v18`;
 - todos os cinco brackets mantêm intenção distinta: B1/B2/B3/B4 projetam
   janelas 9+/8+/6+/4+ e apenas B5 usa automaticamente o metagame cEDH;
 - Generate e Rebuild também falham fechado na avaliação final; o contrato
-  estrutural `commander_functional_role_floors_v2` exige os quatro papéis
-  críticos e invalida autorizações antigas que comprovavam apenas wipes.
+  estrutural `commander_functional_role_floors_v3` exige os quatro papéis
+  críticos por texto Oracle verificável e invalida tags/autorizações antigas
+  que comprovavam apenas wipes ou funções sem efeito real.
   Impressões repetidas da mesma carta consomem apenas uma identidade no limite
   B3;
 - a aplicação do preview passa a exigir autorização HMAC expirável, ligada ao

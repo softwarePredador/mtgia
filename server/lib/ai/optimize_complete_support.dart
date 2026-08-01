@@ -7,6 +7,7 @@ import '../commander_mana_floor.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import '../meta/meta_deck_reference_support.dart';
+import 'cmc_safety.dart';
 import 'edhrec_service.dart';
 import 'optimize_complete_mana_support.dart';
 import 'optimize_deck_support.dart';
@@ -109,6 +110,34 @@ OptimizeRecommendationContext _completeRecommendationContext({
   );
 }
 
+List<Map<String, dynamic>> dedupeCompleteRecommendationCandidatesForReservation(
+  List<Map<String, dynamic>> candidates,
+) {
+  return dedupeCandidatesByName(candidates);
+}
+
+void _settleCompleteCandidateReservation({
+  required CompleteBuildAccumulator state,
+  required Map<String, dynamic> candidate,
+  required bool accepted,
+}) {
+  settleOptimizeRecommendationReservation(
+    ledger: state.recommendationLedger,
+    candidate: candidate,
+    accepted: accepted,
+  );
+}
+
+void _releaseUnsettledCompleteCandidateReservations({
+  required CompleteBuildAccumulator state,
+  required Iterable<Map<String, dynamic>> candidates,
+}) {
+  releaseUnsettledOptimizeRecommendationReservations(
+    ledger: state.recommendationLedger,
+    candidates: candidates,
+  );
+}
+
 Future<List<Map<String, dynamic>>>
 _reserveCompleteCandidatesByRecommendationContext({
   required Pool pool,
@@ -118,14 +147,17 @@ _reserveCompleteCandidatesByRecommendationContext({
   required bool preferCollection,
   required int? budgetLimitBrl,
 }) async {
-  if (candidates.isEmpty || !preferCollection && budgetLimitBrl == null) {
-    return candidates;
+  final uniqueCandidates = dedupeCompleteRecommendationCandidatesForReservation(
+    candidates,
+  );
+  if (uniqueCandidates.isEmpty || !preferCollection && budgetLimitBrl == null) {
+    return uniqueCandidates;
   }
   if (userId == null || userId.trim().isEmpty) {
     return const <Map<String, dynamic>>[];
   }
 
-  final names = candidates
+  final names = uniqueCandidates
       .map((candidate) => candidate['name']?.toString().trim() ?? '')
       .where((name) => name.isNotEmpty)
       .toList(growable: false);
@@ -148,12 +180,17 @@ _reserveCompleteCandidatesByRecommendationContext({
   }
 
   final allowed = <Map<String, dynamic>>[];
-  for (final candidate in candidates) {
+  for (final candidate in uniqueCandidates) {
     final normalized = candidate['name']?.toString().trim().toLowerCase() ?? '';
     final remaining = allowedCounts[normalized] ?? 0;
     if (remaining <= 0) continue;
     allowedCounts[normalized] = remaining - 1;
-    allowed.add({...candidate, ...?constrained.detailsByNameLower[normalized]});
+    allowed.add(
+      markOptimizeRecommendationReservation({
+        ...candidate,
+        ...?constrained.detailsByNameLower[normalized],
+      }),
+    );
   }
   return allowed;
 }
@@ -372,29 +409,46 @@ Future<void> _addIdentitySafeNonBasicLands({
   );
 
   var added = 0;
-  for (final filler in fillers) {
-    if (added >= limit) break;
-    final id = filler['id'] as String;
-    final name = filler['name'] as String;
-    final lowerName = name.toLowerCase();
-    final maxCopies = maxCopiesForFormat(
-      deckFormat: deckFormat,
-      typeLine: filler['type_line'] as String? ?? '',
-      name: name,
-    );
-    if ((state.virtualCountsByName[lowerName] ?? 0) >= maxCopies) continue;
+  try {
+    for (final filler in fillers) {
+      if (added >= limit) break;
+      final id = filler['id'] as String;
+      final name = filler['name'] as String;
+      final lowerName = name.toLowerCase();
+      final maxCopies = maxCopiesForFormat(
+        deckFormat: deckFormat,
+        typeLine: filler['type_line'] as String? ?? '',
+        name: name,
+      );
+      if ((state.virtualCountsByName[lowerName] ?? 0) >= maxCopies) continue;
 
-    final wasAdded = _addCardToVirtualDeck(
+      final wasAdded = _addCardToVirtualDeck(
+        state: state,
+        id: id,
+        name: name,
+        typeLine: filler['type_line'] as String? ?? '',
+        oracleText: filler['oracle_text'] as String? ?? '',
+        manaCost: filler['mana_cost']?.toString() ?? '',
+        cmc: filler['cmc'],
+        functionalTags: filler['functional_tags'],
+        semanticTagsV2: filler['semantic_tags_v2'],
+        bestRoleScore: filler['best_role_score'],
+        colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
+        colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
+        bracket: bracket,
+      );
+      if (wasAdded) added += 1;
+      _settleCompleteCandidateReservation(
+        state: state,
+        candidate: filler,
+        accepted: wasAdded,
+      );
+    }
+  } finally {
+    _releaseUnsettledCompleteCandidateReservations(
       state: state,
-      id: id,
-      name: name,
-      typeLine: filler['type_line'] as String? ?? '',
-      oracleText: filler['oracle_text'] as String? ?? '',
-      colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
-      colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
-      bracket: bracket,
+      candidates: fillers,
     );
-    if (wasAdded) added += 1;
   }
 }
 
@@ -543,9 +597,28 @@ Future<void> runCompleteAiSuggestionLoop({
 
     final additionsInfoResult = await pool.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity
-        FROM cards
-        WHERE name = ANY(@names)
+        SELECT
+          c.id::text,
+          c.name,
+          c.type_line,
+          c.oracle_text,
+          c.colors,
+          c.color_identity,
+          c.mana_cost,
+          c.cmc,
+          ARRAY(
+            SELECT DISTINCT value
+            FROM unnest(
+              COALESCE(cis.function_tags, ARRAY[]::text[]) ||
+              COALESCE(cis.scored_roles, ARRAY[]::text[])
+            ) AS role(value)
+            WHERE value IS NOT NULL AND TRIM(value) <> ''
+          ) AS functional_tags,
+          COALESCE(cis.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+          COALESCE(cis.best_role_score, 0) AS best_role_score
+        FROM cards c
+        LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
+        WHERE c.name = ANY(@names)
       '''),
       parameters: {'names': validNames},
     );
@@ -566,6 +639,15 @@ Future<void> runCompleteAiSuggestionLoop({
             'oracle_text': oracle,
             'colors': colors,
             'color_identity': identity,
+            'mana_cost': (r[6] as String?) ?? '',
+            'cmc': (r[7] as num?)?.toDouble() ?? 0.0,
+            'functional_tags':
+                (r[8] as List?)
+                    ?.map((entry) => entry.toString())
+                    .toList(growable: false) ??
+                const <String>[],
+            'semantic_tags_v2': r[9],
+            'best_role_score': (r[10] as num?)?.toDouble() ?? 0.0,
           };
         }).toList();
 
@@ -634,41 +716,58 @@ Future<void> runCompleteAiSuggestionLoop({
     if (recommendationAllowed.isEmpty) break;
 
     var addedThisIter = 0;
-    for (final candidate in recommendationAllowed) {
-      if (state.virtualTotal >= maxTotal) break;
-      final id = candidate['card_id'] as String;
-      final name = candidate['name'] as String;
-      final typeLine = (candidate['type_line'] as String).toLowerCase();
-      final isBasic = isBasicLandTypeLine(typeLine);
-      final nameLower = name.toLowerCase();
-      final maxCopies = maxCopiesForFormat(
-        deckFormat: deckFormat,
-        typeLine: typeLine,
-        name: name,
-      );
+    try {
+      for (final candidate in recommendationAllowed) {
+        if (state.virtualTotal >= maxTotal) break;
+        final id = candidate['card_id'] as String;
+        final name = candidate['name'] as String;
+        final typeLine = (candidate['type_line'] as String).toLowerCase();
+        final isBasic = isBasicLandTypeLine(typeLine);
+        final nameLower = name.toLowerCase();
+        final maxCopies = maxCopiesForFormat(
+          deckFormat: deckFormat,
+          typeLine: typeLine,
+          name: name,
+        );
 
-      if (!isBasic &&
-          (state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) {
-        continue;
+        if (!isBasic &&
+            (state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) {
+          continue;
+        }
+
+        if ((state.virtualCountsById[id] ?? 0) > 0 &&
+            (state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) {
+          continue;
+        }
+
+        final wasAdded = _addCardToVirtualDeck(
+          state: state,
+          id: id,
+          name: name,
+          typeLine: candidate['type_line'] as String? ?? '',
+          oracleText: candidate['oracle_text'] as String? ?? '',
+          manaCost: candidate['mana_cost']?.toString() ?? '',
+          cmc: candidate['cmc'],
+          functionalTags: candidate['functional_tags'],
+          semanticTagsV2: candidate['semantic_tags_v2'],
+          bestRoleScore: candidate['best_role_score'],
+          colors: (candidate['colors'] as List?)?.cast<String>() ?? const [],
+          colorIdentity: (candidate['color_identity'] as List?)?.cast<String>(),
+          isBasic: isBasic,
+          bracket: bracket,
+        );
+        if (wasAdded) addedThisIter += 1;
+        _settleCompleteCandidateReservation(
+          state: state,
+          candidate: candidate,
+          accepted: wasAdded,
+        );
       }
-
-      if ((state.virtualCountsById[id] ?? 0) > 0 &&
-          (state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) {
-        continue;
-      }
-
-      final wasAdded = _addCardToVirtualDeck(
+    } finally {
+      _releaseUnsettledCompleteCandidateReservations(
         state: state,
-        id: id,
-        name: name,
-        typeLine: candidate['type_line'] as String? ?? '',
-        oracleText: candidate['oracle_text'] as String? ?? '',
-        colors: (candidate['colors'] as List?)?.cast<String>() ?? const [],
-        colorIdentity: (candidate['color_identity'] as List?)?.cast<String>(),
-        isBasic: isBasic,
-        bracket: bracket,
+        candidates: recommendationAllowed,
       );
-      if (wasAdded) addedThisIter += 1;
     }
 
     if (addedThisIter == 0) break;
@@ -710,292 +809,323 @@ Future<int> _bootstrapSparseCompleteInput({
           .toSet();
 
   final selected = <Map<String, dynamic>>[];
-  final selectedNames = <String>{};
-  List<Map<String, dynamic>> bracketSnapshot() => [
-    ...state.virtualDeck,
-    ...selected,
-  ];
+  try {
+    final selectedNames = <String>{};
+    List<Map<String, dynamic>> bracketSnapshot() => [
+      ...state.virtualDeck,
+      ...selected,
+    ];
 
-  void addUnique(Iterable<Map<String, dynamic>> items) {
-    for (final item in items) {
-      if (basic_lands.isLandTypeLine(item['type_line']?.toString() ?? '')) {
-        continue;
-      }
-      final lowerName = ((item['name'] as String?) ?? '').trim().toLowerCase();
-      if (lowerName.isEmpty) continue;
-      if (existingNames.contains(lowerName) ||
-          selectedNames.contains(lowerName)) {
-        continue;
-      }
-      selected.add(item);
-      selectedNames.add(lowerName);
-      if (selected.length >= spellSlotsToFill) {
-        return;
+    void addUnique(Iterable<Map<String, dynamic>> items) {
+      for (final item in items) {
+        if (selected.length >= spellSlotsToFill) {
+          _settleCompleteCandidateReservation(
+            state: state,
+            candidate: item,
+            accepted: false,
+          );
+          continue;
+        }
+        if (basic_lands.isLandTypeLine(item['type_line']?.toString() ?? '')) {
+          _settleCompleteCandidateReservation(
+            state: state,
+            candidate: item,
+            accepted: false,
+          );
+          continue;
+        }
+        final lowerName =
+            ((item['name'] as String?) ?? '').trim().toLowerCase();
+        if (lowerName.isEmpty) {
+          _settleCompleteCandidateReservation(
+            state: state,
+            candidate: item,
+            accepted: false,
+          );
+          continue;
+        }
+        if (existingNames.contains(lowerName) ||
+            selectedNames.contains(lowerName)) {
+          _settleCompleteCandidateReservation(
+            state: state,
+            candidate: item,
+            accepted: false,
+          );
+          continue;
+        }
+        selected.add(item);
+        selectedNames.add(lowerName);
       }
     }
-  }
 
-  final criticalNeeds = buildCommanderCriticalRoleFloorNeeds(
-    cards: state.virtualDeck,
-    targetArchetype: targetArchetype,
-    limit: spellSlotsToFill,
-    bracket: bracket,
-  );
-  final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
-    allCardData: state.virtualDeck,
-    targetArchetype: targetArchetype,
-    limit: spellSlotsToFill,
-  );
-  final themedNeeds = _mergeCriticalCompleteFunctionalNeeds(
-    criticalNeeds: criticalNeeds,
-    plannedNeeds: structuralNeeds,
-    limit: spellSlotsToFill,
-  );
-  final themedPool = await findSynergyReplacements(
-    pool: pool,
-    commanders: commanders,
-    commanderColorIdentity: commanderColorIdentity,
-    targetArchetype: targetArchetype,
-    bracket: bracket,
-    keepTheme: keepTheme,
-    detectedTheme: detectedTheme,
-    coreCards: coreCards,
-    missingCount: spellSlotsToFill,
-    removedCards: const [],
-    functionalNeedsOverride: themedNeeds,
-    excludeNames: existingNames,
-    allCardData: state.virtualDeck,
-    preferredNames: {
-      ...state.aiSuggestedNames,
-      ...state.commanderMetaPriorityNames,
-    },
-    userId: userId,
-    preferCollection: preferCollection,
-    budgetLimitBrl: budgetLimitBrl,
-    deckFormat: deckFormat,
-    recommendationLedger: state.recommendationLedger,
-  );
-  addUnique(themedPool);
-
-  var structuredPool = const <Map<String, dynamic>>[];
-  if (selected.length < spellSlotsToFill) {
-    structuredPool = await loadGuaranteedNonBasicFillers(
+    final criticalNeeds = buildCommanderCriticalRoleFloorNeeds(
+      cards: state.virtualDeck,
+      targetArchetype: targetArchetype,
+      limit: spellSlotsToFill,
+      bracket: bracket,
+    );
+    final structuralNeeds = buildStructuralRecoveryFunctionalNeeds(
+      allCardData: state.virtualDeck,
+      targetArchetype: targetArchetype,
+      limit: spellSlotsToFill,
+    );
+    final themedNeeds = _mergeCriticalCompleteFunctionalNeeds(
+      criticalNeeds: criticalNeeds,
+      plannedNeeds: structuralNeeds,
+      limit: spellSlotsToFill,
+    );
+    final themedPool = await findSynergyReplacements(
       pool: pool,
-      currentDeckCards: bracketSnapshot(),
+      commanders: commanders,
       commanderColorIdentity: commanderColorIdentity,
       targetArchetype: targetArchetype,
       bracket: bracket,
-      excludeNames: existingNames.union(selectedNames),
+      keepTheme: keepTheme,
+      detectedTheme: detectedTheme,
+      coreCards: coreCards,
+      missingCount: spellSlotsToFill,
+      removedCards: const [],
+      functionalNeedsOverride: themedNeeds,
+      excludeNames: existingNames,
+      allCardData: state.virtualDeck,
       preferredNames: {
         ...state.aiSuggestedNames,
         ...state.commanderMetaPriorityNames,
       },
-      limit: spellSlotsToFill - selected.length,
-      deckFormat: deckFormat,
-    );
-  }
-  addUnique(
-    await _reserveCompleteCandidatesByRecommendationContext(
-      pool: pool,
-      state: state,
-      candidates: structuredPool,
       userId: userId,
       preferCollection: preferCollection,
       budgetLimitBrl: budgetLimitBrl,
-    ),
-  );
-
-  if (selected.length < spellSlotsToFill) {
-    final foundationPool = await loadArchetypeCommanderFoundationFillers(
-      pool: pool,
-      commanderColorIdentity: commanderColorIdentity,
-      targetArchetype: targetArchetype,
-      detectedTheme: detectedTheme,
-      excludeNames: existingNames.union(selectedNames),
-      currentDeckCards: bracketSnapshot(),
-      bracket: bracket,
-      limit: spellSlotsToFill - selected.length,
       deckFormat: deckFormat,
+      recommendationLedger: state.recommendationLedger,
     );
+    addUnique(themedPool);
+
+    var structuredPool = const <Map<String, dynamic>>[];
+    if (selected.length < spellSlotsToFill) {
+      structuredPool = await loadGuaranteedNonBasicFillers(
+        pool: pool,
+        currentDeckCards: bracketSnapshot(),
+        commanderColorIdentity: commanderColorIdentity,
+        targetArchetype: targetArchetype,
+        bracket: bracket,
+        excludeNames: existingNames.union(selectedNames),
+        preferredNames: {
+          ...state.aiSuggestedNames,
+          ...state.commanderMetaPriorityNames,
+        },
+        limit: spellSlotsToFill - selected.length,
+        deckFormat: deckFormat,
+      );
+    }
     addUnique(
       await _reserveCompleteCandidatesByRecommendationContext(
         pool: pool,
         state: state,
-        candidates: foundationPool,
+        candidates: structuredPool,
         userId: userId,
         preferCollection: preferCollection,
         budgetLimitBrl: budgetLimitBrl,
       ),
     );
-  }
 
-  if (selected.length < spellSlotsToFill) {
-    final universalPool = await loadUniversalCommanderFallbacks(
-      pool: pool,
-      excludeNames: existingNames.union(selectedNames),
-      commanderColorIdentity: commanderColorIdentity,
-      currentDeckCards: bracketSnapshot(),
-      bracket: bracket,
-      limit: spellSlotsToFill - selected.length,
-      deckFormat: deckFormat,
-    );
-    addUnique(
-      await _reserveCompleteCandidatesByRecommendationContext(
+    if (selected.length < spellSlotsToFill) {
+      final foundationPool = await loadArchetypeCommanderFoundationFillers(
         pool: pool,
-        state: state,
-        candidates: universalPool,
-        userId: userId,
-        preferCollection: preferCollection,
-        budgetLimitBrl: budgetLimitBrl,
-      ),
-    );
-  }
+        commanderColorIdentity: commanderColorIdentity,
+        targetArchetype: targetArchetype,
+        detectedTheme: detectedTheme,
+        excludeNames: existingNames.union(selectedNames),
+        currentDeckCards: bracketSnapshot(),
+        bracket: bracket,
+        limit: spellSlotsToFill - selected.length,
+        deckFormat: deckFormat,
+      );
+      addUnique(
+        await _reserveCompleteCandidatesByRecommendationContext(
+          pool: pool,
+          state: state,
+          candidates: foundationPool,
+          userId: userId,
+          preferCollection: preferCollection,
+          budgetLimitBrl: budgetLimitBrl,
+        ),
+      );
+    }
 
-  if (selected.length < spellSlotsToFill) {
-    final preferredPool = await loadPreferredNameFillers(
-      pool: pool,
-      preferredNames: state.aiSuggestedNames,
-      commanderColorIdentity: commanderColorIdentity,
-      excludeNames: existingNames.union(selectedNames),
-      currentDeckCards: bracketSnapshot(),
-      bracket: bracket,
-      limit: spellSlotsToFill - selected.length,
-      deckFormat: deckFormat,
-    );
-    addUnique(
-      await _reserveCompleteCandidatesByRecommendationContext(
+    if (selected.length < spellSlotsToFill) {
+      final universalPool = await loadUniversalCommanderFallbacks(
         pool: pool,
-        state: state,
-        candidates: preferredPool,
-        userId: userId,
-        preferCollection: preferCollection,
-        budgetLimitBrl: budgetLimitBrl,
-      ),
-    );
-  }
+        excludeNames: existingNames.union(selectedNames),
+        commanderColorIdentity: commanderColorIdentity,
+        currentDeckCards: bracketSnapshot(),
+        bracket: bracket,
+        limit: spellSlotsToFill - selected.length,
+        deckFormat: deckFormat,
+      );
+      addUnique(
+        await _reserveCompleteCandidatesByRecommendationContext(
+          pool: pool,
+          state: state,
+          candidates: universalPool,
+          userId: userId,
+          preferCollection: preferCollection,
+          budgetLimitBrl: budgetLimitBrl,
+        ),
+      );
+    }
 
-  if (selected.length < spellSlotsToFill) {
-    final broadPool = await loadBroadCommanderNonLandFillers(
-      pool: pool,
-      currentDeckCards: bracketSnapshot(),
-      commanderColorIdentity: commanderColorIdentity,
-      excludeNames: existingNames.union(selectedNames),
-      bracket: bracket,
-      limit: spellSlotsToFill - selected.length,
-      deckFormat: deckFormat,
-    );
-    addUnique(
-      await _reserveCompleteCandidatesByRecommendationContext(
+    if (selected.length < spellSlotsToFill) {
+      final preferredPool = await loadPreferredNameFillers(
         pool: pool,
-        state: state,
-        candidates: broadPool,
-        userId: userId,
-        preferCollection: preferCollection,
-        budgetLimitBrl: budgetLimitBrl,
-      ),
-    );
-  }
+        preferredNames: state.aiSuggestedNames,
+        commanderColorIdentity: commanderColorIdentity,
+        excludeNames: existingNames.union(selectedNames),
+        currentDeckCards: bracketSnapshot(),
+        bracket: bracket,
+        limit: spellSlotsToFill - selected.length,
+        deckFormat: deckFormat,
+      );
+      addUnique(
+        await _reserveCompleteCandidatesByRecommendationContext(
+          pool: pool,
+          state: state,
+          candidates: preferredPool,
+          userId: userId,
+          preferCollection: preferCollection,
+          budgetLimitBrl: budgetLimitBrl,
+        ),
+      );
+    }
 
-  if (selected.length < spellSlotsToFill) {
-    final identitySafePool = await loadIdentitySafeNonLandFillers(
-      pool: pool,
-      commanderColorIdentity: commanderColorIdentity,
-      excludeNames: existingNames.union(selectedNames),
-      currentDeckCards: bracketSnapshot(),
-      bracket: bracket,
-      limit: spellSlotsToFill - selected.length,
-      deckFormat: deckFormat,
-    );
-    addUnique(
-      await _reserveCompleteCandidatesByRecommendationContext(
+    if (selected.length < spellSlotsToFill) {
+      final broadPool = await loadBroadCommanderNonLandFillers(
         pool: pool,
+        currentDeckCards: bracketSnapshot(),
+        commanderColorIdentity: commanderColorIdentity,
+        excludeNames: existingNames.union(selectedNames),
+        bracket: bracket,
+        limit: spellSlotsToFill - selected.length,
+        deckFormat: deckFormat,
+      );
+      addUnique(
+        await _reserveCompleteCandidatesByRecommendationContext(
+          pool: pool,
+          state: state,
+          candidates: broadPool,
+          userId: userId,
+          preferCollection: preferCollection,
+          budgetLimitBrl: budgetLimitBrl,
+        ),
+      );
+    }
+
+    if (selected.length < spellSlotsToFill) {
+      final identitySafePool = await loadIdentitySafeNonLandFillers(
+        pool: pool,
+        commanderColorIdentity: commanderColorIdentity,
+        excludeNames: existingNames.union(selectedNames),
+        currentDeckCards: bracketSnapshot(),
+        bracket: bracket,
+        limit: spellSlotsToFill - selected.length,
+        deckFormat: deckFormat,
+      );
+      addUnique(
+        await _reserveCompleteCandidatesByRecommendationContext(
+          pool: pool,
+          state: state,
+          candidates: identitySafePool,
+          userId: userId,
+          preferCollection: preferCollection,
+          budgetLimitBrl: budgetLimitBrl,
+        ),
+      );
+    }
+
+    var added = 0;
+    for (final candidate in selected) {
+      if (state.virtualTotal >= maxTotal) break;
+      final id = candidate['id'] as String;
+      final name = candidate['name'] as String;
+      final typeLine = candidate['type_line'] as String? ?? '';
+      final oracleText = candidate['oracle_text'] as String? ?? '';
+      final colors = (candidate['colors'] as List?)?.cast<String>() ?? const [];
+      final colorIdentity =
+          (candidate['color_identity'] as List?)?.cast<String>();
+      final nameLower = name.toLowerCase();
+      final maxCopies = maxCopiesForFormat(
+        deckFormat: deckFormat,
+        typeLine: typeLine,
+        name: name,
+      );
+
+      if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) continue;
+
+      final wasAdded = _addCardToVirtualDeck(
         state: state,
-        candidates: identitySafePool,
-        userId: userId,
-        preferCollection: preferCollection,
-        budgetLimitBrl: budgetLimitBrl,
-      ),
-    );
-  }
+        id: id,
+        name: name,
+        typeLine: typeLine,
+        oracleText: oracleText,
+        manaCost: candidate['mana_cost']?.toString() ?? '',
+        cmc: candidate['cmc'],
+        functionalTags: candidate['functional_tags'],
+        semanticTagsV2: candidate['semantic_tags_v2'],
+        bestRoleScore: candidate['best_role_score'],
+        colors: colors,
+        colorIdentity: colorIdentity,
+        bracket: bracket,
+      );
+      if (wasAdded) added += 1;
+      _settleCompleteCandidateReservation(
+        state: state,
+        candidate: candidate,
+        accepted: wasAdded,
+      );
+    }
 
-  var added = 0;
-  for (final candidate in selected) {
-    if (state.virtualTotal >= maxTotal) break;
-    final id = candidate['id'] as String;
-    final name = candidate['name'] as String;
-    final typeLine = candidate['type_line'] as String? ?? '';
-    final oracleText = candidate['oracle_text'] as String? ?? '';
-    final colors = (candidate['colors'] as List?)?.cast<String>() ?? const [];
-    final colorIdentity =
-        (candidate['color_identity'] as List?)?.cast<String>();
-    final nameLower = name.toLowerCase();
-    final maxCopies = maxCopiesForFormat(
-      deckFormat: deckFormat,
-      typeLine: typeLine,
-      name: name,
-    );
+    if (added > 0) {
+      state.deterministicStageUsed = true;
+      Log.i(
+        'Complete sparse bootstrap: current_lands=$currentLands target_lands=$targetLands '
+        'spell_slots=$spellSlotsToFill added=$added '
+        'themed_pool=${themedPool.length} structured_pool=${structuredPool.length}',
+      );
+    }
 
-    if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) continue;
-
-    final wasAdded = _addCardToVirtualDeck(
+    return added;
+  } finally {
+    _releaseUnsettledCompleteCandidateReservations(
       state: state,
-      id: id,
-      name: name,
-      typeLine: typeLine,
-      oracleText: oracleText,
-      colors: colors,
-      colorIdentity: colorIdentity,
-      bracket: bracket,
-    );
-    if (wasAdded) added += 1;
-  }
-
-  if (added > 0) {
-    state.deterministicStageUsed = true;
-    Log.i(
-      'Complete sparse bootstrap: current_lands=$currentLands target_lands=$targetLands '
-      'spell_slots=$spellSlotsToFill added=$added '
-      'themed_pool=${themedPool.length} structured_pool=${structuredPool.length}',
+      candidates: selected,
     );
   }
+}
 
-  return added;
+int completeOutstandingLandDeficit({
+  required CompleteBuildAccumulator state,
+  required String deckFormat,
+}) {
+  final currentLands = _countCurrentLands(state.virtualDeck);
+  final avgCmc = calculateCompleteAverageNonLandCmc(state.virtualDeck);
+  final idealLands = resolveCompleteTargetLandCount(
+    deckFormat: deckFormat,
+    recommendedLandCount: state.commanderRecommendedLands,
+    averageNonLandCmc: avgCmc,
+  );
+  return (idealLands - currentLands).clamp(0, idealLands);
 }
 
 void rebalanceCompleteDeckForLandDeficit({
   required CompleteBuildAccumulator state,
   required int maxTotal,
   required String deckFormat,
+  required String targetArchetype,
+  int? bracket,
 }) {
-  var currentLands = 0;
-  for (final card in state.virtualDeck) {
-    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (basic_lands.isLandTypeLine(typeLine)) {
-      currentLands += (card['quantity'] as int?) ?? 1;
-    }
-  }
-
-  final nonLandCards =
-      state.virtualDeck.where((card) {
-        final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-        return !basic_lands.isLandTypeLine(typeLine);
-      }).toList();
-
-  var avgCmc = 0.0;
-  if (nonLandCards.isNotEmpty) {
-    avgCmc =
-        nonLandCards.fold<double>(0, (sum, card) {
-          return sum + ((card['cmc'] as num?)?.toDouble() ?? 0.0);
-        }) /
-        nonLandCards.length;
-  }
-
-  final idealLands = resolveCompleteTargetLandCount(
+  final landDeficit = completeOutstandingLandDeficit(
+    state: state,
     deckFormat: deckFormat,
-    recommendedLandCount: state.commanderRecommendedLands,
-    averageNonLandCmc: avgCmc,
   );
-  final landDeficit = idealLands - currentLands;
   final slotsAvailable = maxTotal - state.virtualTotal;
 
   if (landDeficit <= slotsAvailable || landDeficit <= 0) {
@@ -1006,6 +1136,18 @@ void rebalanceCompleteDeckForLandDeficit({
   Log.d(
     'Land rebalancing: deficit=$landDeficit, available=$slotsAvailable, freeing=$slotsToFree slots',
   );
+
+  final structuralMinimumCounts =
+      deckFormat.trim().toLowerCase() == 'commander'
+          ? commanderFunctionalRoleMinimumCounts(
+            targetArchetype: targetArchetype,
+            bracket: bracket,
+          )
+          : const <String, int>{};
+  final structuralActualCounts = <String, int>{
+    for (final role in structuralMinimumCounts.keys)
+      role: countOptimizationFunctionalRole(state.virtualDeck, role: role),
+  };
 
   var freed = 0;
   for (
@@ -1025,6 +1167,18 @@ void rebalanceCompleteDeckForLandDeficit({
     final qty = (card['quantity'] as int?) ?? 1;
     final addedQty = state.addedCountsById[cardId] ?? 0;
     if (addedQty <= 0) continue;
+    final unitCard = <String, dynamic>{...card, 'quantity': 1};
+    final structuralContributions = <String, int>{
+      for (final role in structuralMinimumCounts.keys)
+        role: countOptimizationFunctionalRole([unitCard], role: role),
+    };
+    final wouldReduceCriticalCoverage = structuralContributions.entries.any(
+      (entry) =>
+          entry.value > 0 &&
+          (structuralActualCounts[entry.key] ?? 0) <=
+              (structuralMinimumCounts[entry.key] ?? 0),
+    );
+    if (wouldReduceCriticalCoverage) continue;
 
     if (_removeOneAddedCardFromVirtualDeck(
       state: state,
@@ -1035,6 +1189,10 @@ void rebalanceCompleteDeckForLandDeficit({
       addedQuantity: addedQty,
     )) {
       freed += 1;
+      for (final entry in structuralContributions.entries) {
+        structuralActualCounts[entry.key] =
+            (structuralActualCounts[entry.key] ?? 0) - entry.value;
+      }
     }
   }
 
@@ -1057,7 +1215,16 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
     bracket: bracket,
   );
   final slotsAvailable = (maxTotal - state.virtualTotal).clamp(0, maxTotal);
-  final slotsToFree = (needs.length - slotsAvailable).clamp(0, maxTotal);
+  final outstandingLandDeficit = completeOutstandingLandDeficit(
+    state: state,
+    deckFormat: deckFormat,
+  );
+  final functionalSlotsAvailable = (slotsAvailable - outstandingLandDeficit)
+      .clamp(0, maxTotal);
+  final slotsToFree = (needs.length - functionalSlotsAvailable).clamp(
+    0,
+    maxTotal,
+  );
   if (slotsToFree <= 0) return 0;
 
   final roleTargets = buildRoleTargetProfile(targetArchetype);
@@ -1150,10 +1317,92 @@ int rebalanceCompleteDeckForFunctionalRoleDeficits({
     Log.i(
       'Complete role-floor rebalancing: freed=$freed '
       'required=${needs.length} roles=${needs.toSet().join(',')} '
+      'open=$slotsAvailable land_reserved=$outstandingLandDeficit '
       'archetype=$targetArchetype bracket=${bracket ?? 2}',
     );
   }
   return freed;
+}
+
+Future<void> reconcileCompleteDeckFunctionalRoleFloors({
+  required Pool pool,
+  required List<String> commanders,
+  required Set<String> commanderColorIdentity,
+  required String deckFormat,
+  required String targetArchetype,
+  required int? bracket,
+  required bool keepTheme,
+  required String detectedTheme,
+  required List<String> coreCards,
+  required int maxTotal,
+  required CompleteBuildAccumulator state,
+  String? userId,
+  bool preferCollection = false,
+  int? budgetLimitBrl,
+}) async {
+  if (deckFormat.trim().toLowerCase() != 'commander') return;
+
+  for (var pass = 1; pass <= 3; pass++) {
+    final before = assessCommanderFunctionalRoleFloors(
+      cards: state.virtualDeck,
+      targetArchetype: targetArchetype,
+      bracket: bracket,
+    );
+    if (before.deficits.isEmpty) return;
+
+    final freed = rebalanceCompleteDeckForFunctionalRoleDeficits(
+      state: state,
+      maxTotal: maxTotal,
+      deckFormat: deckFormat,
+      targetArchetype: targetArchetype,
+      bracket: bracket,
+    );
+    if (state.virtualTotal >= maxTotal && freed == 0) {
+      Log.w(
+        'Complete role-floor reconciliation blocked: '
+        'pass=$pass deficits=${before.deficits}',
+      );
+      return;
+    }
+
+    await fillCompleteDeckRemainder(
+      pool: pool,
+      commanders: commanders,
+      commanderColorIdentity: commanderColorIdentity,
+      deckFormat: deckFormat,
+      targetArchetype: targetArchetype,
+      bracket: bracket,
+      keepTheme: keepTheme,
+      detectedTheme: detectedTheme,
+      coreCards: coreCards,
+      maxTotal: maxTotal,
+      state: state,
+      userId: userId,
+      preferCollection: preferCollection,
+      budgetLimitBrl: budgetLimitBrl,
+    );
+
+    final after = assessCommanderFunctionalRoleFloors(
+      cards: state.virtualDeck,
+      targetArchetype: targetArchetype,
+      bracket: bracket,
+    );
+    if (after.deficits.isEmpty) {
+      state.deterministicStageUsed = true;
+      Log.i('Complete role-floor reconciliation satisfied on pass=$pass.');
+      return;
+    }
+    final improved = before.deficits.entries.any(
+      (entry) => (after.deficits[entry.key] ?? 0) < entry.value,
+    );
+    if (!improved) {
+      Log.w(
+        'Complete role-floor reconciliation made no progress: '
+        'pass=$pass before=${before.deficits} after=${after.deficits}',
+      );
+      return;
+    }
+  }
 }
 
 List<String> mergeCriticalCompleteFunctionalNeeds({
@@ -1216,6 +1465,7 @@ bool _removeOneAddedCardFromVirtualDeck({
   }
 
   final nameLower = (card['name']?.toString() ?? '').trim().toLowerCase();
+  state.recommendationLedger.release(nameLower);
   final nextNameQuantity =
       (state.virtualCountsByName[nameLower] ?? quantity) - 1;
   if (nextNameQuantity <= 0) {
@@ -1253,7 +1503,7 @@ Future<void> fillCompleteDeckRemainder({
 
   final missing = maxTotal - state.virtualTotal;
   var currentLands = _countCurrentLands(state.virtualDeck);
-  final avgCmc = _calculateAverageNonLandCmc(state.virtualDeck);
+  final avgCmc = calculateCompleteAverageNonLandCmc(state.virtualDeck);
   final idealLands = resolveCompleteTargetLandCount(
     deckFormat: deckFormat,
     recommendedLandCount: state.commanderRecommendedLands,
@@ -1271,12 +1521,12 @@ Future<void> fillCompleteDeckRemainder({
   );
 
   if (spellsNeeded > 0) {
+    final selectedSpells = <Map<String, dynamic>>[];
     try {
       final existingNames =
           state.virtualDeck
               .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
               .toSet();
-      final selectedSpells = <Map<String, dynamic>>[];
       final selectedSpellNames = <String>{};
       final criticalRoleNeeds = buildCommanderCriticalRoleFloorNeeds(
         cards: state.virtualDeck,
@@ -1303,21 +1553,43 @@ Future<void> fillCompleteDeckRemainder({
 
       void mergeUniqueSpells(List<Map<String, dynamic>> incoming) {
         for (final item in incoming) {
+          if (selectedSpells.length >= spellsNeeded) {
+            _settleCompleteCandidateReservation(
+              state: state,
+              candidate: item,
+              accepted: false,
+            );
+            continue;
+          }
           if (basic_lands.isLandTypeLine(item['type_line']?.toString() ?? '')) {
+            _settleCompleteCandidateReservation(
+              state: state,
+              candidate: item,
+              accepted: false,
+            );
             continue;
           }
           final lowerName =
               ((item['name'] as String?) ?? '').trim().toLowerCase();
-          if (lowerName.isEmpty) continue;
+          if (lowerName.isEmpty) {
+            _settleCompleteCandidateReservation(
+              state: state,
+              candidate: item,
+              accepted: false,
+            );
+            continue;
+          }
           if (existingNames.contains(lowerName) ||
               selectedSpellNames.contains(lowerName)) {
+            _settleCompleteCandidateReservation(
+              state: state,
+              candidate: item,
+              accepted: false,
+            );
             continue;
           }
           selectedSpells.add(item);
           selectedSpellNames.add(lowerName);
-          if (selectedSpells.length >= spellsNeeded) {
-            return;
-          }
         }
       }
 
@@ -1379,7 +1651,7 @@ Future<void> fillCompleteDeckRemainder({
           deckFormat: deckFormat,
           recommendationLedger: state.recommendationLedger,
         );
-        mergeUniqueSpells(dedupeCandidatesByName(initialSynergySpells));
+        mergeUniqueSpells(initialSynergySpells);
       }
 
       if (selectedSpells.isEmpty) {
@@ -1505,16 +1777,31 @@ Future<void> fillCompleteDeckRemainder({
           name: name,
           typeLine: spell['type_line'] as String? ?? '',
           oracleText: spell['oracle_text'] as String? ?? '',
+          manaCost: spell['mana_cost']?.toString() ?? '',
+          cmc: spell['cmc'],
+          functionalTags: spell['functional_tags'],
+          semanticTagsV2: spell['semantic_tags_v2'],
+          bestRoleScore: spell['best_role_score'],
           colors: (spell['colors'] as List?)?.cast<String>() ?? const [],
           colorIdentity: (spell['color_identity'] as List?)?.cast<String>(),
           bracket: bracket,
         );
         if (wasAdded) actuallyAddedSpells += 1;
+        _settleCompleteCandidateReservation(
+          state: state,
+          candidate: spell,
+          accepted: wasAdded,
+        );
       }
 
       Log.d('  Spells não-terreno adicionadas: $actuallyAddedSpells');
     } catch (e) {
       Log.w('Falha ao buscar spells sinérgicas type=${e.runtimeType}');
+    } finally {
+      _releaseUnsettledCompleteCandidateReservations(
+        state: state,
+        candidates: selectedSpells,
+      );
     }
   }
 
@@ -1587,27 +1874,44 @@ Future<void> fillCompleteDeckRemainder({
     );
     if (fillers.isNotEmpty) state.deterministicStageUsed = true;
 
-    for (final filler in fillers) {
-      if (state.virtualTotal >= maxTotal) break;
-      final id = filler['id'] as String;
-      final name = filler['name'] as String;
-      final nameLower = name.toLowerCase();
-      final maxCopies = maxCopiesForFormat(
-        deckFormat: deckFormat,
-        typeLine: filler['type_line'] as String? ?? '',
-        name: name,
-      );
-      if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) continue;
+    try {
+      for (final filler in fillers) {
+        if (state.virtualTotal >= maxTotal) break;
+        final id = filler['id'] as String;
+        final name = filler['name'] as String;
+        final nameLower = name.toLowerCase();
+        final maxCopies = maxCopiesForFormat(
+          deckFormat: deckFormat,
+          typeLine: filler['type_line'] as String? ?? '',
+          name: name,
+        );
+        if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) continue;
 
-      _addCardToVirtualDeck(
+        final wasAdded = _addCardToVirtualDeck(
+          state: state,
+          id: id,
+          name: name,
+          typeLine: filler['type_line'] as String? ?? '',
+          oracleText: filler['oracle_text'] as String? ?? '',
+          manaCost: filler['mana_cost']?.toString() ?? '',
+          cmc: filler['cmc'],
+          functionalTags: filler['functional_tags'],
+          semanticTagsV2: filler['semantic_tags_v2'],
+          bestRoleScore: filler['best_role_score'],
+          colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
+          colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
+          bracket: bracket,
+        );
+        _settleCompleteCandidateReservation(
+          state: state,
+          candidate: filler,
+          accepted: wasAdded,
+        );
+      }
+    } finally {
+      _releaseUnsettledCompleteCandidateReservations(
         state: state,
-        id: id,
-        name: name,
-        typeLine: filler['type_line'] as String? ?? '',
-        oracleText: filler['oracle_text'] as String? ?? '',
-        colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
-        colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
-        bracket: bracket,
+        candidates: fillers,
       );
     }
 
@@ -1637,27 +1941,46 @@ Future<void> fillCompleteDeckRemainder({
           );
       if (emergencyFillers.isNotEmpty) state.deterministicStageUsed = true;
 
-      for (final filler in emergencyFillers) {
-        if (state.virtualTotal >= maxTotal) break;
-        final id = filler['id'] as String;
-        final name = filler['name'] as String;
-        final nameLower = name.toLowerCase();
-        final maxCopies = maxCopiesForFormat(
-          deckFormat: deckFormat,
-          typeLine: filler['type_line'] as String? ?? '',
-          name: name,
-        );
-        if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) continue;
+      try {
+        for (final filler in emergencyFillers) {
+          if (state.virtualTotal >= maxTotal) break;
+          final id = filler['id'] as String;
+          final name = filler['name'] as String;
+          final nameLower = name.toLowerCase();
+          final maxCopies = maxCopiesForFormat(
+            deckFormat: deckFormat,
+            typeLine: filler['type_line'] as String? ?? '',
+            name: name,
+          );
+          if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) {
+            continue;
+          }
 
-        _addCardToVirtualDeck(
+          final wasAdded = _addCardToVirtualDeck(
+            state: state,
+            id: id,
+            name: name,
+            typeLine: filler['type_line'] as String? ?? '',
+            oracleText: filler['oracle_text'] as String? ?? '',
+            manaCost: filler['mana_cost']?.toString() ?? '',
+            cmc: filler['cmc'],
+            functionalTags: filler['functional_tags'],
+            semanticTagsV2: filler['semantic_tags_v2'],
+            bestRoleScore: filler['best_role_score'],
+            colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
+            colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
+            bracket: bracket,
+          );
+          _settleCompleteCandidateReservation(
+            state: state,
+            candidate: filler,
+            accepted: wasAdded,
+          );
+        }
+      } finally {
+        _releaseUnsettledCompleteCandidateReservations(
           state: state,
-          id: id,
-          name: name,
-          typeLine: filler['type_line'] as String? ?? '',
-          oracleText: filler['oracle_text'] as String? ?? '',
-          colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
-          colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
-          bracket: bracket,
+          candidates: emergencyFillers,
         );
       }
     }
@@ -1709,6 +2032,11 @@ bool _addCardToVirtualDeck({
   required String name,
   required String typeLine,
   required String oracleText,
+  String manaCost = '',
+  Object? cmc,
+  Object? functionalTags,
+  Object? semanticTagsV2,
+  Object? bestRoleScore,
   required List<String> colors,
   required List<String>? colorIdentity,
   bool isBasic = false,
@@ -1752,12 +2080,19 @@ bool _addCardToVirtualDeck({
       'name': name,
       'type_line': typeLine,
       'oracle_text': oracleText,
+      'mana_cost': manaCost,
+      'cmc': switch (cmc) {
+        num value => value.toDouble(),
+        String value => double.tryParse(value.trim()) ?? 0.0,
+        _ => 0.0,
+      },
+      if (functionalTags != null) 'functional_tags': functionalTags,
+      if (semanticTagsV2 != null) 'semantic_tags_v2': semanticTagsV2,
+      if (bestRoleScore != null) 'best_role_score': bestRoleScore,
       'colors': colors,
       'color_identity': colorIdentity,
       'quantity': 1,
       'is_commander': false,
-      'mana_cost': '',
-      'cmc': 0.0,
     });
   } else {
     final existing = state.virtualDeck[existingIndex];
@@ -1779,19 +2114,28 @@ int _countCurrentLands(List<Map<String, dynamic>> cards) {
   });
 }
 
-double _calculateAverageNonLandCmc(List<Map<String, dynamic>> cards) {
-  final nonLandCards =
-      cards.where((card) {
-        final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-        return !basic_lands.isLandTypeLine(typeLine);
-      }).toList();
+double calculateCompleteAverageNonLandCmc(List<Map<String, dynamic>> cards) {
+  var weightedCmc = 0.0;
+  var nonLandQuantity = 0;
+  for (final card in cards) {
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    if (basic_lands.isLandTypeLine(typeLine)) continue;
 
-  if (nonLandCards.isEmpty) return 0.0;
+    final quantity = ((card['quantity'] as num?)?.toInt() ?? 1).clamp(
+      0,
+      1 << 20,
+    );
+    if (quantity <= 0) continue;
+    weightedCmc +=
+        safeCmcForOptimization(card, unknownNonLandFallback: 4) * quantity;
+    nonLandQuantity += quantity;
+  }
 
-  return nonLandCards.fold<double>(0, (sum, card) {
-        return sum + ((card['cmc'] as num?)?.toDouble() ?? 0.0);
-      }) /
-      nonLandCards.length;
+  // A lista ainda pode conter somente o comandante/terrenos durante uma
+  // reconstrução ampla. Um valor neutro impede que metadata ausente seja
+  // interpretada como curva zero e reduza artificialmente a base de mana.
+  if (nonLandQuantity == 0) return 3.5;
+  return weightedCmc / nonLandQuantity;
 }
 
 Map<String, dynamic> _buildCompleteFunctionalRoleFloorError({
@@ -2035,17 +2379,35 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
           .toList();
 
   final ids = rawAdditionsDetailed.map((e) => e['card_id'] as String).toList();
-  final cardInfoById = <String, Map<String, String>>{};
+  final cardInfoById = <String, Map<String, dynamic>>{};
   var additionsDetailed = <Map<String, dynamic>>[];
   var resolvedAdditionsForFloor = <Map<String, dynamic>>[];
   Map<String, dynamic>? postAnalysisComplete;
 
   if (ids.isNotEmpty) {
     final namesAndTypes = await pool.execute(
-      Sql.named(
-        'SELECT id::text, name, type_line, oracle_text '
-        'FROM cards WHERE id = ANY(@ids)',
-      ),
+      Sql.named('''
+        SELECT
+          c.id::text,
+          c.name,
+          c.type_line,
+          c.oracle_text,
+          c.mana_cost,
+          c.cmc,
+          ARRAY(
+            SELECT DISTINCT value
+            FROM unnest(
+              COALESCE(cis.function_tags, ARRAY[]::text[]) ||
+              COALESCE(cis.scored_roles, ARRAY[]::text[])
+            ) AS role(value)
+            WHERE value IS NOT NULL AND TRIM(value) <> ''
+          ) AS functional_tags,
+          COALESCE(cis.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+          COALESCE(cis.best_role_score, 0) AS best_role_score
+        FROM cards c
+        LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
+        WHERE c.id = ANY(@ids)
+      '''),
       parameters: {'ids': ids},
     );
     for (final row in namesAndTypes) {
@@ -2053,6 +2415,15 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
         'name': row[1] as String,
         'type_line': (row[2] as String?) ?? '',
         'oracle_text': (row[3] as String?) ?? '',
+        'mana_cost': (row[4] as String?) ?? '',
+        'cmc': (row[5] as num?)?.toDouble() ?? 0.0,
+        'functional_tags':
+            (row[6] as List?)
+                ?.map((entry) => entry.toString())
+                .toList(growable: false) ??
+            const <String>[],
+        'semantic_tags_v2': row[7],
+        'best_role_score': (row[8] as num?)?.toDouble() ?? 0.0,
       };
     }
 
@@ -2062,8 +2433,8 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       final cardInfo = cardInfoById[cardId];
       if (cardInfo == null) continue;
 
-      final name = cardInfo['name'] ?? '';
-      final typeLine = cardInfo['type_line'] ?? '';
+      final name = cardInfo['name']?.toString() ?? '';
+      final typeLine = cardInfo['type_line']?.toString() ?? '';
       if (name.trim().isEmpty) continue;
 
       final maxCopies = maxCopiesForFormat(
@@ -2085,6 +2456,12 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
           'name': name,
           'type_line': typeLine,
           'oracle_text': cardInfo['oracle_text'] ?? '',
+          'mana_cost': cardInfo['mana_cost'] ?? '',
+          'cmc': cardInfo['cmc'] ?? 0.0,
+          'functional_tags': cardInfo['functional_tags'] ?? const <String>[],
+          'semantic_tags_v2':
+              cardInfo['semantic_tags_v2'] ?? const <Map<String, dynamic>>[],
+          'best_role_score': cardInfo['best_role_score'] ?? 0.0,
         };
       } else {
         aggregatedByName[name.toLowerCase()] = {

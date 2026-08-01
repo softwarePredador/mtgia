@@ -15,7 +15,7 @@ void main() {
     'can_apply': true,
     'learning_eligible': true,
     'functional_role_policy': {
-      'policy': 'commander_functional_role_floors_v2',
+      'policy': 'commander_functional_role_floors_v3',
       'archetype': 'midrange',
       'bracket': 2,
       'applies': true,
@@ -121,7 +121,7 @@ void main() {
           },
         }),
         isNull,
-        reason: 'v2 cannot sign a weakened non-canonical floor matrix',
+        reason: 'v3 cannot sign a weakened non-canonical floor matrix',
       );
       expect(
         signWithPolicy({
@@ -132,6 +132,45 @@ void main() {
         isNull,
       );
     });
+
+    test(
+      'requires the current role policy before signing Commander Complete',
+      () {
+        final completeResponse = <String, dynamic>{
+          'mode': 'complete',
+          'bracket': 2,
+          'can_apply': true,
+          'learning_eligible': true,
+          'additions_detailed': const [
+            {'card_id': 'new-a', 'quantity': 1},
+          ],
+        };
+
+        Map<String, dynamic>? signComplete(Object? policy) =>
+            buildOptimizeApplyAuthorizationForResponse(
+              signingSecret: secret,
+              deckId: 'deck-1',
+              deckSignature: 'signature-1',
+              responseBody: {
+                ...completeResponse,
+                if (policy != null) 'functional_role_policy': policy,
+              },
+              bracket: 2,
+              issuedAt: issuedAt,
+            );
+
+        final currentPolicy = response['functional_role_policy']!;
+        expect(signComplete(null), isNull);
+        expect(
+          signComplete({
+            ...(currentPolicy as Map),
+            'policy': 'commander_functional_role_floors_v2',
+          }),
+          isNull,
+        );
+        expect(signComplete(currentPolicy), isNotNull);
+      },
+    );
 
     test(
       'apply floor distrusts a verified envelope with a weakened role policy',
@@ -186,6 +225,43 @@ void main() {
         }
       },
     );
+
+    test('apply floor rejects legacy Commander Complete envelopes', () {
+      final currentPolicy = Map<String, dynamic>.from(
+        response['functional_role_policy']! as Map,
+      );
+
+      for (final policy in <Object?>[
+        null,
+        {...currentPolicy, 'policy': 'commander_functional_role_floors_v2'},
+      ]) {
+        expect(
+          () => assessOptimizationApplyCommanderFunctionalRoleFloorFromCards(
+            format: 'commander',
+            cards: const <Map<String, dynamic>>[],
+            mutationContext: const {'bracket': 2},
+            authorizationVerification: OptimizeApplyAuthorizationVerification(
+              valid: true,
+              code: 'ok',
+              payload: {
+                'mode': 'complete',
+                'bracket': 2,
+                'removals': const <String, int>{},
+                if (policy != null) 'functional_role_policy': policy,
+              },
+            ),
+            storedArchetype: 'midrange',
+          ),
+          throwsA(
+            isA<OptimizationFunctionalRoleFloorViolation>().having(
+              (error) => error.reason,
+              'reason',
+              'functional_role_policy_binding_missing',
+            ),
+          ),
+        );
+      }
+    });
 
     test('accepts an exact paired partial selection', () {
       final authorization = buildAuthorization();
@@ -334,7 +410,7 @@ void main() {
               'bracket': 2,
               'can_apply': true,
               'functional_role_policy': {
-                'policy': 'commander_functional_role_floors_v2',
+                'policy': 'commander_functional_role_floors_v3',
                 'archetype': 'midrange',
                 'bracket': 2,
                 'applies': true,
@@ -524,7 +600,7 @@ void main() {
               'bracket': 2,
               'can_apply': true,
               'functional_role_policy': {
-                'policy': 'commander_functional_role_floors_v2',
+                'policy': 'commander_functional_role_floors_v3',
                 'archetype': 'midrange',
                 'bracket': 2,
                 'applies': true,

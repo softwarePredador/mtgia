@@ -180,7 +180,10 @@ void main() {
         const {
           'name': 'Persistent Structural Engine',
           'type_line': 'Artifact',
-          'oracle_text': '{T}: Add one mana of any color.',
+          'oracle_text':
+              '{T}: Add one mana of any color. Whenever you cast your second '
+              'spell each turn, draw a card. {2}, {T}: Exile target nonland '
+              'permanent.',
           'functional_tags': ['ramp', 'draw', 'interaction'],
           'quantity': 8,
         },
@@ -222,7 +225,10 @@ void main() {
         const {
           'name': 'Persistent Structural Engine',
           'type_line': 'Artifact',
-          'oracle_text': '{T}: Add one mana of any color.',
+          'oracle_text':
+              '{T}: Add one mana of any color. Whenever you cast your second '
+              'spell each turn, draw a card. {2}, {T}: Exile target nonland '
+              'permanent.',
           'functional_tags': ['ramp', 'draw', 'interaction'],
           'quantity': 8,
         },

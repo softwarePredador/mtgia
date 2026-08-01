@@ -380,6 +380,8 @@ Future<void> processCompleteModeAsync({
         state: state,
         maxTotal: maxTotal,
         deckFormat: deckFormat,
+        targetArchetype: targetArchetype,
+        bracket: bracket,
       ),
     );
     telemetry.trackSync(
@@ -413,6 +415,25 @@ Future<void> processCompleteModeAsync({
     await telemetry.trackAsync(
       'complete.fill_remainder',
       () => optimize_complete.fillCompleteDeckRemainder(
+        pool: pool,
+        commanders: commanders,
+        commanderColorIdentity: commanderColorIdentity,
+        deckFormat: deckFormat,
+        targetArchetype: targetArchetype,
+        bracket: bracket,
+        keepTheme: keepTheme,
+        detectedTheme: themeProfile.theme,
+        coreCards: themeProfile.coreCards,
+        maxTotal: maxTotal,
+        state: state,
+        userId: userId,
+        preferCollection: recommendationContext.preferCollection == true,
+        budgetLimitBrl: recommendationContext.budgetLimitBrl,
+      ),
+    );
+    await telemetry.trackAsync(
+      'complete.reconcile_functional_role_floors',
+      () => optimize_complete.reconcileCompleteDeckFunctionalRoleFloors(
         pool: pool,
         commanders: commanders,
         commanderColorIdentity: commanderColorIdentity,

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
+import '../lib/ai/optimize_functional_role_support.dart';
+import '../lib/ai/optimize_route_recommendation_context_support.dart';
 import '../lib/ai/optimize_runtime_support.dart' as runtime;
 import '../lib/ai/optimize_swap_candidate_support.dart';
 
@@ -98,18 +100,44 @@ void main() {
       },
     );
 
-    test('matches replacement need from persisted multi-role tags', () {
+    test('replacement result preserves CMC and reservation ownership', () {
+      final result = buildOptimizeReplacementResult(
+        const {
+          'id': 'card-id',
+          'name': 'Six Mana Spell',
+          'type_line': 'Sorcery',
+          'oracle_text': 'Draw three cards.',
+          'mana_cost': '{4}{U}{U}',
+          'cmc': 6.0,
+          'colors': ['U'],
+          'color_identity': ['U'],
+        },
+        functionalNeed: 'draw',
+        hasRecommendationReservation: true,
+      );
+
+      expect(result['cmc'], 6.0);
+      expect(result['mana_cost'], '{4}{U}{U}');
+      expect(result[optimizeRecommendationReservationMarker], isTrue);
+    });
+
+    test('verifies critical draw while preserving persisted engine role', () {
       final candidate = {
         'name': 'Source-backed Engine',
         'type_line': 'Enchantment',
-        'oracle_text': 'Whenever you cast your second spell each turn, scry 1.',
+        'oracle_text':
+            'Whenever you cast your second spell each turn, draw a card.',
         'functional_tags': const ['engine', 'draw'],
         'semantic_tags_v2': const <Map<String, dynamic>>[],
         'best_role_score': 72,
       };
 
       expect(
-        matchesFunctionalNeedForCandidate('draw', candidate: candidate),
+        matchesFunctionalNeedForCandidate(
+          'draw',
+          candidate: candidate,
+          enforceCommanderCriticalFloor: true,
+        ),
         isTrue,
       );
       expect(
@@ -124,6 +152,97 @@ void main() {
         greaterThan(90),
       );
     });
+
+    test(
+      'critical draw matching uses the same predicate as the final gate',
+      () {
+        final falsePositive = {
+          'name': 'Graveyard Purge',
+          'type_line': 'Instant',
+          'oracle_text': 'Exile all cards from target player\'s graveyard.',
+          'functional_tags': const <String>[],
+          'semantic_tags_v2': const <Map<String, dynamic>>[],
+        };
+        final realDraw = {
+          'name': 'Divination',
+          'type_line': 'Sorcery',
+          'oracle_text': 'Draw two cards.',
+          'functional_tags': const <String>[],
+          'semantic_tags_v2': const <Map<String, dynamic>>[],
+        };
+
+        expect(
+          matchesFunctionalNeedForCandidate(
+            'draw',
+            candidate: falsePositive,
+            enforceCommanderCriticalFloor: true,
+          ),
+          isFalse,
+        );
+        expect(
+          countOptimizationFunctionalRole([falsePositive], role: 'draw'),
+          0,
+        );
+        expect(
+          matchesFunctionalNeedForCandidate(
+            'draw',
+            candidate: realDraw,
+            enforceCommanderCriticalFloor: true,
+          ),
+          isTrue,
+        );
+        expect(countOptimizationFunctionalRole([realDraw], role: 'draw'), 1);
+      },
+    );
+
+    test(
+      'critical interaction matching uses the same predicate as the final gate',
+      () {
+        final stalePersistedInteraction = {
+          'name': 'Clue Ceremony',
+          'type_line': 'Sorcery',
+          'oracle_text': 'Target player investigates.',
+          'functional_tags': const ['interaction', 'removal'],
+          'semantic_tags_v2': const <Map<String, dynamic>>[],
+        };
+        final realInteraction = {
+          'name': 'Murder',
+          'type_line': 'Instant',
+          'oracle_text': 'Destroy target creature.',
+          'functional_tags': const <String>[],
+          'semantic_tags_v2': const <Map<String, dynamic>>[],
+        };
+
+        expect(
+          matchesFunctionalNeedForCandidate(
+            'interaction',
+            candidate: stalePersistedInteraction,
+            enforceCommanderCriticalFloor: true,
+          ),
+          isFalse,
+        );
+        expect(
+          countOptimizationFunctionalRole([
+            stalePersistedInteraction,
+          ], role: 'interaction'),
+          0,
+        );
+        expect(
+          matchesFunctionalNeedForCandidate(
+            'interaction',
+            candidate: realInteraction,
+            enforceCommanderCriticalFloor: true,
+          ),
+          isTrue,
+        );
+        expect(
+          countOptimizationFunctionalRole([
+            realInteraction,
+          ], role: 'interaction'),
+          1,
+        );
+      },
+    );
 
     test(
       'matches replacement need from semantic v2 when text is ambiguous',
