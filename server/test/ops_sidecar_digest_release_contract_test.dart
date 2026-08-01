@@ -26,6 +26,20 @@ void main() {
       expect(mutation, greaterThan(digestLocked));
     });
 
+    test('resolves user and relative SSH key paths before validation', () {
+      expect(
+        ops,
+        contains(r'SSH_KEY="$(resolve_manaloom_path "$ROOT_DIR" "$SSH_KEY")"'),
+      );
+
+      final resolution = ops.indexOf(
+        r'SSH_KEY="$(resolve_manaloom_path "$ROOT_DIR" "$SSH_KEY")"',
+      );
+      final fileCheck = ops.indexOf(r'if [[ ! -f "$SSH_KEY" ]]');
+      expect(resolution, greaterThanOrEqualTo(0));
+      expect(fileCheck, greaterThan(resolution));
+    });
+
     test('promotes only the immutable digest and proves spec and task', () {
       expect(ops, contains("--image '\$IMAGE_DIGEST_REF'"));
       expect(ops, isNot(contains("--image '\$IMAGE_REPO:\$short_sha'")));
@@ -185,10 +199,7 @@ void main() {
           r'''expected_fragment="$(printf '%s' "$EXPECTED_FRAGMENT_B64" | base64 -d)"''',
         ),
       );
-      expect(
-        sidecars,
-        contains(r'''"http://${SERVICE_ALIAS}:8080/health"'''),
-      );
+      expect(sidecars, contains(r'''"http://${SERVICE_ALIAS}:8080/health"'''));
       expect(sidecars, contains(r'''grep -Fq "$expected_fragment"'''));
       expect(
         sidecars,
@@ -199,10 +210,7 @@ void main() {
       expect(sidecars, contains('MANALOOM_HEALTH_B64='));
       expect(sidecars, contains('health_count='));
       expect(sidecars, contains('for health_frame_attempt in 1 2 3'));
-      expect(
-        sidecars,
-        contains('health remoto invalido apos 3 leituras'),
-      );
+      expect(sidecars, contains('health remoto invalido apos 3 leituras'));
       expect(
         sidecars,
         contains(r'''jq -s -e 'length == 1 and (.[0] | type == "object")' '''),

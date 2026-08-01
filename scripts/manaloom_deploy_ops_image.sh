@@ -61,6 +61,7 @@ for key in SSH_HOST SSH_KEY DB_HOST DB_PORT DB_NAME; do
   fi
 done
 
+SSH_KEY="$(resolve_manaloom_path "$ROOT_DIR" "$SSH_KEY")"
 if [[ ! -f "$SSH_KEY" ]]; then
   echo "chave SSH ausente: $SSH_KEY" >&2
   exit 2
