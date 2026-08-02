@@ -204,9 +204,12 @@ BracketTagResult tagCardForBracket({
       o.contains('exile two') ||
       o.contains('exile one');
   final hasPayLife = o.contains('pay') && o.contains('life') && hasRather;
-  final hasPitch = hasRather && (hasExile || hasPayLife);
+  final hasDiscard = o.contains('discard');
+  final hasPitch = hasRather && (hasExile || hasPayLife || hasDiscard);
   final hasFreeCast = o.contains('without paying');
-  if (_knownFreeInteractionNames.contains(n) || hasPitch || hasFreeCast) {
+  if (_knownFreeInteractionNames.contains(n) ||
+      ((hasPitch || hasFreeCast) &&
+          _looksLikeFreeInteractionText(typeLine, o))) {
     categories.add(BracketCategory.freeInteraction);
   }
 
@@ -770,12 +773,35 @@ bool _looksLikeGameChangerStax(String normalizedName, String oracleLower) {
   if (oracleLower.contains('creatures entering') &&
       oracleLower.contains('don\'t cause'))
     return true;
-  // Search hate
+  // Search hate. Requiring an opponent-facing prohibition avoids classifying
+  // Path to Exile/Winds of Abandon merely because their text says
+  // "its controller may search their library".
   if (oracleLower.contains('search') &&
-      oracleLower.contains('library') &&
-      oracleLower.contains('control'))
+      oracleLower.contains('librar') &&
+      oracleLower.contains('opponent') &&
+      (oracleLower.contains('can\'t') || oracleLower.contains('cannot')))
     return true;
   return false;
+}
+
+bool _looksLikeFreeInteractionText(String typeLine, String oracleLower) {
+  final normalizedType = typeLine.toLowerCase();
+  final isInstant = RegExp(
+    r'(^|[^a-z])instant([^a-z]|$)',
+  ).hasMatch(normalizedType);
+  if (!isInstant) return false;
+
+  return oracleLower.contains('counter target') ||
+      oracleLower.contains('destroy target') ||
+      oracleLower.contains('exile target') ||
+      oracleLower.contains('return target') ||
+      oracleLower.contains('put target') ||
+      oracleLower.contains('deals damage') ||
+      oracleLower.contains('gain indestructible') ||
+      oracleLower.contains('gains indestructible') ||
+      oracleLower.contains('gain hexproof') ||
+      oracleLower.contains('gains hexproof') ||
+      oracleLower.contains('phase out');
 }
 
 bool _looksLikeGameChangerProtection(

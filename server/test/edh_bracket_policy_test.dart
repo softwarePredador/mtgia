@@ -326,6 +326,80 @@ void main() {
       },
     );
 
+    test('does not confuse free value spells with free interaction', () {
+      for (final card in const [
+        {
+          'name': 'Call Forth the Tempest',
+          'type': 'Sorcery',
+          'oracle':
+              'Cascade, cascade. You may cast it without paying its mana cost.',
+        },
+        {
+          'name': 'Arcane Bombardment',
+          'type': 'Enchantment',
+          'oracle':
+              'You may cast any number of the copies without paying their mana costs.',
+        },
+        {
+          'name': 'Sol Talisman',
+          'type': 'Artifact',
+          'oracle':
+              'Suspend 3—{1}. You may cast it without paying its mana cost.',
+        },
+        {
+          'name': 'Gitaxian Probe',
+          'type': 'Sorcery',
+          'oracle':
+              'Rather than pay this spell mana cost, you may pay 2 life. Draw a card.',
+        },
+      ]) {
+        final tags = tagCardForBracket(
+          name: card['name']!,
+          typeLine: card['type']!,
+          oracleText: card['oracle']!,
+        );
+        expect(
+          tags.categories,
+          isNot(contains(BracketCategory.freeInteraction)),
+          reason: card['name'],
+        );
+      }
+    });
+
+    test('distinguishes opponent search locks from search compensation', () {
+      for (final card in const [
+        {
+          'name': 'Path to Exile',
+          'oracle':
+              'Its controller may search their library for a basic land card.',
+        },
+        {
+          'name': 'Winds of Abandon',
+          'oracle':
+              'Its controller searches their library for a basic land card.',
+        },
+      ]) {
+        final tags = tagCardForBracket(
+          name: card['name']!,
+          typeLine: 'Instant',
+          oracleText: card['oracle']!,
+        );
+        expect(
+          tags.categories,
+          isNot(contains(BracketCategory.stax)),
+          reason: card['name'],
+        );
+      }
+
+      final searchLock = tagCardForBracket(
+        name: 'Ashiok, Dream Render',
+        typeLine: 'Legendary Planeswalker — Ashiok',
+        oracleText:
+            "Spells and abilities your opponents control can't cause their controller to search their library.",
+      );
+      expect(searchLock.categories, contains(BracketCategory.stax));
+    });
+
     test('detects curated fast mana lands', () {
       for (final name in const [
         'Gaea\'s Cradle',

@@ -813,8 +813,14 @@ void main() {
                   intensity: OptimizeIntensity.focused,
                   optimizeIntensity: const <String, dynamic>{},
                   qualityWarning: null,
-                  deckAnalysis: const {'total_cards': 72, 'land_count': 9},
-                  postAnalysis: const {'total_cards': 100, 'land_count': 36},
+                  deckAnalysis: const {
+                    'total_cards': 72,
+                    'type_distribution': {'lands': 9},
+                  },
+                  postAnalysis: const {
+                    'total_cards': 100,
+                    'type_distribution': {'lands': 36},
+                  },
                   warnings: const <String, dynamic>{},
                   metaReferenceContext: const <String, dynamic>{},
                   displayRemovals: const <Map<String, dynamic>>[],
@@ -838,7 +844,9 @@ void main() {
 
     expect(find.text('Plains x25'), findsOneWidget);
     expect(find.text('Adicionar (28/28 cartas)'), findsOneWidget);
-    expect(find.text('28 cartas'), findsOneWidget);
+    expect(find.text('28 cartas'), findsAtLeastNWidgets(1));
+    expect(find.text('9 → 36'), findsOneWidget);
+    expect(find.text('Completar: 28 cartas necessárias'), findsOneWidget);
     expect(
       find.byKey(const Key('optimize-complete-selection-locked-message')),
       findsOneWidget,

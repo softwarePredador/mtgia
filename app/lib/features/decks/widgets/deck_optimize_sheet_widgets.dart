@@ -287,6 +287,16 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
         return value.toString();
       }
     }
+    final rawDistribution = source['type_distribution'];
+    if (rawDistribution is Map) {
+      final distribution = rawDistribution.cast<String, dynamic>();
+      for (final key in keys) {
+        final value = distribution[key];
+        if (value != null && value.toString().trim().isNotEmpty) {
+          return value.toString();
+        }
+      }
+    }
     return '-';
   }
 
@@ -316,6 +326,9 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   }
 
   String get _intensityLabel {
+    if (widget.mode == 'complete') {
+      return 'Completar: ${_physicalCount(widget.displayAdditions)} cartas necessárias';
+    }
     return switch (widget.intensity) {
       OptimizeIntensity.light => 'Leve: 3-5 trocas seguras',
       OptimizeIntensity.focused => 'Focado: 6-10 trocas seguras',
@@ -549,6 +562,9 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   }
 
   String get _targetSwapText {
+    if (widget.mode == 'complete') {
+      return '${_physicalCount(widget.displayAdditions)} cartas';
+    }
     final min = _targetSwaps['min']?.toString();
     final max = _targetSwaps['max']?.toString();
     if (min != null && max != null) return '$min-$max';

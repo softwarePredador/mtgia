@@ -626,7 +626,7 @@ int commanderBracketIntentPenalty(
   var penalty = 0;
   if (tags.contains(BracketCategory.gameChanger)) penalty += 10000;
   if (tags.contains(BracketCategory.infiniteCombo)) penalty += 160 * multiplier;
-  if (tags.contains(BracketCategory.extraTurns)) penalty += 100 * multiplier;
+  if (tags.contains(BracketCategory.extraTurns)) penalty += 220 * multiplier;
   if (tags.contains(BracketCategory.freeInteraction)) {
     penalty += 80 * multiplier;
   }

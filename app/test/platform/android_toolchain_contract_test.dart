@@ -39,6 +39,22 @@ void main() {
       appBuild,
       contains('androidTestUtil("androidx.test:orchestrator:1.5.1")'),
     );
+    expect(
+      appBuild,
+      contains('"dev.flutter.plugins.integration_test.IntegrationTestPlugin"'),
+    );
+    expect(appBuild, contains('"pl.leancode.patrol.PatrolPlugin"'));
+    expect(
+      appBuild,
+      contains('patched.lastIndexOf(registerMethodEnd)'),
+      reason:
+          'Profile builds must inject optional test plugin registration even '
+          'when Flutter omits the direct generated registration line.',
+    );
+    expect(
+      appBuild,
+      contains('} else if (!patched.contains(reflectionMarker)) {'),
+    );
     expect(patrolRunner, contains('instrumentation.setUp(MainActivity.class)'));
     expect(patrolRunner, contains('instrumentation.listDartTests()'));
     expect(patrolRunner, contains('instrumentation.runDartTest(dartTestName)'));

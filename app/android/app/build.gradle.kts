@@ -109,6 +109,7 @@ val patchGeneratedPluginRegistrant by tasks.registering {
         var patched = original
         for (className in optionalPluginClasses) {
             val target = "flutterEngine.getPlugins().add(new $className());"
+            val reflectionMarker = "Class.forName(\"$className\")"
             val replacement =
                 """
 try {
@@ -117,9 +118,25 @@ try {
   flutterEngine.getPlugins().add((io.flutter.embedding.engine.plugins.FlutterPlugin) plugin);
 } catch (ClassNotFoundException e) {
   // Test-only plugin is not available on some build variants (e.g. release).
+} catch (Exception e) {
+  io.flutter.Log.e(TAG, "Error registering optional test plugin $className", e);
 }
 """.trimIndent()
-            patched = patched.replace(target, replacement)
+            if (patched.contains(target)) {
+                patched = patched.replace(target, replacement)
+            } else if (!patched.contains(reflectionMarker)) {
+                val registerMethodEnd = "\n  }\n}"
+                val insertAt = patched.lastIndexOf(registerMethodEnd)
+                check(insertAt >= 0) {
+                    "GeneratedPluginRegistrant registerWith method could not be located"
+                }
+                val indentedReplacement =
+                    replacement.lines().joinToString("\n") { "    $it" }
+                patched =
+                    patched.substring(0, insertAt) +
+                    "\n$indentedReplacement" +
+                    patched.substring(insertAt)
+            }
         }
 
         if (patched != original) {

@@ -423,18 +423,14 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
             functionalNeed: need,
             candidate: candidate,
           ) +
-          scoreOptimizeThemeAffinity(
+          scoreOptimizeCandidateContextAffinity(
             candidate: candidate,
-            detectedTheme: themeContext,
-            keepTheme: themeContext != null,
+            themeContext: themeContext,
+            bracket: bracket,
           ) +
           scoreOptimizePreferredNameAffinity(
             cardName: candidate['name'] as String? ?? '',
             preferredNameScores: normalizedPreferredNameScores,
-          ) +
-          scoreOptimizeBracketScopeAffinity(
-            candidate: candidate,
-            bracket: bracket,
           ) +
           (((candidate['best_commander_synergy_score'] as num?)?.toInt() ?? 0) *
               3) +
@@ -491,18 +487,14 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                   functionalNeed: 'utility',
                   candidate: a,
                 ) +
-                scoreOptimizeThemeAffinity(
+                scoreOptimizeCandidateContextAffinity(
                   candidate: a,
-                  detectedTheme: themeContext,
-                  keepTheme: themeContext != null,
+                  themeContext: themeContext,
+                  bracket: bracket,
                 ) +
                 scoreOptimizePreferredNameAffinity(
                   cardName: a['name'] as String? ?? '',
                   preferredNameScores: normalizedPreferredNameScores,
-                ) +
-                scoreOptimizeBracketScopeAffinity(
-                  candidate: a,
-                  bracket: bracket,
                 ) +
                 (((a['best_commander_synergy_score'] as num?)?.toInt() ?? 0) *
                     3);
@@ -522,18 +514,14 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                   functionalNeed: 'utility',
                   candidate: b,
                 ) +
-                scoreOptimizeThemeAffinity(
+                scoreOptimizeCandidateContextAffinity(
                   candidate: b,
-                  detectedTheme: themeContext,
-                  keepTheme: themeContext != null,
+                  themeContext: themeContext,
+                  bracket: bracket,
                 ) +
                 scoreOptimizePreferredNameAffinity(
                   cardName: b['name'] as String? ?? '',
                   preferredNameScores: normalizedPreferredNameScores,
-                ) +
-                scoreOptimizeBracketScopeAffinity(
-                  candidate: b,
-                  bracket: bracket,
                 ) +
                 (((b['best_commander_synergy_score'] as num?)?.toInt() ?? 0) *
                     3);
@@ -691,14 +679,15 @@ int scoreOptimizeThemeAffinity({
         oracle.contains('scry') ||
         oracle.contains('surveil');
     final supportsHandTiming =
-        oracle.contains('draw') &&
-        (oracle.contains('discard') || oracle.contains('first card'));
-    final supportsBigSpellPlan = hasAnyRole(const [
-      'big_spell',
-      'spellslinger',
-      'exile_value',
-      'loot',
-    ]);
+        RegExp(r'draw[^.]{0,100}then discard').hasMatch(oracle) ||
+        RegExp(
+          r'discard[^.]{0,100}(then |if you do,? )?draw',
+        ).hasMatch(oracle) ||
+        (oracle.contains('draw') && oracle.contains('first card'));
+    final supportsBigSpellPlan =
+        (isSpell && hasAnyRole(const ['big_spell'])) ||
+        hasAnyRole(const ['spellslinger', 'exile_value']) ||
+        supportsHandTiming;
 
     if (isSpell) score += 110;
     if (supportsTopDeck) score += 170;
@@ -770,6 +759,23 @@ int scoreOptimizeThemeAffinity({
   }
 
   return score.clamp(-200, 600).toInt();
+}
+
+int scoreOptimizeCandidateContextAffinity({
+  required Map<String, dynamic> candidate,
+  required String? themeContext,
+  required int? bracket,
+}) {
+  return scoreOptimizeThemeAffinity(
+        candidate: candidate,
+        detectedTheme: themeContext,
+        keepTheme: themeContext != null,
+      ) +
+      scoreOptimizeBracketScopeAffinity(
+        candidate: candidate,
+        bracket: bracket,
+      ) -
+      commanderBracketIntentPenalty(candidate, bracket: bracket);
 }
 
 int scoreOptimizePreferredNameAffinity({

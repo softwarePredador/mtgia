@@ -89,6 +89,17 @@ Use defense in depth with explicit boundaries:
     discovery and ranking, but only Oracle text accepted by the canonical wipe
     classifier satisfies the hard structural floor. This prevents a stale tag
     or a generic top-N cutoff from certifying a deck with no real board wipe.
+14. Advisory intent classification is effect-aware. Casting value from
+    cascade, discover, suspend or recursion is not automatically "free
+    interaction", and a controller receiving land-search compensation is not
+    stax. Every synergy-replacement lane applies the same advisory ranking
+    penalty; extra-turn effects receive the strongest B1-B3 penalty without
+    becoming an invented hard ban.
+15. `Miracle Big Spells` rewards expensive instants/sorceries and real
+    top-deck or hand-timing engines. A permanent cannot gain that affinity only
+    because a broad semantic tag calls it `big_spell` or `loot`; this prevents
+    unrelated tribal/colorless finishers from outranking cards the commander
+    can actually cast for miracle.
 
 The intent matrix follows the Wizards Commander Brackets update of
 2025-10-21. The Game Changer set follows the official 2026-02-09 update,

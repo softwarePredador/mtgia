@@ -359,6 +359,38 @@ void main() {
         ),
         0,
       );
+
+      final offPlanTribalCreature = {
+        'name': 'Lathliss, Dragon Queen',
+        'type_line': 'Legendary Creature — Dragon',
+        'oracle_text':
+            'Whenever another nontoken Dragon enters, create a Dragon token.',
+        'functional_tags': const ['big_spell', 'payoff', 'token_maker'],
+      };
+      expect(
+        scoreOptimizeThemeAffinity(
+          candidate: offPlanTribalCreature,
+          detectedTheme: 'Miracle Big Spells',
+          keepTheme: true,
+        ),
+        lessThan(0),
+      );
+
+      final offPlanColorlessCreature = {
+        'name': 'Kozilek, the Great Distortion',
+        'type_line': 'Legendary Creature — Eldrazi',
+        'oracle_text':
+            'When you cast this spell, draw cards. Discard a card with mana value X: Counter target spell with mana value X.',
+        'functional_tags': const ['big_spell', 'draw', 'loot'],
+      };
+      expect(
+        scoreOptimizeThemeAffinity(
+          candidate: offPlanColorlessCreature,
+          detectedTheme: 'Miracle Big Spells',
+          keepTheme: true,
+        ),
+        lessThan(0),
+      );
     });
 
     test('selected archetype remains part of the theme ranking context', () {
@@ -397,6 +429,29 @@ void main() {
         ),
         lessThan(0),
       );
+    });
+
+    test('context ranking applies advisory bracket intent in every lane', () {
+      final extraTurnSpell = {
+        'name': 'Rise of the Eldrazi',
+        'type_line': 'Sorcery',
+        'oracle_text': 'Take an extra turn after this one.',
+        'functional_tags': const ['big_spell'],
+        'minimum_bracket': 1,
+      };
+      final coreScore = scoreOptimizeCandidateContextAffinity(
+        candidate: extraTurnSpell,
+        themeContext: 'Miracle Big Spells',
+        bracket: 2,
+      );
+      final optimizedScore = scoreOptimizeCandidateContextAffinity(
+        candidate: extraTurnSpell,
+        themeContext: 'Miracle Big Spells',
+        bracket: 4,
+      );
+
+      expect(coreScore, lessThan(optimizedScore));
+      expect(optimizedScore - coreScore, 220);
     });
 
     test('ranked commander references do not collapse into a binary tie', () {

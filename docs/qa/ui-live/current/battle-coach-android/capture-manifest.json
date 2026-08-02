@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-07-31T23:18:47.005961Z",
-  "source_digest": "e8f309282f628adfb49fb422fe10065322fa0c319a09583a13a4c785a7356258",
+  "generated_at": "2026-08-02T04:32:46.833672Z",
+  "source_digest": "ca2866fee706b3fdec3f43f7802b787e480918b7ad16b0062bc9a6848b6bcdc3",
   "surface": "battle_coach",
-  "profile": "android_emulator_battle_coach",
+  "profile": "android_emulator_phone",
   "runtime": "flutter_integration_test",
   "target": "android_emulator",
   "device_contract": "sdk_gphone64_arm64, Android 14, emulator runtime, serial emulator-5554, display 1080x2400; capture posture: portrait-up",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "bab6dafbf68c7e8c8afcb56430af56a9a4e5dbf32151f0f48ecf63d4092064ff",
+  "log_sha256": "7c5c598dc22759f45dcb79815b5db4f8af48da6abb0c3140ec34ca4927d9ff55",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "battle_coach_00_welcome",
@@ -67,8 +67,8 @@
     {
       "checkpoint": "battle_coach_05_action_progress",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_05_action_progress.png",
-      "sha256": "dc1b31e34fa85c4f644292179fb5c85fc2124b6fabe1382f7cfbc9bf7a5c856e",
-      "bytes": 620608,
+      "sha256": "dd369f489c94e382bd0e4ef8990d32084f88b1e2bd86d3e6fff396f81a5834a0",
+      "bytes": 620606,
       "width": 1080,
       "height": 2337
     },
