@@ -21,6 +21,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     this.replayListErrorOnFirstCall,
     this.replayListErrorAfterFirstCall,
     this.replays,
+    this.replaysByDeck,
     this.moreReplays,
     this.replayDetail,
     this.automaticPreflight,
@@ -41,12 +42,14 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   final Object? replayListErrorOnFirstCall;
   final Object? replayListErrorAfterFirstCall;
   final List<BattleReplaySummary>? replays;
+  final Map<String, List<BattleReplaySummary>>? replaysByDeck;
   final List<BattleReplaySummary>? moreReplays;
   final BattleReplayDetail? replayDetail;
   final BattlePreflight preflight;
   final BattlePreflight? automaticPreflight;
   final Completer<BattleReplayDetail>? battleCompleter;
   final List<BattleReplayAnnotation> _annotations;
+  final List<String> listedDeckIds = [];
   int listCalls = 0;
   int fetchCalls = 0;
   int opponentListCalls = 0;
@@ -85,11 +88,13 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   @override
   Future<List<BattleReplaySummary>> listReplays(String deckId) async {
     listCalls += 1;
+    listedDeckIds.add(deckId);
     final initialError = replayListErrorOnFirstCall;
     if (listCalls == 1 && initialError != null) throw initialError;
     final refreshError = replayListErrorAfterFirstCall;
     if (listCalls > 1 && refreshError != null) throw refreshError;
-    return replays ??
+    return replaysByDeck?[deckId] ??
+        replays ??
         [
           BattleReplaySummary.fromJson(const {
             'id': 'sim-1',
@@ -458,6 +463,57 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
     expect(gateway.fetchCalls, 2);
+  });
+
+  testWidgets('reloads and clears stale history when route deck changes', (
+    tester,
+  ) async {
+    BattleReplaySummary replay(String id, String deckId, String opponent) =>
+        BattleReplaySummary.fromJson({
+          'id': id,
+          'deck_id': deckId,
+          'type': 'battle',
+          'opponent_name': opponent,
+          'turns_played': 4,
+          'event_count': 1,
+        }, fallbackDeckId: deckId);
+
+    final gateway = _FakeBattleReplayGateway(
+      replaysByDeck: {
+        'deck-1': [replay('sim-1', 'deck-1', 'Oponente antigo')],
+        'deck-2': [replay('sim-2', 'deck-2', 'Oponente correto')],
+      },
+    );
+    final router = GoRouter(
+      initialLocation: '/decks/deck-1/battle-replays',
+      routes: [
+        GoRoute(
+          path: '/decks/:id/battle-replays',
+          builder: (context, state) => BattleReplaysScreen(
+            deckId: state.pathParameters['id']!,
+            gateway: gateway,
+          ),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
+        routerConfig: router,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Battle contra Oponente antigo'), findsOneWidget);
+
+    router.go('/decks/deck-2/battle-replays');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Battle contra Oponente antigo'), findsNothing);
+    expect(find.text('Battle contra Oponente correto'), findsOneWidget);
+    expect(gateway.listedDeckIds, ['deck-1', 'deck-2']);
   });
 
   testWidgets('opens a replay selected by the canonical query parameter', (

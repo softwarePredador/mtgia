@@ -98,6 +98,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   bool _isRunning = false;
   bool _isStartingLive = false;
   bool _jobsLoading = false;
+  int _deckLoadEpoch = 0;
   int _replayLoadEpoch = 0;
   String? _handledRouteReplayId;
   String? _error;
@@ -140,6 +141,15 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   @override
   void didUpdateWidget(covariant BattleReplaysScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.deckId != widget.deckId) {
+      _resetForDeckChange();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(_loadReplays());
+        if (widget.battleLiveEnabled) unawaited(_loadJobs());
+      });
+      return;
+    }
     final previousReplayId = _normalizedReplayId(oldWidget.initialReplayId);
     final nextReplayId = _normalizedReplayId(widget.initialReplayId);
     if (previousReplayId == nextReplayId) return;
@@ -154,7 +164,44 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     });
   }
 
+  void _resetForDeckChange() {
+    _deckLoadEpoch += 1;
+    _replayLoadEpoch += 1;
+    _isLoading = true;
+    _isRunning = false;
+    _isStartingLive = false;
+    _jobsLoading = widget.battleLiveEnabled;
+    _handledRouteReplayId = null;
+    _error = null;
+    _jobsError = null;
+    _replays = const <BattleReplaySummary>[];
+    _jobs = const <BattleJob>[];
+    _selectedReplay = null;
+    _detailView = _ReplayDetailView.timeline;
+    _comparisonBaseline = null;
+    _annotations = const <BattleReplayAnnotation>[];
+    _annotationsLoading = false;
+    _annotationSaving = false;
+    _annotationError = null;
+    _annotationsReplayId = null;
+    _historyStatus = 'all';
+    _historyEngine = 'all';
+    _historyOpponent = 'all';
+    _historyRevision = 'all';
+    _historyNextCursor = null;
+    _historyHasMore = false;
+    _historyLoadingMore = false;
+    _pendingLiveRequestFingerprint = null;
+    _pendingLiveIdempotencyKey = null;
+    _seriesProgress = null;
+    _seriesCancellation = null;
+    _seriesError = null;
+    _activeExecution = null;
+  }
+
   Future<void> _loadReplays({bool quiet = false}) async {
+    final deckId = widget.deckId;
+    final deckLoadEpoch = _deckLoadEpoch;
     if (!quiet) {
       setState(() {
         _isLoading = true;
@@ -163,9 +210,13 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
 
     try {
-      final page = await _gateway.listReplayPage(widget.deckId);
+      final page = await _gateway.listReplayPage(deckId);
       final replays = page.items;
-      if (!mounted) return;
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
         _replays = replays;
         _historyNextCursor = page.nextCursor;
@@ -184,7 +235,11 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       });
       await _openRouteReplayIfNeeded();
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       if (quiet) {
         setState(() {
           _isLoading = false;
@@ -223,13 +278,19 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   Future<void> _loadMoreReplays() async {
     final cursor = _historyNextCursor;
     if (!_historyHasMore || cursor == null || _historyLoadingMore) return;
+    final deckId = widget.deckId;
+    final deckLoadEpoch = _deckLoadEpoch;
     setState(() {
       _historyLoadingMore = true;
       _error = null;
     });
     try {
-      final page = await _gateway.listReplayPage(widget.deckId, cursor: cursor);
-      if (!mounted) return;
+      final page = await _gateway.listReplayPage(deckId, cursor: cursor);
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       final merged = <String, BattleReplaySummary>{
         for (final replay in _replays) replay.id: replay,
         for (final replay in page.items) replay.id: replay,
@@ -241,7 +302,11 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         _historyLoadingMore = false;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
         _historyLoadingMore = false;
       });
@@ -253,6 +318,8 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   Future<void> _loadJobs({bool quiet = false}) async {
     if (!widget.battleLiveEnabled) return;
+    final deckId = widget.deckId;
+    final deckLoadEpoch = _deckLoadEpoch;
     if (!quiet) {
       setState(() {
         _jobsLoading = true;
@@ -260,15 +327,23 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       });
     }
     try {
-      final jobs = await _jobGateway.list(limit: 8, deckId: widget.deckId);
-      if (!mounted) return;
+      final jobs = await _jobGateway.list(limit: 8, deckId: deckId);
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
         _jobs = jobs;
         _jobsLoading = false;
         _jobsError = null;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
         _jobsLoading = false;
         _jobsError = _friendlyJobError(error);
@@ -291,6 +366,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   Future<void> _openReplayId(String replayId) async {
     final loadEpoch = ++_replayLoadEpoch;
+    final deckId = widget.deckId;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -298,10 +374,14 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
     try {
       final detail = await _gateway.fetchReplay(
-        deckId: widget.deckId,
+        deckId: deckId,
         replayId: replayId,
       );
-      if (!mounted || loadEpoch != _replayLoadEpoch) return;
+      if (!mounted ||
+          loadEpoch != _replayLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
         _selectedReplay = detail;
         _detailView = _ReplayDetailView.timeline;
@@ -309,7 +389,11 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       });
       unawaited(_loadAnnotations(detail.summary.id));
     } catch (error) {
-      if (!mounted || loadEpoch != _replayLoadEpoch) return;
+      if (!mounted ||
+          loadEpoch != _replayLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
         _isLoading = false;
         _error = _friendlyError(error);

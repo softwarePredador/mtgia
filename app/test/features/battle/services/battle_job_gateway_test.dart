@@ -281,7 +281,7 @@ Map<String, dynamic> _jobJson({
       'deck_a': _hash('a'),
       'deck_b': _hash('b'),
     },
-    'request_schema_version': 'external_battle_request_v2',
+    'request_schema_version': 'battle_job_request_v1',
     'request_hash': _hash('c'),
     'requested_engine': 'auto',
     'engine': null,

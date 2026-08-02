@@ -4,8 +4,9 @@ import 'battle_test_setup.dart';
 
 const battleJobSchemaVersion = 'battle_job_v1';
 const battleJobListSchemaVersion = 'battle_job_list_v1';
+const battleJobRequestSchemaVersion = 'battle_job_request_v1';
 const externalBattleDeckHashSchemaVersion = 'external_battle_deck_hash_v1';
-const externalBattleRequestSchemaVersion = 'external_battle_request_v2';
+const battleRequestCorrelationSchemaVersion = 'battle_request_correlation_v1';
 
 class BattleJobContractException implements Exception {
   const BattleJobContractException(this.code);
@@ -171,6 +172,69 @@ class BattleJobDeckHashes {
   }
 }
 
+class BattleJobRequestCorrelation {
+  const BattleJobRequestCorrelation({
+    required this.jobRequestSchemaVersion,
+    required this.jobRequestHash,
+    required this.engineRequestHash,
+    this.engineRequestSchemaVersion,
+    this.correlationSource,
+  });
+
+  final String jobRequestSchemaVersion;
+  final String jobRequestHash;
+  final String? engineRequestSchemaVersion;
+  final String engineRequestHash;
+  final String? correlationSource;
+
+  factory BattleJobRequestCorrelation.fromJson(
+    Map<String, dynamic> json, {
+    required String expectedJobRequestSchemaVersion,
+    required String expectedJobRequestHash,
+  }) {
+    _requireOnlyKeys(
+      json,
+      _requestCorrelationKeys,
+      'unknown_request_correlation_field',
+    );
+    if (json['schema_version'] != battleRequestCorrelationSchemaVersion) {
+      throw const BattleJobContractException(
+        'unsupported_request_correlation_schema',
+      );
+    }
+    final jobRequestSchemaVersion = _requireSafeCode(
+      json['job_request_schema_version'],
+      'invalid_job_request_schema',
+    );
+    final jobRequestHash = _requireSha256(
+      json['job_request_hash'],
+      'invalid_job_request_hash',
+    );
+    if (jobRequestSchemaVersion != expectedJobRequestSchemaVersion ||
+        jobRequestHash != expectedJobRequestHash) {
+      throw const BattleJobContractException(
+        'request_correlation_job_mismatch',
+      );
+    }
+    return BattleJobRequestCorrelation(
+      jobRequestSchemaVersion: jobRequestSchemaVersion,
+      jobRequestHash: jobRequestHash,
+      engineRequestSchemaVersion: _optionalSafeCode(
+        json['engine_request_schema_version'],
+        'invalid_engine_request_schema',
+      ),
+      engineRequestHash: _requireSha256(
+        json['engine_request_hash'],
+        'invalid_engine_request_hash',
+      ),
+      correlationSource: _optionalSafeCode(
+        json['correlation_source'],
+        'invalid_request_correlation_source',
+      ),
+    );
+  }
+}
+
 class BattleJob {
   BattleJob._({
     required this.jobId,
@@ -182,6 +246,7 @@ class BattleJob {
     required this.deckBId,
     required this.deckHashes,
     required this.requestHash,
+    required this.requestCorrelation,
     required this.requestedEngine,
     required this.engine,
     required this.engineVersion,
@@ -218,6 +283,7 @@ class BattleJob {
   final String? deckBId;
   final BattleJobDeckHashes deckHashes;
   final String requestHash;
+  final BattleJobRequestCorrelation? requestCorrelation;
   final BattleRequestedEngine requestedEngine;
   final BattleExecutionEngine? engine;
   final String? engineVersion;
@@ -273,7 +339,7 @@ class BattleJob {
     final deckHashes = BattleJobDeckHashes.fromJson(
       _requireMap(json['deck_hashes'], 'invalid_deck_hashes'),
     );
-    if (json['request_schema_version'] != externalBattleRequestSchemaVersion) {
+    if (json['request_schema_version'] != battleJobRequestSchemaVersion) {
       throw const BattleJobContractException(
         'unsupported_request_schema_version',
       );
@@ -282,6 +348,14 @@ class BattleJob {
       json['request_hash'],
       'invalid_request_hash',
     );
+    final rawRequestCorrelation = json['request_correlation'];
+    final requestCorrelation = rawRequestCorrelation == null
+        ? null
+        : BattleJobRequestCorrelation.fromJson(
+            _requireMap(rawRequestCorrelation, 'invalid_request_correlation'),
+            expectedJobRequestSchemaVersion: battleJobRequestSchemaVersion,
+            expectedJobRequestHash: requestHash,
+          );
     final requestedEngine = BattleRequestedEngine.parse(
       json['requested_engine'],
     );
@@ -419,6 +493,7 @@ class BattleJob {
       deckBId: deckBId,
       deckHashes: deckHashes,
       requestHash: requestHash,
+      requestCorrelation: requestCorrelation,
       requestedEngine: requestedEngine,
       engine: engine,
       engineVersion: engineVersion,
@@ -669,6 +744,14 @@ const _deckHashKeys = <String>{
   'deck_a',
   'deck_b',
 };
+const _requestCorrelationKeys = <String>{
+  'schema_version',
+  'job_request_schema_version',
+  'job_request_hash',
+  'engine_request_schema_version',
+  'engine_request_hash',
+  'correlation_source',
+};
 const _creationKeys = <String>{'job', 'created'};
 const _cancellationKeys = <String>{'job', 'accepted'};
 const _listKeys = <String>{'schema_version', 'jobs'};
@@ -684,6 +767,7 @@ const _jobKeys = <String>{
   'deck_hashes',
   'request_schema_version',
   'request_hash',
+  'request_correlation',
   'requested_engine',
   'engine',
   'engine_version',

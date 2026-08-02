@@ -99,22 +99,55 @@ void main() {
     });
 
     test('derives a completed outcome only from a terminal status', () {
-      final job = BattleJob.fromJson(
-        _jobJson(
-          status: 'completed',
-          stage: 'completed',
-          progress: const {'current': 6, 'total': 6, 'ratio': 1.0},
-          terminal: true,
-          replayId: 'replay-1',
-          engine: true,
-        ),
-      );
+      final payload =
+          _jobJson(
+              status: 'completed',
+              stage: 'completed',
+              progress: const {'current': 6, 'total': 6, 'ratio': 1.0},
+              terminal: true,
+              replayId: 'replay-1',
+              engine: true,
+            )
+            ..['request_correlation'] = {
+              'schema_version': 'battle_request_correlation_v1',
+              'job_request_schema_version': 'battle_job_request_v1',
+              'job_request_hash': _hash('c'),
+              'engine_request_schema_version': 'external_battle_request_v2',
+              'engine_request_hash': _hash('d'),
+              'correlation_source': 'sidecar_echo_validated',
+            };
+      final job = BattleJob.fromJson(payload);
 
       expect(job.isTerminal, isTrue);
       expect(job.outcome, BattleJobOutcome.completed);
       expect(job.replayId, 'replay-1');
       expect(job.engine, BattleExecutionEngine.xmage);
+      expect(
+        job.requestCorrelation?.correlationSource,
+        'sidecar_echo_validated',
+      );
       expect(job.canCancel, isFalse);
+    });
+
+    test('rejects correlation that does not match the persisted job hash', () {
+      final payload = _jobJson()
+        ..['request_correlation'] = {
+          'schema_version': 'battle_request_correlation_v1',
+          'job_request_schema_version': 'battle_job_request_v1',
+          'job_request_hash': _hash('d'),
+          'engine_request_hash': _hash('e'),
+        };
+
+      expect(
+        () => BattleJob.fromJson(payload),
+        throwsA(
+          isA<BattleJobContractException>().having(
+            (error) => error.code,
+            'code',
+            'request_correlation_job_mismatch',
+          ),
+        ),
+      );
     });
 
     test('rejects an unknown status and mismatched progress ratio', () {
@@ -266,7 +299,7 @@ Map<String, dynamic> _jobJson({
       'deck_a': _hash('a'),
       'deck_b': _hash('b'),
     },
-    'request_schema_version': 'external_battle_request_v2',
+    'request_schema_version': 'battle_job_request_v1',
     'request_hash': _hash('c'),
     'requested_engine': 'auto',
     if (engine) ...{
