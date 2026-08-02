@@ -198,6 +198,63 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('shows a strong keyboard focus halo on the Coach start action', (
+    tester,
+  ) async {
+    final previousHighlightStrategy = FocusManager.instance.highlightStrategy;
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    addTearDown(() {
+      FocusManager.instance.highlightStrategy = previousHighlightStrategy;
+    });
+
+    await tester.pumpWidget(
+      _subject(
+        _FakeInteractiveGateway(),
+        opponentGateway: _FakeOpponentGateway(),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(
+      find.byKey(const Key('battle-coach-choose-opponent-button')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    const submitKey = Key('battle-opponent-submit-button');
+    const haloKey = Key('battle-opponent-submit-focus-halo');
+    final submit = tester.widget<FilledButton>(find.byKey(submitKey));
+    expect(submit.onPressed, isNotNull);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    submit.focusNode!.requestFocus();
+    await tester.pump();
+
+    expect(submit.focusNode!.hasFocus, isTrue);
+    final decoration =
+        tester.widget<Container>(find.byKey(haloKey)).decoration!
+            as BoxDecoration;
+    expect(
+      decoration.boxShadow,
+      contains(
+        isA<BoxShadow>()
+            .having((shadow) => shadow.color, 'color', AppTheme.frost400)
+            .having((shadow) => shadow.spreadRadius, 'spreadRadius', 4),
+      ),
+    );
+    final border = decoration.border! as Border;
+    expect(border.top.color, AppTheme.frost400);
+    expect(border.top.width, 2);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets(
     'shows a strong focus halo for keyboard navigation without touch residue',
     (tester) async {
@@ -428,6 +485,52 @@ void main() {
     );
     expect(find.text('Prioridade'), findsNothing);
 
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('keyboard focus visibly selects and activates a prompt option', (
+    tester,
+  ) async {
+    final previousHighlightStrategy = FocusManager.instance.highlightStrategy;
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    addTearDown(() {
+      FocusManager.instance.highlightStrategy = previousHighlightStrategy;
+    });
+    final gateway = _FakeInteractiveGateway();
+    await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+    await tester.pump();
+    await tester.pump();
+
+    const optionKey = Key('battle-coach-option-o_abcdefghijklmnop');
+    const haloKey = Key('battle-coach-option-o_abcdefghijklmnop-focus-halo');
+    final option = tester.widget<InkWell>(find.byKey(optionKey));
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    option.focusNode!.requestFocus();
+    await tester.pump();
+
+    expect(option.focusNode!.hasFocus, isTrue);
+    final halo = tester.widget<Container>(find.byKey(haloKey));
+    final decoration = halo.decoration! as BoxDecoration;
+    expect(decoration.border, isA<Border>());
+    expect(
+      decoration.boxShadow,
+      contains(
+        isA<BoxShadow>()
+            .having((shadow) => shadow.color, 'color', AppTheme.frost400)
+            .having((shadow) => shadow.spreadRadius, 'spreadRadius', 4),
+      ),
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(gateway.responses, hasLength(1));
+    expect(
+      find.byKey(const Key('battle-coach-terminal-panel')),
+      findsOneWidget,
+    );
     await tester.pumpWidget(const SizedBox.shrink());
   });
 

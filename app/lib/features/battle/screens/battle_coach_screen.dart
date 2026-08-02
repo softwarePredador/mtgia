@@ -1546,11 +1546,17 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
                 onSubmit: onMultiSubmit,
               ),
             const SizedBox(height: AppTheme.space6),
-            OutlinedButton.icon(
-              key: const Key('battle-coach-delegate-button'),
-              onPressed: busy ? null : onDelegate,
-              icon: const Icon(Icons.auto_mode_rounded),
-              label: const Text('Delegar esta decisão ao motor'),
+            _BattleCoachKeyboardFocusHalo(
+              haloKey: const Key('battle-coach-delegate-focus-halo'),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+              debugLabel: 'Battle Coach delegate decision',
+              builder: (focusNode) => OutlinedButton.icon(
+                key: const Key('battle-coach-delegate-button'),
+                focusNode: focusNode,
+                onPressed: busy ? null : onDelegate,
+                icon: const Icon(Icons.auto_mode_rounded),
+                label: const Text('Delegar esta decisão ao motor'),
+              ),
             ),
             const SizedBox(height: AppTheme.space6),
             Text(
@@ -1618,46 +1624,55 @@ class _PromptOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = option.card;
-    return Material(
-      color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
+    return _BattleCoachKeyboardFocusHalo(
+      haloKey: Key('battle-coach-option-${option.id}-focus-halo'),
       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        key: Key('battle-coach-option-${option.id}'),
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.space8),
-          child: Row(
-            children: [
-              if (card != null) ...[
-                CachedCardImage(
-                  imageUrl: card.effectiveImageUrl,
-                  width: 45,
-                  height: 63,
-                  fit: BoxFit.cover,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                  errorPlaceholder: _CardFallback(name: card.name),
-                ),
-                const SizedBox(width: AppTheme.space10),
-              ] else ...[
-                Icon(
-                  _optionIcon(option.role),
-                  color: AppTheme.brass400,
-                  size: 21,
-                ),
-                const SizedBox(width: AppTheme.space10),
-              ],
-              Expanded(
-                child: Text(
-                  option.label,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
+      debugLabel: 'Battle Coach option ${option.label}',
+      builder: (focusNode) => Material(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: Key('battle-coach-option-${option.id}'),
+          focusNode: focusNode,
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.space8),
+            child: Row(
+              children: [
+                if (card != null) ...[
+                  CachedCardImage(
+                    imageUrl: card.effectiveImageUrl,
+                    width: 45,
+                    height: 63,
+                    fit: BoxFit.cover,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                    errorPlaceholder: _CardFallback(name: card.name),
+                  ),
+                  const SizedBox(width: AppTheme.space10),
+                ] else ...[
+                  Icon(
+                    _optionIcon(option.role),
+                    color: AppTheme.brass400,
+                    size: 21,
+                  ),
+                  const SizedBox(width: AppTheme.space10),
+                ],
+                Expanded(
+                  child: Text(
+                    option.label,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-              const Icon(Icons.chevron_right_rounded, color: AppTheme.textHint),
-            ],
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppTheme.textHint,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1706,10 +1721,16 @@ class _IntegerDecision extends StatelessWidget {
               ? null
               : (next) => onChanged(next.round()),
         ),
-        FilledButton(
-          key: const Key('battle-coach-integer-submit-button'),
-          onPressed: onSubmit,
-          child: const Text('Confirmar quantidade'),
+        _BattleCoachKeyboardFocusHalo(
+          haloKey: const Key('battle-coach-integer-submit-focus-halo'),
+          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+          debugLabel: 'Battle Coach confirm quantity',
+          builder: (focusNode) => FilledButton(
+            key: const Key('battle-coach-integer-submit-button'),
+            focusNode: focusNode,
+            onPressed: onSubmit,
+            child: const Text('Confirmar quantidade'),
+          ),
         ),
       ],
     );
@@ -1743,10 +1764,16 @@ class _MultiAmountDecision extends StatelessWidget {
         onSubmitted: (_) => onSubmit(),
       ),
       const SizedBox(height: AppTheme.space10),
-      FilledButton(
-        key: const Key('battle-coach-multi-submit-button'),
-        onPressed: onSubmit,
-        child: const Text('Confirmar distribuição'),
+      _BattleCoachKeyboardFocusHalo(
+        haloKey: const Key('battle-coach-multi-submit-focus-halo'),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        debugLabel: 'Battle Coach confirm distribution',
+        builder: (focusNode) => FilledButton(
+          key: const Key('battle-coach-multi-submit-button'),
+          focusNode: focusNode,
+          onPressed: onSubmit,
+          child: const Text('Confirmar distribuição'),
+        ),
       ),
     ],
   );

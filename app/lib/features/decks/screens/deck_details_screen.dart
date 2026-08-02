@@ -114,10 +114,43 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   void didUpdateWidget(covariant DeckDetailsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialOptimizationIntent ==
-        widget.initialOptimizationIntent) {
+    final deckChanged = oldWidget.deckId != widget.deckId;
+    final optimizationIntentChanged =
+        oldWidget.initialOptimizationIntent != widget.initialOptimizationIntent;
+    if (!deckChanged && !optimizationIntentChanged) {
       return;
     }
+
+    if (deckChanged) {
+      _pricing = null;
+      _isPricingLoading = false;
+      _hiddenCardIds.clear();
+      _cardSearchController.clear();
+      _validationAutoLoaded = false;
+      _isValidating = false;
+      _validationResult = null;
+      _invalidCardNames = <String>{};
+      _lastValidationDeckSignature = null;
+      _selectedTabIndex = 0;
+      _autoOpenedOptimization = false;
+      _resumableOptimizationChecked = false;
+      if (_tabController.index != 0) {
+        _tabController.index = 0;
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(
+          context.read<DeckProvider>().fetchDeckDetails(
+            widget.deckId,
+            forceRefresh: true,
+          ),
+        );
+        _openInitialOptimizationIntent();
+        unawaited(_offerResumableOptimization());
+      });
+      return;
+    }
+
     _autoOpenedOptimization = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _openInitialOptimizationIntent();
@@ -1862,6 +1895,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     final sheetNavigator = Navigator.of(context);
     final rootNavigator = Navigator.of(context, rootNavigator: true);
     final dialogContext = rootNavigator.context;
+    final router = GoRouter.of(context);
     var loadingOpen = false;
 
     void closeLoading() {
@@ -1932,11 +1966,15 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       },
       onDraftReady: (draftDeckId) async {
         if (!mounted) return;
-        sheetNavigator.pop();
-        showGuidedRebuildCreatedSnackBar(context);
-        GoRouter.of(
-          dialogContext,
-        ).go('/decks/${Uri.encodeComponent(draftDeckId)}');
+        if (sheetNavigator.canPop()) {
+          sheetNavigator.pop();
+          await Future<void>.delayed(Duration.zero);
+        }
+        if (!mounted) return;
+        router.go('/decks/${Uri.encodeComponent(draftDeckId)}');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) showGuidedRebuildCreatedSnackBar(this.context);
+        });
       },
       onRebuildAiError: (rebuildError) async {
         if (!dialogContext.mounted) return;

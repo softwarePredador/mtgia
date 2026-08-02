@@ -1637,22 +1637,28 @@ class _BattleOpponentPickerDialogState
             icon: const Icon(Icons.smart_display_outlined),
             label: const Text('Simular automaticamente'),
           ),
-        FilledButton.icon(
-          key: const Key('battle-opponent-submit-button'),
-          onPressed: canSubmit
-              ? () => _submit(
-                  launchMode: isCoach
-                      ? BattleTestLaunchMode.interactive
-                      : BattleTestLaunchMode.automatic,
-                )
-              : null,
-          icon: const Icon(Icons.play_arrow_rounded),
-          label: Text(
-            isCoach
-                ? 'Iniciar Battle Coach'
-                : _seriesSize.isSeries
-                ? 'Iniciar série de ${_seriesSize.count}'
-                : 'Simular Battle',
+        _BattleOpponentKeyboardFocusHalo(
+          haloKey: const Key('battle-opponent-submit-focus-halo'),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          debugLabel: 'Battle opponent submit',
+          builder: (focusNode) => FilledButton.icon(
+            key: const Key('battle-opponent-submit-button'),
+            focusNode: focusNode,
+            onPressed: canSubmit
+                ? () => _submit(
+                    launchMode: isCoach
+                        ? BattleTestLaunchMode.interactive
+                        : BattleTestLaunchMode.automatic,
+                  )
+                : null,
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: Text(
+              isCoach
+                  ? 'Iniciar Battle Coach'
+                  : _seriesSize.isSeries
+                  ? 'Iniciar série de ${_seriesSize.count}'
+                  : 'Simular Battle',
+            ),
           ),
         ),
       ],
@@ -1795,6 +1801,81 @@ class _BattleOpponentPickerDialogState
       },
     );
   }
+}
+
+class _BattleOpponentKeyboardFocusHalo extends StatefulWidget {
+  const _BattleOpponentKeyboardFocusHalo({
+    this.haloKey,
+    required this.borderRadius,
+    required this.debugLabel,
+    required this.builder,
+  });
+
+  final Key? haloKey;
+  final BorderRadius borderRadius;
+  final String debugLabel;
+  final Widget Function(FocusNode focusNode) builder;
+
+  @override
+  State<_BattleOpponentKeyboardFocusHalo> createState() =>
+      _BattleOpponentKeyboardFocusHaloState();
+}
+
+class _BattleOpponentKeyboardFocusHaloState
+    extends State<_BattleOpponentKeyboardFocusHalo> {
+  late final FocusNode _focusNode;
+  bool _showHalo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode(debugLabel: widget.debugLabel)
+      ..addListener(_syncHalo);
+    FocusManager.instance.addHighlightModeListener(_handleHighlightMode);
+    _syncHalo();
+  }
+
+  void _handleHighlightMode(FocusHighlightMode _) => _syncHalo();
+
+  void _syncHalo() {
+    final showHalo =
+        _focusNode.hasFocus &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    if (showHalo == _showHalo) return;
+    if (!mounted) {
+      _showHalo = showHalo;
+      return;
+    }
+    setState(() => _showHalo = showHalo);
+  }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeHighlightModeListener(_handleHighlightMode);
+    _focusNode
+      ..removeListener(_syncHalo)
+      ..dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+    key: widget.haloKey,
+    decoration: BoxDecoration(
+      borderRadius: widget.borderRadius,
+      color: _showHalo
+          ? AppTheme.frost400.withValues(alpha: 0.12)
+          : Colors.transparent,
+      border: _showHalo ? Border.all(color: AppTheme.frost400, width: 2) : null,
+      boxShadow: _showHalo
+          ? const [
+              BoxShadow(color: AppTheme.frost400, spreadRadius: 4),
+              BoxShadow(color: AppTheme.backgroundAbyss, spreadRadius: 2),
+            ]
+          : const [],
+    ),
+    child: widget.builder(_focusNode),
+  );
 }
 
 class _BattleAutomaticFallbackMessage extends StatelessWidget {

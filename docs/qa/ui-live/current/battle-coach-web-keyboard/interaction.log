@@ -1,14 +1,14 @@
-VISUAL_PROOF_CONTEXT {"schema_version":"manaloom_ui_runtime_context_v1","surface":"battle_coach","source_digest":"e8f309282f628adfb49fb422fe10065322fa0c319a09583a13a4c785a7356258","profile":"web_iab_693x908","runtime":"in_app_browser_browser_level_keyboard_events","target":"web_real_build","device_contract":"Flutter Web release build from the current app sources, Chrome 150 in the Codex in-app browser at its actual 693x908 viewport, browser-level Tab/Shift+Tab/Enter/Space/Escape/typing, disposable validated 100-card Commander decks, positive rules-engine and dedicated interactive-runtime preflight, plus real create/action/reconnect/concede/replay E2E","required_checkpoints":["01_focus_back","02_tab_replays","03_tab_choose_opponent","04_shift_tab_replays","05_enter_dialog_search_focus","06_escape_focus_restored","07_space_dialog_search_focus","08_physical_typing_filters_rival","09_enter_selects_and_preflight","10_session_after_mulligan","11_transport_error_session_preserved","12_session_reconnected","13_action_retry_progress","14_concede_retry_terminal","15_persisted_replay_open"]}
-MANALOOM_BATTLE_COACH_WEB_KEYBOARD_PROOF_V4
-generated_at=2026-08-01T00:08:28Z
-source_digest=e8f309282f628adfb49fb422fe10065322fa0c319a09583a13a4c785a7356258
-runtime=Flutter Web release build served on isolated loopback with current app sources in Chrome 150 through the Codex in-app browser
-viewport=693x908 actual browser viewport; no synthetic viewport claim
+VISUAL_PROOF_CONTEXT {"schema_version":"manaloom_ui_runtime_context_v1","surface":"battle_coach","source_digest":"6e52274f4aded923548297c0a31e28e8f33a0fb5d00bd95a4dcc057241c02690","profile":"web_iab_1280x720","runtime":"in_app_browser_browser_level_keyboard_events","target":"web_real_build","device_contract":"Flutter Web release build from the current app sources, served through a loopback same-origin proxy to the deployed ManaLoom API, Chrome 150 in the Codex in-app browser at its actual 1280x720 viewport, browser-level Tab/Shift+Tab/Enter/Space/Escape/typing, a newly registered and verified production account, a newly generated validated 100-card Commander deck, positive preflight and a real dedicated interactive Battle session","required_checkpoints":["01_focus_back","02_tab_replays","03_tab_choose_opponent","04_shift_tab_replays","05_enter_dialog_search_focus","06_escape_focus_restored","07_space_dialog_search_focus","08_physical_typing_filters_rival","09_tab_focuses_filtered_rival","10_enter_selects_and_preflight","11_tab_focuses_start_battle","12_enter_starts_real_session","13_prompt_option_focus_mulligan","14_prompt_option_focus_keep","15_delegate_focus","16_shift_tab_returns_to_keep","17_enter_activates_keep","18_next_prompt_focus","19_session_conceded_replay_ready"]}
+MANALOOM_BATTLE_COACH_WEB_KEYBOARD_PROOF_V6
+generated_at=2026-08-02T12:13:10Z
+source_digest=6e52274f4aded923548297c0a31e28e8f33a0fb5d00bd95a4dcc057241c02690
+runtime=Flutter Web release build from current app sources, served on loopback with same-origin proxy to the deployed ManaLoom API, exercised in Chrome 150 through the Codex in-app browser
+viewport=1280x720 actual browser viewport; no synthetic viewport claim
 input=browser-level Tab/Shift+Tab/Enter/Space/Escape/typing through the in-app browser; no widget-only shortcut
-fixture=disposable authenticated API accounts with two validated 100-card Commander decks
-battle_coverage=pinned XMage 1.4.60 commit 2c43ec8cdb5cd475d47e6b555a4077151f476a3b plus governed patch 95f0ff69968159025998dcbecb59be5f3c1b67e2 and dedicated interactive runtime
-transport_exercise=the loopback-only interactive transport was paused and resumed on one correlated session; a separate session retried one action and one concession after lost responses
-capture_format=browser JPEG payloads normalized to valid non-empty 693x908 PNG before indexing
+account=newly registered production account, email-delivery verified through the real verification flow; credentials omitted
+deck=newly created Commander Bracket 2 deck, validated with 100 cards and Lorehold as commander
+battle=deployed dedicated interactive runtime, public Animar opponent, positive preflight, real session, human mulligan decision and terminal replay state
+capture_format=browser JPEG payloads normalized losslessly to valid non-empty 1280x720 PNG before indexing
 
 01 PASS browser keyboard traversal reached Back with a visible high-contrast focus ring
 02 PASS Tab advanced visible high-contrast focus to Abrir replays
@@ -17,27 +17,19 @@ capture_format=browser JPEG payloads normalized to valid non-empty 693x908 PNG b
 05 PASS Tab then Enter opened the opponent dialog with search focused
 06 PASS Escape closed the dialog and restored focus to Escolher adversário
 07 PASS Space reopened the opponent dialog with search focused
-08 PASS physical typing entered Rival and filtered to the expected public deck
-09 PASS Enter selected the rival; preflight reported 100 cards verified and interactive mode ready
-10 PASS a real session opened and progressed beyond the initial hand decision
-11 PASS a transient transport failure preserved the live battlefield, hand and current prompt
-12 PASS restoring the same transport recovered the same session without a process-lost terminal
-13 PASS the same action was retried after transport restoration and progressed to the next legal prompt
-14 PASS concession acknowledgement was interrupted, retried with the same persisted intent and produced one conceded terminal
-15 PASS replay 054c8e55-8dd2-4b43-a815-dd820114c9b9 opened with the persisted partial battlefield timeline
+08 PASS physical typing entered Animar and filtered to the expected public deck
+09 PASS Tab moved focus to the filtered rival row
+10 PASS Enter selected the rival; preflight reported 100 cards verified and interactive mode ready
+11 PASS Tab reached the enabled Iniciar Battle Coach action
+12 PASS Enter created and opened a real interactive Battle session
+13 PASS Tab reached Fazer mulligan with a visible high-contrast focus halo
+14 PASS Tab reached Manter esta mão with a visible high-contrast focus halo
+15 PASS Tab reached Delegar esta decisão ao motor with a visible high-contrast focus halo
+16 PASS Shift+Tab returned visible focus to Manter esta mão
+17 PASS Enter activated Manter esta mão and advanced the real session
+18 PASS the next interactive prompt exposed a visible keyboard focus halo on Passar prioridade
+19 PASS concession ended the session and exposed the terminal replay action without leaking the opponent hand
 
-reconnect_session=ae37fe7a-7548-43ba-8ef1-7e6b79dfc624
-reconnect_recovered_state_version=4
-action_concede_session=5e9566bd-d077-4e93-a52c-85c863dd16a4
-action_concede_session_status=conceded
-action_concede_session_state_version=12
-action_submitted_record_count=1
-action_submitted_distinct_idempotency_key_count=1
-concede_record_count=1
-concede_distinct_idempotency_key_count=1
-terminal_record_count=1
-replay_linked_record_count=1
-replay_id=054c8e55-8dd2-4b43-a815-dd820114c9b9
 console_entries_reviewed=100
 console_forbidden_entries=0
 console_error_or_warning_entries=0

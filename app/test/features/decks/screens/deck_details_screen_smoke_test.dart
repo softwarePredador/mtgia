@@ -325,6 +325,48 @@ void main() {
   });
 
   testWidgets(
+    'DeckDetailsScreen refetches and resets local state when route deck changes',
+    (tester) async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              {'spell-1': 1, 'land-1': 36},
+              deckId: 'deck-1',
+              name: 'Deck original',
+            ),
+          ),
+          '/decks/draft-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson(
+              {'add-1': 1, 'spell-1': 1, 'land-1': 37},
+              deckId: 'draft-1',
+              name: 'Draft reconstruído',
+            ),
+          ),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+      final router = await _pumpScreen(
+        tester,
+        apiClient: apiClient,
+        provider: provider,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Deck original'), findsOneWidget);
+      router.go('/decks/draft-1');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Draft reconstruído'), findsOneWidget);
+      expect(find.text('Deck original'), findsNothing);
+      expect(apiClient.getCalls, contains('/decks/draft-1'));
+      expect(router.routeInformationProvider.value.uri.path, '/decks/draft-1');
+    },
+  );
+
+  testWidgets(
     'DeckDetailsScreen opens optimization when reused route gains intent',
     (tester) async {
       final apiClient = _FakeApiClient(
