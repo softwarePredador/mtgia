@@ -398,6 +398,47 @@ void main() {
       );
     });
 
+    test(
+        'reserves the Commander mana base and enforces the requested bracket',
+        () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 8, 1, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 99,
+        minimumBasicLandQuantity: 36,
+        requestedBracket: 2,
+        usageHotCardNames: const [
+          'Mana Vault',
+          "Jeska's Will",
+          'Teferi\'s Protection',
+          'Arcane Signet',
+          'Mind Stone',
+        ],
+      );
+
+      final cards = (result.deck['cards'] as List).cast<Map>();
+      final total = cards.fold<int>(
+        0,
+        (sum, card) => sum + (card['quantity'] as int),
+      );
+      final names = cards.map((card) => card['name']).toSet();
+
+      expect(total, 99);
+      expect(result.basicLandQuantity, greaterThanOrEqualTo(36));
+      expect(result.minimumBasicLandQuantity, 36);
+      expect(result.requestedBracket, 2);
+      expect(names, isNot(contains('Mana Vault')));
+      expect(names, isNot(contains("Jeska's Will")));
+      expect(names, isNot(contains("Teferi's Protection")));
+      expect(result.bracketFilteredCardNames, contains('Mana Vault'));
+      expect(
+        result.toDiagnosticsJson(),
+        containsPair('bracket_filtered_card_count', greaterThanOrEqualTo(3)),
+      );
+    });
+
     test('does not label fallback when stronger sources already own a card',
         () {
       final profile = buildLoreholdReferenceProfilePayload(

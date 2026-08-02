@@ -154,7 +154,7 @@ void main() {
       expect(route, contains('selectAiGenerateOpenAiMaxTokens('));
       expect(route, contains('buildAiGenerateOutputTruncatedPayload()'));
       expect(route, contains("'Retry-After': '1'"));
-      expect(route, contains('ai_generate_reference_prompt_v8'));
+      expect(route, contains('ai_generate_reference_prompt_v9'));
       expect(route, contains('requestedBracket == 5'));
       expect(
         route,

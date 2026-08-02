@@ -59,6 +59,25 @@ void main() {
         'midrange',
       );
       expect(
+        inferAiGenerateTargetArchetype(
+          'Sem Game Changers, fast mana explosiva, combos infinitos ou '
+          'cartas fora do Bracket 2.',
+        ),
+        'midrange',
+      );
+      expect(
+        inferAiGenerateTargetArchetype(
+          'No Game Changers, explosive fast mana, or infinite combos.',
+        ),
+        'midrange',
+      );
+      expect(
+        inferAiGenerateTargetArchetype(
+          'Sem fast mana, mas quero combo com peças.',
+        ),
+        'combo',
+      );
+      expect(
         inferAiGenerateTargetArchetype('Boros combo with recursion'),
         'combo',
       );
@@ -200,6 +219,11 @@ void main() {
         expect(
           route,
           contains('aiGenerateCommanderStructuralMustReject(fallbackBody)'),
+        );
+        expect(route, contains('buildCommanderReferenceStructuralRepair('));
+        expect(
+          route,
+          contains("'structural_repair': structuralRepairDiagnostics"),
         );
         expect(
           route,

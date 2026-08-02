@@ -84,9 +84,10 @@ String inferAiGenerateTargetArchetype(String prompt) {
   final normalized = prompt.trim().toLowerCase();
   final positiveIntent = normalized.replaceAll(
     RegExp(
-      r'\b(?:sem|no|without|avoid|evite|nao quero|não quero)\s+'
-      r'(?:(?:infinite|infinitos?)\s+combos?|combos?\s+'
-      r'(?:infinite|infinitos?)|combos?)\b',
+      r'\b(?:sem|no|without|avoid|evite|nao quero|não quero)\b'
+      r'(?:(?!\b(?:mas|but|however|porém|porem)\b)[^.!?;\n]){0,120}'
+      r'\b(?:(?:infinite|infinitos?)\s+combos?|combos?(?:\s+'
+      r'(?:infinite|infinitos?))?)\b',
     ),
     ' ',
   );

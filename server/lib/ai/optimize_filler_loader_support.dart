@@ -1311,7 +1311,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
           )
         ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
       ) sub
-      ORDER BY sub.pop_score DESC, RANDOM()
+      ORDER BY sub.pop_score DESC, LOWER(sub.name) ASC
       LIMIT 600
     '''),
     parameters: {

@@ -3,6 +3,7 @@ import 'commander_reference_deck_corpus_support.dart';
 import 'commander_learned_deck_support.dart';
 import 'commander_reference_profile_support.dart';
 import '../color_identity.dart';
+import '../edh_bracket_policy.dart';
 
 const deterministicReferenceDeckSourcePrecedence = [
   'active_learned_deck',
@@ -53,6 +54,9 @@ class DeterministicReferenceDeckBuildResult {
     required this.builtInFallbackUsedCount,
     required this.builtInFallbackOnlyCount,
     required this.builtInFallbackOnlySample,
+    required this.minimumBasicLandQuantity,
+    required this.bracketFilteredCardNames,
+    this.requestedBracket,
   });
 
   final Map<String, dynamic> deck;
@@ -66,6 +70,9 @@ class DeterministicReferenceDeckBuildResult {
   final int builtInFallbackUsedCount;
   final int builtInFallbackOnlyCount;
   final List<String> builtInFallbackOnlySample;
+  final int minimumBasicLandQuantity;
+  final List<String> bracketFilteredCardNames;
+  final int? requestedBracket;
 
   Map<String, dynamic> toDiagnosticsJson({int sampleLimit = 10}) => {
     'source_precedence': deterministicReferenceDeckSourcePrecedence,
@@ -76,6 +83,12 @@ class DeterministicReferenceDeckBuildResult {
     'built_in_fallback_used_count': builtInFallbackUsedCount,
     'built_in_fallback_only_count': builtInFallbackOnlyCount,
     'built_in_fallback_only_sample': builtInFallbackOnlySample
+        .take(sampleLimit)
+        .toList(growable: false),
+    'minimum_basic_land_quantity': minimumBasicLandQuantity,
+    if (requestedBracket != null) 'requested_bracket': requestedBracket,
+    'bracket_filtered_card_count': bracketFilteredCardNames.length,
+    'bracket_filtered_card_sample': bracketFilteredCardNames
         .take(sampleLimit)
         .toList(growable: false),
     'source_mix_counts': sourceMixCounts,
@@ -157,6 +170,8 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
+  int minimumBasicLandQuantity = 0,
+  int? requestedBracket,
 }) =>
     buildDeterministicReferenceDeckResult(
       profile: profile,
@@ -166,6 +181,8 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
       promotedLearnedCardNames: promotedLearnedCardNames,
       usageHotCardNames: usageHotCardNames,
       targetMainQuantity: targetMainQuantity,
+      minimumBasicLandQuantity: minimumBasicLandQuantity,
+      requestedBracket: requestedBracket,
     ).deck;
 
 DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
@@ -176,6 +193,8 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
+  int minimumBasicLandQuantity = 0,
+  int? requestedBracket,
 }) {
   final commanderName =
       (profile['commander'] ?? profile['commander_name'] ?? '')
@@ -190,6 +209,20 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   final builtInFallbackEnabled = isLoreholdCommanderReferenceCandidate(
     commanderName,
   );
+  final normalizedMinimumBasicLandQuantity = minimumBasicLandQuantity.clamp(
+    0,
+    targetMainQuantity,
+  );
+  final maximumReferenceQuantity =
+      targetMainQuantity - normalizedMinimumBasicLandQuantity;
+  final bracketPolicy =
+      requestedBracket == null
+          ? null
+          : BracketPolicy.forBracket(requestedBracket);
+  var remainingGameChangerBudget =
+      bracketPolicy?.maxCounts[BracketCategory.gameChanger] ??
+      targetMainQuantity;
+  final bracketFilteredCardNames = <String>[];
 
   void addCard(
     String? rawName,
@@ -308,15 +341,25 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   final cappedCards = <Map<String, dynamic>>[];
   var cappedMainQuantity = 0;
   for (final normalizedName in orderedCardNames) {
-    if (cappedMainQuantity >= targetMainQuantity) break;
+    if (cappedMainQuantity >= maximumReferenceQuantity) break;
     final quantity = quantitiesByName[normalizedName] ?? 0;
     if (quantity <= 0) continue;
-    final remaining = targetMainQuantity - cappedMainQuantity;
+    final displayName = displayNameByName[normalizedName] ?? normalizedName;
+    final isGameChanger = tagCardForBracket(
+      name: displayName,
+      typeLine: '',
+      oracleText: '',
+    ).categories.contains(BracketCategory.gameChanger);
+    if (isGameChanger && remainingGameChangerBudget < quantity) {
+      bracketFilteredCardNames.add(displayName);
+      continue;
+    }
+    if (isGameChanger) {
+      remainingGameChangerBudget -= quantity;
+    }
+    final remaining = maximumReferenceQuantity - cappedMainQuantity;
     final appliedQuantity = quantity > remaining ? remaining : quantity;
-    cappedCards.add({
-      'name': displayNameByName[normalizedName] ?? normalizedName,
-      'quantity': appliedQuantity,
-    });
+    cappedCards.add({'name': displayName, 'quantity': appliedQuantity});
     cappedMainQuantity += appliedQuantity;
   }
   final colors = _profileColorIdentity(profile);
@@ -378,6 +421,11 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     builtInFallbackOnlySample: builtInFallbackOnlyNames
         .take(12)
         .toList(growable: false),
+    minimumBasicLandQuantity: normalizedMinimumBasicLandQuantity,
+    requestedBracket: requestedBracket,
+    bracketFilteredCardNames: List<String>.unmodifiable(
+      bracketFilteredCardNames,
+    ),
   );
 }
 

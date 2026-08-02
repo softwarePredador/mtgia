@@ -26,6 +26,7 @@ import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
 import '../../../lib/ai/generate_bracket_support.dart';
 import '../../../lib/ai/generate_provider_repair_policy.dart';
+import '../../../lib/ai/generate_reference_structural_repair_support.dart';
 import '../../../lib/ai/generate_structural_quality_support.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
@@ -41,7 +42,7 @@ import '../../../lib/openai_structured_output_support.dart';
 import '../../../lib/runtime_environment.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
-    'ai_generate_reference_prompt_v8';
+    'ai_generate_reference_prompt_v9';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -1062,6 +1063,70 @@ $commanderBracketPrompt
         'fallback_allowed=${aiConfig.allowsMockFallbacks}',
       );
 
+      if (referenceProfile != null) {
+        try {
+          final referenceRepairBody = await enforceGenerationConstraints(
+            await _buildMockGenerateResponse(
+              pool: pool,
+              prompt: prompt,
+              format: format,
+              requestedBracket: requestedBracket,
+              requestedCommanderName: requestedCommanderName,
+              referenceProfile: referenceProfile,
+              referenceCardStats: referenceCardStats,
+              unresolvedReferenceCards: unresolvedReferenceCards,
+              referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+              activeLearnedDeck: activeLearnedDeck,
+              promotedLearnedCardNames: promotedLearnedCardNames,
+              archetypeReferenceStats: archetypeReferenceStats,
+              archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+              archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+              usageHotCards: usageHotCards,
+              warningCode: 'ai_generate_validated_reference_repair',
+              warningMessage:
+                  'A lista principal nao passou pelos gates finais. '
+                  'Retornando uma lista de referencia reconstruida e validada.',
+              isMock: false,
+              generationMode: 'reference_deterministic_repair',
+            ),
+          );
+          if (_aiGenerateBodyIsValidWithoutInvalidCards(referenceRepairBody)) {
+            referenceRepairBody['ai_generation_repaired_by_fallback'] = true;
+            referenceRepairBody['learning_eligible'] = false;
+            referenceRepairBody['learning_exclusion_reason'] =
+                'provider_output_replaced_by_validated_reference_repair';
+            referenceRepairBody['original_validation_errors'] =
+                validation.errors;
+            referenceRepairBody['original_validation_quality_evidence'] =
+                validation.qualityEvidenceSummary();
+            if (validation.invalidCards.isNotEmpty) {
+              referenceRepairBody['original_invalid_cards_count'] =
+                  validation.invalidCards.length;
+            }
+            timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+            final validReferenceRepairBody = withAiGenerateRuntimeMetadata(
+              payload: referenceRepairBody,
+              cacheKey: cacheKey,
+              cacheHit: false,
+              timings: timings,
+            );
+            if (!generationConstraints.isRequested) {
+              writeAiGenerateCache(
+                cacheKey: cacheKey,
+                payload: validReferenceRepairBody,
+                ttl: const Duration(seconds: 120),
+              );
+            }
+            return Response.json(body: validReferenceRepairBody);
+          }
+        } catch (error) {
+          Log.w(
+            'Validated Commander reference repair unavailable after provider '
+            'rejection. type=${error.runtimeType}',
+          );
+        }
+      }
+
       if (!aiConfig.allowsMockFallbacks) {
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
         if (bracketPolicyViolation) {
@@ -1901,6 +1966,13 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   String generationMode = 'mock_fallback',
 }) async {
   final usageHotCardNames = usageHotCardCanonicalNames(usageHotCards);
+  final normalizedFormat = normalizeAiGenerateFormat(format);
+  final minimumBasicLandQuantity =
+      normalizedFormat == 'commander'
+          ? requestedBracket != null && requestedBracket >= 4
+              ? 34
+              : 36
+          : 0;
   final referenceDeterministicDeck =
       referenceProfile == null
           ? null
@@ -1911,6 +1983,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             activeLearnedDeck: activeLearnedDeck,
             promotedLearnedCardNames: promotedLearnedCardNames,
             usageHotCardNames: usageHotCardNames,
+            minimumBasicLandQuantity: minimumBasicLandQuantity,
+            requestedBracket: requestedBracket,
           );
   final mockDeck = await _mockGeneratedDeck(
     pool,
@@ -1922,6 +1996,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
     activeLearnedDeck: activeLearnedDeck,
     promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
+    minimumBasicLandQuantity: minimumBasicLandQuantity,
+    requestedBracket: requestedBracket,
   );
 
   String? commanderName;
@@ -1943,11 +2019,60 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       PostgresGeneratedDeckRepository(pool, preferredFormat: format),
     );
 
-    final validation = await validationService.validate(
+    var validation = await validationService.validate(
       format: format,
       cards: cards,
       commanderName: commanderName,
     );
+    Map<String, dynamic>? structuralRepairDiagnostics;
+    if (referenceProfile != null && commanderName != null) {
+      try {
+        final repair = await buildCommanderReferenceStructuralRepair(
+          pool: pool,
+          format: format,
+          requestedBracket: requestedBracket,
+          prompt: prompt,
+          commanderName: commanderName,
+          resolvedCards: validation.resolvedCards,
+          preferredCardNames: referenceCardStats.map((stat) => stat.cardName),
+        );
+        if (repair != null) {
+          final repairedCards = (repair.deck['cards'] as List)
+              .whereType<Map>()
+              .map((card) => card.cast<String, dynamic>())
+              .toList(growable: false);
+          final repairedValidation = await validationService.validate(
+            format: format,
+            cards: repairedCards,
+            commanderName: commanderName,
+          );
+          final repairedBracket = evaluateAiGenerateCommanderBracket(
+            format: format,
+            requestedBracket: requestedBracket,
+            generatedDeck: repairedValidation.generatedDeck,
+          );
+          final repairedStructure =
+              evaluateAiGenerateCommanderStructuralQuality(
+                format: format,
+                requestedBracket: requestedBracket,
+                prompt: prompt,
+                resolvedCards: repairedValidation.resolvedCards,
+              );
+          if (repairedValidation.isValid &&
+              repairedValidation.invalidCards.isEmpty &&
+              repairedBracket.hardCompliant &&
+              repairedStructure.hardCompliant) {
+            validation = repairedValidation;
+            structuralRepairDiagnostics = repair.diagnostics;
+          }
+        }
+      } catch (error) {
+        Log.w(
+          'Commander reference structural repair unavailable; preserving '
+          'the validated source result. type=${error.runtimeType}',
+        );
+      }
+    }
 
     final warnings = <String, dynamic>{
       if (warningCode != null) 'code': warningCode,
@@ -1992,7 +2117,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           unresolvedCardsZero: validation.invalidCards.isEmpty,
           validationErrorCount: validation.errors.length,
           invalidCardCount: validation.invalidCards.length,
-        );
+        )?..addAll({
+          if (structuralRepairDiagnostics != null)
+            'structural_repair': structuralRepairDiagnostics,
+        });
     final deckbuildingContractDiagnostics =
         buildCommanderDeckbuildingContractDiagnostics(
           format: format,
@@ -2008,7 +2136,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeterministicDeckDiagnostics:
               referenceDeterministicDeckDiagnostics,
-          generationMode: generationMode,
+          generationMode:
+              structuralRepairDiagnostics == null
+                  ? generationMode
+                  : '${generationMode}_structural_repair',
         );
 
     final responseBody = <String, dynamic>{
@@ -2017,7 +2148,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       'generated_deck': validation.generatedDeck,
       'meta_context_used': false,
       'is_mock': isMock,
-      'generation_mode': generationMode,
+      'generation_mode':
+          structuralRepairDiagnostics == null
+              ? generationMode
+              : '${generationMode}_structural_repair',
       'stats': {
         'total_suggested': validation.totalSuggestedEntries,
         'total_suggested_cards': validation.totalSuggestedCards,
@@ -2203,6 +2337,8 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
+  int minimumBasicLandQuantity = 0,
+  int? requestedBracket,
 }) async {
   final normalized = format.trim().toLowerCase();
 
@@ -2215,6 +2351,8 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
         activeLearnedDeck: activeLearnedDeck,
         promotedLearnedCardNames: promotedLearnedCardNames,
         usageHotCardNames: usageHotCardNames,
+        minimumBasicLandQuantity: minimumBasicLandQuantity,
+        requestedBracket: requestedBracket,
       );
     }
     final requestedCommander = requestedCommanderName?.trim();
@@ -2291,6 +2429,8 @@ Map<String, dynamic> _mockReferenceProfileDeck(
   CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
+  int minimumBasicLandQuantity = 0,
+  int? requestedBracket,
 }) {
   final commanderName =
       (profile['commander'] ?? profile['commander_name'] ?? '')
@@ -2311,6 +2451,8 @@ Map<String, dynamic> _mockReferenceProfileDeck(
     activeLearnedDeck: activeLearnedDeck,
     promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
+    minimumBasicLandQuantity: minimumBasicLandQuantity,
+    requestedBracket: requestedBracket,
   );
 }
 

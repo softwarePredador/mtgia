@@ -43,6 +43,15 @@ void main() {
         );
         expect(source, contains("'provider_validated_repair'"));
         expect(source, contains("'learning_eligible': false"));
+        expect(
+          source,
+          contains("warningCode: 'ai_generate_validated_reference_repair'"),
+        );
+        expect(
+          source,
+          contains("generationMode: 'reference_deterministic_repair'"),
+        );
+        expect(source, contains('isMock: false'));
       },
     );
 
