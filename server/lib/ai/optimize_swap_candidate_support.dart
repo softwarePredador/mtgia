@@ -102,6 +102,10 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           .map((name) => name.trim().toLowerCase())
           .where((name) => name.isNotEmpty)
           .toSet();
+  final themeContext = buildOptimizeThemeContext(
+    targetArchetype: targetArchetype,
+    detectedTheme: detectedTheme,
+  );
   final commanderName = commanders.isNotEmpty ? commanders.first.trim() : '';
   final rejectedAdditionCounts =
       commanderName.isEmpty
@@ -204,6 +208,10 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                  COALESCE(cmi.usage_count, 0) DESC
       ) sub
       ORDER BY CASE
+                 WHEN LOWER(sub.name) = ANY(@preferred_names::text[]) THEN 1
+                 ELSE 0
+               END DESC,
+               CASE
                  WHEN CAST(@prefer_collection AS boolean) = TRUE
                       AND sub.available_quantity > 0 THEN 1
                  ELSE 0
@@ -220,6 +228,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           .map((name) => name.trim().toLowerCase())
           .where((name) => name.isNotEmpty)
           .toList(growable: false),
+      'preferred_names': normalizedPreferredNames.toList(growable: false),
       'prefer_collection': preferCollection,
       'check_collection':
           userId != null &&
@@ -391,7 +400,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           ) +
           scoreOptimizeThemeAffinity(
             candidate: candidate,
-            detectedTheme: detectedTheme,
+            detectedTheme: themeContext,
             keepTheme: keepTheme,
           ) +
           scoreOptimizeBracketScopeAffinity(
@@ -455,7 +464,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                 ) +
                 scoreOptimizeThemeAffinity(
                   candidate: a,
-                  detectedTheme: detectedTheme,
+                  detectedTheme: themeContext,
                   keepTheme: keepTheme,
                 ) +
                 scoreOptimizeBracketScopeAffinity(
@@ -482,7 +491,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                 ) +
                 scoreOptimizeThemeAffinity(
                   candidate: b,
-                  detectedTheme: detectedTheme,
+                  detectedTheme: themeContext,
                   keepTheme: keepTheme,
                 ) +
                 scoreOptimizeBracketScopeAffinity(
@@ -724,6 +733,21 @@ int scoreOptimizeThemeAffinity({
   }
 
   return score.clamp(-200, 600).toInt();
+}
+
+String? buildOptimizeThemeContext({
+  required String targetArchetype,
+  required String? detectedTheme,
+}) {
+  final parts = <String>[];
+  final archetype = targetArchetype.trim();
+  final detected = detectedTheme?.trim() ?? '';
+  if (archetype.isNotEmpty) parts.add(archetype);
+  if (detected.isNotEmpty &&
+      detected.toLowerCase() != archetype.toLowerCase()) {
+    parts.add(detected);
+  }
+  return parts.isEmpty ? null : parts.join(' / ');
 }
 
 int scoreOptimizeBracketScopeAffinity({

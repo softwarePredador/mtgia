@@ -1799,6 +1799,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   bool _keepTheme = true;
   late OptimizeIntensity _selectedIntensity;
   bool _preferCollection = true;
+  bool _budgetEnabled = false;
   double _budgetLimit = 100;
   late String _rebuildIntent;
   bool _initialResumeStarted = false;
@@ -2220,6 +2221,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       keepTheme: _keepTheme,
       selectedIntensity: _selectedIntensity,
       preferCollection: _preferCollection,
+      budgetEnabled: _budgetEnabled,
       budgetLimit: _budgetLimit,
       rebuildIntent: _rebuildIntent,
       startsFromPostGame: widget.startsFromPostGame,
@@ -2232,6 +2234,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       onIntensityChanged: (value) => setState(() => _selectedIntensity = value),
       onPreferCollectionChanged: (value) =>
           setState(() => _preferCollection = value),
+      onBudgetEnabledChanged: (value) => setState(() => _budgetEnabled = value),
       onBudgetLimitChanged: (value) => setState(() => _budgetLimit = value),
       onRebuildIntentChanged: (value) => setState(() => _rebuildIntent = value),
       onToggleStrategyVisibility: () =>
@@ -2248,13 +2251,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   }
 
   Map<String, dynamic> _recommendationContext() {
-    return {
-      'prefer_collection': _preferCollection,
-      'budget_limit_brl': _budgetLimit.round(),
-      'rebuild_intent': _rebuildIntent,
-      'report': 'before_after_shareable',
-      'explain_swaps': true,
-      'include_price_risk_curve_bracket': true,
-    };
+    return buildOptimizeRecommendationContext(
+      preferCollection: _preferCollection,
+      budgetEnabled: _budgetEnabled,
+      budgetLimit: _budgetLimit,
+      rebuildIntent: _rebuildIntent,
+    );
   }
 }

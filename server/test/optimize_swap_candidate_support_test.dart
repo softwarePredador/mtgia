@@ -37,6 +37,7 @@ void main() {
       );
       expect(source, contains('commander_card_synergy'));
       expect(source, contains('@commander_names::text[]'));
+      expect(source, contains('@preferred_names::text[]'));
       expect(source, contains('AS minimum_bracket'));
       expect(
         source,
@@ -357,6 +358,23 @@ void main() {
           keepTheme: false,
         ),
         0,
+      );
+    });
+
+    test('selected archetype remains part of the theme ranking context', () {
+      expect(
+        buildOptimizeThemeContext(
+          targetArchetype: 'Miracle Big Spells',
+          detectedTheme: 'wheels',
+        ),
+        'Miracle Big Spells / wheels',
+      );
+      expect(
+        buildOptimizeThemeContext(
+          targetArchetype: 'Miracle Big Spells',
+          detectedTheme: 'miracle big spells',
+        ),
+        'Miracle Big Spells',
       );
     });
 

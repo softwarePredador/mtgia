@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/account_security_service.dart';
+import 'package:manaloom/features/auth/models/email_verification_delivery_result.dart';
+import 'package:manaloom/features/auth/models/user.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/verify_email_screen.dart';
 import 'package:provider/provider.dart';
@@ -11,12 +13,25 @@ class _VerifyService extends AccountSecurityService {
   _VerifyService() : super(apiClient: ApiClient());
 
   int verifyCalls = 0;
+  final List<String> verifiedTokens = <String>[];
 
   @override
   Future<String> verifyEmail(String token) async {
     verifyCalls++;
+    verifiedTokens.add(token);
     return 'Email verificado. Recursos liberados.';
   }
+}
+
+class _AuthenticatedAuthProvider extends AuthProvider {
+  _AuthenticatedAuthProvider() : super(apiClient: ApiClient());
+
+  @override
+  bool get isAuthenticated => true;
+
+  @override
+  User get user =>
+      User(id: 'user-1', username: 'e2e-user', email: 'e2e@example.com');
 }
 
 void main() {
@@ -62,4 +77,52 @@ void main() {
       expect(find.byKey(const Key('verify-email-resend-button')), findsNothing);
     },
   );
+
+  testWidgets('new token on the same route verifies without a reload', (
+    tester,
+  ) async {
+    final service = _VerifyService();
+    final auth = AuthProvider(apiClient: ApiClient());
+
+    Widget build(String token) => ChangeNotifierProvider<AuthProvider>.value(
+      value: auth,
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: VerifyEmailScreen(token: token, service: service),
+      ),
+    );
+
+    await tester.pumpWidget(build(''));
+    await tester.pumpAndSettle();
+    expect(service.verifyCalls, 0);
+
+    await tester.pumpWidget(build('arrived-later'));
+    await tester.pumpAndSettle();
+
+    expect(service.verifiedTokens, ['arrived-later']);
+    expect(
+      find.byKey(const Key('verify-email-continue-button')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('delivery failure never tells the user to check the inbox', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AuthProvider>(
+        create: (_) => _AuthenticatedAuthProvider(),
+        child: const MaterialApp(
+          home: VerifyEmailScreen(
+            token: '',
+            initialDeliveryStatus: EmailVerificationDeliveryStatus.unavailable,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Confira a caixa'), findsNothing);
+    expect(find.textContaining('ainda não foi enviado'), findsOneWidget);
+  });
 }

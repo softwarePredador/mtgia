@@ -1,4 +1,5 @@
 import '../../core/api/api_client.dart';
+import 'models/email_verification_delivery_result.dart';
 
 class AccountSecurityService {
   AccountSecurityService({ApiClient? apiClient})
@@ -55,7 +56,7 @@ class AccountSecurityService {
     return _message(response.data, 'Email verificado com sucesso.');
   }
 
-  Future<String> resendEmailVerification() async {
+  Future<EmailVerificationDeliveryResult> resendEmailVerification() async {
     final response = await _apiClient.post(
       '/auth/resend-verification',
       const {},
@@ -68,7 +69,17 @@ class AccountSecurityService {
         ),
       );
     }
-    return _message(response.data, 'Enviaremos um novo link de verificação.');
+    final data = response.data;
+    if (data is! Map) {
+      return const EmailVerificationDeliveryResult(
+        status: EmailVerificationDeliveryStatus.unknown,
+        message: 'Solicitação de verificação processada.',
+      );
+    }
+    return EmailVerificationDeliveryResult.fromJson(
+      data.map((key, value) => MapEntry(key.toString(), value)),
+      fallbackMessage: 'Solicitação de verificação processada.',
+    );
   }
 
   static String _message(Object? data, String fallback) {

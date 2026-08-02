@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../auth_redirect.dart';
+import '../models/email_verification_delivery_result.dart';
 import '../password_policy.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_visual_shell.dart';
@@ -113,12 +114,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
+      final delivery = switch (authProvider.emailVerificationDeliveryStatus) {
+        EmailVerificationDeliveryStatus.sent => 'sent',
+        EmailVerificationDeliveryStatus.unavailable => 'unavailable',
+        EmailVerificationDeliveryStatus.unknown => null,
+      };
       context.go(
         Uri(
           path: '/verify-email',
-          queryParameters: widget.redirectPath == null
-              ? null
-              : {'redirect': widget.redirectPath},
+          queryParameters: {
+            if (widget.redirectPath != null) 'redirect': widget.redirectPath!,
+            if (delivery != null) 'delivery': delivery,
+          },
         ).toString(),
       );
       return;

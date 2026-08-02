@@ -101,17 +101,21 @@ class RecommendationContextSection extends StatelessWidget {
   const RecommendationContextSection({
     super.key,
     required this.preferCollection,
+    required this.budgetEnabled,
     required this.budgetLimit,
     required this.rebuildIntent,
     required this.onPreferCollectionChanged,
+    required this.onBudgetEnabledChanged,
     required this.onBudgetLimitChanged,
     required this.onRebuildIntentChanged,
   });
 
   final bool preferCollection;
+  final bool budgetEnabled;
   final double budgetLimit;
   final String rebuildIntent;
   final ValueChanged<bool> onPreferCollectionChanged;
+  final ValueChanged<bool> onBudgetEnabledChanged;
   final ValueChanged<double> onBudgetLimitChanged;
   final ValueChanged<String> onRebuildIntentChanged;
 
@@ -135,8 +139,21 @@ class RecommendationContextSection extends StatelessWidget {
             onChanged: onPreferCollectionChanged,
           ),
           const SizedBox(height: AppTheme.space6),
+          SwitchListTile.adaptive(
+            key: const Key('optimize-budget-enabled-switch'),
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Limitar orçamento'),
+            subtitle: const Text(
+              'Ative somente quando a lista precisar respeitar um teto de compras.',
+            ),
+            value: budgetEnabled,
+            onChanged: onBudgetEnabledChanged,
+          ),
+          const SizedBox(height: AppTheme.space6),
           Text(
-            'Orçamento: R\$ ${budgetLimit.round()}',
+            budgetEnabled
+                ? 'Orçamento: R\$ ${budgetLimit.round()}'
+                : 'Orçamento: sem limite definido',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w700,
@@ -151,7 +168,7 @@ class RecommendationContextSection extends StatelessWidget {
             label: 'R\$ ${budgetLimit.round()}',
             semanticFormatterCallback: (value) =>
                 'Orçamento de R\$ ${value.round()}',
-            onChanged: onBudgetLimitChanged,
+            onChanged: budgetEnabled ? onBudgetLimitChanged : null,
           ),
           const SizedBox(height: AppTheme.space6),
           InputDecorator(
@@ -179,6 +196,7 @@ class RecommendationContextSection extends StatelessWidget {
           const SizedBox(height: AppTheme.space12),
           _RecommendationContextSummary(
             preferCollection: preferCollection,
+            budgetEnabled: budgetEnabled,
             budgetLimit: budgetLimit,
             rebuildIntent: rebuildIntent,
           ),
@@ -193,15 +211,18 @@ class RecommendationContextSection extends StatelessWidget {
 class _RecommendationContextSummary extends StatelessWidget {
   const _RecommendationContextSummary({
     required this.preferCollection,
+    required this.budgetEnabled,
     required this.budgetLimit,
     required this.rebuildIntent,
   });
 
   final bool preferCollection;
+  final bool budgetEnabled;
   final double budgetLimit;
   final String rebuildIntent;
 
   String get _budgetLabel {
+    if (!budgetEnabled) return 'Sem limite definido';
     final rounded = budgetLimit.round();
     if (rounded <= 0) return 'Sem compras novas';
     return 'Até R\$ $rounded';
@@ -670,6 +691,7 @@ class OptimizationSheetBody extends StatelessWidget {
   final bool keepTheme;
   final OptimizeIntensity selectedIntensity;
   final bool preferCollection;
+  final bool budgetEnabled;
   final double budgetLimit;
   final String rebuildIntent;
   final bool startsFromPostGame;
@@ -681,6 +703,7 @@ class OptimizationSheetBody extends StatelessWidget {
   final ValueChanged<bool> onKeepThemeChanged;
   final ValueChanged<OptimizeIntensity> onIntensityChanged;
   final ValueChanged<bool> onPreferCollectionChanged;
+  final ValueChanged<bool> onBudgetEnabledChanged;
   final ValueChanged<double> onBudgetLimitChanged;
   final ValueChanged<String> onRebuildIntentChanged;
   final VoidCallback onToggleStrategyVisibility;
@@ -694,6 +717,7 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.keepTheme,
     required this.selectedIntensity,
     required this.preferCollection,
+    required this.budgetEnabled,
     required this.budgetLimit,
     required this.rebuildIntent,
     this.startsFromPostGame = false,
@@ -705,6 +729,7 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.onKeepThemeChanged,
     required this.onIntensityChanged,
     required this.onPreferCollectionChanged,
+    required this.onBudgetEnabledChanged,
     required this.onBudgetLimitChanged,
     required this.onRebuildIntentChanged,
     required this.onToggleStrategyVisibility,
@@ -762,9 +787,11 @@ class OptimizationSheetBody extends StatelessWidget {
         const SizedBox(height: AppTheme.space16),
         RecommendationContextSection(
           preferCollection: preferCollection,
+          budgetEnabled: budgetEnabled,
           budgetLimit: budgetLimit,
           rebuildIntent: rebuildIntent,
           onPreferCollectionChanged: onPreferCollectionChanged,
+          onBudgetEnabledChanged: onBudgetEnabledChanged,
           onBudgetLimitChanged: onBudgetLimitChanged,
           onRebuildIntentChanged: onRebuildIntentChanged,
         ),

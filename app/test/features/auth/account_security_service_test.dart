@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/auth/account_security_service.dart';
+import 'package:manaloom/features/auth/models/email_verification_delivery_result.dart';
 
 class _SecurityApi extends ApiClient {
   ApiResponse forgotResponse = ApiResponse(202, {
@@ -81,8 +82,41 @@ void main() {
     expect(api.endpoint, '/auth/verify-email');
     expect(api.payload, {'token': 'verify-once'});
 
-    await service.resendEmailVerification();
+    final result = await service.resendEmailVerification();
     expect(api.endpoint, '/auth/resend-verification');
     expect(api.payload, isEmpty);
+    expect(result.status, EmailVerificationDeliveryStatus.unknown);
+  });
+
+  test(
+    'resend preserves provider delivery failure instead of claiming sent',
+    () async {
+      final api = _SecurityApi()
+        ..resetResponse = ApiResponse(202, {
+          'verification_sent': false,
+          'message': 'Solicitação processada.',
+        });
+      final result = await AccountSecurityService(
+        apiClient: api,
+      ).resendEmailVerification();
+
+      expect(result.status, EmailVerificationDeliveryStatus.unavailable);
+      expect(result.alreadyVerified, isFalse);
+    },
+  );
+
+  test('resend recognizes an already verified account', () async {
+    final api = _SecurityApi()
+      ..resetResponse = ApiResponse(200, {
+        'email_verified': true,
+        'already_verified': true,
+        'message': 'Este email já está verificado.',
+      });
+    final result = await AccountSecurityService(
+      apiClient: api,
+    ).resendEmailVerification();
+
+    expect(result.status, EmailVerificationDeliveryStatus.unknown);
+    expect(result.alreadyVerified, isTrue);
   });
 }

@@ -5,6 +5,205 @@ import 'package:test/test.dart';
 
 void main() {
   test(
+    'complete uses persisted commander reference packages as a safe seed',
+    () {
+      final source =
+          File('lib/ai/optimize_complete_support.dart').readAsStringSync();
+
+      expect(source, contains('loadUsableCommanderReferenceCardStats'));
+      expect(source, contains('state.commanderProfileStageUsed = true'));
+      expect(
+        source,
+        contains('referenceNames.map((name) => name.toLowerCase())'),
+      );
+    },
+  );
+
+  test('complete payload preserves the proven explicit-budget blocker', () {
+    final cards = <Map<String, dynamic>>[
+      const {
+        'card_id': 'commander',
+        'name': 'Lorehold, the Historian',
+        'type_line': 'Legendary Creature — Elder Dragon',
+        'quantity': 1,
+        'is_commander': true,
+      },
+    ];
+    final state = CompleteBuildAccumulator.fromDeck(
+      allCardData: cards,
+      originalCountsById: const {'commander': 1},
+      currentTotalCards: 1,
+    );
+    state.recordRecommendationConstraintDiagnostics(
+      const {
+        'input_count': 2,
+        'output_count': 1,
+        'budget_limit_brl': 100.0,
+        'budget_used_brl': 99.0,
+        'budget_blocked_count': 1,
+        'budget_exceeded_blocked_count': 1,
+        'budget_blocked_additions': [
+          {
+            'name': 'Expensive Spell',
+            'reason': 'budget_exceeded',
+            'estimated_price_brl': 25.0,
+          },
+        ],
+        'price_source': 'cards.price_usd_estimated_brl',
+        'usd_to_brl_rate': 5.5,
+      },
+      validationWarnings: const ['Uma carta excedeu o orçamento.'],
+    );
+
+    final payload = buildCompleteIntermediatePayload(
+      state: state,
+      maxTotal: 100,
+      currentTotalCards: 1,
+      targetArchetype: 'Miracle Big Spells',
+      deckFormat: 'commander',
+      bracket: 2,
+      budgetLimitBrl: 100,
+    );
+    final quality = payload['quality_error'] as Map;
+
+    expect(quality['code'], 'COMPLETE_RECOMMENDATION_CONSTRAINTS_UNSATISFIED');
+    expect(quality['budget_limit_brl'], 100);
+    expect(quality['message'], contains('desative o limite'));
+    expect(quality['next_action'], 'increase_or_disable_budget_limit');
+    final constraints = quality['recommendation_constraints'] as Map;
+    expect(constraints['budget_blocked_count'], 1);
+    expect(constraints['budget_exceeded_blocked_count'], 1);
+    expect(constraints['satisfied'], isFalse);
+    expect(
+      (constraints['budget_blocked_additions'] as List).single,
+      containsPair('name', 'Expensive Spell'),
+    );
+  });
+
+  test(
+    'complete accumulates recommendation blockers across candidate batches',
+    () {
+      final state = CompleteBuildAccumulator.fromDeck(
+        allCardData: const <Map<String, dynamic>>[],
+        originalCountsById: const <String, int>{},
+        currentTotalCards: 0,
+      );
+      state.recordRecommendationConstraintDiagnostics(const {
+        'input_count': 3,
+        'output_count': 2,
+        'budget_limit_brl': 50.0,
+        'budget_blocked_count': 1,
+        'missing_price_blocked_count': 1,
+        'budget_blocked_additions': [
+          {'name': 'Unknown Price', 'reason': 'missing_price'},
+        ],
+      });
+      state.recordRecommendationConstraintDiagnostics(const {
+        'input_count': 4,
+        'output_count': 2,
+        'budget_limit_brl': 50.0,
+        'budget_blocked_count': 2,
+        'budget_exceeded_blocked_count': 2,
+        'budget_blocked_additions': [
+          {'name': 'Costly One', 'reason': 'budget_exceeded'},
+          {'name': 'Costly Two', 'reason': 'budget_exceeded'},
+        ],
+      });
+
+      final diagnostics = state.recommendationConstraintDiagnostics;
+      expect(diagnostics['input_count'], 7);
+      expect(diagnostics['output_count'], 4);
+      expect(diagnostics['budget_blocked_count'], 3);
+      expect(diagnostics['missing_price_blocked_count'], 1);
+      expect(diagnostics['budget_exceeded_blocked_count'], 2);
+      expect(diagnostics['budget_blocked_additions'], hasLength(3));
+      expect(state.hasExplicitBudgetConstraintBlock, isTrue);
+    },
+  );
+
+  test(
+    'explicit budget without a recorded budget block remains catalog partial',
+    () {
+      final state = CompleteBuildAccumulator.fromDeck(
+        allCardData: const [
+          {
+            'card_id': 'commander',
+            'name': 'Lorehold, the Historian',
+            'type_line': 'Legendary Creature — Elder Dragon',
+            'quantity': 1,
+            'is_commander': true,
+          },
+        ],
+        originalCountsById: const {'commander': 1},
+        currentTotalCards: 1,
+      );
+
+      final payload = buildCompleteIntermediatePayload(
+        state: state,
+        maxTotal: 100,
+        currentTotalCards: 1,
+        targetArchetype: 'Miracle Big Spells',
+        deckFormat: 'commander',
+        bracket: 2,
+        budgetLimitBrl: 100,
+      );
+
+      expect(
+        (payload['quality_error'] as Map)['code'],
+        'COMPLETE_QUALITY_PARTIAL',
+      );
+    },
+  );
+
+  test('final resolution count gate rejects unresolved additions', () {
+    final response = <String, dynamic>{
+      'can_apply': true,
+      'learning_eligible': true,
+    };
+    final satisfied = applyCompleteFinalResolutionCountGate(
+      responseBody: response,
+      targetAdditionCount: 99,
+      rawAdditionCount: 99,
+      resolvedAdditionCount: 98,
+      unresolvedAdditionCount: 1,
+      unresolvedCardIds: const ['missing-card-id'],
+    );
+    final quality = response['quality_error'] as Map;
+
+    expect(satisfied, isFalse);
+    expect(quality['code'], 'COMPLETE_FINAL_RESOLUTION_COUNT_MISMATCH');
+    expect(quality['missing_additions'], 1);
+    expect(quality['unresolved_additions'], 1);
+    expect(quality['unresolved_card_ids'], ['missing-card-id']);
+    expect(quality['message'], contains('Nenhuma alteração parcial'));
+    expect(response['can_apply'], isFalse);
+    expect(response['learning_eligible'], isFalse);
+    expect(
+      response['apply_blockers'],
+      contains('complete_final_addition_count_mismatch'),
+    );
+  });
+
+  test('final resolution count gate accepts only an exact target', () {
+    expect(
+      buildCompleteFinalResolutionCountError(
+        targetAdditionCount: 99,
+        rawAdditionCount: 99,
+        resolvedAdditionCount: 99,
+      ),
+      isNull,
+    );
+    expect(
+      buildCompleteFinalResolutionCountError(
+        targetAdditionCount: 99,
+        rawAdditionCount: 100,
+        resolvedAdditionCount: 100,
+      ),
+      isNotNull,
+    );
+  });
+
+  test(
     'complete payload fails closed when final Commander deck has 9 lands',
     () {
       final cards = <Map<String, dynamic>>[

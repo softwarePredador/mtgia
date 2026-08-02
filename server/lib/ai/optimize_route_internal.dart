@@ -461,6 +461,7 @@ Future<void> processCompleteModeAsync({
         targetArchetype: targetArchetype,
         deckFormat: deckFormat,
         bracket: bracket,
+        budgetLimitBrl: recommendationContext.budgetLimitBrl,
       ),
     );
 

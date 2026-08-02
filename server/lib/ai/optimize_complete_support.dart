@@ -8,6 +8,7 @@ import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import '../meta/meta_deck_reference_support.dart';
 import 'cmc_safety.dart';
+import 'commander_reference_card_stats_support.dart';
 import 'edhrec_service.dart';
 import 'optimize_complete_mana_support.dart';
 import 'optimize_deck_support.dart';
@@ -52,6 +53,20 @@ class CompleteBuildAccumulator {
   final Set<String> aiSuggestedNames;
   final Set<String> commanderMetaPriorityNames;
   final OptimizeRecommendationConstraintLedger recommendationLedger;
+  final List<Map<String, dynamic>> _recommendationBudgetBlockedSamples =
+      <Map<String, dynamic>>[];
+  final Set<String> _recommendationBudgetBlockedSampleKeys = <String>{};
+  final Set<String> _recommendationValidationWarnings = <String>{};
+  int _recommendationInputCount = 0;
+  int _recommendationOutputCount = 0;
+  int _recommendationCollectionMatchedCount = 0;
+  int _recommendationPurchaseRequiredCount = 0;
+  int _recommendationBudgetBlockedCount = 0;
+  int _recommendationMissingPriceBlockedCount = 0;
+  int _recommendationBudgetExceededBlockedCount = 0;
+  double? _recommendationBudgetLimitBrl;
+  String? _recommendationPriceSource;
+  double? _recommendationUsdToBrlRate;
   String? commanderMetaEvidenceText;
   Map<String, dynamic>? commanderMetaEvidencePayload;
   int virtualTotal;
@@ -110,6 +125,119 @@ class CompleteBuildAccumulator {
       aiSuggestedNames: <String>{},
       commanderMetaPriorityNames: <String>{},
     );
+  }
+
+  void recordRecommendationConstraintDiagnostics(
+    Map<String, dynamic> diagnostics, {
+    Iterable<String> validationWarnings = const <String>[],
+  }) {
+    int intValue(String key) => switch (diagnostics[key]) {
+      int value => value,
+      num value => value.toInt(),
+      String value => int.tryParse(value.trim()) ?? 0,
+      _ => 0,
+    };
+    double? doubleValue(String key) => switch (diagnostics[key]) {
+      num value => value.toDouble(),
+      String value => double.tryParse(value.trim()),
+      _ => null,
+    };
+
+    _recommendationInputCount += intValue('input_count');
+    _recommendationOutputCount += intValue('output_count');
+    _recommendationCollectionMatchedCount += intValue(
+      'collection_matched_count',
+    );
+    _recommendationPurchaseRequiredCount += intValue('purchase_required_count');
+
+    final rawBlocked = diagnostics['budget_blocked_additions'];
+    final blocked =
+        rawBlocked is List
+            ? rawBlocked
+                .whereType<Map>()
+                .map((entry) => entry.cast<String, dynamic>())
+                .toList(growable: false)
+            : const <Map<String, dynamic>>[];
+    final reportedBudgetBlocked = intValue('budget_blocked_count');
+    final reportedMissingPrice = intValue('missing_price_blocked_count');
+    final reportedBudgetExceeded = intValue('budget_exceeded_blocked_count');
+    _recommendationBudgetBlockedCount +=
+        reportedBudgetBlocked > 0 ? reportedBudgetBlocked : blocked.length;
+    _recommendationMissingPriceBlockedCount +=
+        reportedMissingPrice > 0
+            ? reportedMissingPrice
+            : blocked
+                .where((entry) => entry['reason'] == 'missing_price')
+                .length;
+    _recommendationBudgetExceededBlockedCount +=
+        reportedBudgetExceeded > 0
+            ? reportedBudgetExceeded
+            : blocked
+                .where((entry) => entry['reason'] == 'budget_exceeded')
+                .length;
+
+    for (final entry in blocked) {
+      final name = entry['name']?.toString().trim().toLowerCase() ?? '';
+      final reason = entry['reason']?.toString().trim().toLowerCase() ?? '';
+      final key = '$name|$reason';
+      if (!_recommendationBudgetBlockedSampleKeys.add(key) ||
+          _recommendationBudgetBlockedSamples.length >= 20) {
+        continue;
+      }
+      _recommendationBudgetBlockedSamples.add(entry);
+    }
+
+    _recommendationBudgetLimitBrl =
+        doubleValue('budget_limit_brl') ?? _recommendationBudgetLimitBrl;
+    _recommendationPriceSource =
+        diagnostics['price_source']?.toString() ?? _recommendationPriceSource;
+    _recommendationUsdToBrlRate =
+        doubleValue('usd_to_brl_rate') ?? _recommendationUsdToBrlRate;
+    _recommendationValidationWarnings.addAll(
+      validationWarnings.where((warning) => warning.trim().isNotEmpty),
+    );
+  }
+
+  bool get hasExplicitBudgetConstraintBlock =>
+      _recommendationBudgetLimitBrl != null &&
+      (_recommendationBudgetBlockedCount > 0 ||
+          _recommendationMissingPriceBlockedCount > 0 ||
+          _recommendationBudgetExceededBlockedCount > 0);
+
+  Map<String, dynamic> get recommendationConstraintDiagnostics {
+    if (_recommendationInputCount == 0 &&
+        _recommendationBudgetBlockedCount == 0 &&
+        _recommendationBudgetLimitBrl == null) {
+      return const <String, dynamic>{};
+    }
+    return {
+      'diagnostic_scope': 'candidate_attempts_across_complete_build',
+      'input_count': _recommendationInputCount,
+      'output_count': _recommendationOutputCount,
+      'collection_matched_count': _recommendationCollectionMatchedCount,
+      'purchase_required_count': _recommendationPurchaseRequiredCount,
+      if (_recommendationBudgetLimitBrl != null)
+        'budget_limit_brl': _recommendationBudgetLimitBrl,
+      if (_recommendationBudgetLimitBrl != null)
+        'budget_used_brl': double.parse(
+          recommendationLedger.budgetUsedBrl.toStringAsFixed(2),
+        ),
+      if (_recommendationBudgetBlockedCount > 0)
+        'budget_blocked_count': _recommendationBudgetBlockedCount,
+      if (_recommendationMissingPriceBlockedCount > 0)
+        'missing_price_blocked_count': _recommendationMissingPriceBlockedCount,
+      if (_recommendationBudgetExceededBlockedCount > 0)
+        'budget_exceeded_blocked_count':
+            _recommendationBudgetExceededBlockedCount,
+      if (_recommendationBudgetBlockedSamples.isNotEmpty)
+        'budget_blocked_additions': _recommendationBudgetBlockedSamples,
+      if (_recommendationValidationWarnings.isNotEmpty)
+        'validation_warnings': _recommendationValidationWarnings.toList(),
+      if (_recommendationPriceSource != null)
+        'price_source': _recommendationPriceSource,
+      if (_recommendationUsdToBrlRate != null)
+        'usd_to_brl_rate': _recommendationUsdToBrlRate,
+    };
   }
 }
 
@@ -193,6 +321,10 @@ _reserveCompleteCandidatesByRecommendationContext({
     ),
     ledger: state.recommendationLedger,
   );
+  state.recordRecommendationConstraintDiagnostics(
+    constrained.diagnostics,
+    validationWarnings: constrained.validationWarnings,
+  );
   final allowedCounts = <String, int>{};
   for (final name in constrained.additions) {
     final normalized = name.trim().toLowerCase();
@@ -269,6 +401,32 @@ Future<void> prepareCompleteCommanderSeed({
     state.averageDeckSeedStageUsed = true;
     state.aiSuggestedNames.addAll(
       averageDeckSeedNames.map((e) => e.toLowerCase()),
+    );
+  }
+
+  // Persisted reference-card packages are the strongest curated signal for
+  // commander/theme fit. They are still only a ranking seed: every candidate
+  // continues through format, identity, bracket, singleton, mana and role
+  // gates before it can reach a preview.
+  try {
+    final referenceStats = await loadUsableCommanderReferenceCardStats(
+      pool: pool,
+      commanderName: commanderName,
+    );
+    final referenceNames = referenceStats.stats
+        .map((stat) => stat.cardName.trim())
+        .where((name) => name.isNotEmpty)
+        .toList(growable: false);
+    if (referenceNames.isNotEmpty) {
+      state.commanderProfileStageUsed = true;
+      state.aiSuggestedNames.addAll(
+        referenceNames.map((name) => name.toLowerCase()),
+      );
+    }
+  } catch (error) {
+    Log.w(
+      'Falha ao carregar pacotes de referencia do comandante '
+      'type=${error.runtimeType}',
     );
   }
 
@@ -2168,6 +2326,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
   required String targetArchetype,
   required String deckFormat,
   int? bracket,
+  int? budgetLimitBrl,
 }) {
   final additionsDetailed = <Map<String, dynamic>>[];
   for (final entry in state.addedCountsById.entries) {
@@ -2217,18 +2376,56 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
           : null;
   final requiredWipes = functionalRoleAssessment?.minimumCounts['wipe'] ?? 0;
   final wipeCount = functionalRoleAssessment?.actualCounts['wipe'] ?? 0;
+  final recommendationDiagnostics = state.recommendationConstraintDiagnostics;
+  final recommendationConstraints =
+      recommendationDiagnostics.isEmpty
+          ? null
+          : <String, dynamic>{
+            ...recommendationDiagnostics,
+            'enforcement': 'complete_build_candidate_filter',
+            'satisfied': addedTotal == targetTotal,
+          };
   Map<String, dynamic>? qualityError;
 
-  if (addedTotal < targetTotal) {
-    qualityError = {
-      'code': 'COMPLETE_QUALITY_PARTIAL',
-      'message':
-          'Não foi possível completar o deck com qualidade mínima: adições insuficientes.',
-      'target_additions': targetTotal,
-      'added_total': addedTotal,
-      'basic_added': basicAdded,
-      'non_basic_added': nonBasicAdded,
-    };
+  if (addedTotal != targetTotal) {
+    final missingAdditions = (targetTotal - addedTotal).clamp(0, targetTotal);
+    if (addedTotal < targetTotal &&
+        budgetLimitBrl != null &&
+        state.hasExplicitBudgetConstraintBlock) {
+      qualityError = {
+        'code': 'COMPLETE_RECOMMENDATION_CONSTRAINTS_UNSATISFIED',
+        'message':
+            'Complete bloqueado: o orçamento solicitado ou a ausência de '
+            'preço verificável bloqueou cartas durante a montagem. Aumente '
+            'ou desative o limite de orçamento e tente novamente.',
+        'target_additions': targetTotal,
+        'added_total': addedTotal,
+        'missing_additions': missingAdditions,
+        'basic_added': basicAdded,
+        'non_basic_added': nonBasicAdded,
+        'budget_limit_brl': budgetLimitBrl,
+        if (recommendationConstraints != null)
+          'recommendation_constraints': recommendationConstraints,
+        'next_action': 'increase_or_disable_budget_limit',
+      };
+    } else {
+      qualityError = {
+        'code':
+            addedTotal < targetTotal
+                ? 'COMPLETE_QUALITY_PARTIAL'
+                : 'COMPLETE_QUALITY_COUNT_MISMATCH',
+        'message':
+            addedTotal < targetTotal
+                ? 'Não foi possível completar o deck com qualidade mínima: adições insuficientes.'
+                : 'Complete bloqueado: a montagem produziu mais adições do que o alvo permitido.',
+        'target_additions': targetTotal,
+        'added_total': addedTotal,
+        'missing_additions': missingAdditions,
+        'excess_additions': (addedTotal - targetTotal).clamp(0, addedTotal),
+        'basic_added': basicAdded,
+        'non_basic_added': nonBasicAdded,
+      };
+    }
   } else if (bracketAssessment != null && !bracketAssessment.hardCompliant) {
     qualityError = {
       'code': 'COMPLETE_QUALITY_BRACKET_VIOLATION',
@@ -2293,8 +2490,10 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
     'target_additions': targetTotal,
     'iterations': state.iterations,
     'additions_detailed': additionsDetailed,
+    if (recommendationConstraints != null)
+      'recommendation_constraints': recommendationConstraints,
     'reasoning':
-        (state.virtualTotal >= maxTotal)
+        (addedTotal == targetTotal && state.virtualTotal == maxTotal)
             ? 'Deck completado com cartas sinérgicas ao arquétipo $targetArchetype, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.'
             : 'Deck parcialmente completado; algumas sugestões foram bloqueadas/filtradas.',
     'warnings': {
@@ -2312,7 +2511,8 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
         'blocked_by_bracket': {'blocked_additions': state.blockedByBracketAll},
     },
     'consistency_slo': {
-      'completed_target': addedTotal >= targetTotal,
+      'completed_target': addedTotal == targetTotal,
+      'exact_addition_count_satisfied': addedTotal == targetTotal,
       'mana_foundation_satisfied': manaFloorAssessment.satisfied,
       if (functionalRoleAssessment != null)
         'functional_role_floor_satisfied': functionalRoleAssessment.satisfied,
@@ -2347,6 +2547,95 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       'meta_reference_context': state.commanderMetaEvidencePayload,
     if (qualityError != null) 'quality_error': qualityError,
   }, defaultMode: 'optimize');
+}
+
+Map<String, dynamic>? buildCompleteFinalResolutionCountError({
+  required int targetAdditionCount,
+  required int rawAdditionCount,
+  required int resolvedAdditionCount,
+  int unresolvedAdditionCount = 0,
+  Iterable<String> unresolvedCardIds = const <String>[],
+}) {
+  if (rawAdditionCount == targetAdditionCount &&
+      resolvedAdditionCount == targetAdditionCount) {
+    return null;
+  }
+
+  final missingAdditions =
+      (targetAdditionCount - resolvedAdditionCount)
+          .clamp(0, targetAdditionCount)
+          .toInt();
+  final excessAdditions =
+      (resolvedAdditionCount - targetAdditionCount)
+          .clamp(0, resolvedAdditionCount)
+          .toInt();
+  final droppedDuringResolution =
+      (rawAdditionCount - resolvedAdditionCount)
+          .clamp(0, rawAdditionCount)
+          .toInt();
+  final aliasesCollapsedOrCopyLimited =
+      (droppedDuringResolution - unresolvedAdditionCount)
+          .clamp(0, droppedDuringResolution)
+          .toInt();
+  final uniqueUnresolvedIds = unresolvedCardIds
+      .map((id) => id.trim())
+      .where((id) => id.isNotEmpty)
+      .toSet()
+      .toList(growable: false);
+
+  return {
+    'code': 'COMPLETE_FINAL_RESOLUTION_COUNT_MISMATCH',
+    'message':
+        resolvedAdditionCount < targetAdditionCount
+            ? 'Complete bloqueado na resolução final: apenas '
+                '$resolvedAdditionCount de $targetAdditionCount adições '
+                'permaneceram após resolver cartas e consolidar identidades. '
+                'Nenhuma alteração parcial foi autorizada.'
+            : 'Complete bloqueado na resolução final: foram resolvidas '
+                '$resolvedAdditionCount adições para um alvo de '
+                '$targetAdditionCount. Nenhuma alteração foi autorizada.',
+    'target_additions': targetAdditionCount,
+    'raw_additions': rawAdditionCount,
+    'resolved_additions': resolvedAdditionCount,
+    'missing_additions': missingAdditions,
+    'excess_additions': excessAdditions,
+    'dropped_during_resolution': droppedDuringResolution,
+    'unresolved_additions': unresolvedAdditionCount,
+    'aliases_collapsed_or_copy_limited': aliasesCollapsedOrCopyLimited,
+    if (uniqueUnresolvedIds.isNotEmpty)
+      'unresolved_card_ids': uniqueUnresolvedIds,
+    'next_action': 'retry_complete_without_applying_partial_result',
+  };
+}
+
+bool applyCompleteFinalResolutionCountGate({
+  required Map<String, dynamic> responseBody,
+  required int targetAdditionCount,
+  required int rawAdditionCount,
+  required int resolvedAdditionCount,
+  int unresolvedAdditionCount = 0,
+  Iterable<String> unresolvedCardIds = const <String>[],
+}) {
+  final qualityError = buildCompleteFinalResolutionCountError(
+    targetAdditionCount: targetAdditionCount,
+    rawAdditionCount: rawAdditionCount,
+    resolvedAdditionCount: resolvedAdditionCount,
+    unresolvedAdditionCount: unresolvedAdditionCount,
+    unresolvedCardIds: unresolvedCardIds,
+  );
+  if (qualityError == null) return true;
+
+  final blockers =
+      ((responseBody['apply_blockers'] as List?) ?? const <dynamic>[])
+          .map((blocker) => blocker.toString())
+          .toSet()
+        ..add('complete_final_addition_count_mismatch');
+  responseBody
+    ..['quality_error'] = qualityError
+    ..['can_apply'] = false
+    ..['learning_eligible'] = false
+    ..['apply_blockers'] = blockers.toList(growable: false);
+  return false;
 }
 
 Future<Map<String, dynamic>> buildCompleteFinalResponse({
@@ -2586,6 +2875,28 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     String value => int.tryParse(value.trim()) ?? 0,
     _ => 0,
   };
+  int additionQuantity(Map<String, dynamic> entry) =>
+      switch (entry['quantity']) {
+        int value => value,
+        num value => value.toInt(),
+        String value => int.tryParse(value.trim()) ?? 1,
+        _ => 1,
+      };
+  final rawAdditionCount = rawAdditionsDetailed.fold<int>(
+    0,
+    (sum, entry) => sum + additionQuantity(entry),
+  );
+  final resolvedAdditionCount = resolvedAdditionsForFloor.fold<int>(
+    0,
+    (sum, entry) => sum + additionQuantity(entry),
+  );
+  final unresolvedEntries = rawAdditionsDetailed
+      .where((entry) => !cardInfoById.containsKey(entry['card_id']))
+      .toList(growable: false);
+  final unresolvedAdditionCount = unresolvedEntries.fold<int>(
+    0,
+    (sum, entry) => sum + additionQuantity(entry),
+  );
   final finalFunctionalRoleAssessment =
       deckFormat.trim().toLowerCase() == 'commander' && targetAdditionCount > 0
           ? assessCommanderFunctionalRoleFloors(
@@ -2628,7 +2939,21 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     'post_analysis': postAnalysisComplete,
     'validation_warnings': const <String>[],
   };
-  if (finalBracketAssessment != null && !finalBracketAssessment.hardCompliant) {
+  final finalResolutionCountSatisfied = applyCompleteFinalResolutionCountGate(
+    responseBody: responseBody,
+    targetAdditionCount: targetAdditionCount,
+    rawAdditionCount: rawAdditionCount,
+    resolvedAdditionCount: resolvedAdditionCount,
+    unresolvedAdditionCount: unresolvedAdditionCount,
+    unresolvedCardIds: unresolvedEntries.map(
+      (entry) => entry['card_id']?.toString() ?? '',
+    ),
+  );
+  if (!finalResolutionCountSatisfied) {
+    // A barreira já marcou a resposta como não acionável e preserva o erro de
+    // resolução como causa primária antes dos demais diagnósticos estruturais.
+  } else if (finalBracketAssessment != null &&
+      !finalBracketAssessment.hardCompliant) {
     responseBody
       ..['quality_error'] = {
         'code': 'COMPLETE_QUALITY_BRACKET_VIOLATION',
@@ -2684,10 +3009,7 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       targetArchetype: targetArchetype,
       intensity: intensity,
       keepTheme: keepTheme,
-      additionCount: additionsDetailed.fold<int>(
-        0,
-        (sum, entry) => sum + ((entry['quantity'] as int?) ?? 1),
-      ),
+      additionCount: resolvedAdditionCount,
       removalCount: 0,
     ),
     'mana_foundation': buildOptimizationManaFoundationContract(
@@ -2719,6 +3041,18 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   if (consistencySlo is Map) {
     responseBody['consistency_slo'] = consistencySlo.cast<String, dynamic>();
   }
+  responseBody['consistency_slo'] = {
+    ...?responseBody['consistency_slo'] as Map<String, dynamic>?,
+    'completed_target':
+        rawAdditionCount == targetAdditionCount &&
+        resolvedAdditionCount == targetAdditionCount,
+    'exact_addition_count_satisfied':
+        rawAdditionCount == targetAdditionCount &&
+        resolvedAdditionCount == targetAdditionCount,
+    'target_total': targetAdditionCount,
+    'raw_addition_count': rawAdditionCount,
+    'resolved_addition_count': resolvedAdditionCount,
+  };
   if (finalManaFloorAssessment.applies) {
     responseBody['consistency_slo'] = {
       ...?responseBody['consistency_slo'] as Map<String, dynamic>?,

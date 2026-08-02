@@ -9,6 +9,22 @@ enum DeckAiFailureKind { needsRepair, nearPeak, noSafeUpgradeFound, generic }
 
 enum OptimizeApplyMode { none, addBulk, applyWithIds, applyByNames }
 
+Map<String, dynamic> buildOptimizeRecommendationContext({
+  required bool preferCollection,
+  required bool budgetEnabled,
+  required double budgetLimit,
+  required String rebuildIntent,
+}) {
+  return {
+    'prefer_collection': preferCollection,
+    if (budgetEnabled) 'budget_limit_brl': budgetLimit.round(),
+    'rebuild_intent': rebuildIntent,
+    'report': 'before_after_shareable',
+    'explain_swaps': true,
+    'include_price_risk_curve_bracket': true,
+  };
+}
+
 class DeckAiFailurePresentation {
   final DeckAiFailureKind kind;
   final String title;

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/features/auth/models/email_verification_delivery_result.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,6 +56,10 @@ class _MissingTokenApiClient extends ApiClient {
 }
 
 class _RegisterSuccessApiClient extends ApiClient {
+  _RegisterSuccessApiClient({this.verificationSent});
+
+  final bool? verificationSent;
+
   @override
   Future<ApiResponse> post(
     String endpoint,
@@ -69,6 +74,7 @@ class _RegisterSuccessApiClient extends ApiClient {
         'username': 'qa_register_user',
         'email': 'qa_register_user@example.com',
       },
+      if (verificationSent != null) 'verification_sent': verificationSent,
     });
   }
 }
@@ -181,6 +187,49 @@ void main() {
     expect(joined, contains('email_domain=example.com'));
     expect(joined, contains('POST /auth/register'));
     expect(joined, contains('token recebido: sim'));
+  });
+
+  test('register preserves the real verification delivery outcome', () async {
+    SharedPreferences.setMockInitialValues({});
+    final unavailable = AuthProvider(
+      apiClient: _RegisterSuccessApiClient(verificationSent: false),
+    );
+
+    expect(
+      await unavailable.register(
+        username: 'qa_register_user',
+        email: 'qa_register_user@example.com',
+        password: 'Password123!',
+        legalAccepted: true,
+        termsVersion: '2026-07-21',
+        privacyVersion: '2026-07-21',
+      ),
+      isTrue,
+    );
+    expect(
+      unavailable.emailVerificationDeliveryStatus,
+      EmailVerificationDeliveryStatus.unavailable,
+    );
+
+    SharedPreferences.setMockInitialValues({});
+    final sent = AuthProvider(
+      apiClient: _RegisterSuccessApiClient(verificationSent: true),
+    );
+    expect(
+      await sent.register(
+        username: 'qa_register_user',
+        email: 'qa_register_user@example.com',
+        password: 'Password123!',
+        legalAccepted: true,
+        termsVersion: '2026-07-21',
+        privacyVersion: '2026-07-21',
+      ),
+      isTrue,
+    );
+    expect(
+      sent.emailVerificationDeliveryStatus,
+      EmailVerificationDeliveryStatus.sent,
+    );
   });
 
   test('login network failure exposes friendly user message only', () async {

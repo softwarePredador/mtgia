@@ -20,6 +20,15 @@ void main() {
       expect(source, contains('is_explicit_loopback_http'));
       expect(source, contains('is_https_origin or is_explicit_loopback_http'));
       expect(source, contains('explicitly allowed loopback HTTP fixture'));
+      expect(source, contains('--api-connect-address'));
+      expect(source, contains('--api-connect-port'));
+      expect(source, contains('connect_ip.is_loopback'));
+      expect(source, contains('server_hostname=server_hostname'));
+      expect(source, contains('forwarded_headers["Host"] = parsed_target.netloc'));
+      expect(
+        source,
+        contains('--api-connect-address requires an HTTPS --api-upstream'),
+      );
       expect(
         source,
         isNot(contains('ssl._create_unverified_context')),

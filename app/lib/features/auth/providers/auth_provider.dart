@@ -7,6 +7,7 @@ import '../../../core/observability/app_observability.dart';
 import '../../../core/security/auth_token_store.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../home/services/onboarding_state_store.dart';
+import '../models/email_verification_delivery_result.dart';
 import '../models/user.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
@@ -30,6 +31,8 @@ class AuthProvider extends ChangeNotifier {
   String? _errorMessage;
   bool _needsOnboarding = true;
   bool _onboardingStorageUnavailable = false;
+  EmailVerificationDeliveryStatus _emailVerificationDeliveryStatus =
+      EmailVerificationDeliveryStatus.unknown;
   int _authGeneration = 0;
   Future<void>? _initializeFuture;
 
@@ -40,6 +43,8 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _status == AuthStatus.authenticated;
   bool get needsOnboarding => _needsOnboarding;
   bool get onboardingStorageUnavailable => _onboardingStorageUnavailable;
+  EmailVerificationDeliveryStatus get emailVerificationDeliveryStatus =>
+      _emailVerificationDeliveryStatus;
   String get defaultAuthenticatedLocation => _onboardingStorageUnavailable
       ? '/onboarding/core-flow?storage=unavailable'
       : (_needsOnboarding ? '/onboarding/core-flow' : '/home');
@@ -158,6 +163,7 @@ class AuthProvider extends ChangeNotifier {
     );
     _status = AuthStatus.loading;
     _errorMessage = null;
+    _emailVerificationDeliveryStatus = EmailVerificationDeliveryStatus.unknown;
     notifyListeners();
 
     try {
@@ -248,6 +254,7 @@ class AuthProvider extends ChangeNotifier {
     );
     _status = AuthStatus.loading;
     _errorMessage = null;
+    _emailVerificationDeliveryStatus = EmailVerificationDeliveryStatus.unknown;
     notifyListeners();
 
     try {
@@ -267,6 +274,11 @@ class AuthProvider extends ChangeNotifier {
       if (response.statusCode == 201) {
         if (generation != _authGeneration) return false;
         final data = response.data as Map<String, dynamic>;
+        _emailVerificationDeliveryStatus =
+            EmailVerificationDeliveryResult.fromJson(
+              data,
+              fallbackMessage: '',
+            ).status;
         final nextToken = _readAuthToken(data['token']);
         final nextUser = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint(
@@ -414,6 +426,8 @@ class AuthProvider extends ChangeNotifier {
       _resetOnboardingDecision();
       ApiClient.setToken(null);
       _errorMessage = null;
+      _emailVerificationDeliveryStatus =
+          EmailVerificationDeliveryStatus.unknown;
       _status = AuthStatus.unauthenticated;
       notifyListeners();
     }
@@ -437,6 +451,7 @@ class AuthProvider extends ChangeNotifier {
     _resetOnboardingDecision();
     ApiClient.setToken(null);
     _errorMessage = expiredSessionMessage;
+    _emailVerificationDeliveryStatus = EmailVerificationDeliveryStatus.unknown;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
 

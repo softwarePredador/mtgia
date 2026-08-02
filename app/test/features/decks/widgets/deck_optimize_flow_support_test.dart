@@ -4,6 +4,24 @@ import 'package:manaloom/features/decks/widgets/deck_optimize_flow_support.dart'
 import 'package:manaloom/features/decks/widgets/deck_optimize_ui_support.dart';
 
 void main() {
+  test('budget constraint is absent until the user explicitly enables it', () {
+    final unconstrained = buildOptimizeRecommendationContext(
+      preferCollection: true,
+      budgetEnabled: false,
+      budgetLimit: 100,
+      rebuildIntent: 'upgraded',
+    );
+    final constrained = buildOptimizeRecommendationContext(
+      preferCollection: true,
+      budgetEnabled: true,
+      budgetLimit: 125.6,
+      rebuildIntent: 'upgraded',
+    );
+
+    expect(unconstrained, isNot(contains('budget_limit_brl')));
+    expect(constrained['budget_limit_brl'], 126);
+  });
+
   test('OptimizePreviewData normalizes detailed and fallback fields', () {
     final preview = OptimizePreviewData.fromResult({
       'mode': 'optimize',

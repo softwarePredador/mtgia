@@ -90,14 +90,20 @@ void main() {
   testWidgets(
     'recommendation context shows collection and budget constraints',
     (tester) async {
+      tester.view.physicalSize = const Size(800, 760);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       await tester.pumpWidget(
         _TestMaterialApp(
           home: Scaffold(
             body: RecommendationContextSection(
               preferCollection: true,
+              budgetEnabled: true,
               budgetLimit: 100,
               rebuildIntent: 'optimized',
               onPreferCollectionChanged: (_) {},
+              onBudgetEnabledChanged: (_) {},
               onBudgetLimitChanged: (_) {},
               onRebuildIntentChanged: (_) {},
             ),
@@ -118,6 +124,40 @@ void main() {
       expect(find.text('Antes/depois'), findsOneWidget);
     },
   );
+
+  testWidgets('budget is opt-in so a new deck is not silently truncated', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 760);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      _TestMaterialApp(
+        home: Scaffold(
+          body: RecommendationContextSection(
+            preferCollection: true,
+            budgetEnabled: false,
+            budgetLimit: 100,
+            rebuildIntent: 'upgraded',
+            onPreferCollectionChanged: (_) {},
+            onBudgetEnabledChanged: (_) {},
+            onBudgetLimitChanged: (_) {},
+            onRebuildIntentChanged: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Orçamento: sem limite definido'), findsOneWidget);
+    expect(find.text('Sem limite definido'), findsOneWidget);
+    expect(
+      tester
+          .widget<Slider>(find.byKey(const Key('optimize-budget-slider')))
+          .onChanged,
+      isNull,
+    );
+  });
 
   testWidgets('optimization exposes all five Commander brackets', (
     tester,

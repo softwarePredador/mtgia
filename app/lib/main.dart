@@ -24,6 +24,7 @@ import 'features/auth/screens/register_screen.dart';
 import 'features/auth/screens/forgot_password_screen.dart';
 import 'features/auth/screens/reset_password_screen.dart';
 import 'features/auth/screens/verify_email_screen.dart';
+import 'features/auth/models/email_verification_delivery_result.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/auth_redirect.dart';
 
@@ -426,6 +427,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
           builder: (context, state) => VerifyEmailScreen(
             token: state.uri.queryParameters['token'] ?? '',
             redirectPath: state.uri.queryParameters['redirect'],
+            initialDeliveryStatus:
+                switch (state.uri.queryParameters['delivery']) {
+                  'sent' => EmailVerificationDeliveryStatus.sent,
+                  'unavailable' => EmailVerificationDeliveryStatus.unavailable,
+                  _ => EmailVerificationDeliveryStatus.unknown,
+                },
           ),
         ),
 
