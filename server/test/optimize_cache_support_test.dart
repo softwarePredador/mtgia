@@ -40,7 +40,7 @@ void main() {
         intensity: 'aggressive',
       );
 
-      expect(focused, startsWith('v18:'));
+      expect(focused, startsWith('v19:'));
       expect(focused, equals(focusedAgain));
       expect(aggressive, isNot(equals(focused)));
     });

@@ -27,6 +27,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   required Set<String> excludeNames,
   required List<Map<String, dynamic>> allCardData,
   Set<String> preferredNames = const <String>{},
+  Map<String, int> preferredNameScores = const <String, int>{},
   bool preferLowCurve = false,
   String? userId,
   bool preferCollection = false,
@@ -97,14 +98,34 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   }
 
   final colorIdentityArr = commanderColorIdentity.toList();
+  final normalizedPreferredNameScores = <String, int>{};
+  for (final entry in preferredNameScores.entries) {
+    final name = entry.key.trim().toLowerCase();
+    if (name.isEmpty) continue;
+    final score = entry.value.clamp(0, 400).toInt();
+    final previous = normalizedPreferredNameScores[name] ?? 0;
+    if (score > previous) normalizedPreferredNameScores[name] = score;
+  }
   final normalizedPreferredNames =
-      <String>{...preferredNames, if (keepTheme) ...?coreCards}
+      <String>{
+            ...preferredNames,
+            ...normalizedPreferredNameScores.keys,
+            if (keepTheme) ...?coreCards,
+          }
           .map((name) => name.trim().toLowerCase())
           .where((name) => name.isNotEmpty)
           .toSet();
+  final orderedPreferredNames =
+      normalizedPreferredNames.toList()..sort((a, b) {
+        final byPriority = (normalizedPreferredNameScores[b] ?? 0).compareTo(
+          normalizedPreferredNameScores[a] ?? 0,
+        );
+        return byPriority != 0 ? byPriority : a.compareTo(b);
+      });
   final themeContext = buildOptimizeThemeContext(
     targetArchetype: targetArchetype,
     detectedTheme: detectedTheme,
+    includeDetectedTheme: keepTheme,
   );
   final commanderName = commanders.isNotEmpty ? commanders.first.trim() : '';
   final rejectedAdditionCounts =
@@ -208,14 +229,18 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                  COALESCE(cmi.usage_count, 0) DESC
       ) sub
       ORDER BY CASE
-                 WHEN LOWER(sub.name) = ANY(@preferred_names::text[]) THEN 1
-                 ELSE 0
-               END DESC,
-               CASE
                  WHEN CAST(@prefer_collection AS boolean) = TRUE
                       AND sub.available_quantity > 0 THEN 1
                  ELSE 0
                END DESC,
+               CASE
+                 WHEN LOWER(sub.name) = ANY(@preferred_names::text[]) THEN 1
+                 ELSE 0
+               END DESC,
+               COALESCE(
+                 array_position(@preferred_names::text[], LOWER(sub.name)),
+                 2147483647
+               ) ASC,
                sub.best_commander_synergy_score DESC,
                sub.pop_score DESC,
                LOWER(sub.name) ASC
@@ -228,7 +253,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           .map((name) => name.trim().toLowerCase())
           .where((name) => name.isNotEmpty)
           .toList(growable: false),
-      'preferred_names': normalizedPreferredNames.toList(growable: false),
+      'preferred_names': orderedPreferredNames,
       'prefer_collection': preferCollection,
       'check_collection':
           userId != null &&
@@ -401,7 +426,11 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           scoreOptimizeThemeAffinity(
             candidate: candidate,
             detectedTheme: themeContext,
-            keepTheme: keepTheme,
+            keepTheme: themeContext != null,
+          ) +
+          scoreOptimizePreferredNameAffinity(
+            cardName: candidate['name'] as String? ?? '',
+            preferredNameScores: normalizedPreferredNameScores,
           ) +
           scoreOptimizeBracketScopeAffinity(
             candidate: candidate,
@@ -465,7 +494,11 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                 scoreOptimizeThemeAffinity(
                   candidate: a,
                   detectedTheme: themeContext,
-                  keepTheme: keepTheme,
+                  keepTheme: themeContext != null,
+                ) +
+                scoreOptimizePreferredNameAffinity(
+                  cardName: a['name'] as String? ?? '',
+                  preferredNameScores: normalizedPreferredNameScores,
                 ) +
                 scoreOptimizeBracketScopeAffinity(
                   candidate: a,
@@ -492,7 +525,11 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
                 scoreOptimizeThemeAffinity(
                   candidate: b,
                   detectedTheme: themeContext,
-                  keepTheme: keepTheme,
+                  keepTheme: themeContext != null,
+                ) +
+                scoreOptimizePreferredNameAffinity(
+                  cardName: b['name'] as String? ?? '',
+                  preferredNameScores: normalizedPreferredNameScores,
                 ) +
                 scoreOptimizeBracketScopeAffinity(
                   candidate: b,
@@ -735,15 +772,26 @@ int scoreOptimizeThemeAffinity({
   return score.clamp(-200, 600).toInt();
 }
 
+int scoreOptimizePreferredNameAffinity({
+  required String cardName,
+  required Map<String, int> preferredNameScores,
+}) {
+  final name = cardName.trim().toLowerCase();
+  if (name.isEmpty) return 0;
+  return (preferredNameScores[name] ?? 0).clamp(0, 400).toInt();
+}
+
 String? buildOptimizeThemeContext({
   required String targetArchetype,
   required String? detectedTheme,
+  bool includeDetectedTheme = true,
 }) {
   final parts = <String>[];
   final archetype = targetArchetype.trim();
   final detected = detectedTheme?.trim() ?? '';
   if (archetype.isNotEmpty) parts.add(archetype);
-  if (detected.isNotEmpty &&
+  if (includeDetectedTheme &&
+      detected.isNotEmpty &&
       detected.toLowerCase() != archetype.toLowerCase()) {
     parts.add(detected);
   }

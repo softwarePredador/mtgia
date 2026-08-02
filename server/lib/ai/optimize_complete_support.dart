@@ -51,6 +51,7 @@ class CompleteBuildAccumulator {
   final List<String> filteredByLegalityAll;
   final List<String> invalidAll;
   final Set<String> aiSuggestedNames;
+  final Map<String, int> commanderReferencePriorityScores;
   final Set<String> commanderMetaPriorityNames;
   final OptimizeRecommendationConstraintLedger recommendationLedger;
   final List<Map<String, dynamic>> _recommendationBudgetBlockedSamples =
@@ -93,6 +94,7 @@ class CompleteBuildAccumulator {
     this.filteredByLegalityAll = const <String>[],
     this.invalidAll = const <String>[],
     this.aiSuggestedNames = const <String>{},
+    this.commanderReferencePriorityScores = const <String, int>{},
     this.commanderMetaPriorityNames = const <String>{},
     OptimizeRecommendationConstraintLedger? recommendationLedger,
   }) : recommendationLedger =
@@ -123,6 +125,7 @@ class CompleteBuildAccumulator {
       filteredByLegalityAll: <String>[],
       invalidAll: <String>[],
       aiSuggestedNames: <String>{},
+      commanderReferencePriorityScores: <String, int>{},
       commanderMetaPriorityNames: <String>{},
     );
   }
@@ -421,6 +424,9 @@ Future<void> prepareCompleteCommanderSeed({
       state.commanderProfileStageUsed = true;
       state.aiSuggestedNames.addAll(
         referenceNames.map((name) => name.toLowerCase()),
+      );
+      state.commanderReferencePriorityScores.addAll(
+        buildCommanderReferenceCandidatePriorityScores(referenceStats.stats),
       );
     }
   } catch (error) {
@@ -1047,6 +1053,7 @@ Future<int> _bootstrapSparseCompleteInput({
         ...state.aiSuggestedNames,
         ...state.commanderMetaPriorityNames,
       },
+      preferredNameScores: state.commanderReferencePriorityScores,
       userId: userId,
       preferCollection: preferCollection,
       budgetLimitBrl: budgetLimitBrl,
@@ -1800,6 +1807,7 @@ Future<void> fillCompleteDeckRemainder({
           excludeNames: existingNames.union(selectedSpellNames),
           allCardData: bracketSnapshot(),
           preferredNames: state.aiSuggestedNames,
+          preferredNameScores: state.commanderReferencePriorityScores,
           userId: userId,
           preferCollection: preferCollection,
           budgetLimitBrl: budgetLimitBrl,

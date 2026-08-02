@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
@@ -32,6 +34,15 @@ class _AuthenticatedAuthProvider extends AuthProvider {
   @override
   User get user =>
       User(id: 'user-1', username: 'e2e-user', email: 'e2e@example.com');
+}
+
+class _DeferredVerifyService extends AccountSecurityService {
+  _DeferredVerifyService() : super(apiClient: ApiClient());
+
+  final Completer<String> result = Completer<String>();
+
+  @override
+  Future<String> verifyEmail(String token) => result.future;
 }
 
 void main() {
@@ -104,6 +115,60 @@ void main() {
       find.byKey(const Key('verify-email-continue-button')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('removing the token clears stale verification state', (
+    tester,
+  ) async {
+    final service = _VerifyService();
+    final auth = AuthProvider(apiClient: ApiClient());
+
+    Widget build(String token) => ChangeNotifierProvider<AuthProvider>.value(
+      value: auth,
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: VerifyEmailScreen(token: token, service: service),
+      ),
+    );
+
+    await tester.pumpWidget(build('one-use'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('verify-email-continue-button')),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(build(''));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('verify-email-message')), findsNothing);
+    expect(find.byKey(const Key('verify-email-continue-button')), findsNothing);
+    expect(find.textContaining('Entre na sua conta'), findsOneWidget);
+  });
+
+  testWidgets('an old verification response cannot win after token removal', (
+    tester,
+  ) async {
+    final service = _DeferredVerifyService();
+    final auth = AuthProvider(apiClient: ApiClient());
+
+    Widget build(String token) => ChangeNotifierProvider<AuthProvider>.value(
+      value: auth,
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: VerifyEmailScreen(token: token, service: service),
+      ),
+    );
+
+    await tester.pumpWidget(build('one-use'));
+    await tester.pump();
+    await tester.pumpWidget(build(''));
+    service.result.complete('Email verificado.');
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('verify-email-message')), findsNothing);
+    expect(find.byKey(const Key('verify-email-continue-button')), findsNothing);
+    expect(find.textContaining('Entre na sua conta'), findsOneWidget);
   });
 
   testWidgets('delivery failure never tells the user to check the inbox', (

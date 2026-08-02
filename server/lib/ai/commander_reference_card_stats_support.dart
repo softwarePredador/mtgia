@@ -126,6 +126,60 @@ class CommanderReferenceCardStatsLoadResult {
   final List<String> unresolvedCardNames;
 }
 
+Map<String, int> buildCommanderReferenceCandidatePriorityScores(
+  Iterable<CommanderReferenceCardStat> stats,
+) {
+  final grouped = <String, List<CommanderReferenceCardStat>>{};
+  for (final stat in stats) {
+    if (stat.unresolved) continue;
+    final name = normalizeCommanderReferenceCardName(stat.cardName);
+    if (name.isEmpty) continue;
+    grouped.putIfAbsent(name, () => <CommanderReferenceCardStat>[]).add(stat);
+  }
+
+  final result = <String, int>{};
+  for (final entry in grouped.entries) {
+    final cardStats = entry.value;
+    final bestScore = cardStats
+        .map((stat) => stat.score.round().clamp(0, 100).toInt())
+        .reduce((a, b) => a > b ? a : b);
+    final bestConfidence = cardStats
+        .map((stat) => stat.confidenceRank.clamp(0, 5).toInt())
+        .reduce((a, b) => a > b ? a : b);
+    final evidence =
+        cardStats
+            .fold<int>(
+              0,
+              (sum, stat) => sum + stat.evidenceCount.clamp(0, 20).toInt(),
+            )
+            .clamp(0, 20)
+            .toInt();
+    final roleCount =
+        cardStats
+            .map((stat) => stat.role.trim().toLowerCase())
+            .where((role) => role.isNotEmpty)
+            .toSet()
+            .length
+            .clamp(0, 4)
+            .toInt();
+    final packageCount =
+        cardStats
+            .map((stat) => stat.packageKey.trim().toLowerCase())
+            .where((package) => package.isNotEmpty)
+            .toSet()
+            .length
+            .clamp(0, 4)
+            .toInt();
+    result[entry.key] =
+        (bestScore * 2) +
+        (bestConfidence * 20) +
+        evidence +
+        (roleCount * 10) +
+        (packageCount * 15);
+  }
+  return result;
+}
+
 class CommanderReferenceArchetypeStatsLoadResult {
   const CommanderReferenceArchetypeStatsLoadResult({
     required this.tableAvailable,

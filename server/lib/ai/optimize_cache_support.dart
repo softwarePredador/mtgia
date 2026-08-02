@@ -6,8 +6,8 @@ import 'optimize_functional_role_support.dart';
 
 // Bump whenever the player-facing optimize response contract changes. Cached
 // payloads are returned as-is, so reusing an older schema can omit safety fields
-// such as optimization_contract and battle_validation for up to six hours.
-const optimizeCacheContractVersion = 'v18';
+// or retain an obsolete candidate ranking for up to six hours.
+const optimizeCacheContractVersion = 'v19';
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   final entries = <String>[];

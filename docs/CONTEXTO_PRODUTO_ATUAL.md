@@ -13,7 +13,7 @@
   recebe penalidade temática quando não sustenta `Miracle Big Spells`;
 - Complete e Optimize compartilham gates de bracket, identidade, fundação de
   mana, ramp, compra, interação, wipes, orçamento/coleção e qualidade final.
-  Cache anterior é invalidado pelo contrato `v18`;
+  Cache anterior é invalidado pelo contrato `v19`;
 - todos os cinco brackets mantêm intenção distinta: B1/B2/B3/B4 projetam
   janelas 9+/8+/6+/4+ e apenas B5 usa automaticamente o metagame cEDH;
 - Generate e Rebuild também falham fechado na avaliação final; o contrato

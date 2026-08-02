@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `60eb03bec8f0a9c0484166ef51a6b58fca7d27b8f48495adf1ef4df7f808e7c9`
+**Digest das fontes:** `72c3e95fe1d2df7767dfd29a55ec4e23c70ed50e8fc34ad46c424b7799c13f47`
 
 ## Fontes de verdade
 
@@ -18,12 +18,12 @@
 | `dart_source_files` | 660 |
 | `non_dart_product_files` | 47 |
 | `battle_sidecar_source_files` | 33 |
-| `dart_symbols` | 4836 |
+| `dart_symbols` | 4838 |
 | `semantic_resolved_files` | 660 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 39020 |
-| `semantic_resolved_call_sites` | 62148 |
-| `semantic_resolved_type_references` | 15019 |
+| `semantic_resolved_call_edges` | 39041 |
+| `semantic_resolved_call_sites` | 62195 |
+| `semantic_resolved_type_references` | 15020 |
 | `modules` | 149 |
 | `app_routes` | 41 |
 | `web_routes` | 14 |

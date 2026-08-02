@@ -376,6 +376,42 @@ void main() {
         ),
         'Miracle Big Spells',
       );
+
+      final targetOnly = buildOptimizeThemeContext(
+        targetArchetype: 'Miracle Big Spells',
+        detectedTheme: 'wheels',
+        includeDetectedTheme: false,
+      );
+      expect(targetOnly, 'Miracle Big Spells');
+      expect(
+        scoreOptimizeThemeAffinity(
+          candidate: const {
+            'name': 'Cori-Steel Cutter',
+            'type_line': 'Artifact — Equipment',
+            'oracle_text':
+                'Whenever you cast your second spell each turn, create a 1/1 Monk creature token.',
+            'functional_tags': ['token', 'payoff', 'engine'],
+          },
+          detectedTheme: targetOnly,
+          keepTheme: targetOnly != null,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('ranked commander references do not collapse into a binary tie', () {
+      expect(
+        scoreOptimizePreferredNameAffinity(
+          cardName: 'Strong Setup',
+          preferredNameScores: const {'strong setup': 320, 'weak option': 80},
+        ),
+        greaterThan(
+          scoreOptimizePreferredNameAffinity(
+            cardName: 'Weak Option',
+            preferredNameScores: const {'strong setup': 320, 'weak option': 80},
+          ),
+        ),
+      );
     });
 
     test(

@@ -171,6 +171,40 @@ void main() {
       expect(prompt, contains('Do not force every card'));
     });
 
+    test('candidate priority preserves score, confidence, role and package', () {
+      final priorities = buildCommanderReferenceCandidatePriorityScores([
+        _stat(
+          cardName: 'Strong Setup',
+          cardId: 'strong-id',
+          packageKey: 'topdeck_setup',
+          role: 'topdeck_miracle_setup',
+          score: 92,
+          confidence: 'high',
+        ),
+        _stat(
+          cardName: 'Strong Setup',
+          cardId: 'strong-id',
+          packageKey: 'miracle_payoff',
+          role: 'big_spell',
+          score: 88,
+          confidence: 'high',
+        ),
+        _stat(
+          cardName: 'Weak Option',
+          cardId: 'weak-id',
+          packageKey: 'generic',
+          role: 'utility',
+          score: 15,
+          confidence: 'medium',
+        ),
+      ]);
+
+      expect(
+        priorities['strong setup'],
+        greaterThan(priorities['weak option']!),
+      );
+    });
+
     test('compact prompt caps package cards and prioritizes corpus core', () {
       final stats = [
         for (var i = 0; i < 8; i++)
@@ -1000,7 +1034,6 @@ void main() {
     });
   });
 }
-
 Map<String, dynamic> _resolvedCard({
   required String id,
   required String name,

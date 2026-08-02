@@ -498,7 +498,8 @@ This supersedes the older `card_id:quantity:condition` wording in the
 `POST /ai/optimize` table row above. Changing which physical card is the
 commander therefore invalidates the preview even when card IDs, quantities and
 conditions are otherwise unchanged. The persistent optimize cache contract is
-`v18`; earlier entries are not reused. Its cache key also includes the
+`v19`; earlier entries are not reused after the ranked commander-reference and
+target-archetype selection policy changed. Its cache key also includes the
 normalized deck format, so identical signatures and archetypes cannot share a
 payload across Commander and Brawl. It also binds the functional-role policy
 version, so Complete cannot reuse a preview evaluated by older floor rules.

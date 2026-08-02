@@ -57,8 +57,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   void _scheduleVerification(String token) {
     final normalized = token.trim();
-    if (normalized.isEmpty) return;
     final generation = ++_verificationGeneration;
+    if (normalized.isEmpty) {
+      _working = false;
+      _verified = false;
+      _message = null;
+      _error = null;
+      return;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || generation != _verificationGeneration) return;
       _verify(normalized, generation: generation);
