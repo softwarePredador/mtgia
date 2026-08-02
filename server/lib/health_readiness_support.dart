@@ -885,6 +885,7 @@ Future<BattleLiveSpectatorReadiness> evaluateBattleLiveSpectatorReadiness(
   }
 
   var sourceReady = false;
+  var configurationReady = false;
   final sourceUrl = env['XMAGE_SIDECAR_URL']?.trim() ?? '';
   try {
     final config = BattleEngineConfig.fromEnvironment({
@@ -901,6 +902,7 @@ Future<BattleLiveSpectatorReadiness> evaluateBattleLiveSpectatorReadiness(
     if (baseUri != null &&
         const {'http', 'https'}.contains(baseUri.scheme) &&
         baseUri.host.isNotEmpty) {
+      configurationReady = true;
       final health = await probe('xmage', baseUri.resolve('/health'));
       if (health != null) {
         final identityError = externalBattleIdentityValidationError(
@@ -914,10 +916,11 @@ Future<BattleLiveSpectatorReadiness> evaluateBattleLiveSpectatorReadiness(
       }
     }
   } on Object {
+    configurationReady = false;
     sourceReady = false;
   }
 
-  final healthy = schemaReady && sourceReady;
+  final healthy = configurationReady && schemaReady && sourceReady;
   return BattleLiveSpectatorReadiness(
     healthy: healthy,
     check: {
@@ -928,6 +931,7 @@ Future<BattleLiveSpectatorReadiness> evaluateBattleLiveSpectatorReadiness(
       'transport': battleLivePollingTransport,
       'database': schemaReady ? 'ready' : 'unhealthy',
       'source': sourceReady ? 'ready' : 'unhealthy',
+      'configuration': configurationReady ? 'ready' : 'unhealthy',
       if (!healthy) 'error_code': 'battle_live_spectator_not_ready',
     },
   );

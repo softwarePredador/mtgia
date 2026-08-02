@@ -362,6 +362,7 @@ void main() {
         expect(readiness.check['status'], 'ready');
         expect(readiness.check['database'], 'ready');
         expect(readiness.check['source'], 'ready');
+        expect(readiness.check['configuration'], 'ready');
         expect(readiness.check, isNot(contains('stream_count')));
         expect(probed, ['xmage:/health']);
       },
@@ -379,6 +380,23 @@ void main() {
       );
 
       expect(readiness.healthy, isFalse);
+      expect(readiness.check['source'], 'unhealthy');
+      expect(readiness.check['error_code'], 'battle_live_spectator_not_ready');
+    });
+
+    test('enabled Live Spectator exposes invalid configuration', () async {
+      final readiness = await evaluateBattleLiveSpectatorReadiness(
+        DotEnv()..addAll({
+          'BATTLE_LIVE_SPECTATOR_ENABLED': 'true',
+          'XMAGE_SIDECAR_URL': 'not-a-sidecar-url',
+        }),
+        null,
+        schemaProbe: (_) async => true,
+        probe: (_, __) async => throw StateError('must not probe sidecar'),
+      );
+
+      expect(readiness.healthy, isFalse);
+      expect(readiness.check['configuration'], 'unhealthy');
       expect(readiness.check['source'], 'unhealthy');
       expect(readiness.check['error_code'], 'battle_live_spectator_not_ready');
     });
