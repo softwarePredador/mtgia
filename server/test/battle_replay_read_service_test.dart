@@ -494,6 +494,109 @@ void main() {
     });
 
     test(
+      'adds accepted Battle Coach choices only for the initiating user',
+      () async {
+        final source =
+            File(
+              'lib/battle/battle_replay_read_service.dart',
+            ).readAsStringSync();
+        expect(
+          source,
+          contains('private_session.user_id = CAST(@userId AS uuid)'),
+        );
+        expect(
+          source,
+          contains('private_session.deck_a_id = CAST(@deckId AS uuid)'),
+        );
+        expect(source, contains("accepted.record_kind = 'action_accepted'"));
+
+        final pool = _ScriptedPool([
+          _result(
+            rows: const [
+              [true],
+            ],
+          ),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'winner_deck_id',
+              'turns_played',
+              'game_log',
+              'metrics',
+              'created_at',
+              'deck_a_name',
+              'deck_b_name',
+              'interactive_user_decisions',
+            ],
+            rows: [
+              [
+                'interactive-replay-1',
+                'deck-1',
+                'deck-2',
+                'interactive_coach',
+                null,
+                1,
+                const {
+                  'type': 'interactive_coach',
+                  'engine': 'xmage',
+                  'decision_trace': <Object>[],
+                  'events': <Object>[],
+                },
+                const {'interactive': true},
+                DateTime.utc(2026, 8, 2, 8),
+                'Lorehold',
+                'Animar',
+                const [
+                  {
+                    'schema_version': 'interactive_user_decision_v1',
+                    'decision_id': 'interactive-decision-20',
+                    'decision_origin': 'human_user',
+                    'rules_engine_explanation': false,
+                    'strategy_proof': false,
+                    'decision_type': 'mulligan',
+                    'turn': 1,
+                    'phase': 'Beginning',
+                    'actor': 'Você',
+                    'choice': 'Manter esta mão',
+                    'chosen_option': {
+                      'action': 'Manter esta mão',
+                      'role': 'keep',
+                    },
+                    'reason':
+                        'Escolha se deseja manter esta mão ou fazer mulligan.',
+                  },
+                ],
+              ],
+            ],
+          ),
+        ]);
+
+        final replay = await BattleReplayReadService(pool).fetchReplay(
+          userId: 'user-1',
+          deckId: 'deck-1',
+          replayId: 'interactive-replay-1',
+        );
+
+        expect(replay, isNotNull);
+        final decisions = replay!['decision_trace'] as List;
+        expect(decisions, hasLength(1));
+        expect(decisions.single, containsPair('choice', 'Manter esta mão'));
+        expect(
+          replay['decision_trace_contract'],
+          containsPair('schema_version', interactiveUserDecisionTraceSchema),
+        );
+        expect(
+          replay['decision_trace_contract'],
+          containsPair('scope', 'initiating_user_only'),
+        );
+        expect(decisions.single, isNot(contains('private_state')));
+      },
+    );
+
+    test(
       'rejects a corrupt persisted replay payload without echoing it',
       () async {
         final pool = _ScriptedPool([

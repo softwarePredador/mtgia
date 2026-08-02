@@ -206,10 +206,12 @@ BracketTagResult tagCardForBracket({
   final hasPayLife = o.contains('pay') && o.contains('life') && hasRather;
   final hasDiscard = o.contains('discard');
   final hasPitch = hasRather && (hasExile || hasPayLife || hasDiscard);
-  final hasFreeCast = o.contains('without paying');
+  // "Cast without paying" also appears on rebound, suspend, cascade and
+  // value engines. It is not evidence that the card itself is free
+  // interaction. Curated names and a real alternative-cost pitch pattern are
+  // the fail-safe signals here.
   if (_knownFreeInteractionNames.contains(n) ||
-      ((hasPitch || hasFreeCast) &&
-          _looksLikeFreeInteractionText(typeLine, o))) {
+      (hasPitch && _looksLikeFreeInteractionText(typeLine, o))) {
     categories.add(BracketCategory.freeInteraction);
   }
 

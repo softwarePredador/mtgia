@@ -165,7 +165,7 @@ void main() {
 
         expect(first, equals(second));
         expect(first, isNot(equals(differentBracket)));
-        expect(first, startsWith('ai_generate:v6:'));
+        expect(first, startsWith('ai_generate:v7:'));
         expect(first, isNot(contains('mono red')));
       },
     );
@@ -217,7 +217,7 @@ void main() {
       );
 
       expect(v5, isNot(equals(v4)));
-      expect(v5, startsWith('ai_generate:v6:'));
+      expect(v5, startsWith('ai_generate:v7:'));
     });
 
     test('generation constraints participate in the cache key', () {

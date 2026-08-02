@@ -62,7 +62,10 @@ evaluateAiGenerateCommanderStructuralQuality({
   final applicable =
       normalizedFormat == 'commander' || normalizedFormat == 'edh';
   final cards = resolvedCards.toList(growable: false);
-  final archetype = inferAiGenerateTargetArchetype(prompt);
+  final archetype = inferAiGenerateTargetArchetype(
+    prompt,
+    requestedBracket: requestedBracket,
+  );
 
   return AiGenerateCommanderStructuralAssessment(
     applicable: applicable,
@@ -80,7 +83,7 @@ evaluateAiGenerateCommanderStructuralQuality({
   );
 }
 
-String inferAiGenerateTargetArchetype(String prompt) {
+String inferAiGenerateTargetArchetype(String prompt, {int? requestedBracket}) {
   final normalized = prompt.trim().toLowerCase();
   final positiveIntent = normalized.replaceAll(
     RegExp(
@@ -107,6 +110,7 @@ String inferAiGenerateTargetArchetype(String prompt) {
       positiveIntent.contains('cedh')) {
     return 'combo';
   }
+  if (requestedBracket == 5) return 'combo';
   return 'midrange';
 }
 

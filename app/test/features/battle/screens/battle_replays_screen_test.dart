@@ -544,6 +544,73 @@ void main() {
     );
   });
 
+  testWidgets('labels an accepted Battle Coach action as the user choice', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replayDetail: BattleReplayDetail.fromJson(
+        const {
+          'id': 'interactive-replay-1',
+          'deck_id': 'deck-1',
+          'type': 'interactive_coach',
+          'opponent_name': 'Animar',
+          'decision_trace_contract': {
+            'schema_version': 'interactive_user_decision_trace_v1',
+            'origin': 'human_user',
+            'scope': 'initiating_user_only',
+            'rules_engine_explanation': false,
+            'strategy_proof': false,
+            'privacy': 'selected_choice_without_private_state',
+          },
+          'decision_trace': [
+            {
+              'schema_version': 'interactive_user_decision_v1',
+              'decision_origin': 'human_user',
+              'rules_engine_explanation': false,
+              'strategy_proof': false,
+              'decision_type': 'mulligan',
+              'turn': 1,
+              'phase': 'Beginning',
+              'actor': 'Você',
+              'choice': 'Manter esta mão',
+              'reason': 'Escolha se deseja manter esta mão ou fazer mulligan.',
+            },
+          ],
+        },
+        fallbackDeckId: 'deck-1',
+        fallbackId: 'interactive-replay-1',
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(
+          deckId: 'deck-1',
+          gateway: gateway,
+          initialReplayId: 'interactive-replay-1',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final decisionsTab = find.text('Decisões');
+    final detailPane = find.byKey(const Key('battle-replay-detail-pane'));
+    for (var i = 0; i < 4 && decisionsTab.evaluate().isEmpty; i += 1) {
+      await tester.drag(detailPane, const Offset(0, 300));
+      await tester.pumpAndSettle();
+    }
+    expect(decisionsTab, findsOneWidget);
+    await tester.ensureVisible(decisionsTab);
+    await tester.tap(decisionsTab);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sua escolha no Battle Coach'), findsOneWidget);
+    expect(find.text('Manter esta mão'), findsOneWidget);
+    expect(find.textContaining('fazer mulligan'), findsOneWidget);
+    expect(find.text('Decisão do simulador'), findsNothing);
+  });
+
   testWidgets('keeps a replay as an explicit comparison baseline', (
     tester,
   ) async {

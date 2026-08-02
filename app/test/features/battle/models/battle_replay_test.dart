@@ -237,6 +237,75 @@ void main() {
       expect(decision.confidence, 'high');
     });
 
+    test(
+      'maps owner-scoped Battle Coach choices without relabeling engine rationale',
+      () {
+        final detail = BattleReplayDetail.fromJson({
+          'id': 'interactive-1',
+          'type': 'interactive_coach',
+          'engine': 'xmage',
+          'decision_trace_contract': {
+            'schema_version': 'interactive_user_decision_trace_v1',
+            'origin': 'human_user',
+            'scope': 'initiating_user_only',
+            'rules_engine_explanation': false,
+            'strategy_proof': false,
+            'privacy': 'selected_choice_without_private_state',
+          },
+          'decision_trace': [
+            {
+              'schema_version': 'interactive_user_decision_v1',
+              'decision_id': 'interactive-decision-20',
+              'decision_origin': 'human_user',
+              'decision_type': 'mulligan',
+              'turn': 1,
+              'phase': 'Beginning',
+              'actor': 'Você',
+              'choice': 'Manter esta mão',
+              'chosen_option': {'action': 'Manter esta mão', 'role': 'keep'},
+              'reason': 'Escolha se deseja manter esta mão ou fazer mulligan.',
+              'rules_engine_explanation': false,
+              'strategy_proof': false,
+            },
+          ],
+        });
+
+        expect(detail.nativeDecisionTraceAvailable, isFalse);
+        expect(detail.interactiveUserDecisionTraceAvailable, isTrue);
+        expect(detail.decisions, hasLength(1));
+        final decision = detail.decisions.single;
+        expect(decision.isNativeHeuristic, isFalse);
+        expect(decision.isHumanChoice, isTrue);
+        expect(decision.choice, 'Manter esta mão');
+        expect(decision.reason, contains('fazer mulligan'));
+      },
+    );
+
+    test('rejects an interactive trace without the private-state boundary', () {
+      final detail = BattleReplayDetail.fromJson({
+        'id': 'interactive-untrusted',
+        'decision_trace_contract': const {
+          'schema_version': 'interactive_user_decision_trace_v1',
+          'origin': 'human_user',
+          'scope': 'initiating_user_only',
+          'rules_engine_explanation': false,
+          'strategy_proof': false,
+        },
+        'decision_trace': const [
+          {
+            'schema_version': 'interactive_user_decision_v1',
+            'decision_origin': 'human_user',
+            'rules_engine_explanation': false,
+            'strategy_proof': false,
+            'choice': 'Manter esta mão',
+          },
+        ],
+      });
+
+      expect(detail.interactiveUserDecisionTraceAvailable, isFalse);
+      expect(detail.decisions, isEmpty);
+    });
+
     test('does not relabel external or undeclared traces as heuristics', () {
       final external = BattleReplayDetail.fromJson({
         'engine': 'xmage',

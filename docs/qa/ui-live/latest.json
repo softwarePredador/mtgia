@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "ca2866fee706b3fdec3f43f7802b787e480918b7ad16b0062bc9a6848b6bcdc3",
+  "source_digest": "dc74e63c03d7458203e8e004955a006e50ae9ba3b0f0e434979c503f9c2aa6c9",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-02T04:34:53Z",
+    "verified_at": "2026-08-02T09:27:13Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
       "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on Android 14 emulator, including native Life Counter landscape)",
@@ -20,27 +20,27 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "c082ffea9bc90217f01e4bcb6b578ea3bc8d7f15928d21fc68d401618fd708ff"
+        "sha256": "27b75ec5d211bcedbce747603cb65d0a76e164f69886e9c98700b6699baf3e43"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "ad83e9157aa3a1f987836397809046965b7c32d98b8a7fed388ea662fa406b9f"
+        "sha256": "91b9f821e460f062279310f33977b2e8b89856a34ca01e560ffdd882a10ee5d2"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "59243c7004d4d947cf90d09183e9b62f29dfb7c555a8b182b57d0e4dad64a33f"
+        "sha256": "4a3e6fe07185e8087b23394db051b45c6b5ef434b80197b8d5e9faf9f108a342"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "2a434cc38695d8a288a94ee0448f4ac3092902efccf371bd0717334d806bd812"
+        "sha256": "6085eb005a30678bba0ee7d73065ef3b1d8112f48a26cdefebeddd578b4e9075"
       },
       {
         "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
-        "sha256": "ed6352bd4116507c279b4b830b2a32df7a03dcaa51eea70de69d1890060c2859"
+        "sha256": "467f15a85f5d9c6062dbe292afbc12120978f215d4195c21bf25e8cf2fc8ff90"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "b8e38a17ba473735011f08ae38397035e74259fc4312ebe29c738f8787273714"
+        "sha256": "8548f3a59c2f10063d71defe819ff79f7b4bdf7687a7fca371ac7dbd9c52a02d"
       }
     ],
     "evidence_notes": [
@@ -53,7 +53,7 @@
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-02T04:34:53Z",
+    "reviewed_at": "2026-08-02T09:27:13Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -104,12 +104,12 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "c082ffea9bc90217f01e4bcb6b578ea3bc8d7f15928d21fc68d401618fd708ff",
-      "ad83e9157aa3a1f987836397809046965b7c32d98b8a7fed388ea662fa406b9f",
-      "59243c7004d4d947cf90d09183e9b62f29dfb7c555a8b182b57d0e4dad64a33f",
-      "2a434cc38695d8a288a94ee0448f4ac3092902efccf371bd0717334d806bd812",
-      "ed6352bd4116507c279b4b830b2a32df7a03dcaa51eea70de69d1890060c2859",
-      "b8e38a17ba473735011f08ae38397035e74259fc4312ebe29c738f8787273714"
+      "27b75ec5d211bcedbce747603cb65d0a76e164f69886e9c98700b6699baf3e43",
+      "91b9f821e460f062279310f33977b2e8b89856a34ca01e560ffdd882a10ee5d2",
+      "4a3e6fe07185e8087b23394db051b45c6b5ef434b80197b8d5e9faf9f108a342",
+      "6085eb005a30678bba0ee7d73065ef3b1d8112f48a26cdefebeddd578b4e9075",
+      "467f15a85f5d9c6062dbe292afbc12120978f215d4195c21bf25e8cf2fc8ff90",
+      "8548f3a59c2f10063d71defe819ff79f7b4bdf7687a7fca371ac7dbd9c52a02d"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",
@@ -123,7 +123,7 @@
     "blocking_findings": [],
     "follow_up_findings": [
       "Em Android estreito, o rótulo visual 'Ler Privacidade' termina em reticências; a ação, o ícone, a semântica e o acesso ao documento permanecem inequívocos, mas o texto deve ser abreviado ou empilhado antes da promoção comercial.",
-      "A prova Web real usou o sidecar remoto anterior ao ajuste local e ainda registrou deck_a/deck_b e uma instrução decisória em inglês; o código local agora normaliza nomes de deck e mensagens em português, e a validação de produção deve confirmar essa substituição.",
+      "A prova Web de teclado real e a jornada de Battle Coach em produção serão renovadas após implantar este mesmo digest; nenhuma evidência do ambiente descartável foi tratada como prova de deploy.",
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial."
     ]
   },

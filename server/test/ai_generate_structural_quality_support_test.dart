@@ -47,6 +47,26 @@ void main() {
       expect(competitive.hardCompliant, isTrue);
     });
 
+    test(
+      'an explicit B5 request defaults an otherwise generic deck to combo',
+      () {
+        expect(
+          inferAiGenerateTargetArchetype(
+            'Lorehold Miracle Big Spells',
+            requestedBracket: 5,
+          ),
+          'combo',
+        );
+        expect(
+          inferAiGenerateTargetArchetype(
+            'Lorehold Miracle Big Spells',
+            requestedBracket: 4,
+          ),
+          'midrange',
+        );
+      },
+    );
+
     test('negated infinite combo language does not infer combo archetype', () {
       expect(
         inferAiGenerateTargetArchetype(

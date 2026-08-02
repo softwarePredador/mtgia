@@ -12,6 +12,7 @@ bool isBattleReplayUuid(String value) =>
     _battleReplayUuidPattern.hasMatch(value.trim());
 
 const battleReplayCursorSchema = 'battle_replay_cursor_v1';
+const interactiveUserDecisionTraceSchema = 'interactive_user_decision_trace_v1';
 
 class BattleReplayCursorException implements Exception {
   const BattleReplayCursorException();
@@ -240,7 +241,107 @@ class BattleReplayReadService {
             WHEN db.user_id = CAST(@userId AS uuid) OR db.is_public = true
             THEN db.name
             ELSE NULL
-          END AS deck_b_name
+          END AS deck_b_name,
+          (
+            SELECT COALESCE(
+              jsonb_agg(
+                jsonb_strip_nulls(
+                  jsonb_build_object(
+                    'schema_version',
+                      'interactive_user_decision_v1',
+                    'decision_id',
+                      'interactive-decision-' || submitted.sequence::text,
+                    'decision_origin', 'human_user',
+                    'decision_rationale_kind', 'recorded_human_choice',
+                    'rules_engine_explanation', false,
+                    'strategy_proof', false,
+                    'decision_type', prompt.payload->>'kind',
+                    'turn', state.payload->'turn',
+                    'phase', COALESCE(
+                      state.payload->>'phase',
+                      state.payload->>'step'
+                    ),
+                    'actor', 'Você',
+                    'choice', COALESCE(
+                      selected.option->>'label',
+                      CASE submitted.payload->>'response_kind'
+                        WHEN 'delegate' THEN 'Delegar esta decisão ao motor'
+                        WHEN 'integer' THEN
+                          'Valor ' || COALESCE(
+                            submitted.payload->>'integer_value',
+                            'registrado'
+                          )
+                        WHEN 'multi_amount' THEN
+                          'Distribuição de valores registrada'
+                        ELSE 'Escolha registrada'
+                      END
+                    ),
+                    'chosen_option', jsonb_strip_nulls(
+                      jsonb_build_object(
+                        'action', COALESCE(
+                          selected.option->>'label',
+                          'Escolha registrada'
+                        ),
+                        'role', selected.option->>'role'
+                      )
+                    ),
+                    'reason', COALESCE(
+                      prompt.payload->>'message',
+                      'Escolha confirmada durante o Battle Coach.'
+                    )
+                  )
+                )
+                ORDER BY submitted.sequence
+              ),
+              '[]'::jsonb
+            )
+            FROM interactive_battle_sessions private_session
+            JOIN interactive_battle_records submitted
+              ON submitted.session_id = private_session.id
+             AND submitted.record_kind = 'action_submitted'
+            LEFT JOIN LATERAL (
+              SELECT record.payload
+              FROM interactive_battle_records record
+              WHERE record.session_id = submitted.session_id
+                AND record.record_kind = 'prompt_opened'
+                AND record.prompt_id = submitted.prompt_id
+                AND record.sequence <= submitted.sequence
+              ORDER BY record.sequence DESC
+              LIMIT 1
+            ) prompt ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT option
+              FROM jsonb_array_elements(
+                CASE
+                  WHEN jsonb_typeof(prompt.payload->'options') = 'array'
+                  THEN prompt.payload->'options'
+                  ELSE '[]'::jsonb
+                END
+              ) option
+              WHERE option->>'id' = submitted.option_id
+              LIMIT 1
+            ) selected ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT record.payload
+              FROM interactive_battle_records record
+              WHERE record.session_id = submitted.session_id
+                AND record.record_kind = 'private_state'
+                AND record.sequence <= submitted.sequence
+              ORDER BY record.sequence DESC
+              LIMIT 1
+            ) state ON TRUE
+            WHERE private_session.replay_id = bs.id
+              AND private_session.user_id = CAST(@userId AS uuid)
+              AND private_session.deck_a_id = CAST(@deckId AS uuid)
+              AND EXISTS (
+                SELECT 1
+                FROM interactive_battle_records accepted
+                WHERE accepted.session_id = submitted.session_id
+                  AND accepted.record_kind = 'action_accepted'
+                  AND accepted.payload->>'action_id' =
+                    submitted.idempotency_key
+              )
+          ) AS interactive_user_decisions
         FROM battle_simulations bs
         LEFT JOIN battle_simulation_attempts attempt
           ON attempt.replay_id = bs.id
@@ -377,7 +478,14 @@ class BattleReplayReadService {
     final summary = _summaryFromRow(row, deckId: deckId);
     final gameLog = sanitizePersistedBattleReplay(row['game_log']);
     final events = _eventsFromGameLog(gameLog);
-    final decisions = _decisionsFromGameLog(gameLog);
+    final publicDecisions = _decisionsFromGameLog(gameLog);
+    final interactiveUserDecisions = _interactiveUserDecisionsFromRow(
+      row['interactive_user_decisions'],
+    );
+    final decisions = <dynamic>[
+      ...publicDecisions,
+      ...interactiveUserDecisions,
+    ];
     final visualSnapshots = _visualSnapshotsFromGameLog(gameLog);
     final gameLogMap = gameLog is Map ? gameLog : const {};
     final winnerLabel = gameLogMap['winner']?.toString();
@@ -410,6 +518,15 @@ class BattleReplayReadService {
       'game_log': gameLog,
       'events': events,
       'decision_trace': decisions,
+      if (interactiveUserDecisions.isNotEmpty)
+        'decision_trace_contract': const {
+          'schema_version': interactiveUserDecisionTraceSchema,
+          'origin': 'human_user',
+          'scope': 'initiating_user_only',
+          'rules_engine_explanation': false,
+          'strategy_proof': false,
+          'privacy': 'selected_choice_without_private_state',
+        },
       'visual_snapshots': visualSnapshots,
       if (engine != null && engine.isNotEmpty) 'engine': engine,
       if (gameLogMap['engine_version'] != null)
@@ -548,6 +665,19 @@ class BattleReplayReadService {
       if (decisions is List) return decisions;
     }
     return const [];
+  }
+
+  List<Map<String, dynamic>> _interactiveUserDecisionsFromRow(Object? value) {
+    if (value == null) return const [];
+    final sanitized = sanitizePersistedBattleReplay(value);
+    if (sanitized is! List) return const [];
+    return sanitized
+        .whereType<Map>()
+        .map(
+          (decision) =>
+              decision.map((key, entry) => MapEntry(key.toString(), entry)),
+        )
+        .toList(growable: false);
   }
 
   String? _winnerNameForRow(Map<String, dynamic> row, String winnerDeckId) {

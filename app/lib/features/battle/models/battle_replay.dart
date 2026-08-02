@@ -203,6 +203,7 @@ class BattleReplayDetail {
     required this.decisions,
     this.visualSnapshots = const <BattleReplayVisualSnapshot>[],
     this.nativeDecisionTraceAvailable = false,
+    this.interactiveUserDecisionTraceAvailable = false,
     this.replayText,
     this.raw = const <String, dynamic>{},
   });
@@ -212,6 +213,7 @@ class BattleReplayDetail {
   final List<BattleReplayDecision> decisions;
   final List<BattleReplayVisualSnapshot> visualSnapshots;
   final bool nativeDecisionTraceAvailable;
+  final bool interactiveUserDecisionTraceAvailable;
   final String? replayText;
   final Map<String, dynamic> raw;
 
@@ -238,20 +240,33 @@ class BattleReplayDetail {
         )
         .toList(growable: false);
     final nativeDecisionTraceAvailable = _nativeDecisionTraceAvailable(merged);
-    final decisions =
-        (nativeDecisionTraceAvailable
-                ? _extractDecisions(merged)
-                : const <Map<String, dynamic>>[])
-            .asMap()
-            .entries
-            .map(
-              (entry) => BattleReplayDecision.fromJson(
-                entry.value,
-                fallbackId: 'decision-${entry.key + 1}',
-                isNativeHeuristic: true,
-              ),
-            )
-            .toList(growable: false);
+    final interactiveUserDecisionTraceAvailable =
+        _interactiveUserDecisionTraceAvailable(merged);
+    final rawDecisions =
+        nativeDecisionTraceAvailable || interactiveUserDecisionTraceAvailable
+        ? _extractDecisions(merged)
+        : const <Map<String, dynamic>>[];
+    final decisions = rawDecisions
+        .where(
+          (decision) =>
+              nativeDecisionTraceAvailable ||
+              _isInteractiveUserDecision(decision),
+        )
+        .toList(growable: false)
+        .asMap()
+        .entries
+        .map((entry) {
+          final isHumanChoice =
+              interactiveUserDecisionTraceAvailable &&
+              _isInteractiveUserDecision(entry.value);
+          return BattleReplayDecision.fromJson(
+            entry.value,
+            fallbackId: 'decision-${entry.key + 1}',
+            isNativeHeuristic: nativeDecisionTraceAvailable && !isHumanChoice,
+            isHumanChoice: isHumanChoice,
+          );
+        })
+        .toList(growable: false);
     final visualSnapshots = _extractVisualSnapshots(merged)
         .asMap()
         .entries
@@ -274,6 +289,8 @@ class BattleReplayDetail {
       decisions: decisions,
       visualSnapshots: visualSnapshots,
       nativeDecisionTraceAvailable: nativeDecisionTraceAvailable,
+      interactiveUserDecisionTraceAvailable:
+          interactiveUserDecisionTraceAvailable,
       replayText: _extractReplayText(merged),
       raw: Map<String, dynamic>.unmodifiable(merged),
     );
@@ -360,6 +377,7 @@ class BattleReplayDecision {
     required this.choice,
     required this.reason,
     required this.isNativeHeuristic,
+    this.isHumanChoice = false,
     this.decisionType,
     this.turn,
     this.phase,
@@ -379,6 +397,7 @@ class BattleReplayDecision {
   final String choice;
   final String reason;
   final bool isNativeHeuristic;
+  final bool isHumanChoice;
   final String? decisionType;
   final int? turn;
   final String? phase;
@@ -397,6 +416,7 @@ class BattleReplayDecision {
     Map<String, dynamic> json, {
     required String fallbackId,
     required bool isNativeHeuristic,
+    bool isHumanChoice = false,
   }) {
     final data = _asStringMap(json['data']);
     final merged = <String, dynamic>{...json, ...data};
@@ -424,6 +444,7 @@ class BattleReplayDecision {
           _optionalString(merged['strategic_principle']) ??
           'Justificativa não disponível.',
       isNativeHeuristic: isNativeHeuristic,
+      isHumanChoice: isHumanChoice,
       decisionType: decisionType,
       turn: _parseInt(merged['turn']),
       phase: _optionalString(merged['phase']),
@@ -771,6 +792,26 @@ bool _nativeDecisionTraceAvailable(Map<String, dynamic> json) {
   return _optionalString(learningContract['schema_version']) ==
           'native_battle_learning_v1' &&
       learningContract['decision_trace_available'] == true;
+}
+
+bool _interactiveUserDecisionTraceAvailable(Map<String, dynamic> json) {
+  final contract = _asStringMap(json['decision_trace_contract']);
+  return _optionalString(contract['schema_version']) ==
+          'interactive_user_decision_trace_v1' &&
+      _optionalString(contract['origin']) == 'human_user' &&
+      _optionalString(contract['scope']) == 'initiating_user_only' &&
+      contract['rules_engine_explanation'] == false &&
+      contract['strategy_proof'] == false &&
+      _optionalString(contract['privacy']) ==
+          'selected_choice_without_private_state';
+}
+
+bool _isInteractiveUserDecision(Map<String, dynamic> decision) {
+  return _optionalString(decision['schema_version']) ==
+          'interactive_user_decision_v1' &&
+      _optionalString(decision['decision_origin']) == 'human_user' &&
+      decision['rules_engine_explanation'] == false &&
+      decision['strategy_proof'] == false;
 }
 
 List<Map<String, dynamic>> _decisionAlternatives(

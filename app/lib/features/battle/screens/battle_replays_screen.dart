@@ -3969,7 +3969,7 @@ class _ReplayDecisions extends StatelessWidget {
         icon: Icons.account_tree_outlined,
         title: 'Sem decisões registradas',
         message:
-            'Quando a simulação explicar escolhas importantes, elas aparecem aqui.',
+            'Suas escolhas do Battle Coach e decisões explicadas por uma simulação aparecem aqui.',
       );
     }
 
@@ -5613,6 +5613,27 @@ class _ReplayDecisionTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (decision.isHumanChoice) ...[
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.touch_app_outlined,
+                        size: 15,
+                        color: AppTheme.mythicGold,
+                      ),
+                      const SizedBox(width: AppTheme.space5),
+                      Text(
+                        'Sua escolha no Battle Coach',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppTheme.mythicGold,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppTheme.space5),
+                ],
                 Text(
                   decision.choice,
                   style: theme.textTheme.titleSmall?.copyWith(

@@ -262,6 +262,27 @@ avaliação determinística no deck final. Uma impressão alternativa não conta
 como um segundo Game Changer: limites usam a identidade jogável pelo nome
 normalizado.
 
+### Generation intent differentiation amendment — 2026-08-02
+
+O reparo estrutural de Generate não pode produzir a mesma lista nos extremos
+e chamar apenas o rótulo de bracket de diferença. Seus alvos internos são:
+
+- B1: 38 terrenos e zero sinais de fast mana, interação gratuita, turno extra,
+  peça de combo infinito ou stax no preenchimento automático;
+- B2: 36 terrenos, no máximo um sinal de fast mana e zero dos demais sinais de
+  velocidade acima no preenchimento automático;
+- B3: 36 terrenos, Game Changers limitados pelo cap oficial e ranking de mesa
+  Upgraded;
+- B4: 34 terrenos e ranking Optimized, sem inventar cap oficial;
+- B5: 34 terrenos, arquétipo competitivo por padrão quando o pedido não define
+  outro e prioridade para sinais competitivos dentro da identidade de cor.
+
+Esses números de B1/B2 são alvos conservadores do gerador, não limites
+oficiais aplicados a decks manuais. O contrato continua expondo separadamente
+`hard_compliant` e diagnósticos de intenção. Priorizar peças no B5 também não
+prova combo completo nem viabilidade cEDH; referência competitiva, Battle e
+evidência de exposição continuam necessários para qualquer promoção.
+
 Todo preview acionável é ligado ao deck, assinatura, bracket e deltas permitidos
 por autorização HMAC expirável. `PUT /decks/:id` e
 `POST /decks/:id/cards/bulk` repetem autorização, legalidade, mana e bracket

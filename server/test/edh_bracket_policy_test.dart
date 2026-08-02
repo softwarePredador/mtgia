@@ -366,6 +366,23 @@ void main() {
       }
     });
 
+    test('does not treat rebound blink as free interaction', () {
+      final ephemerate = tagCardForBracket(
+        name: 'Ephemerate',
+        typeLine: 'Instant',
+        oracleText:
+            'Exile target creature you control, then return it to the '
+            "battlefield under its owner's control. Rebound. At the beginning "
+            'of your next upkeep, you may cast this card from exile without '
+            'paying its mana cost.',
+      );
+
+      expect(
+        ephemerate.categories,
+        isNot(contains(BracketCategory.freeInteraction)),
+      );
+    });
+
     test('distinguishes opponent search locks from search compensation', () {
       for (final card in const [
         {
