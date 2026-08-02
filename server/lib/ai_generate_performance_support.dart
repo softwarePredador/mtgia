@@ -10,7 +10,7 @@ import 'ai_job_lifecycle.dart';
 // Bump whenever the player-facing generate response contract changes. Cached
 // payloads are returned as-is, so an older key could omit safety diagnostics
 // such as deckbuilding_contract until its TTL expires.
-const aiGenerateCacheContractVersion = 'v5';
+const aiGenerateCacheContractVersion = 'v6';
 const aiGenerateMaxPromptLength = 8000;
 const aiGenerateMaxFormatLength = 80;
 const aiGenerateMaxCommanderNameLength = 300;
@@ -314,6 +314,45 @@ class AiGenerateOpenAiTimeoutSelection {
   final bool referenceGuidanceBudget;
 }
 
+int selectAiGenerateOpenAiMaxTokens({
+  required OpenAiRuntimeConfig config,
+  required String normalizedFormat,
+}) {
+  final isCommander = normalizedFormat == 'commander';
+  final commanderOverride =
+      (config.env['OPENAI_MAX_TOKENS_GENERATE_COMMANDER'] ?? '').trim();
+  return config.intFor(
+    key:
+        isCommander && commanderOverride.isNotEmpty
+            ? 'OPENAI_MAX_TOKENS_GENERATE_COMMANDER'
+            : 'OPENAI_MAX_TOKENS_GENERATE',
+    fallback: isCommander ? 6000 : 2200,
+    devFallback: isCommander ? 6000 : 2200,
+    stagingFallback: isCommander ? 6000 : 2200,
+    prodFallback: isCommander ? 6000 : 2600,
+    min: 800,
+    max: 8000,
+  );
+}
+
+bool aiGenerateProviderOutputWasTruncated(Object? firstChoice) {
+  if (firstChoice is! Map) return false;
+  return firstChoice['finish_reason']?.toString().trim().toLowerCase() ==
+      'length';
+}
+
+Map<String, dynamic> buildAiGenerateOutputTruncatedPayload() => {
+  'error':
+      'A proposta ficou longa demais para ser concluída. '
+      'Tente gerar novamente.',
+  'error_code': 'ai_generate_output_truncated',
+  'outcome_code': 'provider_output_truncated',
+  'retryable': true,
+  'can_save': false,
+  'learning_eligible': false,
+  'learning_exclusion_reason': 'provider_output_truncated',
+};
+
 bool isCommanderReferenceGuidanceFormat(String normalizedFormat) {
   return normalizedFormat == 'commander' || normalizedFormat == 'brawl';
 }
@@ -348,10 +387,10 @@ AiGenerateOpenAiTimeoutSelection selectAiGenerateOpenAiTimeout({
           .isNotEmpty;
   final referenceTimeout = config.timeoutFor(
     key: 'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS',
-    fallback: const Duration(seconds: 60),
-    devFallback: const Duration(seconds: 60),
-    stagingFallback: const Duration(seconds: 60),
-    prodFallback: const Duration(seconds: 60),
+    fallback: const Duration(seconds: 75),
+    devFallback: const Duration(seconds: 75),
+    stagingFallback: const Duration(seconds: 75),
+    prodFallback: const Duration(seconds: 75),
     min: const Duration(seconds: 3),
     max: const Duration(seconds: 90),
   );

@@ -41,7 +41,7 @@ import '../../../lib/openai_structured_output_support.dart';
 import '../../../lib/runtime_environment.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
-    'ai_generate_reference_prompt_v7';
+    'ai_generate_reference_prompt_v8';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -560,13 +560,13 @@ Deck construction guidelines:
 Build a deck based on this description: "$prompt".
 Format: $format.
 
-$commanderBracketPrompt
-
 $referenceProfilePrompt
 
 ${generationConstraintGuidance.prompt}
 
 $metaContext
+
+$commanderBracketPrompt
 ''';
 
     final normalizedFormat = normalizeAiGenerateFormat(format);
@@ -577,14 +577,9 @@ $metaContext
     );
     final openAiTimeout = openAiTimeoutSelection.timeout;
     timings['openai_timeout_ms'] = openAiTimeout.inMilliseconds;
-    final maxTokens = aiConfig.intFor(
-      key: 'OPENAI_MAX_TOKENS_GENERATE',
-      fallback: normalizedFormat == 'commander' ? 3400 : 2200,
-      devFallback: normalizedFormat == 'commander' ? 3400 : 2200,
-      stagingFallback: normalizedFormat == 'commander' ? 3400 : 2200,
-      prodFallback: normalizedFormat == 'commander' ? 3800 : 2600,
-      min: 800,
-      max: 6000,
+    final maxTokens = selectAiGenerateOpenAiMaxTokens(
+      config: aiConfig,
+      normalizedFormat: normalizedFormat,
     );
     final model = aiConfig.generateModel;
 
@@ -815,6 +810,19 @@ $metaContext
     }
 
     final firstChoice = (aiData['choices'] as List).first;
+    if (aiGenerateProviderOutputWasTruncated(firstChoice)) {
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      return Response.json(
+        statusCode: HttpStatus.badGateway,
+        headers: const {'Cache-Control': 'no-store', 'Retry-After': '1'},
+        body: withAiGenerateRuntimeMetadata(
+          payload: buildAiGenerateOutputTruncatedPayload(),
+          cacheKey: cacheKey,
+          cacheHit: false,
+          timings: timings,
+        ),
+      );
+    }
     final message = firstChoice is Map ? firstChoice['message'] : null;
     final contentRaw = message is Map ? message['content'] : null;
     if (contentRaw is! String || contentRaw.trim().isEmpty) {

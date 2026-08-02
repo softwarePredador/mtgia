@@ -79,6 +79,40 @@ String buildAiGenerateCommanderBracketPrompt({
               'official Commander Game Changers list across the commander '
               'slot and main deck. Exceeding this cap makes the generated '
               'deck invalid.';
+  final governedGameChangerNames =
+      profile.bracket <= 3
+          ? (officialGameChangerNamesForBracketPolicy.toList()..sort()).join(
+            ', ',
+          )
+          : '';
+  final governedListRule =
+      governedGameChangerNames.isEmpty
+          ? ''
+          : '''
+- The exact Game Changer names enforced by the backend are:
+  $governedGameChangerNames.
+- This hard cap overrides every learned deck, reference deck, staple, hot-card,
+  collection, budget, or theme suggestion that appears elsewhere in the prompt.
+''';
+  final structuralChecklist = switch (profile.bracket) {
+    1 || 2 || 3 => '''
+- Final structural checklist before returning JSON: exactly 100 cards including
+  the commander; every nonbasic quantity is 1; 35-38 lands; at least 8 reusable
+  ramp sources, 8 draw sources, 6 interaction pieces, and 2 board wipes.
+- One-shot rituals, temporary Treasure bursts, and cost reducers do not replace
+  the reusable ramp sources required by that checklist.
+''',
+    4 => '''
+- Final structural checklist before returning JSON: exactly 100 cards including
+  the commander; every nonbasic quantity is 1; at least 34 lands, 8 reusable
+  ramp sources, 8 draw sources, 6 interaction pieces, and 1 board wipe.
+''',
+    _ => '''
+- Final structural checklist before returning JSON: exactly 100 cards including
+  the commander; every nonbasic quantity is 1; at least 34 lands, 8 reusable
+  ramp sources, 8 draw sources, and 6 interaction pieces.
+''',
+  };
 
   return '''
 Commander Bracket intent (mandatory):
@@ -86,6 +120,8 @@ Commander Bracket intent (mandatory):
 - Intent: $intent
 - $turnGuidance
 - $gameChangerRule
+$governedListRule
+$structuralChecklist
 - Other power signals (tutors, fast mana, free interaction, combos, stax, and extra turns) are advisory intent signals, not separate hard bans.
 ''';
 }

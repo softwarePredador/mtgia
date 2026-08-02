@@ -82,20 +82,28 @@ evaluateAiGenerateCommanderStructuralQuality({
 
 String inferAiGenerateTargetArchetype(String prompt) {
   final normalized = prompt.trim().toLowerCase();
-  if (normalized.contains('control') ||
-      normalized.contains('stax') ||
-      normalized.contains('prison')) {
+  final positiveIntent = normalized.replaceAll(
+    RegExp(
+      r'\b(?:sem|no|without|avoid|evite|nao quero|não quero)\s+'
+      r'(?:(?:infinite|infinitos?)\s+combos?|combos?\s+'
+      r'(?:infinite|infinitos?)|combos?)\b',
+    ),
+    ' ',
+  );
+  if (positiveIntent.contains('control') ||
+      positiveIntent.contains('stax') ||
+      positiveIntent.contains('prison')) {
     return 'control';
   }
-  if (normalized.contains('aggro') ||
-      normalized.contains('tribal') ||
-      normalized.contains('typal') ||
-      normalized.contains('voltron')) {
+  if (positiveIntent.contains('aggro') ||
+      positiveIntent.contains('tribal') ||
+      positiveIntent.contains('typal') ||
+      positiveIntent.contains('voltron')) {
     return 'aggro';
   }
-  if (normalized.contains('combo') ||
-      normalized.contains('storm') ||
-      normalized.contains('cedh')) {
+  if (positiveIntent.contains('combo') ||
+      positiveIntent.contains('storm') ||
+      positiveIntent.contains('cedh')) {
     return 'combo';
   }
   return 'midrange';

@@ -165,7 +165,7 @@ void main() {
 
         expect(first, equals(second));
         expect(first, isNot(equals(differentBracket)));
-        expect(first, startsWith('ai_generate:v5:'));
+        expect(first, startsWith('ai_generate:v6:'));
         expect(first, isNot(contains('mono red')));
       },
     );
@@ -217,7 +217,7 @@ void main() {
       );
 
       expect(v5, isNot(equals(v4)));
-      expect(v5, startsWith('ai_generate:v5:'));
+      expect(v5, startsWith('ai_generate:v6:'));
     });
 
     test('generation constraints participate in the cache key', () {
@@ -365,7 +365,7 @@ void main() {
         referenceGuidanceEnabled: true,
       );
 
-      expect(selection.timeout, equals(const Duration(seconds: 60)));
+      expect(selection.timeout, equals(const Duration(seconds: 75)));
       expect(
         selection.envKey,
         equals('OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS'),
@@ -421,6 +421,86 @@ void main() {
         ).timeout,
         equals(const Duration(seconds: 90)),
       );
+    });
+
+    test('reserves enough output tokens for 99 distinct Commander cards', () {
+      final production = OpenAiRuntimeConfig(
+        DotEnv()..addAll({'ENVIRONMENT': 'production'}),
+      );
+      final staging = OpenAiRuntimeConfig(
+        DotEnv()..addAll({'ENVIRONMENT': 'staging'}),
+      );
+
+      expect(
+        selectAiGenerateOpenAiMaxTokens(
+          config: production,
+          normalizedFormat: 'commander',
+        ),
+        equals(6000),
+      );
+      expect(
+        selectAiGenerateOpenAiMaxTokens(
+          config: staging,
+          normalizedFormat: 'commander',
+        ),
+        equals(6000),
+      );
+      expect(
+        selectAiGenerateOpenAiMaxTokens(
+          config: production,
+          normalizedFormat: 'standard',
+        ),
+        equals(2600),
+      );
+    });
+
+    test('honors the bounded explicit output-token override', () {
+      final low = OpenAiRuntimeConfig(
+        DotEnv()..addAll({
+          'ENVIRONMENT': 'production',
+          'OPENAI_MAX_TOKENS_GENERATE_COMMANDER': '200',
+        }),
+      );
+      final high = OpenAiRuntimeConfig(
+        DotEnv()..addAll({
+          'ENVIRONMENT': 'production',
+          'OPENAI_MAX_TOKENS_GENERATE_COMMANDER': '12000',
+        }),
+      );
+
+      expect(
+        selectAiGenerateOpenAiMaxTokens(
+          config: low,
+          normalizedFormat: 'commander',
+        ),
+        equals(800),
+      );
+      expect(
+        selectAiGenerateOpenAiMaxTokens(
+          config: high,
+          normalizedFormat: 'commander',
+        ),
+        equals(8000),
+      );
+    });
+
+    test('classifies provider truncation as retryable and never saveable', () {
+      expect(
+        aiGenerateProviderOutputWasTruncated({'finish_reason': 'length'}),
+        isTrue,
+      );
+      expect(
+        aiGenerateProviderOutputWasTruncated({'finish_reason': 'stop'}),
+        isFalse,
+      );
+      expect(aiGenerateProviderOutputWasTruncated(null), isFalse);
+
+      final payload = buildAiGenerateOutputTruncatedPayload();
+      expect(payload['error_code'], 'ai_generate_output_truncated');
+      expect(payload['outcome_code'], 'provider_output_truncated');
+      expect(payload['retryable'], isTrue);
+      expect(payload['can_save'], isFalse);
+      expect(payload['learning_eligible'], isFalse);
     });
 
     test('serializes async job lifecycle state with result status', () {

@@ -47,6 +47,23 @@ void main() {
       expect(competitive.hardCompliant, isTrue);
     });
 
+    test('negated infinite combo language does not infer combo archetype', () {
+      expect(
+        inferAiGenerateTargetArchetype(
+          'Miracle Big Spells sem combos infinitos ou fast mana',
+        ),
+        'midrange',
+      );
+      expect(
+        inferAiGenerateTargetArchetype('Big spells with no infinite combos'),
+        'midrange',
+      );
+      expect(
+        inferAiGenerateTargetArchetype('Boros combo with recursion'),
+        'combo',
+      );
+    });
+
     test('rejects the legal but unusable commander plus 99 lands fallback', () {
       final assessment = evaluateAiGenerateCommanderStructuralQuality(
         format: 'Commander',

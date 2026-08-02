@@ -117,6 +117,11 @@ void main() {
 
       expect(prompt, contains('B3 — Upgraded'));
       expect(prompt, contains('at most 3'));
+      expect(prompt, contains("teferi's protection"));
+      expect(prompt, contains('smothering tithe'));
+      expect(prompt, contains('overrides every learned deck'));
+      expect(prompt, contains('at least 8 reusable'));
+      expect(prompt, contains('temporary Treasure bursts'));
       expect(prompt, contains('Other power signals'));
       expect(response['bracket'], equals(3));
       expect((response['bracket_policy'] as Map)['hard_compliant'], isTrue);
@@ -146,6 +151,10 @@ void main() {
         isTrue,
       );
       expect(route, contains('buildAiGenerateCommanderBracketPrompt('));
+      expect(route, contains('selectAiGenerateOpenAiMaxTokens('));
+      expect(route, contains('buildAiGenerateOutputTruncatedPayload()'));
+      expect(route, contains("'Retry-After': '1'"));
+      expect(route, contains('ai_generate_reference_prompt_v8'));
       expect(route, contains('requestedBracket == 5'));
       expect(
         route,
