@@ -348,10 +348,10 @@ AiGenerateOpenAiTimeoutSelection selectAiGenerateOpenAiTimeout({
           .isNotEmpty;
   final referenceTimeout = config.timeoutFor(
     key: 'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS',
-    fallback: const Duration(seconds: 24),
-    devFallback: const Duration(seconds: 24),
-    stagingFallback: const Duration(seconds: 24),
-    prodFallback: const Duration(seconds: 24),
+    fallback: const Duration(seconds: 60),
+    devFallback: const Duration(seconds: 60),
+    stagingFallback: const Duration(seconds: 60),
+    prodFallback: const Duration(seconds: 60),
     min: const Duration(seconds: 3),
     max: const Duration(seconds: 90),
   );

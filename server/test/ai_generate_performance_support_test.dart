@@ -354,7 +354,7 @@ void main() {
       expect(selection.referenceGuidanceBudget, isFalse);
     });
 
-    test('uses larger default timeout for Commander reference guidance', () {
+    test('uses production-proven timeout for Commander reference guidance', () {
       final config = OpenAiRuntimeConfig(
         DotEnv()..addAll({'ENVIRONMENT': 'staging'}),
       );
@@ -365,7 +365,7 @@ void main() {
         referenceGuidanceEnabled: true,
       );
 
-      expect(selection.timeout, equals(const Duration(seconds: 24)));
+      expect(selection.timeout, equals(const Duration(seconds: 60)));
       expect(
         selection.envKey,
         equals('OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS'),
