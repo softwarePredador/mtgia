@@ -47,14 +47,23 @@ ImportListParseResult parseImportLines(List<String> lines) {
   final unsupportedSectionLines = <String>[];
   final lineRegex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
   var inUnsupportedSection = false;
+  var inCommanderSection = false;
 
   for (var line in lines) {
     line = line.trim();
     if (line.isEmpty) continue;
 
+    final supportedSection = _supportedImportSection(line);
+    if (supportedSection != null) {
+      inUnsupportedSection = false;
+      inCommanderSection = supportedSection == _ImportSection.commander;
+      continue;
+    }
+
     final sectionLabel = _unsupportedImportSectionLabel(line);
     if (sectionLabel != null) {
       inUnsupportedSection = true;
+      inCommanderSection = false;
       invalidLines.add(line);
       unsupportedSectionLines.add(line);
       continue;
@@ -75,7 +84,9 @@ ImportListParseResult parseImportLines(List<String> lines) {
     final quantity = int.parse(match.group(1)!);
     final cardName = _stripCommanderMarkers(match.group(2)!.trim());
     final lineLower = line.toLowerCase();
-    final isCommanderTag = lineLower.contains('[commander') ||
+    final isCommanderTag =
+        inCommanderSection ||
+        lineLower.contains('[commander') ||
         lineLower.contains('*cmdr*') ||
         lineLower.contains('!commander');
 
@@ -94,6 +105,23 @@ ImportListParseResult parseImportLines(List<String> lines) {
   );
 }
 
+enum _ImportSection { commander, mainboard }
+
+_ImportSection? _supportedImportSection(String line) {
+  switch (normalizeDeckSectionValue(line)) {
+    case 'commander':
+    case 'commanders':
+    case 'commandzone':
+      return _ImportSection.commander;
+    case 'deck':
+    case 'main':
+    case 'maindeck':
+    case 'mainboard':
+      return _ImportSection.mainboard;
+  }
+  return null;
+}
+
 String? _unsupportedImportSectionLabel(String line) {
   return isUnsupportedDeckSectionValue(line) ? line.trim() : null;
 }
@@ -101,7 +129,9 @@ String? _unsupportedImportSectionLabel(String line) {
 String _stripCommanderMarkers(String value) {
   return value
       .replaceAll(
-          RegExp(r'\s*\[(?:commander|cmdr)\]\s*$', caseSensitive: false), '')
+        RegExp(r'\s*\[(?:commander|cmdr)\]\s*$', caseSensitive: false),
+        '',
+      )
       .replaceAll(RegExp(r'\s*\*cmdr\*\s*$', caseSensitive: false), '')
       .replaceAll(RegExp(r'\s*!commander\s*$', caseSensitive: false), '')
       .trim();

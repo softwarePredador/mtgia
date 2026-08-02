@@ -99,6 +99,25 @@ void main() {
       );
     });
 
+    test('parses common section-based Commander exports', () {
+      final result = parseImportLines([
+        '[Commander]:',
+        '1 Talrand, Sky Summoner',
+        'Deck:',
+        '99 Wastes',
+      ]);
+
+      expect(result.invalidLines, isEmpty);
+      expect(
+        result.parsedItems.map((item) => item['name']).toList(),
+        equals(['Talrand, Sky Summoner', 'Wastes']),
+      );
+      expect(
+        result.parsedItems.map((item) => item['isCommanderTag']).toList(),
+        equals([true, false]),
+      );
+    });
+
     test('ignores empty lines and reports malformed quantity lines', () {
       final result = parseImportLines([
         '',
@@ -112,40 +131,45 @@ void main() {
       expect(result.invalidLines, equals(['x4 Sol Ring', 'Sol Ring']));
     });
 
-    test('rejects unsupported sections instead of parsing them as main deck',
-        () {
-      final result = parseImportLines([
-        '1 Talrand, Sky Summoner [Commander]',
-        '99 Island',
-        'Sideboard:',
-        '1 Blue Elemental Blast',
-      ]);
+    test(
+      'rejects unsupported sections instead of parsing them as main deck',
+      () {
+        final result = parseImportLines([
+          '1 Talrand, Sky Summoner [Commander]',
+          '99 Island',
+          'Sideboard:',
+          '1 Blue Elemental Blast',
+        ]);
 
-      expect(
-        result.parsedItems.map((item) => item['name']),
-        equals(['Talrand, Sky Summoner', 'Island']),
-      );
-      expect(result.invalidLines, contains('Sideboard:'));
-      expect(result.invalidLines, contains('1 Blue Elemental Blast'));
-      expect(result.unsupportedSectionLines, contains('Sideboard:'));
-      expect(
-        result.unsupportedSectionLines,
-        contains('1 Blue Elemental Blast'),
-      );
-    });
+        expect(
+          result.parsedItems.map((item) => item['name']),
+          equals(['Talrand, Sky Summoner', 'Island']),
+        );
+        expect(result.invalidLines, contains('Sideboard:'));
+        expect(result.invalidLines, contains('1 Blue Elemental Blast'));
+        expect(result.unsupportedSectionLines, contains('Sideboard:'));
+        expect(
+          result.unsupportedSectionLines,
+          contains('1 Blue Elemental Blast'),
+        );
+      },
+    );
   });
 
   group('lookup support functions', () {
     test(
-        'cleans collector suffixes without touching names that contain numbers',
-        () {
-      expect(cleanImportLookupKey('Forest 96'), equals('Forest'));
-      expect(cleanImportLookupKey('Island 123'), equals('Island'));
-      expect(cleanImportLookupKey('Mountain   42'), equals('Mountain'));
-      expect(cleanImportLookupKey('Sword of Fire and Ice'),
-          equals('Sword of Fire and Ice'));
-      expect(cleanImportLookupKey('Sol Ring'), equals('Sol Ring'));
-    });
+      'cleans collector suffixes without touching names that contain numbers',
+      () {
+        expect(cleanImportLookupKey('Forest 96'), equals('Forest'));
+        expect(cleanImportLookupKey('Island 123'), equals('Island'));
+        expect(cleanImportLookupKey('Mountain   42'), equals('Mountain'));
+        expect(
+          cleanImportLookupKey('Sword of Fire and Ice'),
+          equals('Sword of Fire and Ice'),
+        );
+        expect(cleanImportLookupKey('Sol Ring'), equals('Sol Ring'));
+      },
+    );
 
     test('maps split and DFC face names through shared lookup helpers', () {
       expect(
@@ -162,22 +186,24 @@ void main() {
       );
     });
 
-    test('uses real basic-land classifier for import copy-limit exemptions',
-        () {
-      expect(
-        basic_lands.isBasicLandCard(
-          name: 'Forest',
-          typeLine: 'Basic Land - Forest',
-        ),
-        isTrue,
-      );
-      expect(
-        basic_lands.isBasicLandCard(
-          name: 'Temple Garden',
-          typeLine: 'Land - Forest Plains',
-        ),
-        isFalse,
-      );
-    });
+    test(
+      'uses real basic-land classifier for import copy-limit exemptions',
+      () {
+        expect(
+          basic_lands.isBasicLandCard(
+            name: 'Forest',
+            typeLine: 'Basic Land - Forest',
+          ),
+          isTrue,
+        );
+        expect(
+          basic_lands.isBasicLandCard(
+            name: 'Temple Garden',
+            typeLine: 'Land - Forest Plains',
+          ),
+          isFalse,
+        );
+      },
+    );
   });
 }

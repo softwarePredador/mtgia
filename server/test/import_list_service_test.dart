@@ -15,15 +15,31 @@ void main() {
       expect(result.invalidLines, isEmpty);
       expect(
         result.parsedItems.map((item) => item['name']),
-        equals([
-          'Talrand, Sky Summoner',
-          'Sol Ring',
-          'Arcane Signet',
-        ]),
+        equals(['Talrand, Sky Summoner', 'Sol Ring', 'Arcane Signet']),
       );
       expect(
         result.parsedItems.map((item) => item['isCommanderTag']),
         equals([true, true, true]),
+      );
+    });
+
+    test('uses Commander and Mainboard section headers as structure', () {
+      final result = parseImportLines([
+        '[Commander]',
+        '1 Talrand, Sky Summoner',
+        '[Mainboard]',
+        '99 Wastes',
+      ]);
+
+      expect(result.invalidLines, isEmpty);
+      expect(result.unsupportedSectionLines, isEmpty);
+      expect(
+        result.parsedItems.map((item) => item['name']),
+        equals(['Talrand, Sky Summoner', 'Wastes']),
+      );
+      expect(
+        result.parsedItems.map((item) => item['isCommanderTag']),
+        equals([true, false]),
       );
     });
 
@@ -47,16 +63,34 @@ void main() {
         contains('1 Blue Elemental Blast'),
       );
     });
+
+    test('recognizes bracketed unsupported section headers', () {
+      final result = parseImportLines([
+        '[Mainboard]',
+        '99 Island',
+        '[Sideboard]',
+        '1 Blue Elemental Blast',
+      ]);
+
+      expect(result.parsedItems.single['name'], equals('Island'));
+      expect(result.unsupportedSectionLines, contains('[Sideboard]'));
+      expect(
+        result.unsupportedSectionLines,
+        contains('1 Blue Elemental Blast'),
+      );
+    });
   });
 
   group('canonicalizeImportLookupName', () {
-    test('maps known Portuguese Commander names to local English card names',
-        () {
-      expect(
-        canonicalizeImportLookupName('Kaalia da Vastidão'),
-        equals('kaalia of the vast'),
-      );
-    });
+    test(
+      'maps known Portuguese Commander names to local English card names',
+      () {
+        expect(
+          canonicalizeImportLookupName('Kaalia da Vastidão'),
+          equals('kaalia of the vast'),
+        );
+      },
+    );
 
     test('maps common Portuguese deck import staples safely', () {
       expect(canonicalizeImportLookupName('Planície'), equals('plains'));
@@ -131,23 +165,25 @@ void main() {
   });
 
   group('card identity bridge schema', () {
-    test('normalizes canonical and localized names without replacing card id',
-        () {
-      final view = createCardIdentityBridgeViewSql.toLowerCase();
+    test(
+      'normalizes canonical and localized names without replacing card id',
+      () {
+        final view = createCardIdentityBridgeViewSql.toLowerCase();
 
-      expect(view, contains('create or replace view card_identity_bridge'));
-      expect(view, contains('c.id as card_id'));
-      expect(view, contains('c.oracle_id'));
-      expect(view, contains('c.scryfall_id'));
-      expect(view, contains('normalized_canonical_name'));
-      expect(view, contains('normalized_lookup_name'));
-      expect(view, contains('from cards c'));
-      expect(view, contains('from card_localized_names l'));
-      expect(view, contains('union all'));
-      expect(view, contains('match_priority'));
-      expect(view, isNot(contains('insert into cards')));
-      expect(view, isNot(contains('update cards')));
-      expect(view, isNot(contains('delete from cards')));
-    });
+        expect(view, contains('create or replace view card_identity_bridge'));
+        expect(view, contains('c.id as card_id'));
+        expect(view, contains('c.oracle_id'));
+        expect(view, contains('c.scryfall_id'));
+        expect(view, contains('normalized_canonical_name'));
+        expect(view, contains('normalized_lookup_name'));
+        expect(view, contains('from cards c'));
+        expect(view, contains('from card_localized_names l'));
+        expect(view, contains('union all'));
+        expect(view, contains('match_priority'));
+        expect(view, isNot(contains('insert into cards')));
+        expect(view, isNot(contains('update cards')));
+        expect(view, isNot(contains('delete from cards')));
+      },
+    );
   });
 }
