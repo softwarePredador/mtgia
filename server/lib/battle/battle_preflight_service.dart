@@ -9,6 +9,8 @@ import '../ai/native_battle_client.dart';
 import '../ai/xmage_battle_client.dart';
 import '../deck_validation_state_support.dart';
 import 'battle_deck_admission.dart';
+import 'interactive_battle_coverage_probe.dart';
+import 'interactive_battle_runtime_client.dart';
 
 const battlePreflightSchemaVersion = 'battle_preflight_v1';
 const battlePreflightModeSimulation = 'simulation';
@@ -105,12 +107,25 @@ typedef BattleCoverageProbe =
       required BattlePreflightDeck opponent,
     });
 
+typedef InteractiveBattleCoverageProbe =
+    Future<BattleCoverageReport> Function({
+      required Map<String, String> environment,
+      required BattlePreflightDeck deck,
+      required BattlePreflightDeck opponent,
+    });
+
 class BattlePreflightService {
-  BattlePreflightService(this._pool, {BattleCoverageProbe? coverageProbe})
-    : _coverageProbe = coverageProbe ?? checkExternalBattleCoverage;
+  BattlePreflightService(
+    this._pool, {
+    BattleCoverageProbe? coverageProbe,
+    InteractiveBattleCoverageProbe? interactiveCoverageProbe,
+  }) : _coverageProbe = coverageProbe ?? checkExternalBattleCoverage,
+       _interactiveCoverageProbe =
+           interactiveCoverageProbe ?? checkInteractiveBattleCoverage;
 
   final Pool _pool;
   final BattleCoverageProbe _coverageProbe;
+  final InteractiveBattleCoverageProbe _interactiveCoverageProbe;
 
   Future<Map<String, dynamic>> inspect({
     required String userId,
@@ -163,16 +178,30 @@ class BattlePreflightService {
       );
     } else {
       try {
-        final config = BattleEngineConfig.fromEnvironment({
-          ...environment,
-          if (mode == battlePreflightModeInteractive) 'BATTLE_ENGINE': 'xmage',
-        });
-        coverage = await _coverageProbe(
-          config: config,
-          deck: deck,
-          opponent: opponent,
-        );
+        if (mode == battlePreflightModeInteractive) {
+          coverage = await _interactiveCoverageProbe(
+            environment: environment,
+            deck: deck,
+            opponent: opponent,
+          );
+        } else {
+          final config = BattleEngineConfig.fromEnvironment(environment);
+          coverage = await _coverageProbe(
+            config: config,
+            deck: deck,
+            opponent: opponent,
+          );
+        }
       } on BattleEngineConfigurationException {
+        coverage = const BattleCoverageReport(
+          engineCoverage: {
+            'xmage': 'unknown',
+            'forge': 'unknown',
+            'native': 'unknown',
+          },
+          blockers: ['engine_not_configured'],
+        );
+      } on InteractiveBattleConfigurationException {
         coverage = const BattleCoverageReport(
           engineCoverage: {
             'xmage': 'unknown',
@@ -506,6 +535,61 @@ Future<BattleCoverageReport> checkExternalBattleCoverage({
     blockers: const ['engine_coverage_unavailable'],
     unsupportedCards: unsupportedCards,
   );
+}
+
+Future<BattleCoverageReport> checkInteractiveBattleCoverage({
+  required Map<String, String> environment,
+  required BattlePreflightDeck deck,
+  required BattlePreflightDeck opponent,
+}) async {
+  final engineConfig = BattleEngineConfig.fromEnvironment({
+    ...environment,
+    'BATTLE_ENGINE': 'xmage',
+  });
+  final interactiveConfiguration =
+      InteractiveBattleConfiguration.fromEnvironment(environment);
+  if (!interactiveConfiguration.enabled) {
+    throw const InteractiveBattleConfigurationException(
+      'interactive_battle_disabled',
+    );
+  }
+  InteractiveBattleCoverageClient? client;
+  try {
+    client = InteractiveBattleCoverageClient(
+      batchBaseUrl: engineConfig.xmageSidecarUrl,
+      interactiveBaseUrl: interactiveConfiguration.baseUrl,
+      expectedIdentity: engineConfig.xmageIdentity,
+      expectedInteractiveMaximumActive:
+          interactiveConfiguration.maximumActiveGlobal,
+    );
+    final result = await client.check(
+      deckA: deck.externalPayload,
+      deckB: opponent.externalPayload,
+    );
+    return BattleCoverageReport(
+      engineCoverage: {
+        'xmage': result.ready ? 'ready' : 'unsupported',
+        'forge': 'not_selected',
+        'native': 'not_selected',
+      },
+      blockers: result.ready ? const [] : const ['engine_coverage_incomplete'],
+      selectedEngine: result.ready ? 'xmage' : null,
+      unsupportedCards: _coverageRows({
+        'unsupported_cards': result.unsupportedCards,
+      }, engine: 'xmage'),
+    );
+  } on InteractiveBattleCoverageException {
+    return const BattleCoverageReport(
+      engineCoverage: {
+        'xmage': 'unavailable',
+        'forge': 'not_selected',
+        'native': 'not_selected',
+      },
+      blockers: ['engine_coverage_unavailable'],
+    );
+  } finally {
+    client?.close();
+  }
 }
 
 List<Map<String, dynamic>> _coverageRows(

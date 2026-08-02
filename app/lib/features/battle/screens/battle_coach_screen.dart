@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/config/visual_fixture.dart';
@@ -53,8 +55,11 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
   bool _starting = false;
   bool _submitting = false;
   bool _fetching = false;
+  bool _sessionsLoading = false;
   bool _appActive = true;
   String? _error;
+  String? _sessionsError;
+  InteractiveBattleSession? _activeSession;
   int? _integerValue;
   final TextEditingController _multiAmountController = TextEditingController();
   String? _configuredPromptId;
@@ -69,6 +74,9 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
     if (sessionId != null && sessionId.isNotEmpty) {
       _loading = true;
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+    } else {
+      _sessionsLoading = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadActiveSession());
     }
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted && _session?.isWaitingForAction == true) setState(() {});
@@ -95,7 +103,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
   }
 
   Future<void> _chooseOpponent() async {
-    if (_starting) return;
+    if (_starting || _sessionsLoading || _activeSession != null) return;
     final setup = await showBattleOpponentPicker(
       context: context,
       gateway: _opponentGateway,
@@ -122,9 +130,10 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       );
       if (!mounted) return;
       setState(() => _starting = false);
-      final location =
-          '${battleReplaysRouteLocation(widget.deckId)}'
-          '?replay=${Uri.encodeQueryComponent(replay.summary.id)}';
+      final location = battleReplaysRouteLocation(
+        widget.deckId,
+        replayId: replay.summary.id,
+      );
       context.go(location);
     } catch (error) {
       if (!mounted) return;
@@ -161,6 +170,76 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
         _starting = false;
         _error = _friendlyError(error);
       });
+      if (error is InteractiveBattleGatewayException &&
+          error.code == 'interactive_battle_quota_exceeded') {
+        unawaited(_loadActiveSession());
+      }
+    }
+  }
+
+  Future<void> _loadActiveSession() async {
+    if (_sessionsLoading && _activeSession != null) return;
+    if (mounted) {
+      setState(() {
+        _sessionsLoading = true;
+        _sessionsError = null;
+      });
+    }
+    try {
+      final sessions = await _gateway.list(deckId: widget.deckId);
+      final active =
+          sessions
+              .where(
+                (session) =>
+                    !session.isTerminal &&
+                    (session.deckId == null || session.deckId == widget.deckId),
+              )
+              .toList(growable: false)
+            ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      if (!mounted) return;
+      setState(() {
+        _sessionsLoading = false;
+        _sessionsError = null;
+        _activeSession = active.isEmpty ? null : active.first;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _sessionsLoading = false;
+        _sessionsError = _friendlyError(error);
+      });
+    }
+  }
+
+  Future<void> _resumeActiveSession() async {
+    final listed = _activeSession;
+    if (listed == null || _starting) return;
+    setState(() {
+      _starting = true;
+      _error = null;
+    });
+    try {
+      final session = await _gateway.get(listed.id);
+      if (!mounted) return;
+      _acceptSession(session);
+      setState(() {
+        _starting = false;
+        _activeSession = null;
+      });
+      final location = battleCoachSessionRouteLocation(
+        widget.deckId,
+        session.id,
+      );
+      if (GoRouterState.of(context).uri.path != location) {
+        context.replace(location);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _starting = false;
+        _error = _friendlyError(error);
+      });
+      unawaited(_loadActiveSession());
     }
   }
 
@@ -403,7 +482,12 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       return _BattleCoachWelcome(
         starting: _starting,
         error: _error,
+        sessionsLoading: _sessionsLoading,
+        sessionsError: _sessionsError,
+        activeSession: _activeSession,
         onChooseOpponent: _chooseOpponent,
+        onResume: _resumeActiveSession,
+        onRetrySessions: _loadActiveSession,
       );
     }
 
@@ -445,16 +529,45 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
                 onOpenReplay: _openReplay,
               );
               if (!expanded) {
-                return SingleChildScrollView(
+                final preferredDecisionHeight = session.prompt != null
+                    ? constraints.maxHeight * 0.48
+                    : constraints.maxHeight * 0.34;
+                final decisionHeight = constraints.maxHeight < 194
+                    ? constraints.maxHeight * 0.58
+                    : preferredDecisionHeight.clamp(
+                        112.0,
+                        constraints.maxHeight * 0.58,
+                      );
+                return Column(
                   key: const Key('battle-coach-compact-scroll'),
-                  padding: const EdgeInsets.all(AppTheme.pageGutterCompact),
-                  child: Column(
-                    children: [
-                      board,
-                      const SizedBox(height: AppTheme.space12),
-                      decisions,
-                    ],
-                  ),
+                  children: [
+                    SizedBox(
+                      key: const Key('battle-coach-compact-decision-region'),
+                      height: decisionHeight,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppTheme.pageGutterCompact,
+                          AppTheme.pageGutterCompact,
+                          AppTheme.pageGutterCompact,
+                          AppTheme.space8,
+                        ),
+                        child: decisions,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        key: const Key('battle-coach-compact-board-scroll'),
+                        padding: const EdgeInsets.fromLTRB(
+                          AppTheme.pageGutterCompact,
+                          AppTheme.space8,
+                          AppTheme.pageGutterCompact,
+                          AppTheme.pageGutterCompact,
+                        ),
+                        child: board,
+                      ),
+                    ),
+                  ],
                 );
               }
               return Padding(
@@ -546,12 +659,22 @@ class _BattleCoachWelcome extends StatelessWidget {
   const _BattleCoachWelcome({
     required this.starting,
     required this.error,
+    required this.sessionsLoading,
+    required this.sessionsError,
+    required this.activeSession,
     required this.onChooseOpponent,
+    required this.onResume,
+    required this.onRetrySessions,
   });
 
   final bool starting;
   final String? error;
+  final bool sessionsLoading;
+  final String? sessionsError;
+  final InteractiveBattleSession? activeSession;
   final VoidCallback onChooseOpponent;
+  final VoidCallback onResume;
+  final VoidCallback onRetrySessions;
 
   @override
   Widget build(BuildContext context) {
@@ -579,7 +702,7 @@ class _BattleCoachWelcome extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'MÃO · PILHA · CAMPO · PRIORIDADE',
+                    'MÃO · PILHA · CAMPO · DECISÕES COMPATÍVEIS',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.brass400,
@@ -604,7 +727,7 @@ class _BattleCoachWelcome extends StatelessWidget {
                   ),
                   const SizedBox(height: AppTheme.space18),
                   Text(
-                    'Jogue as decisões que importam',
+                    'Participe das decisões compatíveis',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: AppTheme.textPrimary,
@@ -613,9 +736,9 @@ class _BattleCoachWelcome extends StatelessWidget {
                   ),
                   const SizedBox(height: AppTheme.space8),
                   Text(
-                    'O motor de regras conduz regras e ações automáticas. Quando houver uma '
-                    'decisão real — mulligan, alvo, combate, mana ou prioridade — '
-                    'a mesa para e entrega a escolha a você.',
+                    'Durante o Alpha, o motor conduz a partida e pausa somente '
+                    'quando uma decisão compatível estiver disponível. Você '
+                    'escolhe nesses momentos; as demais ações seguem automaticamente.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: AppTheme.textSecondary,
@@ -623,25 +746,86 @@ class _BattleCoachWelcome extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppTheme.space18),
-                  const Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: AppTheme.space8,
-                    runSpacing: AppTheme.space8,
-                    children: [
-                      _CoachTrustChip(
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      const validated = _CoachTrustChip(
                         icon: Icons.rule_rounded,
-                        label: 'Regras verificadas',
-                      ),
-                      _CoachTrustChip(
-                        icon: Icons.visibility_off_outlined,
-                        label: 'Mão adversária privada',
-                      ),
-                      _CoachTrustChip(
+                        label: 'Deck validado para execução',
+                      );
+                      const replay = _CoachTrustChip(
                         icon: Icons.history_rounded,
-                        label: 'Replay e decisões salvos',
-                      ),
-                    ],
+                        label: 'Decisões registradas; replay ao concluir',
+                      );
+                      if (constraints.maxWidth < 380) {
+                        return const Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            validated,
+                            SizedBox(height: AppTheme.space8),
+                            replay,
+                          ],
+                        );
+                      }
+                      return const Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: AppTheme.space8,
+                        runSpacing: AppTheme.space8,
+                        children: [validated, replay],
+                      );
+                    },
                   ),
+                  if (activeSession != null) ...[
+                    const SizedBox(height: AppTheme.space18),
+                    _ActiveBattleSessionCard(session: activeSession!),
+                  ] else if (sessionsLoading) ...[
+                    const SizedBox(height: AppTheme.space18),
+                    Semantics(
+                      liveRegion: true,
+                      label: 'Verificando se existe uma mesa ativa',
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox.square(
+                            dimension: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          SizedBox(width: AppTheme.space8),
+                          Flexible(
+                            child: Text(
+                              'Verificando mesa ativa…',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else if (sessionsError != null) ...[
+                    const SizedBox(height: AppTheme.space18),
+                    Semantics(
+                      liveRegion: true,
+                      child: Column(
+                        children: [
+                          Text(
+                            'Não foi possível verificar mesas ativas. '
+                            '$sessionsError',
+                            key: const Key('battle-coach-active-session-error'),
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.warning,
+                            ),
+                          ),
+                          TextButton.icon(
+                            key: const Key(
+                              'battle-coach-retry-active-session-button',
+                            ),
+                            onPressed: onRetrySessions,
+                            icon: const Icon(Icons.refresh_rounded),
+                            label: const Text('Verificar novamente'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   if (error != null) ...[
                     const SizedBox(height: AppTheme.space16),
                     Text(
@@ -659,22 +843,42 @@ class _BattleCoachWelcome extends StatelessWidget {
                       'battle-coach-choose-opponent-focus-halo',
                     ),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    debugLabel: 'Battle Coach choose opponent',
+                    debugLabel: activeSession == null
+                        ? 'Battle Coach choose opponent'
+                        : 'Battle Coach resume active session',
                     builder: (focusNode) => FilledButton.icon(
-                      key: const Key('battle-coach-choose-opponent-button'),
+                      key: Key(
+                        activeSession == null
+                            ? 'battle-coach-choose-opponent-button'
+                            : 'battle-coach-resume-active-session-button',
+                      ),
                       focusNode: focusNode,
-                      onPressed: starting ? null : onChooseOpponent,
+                      onPressed: starting || sessionsLoading
+                          ? null
+                          : activeSession == null
+                          ? onChooseOpponent
+                          : onResume,
                       icon: starting
                           ? const SizedBox.square(
                               dimension: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
+                          : activeSession != null
+                          ? const Icon(Icons.play_circle_outline_rounded)
                           : const ManaLoomGlyph(
                               ManaLoomGlyphKind.commander,
                               size: 20,
                             ),
                       label: Text(
-                        starting ? 'Preparando a mesa…' : 'Escolher adversário',
+                        starting
+                            ? activeSession == null
+                                  ? 'Preparando a mesa…'
+                                  : 'Retomando a mesa…'
+                            : sessionsLoading
+                            ? 'Verificando mesa ativa…'
+                            : activeSession == null
+                            ? 'Escolher adversário'
+                            : 'Retomar mesa ativa',
                       ),
                     ),
                   ),
@@ -686,6 +890,59 @@ class _BattleCoachWelcome extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ActiveBattleSessionCard extends StatelessWidget {
+  const _ActiveBattleSessionCard({required this.session});
+
+  final InteractiveBattleSession session;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    label:
+        'Mesa ativa encontrada. ${session.status.label}. Retome esta mesa antes de iniciar outra.',
+    child: Container(
+      key: const Key('battle-coach-active-session-card'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.space12),
+      decoration: BoxDecoration(
+        color: AppTheme.frost400.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.38)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.history_toggle_off_rounded,
+            color: AppTheme.frost400,
+          ),
+          const SizedBox(width: AppTheme.space10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Mesa ativa encontrada',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space3),
+                Text(
+                  '${session.status.label}. Retome-a antes de iniciar outra.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _BattleCoachKeyboardFocusHalo extends StatefulWidget {
@@ -723,9 +980,15 @@ class _BattleCoachKeyboardFocusHaloState
   void _handleHighlightMode(FocusHighlightMode _) => _syncHalo();
 
   void _syncHalo() {
+    // Flutter Web can briefly classify browser-level Tab traversal as `touch`
+    // after an asynchronous prompt replacement. On Web, actual DOM focus is
+    // therefore the reliable signal. Native touch surfaces retain the usual
+    // highlight-mode guard so a tap does not leave a keyboard-style residue.
     final showHalo =
         _focusNode.hasFocus &&
-        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+        (kIsWeb ||
+            FocusManager.instance.highlightMode ==
+                FocusHighlightMode.traditional);
     if (showHalo == _showHalo) return;
     if (!mounted) {
       _showHalo = showHalo;
@@ -785,7 +1048,9 @@ class _CoachTrustChip extends StatelessWidget {
       children: [
         Icon(icon, size: 16, color: AppTheme.frost400),
         const SizedBox(width: AppTheme.space6),
-        Text(label),
+        Flexible(
+          child: Text(label, textAlign: TextAlign.center, softWrap: true),
+        ),
       ],
     ),
   );
@@ -807,7 +1072,7 @@ class _BattleCoachStatusBar extends StatelessWidget {
         ? _humanize(state.step!)
         : null;
     final phaseParts = <String>[
-      if (state.turn > 0) 'Turno ${state.turn}',
+      if (state.turn != null && state.turn! > 0) 'Turno ${state.turn}',
       if (phaseLabel != null) phaseLabel,
       if (stepLabel != null &&
           stepLabel != phaseLabel &&
@@ -1014,16 +1279,25 @@ class _PlayerZone extends StatelessWidget {
         _BoardBadge(
           icon: Icons.favorite_rounded,
           label: '${value?.life ?? '—'}',
+          semanticsLabel: value?.life == null
+              ? 'Vida não disponível'
+              : '${value!.life} pontos de vida',
           accent: AppTheme.error,
         ),
         _BoardBadge(
           icon: Icons.style_rounded,
-          label: '${value?.handCount ?? 0}',
+          label: '${value?.handCount ?? '—'}',
+          semanticsLabel: value?.handCount == null
+              ? 'Quantidade de cartas na mão não disponível'
+              : '${value!.handCount} cartas na mão',
           accent: AppTheme.frost400,
         ),
         _BoardBadge(
           icon: Icons.layers_outlined,
-          label: '${value?.libraryCount ?? 0}',
+          label: '${value?.libraryCount ?? '—'}',
+          semanticsLabel: value?.libraryCount == null
+              ? 'Quantidade de cartas no grimório não disponível'
+              : '${value!.libraryCount} cartas no grimório',
           accent: AppTheme.textSecondary,
         ),
       ],
@@ -1300,7 +1574,8 @@ class _BattleCard extends StatelessWidget {
             errorPlaceholder: _CardFallback(name: card.name),
           ),
         ),
-        if (card.damage > 0 || card.counters.isNotEmpty)
+        if ((card.damage != null && card.damage! > 0) ||
+            card.counters.isNotEmpty)
           Positioned(
             right: AppTheme.space3,
             bottom: AppTheme.space3,
@@ -1315,9 +1590,11 @@ class _BattleCard extends StatelessWidget {
               ),
               child: Text(
                 [
-                  if (card.damage > 0) '${card.damage} dano',
+                  if (card.damage != null && card.damage! > 0)
+                    '${card.damage} dano',
                   ...card.counters.map(
-                    (counter) => '${counter.count} ${counter.name}',
+                    (counter) =>
+                        '${counter.count?.toString() ?? '—'} ${counter.name}',
                   ),
                 ].join(' · '),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -1329,12 +1606,284 @@ class _BattleCard extends StatelessWidget {
           ),
       ],
     );
-    return Semantics(
-      image: true,
-      label: '${card.name}${card.tapped ? ', virada' : ''}',
-      child: SizedBox(width: width, height: height, child: cardBody),
+    return _BattleCardPreviewTarget(
+      card: card,
+      child: Semantics(
+        image: true,
+        label: '${card.name}${card.tapped ? ', virada' : ''}',
+        child: SizedBox(width: width, height: height, child: cardBody),
+      ),
     );
   }
+}
+
+class _BattleCardPreviewTarget extends StatefulWidget {
+  const _BattleCardPreviewTarget({required this.card, required this.child});
+
+  final InteractiveBattleCard card;
+  final Widget child;
+
+  @override
+  State<_BattleCardPreviewTarget> createState() =>
+      _BattleCardPreviewTargetState();
+}
+
+class _BattleCardPreviewTargetState extends State<_BattleCardPreviewTarget> {
+  late final FocusNode _focusNode;
+  OverlayEntry? _previewEntry;
+  bool _hovered = false;
+  bool _focused = false;
+  bool _dialogOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode(
+      debugLabel: 'Battle Coach card preview ${widget.card.name}',
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _BattleCardPreviewTarget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.card.id != widget.card.id ||
+        oldWidget.card.name != widget.card.name) {
+      _removePreview();
+    }
+  }
+
+  @override
+  void dispose() {
+    _removePreview();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _syncPreview() {
+    if (_dialogOpen) return;
+    if (_hovered || _focused) {
+      _showPreview();
+    } else {
+      _removePreview();
+    }
+  }
+
+  void _showPreview() {
+    if (_previewEntry != null || !mounted) return;
+    final target = context.findRenderObject();
+    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    if (target is! RenderBox || !target.hasSize || overlay == null) return;
+
+    final screen = MediaQuery.sizeOf(context);
+    final origin = target.localToGlobal(Offset.zero);
+    final previewWidth = screen.width >= 236 ? 220.0 : screen.width - 16;
+    final previewHeight = previewWidth * 1.39 + 58;
+    final right = origin.dx + target.size.width + AppTheme.space10;
+    final preferredLeft = right + previewWidth <= screen.width - 8
+        ? right
+        : origin.dx - previewWidth - AppTheme.space10;
+    final maxLeft = screen.width - previewWidth - 8;
+    final left = preferredLeft.clamp(8.0, maxLeft < 8 ? 8.0 : maxLeft);
+    final maxTop = screen.height - previewHeight - 8;
+    final top = origin.dy.clamp(8.0, maxTop < 8 ? 8.0 : maxTop);
+
+    _previewEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: left,
+        top: top,
+        width: previewWidth,
+        child: IgnorePointer(
+          child: Material(
+            key: const Key('battle-coach-card-hover-preview'),
+            elevation: 14,
+            color: AppTheme.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            child: Container(
+              padding: const EdgeInsets.all(AppTheme.space8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color: AppTheme.brass400.withValues(alpha: 0.62),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CachedCardImage(
+                    imageUrl: widget.card.effectiveImageUrl,
+                    width: previewWidth - AppTheme.space16,
+                    height: (previewWidth - AppTheme.space16) * 1.39,
+                    fit: BoxFit.cover,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    errorPlaceholder: _CardFallback(name: widget.card.name),
+                  ),
+                  const SizedBox(height: AppTheme.space7),
+                  Text(
+                    widget.card.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    overlay.insert(_previewEntry!);
+  }
+
+  void _removePreview() {
+    _previewEntry?.remove();
+    _previewEntry = null;
+  }
+
+  Future<void> _openPreview() async {
+    if (_dialogOpen) return;
+    _dialogOpen = true;
+    _removePreview();
+    await _showCoachCardPreview(context, widget.card);
+    _dialogOpen = false;
+    if (mounted) _syncPreview();
+  }
+
+  KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        (event.logicalKey == LogicalKeyboardKey.enter ||
+            event.logicalKey == LogicalKeyboardKey.space)) {
+      unawaited(_openPreview());
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    key: Key('battle-coach-card-preview-${_cardPreviewKey(widget.card)}'),
+    button: true,
+    label: 'Ver prévia de ${widget.card.name}',
+    hint: 'Passe o mouse, use o foco ou toque para ampliar a carta.',
+    child: Focus(
+      key: Key(
+        'battle-coach-card-preview-${_cardPreviewKey(widget.card)}-focus',
+      ),
+      focusNode: _focusNode,
+      onKeyEvent: _handleKey,
+      onFocusChange: (focused) {
+        _focused = focused;
+        _syncPreview();
+      },
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) {
+          _hovered = true;
+          _syncPreview();
+        },
+        onExit: (_) {
+          _hovered = false;
+          _syncPreview();
+        },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => unawaited(_openPreview()),
+          onLongPress: () => unawaited(_openPreview()),
+          child: widget.child,
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _showCoachCardPreview(
+  BuildContext context,
+  InteractiveBattleCard card,
+) => showDialog<void>(
+  context: context,
+  builder: (context) {
+    final theme = Theme.of(context);
+    final edition = [
+      if (card.setCode != null) card.setCode!.toUpperCase(),
+      if (card.collectorNumber != null) '#${card.collectorNumber}',
+    ].join(' · ');
+    return Dialog(
+      key: const Key('battle-coach-card-preview-dialog'),
+      insetPadding: const EdgeInsets.all(AppTheme.space20),
+      backgroundColor: AppTheme.surfaceElevated,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTheme.space16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      card.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    key: const Key('battle-coach-card-preview-close-button'),
+                    tooltip: 'Fechar',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.space12),
+              Center(
+                child: CachedCardImage(
+                  imageUrl: card.effectiveImageUrl,
+                  width: 220,
+                  height: 306,
+                  fit: BoxFit.cover,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  errorPlaceholder: _CardFallback(name: card.name),
+                ),
+              ),
+              if (edition.isNotEmpty) ...[
+                const SizedBox(height: AppTheme.space12),
+                Text(
+                  edition,
+                  key: const Key('battle-coach-card-preview-edition'),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                'Prévia da carta na mesa. Feche para continuar sua decisão.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textHint,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  },
+);
+
+String _cardPreviewKey(InteractiveBattleCard card) {
+  final raw = card.id?.trim().isNotEmpty == true ? card.id! : card.name;
+  return raw.toLowerCase().replaceAll(RegExp('[^a-z0-9_-]+'), '-');
 }
 
 class _CardFallback extends StatelessWidget {
@@ -1368,35 +1917,44 @@ class _BoardBadge extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.accent,
+    this.semanticsLabel,
   });
 
   final IconData icon;
   final String label;
   final Color accent;
+  final String? semanticsLabel;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: AppTheme.space6,
-      vertical: AppTheme.space3,
-    ),
-    decoration: BoxDecoration(
-      color: accent.withValues(alpha: 0.10),
-      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: accent),
-        const SizedBox(width: AppTheme.space3),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: accent,
-            fontWeight: FontWeight.w800,
-          ),
+  Widget build(BuildContext context) => Semantics(
+    label: semanticsLabel,
+    excludeSemantics: semanticsLabel != null,
+    child: Tooltip(
+      message: semanticsLabel ?? label,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space6,
+          vertical: AppTheme.space3,
         ),
-      ],
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: accent),
+            const SizedBox(width: AppTheme.space3),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: accent,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
   );
 }
@@ -1532,19 +2090,24 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
                     onPressed: () => onOption(option),
                   ),
                 )
-            else if (prompt.inputMode == 'integer')
+            else if (prompt.inputMode == 'integer' &&
+                prompt.minimum != null &&
+                prompt.maximum != null)
               _IntegerDecision(
                 prompt: prompt,
-                value: integerValue ?? prompt.minimum ?? 0,
+                value: integerValue ?? prompt.minimum!,
                 onChanged: onIntegerChanged,
                 onSubmit: onIntegerSubmit,
               )
-            else if (prompt.inputMode == 'multi_amount')
+            else if (prompt.inputMode == 'multi_amount' &&
+                prompt.multiAmountCount > 0)
               _MultiAmountDecision(
                 prompt: prompt,
                 controller: multiAmountController,
                 onSubmit: onMultiSubmit,
-              ),
+              )
+            else
+              const _DecisionInputUnavailable(),
             const SizedBox(height: AppTheme.space6),
             _BattleCoachKeyboardFocusHalo(
               haloKey: const Key('battle-coach-delegate-focus-halo'),
@@ -1641,13 +2204,16 @@ class _PromptOptionTile extends StatelessWidget {
             child: Row(
               children: [
                 if (card != null) ...[
-                  CachedCardImage(
-                    imageUrl: card.effectiveImageUrl,
-                    width: 45,
-                    height: 63,
-                    fit: BoxFit.cover,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                    errorPlaceholder: _CardFallback(name: card.name),
+                  _BattleCardPreviewTarget(
+                    card: card,
+                    child: CachedCardImage(
+                      imageUrl: card.effectiveImageUrl,
+                      width: 45,
+                      height: 63,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                      errorPlaceholder: _CardFallback(name: card.name),
+                    ),
                   ),
                   const SizedBox(width: AppTheme.space10),
                 ] else ...[
@@ -1695,8 +2261,8 @@ class _IntegerDecision extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final minimum = prompt.minimum ?? 0;
-    final maximum = prompt.maximum ?? minimum;
+    final minimum = prompt.minimum!;
+    final maximum = prompt.maximum!;
     final divisions = maximum > minimum ? maximum - minimum : null;
     return Column(
       children: [
@@ -1735,6 +2301,30 @@ class _IntegerDecision extends StatelessWidget {
       ],
     );
   }
+}
+
+class _DecisionInputUnavailable extends StatelessWidget {
+  const _DecisionInputUnavailable();
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    liveRegion: true,
+    label: 'Detalhes desta decisão não estão disponíveis.',
+    child: Container(
+      key: const Key('battle-coach-decision-input-unavailable'),
+      padding: const EdgeInsets.all(AppTheme.space10),
+      decoration: BoxDecoration(
+        color: AppTheme.warning.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.32)),
+      ),
+      child: const Text(
+        'Os detalhes desta decisão não estão disponíveis. Você pode delegá-la '
+        'ao motor ou reconectar à mesa.',
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
 }
 
 class _MultiAmountDecision extends StatelessWidget {

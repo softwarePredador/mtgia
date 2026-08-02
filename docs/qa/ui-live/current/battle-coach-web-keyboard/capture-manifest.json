@@ -1,18 +1,18 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-02T12:13:42.679859Z",
-  "source_digest": "6e52274f4aded923548297c0a31e28e8f33a0fb5d00bd95a4dcc057241c02690",
+  "generated_at": "2026-08-02T19:45:27.457049Z",
+  "source_digest": "b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5",
   "surface": "battle_coach",
   "profile": "web_iab_1280x720",
   "runtime": "in_app_browser_browser_level_keyboard_events",
   "target": "web_real_build",
-  "device_contract": "Flutter Web release build from the current app sources, served through a loopback same-origin proxy to the deployed ManaLoom API, Chrome 150 in the Codex in-app browser at its actual 1280x720 viewport, browser-level Tab/Shift+Tab/Enter/Space/Escape/typing, a newly registered and verified production account, a newly generated validated 100-card Commander deck, positive preflight and a real dedicated interactive Battle session",
+  "device_contract": "Flutter Web release build from the current app sources, served through a loopback no-store same-origin proxy to the deployed ManaLoom API, exercised in the Codex in-app browser at its actual 1280x720 viewport with browser-level Tab, Shift+Tab, Enter, Space, Escape and physical typing; newly registered and verified production account, newly created and validated 100-card Commander deck, positive preflight and a real dedicated interactive Battle session",
   "runtime_console": {
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "f051bf7f0501c798c20b2088638a3acae457b54fd3275ed43b95c12dbcce0b4f",
+  "log_sha256": "8b2b7342dec667a8d58b83e169759387120ece9a8c94c012cebf933b8c6a0354",
   "checkpoint_count": 19,
   "required_checkpoints": [
     "01_focus_back",
@@ -39,152 +39,152 @@
     {
       "checkpoint": "01_focus_back",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/01_focus_back.png",
-      "sha256": "f186ecde1923958087bf30532c7ccf7d034852cdd3ed807295e96c1398e43fd1",
-      "bytes": 207999,
+      "sha256": "1de7537538b0bc4b20ae02c7a808a02400983f27e24fbe2ec4e7ddea80b4533e",
+      "bytes": 215764,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "02_tab_replays",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/02_tab_replays.png",
-      "sha256": "e8625e1c598bebfb145092e6a5c2041930d510c4e5b8f4dc1ff998d4b1f53a65",
-      "bytes": 206734,
+      "sha256": "cc03941f648ec07ff6d6a8486afac24c926d006fdb1d9d62beb95168bfca2622",
+      "bytes": 214606,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "03_tab_choose_opponent",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/03_tab_choose_opponent.png",
-      "sha256": "c997ab4203eb416ebed7ba15ef736b971753d41d5c1f33afbd78c71ea436f464",
-      "bytes": 197151,
+      "sha256": "940e3c373ee0b73cf9dca73b523737cb3ab5da2307ced76a4c9cc70d9f83d01a",
+      "bytes": 204770,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "04_shift_tab_replays",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/04_shift_tab_replays.png",
-      "sha256": "e8625e1c598bebfb145092e6a5c2041930d510c4e5b8f4dc1ff998d4b1f53a65",
-      "bytes": 206734,
+      "sha256": "cc03941f648ec07ff6d6a8486afac24c926d006fdb1d9d62beb95168bfca2622",
+      "bytes": 214606,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "05_enter_dialog_search_focus",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/05_enter_dialog_search_focus.png",
-      "sha256": "6ba241248b66f4642ac328dbee0de44e4e2f538c627662f04b7390b62465b306",
-      "bytes": 233359,
+      "sha256": "8b8b7375ed4b26b8710d7706ef0094174c0c100cc568087d1b7912137589e3c6",
+      "bytes": 209203,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "06_escape_focus_restored",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/06_escape_focus_restored.png",
-      "sha256": "c997ab4203eb416ebed7ba15ef736b971753d41d5c1f33afbd78c71ea436f464",
-      "bytes": 197151,
+      "sha256": "940e3c373ee0b73cf9dca73b523737cb3ab5da2307ced76a4c9cc70d9f83d01a",
+      "bytes": 204770,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "07_space_dialog_search_focus",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/07_space_dialog_search_focus.png",
-      "sha256": "6ba241248b66f4642ac328dbee0de44e4e2f538c627662f04b7390b62465b306",
-      "bytes": 233359,
+      "sha256": "7ca822f5c1936264e9d08e7877bf4d347a97fb7cc669dd2565a93cb84b314651",
+      "bytes": 207977,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "08_physical_typing_filters_rival",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/08_physical_typing_filters_rival.png",
-      "sha256": "b809fd4c2fc7a0b15693510cb507c94ffb87b3aeb6b44c7b467e768c387471fd",
-      "bytes": 185593,
+      "sha256": "2f2ccf6ab8b5713d93d62e87351b282efdcd66850f9fccbc6d1ef720db78a361",
+      "bytes": 185454,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "09_tab_focuses_filtered_rival",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/09_tab_focuses_filtered_rival.png",
-      "sha256": "94c71dea2ed052cea2062d38f02acd3fb5dd9fabd020a9625069bd5ec00f486c",
-      "bytes": 181696,
+      "sha256": "1a5f35c191c5fff7e1d666742d6f260cc813debfd00419f160623f2e82661742",
+      "bytes": 181088,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "10_enter_selects_and_preflight",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/10_enter_selects_and_preflight.png",
-      "sha256": "92d7ecb57a8583c95db9d36ffe49c83804d16256c53bd29ea7c546f4ae6d5a9f",
-      "bytes": 190204,
+      "sha256": "d6a25b4f504366d01df0ac911a8397f3a48e51e033ebd38d7cb3db253b70b4ab",
+      "bytes": 188640,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "11_tab_focuses_start_battle",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/11_tab_focuses_start_battle.png",
-      "sha256": "0eddca5247ad793b7eeb858116edd878bfbb4a44cdc1eed494cf501913ae1896",
-      "bytes": 193227,
+      "sha256": "5c2419e8d692f540bfe73f6a6628a77f0568dedbeb51f6928516a5508627614b",
+      "bytes": 191335,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "12_enter_starts_real_session",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/12_enter_starts_real_session.png",
-      "sha256": "ce3ec2998729a4ded3d4553cd95516dc0f3c576499a4e76ddb23f707faf3bd83",
-      "bytes": 387376,
+      "sha256": "cb56b8e102d17a28b2b67a8224a53c858ebc2c6f63d79f1d1329964a26252cb9",
+      "bytes": 227815,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "13_prompt_option_focus_mulligan",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/13_prompt_option_focus_mulligan.png",
-      "sha256": "31e72b817534be1d1effd937db7eb4d6e84c4c5f599009f59334569e15e2485c",
-      "bytes": 380969,
+      "sha256": "ff6874122bc0147441fcb3c5dd8791bf578f7f9ae161d067ee83047ce07c14ba",
+      "bytes": 267580,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "14_prompt_option_focus_keep",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/14_prompt_option_focus_keep.png",
-      "sha256": "4e7ddf0fbdf30962b84a92107f0a362d550fe76c2fac9d65a67b36df51996a73",
-      "bytes": 379268,
+      "sha256": "66317fbd987adee645240ad6e1c2c2850a2f0f280cec3d2a77daa43fe377f167",
+      "bytes": 266513,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "15_delegate_focus",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/15_delegate_focus.png",
-      "sha256": "ad8638df93132b105da0fc92430ec9209cc763c99baa2866ec76115958220822",
-      "bytes": 384874,
+      "sha256": "4d2bde21946b2af5debeae237a1f0a4c8ad6e8c1b37f59362148638a70407fac",
+      "bytes": 272695,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "16_shift_tab_returns_to_keep",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/16_shift_tab_returns_to_keep.png",
-      "sha256": "ba06c4cf80d9e4a1d7edfd51871aea065458e276ef129329ca9ab10419295314",
-      "bytes": 379655,
+      "sha256": "3ba9a4e6866d4c80f285e5e5c1f4c721530ba6b02fd87e93d80ed7988585efc4",
+      "bytes": 267181,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "17_enter_activates_keep",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/17_enter_activates_keep.png",
-      "sha256": "9f20af5dd36baebb701af5bfa63b22193080f7da594ef81303d48d4ead1287a5",
-      "bytes": 406777,
+      "sha256": "4fadfd896cd49401f46062875b5956dc19ecaa2768f90778483f56b89f6cdd7d",
+      "bytes": 327785,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "18_next_prompt_focus",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/18_next_prompt_focus.png",
-      "sha256": "d23e216b230e6e656fc9737c7634d05e08b88179aa765c944f04dc6202ac25e5",
-      "bytes": 399755,
+      "sha256": "1eb87ea2718fa4affe934c31093642c4764341fffae4691a43ef09633590da61",
+      "bytes": 325236,
       "width": 1280,
       "height": 720
     },
     {
       "checkpoint": "19_session_conceded_replay_ready",
       "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/19_session_conceded_replay_ready.png",
-      "sha256": "f8c4491cb8519d457ba4c6da9d223535a5f8475e0d08b70a722c67a3550f2a57",
-      "bytes": 201817,
+      "sha256": "7ed86ac0653e4365b3196d55a94ed6620ebeeeac52db82eece94ca185abfc3e8",
+      "bytes": 189472,
       "width": 1280,
       "height": 720
     }

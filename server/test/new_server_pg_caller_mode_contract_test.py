@@ -181,6 +181,52 @@ class NewServerPgCallerModeContractTest(unittest.TestCase):
             self.assertIn("env file not found", result.stderr)
             self.assertNotIn("comando Python nao permitido", result.stderr)
 
+    def test_read_only_wrapper_accepts_only_migration_status_dart_command(self) -> None:
+        migrate = REPO_ROOT / "server/bin/migrate.dart"
+        with tempfile.TemporaryDirectory() as tmp:
+            env = {
+                "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+                "MANALOOM_NEW_SERVER_ENV": str(Path(tmp) / "missing.env"),
+            }
+            accepted = subprocess.run(
+                [
+                    str(WRAPPER_PATH),
+                    "--read-only",
+                    "dart",
+                    "run",
+                    str(migrate),
+                    "--status",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            rejected = subprocess.run(
+                [
+                    str(WRAPPER_PATH),
+                    "--read-only",
+                    "dart",
+                    "run",
+                    str(migrate),
+                    "--status",
+                    "--verbose",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+        self.assertEqual(accepted.returncode, 2)
+        self.assertIn("env file not found", accepted.stderr)
+        self.assertNotIn("comando Dart nao permitido", accepted.stderr)
+        self.assertEqual(rejected.returncode, 2)
+        self.assertIn("comando Dart nao permitido", rejected.stderr)
+        self.assertNotIn("env file not found", rejected.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

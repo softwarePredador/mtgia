@@ -150,14 +150,16 @@ public final class SidecarMain {
             }
             send(exchange, 200, body);
         });
-        if ("batch".equals(runtimeMode)) {
-            server.createContext(
-                    "/cards/coverage",
-                    exchange -> handleCardCoverage(exchange, battleService)
-            );
+        if (coverageAvailable(runtimeMode)) {
             server.createContext(
                     "/coverage",
                     exchange -> handleCoverage(exchange, battleService)
+            );
+        }
+        if (batchSimulationAvailable(runtimeMode)) {
+            server.createContext(
+                    "/cards/coverage",
+                    exchange -> handleCardCoverage(exchange, battleService)
             );
             server.createContext(
                     "/simulate",
@@ -448,6 +450,14 @@ public final class SidecarMain {
         return Math.max(MIN_SIMULATION_TIMEOUT_MS, Math.min(requested, MAX_SIMULATION_TIMEOUT_MS));
     }
 
+    static boolean coverageAvailable(String runtimeMode) {
+        return "batch".equals(runtimeMode) || "interactive".equals(runtimeMode);
+    }
+
+    static boolean batchSimulationAvailable(String runtimeMode) {
+        return "batch".equals(runtimeMode);
+    }
+
     private static Exception unwrapSimulationFailure(ExecutionException error) {
         Throwable cause = error.getCause();
         if (cause instanceof Exception) {
@@ -478,6 +488,8 @@ public final class SidecarMain {
 
     private static void handleCoverage(HttpExchange exchange, XmageBattleService battleService)
             throws IOException {
+        exchange.getResponseHeaders().set("Cache-Control", "no-store");
+        exchange.getResponseHeaders().set("X-Content-Type-Options", "nosniff");
         if (!"POST".equals(exchange.getRequestMethod())) {
             send(exchange, 405, singleton("error", "method_not_allowed"));
             return;

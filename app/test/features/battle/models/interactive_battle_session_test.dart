@@ -115,4 +115,44 @@ void main() {
       expect(session.isTerminal, isTrue, reason: value);
     }
   });
+
+  test(
+    'preserves unavailable private-state numbers instead of fabricating 0',
+    () {
+      final session = InteractiveBattleSession.fromJson({
+        'schema_version': 'interactive_battle_session_v1',
+        'id': 'session-unknown-state',
+        'status': 'running',
+        'state_version': 1,
+        'expires_at': '2026-07-27T15:30:00Z',
+        'updated_at': '2026-07-27T15:00:00Z',
+        'private_state': {
+          'players': [
+            {
+              'name': 'ManaLoom',
+              'battlefield': [
+                {
+                  'name': 'Permanent without metrics',
+                  'counters': [
+                    {'name': '+1/+1'},
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      final state = session.privateState;
+      final player = state.players.single;
+      final card = player.battlefield.single;
+      expect(state.turn, isNull);
+      expect(state.priorityTimeSeconds, isNull);
+      expect(player.life, isNull);
+      expect(player.handCount, isNull);
+      expect(player.libraryCount, isNull);
+      expect(card.damage, isNull);
+      expect(card.counters.single.count, isNull);
+    },
+  );
 }

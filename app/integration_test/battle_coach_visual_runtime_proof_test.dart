@@ -271,6 +271,12 @@ class _BattleCoachProofGateway implements InteractiveBattleGateway {
   Completer<InteractiveBattleSession>? _pendingAction;
 
   @override
+  Future<List<InteractiveBattleSession>> list({
+    required String deckId,
+    int limit = 20,
+  }) async => const [];
+
+  @override
   Future<InteractiveBattleSession> create({
     required String deckId,
     required String opponentDeckId,

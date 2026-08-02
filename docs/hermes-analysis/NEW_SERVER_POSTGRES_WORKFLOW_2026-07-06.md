@@ -27,27 +27,33 @@ curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health
 Open or reuse the SSH tunnel and verify the database:
 
 ```bash
-server/bin/with_new_server_pg.sh
+server/bin/with_new_server_pg.sh --read-only \
+  psql -X -v ON_ERROR_STOP=1 -At -c 'select current_database();'
 ```
 
 Run a SQL command against the new PostgreSQL target:
 
 ```bash
-server/bin/with_new_server_pg.sh psql -X -v ON_ERROR_STOP=1 -At -c 'select count(*) from cards;'
+server/bin/with_new_server_pg.sh --read-only \
+  psql -X -v ON_ERROR_STOP=1 -At -c 'select count(*) from cards;'
 ```
 
-Run Python/Hermes scripts against the new PostgreSQL target:
+Run an allowlisted read-only Python/Hermes auditor against the new PostgreSQL
+target:
 
 ```bash
-server/bin/with_new_server_pg.sh python3 docs/hermes-analysis/manaloom-knowledge/scripts/<script>.py ...
+server/bin/with_new_server_pg.sh --read-only python3 \
+  docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py ...
 ```
 
-Run XMage package apply/sync commands by prefixing the existing command with the
-wrapper:
+XMage package apply/sync commands are writes. They require the explicit write
+mode and both one-shot approvals in the caller process:
 
 ```bash
-server/bin/with_new_server_pg.sh python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_batch_pg_apply_evidence.py ...
-server/bin/with_new_server_pg.sh python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py ...
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+server/bin/with_new_server_pg.sh --write-approved python3 \
+  docs/hermes-analysis/manaloom-knowledge/scripts/xmage_batch_pg_apply_evidence.py ...
 ```
 
 Run Dart database commands the same way. Dart scripts that load `.env` must let
@@ -56,7 +62,8 @@ otherwise local runs may try to resolve the internal Docker host
 `evolution_manaloom-postgres`.
 
 ```bash
-server/bin/with_new_server_pg.sh bash -c 'cd server && dart run bin/migrate.dart --status'
+server/bin/with_new_server_pg.sh --read-only dart run \
+  server/bin/migrate.dart --status
 ```
 
 ## Validated State
@@ -65,7 +72,7 @@ Validated on 2026-07-06 from this checkout:
 
 - Public health endpoint returned `healthy` for `mtgia-server` at git SHA
   `43d1d9c94203c74cd37ec786406934342478db47`.
-- `server/bin/with_new_server_pg.sh psql ... 'select current_database(), count(*) from cards;'`
+- `server/bin/with_new_server_pg.sh --read-only psql ... 'select current_database(), count(*) from cards;'`
   returned `halder|34331`.
 - Python/Hermes scripts resolve the same target when run through the wrapper:
   `127.0.0.1:15432/halder`.

@@ -11,6 +11,12 @@ class _FakeApiClient extends ApiClient {
   @override
   Future<ApiResponse> get(String endpoint) async {
     getCalls.add(endpoint);
+    if (endpoint.startsWith('/ai/battle/sessions?')) {
+      return ApiResponse(200, {
+        'schema_version': 'interactive_battle_session_list_v1',
+        'sessions': [_sessionJson()],
+      });
+    }
     return ApiResponse(200, _sessionJson());
   }
 
@@ -27,6 +33,23 @@ class _FakeApiClient extends ApiClient {
 }
 
 void main() {
+  test('lists resumable sessions for the selected deck', () async {
+    final api = _FakeApiClient();
+    final service = InteractiveBattleService(apiClient: api);
+
+    final sessions = await service.list(
+      deckId: '00000000-0000-4000-8000-000000000001',
+      limit: 7,
+    );
+
+    expect(sessions, hasLength(1));
+    expect(sessions.single.id, 'session-1');
+    expect(
+      api.getCalls.single,
+      '/ai/battle/sessions?deck_id=00000000-0000-4000-8000-000000000001&limit=7',
+    );
+  });
+
   test(
     'creates, resumes, responds, and concedes with idempotent payloads',
     () async {

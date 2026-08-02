@@ -7,11 +7,17 @@ ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 # This is release intent from the invoking process, not persistent
 # configuration. The keys are intentionally not loaded from server/.env.
 RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
+RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"
 INTERACTIVE_MAX_ACTIVE="${MANALOOM_RELEASE_XMAGE_INTERACTIVE_MAX_ACTIVE:-4}"
 INTERACTIVE_PER_USER_ACTIVE_LIMIT="${MANALOOM_RELEASE_INTERACTIVE_PER_USER_ACTIVE_LIMIT:-1}"
 if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
       "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
   echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+  exit 2
+fi
+if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" &&
+      "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "1" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1" >&2
   exit 2
 fi
 if [[ ! "$INTERACTIVE_MAX_ACTIVE" =~ ^[1-9][0-9]*$ ||
@@ -22,7 +28,8 @@ if [[ ! "$INTERACTIVE_MAX_ACTIVE" =~ ^[1-9][0-9]*$ ||
   echo "limites do XMage interativo sao invalidos" >&2
   exit 2
 fi
-readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_MAX_ACTIVE
+readonly RELEASE_ENABLE_INTERACTIVE_BATTLE RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR
+readonly INTERACTIVE_MAX_ACTIVE
 readonly INTERACTIVE_PER_USER_ACTIVE_LIMIT
 
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
@@ -122,8 +129,14 @@ if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
 else
   INTERACTIVE_BATTLE_ENABLED=false
 fi
+if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" == "1" ]]; then
+  BATTLE_LIVE_SPECTATOR_ENABLED=true
+else
+  BATTLE_LIVE_SPECTATOR_ENABLED=false
+fi
 readonly XMAGE_INTERACTIVE_SERVICE XMAGE_INTERACTIVE_DNS
 readonly XMAGE_INTERACTIVE_URL PROJECT_NETWORK INTERACTIVE_BATTLE_ENABLED
+readonly BATTLE_LIVE_SPECTATOR_ENABLED
 validate_manaloom_release_api_base_url "$API_BASE_URL"
 validate_manaloom_exact_coordinate project "$EASYPANEL_PROJECT" \
   "$MANALOOM_PRODUCTION_EASYPANEL_PROJECT"
@@ -1430,7 +1443,7 @@ docker service update \
   --env-add SENTRY_ENVIRONMENT=production \
   --env-add SENTRY_RELEASE='manaloom-backend@$short_sha' \
   --env-add BATTLE_JOB_WORKER_ENABLED=true \
-  --env-add BATTLE_LIVE_SPECTATOR_ENABLED=false \
+  --env-add BATTLE_LIVE_SPECTATOR_ENABLED='$BATTLE_LIVE_SPECTATOR_ENABLED' \
   --env-add INTERACTIVE_BATTLE_ENABLED='$INTERACTIVE_BATTLE_ENABLED' \
   --env-add XMAGE_INTERACTIVE_SIDECAR_URL='$XMAGE_INTERACTIVE_URL' \
   --env-add INTERACTIVE_BATTLE_PER_USER_ACTIVE_LIMIT='$INTERACTIVE_PER_USER_ACTIVE_LIMIT' \
@@ -1491,6 +1504,16 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
 expected_interactive_contract="1|$INTERACTIVE_BATTLE_ENABLED|1|$XMAGE_INTERACTIVE_URL|1|$INTERACTIVE_PER_USER_ACTIVE_LIMIT|1|$INTERACTIVE_MAX_ACTIVE|1|$XMAGE_EXPECTED_COMMIT|1|$XMAGE_EXPECTED_PATCH_COMMIT|1|$XMAGE_EXPECTED_VERSION"
 if [[ "$spec_interactive_contract" != "$expected_interactive_contract" ]]; then
   echo "deploy convergiu sem o contrato interativo exato na spec" >&2
+  exit 2
+fi
+spec_live_spectator_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '
+    /^BATTLE_LIVE_SPECTATOR_ENABLED=/{count++; value=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s\",count,value}'
+")"
+if [[ "$spec_live_spectator_contract" != "1|$BATTLE_LIVE_SPECTATOR_ENABLED" ]]; then
+  echo "deploy convergiu sem o contrato exato do acompanhamento ao vivo na spec" >&2
   exit 2
 fi
 spec_email_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
@@ -1602,6 +1625,13 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     /^XMAGE_EXPECTED_VERSION=/{version_count++; version=substr(\$0,index(\$0,\"=\")+1)}
     END{printf \"%d|%s|%d|%s|%d|%s|%d|%s|%d|%s|%d|%s|%d|%s\",enabled_count,enabled,url_count,url,user_count,user_limit,global_count,global_limit,commit_count,commit,patch_count,patch,version_count,version}'
 ")"
+runtime_live_spectator_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
+docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
+  awk '
+    /^BATTLE_LIVE_SPECTATOR_ENABLED=/{count++; value=substr(\$0,index(\$0,\"=\")+1)}
+    END{printf \"%d|%s\",count,value}'
+")"
 runtime_email_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -1649,6 +1679,7 @@ if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_
       "$runtime_proxy_peers" != "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" ||
       "$runtime_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ||
       "$runtime_interactive_contract" != "$expected_interactive_contract" ||
+      "$runtime_live_spectator_contract" != "1|$BATTLE_LIVE_SPECTATOR_ENABLED" ||
       "$runtime_email_contract" != "$expected_email_contract" ||
       "$runtime_resend_api_key_sha256" != "$RESEND_API_KEY_SHA256" ||
       "$runtime_sentry_dsn_sha256" != "$MANALOOM_PRODUCTION_SENTRY_DSN_SHA256" ||
@@ -1666,6 +1697,7 @@ fi
 for attempt in $(seq 1 "$readiness_attempts"); do
   if readiness_payload="$(curl -fsS "$API_BASE_URL/health/ready" 2>/dev/null)" &&
      jq -e \
+       --arg live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_ENABLED" \
        --arg interactive_enabled "$INTERACTIVE_BATTLE_ENABLED" \
        --argjson interactive_maximum_active "$INTERACTIVE_MAX_ACTIVE" '
        .status == "ready" and
@@ -1674,8 +1706,18 @@ for attempt in $(seq 1 "$readiness_attempts"); do
        .checks.release_schema.required_range == "038-056" and
        .checks.release_schema.latest_migration == "056" and
        .checks.battle_job_schema.status == "healthy" and
-       (.checks.battle_live_spectator.status == "disabled" or
-        .checks.battle_live_spectator.status == "ready") and
+       (
+         if $live_spectator_enabled == "true" then
+           .checks.battle_live_spectator.status == "ready" and
+           .checks.battle_live_spectator.enabled == true and
+           .checks.battle_live_spectator.database == "ready" and
+           .checks.battle_live_spectator.source == "ready" and
+           .checks.battle_live_spectator.configuration == "ready"
+         else
+           .checks.battle_live_spectator.status == "disabled" and
+           .checks.battle_live_spectator.enabled == false
+         end
+       ) and
        (
          if $interactive_enabled == "true" then
            .checks.interactive_battle.status == "ready" and
@@ -1751,6 +1793,7 @@ jq -cn \
   --arg xmage_engine_commit "$XMAGE_EXPECTED_COMMIT" \
   --arg xmage_patch_commit "$XMAGE_EXPECTED_PATCH_COMMIT" \
   --arg remote_dir_removed "$remote_dir" \
+  --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_ENABLED" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_ENABLED" \
   '{
     status: "deployed",
@@ -1760,6 +1803,7 @@ jq -cn \
     git_sha: $git_sha,
     xmage_engine_commit: $xmage_engine_commit,
     xmage_patch_commit: $xmage_patch_commit,
+    battle_live_spectator_enabled: $battle_live_spectator_enabled,
     interactive_battle_enabled: $interactive_battle_enabled,
     cors_allowlist: "verified",
     remote_dir_removed: $remote_dir_removed

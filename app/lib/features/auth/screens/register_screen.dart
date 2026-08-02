@@ -570,7 +570,7 @@ class _LegalConsentBlock extends StatelessWidget {
                   label: 'Ler Privacidade',
                   onPressed: onOpenPrivacy,
                 );
-                if (constraints.maxWidth < 310) {
+                if (constraints.maxWidth < 360) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [

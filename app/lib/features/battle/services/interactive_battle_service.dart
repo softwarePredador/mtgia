@@ -3,6 +3,11 @@ import '../models/interactive_battle_session.dart';
 import '../utils/battle_runtime_presentation.dart';
 
 abstract class InteractiveBattleGateway {
+  Future<List<InteractiveBattleSession>> list({
+    required String deckId,
+    int limit = 20,
+  });
+
   Future<InteractiveBattleSession> create({
     required String deckId,
     required String opponentDeckId,
@@ -82,6 +87,45 @@ class InteractiveBattleService implements InteractiveBattleGateway {
   String? _pendingActionIdempotencyKey;
   String? _pendingConcedeSessionId;
   String? _pendingConcedeIdempotencyKey;
+
+  @override
+  Future<List<InteractiveBattleSession>> list({
+    required String deckId,
+    int limit = 20,
+  }) async {
+    final query = Uri(
+      queryParameters: {'deck_id': deckId, 'limit': '$limit'},
+    ).query;
+    final response = await _apiClient.get('/ai/battle/sessions?$query');
+    final payload = _payload(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw InteractiveBattleGatewayException(
+        payload['error']?.toString() ?? 'interactive_battle_request_failed',
+        _friendlyMessage(response.statusCode, payload),
+      );
+    }
+    final rawSessions = payload['sessions'];
+    if (payload['schema_version'] != 'interactive_battle_session_list_v1' ||
+        rawSessions is! List) {
+      throw const InteractiveBattleGatewayException(
+        'interactive_battle_response_invalid',
+        'As mesas responderam em um formato inesperado. Tente atualizar.',
+      );
+    }
+    final sessions = <InteractiveBattleSession>[];
+    for (final raw in rawSessions) {
+      final sessionJson = _asMap(raw);
+      if (sessionJson == null ||
+          sessionJson['schema_version'] != 'interactive_battle_session_v1') {
+        throw const InteractiveBattleGatewayException(
+          'interactive_battle_response_invalid',
+          'As mesas responderam em um formato inesperado. Tente atualizar.',
+        );
+      }
+      sessions.add(InteractiveBattleSession.fromJson(sessionJson));
+    }
+    return List<InteractiveBattleSession>.unmodifiable(sessions);
+  }
 
   @override
   Future<InteractiveBattleSession> create({
@@ -182,10 +226,7 @@ class InteractiveBattleService implements InteractiveBattleGateway {
     ApiResponse response, {
     bool nested = false,
   }) {
-    final raw = response.data;
-    final payload = raw is Map
-        ? raw.map((key, value) => MapEntry(key.toString(), value))
-        : const <String, dynamic>{};
+    final payload = _payload(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final terminal = _asMap(payload['session']);
       if (terminal != null &&
@@ -207,6 +248,13 @@ class InteractiveBattleService implements InteractiveBattleGateway {
     }
     return InteractiveBattleSession.fromJson(sessionJson);
   }
+}
+
+Map<String, dynamic> _payload(ApiResponse response) {
+  final raw = response.data;
+  return raw is Map
+      ? raw.map((key, value) => MapEntry(key.toString(), value))
+      : const <String, dynamic>{};
 }
 
 Map<String, dynamic>? _asMap(Object? value) {

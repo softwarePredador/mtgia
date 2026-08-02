@@ -177,82 +177,123 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('battle-live-disabled-state')), findsOneWidget);
+    expect(
+      find.text('Somente acompanhamento — você não controla a partida'),
+      findsOneWidget,
+    );
     expect(gateway.getCalls, 0);
     expect(gateway.pollCalls, 0);
   });
 
   testWidgets(
-    'connects gated job list and creation without removing synchronous Battle',
+    'keeps job progress when the visual feed is unavailable for the executor',
     (tester) async {
-      final queuedJob = _job();
-      final jobGateway = _FakeBattleJobGateway(
-        job: queuedJob,
-        listedJobs: [queuedJob],
-        creation: BattleJobCreation(job: queuedJob, created: true),
-      );
-      final replayGateway = _BattleReplayGatewayStub();
-      final router = GoRouter(
-        initialLocation: '/',
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) => BattleReplaysScreen(
-              deckId: 'deck-a',
-              gateway: replayGateway,
-              jobGateway: jobGateway,
-              battleLiveEnabled: true,
-            ),
-          ),
-          GoRoute(
-            path: '/decks/:id/battle-live/:jobId',
-            builder: (context, state) => const Scaffold(
-              body: Center(
-                child: Text(
-                  'Espectador aberto',
-                  key: Key('battle-live-route-target'),
-                ),
-              ),
-            ),
+      final gateway = _FakeBattleJobGateway(
+        job: _job(status: 'running', stage: 'running', current: 2),
+        liveResponses: const [
+          BattleJobGatewayException(
+            code: 'battle_job_conflict',
+            message: 'Conflict',
+            statusCode: 409,
           ),
         ],
       );
 
-      await tester.pumpWidget(
-        MaterialApp.router(theme: AppTheme.darkTheme, routerConfig: router),
-      );
-      await tester.pumpAndSettle();
+      await _pumpLiveScreen(tester, gateway);
 
       expect(
-        find.byKey(const Key('battle-run-battle-button')),
+        find.byKey(const Key('battle-live-visual-feed-unavailable')),
         findsOneWidget,
-        reason: 'the homologated synchronous action must remain available',
       );
-      expect(find.byKey(const Key('battle-run-live-button')), findsOneWidget);
-      expect(find.byKey(const Key('battle-live-job-job-1')), findsOneWidget);
-      expect(jobGateway.listCalls, 1);
-
-      await tester.tap(find.byKey(const Key('battle-run-live-button')));
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(
-          const Key(
-            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
-      await tester.pumpAndSettle();
-
-      expect(jobGateway.createCalls, 1);
-      expect(jobGateway.lastCreateRequest?.deckId, 'deck-a');
       expect(
-        jobGateway.lastCreateRequest?.setup.opponentDeckId,
-        '11111111-1111-4111-8111-111111111111',
+        find.textContaining('A simulação continua normalmente'),
+        findsOneWidget,
       );
-      expect(find.byKey(const Key('battle-live-route-target')), findsOneWidget);
+      expect(
+        find.byKey(const Key('battle-live-reconnect-banner')),
+        findsNothing,
+      );
+      expect(find.textContaining('XMage'), findsNothing);
+
+      await tester.pump(const Duration(milliseconds: 120));
+      await tester.pump();
+
+      expect(gateway.getCalls, greaterThanOrEqualTo(2));
+      expect(gateway.pollCalls, 1);
+      await tester.pumpWidget(const SizedBox.shrink());
     },
   );
+
+  testWidgets('creates a live job from the single opponent simulation action', (
+    tester,
+  ) async {
+    final queuedJob = _job();
+    final jobGateway = _FakeBattleJobGateway(
+      job: queuedJob,
+      listedJobs: [queuedJob],
+      creation: BattleJobCreation(job: queuedJob, created: true),
+    );
+    final replayGateway = _BattleReplayGatewayStub();
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => BattleReplaysScreen(
+            deckId: 'deck-a',
+            gateway: replayGateway,
+            jobGateway: jobGateway,
+            battleLiveEnabled: true,
+          ),
+        ),
+        GoRoute(
+          path: '/decks/:id/battle-live/:jobId',
+          builder: (context, state) => const Scaffold(
+            body: Center(
+              child: Text(
+                'Espectador aberto',
+                key: Key('battle-live-route-target'),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
+        routerConfig: router,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('battle-run-battle-button')), findsOneWidget);
+    expect(find.byKey(const Key('battle-run-live-button')), findsNothing);
+    expect(find.byKey(const Key('battle-live-job-job-1')), findsOneWidget);
+    expect(jobGateway.listCalls, 1);
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pumpAndSettle();
+
+    expect(jobGateway.createCalls, 1);
+    expect(jobGateway.lastCreateRequest?.deckId, 'deck-a');
+    expect(
+      jobGateway.lastCreateRequest?.setup.opponentDeckId,
+      '11111111-1111-4111-8111-111111111111',
+    );
+    expect(find.byKey(const Key('battle-live-route-target')), findsOneWidget);
+  });
 
   testWidgets(
     'keeps polling while locally paused and resumes from cursor without duplicates',
@@ -603,7 +644,7 @@ Future<void> _pumpLiveScreen(
 }) async {
   await tester.pumpWidget(
     MaterialApp(
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.darkTheme.copyWith(splashFactory: NoSplash.splashFactory),
       home: MediaQuery(
         data: MediaQueryData(
           disableAnimations: disableAnimations,

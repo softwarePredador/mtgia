@@ -121,9 +121,7 @@ void main() {
     expect(find.byKey(const Key('register-legal-acceptance')), findsOneWidget);
     expect(find.byKey(const Key('register-open-login-button')), findsOneWidget);
 
-    final legalAcceptance = find.byKey(
-      const Key('register-legal-acceptance'),
-    );
+    final legalAcceptance = find.byKey(const Key('register-legal-acceptance'));
     await tester.ensureVisible(legalAcceptance);
     await tester.tap(legalAcceptance);
     await tester.pump();
@@ -134,6 +132,31 @@ void main() {
           'The decorated consent block must provide its own Material for '
           'ListTile ink and focus feedback.',
     );
+  });
+
+  testWidgets('register legal links remain readable on a narrow phone', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(_buildWithAuth(const RegisterScreen()));
+    await tester.pumpAndSettle();
+
+    final terms = find.byKey(const Key('register-open-terms-button'));
+    final privacy = find.byKey(const Key('register-open-privacy-button'));
+    await tester.ensureVisible(privacy);
+    await tester.pumpAndSettle();
+
+    expect(terms, findsOneWidget);
+    expect(privacy, findsOneWidget);
+    expect(find.text('Ler Termos'), findsOneWidget);
+    expect(find.text('Ler Privacidade'), findsOneWidget);
+    expect(
+      tester.getTopLeft(privacy).dy,
+      greaterThan(tester.getTopLeft(terms).dy),
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('login resumes the protected deep link after authentication', (

@@ -1,4 +1,4 @@
-import 'dart:ui' show Tristate;
+import 'dart:ui' show PointerDeviceKind, Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,12 +14,25 @@ import 'package:manaloom/features/battle/services/interactive_battle_service.dar
 import 'package:manaloom/core/widgets/manaloom_theme_motif.dart';
 
 class _FakeInteractiveGateway implements InteractiveBattleGateway {
-  _FakeInteractiveGateway({InteractiveBattleSession? session})
-    : session = session ?? _waitingSession();
+  _FakeInteractiveGateway({
+    InteractiveBattleSession? session,
+    this.activeSessions = const [],
+  }) : session = session ?? _waitingSession();
 
   final InteractiveBattleSession session;
+  final List<InteractiveBattleSession> activeSessions;
   int getCount = 0;
+  int listCount = 0;
   final List<InteractiveBattleResponse> responses = [];
+
+  @override
+  Future<List<InteractiveBattleSession>> list({
+    required String deckId,
+    int limit = 20,
+  }) async {
+    listCount += 1;
+    return activeSessions;
+  }
 
   @override
   Future<InteractiveBattleSession> create({
@@ -144,12 +157,28 @@ void main() {
   testWidgets('shows a clear opt-in welcome before creating a session', (
     tester,
   ) async {
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
     await tester.pumpWidget(_subject(_FakeInteractiveGateway()));
+    await tester.pump();
     await tester.pump();
 
     expect(find.byKey(const Key('battle-coach-welcome-state')), findsOneWidget);
-    expect(find.text('Jogue as decisões que importam'), findsOneWidget);
-    expect(find.text('MÃO · PILHA · CAMPO · PRIORIDADE'), findsOneWidget);
+    expect(find.text('Participe das decisões compatíveis'), findsOneWidget);
+    expect(
+      find.text('MÃO · PILHA · CAMPO · DECISÕES COMPATÍVEIS'),
+      findsOneWidget,
+    );
+    expect(find.text('Deck validado para execução'), findsOneWidget);
+    expect(
+      find.text('Decisões registradas; replay ao concluir'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('toda prioridade'), findsNothing);
     expect(
       tester
           .widget<ManaLoomThemeMotif>(find.byType(ManaLoomThemeMotif))
@@ -166,8 +195,78 @@ void main() {
       find.text('Experimental · decisões assistidas e suporte limitado'),
       findsOneWidget,
     );
+    final layoutException = tester.takeException();
+    expect(layoutException, isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('offers the active table before allowing a new one', (
+    tester,
+  ) async {
+    const deckId = '00000000-0000-4000-8000-000000000001';
+    final active = _waitingSession();
+    final gateway = _FakeInteractiveGateway(activeSessions: [active]);
+    final router = GoRouter(
+      initialLocation: '/decks/$deckId/battle-coach',
+      routes: [
+        GoRoute(
+          path: '/decks/:id/battle-coach',
+          builder: (context, state) => BattleCoachScreen(
+            deckId: state.pathParameters['id']!,
+            gateway: gateway,
+            opponentGateway: _FakeOpponentGateway(),
+            pollInterval: const Duration(hours: 1),
+          ),
+          routes: [
+            GoRoute(
+              path: ':sessionId',
+              builder: (context, state) => BattleCoachScreen(
+                deckId: state.pathParameters['id']!,
+                sessionId: state.pathParameters['sessionId'],
+                gateway: gateway,
+                opponentGateway: _FakeOpponentGateway(),
+                pollInterval: const Duration(hours: 1),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: InkRipple.splashFactory,
+        ),
+        routerConfig: router,
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(gateway.listCount, 1);
+    expect(
+      find.byKey(const Key('battle-coach-active-session-card')),
+      findsOneWidget,
+    );
+    expect(find.text('Retomar mesa ativa'), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-coach-choose-opponent-button')),
+      findsNothing,
+    );
+
+    final resume = find.byKey(
+      const Key('battle-coach-resume-active-session-button'),
+    );
+    await tester.ensureVisible(resume);
+    await tester.pump();
+    await tester.tap(resume);
+    await tester.pumpAndSettle();
+
+    expect(gateway.getCount, greaterThanOrEqualTo(1));
+    expect(find.byKey(const Key('battle-coach-board')), findsOneWidget);
+    expect(find.textContaining('XMage'), findsNothing);
   });
 
   testWidgets('uses interactive copy and CTA in the Coach opponent picker', (
@@ -190,7 +289,7 @@ void main() {
       find.byKey(const Key('battle-opponent-coach-description')),
       findsOneWidget,
     );
-    expect(find.text('Iniciar Battle Coach'), findsOneWidget);
+    expect(find.text('Jogar com Coach'), findsOneWidget);
     expect(find.text('Simular Battle'), findsNothing);
     expect(find.byKey(const Key('battle-test-objective-field')), findsNothing);
     expect(find.byKey(const Key('battle-focus-cards-field')), findsNothing);
@@ -488,6 +587,109 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('renders unavailable battle metrics without fabricated zeroes', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      _subject(
+        _FakeInteractiveGateway(session: _unknownMetricsSession()),
+        sessionId: 'session-unknown-state',
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('0'), findsNothing);
+    expect(find.bySemanticsLabel('Vida não disponível'), findsWidgets);
+    expect(
+      find.bySemanticsLabel('Quantidade de cartas na mão não disponível'),
+      findsWidgets,
+    );
+    expect(
+      find.bySemanticsLabel('Quantidade de cartas no grimório não disponível'),
+      findsWidgets,
+    );
+
+    semantics.dispose();
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('previews a card by hover, focus, tap, and long press', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      _subject(
+        _FakeInteractiveGateway(session: _waitingSession(withCard: true)),
+        sessionId: 'session-1',
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    const previewKey = Key('battle-coach-card-preview-card-preview-1');
+    const focusKey = Key('battle-coach-card-preview-card-preview-1-focus');
+    final preview = find.byKey(previewKey);
+    await tester.ensureVisible(preview);
+    await tester.pump();
+    expect(
+      tester.getSemantics(preview).label,
+      contains('Ver prévia de Swords to Plowshares'),
+    );
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(preview));
+    await tester.pump();
+    expect(
+      find.byKey(const Key('battle-coach-card-hover-preview')),
+      findsOneWidget,
+    );
+    await mouse.moveTo(Offset.zero);
+    await tester.pump();
+    expect(
+      find.byKey(const Key('battle-coach-card-hover-preview')),
+      findsNothing,
+    );
+
+    final focus = tester.widget<Focus>(find.byKey(focusKey));
+    focus.focusNode!.requestFocus();
+    await tester.pump();
+    expect(
+      find.byKey(const Key('battle-coach-card-hover-preview')),
+      findsOneWidget,
+    );
+    focus.focusNode!.unfocus();
+    await tester.pump();
+
+    await tester.tap(preview);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('battle-coach-card-preview-dialog')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Prévia da carta na mesa. Feche para continuar sua decisão.'),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.byKey(const Key('battle-coach-card-preview-close-button')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(preview);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('battle-coach-card-preview-dialog')),
+      findsOneWidget,
+    );
+
+    await mouse.removePointer();
+    semantics.dispose();
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('keyboard focus visibly selects and activates a prompt option', (
     tester,
   ) async {
@@ -566,6 +768,15 @@ void main() {
           find.byKey(const Key('battle-coach-compact-scroll')),
           findsOneWidget,
         );
+        final decisionRegion = tester.getRect(
+          find.byKey(const Key('battle-coach-compact-decision-region')),
+        );
+        final boardViewport = tester.getRect(
+          find.byKey(const Key('battle-coach-compact-board-scroll')),
+        );
+        expect(decisionRegion.top, lessThan(boardViewport.top));
+        expect(decisionRegion.bottom, lessThanOrEqualTo(boardViewport.top));
+        expect(decisionRegion.bottom, lessThanOrEqualTo(size.height));
         final delegate = find.byKey(const Key('battle-coach-delegate-button'));
         expect(delegate, findsOneWidget);
         await tester.ensureVisible(delegate);
@@ -726,7 +937,7 @@ Widget _subject(
   ),
 );
 
-InteractiveBattleSession _waitingSession() =>
+InteractiveBattleSession _waitingSession({bool withCard = false}) =>
     InteractiveBattleSession.fromJson({
       'schema_version': 'interactive_battle_session_v1',
       'id': 'session-1',
@@ -766,7 +977,16 @@ InteractiveBattleSession _waitingSession() =>
         ],
         'stack': const <dynamic>[],
         'combat': const <dynamic>[],
-        'own_hand': const <dynamic>[],
+        'own_hand': withCard
+            ? [
+                {
+                  'id': 'card-preview-1',
+                  'name': 'Swords to Plowshares',
+                  'set_code': '2xm',
+                  'collector_number': '35',
+                },
+              ]
+            : const <dynamic>[],
       },
       'prompt': {
         'schema_version': 'interactive_battle_prompt_v1',
@@ -784,6 +1004,40 @@ InteractiveBattleSession _waitingSession() =>
             'role': 'keep',
           },
         ],
+      },
+    });
+
+InteractiveBattleSession _unknownMetricsSession() =>
+    InteractiveBattleSession.fromJson({
+      'schema_version': 'interactive_battle_session_v1',
+      'id': 'session-unknown-state',
+      'status': 'running',
+      'state_version': 1,
+      'deck_id': '00000000-0000-4000-8000-000000000001',
+      'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
+      'expires_at': '2099-07-27T15:30:00Z',
+      'updated_at': '2026-07-27T15:00:00Z',
+      'private_state': {
+        'own_player': 'ManaLoom',
+        'players': [
+          {
+            'name': 'ManaLoom',
+            'battlefield': const <dynamic>[],
+            'graveyard': const <dynamic>[],
+            'exile': const <dynamic>[],
+            'command': const <dynamic>[],
+          },
+          {
+            'name': 'Opponent',
+            'battlefield': const <dynamic>[],
+            'graveyard': const <dynamic>[],
+            'exile': const <dynamic>[],
+            'command': const <dynamic>[],
+          },
+        ],
+        'stack': const <dynamic>[],
+        'combat': const <dynamic>[],
+        'own_hand': const <dynamic>[],
       },
     });
 

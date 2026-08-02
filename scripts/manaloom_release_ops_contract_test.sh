@@ -402,14 +402,35 @@ grep -Fq 'MANALOOM_RELEASE_STARTUP_PROOF status=captured' "$ROOT_DIR/scripts/man
 grep -Fq 'scope: "exact_signed_apk"' "$ROOT_DIR/scripts/manaloom_release_observability_gate.sh"
 grep -Fq -- '--dart-define="RELEASE_STARTUP_PROOF=true"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq -- '--dart-define="ENABLE_SCANNER_RELEASE=false"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq -- '--dart-define="ENABLE_BATTLE_LIVE_SPECTATOR=$BATTLE_LIVE_SPECTATOR_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq -- '--dart-define="ENABLE_BATTLE_LIVE_SPECTATOR=$BATTLE_LIVE_SPECTATOR_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq -- '--dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq -- '--dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'battle_live_spectator_enabled' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'battle_live_spectator_enabled' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'interactive_battle_enabled' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'interactive_battle_enabled' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+for live_release_script in \
+  "$ROOT_DIR/scripts/manaloom_build_android_release.sh" \
+  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh" \
+  "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"; do
+  live_release_error="$TMP_DIR/$(basename "$live_release_script").live-flag.err"
+  if MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR=invalid \
+      "$live_release_script" >"$TMP_DIR/live-flag.out" 2>"$live_release_error"; then
+    echo "script de release aceitou opt-in Live inválido: $live_release_script" >&2
+    exit 1
+  fi
+  grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' \
+    "$live_release_error"
+done
 grep -Fq 'scanner_release_enabled: false' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 ! grep -Fq 'ENABLE_SCANNER_RELEASE=true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 ! grep -Fq 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
@@ -434,7 +455,10 @@ if grep -Fq -- "--env-add RESEND_API_KEY='\$RESEND_API_KEY'" \
   echo "deploy backend voltou a interpolar segredo Resend no shell remoto" >&2
   exit 1
 fi
-grep -Fq -- '--env-add BATTLE_LIVE_SPECTATOR_ENABLED=false' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq -- "--env-add BATTLE_LIVE_SPECTATOR_ENABLED='\$BATTLE_LIVE_SPECTATOR_ENABLED'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.battle_live_spectator.database == "ready"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq -- "--env-add INTERACTIVE_BATTLE_ENABLED='\$INTERACTIVE_BATTLE_ENABLED'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "require_xmage_interactive_release_contract \"\$sha\"" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

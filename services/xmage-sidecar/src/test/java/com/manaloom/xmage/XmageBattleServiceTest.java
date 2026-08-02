@@ -53,6 +53,15 @@ final class XmageBattleServiceTest {
     }
 
     @Test
+    void interactiveRuntimeExposesOnlyReadOnlyDeckCoverage() {
+        assertTrue(SidecarMain.coverageAvailable("batch"));
+        assertTrue(SidecarMain.coverageAvailable("interactive"));
+        assertFalse(SidecarMain.coverageAvailable("invalid"));
+        assertTrue(SidecarMain.batchSimulationAvailable("batch"));
+        assertFalse(SidecarMain.batchSimulationAvailable("interactive"));
+    }
+
+    @Test
     void completedBattleRequiresAnObservedPositiveTurnAndSnapshot() {
         assertThrows(
                 IllegalStateException.class,

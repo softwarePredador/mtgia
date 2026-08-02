@@ -321,33 +321,20 @@ class InteractiveBattleService {
     String userId, {
     int limit = 20,
     String? deckId,
-  }) {
+  }) async {
     _requireEnabled();
-    return _store.list(userId, limit: limit, deckId: deckId);
+    final sessions = await _store.list(userId, limit: limit, deckId: deckId);
+    final now = DateTime.now().toUtc();
+    return Future.wait(
+      sessions.map((session) => _expireIfNeeded(userId, session, now: now)),
+    );
   }
 
   Future<InteractiveBattleSession> get(String userId, String id) async {
     _requireEnabled();
-    final session = await _owned(userId, id);
+    final owned = await _owned(userId, id);
+    final session = await _expireIfNeeded(userId, owned);
     if (session.status.isTerminal) return session;
-    if (DateTime.now().toUtc().isAfter(session.expiresAt)) {
-      await _bestEffortConcede(
-        session,
-        actionId: 'system-expire-${session.id}',
-      );
-      await _finishFailedAttempt(
-        userId: userId,
-        attemptId: session.attemptId,
-        status: InteractiveBattleStatus.expired,
-        reason: 'interactive_session_ttl_expired',
-      );
-      return _store.terminalize(
-        userId: userId,
-        id: id,
-        status: InteractiveBattleStatus.expired,
-        reason: 'interactive_session_ttl_expired',
-      );
-    }
     final runtimeId = session.runtimeSessionId;
     if (runtimeId == null) return session;
     try {
@@ -605,6 +592,30 @@ class InteractiveBattleService {
     } on Object {
       // Expiry remains terminal even when the transient runtime is gone.
     }
+  }
+
+  Future<InteractiveBattleSession> _expireIfNeeded(
+    String userId,
+    InteractiveBattleSession session, {
+    DateTime? now,
+  }) async {
+    final observedAt = now ?? DateTime.now().toUtc();
+    if (session.status.isTerminal || observedAt.isBefore(session.expiresAt)) {
+      return session;
+    }
+    await _bestEffortConcede(session, actionId: 'system-expire-${session.id}');
+    await _finishFailedAttempt(
+      userId: userId,
+      attemptId: session.attemptId,
+      status: InteractiveBattleStatus.expired,
+      reason: 'interactive_session_ttl_expired',
+    );
+    return _store.terminalize(
+      userId: userId,
+      id: session.id,
+      status: InteractiveBattleStatus.expired,
+      reason: 'interactive_session_ttl_expired',
+    );
   }
 
   Future<void> _finishFailedAttempt({

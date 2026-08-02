@@ -316,6 +316,70 @@ void main() {
     expect(persistence.finishedStatuses, [InteractiveBattleStatus.conceded]);
     expect(persistence.finishedReplayIds, [_replayId]);
   });
+
+  test(
+    'list terminalizes expired TTL rows without stale state and preserves owner scope',
+    () async {
+      final now = DateTime.now().toUtc();
+      final expired = _session(
+        id: '55555555-5555-4555-8555-555555555555',
+        requestHash: 'c' * 64,
+        status: InteractiveBattleStatus.waitingForAction,
+        expiresAt: now.subtract(const Duration(minutes: 1)),
+        attemptId: _attemptId,
+      );
+      final fresh = _session(
+        id: '66666666-6666-4666-8666-666666666666',
+        requestHash: 'd' * 64,
+        status: InteractiveBattleStatus.waitingForAction,
+        expiresAt: now.add(const Duration(minutes: 5)),
+      );
+      final completed = _session(
+        id: '77777777-7777-4777-8777-777777777777',
+        requestHash: 'e' * 64,
+        status: InteractiveBattleStatus.completed,
+        expiresAt: now.subtract(const Duration(minutes: 5)),
+      );
+      final foreignExpired = _session(
+        id: '88888888-8888-4888-8888-888888888888',
+        userId: _otherUserId,
+        requestHash: 'f' * 64,
+        status: InteractiveBattleStatus.waitingForAction,
+        expiresAt: now.subtract(const Duration(minutes: 1)),
+      );
+      final store = _Store(
+        listedSessions: [expired, fresh, completed, foreignExpired],
+      );
+      final persistence = _Persistence();
+      final service = _service(
+        store: store,
+        runtime: _Runtime(),
+        persistence: persistence,
+      );
+
+      final sessions = await service.list(_userId);
+
+      expect(sessions.map((session) => session.id), [
+        expired.id,
+        fresh.id,
+        completed.id,
+      ]);
+      expect(sessions.first.status, InteractiveBattleStatus.expired);
+      expect(sessions[1].status, InteractiveBattleStatus.waitingForAction);
+      expect(sessions[2].status, InteractiveBattleStatus.completed);
+      expect(
+        sessions.any(
+          (session) =>
+              session.id == expired.id &&
+              session.status == InteractiveBattleStatus.waitingForAction,
+        ),
+        isFalse,
+      );
+      expect(store.terminalizedIds, [expired.id]);
+      expect(store.terminalizedIds, isNot(contains(foreignExpired.id)));
+      expect(persistence.finishedStatuses, [InteractiveBattleStatus.expired]);
+    },
+  );
 }
 
 InteractiveBattleService _service({
@@ -509,17 +573,41 @@ class _Persistence implements InteractiveBattlePersistence {
 }
 
 class _Store implements InteractiveBattleStoreApi {
-  _Store({this.failAttemptAttachment = false});
+  _Store({
+    this.failAttemptAttachment = false,
+    List<InteractiveBattleSession> listedSessions = const [],
+  }) : listedSessions = List<InteractiveBattleSession>.from(listedSessions);
 
   final bool failAttemptAttachment;
+  final List<InteractiveBattleSession> listedSessions;
   InteractiveBattleSession? current;
   String? attachedAttemptId;
   final Set<String> actionKeys = <String>{};
   final Set<String> concedeKeys = <String>{};
+  final List<String> terminalizedIds = <String>[];
 
   @override
-  Future<InteractiveBattleSession?> get(String userId, String id) async =>
-      current?.id == id && current?.userId == userId ? current : null;
+  Future<InteractiveBattleSession?> get(String userId, String id) async {
+    if (current?.id == id && current?.userId == userId) return current;
+    for (final session in listedSessions) {
+      if (session.id == id && session.userId == userId) return session;
+    }
+    return null;
+  }
+
+  @override
+  Future<List<InteractiveBattleSession>> list(
+    String userId, {
+    int limit = 20,
+    String? deckId,
+  }) async => listedSessions
+      .where(
+        (session) =>
+            session.userId == userId &&
+            (deckId == null || session.deckAId == deckId),
+      )
+      .take(limit)
+      .toList(growable: false);
 
   @override
   Future<InteractiveBattleCreateResult> create(
@@ -603,13 +691,22 @@ class _Store implements InteractiveBattleStoreApi {
     required String reason,
     String? errorCode,
   }) async {
-    current = _copy(
-      current!,
+    final source = await get(userId, id);
+    if (source == null) throw const InteractiveBattleNotFoundException();
+    if (source.status.isTerminal) return source;
+    final updated = _copy(
+      source,
       status: status,
       terminalReason: reason,
       errorCode: errorCode,
     );
-    return current!;
+    if (current?.id == id) current = updated;
+    final listedIndex = listedSessions.indexWhere(
+      (session) => session.id == id && session.userId == userId,
+    );
+    if (listedIndex >= 0) listedSessions[listedIndex] = updated;
+    terminalizedIds.add(id);
+    return updated;
   }
 
   @override
@@ -620,11 +717,14 @@ InteractiveBattleSession _session({
   required String id,
   required String requestHash,
   required InteractiveBattleStatus status,
+  String userId = _userId,
+  DateTime? expiresAt,
+  String? attemptId,
 }) {
   final now = DateTime.now().toUtc();
   return InteractiveBattleSession(
     id: id,
-    userId: _userId,
+    userId: userId,
     status: status,
     stateVersion: 0,
     deckAId: _deckAId,
@@ -633,11 +733,12 @@ InteractiveBattleSession _session({
     deckBHash: _deckBHash,
     requestHash: requestHash,
     ttlSeconds: 600,
-    expiresAt: now.add(const Duration(minutes: 10)),
+    expiresAt: expiresAt ?? now.add(const Duration(minutes: 10)),
     lastActivityAt: now,
     createdAt: now,
     updatedAt: now,
     privateState: const {},
+    attemptId: attemptId,
   );
 }
 
@@ -753,6 +854,7 @@ const _deckB = BattleJobDeckSnapshot(
   hash: _deckBHash,
 );
 const _userId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
+const _otherUserId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2';
 const _deckAId = '11111111-1111-4111-8111-111111111111';
 const _deckBId = '22222222-2222-4222-8222-222222222222';
 const _attemptId = '33333333-3333-4333-8333-333333333333';

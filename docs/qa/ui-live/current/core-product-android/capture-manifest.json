@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-02T12:04:38.584042Z",
-  "source_digest": "6e52274f4aded923548297c0a31e28e8f33a0fb5d00bd95a4dcc057241c02690",
+  "generated_at": "2026-08-02T20:10:43.228474Z",
+  "source_digest": "b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5",
   "surface": "core_product_runtime_ui_acceptance",
   "profile": "android_emulator_core_product",
   "runtime": "flutter_integration_test",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "657ce5806869306c8ad9d4d18bddc8ebe84bed3da25a9b0e0d257770c6d65dea",
+  "log_sha256": "bd3ecb5d3e4066bd0b5a94dfcf443eeb2598f8c37735cd54806d6e0d187996ff",
   "checkpoint_count": 18,
   "required_checkpoints": [
     "core_01_collection_editor",

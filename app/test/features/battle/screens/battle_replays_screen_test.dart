@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
@@ -21,6 +24,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     this.moreReplays,
     this.replayDetail,
     this.automaticPreflight,
+    this.battleCompleter,
     List<BattleReplayAnnotation> annotations = const [],
     this.preflight = const BattlePreflight(
       status: 'ready',
@@ -41,6 +45,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   final BattleReplayDetail? replayDetail;
   final BattlePreflight preflight;
   final BattlePreflight? automaticPreflight;
+  final Completer<BattleReplayDetail>? battleCompleter;
   final List<BattleReplayAnnotation> _annotations;
   int listCalls = 0;
   int fetchCalls = 0;
@@ -325,6 +330,8 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     lastOpponentDeckId = opponentDeckId;
     final error = battleError;
     if (error != null) throw error;
+    final pending = battleCompleter;
+    if (pending != null) return pending.future;
     return BattleReplayDetail.fromJson(
       {
         'replay_id': 'sim-new',
@@ -395,6 +402,62 @@ void main() {
       battleReplaysRouteLocation('deck id/with slash'),
       '/decks/deck%20id%2Fwith%20slash/battle-replays',
     );
+    expect(
+      battleReplaysRouteLocation('deck id/with slash', replayId: 'replay/id'),
+      '/decks/deck%20id%2Fwith%20slash/battle-replays?replay=replay%2Fid',
+    );
+  });
+
+  testWidgets('keeps opened and closed replay selection in the URL', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    late final GoRouter router;
+    router = GoRouter(
+      initialLocation: '/decks/deck-1/battle-replays',
+      routes: [
+        GoRoute(
+          path: '/decks/:id/battle-replays',
+          builder: (context, state) => BattleReplaysScreen(
+            deckId: state.pathParameters['id']!,
+            gateway: gateway,
+            initialReplayId: state.uri.queryParameters['replay'],
+          ),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
+        routerConfig: router,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Battle contra Atraxa Superfriends'));
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.queryParameters['replay'],
+      'sim-1',
+    );
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+
+    router.go('/decks/deck-1/battle-replays');
+    await tester.pumpAndSettle();
+    expect(
+      router.routeInformationProvider.value.uri.queryParameters['replay'],
+      isNull,
+    );
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsNothing);
+
+    router.go('/decks/deck-1/battle-replays?replay=sim-1');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+    expect(gateway.fetchCalls, 2);
   });
 
   testWidgets('opens a replay selected by the canonical query parameter', (
@@ -404,7 +467,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
         home: BattleReplaysScreen(
           deckId: 'deck-1',
           gateway: gateway,
@@ -429,7 +494,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
         home: BattleReplaysScreen(
           deckId: 'deck-1',
           gateway: gateway,
@@ -452,7 +519,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
         home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
       ),
     );
@@ -544,6 +613,46 @@ void main() {
     );
   });
 
+  testWidgets('never presents a winner for censored or conceded replays', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      replays: [
+        BattleReplaySummary.fromJson(const {
+          'id': 'censored-1',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'status': 'censored',
+          'opponent_name': 'Atraxa',
+          'winner_name': 'Player A',
+        }),
+        BattleReplaySummary.fromJson(const {
+          'id': 'conceded-1',
+          'deck_id': 'deck-1',
+          'type': 'battle',
+          'status': 'conceded',
+          'opponent_name': 'Korvold',
+          'winner_name': 'Player B',
+        }),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Limite atingido · sem vencedor confirmado'),
+      findsOneWidget,
+    );
+    expect(find.text('Partida encerrada por desistência'), findsOneWidget);
+    expect(find.textContaining('Vencedor:'), findsNothing);
+  });
+
   testWidgets('labels an accepted Battle Coach action as the user choice', (
     tester,
   ) async {
@@ -584,7 +693,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
         home: BattleReplaysScreen(
           deckId: 'deck-1',
           gateway: gateway,
@@ -1285,6 +1396,47 @@ void main() {
     },
   );
 
+  testWidgets('shows a dedicated opponent execution state without old replay', (
+    tester,
+  ) async {
+    final completer = Completer<BattleReplayDetail>();
+    final gateway = _FakeBattleReplayGateway(battleCompleter: completer);
+    final completedDetail = await gateway.fetchReplay(
+      deckId: 'deck-1',
+      replayId: 'sim-new',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pump();
+    await tester.pump();
+
+    expect(
+      find.byKey(const Key('battle-execution-progress-state')),
+      findsOneWidget,
+    );
+    expect(find.text('Adversário: Meu Korvold'), findsOneWidget);
+    expect(find.text('Battle contra Atraxa Superfriends'), findsNothing);
+
+    completer.complete(completedDetail);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+  });
+
   testWidgets('Enter selects the unique filtered opponent and runs preflight', (
     tester,
   ) async {
@@ -1347,7 +1499,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('battle-run-live-button')));
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
     await tester.pumpAndSettle();
 
     final seriesField = find.byKey(const Key('battle-series-size-field'));
@@ -1791,8 +1943,8 @@ void main() {
       find.byKey(const Key('battle-opponent-simulation-description')),
       findsOneWidget,
     );
-    expect(find.text('Simular Battle'), findsOneWidget);
-    expect(find.text('Iniciar Battle Coach'), findsNothing);
+    expect(find.text('Iniciar simulação'), findsOneWidget);
+    expect(find.text('Jogar com Coach'), findsNothing);
     expect(tester.getSize(dialog).width, lessThanOrEqualTo(390));
     expect(tester.takeException(), isNull);
   });
@@ -1824,7 +1976,7 @@ void main() {
     final submit = find.byKey(const Key('battle-opponent-submit-button'));
     expect(dialog, findsOneWidget);
     expect(submit, findsOneWidget);
-    expect(find.text('Simular Battle'), findsOneWidget);
+    expect(find.text('Iniciar simulação'), findsOneWidget);
     expect(tester.getRect(submit).bottom, lessThanOrEqualTo(390));
     expect(tester.takeException(), isNull);
   });

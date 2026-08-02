@@ -11,7 +11,6 @@ import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/battle_job.dart';
 import '../models/battle_live_cursor.dart';
 import '../services/battle_job_gateway.dart';
-import '../utils/battle_runtime_presentation.dart';
 
 String battleLiveRouteLocation(String deckId, String jobId) =>
     '/decks/${Uri.encodeComponent(deckId)}/battle-live/'
@@ -63,6 +62,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
   bool _cancelConfirmationVisible = false;
   bool _cancelling = false;
   bool _appActive = true;
+  bool _visualFeedUnavailable = false;
   int _visibleRecordCount = 0;
   String? _connectionError;
 
@@ -134,16 +134,24 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       });
 
       BattleLiveSession nextSession = _session;
-      try {
-        nextSession = await _gateway.pollLive(
-          jobId: widget.jobId,
-          session: _session,
-        );
-      } on BattleJobGatewayException {
-        if (job.isTerminal) {
-          nextSession = _session;
-        } else {
-          rethrow;
+      var visualFeedUnavailable = _visualFeedUnavailable;
+      if (job.engine != null && job.engine != BattleExecutionEngine.xmage) {
+        visualFeedUnavailable = true;
+      }
+      if (!visualFeedUnavailable) {
+        try {
+          nextSession = await _gateway.pollLive(
+            jobId: widget.jobId,
+            session: _session,
+          );
+        } on BattleJobGatewayException catch (error) {
+          if (error.statusCode == 409) {
+            visualFeedUnavailable = true;
+          } else if (job.isTerminal) {
+            nextSession = _session;
+          } else {
+            rethrow;
+          }
         }
       }
       if (!mounted) return;
@@ -151,6 +159,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       setState(() {
         _job = job;
         _session = nextSession;
+        _visualFeedUnavailable = visualFeedUnavailable;
         if (!_playbackPaused) {
           _visibleRecordCount = nextSession.records.length;
         }
@@ -255,7 +264,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
     return Scaffold(
       key: const Key('battle-live-screen'),
       appBar: AppBar(
-        title: const Text('Battle ao vivo'),
+        title: const Text('Acompanhar ao vivo'),
         actions: [
           if (widget.featureEnabled && !_initialLoading)
             IconButton(
@@ -269,7 +278,14 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppTheme.contentMaxWidth),
-          child: SizedBox.expand(child: _buildBody()),
+          child: SizedBox.expand(
+            child: Column(
+              children: [
+                const _BattleLiveReadOnlyNotice(),
+                Expanded(child: _buildBody()),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -297,7 +313,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       return const AppStatePanel.loading(
         key: Key('battle-live-loading-state'),
         title: 'Conectando ao Battle',
-        message: 'Retomando o job e sua timeline pelo cursor validado.',
+        message: 'Retomando a partida e as atualizações já validadas.',
         accent: AppTheme.frost400,
       );
     }
@@ -308,7 +324,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
         icon: Icons.cloud_off_rounded,
         title: 'Battle temporariamente indisponível',
         message:
-            'O job não foi alterado. Reconecte para retomar do último cursor.',
+            'A partida não foi alterada. Reconecte para retomar do último ponto recebido.',
         accent: Theme.of(context).colorScheme.error,
         actionLabel: 'Reconectar',
         onAction: _retry,
@@ -346,7 +362,10 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
                   _buildConnectionNotice(),
                   if (_cancelConfirmationVisible) _buildCancelConfirmation(),
                   const SizedBox(height: AppTheme.space16),
-                  _buildWorkspace(constraints.maxWidth),
+                  if (_visualFeedUnavailable)
+                    const _BattleVisualFeedUnavailablePanel()
+                  else
+                    _buildWorkspace(constraints.maxWidth),
                   if (_isTerminal) ...[
                     const SizedBox(height: AppTheme.space16),
                     _buildTerminalAction(),
@@ -409,8 +428,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
           ),
           const SizedBox(height: AppTheme.space8),
           Text(
-            'Job ${_shortId(job.jobId)} · ${_battleStageLabel(job.stage)}'
-            '${job.engine == null ? '' : ' · ${_engineLabel(job.engine!)}'}',
+            'Partida ${_shortId(job.jobId)} · ${_battleStageLabel(job.stage)}',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
             ),
@@ -557,7 +575,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           const Text(
-            'Cancelar solicita a parada do worker; o replay pode não existir.',
+            'Cancelar solicita o encerramento da partida; o replay pode não existir.',
           ),
           FilledButton(
             key: const Key('battle-live-confirm-cancel-button'),
@@ -695,6 +713,99 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
   }
 }
 
+class _BattleLiveReadOnlyNotice extends StatelessWidget {
+  const _BattleLiveReadOnlyNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      label: 'Somente acompanhamento. Você não controla a partida.',
+      child: Container(
+        key: const Key('battle-live-read-only-notice'),
+        width: double.infinity,
+        margin: const EdgeInsets.fromLTRB(
+          AppTheme.space16,
+          AppTheme.space10,
+          AppTheme.space16,
+          AppTheme.space0,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space12,
+          vertical: AppTheme.space8,
+        ),
+        decoration: BoxDecoration(
+          color: AppTheme.frost400.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+          border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.34)),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.visibility_outlined, size: 18, color: AppTheme.frost400),
+            SizedBox(width: AppTheme.space8),
+            Expanded(
+              child: Text(
+                'Somente acompanhamento — você não controla a partida',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BattleVisualFeedUnavailablePanel extends StatelessWidget {
+  const _BattleVisualFeedUnavailablePanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('battle-live-visual-feed-unavailable'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.space20),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.42)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.visibility_off_outlined,
+            color: AppTheme.brass400,
+            size: 28,
+          ),
+          const SizedBox(height: AppTheme.space10),
+          Text(
+            'Acompanhamento visual indisponível para esta partida',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppTheme.space6),
+          Text(
+            'A simulação continua normalmente. O progresso será atualizado '
+            'aqui e o replay poderá ser aberto quando a partida terminar.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BattleLiveTable extends StatelessWidget {
   const _BattleLiveTable({
     required this.snapshot,
@@ -751,7 +862,7 @@ class _BattleLiveTable extends StatelessWidget {
           const SizedBox(height: AppTheme.space6),
           Text(
             paused
-                ? 'Visualização pausada localmente. O job continua recebendo atualizações.'
+                ? 'Visualização pausada localmente. A partida continua recebendo atualizações.'
                 : 'Somente zonas públicas e contagens validadas são exibidas.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
@@ -1184,10 +1295,12 @@ String _battleJobStatusLabel(BattleJobStatus status) => switch (status) {
 };
 
 String _battleStageLabel(String stage) => switch (stage) {
-  'queued' => 'Aguardando worker',
-  'claimed' => 'Worker reservado',
+  'queued' => 'Aguardando início',
+  'claimed' => 'Preparando a partida',
+  'starting_engine' => 'Iniciando a simulação',
   'running' => 'Simulação em curso',
-  'cancel_pending' => 'Encerrando worker',
+  'persisting_replay' => 'Salvando o replay',
+  'cancel_pending' => 'Encerrando a partida',
   'completed' => 'Replay persistido',
   'censored' => 'Resultado censurado',
   'timeout' => 'Tempo esgotado',
@@ -1198,17 +1311,14 @@ String _battleStageLabel(String stage) => switch (stage) {
   _ => stage.replaceAll('_', ' '),
 };
 
-String _engineLabel(BattleExecutionEngine engine) =>
-    battleRuntimeUserLabel(engine.wireValue);
-
 String _terminalReasonCopy(String? reason) => switch (reason) {
   'cancelled' => 'A execução foi cancelada antes da persistência do replay.',
   'timeout' => 'O motor atingiu o limite de tempo configurado.',
   'coverage_error' => 'O motor não cobriu todas as regras necessárias.',
-  'engine_error' => 'O motor encerrou com falha e não publicou replay.',
+  'engine_error' => 'A simulação encerrou com falha e não publicou replay.',
   'persistence_error' =>
     'A execução terminou, mas o replay não foi persistido.',
-  _ => 'O job terminou sem uma referência pública de replay.',
+  _ => 'A partida terminou sem uma referência pública de replay.',
 };
 
 String _snapshotPosition(Map<String, dynamic> payload) {

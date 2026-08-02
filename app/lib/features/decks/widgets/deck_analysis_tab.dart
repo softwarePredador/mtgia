@@ -598,140 +598,133 @@ class _BattleLabLaunch extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Semantics(
-      button: true,
-      label: 'Testar $deckName no Battle Lab',
+      container: true,
+      explicitChildNodes: true,
+      label: 'Battle Lab para $deckName',
       hint: onOpenCoach == null
-          ? 'Abre o setup de confronto e o histórico de replays'
-          : 'Abre a mesa interativa ou o histórico de simulações',
+          ? 'Oferece testes de consistência, confrontos e replays'
+          : 'Oferece simulações, replays e o Coach interativo',
       child: Material(
         key: const Key('deck-analysis-battle-lab-entry'),
         color: Colors.transparent,
-        child: InkWell(
-          onTap: onOpenCoach ?? onOpen,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.space16,
-              vertical: AppTheme.space14,
-            ),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: AppTheme.brass400.withValues(alpha: 0.62),
-                ),
-                bottom: BorderSide(
-                  color: AppTheme.outlineMuted.withValues(alpha: 0.5),
-                ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.space16,
+            vertical: AppTheme.space14,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: AppTheme.brass400.withValues(alpha: 0.62)),
+              bottom: BorderSide(
+                color: AppTheme.outlineMuted.withValues(alpha: 0.5),
               ),
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final compact =
-                    constraints.maxWidth < (onOpenCoach == null ? 620 : 900);
-                final copy = Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppTheme.brass400.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact =
+                  constraints.maxWidth < (onOpenCoach == null ? 620 : 900);
+              final copy = Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppTheme.brass400.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    child: const ManaLoomGlyph(
+                      ManaLoomGlyphKind.battleReplay,
+                      color: AppTheme.brass400,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.space12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          onOpenCoach == null
+                              ? 'Battle Lab'
+                              : 'Battle Lab e Coach',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: AppTheme.space4),
+                        Text(
+                          onOpenCoach == null
+                              ? 'Teste consistência, simule contra um adversário e revise as evidências do replay.'
+                              : 'Simule confrontos ou jogue com o Coach nas decisões disponíveis.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+              final actions = Wrap(
+                alignment: WrapAlignment.end,
+                spacing: AppTheme.space8,
+                runSpacing: AppTheme.space8,
+                children: [
+                  if (onOpenCoach != null)
+                    FilledButton.icon(
+                      key: const Key('deck-analysis-open-battle-coach-button'),
+                      onPressed: onOpenCoach,
+                      icon: const ManaLoomGlyph(
+                        ManaLoomGlyphKind.commander,
+                        size: 19,
                       ),
-                      child: const ManaLoomGlyph(
+                      label: const Text('Jogar com Coach'),
+                    ),
+                  if (onOpenCoach != null)
+                    OutlinedButton.icon(
+                      key: const Key('deck-analysis-open-battle-lab-button'),
+                      onPressed: onOpen,
+                      icon: const ManaLoomGlyph(
                         ManaLoomGlyphKind.battleReplay,
-                        color: AppTheme.brass400,
-                        size: 24,
+                        size: 19,
                       ),
+                      label: const Text('Abrir Battle Lab'),
+                    )
+                  else
+                    FilledButton.icon(
+                      key: const Key('deck-analysis-open-battle-lab-button'),
+                      onPressed: onOpen,
+                      icon: const Icon(Icons.play_arrow_rounded),
+                      label: const Text('Abrir Battle Lab'),
                     ),
-                    const SizedBox(width: AppTheme.space12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            onOpenCoach == null
-                                ? 'Testar este deck'
-                                : 'Jogar e aprender com este deck',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: AppTheme.textPrimary,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: AppTheme.space4),
-                          Text(
-                            onOpenCoach == null
-                                ? 'Escolha um adversário, declare o objetivo e acompanhe as evidências do replay.'
-                                : 'Assuma mulligans, alvos, combate e prioridades; o motor cuida das regras e salva o replay.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textSecondary,
-                              height: 1.35,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-                final actions = Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: AppTheme.space8,
-                  runSpacing: AppTheme.space8,
-                  children: [
-                    if (onOpenCoach != null)
-                      FilledButton.icon(
-                        key: const Key(
-                          'deck-analysis-open-battle-coach-button',
-                        ),
-                        onPressed: onOpenCoach,
-                        icon: const ManaLoomGlyph(
-                          ManaLoomGlyphKind.commander,
-                          size: 19,
-                        ),
-                        label: const Text('Jogar Battle Coach'),
-                      ),
-                    if (onOpenCoach != null)
-                      OutlinedButton.icon(
-                        key: const Key('deck-analysis-open-battle-lab-button'),
-                        onPressed: onOpen,
-                        icon: const ManaLoomGlyph(
-                          ManaLoomGlyphKind.battleReplay,
-                          size: 19,
-                        ),
-                        label: const Text('Simulações e replays'),
-                      )
-                    else
-                      FilledButton.icon(
-                        key: const Key('deck-analysis-open-battle-lab-button'),
-                        onPressed: onOpen,
-                        icon: const Icon(Icons.play_arrow_rounded),
-                        label: const Text('Abrir Battle Lab'),
-                      ),
-                  ],
-                );
+                ],
+              );
 
-                if (compact) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      copy,
-                      const SizedBox(height: AppTheme.space12),
-                      actions,
-                    ],
-                  );
-                }
-
-                return Row(
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(child: copy),
-                    const SizedBox(width: AppTheme.space16),
+                    copy,
+                    const SizedBox(height: AppTheme.space12),
                     actions,
                   ],
                 );
-              },
-            ),
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: copy),
+                  const SizedBox(width: AppTheme.space16),
+                  actions,
+                ],
+              );
+            },
           ),
         ),
       ),

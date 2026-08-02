@@ -18,6 +18,7 @@ usage() {
 Uso:
   with_new_server_pg.sh --read-only psql [argumentos]
   with_new_server_pg.sh --read-only python3 <pg_hermes_sqlite_contract_audit.py> [argumentos]
+  with_new_server_pg.sh --read-only dart run <server/bin/migrate.dart> --status
   with_new_server_pg.sh --write-approved comando [argumentos]
 
 O modo read-only aceita psql ou auditores read-only explicitamente permitidos
@@ -85,6 +86,32 @@ PY
       if [[ "$allowed_audit" != "1" ]] ||
          [[ "$(command -v -- "$1" 2>/dev/null || true)" != "$(command -v -- "$PYTHON_BIN" 2>/dev/null || true)" ]]; then
         echo "with_new_server_pg: comando Python nao permitido no modo read-only" >&2
+        exit 2
+      fi
+      ;;
+    dart)
+      if (( $# != 4 )) ||
+         [[ "$2" != "run" ]] ||
+         [[ "$4" != "--status" ]]; then
+        echo "with_new_server_pg: comando Dart nao permitido no modo read-only" >&2
+        exit 2
+      fi
+      requested_dart_script="$($PYTHON_BIN - "$3" <<'PY'
+import sys
+from pathlib import Path
+
+print(Path(sys.argv[1]).resolve())
+PY
+)"
+      expected_dart_script="$($PYTHON_BIN - "$REPO_ROOT/server/bin/migrate.dart" <<'PY'
+import sys
+from pathlib import Path
+
+print(Path(sys.argv[1]).resolve())
+PY
+)"
+      if [[ "$requested_dart_script" != "$expected_dart_script" ]]; then
+        echo "with_new_server_pg: comando Dart nao permitido no modo read-only" >&2
         exit 2
       fi
       ;;
@@ -165,7 +192,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-for tool in "$PYTHON_BIN" ssh ssh-keyscan ssh-keygen lsof nc pg_isready; do
+for tool in "$PYTHON_BIN" "$1" ssh ssh-keyscan ssh-keygen lsof nc pg_isready; do
   command -v "$tool" >/dev/null 2>&1 || {
     echo "with_new_server_pg: ferramenta obrigatoria ausente: $tool" >&2
     exit 2

@@ -211,7 +211,11 @@ void main() {
       find.byKey(const Key('deck-analysis-battle-lab-entry')),
       findsOneWidget,
     );
-    expect(find.text('Testar este deck'), findsOneWidget);
+    expect(find.text('Battle Lab'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('deck-analysis-battle-lab-entry')));
+    await tester.pump();
+    expect(opened, isFalse);
 
     await tester.tap(
       find.byKey(const Key('deck-analysis-open-battle-lab-button')),
@@ -241,7 +245,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Jogar e aprender com este deck'), findsOneWidget);
+    expect(find.text('Battle Lab e Coach'), findsOneWidget);
     expect(
       find.byKey(const Key('deck-analysis-open-battle-coach-button')),
       findsOneWidget,

@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "6e52274f4aded923548297c0a31e28e8f33a0fb5d00bd95a4dcc057241c02690",
+  "source_digest": "b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-02T12:22:12Z",
+    "verified_at": "2026-08-02T20:17:38Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
       "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on Android 14 emulator, including native Life Counter landscape)",
@@ -22,31 +22,31 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "901a516ada588b567c47ede2bccf4d9d926254c873bf952d73bcd9328bea0dc6"
+        "sha256": "ed7fd08bed271aac602f1920a4e7ab446862565f496a00e4191951743e3e3cf2"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "56bbf620ab54f03b4501698fd06440fe1d9c783ca4d017d77c3e9a1962197bd4"
+        "sha256": "3416680d868b2092cc8b79b8d40a2beefe32813d4fedb6534f307cbd5ef40f9d"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "43d226c56db6bf874b32e1cfba4deaa1e0627cc1cdec5998f1e11af3af8bb66e"
+        "sha256": "4c7225378cb0cc7dc03661058186343cdc3d3950d9f1a041d43efe490c41f65b"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "cf4a7591749612d9138ae6bb71452ed9dbb7f4522073c2edd95734d3159e4cdc"
+        "sha256": "79de7b1e351d67c4a6e823ea03f01e7a5cbcfc3252551c0d0d9740cc00a54e91"
       },
       {
         "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
-        "sha256": "31ba656a5893a69903e1a3caaa369790fe3795bc036616e726017671e4a690a1"
+        "sha256": "163c61db30e9e05e1702b84497707eacbe4e38ce484e17da50c13f847a1dfd7b"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "75b05614312dd6f5f7d76ee7392e8db9925095120cac52820942f27fc50d8e5e"
+        "sha256": "26c80d50995c2ed0796a00fbe060f0d5374f78d8be303db0c4c4a6dbba0bdda9"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "59bca458ecc0d1a49397976b2fbbc4f83846c3a1d1e3100f53b7465c9f212161"
+        "sha256": "d2b6b951b947ee0fe7c7d1f3bd626aec1eda24374d66b2215818de7e08a1dd87"
       }
     ],
     "evidence_notes": [
@@ -54,13 +54,13 @@
       "O emulador Android 14 concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2400×1080; esta rodada não reivindica crédito de aparelho físico.",
       "A jornada Android dedicada de coleção, criação de Commander e otimização concluiu 18/18 estados, incluindo validação inline, retry de persistência, correção segura de terrenos de 9 para 36 e inspeção individual dos brackets B1-B5.",
       "O Battle Coach foi recapturado em 7 estados no emulador Android, cobrindo boas-vindas, mesa ativa, decisão, erro recuperável, confirmação, progresso e replay terminal.",
-      "A prova Web real de teclado cobriu 19/19 checkpoints com Tab, Shift+Tab, Enter, Espaço, Escape e digitação do navegador; iniciou uma sessão interativa positiva com conta e deck novos, manteve a mão e registrou o replay, sem erro ou warning no console.",
+      "A prova Web real de teclado cobriu 19/19 checkpoints com Tab, Shift+Tab, Enter, Espaço, Escape e digitação do navegador; criou conta e deck novos (Talrand e 99 Wastes), escolheu o rival público Animar, obteve preflight positivo, manteve a mão, tomou uma decisão legal após troca assíncrona de prompt e registrou o replay terminal, sem erro ou warning no console.",
       "A matriz P0 e as provas Android usaram PostgreSQL/API loopback descartáveis; a jornada Web usou o build release do digest atual por proxy same-origin contra a API implantada."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-02T12:22:12Z",
+    "reviewed_at": "2026-08-02T20:17:38Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -111,13 +111,13 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "901a516ada588b567c47ede2bccf4d9d926254c873bf952d73bcd9328bea0dc6",
-      "56bbf620ab54f03b4501698fd06440fe1d9c783ca4d017d77c3e9a1962197bd4",
-      "43d226c56db6bf874b32e1cfba4deaa1e0627cc1cdec5998f1e11af3af8bb66e",
-      "cf4a7591749612d9138ae6bb71452ed9dbb7f4522073c2edd95734d3159e4cdc",
-      "31ba656a5893a69903e1a3caaa369790fe3795bc036616e726017671e4a690a1",
-      "75b05614312dd6f5f7d76ee7392e8db9925095120cac52820942f27fc50d8e5e",
-      "59bca458ecc0d1a49397976b2fbbc4f83846c3a1d1e3100f53b7465c9f212161"
+      "ed7fd08bed271aac602f1920a4e7ab446862565f496a00e4191951743e3e3cf2",
+      "3416680d868b2092cc8b79b8d40a2beefe32813d4fedb6534f307cbd5ef40f9d",
+      "4c7225378cb0cc7dc03661058186343cdc3d3950d9f1a041d43efe490c41f65b",
+      "79de7b1e351d67c4a6e823ea03f01e7a5cbcfc3252551c0d0d9740cc00a54e91",
+      "163c61db30e9e05e1702b84497707eacbe4e38ce484e17da50c13f847a1dfd7b",
+      "26c80d50995c2ed0796a00fbe060f0d5374f78d8be303db0c4c4a6dbba0bdda9",
+      "d2b6b951b947ee0fe7c7d1f3bd626aec1eda24374d66b2215818de7e08a1dd87"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",
@@ -131,7 +131,6 @@
     "reviewed_screenshot_count": 258,
     "blocking_findings": [],
     "follow_up_findings": [
-      "Em Android estreito, o rótulo visual 'Ler Privacidade' termina em reticências; a ação, o ícone, a semântica e o acesso ao documento permanecem inequívocos, mas o texto deve ser abreviado ou empilhado antes da promoção comercial.",
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
       "O smoke em aparelho Samsung físico e a navegação humana com TalkBack permanecem verificações separadas de release; esta rodada não reivindica esse crédito."
     ]

@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `9b3d7ee894e9a29345e297520aa5010d0a0296762fa6de760acab1011330efe9`
+**Digest das fontes:** `db2676e5d40f6800f92bb9d9a3194f9b441e487801f3ba68ce461664c13109c5`
 
 ## Fontes de verdade
 
@@ -15,15 +15,15 @@
 
 | Superfície | Quantidade |
 |---|---:|
-| `dart_source_files` | 661 |
+| `dart_source_files` | 662 |
 | `non_dart_product_files` | 47 |
 | `battle_sidecar_source_files` | 33 |
-| `dart_symbols` | 4860 |
-| `semantic_resolved_files` | 661 |
+| `dart_symbols` | 4881 |
+| `semantic_resolved_files` | 662 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 39198 |
-| `semantic_resolved_call_sites` | 62481 |
-| `semantic_resolved_type_references` | 15053 |
+| `semantic_resolved_call_edges` | 39517 |
+| `semantic_resolved_call_sites` | 62915 |
+| `semantic_resolved_type_references` | 15126 |
 | `modules` | 149 |
 | `app_routes` | 41 |
 | `web_routes` | 14 |
@@ -32,8 +32,8 @@
 | `database_views` | 6 |
 | `migrations` | 56 |
 | `scripts_and_jobs` | 665 |
-| `environment_variables` | 691 |
-| `tests` | 1170 |
+| `environment_variables` | 692 |
+| `tests` | 1171 |
 | `flows` | 8 |
 | `traceability_rules` | 11 |
 

@@ -67,7 +67,7 @@ class InteractiveBattleCard {
   final String? collectorNumber;
   final String? imageUrl;
   final bool tapped;
-  final int damage;
+  final int? damage;
   final List<InteractiveBattleCounter> counters;
 
   String? get effectiveImageUrl => ScryfallImageHelper.preferredImageUrl(
@@ -86,7 +86,7 @@ class InteractiveBattleCard {
           _text(json['collector_number']) ?? _text(json['card_number']),
       imageUrl: _text(json['image_url']),
       tapped: json['tapped'] == true,
-      damage: _integer(json['damage']),
+      damage: _nullableInteger(json['damage']),
       counters: _maps(
         json['counters'],
       ).map(InteractiveBattleCounter.fromJson).toList(growable: false),
@@ -98,12 +98,12 @@ class InteractiveBattleCounter {
   const InteractiveBattleCounter({required this.name, required this.count});
 
   final String name;
-  final int count;
+  final int? count;
 
   factory InteractiveBattleCounter.fromJson(Map<String, dynamic> json) =>
       InteractiveBattleCounter(
         name: _text(json['name']) ?? 'marcador',
-        count: _integer(json['count']),
+        count: _nullableInteger(json['count']),
       );
 }
 
@@ -121,9 +121,9 @@ class InteractiveBattlePlayer {
   });
 
   final String name;
-  final int life;
-  final int libraryCount;
-  final int handCount;
+  final int? life;
+  final int? libraryCount;
+  final int? handCount;
   final bool hasLeft;
   final List<InteractiveBattleCard> battlefield;
   final List<InteractiveBattleCard> graveyard;
@@ -133,9 +133,11 @@ class InteractiveBattlePlayer {
   factory InteractiveBattlePlayer.fromJson(Map<String, dynamic> json) =>
       InteractiveBattlePlayer(
         name: _text(json['name']) ?? 'Jogador',
-        life: _integer(json['life'], fallback: 40),
-        libraryCount: _integer(json['library_count'] ?? json['library_size']),
-        handCount: _integer(json['hand_count'] ?? json['hand_size']),
+        life: _nullableInteger(json['life']),
+        libraryCount: _nullableInteger(
+          json['library_count'] ?? json['library_size'],
+        ),
+        handCount: _nullableInteger(json['hand_count'] ?? json['hand_size']),
         hasLeft: json['has_left'] == true,
         battlefield: _cards(json['battlefield']),
         graveyard: _cards(json['graveyard']),
@@ -181,13 +183,13 @@ class InteractiveBattlePrivateState {
     required this.ownHand,
   });
 
-  final int turn;
+  final int? turn;
   final String? phase;
   final String? step;
   final String? activePlayer;
   final String? priorityPlayer;
   final String? ownPlayer;
-  final int priorityTimeSeconds;
+  final int? priorityTimeSeconds;
   final List<InteractiveBattlePlayer> players;
   final List<InteractiveBattleCard> stack;
   final List<InteractiveBattleCombatGroup> combat;
@@ -204,13 +206,13 @@ class InteractiveBattlePrivateState {
 
   factory InteractiveBattlePrivateState.fromJson(Map<String, dynamic> json) =>
       InteractiveBattlePrivateState(
-        turn: _integer(json['turn']),
+        turn: _nullableInteger(json['turn']),
         phase: _text(json['phase']),
         step: _text(json['step']),
         activePlayer: _text(json['active_player']),
         priorityPlayer: _text(json['priority_player']),
         ownPlayer: _text(json['own_player']),
-        priorityTimeSeconds: _integer(json['priority_time_seconds']),
+        priorityTimeSeconds: _nullableInteger(json['priority_time_seconds']),
         players: _maps(
           json['players'],
         ).map(InteractiveBattlePlayer.fromJson).toList(growable: false),

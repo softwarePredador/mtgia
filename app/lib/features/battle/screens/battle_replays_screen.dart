@@ -25,8 +25,12 @@ import '../services/battle_replay_service.dart';
 import '../utils/battle_runtime_presentation.dart';
 import 'battle_live_spectator_screen.dart';
 
-String battleReplaysRouteLocation(String deckId) =>
-    '/decks/${Uri.encodeComponent(deckId)}/battle-replays';
+String battleReplaysRouteLocation(String deckId, {String? replayId}) {
+  final base = '/decks/${Uri.encodeComponent(deckId)}/battle-replays';
+  final normalizedReplayId = replayId?.trim();
+  if (normalizedReplayId == null || normalizedReplayId.isEmpty) return base;
+  return '$base?replay=${Uri.encodeQueryComponent(normalizedReplayId)}';
+}
 
 enum BattleOpponentPickerMode { simulation, coach }
 
@@ -36,6 +40,7 @@ Future<BattleTestSetup?> showBattleOpponentPicker({
   required String currentDeckId,
   bool allowSeries = false,
   BattleOpponentPickerMode mode = BattleOpponentPickerMode.simulation,
+  ValueChanged<BattleOpponentDeck?>? onOpponentResolved,
 }) => showDialog<BattleTestSetup>(
   context: context,
   builder: (context) => _BattleOpponentPickerDialog(
@@ -43,10 +48,25 @@ Future<BattleTestSetup?> showBattleOpponentPicker({
     currentDeckId: currentDeckId,
     allowSeries: allowSeries,
     mode: mode,
+    onOpponentResolved: onOpponentResolved,
   ),
 );
 
 enum _ReplayDetailView { timeline, decisions }
+
+enum _BattleExecutionKind { consistency, synchronousBattle, liveBattle }
+
+class _BattleExecutionContext {
+  const _BattleExecutionContext({required this.kind, this.opponentLabel});
+
+  final _BattleExecutionKind kind;
+  final String? opponentLabel;
+}
+
+String? _normalizedReplayId(String? value) {
+  final normalized = value?.trim();
+  return normalized == null || normalized.isEmpty ? null : normalized;
+}
 
 class BattleReplaysScreen extends StatefulWidget {
   const BattleReplaysScreen({
@@ -78,7 +98,8 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   bool _isRunning = false;
   bool _isStartingLive = false;
   bool _jobsLoading = false;
-  bool _initialReplayConsumed = false;
+  int _replayLoadEpoch = 0;
+  String? _handledRouteReplayId;
   String? _error;
   String? _jobsError;
   List<BattleReplaySummary> _replays = const <BattleReplaySummary>[];
@@ -103,6 +124,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   BattleJobSeriesProgress? _seriesProgress;
   BattleJobSeriesCancellation? _seriesCancellation;
   String? _seriesError;
+  _BattleExecutionContext? _activeExecution;
 
   @override
   void initState() {
@@ -113,6 +135,23 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     if (widget.battleLiveEnabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _loadJobs());
     }
+  }
+
+  @override
+  void didUpdateWidget(covariant BattleReplaysScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final previousReplayId = _normalizedReplayId(oldWidget.initialReplayId);
+    final nextReplayId = _normalizedReplayId(widget.initialReplayId);
+    if (previousReplayId == nextReplayId) return;
+
+    if (nextReplayId == null) {
+      _handledRouteReplayId = null;
+      _clearReplaySelection(syncLocation: false);
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_openRouteReplayIfNeeded());
+    });
   }
 
   Future<void> _loadReplays({bool quiet = false}) async {
@@ -143,7 +182,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         _isLoading = false;
         _error = null;
       });
-      await _openInitialReplayIfNeeded();
+      await _openRouteReplayIfNeeded();
     } catch (error) {
       if (!mounted) return;
       if (quiet) {
@@ -166,19 +205,19 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         _historyLoadingMore = false;
         _error = _friendlyError(error);
       });
-      await _openInitialReplayIfNeeded();
+      await _openRouteReplayIfNeeded();
     }
   }
 
-  Future<void> _openInitialReplayIfNeeded() async {
-    final initialReplayId = widget.initialReplayId?.trim();
-    if (_initialReplayConsumed ||
-        initialReplayId == null ||
-        initialReplayId.isEmpty) {
+  Future<void> _openRouteReplayIfNeeded() async {
+    final replayId = _normalizedReplayId(widget.initialReplayId);
+    if (replayId == null ||
+        _handledRouteReplayId == replayId ||
+        _selectedReplay?.summary.id == replayId) {
       return;
     }
-    _initialReplayConsumed = true;
-    await _openReplayId(initialReplayId);
+    _handledRouteReplayId = replayId;
+    await _openReplayId(replayId);
   }
 
   Future<void> _loadMoreReplays() async {
@@ -245,9 +284,13 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   Future<void> _openReplay(BattleReplaySummary summary) async {
     await _openReplayId(summary.id);
+    if (mounted && _selectedReplay?.summary.id == summary.id) {
+      _syncReplayLocation(summary.id);
+    }
   }
 
   Future<void> _openReplayId(String replayId) async {
+    final loadEpoch = ++_replayLoadEpoch;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -258,7 +301,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         deckId: widget.deckId,
         replayId: replayId,
       );
-      if (!mounted) return;
+      if (!mounted || loadEpoch != _replayLoadEpoch) return;
       setState(() {
         _selectedReplay = detail;
         _detailView = _ReplayDetailView.timeline;
@@ -266,7 +309,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       });
       unawaited(_loadAnnotations(detail.summary.id));
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || loadEpoch != _replayLoadEpoch) return;
       setState(() {
         _isLoading = false;
         _error = _friendlyError(error);
@@ -274,17 +317,67 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
+  void _syncReplayLocation(String? replayId) {
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return;
+    final routeState = GoRouterState.of(context);
+    final baseLocation = battleReplaysRouteLocation(widget.deckId);
+    if (routeState.uri.path != Uri.parse(baseLocation).path) return;
+    final location = battleReplaysRouteLocation(
+      widget.deckId,
+      replayId: replayId,
+    );
+    if (routeState.uri.toString() == location) return;
+    router.go(location);
+  }
+
+  void _clearReplaySelection({required bool syncLocation}) {
+    _replayLoadEpoch += 1;
+    if (_selectedReplay != null || _annotationsReplayId != null) {
+      setState(() {
+        _selectedReplay = null;
+        _annotationsReplayId = null;
+        _annotations = const <BattleReplayAnnotation>[];
+        _annotationError = null;
+      });
+    }
+    if (syncLocation) _syncReplayLocation(null);
+  }
+
   Future<void> _runGoldfish() async {
     await _runSimulation(
       () => _gateway.runGoldfishSimulation(deckId: widget.deckId),
+      execution: const _BattleExecutionContext(
+        kind: _BattleExecutionKind.consistency,
+      ),
     );
   }
 
   Future<void> _runBattle() async {
-    final setup = await _askBattleTestSetup();
+    BattleOpponentDeck? opponent;
+    final setup = await _askBattleTestSetup(
+      allowSeries: widget.battleLiveEnabled,
+      onOpponentResolved: (value) => opponent = value,
+    );
     if (setup == null || setup.opponentDeckId.trim().isEmpty) return;
+
+    final execution = _BattleExecutionContext(
+      kind: widget.battleLiveEnabled
+          ? _BattleExecutionKind.liveBattle
+          : _BattleExecutionKind.synchronousBattle,
+      opponentLabel: opponent?.name ?? 'Deck selecionado',
+    );
+    if (widget.battleLiveEnabled) {
+      if (setup.seriesSize.isSeries) {
+        await _runLiveSeries(setup, execution);
+      } else {
+        await _runLiveBattle(setup, execution);
+      }
+      return;
+    }
     await _runSimulation(
       () => _gateway.runBattleTest(deckId: widget.deckId, setup: setup),
+      execution: execution,
     );
   }
 
@@ -292,13 +385,10 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     context.push('/decks/${Uri.encodeComponent(widget.deckId)}/battle-coach');
   }
 
-  Future<void> _runLiveBattle() async {
-    final setup = await _askBattleTestSetup(allowSeries: true);
-    if (setup == null || setup.opponentDeckId.trim().isEmpty) return;
-    if (setup.seriesSize.isSeries) {
-      await _runLiveSeries(setup);
-      return;
-    }
+  Future<void> _runLiveBattle(
+    BattleTestSetup setup,
+    _BattleExecutionContext execution,
+  ) async {
     final requestFingerprint = jsonEncode({
       'deck_id': widget.deckId,
       ...setup.toRequestJson(),
@@ -310,6 +400,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         : ApiClient.generateRequestId();
     _pendingLiveRequestFingerprint = requestFingerprint;
     _pendingLiveIdempotencyKey = idempotencyKey;
+    _beginExecution(execution);
     setState(() {
       _isStartingLive = true;
       _jobsError = null;
@@ -327,6 +418,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       _pendingLiveIdempotencyKey = null;
       setState(() {
         _isStartingLive = false;
+        _activeExecution = null;
         _jobs = [
           creation.job,
           ..._jobs.where((job) => job.jobId != creation.job.jobId),
@@ -340,15 +432,20 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       if (!mounted) return;
       setState(() {
         _isStartingLive = false;
+        _activeExecution = null;
         _jobsError = _friendlyJobError(error);
       });
     }
   }
 
-  Future<void> _runLiveSeries(BattleTestSetup setup) async {
+  Future<void> _runLiveSeries(
+    BattleTestSetup setup,
+    _BattleExecutionContext execution,
+  ) async {
     final cancellation = BattleJobSeriesCancellation();
     final runner = BattleJobSeriesRunner(gateway: _jobGateway);
     final seriesId = ApiClient.generateRequestId();
+    _beginExecution(execution);
     setState(() {
       _isStartingLive = true;
       _seriesCancellation = cancellation;
@@ -381,6 +478,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       if (!mounted) return;
       setState(() {
         _isStartingLive = false;
+        _activeExecution = null;
         _seriesProgress = result;
         _seriesCancellation = null;
       });
@@ -396,6 +494,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       if (!mounted) return;
       setState(() {
         _isStartingLive = false;
+        _activeExecution = null;
         _seriesCancellation = null;
         _seriesError = _friendlyJobError(error);
       });
@@ -423,8 +522,10 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Future<void> _runSimulation(
-    Future<BattleReplayDetail> Function() runner,
-  ) async {
+    Future<BattleReplayDetail> Function() runner, {
+    required _BattleExecutionContext execution,
+  }) async {
+    _beginExecution(execution);
     setState(() {
       _isRunning = true;
       _error = null;
@@ -437,13 +538,16 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         _selectedReplay = detail;
         _detailView = _ReplayDetailView.timeline;
         _isRunning = false;
+        _activeExecution = null;
       });
       unawaited(_loadAnnotations(detail.summary.id));
+      _syncReplayLocation(detail.summary.id);
       await _loadReplays(quiet: true);
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _isRunning = false;
+        _activeExecution = null;
         _error = _friendlyError(error);
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -455,13 +559,24 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
-  Future<BattleTestSetup?> _askBattleTestSetup({bool allowSeries = false}) =>
-      showBattleOpponentPicker(
-        context: context,
-        gateway: _gateway,
-        currentDeckId: widget.deckId,
-        allowSeries: allowSeries,
-      );
+  void _beginExecution(_BattleExecutionContext execution) {
+    _clearReplaySelection(syncLocation: true);
+    setState(() {
+      _activeExecution = execution;
+      _error = null;
+    });
+  }
+
+  Future<BattleTestSetup?> _askBattleTestSetup({
+    bool allowSeries = false,
+    ValueChanged<BattleOpponentDeck?>? onOpponentResolved,
+  }) => showBattleOpponentPicker(
+    context: context,
+    gateway: _gateway,
+    currentDeckId: widget.deckId,
+    allowSeries: allowSeries,
+    onOpponentResolved: onOpponentResolved,
+  );
 
   Future<void> _recordMulliganDecision(
     _OpeningHandExercise exercise,
@@ -638,7 +753,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     return Scaffold(
       key: const Key('battle-replays-screen'),
       appBar: AppBar(
-        title: const Text('Battle e replays'),
+        title: const Text('Battle Lab'),
         actions: [
           IconButton(
             key: const Key('battle-replays-refresh-button'),
@@ -661,11 +776,9 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
                   isRunning: _isRunning || _isStartingLive,
                   onRunGoldfish: _runGoldfish,
                   onRunBattle: _runBattle,
-                  onRunLive: widget.battleLiveEnabled ? _runLiveBattle : null,
                   onOpenCoach: widget.interactiveBattleEnabled
                       ? _openBattleCoach
                       : null,
-                  isStartingLive: _isStartingLive,
                 ),
                 if (_seriesProgress != null || _seriesError != null)
                   _BattleSeriesProgressPanel(
@@ -697,6 +810,14 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Widget _buildBody() {
+    final activeExecution = _activeExecution;
+    if (activeExecution != null && (_isRunning || _isStartingLive)) {
+      return _BattleExecutionPanel(
+        execution: activeExecution,
+        seriesProgress: _seriesProgress,
+      );
+    }
+
     if (_isLoading) {
       return const AppStatePanel.loading(
         key: Key('battle-replays-loading-state'),
@@ -794,7 +915,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
           onReload: () => _loadAnnotations(detail.summary.id),
           onKeep: () => _recordMulliganDecision(openingHand, 'keep'),
           onMulligan: () => _recordMulliganDecision(openingHand, 'mulligan'),
-          onBack: () => setState(() => _selectedReplay = null),
+          onBack: () => _clearReplaySelection(syncLocation: true),
           showBack: showBack,
         );
       }
@@ -840,7 +961,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       onReportEvent: _reportReplayEvent,
       view: _detailView,
       onViewChanged: (view) => setState(() => _detailView = view),
-      onBack: () => setState(() => _selectedReplay = null),
+      onBack: () => _clearReplaySelection(syncLocation: true),
       showBack: showBack,
     );
   }
@@ -853,7 +974,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       message:
           'Rode uma simulação para criar histórico. Cada replay informa o motor e o contrato de execução usados.',
       accent: AppTheme.brass400,
-      actionLabel: 'Rodar goldfish',
+      actionLabel: 'Testar consistência',
       onAction: _runGoldfish,
       motif: ManaLoomMotifVariant.battlefield,
     );
@@ -1173,6 +1294,7 @@ String _historyStatusLabel(String value) => switch (value) {
   'all' => 'Todos os status',
   'completed' || 'success' => 'Concluído',
   'censored' => 'Censurado',
+  'conceded' || 'concession' => 'Encerrado por desistência',
   'timeout' => 'Timeout',
   'coverage_error' => 'Sem cobertura',
   'engine_error' => 'Falha do motor',
@@ -1180,6 +1302,25 @@ String _historyStatusLabel(String value) => switch (value) {
   'persistence_error' => 'Falha ao salvar',
   _ => value.replaceAll('_', ' '),
 };
+
+String _battleReplayStatusLabel(BattleReplaySummary replay) =>
+    switch (replay.status) {
+      'conceded' || 'concession' => 'Desistência',
+      _ => replay.statusLabel,
+    };
+
+String _battleReplayResultLabel(BattleReplaySummary replay) =>
+    switch (replay.status) {
+      'censored' => 'Limite atingido · sem vencedor confirmado',
+      'conceded' || 'concession' => 'Partida encerrada por desistência',
+      'timeout' => 'Tempo esgotado · sem vencedor confirmado',
+      'cancelled' => 'Partida cancelada · sem resultado',
+      'coverage_error' ||
+      'engine_error' ||
+      'persistence_error' ||
+      'failed' => 'Execução sem resultado confirmado',
+      _ => replay.resultLabel,
+    };
 
 String _historyEngineLabel(String value) => switch (value) {
   'all' => 'Todos os modos',
@@ -1198,12 +1339,14 @@ class _BattleOpponentPickerDialog extends StatefulWidget {
     required this.currentDeckId,
     this.allowSeries = false,
     this.mode = BattleOpponentPickerMode.simulation,
+    this.onOpponentResolved,
   });
 
   final BattleReplayGateway gateway;
   final String currentDeckId;
   final bool allowSeries;
   final BattleOpponentPickerMode mode;
+  final ValueChanged<BattleOpponentDeck?>? onOpponentResolved;
 
   @override
   State<_BattleOpponentPickerDialog> createState() =>
@@ -1374,6 +1517,11 @@ class _BattleOpponentPickerDialogState
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
         .toList(growable: false);
+    final opponent = _decks.cast<BattleOpponentDeck?>().firstWhere(
+      (deck) => deck?.id == opponentDeckId,
+      orElse: () => null,
+    );
+    widget.onOpponentResolved?.call(opponent);
     Navigator.of(context).pop(
       BattleTestSetup(
         opponentDeckId: opponentDeckId,
@@ -1438,7 +1586,7 @@ class _BattleOpponentPickerDialogState
                     ? 'Selecione o deck adversário. O Coach abrirá '
                           'uma sessão interativa e pausará nas decisões disponíveis.'
                     : widget.allowSeries
-                    ? 'Selecione um deck e quantas tentativas independentes deseja enfileirar.'
+                    ? 'Selecione um deck e quantas tentativas independentes deseja acompanhar.'
                     : 'Selecione um deck seu ou público. O replay será salvo no histórico ao concluir.',
                 key: Key(
                   isCoach
@@ -1654,10 +1802,10 @@ class _BattleOpponentPickerDialogState
             icon: const Icon(Icons.play_arrow_rounded),
             label: Text(
               isCoach
-                  ? 'Iniciar Battle Coach'
+                  ? 'Jogar com Coach'
                   : _seriesSize.isSeries
-                  ? 'Iniciar série de ${_seriesSize.count}'
-                  : 'Simular Battle',
+                  ? 'Simular série de ${_seriesSize.count}'
+                  : 'Iniciar simulação',
             ),
           ),
         ),
@@ -1932,7 +2080,7 @@ class _BattlePreflightPanel extends StatelessWidget {
     if (loading) {
       return Semantics(
         liveRegion: true,
-        label: 'Verificando cobertura dos decks',
+        label: 'Executando a verificação da partida',
         child: const LinearProgressIndicator(
           key: Key('battle-preflight-loading'),
           minHeight: 3,
@@ -1944,7 +2092,7 @@ class _BattlePreflightPanel extends StatelessWidget {
         key: const Key('battle-preflight-error'),
         icon: Icons.error_outline_rounded,
         color: AppTheme.error,
-        title: 'Preflight indisponível',
+        title: 'Verificação da partida indisponível',
         message: error!,
       );
     }
@@ -2053,7 +2201,9 @@ String _battlePreflightBlockerMessage(
     return 'Cobertura de regras em preparação para $visibleNames'
         '${remaining > 0 ? ' e mais $remaining carta(s)' : ''}.';
   }
-  if (blockers.isEmpty) return 'O preflight não confirmou prontidão.';
+  if (blockers.isEmpty) {
+    return 'A verificação da partida não confirmou prontidão.';
+  }
   const labels = <String, String>{
     'deck_size_invalid': 'Tamanho do deck precisa ser corrigido',
     'deck_format_invalid': 'O deck precisa usar o formato Commander',
@@ -2079,22 +2229,172 @@ bool _isUuid(String value) => RegExp(
   r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
 ).hasMatch(value);
 
+class _BattleExecutionPanel extends StatelessWidget {
+  const _BattleExecutionPanel({
+    required this.execution,
+    required this.seriesProgress,
+  });
+
+  final _BattleExecutionContext execution;
+  final BattleJobSeriesProgress? seriesProgress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final opponent = execution.opponentLabel?.trim();
+    final title = switch (execution.kind) {
+      _BattleExecutionKind.consistency => 'Testando consistência',
+      _BattleExecutionKind.synchronousBattle => 'Simulando confronto',
+      _BattleExecutionKind.liveBattle => 'Preparando acompanhamento ao vivo',
+    };
+    final activeStage = switch (execution.kind) {
+      _BattleExecutionKind.consistency => 'Gerando a amostra do deck',
+      _BattleExecutionKind.synchronousBattle => 'Executando a partida',
+      _BattleExecutionKind.liveBattle when seriesProgress != null =>
+        'Enfileirando ${seriesProgress!.submittedCount} de '
+            '${seriesProgress!.total} partidas',
+      _BattleExecutionKind.liveBattle => 'Criando a partida',
+    };
+    final finalStage = switch (execution.kind) {
+      _BattleExecutionKind.liveBattle when seriesProgress != null =>
+        'As partidas aparecerão em Acompanhar ao vivo',
+      _BattleExecutionKind.liveBattle =>
+        'A mesa de acompanhamento abrirá automaticamente',
+      _ => 'O replay será aberto assim que estiver salvo',
+    };
+
+    return Semantics(
+      liveRegion: true,
+      label: '$title. $activeStage.',
+      child: ListView(
+        key: const Key('battle-execution-progress-state'),
+        padding: const EdgeInsets.all(AppTheme.space20),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppTheme.space20),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceElevated,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              border: Border.all(
+                color: AppTheme.brass400.withValues(alpha: 0.52),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const ManaLoomGlyph(
+                  ManaLoomGlyphKind.battleReplay,
+                  color: AppTheme.brass400,
+                  size: 34,
+                ),
+                const SizedBox(height: AppTheme.space12),
+                Text(
+                  title,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (opponent != null && opponent.isNotEmpty) ...[
+                  const SizedBox(height: AppTheme.space4),
+                  Text(
+                    'Adversário: $opponent',
+                    key: const Key('battle-execution-opponent'),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: AppTheme.space20),
+                const _BattleExecutionStage(
+                  label: 'Verificação da partida concluída',
+                  completed: true,
+                ),
+                _BattleExecutionStage(
+                  key: const Key('battle-execution-active-stage'),
+                  label: activeStage,
+                  active: true,
+                ),
+                _BattleExecutionStage(label: finalStage),
+                const SizedBox(height: AppTheme.space12),
+                Text(
+                  execution.kind == _BattleExecutionKind.liveBattle
+                      ? 'Você pode sair desta tela; o processamento continuará '
+                            'e ficará no histórico.'
+                      : 'Mantenha esta tela aberta até o replay ser salvo.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textHint,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BattleExecutionStage extends StatelessWidget {
+  const _BattleExecutionStage({
+    super.key,
+    required this.label,
+    this.completed = false,
+    this.active = false,
+  });
+
+  final String label;
+  final bool completed;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.space6),
+      child: Row(
+        children: [
+          if (active)
+            const SizedBox.square(
+              dimension: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            Icon(
+              completed
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              size: 20,
+              color: completed ? AppTheme.success : AppTheme.textHint,
+            ),
+          const SizedBox(width: AppTheme.space10),
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: active ? AppTheme.textPrimary : AppTheme.textSecondary,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BattleReplayActions extends StatelessWidget {
   const _BattleReplayActions({
     required this.isRunning,
     required this.onRunGoldfish,
     required this.onRunBattle,
-    required this.onRunLive,
     required this.onOpenCoach,
-    required this.isStartingLive,
   });
 
   final bool isRunning;
   final VoidCallback onRunGoldfish;
   final VoidCallback onRunBattle;
-  final VoidCallback? onRunLive;
   final VoidCallback? onOpenCoach;
-  final bool isStartingLive;
 
   @override
   Widget build(BuildContext context) {
@@ -2139,9 +2439,9 @@ class _BattleReplayActions extends StatelessWidget {
           ),
           const SizedBox(height: AppTheme.space6),
           Text(
-            'Consistência (Goldfish) observa mãos e curva sem adversário. '
-            'Confronto (Battle) executa dois decks e salva evidências do replay. '
-            '${onOpenCoach == null ? '' : 'Battle Coach para nas decisões para você jogar. '}'
+            'Teste consistência sem adversário ou simule contra outro deck '
+            'para acompanhar a partida e revisar o replay. '
+            '${onOpenCoach == null ? '' : 'O Coach pausa nas decisões disponíveis para você jogar. '}'
             'Nenhum modo prova superioridade ou substitui regra oficial.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
@@ -2158,14 +2458,14 @@ class _BattleReplayActions extends StatelessWidget {
                   key: const Key('battle-run-goldfish-button'),
                   onPressed: isRunning ? null : onRunGoldfish,
                   icon: const Icon(Icons.speed_rounded),
-                  label: const Text('Consistência · Goldfish'),
+                  label: const Text('Testar consistência'),
                 )
               else
                 OutlinedButton.icon(
                   key: const Key('battle-run-goldfish-button'),
                   onPressed: isRunning ? null : onRunGoldfish,
                   icon: const Icon(Icons.speed_rounded),
-                  label: const Text('Consistência · Goldfish'),
+                  label: const Text('Testar consistência'),
                 ),
               OutlinedButton.icon(
                 key: const Key('battle-run-battle-button'),
@@ -2174,7 +2474,7 @@ class _BattleReplayActions extends StatelessWidget {
                   ManaLoomGlyphKind.battleReplay,
                   size: 20,
                 ),
-                label: const Text('Confronto · Battle'),
+                label: const Text('Simular contra adversário'),
               ),
               if (onOpenCoach != null)
                 FilledButton.icon(
@@ -2184,26 +2484,7 @@ class _BattleReplayActions extends StatelessWidget {
                     ManaLoomGlyphKind.commander,
                     size: 20,
                   ),
-                  label: const Text('Jogar · Battle Coach'),
-                ),
-              if (onRunLive != null)
-                OutlinedButton.icon(
-                  key: const Key('battle-run-live-button'),
-                  onPressed: isRunning ? null : onRunLive,
-                  icon: isStartingLive
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const ManaLoomGlyph(
-                          ManaLoomGlyphKind.battleReplay,
-                          size: 20,
-                        ),
-                  label: Text(
-                    isStartingLive
-                        ? 'Iniciando mesa…'
-                        : 'Acompanhar ao vivo · experimental',
-                  ),
+                  label: const Text('Jogar com Coach'),
                 ),
             ],
           ),
@@ -2364,10 +2645,9 @@ class _BattleSeriesProgressPanel extends StatelessWidget {
             ],
             const SizedBox(height: AppTheme.space8),
             Text(
-              'Nesta etapa, o app coordena a fila; cada job criado já é salvo '
-              'no PostgreSQL. Se o app fechar antes de enfileirar tudo, os jobs '
-              'existentes permanecem, mas a retomada automática da série ainda '
-              'não está disponível.',
+              'Cada partida criada permanece no histórico. Se o app fechar '
+              'antes de preparar toda a série, as partidas já iniciadas '
+              'continuam disponíveis, mas a série não é retomada automaticamente.',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: AppTheme.textHint,
                 height: 1.3,
@@ -2431,7 +2711,7 @@ class _BattleLiveJobStrip extends StatelessWidget {
                 const SizedBox(width: AppTheme.space8),
                 Expanded(
                   child: Text(
-                    'Jobs recentes · acompanhamento experimental',
+                    'Acompanhar ao vivo',
                     style: theme.textTheme.labelLarge?.copyWith(
                       color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w800,
@@ -2472,7 +2752,7 @@ class _BattleLiveJobStrip extends StatelessWidget {
               )
             else if (visibleJobs.isEmpty)
               Text(
-                'Nenhum job assíncrono para este deck.',
+                'Nenhuma partida em acompanhamento para este deck.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                 ),
@@ -2600,7 +2880,7 @@ class _BattleReplaySummaryTile extends StatelessWidget {
                         ),
                         const SizedBox(height: AppTheme.space4),
                         Text(
-                          replay.resultLabel,
+                          _battleReplayResultLabel(replay),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -2621,7 +2901,7 @@ class _BattleReplaySummaryTile extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _ReplayMetaChip(label: replay.statusLabel),
+                  _ReplayMetaChip(label: _battleReplayStatusLabel(replay)),
                   _ReplayMetaChip(label: replay.turnLabel),
                   _ReplayMetaChip(label: replay.eventLabel),
                   if (replay.createdAt != null)
@@ -2994,7 +3274,8 @@ class _BattleReplayDetailPane extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.space8),
               Text(
-                '${summary.resultLabel} · ${summary.turnLabel} · ${summary.sourceLabel}',
+                '${_battleReplayResultLabel(summary)} · '
+                '${summary.turnLabel} · ${summary.sourceLabel}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                   height: 1.32,
