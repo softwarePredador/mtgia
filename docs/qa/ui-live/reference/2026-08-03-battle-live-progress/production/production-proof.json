@@ -1,0 +1,56 @@
+{
+  "schema_version": "manaloom_production_battle_live_proof_v1",
+  "captured_at": "2026-08-03T19:25:00Z",
+  "web_url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/",
+  "api_base_url": "https://evolution-cartinhas.2ta7qx.easypanel.host",
+  "release": {
+    "git_sha": "3a3b7847a620ad5c7285eb653abfaae73f11e034",
+    "image_digest_ref": "localhost:5000/manaloom/app-web@sha256:c9e87ec738b3fc3531a99d22c16810daaf0b6b03cc885448f7c586e4404e78d9",
+    "interactive_battle_enabled": true,
+    "battle_live_spectator_enabled": true
+  },
+  "fresh_run": {
+    "job_id": "3ce87e6f-73bb-4bed-95c5-0d1b3455b6d1",
+    "replay_id": "1ded40f9-d899-4998-b89f-7fa17f418e2b",
+    "started_at": "2026-08-03T19:22:56.953989Z",
+    "finished_at": "2026-08-03T19:24:00.496492Z",
+    "duration_ms": 63543,
+    "status": "censored",
+    "terminal_reason": "engine_max_turns_censored",
+    "initial_visible_at_seconds": 3,
+    "active_feed_visible_at_seconds": 25,
+    "active_feed_turn": 13,
+    "active_feed_public_records": 80
+  },
+  "completed_run": {
+    "job_id": "af5ee15d-e207-4e33-b6cd-ab0759cba5f0",
+    "replay_id": "f00f5843-0b4e-4dda-a78a-6e54f8bed1b1",
+    "status": "completed",
+    "ui_terminal_stage": "Replay persistido",
+    "replay_opened": true
+  },
+  "screenshots": [
+    {
+      "path": "production_02_censored_max_turns.png",
+      "sha256": "4221b4632d9c3807777553f0ffe9bab480cf46c0ee709f8667c522f1541db8ba",
+      "bytes": 68277,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "production_03_completed_replay_persisted.png",
+      "sha256": "0044cfd3b430cedc3f1aee72e23ef741405d4a12fcdd8def88a4d9650efee034",
+      "bytes": 65765,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "production_04_replay_opened.png",
+      "sha256": "e79b82a0ec5572385f737b32f3b2c5fb775a1402ca35dcd29026fd67f4173968",
+      "bytes": 70410,
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "credentials_preserved": false
+}

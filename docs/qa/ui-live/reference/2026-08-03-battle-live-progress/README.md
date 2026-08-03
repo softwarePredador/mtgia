@@ -32,3 +32,17 @@ preservadas pelo mesmo commit, sem duplicar dezenas de megabytes de PNGs:
 Ao todo, 219 capturas receberam revisão visual nesta rodada. A única melhoria
 cosmética observada fora do escopo Battle foi a quebra da última letra de
 “Reconstruir” no Pós-jogo Web wide; ela está registrada no relatório vigente.
+
+## Revalidação publicada
+
+O subdiretório [`production`](production) preserva as capturas feitas depois
+do deploy do SHA `3a3b7847a620ad5c7285eb653abfaae73f11e034` no Web público:
+
+- encerramento censurado por `engine_max_turns_censored`, sem apresentar falso
+  vencedor;
+- sessão concluída já sincronizada como `Replay persistido`;
+- replay persistido aberto no Battle Lab.
+
+O arquivo [`production/production-proof.json`](production/production-proof.json)
+registra os hashes das imagens e os identificadores técnicos da rodada, sem
+credenciais da conta descartável.
