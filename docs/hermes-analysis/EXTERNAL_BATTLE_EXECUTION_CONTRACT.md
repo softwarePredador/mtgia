@@ -293,6 +293,11 @@ Timeout handling therefore has two layers:
   `CardInfo` objects;
 - the battle loop stops at the requested timeout without waiting on synchronous
   table/session cleanup;
+- the XMage watcher cooperatively stops the table as soon as it observes the
+  first turn above `max_turns`; that terminal result is `censored`, keeps the
+  bounded public evidence collected so far, omits a comparison winner, and is
+  eligible for normal replay persistence instead of waiting for wall-clock
+  timeout;
 - an HTTP watchdog cancels any execution that does not return within a
   five-second cleanup grace, sends `504`, and exits the sidecar so the container
   restarts both XMage processes from a clean state.

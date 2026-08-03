@@ -219,6 +219,12 @@ final class XmageBattleService {
                     publishedViewCount = liveViews.size();
                     publishedMessageCount = liveMessages.size();
                 }
+                if (shouldCensorAtTurn(
+                        lastView == null ? 0 : lastView.getTurn(),
+                        contract.maxTurns
+                )) {
+                    break;
+                }
                 if (shouldFinishBattle(
                         client.isGameOver(),
                         state == TableState.FINISHED,
@@ -408,6 +414,10 @@ final class XmageBattleService {
 
     static boolean shouldFinishBattle(boolean gameOver, boolean tableFinished, boolean gameViewObserved) {
         return gameViewObserved && (gameOver || tableFinished);
+    }
+
+    static boolean shouldCensorAtTurn(int observedTurn, int maxTurns) {
+        return observedTurn > maxTurns;
     }
 
     static boolean winnerEligibleForComparison(String status) {
@@ -692,7 +702,7 @@ final class XmageBattleService {
                     : "none");
 
             Map<String, Object> controls = new LinkedHashMap<>();
-            controls.put("max_turns", control(maxTurns, "post_completion_right_censoring", "engine_enforced", false));
+            controls.put("max_turns", control(maxTurns, "live_turn_limit_right_censoring", "engine_enforced", true));
             controls.put("focus_cards", control(focusCards, "positive_evidence_observation_only", null, null));
             controls.put("force_focus_access_mode", control(forceFocusAccessMode, "none_only_non_none_rejected", null, null));
             controls.put("same_lane", control(sameLane, "comparison_metadata_only", null, null));

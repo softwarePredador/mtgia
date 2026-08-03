@@ -83,6 +83,13 @@ final class XmageBattleServiceTest {
     }
 
     @Test
+    void maxTurnLimitCensorsAsSoonAsTheNextTurnIsObserved() {
+        assertFalse(XmageBattleService.shouldCensorAtTurn(0, 10));
+        assertFalse(XmageBattleService.shouldCensorAtTurn(10, 10));
+        assertTrue(XmageBattleService.shouldCensorAtTurn(11, 10));
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void v2ContractValidatesIdentityHashesAndCorrelationOnlySeed() {
         XmageBattleService service = new XmageBattleService("127.0.0.1", 17171);
@@ -104,6 +111,12 @@ final class XmageBattleServiceTest {
                 "request_correlation_only_server_rng_uncontrolled",
                 SidecarMain.SEED_SEMANTICS
         );
+        Map<String, Object> controls =
+                (Map<String, Object>) ((Map<String, Object>) metadata.get("request_contract"))
+                        .get("controls");
+        Map<String, Object> maxTurns = (Map<String, Object>) controls.get("max_turns");
+        assertEquals("live_turn_limit_right_censoring", maxTurns.get("semantics"));
+        assertTrue((Boolean) maxTurns.get("engine_enforced"));
         assertFalse((Boolean) ((Map<String, Object>) metadata.get("execution_outcome")).get("timed_out"));
 
         JsonObject broken = request.deepCopy();
