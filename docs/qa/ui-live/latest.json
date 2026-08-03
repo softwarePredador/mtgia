@@ -1,12 +1,12 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "3b20f72472d724d6c0a68c868c4399ea88d3527f2a9aedf2514d47bd4ec16207",
+  "source_digest": "9a6f4dec081ae6413556bc1ab03e22590b7521162ad6414bad1df679f46e05ad",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-03T13:37:31Z",
+    "verified_at": "2026-08-03T18:55:27Z",
     "commands": [
-      "flutter test dos modelos, gateway e tela Battle Live (63 testes aprovados)",
+      "flutter test da tela Battle Live, incluindo promoção de estágio e sincronização terminal (22 testes aprovados)",
       "flutter test dos contratos de evidência e integração Battle Live (25 testes aprovados)",
       "dart test dos contratos backend Battle Job/Live/readiness/migrations (55 testes aprovados)",
       "python3 -m unittest server/test/native_battle_sidecar_test.py (6 testes aprovados)",
@@ -21,36 +21,36 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "9b24f3588b894a944de3c516af20a7f35bd9c4ed546949eb284330b6089408eb"
+        "sha256": "cc7ecf34db470f101b56f876ec1b0b2b2d23931fdff5c64a9b62635b4d73ca75"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "9130d8b944fa122cf599cb34362aa2f9951ec62f44ec5a7577ce5677f01efcea"
+        "sha256": "71c13988437a6cc5edcf57d6f624e1adfa091c175664685a463516f2340eb34a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "5640dbccb6b840db028bc60b654f4fb68f69f6463e6386de03e75a9593be1b5d"
+        "sha256": "5bc2543ee71656b29186fe83bd6908b06d85dadc56bc8f81737cf8f266c0622e"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "4828efd0612f59ce35d45b9614ef87ff31d8cdbc56a4940d727e3aff3bd4833d"
+        "sha256": "aa26db8f298a99b5897cbdf348ef33434c498c965f32735a0e775c337f8286ac"
       },
       {
         "path": "docs/qa/ui-live/current/battle-live-web/capture-manifest.json",
-        "sha256": "ea1fbe1a3250b203a7a3cf4f5d4379457fb540ed03aefb860be7b04bd03d27ea"
+        "sha256": "c09623791507716f75d740b364298378aaec9e8d0d07a6af64e6629d84e14b92"
       }
     ],
     "evidence_notes": [
       "As 160 capturas Web e as 54 capturas Android da matriz P0 foram recapturadas integralmente no digest atual, sem carry-forward.",
       "O emulador Android 14 concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2400×1080; esta rodada não reivindica crédito de aparelho físico.",
-      "O Battle Live foi recapturado no build Web release em cinco estados: espera inicial, feed público ativo, reconexão recuperável preservando dados, timeout terminal e conclusão com replay.",
+      "O Battle Live foi recapturado no build Web release em cinco estados: espera inicial, feed público ativo com estágio promovido para partida em andamento, reconexão recuperável preservando dados, timeout terminal e conclusão sincronizada com replay.",
       "Todas as 219 capturas referenciadas foram abertas e revisadas no digest atual; manifestos opcionais antigos de Battle Coach não receberam crédito nesta rodada.",
       "A matriz P0 usou PostgreSQL/API loopback descartáveis e o Battle Live usou um harness determinístico que valida a UI real sem inventar percentual de progresso."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-03T13:37:31Z",
+    "reviewed_at": "2026-08-03T18:55:27Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -101,11 +101,11 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "9b24f3588b894a944de3c516af20a7f35bd9c4ed546949eb284330b6089408eb",
-      "9130d8b944fa122cf599cb34362aa2f9951ec62f44ec5a7577ce5677f01efcea",
-      "5640dbccb6b840db028bc60b654f4fb68f69f6463e6386de03e75a9593be1b5d",
-      "4828efd0612f59ce35d45b9614ef87ff31d8cdbc56a4940d727e3aff3bd4833d",
-      "ea1fbe1a3250b203a7a3cf4f5d4379457fb540ed03aefb860be7b04bd03d27ea"
+      "cc7ecf34db470f101b56f876ec1b0b2b2d23931fdff5c64a9b62635b4d73ca75",
+      "71c13988437a6cc5edcf57d6f624e1adfa091c175664685a463516f2340eb34a",
+      "5bc2543ee71656b29186fe83bd6908b06d85dadc56bc8f81737cf8f266c0622e",
+      "aa26db8f298a99b5897cbdf348ef33434c498c965f32735a0e775c337f8286ac",
+      "c09623791507716f75d740b364298378aaec9e8d0d07a6af64e6629d84e14b92"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",
@@ -118,6 +118,7 @@
     "blocking_findings": [],
     "follow_up_findings": [
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
+      "No viewport Web wide, o texto do botão Reconstruir na tela Pós-jogo pode quebrar a última letra; é uma melhoria cosmética não bloqueante e não faz parte do fluxo Battle Live desta entrega.",
       "O smoke em aparelho Samsung físico e a navegação humana com TalkBack permanecem verificações separadas de release; esta rodada não reivindica esse crédito."
     ]
   },

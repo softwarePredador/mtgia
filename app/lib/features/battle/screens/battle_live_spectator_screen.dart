@@ -129,7 +129,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
     BattleJob? fetchedJob;
 
     try {
-      final job = await _gateway.get(widget.jobId);
+      var job = await _gateway.get(widget.jobId);
       fetchedJob = job;
       if (!mounted) return;
       setState(() {
@@ -155,6 +155,16 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
           } else {
             rethrow;
           }
+        }
+      }
+      if (nextSession.isTerminal && !job.isTerminal) {
+        try {
+          job = await _gateway.get(widget.jobId);
+          fetchedJob = job;
+        } catch (_) {
+          // The terminal live page is authoritative for presentation. A
+          // manual reconnect can still refresh ancillary job timestamps if
+          // this best-effort synchronization request fails.
         }
       }
       if (!mounted) return;
@@ -391,9 +401,10 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
   Widget _buildStatusHeader() {
     final job = _job!;
     final theme = Theme.of(context);
-    final statusColor = _battleJobStatusColor(job.status);
-    final progressIsTerminal = job.isTerminal;
-    final stageLabel = _battleStageLabel(job.stage);
+    final displayStatus = _battleLiveDisplayStatus(job, _session);
+    final statusColor = _battleJobStatusColor(displayStatus);
+    final progressIsTerminal = displayStatus.isTerminal;
+    final stageLabel = _battleLiveStageLabel(job, _session, displayStatus);
     final elapsedLabel = _battleElapsedLabel(job);
     return Container(
       key: const Key('battle-live-status-header'),
@@ -427,7 +438,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
                 ),
               ),
               _LiveStatusBadge(
-                label: _battleJobStatusLabel(job.status),
+                label: _battleJobStatusLabel(displayStatus),
                 color: statusColor,
               ),
               if (_playbackPaused)
@@ -448,7 +459,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
           Semantics(
             label: 'Progresso do Battle',
             value: progressIsTerminal
-                ? 'Execução encerrada: ${_battleJobStatusLabel(job.status)}'
+                ? 'Execução encerrada: ${_battleJobStatusLabel(displayStatus)}'
                 : 'Em andamento: $stageLabel',
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
@@ -1321,6 +1332,44 @@ String _battleJobStatusLabel(BattleJobStatus status) => switch (status) {
   BattleJobStatus.cancelled => 'Cancelado',
   BattleJobStatus.persistenceError => 'Falha ao persistir',
 };
+
+BattleJobStatus _battleLiveDisplayStatus(
+  BattleJob job,
+  BattleLiveSession session,
+) {
+  final liveStatus = session.status;
+  if (liveStatus?.isTerminal != true) return job.status;
+  return switch (liveStatus!) {
+    BattleLiveStatus.completed => BattleJobStatus.completed,
+    BattleLiveStatus.censored => BattleJobStatus.censored,
+    BattleLiveStatus.timeout => BattleJobStatus.timeout,
+    BattleLiveStatus.coverageError => BattleJobStatus.coverageError,
+    BattleLiveStatus.engineError ||
+    BattleLiveStatus.interrupted => BattleJobStatus.engineError,
+    BattleLiveStatus.cancelled => BattleJobStatus.cancelled,
+    BattleLiveStatus.persistenceError => BattleJobStatus.persistenceError,
+    BattleLiveStatus.queued ||
+    BattleLiveStatus.claimed ||
+    BattleLiveStatus.running ||
+    BattleLiveStatus.cancelPending => job.status,
+  };
+}
+
+String _battleLiveStageLabel(
+  BattleJob job,
+  BattleLiveSession session,
+  BattleJobStatus displayStatus,
+) {
+  if (session.hasMore && session.isTerminal) {
+    return 'Finalizando registros da partida';
+  }
+  if (session.replayPending) return 'Salvando o replay';
+  if (session.isTerminal) return _battleStageLabel(displayStatus.wireValue);
+  if (session.records.isNotEmpty && job.stage == 'starting_engine') {
+    return 'Partida em andamento';
+  }
+  return _battleStageLabel(job.stage);
+}
 
 String _battleStageLabel(String stage) => switch (stage) {
   'queued' => 'Aguardando início',

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-03T13:36:00.894527Z",
-  "source_digest": "3b20f72472d724d6c0a68c868c4399ea88d3527f2a9aedf2514d47bd4ec16207",
+  "generated_at": "2026-08-03T18:42:27.997026Z",
+  "source_digest": "9a6f4dec081ae6413556bc1ab03e22590b7521162ad6414bad1df679f46e05ad",
   "surface": "authenticated_p0_matrix",
   "profile": "web_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "7ab5efb7a93a2b1f40b6587c179070ef757f6dc4ca60ae35024fc7b329a207ff",
+  "log_sha256": "7c312be30baeac032ba9ddfd83eebc10efc3a718582c382c72dfc7c2af57aa3f",
   "checkpoint_count": 54,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -154,16 +154,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/community_deck_success.png",
-      "sha256": "2d6c8dca0f2a9ef73772a9e65c016d55f19910dca328e9db6f313be51592fdb5",
-      "bytes": 63568,
+      "sha256": "a36e23afeb663415052c282fda4e6bc990b2f8384c998cb65e1b5e1de1aad3ee",
+      "bytes": 63411,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "community_public_decks",
       "path": "app/test/ui/goldens/runtime/web_mobile/community_public_decks.png",
-      "sha256": "afe322eccac2cf3e8c224432faef986a13be44769deadc20d780d46f1ff3cd85",
-      "bytes": 113132,
+      "sha256": "aff2172d6cb7c16606ef2abfe498cd420fb9fbbef75ad9ea4cbdb84aba9b94b7",
+      "bytes": 113006,
       "width": 390,
       "height": 844
     },
@@ -306,8 +306,8 @@
     {
       "checkpoint": "life_counter_initial",
       "path": "app/test/ui/goldens/runtime/web_mobile/life_counter_initial.png",
-      "sha256": "5f18a769e61e307078111551d33c34e3ee8fca5e494d675ecd39ddcaa9ea7c17",
-      "bytes": 136263,
+      "sha256": "0b07c971d5f5d9f798a93bb2491abf72a982ee96ac2803fa8c8782a1868df497",
+      "bytes": 136168,
       "width": 390,
       "height": 844
     },
@@ -362,8 +362,8 @@
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/profile_success.png",
-      "sha256": "935e8362e97839956f7bfbcd6394cfe7a2963e9ef9830d084c917429d108f89d",
-      "bytes": 59565,
+      "sha256": "5cdc36ebd67d6462ea51afcf7c9f3e3a445cbf77006da255514c337b5416bba1",
+      "bytes": 60012,
       "width": 390,
       "height": 844
     },
@@ -474,8 +474,8 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/user_profile_success.png",
-      "sha256": "053394ac60632480d6110cff296dc82746542b3cfd708b42a4a50b0edad8b5c5",
-      "bytes": 39826,
+      "sha256": "a2aae94292d40e0d53694fa98e30f539a4420b44be6f1f980080d76ed6c7e09b",
+      "bytes": 39150,
       "width": 390,
       "height": 844
     },
@@ -490,8 +490,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/web_mobile/user_search_results.png",
-      "sha256": "c77ee98d45195db7ea88418bc3c5c2a5e77e6649b189205bf5da7b8341673e72",
-      "bytes": 20149,
+      "sha256": "aca00557df5ec0e1eaf8bee64768622d45ac32ebc94149fabe74ae0295958835",
+      "bytes": 19643,
       "width": 390,
       "height": 844
     },

@@ -1,0 +1,66 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-03T18:20:50.966296Z",
+  "source_digest": "9a6f4dec081ae6413556bc1ab03e22590b7521162ad6414bad1df679f46e05ad",
+  "surface": "battle_live",
+  "profile": "web_battle_live_1440x900",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Battle Live Flutter surface requested at 1440x900; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "be7e8376cea39cfb5c6bbce1cd213492717b5398fb17936a26c4552c520b87ff",
+  "checkpoint_count": 5,
+  "required_checkpoints": [
+    "battle_live_00_waiting",
+    "battle_live_01_active_feed",
+    "battle_live_02_recoverable_reconnect",
+    "battle_live_03_timeout_terminal",
+    "battle_live_04_completed_replay"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "battle_live_00_waiting",
+      "path": "docs/qa/ui-live/current/battle-live-web/battle_live_00_waiting.png",
+      "sha256": "4b2bb9fcc937f474676c43d2a16de992a0ede7f4ad1b9be21b93c840609df2ab",
+      "bytes": 59677,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "battle_live_01_active_feed",
+      "path": "docs/qa/ui-live/current/battle-live-web/battle_live_01_active_feed.png",
+      "sha256": "7c449d23f6f0f4a6a81c97bec16e9f131bb4ee135adc7781911b3a87a9f97a52",
+      "bytes": 83126,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "battle_live_02_recoverable_reconnect",
+      "path": "docs/qa/ui-live/current/battle-live-web/battle_live_02_recoverable_reconnect.png",
+      "sha256": "29848eb0d19fa93a6066003edc809d9150cbb40b8ea2b7eb6c4f03eddc7da5ff",
+      "bytes": 91004,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "battle_live_03_timeout_terminal",
+      "path": "docs/qa/ui-live/current/battle-live-web/battle_live_03_timeout_terminal.png",
+      "sha256": "985e4cd1bc2a77ed01cd554b7aeb7f0dd70f6a5ab3f27136cc3604b542bfd8a9",
+      "bytes": 99100,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "battle_live_04_completed_replay",
+      "path": "docs/qa/ui-live/current/battle-live-web/battle_live_04_completed_replay.png",
+      "sha256": "69268b1810a76f60cc6e1398512defb33e5db27f04940ae9f3ce82811f9a69db",
+      "bytes": 93058,
+      "width": 1440,
+      "height": 900
+    }
+  ]
+}

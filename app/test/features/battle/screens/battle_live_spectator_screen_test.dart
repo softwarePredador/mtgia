@@ -306,6 +306,74 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('promotes the stage copy once public Battle records arrive', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleJobGateway(
+      job: _job(
+        status: 'running',
+        stage: 'starting_engine',
+        current: 15,
+        total: 100,
+      ),
+      liveResponses: [
+        _page(
+          items: [_snapshotRecord(sequence: 1, recordId: 'snapshot-running')],
+        ),
+      ],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    expect(find.textContaining('Partida em andamento'), findsOneWidget);
+    expect(find.textContaining('Iniciando a simulação'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('synchronizes a stale running job after the terminal live page', (
+    tester,
+  ) async {
+    final runningJob = _job(
+      status: 'running',
+      stage: 'starting_engine',
+      current: 15,
+      total: 100,
+    );
+    final completedJob = _job(
+      status: 'completed',
+      stage: 'completed',
+      current: 100,
+      total: 100,
+      replayId: 'replay-1',
+      terminalReason: 'completed',
+    );
+    final gateway = _FakeBattleJobGateway(
+      job: completedJob,
+      jobResponses: [runningJob, completedJob],
+      liveResponses: [
+        _page(
+          status: 'completed',
+          terminal: true,
+          terminalReason: 'completed',
+          nextCursor: 'blc1.terminal-refresh.signature',
+          replay: const {'replay_id': 'replay-1', 'available': true},
+        ),
+      ],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    expect(gateway.getCalls, 2);
+    expect(find.text('Concluído'), findsOneWidget);
+    expect(find.textContaining('Replay persistido'), findsOneWidget);
+    expect(find.text('Em execução'), findsNothing);
+    final indicator = tester.widget<LinearProgressIndicator>(
+      find.byKey(const Key('battle-live-progress')),
+    );
+    expect(indicator.value, 1);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('creates a live job from the single opponent simulation action', (
     tester,
   ) async {
