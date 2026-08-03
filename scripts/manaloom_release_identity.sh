@@ -60,7 +60,11 @@ if [[ "$REQUIRE_CLEAN" == "1" ]]; then
   fi
 fi
 
-VERSION="$(git -C "$ROOT_DIR" show "$SHA:app/pubspec.yaml" | awk '/^version:/{print $2; exit}')"
+# Read the complete blob before emitting the version. Exiting awk at the first
+# match closes the pipe early and, with pipefail enabled, can turn a valid
+# `git show` into SIGPIPE (141) when pubspec.yaml is larger than the pipe
+# buffer. Release identity must be independent of the file size.
+VERSION="$(git -C "$ROOT_DIR" show "$SHA:app/pubspec.yaml" | awk '/^version:/{value=$2} END{print value}')"
 if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+\+[1-9][0-9]*$ ]]; then
   echo "versao mobile invalida; esperado semver+build positivo, recebido: ${VERSION:-ausente}" >&2
   exit 2

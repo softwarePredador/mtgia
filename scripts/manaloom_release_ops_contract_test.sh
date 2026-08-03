@@ -314,7 +314,15 @@ git init --quiet --bare --initial-branch=master "$IDENTITY_ORIGIN"
 git init --quiet --initial-branch=master "$IDENTITY_REPO"
 git -C "$IDENTITY_REPO" remote add origin "$IDENTITY_ORIGIN"
 mkdir -p "$IDENTITY_REPO/app"
-printf 'name: manaloom_contract\nversion: 1.2.3+45\n' > "$IDENTITY_REPO/app/pubspec.yaml"
+{
+  printf 'name: manaloom_contract\nversion: 1.2.3+45\n'
+  # Keep enough committed content after `version` to make an early-exit pipe
+  # deterministically surface SIGPIPE under `set -o pipefail`.
+  for padding_index in $(seq 1 4096); do
+    printf '# release identity pipefail regression padding %04d\n' \
+      "$padding_index"
+  done
+} > "$IDENTITY_REPO/app/pubspec.yaml"
 git -C "$IDENTITY_REPO" add app/pubspec.yaml
 git -C "$IDENTITY_REPO" \
   -c user.name='ManaLoom Contract' \
