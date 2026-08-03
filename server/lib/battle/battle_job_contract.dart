@@ -5,7 +5,8 @@ const battleJobListSchemaVersion = 'battle_job_list_v1';
 const battleJobMaximumBodyBytes = 64 * 1024;
 const battleJobMaximumFocusCards = 3;
 const battleJobMinimumTimeoutMs = 1000;
-const battleJobMaximumTimeoutMs = 40000;
+const battleJobDefaultTimeoutMs = 120000;
+const battleJobMaximumTimeoutMs = 180000;
 const battleJobMaximumTurns = 100;
 
 final RegExp battleJobUuidPattern = RegExp(
@@ -259,7 +260,7 @@ class BattleJobCreateInput {
     final timeoutMs = _boundedInteger(
       body['timeout_ms'],
       key: 'timeout_ms',
-      defaultValue: battleJobMaximumTimeoutMs,
+      defaultValue: battleJobDefaultTimeoutMs,
       minimum: battleJobMinimumTimeoutMs,
       maximum: battleJobMaximumTimeoutMs,
     );

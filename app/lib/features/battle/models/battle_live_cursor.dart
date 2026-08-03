@@ -320,25 +320,31 @@ class BattleLiveSession {
   BattleLiveSession._({
     required this.streamId,
     required this.cursor,
+    required this.hasMore,
     required this.status,
     required List<BattleLiveRecord> records,
     required this.replayId,
+    required this.replayPending,
     required this.terminalReason,
   }) : records = List.unmodifiable(records);
 
   const BattleLiveSession.empty()
     : streamId = null,
       cursor = null,
+      hasMore = false,
       status = null,
       records = const <BattleLiveRecord>[],
       replayId = null,
+      replayPending = false,
       terminalReason = null;
 
   final String? streamId;
   final String? cursor;
+  final bool hasMore;
   final BattleLiveStatus? status;
   final List<BattleLiveRecord> records;
   final String? replayId;
+  final bool replayPending;
   final String? terminalReason;
 
   bool get isTerminal => status?.isTerminal == true;
@@ -407,9 +413,11 @@ class BattleLiveSession {
     return BattleLiveSession._(
       streamId: page.streamId,
       cursor: page.nextCursor,
+      hasMore: page.hasMore,
       status: page.status,
       records: nextRecords,
       replayId: nextReplayId,
+      replayPending: page.replayPending,
       terminalReason: page.terminalReason ?? terminalReason,
     );
   }

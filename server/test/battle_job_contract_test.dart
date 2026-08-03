@@ -39,6 +39,40 @@ void main() {
       expect(input.idempotencyKey, 'battle-contract-1');
     });
 
+    test(
+      'uses the async budget default and enforces its dedicated maximum',
+      () {
+        final defaulted = BattleJobCreateInput.parse({
+          'deck_id': _deckA,
+          'opponent_deck_id': _deckB,
+        });
+        final maximum = BattleJobCreateInput.parse({
+          'deck_id': _deckA,
+          'opponent_deck_id': _deckB,
+          'timeout_ms': battleJobMaximumTimeoutMs,
+        });
+
+        expect(battleJobDefaultTimeoutMs, 120000);
+        expect(battleJobMaximumTimeoutMs, 180000);
+        expect(defaulted.timeoutMs, battleJobDefaultTimeoutMs);
+        expect(maximum.timeoutMs, battleJobMaximumTimeoutMs);
+        expect(
+          () => BattleJobCreateInput.parse({
+            'deck_id': _deckA,
+            'opponent_deck_id': _deckB,
+            'timeout_ms': battleJobMaximumTimeoutMs + 1,
+          }),
+          throwsA(
+            isA<BattleJobValidationException>().having(
+              (error) => error.code,
+              'code',
+              'battle_job_timeout_ms_invalid',
+            ),
+          ),
+        );
+      },
+    );
+
     test('rejects invalid UUIDs and unknown fields', () {
       expect(
         () => BattleJobCreateInput.parse({

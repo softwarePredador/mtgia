@@ -15,6 +15,10 @@ manaloom_web_runtime_device_contract() {
       printf '%s' \
         'Chrome real release build; Flutter surface requested at 1920x1080; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present'
       ;;
+    web_battle_live_1440x900)
+      printf '%s' \
+        'Chrome real release build; Battle Live Flutter surface requested at 1440x900; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present'
+      ;;
     *)
       echo "Unsupported Web runtime profile: $profile" >&2
       return 2

@@ -82,7 +82,7 @@ void main() {
         'test_objective': 'commander',
         'focus_cards': const ['Krenko, Mob Boss'],
         'max_turns': 30,
-        'timeout_ms': 40000,
+        'timeout_ms': 120000,
         'idempotency_key': 'attempt-1',
       });
     });

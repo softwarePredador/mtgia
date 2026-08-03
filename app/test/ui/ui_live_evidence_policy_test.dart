@@ -61,6 +61,14 @@ void main() {
       gate['p0_capture_command'],
       contains('manaloom_p0_runtime_capture.sh'),
     );
+    expect(
+      gate['battle_live_capture_command'],
+      '../scripts/manaloom_ui_live_evidence_gate.sh '
+      '--capture-battle-live-web',
+    );
+    expect(liveGate, contains('--capture-battle-live-web'));
+    expect(liveGate, contains('battle_live_visual_runtime_proof_test.dart'));
+    expect(liveGate, contains('web_battle_live_1440x900'));
     expect(File('../docs/qa/ui-live/latest.json').existsSync(), isTrue);
 
     final crop = gate['web_host_margin_crop'] as Map<String, dynamic>;
@@ -77,6 +85,12 @@ void main() {
       isTrue,
     );
     expect(digest, contains('app/test_driver/runtime_screenshot_crop.dart'));
+    expect(
+      digest,
+      contains(
+        'app/integration_test/battle_live_visual_runtime_proof_test.dart',
+      ),
+    );
     expect(digest, contains('scripts/manaloom_p0_runtime_capture.sh'));
     expect(digest, contains('scripts/lib/manaloom_ui_runtime_contract.sh'));
   });
@@ -130,6 +144,34 @@ void main() {
 
       final p0Matrix = surfaces.singleWhere(
         (surface) => surface['id'] == 'authenticated_p0_matrix',
+      );
+      final battleLive = surfaces.singleWhere(
+        (surface) => surface['id'] == 'battle_live',
+      );
+      expect(battleLive['required_profiles'], <String, dynamic>{
+        'web_battle_live_1440x900': 5,
+      });
+      expect(
+        (battleLive['required_checkpoints'] as List).cast<String>(),
+        <String>[
+          'battle_live_00_waiting',
+          'battle_live_01_active_feed',
+          'battle_live_02_recoverable_reconnect',
+          'battle_live_03_timeout_terminal',
+          'battle_live_04_completed_replay',
+        ],
+      );
+      expect(
+        (battleLive['stable_keys'] as List).cast<String>().toSet(),
+        containsAll(<String>{
+          'battle-live-progress',
+          'battle-live-table',
+          'battle-live-timeline',
+          'battle-live-reconnect-banner',
+          'battle-live-terminal-state',
+          'battle-live-new-attempt-button',
+          'battle-live-open-replay-button',
+        }),
       );
       expect(p0Matrix['required_profiles'], <String, dynamic>{
         'web_mobile_390x844': 54,

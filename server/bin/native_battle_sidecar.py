@@ -23,6 +23,8 @@ KNOWLEDGE_DB = Path(
     os.environ.get("MANALOOM_KNOWLEDGE_DB", "/data/manaloom-ops/knowledge.db")
 )
 MAX_BODY_BYTES = 8 * 1024 * 1024
+DEFAULT_SIMULATION_TIMEOUT_MS = 40_000
+MAXIMUM_SIMULATION_TIMEOUT_MS = 180_000
 PROCESS_ID = str(uuid.uuid4())
 STARTED_AT = datetime.now(timezone.utc).isoformat()
 SIMULATION_LOCK = threading.Lock()
@@ -213,7 +215,13 @@ def _run_simulation(payload: dict[str, Any], *, db_path: Path = KNOWLEDGE_DB) ->
             "message": "Reviewed native coverage is incomplete",
             "unsupported_cards": coverage["unsupported_cards"],
         }
-    timeout_ms = max(1000, min(40000, int(payload.get("timeout_ms") or 40000)))
+    timeout_ms = max(
+        1000,
+        min(
+            MAXIMUM_SIMULATION_TIMEOUT_MS,
+            int(payload.get("timeout_ms") or DEFAULT_SIMULATION_TIMEOUT_MS),
+        ),
+    )
     env = dict(os.environ)
     env["MANALOOM_KNOWLEDGE_DB"] = str(db_path)
     with SIMULATION_LOCK:

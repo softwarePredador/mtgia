@@ -200,6 +200,42 @@ class NativeBattleSidecarTest(unittest.TestCase):
             ["battle_rule_v1:test"],
         )
 
+    def test_simulation_accepts_the_async_job_timeout_budget(self) -> None:
+        module = _load_module()
+        completed = subprocess.CompletedProcess(
+            args=["python"],
+            returncode=0,
+            stdout=json.dumps(
+                {
+                    "status": "completed",
+                    "engine": "manaloom_native_reviewed",
+                    "engine_contract": "native_reviewed_rules_execution",
+                }
+            ),
+            stderr="",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "knowledge.db"
+            _create_db(db)
+            with mock.patch.object(
+                module.subprocess,
+                "run",
+                return_value=completed,
+            ) as run:
+                status, _ = module._run_simulation(
+                    {
+                        "required_rule_cards": [{"name": "Aerialephant"}],
+                        "timeout_ms": 999_999,
+                    },
+                    db_path=db,
+                )
+
+        self.assertEqual(status, 200)
+        self.assertEqual(
+            run.call_args.kwargs["timeout"],
+            module.MAXIMUM_SIMULATION_TIMEOUT_MS / 1000,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

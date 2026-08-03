@@ -3843,6 +3843,24 @@ final migrations = <Migration>[
       CHECK (timeout_ms BETWEEN 1 AND 600000);
     ''',
   ),
+  Migration(
+    version: '057',
+    name: 'expand_battle_job_async_timeout',
+    up: '''
+      ALTER TABLE battle_jobs
+      DROP CONSTRAINT IF EXISTS chk_battle_job_timeout;
+      ALTER TABLE battle_jobs
+      ADD CONSTRAINT chk_battle_job_timeout
+      CHECK (timeout_ms BETWEEN 1000 AND 180000);
+    ''',
+    down: '''
+      ALTER TABLE battle_jobs
+      DROP CONSTRAINT IF EXISTS chk_battle_job_timeout;
+      ALTER TABLE battle_jobs
+      ADD CONSTRAINT chk_battle_job_timeout
+      CHECK (timeout_ms BETWEEN 1000 AND 40000);
+    ''',
+  ),
 ];
 
 class Migration {
@@ -3936,7 +3954,8 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '053' ||
       '054' ||
       '055' ||
-      '056' => MigrationRollbackPolicy.manualOnly,
+      '056' ||
+      '057' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

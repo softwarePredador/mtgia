@@ -107,27 +107,32 @@ void main() {
     },
   );
 
-  test('source 404 is an empty recoverable running page', () async {
-    final store = _MemoryStore(_runningJob());
-    final source = _ThrowingSource(
-      const BattleLiveSourceException(
-        'source_stream_not_found',
-        statusCode: 404,
-        retryable: true,
-      ),
-    );
+  test(
+    'running auto job with unresolved engine keeps source 404 recoverable',
+    () async {
+      final store = _MemoryStore(
+        _runningJob(requestedEngine: 'auto', engineLane: 'auto'),
+      );
+      final source = _ThrowingSource(
+        const BattleLiveSourceException(
+          'source_stream_not_found',
+          statusCode: 404,
+          retryable: true,
+        ),
+      );
 
-    final page = await _service(
-      store,
-      source,
-    ).read(userId: _userId, jobId: _jobId);
+      final page = await _service(
+        store,
+        source,
+      ).read(userId: _userId, jobId: _jobId);
 
-    expect(page.status, BattleLiveStatus.running);
-    expect(page.items, isEmpty);
-    expect(page.replay, isNull);
-    expect(page.status.isTerminal, isFalse);
-    expect(source.calls, 1);
-  });
+      expect(page.status, BattleLiveStatus.running);
+      expect(page.items, isEmpty);
+      expect(page.replay, isNull);
+      expect(page.status.isTerminal, isFalse);
+      expect(source.calls, 1);
+    },
+  );
 
   test('queued auto jobs expose an empty page before XMage dispatch', () async {
     final store = _MemoryStore(
@@ -302,6 +307,27 @@ void main() {
       );
       await expectLater(
         _service(unsupportedStore, null).read(userId: _userId, jobId: _jobId),
+        throwsA(
+          isA<BattleLiveConflictException>().having(
+            (error) => error.code,
+            'code',
+            'battle_live_engine_unsupported',
+          ),
+        ),
+      );
+
+      final resolvedNonXmageStore = _MemoryStore(
+        _runningJob(
+          requestedEngine: 'auto',
+          engineLane: 'auto',
+          engine: 'forge',
+        ),
+      );
+      await expectLater(
+        _service(
+          resolvedNonXmageStore,
+          null,
+        ).read(userId: _userId, jobId: _jobId),
         throwsA(
           isA<BattleLiveConflictException>().having(
             (error) => error.code,
@@ -488,6 +514,7 @@ BattleLiveJobState _runningJob({
   BattleJobStatus status = BattleJobStatus.running,
   String requestedEngine = 'xmage',
   String engineLane = 'xmage',
+  String? engine,
   String? replayId,
   Object? replayGameLog,
 }) {
@@ -498,7 +525,7 @@ BattleLiveJobState _runningJob({
     requestId: 'battle-job-$_jobId',
     requestedEngine: requestedEngine,
     engineLane: engineLane,
-    engine: status.isTerminal ? 'xmage' : null,
+    engine: engine ?? (status.isTerminal ? 'xmage' : null),
     replayId: replayId,
     replayGameLog: replayGameLog,
   );

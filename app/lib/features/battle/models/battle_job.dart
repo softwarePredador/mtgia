@@ -7,6 +7,8 @@ const battleJobListSchemaVersion = 'battle_job_list_v1';
 const battleJobRequestSchemaVersion = 'battle_job_request_v1';
 const externalBattleDeckHashSchemaVersion = 'external_battle_deck_hash_v1';
 const battleRequestCorrelationSchemaVersion = 'battle_request_correlation_v1';
+const battleJobDefaultTimeoutMs = 120000;
+const battleJobMaximumTimeoutMs = 180000;
 
 class BattleJobContractException implements Exception {
   const BattleJobContractException(this.code);
@@ -390,7 +392,7 @@ class BattleJob {
     }
 
     final timeoutMs = _requireInt(json['timeout_ms'], 'invalid_timeout');
-    if (timeoutMs < 1000 || timeoutMs > 40000) {
+    if (timeoutMs < 1000 || timeoutMs > battleJobMaximumTimeoutMs) {
       throw const BattleJobContractException('invalid_timeout');
     }
     final attemptCount = _requireInt(
@@ -588,7 +590,7 @@ class BattleJobCreateRequest {
     required this.setup,
     required String idempotencyKey,
     this.maxTurns = 30,
-    this.timeoutMs = 40000,
+    this.timeoutMs = battleJobDefaultTimeoutMs,
     this.engine,
     this.seed,
   }) : deckId = _validateRequestIdentifier(deckId, 'invalid_deck_id'),
@@ -610,7 +612,7 @@ class BattleJobCreateRequest {
     if (maxTurns < 1 || maxTurns > 100) {
       throw const BattleJobContractException('invalid_max_turns');
     }
-    if (timeoutMs < 1000 || timeoutMs > 40000) {
+    if (timeoutMs < 1000 || timeoutMs > battleJobMaximumTimeoutMs) {
       throw const BattleJobContractException('invalid_timeout');
     }
     if (seed != null && (seed! < 0 || seed! > 0x7fffffff)) {

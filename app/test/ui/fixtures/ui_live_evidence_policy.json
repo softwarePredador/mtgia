@@ -15,6 +15,7 @@
   "gate": {
     "command": "../scripts/manaloom_ui_live_evidence_gate.sh --check",
     "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> MANALOOM_UI_ANDROID_RUNTIME_KIND=auto ../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+    "battle_live_capture_command": "../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-live-web",
     "p0_capture_command": "../scripts/manaloom_p0_runtime_capture.sh --profile <PROFILE> --ready-manifest <READY_JSON> --runtime-log <LOG> [--device <ANDROID_RUNTIME_ID>]",
     "p0_index_command": "MANALOOM_P0_*_DIR=<REPO_CAPTURE_DIR> MANALOOM_P0_*_LOG=<RUNTIME_LOG> ../scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
     "current_review": "../docs/qa/ui-live/latest.json",
@@ -62,6 +63,34 @@
         "battle_coach_04_concede_confirmation",
         "battle_coach_05_action_progress",
         "battle_coach_06_terminal_replay"
+      ]
+    },
+    {
+      "id": "battle_live",
+      "route": "/decks/:id/battle-live/:jobId",
+      "source": "lib/features/battle/screens/battle_live_spectator_screen.dart",
+      "automated_test": "test/features/battle/screens/battle_live_spectator_screen_test.dart",
+      "runtime_test": "integration_test/battle_live_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "battle-live-screen",
+        "battle-live-status-header",
+        "battle-live-progress",
+        "battle-live-table",
+        "battle-live-timeline",
+        "battle-live-reconnect-banner",
+        "battle-live-terminal-state",
+        "battle-live-new-attempt-button",
+        "battle-live-open-replay-button"
+      ],
+      "required_profiles": {
+        "web_battle_live_1440x900": 5
+      },
+      "required_checkpoints": [
+        "battle_live_00_waiting",
+        "battle_live_01_active_feed",
+        "battle_live_02_recoverable_reconnect",
+        "battle_live_03_timeout_terminal",
+        "battle_live_04_completed_replay"
       ]
     },
     {

@@ -222,6 +222,51 @@ void main() {
       expect(completed.replayId, 'replay-1');
       expect(completed.records, hasLength(1));
     });
+
+    test('preserves explicit pagination and replay-pending state', () {
+      final paged = const BattleLiveSession.empty().apply(
+        BattleLivePage.fromJson(
+          _pageJson(
+            items: [_eventRecord(sequence: 1, recordId: 'event-1')],
+            nextCursor: 'blc1.paged.signature',
+            hasMore: true,
+          ),
+        ),
+      );
+
+      expect(paged.hasMore, isTrue);
+      expect(paged.replayPending, isFalse);
+
+      final pending = paged.apply(
+        BattleLivePage.fromJson(
+          _pageJson(
+            status: 'completed',
+            isTerminal: true,
+            terminalReason: 'completed',
+            nextCursor: 'blc1.pending.signature',
+            replayPending: true,
+          ),
+        ),
+      );
+
+      expect(pending.hasMore, isFalse);
+      expect(pending.replayPending, isTrue);
+
+      final completed = pending.apply(
+        BattleLivePage.fromJson(
+          _pageJson(
+            status: 'completed',
+            isTerminal: true,
+            terminalReason: 'completed',
+            nextCursor: 'blc1.replay.signature',
+            replay: const {'replay_id': 'replay-1', 'available': true},
+          ),
+        ),
+      );
+
+      expect(completed.replayPending, isFalse);
+      expect(completed.replayId, 'replay-1');
+    });
   });
 }
 
@@ -232,6 +277,8 @@ Map<String, dynamic> _pageJson({
   String nextCursor = 'blc1.next.signature',
   String? terminalReason,
   Map<String, dynamic>? replay,
+  bool replayPending = false,
+  bool hasMore = false,
 }) {
   return <String, dynamic>{
     'schema_version': 'battle_live_cursor_v1',
@@ -243,7 +290,7 @@ Map<String, dynamic> _pageJson({
     'items': items,
     'item_count': items.length,
     'next_cursor': nextCursor,
-    'has_more': false,
+    'has_more': hasMore,
     'truncated': false,
     'truncation': const {
       'source': false,
@@ -252,7 +299,7 @@ Map<String, dynamic> _pageJson({
       'field_limit': false,
     },
     'limits': const {'page': 50, 'payload_bytes': 131072},
-    'replay_pending': false,
+    'replay_pending': replayPending,
     'replay_already_delivered': false,
     if (replay != null) 'replay': replay,
   };

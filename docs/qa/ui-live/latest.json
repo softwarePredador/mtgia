@@ -1,21 +1,19 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "2c5027b50a59dea8978bd99cf0a7dfff21683fdca1873e4cf9156c1c2c66fca2",
+  "source_digest": "3b20f72472d724d6c0a68c868c4399ea88d3527f2a9aedf2514d47bd4ec16207",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-02T23:41:50Z",
+    "verified_at": "2026-08-03T13:37:31Z",
     "commands": [
+      "flutter test dos modelos, gateway e tela Battle Live (63 testes aprovados)",
+      "flutter test dos contratos de evidência e integração Battle Live (25 testes aprovados)",
+      "dart test dos contratos backend Battle Job/Live/readiness/migrations (55 testes aprovados)",
+      "python3 -m unittest server/test/native_battle_sidecar_test.py (6 testes aprovados)",
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
-      "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on Android 14 emulator, including native Life Counter landscape)",
-      "flutter test integration_test/core_product_acceptance_runtime_test.dart -d emulator-5554 (18 collection/deck/optimizer/runtime states on Android emulator, including the B1-B5 selector)",
-      "flutter test integration_test/battle_coach_visual_runtime_proof_test.dart -d emulator-5554 (7 Battle Coach runtime states on Android emulator)",
-      "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
-      "dart test server/test/edh_bracket_policy_test.dart server/test/optimize_swap_candidate_support_test.dart (40 passed)",
-      "flutter test app/test/features/decks/widgets/deck_optimize_dialogs_test.dart app/test/platform/android_toolchain_contract_test.dart (28 passed)",
-      "flutter test app/test/features/battle/screens/battle_coach_screen_test.dart app/test/features/battle/screens/battle_replays_screen_test.dart app/test/features/decks/screens/deck_details_screen_test.dart (60 passed)",
-      "flutter test app/test/features/battle/models/battle_replay_test.dart app/test/features/battle/screens/battle_replays_screen_test.dart (42 passed after the replay presentation adjustment)",
-      "flutter analyze (no issues found)"
+      "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints no emulador Android 14, incluindo Life Counter nativo em landscape)",
+      "flutter test --release -d chrome integration_test/battle_live_visual_runtime_proof_test.dart (5/5 estados Battle Live Web)",
+      "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix"
     ]
   },
   "runtime": {
@@ -23,113 +21,100 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "511ab4801135c6339f63328f83fa1fa683808779ed95b8210ca649eb1fda9337"
+        "sha256": "9b24f3588b894a944de3c516af20a7f35bd9c4ed546949eb284330b6089408eb"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "74cccb76fb4bae34da50895a7296d076294b716842b6256d4529c76962bb0dd0"
+        "sha256": "9130d8b944fa122cf599cb34362aa2f9951ec62f44ec5a7577ce5677f01efcea"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "49896aaf01f819ad474c67b468bf6a90d1dcea18e12f53087d6e9bbc5efe9e62"
+        "sha256": "5640dbccb6b840db028bc60b654f4fb68f69f6463e6386de03e75a9593be1b5d"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "0be592ca474ef6896c6268f8375a1bf8ade7e2c31ccb21aa3b15ba786db6c36c"
+        "sha256": "4828efd0612f59ce35d45b9614ef87ff31d8cdbc56a4940d727e3aff3bd4833d"
       },
       {
-        "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
-        "sha256": "e707b431809791accb1c5fd82e8cc27f675cee59a16a6afcb7d69b1e8193c91f"
-      },
-      {
-        "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "ef0b5c6366fb4e70a561840e90a4a9464f676beffa4a3a546684df21e47a8479"
-      },
-      {
-        "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "6c48077bd50e5d3f09329f9c12c29b846864a091c129635799dc66f01086f782"
+        "path": "docs/qa/ui-live/current/battle-live-web/capture-manifest.json",
+        "sha256": "ea1fbe1a3250b203a7a3cf4f5d4379457fb540ed03aefb860be7b04bd03d27ea"
       }
     ],
     "evidence_notes": [
       "As 160 capturas Web e as 54 capturas Android da matriz P0 foram recapturadas integralmente no digest atual, sem carry-forward.",
       "O emulador Android 14 concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2400×1080; esta rodada não reivindica crédito de aparelho físico.",
-      "A jornada Android dedicada de coleção, criação de Commander e otimização concluiu 18/18 estados, incluindo validação inline, retry de persistência, correção segura de terrenos de 9 para 36 e inspeção individual dos brackets B1-B5.",
-      "O Battle Coach foi recapturado em 7 estados no emulador Android, cobrindo boas-vindas, mesa ativa, decisão, erro recuperável, confirmação, progresso e replay terminal.",
-      "A prova Web real de teclado cobriu 19/19 checkpoints com Tab, Shift+Tab, Enter, Espaço, Escape e digitação do navegador; criou conta e deck novos (Talrand e 99 Wastes), escolheu o rival público Animar, obteve preflight positivo, manteve a mão, tomou uma decisão legal após troca assíncrona de prompt e registrou o replay terminal, sem erro ou warning no console.",
-      "A matriz P0 e as provas Android usaram PostgreSQL/API loopback descartáveis; a jornada Web usou o build release do digest atual por proxy same-origin contra a API implantada."
+      "O Battle Live foi recapturado no build Web release em cinco estados: espera inicial, feed público ativo, reconexão recuperável preservando dados, timeout terminal e conclusão com replay.",
+      "Todas as 219 capturas referenciadas foram abertas e revisadas no digest atual; manifestos opcionais antigos de Battle Coach não receberam crédito nesta rodada.",
+      "A matriz P0 usou PostgreSQL/API loopback descartáveis e o Battle Live usou um harness determinístico que valida a UI real sem inventar percentual de progresso."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-02T23:41:50Z",
+    "reviewed_at": "2026-08-03T13:37:31Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
     },
-    "visual_thesis": "ManaLoom assume a identidade original de um utilitário arcano de mesa: Obsidian organiza o fundo, Frost sustenta leitura, Brass indica prioridade, objetos de carta e motivos de campo dão contexto e WUBRG aparece como dado do jogo. O resultado remete a Magic sem copiar logos, card backs, set marks ou trade dress da Wizards.",
-    "content_plan": "Cada rota apresenta contexto e estado antes da ação; decks, cartas, formatos, legalidade e coleção permanecem objetos primários, enquanto Battle explicita mão, pilha, campo e prioridade e o Life Counter preserva a leitura de mesa. Formulários mantêm ajuda e validação junto ao campo.",
-    "interaction_thesis": "A próxima ação permanece identificável por hierarquia, foco e feedback; erros, vazios, bloqueios, progresso e zonas de jogo permanecem distinguíveis e recuperáveis. O roteiro de teclado Web confirmou foco visível e ativação real da escolha de adversário, início da sessão, decisões e replay.",
+    "visual_thesis": "ManaLoom assume a identidade original de um utilitário arcano de mesa: Obsidian organiza o fundo, Frost sustenta leitura, Brass indica prioridade e ações, e os painéis de estado tornam a Battle observável sem reproduzir marcas proprietárias da Wizards.",
+    "content_plan": "Acompanhamento apresenta status e tempo primeiro, depois mesa pública, timeline e ação terminal; dados já recebidos permanecem visíveis durante reconexão e o replay aparece quando efetivamente persistido.",
+    "interaction_thesis": "A próxima ação permanece identificável por hierarquia, foco e feedback; espera, atividade, falha recuperável, timeout e conclusão têm comportamentos distintos, sem bloquear o usuário com um percentual fictício.",
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 258 capturas preservam título/contexto, estado e CTA em ordem clara; cadastro, legal, Battle, Life Counter, busca, criação, otimização e detalhes de deck mantêm foco e camadas previsíveis."
+        "note": "As 219 capturas preservam título, contexto, estado e CTA em ordem clara; no Battle Live, status/tempo precedem mesa, timeline e ação terminal."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
-        "note": "Cartas, Commander, legalidade, mão, pilha, campo, prioridade, vida e WUBRG comunicam o domínio; o verso autoral do ManaLoom substitui o ícone genérico quando a arte está ausente, e marcas proprietárias da Wizards não são reproduzidas."
+        "note": "Cartas, Commander, legalidade, mão, grimório, campo, cemitério, pilha, combate, mana e vida comunicam o domínio sem copiar trade dress proprietária."
       },
       "color_and_contrast": {
         "status": "pass",
-        "note": "Frost sobre Obsidian mantém legibilidade, Brass destaca foco/prioridade, e estados de sucesso, erro e bloqueio também usam texto e ícone, não apenas cor."
+        "note": "Frost sobre Obsidian mantém legibilidade, Brass destaca ações e estados também usam texto e ícone, não apenas cor."
       },
       "typography": {
         "status": "pass",
-        "note": "Títulos, labels, ajuda, versões legais e conteúdo denso mantêm escala e peso coerentes nos três viewports Web e no emulador Android."
+        "note": "Títulos, labels, ajuda, dados de mesa e timeline mantêm escala e peso coerentes nos três viewports Web e no emulador Android."
       },
       "spacing_and_density": {
         "status": "pass",
-        "note": "Cards, campos, links legais, listas, tabs, zonas de jogo e painéis preservam gutters e ritmo; não foi observado overlap ou compressão crítica."
+        "note": "Cards, campos, listas e painéis preservam gutters e ritmo; não foi observado overlap, corte de CTA ou compressão crítica."
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 no emulador Android, 18 estados Android do produto principal, 7 estados dedicados do Battle Coach Android e 19 estados de teclado Web. O Life Counter foi validado em landscape 2400×1080 e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 no emulador Android e 5 do Battle Live Web. O Life Counter foi validado em landscape 2400×1080 e nenhuma superfície apresentou overflow bloqueante."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Formulários, navegação, busca, modais, estados vazios e Battle têm ações e retorno explícitos; os testes automatizados e 19 checkpoints reais de teclado confirmaram foco, atalhos, semântica e ativação de uma sessão positiva."
+        "note": "Reconectar preserva os registros já vistos; timeout oferece nova tentativa e retorno; conclusão oferece abertura explícita do replay final."
       },
       "state_coverage": {
         "status": "pass",
-        "note": "A matriz cobre 54 checkpoints de rotas/estados P0, incluindo o estado vazio de decks, sucesso, erro, modal, disabled, acima/abaixo da dobra, cadastro/legal, comunidades, trades, Battle e Life Counter."
+        "note": "A matriz cobre 54 checkpoints P0 por perfil aplicável e o Battle Live cobre espera, progresso real, desconexão recuperável, timeout e conclusão."
       },
       "accessibility_visual": {
         "status": "pass",
-        "note": "Foco visível, labels, redundância de estado e alvos foram inspecionados; o roteiro humano TalkBack continua explicitamente pendente e não recebeu crédito visual."
+        "note": "Foco visível, labels, redundância de estado e alvos foram inspecionados; o roteiro humano TalkBack continua pendente e não recebeu crédito visual."
       },
       "attractiveness": {
         "status": "pass",
-        "note": "A composição é coesa, funcional e reconhecível como produto para jogadores de MTG: estados antes genéricos agora usam moldura de carta/campo, Battle parece uma mesa decisória e Home/Deck/Life preservam personalidade sem ruído ornamental."
+        "note": "A composição é coesa e reconhecível como produto para jogadores de MTG; o Battle Live parece uma mesa de observação útil, com densidade controlada e ações de latão."
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "511ab4801135c6339f63328f83fa1fa683808779ed95b8210ca649eb1fda9337",
-      "74cccb76fb4bae34da50895a7296d076294b716842b6256d4529c76962bb0dd0",
-      "49896aaf01f819ad474c67b468bf6a90d1dcea18e12f53087d6e9bbc5efe9e62",
-      "0be592ca474ef6896c6268f8375a1bf8ade7e2c31ccb21aa3b15ba786db6c36c",
-      "e707b431809791accb1c5fd82e8cc27f675cee59a16a6afcb7d69b1e8193c91f",
-      "ef0b5c6366fb4e70a561840e90a4a9464f676beffa4a3a546684df21e47a8479",
-      "6c48077bd50e5d3f09329f9c12c29b846864a091c129635799dc66f01086f782"
+      "9b24f3588b894a944de3c516af20a7f35bd9c4ed546949eb284330b6089408eb",
+      "9130d8b944fa122cf599cb34362aa2f9951ec62f44ec5a7577ce5677f01efcea",
+      "5640dbccb6b840db028bc60b654f4fb68f69f6463e6386de03e75a9593be1b5d",
+      "4828efd0612f59ce35d45b9614ef87ff31d8cdbc56a4940d727e3aff3bd4833d",
+      "ea1fbe1a3250b203a7a3cf4f5d4379457fb540ed03aefb860be7b04bd03d27ea"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",
       "web_desktop_1440x900",
       "web_mobile_390x844",
       "web_wide_1920x1080",
-      "android_emulator_core_product",
-      "android_emulator_phone",
-      "web_iab_1280x720"
+      "web_battle_live_1440x900"
     ],
-    "reviewed_screenshot_count": 258,
+    "reviewed_screenshot_count": 219,
     "blocking_findings": [],
     "follow_up_findings": [
       "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
@@ -139,10 +124,8 @@
   "release_checks": {
     "android_talkback_human": "pending",
     "android_hardware_smoke": "pending",
-    "battle_coach_android_emulator": "pass_current_digest",
-    "battle_coach_web_keyboard_real": "pass_current_digest",
-    "battle_coach_positive_preflight": "pass_current_digest",
-    "battle_coach_runtime_copy_production": "pass_current_digest",
+    "battle_live_web_real": "pass_current_digest",
+    "battle_coach_optional_manifests": "stale_not_claimed",
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }
 }

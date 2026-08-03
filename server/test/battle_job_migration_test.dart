@@ -106,4 +106,27 @@ void main() {
     expect(migration.up, contains("'server_dispatch_recorded'"));
     expect(migration.up, contains("'sidecar_echo_validated'"));
   });
+
+  test('migration 057 and fresh schema expand only the async job budget', () {
+    final migration = migrate.migrations.singleWhere(
+      (candidate) => candidate.version == '057',
+    );
+    final baseline = File('database_setup.sql').readAsStringSync();
+
+    expect(migration.name, 'expand_battle_job_async_timeout');
+    expect(
+      migration.up,
+      contains('CHECK (timeout_ms BETWEEN 1000 AND 180000)'),
+    );
+    expect(baseline, contains('CHECK (timeout_ms BETWEEN 1000 AND 180000)'));
+    expect(
+      migration.down,
+      contains('CHECK (timeout_ms BETWEEN 1000 AND 40000)'),
+    );
+    expect(splitPostgresStatements(migration.up), hasLength(2));
+    expect(
+      migrate.migrationRollbackPolicy('057'),
+      migrate.MigrationRollbackPolicy.manualOnly,
+    );
+  });
 }

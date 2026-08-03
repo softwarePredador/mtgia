@@ -119,6 +119,7 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '054': 'create_battle_jobs',
   '055': 'create_battle_job_live_records',
   '056': 'create_interactive_battle_sessions',
+  '057': 'expand_battle_job_async_timeout',
 };
 
 const releaseSchemaReadinessSql = '''
@@ -142,11 +143,12 @@ const releaseSchemaReadinessSql = '''
       ('053', 'create_battle_replay_annotations'),
       ('054', 'create_battle_jobs'),
       ('055', 'create_battle_job_live_records'),
-      ('056', 'create_interactive_battle_sessions')
+      ('056', 'create_interactive_battle_sessions'),
+      ('057', 'expand_battle_job_async_timeout')
   )
   SELECT
     (
-      SELECT COUNT(*) = 19
+      SELECT COUNT(*) = 20
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
@@ -155,7 +157,7 @@ const releaseSchemaReadinessSql = '''
     COALESCE(
       (SELECT MAX(version) FROM public.schema_migrations),
       ''
-    ) = '056' AS latest_migration_ready,
+    ) = '057' AS latest_migration_ready,
     (
       SELECT COUNT(*)
       FROM pg_class
@@ -590,8 +592,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: healthy,
       check: {
         'status': healthy ? 'healthy' : 'unhealthy',
-        'required_range': '038-056',
-        'latest_migration': '056',
+        'required_range': '038-057',
+        'latest_migration': '057',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -603,8 +605,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: false,
       check: {
         'status': 'unhealthy',
-        'required_range': '038-056',
-        'latest_migration': '056',
+        'required_range': '038-057',
+        'latest_migration': '057',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),

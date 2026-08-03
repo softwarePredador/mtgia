@@ -252,12 +252,23 @@ BattleLiveRecordWrite _checkpointWrite(BattleLiveSourceSnapshot snapshot) {
 bool _supportsXmageLive(BattleLiveJobState job) {
   final actual = job.engine?.trim().toLowerCase();
   if (actual != null && actual.isNotEmpty) return actual == 'xmage';
-  if (job.status == BattleJobStatus.queued ||
-      job.status == BattleJobStatus.claimed) {
-    return job.requestedEngine == 'auto' || job.requestedEngine == 'xmage';
-  }
-  return job.engineLane == 'xmage' &&
-      (job.requestedEngine == 'auto' || job.requestedEngine == 'xmage');
+
+  final active = switch (job.status) {
+    BattleJobStatus.queued ||
+    BattleJobStatus.claimed ||
+    BattleJobStatus.running ||
+    BattleJobStatus.cancelPending => true,
+    _ => false,
+  };
+  if (!active) return false;
+
+  final requested = job.requestedEngine.trim().toLowerCase();
+  final lane = job.engineLane.trim().toLowerCase();
+  return switch (requested) {
+    'auto' => lane == 'auto' || lane == 'xmage',
+    'xmage' => lane == 'xmage',
+    _ => false,
+  };
 }
 
 BattleLiveStatus _liveStatus(BattleJobStatus status) => switch (status) {

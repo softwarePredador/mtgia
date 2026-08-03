@@ -14,17 +14,20 @@ import 'package:manaloom/features/battle/services/battle_replay_service.dart';
 class _FakeBattleJobGateway extends BattleJobGateway {
   _FakeBattleJobGateway({
     required BattleJob job,
+    List<BattleJob> jobResponses = const [],
     List<Object> liveResponses = const [],
     BattleJobCancellation? cancellation,
     List<BattleJob>? listedJobs,
     BattleJobCreation? creation,
   }) : _job = job,
+       _jobResponses = List<BattleJob>.from(jobResponses),
        _liveResponses = List<Object>.from(liveResponses),
        _cancellation = cancellation,
        _listedJobs = listedJobs ?? const [],
        _creation = creation;
 
   BattleJob _job;
+  final List<BattleJob> _jobResponses;
   final List<Object> _liveResponses;
   final BattleJobCancellation? _cancellation;
   final List<BattleJob> _listedJobs;
@@ -59,6 +62,9 @@ class _FakeBattleJobGateway extends BattleJobGateway {
   @override
   Future<BattleJob> get(String jobId) async {
     getCalls += 1;
+    if (_jobResponses.isNotEmpty) {
+      _job = _jobResponses.removeAt(0);
+    }
     return _job;
   }
 
@@ -186,15 +192,38 @@ void main() {
   });
 
   testWidgets(
-    'keeps job progress when the visual feed is unavailable for the executor',
+    'treats an early auto-engine 409 as transient and recovers live records',
     (tester) async {
+      final waitingJob = _job(
+        status: 'running',
+        stage: 'running',
+        current: 15,
+        total: 100,
+      );
+      final liveJob = _job(
+        status: 'running',
+        stage: 'running',
+        current: 20,
+        total: 100,
+        engine: 'xmage',
+      );
       final gateway = _FakeBattleJobGateway(
-        job: _job(status: 'running', stage: 'running', current: 2),
-        liveResponses: const [
-          BattleJobGatewayException(
+        job: liveJob,
+        jobResponses: [waitingJob, liveJob],
+        liveResponses: [
+          const BattleJobGatewayException(
             code: 'battle_job_conflict',
             message: 'Conflict',
             statusCode: 409,
+          ),
+          _page(
+            items: [
+              _eventRecord(
+                sequence: 1,
+                recordId: 'event-recovered',
+                message: 'A partida começou.',
+              ),
+            ],
           ),
         ],
       );
@@ -203,11 +232,7 @@ void main() {
 
       expect(
         find.byKey(const Key('battle-live-visual-feed-unavailable')),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('A simulação continua normalmente'),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('battle-live-reconnect-banner')),
@@ -219,10 +244,67 @@ void main() {
       await tester.pump();
 
       expect(gateway.getCalls, greaterThanOrEqualTo(2));
-      expect(gateway.pollCalls, 1);
+      expect(gateway.pollCalls, 2);
+      expect(
+        find.byKey(const Key('battle-live-record-event-recovered')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('battle-live-visual-feed-unavailable')),
+        findsNothing,
+      );
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
+
+  testWidgets('shows unavailable feed only for a known unsupported engine', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleJobGateway(
+      job: _job(
+        status: 'running',
+        stage: 'running',
+        current: 2,
+        engine: 'forge',
+      ),
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    expect(
+      find.byKey(const Key('battle-live-visual-feed-unavailable')),
+      findsOneWidget,
+    );
+    expect(gateway.pollCalls, 0);
+    expect(find.textContaining('XMage'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('shows honest indeterminate progress while the job is active', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleJobGateway(
+      job: _job(
+        status: 'running',
+        stage: 'starting_engine',
+        current: 15,
+        total: 100,
+      ),
+      liveResponses: [_page()],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    final indicator = tester.widget<LinearProgressIndicator>(
+      find.byKey(const Key('battle-live-progress')),
+    );
+    expect(indicator.value, isNull);
+    expect(find.textContaining('15 de 100'), findsNothing);
+    expect(find.textContaining('15 por cento'), findsNothing);
+    expect(find.textContaining('Iniciando a simulação'), findsOneWidget);
+    expect(find.textContaining('Tempo decorrido:'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 
   testWidgets('creates a live job from the single opponent simulation action', (
     tester,
@@ -539,6 +621,127 @@ void main() {
     );
   });
 
+  testWidgets('drains every final live page before stopping', (tester) async {
+    final gateway = _FakeBattleJobGateway(
+      job: _job(status: 'running', stage: 'running', current: 5),
+      liveResponses: [
+        _page(
+          status: 'completed',
+          terminal: true,
+          terminalReason: 'completed',
+          items: [
+            _eventRecord(
+              sequence: 1,
+              recordId: 'event-final-1',
+              message: 'Primeiro registro final.',
+            ),
+          ],
+          nextCursor: 'blc1.final-page-one.signature',
+          hasMore: true,
+        ),
+        _page(
+          status: 'completed',
+          terminal: true,
+          terminalReason: 'completed',
+          items: [
+            _eventRecord(
+              sequence: 2,
+              recordId: 'event-final-2',
+              message: 'Último registro final.',
+            ),
+          ],
+          nextCursor: 'blc1.final-page-two.signature',
+          replay: const {'replay_id': 'replay-1', 'available': true},
+        ),
+      ],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+
+    expect(gateway.pollCalls, 2);
+    expect(gateway.pollInputs.last.cursor, 'blc1.final-page-one.signature');
+    expect(
+      find.byKey(const Key('battle-live-record-event-final-1')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-live-record-event-final-2')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-live-open-replay-button')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('explains timeout without exposing the engine provider', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleJobGateway(
+      job: _job(
+        status: 'timeout',
+        stage: 'timeout',
+        current: 6,
+        terminalReason: 'xmage_battle_operational_failure',
+        errorCode: 'xmage_timeout',
+      ),
+      liveResponses: [
+        _page(
+          status: 'timeout',
+          terminal: true,
+          terminalReason: 'xmage_battle_operational_failure',
+        ),
+      ],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    expect(
+      find.textContaining('atingiu o limite de tempo antes de concluir'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('XMage'), findsNothing);
+    expect(
+      find.byKey(const Key('battle-live-new-attempt-button')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-live-back-replays-button')),
+      findsOneWidget,
+    );
+    final indicator = tester.widget<LinearProgressIndicator>(
+      find.byKey(const Key('battle-live-progress')),
+    );
+    expect(indicator.value, 1);
+  });
+
+  testWidgets('explains an operational failure with provider-neutral copy', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleJobGateway(
+      job: _job(
+        status: 'engine_error',
+        stage: 'engine_error',
+        current: 6,
+        terminalReason: 'xmage_battle_operational_failure',
+      ),
+      liveResponses: [
+        _page(
+          status: 'engine_error',
+          terminal: true,
+          terminalReason: 'xmage_battle_operational_failure',
+        ),
+      ],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    expect(find.textContaining('falha temporária do motor'), findsOneWidget);
+    expect(find.textContaining('XMage'), findsNothing);
+  });
+
   testWidgets('supports keyboard pause and reduced motion', (tester) async {
     final gateway = _FakeBattleJobGateway(
       job: _job(status: 'running', stage: 'running', current: 2),
@@ -669,8 +872,11 @@ BattleJob _job({
   String status = 'queued',
   String stage = 'queued',
   int current = 0,
+  int total = 6,
+  String? engine,
   String? replayId,
   String? terminalReason,
+  String? errorCode,
 }) {
   final terminal = const {
     'completed',
@@ -687,7 +893,7 @@ BattleJob _job({
     'idempotency_key': 'attempt-1',
     'status': status,
     'stage': stage,
-    'progress': {'current': current, 'total': 6, 'ratio': current / 6},
+    'progress': {'current': current, 'total': total, 'ratio': current / total},
     'deck_a_id': 'deck-a',
     'deck_b_id': 'deck-b',
     'deck_hashes': {
@@ -699,12 +905,13 @@ BattleJob _job({
     'request_schema_version': battleJobRequestSchemaVersion,
     'request_hash': _hash('c'),
     'requested_engine': 'auto',
-    'engine': null,
-    'timeout_ms': 40000,
+    'engine': engine,
+    'timeout_ms': 120000,
     'attempt_count': status == 'queued' ? 0 : 1,
     if (status != 'queued') 'attempt_id': 'attempt-run-1',
     if (replayId != null) 'replay_id': replayId,
     if (terminalReason != null) 'terminal_reason': terminalReason,
+    if (errorCode != null) 'error_code': errorCode,
     'heartbeat_at': '2026-07-26T12:00:01Z',
     'created_at': '2026-07-26T12:00:00Z',
     'updated_at': '2026-07-26T12:00:01Z',
@@ -725,6 +932,7 @@ BattleLivePage _page({
   String nextCursor = 'blc1.next.signature',
   Map<String, dynamic>? replay,
   bool replayPending = false,
+  bool hasMore = false,
 }) {
   return BattleLivePage.fromJson({
     'schema_version': 'battle_live_cursor_v1',
@@ -736,7 +944,7 @@ BattleLivePage _page({
     'items': items,
     'item_count': items.length,
     'next_cursor': nextCursor,
-    'has_more': false,
+    'has_more': hasMore,
     'truncated': false,
     'truncation': const {
       'source': false,

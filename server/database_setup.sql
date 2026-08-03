@@ -912,7 +912,7 @@ CREATE TABLE IF NOT EXISTS battle_jobs (
             AND progress_current BETWEEN 0 AND progress_total
         ),
     CONSTRAINT chk_battle_job_timeout
-        CHECK (timeout_ms BETWEEN 1000 AND 40000),
+        CHECK (timeout_ms BETWEEN 1000 AND 180000),
     CONSTRAINT chk_battle_job_attempt_count
         CHECK (attempt_count BETWEEN 0 AND 100),
     CONSTRAINT chk_battle_job_idempotency

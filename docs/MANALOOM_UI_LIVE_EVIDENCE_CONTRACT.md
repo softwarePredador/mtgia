@@ -41,6 +41,14 @@ status → mesa e zonas → decisão → conclusão/replay. A interação para q
 uma decisão humana, bloqueia duplicidade durante o envio, preserva a mesa no
 erro recuperável e mantém concessão atrás de confirmação.
 
+Para o Battle Live, a tese corrente é uma mesa observável contínua em
+Obsidian/slate, sem porcentagens simuladas: brass identifica execução e ação,
+frost organiza estado público e timeline. O conteúdo segue fase e tempo
+decorrido → mesa pública → eventos incrementais → conclusão/replay. A interação
+revela o primeiro checkpoint assim que ele existe, preserva a mesa ao
+reconectar, drena páginas terminais e oferece nova tentativa explícita em
+timeout ou falha operacional.
+
 ## Fluxo canônico
 
 Revalidar somente a prova já revisada:
@@ -57,8 +65,21 @@ MANALOOM_UI_ANDROID_RUNTIME_KIND=auto \
 ./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach
 ```
 
-O capture executa analyzer e testes focados, roda o integration test no device,
-atesta por ADB se o alvo é emulador ou aparelho físico,
+Capturar o Battle Live em build Web release real:
+
+```bash
+./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-live-web
+```
+
+Essa prova usa gateway fake, não autentica nem chama API, e registra cinco
+checkpoints: espera com progresso indeterminado, feed público com snapshot e
+evento, falha recuperável preservando a mesa, timeout com próxima ação clara e
+conclusão com replay. A captura grava
+`docs/qa/ui-live/current/battle-live-web/capture-manifest.json`; ela permanece
+fora do aggregate até todas as cinco imagens serem abertas e revisadas.
+
+O capture do Battle Coach executa analyzer e testes focados, roda o integration
+test no device e atesta por ADB se o alvo é emulador ou aparelho físico,
 extrai os PNGs emitidos pelo runtime e grava
 `docs/qa/ui-live/current/battle-coach-android/capture-manifest.json`. Capturar
 não aprova visualmente: depois disso o revisor abre cada PNG, corrige a UI se
@@ -69,7 +90,7 @@ A prova corrente também agrega a matriz P0 ampla em quatro perfis:
 - Web real mobile, desktop e wide;
 - Android em Pixel 6 AVD, API 34, explicitamente identificado como emulador;
 - Battle Coach Android em sete estados;
-- Battle Coach Web em nove checkpoints de teclado físico.
+- Battle Coach Web em 19 checkpoints de teclado físico.
 
 Os manifestos ficam em `docs/qa/ui-live/current/p0-matrix`,
 `battle-coach-android` e `battle-coach-web-keyboard`. O aggregate
@@ -117,6 +138,8 @@ resources Android, contrato de superfícies e o próprio harness de prova.
 - política: `app/test/ui/fixtures/ui_live_evidence_policy.json`;
 - guard: `app/test/ui/ui_live_evidence_policy_test.dart`;
 - integração: `app/integration_test/battle_coach_visual_runtime_proof_test.dart`;
+- integração Battle Live:
+  `app/integration_test/battle_live_visual_runtime_proof_test.dart`;
 - extração/verificação: `app/tool/ui_runtime_evidence.dart`;
 - gate: `scripts/manaloom_ui_live_evidence_gate.sh`;
 - digest: `scripts/manaloom_ui_source_digest.sh`;

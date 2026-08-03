@@ -553,6 +553,7 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
   final captureTargets = <String>{};
   final captureCountsByProfile = <String, int>{};
   final captureTargetsByProfile = <String, String>{};
+  final captureSurfacesByProfile = <String, String>{};
   var screenshotCount = 0;
   final hasMultipleCaptures = captureReferences.length > 1;
   for (final captureReference in captureReferences) {
@@ -627,6 +628,12 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
       expect(screenshotEntries.isNotEmpty, 'capture contains no screenshots');
       captureCountsByProfile[profile] = screenshotEntries.length;
       captureTargetsByProfile[profile] = target;
+      final existingSurface = captureSurfacesByProfile[profile];
+      expect(
+        existingSurface == null || existingSurface == surface,
+        'runtime profile $profile is shared by multiple surfaces',
+      );
+      captureSurfacesByProfile[profile] = surface;
       screenshotCount += screenshotEntries.length;
       for (final screenshot in screenshotEntries) {
         final checkpoint = screenshot['checkpoint']?.toString() ?? '';
@@ -679,6 +686,7 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
       review: review,
       captureCountsByProfile: captureCountsByProfile,
       captureTargetsByProfile: captureTargetsByProfile,
+      captureSurfacesByProfile: captureSurfacesByProfile,
       captureTargets: captureTargets,
       expect: expect,
     );
@@ -790,6 +798,7 @@ void _validateUiLiveEvidencePolicy({
   required Map<String, dynamic> review,
   required Map<String, int> captureCountsByProfile,
   required Map<String, String> captureTargetsByProfile,
+  required Map<String, String> captureSurfacesByProfile,
   required Set<String> captureTargets,
   required void Function(bool condition, String message) expect,
 }) {
@@ -799,16 +808,9 @@ void _validateUiLiveEvidencePolicy({
     'unsupported live UI evidence policy schema',
   );
   final surfaces = _objectListOrEmpty(policy['surfaces']);
-  final p0Surface = surfaces.cast<Map<String, dynamic>?>().firstWhere(
-    (surface) => surface?['id'] == 'authenticated_p0_matrix',
-    orElse: () => null,
-  );
-  expect(
-    p0Surface != null,
-    'live UI evidence policy has no authenticated P0 surface',
-  );
-  if (p0Surface != null) {
-    final requiredProfiles = _objectOrEmpty(p0Surface['required_profiles']);
+  for (final surface in surfaces) {
+    final surfaceId = surface['id']?.toString().trim() ?? '';
+    final requiredProfiles = _objectOrEmpty(surface['required_profiles']);
     for (final entry in requiredProfiles.entries) {
       final requiredCount = switch (entry.value) {
         int count => count,
@@ -816,6 +818,10 @@ void _validateUiLiveEvidencePolicy({
         String value => int.tryParse(value.trim()),
         _ => null,
       };
+      expect(
+        surfaceId.isNotEmpty,
+        'policy surface with required profiles has no id',
+      );
       expect(
         requiredCount != null && requiredCount > 0,
         'policy profile ${entry.key} has an invalid checkpoint count',
@@ -825,8 +831,21 @@ void _validateUiLiveEvidencePolicy({
         'runtime profile ${entry.key} must contain exactly '
         '$requiredCount screenshots',
       );
+      expect(
+        captureSurfacesByProfile[entry.key] == surfaceId,
+        'runtime profile ${entry.key} must belong to surface $surfaceId',
+      );
     }
-
+  }
+  final p0Surface = surfaces.cast<Map<String, dynamic>?>().firstWhere(
+    (surface) => surface?['id'] == 'authenticated_p0_matrix',
+    orElse: () => null,
+  );
+  expect(
+    p0Surface != null,
+    'live UI evidence policy has no authenticated P0 surface',
+  );
+  if (p0Surface != null) {
     final androidContract = _objectOrEmpty(
       p0Surface['android_runtime_contract'],
     );

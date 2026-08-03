@@ -49,6 +49,39 @@ void main() {
           ),
         ),
       );
+      expect(
+        () => BattleJobCreateRequest(
+          deckId: 'deck-a',
+          setup: BattleTestSetup(opponentDeckId: 'deck-b'),
+          idempotencyKey: 'attempt',
+          timeoutMs: 180001,
+        ),
+        throwsA(
+          isA<BattleJobContractException>().having(
+            (error) => error.code,
+            'code',
+            'invalid_timeout',
+          ),
+        ),
+      );
+    });
+
+    test('defaults to 120 seconds and accepts the 180 second ceiling', () {
+      final standard = BattleJobCreateRequest(
+        deckId: 'deck-a',
+        setup: BattleTestSetup(opponentDeckId: 'deck-b'),
+        idempotencyKey: 'attempt-standard',
+      );
+      final maximum = BattleJobCreateRequest(
+        deckId: 'deck-a',
+        setup: BattleTestSetup(opponentDeckId: 'deck-b'),
+        idempotencyKey: 'attempt-maximum',
+        timeoutMs: 180000,
+      );
+
+      expect(standard.timeoutMs, 120000);
+      expect(standard.toJson()['timeout_ms'], 120000);
+      expect(maximum.timeoutMs, 180000);
     });
 
     test('rejects an empty focus objective and a self-match', () {
@@ -96,6 +129,12 @@ void main() {
       expect(job.progress.total, 6);
       expect(job.canCancel, isTrue);
       expect(job.replayId, isNull);
+    });
+
+    test('accepts the backend timeout ceiling', () {
+      final job = BattleJob.fromJson(_jobJson(timeoutMs: 180000));
+
+      expect(job.timeoutMs, 180000);
     });
 
     test('derives a completed outcome only from a terminal status', () {
@@ -283,6 +322,7 @@ Map<String, dynamic> _jobJson({
   bool terminal = false,
   String? replayId,
   bool engine = false,
+  int timeoutMs = 40000,
 }) {
   return <String, dynamic>{
     'schema_version': 'battle_job_v1',
@@ -311,7 +351,7 @@ Map<String, dynamic> _jobJson({
       'engine_process_started_at': '2026-07-26T12:00:01Z',
     } else
       'engine': null,
-    'timeout_ms': 40000,
+    'timeout_ms': timeoutMs,
     'attempt_count': engine ? 1 : 0,
     if (engine) 'attempt_id': 'attempt-engine-1',
     if (replayId != null) 'replay_id': replayId,

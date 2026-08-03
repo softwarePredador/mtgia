@@ -37,6 +37,7 @@ SOURCE_ROOTS=(
   "app/pubspec.yaml"
   "app/pubspec.lock"
   "app/integration_test/battle_coach_visual_runtime_proof_test.dart"
+  "app/integration_test/battle_live_visual_runtime_proof_test.dart"
   "app/integration_test/core_product_acceptance_runtime_test.dart"
   "app/integration_test/app_existing_user_visual_audit_test.dart"
   "app/integration_test/runtime_test_helpers.dart"

@@ -35,6 +35,20 @@ eventos incrementais, mas seu registro process-local não é fonte durável.
 7. Pausar no Flutter pausa somente playback/renderização local; polling e
    engine continuam. Reconexão retoma pelo último cursor aceito.
 8. Cancelamento continua cooperativo nos limites definidos pelo ADR 0002.
+9. Enquanto um job `auto` estiver ativo e o engine real ainda não tiver sido
+   persistido, o Live continua elegível para a fonte XMage. O engine real,
+   quando conhecido, volta a ser a autoridade: um engine diferente de XMage
+   encerra o feed visual com 409. Isso evita que a janela normal entre
+   `running` e a atribuição terminal do engine seja confundida com
+   incompatibilidade permanente.
+10. O orçamento do job assíncrono é separado do endpoint síncrono: jobs usam
+    120 segundos por padrão, com teto de 180 segundos, enquanto
+    `/ai/simulate` preserva o teto de 40 segundos compatível com o proxy. A
+    migration 057 amplia apenas o `CHECK` de `battle_jobs`.
+11. Progresso intermediário do worker é uma fase operacional, não uma
+    porcentagem de partida. O cliente apresenta fase e tempo decorrido com
+    indicador indeterminado, mantém polling durante páginas/replay pendentes e
+    só mostra progresso terminal como concluído.
 
 ## Flags e falha fechada
 
@@ -64,6 +78,9 @@ explicitamente habilitado.
   persistido;
 - o sidecar pode reiniciar sem virar fonte de verdade;
 - polling adiciona latência de poucos segundos, aceitável para espectador;
+- uma partida que ultrapassa 40 segundos não é encerrada apenas pelo limite do
+  transporte síncrono, e a pessoa continua vendo os checkpoints públicos e o
+  tempo decorrido durante a execução;
 - SSE/WebSocket ficam adiados até medição demonstrar benefício;
 - Live continua somente leitura e não aproxima Coach Mode de um GO.
 

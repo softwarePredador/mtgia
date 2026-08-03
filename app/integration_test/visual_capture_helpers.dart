@@ -63,12 +63,14 @@ Future<void> _ensureSurfaceConverted(
 Future<void> captureVisualProof(
   IntegrationTestWidgetsFlutterBinding binding,
   WidgetTester tester,
-  String name,
-) async {
+  String name, {
+  Future<void> Function()? beforeTakeScreenshot,
+}) async {
   // ignore: avoid_print
   print('CAPTURE_START $name');
   await tester.pump(const Duration(milliseconds: 250));
   await _ensureSurfaceConverted(binding, name);
+  await beforeTakeScreenshot?.call();
 
   try {
     final screenshot = await binding

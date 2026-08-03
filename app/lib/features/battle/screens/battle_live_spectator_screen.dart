@@ -69,6 +69,10 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
   bool get _isTerminal => _session.isTerminal || _job?.isTerminal == true;
   bool get _pollingComplete {
     final job = _job;
+    if ((_session.hasMore || _session.replayPending) &&
+        !_visualFeedUnavailable) {
+      return false;
+    }
     if (job?.isTerminal == true) return true;
     final status = _session.status;
     if (status == null || !status.isTerminal) return false;
@@ -134,10 +138,9 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       });
 
       BattleLiveSession nextSession = _session;
-      var visualFeedUnavailable = _visualFeedUnavailable;
-      if (job.engine != null && job.engine != BattleExecutionEngine.xmage) {
-        visualFeedUnavailable = true;
-      }
+      final knownUnsupportedEngine =
+          job.engine != null && job.engine != BattleExecutionEngine.xmage;
+      var visualFeedUnavailable = knownUnsupportedEngine;
       if (!visualFeedUnavailable) {
         try {
           nextSession = await _gateway.pollLive(
@@ -146,7 +149,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
           );
         } on BattleJobGatewayException catch (error) {
           if (error.statusCode == 409) {
-            visualFeedUnavailable = true;
+            visualFeedUnavailable = !_isTransientEngineAssignment(job);
           } else if (job.isTerminal) {
             nextSession = _session;
           } else {
@@ -180,7 +183,9 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       });
     } finally {
       _pollInFlight = false;
-      if (mounted && !_pollingComplete) _schedulePoll();
+      if (mounted && !_pollingComplete) {
+        _schedulePoll(immediate: _session.hasMore);
+      }
     }
   }
 
@@ -256,6 +261,10 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
       Navigator.of(context).pop();
       return;
     }
+    context.go('/decks/${Uri.encodeComponent(widget.deckId)}/battle-replays');
+  }
+
+  void _prepareNewAttempt() {
     context.go('/decks/${Uri.encodeComponent(widget.deckId)}/battle-replays');
   }
 
@@ -383,7 +392,9 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
     final job = _job!;
     final theme = Theme.of(context);
     final statusColor = _battleJobStatusColor(job.status);
-    final progressPercent = (job.progress.ratio * 100).round();
+    final progressIsTerminal = job.isTerminal;
+    final stageLabel = _battleStageLabel(job.stage);
+    final elapsedLabel = _battleElapsedLabel(job);
     return Container(
       key: const Key('battle-live-status-header'),
       padding: const EdgeInsets.all(AppTheme.space16),
@@ -428,7 +439,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
           ),
           const SizedBox(height: AppTheme.space8),
           Text(
-            'Partida ${_shortId(job.jobId)} · ${_battleStageLabel(job.stage)}',
+            'Partida ${_shortId(job.jobId)}',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
             ),
@@ -436,12 +447,14 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
           const SizedBox(height: AppTheme.space12),
           Semantics(
             label: 'Progresso do Battle',
-            value: '$progressPercent por cento',
+            value: progressIsTerminal
+                ? 'Execução encerrada: ${_battleJobStatusLabel(job.status)}'
+                : 'Em andamento: $stageLabel',
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
               child: LinearProgressIndicator(
                 key: const Key('battle-live-progress'),
-                value: job.progress.ratio,
+                value: progressIsTerminal ? 1 : null,
                 minHeight: 6,
                 backgroundColor: AppTheme.outlineMuted.withValues(alpha: 0.38),
                 color: statusColor,
@@ -455,7 +468,10 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                '${job.progress.current} de ${job.progress.total} etapas',
+                progressIsTerminal
+                    ? '$stageLabel · Duração total: $elapsedLabel'
+                    : '$stageLabel · Tempo decorrido: $elapsedLabel',
+                key: const Key('battle-live-progress-detail'),
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: AppTheme.textSecondary,
                 ),
@@ -631,9 +647,7 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
   Widget _buildTerminalAction() {
     final replayId = _replayId;
     final replayPending =
-        !_pollingComplete &&
-        _session.status == BattleLiveStatus.completed &&
-        replayId == null;
+        replayId == null && (_session.replayPending || _session.hasMore);
     final theme = Theme.of(context);
     return Container(
       key: const Key('battle-live-terminal-state'),
@@ -678,6 +692,8 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
                       : replayId == null
                       ? _terminalReasonCopy(
                           _session.terminalReason ?? _job?.terminalReason,
+                          status: _job?.status,
+                          errorCode: _job?.errorCode,
                         )
                       : 'Abra o registro persistido para revisar campo, '
                             'timeline e evidências do motor.',
@@ -702,10 +718,22 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           else
-            OutlinedButton(
-              key: const Key('battle-live-back-replays-button'),
-              onPressed: _backToReplays,
-              child: const Text('Voltar aos replays'),
+            Wrap(
+              spacing: AppTheme.space8,
+              runSpacing: AppTheme.space8,
+              children: [
+                FilledButton.icon(
+                  key: const Key('battle-live-new-attempt-button'),
+                  onPressed: _prepareNewAttempt,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Preparar nova tentativa'),
+                ),
+                TextButton(
+                  key: const Key('battle-live-back-replays-button'),
+                  onPressed: _backToReplays,
+                  child: const Text('Voltar aos replays'),
+                ),
+              ],
             ),
         ],
       ),
@@ -1311,15 +1339,60 @@ String _battleStageLabel(String stage) => switch (stage) {
   _ => stage.replaceAll('_', ' '),
 };
 
-String _terminalReasonCopy(String? reason) => switch (reason) {
-  'cancelled' => 'A execução foi cancelada antes da persistência do replay.',
-  'timeout' => 'O motor atingiu o limite de tempo configurado.',
-  'coverage_error' => 'O motor não cobriu todas as regras necessárias.',
-  'engine_error' => 'A simulação encerrou com falha e não publicou replay.',
-  'persistence_error' =>
-    'A execução terminou, mas o replay não foi persistido.',
-  _ => 'A partida terminou sem uma referência pública de replay.',
-};
+bool _isTransientEngineAssignment(BattleJob job) =>
+    !job.isTerminal &&
+    job.status == BattleJobStatus.running &&
+    job.requestedEngine == BattleRequestedEngine.auto &&
+    job.engine == null;
+
+String _battleElapsedLabel(BattleJob job) {
+  final startedAt = job.startedAt ?? job.createdAt;
+  final endedAt = job.finishedAt ?? DateTime.now().toUtc();
+  final rawElapsed = endedAt.difference(startedAt);
+  final elapsed = rawElapsed.isNegative ? Duration.zero : rawElapsed;
+  if (elapsed.inDays > 0) {
+    return '${elapsed.inDays}d ${elapsed.inHours.remainder(24)}h';
+  }
+  if (elapsed.inHours > 0) {
+    return '${elapsed.inHours}h ${elapsed.inMinutes.remainder(60)}min';
+  }
+  if (elapsed.inMinutes > 0) {
+    return '${elapsed.inMinutes}min ${elapsed.inSeconds.remainder(60)}s';
+  }
+  return '${elapsed.inSeconds}s';
+}
+
+String _terminalReasonCopy(
+  String? reason, {
+  BattleJobStatus? status,
+  String? errorCode,
+}) {
+  final normalizedReason = reason?.trim().toLowerCase();
+  final normalizedError = errorCode?.trim().toLowerCase();
+  if (status == BattleJobStatus.timeout ||
+      normalizedReason == 'timeout' ||
+      normalizedReason == 'battle_job_timeout' ||
+      normalizedError == 'battle_job_timeout' ||
+      normalizedError == 'xmage_timeout') {
+    return 'A simulação atingiu o limite de tempo antes de concluir. '
+        'Prepare uma nova tentativa para executar novamente.';
+  }
+  if (normalizedReason == 'xmage_battle_operational_failure' ||
+      normalizedError == 'xmage_battle_operational_failure' ||
+      status == BattleJobStatus.engineError ||
+      normalizedReason == 'engine_error') {
+    return 'A simulação foi encerrada por uma falha temporária do motor. '
+        'Nenhuma alteração foi feita no deck; tente novamente.';
+  }
+  return switch (normalizedReason) {
+    'cancelled' => 'A execução foi cancelada antes da persistência do replay.',
+    'coverage_error' =>
+      'O motor não cobriu todas as regras necessárias para esta partida.',
+    'persistence_error' =>
+      'A execução terminou, mas o replay não foi persistido.',
+    _ => 'A partida terminou sem uma referência pública de replay.',
+  };
+}
 
 String _snapshotPosition(Map<String, dynamic> payload) {
   final turn = payload['turn'];

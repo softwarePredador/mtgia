@@ -300,7 +300,10 @@ void main() {
             .first,
       );
       expect(progressSemantics.properties.label, 'Progresso do Battle');
-      expect(progressSemantics.properties.value, '50 por cento');
+      expect(
+        progressSemantics.properties.value,
+        'Em andamento: Simulação em curso',
+      );
       expect(find.bySemanticsLabel('Pausar visualização'), findsOne);
       final reconnect = find.byKey(const Key('battle-live-refresh-button'));
       expect(find.byTooltip('Reconectar ao Battle'), findsOne);

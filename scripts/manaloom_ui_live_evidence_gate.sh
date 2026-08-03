@@ -6,6 +6,7 @@ MODE="${1:---check}"
 PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
 REVIEW_FILE="$ROOT_DIR/docs/qa/ui-live/latest.json"
 CAPTURE_OUTPUT="docs/qa/ui-live/current/battle-coach-android"
+BATTLE_LIVE_CAPTURE_OUTPUT="docs/qa/ui-live/current/battle-live-web"
 CORE_PRODUCT_CAPTURE_OUTPUT="docs/qa/ui-live/current/core-product-android"
 P0_CAPTURE_OUTPUT="docs/qa/ui-live/current/p0-matrix"
 
@@ -255,6 +256,250 @@ PY
   rm -rf "$run_dir"
 }
 
+capture_battle_live_web() {
+  if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]]; then
+    echo "Flutter executable is required for Battle Live Web capture" >&2
+    exit 2
+  fi
+  for required_tool in curl jq sed; do
+    command -v "$required_tool" >/dev/null 2>&1 || {
+      echo "$required_tool is required for Battle Live Web capture" >&2
+      exit 2
+    }
+  done
+
+  local profile="web_battle_live_1440x900"
+  local target="web_real_build"
+  local device_contract
+  local chrome_executable chromedriver_bin browser_major driver_major
+  local source_digest run_dir screenshot_dir runtime_log chromedriver_log
+  local chromedriver_pid="" drive_status actual_count context_json
+  local output_dir="$ROOT_DIR/$BATTLE_LIVE_CAPTURE_OUTPUT"
+  local previous_output=""
+  local output_mutation_started="false"
+  local promoted="false"
+  device_contract="$(manaloom_web_runtime_device_contract "$profile")"
+  chrome_executable="${CHROME_EXECUTABLE:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
+  chromedriver_bin="${MANALOOM_CHROMEDRIVER_BIN:-$(command -v chromedriver 2>/dev/null || true)}"
+  if [[ ! -x "$chrome_executable" ]]; then
+    echo "Battle Live Web capture requires Chrome: $chrome_executable" >&2
+    exit 2
+  fi
+  if [[ -z "$chromedriver_bin" || ! -x "$chromedriver_bin" ]]; then
+    echo "Battle Live Web capture requires an executable ChromeDriver" >&2
+    exit 2
+  fi
+  browser_major="$("$chrome_executable" --version | sed -E 's/^[^0-9]*([0-9]+).*/\1/')"
+  driver_major="$("$chromedriver_bin" --version | sed -E 's/^[^0-9]*([0-9]+).*/\1/')"
+  if [[ -z "$browser_major" || -z "$driver_major" ||
+        "$browser_major" != "$driver_major" ]]; then
+    echo "ChromeDriver major $driver_major does not match Chrome major $browser_major" >&2
+    exit 2
+  fi
+  if curl --silent --fail --max-time 1 \
+    http://127.0.0.1:4444/status >/dev/null 2>&1; then
+    echo "WebDriver port 4444 is already in use" >&2
+    exit 2
+  fi
+
+  source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
+  run_dir="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_battle_live_proof.XXXXXX")"
+  screenshot_dir="$run_dir/screenshots"
+  runtime_log="$run_dir/battle-live-web-runtime.log"
+  chromedriver_log="$run_dir/chromedriver.log"
+  mkdir -p "$screenshot_dir"
+
+  cleanup_battle_live_capture() {
+    local cleanup_status="$?"
+    trap - EXIT INT TERM
+    if [[ -n "$chromedriver_pid" ]]; then
+      kill "$chromedriver_pid" >/dev/null 2>&1 || true
+      wait "$chromedriver_pid" >/dev/null 2>&1 || true
+    fi
+    if [[ "$promoted" != "true" &&
+          "$output_mutation_started" == "true" ]]; then
+      rm -rf "$output_dir"
+      if [[ -n "$previous_output" && -d "$previous_output" ]]; then
+        mv "$previous_output" "$output_dir"
+      fi
+    fi
+    rm -rf "$run_dir"
+    exit "$cleanup_status"
+  }
+  trap cleanup_battle_live_capture EXIT INT TERM
+
+  print_header "Battle Live automated UI evidence"
+  (
+    cd "$ROOT_DIR/app"
+    "$FLUTTER_BIN" analyze \
+      lib/features/battle/models/battle_job.dart \
+      lib/features/battle/models/battle_live_cursor.dart \
+      lib/features/battle/screens/battle_live_spectator_screen.dart \
+      lib/features/battle/services/battle_job_gateway.dart \
+      integration_test/battle_live_visual_runtime_proof_test.dart \
+      test/features/battle/screens/battle_live_spectator_screen_test.dart \
+      test/ui/ui_live_evidence_policy_test.dart \
+      tool/ui_runtime_evidence.dart \
+      --no-pub --no-version-check --no-fatal-infos
+    "$FLUTTER_BIN" test \
+      integration_test/battle_live_visual_runtime_proof_test.dart \
+      -d flutter-tester \
+      --dart-define=MANALOOM_CAPTURE_RUNTIME_PROOF=false \
+      --no-pub --no-version-check --reporter compact
+    "$FLUTTER_BIN" test \
+      test/features/battle/screens/battle_live_spectator_screen_test.dart \
+      test/ui/ui_live_evidence_policy_test.dart \
+      --no-pub --no-version-check --reporter compact
+  )
+
+  "$chromedriver_bin" --port=4444 >"$chromedriver_log" 2>&1 &
+  chromedriver_pid="$!"
+  local webdriver_ready="false"
+  for _ in {1..50}; do
+    if curl --silent --fail --max-time 1 \
+      http://127.0.0.1:4444/status >/dev/null 2>&1; then
+      webdriver_ready="true"
+      break
+    fi
+    if ! kill -0 "$chromedriver_pid" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.2
+  done
+  if [[ "$webdriver_ready" != "true" ]]; then
+    echo "ChromeDriver did not become ready; see $chromedriver_log" >&2
+    exit 1
+  fi
+
+  print_header "Battle Live real Web release runtime capture"
+  set +e
+  (
+    cd "$ROOT_DIR/app"
+    MANALOOM_SCREENSHOT_DIR="$screenshot_dir" "$FLUTTER_BIN" drive \
+      --driver=test_driver/integration_test.dart \
+      --target=integration_test/battle_live_visual_runtime_proof_test.dart \
+      --no-pub --no-version-check \
+      --device-connection=attached \
+      --timeout=600 \
+      --release \
+      -d chrome \
+      --browser-dimension=1440x900@1 \
+      --no-web-resources-cdn \
+      --dart-define=MANALOOM_CAPTURE_RUNTIME_PROOF=true \
+      --dart-define=MANALOOM_UI_SOURCE_DIGEST="$source_digest" \
+      --dart-define=MANALOOM_UI_PROOF_PROFILE="$profile" \
+      --dart-define=MANALOOM_UI_PROOF_TARGET="$target" \
+      --dart-define=MANALOOM_UI_PROOF_DEVICE_CONTRACT="$device_contract" \
+      --dart-define=MANALOOM_VISUAL_WIDTH=1440 \
+      --dart-define=MANALOOM_VISUAL_HEIGHT=900 \
+      --dart-define=MANALOOM_EMIT_SCREENSHOT_CHUNKS=false \
+      --dart-define=MANALOOM_VISUAL_FIXTURE_MODE=true \
+      --dart-define=DISABLE_FIREBASE_STARTUP=true \
+      --dart-define=DISABLE_PUSH_INIT=true \
+      --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true
+  ) 2>&1 | tee "$runtime_log"
+  drive_status="${PIPESTATUS[0]}"
+  set -e
+  if [[ "$drive_status" -ne 0 ]]; then
+    echo "Battle Live Web runtime proof failed; no evidence was promoted" >&2
+    exit "$drive_status"
+  fi
+
+  # Web release can omit print() output. Keep the successful runtime log but
+  # bind it to one complete, host-attested context before indexing screenshots.
+  sed '/VISUAL_PROOF_CONTEXT /d' "$runtime_log" \
+    >"$run_dir/runtime-without-context.log"
+  mv "$run_dir/runtime-without-context.log" "$runtime_log"
+  context_json="$(
+    jq --compact-output --null-input \
+      --arg source_digest "$source_digest" \
+      --arg profile "$profile" \
+      --arg target "$target" \
+      --arg device_contract "$device_contract" \
+      '{
+        schema_version: "manaloom_ui_runtime_context_v1",
+        surface: "battle_live",
+        source_digest: $source_digest,
+        profile: $profile,
+        runtime: "flutter_drive",
+        target: $target,
+        device_contract: $device_contract,
+        required_checkpoints: [
+          "battle_live_00_waiting",
+          "battle_live_01_active_feed",
+          "battle_live_02_recoverable_reconnect",
+          "battle_live_03_timeout_terminal",
+          "battle_live_04_completed_replay"
+        ]
+      }'
+  )"
+  printf 'VISUAL_PROOF_CONTEXT %s\n' "$context_json" >>"$runtime_log"
+  if grep -Eq \
+    '(^|[[:space:]])(EXCEPTION CAUGHT|Some tests failed|══╡ EXCEPTION)' \
+    "$runtime_log"; then
+    echo "Battle Live runtime log contains a forbidden test failure" >&2
+    exit 1
+  fi
+
+  actual_count="$(
+    find "$screenshot_dir" -maxdepth 1 -type f -name '*.png' | wc -l |
+      tr -d '[:space:]'
+  )"
+  if [[ "$actual_count" != "5" ]]; then
+    echo "Expected 5 Battle Live screenshots, got $actual_count" >&2
+    exit 1
+  fi
+  for checkpoint in \
+    battle_live_00_waiting \
+    battle_live_01_active_feed \
+    battle_live_02_recoverable_reconnect \
+    battle_live_03_timeout_terminal \
+    battle_live_04_completed_replay; do
+    if [[ ! -s "$screenshot_dir/$checkpoint.png" ]]; then
+      echo "Battle Live checkpoint is missing: $checkpoint" >&2
+      exit 1
+    fi
+  done
+  (
+    cd "$ROOT_DIR/app"
+    "$DART_BIN" run tool/ui_runtime_evidence.dart validate-directory \
+      --screenshots "$screenshot_dir"
+  )
+
+  if [[ -d "$output_dir" ]]; then
+    previous_output="$run_dir/previous-battle-live-web"
+    mv "$output_dir" "$previous_output"
+  fi
+  output_mutation_started="true"
+  mkdir -p "$output_dir"
+  cp "$screenshot_dir"/*.png "$output_dir/"
+  (
+    cd "$ROOT_DIR/app"
+    "$DART_BIN" run tool/ui_runtime_evidence.dart index-directory \
+      --repo-root "$ROOT_DIR" \
+      --screenshots "$BATTLE_LIVE_CAPTURE_OUTPUT" \
+      --log "$runtime_log" \
+      --manifest "$BATTLE_LIVE_CAPTURE_OUTPUT/capture-manifest.json" \
+      --source-digest "$source_digest" \
+      --surface battle_live \
+      --profile "$profile" \
+      --runtime flutter_drive \
+      --target "$target" \
+      --device-contract "$device_contract"
+  )
+  promoted="true"
+
+  printf '\nBattle Live PASS_RUNTIME captured in a real Web release build.\n'
+  printf 'It is not visually approved. Open all 5 PNGs under %s before updating %s.\n' \
+    "$output_dir" "$REVIEW_FILE"
+  trap - EXIT INT TERM
+  if [[ -n "$chromedriver_pid" ]]; then
+    kill "$chromedriver_pid" >/dev/null 2>&1 || true
+    wait "$chromedriver_pid" >/dev/null 2>&1 || true
+  fi
+  rm -rf "$run_dir"
+}
+
 capture_core_product() {
   if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]]; then
     echo "Flutter executable is required for runtime capture" >&2
@@ -456,6 +701,9 @@ case "$MODE" in
   --capture-battle-coach)
     capture_battle_coach
     ;;
+  --capture-battle-live-web)
+    capture_battle_live_web
+    ;;
   --capture-core-product)
     capture_core_product
     ;;
@@ -466,6 +714,7 @@ case "$MODE" in
     printf '%s\n' \
       "usage: $0 --check" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-battle-coach" \
+      "       [MANALOOM_CHROMEDRIVER_BIN=<path>] $0 --capture-battle-live-web" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-core-product" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
     ;;

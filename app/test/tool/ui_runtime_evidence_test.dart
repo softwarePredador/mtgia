@@ -474,6 +474,43 @@ void main() {
         ),
       ),
     );
+
+    policy.writeAsStringSync(
+      const JsonEncoder.withIndent('  ').convert(<String, Object>{
+        'schema_version': 'manaloom_ui_live_evidence_policy_v1',
+        'surfaces': [
+          {
+            'id': 'authenticated_p0_matrix',
+            'required_profiles': {'web_mobile': 1, 'android_emulator': 1},
+            'android_runtime_contract': {
+              'accepted_targets': ['android_emulator'],
+              'emulator_must_not_be_reported_as_physical': true,
+              'current_profile': 'android_emulator',
+            },
+          },
+          {
+            'id': 'battle_live',
+            'required_profiles': {'web_battle_live_1440x900': 5},
+          },
+        ],
+      }),
+    );
+    expect(
+      () => verifyUiLiveEvidence(
+        reviewFile: review,
+        repoRoot: temp,
+        expectedSourceDigest: _digest,
+      ),
+      throwsA(
+        isA<UiRuntimeEvidenceException>().having(
+          (error) => error.message,
+          'message',
+          contains(
+            'web_battle_live_1440x900 must contain exactly 5 screenshots',
+          ),
+        ),
+      ),
+    );
   });
 
   test('rejects physical release credit backed only by emulator captures', () {

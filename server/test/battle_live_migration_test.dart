@@ -65,7 +65,7 @@ void main() {
       'create_battle_job_live_records',
     );
     expect(releaseSchemaReadinessSql, contains("'055'"));
-    expect(releaseSchemaReadinessSql, contains("= '056'"));
+    expect(releaseSchemaReadinessSql, contains("= '057'"));
     expect(
       releaseSchemaReadinessSql,
       contains("to_regclass('public.battle_job_live_records')"),
