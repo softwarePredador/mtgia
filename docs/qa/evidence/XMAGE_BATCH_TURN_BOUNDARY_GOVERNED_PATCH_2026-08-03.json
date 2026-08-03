@@ -1,0 +1,112 @@
+{
+  "schema_version": "manaloom_xmage_governed_patch_evidence_v1_2026-07-30",
+  "captured_at_utc": "2026-08-03T16:58:21Z",
+  "status": "pass",
+  "patch_id": "xmage_lorehold_turn_boundary_2c43ec8_9919487_2026_08_03",
+  "source": {
+    "upstream_repository": "https://github.com/magefree/mage.git",
+    "upstream_base_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "governed_repository": "https://github.com/softwarePredador/mage.git",
+    "governed_branch": "manaloom-battle-turn-boundary",
+    "patch_commit": "991948742f840cd88493a4ea8cb3f4ed192e4742",
+    "patch_parent": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "patch_tree": "cacc9649f20ddf450528073251acd91e1d41c152",
+    "fetchable": true,
+    "verified_via": "github_git_commit_api_and_fresh_git_fetch",
+    "commit_message": "ManaLoom: enforce batch simulation turn boundary"
+  },
+  "exact_delta": {
+    "audit_mode": "read_only_local_git_object_diff",
+    "old_is_direct_parent": true,
+    "changed_path_count": 17,
+    "changed_card_implementation_count": 1,
+    "added_card_implementations": [
+      "Lorehold, the Historian"
+    ],
+    "unrelated_card_implementations": [],
+    "raw_diff_sha256": "7ba3ba633f2ae6d61e644602d632f3718f3b065efd570fec403434cc71e668b5",
+    "name_status_sha256": "e9b4c1e9205f3eafeb27b0eead0b62981b77c3ed10c4b1a9037ef8f85cf63970",
+    "sorted_paths_sha256": "8d608c0b5484a67358db2ae274534baff1e830fea41bed576cb31003174f1bfc",
+    "changed_paths": [
+      "Mage.Server/src/main/java/mage/server/TableController.java",
+      "Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java",
+      "Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java",
+      "Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java",
+      "Mage.Tests/src/test/java/org/mage/test/game/MatchOptionsRuntimeBoundaryTest.java",
+      "Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java",
+      "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java",
+      "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java",
+      "Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java",
+      "Mage/src/main/java/mage/game/match/MatchOptions.java",
+      "Mage/src/main/java/mage/game/permanent/PermanentCard.java",
+      "Mage/src/main/java/mage/game/permanent/PermanentImpl.java",
+      "Mage/src/main/java/mage/util/CardUtil.java",
+      "Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java",
+      "Mage/src/main/java/mage/watchers/Watcher.java",
+      "Mage/src/main/java/mage/watchers/Watchers.java",
+      "Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java"
+    ]
+  },
+  "versioned_patch": {
+    "path": "docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch",
+    "sha256": "24f6e88e082a222b60e2fb890898e43d3c7ef971ee6e38550aa476f371733642",
+    "applies_to_upstream_base": true,
+    "result_tree_matches_governed_commit": true,
+    "source_pull_request": "https://github.com/magefree/mage/pull/15591",
+    "source_commits": [
+      "03cc893d7c982c195ffc3f8e3083e9123b5c17d0",
+      "0e6ca9cacaf612d00f18d68d39531c0666f570c1"
+    ],
+    "manaloom_runtime_boundary_scope": [
+      "MatchOptions propagates the batch stop boundary into GameOptions",
+      "the sidecar sets the requested right-censoring boundary at UNTAP"
+    ]
+  },
+  "focused_verification": {
+    "artifact_path": "docs/qa/evidence/XMAGE_BATCH_TURN_BOUNDARY_VERIFICATION_2026-08-03.json",
+    "artifact_sha256": "aa6d8678c618ecbc8c9b681f6ed6bb2f335a0ee36d63f76e7e30fe5d39a62930",
+    "java_major": 17,
+    "reactor_modules": 34,
+    "focused_tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "result": "pass"
+  },
+  "postgresql_product_scope": {
+    "captured_at_utc": "2026-08-03T16:58:21Z",
+    "canonical_wrapper": "server/bin/with_new_server_pg.sh",
+    "transaction_mode": "read_only",
+    "transaction_read_only": true,
+    "writes_performed": false,
+    "queries_executed": 1,
+    "card_name": "Lorehold, the Historian",
+    "printing_match_count": 4,
+    "distinct_oracle_ids": 1,
+    "commander_statuses": [
+      "legal"
+    ],
+    "legendary_creature_rows": 4,
+    "product_scope_status": "product_in_scope"
+  },
+  "runtime_policy": {
+    "catalog_resolution_is_semantic_proof": false,
+    "focused_tests_are_required": true,
+    "patch_identity_is_public_in_health_and_replays": true,
+    "user_facing_copy_is_engine_neutral": true,
+    "fallback_or_card_removal_allowed": false
+  },
+  "qualification": {
+    "status": "pass",
+    "deployment_allowed": true,
+    "blocking_reasons": [],
+    "remaining_review_required": 0
+  },
+  "safety": {
+    "postgres_writes": false,
+    "hermes_or_sqlite_writes": false,
+    "deck_mutations": false,
+    "rule_promotions": false,
+    "credentials_recorded": false
+  }
+}

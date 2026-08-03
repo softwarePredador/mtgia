@@ -1,6 +1,19 @@
+diff --git a/Mage.Server/src/main/java/mage/server/TableController.java b/Mage.Server/src/main/java/mage/server/TableController.java
+index be338040777e9805e30fa773e8d37654ce2ac5b7..765c8894151021bdad56f9f41016887b310d21f5 100644
+--- a/Mage.Server/src/main/java/mage/server/TableController.java
++++ b/Mage.Server/src/main/java/mage/server/TableController.java
+@@ -672,6 +672,8 @@ public class TableController {
+             table.initGame();
+             GameOptions gameOptions = new GameOptions();
+             gameOptions.rollbackTurnsAllowed = match.getOptions().isRollbackTurnsAllowed();
++            gameOptions.stopOnTurn = match.getOptions().getStopOnTurn();
++            gameOptions.stopAtStep = match.getOptions().getStopAtStep();
+             gameOptions.bannedUsers = match.getOptions().getBannedUsers();
+             gameOptions.planeChase = match.getOptions().isPlaneChase();
+             gameOptions.perPlayerEmblemCards = match.getOptions().getPerPlayerEmblemCards();
 diff --git a/Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java b/Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java
 new file mode 100644
-index 000000000..0c600b7bd
+index 0000000000000000000000000000000000000000..0c600b7bd57c8c14e64f8e7fe8e8929ca1ac9231
 --- /dev/null
 +++ b/Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java
 @@ -0,0 +1,61 @@
@@ -66,17 +79,26 @@ index 000000000..0c600b7bd
 +    }
 +}
 diff --git a/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java b/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
-index ee3db25c8..b941a093f 100644
+index ee3db25c8d30be93457ee466aa6c0c594542353d..b941a093f1542b5d130ccf338e587296795df85b 100644
 --- a/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
 +++ b/Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
-@@ -195,0 +196,2 @@ public final class SecretsOfStrixhaven extends ExpansionSet {
+@@ -193,6 +193,8 @@ public final class SecretsOfStrixhaven extends ExpansionSet {
+         cards.add(new SetCardInfo("Lluwen, Exchange Student", 199, Rarity.UNCOMMON, mage.cards.l.LluwenExchangeStudent.class));
+         cards.add(new SetCardInfo("Lorehold Charm", 200, Rarity.UNCOMMON, mage.cards.l.LoreholdCharm.class, NON_FULL_USE_VARIOUS));
+         cards.add(new SetCardInfo("Lorehold Charm", 363, Rarity.UNCOMMON, mage.cards.l.LoreholdCharm.class, NON_FULL_USE_VARIOUS));
 +        cards.add(new SetCardInfo("Lorehold, the Historian", 201, Rarity.MYTHIC, mage.cards.l.LoreholdTheHistorian.class, NON_FULL_USE_VARIOUS));
 +        cards.add(new SetCardInfo("Lorehold, the Historian", 284, Rarity.MYTHIC, mage.cards.l.LoreholdTheHistorian.class, NON_FULL_USE_VARIOUS));
+         cards.add(new SetCardInfo("Lumaret's Favor", 153, Rarity.UNCOMMON, mage.cards.l.LumaretsFavor.class));
+         cards.add(new SetCardInfo("Maelstrom Artisan", 122, Rarity.RARE, mage.cards.m.MaelstromArtisan.class, NON_FULL_USE_VARIOUS));
+         cards.add(new SetCardInfo("Maelstrom Artisan", 334, Rarity.RARE, mage.cards.m.MaelstromArtisan.class, NON_FULL_USE_VARIOUS));
 diff --git a/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java b/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
-index f3795d52c..237834ee0 100644
+index f3795d52c80f6c4503414884743bb9f22ab0b2b1..237834ee04b5266ae5e609d246e1e097a58b824b 100644
 --- a/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
 +++ b/Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java
-@@ -89,0 +90,54 @@ public class MiracleTest extends CardTestPlayerBase {
+@@ -87,4 +87,58 @@ public class MiracleTest extends CardTestPlayerBase {
+         assertLife(playerB, 15);
+ 
+     }
 +
 +    @Test
 +    public void testLoreholdGrantsMiracleOnlyToInstantAndSorceryCards() {
@@ -131,9 +153,51 @@ index f3795d52c..237834ee0 100644
 +        assertGraveyardCount(playerA, "Mountain", 1);
 +        assertHandCount(playerA, "Island", 1);
 +    }
+ }
+diff --git a/Mage.Tests/src/test/java/org/mage/test/game/MatchOptionsRuntimeBoundaryTest.java b/Mage.Tests/src/test/java/org/mage/test/game/MatchOptionsRuntimeBoundaryTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..88d52511fbc86b55506121063918ce2abb87f2bf
+--- /dev/null
++++ b/Mage.Tests/src/test/java/org/mage/test/game/MatchOptionsRuntimeBoundaryTest.java
+@@ -0,0 +1,35 @@
++package org.mage.test.game;
++
++import mage.constants.PhaseStep;
++import mage.game.match.MatchOptions;
++import org.junit.Assert;
++import org.junit.Test;
++
++public class MatchOptionsRuntimeBoundaryTest {
++
++    @Test
++    public void storesRuntimeStopBoundary() {
++        MatchOptions options = new MatchOptions(
++                "bounded simulation",
++                "test match name",
++                false
++        );
++
++        options.setStopOnTurn(11);
++        options.setStopAtStep(PhaseStep.UNTAP);
++
++        Assert.assertEquals(Integer.valueOf(11), options.getStopOnTurn());
++        Assert.assertEquals(PhaseStep.UNTAP, options.getStopAtStep());
++    }
++
++    @Test(expected = IllegalArgumentException.class)
++    public void rejectsNonPositiveRuntimeStopBoundary() {
++        MatchOptions options = new MatchOptions(
++                "invalid bounded simulation",
++                "test match name",
++                false
++        );
++
++        options.setStopOnTurn(0);
++    }
++}
 diff --git a/Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java b/Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java
 new file mode 100644
-index 000000000..bb4fcc314
+index 0000000000000000000000000000000000000000..bb4fcc314e5f342f525fed2ac3e6d4889b42304f
 --- /dev/null
 +++ b/Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java
 @@ -0,0 +1,61 @@
@@ -200,7 +264,7 @@ index 000000000..bb4fcc314
 +}
 diff --git a/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java
 new file mode 100644
-index 000000000..fcfcdcbd9
+index 0000000000000000000000000000000000000000..fcfcdcbd924e31cb7551c8c1217e674f25c8ed54
 --- /dev/null
 +++ b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java
 @@ -0,0 +1,32 @@
@@ -238,7 +302,7 @@ index 000000000..fcfcdcbd9
 +}
 diff --git a/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java
 new file mode 100644
-index 000000000..98db50a94
+index 0000000000000000000000000000000000000000..98db50a94f6a65ffe285c0524d0e38d5822171f5
 --- /dev/null
 +++ b/Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java
 @@ -0,0 +1,38 @@
@@ -281,19 +345,34 @@ index 000000000..98db50a94
 +    }
 +}
 diff --git a/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java b/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java
-index 2857294f9..855f268fc 100644
+index 2857294f91706e0e0b77dbce3e20e0d078d35c70..855f268fc66b313affc88f330ae79b88c78767bc 100644
 --- a/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java
 +++ b/Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java
-@@ -7,3 +6,0 @@ import mage.abilities.TriggeredAbilityImpl;
+@@ -4,10 +4,9 @@ import mage.ApprovingObject;
+ import mage.abilities.Ability;
+ import mage.abilities.SpellAbility;
+ import mage.abilities.TriggeredAbilityImpl;
 -import mage.abilities.costs.mana.ManaCost;
 -import mage.abilities.costs.mana.ManaCosts;
 -import mage.abilities.costs.mana.ManaCostsImpl;
-@@ -10,0 +8,2 @@ import mage.abilities.effects.OneShotEffect;
+ import mage.abilities.effects.OneShotEffect;
 +import mage.abilities.effects.common.cost.MiracleCostModifier;
 +import mage.abilities.effects.common.cost.MiracleCostModifierFlat;
-@@ -17,0 +17 @@ import mage.target.targetpointer.FixedTarget;
+ import mage.cards.Card;
+ import mage.constants.Outcome;
+ import mage.constants.Zone;
+@@ -15,6 +14,7 @@ import mage.game.Game;
+ import mage.game.events.GameEvent;
+ import mage.players.Player;
+ import mage.target.targetpointer.FixedTarget;
 +import mage.util.functions.MiracleCostModifierCreator;
-@@ -77,0 +78,8 @@ public class MiracleAbility extends TriggeredAbilityImpl {
+ import mage.watchers.common.MiracleWatcher;
+ 
+ /**
+@@ -75,16 +75,23 @@ public class MiracleAbility extends TriggeredAbilityImpl {
+ 
+     private static final String staticRule = " <i>(You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)</i>";
+     private final String ruleText;
 +    private final MiracleCostModifierCreator miracleCostModifierCreator;
 +
 +    public MiracleAbility(MiracleCostModifierCreator miracleCostModifierCreator, String costText) {
@@ -302,60 +381,151 @@ index 2857294f9..855f268fc 100644
 +        this.ruleText = "Miracle " + costText + staticRule;
 +        this.miracleCostModifierCreator = miracleCostModifierCreator;
 +    }
-@@ -80,3 +88 @@ public class MiracleAbility extends TriggeredAbilityImpl {
+ 
+     public MiracleAbility(String miracleCosts) {
 -        super(Zone.HAND, new MiracleEffect(miracleCosts), true);
 -        addWatcher(new MiracleWatcher());
 -        ruleText = "Miracle " + miracleCosts + staticRule;
 +        this(() -> new MiracleCostModifierFlat(miracleCosts), miracleCosts);
-@@ -87,0 +94 @@ public class MiracleAbility extends TriggeredAbilityImpl {
+     }
+ 
+     private MiracleAbility(final MiracleAbility ability) {
+         super(ability);
+         this.ruleText = ability.ruleText;
 +        this.miracleCostModifierCreator = ability.miracleCostModifierCreator;
-@@ -118 +125 @@ class MiracleEffect extends OneShotEffect {
+     }
+ 
+     @Override
+@@ -115,17 +122,16 @@ public class MiracleAbility extends TriggeredAbilityImpl {
+ 
+ class MiracleEffect extends OneShotEffect {
+ 
 -    private final ManaCosts<ManaCost> miracleCosts;
 +    private final MiracleCostModifierCreator miracleCostModifierCreator;
-@@ -120 +127 @@ class MiracleEffect extends OneShotEffect {
+ 
 -    public MiracleEffect(String miracleCosts) {
 +    public MiracleEffect(MiracleCostModifierCreator miracleCostModifierCreator) {
-@@ -122,2 +129 @@ class MiracleEffect extends OneShotEffect {
+         super(Outcome.Benefit);
 -        this.staticText = "cast this card for its miracle cost";
 -        this.miracleCosts = new ManaCostsImpl<>(miracleCosts);
 +        this.miracleCostModifierCreator = miracleCostModifierCreator;
-@@ -128 +134 @@ class MiracleEffect extends OneShotEffect {
+     }
+ 
+     protected MiracleEffect(final MiracleEffect effect) {
+         super(effect);
 -        this.miracleCosts = effect.miracleCosts;
 +        this.miracleCostModifierCreator = effect.miracleCostModifierCreator;
-@@ -143,4 +149,2 @@ class MiracleEffect extends OneShotEffect {
+     }
+ 
+     @Override
+@@ -140,11 +146,10 @@ class MiracleEffect extends OneShotEffect {
+         Card card = game.getCard(getTargetPointer().getFirst(game, source));
+         if (controller != null && card != null) {
+             SpellAbility abilityToCast = card.getSpellAbility().copy();
 -            ManaCosts<ManaCost> costRef = abilityToCast.getManaCostsToPay();
 -            // replace with the new cost
 -            costRef.clear();
 -            costRef.add(miracleCosts);
 +            final MiracleCostModifier effect = this.miracleCostModifierCreator.get().setCastToModify(abilityToCast);
 +            game.getState().getContinuousEffects().addEffect(effect, source);
-@@ -147,0 +152 @@ class MiracleEffect extends OneShotEffect {
+             controller.cast(abilityToCast, game, false, new ApprovingObject(source, game));
 +            effect.discard();
+             return true;
+         }
+         return false;
+diff --git a/Mage/src/main/java/mage/game/match/MatchOptions.java b/Mage/src/main/java/mage/game/match/MatchOptions.java
+index 55e0eca306394307a9e72df44b6df1b726237cd1..f8549b7ba26535757645ef7767914d5a6349a52a 100644
+--- a/Mage/src/main/java/mage/game/match/MatchOptions.java
++++ b/Mage/src/main/java/mage/game/match/MatchOptions.java
+@@ -4,6 +4,7 @@ import mage.cards.decks.DeckCardInfo;
+ import mage.constants.MatchBufferTime;
+ import mage.constants.MatchTimeLimit;
+ import mage.constants.MultiplayerAttackOption;
++import mage.constants.PhaseStep;
+ import mage.constants.RangeOfInfluence;
+ import mage.constants.SkillLevel;
+ import mage.game.mulligan.MulliganType;
+@@ -45,6 +46,8 @@ public class MatchOptions implements Serializable {
+ 
+     protected MatchTimeLimit matchTimeLimit = MatchTimeLimit.NONE; // total time limit for priority
+     protected MatchBufferTime matchBufferTime = MatchBufferTime.NONE; // additional/buffer time limit for each priority before real time ticking starts
++    protected Integer stopOnTurn = null;
++    protected PhaseStep stopAtStep = PhaseStep.UNTAP;
+     protected MulliganType mulliganType = MulliganType.GAME_DEFAULT;
+ 
+     protected Collection<DeckCardInfo> perPlayerEmblemCards = Collections.emptySet();
+@@ -173,6 +176,25 @@ public class MatchOptions implements Serializable {
+         this.matchBufferTime = Optional.ofNullable(matchBufferTime).orElse(MatchBufferTime.NONE);
+     }
+ 
++    public Integer getStopOnTurn() {
++        return stopOnTurn;
++    }
++
++    public void setStopOnTurn(Integer stopOnTurn) {
++        if (stopOnTurn != null && stopOnTurn < 1) {
++            throw new IllegalArgumentException("stopOnTurn must be positive");
++        }
++        this.stopOnTurn = stopOnTurn;
++    }
++
++    public PhaseStep getStopAtStep() {
++        return stopAtStep;
++    }
++
++    public void setStopAtStep(PhaseStep stopAtStep) {
++        this.stopAtStep = Optional.ofNullable(stopAtStep).orElse(PhaseStep.UNTAP);
++    }
++
+     public String getPassword() {
+         return password;
+     }
 diff --git a/Mage/src/main/java/mage/game/permanent/PermanentCard.java b/Mage/src/main/java/mage/game/permanent/PermanentCard.java
-index c2f808b09..89cb491e1 100644
+index c2f808b095f66d472d4a2b2001430dc0c94c67b3..89cb491e19ff9ba45f0aa93f713b6b62b7e1e449 100644
 --- a/Mage/src/main/java/mage/game/permanent/PermanentCard.java
 +++ b/Mage/src/main/java/mage/game/permanent/PermanentCard.java
-@@ -170,0 +171,4 @@ public class PermanentCard extends PermanentImpl {
+@@ -168,6 +168,10 @@ public class PermanentCard extends PermanentImpl {
+         }
+         this.abilities.setControllerId(this.controllerId);
+         this.abilities.setSourceId(objectId);
 +        this.abilities.stream().flatMap(ability -> ability.getWatchers().stream().map(watcher -> watcher.getKey())).map(game.getState()::getWatcher).distinct().forEach(watcher -> {
 +            watcher.setControllerId(this.controllerId);
 +            watcher.setSourceId(objectId);
 +        });
+         this.cardType.clear();
+         this.cardType.addAll(card.getCardType());
+         if (!isReset) {
 diff --git a/Mage/src/main/java/mage/game/permanent/PermanentImpl.java b/Mage/src/main/java/mage/game/permanent/PermanentImpl.java
-index 10585d52e..fff65460c 100644
+index 10585d52e4c83f2b518ef881840ba0dad8f79105..fff65460cc67bbca6a5c64310364a6db600f4a4d 100644
 --- a/Mage/src/main/java/mage/game/permanent/PermanentImpl.java
 +++ b/Mage/src/main/java/mage/game/permanent/PermanentImpl.java
-@@ -46 +45,0 @@ import java.util.*;
+@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
+ 
+ import java.io.Serializable;
+ import java.util.*;
 -import java.util.stream.Collectors;
-@@ -965,0 +965,4 @@ public abstract class PermanentImpl extends CardImpl implements Permanent {
+ 
+ /**
+  * @author BetaSteward_at_googlemail.com
+@@ -963,6 +962,10 @@ public abstract class PermanentImpl extends CardImpl implements Permanent {
+         // must change abilities controller too
+         this.controllerId = newControllerId;
+         this.getAbilities().setControllerId(newControllerId);
 +
 +        // and watchers
 +        this.getAbilities().stream().flatMap(ability -> ability.getWatchers().stream().map(watcher -> watcher.getKey())).map(game.getState()::getWatcher).distinct().forEach(watcher -> watcher.setControllerId(newControllerId));
 +
+         return true;
+     }
+ 
 diff --git a/Mage/src/main/java/mage/util/CardUtil.java b/Mage/src/main/java/mage/util/CardUtil.java
-index bea833610..3c2e125ef 100644
+index bea833610fa6c8631fb5c66b5a3ad47633b79111..3c2e125ef64dce10c1a148527e249348d31b65a5 100644
 --- a/Mage/src/main/java/mage/util/CardUtil.java
 +++ b/Mage/src/main/java/mage/util/CardUtil.java
-@@ -54,0 +55,8 @@ import org.apache.log4j.Logger;
+@@ -52,6 +52,14 @@ import mage.target.targetpointer.FixedTarget;
+ import mage.watchers.Watcher;
+ import org.apache.log4j.Logger;
+ 
 +import java.io.ByteArrayInputStream;
 +import java.io.ByteArrayOutputStream;
 +import java.io.IOException;
@@ -364,7 +534,13 @@ index bea833610..3c2e125ef 100644
 +import java.io.ObjectInputStream;
 +import java.io.ObjectOutputStream;
 +import java.io.Serializable;
-@@ -2044,0 +2053,14 @@ public final class CardUtil {
+ import java.io.UnsupportedEncodingException;
+ import java.net.URLDecoder;
+ import java.net.URLEncoder;
+@@ -2042,6 +2050,20 @@ public final class CardUtil {
+         } else if (value instanceof AbstractMap.SimpleImmutableEntry) { //Used by Leonin Arbiter, Vessel Of The All Consuming Wanderer as a generic Pair class
+             AbstractMap.SimpleImmutableEntry entryValue = (AbstractMap.SimpleImmutableEntry) value;
+             return (T) new AbstractMap.SimpleImmutableEntry(deepCopyObject(entryValue.getKey()), deepCopyObject(entryValue.getValue()));
 +        } else if (value instanceof Serializable) {
 +            try {
 +                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -379,9 +555,12 @@ index bea833610..3c2e125ef 100644
 +            catch (ClassNotFoundException|IOException ex) {
 +                throw new IllegalStateException("Failed copying serializable object " + value.getClass().getSimpleName() + " during deep copy", ex);
 +            }
+         } else {
+             // warning, do not add unnecessarily new data types and structures to game engine, try to use only standard types (see above)
+             throw new IllegalStateException("Unhandled object " + value.getClass().getSimpleName() + " during deep copy, must add explicit handling of all Object types");
 diff --git a/Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java b/Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java
 new file mode 100644
-index 000000000..6735f8c00
+index 0000000000000000000000000000000000000000..6735f8c0062d08c10b331196760e8da337248996
 --- /dev/null
 +++ b/Mage/src/main/java/mage/util/functions/MiracleCostModifierCreator.java
 @@ -0,0 +1,8 @@
@@ -394,36 +573,61 @@ index 000000000..6735f8c00
 +
 +public interface MiracleCostModifierCreator extends Supplier<MiracleCostModifier>, Serializable { }
 diff --git a/Mage/src/main/java/mage/watchers/Watcher.java b/Mage/src/main/java/mage/watchers/Watcher.java
-index 490e7b3bd..1beebf5be 100644
+index 490e7b3bdc64b9c041935c6f994b9998218e5258..1beebf5be111604e2f97580c43cf91ce70719873 100644
 --- a/Mage/src/main/java/mage/watchers/Watcher.java
 +++ b/Mage/src/main/java/mage/watchers/Watcher.java
-@@ -26,0 +27,5 @@ public abstract class Watcher implements Serializable {
+@@ -24,8 +24,18 @@ public abstract class Watcher implements Serializable {
+     protected boolean condition;
+     protected final WatcherScope scope;
+ 
 +    // if a watcher can dynamically add other watchers to the game state, set this flag.
 +    // this will protect it from modifying the watchers map inside its own watch(),
 +    // which would cause a ConcurrentModificationException.
 +    protected final boolean isolated;
 +
-@@ -27,0 +33,4 @@ public abstract class Watcher implements Serializable {
+     public Watcher(WatcherScope scope) {
 +        this(scope, false);
 +    }
 +
 +    public Watcher(WatcherScope scope, boolean isolated) {
-@@ -28,0 +38 @@ public abstract class Watcher implements Serializable {
+         this.scope = scope;
 +        this.isolated = isolated;
-@@ -35,0 +46 @@ public abstract class Watcher implements Serializable {
+     }
+ 
+     protected Watcher(final Watcher watcher) {
+@@ -33,6 +43,7 @@ public abstract class Watcher implements Serializable {
+         this.controllerId = watcher.controllerId;
+         this.sourceId = watcher.sourceId;
+         this.scope = watcher.scope;
 +        this.isolated = watcher.isolated;
-@@ -127,0 +139,4 @@ public abstract class Watcher implements Serializable {
+     }
+ 
+     public UUID getControllerId() {
+@@ -125,4 +136,8 @@ public abstract class Watcher implements Serializable {
+     public WatcherScope getScope() {
+         return scope;
+     }
 +
 +    public boolean isolated() {
 +        return this.isolated;
 +    }
+ }
 diff --git a/Mage/src/main/java/mage/watchers/Watchers.java b/Mage/src/main/java/mage/watchers/Watchers.java
-index c907997f3..7a6660bd7 100644
+index c907997f335bc77c44d02a839631cfa022ce584b..7a6660bd762f210b1fdb4661a123e22075e91bc8 100644
 --- a/Mage/src/main/java/mage/watchers/Watchers.java
 +++ b/Mage/src/main/java/mage/watchers/Watchers.java
-@@ -8,0 +9 @@ import java.util.HashMap;
+@@ -6,6 +6,7 @@ import org.apache.log4j.LogManager;
+ import org.apache.log4j.Logger;
+ 
+ import java.util.HashMap;
 +import java.util.stream.Stream;
-@@ -36,3 +37,7 @@ public class Watchers extends HashMap<String, Watcher> {
+ 
+ /**
+  * @author BetaSteward_at_googlemail.com
+@@ -33,9 +34,13 @@ public class Watchers extends HashMap<String, Watcher> {
+     }
+ 
+     public void watch(GameEvent event, Game game) {
 -        for (Watcher watcher : this.values()) {
 -            watcher.watch(event, game);
 -        }
@@ -434,9 +638,12 @@ index c907997f3..7a6660bd7 100644
 +            isolated.values().stream()
 +        ).forEach(watcher -> watcher.watch(event, game));
 +        isolated.entrySet().stream().forEach(entry -> this.put(entry.getKey(), entry.getValue()));
+     }
+ 
+     public void reset() {
 diff --git a/Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java b/Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java
 new file mode 100644
-index 000000000..ac10b8db3
+index 0000000000000000000000000000000000000000..ac10b8db3d6bd10de6c56cc3f7204b74931e11bd
 --- /dev/null
 +++ b/Mage/src/main/java/mage/watchers/common/MiracleGrantedWatcher.java
 @@ -0,0 +1,62 @@

@@ -39,13 +39,16 @@ EXPECTED_POLICY = {
     "user_facing_copy_must_be_engine_neutral": True,
 }
 EXPECTED_PATHS = {
+    "Mage.Server/src/main/java/mage/server/TableController.java",
     "Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java",
     "Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java",
     "Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java",
+    "Mage.Tests/src/test/java/org/mage/test/game/MatchOptionsRuntimeBoundaryTest.java",
     "Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java",
     "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java",
     "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java",
     "Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java",
+    "Mage/src/main/java/mage/game/match/MatchOptions.java",
     "Mage/src/main/java/mage/game/permanent/PermanentCard.java",
     "Mage/src/main/java/mage/game/permanent/PermanentImpl.java",
     "Mage/src/main/java/mage/util/CardUtil.java",
@@ -110,7 +113,10 @@ def versioned_patch_name_status(path: Path) -> list[tuple[str, str]]:
 
 
 def canonical_name_status_sha256(entries: list[tuple[str, str]]) -> str:
-    encoded = "".join(f"{status}\t{path}\n" for status, path in entries)
+    encoded = "".join(
+        f"{status}\t{path}\n"
+        for status, path in sorted(entries, key=lambda row: row[1])
+    )
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
@@ -438,7 +444,7 @@ def build_report(
         and focused.get("errors") == 0
         and focused.get("skipped") == 0
         and focused.get("result") == "pass",
-        "The focused Miracle and Lorehold scenarios must pass without skips.",
+        "The focused Miracle, Lorehold and runtime-boundary scenarios must pass without skips.",
     )
 
     postgres = (

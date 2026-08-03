@@ -15,25 +15,25 @@
     "user_facing_copy_must_be_engine_neutral": true
   },
   "active_patch": {
-    "id": "xmage_lorehold_historian_2c43ec8_95f0ff6_2026_07_30",
+    "id": "xmage_lorehold_turn_boundary_2c43ec8_9919487_2026_08_03",
     "upstream_pin_file": "services/xmage-sidecar/XMAGE_COMMIT",
     "patch_commit_file": "services/xmage-sidecar/XMAGE_PATCH_COMMIT",
     "upstream_pin": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
-    "patch_commit": "95f0ff69968159025998dcbecb59be5f3c1b67e2",
+    "patch_commit": "991948742f840cd88493a4ea8cb3f4ed192e4742",
     "governed_repository": "https://github.com/softwarePredador/mage.git",
-    "evidence_path": "docs/qa/evidence/XMAGE_LOREHOLD_GOVERNED_PATCH_2026-07-30.json",
-    "evidence_sha256": "73f2b46e329c58e2575ca365109251f4d74bdc0e8977774d3b795462fa697f3d",
+    "evidence_path": "docs/qa/evidence/XMAGE_BATCH_TURN_BOUNDARY_GOVERNED_PATCH_2026-08-03.json",
+    "evidence_sha256": "33e4626aa43719ed5977d195d31211c80230de1244f3df64f0370e77ec7505e2",
     "expected": {
-      "changed_path_count": 14,
+      "changed_path_count": 17,
       "changed_card_implementation_count": 1,
-      "focused_test_count": 6,
+      "focused_test_count": 8,
       "postgresql_printing_match_count": 4,
       "postgresql_distinct_oracle_ids": 1,
       "postgresql_legendary_creature_rows": 4,
-      "versioned_patch_sha256": "ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812",
-      "raw_diff_sha256": "fc94374d923b88c7c31d9a65605c23309b92ea7903865b030c93c62dc9844ef0",
-      "name_status_sha256": "a8cb9207f38eda271cc17efd27be732941eae0377ad893da82347c1948e9af39",
-      "sorted_paths_sha256": "8c5cd517e644a08bec69dccc8a9b022caec88a15610cfb0850be4f5caaac949e"
+      "versioned_patch_sha256": "24f6e88e082a222b60e2fb890898e43d3c7ef971ee6e38550aa476f371733642",
+      "raw_diff_sha256": "7ba3ba633f2ae6d61e644602d632f3718f3b065efd570fec403434cc71e668b5",
+      "name_status_sha256": "e9b4c1e9205f3eafeb27b0eead0b62981b77c3ed10c4b1a9037ef8f85cf63970",
+      "sorted_paths_sha256": "8d608c0b5484a67358db2ae274534baff1e830fea41bed576cb31003174f1bfc"
     }
   }
 }

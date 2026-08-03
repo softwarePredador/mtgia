@@ -87,6 +87,7 @@ final class XmageBattleServiceTest {
         assertFalse(XmageBattleService.shouldCensorAtTurn(0, 10));
         assertFalse(XmageBattleService.shouldCensorAtTurn(10, 10));
         assertTrue(XmageBattleService.shouldCensorAtTurn(11, 10));
+        assertEquals(11, XmageBattleService.engineStopOnTurn(10));
     }
 
     @Test
@@ -115,7 +116,7 @@ final class XmageBattleServiceTest {
                 (Map<String, Object>) ((Map<String, Object>) metadata.get("request_contract"))
                         .get("controls");
         Map<String, Object> maxTurns = (Map<String, Object>) controls.get("max_turns");
-        assertEquals("live_turn_limit_right_censoring", maxTurns.get("semantics"));
+        assertEquals("engine_turn_limit_right_censoring", maxTurns.get("semantics"));
         assertTrue((Boolean) maxTurns.get("engine_enforced"));
         assertFalse((Boolean) ((Map<String, Object>) metadata.get("execution_outcome")).get("timed_out"));
 

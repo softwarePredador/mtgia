@@ -8,7 +8,7 @@ REPOSITORY_ROOT="$(CDPATH='' cd -- "$SIDECAR_DIR/../.." && pwd)"
 EXPECTED_PIN="2c43ec8cdb5cd475d47e6b555a4077151f476a3b"
 MIRACLE_SOURCE_COMMIT="03cc893d7c982c195ffc3f8e3083e9123b5c17d0"
 LOREHOLD_SOURCE_COMMIT="0e6ca9cacaf612d00f18d68d39531c0666f570c1"
-PATCH_SHA256="ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812"
+PATCH_SHA256="24f6e88e082a222b60e2fb890898e43d3c7ef971ee6e38550aa476f371733642"
 PATCH_FILE="$REPOSITORY_ROOT/docs/qa/evidence/LOREHOLD_CANDIDATE_FOCUSED_TESTS_2026-07-29.patch"
 UPSTREAM_URL="https://github.com/magefree/mage.git"
 
@@ -121,7 +121,7 @@ CHANGED_COUNT="$(
     wc -l |
     tr -d '[:space:]'
 )"
-if [[ "$CHANGED_COUNT" != "14" ]]; then
+if [[ "$CHANGED_COUNT" != "17" ]]; then
   echo "Unexpected Lorehold patch scope: $CHANGED_COUNT files." >&2
   exit 1
 fi
@@ -130,11 +130,14 @@ CHANGED_PATHS="$(changed_paths)"
 for required_path in \
   "Mage.Sets/src/mage/cards/l/LoreholdTheHistorian.java" \
   "Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java" \
+  "Mage.Server/src/main/java/mage/server/TableController.java" \
   "Mage.Tests/src/test/java/org/mage/test/cards/abilities/keywords/MiracleTest.java" \
+  "Mage.Tests/src/test/java/org/mage/test/game/MatchOptionsRuntimeBoundaryTest.java" \
   "Mage/src/main/java/mage/abilities/common/MiracleGrantedAbility.java" \
   "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifier.java" \
   "Mage/src/main/java/mage/abilities/effects/common/cost/MiracleCostModifierFlat.java" \
   "Mage/src/main/java/mage/abilities/keyword/MiracleAbility.java" \
+  "Mage/src/main/java/mage/game/match/MatchOptions.java" \
   "Mage/src/main/java/mage/game/permanent/PermanentCard.java" \
   "Mage/src/main/java/mage/game/permanent/PermanentImpl.java" \
   "Mage/src/main/java/mage/util/CardUtil.java" \
@@ -165,7 +168,7 @@ mvn -B \
   -f "$WORK_DIR/xmage/pom.xml" \
   -pl Mage.Tests \
   -am \
-  -Dtest=MiracleTest \
+  -Dtest=MiracleTest,MatchOptionsRuntimeBoundaryTest \
   -Dsurefire.failIfNoSpecifiedTests=false \
   -Djacoco.skip=true \
   test

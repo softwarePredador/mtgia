@@ -1,0 +1,42 @@
+{
+  "schema_version": "manaloom_xmage_batch_turn_boundary_verification_v1_2026-08-03",
+  "captured_at_utc": "2026-08-03T16:56:34Z",
+  "status": "pass_local_reproduction",
+  "source": {
+    "upstream_base_commit": "2c43ec8cdb5cd475d47e6b555a4077151f476a3b",
+    "governed_patch_commit": "991948742f840cd88493a4ea8cb3f4ed192e4742",
+    "governed_patch_tree": "cacc9649f20ddf450528073251acd91e1d41c152",
+    "versioned_patch_sha256": "24f6e88e082a222b60e2fb890898e43d3c7ef971ee6e38550aa476f371733642",
+    "governed_branch": "manaloom-battle-turn-boundary"
+  },
+  "execution": {
+    "command": "services/xmage-sidecar/bin/verify_lorehold_candidate_patch.sh",
+    "java_major": 17,
+    "reactor_modules": 34,
+    "build_result": "success",
+    "elapsed_seconds": 116
+  },
+  "focused_tests": {
+    "selectors": [
+      "MiracleTest",
+      "MatchOptionsRuntimeBoundaryTest"
+    ],
+    "tests_run": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "result": "pass"
+  },
+  "runtime_boundary_assertions": [
+    "the requested positive turn boundary is stored in MatchOptions",
+    "non-positive turn boundaries are rejected",
+    "the complete Lorehold and Miracle focused suite remains green"
+  ],
+  "safety": {
+    "temporary_checkout": true,
+    "postgres_queries": 0,
+    "postgres_writes": false,
+    "hermes_or_sqlite_writes": false,
+    "runtime_deployments": false
+  }
+}

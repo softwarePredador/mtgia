@@ -10,6 +10,7 @@ import mage.cards.repository.CardRepository;
 import mage.cards.repository.CardScanner;
 import mage.constants.MatchTimeLimit;
 import mage.constants.MultiplayerAttackOption;
+import mage.constants.PhaseStep;
 import mage.constants.RangeOfInfluence;
 import mage.constants.TableState;
 import mage.game.match.MatchOptions;
@@ -43,6 +44,8 @@ import java.util.concurrent.locks.ReentrantLock;
 final class XmageBattleService {
     private static final String GAME_TYPE = "Freeform Commander Free For All";
     private static final String DECK_TYPE = "Variant Magic - Freeform Commander";
+    private static final long LIVE_OBSERVATION_TIMEOUT_MS = 20000L;
+    private static final long SESSION_PING_INTERVAL_MS = 20000L;
     private static final ReentrantLock SIMULATION_LOCK = new ReentrantLock();
     private static volatile boolean cardDatabaseReady;
     private static volatile Set<String> availableCardNames = Collections.emptySet();
@@ -161,7 +164,6 @@ final class XmageBattleService {
         try {
             Connection connection = connection(requestId);
             session.connectStart(connection);
-            client.setSession(session);
             if (!session.isConnected() || !session.isServerReady()) {
                 throw new IllegalStateException("XMage server connection is not ready");
             }
@@ -175,7 +177,11 @@ final class XmageBattleService {
                 throw new IllegalStateException("XMage deck type is unavailable: " + DECK_TYPE);
             }
 
-            MatchOptions options = matchOptions(requestId, gameType);
+            MatchOptions options = matchOptions(
+                    requestId,
+                    gameType,
+                    contract.maxTurns
+            );
             TableView table = session.createTable(roomId, options);
             tableId = table.getTableId();
             if (!session.joinTable(roomId, tableId, "deck_a", PlayerType.COMPUTER_MAD, 5,
@@ -192,13 +198,33 @@ final class XmageBattleService {
 
             boolean watching = false;
             boolean gameObserved = false;
+            long watchingStartedAt = 0L;
+            long lastPingAt = startedAt;
             while (true) {
-                Optional<TableView> current = session.getTable(roomId, tableId);
-                TableState state = current.map(TableView::getTableState).orElse(null);
-                if (!watching && state == TableState.DUELING && current.isPresent()
-                        && !current.get().getGames().isEmpty()) {
-                    session.watchGame(current.get().getGames().get(0));
-                    watching = true;
+                TableState state = null;
+                if (!watching) {
+                    UUID gameId = client.getGameId();
+                    if (gameId == null) {
+                        Optional<TableView> current =
+                                session.getTable(roomId, tableId);
+                        state = current
+                                .map(TableView::getTableState)
+                                .orElse(null);
+                        if (state == TableState.DUELING
+                                && current.isPresent()
+                                && !current.get().getGames().isEmpty()) {
+                            gameId = current.get().getGames().get(0);
+                        }
+                    }
+                    if (gameId != null) {
+                        if (!session.watchGame(gameId)) {
+                            throw new IllegalStateException(
+                                    "XMage rejected the Battle spectator"
+                            );
+                        }
+                        watching = true;
+                        watchingStartedAt = System.currentTimeMillis();
+                    }
                 }
                 GameView lastView = client.getLastView();
                 if (lastView != null && lastView.getTurn() > 0) {
@@ -219,6 +245,19 @@ final class XmageBattleService {
                     publishedViewCount = liveViews.size();
                     publishedMessageCount = liveMessages.size();
                 }
+                long now = System.currentTimeMillis();
+                if (watching
+                        && !gameObserved
+                        && now - watchingStartedAt
+                        >= LIVE_OBSERVATION_TIMEOUT_MS) {
+                    throw new IllegalStateException(
+                            "XMage Battle spectator produced no live state"
+                    );
+                }
+                if (now - lastPingAt >= SESSION_PING_INTERVAL_MS) {
+                    session.ping();
+                    lastPingAt = now;
+                }
                 if (shouldCensorAtTurn(
                         lastView == null ? 0 : lastView.getTurn(),
                         contract.maxTurns
@@ -232,7 +271,7 @@ final class XmageBattleService {
                 )) {
                     break;
                 }
-                if (System.currentTimeMillis() - startedAt >= timeoutMs) {
+                if (now - startedAt >= timeoutMs) {
                     timedOut = true;
                     break;
                 }
@@ -420,6 +459,10 @@ final class XmageBattleService {
         return observedTurn > maxTurns;
     }
 
+    static int engineStopOnTurn(int maxTurns) {
+        return maxTurns + 1;
+    }
+
     static boolean winnerEligibleForComparison(String status) {
         return "completed".equals(status);
     }
@@ -490,7 +533,11 @@ final class XmageBattleService {
         return BattleRequestContract.canonicalDeckHash(deck);
     }
 
-    private MatchOptions matchOptions(String requestId, GameTypeView gameType) {
+    private MatchOptions matchOptions(
+            String requestId,
+            GameTypeView gameType,
+            int maxTurns
+    ) {
         MatchOptions options = new MatchOptions("ManaLoom " + requestId, gameType.getName(), true);
         options.getPlayerTypes().add(PlayerType.COMPUTER_MAD);
         options.getPlayerTypes().add(PlayerType.COMPUTER_MAD);
@@ -500,6 +547,8 @@ final class XmageBattleService {
         options.setRange(RangeOfInfluence.ALL);
         options.setWinsNeeded(1);
         options.setMatchTimeLimit(MatchTimeLimit.MIN__15);
+        options.setStopOnTurn(engineStopOnTurn(maxTurns));
+        options.setStopAtStep(PhaseStep.UNTAP);
         return options;
     }
 
@@ -702,7 +751,7 @@ final class XmageBattleService {
                     : "none");
 
             Map<String, Object> controls = new LinkedHashMap<>();
-            controls.put("max_turns", control(maxTurns, "live_turn_limit_right_censoring", "engine_enforced", true));
+            controls.put("max_turns", control(maxTurns, "engine_turn_limit_right_censoring", "engine_enforced", true));
             controls.put("focus_cards", control(focusCards, "positive_evidence_observation_only", null, null));
             controls.put("force_focus_access_mode", control(forceFocusAccessMode, "none_only_non_none_rejected", null, null));
             controls.put("same_lane", control(sameLane, "comparison_metadata_only", null, null));

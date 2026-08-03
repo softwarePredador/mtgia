@@ -26,7 +26,7 @@ import java.util.UUID;
 
 public final class SidecarMain {
     static final String XMAGE_COMMIT = "2c43ec8cdb5cd475d47e6b555a4077151f476a3b";
-    static final String XMAGE_PATCH_COMMIT = "95f0ff69968159025998dcbecb59be5f3c1b67e2";
+    static final String XMAGE_PATCH_COMMIT = "991948742f840cd88493a4ea8cb3f4ed192e4742";
     static final String XMAGE_VERSION = "1.4.60";
     static final String EXECUTION_SCHEMA = "external_battle_execution_v2";
     static final String REQUEST_SCHEMA = "external_battle_request_v2";

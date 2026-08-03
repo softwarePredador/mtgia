@@ -138,13 +138,15 @@ version, and the patched SQLite JDBC version. Cached jars without the matching
 fingerprint are rebuilt. The local gate validates `XMAGE_COMMIT` before reusing
 the Maven cache.
 
-### Governed Lorehold runtime patch
+### Governed Lorehold and batch-boundary runtime patch
 
-Lorehold is not present in the canonical upstream pin. The minimal patch
-contains the public dynamic-Miracle and Lorehold changes from XMage PR 15591
-plus three direct tests; it deliberately excludes the unrelated cards in that
-PR. Its exact resulting tree is published as commit
-`95f0ff69968159025998dcbecb59be5f3c1b67e2` in the governed
+Lorehold is not present in the canonical upstream pin. The governed patch
+contains the public dynamic-Miracle and Lorehold changes from XMage PR 15591,
+the direct Lorehold scenarios, and the small transport needed to pass the
+requested batch turn boundary from `MatchOptions` into `GameOptions`. It
+deliberately excludes the unrelated cards in that PR. Its exact resulting tree
+is published as commit
+`991948742f840cd88493a4ea8cb3f4ed192e4742` in the governed
 `softwarePredador/mage` fork, with the canonical pin as its direct parent.
 
 Run the isolated verifier with Java 17:
@@ -154,9 +156,10 @@ services/xmage-sidecar/bin/verify_lorehold_candidate_patch.sh
 ```
 
 The verifier fetches the official canonical pin into a temporary checkout,
-checks the patch digest, applies it and runs `MiracleTest`. The separate
-governance auditor binds the published commit, parent, tree, complete 14-path
-diff, six focused tests and read-only PostgreSQL product scope:
+checks the patch digest, applies it and runs `MiracleTest` plus
+`MatchOptionsRuntimeBoundaryTest`. The separate governance auditor binds the
+published commit, parent, tree, complete 17-path diff, eight focused tests and
+read-only PostgreSQL product scope:
 
 ```bash
 python3 \

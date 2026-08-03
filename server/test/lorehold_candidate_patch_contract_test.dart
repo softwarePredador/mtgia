@@ -22,7 +22,7 @@ void main() {
   test('Lorehold patch is complete, pinned and excludes unrelated cards', () {
     const expectedPin = '2c43ec8cdb5cd475d47e6b555a4077151f476a3b';
     const expectedPatchSha =
-        'ef492f2d3993a2918ceb88db715373be4ae1bcead74dfbb01c161eaaee6b1812';
+        '24f6e88e082a222b60e2fb890898e43d3c7ef971ee6e38550aa476f371733642';
 
     expect(
       File(
@@ -43,6 +43,8 @@ void main() {
       'testLoreholdGrantsMiracleOnlyToInstantAndSorceryCards',
       'testLoreholdDoesNotGrantMiracleToCreatureCards',
       'testLoreholdMayDiscardAndDrawOnOpponentsUpkeep',
+      'MatchOptionsRuntimeBoundaryTest.java',
+      'gameOptions.stopOnTurn = match.getOptions().getStopOnTurn()',
     ]) {
       expect(patch, contains(requiredFragment));
     }

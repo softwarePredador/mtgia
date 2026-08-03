@@ -40,8 +40,8 @@ class XmageGovernedPatchAuditTests(unittest.TestCase):
 
         self.assertEqual(report["status"], "pass", report["failures"])
         self.assertTrue(report["deployment_allowed"])
-        self.assertEqual(report["patch"]["changed_path_count"], 14)
-        self.assertEqual(report["patch"]["focused_test_count"], 6)
+        self.assertEqual(report["patch"]["changed_path_count"], 17)
+        self.assertEqual(report["patch"]["focused_test_count"], 8)
         self.assertIn(
             "runtime_identity_surfaces",
             {row["id"] for row in report["checks"]},
@@ -61,7 +61,7 @@ class XmageGovernedPatchAuditTests(unittest.TestCase):
         assert patch_path is not None
         entries = audit.versioned_patch_name_status(patch_path)
 
-        self.assertEqual(len(entries), 14)
+        self.assertEqual(len(entries), 17)
         self.assertEqual(
             audit.canonical_name_status_sha256(entries),
             self.evidence["exact_delta"]["name_status_sha256"],

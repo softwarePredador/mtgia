@@ -2,7 +2,6 @@ package com.manaloom.xmage;
 
 import mage.interfaces.MageClient;
 import mage.interfaces.callback.ClientCallback;
-import mage.remote.Session;
 import mage.utils.MageVersion;
 import mage.view.ChatMessage;
 import mage.view.GameClientMessage;
@@ -25,7 +24,6 @@ final class TrackingMageClient implements MageClient {
     private final List<GameView> views = Collections.synchronizedList(new ArrayList<GameView>());
     private final List<Map<String, Object>> messages =
             Collections.synchronizedList(new ArrayList<Map<String, Object>>());
-    private volatile Session session;
     private volatile UUID gameId;
     private volatile GameView lastView;
     private volatile boolean gameOver;
@@ -33,12 +31,12 @@ final class TrackingMageClient implements MageClient {
     private volatile long lastFingerprint;
     private volatile boolean hasFingerprint;
 
-    void setSession(Session session) {
-        this.session = session;
-    }
-
     GameView getLastView() {
         return lastView;
+    }
+
+    UUID getGameId() {
+        return gameId;
     }
 
     boolean isGameOver() {
@@ -99,9 +97,6 @@ final class TrackingMageClient implements MageClient {
                 case START_GAME:
                     TableClientMessage start = (TableClientMessage) callback.getData();
                     gameId = start.getGameId();
-                    if (session != null) {
-                        session.joinGame(gameId);
-                    }
                     break;
                 case GAME_UPDATE:
                     recordView((GameView) callback.getData());

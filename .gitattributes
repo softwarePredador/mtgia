@@ -1,2 +1,3 @@
 # Vendored Comprehensive Rules preserve significant upstream line whitespace.
 server/magicrules.txt whitespace=-blank-at-eol
+docs/qa/evidence/*.patch whitespace=-blank-at-eol
