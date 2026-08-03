@@ -536,6 +536,7 @@ class BattleReplayVisualSnapshot {
   }
 
   String get turnLabel {
+    if (_isGenericSnapshot) return 'Etapa ${index + 1}';
     if (turn == null) return 'Turno não disponível';
     return turn == 0 ? 'Setup' : 'T$turn';
   }
@@ -549,7 +550,8 @@ class BattleReplayVisualSnapshot {
           : '$value · $stepValue';
     }
     final stepValue = step?.trim();
-    return stepValue == null || stepValue.isEmpty ? action : stepValue;
+    if (stepValue != null && stepValue.isNotEmpty) return stepValue;
+    return _isGenericSnapshot ? 'Estado observado' : action;
   }
 
   String get message {
@@ -562,12 +564,20 @@ class BattleReplayVisualSnapshot {
         _optionalString(event['card_name']) ??
         _optionalString(event['card']) ??
         _optionalString(event['creature']);
+    if (_isGenericSnapshot && activePlayer == null && card == null) {
+      return 'Leitura parcial do estado da partida.';
+    }
     return _composeEventMessage(
       action: action,
       actor: activePlayer,
       card: card,
     );
   }
+
+  bool get _isGenericSnapshot =>
+      action.trim().toLowerCase() == 'snapshot' &&
+      phase?.trim().isNotEmpty != true &&
+      step?.trim().isNotEmpty != true;
 }
 
 class BattleReplayCombatGroup {

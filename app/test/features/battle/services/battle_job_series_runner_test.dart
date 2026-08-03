@@ -208,7 +208,7 @@ BattleJob _job({
       'deck_a': _hash('a'),
       'deck_b': _hash('b'),
     },
-    'request_schema_version': 'external_battle_request_v2',
+    'request_schema_version': battleJobRequestSchemaVersion,
     'request_hash': _hash('c'),
     'requested_engine': 'auto',
     'engine': terminal ? 'manaloom_native_reviewed' : null,

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-02T20:11:49.234294Z",
-  "source_digest": "b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5",
+  "generated_at": "2026-08-02T23:14:43.009874Z",
+  "source_digest": "2c5027b50a59dea8978bd99cf0a7dfff21683fdca1873e4cf9156c1c2c66fca2",
   "surface": "authenticated_p0_matrix",
   "profile": "web_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "1b2069e34300bae5448c4a5dc19e83eb26d93a7f68c1e12c7f19d88aca250a28",
+  "log_sha256": "c6a33763fcaf9b0b796cb45294cd4c8bd7ef08302f783e7569196874decf8955",
   "checkpoint_count": 54,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -154,16 +154,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/community_deck_success.png",
-      "sha256": "c32d06be1b93581abc4d8a59300d05750b713efef5c2187c3c79cca2d4cd9db7",
-      "bytes": 63583,
+      "sha256": "0542ed3af8a64e5a8e407df9440caf4baa7fbd29779b9fad86842b6609daea0d",
+      "bytes": 63153,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "community_public_decks",
       "path": "app/test/ui/goldens/runtime/web_mobile/community_public_decks.png",
-      "sha256": "0124c3d7b4e161dba678ae81d4372118fc9fdccda91ba59bbed87334115da5ca",
-      "bytes": 112703,
+      "sha256": "db8da99cb5357cd3e3440efee4b10a9c13dfa37fde02f3430a1989c73b594b6d",
+      "bytes": 112808,
       "width": 390,
       "height": 844
     },
@@ -306,8 +306,8 @@
     {
       "checkpoint": "life_counter_initial",
       "path": "app/test/ui/goldens/runtime/web_mobile/life_counter_initial.png",
-      "sha256": "4c49f19536fbf61a00308f00abb63301c1228077af19401c6f47d45c8a6c7ce5",
-      "bytes": 135998,
+      "sha256": "b5983c28cc2396829f6d84096c7797be7babb7ac44b5892c56c320c7d190d03f",
+      "bytes": 136104,
       "width": 390,
       "height": 844
     },
@@ -362,8 +362,8 @@
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/profile_success.png",
-      "sha256": "469fd87ab849ff927d126eed72ac1dc97fef4418f7406d25d41737c3ab15c3e3",
-      "bytes": 60112,
+      "sha256": "e6c5983704fca4cc05aaa5e49b65c7f8d004b71f0118509f7d6dda38466237f8",
+      "bytes": 59032,
       "width": 390,
       "height": 844
     },
@@ -402,8 +402,8 @@
     {
       "checkpoint": "reset_password_invalid_link",
       "path": "app/test/ui/goldens/runtime/web_mobile/reset_password_invalid_link.png",
-      "sha256": "c06e64c9206b6629134f7a305ac87e9ae1cdfbea2a73bc9766f219aa83d416a0",
-      "bytes": 220899,
+      "sha256": "d0a4ea3d625191c4a82f2379cf1c61e3ab0a65c5963272fc6aaec2a1fc3c084e",
+      "bytes": 220897,
       "width": 390,
       "height": 844
     },
@@ -434,8 +434,8 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/web_mobile/splash_boot.png",
-      "sha256": "ca192557574516bdbb2a1355c026061fcf0183917d0187a258ed4629dafa9f54",
-      "bytes": 154381,
+      "sha256": "727fb8f4874e39231c2f71058ce9ffdf247782c32d8ae4e00046685f119121ba",
+      "bytes": 154378,
       "width": 390,
       "height": 844
     },
@@ -474,8 +474,8 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/user_profile_success.png",
-      "sha256": "7197136aced10fd1d5512f110144a8140e618c7640136be18aad87155d8ee796",
-      "bytes": 39694,
+      "sha256": "82c9b807f9d59b919c3f6aca4606b4e42bf7ac9ccc2f10e2e0f97824ab807f80",
+      "bytes": 38542,
       "width": 390,
       "height": 844
     },
@@ -490,8 +490,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/web_mobile/user_search_results.png",
-      "sha256": "e2853cbd23784c6408d01dc991d6fdadf6588b77eebe1f9895d408e87f8ed823",
-      "bytes": 19818,
+      "sha256": "4c805e624152092f62b54c549681d16437f7c9ded57b335658fa93d20dbb7e4e",
+      "bytes": 19017,
       "width": 390,
       "height": 844
     },

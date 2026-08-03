@@ -159,9 +159,11 @@ void main() {
 
       expect(detail.visualSnapshots, hasLength(2));
       final first = detail.visualSnapshots.first;
-      expect(first.turnLabel, 'T3');
+      expect(first.turnLabel, 'Etapa 1');
       expect(first.phase, isNull);
       expect(first.step, isNull);
+      expect(first.phaseLabel, 'Estado observado');
+      expect(first.message, 'Leitura parcial do estado da partida.');
       expect(first.stack, isEmpty);
       expect(first.combat, isEmpty);
       expect(first.players.map((player) => player.name), ['deck_a', 'deck_b']);
@@ -175,7 +177,7 @@ void main() {
       expect(first.players.first.librarySize, isNull);
       expect(first.players.first.graveyardSize, isNull);
       expect(detail.visualSnapshots.last.turn, isNull);
-      expect(detail.visualSnapshots.last.turnLabel, 'Turno não disponível');
+      expect(detail.visualSnapshots.last.turnLabel, 'Etapa 2');
       expect(detail.visualSnapshots.last.players.last.life, 0);
     });
 

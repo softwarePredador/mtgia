@@ -2857,7 +2857,7 @@ class _BattleLiveJobStrip extends StatelessWidget {
                           child: Text(
                             '${_battleJobListStatusLabel(job.status)} · '
                             '${job.progress.current}/${job.progress.total} '
-                            'etapas · ${job.jobId}',
+                            'etapas · ${_battleJobActionLabel(job)}',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -2895,6 +2895,13 @@ String _battleJobListStatusLabel(BattleJobStatus status) => switch (status) {
   BattleJobStatus.cancelled => 'Cancelado',
   BattleJobStatus.persistenceError => 'Falha ao salvar',
 };
+
+String _battleJobActionLabel(BattleJob job) {
+  if (job.status == BattleJobStatus.completed && job.replayId != null) {
+    return 'replay disponível';
+  }
+  return job.isTerminal ? 'abrir resultado' : 'abrir acompanhamento';
+}
 
 class _BattleReplaySummaryTile extends StatelessWidget {
   const _BattleReplaySummaryTile({
@@ -4601,6 +4608,14 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
     final theme = Theme.of(context);
     final snapshots = widget.detail.visualSnapshots;
     final snapshot = snapshots[_index];
+    final activePlayerLabel = _replayParticipantDisplayName(
+      snapshot.activePlayer,
+      widget.detail.summary,
+    );
+    final priorityPlayerLabel = _replayParticipantDisplayName(
+      snapshot.priorityPlayer,
+      widget.detail.summary,
+    );
     final canMoveBack = _index > 0;
     final canMoveForward = _index < snapshots.length - 1;
     final nextKeyMoment = _nextKeyMomentIndex();
@@ -4672,19 +4687,19 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          if (snapshot.activePlayer != null) ...[
+                          if (activePlayerLabel != null) ...[
                             const SizedBox(height: AppTheme.space4),
                             Text(
-                              'Ativo: ${snapshot.activePlayer}',
+                              'Ativo: $activePlayerLabel',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppTheme.textSecondary,
                               ),
                             ),
                           ],
-                          if (snapshot.priorityPlayer != null) ...[
+                          if (priorityPlayerLabel != null) ...[
                             const SizedBox(height: AppTheme.space3),
                             Text(
-                              'Prioridade: ${snapshot.priorityPlayer}',
+                              'Prioridade: $priorityPlayerLabel',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppTheme.textSecondary,
                               ),
@@ -4795,6 +4810,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                   changes: _observedSnapshotChanges(
                     snapshots[_index - 1],
                     snapshot,
+                    summary: widget.detail.summary,
                   ),
                 ),
               if (snapshot.stack.isNotEmpty)
@@ -4819,6 +4835,7 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
               _VisualPlayerBoards(
                 players: snapshot.players,
                 activePlayer: snapshot.activePlayer,
+                summary: widget.detail.summary,
               ),
             ],
           ),
@@ -4852,8 +4869,9 @@ bool _isReplayKeyMoment(BattleReplayVisualSnapshot snapshot) {
 
 List<String> _observedSnapshotChanges(
   BattleReplayVisualSnapshot previous,
-  BattleReplayVisualSnapshot current,
-) {
+  BattleReplayVisualSnapshot current, {
+  required BattleReplaySummary summary,
+}) {
   final changes = <String>[];
   final previousPlayers = <String, BattleReplayPlayerSnapshot>{
     for (final player in previous.players) _snapshotPlayerKey(player): player,
@@ -4869,8 +4887,9 @@ List<String> _observedSnapshotChanges(
         currentLife != null &&
         previousLife != currentLife) {
       final delta = currentLife - previousLife;
+      final playerName = _replayPlayerDisplayName(currentPlayer, summary);
       changes.add(
-        '${currentPlayer.name}: vida ${delta > 0 ? 'aumentou' : 'diminuiu'} '
+        '$playerName: vida ${delta > 0 ? 'aumentou' : 'diminuiu'} '
         '${delta.abs()} (${previousLife.toString()} → ${currentLife.toString()}).',
       );
     }
@@ -4885,13 +4904,15 @@ List<String> _observedSnapshotChanges(
       final before = previousBattlefield[name] ?? 0;
       final after = currentBattlefield[name] ?? 0;
       if (after > before) {
+        final playerName = _replayPlayerDisplayName(currentPlayer, summary);
         changes.add(
-          '${currentPlayer.name}: ${_observedCardLabel(name, after - before)} '
+          '$playerName: ${_observedCardLabel(name, after - before)} '
           'entrou no campo observado.',
         );
       } else if (before > after) {
+        final playerName = _replayPlayerDisplayName(currentPlayer, summary);
         changes.add(
-          '${currentPlayer.name}: ${_observedCardLabel(name, before - after)} '
+          '$playerName: ${_observedCardLabel(name, before - after)} '
           'saiu do campo observado.',
         );
       }
@@ -4908,8 +4929,9 @@ List<String> _observedSnapshotChanges(
           before.isTapped == after.isTapped) {
         continue;
       }
+      final playerName = _replayPlayerDisplayName(currentPlayer, summary);
       changes.add(
-        '${currentPlayer.name}: ${after.name} ficou '
+        '$playerName: ${after.name} ficou '
         '${after.isTapped! ? 'virada' : 'desvirada'} no estado observado.',
       );
     }
@@ -5081,14 +5103,82 @@ String _combatGroupLabel(BattleReplayCombatGroup group) {
   return '$attackLabel → $defender · $blockLabel';
 }
 
+String _replayPlayerDisplayName(
+  BattleReplayPlayerSnapshot player,
+  BattleReplaySummary summary,
+) =>
+    _replayParticipantDisplayName(player.deckKey ?? player.name, summary) ??
+    (player.name.trim().isEmpty ? 'Jogador' : player.name.trim());
+
+String? _replayParticipantDisplayName(
+  String? rawValue,
+  BattleReplaySummary summary,
+) {
+  final value = rawValue?.trim();
+  if (value == null || value.isEmpty) return null;
+  final normalized = _replayParticipantKey(value);
+  final rawDeckAId = summary.raw['deck_a_id']?.toString().trim();
+  final rawDeckBId = summary.raw['deck_b_id']?.toString().trim();
+  final subjectSide = rawDeckAId == summary.deckId
+      ? 'a'
+      : rawDeckBId == summary.deckId
+      ? 'b'
+      : null;
+
+  bool matchesSide(String side, String? deckId) {
+    return normalized == side ||
+        normalized == 'deck_$side' ||
+        normalized == 'player_$side' ||
+        (deckId != null && normalized == _replayParticipantKey(deckId));
+  }
+
+  final matchesA = matchesSide('a', rawDeckAId);
+  final matchesB = matchesSide('b', rawDeckBId);
+  if ((subjectSide == 'a' && matchesA) ||
+      (subjectSide == 'b' && matchesB) ||
+      normalized == _replayParticipantKey(summary.deckId)) {
+    final deckName = summary.deckName?.trim();
+    return deckName?.isNotEmpty == true ? deckName : 'Seu deck';
+  }
+  if ((subjectSide == 'a' && matchesB) ||
+      (subjectSide == 'b' && matchesA) ||
+      (summary.opponentDeckId != null &&
+          normalized == _replayParticipantKey(summary.opponentDeckId!))) {
+    final opponentName = summary.opponentName?.trim();
+    return opponentName?.isNotEmpty == true ? opponentName : 'Adversário';
+  }
+  return value;
+}
+
+String _replayParticipantKey(String value) => value
+    .trim()
+    .toLowerCase()
+    .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+    .replaceAll(RegExp(r'^_+|_+$'), '');
+
+bool _isReplayPlayerActive(
+  BattleReplayPlayerSnapshot player,
+  String? activePlayer,
+) {
+  final activeKey = activePlayer == null
+      ? null
+      : _replayParticipantKey(activePlayer);
+  if (activeKey == null || activeKey.isEmpty) return false;
+  return _replayParticipantKey(player.name) == activeKey ||
+      (player.deckKey != null &&
+          _replayParticipantKey(player.deckKey!) == activeKey);
+}
+
 class _VisualPlayerBoards extends StatelessWidget {
   const _VisualPlayerBoards({
     required this.players,
     required this.activePlayer,
+    required this.summary,
   });
 
   final List<BattleReplayPlayerSnapshot> players;
   final String? activePlayer;
+  final BattleReplaySummary summary;
 
   @override
   Widget build(BuildContext context) {
@@ -5108,7 +5198,8 @@ class _VisualPlayerBoards extends StatelessWidget {
                   ),
                   child: _VisualPlayerBoard(
                     player: player,
-                    isActive: player.name == activePlayer,
+                    displayName: _replayPlayerDisplayName(player, summary),
+                    isActive: _isReplayPlayerActive(player, activePlayer),
                   ),
                 ),
             ],
@@ -5131,7 +5222,14 @@ class _VisualPlayerBoards extends StatelessWidget {
                 Expanded(
                   child: _VisualPlayerBoard(
                     player: players[index],
-                    isActive: players[index].name == activePlayer,
+                    displayName: _replayPlayerDisplayName(
+                      players[index],
+                      summary,
+                    ),
+                    isActive: _isReplayPlayerActive(
+                      players[index],
+                      activePlayer,
+                    ),
                   ),
                 ),
               ],
@@ -5144,9 +5242,14 @@ class _VisualPlayerBoards extends StatelessWidget {
 }
 
 class _VisualPlayerBoard extends StatelessWidget {
-  const _VisualPlayerBoard({required this.player, required this.isActive});
+  const _VisualPlayerBoard({
+    required this.player,
+    required this.displayName,
+    required this.isActive,
+  });
 
   final BattleReplayPlayerSnapshot player;
+  final String displayName;
   final bool isActive;
 
   @override
@@ -5173,7 +5276,7 @@ class _VisualPlayerBoard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  player.name,
+                  displayName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(

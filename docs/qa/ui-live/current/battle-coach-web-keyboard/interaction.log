@@ -1,36 +1,36 @@
-VISUAL_PROOF_CONTEXT {"schema_version":"manaloom_ui_runtime_context_v1","surface":"battle_coach","source_digest":"b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5","profile":"web_iab_1280x720","runtime":"in_app_browser_browser_level_keyboard_events","target":"web_real_build","device_contract":"Flutter Web release build from the current app sources, served through a loopback no-store same-origin proxy to the deployed ManaLoom API, exercised in the Codex in-app browser at its actual 1280x720 viewport with browser-level Tab, Shift+Tab, Enter, Space, Escape and physical typing; newly registered and verified production account, newly created and validated 100-card Commander deck, positive preflight and a real dedicated interactive Battle session","required_checkpoints":["01_focus_back","02_tab_replays","03_tab_choose_opponent","04_shift_tab_replays","05_enter_dialog_search_focus","06_escape_focus_restored","07_space_dialog_search_focus","08_physical_typing_filters_rival","09_tab_focuses_filtered_rival","10_enter_selects_and_preflight","11_tab_focuses_start_battle","12_enter_starts_real_session","13_prompt_option_focus_mulligan","14_prompt_option_focus_keep","15_delegate_focus","16_shift_tab_returns_to_keep","17_enter_activates_keep","18_next_prompt_focus","19_session_conceded_replay_ready"]}
-MANALOOM_BATTLE_COACH_WEB_KEYBOARD_PROOF_V7
-generated_at=2026-08-02T19:41:26Z
-source_digest=b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5
-runtime=Flutter Web release build from current app sources, served on loopback with a no-store same-origin proxy to the deployed ManaLoom API, exercised through the Codex in-app browser
+VISUAL_PROOF_CONTEXT {"schema_version":"manaloom_ui_runtime_context_v1","surface":"battle_coach","source_digest":"2c5027b50a59dea8978bd99cf0a7dfff21683fdca1873e4cf9156c1c2c66fca2","profile":"web_iab_1280x720","runtime":"in_app_browser_browser_level_keyboard_events","target":"web_real_build","device_contract":"Flutter Web release build from the current app sources, served through a loopback no-store same-origin HTTPS proxy to the deployed ManaLoom API, exercised in the Codex in-app browser at its actual 1280x720 viewport with browser-level Tab, Shift+Tab, Enter, Space, Escape and physical typing; release-window QA account and two independently validated 100-card Commander decks, positive preflight, real dedicated interactive Battle sessions and terminal replay","required_checkpoints":["01_focus_back","02_tab_replays","03_tab_choose_opponent","04_shift_tab_replays","05_enter_dialog_search_focus","06_escape_focus_restored","07_space_dialog_search_focus","08_physical_typing_filters_rival","09_tab_focuses_filtered_rival","10_enter_selects_and_preflight","11_tab_focuses_start_battle","12_enter_starts_real_session","13_prompt_option_focus_mulligan","14_prompt_option_focus_keep","15_delegate_focus","16_shift_tab_returns_to_keep","17_enter_activates_keep","18_next_prompt_focus","19_session_conceded_replay_ready"]}
+MANALOOM_BATTLE_COACH_WEB_KEYBOARD_PROOF_V8
+generated_at=2026-08-02T23:35:00Z
+source_digest=2c5027b50a59dea8978bd99cf0a7dfff21683fdca1873e4cf9156c1c2c66fca2
+runtime=Flutter Web release build from current app sources, served on loopback with a no-store same-origin HTTPS proxy to the deployed ManaLoom API, exercised through the Codex in-app browser
 viewport=1280x720 actual browser viewport; no synthetic viewport claim
 input=browser-level Tab/Shift+Tab/Enter/Space/Escape/typing through the in-app browser; no widget-only shortcut
-account=newly registered production account, verified through the explicitly approved exact-account database path after sandbox email delivery was unavailable; credentials omitted
-deck=newly created and validated Commander deck with Talrand, Sky Summoner plus 99 Wastes, 100/100 cards
-battle=deployed dedicated interactive runtime, public Animar opponent, positive preflight, real session, human starting-target and mulligan decisions, a subsequent legal card-action prompt and terminal replay state
-capture_format=browser JPEG payloads normalized losslessly to valid non-empty 1280x720 PNG before indexing
+account=release-window QA account; credentials omitted and browser storage not inspected
+deck=independently created and validated Commander decks with Talrand, Sky Summoner plus 99 Wastes, 100/100 cards
+battle=deployed dedicated interactive runtime; positive preflight; real sessions; starting-target, mulligan and priority prompts; explicit terminal concession and replay
+capture_format=browser 1280x720 JPEG payloads normalized losslessly to valid non-empty PNG before indexing
 
-01 PASS browser keyboard traversal reached Back with a visible high-contrast focus ring
-02 PASS Tab advanced visible high-contrast focus to Abrir replays
-03 PASS Tab advanced visible focus to Escolher adversário
-04 PASS Shift+Tab returned visible focus to Abrir replays
-05 PASS Tab then Enter opened the opponent dialog with search focused
+01 PASS route entry placed visible high-contrast focus on Back
+02 PASS browser-level Tab advanced visible focus to Abrir replays
+03 PASS browser-level Tab advanced visible focus to Escolher adversário
+04 PASS browser-level Shift+Tab returned visible focus to Abrir replays
+05 PASS Tab and Enter opened the opponent dialog with search focused
 06 PASS Escape closed the dialog and restored focus to Escolher adversário
 07 PASS Space reopened the opponent dialog with search focused
-08 PASS physical typing entered Animar and filtered to the expected public deck
-09 PASS Tab moved focus to the filtered rival row
+08 PASS physical typing entered E2E Battle and filtered to one validated rival deck
+09 PASS Tab moved visible focus to the filtered rival row
 10 PASS Enter selected the rival; preflight reported 100 cards verified and interactive mode ready
-11 PASS Tab reached the enabled Jogar com Coach action
-12 PASS Enter created and opened a real interactive Battle session with a compatible starting-target prompt
-13 PASS after answering the starting-target prompt, Tab reached Fazer mulligan with a visible high-contrast focus halo
+11 PASS subsequent Tab traversal reached the enabled Jogar com Coach action
+12 PASS Enter created and opened a real interactive Battle session
+13 PASS browser keyboard traversal reached Fazer mulligan with a visible high-contrast focus halo
 14 PASS Tab reached Manter esta mão with a visible high-contrast focus halo
 15 PASS Tab reached Delegar esta decisão ao motor with a visible high-contrast focus halo
 16 PASS Shift+Tab returned visible focus to Manter esta mão
 17 PASS Enter activated Manter esta mão and advanced the real session
-18 PASS the asynchronously replaced prompt exposed a visible keyboard focus halo on the first legal Play Wastes action
-19 PASS concession ended the session and exposed the terminal replay action without leaking the opponent hand
+18 PASS the asynchronously replaced priority prompt preserved a visible focus halo on a legal action while Play Wastes and Passar prioridade remained available
+19 PASS an explicitly conceded real session exposed Analisar replay without leaking the opponent hand
 
-console_entries_reviewed=0
+console_entries_reviewed=100
 console_forbidden_entries=0
 console_error_or_warning_entries=0
 result=PASS_RUNTIME

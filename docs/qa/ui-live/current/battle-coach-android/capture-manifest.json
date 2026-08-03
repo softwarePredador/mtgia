@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-02T20:08:49.095106Z",
-  "source_digest": "b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5",
+  "generated_at": "2026-08-02T23:13:31.105401Z",
+  "source_digest": "2c5027b50a59dea8978bd99cf0a7dfff21683fdca1873e4cf9156c1c2c66fca2",
   "surface": "battle_coach",
   "profile": "android_emulator_phone",
   "runtime": "flutter_integration_test",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "1f0115dbab784ffee17f4f885c47540b7d0e090aa417b98782cc9fb5d57ba8b6",
+  "log_sha256": "21ba51a5db82a99d495b94db071c8f54c4e56aa4dd26fbb7b7f33bb52877738e",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "battle_coach_00_welcome",
@@ -67,8 +67,8 @@
     {
       "checkpoint": "battle_coach_05_action_progress",
       "path": "docs/qa/ui-live/current/battle-coach-android/battle_coach_05_action_progress.png",
-      "sha256": "eb96b9637d714c376dba7e2e14b4b347930967260fe98919dd72012c8c2303e9",
-      "bytes": 575651,
+      "sha256": "78c0021338eddf4537d5e877e6711621753fa973a829e12755d0778228897f11",
+      "bytes": 575656,
       "width": 1080,
       "height": 2337
     },

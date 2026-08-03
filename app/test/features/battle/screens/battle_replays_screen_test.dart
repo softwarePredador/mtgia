@@ -669,6 +669,50 @@ void main() {
     );
   });
 
+  testWidgets('replaces engine deck keys with the user-facing deck names', (
+    tester,
+  ) async {
+    final detail = BattleReplayDetail.fromJson({
+      'replay': {
+        'id': 'sim-named-players',
+        'deck_a_id': 'deck-1',
+        'deck_b_id': 'deck-2',
+        'deck_name': 'Meu Spellslinger',
+        'opponent_name': 'Talrand adversário',
+        'type': 'battle',
+        'visual_snapshots': [
+          {
+            'turn': 1,
+            'players': {
+              'deck_a': {'life': 40},
+              'deck_b': {'life': 38},
+            },
+          },
+        ],
+      },
+    }, fallbackDeckId: 'deck-1');
+    final gateway = _FakeBattleReplayGateway(replayDetail: detail);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(
+          deckId: 'deck-1',
+          gateway: gateway,
+          initialReplayId: 'sim-named-players',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Meu Spellslinger'), findsOneWidget);
+    expect(find.text('Talrand adversário'), findsWidgets);
+    expect(find.text('Estado observado'), findsOneWidget);
+    expect(find.text('Leitura parcial do estado da partida.'), findsOneWidget);
+    expect(find.text('deck_a'), findsNothing);
+    expect(find.text('deck_b'), findsNothing);
+  });
+
   testWidgets('never presents a winner for censored or conceded replays', (
     tester,
   ) async {

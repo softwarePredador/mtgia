@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "b3d7a4494dac0f4e9175c1e79f869f0896e569b1ccabc8f247d1c694fefee3a5",
+  "source_digest": "2c5027b50a59dea8978bd99cf0a7dfff21683fdca1873e4cf9156c1c2c66fca2",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-02T20:17:38Z",
+    "verified_at": "2026-08-02T23:41:50Z",
     "commands": [
       "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
       "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints on Android 14 emulator, including native Life Counter landscape)",
@@ -14,6 +14,7 @@
       "dart test server/test/edh_bracket_policy_test.dart server/test/optimize_swap_candidate_support_test.dart (40 passed)",
       "flutter test app/test/features/decks/widgets/deck_optimize_dialogs_test.dart app/test/platform/android_toolchain_contract_test.dart (28 passed)",
       "flutter test app/test/features/battle/screens/battle_coach_screen_test.dart app/test/features/battle/screens/battle_replays_screen_test.dart app/test/features/decks/screens/deck_details_screen_test.dart (60 passed)",
+      "flutter test app/test/features/battle/models/battle_replay_test.dart app/test/features/battle/screens/battle_replays_screen_test.dart (42 passed after the replay presentation adjustment)",
       "flutter analyze (no issues found)"
     ]
   },
@@ -22,31 +23,31 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "ed7fd08bed271aac602f1920a4e7ab446862565f496a00e4191951743e3e3cf2"
+        "sha256": "511ab4801135c6339f63328f83fa1fa683808779ed95b8210ca649eb1fda9337"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "3416680d868b2092cc8b79b8d40a2beefe32813d4fedb6534f307cbd5ef40f9d"
+        "sha256": "74cccb76fb4bae34da50895a7296d076294b716842b6256d4529c76962bb0dd0"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "4c7225378cb0cc7dc03661058186343cdc3d3950d9f1a041d43efe490c41f65b"
+        "sha256": "49896aaf01f819ad474c67b468bf6a90d1dcea18e12f53087d6e9bbc5efe9e62"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "79de7b1e351d67c4a6e823ea03f01e7a5cbcfc3252551c0d0d9740cc00a54e91"
+        "sha256": "0be592ca474ef6896c6268f8375a1bf8ade7e2c31ccb21aa3b15ba786db6c36c"
       },
       {
         "path": "docs/qa/ui-live/current/core-product-android/capture-manifest.json",
-        "sha256": "163c61db30e9e05e1702b84497707eacbe4e38ce484e17da50c13f847a1dfd7b"
+        "sha256": "e707b431809791accb1c5fd82e8cc27f675cee59a16a6afcb7d69b1e8193c91f"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-android/capture-manifest.json",
-        "sha256": "26c80d50995c2ed0796a00fbe060f0d5374f78d8be303db0c4c4a6dbba0bdda9"
+        "sha256": "ef0b5c6366fb4e70a561840e90a4a9464f676beffa4a3a546684df21e47a8479"
       },
       {
         "path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
-        "sha256": "d2b6b951b947ee0fe7c7d1f3bd626aec1eda24374d66b2215818de7e08a1dd87"
+        "sha256": "6c48077bd50e5d3f09329f9c12c29b846864a091c129635799dc66f01086f782"
       }
     ],
     "evidence_notes": [
@@ -60,7 +61,7 @@
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-02T20:17:38Z",
+    "reviewed_at": "2026-08-02T23:41:50Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -111,13 +112,13 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "ed7fd08bed271aac602f1920a4e7ab446862565f496a00e4191951743e3e3cf2",
-      "3416680d868b2092cc8b79b8d40a2beefe32813d4fedb6534f307cbd5ef40f9d",
-      "4c7225378cb0cc7dc03661058186343cdc3d3950d9f1a041d43efe490c41f65b",
-      "79de7b1e351d67c4a6e823ea03f01e7a5cbcfc3252551c0d0d9740cc00a54e91",
-      "163c61db30e9e05e1702b84497707eacbe4e38ce484e17da50c13f847a1dfd7b",
-      "26c80d50995c2ed0796a00fbe060f0d5374f78d8be303db0c4c4a6dbba0bdda9",
-      "d2b6b951b947ee0fe7c7d1f3bd626aec1eda24374d66b2215818de7e08a1dd87"
+      "511ab4801135c6339f63328f83fa1fa683808779ed95b8210ca649eb1fda9337",
+      "74cccb76fb4bae34da50895a7296d076294b716842b6256d4529c76962bb0dd0",
+      "49896aaf01f819ad474c67b468bf6a90d1dcea18e12f53087d6e9bbc5efe9e62",
+      "0be592ca474ef6896c6268f8375a1bf8ade7e2c31ccb21aa3b15ba786db6c36c",
+      "e707b431809791accb1c5fd82e8cc27f675cee59a16a6afcb7d69b1e8193c91f",
+      "ef0b5c6366fb4e70a561840e90a4a9464f676beffa4a3a546684df21e47a8479",
+      "6c48077bd50e5d3f09329f9c12c29b846864a091c129635799dc66f01086f782"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",

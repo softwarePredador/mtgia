@@ -1,8 +1,8 @@
 # Plano de entrega do ManaLoom Battle Lab e Coach
 
-**Estado:** `M3_LOCAL_IMPLEMENTED / BL10_PARTIAL / RELEASE_NO_GO`
+**Estado:** `M3_ALPHA_DEPLOYED / BL10_SOFTWARE_PASS / HARDWARE_GO_PENDING`
 
-**Atualizado em:** 2026-07-27
+**Atualizado em:** 2026-08-02
 
 **Baseline preservada:** a Sprint 5 de
 `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` continua `PASS` para execução,
@@ -10,9 +10,9 @@ persistência, autorização e evidência técnica de Battle. Este plano não re
 nem reinterpreta aquela prova.
 
 **Condição de início:** a ampliação local foi autorizada explicitamente em
-2026-07-26. Ela cobre código, testes locais, documentação, commit e push, mas
-não concede escrita PostgreSQL live, migration live, deploy ou GO de release.
-Os gates afetados precisam ser repetidos na SHA publicada.
+2026-07-26. Em 2026-08-02 o usuário também autorizou backup, migrations,
+escritas de QA, deploy e E2E live. Essa autoridade foi exercida somente nos
+alvos registrados na evidência de release e não se estende a promoções futuras.
 
 **Autoridade:** este documento organiza a evolução de produto posterior à
 baseline Battle. Os significados de `PASS`, `BLOCKED`, escrita live e release
@@ -83,12 +83,28 @@ completa é um épico posterior e não pertence ao compromisso deste plano.
 | BL9 | `PASS_LOCAL_FEATURE_OFF_SCOPE_REFINED` | Coach Web/Android, prompts de opção/inteiro/múltiplos valores, mesa privada, reconexão, concessão e delegação por prompt foram implementados; preferência automática da sessão foi rejeitada para o alpha porque o runtime aprovado exige timeout terminal |
 | BL10 | `PARTIAL_LOCAL_RELEASE_NO_GO` | Segurança, fault handling, isolamento, runtime XMage real, Web release, `battle-lab`, gate completo e E2E determinístico possuem prova local; Android físico/TalkBack, carga alvo integrada, alertas, deploy/migration e smoke da mesma SHA permanecem abertos |
 
-Battle Coach agora existe como alpha local atrás de duas flags fail-closed:
-`INTERACTIVE_BATTLE_ENABLED=false` no backend e
-`ENABLE_INTERACTIVE_BATTLE=false` no app/release. Portanto, o produto publicado
-continua terminando em Battle Lab + Live Spectator somente leitura e sujeito
-aos gates de release. O estado por task e as evidências reproduzíveis ficam em
-`docs/MANALOOM_BATTLE_LAB_TRACKER.md` e `docs/qa/`.
+### 2.2 Fechamento operacional em 2026-08-02
+
+Battle Coach e Live Spectator foram habilitados explicitamente na release
+alpha, depois de backup PostgreSQL, migration 056, gates locais e deploy. A
+jornada live partiu de uma conta nova e comprovou:
+
+- importação Commander com seção `[Commander]`, comandante detectado e lista
+  100/100 válida;
+- reconstrução guiada bracket 2 com 36 terrenos, curva coerente e sem Game
+  Changers ou aceleradores incompatíveis com o alvo;
+- preflight positivo entre dois decks cobertos, Keep, passagem de prioridade,
+  avanço de turno, concessão e replay com decisões;
+- job automático concluído, 10 turnos, 380 eventos e 21 snapshots observáveis;
+- troca de rota entre decks sem vazamento do replay anterior;
+- linguagem neutra de fornecedor e estados desconhecidos/zonas não observadas
+  apresentados sem inferência fabricada.
+
+As flags continuam fail-closed por padrão no código e são ativadas por
+configuração explícita da release. O que permanece aberto não é lógica de
+produto: smoke no Samsung físico e roteiro humano com TalkBack dependem do
+aparelho conectado. A evidência detalhada fica em
+`docs/qa/MANALOOM_BATTLE_FLOW_RELEASE_EVIDENCE_2026-08-02.md`.
 
 ## 3. Premissas da estimativa
 
