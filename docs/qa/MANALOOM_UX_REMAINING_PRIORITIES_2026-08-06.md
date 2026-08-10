@@ -27,8 +27,8 @@ O ledger completo está em
 Nova atividade autorizada antes da prova física:
 [`MANALOOM_WEB_HOST_CANVAS_CONTINUITY_ACTIVITY_2026-08-10.md`](MANALOOM_WEB_HOST_CANVAS_CONTINUITY_ACTIVITY_2026-08-10.md).
 Ela elimina o fundo branco externo à superfície Flutter. Como o shell Web
-participa do digest, sua implementação exigirá nova reancoragem Web antes do
-Samsung e do aggregate final.
+participa do digest, a implementação local já produziu novo digest e agora
+exige reancoragem Web antes do Samsung e do aggregate final.
 
 ## Estado dos pacotes
 
@@ -60,12 +60,12 @@ for recapturado.
 
 ## Prioridades restantes, na ordem correta
 
-### P1-A — continuidade do canvas Web, autorizada
+### P1-A — continuidade do canvas Web, implementada localmente
 
-Corrigir o host HTML e o viewport do harness para que bootstrap, resize e
-overlays nunca revelem faixas brancas. Validar por contrato automatizado e Web
-real. Esta é a última mudança app-facing planejada antes do congelamento e
-invalida as capturas Web correntes ao produzir o novo digest.
+O host HTML já usa canvas Obsidian contínuo e passou por contrato automatizado,
+build release e inspeção focal Web real em `390×844`, `1440×900` e
+`1920×1080`. A prova integral ainda precisa ser reancorada no digest novo;
+esta permanece a última mudança app-facing planejada antes do congelamento.
 
 ### P0-A — recaptura física obrigatória
 

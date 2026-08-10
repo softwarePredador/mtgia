@@ -46,6 +46,24 @@ void main() {
       reason: 'mobile browsers must render Flutter at the CSS viewport width',
     );
     expect(
+      index,
+      contains('<meta name="theme-color" content="#0B0D12">'),
+      reason: 'browser chrome must use the same Obsidian canvas as ManaLoom',
+    );
+    expect(index, contains('<style id="manaloom-host-canvas">'));
+    expect(index, contains('color-scheme: dark;'));
+    expect(index, contains('width: 100%;'));
+    expect(index, contains('height: 100%;'));
+    expect(index, contains('margin: 0;'));
+    expect(index, contains('padding: 0;'));
+    expect(index, contains('overflow: hidden;'));
+    expect(
+      RegExp(r'background-color: #0B0D12;').allMatches(index),
+      hasLength(3),
+      reason:
+          'root, document and Flutter host must share one Obsidian canvas',
+    );
+    expect(
       nginx,
       contains(
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: "

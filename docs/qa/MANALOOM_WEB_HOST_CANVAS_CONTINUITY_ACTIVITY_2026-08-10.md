@@ -1,7 +1,7 @@
 # ManaLoom — atividade de continuidade do canvas Web
 
 Data: 2026-08-10
-Estado: `AUTHORIZED · CHECKPOINT_NO_VERIFY_EXPLICITLY_AUTHORIZED · IMPLEMENTATION_NOT_STARTED`
+Estado: `IMPLEMENTED_LOCAL · AUTOMATED_PASS · TARGETED_RUNTIME_PASS · FULL_REANCHOR_PENDING`
 Prioridade: `P1 QA/VISUAL · BEFORE_FINAL_REANCHOR`
 Origem: revisão humana da janela Chrome que executava o checkpoint
 `battle_learning_00_play_entry`
@@ -116,6 +116,44 @@ com a interface.
 de UI. Qualquer mudança nesses arquivos gera novo digest e invalida o crédito
 corrente de `25 manifests/402 capturas Web`, ainda que o conteúdo Flutter seja
 visualmente idêntico.
+
+O digest local depois da implementação é
+`df08241c0cbdf1f3ca52ac08ce2b711675a107f4c44afa1979ea8128edfd8925`.
+Consequentemente, os manifests Web do digest anterior não são apresentados
+como prova corrente e o aggregate oficial não foi promovido.
+
+## Implementação e validação focal de 2026-08-10
+
+- `app/web/index.html` passou a declarar `color-scheme: dark`, canvas
+  `#0B0D12`, margem e padding zero, ocupação integral e overflow controlado em
+  `html`/`body`, além do mesmo fundo no host Flutter;
+- o `theme-color` do navegador foi alinhado ao token `backgroundAbyss` do app;
+- `server/test/flutter_web_deploy_contract_test.dart` agora recusa regressão
+  do contrato de canvas;
+- o recortador de screenshot não foi alterado: sua suíte confirma que ele
+  preserva uma captura escura integral e recusa recortar conteúdo assimétrico;
+- o build Flutter Web release com base `/app/` concluiu e carregou todos os
+  artefatos essenciais com resposta HTTP 200;
+- no navegador real, `390×844`, `1440×900` e `1920×1080` apresentaram
+  `html`, `body` e `flutter-view` em `rgb(11, 13, 18)`, margem `0px` e bounds
+  exatamente iguais ao viewport, sem faixa branca visível.
+
+Validações aprovadas:
+
+- `dart test test/flutter_web_deploy_contract_test.dart`;
+- `flutter test --no-pub --no-version-check test/tool/runtime_screenshot_crop_test.dart`;
+- `flutter build web --release --no-pub --no-web-resources-cdn --base-href /app/`;
+- inspeção visual focal nos três viewports oficiais.
+
+Esta inspeção focal demonstra a correção do host, mas não substitui a
+recaptura/revisão integral dos fluxos nem concede `PASS_VISUAL_REVIEWED`
+global.
+
+O gate `./scripts/quality_gate.sh ui-proof` foi executado depois da mudança e
+falhou de forma esperada e saudável: o review e os manifests ainda apontam
+para o digest anterior, os hashes não cobrem as capturas do digest novo e a
+contagem revisada não cobre todo o runtime. Nenhuma evidência antiga foi
+promovida ou marcada como corrente.
 
 Depois da implementação, a sequência obrigatória é:
 

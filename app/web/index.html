@@ -20,7 +20,29 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ManaLoom - AI-powered MTG deck builder.">
-  <meta name="theme-color" content="#0F1115">
+  <meta name="theme-color" content="#0B0D12">
+
+  <style id="manaloom-host-canvas">
+    :root {
+      color-scheme: dark;
+      background-color: #0B0D12;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0B0D12;
+    }
+
+    body > flutter-view,
+    body > flt-glass-pane {
+      background-color: #0B0D12;
+    }
+  </style>
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
