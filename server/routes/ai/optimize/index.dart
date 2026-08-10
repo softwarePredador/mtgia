@@ -33,6 +33,8 @@ import '../../../lib/ai/optimize_route_land_removal_protection_support.dart'
     as optimize_route_land_removal_protection;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
+import '../../../lib/ai/optimize_printing_identity_support.dart'
+    as optimize_printing_identity;
 import '../../../lib/ai/optimize_route_recommendation_context_support.dart'
     as optimize_route_recommendation_context;
 import '../../../lib/ai/optimize_route_resilience_support.dart'
@@ -77,6 +79,7 @@ import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
+import '../../../lib/retention/post_game_note_service.dart';
 import '../../../lib/ai/optimize_route_internal.dart';
 import '../../../lib/ai/optimize_response_support.dart';
 export '../../../lib/ai/optimize_response_support.dart';
@@ -519,6 +522,31 @@ Future<Response> onRequest(RequestContext context) async {
 
     // 1. Fetch Deck Data
     final pool = context.read<Pool>();
+    Map<String, dynamic>? postGameEvidence;
+    final postGameNoteId = recommendationContext.postGameNoteId;
+    if (postGameNoteId != null) {
+      postGameEvidence = await telemetry.trackAsync(
+        'request.post_game_evidence',
+        () => PostGameNoteService(pool).loadOptimizeEvidence(
+          userId: authenticatedUserId,
+          deckId: deckId,
+          noteId: postGameNoteId,
+        ),
+      );
+      if (postGameEvidence == null) {
+        return Response.json(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: {
+            'error':
+                'A evidência pós-jogo não existe, foi removida ou não pertence a este deck.',
+            'error_code': 'post_game_evidence_not_found',
+            'outcome_code': 'post_game_evidence_rejected',
+            'can_apply': false,
+            'learning_eligible': false,
+          },
+        );
+      }
+    }
 
     if (shouldUseAsyncOptimizeExecutor(
       intensity: intensity,
@@ -600,6 +628,10 @@ Future<Response> onRequest(RequestContext context) async {
         responseBody,
         recommendationContext,
       );
+      optimize_route_request.attachPostGameEvidenceToOptimizeResponse(
+        responseBody,
+        postGameEvidence,
+      );
       return Response.json(statusCode: HttpStatus.accepted, body: responseBody);
     }
 
@@ -630,6 +662,13 @@ Future<Response> onRequest(RequestContext context) async {
         hasKeepThemeOverride
             ? (parsedKeepTheme ?? true)
             : (userPreferences['keep_theme_default'] as bool? ?? true);
+    final postGameEvidenceRevision = postGameEvidence?['note_revision'];
+    final recommendationContextCacheSignature = <String>[
+      if (recommendationContext.cacheSignature.isNotEmpty)
+        recommendationContext.cacheSignature,
+      if (postGameEvidenceRevision != null)
+        'post_game_note_revision=$postGameEvidenceRevision',
+    ].join('|');
 
     late final optimize_request.OptimizeDeckContextData deckContext;
     try {
@@ -644,7 +683,7 @@ Future<Response> onRequest(RequestContext context) async {
           intensity: intensity.selected,
           bracket: bracket,
           keepTheme: keepTheme,
-          recommendationContextSignature: recommendationContext.cacheSignature,
+          recommendationContextSignature: recommendationContextCacheSignature,
           telemetry: telemetry,
         ),
       );
@@ -708,6 +747,10 @@ Future<Response> onRequest(RequestContext context) async {
             responseBody,
             recommendationContext,
           );
+          optimize_route_request.attachPostGameEvidenceToOptimizeResponse(
+            responseBody,
+            postGameEvidence,
+          );
           responseBody['commander_contract'] =
               buildCommanderOptimizePlanningSummary(
                 format: deckContext.deckFormat,
@@ -757,6 +800,14 @@ Future<Response> onRequest(RequestContext context) async {
       matchScore: deckContext.themeProfile.matchScore,
       coreCards: deckContext.themeProfile.coreCards,
     );
+    final postGameEvidenceContext = optimize_route_request
+        .buildPostGameEvidencePrompt(postGameEvidence);
+    final postGamePreserveCardNames = optimize_route_request
+        .postGameEvidenceCardNames(postGameEvidence, key: 'performed_well');
+    final optimizeCoreCards = <String>{
+      ...themeProfile.coreCards,
+      ...postGamePreserveCardNames,
+    }.toList(growable: false);
     final deckState = DeckOptimizationState(
       status: deckContext.deckState.status,
       recommendedMode: deckContext.deckState.recommendedMode,
@@ -904,6 +955,10 @@ Future<Response> onRequest(RequestContext context) async {
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,
         recommendationContext,
+      );
+      optimize_route_request.attachPostGameEvidenceToOptimizeResponse(
+        responseBody,
+        postGameEvidence,
       );
       responseBody['deck_state'] ??= deckState.toJson();
       responseBody['intensity'] ??= intensity.selected;
@@ -1244,6 +1299,14 @@ Future<Response> onRequest(RequestContext context) async {
       }
     }
 
+    if (postGameEvidenceContext != null) {
+      optimizeMetaEvidenceContext = [
+        if (optimizeMetaEvidenceContext?.trim().isNotEmpty == true)
+          optimizeMetaEvidenceContext!.trim(),
+        postGameEvidenceContext,
+      ].join('\n\n');
+    }
+
     try {
       deterministicSwapCandidates.addAll(
         await telemetry.trackAsync(
@@ -1257,7 +1320,7 @@ Future<Response> onRequest(RequestContext context) async {
             bracket: bracket,
             keepTheme: keepTheme,
             detectedTheme: themeProfile.theme,
-            coreCards: themeProfile.coreCards,
+            coreCards: optimizeCoreCards,
             commanderPriorityNames: optimizeCommanderPriorityNames,
             swapLimit: intensity.targetMax,
             intensity: intensity.selected,
@@ -1372,6 +1435,10 @@ Future<Response> onRequest(RequestContext context) async {
         responseBody,
         recommendationContext,
       );
+      optimize_route_request.attachPostGameEvidenceToOptimizeResponse(
+        responseBody,
+        postGameEvidence,
+      );
       return Response.json(statusCode: HttpStatus.accepted, body: responseBody);
     }
 
@@ -1424,7 +1491,7 @@ Future<Response> onRequest(RequestContext context) async {
             bracket: bracket,
             keepTheme: keepTheme,
             detectedTheme: themeProfile.theme,
-            coreCards: themeProfile.coreCards,
+            coreCards: optimizeCoreCards,
             metaEvidenceContext: optimizeMetaEvidenceContext,
             userId: authenticatedUserId,
             deckId: deckId,
@@ -1585,8 +1652,7 @@ Future<Response> onRequest(RequestContext context) async {
               .where((n) => n.isNotEmpty)
               .toSet();
       final commanderLower = commanders.map((c) => c.toLowerCase()).toSet();
-      final coreLower =
-          themeProfile.coreCards.map((c) => c.toLowerCase()).toSet();
+      final coreLower = optimizeCoreCards.map((c) => c.toLowerCase()).toSet();
       final blockedByTheme = <String>[];
       final recommendationDetailsByName = <String, Map<String, dynamic>>{};
       final recommendationConstraintWarnings = <String>[];
@@ -1615,7 +1681,7 @@ Future<Response> onRequest(RequestContext context) async {
             bracket: bracket,
             keepTheme: keepTheme,
             detectedTheme: themeProfile.theme,
-            coreCards: themeProfile.coreCards,
+            coreCards: optimizeCoreCards,
             missingCount: fallbackRemovalCandidates.length,
             removedCards: fallbackRemovalCandidates,
             excludeNames: deckNamesLower,
@@ -1965,7 +2031,7 @@ Future<Response> onRequest(RequestContext context) async {
               bracket: bracket,
               keepTheme: keepTheme,
               detectedTheme: themeProfile.theme,
-              coreCards: themeProfile.coreCards,
+              coreCards: optimizeCoreCards,
               missingCount: rebalancePlan.missingCount,
               removedCards: rebalancePlan.removedButUnmatched,
               excludeNames: rebalancePlan.excludeNames,
@@ -2800,10 +2866,8 @@ Future<Response> onRequest(RequestContext context) async {
               ? preCmc
               : (double.tryParse('${postAnalysis['average_cmc'] ?? preCmc}') ??
                   preCmc);
-      final originalCardByName = <String, Map<String, dynamic>>{
-        for (final card in allCardData)
-          (((card['name'] as String?) ?? '').trim().toLowerCase()): card,
-      }..removeWhere((key, value) => key.isEmpty);
+      final originalCardByName = optimize_printing_identity
+          .indexDeckRemovalPrintingsByName(allCardData);
       final detailRisk = intensity.selected == 'aggressive' ? 'medium' : 'low';
       final detailPriority = intensity.selected == 'light' ? 'Medium' : 'High';
 
@@ -2917,6 +2981,10 @@ Future<Response> onRequest(RequestContext context) async {
                 final v = validByNameLower[name.toLowerCase()];
                 if (v == null || v['id'] == null) return null;
                 final originalCard = originalCardByName[name.toLowerCase()];
+                final originalCardId = originalCard?['card_id']?.toString();
+                if (originalCardId == null || originalCardId.isEmpty) {
+                  return null;
+                }
                 final resolvedRoles =
                     originalCard == null
                         ? const <String>[]
@@ -2926,8 +2994,8 @@ Future<Response> onRequest(RequestContext context) async {
                           ..sort());
                 return buildOptimizeRecommendationDetail(
                   type: 'remove',
-                  name: '${v['name']}',
-                  cardId: '${v['id']}',
+                  name: originalCard?['name']?.toString() ?? '${v['name']}',
+                  cardId: originalCardId,
                   quantity: 1,
                   targetArchetype: targetArchetype,
                   confidenceLevel: themeProfile.confidence,
@@ -3225,6 +3293,10 @@ Future<Response> onRequest(RequestContext context) async {
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,
         recommendationContext,
+      );
+      optimize_route_request.attachPostGameEvidenceToOptimizeResponse(
+        responseBody,
+        postGameEvidence,
       );
 
       try {

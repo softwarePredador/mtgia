@@ -26,6 +26,32 @@ class _FakeSocialProvider extends SocialProvider {
 }
 
 void main() {
+  testWidgets('restores a URL query and runs the public search on reload', (
+    tester,
+  ) async {
+    final provider = _FakeSocialProvider();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<SocialProvider>.value(
+        value: provider,
+        child: const MaterialApp(
+          home: UserSearchScreen(initialQuery: 'mesadequinta'),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(provider.searchQueries, ['mesadequinta']);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const Key('user-search-field')))
+          .controller
+          ?.text,
+      'mesadequinta',
+    );
+    expect(find.byKey(const Key('user-search-empty-results')), findsOneWidget);
+  });
+
   testWidgets('user search only exposes clear action when query is present', (
     tester,
   ) async {
@@ -104,7 +130,7 @@ void main() {
     expect(find.byKey(const Key('user-search-error')), findsOneWidget);
     expect(find.text('Falha ao buscar jogadores'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Tentar novamente'));
+    await tester.tap(find.byKey(const Key('user-search-retry')));
     await tester.pump();
 
     expect(provider.searchQueries, ['Atraxa']);

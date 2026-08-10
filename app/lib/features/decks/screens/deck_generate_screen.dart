@@ -11,7 +11,9 @@ import '../../commercial/widgets/ai_usage_gate.dart';
 import '../../commercial/widgets/ai_usage_meter.dart';
 import '../providers/deck_provider.dart';
 import '../models/commander_bracket.dart';
+import '../models/deck_card_item.dart';
 import '../services/deck_entry_draft_store.dart';
+import '../widgets/deck_commander_selector.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
 /// Tela para gerar decks automaticamente a partir de uma descrição em texto
@@ -21,11 +23,13 @@ class DeckGenerateScreen extends StatefulWidget {
     this.initialFormat,
     this.draftOwnerId = 'local',
     this.draftStore,
+    this.onOnboardingTaskCompleted,
   });
 
   final String? initialFormat;
   final String draftOwnerId;
   final DeckEntryDraftStore? draftStore;
+  final Future<bool> Function(String format)? onOnboardingTaskCompleted;
 
   @override
   State<DeckGenerateScreen> createState() => _DeckGenerateScreenState();
@@ -46,6 +50,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   bool _preferCollection = false;
   bool _collectionOnly = false;
   Map<String, dynamic>? _generatedDeck;
+  DeckCardItem? _selectedCommanderCard;
   final Map<String, Map<String, dynamic>> _learnedDecksByCommander = {};
   GenerateDeckCancellation? _generateCancellation;
   String? _activeGenerateJobId;
@@ -152,7 +157,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   void _handleCommanderChanged() {
     _scheduleDraftSave();
     if (!mounted || !_usesCommanderField) return;
-    setState(() {});
+    setState(() {
+      final selected = _selectedCommanderCard;
+      if (selected != null &&
+          _normalizeCommanderLookup(selected.name) !=
+              _normalizeCommanderLookup(_commanderController.text)) {
+        _selectedCommanderCard = null;
+      }
+    });
+  }
+
+  void _handleCanonicalCommanderChanged(DeckCardItem? card) {
+    _selectedCommanderCard = card;
+    _commanderController.text = card?.name ?? '';
+    if (mounted) setState(() {});
   }
 
   Future<void> _restoreDraft() async {
@@ -853,13 +871,29 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (success) {
         await _clearDraft();
         if (!mounted) return;
+        final onboardingCompleted = await _completeOnboardingTask();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Deck criado com sucesso!'),
+            content: Text(
+              widget.onOnboardingTaskCompleted == null
+                  ? 'Deck criado com sucesso!'
+                  : onboardingCompleted
+                  ? 'Primeiro deck criado. Sua Home já tem o próximo passo.'
+                  : 'Deck criado, mas o guia não pôde salvar a conclusão.',
+            ),
             backgroundColor: AppTheme.success,
           ),
         );
-        context.go('/decks');
+        if (widget.onOnboardingTaskCompleted != null) {
+          context.go(
+            onboardingCompleted
+                ? '/home'
+                : '/onboarding/core-flow?storage=unavailable',
+          );
+        } else {
+          context.go('/decks');
+        }
       } else {
         final message = FriendlyErrorMapper.fromException(
           context.read<DeckProvider>().errorMessage,
@@ -880,6 +914,16 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
       }
+    }
+  }
+
+  Future<bool> _completeOnboardingTask() async {
+    final completion = widget.onOnboardingTaskCompleted;
+    if (completion == null) return true;
+    try {
+      return await completion(_selectedFormat.toLowerCase());
+    } catch (_) {
+      return false;
     }
   }
 
@@ -1118,7 +1162,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             decoration: InputDecoration(
               hintText: 'Ex: Lorehold, the Historian',
               helperText:
-                  'Use quando quiser guiar a geração por um comandante específico.',
+                  'Você pode colar um nome; confirme a carta visualmente abaixo para fixar identidade e impressão.',
+              helperMaxLines: 3,
               counterText: '',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1126,6 +1171,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               filled: true,
               fillColor: theme.colorScheme.surface,
             ),
+          ),
+          const SizedBox(height: AppTheme.space12),
+          DeckCommanderSelector(
+            format: _selectedFormat.toLowerCase(),
+            selectedCard: _selectedCommanderCard,
+            onChanged: _isGenerating || _isLoadingLearnedDeck
+                ? (_) {}
+                : _handleCanonicalCommanderChanged,
+            title: 'Carta canônica do comandante',
+            subtitle:
+                _commanderController.text.trim().isNotEmpty &&
+                    _selectedCommanderCard == null
+                ? 'O nome do rascunho ainda não está confirmado. Busque a carta para ver arte, tipo e identidade de cor.'
+                : 'A seleção visual fixa a identidade correta antes da proposta da IA.',
           ),
           const SizedBox(height: AppTheme.space20),
         ],
@@ -1823,8 +1882,6 @@ class _LearnedDeckCallout extends StatelessWidget {
                       const SizedBox(height: AppTheme.space4),
                       Text(
                         helperText,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.textSecondary.withValues(alpha: 0.84),
                           height: 1.25,

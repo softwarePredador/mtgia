@@ -1,0 +1,165 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T20:00:05.811334Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "social_trade",
+  "profile": "web_social_trade_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Social Trade controlled Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "64beee16dd6f07f072616c6b174d04281bdd813e31afaf59f26c9faa9dd37cd7",
+  "checkpoint_count": 16,
+  "required_checkpoints": [
+    "social_trade_00_matches_populated",
+    "social_trade_01_marketplace_populated",
+    "social_trade_02_marketplace_empty",
+    "social_trade_03_trade_create_rehydrated",
+    "social_trade_04_trade_create_review",
+    "social_trade_05_trade_create_unavailable",
+    "social_trade_06_trade_pending_actions",
+    "social_trade_07_trade_counter_draft",
+    "social_trade_08_trade_declined",
+    "social_trade_09_trade_error",
+    "social_trade_10_trade_completed",
+    "social_trade_11_trade_inbox_empty",
+    "social_trade_12_messages_empty",
+    "social_trade_13_users_empty_results",
+    "social_trade_14_community_context_comment",
+    "social_trade_15_matches_empty"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "social_trade_00_matches_populated",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_00_matches_populated.png",
+      "sha256": "761a5640671b80bbc3f1673d02a8217d12e60bf8ad2892c60f0bea4205d0c8fc",
+      "bytes": 59078,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_01_marketplace_populated",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_01_marketplace_populated.png",
+      "sha256": "62685a02279643acd8b0621b16a3a5bbc383155d2e760de8f610504f6fc64b5d",
+      "bytes": 53452,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_02_marketplace_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_02_marketplace_empty.png",
+      "sha256": "3843a4f984983a7729ef03ed61d47aa517fabd6043ee19e4a2055e440f585b11",
+      "bytes": 36289,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_03_trade_create_rehydrated",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_03_trade_create_rehydrated.png",
+      "sha256": "78dadd68d96e259f20826c1270f68e1e9386fa8b93677c9c57282ed8d3c1df24",
+      "bytes": 57620,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_04_trade_create_review",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_04_trade_create_review.png",
+      "sha256": "1f5550e96c901b336bcf8d014193ba52e1e29d496d2e001e9dbaf31f3a52dbeb",
+      "bytes": 85748,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_05_trade_create_unavailable",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_05_trade_create_unavailable.png",
+      "sha256": "283dbf82cb44ac958340ba633613754d75937c1e16607eff79fc33904560c8a2",
+      "bytes": 50023,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_06_trade_pending_actions",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_06_trade_pending_actions.png",
+      "sha256": "76a026a29b9b0a1bbaed09be359d94b70769bb4b8bdc7fe6d2eb5cfb33cee03a",
+      "bytes": 73086,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_07_trade_counter_draft",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_07_trade_counter_draft.png",
+      "sha256": "680612b3671fb6b7a773c25204fb5b7594763a2a23ef2bbef416eb31c59d9076",
+      "bytes": 67917,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_08_trade_declined",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_08_trade_declined.png",
+      "sha256": "1e0fee716326eea64fac07194cdf6049ffdaeab2689970d6d9ede062ecc5e6cb",
+      "bytes": 81806,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_09_trade_error",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_09_trade_error.png",
+      "sha256": "96d87c05ce222e9935b9bde17a7c5348a208a1bf2ac0a40bc246deef15df4d55",
+      "bytes": 33085,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_10_trade_completed",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_10_trade_completed.png",
+      "sha256": "00b3ba117996198747c87865a8cf04815ff3a57143c1686aa80fe1d462670239",
+      "bytes": 73902,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_11_trade_inbox_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_11_trade_inbox_empty.png",
+      "sha256": "841890c521dc9fdeac4b33336e9e19c0f8c209e6c8f51a8b6d7721feec28a288",
+      "bytes": 36454,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_12_messages_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_12_messages_empty.png",
+      "sha256": "d703af8a850ced4ad0c39419a761b95786748c69c6d768d61a8e55a90b361846",
+      "bytes": 31813,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_13_users_empty_results",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_13_users_empty_results.png",
+      "sha256": "ec0f94c4e9b9fe02d53623a1390137144f4cd3e57a1c574b7e53aec8972351e6",
+      "bytes": 34941,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_14_community_context_comment",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_14_community_context_comment.png",
+      "sha256": "b03a5f32b5b86bffe292ef020fcfdf2d88c2b7778f8dda40f7ff8b93d3021c7e",
+      "bytes": 62588,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "social_trade_15_matches_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/social_trade_15_matches_empty.png",
+      "sha256": "d2c7928f1dd0325ebbebceea5e7e14d65264ec370b0bbc8fd979e7f1b209d917",
+      "bytes": 34461,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

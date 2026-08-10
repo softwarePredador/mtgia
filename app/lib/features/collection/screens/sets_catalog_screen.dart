@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
@@ -14,7 +12,6 @@ import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/mtg_set.dart';
-import '../set_icon_svg_cache.dart';
 import 'set_cards_screen.dart';
 
 class SetsCatalogScreen extends StatefulWidget {
@@ -457,37 +454,37 @@ class _CatalogHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppTheme.space10),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _FilterChip(
-                  label: 'Todos',
-                  selected: statusFilter == null,
-                  onSelected: () => onStatusFilterChanged(null),
-                ),
-                _FilterChip(
-                  label: 'Futuras',
-                  selected: statusFilter == 'future',
-                  onSelected: () => onStatusFilterChanged('future'),
-                ),
-                _FilterChip(
-                  label: 'Novas',
-                  selected: statusFilter == 'new',
-                  onSelected: () => onStatusFilterChanged('new'),
-                ),
-                _FilterChip(
-                  label: 'Atuais',
-                  selected: statusFilter == 'current',
-                  onSelected: () => onStatusFilterChanged('current'),
-                ),
-                _FilterChip(
-                  label: 'Antigas',
-                  selected: statusFilter == 'old',
-                  onSelected: () => onStatusFilterChanged('old'),
-                ),
-              ],
-            ),
+          Wrap(
+            key: const Key('sets-catalog-status-filters'),
+            spacing: AppTheme.space8,
+            runSpacing: AppTheme.space8,
+            children: [
+              _FilterChip(
+                label: 'Todos',
+                selected: statusFilter == null,
+                onSelected: () => onStatusFilterChanged(null),
+              ),
+              _FilterChip(
+                label: 'Futuras',
+                selected: statusFilter == 'future',
+                onSelected: () => onStatusFilterChanged('future'),
+              ),
+              _FilterChip(
+                label: 'Novas',
+                selected: statusFilter == 'new',
+                onSelected: () => onStatusFilterChanged('new'),
+              ),
+              _FilterChip(
+                label: 'Atuais',
+                selected: statusFilter == 'current',
+                onSelected: () => onStatusFilterChanged('current'),
+              ),
+              _FilterChip(
+                label: 'Antigas',
+                selected: statusFilter == 'old',
+                onSelected: () => onStatusFilterChanged('old'),
+              ),
+            ],
           ),
         ],
       ),
@@ -508,21 +505,18 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppTheme.space8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: selected,
-        onSelected: (_) => onSelected(),
-        selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
-        backgroundColor: AppTheme.surfaceSlate,
-        side: BorderSide(
-          color: selected ? AppTheme.brass400 : AppTheme.outlineMuted,
-        ),
-        labelStyle: TextStyle(
-          color: selected ? AppTheme.brass400 : AppTheme.textSecondary,
-          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-        ),
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onSelected(),
+      selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
+      backgroundColor: AppTheme.surfaceSlate,
+      side: BorderSide(
+        color: selected ? AppTheme.brass400 : AppTheme.outlineMuted,
+      ),
+      labelStyle: TextStyle(
+        color: selected ? AppTheme.brass400 : AppTheme.textSecondary,
+        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
       ),
     );
   }
@@ -567,6 +561,7 @@ class _SetCatalogTile extends StatelessWidget {
             spacing: 8,
             runSpacing: 6,
             children: [
+              _MiniMeta(icon: Icons.tag_outlined, label: set.code),
               _MiniMeta(
                 icon: Icons.calendar_today_outlined,
                 label: set.releaseDate ?? '-',
@@ -598,10 +593,7 @@ class _SetCatalogArtwork extends StatelessWidget {
   Widget build(BuildContext context) {
     final persistedArtwork = set.representativeImageUrl?.trim();
     final artworkUrl =
-        ScryfallImageHelper.withVersion(
-          persistedArtwork,
-          version: 'art_crop',
-        ) ??
+        ScryfallImageHelper.withVersion(persistedArtwork, version: 'normal') ??
         (persistedArtwork?.isNotEmpty == true ? persistedArtwork : null);
 
     return Semantics(
@@ -616,61 +608,19 @@ class _SetCatalogArtwork extends StatelessWidget {
         height: 56,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (artworkUrl != null)
-                CardArtwork(
-                  variant: CardArtworkVariant.setArt,
+          child: artworkUrl != null
+              ? CardArtwork(
+                  variant: CardArtworkVariant.fullCard,
                   networkImageKey: Key('set-artwork-image-${set.code}'),
                   imageUrl: artworkUrl,
-                  semanticLabel: 'Arte representativa da coleção ${set.name}',
+                  semanticLabel:
+                      'Carta representativa completa da coleção ${set.name}',
                   constrainAspectRatio: false,
+                  showStatusBadge: false,
                   loadingPlaceholder: const _SetArtworkLoading(),
                   errorPlaceholder: _SetIconArtwork(set: set),
                 )
-              else
-                _SetIconArtwork(set: set),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [AppTheme.transparent, AppTheme.overlayBlack65],
-                    stops: [0.48, 1],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 7,
-                bottom: 6,
-                child: Container(
-                  key: Key('set-code-badge-${set.code}'),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.space7,
-                    vertical: AppTheme.space3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.backgroundAbyss.withValues(alpha: 0.86),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                    border: Border.all(
-                      color: AppTheme.brass400.withValues(alpha: 0.64),
-                    ),
-                  ),
-                  child: Text(
-                    set.code,
-                    style: const TextStyle(
-                      color: AppTheme.brass400,
-                      fontSize: AppTheme.fontXs,
-                      height: AppTheme.lineHeightSingle,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.4,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+              : _SetIconArtwork(set: set),
         ),
       ),
     );
@@ -678,67 +628,17 @@ class _SetCatalogArtwork extends StatelessWidget {
 }
 
 class _SetIconArtwork extends StatelessWidget {
-  static final SetIconSvgCache _svgCache = SetIconSvgCache();
-
   final MtgSet set;
 
   const _SetIconArtwork({required this.set});
 
   @override
   Widget build(BuildContext context) {
-    final iconUrl = set.resolvedIconSvgUri;
     return DecoratedBox(
       key: Key('set-icon-fallback-${set.code}'),
       decoration: const BoxDecoration(gradient: AppTheme.goldAccentGradient),
-      child: Center(
-        child: iconUrl == null
-            ? const _SetIconTerminalFallback()
-            : Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppTheme.space18,
-                  AppTheme.space9,
-                  AppTheme.space18,
-                  AppTheme.space20,
-                ),
-                child: FutureBuilder<String?>(
-                  key: Key('set-icon-request-${set.code}'),
-                  future: _svgCache.resolve(iconUrl, _loadSvg),
-                  builder: (context, snapshot) {
-                    final svg = snapshot.data;
-                    if (svg == null) {
-                      return const _SetIconTerminalFallback();
-                    }
-                    return SvgPicture.string(
-                      svg,
-                      key: Key('set-icon-image-${set.code}'),
-                      fit: BoxFit.contain,
-                      colorFilter: const ColorFilter.mode(
-                        AppTheme.backgroundAbyss,
-                        BlendMode.srcIn,
-                      ),
-                    );
-                  },
-                ),
-              ),
-      ),
+      child: const Center(child: _SetIconTerminalFallback()),
     );
-  }
-
-  static Future<String?> _loadSvg(String url) async {
-    try {
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: const {'Accept': 'image/svg+xml,image/*'},
-          )
-          .timeout(const Duration(seconds: 8));
-      if (response.statusCode != 200) return null;
-      final svg = response.body.trim();
-      if (!svg.contains('<svg')) return null;
-      return svg;
-    } catch (_) {
-      return null;
-    }
   }
 }
 

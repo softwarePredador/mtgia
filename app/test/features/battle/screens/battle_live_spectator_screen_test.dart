@@ -330,6 +330,92 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('renders exact public card identities without name inference', (
+    tester,
+  ) async {
+    final snapshot = _snapshotRecord(
+      sequence: 1,
+      recordId: 'snapshot-public-cards',
+    );
+    final payload = snapshot['snapshot'] as Map<String, dynamic>;
+    final player = (payload['players'] as List).first as Map<String, dynamic>;
+    player['battlefield'] = [
+      {
+        'card_id': '11111111-1111-4111-8111-111111111111',
+        'name': 'Sol Ring',
+        'tapped': false,
+      },
+    ];
+    player['graveyard'] = [
+      {'name': 'Name Only Public Card'},
+    ];
+    player['exile'] = <Map<String, dynamic>>[];
+    player['command'] = <Map<String, dynamic>>[];
+
+    final exactEvent = _eventRecord(
+      sequence: 2,
+      recordId: 'event-exact-card',
+      message: 'Sol Ring entrou em jogo.',
+    );
+    (exactEvent['event'] as Map<String, dynamic>)['card_id'] =
+        '11111111-1111-4111-8111-111111111111';
+    final nameOnlyEvent = _eventRecord(
+      sequence: 3,
+      recordId: 'event-name-only',
+      message: 'Uma carta pública resolveu.',
+    );
+
+    final gateway = _FakeBattleJobGateway(
+      job: _job(
+        status: 'running',
+        stage: 'running',
+        current: 2,
+        engine: 'xmage',
+      ),
+      liveResponses: [
+        _page(items: [snapshot, exactEvent, nameOnlyEvent]),
+      ],
+    );
+
+    await _pumpLiveScreen(tester, gateway);
+
+    expect(
+      find.byKey(
+        const Key('battle-live-card-art-11111111-1111-4111-8111-111111111111'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      tester.getSize(
+        find.byKey(
+          const Key(
+            'battle-live-card-art-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      ),
+      const Size(72, 101),
+    );
+    expect(
+      find.byKey(const Key('battle-live-event-card-event-exact-card')),
+      findsOneWidget,
+    );
+    expect(
+      tester.getSize(
+        find.byKey(const Key('battle-live-event-card-event-exact-card')),
+      ),
+      const Size(44, 62),
+    );
+    expect(
+      find.byKey(const Key('battle-live-event-card-event-name-only')),
+      findsNothing,
+      reason: 'a public name alone cannot manufacture card artwork',
+    );
+    expect(find.text('Name Only Public Card'), findsOneWidget);
+    expect(find.text('Acompanhamento em tempo real'), findsOneWidget);
+    expect(find.text('Partida job-1'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('synchronizes a stale running job after the terminal live page', (
     tester,
   ) async {

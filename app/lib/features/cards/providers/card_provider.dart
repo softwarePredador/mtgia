@@ -509,7 +509,7 @@ class CardProvider extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> fetchPrintingsByName(String name) async {
     final encoded = Uri.encodeQueryComponent(name.trim());
     final response = await _apiClient.get(
-      '/cards/printings?name=$encoded&limit=50',
+      '/cards/printings?name=$encoded&limit=50&dedupe=false',
     );
     if (response.statusCode != 200) {
       throw Exception('Não foi possível carregar as edições agora.');
@@ -528,7 +528,7 @@ class CardProvider extends ChangeNotifier {
     // Usa o parâmetro sync=true que importa automaticamente do Scryfall
     final encoded = Uri.encodeQueryComponent(name.trim());
     final response = await _apiClient.get(
-      '/cards/printings?name=$encoded&limit=50&sync=true',
+      '/cards/printings?name=$encoded&limit=50&dedupe=false&sync=true',
     );
     if (response.statusCode != 200) {
       throw Exception('Não foi possível sincronizar as edições agora.');

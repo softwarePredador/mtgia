@@ -16,6 +16,13 @@
     "command": "../scripts/manaloom_ui_live_evidence_gate.sh --check",
     "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> MANALOOM_UI_ANDROID_RUNTIME_KIND=auto ../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
     "battle_live_capture_command": "../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-live-web",
+    "binder_import_capture_command": "../scripts/manaloom_binder_import_visual_qa.sh",
+    "deck_workshop_capture_command": "../scripts/manaloom_deck_workshop_visual_qa.sh",
+    "battle_learning_capture_command": "../scripts/manaloom_battle_learning_visual_qa.sh",
+    "social_trade_capture_command": "../scripts/manaloom_social_trade_visual_qa.sh",
+    "onboarding_intent_capture_command": "../scripts/manaloom_onboarding_intent_visual_qa.sh",
+    "visual_system_workspace_capture_command": "../scripts/manaloom_visual_system_workspace_qa.sh",
+    "critical_overlays_states_capture_command": "../scripts/manaloom_critical_overlays_states_visual_qa.sh",
     "p0_capture_command": "../scripts/manaloom_p0_runtime_capture.sh --profile <PROFILE> --ready-manifest <READY_JSON> --runtime-log <LOG> [--device <ANDROID_RUNTIME_ID>]",
     "p0_index_command": "MANALOOM_P0_*_DIR=<REPO_CAPTURE_DIR> MANALOOM_P0_*_LOG=<RUNTIME_LOG> ../scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
     "current_review": "../docs/qa/ui-live/latest.json",
@@ -52,6 +59,8 @@
         "battle-coach-board",
         "battle-coach-own-hand",
         "battle-coach-error-banner",
+        "battle-coach-concede-dialog",
+        "battle-coach-cancel-concede-button",
         "battle-coach-action-progress",
         "battle-coach-terminal-panel"
       ],
@@ -61,8 +70,10 @@
         "battle_coach_02_decision_prompt",
         "battle_coach_03_recoverable_error",
         "battle_coach_04_concede_confirmation",
-        "battle_coach_05_action_progress",
-        "battle_coach_06_terminal_replay"
+        "battle_coach_05_concede_progress",
+        "battle_coach_06_concede_terminal",
+        "battle_coach_07_action_progress",
+        "battle_coach_08_terminal_replay"
       ]
     },
     {
@@ -94,6 +105,532 @@
       ]
     },
     {
+      "id": "binder_import",
+      "route": "/collection/import?list_type=have|want",
+      "source": "lib/features/binder/screens/binder_import_screen.dart",
+      "automated_test": "test/features/binder/screens/binder_import_screen_test.dart",
+      "runtime_test": "integration_test/binder_import_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "binder-import-screen",
+        "binder-import-source-field",
+        "binder-import-empty-review",
+        "binder-import-candidate-",
+        "binder-import-plan-summary",
+        "binder-import-apply-confirmation",
+        "binder-import-retry-button",
+        "binder-import-history"
+      ],
+      "required_profiles": {
+        "web_binder_import_mobile_390x844": 7,
+        "web_binder_import_desktop_1440x900": 7,
+        "web_binder_import_wide_1920x1080": 7
+      },
+      "required_checkpoints": [
+        "binder_import_00_source",
+        "binder_import_01_review_duplicates",
+        "binder_import_02_plan",
+        "binder_import_03_confirmation",
+        "binder_import_04_partial_failure",
+        "binder_import_05_retry_success",
+        "binder_import_06_history"
+      ]
+    },
+    {
+      "id": "deck_workshop",
+      "route": "/decks/:id#oficina plus generate/import/optimize decision flow",
+      "source": "lib/features/decks/widgets/deck_workshop_tab.dart",
+      "sources": [
+        "lib/features/decks/widgets/deck_workshop_tab.dart",
+        "lib/features/decks/widgets/sample_hand_widget.dart"
+      ],
+      "automated_test": "test/features/decks/widgets/deck_workshop_tab_test.dart",
+      "automated_tests": [
+        "test/features/decks/widgets/deck_workshop_tab_test.dart",
+        "test/features/decks/widgets/sample_hand_widget_test.dart"
+      ],
+      "runtime_test": "integration_test/deck_workshop_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "deck-workshop-tab",
+        "deck-workshop-hero",
+        "deck-workshop-commander-art-frame",
+        "deck-workshop-decision-rail",
+        "deck-workshop-event-",
+        "deck-workshop-history-pair-",
+        "deck-workshop-undo-",
+        "deck-workshop-rollback-reason-",
+        "deck-workshop-test-next-step",
+        "deck-workshop-inline-error",
+        "sample-hand-carousel-hint"
+      ],
+      "required_profiles": {
+        "web_deck_workshop_mobile_390x844": 9,
+        "web_deck_workshop_desktop_1440x900": 9,
+        "web_deck_workshop_wide_1920x1080": 9
+      },
+      "required_checkpoints": [
+        "deck_workshop_00_commander",
+        "deck_workshop_01_import_preflight",
+        "deck_workshop_02_sources",
+        "deck_workshop_03_paired_swaps",
+        "deck_workshop_04_partial_selection",
+        "deck_workshop_05_card_reader",
+        "deck_workshop_06_history_undo",
+        "deck_workshop_07_conflict",
+        "deck_workshop_08_sample_hand_continuity"
+      ]
+    },
+    {
+      "id": "battle_learning",
+      "route": "/home → /decks/:id/battle-live/:jobId → /decks/:id/battle-lab → /decks/:id/post-game → Optimize",
+      "source": "lib/features/retention/screens/post_game_notes_screen.dart",
+      "automated_test": "test/features/retention/post_game_card_evidence_test.dart",
+      "runtime_test": "integration_test/battle_learning_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "post-game-form",
+        "post-game-replay-source",
+        "post-game-card-evidence-picker",
+        "post-game-evidence-receipt",
+        "post-game-optimize-evidence-button"
+      ],
+      "required_profiles": {
+        "web_battle_learning_mobile_390x844": 10,
+        "web_battle_learning_desktop_1440x900": 10,
+        "web_battle_learning_wide_1920x1080": 10
+      },
+      "required_checkpoints": [
+        "battle_learning_00_play_entry",
+        "battle_learning_01_active_session",
+        "battle_learning_02_live_table",
+        "battle_learning_03_reconnect",
+        "battle_learning_04_timeout",
+        "battle_learning_05_completed",
+        "battle_learning_06_replay_evidence",
+        "battle_learning_07_postgame_signals",
+        "battle_learning_08_postgame_receipt",
+        "battle_learning_09_optimize_evidence"
+      ]
+    },
+    {
+      "id": "social_trade",
+      "route": "/trades/matches → /collection?tab=1 → /trades/new/:receiverId → /trades/:id plus Community feedback and contextual empty states",
+      "source": "lib/features/trades/screens/trade_matches_screen.dart",
+      "automated_test": "test/features/trades/screens/trade_matches_screen_test.dart",
+      "runtime_test": "integration_test/social_trade_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "trade-matches-content",
+        "trade-matches-header",
+        "trade-match-card-",
+        "trade-match-freshness-",
+        "trade-match-propose-",
+        "trade-matches-empty"
+      ],
+      "required_profiles": {
+        "web_social_trade_mobile_390x844": 16,
+        "web_social_trade_desktop_1440x900": 16,
+        "web_social_trade_wide_1920x1080": 16
+      },
+      "required_checkpoints": [
+        "social_trade_00_matches_populated",
+        "social_trade_01_marketplace_populated",
+        "social_trade_02_marketplace_empty",
+        "social_trade_03_trade_create_rehydrated",
+        "social_trade_04_trade_create_review",
+        "social_trade_05_trade_create_unavailable",
+        "social_trade_06_trade_pending_actions",
+        "social_trade_07_trade_counter_draft",
+        "social_trade_08_trade_declined",
+        "social_trade_09_trade_error",
+        "social_trade_10_trade_completed",
+        "social_trade_11_trade_inbox_empty",
+        "social_trade_12_messages_empty",
+        "social_trade_13_users_empty_results",
+        "social_trade_14_community_context_comment",
+        "social_trade_15_matches_empty"
+      ]
+    },
+    {
+      "id": "onboarding_intent",
+      "route": "/onboarding/core-flow → exact first task → /home contextual return",
+      "source": "lib/features/home/onboarding_core_flow_screen.dart",
+      "automated_test": "test/features/home/onboarding_core_flow_screen_test.dart",
+      "runtime_test": "integration_test/onboarding_intent_visual_runtime_proof_test.dart",
+      "stable_keys": [
+        "onboarding-intent-screen",
+        "onboarding-intent-hero",
+        "onboarding-journey-progress",
+        "onboarding-goal-rail",
+        "onboarding-context-panel",
+        "onboarding-primary-action",
+        "onboarding-skip-action"
+      ],
+      "required_profiles": {
+        "web_onboarding_intent_mobile_390x844": 5,
+        "web_onboarding_intent_desktop_1440x900": 5,
+        "web_onboarding_intent_wide_1920x1080": 5
+      },
+      "required_checkpoints": [
+        "onboarding_intent_00_first_run",
+        "onboarding_intent_01_build_path",
+        "onboarding_intent_02_resumed_plan",
+        "onboarding_intent_03_skipped_home",
+        "onboarding_intent_04_completed_home"
+      ]
+    },
+    {
+      "id": "visual_system_workspace",
+      "route": "/profile → /community/user/:id → /decks plus contextual state canvases",
+      "source": "lib/features/profile/profile_screen.dart",
+      "sources": [
+        "lib/features/profile/profile_screen.dart",
+        "lib/features/social/screens/user_profile_screen.dart",
+        "lib/features/decks/screens/deck_list_screen.dart",
+        "lib/core/widgets/app_state_panel.dart"
+      ],
+      "automated_test": "test/features/profile/profile_screen_test.dart",
+      "runtime_test": "integration_test/visual_system_workspace_runtime_proof_test.dart",
+      "stable_keys": [
+        "profile-content",
+        "profile-identity-rail",
+        "profile-settings-workspace",
+        "profile-save-status",
+        "profile-save-button",
+        "user-profile-identity-rail",
+        "user-profile-workspace",
+        "deck-list-empty-workspace"
+      ],
+      "required_profiles": {
+        "web_visual_system_mobile_390x844": 10,
+        "web_visual_system_desktop_1440x900": 10,
+        "web_visual_system_wide_1920x1080": 10
+      },
+      "required_checkpoints": [
+        "visual_system_00_profile_clean",
+        "visual_system_01_profile_dirty",
+        "visual_system_02_profile_saving",
+        "visual_system_03_profile_error",
+        "visual_system_04_profile_saved",
+        "visual_system_05_public_profile",
+        "visual_system_06_decks_first_use",
+        "visual_system_07_no_results",
+        "visual_system_08_offline",
+        "visual_system_09_unavailable"
+      ]
+    },
+    {
+      "id": "critical_overlays_states",
+      "route": "/profile security overlays → /decks destructive action and commander recovery → binder editor → /trades/new/:receiverId → explicit session/permission contract states",
+      "source": "lib/features/profile/profile_screen.dart",
+      "sources": [
+        "lib/features/profile/profile_screen.dart",
+        "lib/features/decks/screens/deck_list_screen.dart",
+        "lib/features/decks/widgets/deck_commander_selector.dart",
+        "lib/features/binder/widgets/binder_item_editor.dart",
+        "lib/features/trades/screens/create_trade_screen.dart",
+        "lib/core/widgets/app_state_panel.dart"
+      ],
+      "automated_test": "test/features/profile/profile_screen_test.dart",
+      "automated_tests": [
+        "test/features/profile/profile_screen_test.dart",
+        "test/features/decks/screens/deck_list_responsive_test.dart",
+        "test/features/binder/widgets/binder_item_editor_validation_test.dart",
+        "test/features/trades/screens/trade_confirmation_flow_test.dart",
+        "test/core/widgets/app_state_panel_test.dart"
+      ],
+      "runtime_test": "integration_test/critical_overlays_states_runtime_proof_test.dart",
+      "stable_keys": [
+        "profile-change-password-button",
+        "profile-avatar-dialog",
+        "profile-blocked-users-loading",
+        "profile-blocked-users-error",
+        "profile-blocked-users-retry",
+        "deck-options-",
+        "deck-delete-dialog-",
+        "deck-delete-cancel-",
+        "deck-create-commander-selected",
+        "binder-editor-printings-error",
+        "binder-editor-printings-retry",
+        "binder-editor-delete-dialog",
+        "binder-editor-save-error",
+        "create-trade-item-picker-",
+        "create-trade-review-dialog",
+        "create-trade-review-item-",
+        "create-trade-submit-error"
+      ],
+      "required_profiles": {
+        "web_critical_overlays_mobile_390x844": 22,
+        "web_critical_overlays_desktop_1440x900": 22,
+        "web_critical_overlays_wide_1920x1080": 22
+      },
+      "required_checkpoints": [
+        "ux_pack08_00_profile_security_below_fold",
+        "ux_pack08_01_profile_avatar_dialog",
+        "ux_pack08_02_profile_blocked_loading",
+        "ux_pack08_03_profile_blocked_error_retry",
+        "ux_pack08_04_profile_blocked_recovered",
+        "ux_pack08_05_profile_password_validation",
+        "ux_pack08_06_profile_revoke_validation",
+        "ux_pack08_07_profile_delete_validation",
+        "ux_pack08_08_deck_seeded_action_context",
+        "ux_pack08_09_deck_delete_action_menu",
+        "ux_pack08_10_deck_delete_confirmation",
+        "ux_pack08_11_deck_delete_cancelled",
+        "ux_pack08_12_commander_selection_recovered",
+        "ux_pack08_13_binder_printings_error_retry",
+        "ux_pack08_14_binder_printings_recovered",
+        "ux_pack08_15_binder_delete_confirmation",
+        "ux_pack08_16_binder_save_error",
+        "ux_pack08_17_trade_item_picker",
+        "ux_pack08_18_trade_review_exact_identity",
+        "ux_pack08_19_trade_submit_error_retry",
+        "ux_pack08_20_session_expired",
+        "ux_pack08_21_permission_denied"
+      ],
+      "checkpoint_contracts": [
+        {
+          "id": "ux_pack08_00_profile_security_below_fold",
+          "domain": "profile_security",
+          "state": "security_actions_available",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-change-password-button",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_security_overlays",
+          "stage": "before",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_01_profile_avatar_dialog",
+          "domain": "profile_security",
+          "state": "avatar_dialog_open",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-avatar-dialog",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_avatar",
+          "stage": "open",
+          "mutation_policy": "cancelled"
+        },
+        {
+          "id": "ux_pack08_02_profile_blocked_loading",
+          "domain": "profile_security",
+          "state": "blocked_users_loading",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-blocked-users-loading",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_blocked_users",
+          "stage": "open",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_03_profile_blocked_error_retry",
+          "domain": "profile_security",
+          "state": "blocked_users_error_with_retry",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-blocked-users-error",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_blocked_users",
+          "stage": "error",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_04_profile_blocked_recovered",
+          "domain": "profile_security",
+          "state": "blocked_users_recovered",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-blocked-users-list",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_blocked_users",
+          "stage": "recovered",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_05_profile_password_validation",
+          "domain": "profile_security",
+          "state": "password_validation",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-change-password-dialog",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_password",
+          "stage": "open",
+          "mutation_policy": "validation_only"
+        },
+        {
+          "id": "ux_pack08_06_profile_revoke_validation",
+          "domain": "profile_security",
+          "state": "session_revoke_validation",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-revoke-sessions-dialog",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_revoke_sessions",
+          "stage": "open",
+          "mutation_policy": "validation_only"
+        },
+        {
+          "id": "ux_pack08_07_profile_delete_validation",
+          "domain": "profile_security",
+          "state": "account_delete_validation",
+          "source": "lib/features/profile/profile_screen.dart",
+          "anchor": "profile-delete-account-dialog",
+          "automated_tests": ["test/features/profile/profile_screen_test.dart"],
+          "flow_id": "profile_delete_account",
+          "stage": "open",
+          "mutation_policy": "validation_only"
+        },
+        {
+          "id": "ux_pack08_08_deck_seeded_action_context",
+          "domain": "decks",
+          "state": "seeded_deck_action_context",
+          "source": "lib/features/decks/screens/deck_list_screen.dart",
+          "anchor": "deck-options-",
+          "automated_tests": ["test/features/decks/screens/deck_list_responsive_test.dart"],
+          "flow_id": "deck_delete",
+          "stage": "before",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_09_deck_delete_action_menu",
+          "domain": "decks",
+          "state": "delete_action_disclosed",
+          "source": "lib/features/decks/screens/deck_list_screen.dart",
+          "anchor": "deck-delete-menu-",
+          "automated_tests": ["test/features/decks/screens/deck_list_responsive_test.dart"],
+          "flow_id": "deck_delete",
+          "stage": "intermediate",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_10_deck_delete_confirmation",
+          "domain": "decks",
+          "state": "delete_confirmation_open",
+          "source": "lib/features/decks/screens/deck_list_screen.dart",
+          "anchor": "deck-delete-dialog-",
+          "automated_tests": ["test/features/decks/screens/deck_list_responsive_test.dart"],
+          "flow_id": "deck_delete",
+          "stage": "open",
+          "mutation_policy": "cancelled"
+        },
+        {
+          "id": "ux_pack08_11_deck_delete_cancelled",
+          "domain": "decks",
+          "state": "deck_preserved_after_cancel",
+          "source": "lib/features/decks/screens/deck_list_screen.dart",
+          "anchor": "deck-list-row-",
+          "automated_tests": ["test/features/decks/screens/deck_list_responsive_test.dart"],
+          "flow_id": "deck_delete",
+          "stage": "final",
+          "mutation_policy": "cancelled"
+        },
+        {
+          "id": "ux_pack08_12_commander_selection_recovered",
+          "domain": "decks",
+          "state": "commander_selection_recovered",
+          "source": "lib/features/decks/widgets/deck_commander_selector.dart",
+          "anchor": "deck-create-commander-selected",
+          "automated_tests": ["test/features/decks/screens/deck_list_responsive_test.dart"],
+          "flow_id": "commander_selection",
+          "stage": "recovered",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_13_binder_printings_error_retry",
+          "domain": "binder",
+          "state": "printing_lookup_error_with_retry",
+          "source": "lib/features/binder/widgets/binder_item_editor.dart",
+          "anchor": "binder-editor-printings-error",
+          "automated_tests": ["test/features/binder/widgets/binder_item_editor_validation_test.dart"],
+          "flow_id": "binder_editor",
+          "stage": "error",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_14_binder_printings_recovered",
+          "domain": "binder",
+          "state": "printing_lookup_recovered",
+          "source": "lib/features/binder/widgets/binder_item_editor.dart",
+          "anchor": "binder-editor-printings-list",
+          "automated_tests": ["test/features/binder/widgets/binder_item_editor_validation_test.dart"],
+          "flow_id": "binder_editor",
+          "stage": "recovered",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_15_binder_delete_confirmation",
+          "domain": "binder",
+          "state": "delete_confirmation_open",
+          "source": "lib/features/binder/widgets/binder_item_editor.dart",
+          "anchor": "binder-editor-delete-dialog",
+          "automated_tests": ["test/features/binder/widgets/binder_item_editor_validation_test.dart"],
+          "flow_id": "binder_delete",
+          "stage": "open",
+          "mutation_policy": "cancelled"
+        },
+        {
+          "id": "ux_pack08_16_binder_save_error",
+          "domain": "binder",
+          "state": "save_error_preserves_editor",
+          "source": "lib/features/binder/widgets/binder_item_editor.dart",
+          "anchor": "binder-editor-save-error",
+          "automated_tests": ["test/features/binder/widgets/binder_item_editor_validation_test.dart"],
+          "flow_id": "binder_save",
+          "stage": "error",
+          "mutation_policy": "intercepted_failure"
+        },
+        {
+          "id": "ux_pack08_17_trade_item_picker",
+          "domain": "trades",
+          "state": "item_picker_open",
+          "source": "lib/features/trades/screens/create_trade_screen.dart",
+          "anchor": "create-trade-item-picker-",
+          "automated_tests": ["test/features/trades/screens/trade_confirmation_flow_test.dart"],
+          "flow_id": "trade_proposal",
+          "stage": "open",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_18_trade_review_exact_identity",
+          "domain": "trades",
+          "state": "exact_printing_review",
+          "source": "lib/features/trades/screens/create_trade_screen.dart",
+          "anchor": "create-trade-review-item-",
+          "automated_tests": ["test/features/trades/screens/trade_confirmation_flow_test.dart"],
+          "flow_id": "trade_proposal",
+          "stage": "intermediate",
+          "mutation_policy": "read_only"
+        },
+        {
+          "id": "ux_pack08_19_trade_submit_error_retry",
+          "domain": "trades",
+          "state": "submit_error_preserves_proposal",
+          "source": "lib/features/trades/screens/create_trade_screen.dart",
+          "anchor": "create-trade-submit-error",
+          "automated_tests": ["test/features/trades/screens/trade_confirmation_flow_test.dart"],
+          "flow_id": "trade_proposal",
+          "stage": "error",
+          "mutation_policy": "intercepted_failure"
+        },
+        {
+          "id": "ux_pack08_20_session_expired",
+          "domain": "cross_cutting_state",
+          "state": "session_expired_contract",
+          "source": "lib/core/widgets/app_state_panel.dart",
+          "anchor": "critical-contract-state-panel",
+          "automated_tests": ["test/core/widgets/app_state_panel_test.dart"],
+          "flow_id": "session_recovery_contract",
+          "stage": "final",
+          "mutation_policy": "synthetic_contract_state"
+        },
+        {
+          "id": "ux_pack08_21_permission_denied",
+          "domain": "cross_cutting_state",
+          "state": "permission_denied_contract",
+          "source": "lib/core/widgets/app_state_panel.dart",
+          "anchor": "critical-contract-state-panel",
+          "automated_tests": ["test/core/widgets/app_state_panel_test.dart"],
+          "flow_id": "permission_recovery_contract",
+          "stage": "final",
+          "mutation_policy": "synthetic_contract_state"
+        }
+      ]
+    },
+    {
       "id": "authenticated_p0_matrix",
       "route": "all active P0 routes declared by ui_surface_inventory.json",
       "source": "integration_test/app_existing_user_visual_audit_test.dart",
@@ -114,7 +651,7 @@
         "web_mobile_390x844": 54,
         "web_desktop_1440x900": 53,
         "web_wide_1920x1080": 53,
-        "android_emulator_manaloom_api34": 54
+        "android_physical_sm_a135m": 54
       },
       "android_runtime_contract": {
         "accepted_targets": [
@@ -123,7 +660,7 @@
         ],
         "must_be_attested_from_adb": true,
         "emulator_must_not_be_reported_as_physical": true,
-        "current_profile": "android_emulator_manaloom_api34"
+        "current_profile": "android_physical_sm_a135m"
       },
       "required_checkpoints": [
         "splash_boot",

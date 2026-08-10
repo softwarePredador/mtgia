@@ -12,6 +12,7 @@ class _FakeTradeBinderProvider extends BinderProvider {
   final bool failPublic;
   int directCalls = 0;
   int publicCalls = 0;
+  int publicItemCalls = 0;
 
   @override
   Future<List<BinderItem>?> fetchBinderDirect({
@@ -42,6 +43,15 @@ class _FakeTradeBinderProvider extends BinderProvider {
   }) async {
     publicCalls++;
     return failPublic ? null : [];
+  }
+
+  @override
+  Future<BinderItem?> fetchPublicBinderItemDirect({
+    required String userId,
+    required String itemId,
+  }) async {
+    publicItemCalls++;
+    return null;
   }
 }
 
@@ -216,6 +226,44 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Tentar novamente'), findsOneWidget);
+  });
+
+  testWidgets('oferta indisponivel mantém envio desabilitado', (tester) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final binder = _FakeTradeBinderProvider();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>.value(value: binder),
+          ChangeNotifierProvider<TradeProvider>(create: (_) => TradeProvider()),
+        ],
+        child: const MaterialApp(
+          home: CreateTradeScreen(
+            receiverId: 'user-2',
+            initialType: 'trade',
+            initialBinderItemId: 'missing-binder-item',
+            source: 'marketplace',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('create-trade-origin-error')), findsOneWidget);
+    expect(binder.publicItemCalls, 1);
+    expect(
+      tester
+          .widget<ElevatedButton>(
+            find.byKey(const ValueKey('create-trade-submit-button')),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('seletores customizados expõem estado e alvo mínimo de toque', (

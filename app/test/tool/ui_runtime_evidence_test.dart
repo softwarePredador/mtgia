@@ -214,6 +214,40 @@ void main() {
     );
   });
 
+  test('rejects an emulator target for a physical Android profile', () {
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/android_physical',
+    )..createSync(recursive: true);
+    final png = _proofPng(1080, 2408);
+    File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+    final log = File('${temp.path}/android-physical.log')
+      ..writeAsStringSync(
+        _directoryRuntimeLog(
+          profile: 'android_physical_sm_a135m',
+          target: 'android_emulator',
+          deviceContract: 'SM-A135M, Android 14, physical runtime',
+          checkpoints: const ['login_empty'],
+        ),
+      );
+
+    expect(
+      () => indexUiRuntimeScreenshotDirectory(
+        screenshotDirectory: screenshotDirectory,
+        runtimeLog: log,
+        repoRoot: temp,
+        manifestRelativePath:
+            'docs/qa/ui-live/current/p0-matrix/android-physical.json',
+        expectedSourceDigest: _digest,
+        surface: 'authenticated_p0_matrix',
+        profile: 'android_physical_sm_a135m',
+        runtime: 'flutter_drive',
+        target: 'android_emulator',
+        deviceContract: 'SM-A135M, Android 14, physical runtime',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+  });
+
   test('rejects missing checkpoints instead of accepting partial proof', () {
     final png = _proofPng(2, 2);
     final log = File('${temp.path}/runtime.log')

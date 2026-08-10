@@ -53,8 +53,10 @@ const _checkpoints = <String>[
   'battle_coach_02_decision_prompt',
   'battle_coach_03_recoverable_error',
   'battle_coach_04_concede_confirmation',
-  'battle_coach_05_action_progress',
-  'battle_coach_06_terminal_replay',
+  'battle_coach_05_concede_progress',
+  'battle_coach_06_concede_terminal',
+  'battle_coach_07_action_progress',
+  'battle_coach_08_terminal_replay',
 ];
 
 void main() {
@@ -143,8 +145,42 @@ void main() {
       );
       expect(tester.takeException(), isNull);
       await _capture(binding, tester, _checkpoints[4]);
-      await tester.tap(find.text('Continuar jogando'));
-      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('battle-coach-confirm-concede-button')),
+      );
+      await tester.pump();
+      expect(
+        find.byKey(const Key('battle-coach-action-progress')),
+        findsOneWidget,
+      );
+      expect(gateway.concedeCalls, 1);
+      expect(tester.takeException(), isNull);
+      await _capture(binding, tester, _checkpoints[5]);
+
+      gateway.completeConcede();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 450));
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('battle-coach-terminal-panel')),
+      );
+      expect(find.text('Você concedeu'), findsWidgets);
+      expect(
+        find.textContaining('A sessão terminou por concessão.'),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-open-replay-button')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+      await _capture(binding, tester, _checkpoints[6]);
+
+      final actionGateway = _BattleCoachProofGateway();
+      await _pumpSubject(tester, actionGateway, sessionId: 'session-proof');
+      await pumpUntilFound(tester, find.byKey(const Key('battle-coach-board')));
+      await _waitForRenderedCardArt(tester);
 
       await tester.ensureVisible(choice);
       await tester.pump(const Duration(milliseconds: 250));
@@ -154,11 +190,11 @@ void main() {
         find.byKey(const Key('battle-coach-action-progress')),
         findsOneWidget,
       );
-      expect(gateway.responses, hasLength(1));
+      expect(actionGateway.responses, hasLength(1));
       expect(tester.takeException(), isNull);
-      await _capture(binding, tester, _checkpoints[5]);
+      await _capture(binding, tester, _checkpoints[7]);
 
-      gateway.completeAction();
+      actionGateway.completeAction();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 450));
       await pumpUntilFound(
@@ -178,7 +214,7 @@ void main() {
       );
       expectNoRawTechnicalErrorText(tester);
       expect(tester.takeException(), isNull);
-      await _capture(binding, tester, _checkpoints[6]);
+      await _capture(binding, tester, _checkpoints[8]);
     },
   );
 
@@ -268,7 +304,9 @@ String _proofImageUrl(String fileName) {
 class _BattleCoachProofGateway implements InteractiveBattleGateway {
   final List<InteractiveBattleResponse> responses = [];
   bool failNextGet = false;
+  int concedeCalls = 0;
   Completer<InteractiveBattleSession>? _pendingAction;
+  Completer<InteractiveBattleSession>? _pendingConcede;
 
   @override
   Future<List<InteractiveBattleSession>> list({
@@ -307,8 +345,17 @@ class _BattleCoachProofGateway implements InteractiveBattleGateway {
   }
 
   @override
-  Future<InteractiveBattleSession> concede(String sessionId) async =>
-      _terminalSession(status: 'conceded');
+  Future<InteractiveBattleSession> concede(String sessionId) {
+    concedeCalls += 1;
+    _pendingConcede = Completer<InteractiveBattleSession>();
+    return _pendingConcede!.future;
+  }
+
+  void completeConcede() {
+    final pending = _pendingConcede;
+    if (pending == null || pending.isCompleted) return;
+    pending.complete(_terminalSession(status: 'conceded'));
+  }
 
   void completeAction() {
     final pending = _pendingAction;

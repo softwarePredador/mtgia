@@ -871,6 +871,11 @@ void _validateUiLiveEvidencePolicy({
               observedTarget == 'android_emulator',
           'emulator profile is not attested as android_emulator',
         );
+        expect(
+          !currentAndroidProfile.toLowerCase().contains('physical') ||
+              observedTarget == 'android_physical',
+          'physical profile is not attested as android_physical',
+        );
       }
     }
   }

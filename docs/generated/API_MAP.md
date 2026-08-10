@@ -37,6 +37,8 @@
 | `/auth/verify-email` | `POST` | `server/routes/auth/verify-email.dart` | 2 | `source` |
 | `/billing/webhook` | `POST` | `server/routes/billing/webhook/index.dart` | 1 | `source` |
 | `/binder` | `GET, POST` | `server/routes/binder/index.dart` | 2 | `source` |
+| `/binder/import/apply` | `POST` | `server/routes/binder/import/apply/index.dart` | 2 | `source` |
+| `/binder/import/preview` | `POST` | `server/routes/binder/import/preview/index.dart` | 2 | `source` |
 | `/binder/{id}` | `DELETE, GET, PUT` | `server/routes/binder/[id]/index.dart` | 2 | `source` |
 | `/cards` | `GET` | `server/routes/cards/index.dart` | 1 | `source` |
 | `/cards/printings` | `GET` | `server/routes/cards/printings/index.dart` | 1 | `source` |
@@ -74,6 +76,7 @@
 | `/decks/{id}/cards/replace` | `POST` | `server/routes/decks/[id]/cards/replace/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/set` | `POST` | `server/routes/decks/[id]/cards/set/index.dart` | 2 | `source` |
 | `/decks/{id}/export` | `GET` | `server/routes/decks/[id]/export/index.dart` | 2 | `source` |
+| `/decks/{id}/optimizations` | `GET` | `server/routes/decks/[id]/optimizations/index.dart` | 2 | `source` |
 | `/decks/{id}/optimizations/{eventId}/rollback` | `POST` | `server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart` | 2 | `source` |
 | `/decks/{id}/post-game-notes` | `GET, POST` | `server/routes/decks/[id]/post-game-notes/index.dart` | 2 | `source` |
 | `/decks/{id}/post-game-notes/{noteId}` | `DELETE` | `server/routes/decks/[id]/post-game-notes/[noteId].dart` | 2 | `source` |

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
@@ -46,6 +47,21 @@ class _FailingCreateDeckProvider extends _StaticDeckProvider {
     List<Map<String, dynamic>>? cards,
     bool isPublic = false,
   }) async {
+    return false;
+  }
+}
+
+class _FailingDeleteDeckProvider extends _StaticDeckProvider {
+  _FailingDeleteDeckProvider(super.seededDecks);
+
+  int deleteCalls = 0;
+
+  @override
+  String? get errorMessage => 'A conexão caiu antes de excluir o deck.';
+
+  @override
+  Future<bool> deleteDeck(String deckId) async {
+    deleteCalls += 1;
     return false;
   }
 }
@@ -249,6 +265,62 @@ Future<void> _pumpDecks(
   await tester.pumpAndSettle();
 }
 
+Future<void> _pumpOnboardingCreate(
+  WidgetTester tester, {
+  required DeckProvider deckProvider,
+  required Future<bool> Function(String format) onCompleted,
+}) async {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  final router = GoRouter(
+    initialLocation: '/decks',
+    routes: [
+      GoRoute(
+        path: '/decks',
+        builder: (_, __) => DeckListScreen(
+          openCreateOnStart: true,
+          initialCreateFormat: 'pioneer',
+          onOnboardingTaskCompleted: onCompleted,
+        ),
+      ),
+      GoRoute(
+        path: '/home',
+        builder: (_, __) =>
+            const SizedBox(key: Key('onboarding-completed-home')),
+      ),
+      GoRoute(
+        path: '/onboarding/core-flow',
+        builder: (_, __) =>
+            const SizedBox(key: Key('onboarding-storage-recovery')),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
+  await tester.pumpWidget(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<DeckProvider>.value(value: deckProvider),
+        ChangeNotifierProvider<CardProvider>(
+          create: (_) => _CommanderCardProvider(const []),
+        ),
+        ChangeNotifierProvider<MessageProvider>(
+          create: (_) => MessageProvider(apiClient: _NoopApiClient()),
+        ),
+        ChangeNotifierProvider<NotificationProvider>(
+          create: (_) => NotificationProvider(apiClient: _NoopApiClient()),
+        ),
+      ],
+      child: MaterialApp.router(
+        theme: AppTheme.darkTheme,
+        routerConfig: router,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 Future<void> _openCreateDialog(WidgetTester tester) async {
   final create = find.byKey(const Key('deck-list-empty-create-button'));
   await tester.ensureVisible(create);
@@ -270,6 +342,27 @@ Future<void> _selectCommander(WidgetTester tester, DeckCardItem card) async {
 }
 
 void main() {
+  testWidgets('a single deck uses a wide workbench instead of one grid cell', (
+    tester,
+  ) async {
+    final deck = _decks().first;
+    await _pumpDecks(tester, const Size(1920, 1080), decks: [deck]);
+
+    expect(
+      find.byKey(const Key('deck-list-sparse-wide-workspace')),
+      findsOneWidget,
+    );
+    final card = tester.getRect(find.byKey(Key('deck-list-row-${deck.id}')));
+    final workspace = tester.getRect(
+      find.byKey(const Key('deck-list-sparse-wide-workspace')),
+    );
+    expect(workspace.width, greaterThan(1500));
+    expect(card.width, greaterThan(1100));
+    expect(find.text('Ações rápidas'), findsOneWidget);
+    expect(find.text('Criar com IA'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('wide gallery is bounded and fits at least five dense columns', (
     tester,
   ) async {
@@ -390,11 +483,15 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('empty deck actions stay compact and centered on wide screens', (
+  testWidgets('empty deck becomes a starter workspace on wide screens', (
     tester,
   ) async {
     await _pumpDecks(tester, const Size(1880, 1000), decks: const <Deck>[]);
 
+    final workspace = find.byKey(const Key('deck-list-empty-workspace'));
+    final introRect = tester.getRect(
+      find.byKey(const Key('deck-list-empty-intro')),
+    );
     final actionsRect = tester.getRect(
       find.byKey(const Key('deck-list-empty-actions')),
     );
@@ -404,12 +501,18 @@ void main() {
     final generateRect = tester.getRect(
       find.byKey(const Key('deck-list-empty-generate-button')),
     );
+    final importRect = tester.getRect(
+      find.byKey(const Key('deck-list-empty-import-button')),
+    );
 
-    expect(actionsRect.width, lessThanOrEqualTo(380));
+    expect(workspace, findsOneWidget);
+    expect(actionsRect.width, closeTo(460, 0.1));
     expect(createRect.width, closeTo(actionsRect.width, 0.1));
     expect(generateRect.width, closeTo(actionsRect.width, 0.1));
-    expect(actionsRect.center.dx, closeTo(940, 1));
-    expect(generateRect.top, greaterThan(createRect.bottom));
+    expect(importRect.width, closeTo(actionsRect.width, 0.1));
+    expect(introRect.right, lessThan(actionsRect.left));
+    expect(generateRect.top, greaterThanOrEqualTo(createRect.bottom));
+    expect(importRect.top, greaterThanOrEqualTo(generateRect.bottom));
     expect(tester.takeException(), isNull);
   });
 
@@ -433,6 +536,71 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'deck deletion exposes stable action, confirmation, cancel and failure anchors',
+    (tester) async {
+      final provider = _FailingDeleteDeckProvider([_decks().first]);
+      await _pumpDecks(tester, const Size(390, 844), deckProvider: provider);
+
+      final options = find.byKey(const Key('deck-options-deck-0'));
+      expect(options, findsOneWidget);
+      expect(
+        tester.getSize(options).shortestSide,
+        greaterThanOrEqualTo(AppTheme.touchTargetMin),
+      );
+
+      await tester.tap(options);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('deck-delete-menu-deck-0')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('deck-delete-dialog-deck-0')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('deck-delete-cancel-deck-0')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('deck-list-row-deck-0')), findsOneWidget);
+      expect(provider.deleteCalls, 0);
+
+      await tester.tap(options);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('deck-delete-menu-deck-0')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('deck-delete-confirm-deck-0')));
+      await tester.pumpAndSettle();
+
+      expect(provider.deleteCalls, 1);
+      expect(find.byKey(const Key('deck-delete-error-deck-0')), findsOneWidget);
+      expect(find.byKey(const Key('deck-list-row-deck-0')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('deck deletion dialog remains compact on a wide viewport', (
+    tester,
+  ) async {
+    await _pumpDecks(tester, const Size(1440, 900));
+
+    await tester.tap(find.byKey(const Key('deck-options-deck-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('deck-delete-menu-deck-0')));
+    await tester.pumpAndSettle();
+
+    final dialog = find.byKey(const Key('deck-delete-dialog-deck-0'));
+    final dialogContent = find.byKey(
+      const Key('deck-delete-dialog-content-deck-0'),
+    );
+    expect(dialog, findsOneWidget);
+    expect(dialogContent, findsOneWidget);
+    expect(tester.getSize(dialogContent).width, lessThanOrEqualTo(520));
+    expect(tester.getSize(dialogContent).width, greaterThanOrEqualTo(360));
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const Key('deck-delete-cancel-deck-0')));
+    await tester.pumpAndSettle();
+  });
 
   testWidgets(
     'empty deck name stays inside modal, receives focus, and clears on edit',
@@ -582,6 +750,54 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Atraxa, Grand Unifier'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('wide commander picker compares candidates in two columns', (
+    tester,
+  ) async {
+    final secondCommander = DeckCardItem(
+      id: 'card-muldrotha',
+      name: 'Muldrotha, the Gravetide',
+      typeLine: 'Legendary Creature — Elemental Avatar',
+      colorIdentity: const ['U', 'B', 'G'],
+      setCode: 'dom',
+      rarity: 'mythic',
+      quantity: 1,
+      isCommander: false,
+    );
+    await _pumpDecks(
+      tester,
+      const Size(1280, 900),
+      decks: const <Deck>[],
+      cardProvider: _CommanderCardProvider([_atraxa, secondCommander]),
+    );
+    await _openCreateDialog(tester);
+    await tester.tap(find.byKey(const Key('deck-create-commander-select')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('deck-create-commander-search-field')),
+      'com',
+    );
+    await tester.pump(const Duration(milliseconds: 321));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('commander-picker-comparison-grid')),
+      findsOneWidget,
+    );
+    final first = tester.getRect(
+      find.byKey(const Key('deck-create-commander-result-card-atraxa')),
+    );
+    final second = tester.getRect(
+      find.byKey(const Key('deck-create-commander-result-card-muldrotha')),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('commander-picker-dialog'))).width,
+      greaterThan(850),
+    );
+    expect((first.top - second.top).abs(), lessThan(0.1));
+    expect(second.left, greaterThan(first.left));
     expect(tester.takeException(), isNull);
   });
 
@@ -990,6 +1206,46 @@ void main() {
       expect(find.byKey(const Key('deck-create-submit-error')), findsNothing);
       expect(find.text('Deck criado com sucesso!'), findsOneWidget);
       expect(find.byType(SnackBar), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'onboarding manual create opens, preserves format and completes',
+    (tester) async {
+      final provider = _SuccessfulCreateDeckProvider();
+      final completedFormats = <String>[];
+      await _pumpOnboardingCreate(
+        tester,
+        deckProvider: provider,
+        onCompleted: (format) async {
+          completedFormats.add(format);
+          return true;
+        },
+      );
+
+      expect(find.byKey(const Key('deck-create-dialog')), findsOneWidget);
+      expect(
+        tester
+            .widget<DropdownButtonFormField<String>>(
+              find.byKey(const Key('deck-create-format-field')),
+            )
+            .initialValue,
+        'pioneer',
+      );
+      await tester.enterText(
+        find.byKey(const Key('deck-create-name-field')),
+        'Pioneer do onboarding',
+      );
+      await tester.tap(find.byKey(const Key('deck-create-submit-button')));
+      await tester.pumpAndSettle();
+
+      expect(provider.createdFormat, 'pioneer');
+      expect(completedFormats, ['pioneer']);
+      expect(
+        find.byKey(const Key('onboarding-completed-home')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     },
   );

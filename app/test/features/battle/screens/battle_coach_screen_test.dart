@@ -23,6 +23,7 @@ class _FakeInteractiveGateway implements InteractiveBattleGateway {
   final List<InteractiveBattleSession> activeSessions;
   int getCount = 0;
   int listCount = 0;
+  int concedeCalls = 0;
   final List<InteractiveBattleResponse> responses = [];
 
   @override
@@ -59,8 +60,10 @@ class _FakeInteractiveGateway implements InteractiveBattleGateway {
   }
 
   @override
-  Future<InteractiveBattleSession> concede(String sessionId) async =>
-      _terminalSession(status: 'conceded');
+  Future<InteractiveBattleSession> concede(String sessionId) async {
+    concedeCalls += 1;
+    return _terminalSession(status: 'conceded');
+  }
 }
 
 class _FakeOpponentGateway extends BattleReplayService {
@@ -586,6 +589,51 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'concede confirmation cancels safely and confirms a causal terminal state',
+    (tester) async {
+      final gateway = _FakeInteractiveGateway();
+      await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+      await tester.pump();
+      await tester.pump();
+
+      final concede = find.byKey(const Key('battle-coach-concede-button'));
+      await tester.ensureVisible(concede);
+      await tester.tap(concede);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('battle-coach-concede-dialog')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-cancel-concede-button')),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('battle-coach-cancel-concede-button')),
+      );
+      await tester.pumpAndSettle();
+      expect(gateway.concedeCalls, 0);
+      expect(find.byKey(const Key('battle-coach-board')), findsOneWidget);
+
+      await tester.tap(concede);
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('battle-coach-confirm-concede-button')),
+      );
+      await tester.pumpAndSettle();
+      expect(gateway.concedeCalls, 1);
+      expect(
+        find.byKey(const Key('battle-coach-terminal-panel')),
+        findsOneWidget,
+      );
+      expect(find.text('Você concedeu'), findsWidgets);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   testWidgets('renders unavailable battle metrics without fabricated zeroes', (
     tester,

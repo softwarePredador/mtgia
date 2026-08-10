@@ -20,7 +20,7 @@ usage:
     --ready-manifest <ready.json> --runtime-log <log>
 
   manaloom_p0_runtime_capture.sh \
-    --profile android_emulator_manaloom_api34 \
+    --profile android_emulator_manaloom_api34|android_physical_sm_a135m \
     --ready-manifest <ready.json> --runtime-log <log> \
     --device <adb-id>
 
@@ -150,15 +150,24 @@ case "$PROFILE" in
     device_contract="$(manaloom_web_runtime_device_contract "$PROFILE")"
     governed_output="$APP_DIR/test/ui/goldens/runtime/web_wide"
     ;;
-  android_emulator_manaloom_api34)
+  android_emulator_manaloom_api34|android_physical_sm_a135m)
     platform="android"
-    width=390
-    height=844
     expected_count=54
-    target="android_emulator"
-    governed_output="$APP_DIR/test/ui/goldens/runtime/android_emulator"
+    if [[ "$PROFILE" == "android_emulator_manaloom_api34" ]]; then
+      width=390
+      height=844
+      expected_runtime_kind="emulator"
+      target="android_emulator"
+      governed_output="$APP_DIR/test/ui/goldens/runtime/android_emulator"
+    else
+      width=360
+      height=803
+      expected_runtime_kind="physical"
+      target="android_physical"
+      governed_output="$APP_DIR/test/ui/goldens/runtime/android_physical"
+    fi
     if [[ -z "$DEVICE_ID" ]]; then
-      echo "--device is required for the Android emulator profile" >&2
+      echo "--device is required for the Android profile" >&2
       exit 2
     fi
     command -v adb >/dev/null 2>&1 || {
@@ -172,9 +181,13 @@ case "$PROFILE" in
     kernel_qemu="$(adb -s "$DEVICE_ID" shell getprop ro.kernel.qemu | tr -d '\r')"
     boot_qemu="$(adb -s "$DEVICE_ID" shell getprop ro.boot.qemu | tr -d '\r')"
     serial="$(adb -s "$DEVICE_ID" get-serialno | tr -d '\r')"
-    if [[ "$kernel_qemu" != "1" && "$boot_qemu" != "1" &&
-          "$serial" != emulator-* ]]; then
-      echo "Profile requires an attested Android emulator" >&2
+    observed_runtime_kind="physical"
+    if [[ "$kernel_qemu" == "1" || "$boot_qemu" == "1" ||
+          "$serial" == emulator-* ]]; then
+      observed_runtime_kind="emulator"
+    fi
+    if [[ "$observed_runtime_kind" != "$expected_runtime_kind" ]]; then
+      echo "Profile requires an attested Android $expected_runtime_kind runtime" >&2
       exit 1
     fi
     model="$(adb -s "$DEVICE_ID" shell getprop ro.product.model | tr -d '\r')"
@@ -186,7 +199,7 @@ case "$PROFILE" in
       manaloom_android_runtime_device_contract \
         "$model" \
         "$android_version" \
-        emulator \
+        "$observed_runtime_kind" \
         "$serial" \
         "$device_size" \
         "portrait-up with native Life Counter landscape checkpoint"

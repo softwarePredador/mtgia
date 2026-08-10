@@ -33,12 +33,20 @@ class _FakeOnboardingRepository implements OnboardingStateRepository {
   Future<void> saveProgress(
     String userId, {
     required String selectedFormat,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   }) async {
     if (failWrites) {
       throw const OnboardingPersistenceException('write failed');
     }
     savedFormats.add(selectedFormat);
-    state = state.copyWith(selectedFormat: selectedFormat);
+    state = state.copyWith(
+      selectedFormat: selectedFormat,
+      selectedGoal: selectedGoal,
+      experience: experience,
+      buildMode: buildMode,
+    );
   }
 
   @override
@@ -46,6 +54,9 @@ class _FakeOnboardingRepository implements OnboardingStateRepository {
     String userId, {
     required String selectedFormat,
     required OnboardingDisposition disposition,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   }) async {
     if (failWrites) {
       throw const OnboardingPersistenceException('write failed');
@@ -54,6 +65,9 @@ class _FakeOnboardingRepository implements OnboardingStateRepository {
     state = OnboardingState(
       disposition: disposition,
       selectedFormat: selectedFormat,
+      selectedGoal: selectedGoal ?? state.selectedGoal,
+      experience: experience ?? state.experience,
+      buildMode: buildMode ?? state.buildMode,
     );
   }
 }
@@ -108,19 +122,38 @@ Widget _subject({
       ),
       GoRoute(
         path: '/home',
-        builder: (_, _) => const Scaffold(key: Key('home-destination')),
+        builder: (_, state) => Scaffold(
+          key: const Key('home-destination'),
+          body: Text(state.uri.toString(), key: const Key('route-uri')),
+        ),
       ),
       GoRoute(
         path: '/decks',
-        builder: (_, _) => const Scaffold(key: Key('decks-destination')),
+        builder: (_, state) => Scaffold(
+          key: const Key('decks-destination'),
+          body: Text(state.uri.toString(), key: const Key('route-uri')),
+        ),
       ),
       GoRoute(
         path: '/decks/generate',
-        builder: (_, _) => const Scaffold(key: Key('generate-destination')),
+        builder: (_, state) => Scaffold(
+          key: const Key('generate-destination'),
+          body: Text(state.uri.toString(), key: const Key('route-uri')),
+        ),
       ),
       GoRoute(
         path: '/decks/import',
-        builder: (_, _) => const Scaffold(key: Key('import-destination')),
+        builder: (_, state) => Scaffold(
+          key: const Key('import-destination'),
+          body: Text(state.uri.toString(), key: const Key('route-uri')),
+        ),
+      ),
+      GoRoute(
+        path: '/collection/import',
+        builder: (_, state) => Scaffold(
+          key: const Key('collection-import-destination'),
+          body: Text(state.uri.toString(), key: const Key('route-uri')),
+        ),
       ),
     ],
   );
@@ -152,7 +185,12 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final repository = _FakeOnboardingRepository(
-      state: const OnboardingState(selectedFormat: 'pioneer'),
+      state: const OnboardingState(
+        selectedFormat: 'pioneer',
+        selectedGoal: OnboardingGoal.buildDeck,
+        experience: OnboardingExperience.returning,
+        buildMode: OnboardingBuildMode.manual,
+      ),
     );
     final tracker = _FakeEventTracker();
     late GoRouter router;
@@ -172,34 +210,21 @@ void main() {
       reason: 'overflow before scrolling the onboarding',
     );
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('onboarding-format-dropdown')),
-      180,
-      scrollable: find.descendant(
-        of: find.byKey(const Key('onboarding-scroll-view')),
-        matching: find.byType(Scrollable),
-      ),
-    );
+    await _ensureVisible(tester, const Key('onboarding-format-dropdown'));
     final dropdown = tester.widget<DropdownButtonFormField<String>>(
       find.byKey(const Key('onboarding-format-dropdown')),
     );
     expect(dropdown.initialValue, 'pioneer');
+    expect(find.text('PLANO RETOMADO'), findsOneWidget);
     expect(
       tester.takeException(),
       isNull,
       reason: 'overflow while showing the format step',
     );
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('onboarding-complete-action')),
-      220,
-      scrollable: find.descendant(
-        of: find.byKey(const Key('onboarding-scroll-view')),
-        matching: find.byType(Scrollable),
-      ),
-    );
-    await tester.pump();
+    await _ensureVisible(tester, const Key('onboarding-primary-action'));
 
-    expect(find.byKey(const Key('onboarding-complete-action')), findsOneWidget);
+    expect(find.byKey(const Key('onboarding-primary-action')), findsOneWidget);
+    expect(find.byKey(const Key('onboarding-build-manual')), findsOneWidget);
     expect(
       tracker.events.where((event) => event == 'core_flow_started'),
       hasLength(1),
@@ -227,15 +252,7 @@ void main() {
     );
     addTearDown(router.dispose);
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('onboarding-skip-action')),
-      240,
-      scrollable: find.descendant(
-        of: find.byKey(const Key('onboarding-scroll-view')),
-        matching: find.byType(Scrollable),
-      ),
-    );
-    await tester.tap(find.byKey(const Key('onboarding-skip-action')));
+    await _tapWhenVisible(tester, const Key('onboarding-skip-action'));
     await tester.pumpAndSettle();
 
     expect(
@@ -264,18 +281,20 @@ void main() {
       );
       addTearDown(router.dispose);
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('onboarding-skip-action')),
-        240,
-        scrollable: find.descendant(
-          of: find.byKey(const Key('onboarding-scroll-view')),
-          matching: find.byType(Scrollable),
-        ),
+      await _tapWhenVisible(
+        tester,
+        const Key('onboarding-goal-catalogCollection'),
       );
-      await tester.tap(find.byKey(const Key('onboarding-skip-action')));
+      await _tapWhenVisible(
+        tester,
+        const Key('onboarding-experience-firstSteps'),
+      );
+      await _tapWhenVisible(tester, const Key('onboarding-skip-action'));
       await tester.pumpAndSettle();
 
       expect(repository.settlements, [OnboardingDisposition.skipped]);
+      expect(repository.state.selectedGoal, OnboardingGoal.catalogCollection);
+      expect(repository.state.experience, OnboardingExperience.firstSteps);
       expect(settledCalls, 1);
       expect(
         tracker.events.where((event) => event == 'onboarding_skipped'),
@@ -285,7 +304,7 @@ void main() {
     },
   );
 
-  testWidgets('base choice saves the resumed format before deep navigation', (
+  testWidgets('import intent saves context before exact task navigation', (
     tester,
   ) async {
     final repository = _FakeOnboardingRepository();
@@ -300,23 +319,96 @@ void main() {
     );
     addTearDown(router.dispose);
     await tester.pumpAndSettle();
+    await _tapWhenVisible(tester, const Key('onboarding-goal-importDeck'));
+    await _tapWhenVisible(tester, const Key('onboarding-experience-returning'));
+    await _ensureVisible(tester, const Key('onboarding-format-dropdown'));
     final dropdown = tester.widget<DropdownButtonFormField<String>>(
       find.byKey(const Key('onboarding-format-dropdown')),
     );
     dropdown.onChanged?.call('modern');
     await tester.pumpAndSettle();
-    await tester.ensureVisible(
-      find.byKey(const Key('onboarding-import-action')),
-    );
-    await tester.tap(find.byKey(const Key('onboarding-import-action')));
+    await _tapWhenVisible(tester, const Key('onboarding-primary-action'));
     await tester.pumpAndSettle();
 
-    expect(repository.savedFormats, ['modern', 'modern']);
+    expect(repository.savedFormats.last, 'modern');
+    expect(repository.state.selectedGoal, OnboardingGoal.importDeck);
+    expect(repository.state.experience, OnboardingExperience.returning);
+    expect(repository.state.isSettled, isFalse);
     expect(
       tracker.events,
-      containsAll(['format_selected', 'base_choice_import']),
+      containsAll([
+        'onboarding_goal_selected',
+        'onboarding_experience_selected',
+        'format_selected',
+        'onboarding_task_started',
+      ]),
     );
     expect(find.byKey(const Key('import-destination')), findsOneWidget);
+    expect(
+      _displayedRouteUri(),
+      Uri.parse('/decks/import?format=modern&from=onboarding'),
+    );
+  });
+
+  testWidgets('manual build intent opens create with the selected format', (
+    tester,
+  ) async {
+    final repository = _FakeOnboardingRepository();
+    final tracker = _FakeEventTracker();
+    late GoRouter router;
+    await tester.pumpWidget(
+      _subject(
+        repository: repository,
+        tracker: tracker,
+        onRouter: (value) => router = value,
+      ),
+    );
+    addTearDown(router.dispose);
+    await tester.pumpAndSettle();
+
+    await _tapWhenVisible(tester, const Key('onboarding-goal-buildDeck'));
+    await _tapWhenVisible(
+      tester,
+      const Key('onboarding-experience-experienced'),
+    );
+    await _tapWhenVisible(tester, const Key('onboarding-build-manual'));
+    await _tapWhenVisible(tester, const Key('onboarding-primary-action'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('decks-destination')), findsOneWidget);
+    expect(
+      _displayedRouteUri(),
+      Uri.parse('/decks?create=1&format=commander&from=onboarding'),
+    );
+    expect(repository.state.buildMode, OnboardingBuildMode.manual);
+    expect(repository.settlements, isEmpty);
+  });
+
+  testWidgets('play intent hands off to Home without false completion', (
+    tester,
+  ) async {
+    final repository = _FakeOnboardingRepository();
+    final tracker = _FakeEventTracker();
+    late GoRouter router;
+    await tester.pumpWidget(
+      _subject(
+        repository: repository,
+        tracker: tracker,
+        onRouter: (value) => router = value,
+      ),
+    );
+    addTearDown(router.dispose);
+    await tester.pumpAndSettle();
+
+    await _tapWhenVisible(tester, const Key('onboarding-goal-play'));
+    await _tapWhenVisible(tester, const Key('onboarding-experience-returning'));
+    await _tapWhenVisible(tester, const Key('onboarding-primary-action'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('home-destination')), findsOneWidget);
+    expect(repository.state.selectedGoal, OnboardingGoal.play);
+    expect(repository.state.isSettled, isFalse);
+    expect(repository.settlements, isEmpty);
   });
 
   testWidgets('load failure exposes retry without inferring completion', (
@@ -339,14 +431,7 @@ void main() {
     );
     addTearDown(router.dispose);
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('onboarding-persistence-error')),
-      120,
-      scrollable: find.descendant(
-        of: find.byKey(const Key('onboarding-scroll-view')),
-        matching: find.byType(Scrollable),
-      ),
-    );
+    await _ensureVisible(tester, const Key('onboarding-persistence-error'));
 
     expect(
       find.byKey(const Key('onboarding-persistence-error')),
@@ -388,10 +473,37 @@ void main() {
     await tester.pumpAndSettle();
 
     FocusManager.instance.primaryFocus?.unfocus();
-    for (var index = 0; index < 3; index += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-      await tester.pump();
-    }
+    await _tabUntilFocusInside(
+      tester,
+      find.byKey(const Key('onboarding-goal-buildDeck')),
+      maxTabs: 12,
+    );
+    expect(
+      _primaryFocusIsInside(find.byKey(const Key('onboarding-goal-buildDeck'))),
+      isTrue,
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+    await _tabUntilFocusInside(
+      tester,
+      find.byKey(const Key('onboarding-experience-firstSteps')),
+      maxTabs: 12,
+    );
+    expect(
+      _primaryFocusIsInside(
+        find.byKey(const Key('onboarding-experience-firstSteps')),
+      ),
+      isTrue,
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+    await _tabUntilFocusInside(
+      tester,
+      find.byKey(const Key('onboarding-format-dropdown')),
+      maxTabs: 6,
+    );
     expect(
       _primaryFocusIsInside(
         find.byKey(const Key('onboarding-format-dropdown')),
@@ -399,15 +511,46 @@ void main() {
       isTrue,
     );
 
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
+    await _tabUntilFocusInside(
+      tester,
+      find.byKey(const Key('onboarding-primary-action')),
+      maxTabs: 8,
+    );
     expect(
-      _primaryFocusIsInside(
-        find.byKey(const Key('onboarding-generate-action')),
-      ),
+      _primaryFocusIsInside(find.byKey(const Key('onboarding-primary-action'))),
       isTrue,
     );
   });
+}
+
+Future<void> _ensureVisible(WidgetTester tester, Key key) async {
+  final finder = find.byKey(key);
+  expect(finder, findsOneWidget);
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _tapWhenVisible(WidgetTester tester, Key key) async {
+  await _ensureVisible(tester, key);
+  await tester.tap(find.byKey(key));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _tabUntilFocusInside(
+  WidgetTester tester,
+  Finder target, {
+  required int maxTabs,
+}) async {
+  for (var index = 0; index < maxTabs; index += 1) {
+    if (_primaryFocusIsInside(target)) return;
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+  }
+}
+
+Uri _displayedRouteUri() {
+  final text = find.byKey(const Key('route-uri')).evaluate().single.widget;
+  return Uri.parse((text as Text).data!);
 }
 
 bool _primaryFocusIsInside(Finder ancestorFinder) {

@@ -7,15 +7,20 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/card_artwork.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/decks/models/deck.dart';
+import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/home/home_screen.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
+import 'package:manaloom/features/home/services/onboarding_state_store.dart';
 import 'package:manaloom/features/market/providers/market_provider.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../ui/support/manaloom_ui_audit_harness.dart';
 
@@ -35,6 +40,24 @@ class _SeededDeckProvider extends _IdleDeckProvider {
 
   @override
   List<Deck> get decks => List<Deck>.unmodifiable(seededDecks);
+}
+
+class _RevisionDeckProvider extends _SeededDeckProvider {
+  _RevisionDeckProvider(this.details) : super([details]);
+
+  final DeckDetails details;
+  int detailsCalls = 0;
+
+  @override
+  DeckDetails? get selectedDeck => details;
+
+  @override
+  Future<void> fetchDeckDetails(
+    String deckId, {
+    bool forceRefresh = false,
+  }) async {
+    detailsCalls += 1;
+  }
 }
 
 class _ErrorDeckProvider extends _IdleDeckProvider {
@@ -82,6 +105,51 @@ class _IdleMarketProvider extends MarketProvider {
   }) async {}
 }
 
+class _MemoryOnboardingRepository implements OnboardingStateRepository {
+  _MemoryOnboardingRepository(this.state);
+
+  OnboardingState state;
+  final List<OnboardingDisposition> settlements = <OnboardingDisposition>[];
+
+  @override
+  Future<OnboardingState> load(String userId) async => state;
+
+  @override
+  Future<void> saveProgress(
+    String userId, {
+    required String selectedFormat,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
+  }) async {
+    state = state.copyWith(
+      selectedFormat: selectedFormat,
+      selectedGoal: selectedGoal,
+      experience: experience,
+      buildMode: buildMode,
+    );
+  }
+
+  @override
+  Future<void> settle(
+    String userId, {
+    required String selectedFormat,
+    required OnboardingDisposition disposition,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
+  }) async {
+    settlements.add(disposition);
+    state = OnboardingState(
+      disposition: disposition,
+      selectedFormat: selectedFormat,
+      selectedGoal: selectedGoal ?? state.selectedGoal,
+      experience: experience ?? state.experience,
+      buildMode: buildMode ?? state.buildMode,
+    );
+  }
+}
+
 Widget _buildSubject({
   bool? lifeCounterAvailable,
   List<Deck> decks = const [],
@@ -125,22 +193,33 @@ Widget _buildSubject({
 Future<GoRouter> _pumpNavigationSubject(
   WidgetTester tester, {
   List<Deck> decks = const [],
+  DeckProvider? deckProvider,
   bool lifeCounterAvailable = false,
+  String userId = '',
+  OnboardingStateRepository? onboardingStateRepository,
+  VoidCallback? onOnboardingSettled,
 }) async {
   final router = GoRouter(
     initialLocation: '/home',
     routes: [
       GoRoute(
         path: '/home',
-        builder: (_, _) =>
-            HomeScreen(lifeCounterAvailable: lifeCounterAvailable),
+        builder: (_, _) => HomeScreen(
+          lifeCounterAvailable: lifeCounterAvailable,
+          userId: userId,
+          onboardingStateRepository: onboardingStateRepository,
+          onOnboardingSettled: onOnboardingSettled,
+        ),
       ),
       for (final path in [
         '/life-counter',
         '/community',
         '/onboarding/core-flow',
         '/decks',
+        '/decks/generate',
+        '/decks/import',
         '/collection',
+        '/collection/import',
         '/profile',
         '/login',
       ])
@@ -153,6 +232,15 @@ Future<GoRouter> _pumpNavigationSubject(
             ),
           ),
         ),
+      GoRoute(
+        path: '/decks/:id/post-game',
+        builder: (_, state) => Scaffold(
+          body: Text(
+            state.uri.toString(),
+            key: const Key('home-navigation-destination'),
+          ),
+        ),
+      ),
       GoRoute(
         path: '/decks/:id',
         builder: (_, state) => Scaffold(
@@ -173,7 +261,7 @@ Future<GoRouter> _pumpNavigationSubject(
           create: (_) => AuthProvider(apiClient: _NoopApiClient()),
         ),
         ChangeNotifierProvider<DeckProvider>(
-          create: (_) => _SeededDeckProvider(decks),
+          create: (_) => deckProvider ?? _SeededDeckProvider(decks),
         ),
         ChangeNotifierProvider<MarketProvider>(
           create: (_) => _IdleMarketProvider(),
@@ -211,6 +299,9 @@ Future<void> _loadGoldenFonts() async {
 
 void main() {
   setUpAll(_loadGoldenFonts);
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
 
   testWidgets('shows premium home dashboard and empty deck state', (
     tester,
@@ -413,6 +504,10 @@ void main() {
         .widget<FilledButton>(find.byKey(const Key('home-primary-action')))
         .onPressed!();
     await tester.pumpAndSettle();
+    expect(find.text('Qual partida você vai abrir?'), findsOneWidget);
+    expect(find.byKey(const Key('home-play-quick-mode')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('home-play-quick-mode')));
+    await tester.pumpAndSettle();
     expect(find.text('/life-counter'), findsOneWidget);
 
     final deck = Deck(
@@ -430,6 +525,206 @@ void main() {
       router.routerDelegate.currentConfiguration.uri.toString(),
       '/decks/recent-deck',
     );
+  });
+
+  testWidgets('pending build intent stays contextual and resumes exact task', (
+    tester,
+  ) async {
+    final repository = _MemoryOnboardingRepository(
+      const OnboardingState(
+        selectedGoal: OnboardingGoal.buildDeck,
+        experience: OnboardingExperience.returning,
+        selectedFormat: 'pioneer',
+        buildMode: OnboardingBuildMode.manual,
+      ),
+    );
+    final unrelatedDeck = Deck(
+      id: 'existing-deck',
+      name: 'Deck anterior',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime(2026, 7, 20),
+      cardCount: 100,
+    );
+    final router = await _pumpNavigationSubject(
+      tester,
+      decks: [unrelatedDeck],
+      userId: 'intent-build',
+      onboardingStateRepository: repository,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Seu primeiro\ndeck começa aqui'), findsOneWidget);
+    expect(find.text('Continuar montagem'), findsOneWidget);
+    expect(find.text('Continue\nDeck anterior'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('home-primary-action')));
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri,
+      Uri.parse('/decks?create=1&format=pioneer&from=onboarding'),
+    );
+    expect(repository.settlements, isEmpty);
+  });
+
+  testWidgets('completed import intent returns to the created deck', (
+    tester,
+  ) async {
+    final repository = _MemoryOnboardingRepository(
+      const OnboardingState(
+        disposition: OnboardingDisposition.completed,
+        selectedGoal: OnboardingGoal.importDeck,
+        experience: OnboardingExperience.experienced,
+        selectedFormat: 'modern',
+      ),
+    );
+    final deck = Deck(
+      id: 'imported-deck',
+      name: 'Murktide revisado',
+      format: 'modern',
+      isPublic: false,
+      createdAt: DateTime(2026, 8, 6),
+      cardCount: 60,
+    );
+    final router = await _pumpNavigationSubject(
+      tester,
+      decks: [deck],
+      userId: 'intent-import',
+      onboardingStateRepository: repository,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Revise\nMurktide revisado'), findsOneWidget);
+    expect(find.text('Abrir deck'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('home-primary-action')));
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/decks/imported-deck',
+    );
+    expect(repository.settlements, isEmpty);
+  });
+
+  testWidgets('pending play intent settles only when the table is opened', (
+    tester,
+  ) async {
+    final repository = _MemoryOnboardingRepository(
+      const OnboardingState(
+        selectedGoal: OnboardingGoal.play,
+        experience: OnboardingExperience.firstSteps,
+        selectedFormat: 'commander',
+      ),
+    );
+    var settledCalls = 0;
+    await _pumpNavigationSubject(
+      tester,
+      lifeCounterAvailable: true,
+      userId: 'intent-play',
+      onboardingStateRepository: repository,
+      onOnboardingSettled: () => settledCalls += 1,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sua mesa\nestá pronta'), findsOneWidget);
+    expect(repository.settlements, isEmpty);
+    await tester.tap(find.byKey(const Key('home-primary-action')));
+    await tester.pumpAndSettle();
+
+    expect(repository.settlements, [OnboardingDisposition.completed]);
+    expect(repository.state.disposition, OnboardingDisposition.completed);
+    expect(settledCalls, 1);
+    expect(find.text('Qual partida você vai abrir?'), findsOneWidget);
+  });
+
+  testWidgets('play entry separates resume, end, new deck and quick mode', (
+    tester,
+  ) async {
+    final session = LifeCounterSession.initial(
+      playSessionId: 'play-active',
+      deckId: 'deck-active',
+      deckName: 'Alela em mesa',
+      deckSnapshotHash:
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      deckVersionAtEpochMs: DateTime(2026, 8, 5).millisecondsSinceEpoch,
+      startedAtEpochMs: DateTime(2026, 8, 5, 12).millisecondsSinceEpoch,
+    );
+    SharedPreferences.setMockInitialValues({
+      legacyLifeCounterSessionPrefsKey: session.toJsonString(),
+    });
+
+    await _pumpNavigationSubject(tester, lifeCounterAvailable: true);
+    tester
+        .widget<FilledButton>(find.byKey(const Key('home-primary-action')))
+        .onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('home-play-active-session')), findsOneWidget);
+    expect(find.text('Alela em mesa'), findsOneWidget);
+    expect(find.text('Retomar'), findsOneWidget);
+    expect(find.text('Encerrar e registrar'), findsOneWidget);
+    expect(find.text('Nova partida rápida · sem deck'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('home-play-end-session')));
+    await tester.pumpAndSettle();
+
+    final endedLocation = tester
+        .widget<Text>(find.byKey(const Key('home-navigation-destination')))
+        .data!;
+    final endedUri = Uri.parse(endedLocation);
+    expect(endedUri.path, '/decks/deck-active/post-game');
+    expect(endedUri.queryParameters['playSessionId'], 'play-active');
+    expect(
+      endedUri.queryParameters['deckSnapshotHash'],
+      session.deckSnapshotHash,
+    );
+  });
+
+  testWidgets('deck play entry confirms and carries an exact revision', (
+    tester,
+  ) async {
+    final details = DeckDetails(
+      id: 'deck-revision',
+      name: 'Alela Artefatos',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime(2026, 8, 1),
+      cardCount: 100,
+      stats: const {'total_cards': 100},
+      commander: const [],
+      mainBoard: const {},
+      deckSnapshotHash:
+          'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+      deckVersionAt: DateTime(2026, 8, 5, 13),
+    );
+    final provider = _RevisionDeckProvider(details);
+    await _pumpNavigationSubject(
+      tester,
+      lifeCounterAvailable: true,
+      deckProvider: provider,
+    );
+
+    tester
+        .widget<FilledButton>(find.byKey(const Key('home-primary-action')))
+        .onPressed!();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('home-play-deck-deck-revision')));
+    await tester.pumpAndSettle();
+
+    final displayedLocation = tester
+        .widget<Text>(find.byKey(const Key('home-navigation-destination')))
+        .data!;
+    final uri = Uri.parse(displayedLocation);
+    expect(uri.path, '/life-counter');
+    expect(uri.queryParameters['deckId'], details.id);
+    expect(uri.queryParameters['deckName'], details.name);
+    expect(uri.queryParameters['deckSnapshotHash'], details.deckSnapshotHash);
+    expect(
+      uri.queryParameters['deckVersionAt'],
+      details.deckVersionAt!.millisecondsSinceEpoch.toString(),
+    );
+    expect(provider.detailsCalls, 1);
   });
 
   testWidgets('keeps home intent cards readable on SM A135M width', (
@@ -766,6 +1061,42 @@ void main() {
       ),
     );
     expect(image.fit, BoxFit.contain);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('recent deck resolves governed commander reference art', (
+    tester,
+  ) async {
+    final deck = Deck(
+      id: 'deck-reference-art',
+      name: 'Deck sem URL persistida',
+      format: 'commander',
+      commanderName: 'Atraxa, Grand Unifier',
+      isPublic: false,
+      createdAt: DateTime(2026, 8, 7),
+      cardCount: 100,
+      colorIdentity: const ['W', 'U', 'B', 'G'],
+    );
+
+    await tester.pumpWidget(
+      _buildSubject(lifeCounterAvailable: false, decks: [deck]),
+    );
+    await tester.pump();
+
+    final artworkFrame = find.byKey(
+      const Key('home-recent-deck-art-deck-reference-art'),
+    );
+    expect(
+      find.descendant(of: artworkFrame, matching: find.byType(CardArtwork)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: artworkFrame,
+        matching: find.byKey(const Key('card-artwork-status-reference')),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }

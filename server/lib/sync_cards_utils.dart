@@ -143,7 +143,7 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
 /// `4`: typeLine, `5`: oracleText, `6`: colors, `7`: colorIdentity,
 /// `8`: power, `9`: toughness, `10`: keywords, `11`: imageUrl,
 /// `12`: setCode, `13`: rarity, `14`: isReserved, `15`: collectorNumber,
-/// `16`: foil, `17`: layout, `18`: cardFacesJson.
+/// `16`: capacidade foil da impressão, `17`: layout, `18`: cardFacesJson.
 List<Object?>? extractSetCardSyncRow(
   Map<String, dynamic> card,
   String setCode,

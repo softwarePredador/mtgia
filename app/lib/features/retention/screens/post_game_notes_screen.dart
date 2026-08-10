@@ -3,9 +3,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/card_artwork.dart';
+import '../../../core/widgets/horizontal_discovery_rail.dart';
+import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
+import '../../decks/models/deck_card_item.dart';
+import '../../decks/models/deck_details.dart';
 import '../models/post_game_note.dart';
 import '../services/post_game_note_store.dart';
+
+typedef PostGameDeckLoader = Future<DeckDetails?> Function(String deckId);
 
 class PostGameNotesScreen extends StatefulWidget {
   const PostGameNotesScreen({
@@ -17,6 +24,7 @@ class PostGameNotesScreen extends StatefulWidget {
     this.sessionEndedAt,
     this.deckSnapshotHash,
     this.deckVersionAt,
+    this.deckLoader,
   });
 
   final String deckId;
@@ -26,6 +34,7 @@ class PostGameNotesScreen extends StatefulWidget {
   final DateTime? sessionEndedAt;
   final String? deckSnapshotHash;
   final DateTime? deckVersionAt;
+  final PostGameDeckLoader? deckLoader;
 
   @override
   State<PostGameNotesScreen> createState() => _PostGameNotesScreenState();
@@ -36,10 +45,16 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
   final _resultController = TextEditingController();
   final _tableLevelController = TextEditingController(text: 'Casual');
   final _notesController = TextEditingController();
-  final _goodCardsController = TextEditingController();
-  final _badCardsController = TextEditingController();
+  final _cardSearchController = TextEditingController();
   final Set<PostGameIssue> _selectedIssues = <PostGameIssue>{};
+  final Set<String> _preserveCardIds = <String>{};
+  final Set<String> _reviewCardIds = <String>{};
   List<PostGameNote> _notes = const <PostGameNote>[];
+  DeckDetails? _deck;
+  bool _deckLoading = false;
+  String? _deckLoadError;
+  String _cardSearchQuery = '';
+  PostGameNote? _lastSavedEvidence;
   DeckEvolutionSummary _summary = const DeckEvolutionSummary(
     totalMatches: 0,
     issueCounts: <PostGameIssue, int>{},
@@ -62,6 +77,7 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
         widget.store ??
         PostGameNoteStore(remoteClient: ApiPostGameNoteRemoteClient());
     _load();
+    _loadDeck();
   }
 
   @override
@@ -69,9 +85,35 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     _resultController.dispose();
     _tableLevelController.dispose();
     _notesController.dispose();
-    _goodCardsController.dispose();
-    _badCardsController.dispose();
+    _cardSearchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadDeck() async {
+    final loader = widget.deckLoader;
+    if (loader == null) return;
+    setState(() {
+      _deckLoading = true;
+      _deckLoadError = null;
+    });
+    try {
+      final deck = await loader(widget.deckId);
+      if (!mounted) return;
+      setState(() {
+        _deck = deck;
+        _deckLoading = false;
+        _deckLoadError = deck == null
+            ? 'A revisão do deck não está disponível agora.'
+            : null;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _deckLoading = false;
+        _deckLoadError =
+            'Não foi possível abrir as cartas desta revisão. Tente novamente.';
+      });
+    }
   }
 
   Future<void> _load({bool showLoading = true}) async {
@@ -95,6 +137,7 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
       setState(() {
         _notes = notes;
         _summary = summary;
+        _lastSavedEvidence ??= notes.isEmpty ? null : notes.first;
         _pendingSyncCount = pendingSyncCount;
         _isLoading = false;
         _loadError = null;
@@ -116,9 +159,13 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     if (_isSaving) return;
     if (_resultController.text.trim().isEmpty &&
         _notesController.text.trim().isEmpty &&
-        _selectedIssues.isEmpty) {
+        _selectedIssues.isEmpty &&
+        _preserveCardIds.isEmpty &&
+        _reviewCardIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registre resultado, nota ou problema.')),
+        const SnackBar(
+          content: Text('Registre resultado, carta observada ou problema.'),
+        ),
       );
       return;
     }
@@ -133,23 +180,26 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
       result: _resultController.text,
       tableLevel: _tableLevelController.text,
       notes: _notesController.text,
-      performedWell: _splitCards(_goodCardsController.text),
-      underperformed: _splitCards(_badCardsController.text),
+      performedWellEvidence: _selectedEvidence(_preserveCardIds),
+      underperformedEvidence: _selectedEvidence(_reviewCardIds),
       issues: _selectedIssues.toList(growable: false),
       playSessionId: widget.playSessionId,
       sessionStartedAt: widget.sessionStartedAt,
       sessionEndedAt: widget.sessionEndedAt,
-      deckSnapshotHash: widget.deckSnapshotHash,
-      deckVersionAt: widget.deckVersionAt,
+      deckSnapshotHash: widget.deckSnapshotHash ?? _deck?.deckSnapshotHash,
+      deckVersionAt: widget.deckVersionAt ?? _deck?.deckVersionAt,
     );
     try {
       await _store.addNote(note);
       if (!mounted) return;
       setState(() {
+        _lastSavedEvidence = note;
         _resultController.clear();
         _notesController.clear();
-        _goodCardsController.clear();
-        _badCardsController.clear();
+        _cardSearchController.clear();
+        _cardSearchQuery = '';
+        _preserveCardIds.clear();
+        _reviewCardIds.clear();
         _selectedIssues.clear();
       });
       await _load(showLoading: false);
@@ -211,12 +261,110 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     await operation();
   }
 
-  List<String> _splitCards(String raw) {
-    return raw
-        .split(',')
-        .map((value) => value.trim())
-        .where((value) => value.isNotEmpty)
+  List<DeckCardItem> get _deckCards {
+    final deck = _deck;
+    if (deck == null || _requestedRevisionCannotBeConfirmed) {
+      return const <DeckCardItem>[];
+    }
+    final byId = <String, DeckCardItem>{};
+    for (final card in [
+      ...deck.commander,
+      ...deck.mainBoard.values.expand((cards) => cards),
+    ]) {
+      byId.putIfAbsent(card.id, () => card);
+    }
+    final cards = byId.values.toList()
+      ..sort((left, right) {
+        if (left.isCommander != right.isCommander) {
+          return left.isCommander ? -1 : 1;
+        }
+        return left.name.toLowerCase().compareTo(right.name.toLowerCase());
+      });
+    return cards;
+  }
+
+  bool get _requestedRevisionCannotBeConfirmed {
+    final deck = _deck;
+    if (deck == null) return false;
+
+    final requestedHash = widget.deckSnapshotHash?.trim().toLowerCase();
+    if (requestedHash != null && requestedHash.isNotEmpty) {
+      final loadedHash = deck.deckSnapshotHash?.trim().toLowerCase();
+      if (loadedHash == null || loadedHash != requestedHash) return true;
+    }
+
+    final requestedVersion = widget.deckVersionAt;
+    if (requestedVersion != null) {
+      final loadedVersion = deck.deckVersionAt;
+      if (loadedVersion == null ||
+          !loadedVersion.isAtSameMomentAs(requestedVersion)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  String? get _deckEvidenceError {
+    if (_requestedRevisionCannotBeConfirmed) {
+      return 'Esta partida usa outra revisão do deck. Para não misturar '
+          'cartas, os sinais ficam bloqueados; registre o resultado e os '
+          'problemas ou recarregue a revisão correta.';
+    }
+    return _deckLoadError;
+  }
+
+  List<DeckCardItem> get _visibleDeckCards {
+    final query = _cardSearchQuery.trim().toLowerCase();
+    if (query.isEmpty) return _deckCards;
+    return _deckCards
+        .where(
+          (card) =>
+              card.name.toLowerCase().contains(query) ||
+              card.typeLine.toLowerCase().contains(query) ||
+              card.setCode.toLowerCase().contains(query),
+        )
         .toList(growable: false);
+  }
+
+  List<PostGameCardEvidence> _selectedEvidence(Set<String> selectedIds) {
+    final byId = {for (final card in _deckCards) card.id: card};
+    return selectedIds
+        .map((id) => byId[id])
+        .whereType<DeckCardItem>()
+        .map(
+          (card) => PostGameCardEvidence(
+            cardId: card.id,
+            name: card.name,
+            imageUrl: card.printingImageUrl,
+            setCode: card.setCode,
+            collectorNumber: card.collectorNumber,
+            quantity: card.quantity,
+            isCommander: card.isCommander,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  void _cycleCardSignal(DeckCardItem card) {
+    setState(() {
+      if (_preserveCardIds.remove(card.id)) {
+        _reviewCardIds.add(card.id);
+        return;
+      }
+      if (_reviewCardIds.remove(card.id)) return;
+      _preserveCardIds.add(card.id);
+    });
+  }
+
+  void _openOptimize(PostGameNote note, {bool rebuild = false}) {
+    final uri = Uri(
+      path: '/decks/${widget.deckId}',
+      queryParameters: <String, String>{
+        'optimize': rebuild ? 'rebuild' : 'post_game',
+        'postGameNoteId': note.id,
+      },
+    );
+    context.go(uri.toString());
   }
 
   @override
@@ -242,6 +390,7 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
               message: _loadError,
               accent: AppTheme.error,
               actionLabel: 'Tentar novamente',
+              actionKey: const Key('post-game-load-retry'),
               onAction: _load,
             )
           : SingleChildScrollView(
@@ -258,20 +407,53 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                   builder: (context, constraints) {
                     final isDesktop =
                         constraints.maxWidth >= AppTheme.breakpointExpanded;
+                    final optimizeEvidence =
+                        _lastSavedEvidence ??
+                        (_notes.isEmpty ? null : _notes.first);
                     final summary = _EvolutionSummaryPanel(
                       summary: _summary,
                       contentSizedActions: isDesktop,
-                      onOptimize: () => context.go(
-                        '/decks/${widget.deckId}?optimize=post_game',
-                      ),
-                      onRebuild: () => context.go(
-                        '/decks/${widget.deckId}?optimize=rebuild',
-                      ),
+                      evidenceNote: optimizeEvidence,
+                      onOptimize: optimizeEvidence == null
+                          ? null
+                          : () => _openOptimize(optimizeEvidence),
+                      onRebuild: optimizeEvidence == null
+                          ? null
+                          : () =>
+                                _openOptimize(optimizeEvidence, rebuild: true),
                     );
                     final formAndHistory = Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if (widget.playSessionId != null) ...[
+                        _PostGameSourceHero(
+                          deck: _deck,
+                          deckId: widget.deckId,
+                          playSessionId: widget.playSessionId,
+                          startedAt: widget.sessionStartedAt,
+                          endedAt: widget.sessionEndedAt,
+                          deckSnapshotHash: widget.deckSnapshotHash,
+                        ),
+                        const SizedBox(height: AppTheme.space12),
+                        if (_lastSavedEvidence != null) ...[
+                          _EvidenceReceiptPanel(
+                            note: _lastSavedEvidence!,
+                            onOptimize: () =>
+                                _openOptimize(_lastSavedEvidence!),
+                          ),
+                          const SizedBox(height: AppTheme.space12),
+                        ],
+                        if (widget.playSessionId != null &&
+                            widget.playSessionId!.startsWith(
+                              'battle-replay:',
+                            )) ...[
+                          _ReplayEvidenceLinkPanel(
+                            replayId: widget.playSessionId!.substring(
+                              'battle-replay:'.length,
+                            ),
+                            deckId: widget.deckId,
+                          ),
+                          const SizedBox(height: AppTheme.space12),
+                        ] else if (widget.playSessionId != null) ...[
                           _LifeCounterSessionPanel(
                             startedAt: widget.sessionStartedAt,
                             endedAt: widget.sessionEndedAt,
@@ -287,11 +469,20 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                           resultController: _resultController,
                           tableLevelController: _tableLevelController,
                           notesController: _notesController,
-                          goodCardsController: _goodCardsController,
-                          badCardsController: _badCardsController,
+                          cardSearchController: _cardSearchController,
+                          cards: _visibleDeckCards,
+                          preserveCardIds: _preserveCardIds,
+                          reviewCardIds: _reviewCardIds,
+                          deckLoading: _deckLoading,
+                          deckLoadError: _deckEvidenceError,
                           selectedIssues: _selectedIssues,
                           contentSizedAction: isDesktop,
                           isSaving: _isSaving,
+                          onSearchChanged: (value) {
+                            setState(() => _cardSearchQuery = value);
+                          },
+                          onRetryDeck: _loadDeck,
+                          onCardSignalChanged: _cycleCardSignal,
                           onIssueChanged: (issue, selected) {
                             setState(() {
                               if (selected) {
@@ -384,6 +575,240 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _PostGameSourceHero extends StatelessWidget {
+  const _PostGameSourceHero({
+    required this.deck,
+    required this.deckId,
+    required this.playSessionId,
+    required this.startedAt,
+    required this.endedAt,
+    required this.deckSnapshotHash,
+  });
+
+  final DeckDetails? deck;
+  final String deckId;
+  final String? playSessionId;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final String? deckSnapshotHash;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final commander = deck == null || deck!.commander.isEmpty
+        ? null
+        : deck!.commander.first;
+    final exactArtwork = commander?.printingImageUrl;
+    final replayLinked = playSessionId?.startsWith('battle-replay:') == true;
+    final sessionLinked = playSessionId?.trim().isNotEmpty == true;
+    final sourceLabel = replayLinked
+        ? 'Replay persistido'
+        : sessionLinked
+        ? 'Sessão do Life Counter'
+        : 'Registro manual · sem sessão vinculada';
+    final snapshotHash =
+        deckSnapshotHash?.trim() ?? deck?.deckSnapshotHash?.trim();
+    final revisionLabel = snapshotHash == null || snapshotHash.isEmpty
+        ? 'revisão não identificada'
+        : 'revisão ${snapshotHash.substring(0, snapshotHash.length.clamp(0, 8))}';
+    final duration =
+        startedAt != null && endedAt != null && !endedAt!.isBefore(startedAt!)
+        ? endedAt!.difference(startedAt!)
+        : null;
+
+    return Semantics(
+      container: true,
+      label:
+          '${deck?.name ?? 'Deck'}; $sourceLabel; $revisionLabel. Evidência pós-jogo.',
+      child: Container(
+        key: const Key('post-game-source-hero'),
+        padding: const EdgeInsets.all(AppTheme.space16),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate,
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.42)),
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.brass400.withValues(alpha: 0.12),
+              AppTheme.surfaceSlate,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 76,
+              height: 106,
+              child: exactArtwork == null
+                  ? DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceElevated,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                        border: Border.all(color: AppTheme.outlineMuted),
+                      ),
+                      child: const Center(
+                        child: ManaLoomGlyph(
+                          ManaLoomGlyphKind.battleReplay,
+                          size: 34,
+                          color: AppTheme.brass400,
+                        ),
+                      ),
+                    )
+                  : CardArtwork(
+                      key: const Key('post-game-source-art'),
+                      variant: CardArtworkVariant.fullCard,
+                      imageUrl: exactArtwork,
+                      semanticLabel:
+                          'Impressão do comandante ${commander?.name ?? ''}',
+                      constrainAspectRatio: false,
+                      showStatusBadge: false,
+                    ),
+            ),
+            const SizedBox(width: AppTheme.space16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    sourceLabel.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppTheme.brass400,
+                      letterSpacing: 1.1,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space5),
+                  Text(
+                    deck?.name ??
+                        'Evidência do deck ${_shortEvidenceId(deckId)}',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space6),
+                  Text(
+                    [
+                      revisionLabel,
+                      if (duration != null) _durationLabel(duration),
+                      if (commander != null) commander.name,
+                    ].join(' · '),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space10),
+                  Text(
+                    'Marque somente o que você observou. Nada será aplicado ao deck automaticamente.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EvidenceReceiptPanel extends StatelessWidget {
+  const _EvidenceReceiptPanel({required this.note, required this.onOptimize});
+
+  final PostGameNote note;
+  final VoidCallback onOptimize;
+
+  @override
+  Widget build(BuildContext context) {
+    final signalCount =
+        note.performedWellEvidence.length + note.underperformedEvidence.length;
+    return Container(
+      key: const Key('post-game-evidence-receipt'),
+      padding: const EdgeInsets.all(AppTheme.space14),
+      decoration: BoxDecoration(
+        color: AppTheme.success.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.success.withValues(alpha: 0.36)),
+      ),
+      child: Wrap(
+        spacing: AppTheme.space12,
+        runSpacing: AppTheme.space10,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const Icon(Icons.verified_outlined, color: AppTheme.success),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: Text(
+              'Evidência ${_shortEvidenceId(note.id)} salva localmente · '
+              '${note.issues.length} problema(s) · $signalCount carta(s). '
+              'O Optimize validará este registro no backend antes de usá-lo.',
+              style: const TextStyle(color: AppTheme.textPrimary, height: 1.35),
+            ),
+          ),
+          FilledButton.icon(
+            key: const Key('post-game-optimize-evidence-button'),
+            onPressed: onOptimize,
+            icon: const Icon(Icons.auto_fix_high_rounded),
+            label: const Text('Usar no Optimize'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReplayEvidenceLinkPanel extends StatelessWidget {
+  const _ReplayEvidenceLinkPanel({
+    required this.replayId,
+    required this.deckId,
+  });
+
+  final String replayId;
+  final String deckId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('post-game-replay-source'),
+      padding: const EdgeInsets.all(AppTheme.space14),
+      decoration: BoxDecoration(
+        color: AppTheme.frost400.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.30)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.replay_circle_filled, color: AppTheme.frost400),
+          const SizedBox(width: AppTheme.space10),
+          Expanded(
+            child: Text(
+              'O replay ${_shortEvidenceId(replayId)} continua imutável. Este pós-jogo é uma anotação de aprendizagem separada e vinculada.',
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ),
+          TextButton(
+            key: const Key('post-game-open-replay-button'),
+            onPressed: () => context.push(
+              '/decks/${Uri.encodeComponent(deckId)}/battle-replays?replay=${Uri.encodeQueryComponent(replayId)}',
+            ),
+            child: const Text('Abrir replay'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -496,12 +921,14 @@ class _EvolutionSummaryPanel extends StatelessWidget {
     required this.summary,
     required this.onOptimize,
     required this.onRebuild,
+    required this.evidenceNote,
     this.contentSizedActions = false,
   });
 
   final DeckEvolutionSummary summary;
-  final VoidCallback onOptimize;
-  final VoidCallback onRebuild;
+  final PostGameNote? evidenceNote;
+  final VoidCallback? onOptimize;
+  final VoidCallback? onRebuild;
   final bool contentSizedActions;
 
   @override
@@ -589,6 +1016,22 @@ class _EvolutionSummaryPanel extends StatelessWidget {
             const SizedBox(height: AppTheme.space12),
             _CardSignalRows(summary: summary),
           ],
+          if (evidenceNote == null) ...[
+            const SizedBox(height: AppTheme.space12),
+            const Text(
+              'Salve uma evidência para habilitar o handoff autenticado ao Optimize.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+            ),
+          ] else ...[
+            const SizedBox(height: AppTheme.space12),
+            Text(
+              'Próxima análise: evidência ${_shortEvidenceId(evidenceNote!.id)}',
+              style: const TextStyle(
+                color: AppTheme.brass400,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
           const SizedBox(height: AppTheme.space14),
           if (contentSizedActions)
             Wrap(
@@ -633,7 +1076,7 @@ class _EvolutionSummaryPanel extends StatelessWidget {
       key: const Key('post-game-rebuild-from-summary-button'),
       onPressed: onRebuild,
       icon: const Icon(Icons.construction_outlined),
-      label: const Text('Reconstruir'),
+      label: const FittedBox(fit: BoxFit.scaleDown, child: Text('Reconstruir')),
     );
   }
 }
@@ -708,9 +1151,16 @@ class _PostGameForm extends StatelessWidget {
     required this.resultController,
     required this.tableLevelController,
     required this.notesController,
-    required this.goodCardsController,
-    required this.badCardsController,
+    required this.cardSearchController,
+    required this.cards,
+    required this.preserveCardIds,
+    required this.reviewCardIds,
+    required this.deckLoading,
+    required this.deckLoadError,
     required this.selectedIssues,
+    required this.onSearchChanged,
+    required this.onRetryDeck,
+    required this.onCardSignalChanged,
     required this.onIssueChanged,
     required this.onSave,
     required this.isSaving,
@@ -720,9 +1170,16 @@ class _PostGameForm extends StatelessWidget {
   final TextEditingController resultController;
   final TextEditingController tableLevelController;
   final TextEditingController notesController;
-  final TextEditingController goodCardsController;
-  final TextEditingController badCardsController;
+  final TextEditingController cardSearchController;
+  final List<DeckCardItem> cards;
+  final Set<String> preserveCardIds;
+  final Set<String> reviewCardIds;
+  final bool deckLoading;
+  final String? deckLoadError;
   final Set<PostGameIssue> selectedIssues;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onRetryDeck;
+  final ValueChanged<DeckCardItem> onCardSignalChanged;
   final void Function(PostGameIssue issue, bool selected) onIssueChanged;
   final VoidCallback onSave;
   final bool isSaving;
@@ -777,24 +1234,26 @@ class _PostGameForm extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppTheme.space10),
-          TextField(
-            key: const Key('post-game-good-cards-field'),
-            controller: goodCardsController,
-            decoration: const InputDecoration(
-              labelText: 'Cartas que performaram bem',
-              hintText: 'Separe por vírgula',
+          _DeckCardEvidencePicker(
+            searchController: cardSearchController,
+            cards: cards,
+            preserveCardIds: preserveCardIds,
+            reviewCardIds: reviewCardIds,
+            loading: deckLoading,
+            error: deckLoadError,
+            onSearchChanged: onSearchChanged,
+            onRetry: onRetryDeck,
+            onCardSignalChanged: onCardSignalChanged,
+          ),
+          const SizedBox(height: AppTheme.space14),
+          Text(
+            'Problemas observados',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: AppTheme.space10),
-          TextField(
-            key: const Key('post-game-bad-cards-field'),
-            controller: badCardsController,
-            decoration: const InputDecoration(
-              labelText: 'Cartas que performaram mal',
-              hintText: 'Separe por vírgula',
-            ),
-          ),
-          const SizedBox(height: AppTheme.space12),
+          const SizedBox(height: AppTheme.space8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -828,6 +1287,335 @@ class _PostGameForm extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+enum _CardEvidenceSignal { neutral, preserve, review }
+
+class _DeckCardEvidencePicker extends StatelessWidget {
+  const _DeckCardEvidencePicker({
+    required this.searchController,
+    required this.cards,
+    required this.preserveCardIds,
+    required this.reviewCardIds,
+    required this.loading,
+    required this.error,
+    required this.onSearchChanged,
+    required this.onRetry,
+    required this.onCardSignalChanged,
+  });
+
+  final TextEditingController searchController;
+  final List<DeckCardItem> cards;
+  final Set<String> preserveCardIds;
+  final Set<String> reviewCardIds;
+  final bool loading;
+  final String? error;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onRetry;
+  final ValueChanged<DeckCardItem> onCardSignalChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('post-game-card-evidence-picker'),
+      padding: const EdgeInsets.all(AppTheme.space14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.style_outlined,
+                color: AppTheme.frost400,
+                size: 21,
+              ),
+              const SizedBox(width: AppTheme.space8),
+              Expanded(
+                child: Text(
+                  'Cartas realmente observadas',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.space5),
+          Text(
+            'Toque uma vez para Preservar, outra para Revisar e a terceira para limpar.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: AppTheme.space12),
+          TextField(
+            key: const Key('post-game-card-search-field'),
+            controller: searchController,
+            onChanged: onSearchChanged,
+            decoration: const InputDecoration(
+              labelText: 'Buscar nesta revisão',
+              hintText: 'Nome, tipo ou edição',
+              prefixIcon: Icon(Icons.search_rounded),
+            ),
+          ),
+          const SizedBox(height: AppTheme.space12),
+          if (loading)
+            const SizedBox(
+              key: Key('post-game-deck-cards-loading'),
+              height: 138,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (cards.isEmpty)
+            _DeckEvidenceUnavailable(
+              message:
+                  error ??
+                  (searchController.text.trim().isEmpty
+                      ? 'As cartas desta revisão não foram carregadas. Você ainda pode registrar resultado e problemas.'
+                      : 'Nenhuma carta desta revisão corresponde à busca.'),
+              showRetry: error != null,
+              onRetry: onRetry,
+            )
+          else ...[
+            HorizontalDiscoveryRail(
+              key: const Key('post-game-deck-card-discovery-rail'),
+              semanticLabel:
+                  '${cards.length} cartas desta revisão disponíveis para marcar',
+              hintText: 'Deslize para revisar todas as cartas.',
+              backwardHintText: 'Volte para comparar as cartas anteriores.',
+              forwardSemanticLabel: 'Ver próximas cartas da revisão',
+              backwardSemanticLabel: 'Voltar às cartas anteriores da revisão',
+              hintKey: const Key('post-game-deck-card-rail-hint'),
+              forwardButtonKey: const Key('post-game-deck-card-rail-next'),
+              backwardButtonKey: const Key('post-game-deck-card-rail-previous'),
+              builder: (context, controller) => SizedBox(
+                key: const Key('post-game-deck-card-rail'),
+                height: 166,
+                child: ListView.separated(
+                  controller: controller,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: cards.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(width: AppTheme.space10),
+                  itemBuilder: (context, index) {
+                    final card = cards[index];
+                    final signal = preserveCardIds.contains(card.id)
+                        ? _CardEvidenceSignal.preserve
+                        : reviewCardIds.contains(card.id)
+                        ? _CardEvidenceSignal.review
+                        : _CardEvidenceSignal.neutral;
+                    return _DeckEvidenceCard(
+                      card: card,
+                      signal: signal,
+                      onTap: () => onCardSignalChanged(card),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: AppTheme.space10),
+            Wrap(
+              spacing: AppTheme.space12,
+              runSpacing: AppTheme.space6,
+              children: [
+                _SignalLegend(
+                  color: AppTheme.success,
+                  icon: Icons.shield_outlined,
+                  label: '${preserveCardIds.length} preservar',
+                ),
+                _SignalLegend(
+                  color: AppTheme.warning,
+                  icon: Icons.manage_search_rounded,
+                  label: '${reviewCardIds.length} revisar',
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DeckEvidenceUnavailable extends StatelessWidget {
+  const _DeckEvidenceUnavailable({
+    required this.message,
+    required this.showRetry,
+    required this.onRetry,
+  });
+
+  final String message;
+  final bool showRetry;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('post-game-deck-cards-unavailable'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.space12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.layers_clear_outlined, color: AppTheme.textHint),
+          const SizedBox(width: AppTheme.space10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ),
+          if (showRetry)
+            TextButton(
+              key: const Key('post-game-retry-deck-cards'),
+              onPressed: onRetry,
+              child: const Text('Tentar novamente'),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeckEvidenceCard extends StatelessWidget {
+  const _DeckEvidenceCard({
+    required this.card,
+    required this.signal,
+    required this.onTap,
+  });
+
+  final DeckCardItem card;
+  final _CardEvidenceSignal signal;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final signalColor = switch (signal) {
+      _CardEvidenceSignal.neutral => AppTheme.outlineMuted,
+      _CardEvidenceSignal.preserve => AppTheme.success,
+      _CardEvidenceSignal.review => AppTheme.warning,
+    };
+    final signalLabel = switch (signal) {
+      _CardEvidenceSignal.neutral => 'Sem sinal',
+      _CardEvidenceSignal.preserve => 'Preservar',
+      _CardEvidenceSignal.review => 'Revisar',
+    };
+    final nextAction = switch (signal) {
+      _CardEvidenceSignal.neutral => 'marcar para preservar',
+      _CardEvidenceSignal.preserve => 'marcar para revisar',
+      _CardEvidenceSignal.review => 'limpar sinal',
+    };
+    final exactArtwork = card.printingImageUrl;
+
+    return Semantics(
+      button: true,
+      label: '${card.name}. $signalLabel. Toque para $nextAction.',
+      child: Material(
+        key: Key('post-game-card-${card.id}'),
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          child: Container(
+            width: 88,
+            padding: const EdgeInsets.all(AppTheme.space6),
+            decoration: BoxDecoration(
+              color: signalColor.withValues(
+                alpha: signal == _CardEvidenceSignal.neutral ? 0.04 : 0.10,
+              ),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(
+                color: signalColor.withValues(alpha: 0.72),
+                width: signal == _CardEvidenceSignal.neutral ? 1 : 2,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: exactArtwork == null
+                      ? DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceElevated,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusXs,
+                            ),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported_outlined,
+                              color: AppTheme.textHint,
+                            ),
+                          ),
+                        )
+                      : CardArtwork(
+                          key: Key('post-game-card-art-${card.id}'),
+                          variant: CardArtworkVariant.gallery,
+                          imageUrl: exactArtwork,
+                          semanticLabel: 'Impressão de ${card.name}',
+                          constrainAspectRatio: false,
+                          showStatusBadge: false,
+                        ),
+                ),
+                const SizedBox(height: AppTheme.space5),
+                Text(
+                  card.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontXs,
+                    height: 1.05,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SignalLegend extends StatelessWidget {
+  const _SignalLegend({
+    required this.color,
+    required this.icon,
+    required this.label,
+  });
+
+  final Color color;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: AppTheme.space5),
+        Text(
+          label,
+          style: TextStyle(color: color, fontWeight: FontWeight.w800),
+        ),
+      ],
     );
   }
 }
@@ -915,6 +1703,11 @@ class _PostGameNoteTile extends StatelessWidget {
               ),
             ),
           ],
+          if (note.performedWellEvidence.isNotEmpty ||
+              note.underperformedEvidence.isNotEmpty) ...[
+            const SizedBox(height: AppTheme.space10),
+            _SavedCardEvidenceStrip(note: note),
+          ],
           if (note.issues.isNotEmpty) ...[
             const SizedBox(height: AppTheme.space10),
             Wrap(
@@ -926,6 +1719,117 @@ class _PostGameNoteTile extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _SavedCardEvidenceStrip extends StatelessWidget {
+  const _SavedCardEvidenceStrip({required this.note});
+
+  final PostGameNote note;
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = <({PostGameCardEvidence card, bool preserve})>[
+      for (final card in note.performedWellEvidence)
+        (card: card, preserve: true),
+      for (final card in note.underperformedEvidence)
+        (card: card, preserve: false),
+    ];
+    return HorizontalDiscoveryRail(
+      key: const Key('post-game-saved-evidence-discovery-rail'),
+      semanticLabel: '${entries.length} evidências de cartas salvas',
+      hintText: 'Deslize para rever todas as evidências.',
+      backwardHintText: 'Volte às evidências anteriores.',
+      forwardSemanticLabel: 'Ver próximas evidências salvas',
+      backwardSemanticLabel: 'Voltar às evidências salvas anteriores',
+      hintKey: const Key('post-game-saved-evidence-hint'),
+      forwardButtonKey: const Key('post-game-saved-evidence-next'),
+      backwardButtonKey: const Key('post-game-saved-evidence-previous'),
+      builder: (context, controller) => SizedBox(
+        height: 72,
+        child: ListView.separated(
+          controller: controller,
+          scrollDirection: Axis.horizontal,
+          itemCount: entries.length,
+          separatorBuilder: (_, __) => const SizedBox(width: AppTheme.space8),
+          itemBuilder: (context, index) {
+            final entry = entries[index];
+            final color = entry.preserve ? AppTheme.success : AppTheme.warning;
+            final artwork = entry.card.imageUrl?.trim();
+            return Container(
+              key: Key('post-game-saved-card-${entry.card.cardId ?? index}'),
+              width: 172,
+              padding: const EdgeInsets.all(AppTheme.space6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: color.withValues(alpha: 0.32)),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 39,
+                    height: 56,
+                    child: artwork == null || artwork.isEmpty
+                        ? DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusXs,
+                              ),
+                            ),
+                            child: Icon(
+                              entry.preserve
+                                  ? Icons.shield_outlined
+                                  : Icons.manage_search_rounded,
+                              size: 18,
+                              color: color,
+                            ),
+                          )
+                        : CardArtwork(
+                            variant: CardArtworkVariant.gallery,
+                            imageUrl: artwork,
+                            semanticLabel: 'Impressão de ${entry.card.name}',
+                            constrainAspectRatio: false,
+                            showStatusBadge: false,
+                          ),
+                  ),
+                  const SizedBox(width: AppTheme.space8),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry.preserve ? 'PRESERVAR' : 'REVISAR',
+                          style: TextStyle(
+                            color: color,
+                            fontSize: AppTheme.fontXs,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: AppTheme.space3),
+                        Text(
+                          entry.card.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: AppTheme.fontXs,
+                            height: 1.1,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -985,4 +1889,17 @@ class _OperationErrorPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+String _shortEvidenceId(String value) {
+  final normalized = value.trim();
+  if (normalized.length <= 10) return normalized;
+  return '${normalized.substring(0, 8)}…';
+}
+
+String _durationLabel(Duration duration) {
+  if (duration.inHours > 0) {
+    return '${duration.inHours}h ${duration.inMinutes.remainder(60)}min';
+  }
+  return '${duration.inMinutes.clamp(1, 9999)} min';
 }

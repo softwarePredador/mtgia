@@ -121,7 +121,8 @@ void main() {
       );
       expect(encoded, isNot(contains('Secret Hand Card')));
       expect(encoded, isNot(contains('Hidden Library Card')));
-      expect(encoded, isNot(contains('Public Graveyard Card')));
+      expect(encoded, contains('Public Graveyard Card'));
+      expect(encoded, contains('Public Commander'));
 
       final public = BattleLiveCursorContract(
         cursorSigningKey: List<int>.filled(32, 7),
@@ -132,7 +133,8 @@ void main() {
       expect(public.first.payload['card_name'], 'Sol Ring');
       expect(publicEncoded, isNot(contains('Secret Hand Card')));
       expect(publicEncoded, isNot(contains('Hidden Library Card')));
-      expect(publicEncoded, isNot(contains('Public Graveyard Card')));
+      expect(publicEncoded, contains('Public Graveyard Card'));
+      expect(publicEncoded, contains('Public Commander'));
     },
   );
 

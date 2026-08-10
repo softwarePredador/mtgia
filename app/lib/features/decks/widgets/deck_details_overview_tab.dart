@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
@@ -101,20 +102,15 @@ class DeckDetailsOverviewTab extends StatelessWidget {
       deck.commander.isNotEmpty ? deck.commander.first : null;
 
   String? get _heroCommanderImageUrl {
-    final imageUrl = _heroCommander?.imageUrl?.trim();
+    final imageUrl = _heroCommander?.printingImageUrl?.trim();
     if (imageUrl == null || imageUrl.isEmpty) {
       return null;
     }
     return imageUrl;
   }
 
-  String? get _heroCommanderArtUrl {
-    return ScryfallImageHelper.preferredImageUrl(
-      explicitUrl: _heroCommanderImageUrl,
-      cardName: _heroCommander?.name,
-      version: 'art_crop',
-    );
-  }
+  String? get _heroCommanderReferenceUrl =>
+      ScryfallImageHelper.namedImageUrl(_heroCommander?.name);
 
   String get _heroSummary {
     final parts = <String>['$totalCards cartas'];
@@ -151,8 +147,9 @@ class DeckDetailsOverviewTab extends StatelessWidget {
 
   Widget _buildHero(BuildContext context, {required Color formatAccent}) {
     final theme = Theme.of(context);
-    final artUrl = _heroCommanderArtUrl;
-    final hasArtwork = artUrl != null || _heroCommanderImageUrl != null;
+    final exactImageUrl = _heroCommanderImageUrl;
+    final referenceImageUrl = _heroCommanderReferenceUrl;
+    final hasArtwork = exactImageUrl != null || referenceImageUrl != null;
 
     return Container(
       key: const Key('deck-overview-hero'),
@@ -168,49 +165,16 @@ class DeckDetailsOverviewTab extends StatelessWidget {
           width: AppTheme.strokeRegular,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        child: Stack(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.space22),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (hasArtwork)
-              Positioned.fill(
-                child: Row(
-                  children: [
-                    const Spacer(flex: 5),
-                    Expanded(
-                      flex: 4,
-                      child: CachedCardImage(
-                        imageUrl: artUrl ?? _heroCommanderImageUrl,
-                        fallbackImageUrl: _heroCommander?.fallbackImageUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      AppTheme.backgroundAbyss,
-                      AppTheme.backgroundAbyss.withValues(alpha: 0.96),
-                      AppTheme.surfaceElevated.withValues(
-                        alpha: hasArtwork ? 0.38 : 1,
-                      ),
-                    ],
-                    stops: const [0, 0.48, 1],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppTheme.space22),
+            Expanded(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -292,6 +256,26 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                 ),
               ),
             ),
+            if (hasArtwork) ...[
+              const SizedBox(width: AppTheme.space16),
+              SizedBox(
+                key: const Key('deck-overview-hero-art-frame'),
+                width: 78,
+                height: 109,
+                child: CardArtwork(
+                  variant: CardArtworkVariant.fullCard,
+                  imageKey: const Key('deck-overview-hero-art'),
+                  imageUrl: exactImageUrl,
+                  fallbackImageUrl: referenceImageUrl,
+                  semanticLabel: exactImageUrl == null
+                      ? 'Carta de referência do comandante ${_heroCommander?.name}'
+                      : 'Impressão do comandante ${_heroCommander?.name}',
+                  imageIsReference: exactImageUrl == null,
+                  constrainAspectRatio: false,
+                  showStatusBadge: false,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -528,11 +512,17 @@ class _CommanderSection extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    child: CachedCardImage(
-                      imageUrl: card.effectiveImageUrl,
+                    child: CardArtwork(
+                      variant: CardArtworkVariant.gallery,
+                      imageUrl: card.printingImageUrl,
                       fallbackImageUrl: card.fallbackImageUrl,
+                      semanticLabel: card.hasPrintingArtwork
+                          ? 'Arte da impressão ${card.name}'
+                          : 'Arte de referência de ${card.name}',
+                      imageIsReference: !card.hasPrintingArtwork,
                       width: 52,
                       height: 72,
+                      constrainAspectRatio: false,
                     ),
                   ),
                   const SizedBox(width: AppTheme.space12),
@@ -562,6 +552,20 @@ class _CommanderSection extends StatelessWidget {
                             height: 1.25,
                           ),
                         ),
+                        if (card.setCode.trim().isNotEmpty ||
+                            (card.collectorNumber ?? '').trim().isNotEmpty ||
+                            (card.setName ?? '').trim().isNotEmpty ||
+                            card.foil != null) ...[
+                          const SizedBox(height: AppTheme.space7),
+                          CardEditionMetadataLine(
+                            setCode: card.setCode,
+                            collectorNumber: card.collectorNumber,
+                            setName: card.setName,
+                            setReleaseDate: card.setReleaseDate,
+                            rarity: card.rarity,
+                            foil: card.foil,
+                          ),
+                        ],
                         if (isCardInvalid(card)) ...[
                           const SizedBox(height: AppTheme.space8),
                           _InlineCommanderBadge(

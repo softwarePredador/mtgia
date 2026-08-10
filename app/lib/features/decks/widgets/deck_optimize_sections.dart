@@ -4,6 +4,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/commander_bracket.dart';
 import '../providers/deck_provider_support.dart';
+import '../../retention/models/post_game_note.dart';
 import 'deck_optimize_sheet_widgets.dart';
 import 'deck_ui_components.dart';
 
@@ -695,6 +696,9 @@ class OptimizationSheetBody extends StatelessWidget {
   final double budgetLimit;
   final String rebuildIntent;
   final bool startsFromPostGame;
+  final PostGameNote? postGameEvidence;
+  final bool postGameEvidenceLoading;
+  final bool postGameEvidenceMissing;
   final bool showAllStrategies;
   final Future<List<Map<String, dynamic>>> optionsFuture;
   final ScrollController scrollController;
@@ -721,6 +725,9 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.budgetLimit,
     required this.rebuildIntent,
     this.startsFromPostGame = false,
+    this.postGameEvidence,
+    this.postGameEvidenceLoading = false,
+    this.postGameEvidenceMissing = false,
     required this.showAllStrategies,
     required this.optionsFuture,
     required this.scrollController,
@@ -752,7 +759,11 @@ class OptimizationSheetBody extends StatelessWidget {
         ),
         const SizedBox(height: AppTheme.space16),
         if (startsFromPostGame) ...[
-          const _PostGameOptimizationNotice(),
+          _PostGameOptimizationNotice(
+            evidence: postGameEvidence,
+            loading: postGameEvidenceLoading,
+            missing: postGameEvidenceMissing,
+          ),
           const SizedBox(height: AppTheme.space16),
         ],
         if (savedArchetype != null && savedArchetype!.trim().isNotEmpty) ...[
@@ -801,7 +812,15 @@ class OptimizationSheetBody extends StatelessWidget {
 }
 
 class _PostGameOptimizationNotice extends StatelessWidget {
-  const _PostGameOptimizationNotice();
+  const _PostGameOptimizationNotice({
+    required this.evidence,
+    required this.loading,
+    required this.missing,
+  });
+
+  final PostGameNote? evidence;
+  final bool loading;
+  final bool missing;
 
   @override
   Widget build(BuildContext context) {
@@ -813,15 +832,59 @@ class _PostGameOptimizationNotice extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.35)),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.sports_score_outlined, color: AppTheme.brass400),
-          SizedBox(width: AppTheme.space10),
+          const Icon(Icons.sports_score_outlined, color: AppTheme.brass400),
+          const SizedBox(width: AppTheme.space10),
           Expanded(
-            child: Text(
-              'Fluxo iniciado pelo pós-jogo. Use coleção, orçamento e intensidade para transformar os problemas recorrentes da mesa em um ajuste revisável.',
-              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  loading
+                      ? 'Validando evidência pós-jogo…'
+                      : missing
+                      ? 'Evidência local não encontrada'
+                      : evidence == null
+                      ? 'Fluxo iniciado pelo pós-jogo'
+                      : 'Evidência ${_shortPostGameEvidenceId(evidence!.id)} pronta para validação',
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space5),
+                Text(
+                  missing
+                      ? 'O Optimize não seguirá silenciosamente: o backend também exigirá o registro autenticado antes de usar qualquer sinal.'
+                      : evidence == null
+                      ? 'Salve um registro com cartas e problemas para produzir recomendações ligadas à partida.'
+                      : '${evidence!.issues.length} problema(s) · '
+                            '${evidence!.performedWellEvidence.length} carta(s) para preservar · '
+                            '${evidence!.underperformedEvidence.length} para revisar. '
+                            'Nenhuma troca será aplicada automaticamente.',
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+                if (evidence != null && evidence!.issues.isNotEmpty) ...[
+                  const SizedBox(height: AppTheme.space8),
+                  Wrap(
+                    spacing: AppTheme.space6,
+                    runSpacing: AppTheme.space6,
+                    children: evidence!.issues
+                        .map(
+                          (issue) => Chip(
+                            label: Text(issue.label),
+                            avatar: const Icon(Icons.flag_outlined, size: 15),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
@@ -829,3 +892,6 @@ class _PostGameOptimizationNotice extends StatelessWidget {
     );
   }
 }
+
+String _shortPostGameEvidenceId(String value) =>
+    value.length <= 10 ? value : '${value.substring(0, 8)}…';

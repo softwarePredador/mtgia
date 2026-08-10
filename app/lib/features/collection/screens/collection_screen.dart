@@ -14,9 +14,15 @@ import 'sets_catalog_screen.dart';
 class CollectionScreen extends StatefulWidget {
   /// Tab inicial: 0 = Fichário, 1 = Marketplace, 2 = Trades, 3 = Coleções
   final int initialTab;
+  final String initialBinderList;
   final ApiClient? setsApiClient;
 
-  const CollectionScreen({super.key, this.initialTab = 0, this.setsApiClient});
+  const CollectionScreen({
+    super.key,
+    this.initialTab = 0,
+    this.initialBinderList = 'have',
+    this.setsApiClient,
+  });
 
   @override
   State<CollectionScreen> createState() => _CollectionScreenState();
@@ -77,7 +83,10 @@ class _CollectionScreenState extends State<CollectionScreen>
 
     final canonicalUri = Uri(
       path: '/collection',
-      queryParameters: {'tab': '$tab'},
+      queryParameters: {
+        'tab': '$tab',
+        if (tab == 0 && widget.initialBinderList == 'want') 'list': 'want',
+      },
     );
     if (GoRouterState.of(context).uri == canonicalUri) return;
     router.go(canonicalUri.toString());
@@ -166,7 +175,7 @@ class _CollectionScreenState extends State<CollectionScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          const BinderTabContent(),
+          BinderTabContent(initialListType: widget.initialBinderList),
           const MarketplaceTabContent(),
           const TradeInboxTabContent(),
           SetsCatalogScreen(apiClient: widget.setsApiClient, showAppBar: false),

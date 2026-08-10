@@ -161,10 +161,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Edições disponíveis'), findsOneWidget);
-    expect(find.text('OTH #7 foil'), findsOneWidget);
-    expect(find.text('Other Set • 2025-01-01 • rare'), findsOneWidget);
+    expect(find.text('OTH #7'), findsOneWidget);
+    expect(find.text('Foil disponível'), findsOneWidget);
+    expect(find.text('Other Set'), findsOneWidget);
+    expect(find.text('2025 • Rare'), findsOneWidget);
 
-    await tester.tap(find.text('OTH #7 foil'));
+    await tester.tap(find.text('OTH #7'));
     await tester.pumpAndSettle();
 
     expect(replacedId, 'card-2');

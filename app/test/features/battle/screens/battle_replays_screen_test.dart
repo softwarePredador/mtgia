@@ -207,6 +207,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
                       'image_url': 'https://cards.example/island.jpg',
                       'type_line': 'Basic Land - Island',
                     },
+                    {'name': 'Name Only Permanent', 'type_line': 'Artifact'},
                   ],
                   'graveyard': [],
                   'library_size': 91,
@@ -616,6 +617,18 @@ void main() {
       find.byKey(const Key('battle-visual-card-Arcane Signet')),
       findsOneWidget,
     );
+    expect(
+      find.byKey(const Key('battle-visual-card-Name Only Permanent')),
+      findsOneWidget,
+    );
+    final nameOnlyImage = tester.widget<CachedCardImage>(
+      find.byKey(const Key('battle-visual-card-image-Name Only Permanent')),
+    );
+    expect(
+      nameOnlyImage.imageUrl,
+      isNull,
+      reason: 'a replay must not infer artwork from a card name',
+    );
 
     final arcaneSignetCard = find.byKey(
       const Key('battle-visual-card-Arcane Signet'),
@@ -630,8 +643,21 @@ void main() {
     await tester.tap(find.byTooltip('Fechar'));
     await tester.pumpAndSettle();
 
-    final decisionsTab = find.text('Decisões');
+    final evidenceHandoff = find.byKey(
+      const Key('battle-replay-evidence-handoff'),
+    );
     final detailPane = find.byKey(const Key('battle-replay-detail-pane'));
+    for (var i = 0; i < 5 && evidenceHandoff.evaluate().isEmpty; i += 1) {
+      await tester.drag(detailPane, const Offset(0, -260));
+      await tester.pumpAndSettle();
+    }
+    expect(evidenceHandoff, findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-replay-create-evidence-button')),
+      findsOneWidget,
+    );
+
+    final decisionsTab = find.text('Decisões');
     for (var i = 0; i < 4 && decisionsTab.evaluate().isEmpty; i += 1) {
       await tester.drag(detailPane, const Offset(0, 300));
       await tester.pumpAndSettle();

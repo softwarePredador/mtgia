@@ -178,21 +178,22 @@ run_no_egress psql -X -v ON_ERROR_STOP=1 \
   -c "
     INSERT INTO cards (
       scryfall_id, oracle_id, name, mana_cost, type_line, oracle_text,
-      colors, color_identity, set_code, rarity, price_usd, cmc
+      colors, color_identity, set_code, rarity, price_usd,
+      collector_number, foil, cmc
     ) VALUES
     (
       '00000000-0000-4000-8000-000000000001'::uuid,
       '00000000-0000-4000-8000-000000000002'::uuid,
       'Sol Ring', '{1}', 'Artifact',
       '{T}: Add {C}{C}.', ARRAY[]::text[], ARRAY[]::text[],
-      'TST', 'uncommon', 1.50, 1
+      'TST', 'uncommon', 1.50, '001', FALSE, 1
     ),
     (
       '00000000-0000-4000-8000-000000000007'::uuid,
       '00000000-0000-4000-8000-000000000002'::uuid,
       'Sol Ring', '{1}', 'Artifact',
       '{T}: Add {C}{C}.', ARRAY[]::text[], ARRAY[]::text[],
-      'T2S', 'rare', 2.50, 1
+      'T2S', 'rare', 2.50, '777', TRUE, 1
     )
     ON CONFLICT (scryfall_id) DO NOTHING;
     INSERT INTO card_legalities (card_id, format, status)

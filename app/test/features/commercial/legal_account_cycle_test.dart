@@ -44,8 +44,11 @@ void main() {
 
     expect(find.text('Termos de uso'), findsOneWidget);
     expect(find.text('Privacidade'), findsOneWidget);
-    expect(find.textContaining(currentTermsVersion), findsNWidgets(2));
+    expect(find.textContaining(currentTermsVersion), findsOneWidget);
     expect(find.byKey(const Key('legal-review-status')), findsOneWidget);
+    expect(find.byKey(const Key('legal-card-source-section')), findsOneWidget);
+    expect(find.textContaining('conteúdo de fã não oficial'), findsOneWidget);
+    expect(find.textContaining('Scryfall não produz'), findsOneWidget);
     expect(
       find.textContaining('revisão jurídica externa permanece pendente'),
       findsOneWidget,

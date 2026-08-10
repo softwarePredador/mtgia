@@ -22,12 +22,14 @@ class CardScannerScreen extends StatefulWidget {
   /// Callback para modo binder — ao escanear e confirmar carta,
   /// chama essa função ao invés de adicionar ao deck.
   final void Function(Map<String, dynamic> card)? onCardScannedForBinder;
+  final bool continuousBinderSession;
 
   const CardScannerScreen({
     super.key,
     required this.deckId,
     this.mode,
     this.onCardScannedForBinder,
+    this.continuousBinderSession = false,
   });
 
   bool get isBinderMode => mode == 'binder';
@@ -352,14 +354,37 @@ class _CardScannerScreenState extends State<CardScannerScreen>
     if (widget.isBinderMode) {
       final cardData = {
         'id': card.id,
+        'oracle_id': card.oracleId,
         'name': card.name,
         'image_url': card.imageUrl,
+        'layout': card.layout,
+        'card_faces': card.cardFaces
+            .map((face) => {'name': face.name, 'image_url': face.imageUrl})
+            .toList(growable: false),
         'set_code': card.setCode,
+        'set_name': card.setName,
+        'set_release_date': card.setReleaseDate,
+        'collector_number': card.collectorNumber,
+        'foil': card.foil,
         'mana_cost': card.manaCost,
+        'type_line': card.typeLine,
         'rarity': card.rarity,
       };
-      Navigator.pop(context);
-      widget.onCardScannedForBinder?.call(cardData);
+      if (widget.continuousBinderSession) {
+        widget.onCardScannedForBinder?.call(cardData);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${card.name} entrou na fila de revisão.'),
+            backgroundColor: AppTheme.success.withValues(alpha: 0.92),
+          ),
+        );
+        _scannerProvider.reset();
+        _startLiveStream();
+      } else {
+        Navigator.pop(context);
+        widget.onCardScannedForBinder?.call(cardData);
+      }
       return;
     }
 

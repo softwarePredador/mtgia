@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/scryfall_image_url.dart';
 
 /// GET /community/marketplace → Busca global de cartas para troca/venda
 Future<Response> onRequest(RequestContext context) async {
@@ -96,15 +97,30 @@ Future<Response> onRequest(RequestContext context) async {
     // Items com dados do dono e da carta
     final itemsFuture = pool.execute(
       Sql.named('''
-      SELECT bi.id, bi.card_id,
+      WITH canonical_sets AS (
+        SELECT DISTINCT ON (LOWER(code))
+          code,
+          name,
+          release_date
+        FROM sets
+        ORDER BY LOWER(code), release_date DESC NULLS LAST, code
+      )
+      SELECT bi.id, bi.card_id, bi.created_at, bi.updated_at,
              item_availability.available_quantity,
              bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency, bi.notes,
               bi.user_id, bi.language, bi.list_type,
               c.name AS card_name, c.image_url AS card_image_url,
+              c.scryfall_id::text AS card_scryfall_id,
+              c.oracle_id::text AS card_oracle_id,
+              c.layout AS card_layout,
+              c.card_faces_json AS card_faces,
               c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
+              c.collector_number AS card_collector_number,
               c.rarity AS card_rarity, c.type_line AS card_type_line,
               c.is_reserved AS card_is_reserved,
+              s.name AS card_set_name,
+              s.release_date AS card_set_release_date,
               COALESCE(c.price_usd, c.price) AS card_reference_price,
               c.price_source AS card_reference_price_source,
               c.price_updated_at AS card_reference_price_updated_at,
@@ -127,6 +143,7 @@ Future<Response> onRequest(RequestContext context) async {
               shipping.avg_shipping_hours AS owner_avg_shipping_hours
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
       JOIN users u ON u.id = bi.user_id
       JOIN binder_item_availability item_availability
         ON item_availability.binder_item_id = bi.id
@@ -202,8 +219,25 @@ Future<Response> onRequest(RequestContext context) async {
             'card': {
               'id': cols['card_id'],
               'name': cols['card_name'],
-              'image_url': cols['card_image_url'],
+              'image_url': normalizeScryfallImageUrl(
+                cols['card_image_url']?.toString(),
+                printingId: cols['card_scryfall_id']?.toString(),
+                oracleId: cols['card_oracle_id']?.toString(),
+              ),
+              'scryfall_id': cols['card_scryfall_id'],
+              'oracle_id': cols['card_oracle_id'],
+              'layout': cols['card_layout'],
+              'card_faces': cols['card_faces'],
               'set_code': cols['card_set_code'],
+              'collector_number': cols['card_collector_number'],
+              'set_name': cols['card_set_name'],
+              'set_release_date':
+                  cols['card_set_release_date'] is DateTime
+                      ? (cols['card_set_release_date'] as DateTime)
+                          .toIso8601String()
+                          .split('T')
+                          .first
+                      : cols['card_set_release_date']?.toString(),
               'mana_cost': cols['card_mana_cost'],
               'rarity': cols['card_rarity'],
               'type_line': cols['card_type_line'],
@@ -223,6 +257,8 @@ Future<Response> onRequest(RequestContext context) async {
             'notes': cols['notes'],
             'language': cols['language'],
             'list_type': cols['list_type'] ?? 'have',
+            'created_at': _dateTimeString(cols['created_at']),
+            'updated_at': _dateTimeString(cols['updated_at']),
             'price_insight': _buildPriceInsight(cols),
             'owner': {
               'id': cols['user_id'],

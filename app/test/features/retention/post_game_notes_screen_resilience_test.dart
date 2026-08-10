@@ -82,7 +82,7 @@ void main() {
       expect(find.textContaining('storage path'), findsNothing);
       expect(find.byType(CircularProgressIndicator), findsNothing);
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Tentar novamente'));
+      await tester.tap(find.byKey(const Key('post-game-load-retry')));
       await tester.pumpAndSettle();
 
       expect(store.loadCalls, 2);

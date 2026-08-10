@@ -237,6 +237,8 @@ class AppTheme {
   static const double contentMaxWidth = 1280;
   static const double readingMaxWidth = 760;
   static const double inspectorWidth = 360;
+  static const double identityRailWidth = 320;
+  static const double compactFieldWidth = 148;
   static const double pageGutterCompact = 12;
   static const double pageGutter = 20;
   static const double paneGap = 20;

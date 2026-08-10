@@ -3,14 +3,16 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/mana_symbols.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../cards/screens/card_detail_screen.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/providers/deck_provider.dart';
-import '../../cards/screens/card_detail_screen.dart';
 import '../../social/widgets/social_report_dialog.dart';
+import '../../trades/trade_route_contract.dart';
 import '../providers/community_provider.dart';
 
 class CommunityDeckDetailScreen extends StatefulWidget {
@@ -33,6 +35,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   bool _isCopying = false;
   bool _isSubmittingComment = false;
   bool _isReporting = false;
+  String _commentContext = 'Deck todo';
 
   @override
   void initState() {
@@ -56,7 +59,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
     final results = await Future.wait<dynamic>([
       provider.fetchPublicDeckDetails(widget.deckId),
       provider.fetchDeckComments(widget.deckId),
-      provider.fetchTradeMatches(deckId: widget.deckId),
+      provider.fetchTradeMatches(),
     ]);
     final data = results[0] as Map<String, dynamic>?;
     final comments = results[1] as List<CommunityDeckComment>;
@@ -125,9 +128,13 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
       return;
     }
     setState(() => _isSubmittingComment = true);
+    final contextualBody = composeCommunityDeckCommentBody(
+      body: body,
+      contextLabel: _commentContext,
+    );
     final ok = await context.read<CommunityProvider>().addDeckComment(
       widget.deckId,
-      body,
+      contextualBody,
     );
     if (!mounted) return;
     if (ok) {
@@ -314,6 +321,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
               final contextColumn = _buildContextColumn(
                 visualAnalysis,
                 isDesktop: isDesktop,
+                commentContexts: _commentContextOptions(commander, mainBoard),
               );
 
               return Column(
@@ -479,6 +487,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   Widget _buildContextColumn(
     Map<String, dynamic> visualAnalysis, {
     required bool isDesktop,
+    required List<String> commentContexts,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -494,24 +503,56 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
           SizedBox(width: double.infinity, child: _buildCopyButton()),
         const SizedBox(height: AppTheme.space16),
         _VisualAnalysisPanel(analysis: visualAnalysis),
-        if (_tradeMatches.isNotEmpty) ...[
-          const SizedBox(height: AppTheme.space14),
-          _TradeMatchesPanel(matches: _tradeMatches),
-        ],
+        const SizedBox(height: AppTheme.space14),
+        _TradeMatchesPanel(matches: _tradeMatches),
         const SizedBox(height: AppTheme.space14),
         _CommunityFeedbackPanel(
           comments: _comments,
+          commentContexts: commentContexts,
+          selectedContext: _commentContext,
           currentUserId: context.read<AuthProvider>().user?.id,
           controller: _commentController,
           isSubmitting: _isSubmittingComment,
           isReporting: _isReporting,
           onSubmit: _submitComment,
+          onContextChanged: (value) {
+            if (value == null) return;
+            setState(() => _commentContext = value);
+          },
           onReport: _reportDeck,
           onReportComment: _reportComment,
           onDeleteComment: _deleteComment,
         ),
       ],
     );
+  }
+
+  List<String> _commentContextOptions(
+    List<dynamic> commander,
+    Map<String, dynamic> mainBoard,
+  ) {
+    final options = <String>['Deck todo', 'Estratégia', 'Base de mana'];
+    final seen = options.toSet();
+
+    void addCard(Object? raw) {
+      if (raw is! Map) return;
+      final name = raw['name']?.toString().trim();
+      if (name == null || name.isEmpty) return;
+      final label = 'Carta · $name';
+      if (seen.add(label)) options.add(label);
+    }
+
+    for (final card in commander) {
+      addCard(card);
+    }
+    for (final group in mainBoard.values) {
+      if (group is! List) continue;
+      for (final card in group) {
+        addCard(card);
+        if (options.length >= 15) return options;
+      }
+    }
+    return options;
   }
 
   Widget _buildCopyButton() {
@@ -617,13 +658,11 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   }
 
   Widget _buildCardTile(Map<String, dynamic> card) {
-    final qty = card['quantity'] as int? ?? 1;
-    final name = card['name'] as String? ?? '';
-    final typeLine = card['type_line'] as String? ?? '';
-    final manaCost = card['mana_cost'] as String? ?? '';
-    final imageUrl = card['image_url'] as String?;
+    final deckCard = DeckCardItem.fromJson(card);
+    final manaCost = deckCard.manaCost ?? '';
 
     return Card(
+      key: Key('community-deck-card-${deckCard.id}'),
       color: AppTheme.surfaceElevated,
       margin: const EdgeInsets.only(bottom: AppTheme.space4),
       shape: RoundedRectangleBorder(
@@ -632,28 +671,57 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
       child: ListTile(
         dense: true,
         onTap: () {
-          final deckCard = DeckCardItem.fromJson(card);
           openCardDetailRoute(context, deckCard);
         },
-        leading: CachedCardImage(
-          imageUrl: imageUrl,
-          width: 32,
-          height: 45,
-          borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        leading: SizedBox(
+          width: 42,
+          height: 60,
+          child: CardArtwork(
+            variant: CardArtworkVariant.gallery,
+            imageUrl: deckCard.printingImageUrl,
+            fallbackImageUrl: deckCard.fallbackImageUrl,
+            semanticLabel: deckCard.hasPrintingArtwork
+                ? 'Arte da impressão ${deckCard.name}'
+                : 'Arte de referência de ${deckCard.name}',
+            constrainAspectRatio: false,
+          ),
         ),
         title: Text(
-          '${qty}x $name',
+          '${deckCard.quantity}x ${deckCard.name}',
           style: const TextStyle(
             color: AppTheme.textPrimary,
             fontSize: AppTheme.fontMd,
             fontWeight: FontWeight.w500,
           ),
         ),
-        subtitle: Text(
-          typeLine,
-          style: const TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: AppTheme.fontSm,
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: AppTheme.space3),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (deckCard.typeLine.trim().isNotEmpty)
+                Text(
+                  deckCard.typeLine,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
+              const SizedBox(height: AppTheme.space3),
+              CardEditionMetadataLine(
+                setCode: deckCard.setCode,
+                collectorNumber: deckCard.collectorNumber,
+                setName: deckCard.setName,
+                setReleaseDate: deckCard.setReleaseDate,
+                rarity: deckCard.rarity,
+                warning: deckCard.hasPrintingArtwork
+                    ? null
+                    : 'Arte de referência',
+              ),
+            ],
           ),
         ),
         trailing: manaCost.isNotEmpty
@@ -809,20 +877,26 @@ class _TradeMatchesPanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppTheme.space8),
-          ...matches
-              .take(3)
-              .map(
-                (match) => Padding(
-                  padding: const EdgeInsets.only(top: AppTheme.space8),
-                  child: Text(
-                    '${match.cardName} com ${match.ownerName}',
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      height: 1.35,
+          if (matches.isEmpty)
+            const Text(
+              'Sua wishlist e as faltantes dos seus decks ainda não encontraram uma cópia pública livre.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+            )
+          else
+            ...matches
+                .take(3)
+                .map(
+                  (match) => Padding(
+                    padding: const EdgeInsets.only(top: AppTheme.space8),
+                    child: Text(
+                      '${match.cardName} com ${match.ownerName}',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        height: 1.35,
+                      ),
                     ),
                   ),
                 ),
-              ),
           if (matches.length > 3) ...[
             const SizedBox(height: AppTheme.space8),
             Text(
@@ -830,6 +904,20 @@ class _TradeMatchesPanel extends StatelessWidget {
               style: const TextStyle(color: AppTheme.brass400),
             ),
           ],
+          const SizedBox(height: AppTheme.space12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: const Key('community-deck-open-trade-matches'),
+              onPressed: () => context.push(tradeMatchesRouteLocation()),
+              icon: const Icon(Icons.arrow_forward_rounded),
+              label: Text(
+                matches.isEmpty
+                    ? 'Revisar matches'
+                    : 'Abrir ofertas compatíveis',
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -839,22 +927,28 @@ class _TradeMatchesPanel extends StatelessWidget {
 class _CommunityFeedbackPanel extends StatelessWidget {
   const _CommunityFeedbackPanel({
     required this.comments,
+    required this.commentContexts,
+    required this.selectedContext,
     required this.currentUserId,
     required this.controller,
     required this.isSubmitting,
     required this.isReporting,
     required this.onSubmit,
+    required this.onContextChanged,
     required this.onReport,
     required this.onReportComment,
     required this.onDeleteComment,
   });
 
   final List<CommunityDeckComment> comments;
+  final List<String> commentContexts;
+  final String selectedContext;
   final String? currentUserId;
   final TextEditingController controller;
   final bool isSubmitting;
   final bool isReporting;
   final VoidCallback onSubmit;
+  final ValueChanged<String?> onContextChanged;
   final VoidCallback onReport;
   final ValueChanged<CommunityDeckComment> onReportComment;
   final ValueChanged<CommunityDeckComment> onDeleteComment;
@@ -898,6 +992,29 @@ class _CommunityFeedbackPanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppTheme.space8),
+          DropdownButtonFormField<String>(
+            key: const Key('community-deck-comment-context'),
+            initialValue: selectedContext,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Comentar sobre',
+              prefixIcon: Icon(Icons.link_rounded),
+            ),
+            items: commentContexts
+                .map(
+                  (contextLabel) => DropdownMenuItem<String>(
+                    value: contextLabel,
+                    child: Text(
+                      contextLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                .toList(growable: false),
+            onChanged: isSubmitting ? null : onContextChanged,
+          ),
+          const SizedBox(height: AppTheme.space8),
           TextField(
             key: const Key('community-deck-comment-field'),
             controller: controller,
@@ -907,6 +1024,27 @@ class _CommunityFeedbackPanel extends StatelessWidget {
               labelText: 'Comentar no deck',
               hintText: 'Sugira ajuste, risco ou carta para testar.',
             ),
+          ),
+          const SizedBox(height: AppTheme.space6),
+          const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.public_rounded,
+                size: 14,
+                color: AppTheme.textSecondary,
+              ),
+              SizedBox(width: AppTheme.space5),
+              Expanded(
+                child: Text(
+                  'O comentário e seu contexto ficam públicos neste deck.',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontXs,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: AppTheme.space8),
           ValueListenableBuilder<TextEditingValue>(
@@ -945,12 +1083,45 @@ class _CommunityFeedbackPanel extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Text(
-                            '${comment.authorName ?? 'Jogador'}: ${comment.body}',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              height: 1.35,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (comment.contextLabel != null) ...[
+                                Container(
+                                  key: Key(
+                                    'community-comment-context-${comment.id}',
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppTheme.space6,
+                                    vertical: AppTheme.space2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.frost400.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusXs,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    comment.contextLabel!,
+                                    style: const TextStyle(
+                                      color: AppTheme.frost400,
+                                      fontSize: AppTheme.fontXs,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: AppTheme.space4),
+                              ],
+                              Text(
+                                '${comment.authorName ?? 'Jogador'}: ${comment.body}',
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         PopupMenuButton<String>(

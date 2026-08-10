@@ -86,5 +86,19 @@ void main() {
       expect(deleteRoute, contains("'if-match'"));
       expect(deleteRoute, contains('HttpStatus.conflict'));
     });
+
+    test('exact card evidence is canonicalized inside the owned deck', () {
+      expect(service, contains('_boundedCardEvidenceList'));
+      expect(service, contains('_canonicalizeDeckCardEvidence'));
+      expect(service, contains('FROM deck_cards dc'));
+      expect(service, contains('JOIN decks d ON d.id = dc.deck_id'));
+      expect(service, contains('d.user_id = CAST(@userId AS uuid)'));
+      expect(service, contains('dc.deck_id = CAST(@deckId AS uuid)'));
+      expect(service, contains("'card_id': cardId"));
+      expect(service, contains("_nullableString(map['image_url'])"));
+      expect(service, contains('loadOptimizeEvidence'));
+      expect(service, contains("'post_game_optimize_evidence_v1'"));
+      expect(service, contains("'matches_current':"));
+    });
   });
 }

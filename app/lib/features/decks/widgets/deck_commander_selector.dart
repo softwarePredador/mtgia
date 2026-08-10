@@ -18,11 +18,15 @@ class DeckCommanderSelector extends StatelessWidget {
     required this.format,
     required this.selectedCard,
     required this.onChanged,
+    this.title = 'Comandante (opcional)',
+    this.subtitle = 'Escolha agora ou conclua o deck como rascunho.',
   });
 
   final String format;
   final DeckCardItem? selectedCard;
   final ValueChanged<DeckCardItem?> onChanged;
+  final String title;
+  final String subtitle;
 
   Future<void> _openPicker(BuildContext context) async {
     final provider = context.read<CardProvider>();
@@ -49,7 +53,7 @@ class DeckCommanderSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Comandante (opcional)',
+          title,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w800,
@@ -57,7 +61,7 @@ class DeckCommanderSelector extends StatelessWidget {
         ),
         const SizedBox(height: AppTheme.space5),
         Text(
-          'Escolha agora ou conclua o deck como rascunho.',
+          subtitle,
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
@@ -372,6 +376,7 @@ class _CommanderPickerDialogState extends State<_CommanderPickerDialog> {
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     final availableHeight = math.max(288.0, mediaSize.height - 32);
     final dialogHeight = math.min(640.0, availableHeight);
+    final useComparisonGrid = mediaSize.width >= AppTheme.breakpointExpanded;
 
     // Keep the picker at a useful height while the software keyboard is open.
     // Results remain scrollable above it through the bottom list padding.
@@ -392,7 +397,7 @@ class _CommanderPickerDialogState extends State<_CommanderPickerDialog> {
           ),
         ),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 620),
+          constraints: BoxConstraints(maxWidth: useComparisonGrid ? 920 : 620),
           child: SizedBox(
             height: dialogHeight,
             child: Padding(
@@ -528,21 +533,44 @@ class _CommanderPickerDialogState extends State<_CommanderPickerDialog> {
                           );
                         }
 
+                        Widget buildCandidate(int index) {
+                          final card = cards[index];
+                          return _CommanderCandidateTile(
+                            card: card,
+                            format: widget.format,
+                            selected: widget.selectedCardId == card.id,
+                            onSelected: () => Navigator.pop(context, card),
+                          );
+                        }
+
+                        if (useComparisonGrid) {
+                          return KeyedSubtree(
+                            key: const Key('commander-picker-comparison-grid'),
+                            child: GridView.builder(
+                              key: const Key('deck-create-commander-results'),
+                              padding: EdgeInsets.only(bottom: keyboardInset),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: AppTheme.space10,
+                                    mainAxisSpacing: AppTheme.space10,
+                                    mainAxisExtent: 136,
+                                  ),
+                              itemCount: cards.length,
+                              itemBuilder: (context, index) =>
+                                  buildCandidate(index),
+                            ),
+                          );
+                        }
+
                         return ListView.separated(
                           key: const Key('deck-create-commander-results'),
                           padding: EdgeInsets.only(bottom: keyboardInset),
                           itemCount: cards.length,
                           separatorBuilder: (_, _) =>
                               const SizedBox(height: AppTheme.space8),
-                          itemBuilder: (context, index) {
-                            final card = cards[index];
-                            return _CommanderCandidateTile(
-                              card: card,
-                              format: widget.format,
-                              selected: widget.selectedCardId == card.id,
-                              onSelected: () => Navigator.pop(context, card),
-                            );
-                          },
+                          itemBuilder: (context, index) =>
+                              buildCandidate(index),
                         );
                       },
                     ),

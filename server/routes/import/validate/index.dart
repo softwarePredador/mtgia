@@ -21,6 +21,7 @@ Future<Response> _validateList(RequestContext context) async {
   final pool = context.read<Pool>();
 
   late final String normalizedFormat;
+  late final String? commanderName;
   late final Object rawList;
   try {
     final body = requireJsonObject(await context.request.json());
@@ -30,6 +31,7 @@ Future<Response> _validateList(RequestContext context) async {
       throw DeckRequestException(unsupportedDeckFormatMessage(rawFormat));
     }
     normalizedFormat = supportedFormat;
+    commanderName = readOptionalString(body, 'commander', trim: true);
     final listValue = body['list'];
     if (listValue == null) {
       throw const DeckRequestException('Field list is required.');
@@ -90,6 +92,28 @@ Future<Response> _validateList(RequestContext context) async {
         localizedMatches.add(localizedMatch);
       }
 
+      final normalizedCommander = commanderName?.trim().toLowerCase();
+      final canonicalCommander =
+          normalizedCommander == null
+              ? null
+              : canonicalizeImportLookupName(normalizedCommander);
+      final localizedCommander =
+          normalizedCommander == null
+              ? null
+              : normalizeLocalizedImportName(normalizedCommander);
+      final databaseName = cardData['name']?.toString() ?? '';
+      final isCommander =
+          item['isCommanderTag'] == true ||
+          (normalizedCommander != null &&
+              (databaseName.toLowerCase() == normalizedCommander ||
+                  databaseName.toLowerCase() == canonicalCommander ||
+                  (cardData['_localized_match'] == true &&
+                      normalizeLocalizedImportName(
+                            cardData['_localized_printed_name']?.toString() ??
+                                '',
+                          ) ==
+                          localizedCommander)));
+
       foundCards.add({
         'card_id': cardData['id'],
         'oracle_id': cardData['oracle_id'],
@@ -97,13 +121,51 @@ Future<Response> _validateList(RequestContext context) async {
         'type_line': cardData['type_line'],
         'image_url': cardData['image_url'],
         'quantity': item['quantity'],
-        'is_commander': item['isCommanderTag'],
+        'is_commander': isCommander,
         'original_line': item['line'],
       });
     } else {
       if (!notFoundLines.contains(item['line'])) {
         notFoundLines.add(item['line']);
       }
+    }
+  }
+
+  final requiresCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+  final trimmedCommander = commanderName?.trim();
+  if (requiresCommander &&
+      trimmedCommander != null &&
+      trimmedCommander.isNotEmpty &&
+      !foundCards.any((card) => card['is_commander'] == true)) {
+    final commanderLookup = await resolveImportCardNames(pool, [
+      {
+        'line': 'commander: $trimmedCommander',
+        'name': trimmedCommander,
+        'quantity': 1,
+        'isCommanderTag': true,
+      },
+    ], preferredFormat: normalizedFormat);
+    final commanderKey = trimmedCommander.toLowerCase();
+    final commanderData =
+        commanderLookup[commanderKey] ??
+        commanderLookup[cleanImportLookupKey(commanderKey)] ??
+        commanderLookup[canonicalizeImportLookupName(
+          cleanImportLookupKey(commanderKey),
+        )];
+    if (commanderData == null) {
+      notFoundLines.add('Comandante: $trimmedCommander');
+    } else {
+      foundCards.add({
+        'card_id': commanderData['id'],
+        'oracle_id': commanderData['oracle_id'],
+        'name': commanderData['name'],
+        'type_line': commanderData['type_line'],
+        'image_url': commanderData['image_url'],
+        'quantity': 1,
+        'is_commander': true,
+        'original_line': 'Comandante: $trimmedCommander',
+      });
     }
   }
 
@@ -250,6 +312,9 @@ Future<Response> _validateList(RequestContext context) async {
     0,
     (sum, c) => sum + (c['quantity'] as int),
   );
+  final commanderDetected = consolidated.any(
+    (card) => card['is_commander'] == true,
+  );
 
   // Warnings de tamanho do deck
   if (normalizedFormat == 'commander') {
@@ -262,8 +327,7 @@ Future<Response> _validateList(RequestContext context) async {
         'Para validação estrita, Commander deve ter exatamente 100 cartas (encontradas: $totalCards)',
       );
     }
-    final hasCommander = consolidated.any((c) => c['is_commander'] == true);
-    if (!hasCommander) {
+    if (!commanderDetected) {
       warnings.add('Nenhum comandante foi marcado na lista.');
     }
   }
@@ -278,8 +342,7 @@ Future<Response> _validateList(RequestContext context) async {
         'Para validação estrita, Brawl deve ter exatamente 60 cartas (encontradas: $totalCards)',
       );
     }
-    final hasCommander = consolidated.any((c) => c['is_commander'] == true);
-    if (!hasCommander) {
+    if (!commanderDetected) {
       warnings.add('Nenhum comandante foi marcado na lista.');
     }
   }
@@ -293,6 +356,8 @@ Future<Response> _validateList(RequestContext context) async {
       'warnings': warnings,
       'total_cards': totalCards,
       'total_unique': consolidated.length,
+      'commander_detected': commanderDetected,
+      'missing_commander': requiresCommander && !commanderDetected,
     },
   );
 }

@@ -3861,6 +3861,147 @@ final migrations = <Migration>[
       CHECK (timeout_ms BETWEEN 1000 AND 40000);
     ''',
   ),
+  Migration(
+    version: '058',
+    name: 'snapshot_trade_item_identity',
+    up: '''
+      ALTER TABLE trade_items
+      ADD COLUMN IF NOT EXISTS snapshot_schema_version TEXT NOT NULL
+      DEFAULT 'trade_item_snapshot_v1';
+      ALTER TABLE trade_items
+      ADD COLUMN IF NOT EXISTS snapshot_status TEXT NOT NULL
+      DEFAULT 'legacy_unavailable';
+      ALTER TABLE trade_items
+      ADD COLUMN IF NOT EXISTS item_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb;
+      ALTER TABLE trade_items
+      ADD COLUMN IF NOT EXISTS snapshot_captured_at TIMESTAMP WITH TIME ZONE;
+
+      DROP TRIGGER IF EXISTS manaloom_trade_item_snapshot_immutable
+      ON trade_items;
+      WITH canonical_sets AS (
+        SELECT DISTINCT ON (LOWER(code)) code, name, release_date
+        FROM sets
+        ORDER BY LOWER(code), release_date DESC NULLS LAST, code
+      ), recoverable AS (
+        SELECT
+          ti.id,
+          jsonb_build_object(
+            'schema_version', 'trade_item_snapshot_v1',
+            'card', jsonb_strip_nulls(jsonb_build_object(
+              'id', c.id::text,
+              'scryfall_id', c.scryfall_id::text,
+              'oracle_id', c.oracle_id::text,
+              'name', c.name,
+              'image_url', c.image_url,
+              'layout', c.layout,
+              'card_faces', c.card_faces_json,
+              'set_code', c.set_code,
+              'collector_number', c.collector_number,
+              'set_name', s.name,
+              'set_release_date', TO_CHAR(s.release_date, 'YYYY-MM-DD'),
+              'mana_cost', c.mana_cost,
+              'type_line', c.type_line,
+              'rarity', c.rarity
+            )),
+            'physical', jsonb_build_object(
+              'condition', bi.condition,
+              'is_foil', bi.is_foil,
+              'language', bi.language
+            )
+          ) AS item_snapshot
+        FROM trade_items ti
+        JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+        JOIN cards c ON c.id = bi.card_id
+        LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
+        WHERE ti.snapshot_status = 'legacy_unavailable'
+          AND ti.item_snapshot = '{}'::jsonb
+      )
+      UPDATE trade_items ti
+      SET snapshot_status = 'legacy_recovered',
+          item_snapshot = recoverable.item_snapshot,
+          snapshot_captured_at = CURRENT_TIMESTAMP
+      FROM recoverable
+      WHERE ti.id = recoverable.id;
+
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_schema;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT chk_trade_items_snapshot_schema CHECK (
+        snapshot_schema_version = 'trade_item_snapshot_v1'
+      );
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_status;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT chk_trade_items_snapshot_status CHECK (
+        snapshot_status IN (
+          'captured', 'legacy_recovered', 'legacy_unavailable'
+        )
+      );
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_payload;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT chk_trade_items_snapshot_payload CHECK (
+        jsonb_typeof(item_snapshot) = 'object'
+        AND OCTET_LENGTH(item_snapshot::text) <= 65536
+      );
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_lifecycle;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT chk_trade_items_snapshot_lifecycle CHECK (
+        (
+          snapshot_status IN ('captured', 'legacy_recovered')
+          AND item_snapshot <> '{}'::jsonb
+          AND snapshot_captured_at IS NOT NULL
+          AND item_snapshot ->> 'schema_version' = snapshot_schema_version
+          AND jsonb_typeof(item_snapshot -> 'card') = 'object'
+          AND jsonb_typeof(item_snapshot -> 'physical') = 'object'
+        ) OR (
+          snapshot_status = 'legacy_unavailable'
+          AND item_snapshot = '{}'::jsonb
+          AND snapshot_captured_at IS NULL
+        )
+      );
+
+      CREATE OR REPLACE FUNCTION manaloom_trade_item_snapshot_immutable()
+      RETURNS TRIGGER
+      LANGUAGE plpgsql
+      AS \$trade_item_snapshot\$
+      BEGIN
+        IF NEW.snapshot_schema_version IS DISTINCT FROM OLD.snapshot_schema_version
+           OR NEW.snapshot_status IS DISTINCT FROM OLD.snapshot_status
+           OR NEW.item_snapshot IS DISTINCT FROM OLD.item_snapshot
+           OR NEW.snapshot_captured_at IS DISTINCT FROM OLD.snapshot_captured_at THEN
+          RAISE EXCEPTION USING
+            ERRCODE = '23514',
+            MESSAGE = 'trade_item_snapshot_immutable';
+        END IF;
+        RETURN NEW;
+      END;
+      \$trade_item_snapshot\$;
+      CREATE TRIGGER manaloom_trade_item_snapshot_immutable
+      BEFORE UPDATE OF snapshot_schema_version, snapshot_status, item_snapshot,
+        snapshot_captured_at ON trade_items
+      FOR EACH ROW
+      EXECUTE FUNCTION manaloom_trade_item_snapshot_immutable();
+    ''',
+    down: '''
+      DROP TRIGGER IF EXISTS manaloom_trade_item_snapshot_immutable
+      ON trade_items;
+      DROP FUNCTION IF EXISTS manaloom_trade_item_snapshot_immutable();
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_lifecycle;
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_payload;
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_status;
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_schema;
+      ALTER TABLE trade_items DROP COLUMN IF EXISTS snapshot_captured_at;
+      ALTER TABLE trade_items DROP COLUMN IF EXISTS item_snapshot;
+      ALTER TABLE trade_items DROP COLUMN IF EXISTS snapshot_status;
+      ALTER TABLE trade_items DROP COLUMN IF EXISTS snapshot_schema_version;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -3955,7 +4096,8 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '054' ||
       '055' ||
       '056' ||
-      '057' => MigrationRollbackPolicy.manualOnly,
+      '057' ||
+      '058' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

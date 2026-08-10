@@ -463,6 +463,20 @@ void _parsePublicPlayer(Map<String, dynamic> json) {
   _validateOptionalStringFields(json, _playerStringKeys);
   _validateOptionalIntFields(json, _playerIntKeys);
   _validateOptionalBoolFields(json, _playerBoolKeys);
+  _validateMapList(json, 'battlefield', _parsePublicZoneObject);
+  _validateMapList(json, 'graveyard', _parsePublicZoneObject);
+  _validateMapList(json, 'exile', _parsePublicZoneObject);
+  _validateMapList(json, 'command', _parsePublicZoneObject);
+}
+
+void _parsePublicZoneObject(Map<String, dynamic> json) {
+  _requireOnlyKeys(
+    json,
+    _zoneObjectKeys,
+    'private_or_unknown_zone_object_field',
+  );
+  _validateOptionalStringFields(json, _zoneObjectStringKeys);
+  _validateOptionalBoolFields(json, _zoneObjectBoolKeys);
 }
 
 void _parsePublicStackObject(Map<String, dynamic> json) {
@@ -684,6 +698,7 @@ const _eventKeys = <String>{
   'damage',
   'life_after',
   'tapped',
+  'card_id',
   'card_name',
   'message',
   'details',
@@ -698,6 +713,7 @@ const _eventStringKeys = <String>{
   'subject_deck_key',
   'target_side',
   'severity',
+  'card_id',
   'card_name',
   'message',
 };
@@ -782,6 +798,10 @@ const _playerKeys = <String>{
   'command_size',
   'lands',
   'has_left',
+  'battlefield',
+  'graveyard',
+  'exile',
+  'command',
 };
 const _playerStringKeys = <String>{'deck_key', 'name'};
 const _playerIntKeys = <String>{
@@ -798,8 +818,28 @@ const _playerIntKeys = <String>{
 };
 const _playerBoolKeys = <String>{'has_left'};
 
+const _zoneObjectKeys = <String>{
+  'object_id',
+  'card_id',
+  'name',
+  'card_name',
+  'power',
+  'toughness',
+  'tapped',
+};
+const _zoneObjectStringKeys = <String>{
+  'object_id',
+  'card_id',
+  'name',
+  'card_name',
+  'power',
+  'toughness',
+};
+const _zoneObjectBoolKeys = <String>{'tapped'};
+
 const _stackKeys = <String>{
   'object_id',
+  'card_id',
   'name',
   'card_name',
   'object_type',
@@ -819,6 +859,7 @@ const _combatStringKeys = <String>{'defender_side', 'defender_name'};
 const _combatBoolKeys = <String>{'blocked'};
 const _combatObjectKeys = <String>{
   'object_id',
+  'card_id',
   'name',
   'card_name',
   'controller_side',
@@ -829,6 +870,7 @@ const _combatObjectKeys = <String>{
 };
 const _combatObjectStringKeys = <String>{
   'object_id',
+  'card_id',
   'name',
   'card_name',
   'controller_side',

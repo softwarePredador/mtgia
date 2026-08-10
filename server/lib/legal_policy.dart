@@ -1,4 +1,4 @@
-const currentTermsVersion = '2026-07-21';
+const currentTermsVersion = '2026-08-05';
 const currentPrivacyVersion = '2026-07-21';
 const requireLegalAcceptanceEnvironment = 'MANALOOM_REQUIRE_LEGAL_ACCEPTANCE';
 

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
+import '../../../core/widgets/horizontal_discovery_rail.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/binder_provider.dart';
@@ -13,12 +15,15 @@ import '../widgets/binder_item_editor.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
 import '../../cards/screens/card_search_screen.dart';
 import '../../scanner/screens/card_scanner_screen.dart';
+import '../../trades/trade_route_contract.dart';
 
 /// Widget embeddable para uso como tab dentro do CollectionScreen.
 /// Não possui Scaffold/AppBar — apenas o body content.
 /// Agora possui 2 sub-tabs: "Tenho" (have) e "Quero" (want).
 class BinderTabContent extends StatefulWidget {
-  const BinderTabContent({super.key});
+  const BinderTabContent({super.key, this.initialListType = 'have'});
+
+  final String initialListType;
 
   @override
   State<BinderTabContent> createState() => _BinderTabContentState();
@@ -34,12 +39,42 @@ class _BinderTabContentState extends State<BinderTabContent>
   @override
   void initState() {
     super.initState();
-    _subTabController = TabController(length: 2, vsync: this);
+    _subTabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialListType == 'want' ? 1 : 0,
+    );
     _subTabController.addListener(() {
       if (!_subTabController.indexIsChanging) {
         setState(() {});
+        _syncListRoute();
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant BinderTabContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final target = widget.initialListType == 'want' ? 1 : 0;
+    if (_subTabController.index != target) {
+      _subTabController.index = target;
+    }
+  }
+
+  void _syncListRoute() {
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return;
+    final current = GoRouterState.of(context).uri;
+    if (current.path != '/collection') return;
+    final target = Uri(
+      path: '/collection',
+      queryParameters: {
+        'tab': '0',
+        if (_subTabController.index == 1) 'list': 'want',
+      },
+    );
+    if (current == target) return;
+    router.go(target.toString());
   }
 
   @override
@@ -274,6 +309,7 @@ class _BinderListViewState extends State<_BinderListView>
               cardId: card['id'] as String,
               cardName: card['name'] as String?,
               cardImageUrl: card['image_url'] as String?,
+              initialPrinting: card,
               initialListType: widget.listType,
               onSave: (data) async {
                 final ok = await provider.addItem(
@@ -317,6 +353,7 @@ class _BinderListViewState extends State<_BinderListView>
               cardId: card['id'] as String,
               cardName: card['name'] as String?,
               cardImageUrl: card['image_url'] as String?,
+              initialPrinting: card,
               initialListType: widget.listType,
               onSave: (data) async {
                 final ok = await provider.addItem(
@@ -343,6 +380,16 @@ class _BinderListViewState extends State<_BinderListView>
         ),
       ),
     );
+  }
+
+  Future<void> _openBulkImport() async {
+    final changed = await context.push<bool>(
+      '/collection/import?list_type=${widget.listType}',
+    );
+    if (changed == true && mounted) {
+      await _fetchItems(reset: true);
+      if (mounted) await context.read<BinderProvider>().fetchStats();
+    }
   }
 
   void _editItem(BinderItem item) {
@@ -390,6 +437,15 @@ class _BinderListViewState extends State<_BinderListView>
             if (showStats)
               _StatsBar(
                 stats: stats,
+                onAdd: _openAddCard,
+                onImport: _openBulkImport,
+                onScan: LaunchFeatures.scannerEnabled ? _openScanCard : null,
+                onMatches: () => context.push(tradeMatchesRouteLocation()),
+              ),
+
+            if (!showStats && _items.isNotEmpty)
+              _CompactCollectionActions(
+                onImport: _openBulkImport,
                 onAdd: _openAddCard,
                 onScan: LaunchFeatures.scannerEnabled ? _openScanCard : null,
               ),
@@ -549,12 +605,22 @@ class _BinderListViewState extends State<_BinderListView>
                   runSpacing: 8,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: _openAddCard,
-                      icon: const Icon(Icons.add),
-                      label: const Text('Buscar carta'),
+                      key: Key('binder-import-list-${widget.listType}'),
+                      onPressed: _openBulkImport,
+                      icon: const Icon(Icons.playlist_add_check_rounded),
+                      label: const Text('Importar lista'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.brass500,
                         foregroundColor: AppTheme.backgroundAbyss,
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: _openAddCard,
+                      icon: const Icon(Icons.search_rounded),
+                      label: const Text('Buscar carta'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.frost400,
+                        side: const BorderSide(color: AppTheme.outlineMuted),
                       ),
                     ),
                     if (LaunchFeatures.scannerEnabled)
@@ -651,7 +717,7 @@ class _BinderListViewState extends State<_BinderListView>
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                mainAxisExtent: 108,
+                mainAxisExtent: 152,
               ),
               itemCount: itemCount,
               itemBuilder: itemBuilder,
@@ -671,14 +737,76 @@ class _BinderListViewState extends State<_BinderListView>
 }
 
 // =====================================================================
+// Compact ingestion actions
+// =====================================================================
+
+class _CompactCollectionActions extends StatelessWidget {
+  const _CompactCollectionActions({
+    required this.onImport,
+    required this.onAdd,
+    this.onScan,
+  });
+
+  final VoidCallback onImport;
+  final VoidCallback onAdd;
+  final VoidCallback? onScan;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('binder-compact-ingestion-actions'),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.space10,
+        AppTheme.space8,
+        AppTheme.space10,
+        AppTheme.space4,
+      ),
+      color: AppTheme.surfaceElevated,
+      child: Wrap(
+        spacing: AppTheme.space8,
+        runSpacing: AppTheme.space6,
+        children: [
+          FilledButton.tonalIcon(
+            key: const Key('binder-compact-import-action'),
+            onPressed: onImport,
+            icon: const Icon(Icons.playlist_add_check_rounded, size: 18),
+            label: const Text('Importar'),
+          ),
+          OutlinedButton.icon(
+            onPressed: onAdd,
+            icon: const Icon(Icons.search_rounded, size: 18),
+            label: const Text('Buscar'),
+          ),
+          if (onScan != null)
+            OutlinedButton.icon(
+              onPressed: onScan,
+              icon: const Icon(Icons.camera_alt_outlined, size: 18),
+              label: const Text('Escanear'),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// =====================================================================
 // Stats bar
 // =====================================================================
 
 class _StatsBar extends StatefulWidget {
   final BinderStats stats;
   final VoidCallback? onAdd;
+  final VoidCallback? onImport;
   final VoidCallback? onScan;
-  const _StatsBar({required this.stats, this.onAdd, this.onScan});
+  final VoidCallback? onMatches;
+  const _StatsBar({
+    required this.stats,
+    this.onAdd,
+    this.onImport,
+    this.onScan,
+    this.onMatches,
+  });
 
   @override
   State<_StatsBar> createState() => _StatsBarState();
@@ -697,7 +825,7 @@ class _StatsBarState extends State<_StatsBar> {
         : 0;
     return Container(
       key: const Key('binder-stats-dashboard'),
-      constraints: BoxConstraints(maxHeight: _expanded ? 300 : 136),
+      constraints: BoxConstraints(maxHeight: _expanded ? 340 : 188),
       padding: const EdgeInsets.fromLTRB(
         AppTheme.space12,
         AppTheme.space10,
@@ -736,119 +864,149 @@ class _StatsBarState extends State<_StatsBar> {
               ],
             ),
             const SizedBox(height: AppTheme.space4),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _StatCard(
-                    key: const Key('binder-stat-total'),
-                    icon: Icons.collections_bookmark,
-                    label: 'Total',
-                    value: '${stats.totalItems}',
-                    tooltip: 'Cartas cadastradas no fichário',
-                  ),
-                  _StatCard(
-                    key: const Key('binder-stat-free'),
-                    icon: Icons.inventory_2_outlined,
-                    label: 'Livres',
-                    value: '${stats.freeQuantity}',
-                    tooltip:
-                        'Cópias possuídas que não estão em decks ou trades',
-                    color: AppTheme.success,
-                  ),
-                  _StatCard(
-                    key: const Key('binder-stat-allocated'),
-                    icon: Icons.style_outlined,
-                    label: 'Alocadas',
-                    value: '${stats.allocatedQuantity}',
-                    tooltip: 'Cópias exigidas pelos seus decks ativos',
-                    color: AppTheme.frost400,
-                  ),
-                  if (stats.deckMissingQuantity > 0)
+            HorizontalDiscoveryRail(
+              semanticLabel: 'Indicadores do fichário',
+              hintText: 'Deslize ou avance para ver os outros indicadores.',
+              backwardHintText: 'Volte para rever os indicadores anteriores.',
+              forwardSemanticLabel: 'Ver próximos indicadores do fichário',
+              backwardSemanticLabel: 'Ver indicadores anteriores do fichário',
+              hintKey: const Key('binder-stats-rail-hint'),
+              forwardButtonKey: const Key('binder-stats-rail-next'),
+              backwardButtonKey: const Key('binder-stats-rail-previous'),
+              builder: (context, controller) => SingleChildScrollView(
+                key: const Key('binder-stats-rail'),
+                controller: controller,
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
                     _StatCard(
-                      key: const Key('binder-stat-missing'),
-                      icon: Icons.warning_amber_rounded,
-                      label: 'Faltam',
-                      value: '${stats.deckMissingQuantity}',
-                      tooltip:
-                          'Cópias ainda necessárias para completar os decks',
-                      color: AppTheme.warning,
+                      key: const Key('binder-stat-total'),
+                      icon: Icons.collections_bookmark,
+                      label: 'Total',
+                      value: '${stats.totalItems}',
+                      tooltip: 'Cartas cadastradas no fichário',
                     ),
-                  _StatCard(
-                    key: const Key('binder-stat-unique'),
-                    icon: Icons.style,
-                    label: 'Únicas',
-                    value: '${stats.uniqueCards}',
-                    tooltip: 'Cartas únicas',
-                  ),
-                  _StatCard(
-                    key: const Key('binder-stat-duplicates'),
-                    icon: Icons.library_add_check_outlined,
-                    label: 'Duplicadas',
-                    value: '$duplicateCopies',
-                    tooltip: 'Cópias além da primeira',
-                    color: AppTheme.frost400,
-                  ),
-                  _StatCard(
-                    icon: Icons.swap_horiz,
-                    label: 'Troca',
-                    value: '${stats.forTradeCount}',
-                    tooltip: 'Itens marcados para troca',
-                    color: AppTheme.frost400,
-                  ),
-                  _StatCard(
-                    icon: Icons.sell,
-                    label: 'Venda',
-                    value: '${stats.forSaleCount}',
-                    tooltip: 'Itens marcados para venda',
-                    color: AppTheme.brass400,
-                  ),
-                  _StatCard(
-                    icon: Icons.attach_money,
-                    label: 'Valor conhecido',
-                    value: _binderKnownValueLabel(stats),
-                    tooltip: stats.estimatedValueMixedCurrency
-                        ? 'Totais em BRL e USD, sem conversão cambial implícita'
-                        : 'Soma apenas das cópias com preço conhecido',
-                    color: AppTheme.brass400,
-                  ),
-                  _StatCard(
-                    icon: Icons.favorite_border,
-                    label: 'Wishlist',
-                    value: '${stats.wishlistCount}',
-                    tooltip: 'Cartas na lista Quero',
-                    color: AppTheme.brass400,
-                  ),
-                  _StatCard(
-                    icon: Icons.extension_outlined,
-                    label: 'Em decks',
-                    value: '${stats.cardsUsedInDecks}',
-                    tooltip: 'Cartas do fichário usadas em decks',
-                    color: AppTheme.frost400,
-                  ),
-                  _StatCard(
-                    icon: Icons.price_check_outlined,
-                    label: 'Sem preço',
-                    value: '${stats.priceMissingCount}',
-                    tooltip: 'Itens sem preço próprio ou de mercado',
-                  ),
-                  if (widget.onScan != null)
-                    _ActionIconButton(
-                      key: const Key('binder-scan-card-action'),
-                      icon: Icons.camera_alt,
-                      tooltip: 'Escanear carta',
-                      onPressed: widget.onScan!,
+                    _StatCard(
+                      key: const Key('binder-stat-free'),
+                      icon: Icons.inventory_2_outlined,
+                      label: 'Livres',
+                      value: '${stats.freeQuantity}',
+                      tooltip:
+                          'Cópias possuídas que não estão em decks ou trades',
+                      color: AppTheme.success,
+                    ),
+                    _StatCard(
+                      key: const Key('binder-stat-allocated'),
+                      icon: Icons.style_outlined,
+                      label: 'Alocadas',
+                      value: '${stats.allocatedQuantity}',
+                      tooltip: 'Cópias exigidas pelos seus decks ativos',
                       color: AppTheme.frost400,
                     ),
-                  if (widget.onAdd != null)
-                    _ActionIconButton(
-                      key: const Key('binder-add-card-action'),
-                      icon: Icons.add,
-                      tooltip: 'Adicionar carta',
-                      onPressed: widget.onAdd!,
-                      color: AppTheme.brass500,
+                    if (stats.deckMissingQuantity > 0)
+                      _StatCard(
+                        key: const Key('binder-stat-missing'),
+                        icon: Icons.warning_amber_rounded,
+                        label: 'Faltam',
+                        value: '${stats.deckMissingQuantity}',
+                        tooltip:
+                            'Cópias ainda necessárias para completar os decks',
+                        color: AppTheme.warning,
+                      ),
+                    _StatCard(
+                      key: const Key('binder-stat-unique'),
+                      icon: Icons.style,
+                      label: 'Únicas',
+                      value: '${stats.uniqueCards}',
+                      tooltip: 'Cartas únicas',
                     ),
-                ],
+                    _StatCard(
+                      key: const Key('binder-stat-duplicates'),
+                      icon: Icons.library_add_check_outlined,
+                      label: 'Duplicadas',
+                      value: '$duplicateCopies',
+                      tooltip: 'Cópias além da primeira',
+                      color: AppTheme.frost400,
+                    ),
+                    _StatCard(
+                      icon: Icons.swap_horiz,
+                      label: 'Troca',
+                      value: '${stats.forTradeCount}',
+                      tooltip: 'Itens marcados para troca',
+                      color: AppTheme.frost400,
+                    ),
+                    _StatCard(
+                      icon: Icons.sell,
+                      label: 'Venda',
+                      value: '${stats.forSaleCount}',
+                      tooltip: 'Itens marcados para venda',
+                      color: AppTheme.brass400,
+                    ),
+                    _StatCard(
+                      icon: Icons.attach_money,
+                      label: 'Valor conhecido',
+                      value: _binderKnownValueLabel(stats),
+                      tooltip: stats.estimatedValueMixedCurrency
+                          ? 'Totais em BRL e USD, sem conversão cambial implícita'
+                          : 'Soma apenas das cópias com preço conhecido',
+                      color: AppTheme.brass400,
+                    ),
+                    _StatCard(
+                      icon: Icons.favorite_border,
+                      label: 'Wishlist',
+                      value: '${stats.wishlistCount}',
+                      tooltip: 'Cartas na lista Quero',
+                      color: AppTheme.brass400,
+                    ),
+                    if (widget.onMatches != null &&
+                        (stats.wishlistCount > 0 ||
+                            stats.deckMissingQuantity > 0))
+                      _ActionIconButton(
+                        key: const Key('binder-open-trade-matches-action'),
+                        icon: Icons.hub_outlined,
+                        tooltip: 'Ver matches para faltantes',
+                        onPressed: widget.onMatches!,
+                        color: AppTheme.brass400,
+                      ),
+                    _StatCard(
+                      icon: Icons.extension_outlined,
+                      label: 'Em decks',
+                      value: '${stats.cardsUsedInDecks}',
+                      tooltip: 'Cartas do fichário usadas em decks',
+                      color: AppTheme.frost400,
+                    ),
+                    _StatCard(
+                      icon: Icons.price_check_outlined,
+                      label: 'Sem preço',
+                      value: '${stats.priceMissingCount}',
+                      tooltip: 'Itens sem preço próprio ou de mercado',
+                    ),
+                    if (widget.onScan != null)
+                      _ActionIconButton(
+                        key: const Key('binder-scan-card-action'),
+                        icon: Icons.camera_alt,
+                        tooltip: 'Escanear carta',
+                        onPressed: widget.onScan!,
+                        color: AppTheme.frost400,
+                      ),
+                    if (widget.onImport != null)
+                      _ActionIconButton(
+                        key: const Key('binder-import-list-action'),
+                        icon: Icons.playlist_add_check_rounded,
+                        tooltip: 'Importar lista da coleção',
+                        onPressed: widget.onImport!,
+                        color: AppTheme.brass400,
+                      ),
+                    if (widget.onAdd != null)
+                      _ActionIconButton(
+                        key: const Key('binder-add-card-action'),
+                        icon: Icons.add,
+                        tooltip: 'Adicionar carta',
+                        onPressed: widget.onAdd!,
+                        color: AppTheme.brass500,
+                      ),
+                  ],
+                ),
               ),
             ),
             if (_expanded && stats.setProgress.isNotEmpty) ...[
@@ -1374,182 +1532,194 @@ class _SearchFilterBar extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppTheme.space8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _FilterDropdown(
-                  value: conditionFilter,
-                  items: const ['NM', 'LP', 'MP', 'HP', 'DMG'],
-                  hint: 'Condição',
-                  onChanged: onConditionChanged,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                _FilterDropdown(
-                  value: rarityFilter,
-                  items: const ['common', 'uncommon', 'rare', 'mythic'],
-                  hint: 'Raridade',
-                  onChanged: onRarityChanged,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                _FilterDropdown(
-                  value: languageFilter,
-                  items: const ['en', 'pt', 'es', 'ja'],
-                  hint: 'Idioma',
-                  onChanged: onLanguageChanged,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                _SetCodeFilterField(
-                  controller: setController,
-                  onSubmitted: onSearch,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                _FilterDropdown(
-                  value: sortBy,
-                  items: const [
-                    'name',
-                    'set',
-                    'rarity',
-                    'condition',
-                    'language',
-                    'foil',
-                    'quantity',
-                    'price',
-                    'updated_at',
-                  ],
-                  hint: 'Ordenar',
-                  onChanged: onSortChanged,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                FilterChip(
-                  label: Text(sortOrder == 'asc' ? 'A-Z' : 'Z-A'),
-                  selected: sortOrder == 'desc',
-                  onSelected: (_) => onSortOrderToggle(),
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color: sortOrder == 'desc'
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
+          HorizontalDiscoveryRail(
+            semanticLabel: 'Filtros do fichário',
+            hintText: 'Deslize ou avance para ver os outros filtros.',
+            backwardHintText: 'Volte para rever os filtros anteriores.',
+            forwardSemanticLabel: 'Ver próximos filtros do fichário',
+            backwardSemanticLabel: 'Ver filtros anteriores do fichário',
+            hintKey: const Key('binder-filters-rail-hint'),
+            forwardButtonKey: const Key('binder-filters-rail-next'),
+            backwardButtonKey: const Key('binder-filters-rail-previous'),
+            builder: (context, controller) => SingleChildScrollView(
+              key: const Key('binder-filters-rail'),
+              controller: controller,
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _FilterDropdown(
+                    value: conditionFilter,
+                    items: const ['NM', 'LP', 'MP', 'HP', 'DMG'],
+                    hint: 'Condição',
+                    onChanged: onConditionChanged,
                   ),
-                  side: BorderSide(
-                    color: sortOrder == 'desc'
-                        ? AppTheme.brass400
-                        : AppTheme.outlineMuted,
+                  const SizedBox(width: AppTheme.space8),
+                  _FilterDropdown(
+                    value: rarityFilter,
+                    items: const ['common', 'uncommon', 'rare', 'mythic'],
+                    hint: 'Raridade',
+                    onChanged: onRarityChanged,
                   ),
-                  avatar: Icon(
-                    sortOrder == 'asc'
-                        ? Icons.arrow_upward
-                        : Icons.arrow_downward,
-                    size: 14,
-                    color: sortOrder == 'desc'
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
+                  const SizedBox(width: AppTheme.space8),
+                  _FilterDropdown(
+                    value: languageFilter,
+                    items: const ['en', 'pt', 'es', 'ja'],
+                    hint: 'Idioma',
+                    onChanged: onLanguageChanged,
                   ),
-                ),
-                const SizedBox(width: AppTheme.space8),
-                FilterChip(
-                  label: const Text('Foil'),
-                  selected: foilFilter == true,
-                  onSelected: (_) {
-                    onFoilChanged(foilFilter == true ? null : true);
-                  },
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color: foilFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
+                  const SizedBox(width: AppTheme.space8),
+                  _SetCodeFilterField(
+                    controller: setController,
+                    onSubmitted: onSearch,
                   ),
-                  side: BorderSide(
-                    color: foilFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.outlineMuted,
+                  const SizedBox(width: AppTheme.space8),
+                  _FilterDropdown(
+                    value: sortBy,
+                    items: const [
+                      'name',
+                      'set',
+                      'rarity',
+                      'condition',
+                      'language',
+                      'foil',
+                      'quantity',
+                      'price',
+                      'updated_at',
+                    ],
+                    hint: 'Ordenar',
+                    onChanged: onSortChanged,
                   ),
-                  avatar: Icon(
-                    Icons.flare_rounded,
-                    size: 14,
-                    color: foilFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
+                  const SizedBox(width: AppTheme.space8),
+                  FilterChip(
+                    label: Text(sortOrder == 'asc' ? 'A-Z' : 'Z-A'),
+                    selected: sortOrder == 'desc',
+                    onSelected: (_) => onSortOrderToggle(),
+                    selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
+                    backgroundColor: AppTheme.surfaceSlate,
+                    labelStyle: TextStyle(
+                      color: sortOrder == 'desc'
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                    side: BorderSide(
+                      color: sortOrder == 'desc'
+                          ? AppTheme.brass400
+                          : AppTheme.outlineMuted,
+                    ),
+                    avatar: Icon(
+                      sortOrder == 'asc'
+                          ? Icons.arrow_upward
+                          : Icons.arrow_downward,
+                      size: 14,
+                      color: sortOrder == 'desc'
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppTheme.space8),
-                FilterChip(
-                  label: const Text('Normal'),
-                  selected: foilFilter == false,
-                  onSelected: (_) {
-                    onFoilChanged(foilFilter == false ? null : false);
-                  },
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color: foilFilter == false
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
+                  const SizedBox(width: AppTheme.space8),
+                  FilterChip(
+                    label: const Text('Foil'),
+                    selected: foilFilter == true,
+                    onSelected: (_) {
+                      onFoilChanged(foilFilter == true ? null : true);
+                    },
+                    selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
+                    backgroundColor: AppTheme.surfaceSlate,
+                    labelStyle: TextStyle(
+                      color: foilFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                    side: BorderSide(
+                      color: foilFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.outlineMuted,
+                    ),
+                    avatar: Icon(
+                      Icons.flare_rounded,
+                      size: 14,
+                      color: foilFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                    ),
                   ),
-                  side: BorderSide(
-                    color: foilFilter == false
-                        ? AppTheme.brass400
-                        : AppTheme.outlineMuted,
+                  const SizedBox(width: AppTheme.space8),
+                  FilterChip(
+                    label: const Text('Normal'),
+                    selected: foilFilter == false,
+                    onSelected: (_) {
+                      onFoilChanged(foilFilter == false ? null : false);
+                    },
+                    selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
+                    backgroundColor: AppTheme.surfaceSlate,
+                    labelStyle: TextStyle(
+                      color: foilFilter == false
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                    side: BorderSide(
+                      color: foilFilter == false
+                          ? AppTheme.brass400
+                          : AppTheme.outlineMuted,
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppTheme.space8),
-                FilterChip(
-                  label: const Text('Troca'),
-                  selected: tradeFilter == true,
-                  onSelected: (_) => onTradeToggle(),
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color: tradeFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
+                  const SizedBox(width: AppTheme.space8),
+                  FilterChip(
+                    label: const Text('Troca'),
+                    selected: tradeFilter == true,
+                    onSelected: (_) => onTradeToggle(),
+                    selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
+                    backgroundColor: AppTheme.surfaceSlate,
+                    labelStyle: TextStyle(
+                      color: tradeFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                    side: BorderSide(
+                      color: tradeFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.outlineMuted,
+                    ),
+                    avatar: Icon(
+                      Icons.swap_horiz,
+                      size: 14,
+                      color: tradeFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                    ),
                   ),
-                  side: BorderSide(
-                    color: tradeFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.outlineMuted,
+                  const SizedBox(width: AppTheme.space8),
+                  FilterChip(
+                    label: const Text('Venda'),
+                    selected: saleFilter == true,
+                    onSelected: (_) => onSaleToggle(),
+                    selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
+                    backgroundColor: AppTheme.surfaceSlate,
+                    labelStyle: TextStyle(
+                      color: saleFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                    side: BorderSide(
+                      color: saleFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.outlineMuted,
+                    ),
+                    avatar: Icon(
+                      Icons.sell,
+                      size: 14,
+                      color: saleFilter == true
+                          ? AppTheme.brass400
+                          : AppTheme.textSecondary,
+                    ),
                   ),
-                  avatar: Icon(
-                    Icons.swap_horiz,
-                    size: 14,
-                    color: tradeFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: AppTheme.space8),
-                FilterChip(
-                  label: const Text('Venda'),
-                  selected: saleFilter == true,
-                  onSelected: (_) => onSaleToggle(),
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color: saleFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                  ),
-                  side: BorderSide(
-                    color: saleFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.outlineMuted,
-                  ),
-                  avatar: Icon(
-                    Icons.sell,
-                    size: 14,
-                    color: saleFilter == true
-                        ? AppTheme.brass400
-                        : AppTheme.textSecondary,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -1706,11 +1876,18 @@ class _BinderItemCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CachedCardImage(
-                imageUrl: item.cardImageUrl,
+              SizedBox(
                 width: AppTheme.touchTargetMin,
-                height: 64,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                height: 68,
+                child: CardArtwork(
+                  variant: CardArtworkVariant.gallery,
+                  imageUrl: item.cardPrintingImageUrl,
+                  fallbackImageUrl: item.cardFallbackImageUrl,
+                  semanticLabel: item.hasPrintingArtwork
+                      ? 'Arte da impressão ${item.cardName}'
+                      : 'Arte de referência de ${item.cardName}',
+                  constrainAspectRatio: false,
+                ),
               ),
               const SizedBox(width: AppTheme.space12),
               Expanded(
@@ -1729,40 +1906,33 @@ class _BinderItemCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: AppTheme.space2),
-                    Row(
+                    CardEditionMetadataLine(
+                      setCode: item.cardSetCode ?? '',
+                      collectorNumber: item.cardCollectorNumber,
+                      setName: item.cardSetName,
+                      setReleaseDate: item.cardSetReleaseDate,
+                      rarity: item.cardRarity,
+                      foil: item.isFoil,
+                      finishContext: CardFinishContext.physicalCopy,
+                      warning: item.hasPrintingArtwork
+                          ? null
+                          : 'Arte de referência',
+                    ),
+                    const SizedBox(height: AppTheme.space4),
+                    Wrap(
+                      spacing: AppTheme.space6,
+                      runSpacing: AppTheme.space4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         _badge('×${item.quantity}', AppTheme.frost400),
-                        const SizedBox(width: AppTheme.space6),
                         _badge(item.condition, _conditionColor(item.condition)),
-                        if (item.isFoil) ...[
-                          const SizedBox(width: AppTheme.space6),
-                          Icon(
-                            Icons.flare_rounded,
-                            size: 14,
-                            color: AppTheme.brass400.withValues(alpha: 0.8),
-                          ),
-                        ],
-                        if (item.cardIsReserved) ...[
-                          const SizedBox(width: AppTheme.space6),
+                        if (item.cardIsReserved)
                           _badge('Reserved', AppTheme.brass400),
-                        ],
-                        if (item.cardSetCode != null) ...[
-                          const SizedBox(width: AppTheme.space6),
-                          Text(
-                            cardEditionCodeLabel(setCode: item.cardSetCode),
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontXs,
-                            ),
-                          ),
-                        ],
-                        if (item.language.trim().isNotEmpty) ...[
-                          const SizedBox(width: AppTheme.space6),
+                        if (item.language.trim().isNotEmpty)
                           _badge(
                             item.language.toUpperCase(),
                             AppTheme.textSecondary,
                           ),
-                        ],
                       ],
                     ),
                     if (item.listType == 'have') ...[

@@ -26,6 +26,46 @@ void main() {
     expect(state.updatedAt, isNotNull);
   });
 
+  test('goal, experience and build mode resume per user', () async {
+    final store = OnboardingStateStore();
+
+    await store.saveProgress(
+      'user-a',
+      selectedFormat: 'modern',
+      selectedGoal: OnboardingGoal.buildDeck,
+      experience: OnboardingExperience.returning,
+      buildMode: OnboardingBuildMode.manual,
+    );
+    final state = await OnboardingStateStore().load('user-a');
+
+    expect(state.selectedGoal, OnboardingGoal.buildDeck);
+    expect(state.experience, OnboardingExperience.returning);
+    expect(state.buildMode, OnboardingBuildMode.manual);
+    expect(state.selectedFormat, 'modern');
+    expect(state.disposition, OnboardingDisposition.pending);
+  });
+
+  test('settlement preserves the selected journey when omitted', () async {
+    final store = OnboardingStateStore();
+    await store.saveProgress(
+      'user-a',
+      selectedFormat: 'commander',
+      selectedGoal: OnboardingGoal.catalogCollection,
+      experience: OnboardingExperience.experienced,
+    );
+
+    await store.settle(
+      'user-a',
+      selectedFormat: 'commander',
+      disposition: OnboardingDisposition.completed,
+    );
+    final state = await store.load('user-a');
+
+    expect(state.disposition, OnboardingDisposition.completed);
+    expect(state.selectedGoal, OnboardingGoal.catalogCollection);
+    expect(state.experience, OnboardingExperience.experienced);
+  });
+
   test('completed and skipped decisions remain isolated per user', () async {
     final store = OnboardingStateStore();
 
@@ -64,6 +104,19 @@ void main() {
 
     expect((await store.load('user-a')).isSettled, isFalse);
     expect((await store.load('user-b')).isSettled, isFalse);
+  });
+
+  test('unknown optional journey values fall back without settling', () async {
+    SharedPreferences.setMockInitialValues({
+      'manaloom.onboarding.v1.user.user-a':
+          '{"version":1,"disposition":"pending","selected_format":"commander","selected_goal":"unknown","experience":"other","build_mode":"surprise"}',
+    });
+    final state = await OnboardingStateStore().load('user-a');
+
+    expect(state.selectedGoal, isNull);
+    expect(state.experience, isNull);
+    expect(state.buildMode, OnboardingBuildMode.guided);
+    expect(state.isSettled, isFalse);
   });
 
   test('invalid user and pending settlement are rejected', () async {

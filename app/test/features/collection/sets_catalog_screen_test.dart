@@ -166,15 +166,13 @@ void main() {
     expect(find.text('14 cartas'), findsOneWidget);
     expect(find.byKey(const Key('set-artwork-frame-MSH')), findsOneWidget);
     expect(find.byKey(const Key('set-artwork-image-MSH')), findsOneWidget);
-    expect(find.byKey(const Key('set-icon-request-TMT')), findsOneWidget);
-    expect(find.byKey(const Key('set-code-badge-MSH')), findsOneWidget);
-    expect(find.byKey(const Key('set-code-badge-TMT')), findsOneWidget);
+    expect(find.byKey(const Key('set-icon-fallback-TMT')), findsOneWidget);
 
     final artwork = tester.widget<CachedNetworkImage>(
       find.byKey(const Key('set-artwork-image-MSH')),
     );
-    expect(artwork.imageUrl, contains('/art_crop/'));
-    expect(artwork.fit, BoxFit.cover);
+    expect(artwork.imageUrl, contains('/normal/'));
+    expect(artwork.fit, BoxFit.contain);
 
     await tester.enterText(find.byKey(const Key('setsSearchField')), 'soc');
     await tester.pump(const Duration(milliseconds: 400));
@@ -234,7 +232,36 @@ void main() {
       tester.getSize(find.byKey(const Key('set-artwork-frame-MSH'))),
       const Size(84, 56),
     );
-    expect(find.byKey(const Key('set-code-badge-MSH')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('compact catalog wraps every status filter into view', (
+    tester,
+  ) async {
+    await setViewport(tester, const Size(390, 844));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetsCatalogScreen(apiClient: _FakeApiClient()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final filters = find.byKey(const Key('sets-catalog-status-filters'));
+    expect(filters, findsOneWidget);
+    expect(tester.getSize(filters).height, greaterThan(48));
+    for (final label in const [
+      'Todos',
+      'Futuras',
+      'Novas',
+      'Atuais',
+      'Antigas',
+    ]) {
+      final rect = tester.getRect(find.text(label).first);
+      expect(rect.left, greaterThanOrEqualTo(0));
+      expect(rect.right, lessThanOrEqualTo(390));
+    }
     expect(tester.takeException(), isNull);
   });
 

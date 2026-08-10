@@ -38,12 +38,22 @@ class _FakeBinderProvider extends BinderProvider {
 }
 
 class _RecordingCreateTradeProvider extends TradeProvider {
+  _RecordingCreateTradeProvider({this.sourceTrade});
+
+  final TradeOffer? sourceTrade;
   int createCalls = 0;
   String? lastType;
   List<Map<String, dynamic>> lastMyItems = const [];
   List<Map<String, dynamic>> lastRequestedItems = const [];
   double? lastPaymentAmount;
   String? lastPaymentMethod;
+  String? lastCounterToTradeId;
+
+  @override
+  TradeOffer? get selectedTrade => sourceTrade ?? super.selectedTrade;
+
+  @override
+  Future<void> fetchTradeDetail(String tradeId) async {}
 
   @override
   Future<bool> createTrade({
@@ -54,6 +64,7 @@ class _RecordingCreateTradeProvider extends TradeProvider {
     List<Map<String, dynamic>> requestedItems = const [],
     double? paymentAmount,
     String? paymentMethod,
+    String? counterToTradeId,
   }) async {
     createCalls++;
     lastType = type;
@@ -61,7 +72,28 @@ class _RecordingCreateTradeProvider extends TradeProvider {
     lastRequestedItems = requestedItems;
     lastPaymentAmount = paymentAmount;
     lastPaymentMethod = paymentMethod;
+    lastCounterToTradeId = counterToTradeId;
     return true;
+  }
+}
+
+class _FailingCreateTradeProvider extends _RecordingCreateTradeProvider {
+  @override
+  String? get errorMessage => 'Não foi possível enviar a proposta agora.';
+
+  @override
+  Future<bool> createTrade({
+    required String receiverId,
+    String type = 'trade',
+    String? message,
+    List<Map<String, dynamic>> myItems = const [],
+    List<Map<String, dynamic>> requestedItems = const [],
+    double? paymentAmount,
+    String? paymentMethod,
+    String? counterToTradeId,
+  }) async {
+    createCalls += 1;
+    return false;
   }
 }
 
@@ -159,6 +191,11 @@ void main() {
       id: 'binder-1',
       cardId: 'card-1',
       cardName: 'Doubling Season',
+      cardSetCode: 'CMM',
+      cardCollectorNumber: '158',
+      cardSetName: 'Commander Masters',
+      cardSetReleaseDate: '2023-08-04',
+      cardRarity: 'mythic',
       quantity: 1,
       condition: 'LP',
       forSale: true,
@@ -198,6 +235,7 @@ void main() {
       find.byKey(const Key('create-trade-payment-field')),
       '10',
     );
+    await tester.pump();
     await tester.ensureVisible(
       find.byKey(const ValueKey('create-trade-submit-button')),
     );
@@ -205,8 +243,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('create-trade-review-dialog')), findsOneWidget);
+    expect(
+      find.byKey(const Key('create-trade-review-item-binder-1')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('create-trade-review-item-binder-1')),
+        matching: find.textContaining('CMM #158'),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Revisar proposta'), findsOneWidget);
-    expect(find.textContaining('1x Doubling Season • LP • pt'), findsOneWidget);
+    expect(find.text('1x Doubling Season'), findsOneWidget);
+    expect(find.textContaining('LP • PT'), findsOneWidget);
     expect(find.textContaining('O valor pedido parece maior'), findsOneWidget);
     expect(tradeProvider.createCalls, 0);
 
@@ -255,6 +305,19 @@ void main() {
 
     await tester.tap(find.byKey(const Key('create-trade-add-item-offered')));
     await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('create-trade-item-picker-offered')),
+      findsOneWidget,
+    );
+    final pickerHeight = tester
+        .getSize(find.byKey(const Key('create-trade-item-picker-offered')))
+        .height;
+    expect(pickerHeight, greaterThanOrEqualTo(180));
+    expect(pickerHeight, lessThanOrEqualTo(250));
+    expect(
+      find.byKey(const Key('create-trade-picker-item-offered-offered-1')),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Sol Ring'));
     await tester.pumpAndSettle();
     await tester.enterText(
@@ -295,6 +358,114 @@ void main() {
     expect(tradeProvider.lastRequestedItems, hasLength(1));
     expect(tradeProvider.lastPaymentAmount, isNull);
     expect(tradeProvider.lastPaymentMethod, isNull);
+  });
+
+  testWidgets('failed proposal stays visible with a stable retry anchor', (
+    tester,
+  ) async {
+    final tradeProvider = _FailingCreateTradeProvider();
+    final requestedItem = _binderItem(
+      id: 'requested-error',
+      cardName: 'Rhystic Study',
+      price: 80,
+    );
+    final offeredItem = _binderItem(
+      id: 'offered-error',
+      cardName: 'Sol Ring',
+      price: 20,
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _FakeBinderProvider([offeredItem]),
+          ),
+          ChangeNotifierProvider<TradeProvider>.value(value: tradeProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: CreateTradeScreen(
+            receiverId: 'receiver-1',
+            initialType: 'trade',
+            preselectedItem: requestedItem,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('create-trade-add-item-offered')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const Key('create-trade-picker-item-offered-offered-error')),
+    );
+    await tester.pumpAndSettle();
+
+    final submit = find.byKey(const ValueKey('create-trade-submit-button'));
+    await tester.ensureVisible(submit);
+    await tester.tap(submit);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('create-trade-review-confirm-button')),
+    );
+    await tester.pumpAndSettle();
+
+    final error = find.byKey(const Key('create-trade-submit-error'));
+    await tester.ensureVisible(error);
+    expect(error, findsOneWidget);
+    expect(find.byKey(const Key('create-trade-submit-retry')), findsOneWidget);
+    expect(
+      find.byKey(const Key('create-trade-selected-item-offered-0')),
+      findsOneWidget,
+    );
+    expect(find.byType(SnackBar), findsNothing);
+    expect(tradeProvider.createCalls, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('offered quantity is capped by currently available copies', (
+    tester,
+  ) async {
+    final offeredItem = _binderItem(
+      id: 'offered-availability',
+      cardName: 'Sol Ring',
+      price: 20,
+      quantity: 3,
+      availableQuantity: 1,
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _FakeBinderProvider([offeredItem]),
+          ),
+          ChangeNotifierProvider<TradeProvider>(
+            create: (_) => _RecordingCreateTradeProvider(),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CreateTradeScreen(
+            receiverId: 'receiver-1',
+            initialType: 'trade',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('create-trade-add-item-offered')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sol Ring'));
+    await tester.pumpAndSettle();
+
+    final increment = tester.widget<InkWell>(
+      find.byKey(const Key('create-trade-item-increment-offered-0')),
+    );
+    expect(increment.onTap, isNull);
+    expect(find.text('Disponível 1'), findsOneWidget);
   });
 
   testWidgets('switching mixed to sale clears and omits offered items', (
@@ -398,15 +569,75 @@ void main() {
     await tester.ensureVisible(
       find.byKey(const ValueKey('create-trade-submit-button')),
     );
-    await tester.tap(find.byKey(const ValueKey('create-trade-submit-button')));
-    await tester.pump();
-
     expect(
-      find.text('Uma troca precisa de itens dos dois jogadores'),
-      findsOneWidget,
+      tester
+          .widget<ElevatedButton>(
+            find.byKey(const ValueKey('create-trade-submit-button')),
+          )
+          .onPressed,
+      isNull,
     );
     expect(tradeProvider.createCalls, 0);
     expect(find.byKey(const Key('create-trade-review-dialog')), findsNothing);
+  });
+
+  testWidgets('counterproposal restores both sides from the backend trade', (
+    tester,
+  ) async {
+    final sourceTrade = _trade(
+      status: 'pending',
+      senderId: 'sender-1',
+      receiverId: 'user-1',
+    );
+    final tradeProvider = _RecordingCreateTradeProvider(
+      sourceTrade: sourceTrade,
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _FakeBinderProvider(),
+          ),
+          ChangeNotifierProvider<TradeProvider>.value(value: tradeProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: CreateTradeScreen(
+            receiverId: 'sender-1',
+            initialType: 'trade',
+            source: 'counter',
+            counterTradeId: sourceTrade.id,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('create-trade-origin-context')),
+      findsOneWidget,
+    );
+    expect(find.text('Contraproposta à negociação anterior'), findsOneWidget);
+    expect(find.text('Sol Ring'), findsOneWidget);
+    expect(find.text('Arcane Signet'), findsOneWidget);
+
+    final submit = find.byKey(const ValueKey('create-trade-submit-button'));
+    await tester.ensureVisible(submit);
+    await tester.tap(submit);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('create-trade-review-confirm-button')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tradeProvider.createCalls, 1);
+    expect(tradeProvider.lastCounterToTradeId, sourceTrade.id);
+    expect(tradeProvider.lastMyItems.single['binder_item_id'], 'binder-1');
+    expect(
+      tradeProvider.lastRequestedItems.single['binder_item_id'],
+      'binder-2',
+    );
   });
 
   testWidgets('TradeDetailScreen confirms accept before provider action', (
@@ -417,6 +648,10 @@ void main() {
     );
 
     await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
+
+    expect(find.textContaining('Você entrega'), findsWidgets);
+    expect(find.textContaining('Você recebe'), findsWidgets);
+    expect(find.byKey(const Key('trade-action-counter')), findsOneWidget);
 
     final acceptButton = find.byKey(const Key('trade-action-accept'));
     await tester.ensureVisible(acceptButton);
@@ -483,6 +718,24 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('TradeDetailScreen explains unavailable legacy identity', (
+    tester,
+  ) async {
+    final provider = _DetailTradeProvider(
+      _trade(
+        status: 'completed',
+        receiverId: 'user-1',
+        legacyUnavailable: true,
+      ),
+    );
+
+    await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
+
+    expect(find.text('Carta histórica indisponível'), findsOneWidget);
+    expect(find.text('Identidade histórica indisponível'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('TradeDetailScreen vazio oferece retry do detalhe atual', (
     tester,
   ) async {
@@ -494,7 +747,7 @@ void main() {
     expect(find.byKey(const Key('trade-detail-error-state')), findsOneWidget);
     expect(find.text('Não foi possível abrir este trade'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Tentar novamente'));
+    await tester.tap(find.byKey(const Key('trade-detail-error-retry')));
     await tester.pump();
 
     expect(provider.fetchCalls, 2);
@@ -505,12 +758,15 @@ BinderItem _binderItem({
   required String id,
   required String cardName,
   required double price,
+  int quantity = 1,
+  int availableQuantity = 1,
 }) {
   return BinderItem(
     id: id,
     cardId: 'card-$id',
     cardName: cardName,
-    quantity: 1,
+    quantity: quantity,
+    availableQuantity: availableQuantity,
     condition: 'NM',
     forTrade: true,
     forSale: true,
@@ -552,6 +808,7 @@ TradeOffer _trade({
   required String status,
   String senderId = 'sender-1',
   String receiverId = 'receiver-1',
+  bool legacyUnavailable = false,
 }) {
   final now = DateTime(2026, 4, 30, 12);
   return TradeOffer(
@@ -565,12 +822,16 @@ TradeOffer _trade({
     myItems: [
       TradeItem(
         id: 'item-1',
-        binderItemId: 'binder-1',
+        binderItemId: legacyUnavailable ? '' : 'binder-1',
         direction: 'offering',
         quantity: 1,
-        condition: 'NM',
+        condition: legacyUnavailable ? null : 'NM',
         agreedPrice: 20,
-        card: TradeItemCard(id: 'card-1', name: 'Sol Ring'),
+        snapshotStatus: legacyUnavailable ? 'legacy_unavailable' : 'captured',
+        identityStatus: legacyUnavailable ? 'unavailable' : 'preserved',
+        card: legacyUnavailable
+            ? TradeItemCard(id: '', name: 'Carta histórica indisponível')
+            : TradeItemCard(id: 'card-1', name: 'Sol Ring'),
       ),
     ],
     theirItems: [

@@ -4,7 +4,7 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/utils/currency_formatter.dart';
 import 'package:manaloom/core/utils/friendly_error_mapper.dart';
 import 'package:manaloom/core/utils/mana_helper.dart';
-import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/card_artwork.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/core/widgets/mana_symbols.dart';
 import 'package:provider/provider.dart';
@@ -2163,6 +2163,7 @@ class _FunctionalSampleRow extends StatelessWidget {
             sample: sample,
             imageUrl: imageUrl,
             fallbackImageUrl: fallbackImageUrl,
+            hasPrintingArtwork: card?.hasPrintingArtwork == true,
             typeLine: typeLine,
             quantity: quantity,
             reason: reason,
@@ -2178,12 +2179,18 @@ class _FunctionalSampleRow extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CachedCardImage(
+                CardArtwork(
+                  variant: CardArtworkVariant.gallery,
                   imageUrl: imageUrl,
                   fallbackImageUrl: fallbackImageUrl,
+                  semanticLabel: card?.hasPrintingArtwork == true
+                      ? 'Arte da impressão ${sample.name}'
+                      : 'Arte de referência de ${sample.name}',
+                  imageIsReference: card?.hasPrintingArtwork != true,
                   width: AppTheme.touchTargetMin,
                   height: 64,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  constrainAspectRatio: false,
                 ),
                 const SizedBox(width: AppTheme.space10),
                 Expanded(
@@ -2245,6 +2252,7 @@ void _showFunctionalSamplePreview(
   required DeckFunctionalTagSample sample,
   required String? imageUrl,
   required String? fallbackImageUrl,
+  required bool hasPrintingArtwork,
   required String typeLine,
   required int? quantity,
   required String reason,
@@ -2288,12 +2296,18 @@ void _showFunctionalSamplePreview(
                 ),
                 const SizedBox(height: AppTheme.space12),
                 Center(
-                  child: CachedCardImage(
+                  child: CardArtwork(
+                    variant: CardArtworkVariant.fullCard,
                     imageUrl: imageUrl,
                     fallbackImageUrl: fallbackImageUrl,
+                    semanticLabel: hasPrintingArtwork
+                        ? 'Arte da impressão ${sample.name}'
+                        : 'Arte de referência de ${sample.name}',
+                    imageIsReference: !hasPrintingArtwork,
                     width: 220,
                     height: 306,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    constrainAspectRatio: false,
                   ),
                 ),
                 const SizedBox(height: AppTheme.space12),

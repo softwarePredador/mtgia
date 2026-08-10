@@ -173,9 +173,15 @@ Future<void> deleteRuntimeAccount(ApiClient api, RuntimeAuthSession session) {
 Future<void> captureRuntimeCheckpoint(
   IntegrationTestWidgetsFlutterBinding binding,
   WidgetTester tester,
-  String name,
-) {
-  return captureVisualProof(binding, tester, name);
+  String name, {
+  Future<void> Function()? beforeTakeScreenshot,
+}) {
+  return captureVisualProof(
+    binding,
+    tester,
+    name,
+    beforeTakeScreenshot: beforeTakeScreenshot,
+  );
 }
 
 void expectNoRawTechnicalErrorText(WidgetTester tester) {

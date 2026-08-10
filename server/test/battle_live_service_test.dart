@@ -246,7 +246,7 @@ void main() {
       expect(encoded, isNot(contains('Secret callback')));
       expect(encoded, isNot(contains('Secret Hand Card')));
       expect(encoded, isNot(contains('Secret Library Card')));
-      expect(encoded, isNot(contains('Public Permanent')));
+      expect(encoded, contains('Public Permanent'));
       expect(encoded, contains('"battlefield_count":1'));
 
       final reconnected = await service.read(

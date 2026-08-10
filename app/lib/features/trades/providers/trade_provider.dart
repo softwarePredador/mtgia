@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../../core/utils/scryfall_image_helper.dart';
 
 // =====================================================================
 // Models
@@ -40,7 +43,14 @@ class TradeItemCard {
   final String id;
   final String name;
   final String? imageUrl;
+  final String? scryfallId;
+  final String? oracleId;
+  final String? layout;
+  final List<String> faceImageUrls;
   final String? setCode;
+  final String? collectorNumber;
+  final String? setName;
+  final String? setReleaseDate;
   final String? manaCost;
   final String? rarity;
 
@@ -48,17 +58,59 @@ class TradeItemCard {
     required this.id,
     required this.name,
     this.imageUrl,
+    this.scryfallId,
+    this.oracleId,
+    this.layout,
+    this.faceImageUrls = const [],
     this.setCode,
+    this.collectorNumber,
+    this.setName,
+    this.setReleaseDate,
     this.manaCost,
     this.rarity,
   });
 
+  String? get printingImageUrl {
+    final image = imageUrl?.trim();
+    final uri = image == null ? null : Uri.tryParse(image);
+    final isScryfallApi = uri?.host.toLowerCase() == 'api.scryfall.com';
+    final segments = uri?.pathSegments ?? const <String>[];
+    final candidate = segments.length == 2 && segments.first == 'cards'
+        ? segments[1].toLowerCase()
+        : null;
+    final isReference =
+        isScryfallApi &&
+        (uri?.path == '/cards/named' ||
+            (candidate != null &&
+                candidate == oracleId?.trim().toLowerCase() &&
+                candidate != scryfallId?.trim().toLowerCase()));
+    if (image != null && image.isNotEmpty && !isReference) return image;
+    for (final faceImage in faceImageUrls) {
+      if (faceImage.trim().isNotEmpty) return faceImage.trim();
+    }
+    return null;
+  }
+
+  String? get fallbackImageUrl =>
+      id.trim().isEmpty ? null : ScryfallImageHelper.namedImageUrl(name);
+
+  bool get hasPrintingArtwork => printingImageUrl != null;
+
   factory TradeItemCard.fromJson(Map<String, dynamic> json) {
     return TradeItemCard(
-      id: json['id'] as String,
-      name: json['name'] as String? ?? '',
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString().trim().isNotEmpty == true
+          ? json['name'].toString()
+          : 'Carta histórica indisponível',
       imageUrl: json['image_url'] as String?,
+      scryfallId: json['scryfall_id']?.toString(),
+      oracleId: json['oracle_id']?.toString(),
+      layout: json['layout']?.toString(),
+      faceImageUrls: _tradeCardFaceImageUrls(json['card_faces']),
       setCode: json['set_code'] as String?,
+      collectorNumber: json['collector_number']?.toString(),
+      setName: json['set_name']?.toString(),
+      setReleaseDate: json['set_release_date']?.toString(),
       manaCost: json['mana_cost'] as String?,
       rarity: json['rarity'] as String?,
     );
@@ -73,6 +125,9 @@ class TradeItem {
   final double? agreedPrice;
   final String? condition;
   final bool? isFoil;
+  final String? language;
+  final String snapshotStatus;
+  final String identityStatus;
   final TradeItemCard card;
 
   TradeItem({
@@ -83,8 +138,21 @@ class TradeItem {
     this.agreedPrice,
     this.condition,
     this.isFoil,
+    this.language,
+    this.snapshotStatus = 'captured',
+    this.identityStatus = 'preserved',
     required this.card,
   });
+
+  bool get hasPreservedIdentity => identityStatus == 'preserved';
+
+  bool get isHistoricalIdentityUnavailable => identityStatus == 'unavailable';
+
+  String? get identityWarning => switch (identityStatus) {
+    'unavailable' => 'Identidade histórica indisponível',
+    'live_fallback' => 'Dados atuais; proposta anterior à preservação',
+    _ => null,
+  };
 
   factory TradeItem.fromJson(Map<String, dynamic> json) {
     return TradeItem(
@@ -97,9 +165,41 @@ class TradeItem {
           : null,
       condition: json['condition'] as String?,
       isFoil: json['is_foil'] as bool?,
+      language: json['language'] as String?,
+      snapshotStatus:
+          json['snapshot_status']?.toString() ?? 'legacy_unavailable',
+      identityStatus: json['identity_status']?.toString() ?? 'live_fallback',
       card: TradeItemCard.fromJson(json['card'] as Map<String, dynamic>? ?? {}),
     );
   }
+}
+
+List<String> _tradeCardFaceImageUrls(Object? value) {
+  Object? decoded = value;
+  if (value is String && value.trim().isNotEmpty) {
+    try {
+      decoded = jsonDecode(value);
+    } on FormatException {
+      return const [];
+    }
+  }
+  if (decoded is! List) return const [];
+
+  return decoded
+      .whereType<Map>()
+      .map((face) {
+        final imageUris = face['image_uris'];
+        if (imageUris is! Map) return face['image_url']?.toString().trim();
+        return (imageUris['normal'] ??
+                imageUris['large'] ??
+                imageUris['small'] ??
+                imageUris['png'])
+            ?.toString()
+            .trim();
+      })
+      .whereType<String>()
+      .where((url) => url.isNotEmpty)
+      .toList(growable: false);
 }
 
 class TradeMessage {
@@ -702,6 +802,7 @@ class TradeProvider extends ChangeNotifier {
     List<Map<String, dynamic>> requestedItems = const [],
     double? paymentAmount,
     String? paymentMethod,
+    String? counterToTradeId,
   }) async {
     final generation = _stateGeneration;
     _isLoading = true;
@@ -718,6 +819,9 @@ class TradeProvider extends ChangeNotifier {
       if (message != null) body['message'] = message;
       if (paymentAmount != null) body['payment_amount'] = paymentAmount;
       if (paymentMethod != null) body['payment_method'] = paymentMethod;
+      if (counterToTradeId?.trim().isNotEmpty == true) {
+        body['counter_to_trade_id'] = counterToTradeId!.trim();
+      }
 
       final res = await _api.post('/trades', body);
       if (generation != _stateGeneration) return false;

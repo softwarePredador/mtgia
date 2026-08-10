@@ -1,0 +1,102 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T20:25:31.933817Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "deck_workshop",
+  "profile": "web_deck_workshop_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Deck Workshop controlled Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "91fbc9606a312a2c07ba8941004f27f9d573579f1fc7201578db45edac004ed3",
+  "checkpoint_count": 9,
+  "required_checkpoints": [
+    "deck_workshop_00_commander",
+    "deck_workshop_01_import_preflight",
+    "deck_workshop_02_sources",
+    "deck_workshop_03_paired_swaps",
+    "deck_workshop_04_partial_selection",
+    "deck_workshop_05_card_reader",
+    "deck_workshop_06_history_undo",
+    "deck_workshop_07_conflict",
+    "deck_workshop_08_sample_hand_continuity"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "deck_workshop_00_commander",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_00_commander.png",
+      "sha256": "2be8f57ff47379b2df5c788285a90fe1a6bb565e4d304715561c66ee59a8fbb5",
+      "bytes": 59506,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_01_import_preflight",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_01_import_preflight.png",
+      "sha256": "017d59604ebf0762d16269195941a4af44a132a527c455669a7146607be4f04c",
+      "bytes": 88443,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_02_sources",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_02_sources.png",
+      "sha256": "4a8660426fb5343d824bec9448f1697c4fbc18c946faa74798d6d1a8ee0ea5ca",
+      "bytes": 60072,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_03_paired_swaps",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_03_paired_swaps.png",
+      "sha256": "5351081139259e0150cbda5f1b7f8c5521fe605a4c5188b96eb6819bbc8e5ffc",
+      "bytes": 49949,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_04_partial_selection",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_04_partial_selection.png",
+      "sha256": "15a6d0cbeb9508700bff76fe4f01498154e793a9fb5ed24813835f5e0f8bde7c",
+      "bytes": 53228,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_05_card_reader",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_05_card_reader.png",
+      "sha256": "7d05aa9a96d29eaa996810fa9956c3c78df2a3193258bf121a30255c88e5f74d",
+      "bytes": 286478,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_06_history_undo",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_06_history_undo.png",
+      "sha256": "91b0eda4471f8c026de19ce89899c6ea9c28d0288f74c8bfd5b6413cfbdbb535",
+      "bytes": 64884,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_07_conflict",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_07_conflict.png",
+      "sha256": "5390501588bcdaf613967391a1a0f72444685098bb566c051dd7a0e57dcf7f24",
+      "bytes": 67197,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_08_sample_hand_continuity",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_08_sample_hand_continuity.png",
+      "sha256": "4a3cb66db91174042e59a014c56ab4f3b4967fd0d5467782e869656bd6314a02",
+      "bytes": 60859,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

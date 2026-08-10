@@ -1,0 +1,102 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T20:26:41.213220Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "deck_workshop",
+  "profile": "web_deck_workshop_desktop_1440x900",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Deck Workshop controlled Flutter surface requested at 1440x900; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "c5d3e287594c29b1c8d0eb81971e26d213299b8b4fbe74acd629ee2102ee5f7a",
+  "checkpoint_count": 9,
+  "required_checkpoints": [
+    "deck_workshop_00_commander",
+    "deck_workshop_01_import_preflight",
+    "deck_workshop_02_sources",
+    "deck_workshop_03_paired_swaps",
+    "deck_workshop_04_partial_selection",
+    "deck_workshop_05_card_reader",
+    "deck_workshop_06_history_undo",
+    "deck_workshop_07_conflict",
+    "deck_workshop_08_sample_hand_continuity"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "deck_workshop_00_commander",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_00_commander.png",
+      "sha256": "ec2258c45302618c579c7e132656853a430da7d80fcf04635ce4fdd44a752b53",
+      "bytes": 107284,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_01_import_preflight",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_01_import_preflight.png",
+      "sha256": "c38ebaa1ca4cfded64aa4d6e947859a9822c1fe4a483fadaa2b5d80d64da289b",
+      "bytes": 110420,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_02_sources",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_02_sources.png",
+      "sha256": "e602d36d9354cc02743be78f63be92a19de405cb4a35672e2baed45990d5d37a",
+      "bytes": 94674,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_03_paired_swaps",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_03_paired_swaps.png",
+      "sha256": "5a550a886e04c3b1951c5ef6bf1b8a41e28681527d0860000ef8c9ad8168f711",
+      "bytes": 87277,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_04_partial_selection",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_04_partial_selection.png",
+      "sha256": "162309b2b37fc101ee7ea3c93fee1aa59e343833f61d60b87941de35b6460cf4",
+      "bytes": 92910,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_05_card_reader",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_05_card_reader.png",
+      "sha256": "13964f387a5294d2acf6c3afc9a852bcfb50acaefdad1a0846433b9776d54fed",
+      "bytes": 254234,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_06_history_undo",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_06_history_undo.png",
+      "sha256": "e010582e8f51448579c6426e45393380b4fd6e7adb65b4d805aa33e2c0c0ec1c",
+      "bytes": 236629,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_07_conflict",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_07_conflict.png",
+      "sha256": "9457dd4b04d9ec6d21476a069c2aed9c730f13048dab4649da4432fea69d995f",
+      "bytes": 201274,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "deck_workshop_08_sample_hand_continuity",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_08_sample_hand_continuity.png",
+      "sha256": "420518bcc286d8ca7e457c9f4e2819d5c5a8a6d9a98735bc26e02fb32bb2fb84",
+      "bytes": 157356,
+      "width": 1440,
+      "height": 900
+    }
+  ]
+}

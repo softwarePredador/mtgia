@@ -28,6 +28,9 @@ SEED_CARD_ID=""
 SEED_BASIC_LAND_CARD_ID=""
 SEED_COMMANDER_CARD_ID=""
 SEED_DECK_ID=""
+SEED_BINDER_ITEM_ID=""
+SEED_PEER_BINDER_ITEM_ID=""
+SEED_TRADE_ID=""
 readonly SEED_PASSWORD='VisualQA!2026-Deck'
 
 # shellcheck source=scripts/lib/manaloom_dart_toolchain.sh
@@ -249,8 +252,10 @@ peer_token="$(jq -er '.token' <<<"$peer_response")"
 
 card_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $seed_token" \
-  "$API_BASE_URL/cards?name=Sol%20Ring&limit=1")"
-SEED_CARD_ID="$(jq -er '.data[0].id' <<<"$card_response")"
+  "$API_BASE_URL/cards?name=Sol%20Ring&limit=10&dedupe=false")"
+SEED_CARD_ID="$(jq -er \
+  'first(.data[] | select(.scryfall_id == "00000000-0000-4000-8000-000000000001") | .id)' \
+  <<<"$card_response")"
 basic_land_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $seed_token" \
   "$API_BASE_URL/cards?name=Wastes&limit=10")"
@@ -317,7 +322,9 @@ INSERT INTO sets (
   is_online_only,
   is_foreign_only
 )
-VALUES ('TST', 'S3-07 Visual Fixture Set', DATE '2026-07-21', 'expansion', FALSE, FALSE)
+VALUES
+  ('TST', 'S3-07 Visual Fixture Set', DATE '2026-07-21', 'expansion', FALSE, FALSE),
+  ('T2S', 'S3-07 Foil Archive', DATE '2025-02-03', 'special', FALSE, FALSE)
 ON CONFLICT (code) DO UPDATE SET
   name = EXCLUDED.name,
   release_date = EXCLUDED.release_date,
@@ -366,6 +373,56 @@ jq -e '.ok == true or .is_valid == true or .valid == true' \
   <<<"$deck_validation_response" >/dev/null
 jq -e '.ok == true or .is_valid == true or .valid == true' \
   <<<"$peer_deck_validation_response" >/dev/null
+
+seed_binder_response="$(curl -fsS --max-time 20 \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $seed_token" \
+  -d "$(jq -cn --arg card_id "$SEED_CARD_ID" '{
+    card_id: $card_id,
+    quantity: 3,
+    condition: "NM",
+    is_foil: false,
+    for_trade: true,
+    for_sale: false,
+    price: 24.5,
+    language: "pt-br",
+    list_type: "have"
+  }')" \
+  "$API_BASE_URL/binder")"
+SEED_BINDER_ITEM_ID="$(jq -er '.id' <<<"$seed_binder_response")"
+
+peer_binder_response="$(curl -fsS --max-time 20 \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $peer_token" \
+  -d "$(jq -cn --arg card_id "$SEED_CARD_ID" '{
+    card_id: $card_id,
+    quantity: 3,
+    condition: "LP",
+    is_foil: true,
+    for_trade: true,
+    for_sale: true,
+    price: 32.5,
+    language: "ja",
+    list_type: "have"
+  }')" \
+  "$API_BASE_URL/binder")"
+SEED_PEER_BINDER_ITEM_ID="$(jq -er '.id' <<<"$peer_binder_response")"
+
+trade_response="$(curl -fsS --max-time 20 \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $seed_token" \
+  -d "$(jq -cn \
+    --arg receiver_id "$SEED_PEER_USER_ID" \
+    --arg my_item_id "$SEED_BINDER_ITEM_ID" \
+    --arg requested_item_id "$SEED_PEER_BINDER_ITEM_ID" '{
+      receiver_id: $receiver_id,
+      type: "trade",
+      my_items: [{binder_item_id: $my_item_id, quantity: 1, agreed_price: 24.5}],
+      requested_items: [{binder_item_id: $requested_item_id, quantity: 1, agreed_price: 32.5}],
+      message: "Fixture visual descartável de identidade física"
+    }')" \
+  "$API_BASE_URL/trades")"
+SEED_TRADE_ID="$(jq -er '.id' <<<"$trade_response")"
 
 (
   cd "$APP_DIR"
@@ -430,6 +487,10 @@ jq -n \
   --arg seed_commander_card_id "$SEED_COMMANDER_CARD_ID" \
   --arg seed_deck_id "$SEED_DECK_ID" \
   --arg seed_peer_deck_id "$SEED_PEER_DECK_ID" \
+  --arg seed_binder_item_id "$SEED_BINDER_ITEM_ID" \
+  --arg seed_peer_binder_item_id "$SEED_PEER_BINDER_ITEM_ID" \
+  --arg seed_trade_id "$SEED_TRADE_ID" \
+  --arg fixture_image_url "$fixture_image_url" \
   --arg bundle_sha256 "$bundle_sha256" \
   '{
     status: "ready",
@@ -451,6 +512,10 @@ jq -n \
     seed_commander_card_id: $seed_commander_card_id,
     seed_deck_id: $seed_deck_id,
     seed_peer_deck_id: $seed_peer_deck_id,
+    seed_binder_item_id: $seed_binder_item_id,
+    seed_peer_binder_item_id: $seed_peer_binder_item_id,
+    seed_trade_id: $seed_trade_id,
+    fixture_image_url: $fixture_image_url,
     bundle_sha256: $bundle_sha256,
     cleanup: "trap_registered"
   }' >"$READY_MANIFEST"
@@ -464,6 +529,9 @@ printf 'seed_card_id=%s\n' "$SEED_CARD_ID"
 printf 'empty_user_id=%s\n' "$EMPTY_USER_ID"
 printf 'seed_peer_user_id=%s\n' "$SEED_PEER_USER_ID"
 printf 'seed_peer_deck_id=%s\n' "$SEED_PEER_DECK_ID"
+printf 'seed_binder_item_id=%s\n' "$SEED_BINDER_ITEM_ID"
+printf 'seed_peer_binder_item_id=%s\n' "$SEED_PEER_BINDER_ITEM_ID"
+printf 'seed_trade_id=%s\n' "$SEED_TRADE_ID"
 printf 'bundle_sha256=%s\n' "$bundle_sha256"
 printf 'Press Ctrl+C to stop and prove cleanup.\n'
 

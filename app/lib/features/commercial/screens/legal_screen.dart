@@ -145,6 +145,13 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                             'Magic: The Gathering e nomes de cartas pertencem aos seus respectivos titulares. ManaLoom não reivindica propriedade sobre IP de terceiros. Listas, notas e comentários criados pelo usuário permanecem vinculados à conta do usuário.',
                       ),
                       const _LegalDocumentSection(
+                        anchorKey: Key('legal-card-source-section'),
+                        title: 'Conteúdo de fã e fonte das cartas',
+                        icon: Icons.image_outlined,
+                        body:
+                            'ManaLoom é conteúdo de fã não oficial permitido sob a Política de Conteúdo de Fãs. Não é aprovado nem endossado pela Wizards. Partes dos materiais usados são propriedade da Wizards of the Coast. © Wizards of the Coast LLC. Dados e imagens de cartas são fornecidos por Scryfall; Scryfall não produz, aprova ou endossa o ManaLoom.',
+                      ),
+                      const _LegalDocumentSection(
                         title: 'Disclaimer de IA',
                         icon: Icons.auto_awesome_outlined,
                         body:

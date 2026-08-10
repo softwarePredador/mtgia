@@ -493,6 +493,7 @@ class BattleLiveCursorContract {
         (_explicitPublicIdentityEventTypes.contains(normalizedType) &&
             hasExplicitPublicVisibility);
     if (identityIsPublic) {
+      builder.string('card_id', source['card_id']);
       builder.string('card_name', source['card_name']);
     }
     if (messageIsPublic) {
@@ -571,6 +572,24 @@ class BattleLiveCursorContract {
     builder.integer('command_size', source['command_size']);
     builder.integer('lands', source['lands']);
     builder.boolean('has_left', source['has_left']);
+    builder.listOfMaps('battlefield', source['battlefield'], _publicZoneObject);
+    builder.listOfMaps('graveyard', source['graveyard'], _publicZoneObject);
+    builder.listOfMaps('exile', source['exile'], _publicZoneObject);
+    builder.listOfMaps('command', source['command'], _publicZoneObject);
+    return builder.build();
+  }
+
+  _PublicValue<Map<String, dynamic>> _publicZoneObject(
+    Map<String, dynamic> source,
+  ) {
+    final builder = _PublicMapBuilder(this);
+    builder.string('object_id', source['object_id']);
+    builder.string('card_id', source['card_id']);
+    builder.string('name', source['name']);
+    builder.string('card_name', source['card_name']);
+    builder.string('power', source['power']);
+    builder.string('toughness', source['toughness']);
+    builder.boolean('tapped', source['tapped']);
     return builder.build();
   }
 
@@ -579,6 +598,7 @@ class BattleLiveCursorContract {
   ) {
     final builder = _PublicMapBuilder(this);
     builder.string('object_id', source['object_id']);
+    builder.string('card_id', source['card_id']);
     builder.string('name', source['name']);
     builder.string('card_name', source['card_name']);
     builder.string('object_type', source['object_type']);
@@ -604,6 +624,7 @@ class BattleLiveCursorContract {
   ) {
     final builder = _PublicMapBuilder(this);
     builder.string('object_id', source['object_id']);
+    builder.string('card_id', source['card_id']);
     builder.string('name', source['name']);
     builder.string('card_name', source['card_name']);
     builder.string('controller_side', source['controller_side']);

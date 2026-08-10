@@ -45,9 +45,9 @@ void main() {
 
         expect(requiredReleaseSchemaMigrations, migrationsFromSource);
         expect(requiredReleaseSchemaMigrations.keys.first, '038');
-        expect(requiredReleaseSchemaMigrations.keys.last, '057');
+        expect(requiredReleaseSchemaMigrations.keys.last, '058');
         expect(releaseSchemaReadinessSql, contains("MAX(version)"));
-        expect(releaseSchemaReadinessSql, contains(") = '057'"));
+        expect(releaseSchemaReadinessSql, contains(") = '058'"));
         for (final entry in requiredReleaseSchemaMigrations.entries) {
           expect(
             releaseSchemaReadinessSql,
@@ -91,6 +91,13 @@ void main() {
           'idx_battle_jobs_lease',
           'interactive_battle_sessions',
           'interactive_battle_records',
+          'snapshot_trade_item_identity',
+          'snapshot_schema_version',
+          'snapshot_status',
+          'item_snapshot',
+          'snapshot_captured_at',
+          'chk_trade_items_snapshot_lifecycle',
+          'manaloom_trade_item_snapshot_immutable',
         ]) {
           expect(releaseSchemaReadinessSql, contains(anchor), reason: anchor);
         }

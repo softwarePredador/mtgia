@@ -131,6 +131,76 @@ void main() {
     expect(api.commentPosts, ['Boa sugestão para testar na mesa.']);
     expect(find.text('Comentário publicado.'), findsOneWidget);
   });
+
+  testWidgets('comment can anchor its public context to a deck card', (
+    tester,
+  ) async {
+    final api = _CommunityDetailApiFixture();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthProvider>(
+            create: (_) => _FakeAuthProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => CommunityProvider(apiClient: api),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => DeckProvider(apiClient: _DeckApiFixture()),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CommunityDeckDetailScreen(deckId: 'deck-1'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final contextField = find.byKey(
+      const Key('community-deck-comment-context'),
+    );
+    await tester.ensureVisible(contextField);
+    await tester.tap(contextField);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Carta · Arcane Signet').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('community-deck-comment-field')),
+      'Vale testar esta peça na curva dois.',
+    );
+    await tester.pumpAndSettle();
+    final submit = find.byKey(
+      const Key('community-deck-comment-submit-button'),
+    );
+    await tester.ensureVisible(submit);
+    await tester.pumpAndSettle();
+    await tester.tap(submit);
+    await tester.pumpAndSettle();
+
+    expect(api.commentPosts, [
+      '[Contexto: Carta · Arcane Signet] '
+          'Vale testar esta peça na curva dois.',
+    ]);
+  });
+
+  testWidgets('shows exact printing identity for public deck cards', (
+    tester,
+  ) async {
+    await _pumpDetail(tester, const Size(390, 844));
+
+    final card = find.byKey(const Key('community-deck-card-card-1'));
+    await tester.ensureVisible(card);
+    await tester.pumpAndSettle();
+
+    expect(card, findsOneWidget);
+    expect(find.text('TST #001'), findsOneWidget);
+    expect(find.text('Non-foil'), findsNothing);
+    expect(find.textContaining('Test Set'), findsOneWidget);
+    expect(find.text('Arte de referência'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpDetail(WidgetTester tester, Size size) async {
@@ -176,14 +246,34 @@ class _CommunityDetailApiFixture extends ApiClient {
         'owner_username': 'player_one',
         'stats': {'total_cards': 100},
         'commander': const [],
-        'main_board': const <String, dynamic>{},
+        'main_board': const <String, dynamic>{
+          'Artifact': [
+            {
+              'id': 'card-1',
+              'oracle_id': 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+              'name': 'Arcane Signet',
+              'quantity': 1,
+              'is_commander': false,
+              'type_line': 'Artifact',
+              'mana_cost': '{2}',
+              'image_url':
+                  'https://cards.scryfall.io/normal/front/a/a/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.jpg',
+              'set_code': 'tst',
+              'collector_number': '001',
+              'set_name': 'Test Set',
+              'set_release_date': '2026-01-02',
+              'rarity': 'uncommon',
+              'foil': false,
+            },
+          ],
+        },
         'visual_analysis': const <String, dynamic>{},
       });
     }
     if (endpoint == '/community/decks/deck-1/comments') {
       return ApiResponse(200, {'data': const []});
     }
-    if (endpoint == '/community/trade-matches?deck_id=deck-1') {
+    if (endpoint == '/community/trade-matches') {
       return ApiResponse(200, {'matches': const []});
     }
     throw UnimplementedError('No GET handler for $endpoint');

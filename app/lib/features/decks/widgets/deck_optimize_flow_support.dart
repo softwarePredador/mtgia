@@ -14,7 +14,9 @@ Map<String, dynamic> buildOptimizeRecommendationContext({
   required bool budgetEnabled,
   required double budgetLimit,
   required String rebuildIntent,
+  String? postGameNoteId,
 }) {
+  final normalizedPostGameNoteId = postGameNoteId?.trim();
   return {
     'prefer_collection': preferCollection,
     if (budgetEnabled) 'budget_limit_brl': budgetLimit.round(),
@@ -22,6 +24,8 @@ Map<String, dynamic> buildOptimizeRecommendationContext({
     'report': 'before_after_shareable',
     'explain_swaps': true,
     'include_price_risk_curve_bracket': true,
+    if (normalizedPostGameNoteId != null && normalizedPostGameNoteId.isNotEmpty)
+      'post_game_note_id': normalizedPostGameNoteId,
   };
 }
 
@@ -306,6 +310,7 @@ class OptimizePreviewData {
   final Map<String, dynamic> postAnalysis;
   final Map<String, dynamic>? qualityWarning;
   final Map<String, dynamic> metaReferenceContext;
+  final Map<String, dynamic> postGameEvidence;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
   final OptimizeIntensity intensity;
@@ -335,6 +340,7 @@ class OptimizePreviewData {
     required this.postAnalysis,
     required this.qualityWarning,
     required this.metaReferenceContext,
+    this.postGameEvidence = const <String, dynamic>{},
     required this.displayRemovals,
     required this.displayAdditions,
     required this.intensity,
@@ -440,6 +446,9 @@ class OptimizePreviewData {
           : null,
       metaReferenceContext: (result['meta_reference_context'] is Map)
           ? (result['meta_reference_context'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{},
+      postGameEvidence: (result['post_game_evidence'] is Map)
+          ? (result['post_game_evidence'] as Map).cast<String, dynamic>()
           : const <String, dynamic>{},
       displayRemovals: removalsDetailed.isNotEmpty
           ? removalsDetailed
@@ -964,6 +973,12 @@ Map<String, dynamic> buildOptimizeMutationContext(
       'preview_post_analysis': preview.postAnalysis,
     'warnings': preview.warnings,
     'meta_reference_context': preview.metaReferenceContext,
+    if (preview.postGameEvidence.isNotEmpty)
+      'post_game_evidence_receipt': {
+        'schema_version': preview.postGameEvidence['schema_version'],
+        'note_id': preview.postGameEvidence['note_id'],
+        'note_revision': preview.postGameEvidence['note_revision'],
+      },
     'optimization_contract': preview.optimizationContract,
     'commander_contract': preview.commanderContract,
     if (preview.bracketPolicy.isNotEmpty)

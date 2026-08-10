@@ -89,10 +89,20 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
     // Buscar cartas
     final cardsResult = await conn.execute(
       Sql.named('''
+        WITH canonical_sets AS (
+          SELECT DISTINCT ON (LOWER(code))
+            code,
+            name,
+            release_date
+          FROM sets
+          ORDER BY LOWER(code), release_date DESC NULLS LAST, code
+        )
         SELECT
           dc.quantity,
           dc.is_commander,
           c.id,
+          c.scryfall_id::text AS scryfall_id,
+          c.oracle_id::text AS oracle_id,
           c.name,
           c.mana_cost,
           c.type_line,
@@ -101,10 +111,17 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
           c.color_identity,
           c.image_url,
           c.set_code,
-          c.rarity
+          c.collector_number,
+          c.rarity,
+          c.is_reserved,
+          c.foil,
+          s.name AS set_name,
+          s.release_date AS set_release_date
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
+        LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
         WHERE dc.deck_id = @deckId
+        ORDER BY dc.is_commander DESC, c.name ASC, c.collector_number ASC
       '''),
       parameters: {'deckId': deckId},
     );
@@ -112,9 +129,19 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
     final cardsList =
         cardsResult.map((row) {
           final m = row.toColumnMap();
+          final oracleId = m['oracle_id']?.toString();
           m['image_url'] = normalizeScryfallImageUrl(
             m['image_url']?.toString(),
+            printingId: m.remove('scryfall_id')?.toString(),
+            oracleId: oracleId,
           );
+          if (m['set_release_date'] is DateTime) {
+            m['set_release_date'] =
+                (m['set_release_date'] as DateTime)
+                    .toIso8601String()
+                    .split('T')
+                    .first;
+          }
           return m;
         }).toList();
 

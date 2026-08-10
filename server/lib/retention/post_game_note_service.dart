@@ -111,10 +111,10 @@ class PostGameNoteService {
       for (final issue in _stringList(note['issues'])) {
         issueCounts[issue] = (issueCounts[issue] ?? 0) + 1;
       }
-      for (final card in _stringList(note['performed_well'])) {
+      for (final card in _cardEvidenceNames(note['performed_well'])) {
         performerCounts[card] = (performerCounts[card] ?? 0) + 1;
       }
-      for (final card in _stringList(note['underperformed'])) {
+      for (final card in _cardEvidenceNames(note['underperformed'])) {
         reviewCounts[card] = (reviewCounts[card] ?? 0) + 1;
       }
       final createdAt = DateTime.tryParse(note['created_at']?.toString() ?? '');
@@ -142,6 +142,79 @@ class PostGameNoteService {
     };
   }
 
+  /// Loads one authenticated, owner-scoped evidence receipt for Optimize.
+  ///
+  /// Only structured issues and explicitly selected card signals cross into
+  /// the recommendation pipeline. Free-form notes stay in the post-game
+  /// journal and are not copied into an AI prompt by this contract.
+  Future<Map<String, dynamic>?> loadOptimizeEvidence({
+    required String userId,
+    required String deckId,
+    required String noteId,
+  }) {
+    return pool.runTx((session) async {
+      final rows = await session.execute(
+        Sql.named('''
+          SELECT $_noteColumns
+          FROM post_game_notes
+          WHERE id = @noteId
+            AND deck_id = CAST(@deckId AS uuid)
+            AND user_id = CAST(@userId AS uuid)
+            AND deleted_at IS NULL
+          LIMIT 1
+        '''),
+        parameters: {'noteId': noteId, 'deckId': deckId, 'userId': userId},
+      );
+      if (rows.isEmpty) return null;
+
+      final note = _rowToJson(rows.first);
+      final currentSnapshot = await _captureDeckSnapshot(
+        session,
+        userId: userId,
+        deckId: deckId,
+      );
+      final recordedSnapshotHash = _nullableString(note['deck_snapshot_hash']);
+      final performedWell = _cardEvidenceList(note['performed_well']);
+      final underperformed = _cardEvidenceList(note['underperformed']);
+      final playSessionId = _nullableString(note['play_session_id']);
+      const replayPrefix = 'battle-replay:';
+      final battleReplayId =
+          playSessionId != null && playSessionId.startsWith(replayPrefix)
+              ? _nullableString(playSessionId.substring(replayPrefix.length))
+              : null;
+
+      return <String, dynamic>{
+        'schema_version': 'post_game_optimize_evidence_v1',
+        'note_id': note['id'],
+        'deck_id': deckId,
+        'note_revision': note['revision'],
+        'result': note['result'],
+        'table_level': note['table_level'],
+        'issues': _stringList(note['issues']),
+        'performed_well': performedWell,
+        'underperformed': underperformed,
+        'selected_card_count': performedWell.length + underperformed.length,
+        'source': <String, dynamic>{
+          if (playSessionId != null) 'play_session_id': playSessionId,
+          if (battleReplayId != null) 'battle_replay_id': battleReplayId,
+          'kind':
+              battleReplayId != null
+                  ? 'battle_replay'
+                  : playSessionId != null
+                  ? 'life_counter'
+                  : 'manual',
+        },
+        'deck_revision': <String, dynamic>{
+          'recorded_snapshot_hash': recordedSnapshotHash,
+          'current_snapshot_hash': currentSnapshot.hash,
+          'matches_current':
+              recordedSnapshotHash != null &&
+              recordedSnapshotHash == currentSnapshot.hash,
+        },
+      };
+    });
+  }
+
   Future<Map<String, dynamic>> upsertNote({
     required String userId,
     required String deckId,
@@ -154,11 +227,11 @@ class PostGameNoteService {
     final result = _boundedString(note['result'], 'result', 80);
     final tableLevel = _boundedString(note['table_level'], 'table_level', 120);
     final notes = _boundedString(note['notes'], 'notes', 8000);
-    final performedWell = _boundedList(
+    final requestedPerformedWell = _boundedCardEvidenceList(
       note['performed_well'],
       'performed_well',
     );
-    final underperformed = _boundedList(
+    final requestedUnderperformed = _boundedCardEvidenceList(
       note['underperformed'],
       'underperformed',
     );
@@ -205,6 +278,20 @@ class PostGameNoteService {
           session,
           userId: userId,
           deckId: deckId,
+        );
+        final performedWell = await _canonicalizeDeckCardEvidence(
+          session,
+          userId: userId,
+          deckId: deckId,
+          evidence: requestedPerformedWell,
+          field: 'performed_well',
+        );
+        final underperformed = await _canonicalizeDeckCardEvidence(
+          session,
+          userId: userId,
+          deckId: deckId,
+          evidence: requestedUnderperformed,
+          field: 'underperformed',
         );
         final current = await session.execute(
           Sql.named('''
@@ -491,8 +578,8 @@ class PostGameNoteService {
       'result': map['result']?.toString() ?? '',
       'table_level': map['table_level']?.toString() ?? '',
       'notes': map['notes']?.toString() ?? '',
-      'performed_well': _stringList(map['performed_well']),
-      'underperformed': _stringList(map['underperformed']),
+      'performed_well': _cardEvidenceList(map['performed_well']),
+      'underperformed': _cardEvidenceList(map['underperformed']),
       'issues': _stringList(map['issues']),
       'play_session_id': _nullableString(map['play_session_id']),
       'session_started_at': _dateString(map['session_started_at']),
@@ -567,6 +654,115 @@ class PostGameNoteService {
     return values;
   }
 
+  static List<Object> _boundedCardEvidenceList(Object? value, String field) {
+    final raw = value is String ? _decodeJsonList(value) : value;
+    if (raw == null) return const <Object>[];
+    if (raw is! List || raw.length > 80) {
+      throw PostGameValidationException('$field excede o limite permitido.');
+    }
+    final result = <Object>[];
+    final seen = <String>{};
+    for (final entry in raw) {
+      if (entry is Map) {
+        final map = entry.map(
+          (key, nested) => MapEntry(key.toString(), nested),
+        );
+        final cardId = _nullableString(map['card_id']);
+        final name = _boundedString(
+          map['name'] ?? map['card_name'],
+          field,
+          240,
+        );
+        if (cardId == null) {
+          if (name.isEmpty || !seen.add('name:${name.toLowerCase()}')) {
+            continue;
+          }
+          result.add(name);
+          continue;
+        }
+        if (cardId.length > 128 ||
+            !RegExp(
+              r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+            ).hasMatch(cardId)) {
+          throw PostGameValidationException('$field contém card_id inválido.');
+        }
+        if (!seen.add('id:${cardId.toLowerCase()}')) continue;
+        result.add(<String, dynamic>{'card_id': cardId, 'name': name});
+        continue;
+      }
+      final name = _boundedString(entry, field, 240);
+      if (name.isEmpty || !seen.add('name:${name.toLowerCase()}')) continue;
+      result.add(name);
+    }
+    return List<Object>.unmodifiable(result);
+  }
+
+  static Future<List<Object>> _canonicalizeDeckCardEvidence(
+    Session session, {
+    required String userId,
+    required String deckId,
+    required List<Object> evidence,
+    required String field,
+  }) async {
+    final ids = evidence
+        .whereType<Map>()
+        .map((entry) => _nullableString(entry['card_id']))
+        .whereType<String>()
+        .toList(growable: false);
+    if (ids.isEmpty) return evidence;
+
+    final rows = await session.execute(
+      Sql.named('''
+        SELECT c.id::text AS card_id,
+               c.name,
+               c.image_url,
+               c.set_code,
+               c.collector_number,
+               dc.quantity,
+               dc.is_commander
+        FROM deck_cards dc
+        JOIN decks d ON d.id = dc.deck_id
+        JOIN cards c ON c.id = dc.card_id
+        WHERE dc.deck_id = CAST(@deckId AS uuid)
+          AND d.user_id = CAST(@userId AS uuid)
+          AND c.id = ANY(CAST(@cardIds AS uuid[]))
+      '''),
+      parameters: {'deckId': deckId, 'userId': userId, 'cardIds': ids},
+    );
+    final byId = <String, Map<String, dynamic>>{};
+    for (final row in rows) {
+      final map = row.toColumnMap();
+      final id = _nullableString(map['card_id']);
+      if (id == null) continue;
+      byId[id.toLowerCase()] = <String, dynamic>{
+        'card_id': id,
+        'name': map['name']?.toString() ?? '',
+        if (_nullableString(map['image_url']) case final imageUrl?)
+          'image_url': imageUrl,
+        if (_nullableString(map['set_code']) case final setCode?)
+          'set_code': setCode,
+        if (_nullableString(map['collector_number'])
+            case final collectorNumber?)
+          'collector_number': collectorNumber,
+        'quantity': _asInt(map['quantity'], fallback: 1),
+        if (map['is_commander'] == true) 'is_commander': true,
+      };
+    }
+    if (byId.length != ids.map((id) => id.toLowerCase()).toSet().length) {
+      throw PostGameValidationException(
+        '$field contém carta fora da revisão atual do deck.',
+      );
+    }
+
+    return List<Object>.unmodifiable([
+      for (final entry in evidence)
+        if (entry is Map)
+          byId[_nullableString(entry['card_id'])!.toLowerCase()]!
+        else
+          entry,
+    ]);
+  }
+
   static int _asInt(Object? value, {required int fallback}) {
     if (value is int) return value;
     return int.tryParse(value?.toString() ?? '') ?? fallback;
@@ -588,6 +784,36 @@ class PostGameNoteService {
     if (raw is! List) return const <String>[];
     return raw
         .map((entry) => entry.toString().trim())
+        .where((entry) => entry.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+  }
+
+  static List<Object> _cardEvidenceList(Object? value) {
+    final raw = value is String ? _decodeJsonList(value) : value;
+    if (raw is! List) return const <Object>[];
+    return raw
+        .where((entry) => entry is String || entry is Map)
+        .map<Object>((entry) {
+          if (entry is! Map) return entry.toString().trim();
+          return entry.map((key, nested) => MapEntry(key.toString(), nested));
+        })
+        .where((entry) {
+          if (entry is String) return entry.isNotEmpty;
+          final map = entry as Map<String, dynamic>;
+          return _nullableString(map['name'] ?? map['card_name']) != null;
+        })
+        .toList(growable: false);
+  }
+
+  static List<String> _cardEvidenceNames(Object? value) {
+    return _cardEvidenceList(value)
+        .map(
+          (entry) =>
+              entry is Map<String, dynamic>
+                  ? _nullableString(entry['name'] ?? entry['card_name']) ?? ''
+                  : entry.toString().trim(),
+        )
         .where((entry) => entry.isNotEmpty)
         .toSet()
         .toList(growable: false);

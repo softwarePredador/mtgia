@@ -65,10 +65,8 @@ void main() {
 
   test('fetchPublicDecks classifies backend error', () async {
     final api = _FakeCommunityApiClient(
-      getHandler:
-          (_) async => ApiResponse(500, {
-            'error': 'boom',
-          }, requestId: 'req-community-500'),
+      getHandler: (_) async =>
+          ApiResponse(500, {'error': 'boom'}, requestId: 'req-community-500'),
     );
     final provider = CommunityProvider(apiClient: api);
 
@@ -80,11 +78,9 @@ void main() {
 
   test('fetchPublicDecks never exposes raw exception details', () async {
     final api = _FakeCommunityApiClient(
-      getHandler:
-          (_) async =>
-              throw StateError(
-                'postgres://private-user:secret@internal-host/community',
-              ),
+      getHandler: (_) async => throw StateError(
+        'postgres://private-user:secret@internal-host/community',
+      ),
     );
     final provider = CommunityProvider(apiClient: api);
 
@@ -102,10 +98,9 @@ void main() {
 
   test('fetchPublicDeckDetails returns null for 404', () async {
     final api = _FakeCommunityApiClient(
-      getHandler:
-          (_) async => ApiResponse(404, {
-            'error': 'not found',
-          }, requestId: 'req-community-404'),
+      getHandler: (_) async => ApiResponse(404, {
+        'error': 'not found',
+      }, requestId: 'req-community-404'),
     );
     final provider = CommunityProvider(apiClient: api);
 
@@ -116,13 +111,12 @@ void main() {
 
   test('fetchPublicDecks URL-encodes search query', () async {
     final api = _FakeCommunityApiClient(
-      getHandler:
-          (_) async => ApiResponse(200, {
-            'data': <Map<String, dynamic>>[],
-            'page': 1,
-            'limit': 20,
-            'total': 0,
-          }),
+      getHandler: (_) async => ApiResponse(200, {
+        'data': <Map<String, dynamic>>[],
+        'page': 1,
+        'limit': 20,
+        'total': 0,
+      }),
     );
     final provider = CommunityProvider(apiClient: api);
 
@@ -180,4 +174,78 @@ void main() {
       expect(provider.searchQuery, 'Krenko');
     },
   );
+
+  test('community comments preserve a public human-readable context', () {
+    final persisted = composeCommunityDeckCommentBody(
+      body: 'Vale testar duas cópias no próximo jogo.',
+      contextLabel: 'Carta · Arcane Signet',
+    );
+    final parsed = parseCommunityDeckCommentBody(persisted);
+    final comment = CommunityDeckComment.fromJson({
+      'id': 'comment-1',
+      'body': persisted,
+      'created_at': '2026-08-06T12:00:00Z',
+    });
+
+    expect(
+      persisted,
+      '[Contexto: Carta · Arcane Signet] '
+      'Vale testar duas cópias no próximo jogo.',
+    );
+    expect(parsed.contextLabel, 'Carta · Arcane Signet');
+    expect(parsed.body, 'Vale testar duas cópias no próximo jogo.');
+    expect(comment.contextLabel, 'Carta · Arcane Signet');
+    expect(comment.body, 'Vale testar duas cópias no próximo jogo.');
+    expect(
+      composeCommunityDeckCommentBody(
+        body: 'Comentário geral.',
+        contextLabel: 'Deck todo',
+      ),
+      'Comentário geral.',
+    );
+  });
+
+  test('trade match keeps exact public copy and actionable owner identity', () {
+    final match = CommunityTradeMatch.fromJson({
+      'card': {
+        'id': 'printing-1',
+        'name': 'Sol Ring',
+        'image_url':
+            'https://cards.scryfall.io/normal/front/a/a/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.jpg',
+        'scryfall_id': 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        'oracle_id': 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        'set_code': 'cmm',
+        'collector_number': '396',
+      },
+      'wanted_quantity': 1,
+      'sources': ['deck_missing'],
+      'offer': {
+        'binder_item_id': 'binder-1',
+        'quantity': 1,
+        'condition': 'LP',
+        'language': 'pt-br',
+        'for_trade': true,
+        'price': 12.5,
+        'currency': 'BRL',
+        'updated_at': '2026-08-06T10:00:00Z',
+      },
+      'owner': {
+        'id': 'owner-1',
+        'username': 'planeswalker',
+        'display_name': 'Nissa',
+        'location_city': 'São Paulo',
+        'location_state': 'SP',
+      },
+    });
+
+    expect(match.isActionable, isTrue);
+    expect(match.binderItemId, 'binder-1');
+    expect(match.item.cardScryfallId, 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+    expect(match.item.cardCollectorNumber, '396');
+    expect(match.item.condition, 'LP');
+    expect(match.item.language, 'pt-br');
+    expect(match.ownerId, 'owner-1');
+    expect(match.ownerLocationLabel, 'São Paulo, SP');
+    expect(match.proposalSource, 'deck_missing');
+  });
 }

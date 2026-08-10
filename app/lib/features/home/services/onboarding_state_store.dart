@@ -4,15 +4,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum OnboardingDisposition { pending, completed, skipped }
 
+enum OnboardingGoal {
+  catalogCollection,
+  buildDeck,
+  importDeck,
+  play,
+  improveDeck,
+}
+
+enum OnboardingExperience { firstSteps, returning, experienced }
+
+enum OnboardingBuildMode { guided, manual }
+
 class OnboardingState {
   const OnboardingState({
     this.disposition = OnboardingDisposition.pending,
     this.selectedFormat = 'commander',
+    this.selectedGoal,
+    this.experience,
+    this.buildMode = OnboardingBuildMode.guided,
     this.updatedAt,
   });
 
   final OnboardingDisposition disposition;
   final String selectedFormat;
+  final OnboardingGoal? selectedGoal;
+  final OnboardingExperience? experience;
+  final OnboardingBuildMode buildMode;
   final DateTime? updatedAt;
 
   bool get isSettled => disposition != OnboardingDisposition.pending;
@@ -20,11 +38,17 @@ class OnboardingState {
   OnboardingState copyWith({
     OnboardingDisposition? disposition,
     String? selectedFormat,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
     DateTime? updatedAt,
   }) {
     return OnboardingState(
       disposition: disposition ?? this.disposition,
       selectedFormat: selectedFormat ?? this.selectedFormat,
+      selectedGoal: selectedGoal ?? this.selectedGoal,
+      experience: experience ?? this.experience,
+      buildMode: buildMode ?? this.buildMode,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -33,12 +57,21 @@ class OnboardingState {
 abstract interface class OnboardingStateRepository {
   Future<OnboardingState> load(String userId);
 
-  Future<void> saveProgress(String userId, {required String selectedFormat});
+  Future<void> saveProgress(
+    String userId, {
+    required String selectedFormat,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
+  });
 
   Future<void> settle(
     String userId, {
     required String selectedFormat,
     required OnboardingDisposition disposition,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   });
 }
 
@@ -99,12 +132,26 @@ class OnboardingStateStore implements OnboardingStateRepository {
       final selectedFormat = supportedFormats.contains(rawFormat)
           ? rawFormat!
           : 'commander';
+      final selectedGoal = OnboardingGoal.values.firstWhereOrNull(
+        (value) => value.name == decoded['selected_goal'],
+      );
+      final experience = OnboardingExperience.values.firstWhereOrNull(
+        (value) => value.name == decoded['experience'],
+      );
+      final buildMode =
+          OnboardingBuildMode.values.firstWhereOrNull(
+            (value) => value.name == decoded['build_mode'],
+          ) ??
+          OnboardingBuildMode.guided;
       final updatedAt = DateTime.tryParse(
         decoded['updated_at']?.toString() ?? '',
       );
       return OnboardingState(
         disposition: disposition,
         selectedFormat: selectedFormat,
+        selectedGoal: selectedGoal,
+        experience: experience,
+        buildMode: buildMode,
         updatedAt: updatedAt,
       );
     } catch (_) {
@@ -116,12 +163,18 @@ class OnboardingStateStore implements OnboardingStateRepository {
   Future<void> saveProgress(
     String userId, {
     required String selectedFormat,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   }) async {
     final current = await load(userId);
     await _write(
       userId,
       current.copyWith(
         selectedFormat: _normalizeFormat(selectedFormat),
+        selectedGoal: selectedGoal,
+        experience: experience,
+        buildMode: buildMode,
         updatedAt: DateTime.now().toUtc(),
       ),
     );
@@ -132,17 +185,24 @@ class OnboardingStateStore implements OnboardingStateRepository {
     String userId, {
     required String selectedFormat,
     required OnboardingDisposition disposition,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   }) async {
     if (disposition == OnboardingDisposition.pending) {
       throw const OnboardingPersistenceException(
         'O estado final do onboarding não pode permanecer pendente.',
       );
     }
+    final current = await load(userId);
     await _write(
       userId,
-      OnboardingState(
+      current.copyWith(
         disposition: disposition,
         selectedFormat: _normalizeFormat(selectedFormat),
+        selectedGoal: selectedGoal,
+        experience: experience,
+        buildMode: buildMode,
         updatedAt: DateTime.now().toUtc(),
       ),
     );
@@ -157,6 +217,9 @@ class OnboardingStateStore implements OnboardingStateRepository {
         'version': currentVersion,
         'disposition': state.disposition.name,
         'selected_format': state.selectedFormat,
+        'selected_goal': state.selectedGoal?.name,
+        'experience': state.experience?.name,
+        'build_mode': state.buildMode.name,
         'updated_at': state.updatedAt?.toIso8601String(),
       }),
     );
@@ -188,4 +251,13 @@ class OnboardingStateStore implements OnboardingStateRepository {
   }
 
   String _keyFor(String userId) => '$_keyPrefix${Uri.encodeComponent(userId)}';
+}
+
+extension _IterableEnumLookup<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T value) predicate) {
+    for (final value in this) {
+      if (predicate(value)) return value;
+    }
+    return null;
+  }
 }

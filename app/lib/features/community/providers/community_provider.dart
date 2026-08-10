@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
+import '../../binder/providers/binder_provider.dart';
 
 /// Modelo simplificado de deck público da comunidade
 class CommunityDeck {
@@ -57,6 +58,7 @@ class CommunityDeckComment {
     this.authorId,
     this.authorName,
     this.authorAvatarUrl,
+    this.contextLabel,
   });
 
   final String id;
@@ -65,12 +67,16 @@ class CommunityDeckComment {
   final String? authorId;
   final String? authorName;
   final String? authorAvatarUrl;
+  final String? contextLabel;
 
   factory CommunityDeckComment.fromJson(Map<String, dynamic> json) {
     final author = json['author'] as Map<String, dynamic>?;
+    final parsedBody = parseCommunityDeckCommentBody(
+      json['body']?.toString() ?? '',
+    );
     return CommunityDeckComment(
       id: json['id']?.toString() ?? '',
-      body: json['body']?.toString() ?? '',
+      body: parsedBody.body,
       createdAt:
           DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.fromMillisecondsSinceEpoch(0),
@@ -79,50 +85,151 @@ class CommunityDeckComment {
           ? author!['display_name'].toString()
           : author?['username']?.toString(),
       authorAvatarUrl: author?['avatar_url']?.toString(),
+      contextLabel: parsedBody.contextLabel,
     );
   }
 }
 
+typedef CommunityDeckCommentBody = ({String body, String? contextLabel});
+
+String composeCommunityDeckCommentBody({
+  required String body,
+  String? contextLabel,
+}) {
+  final cleanBody = body.trim();
+  final cleanContext = contextLabel
+      ?.replaceAll(RegExp(r'[\[\]\r\n]+'), ' ')
+      .trim();
+  if (cleanContext == null ||
+      cleanContext.isEmpty ||
+      cleanContext == 'Deck todo') {
+    return cleanBody;
+  }
+  final boundedContext = cleanContext.length <= 80
+      ? cleanContext
+      : cleanContext.substring(0, 80).trimRight();
+  return '[Contexto: $boundedContext] $cleanBody';
+}
+
+CommunityDeckCommentBody parseCommunityDeckCommentBody(String value) {
+  final cleanValue = value.trim();
+  final match = RegExp(
+    r'^\[Contexto:\s*([^\]]+)\]\s*(.*)$',
+    dotAll: true,
+  ).firstMatch(cleanValue);
+  if (match == null) return (body: cleanValue, contextLabel: null);
+  final contextLabel = match.group(1)?.trim();
+  final body = match.group(2)?.trim() ?? '';
+  return (
+    body: body,
+    contextLabel: contextLabel?.isEmpty == true ? null : contextLabel,
+  );
+}
+
 class CommunityTradeMatch {
-  const CommunityTradeMatch({
-    required this.cardName,
+  CommunityTradeMatch({
+    required this.item,
     required this.wantedQuantity,
+    required this.ownerId,
     required this.ownerName,
     required this.sources,
-    this.price,
-    this.currency,
-    this.forTrade = false,
-    this.forSale = false,
+    this.ownerUsername,
+    this.ownerAvatarUrl,
+    this.ownerLocationCity,
+    this.ownerLocationState,
   });
 
-  final String cardName;
+  final BinderItem item;
   final int wantedQuantity;
+  final String ownerId;
   final String ownerName;
+  final String? ownerUsername;
+  final String? ownerAvatarUrl;
+  final String? ownerLocationCity;
+  final String? ownerLocationState;
   final List<String> sources;
-  final double? price;
-  final String? currency;
-  final bool forTrade;
-  final bool forSale;
+
+  String get cardName => item.cardName;
+  String get cardId => item.cardId;
+  String get binderItemId => item.id;
+  double? get price => item.price;
+  String get currency => item.currency;
+  bool get forTrade => item.forTrade;
+  bool get forSale => item.forSale;
+  String get proposalType => forSale && forTrade
+      ? 'mixed'
+      : forSale
+      ? 'sale'
+      : 'trade';
+  String get proposalSource =>
+      sources.contains('deck_missing') ? 'deck_missing' : 'wishlist';
+  bool get isActionable =>
+      ownerId.isNotEmpty && binderItemId.isNotEmpty && (forTrade || forSale);
+  String get freshnessLabel => marketplaceOfferFreshnessLabel(item.updatedAt);
+  String? get ownerLocationLabel {
+    final city = ownerLocationCity?.trim();
+    final state = ownerLocationState?.trim();
+    if (city != null && city.isNotEmpty && state != null && state.isNotEmpty) {
+      return '$city, $state';
+    }
+    if (state != null && state.isNotEmpty) return state;
+    return null;
+  }
 
   factory CommunityTradeMatch.fromJson(Map<String, dynamic> json) {
     final card = json['card'] as Map<String, dynamic>? ?? const {};
     final owner = json['owner'] as Map<String, dynamic>? ?? const {};
     final offer = json['offer'] as Map<String, dynamic>? ?? const {};
+    final binderItem = BinderItem.fromJson({
+      'id': offer['binder_item_id']?.toString() ?? '',
+      'card': card,
+      'quantity': _readInt(offer['quantity']) ?? 0,
+      'available_quantity': _readInt(offer['quantity']) ?? 0,
+      'condition': offer['condition']?.toString() ?? 'NM',
+      'is_foil': offer['is_foil'] == true,
+      'language': offer['language']?.toString() ?? 'en',
+      'for_trade': offer['for_trade'] == true,
+      'for_sale': offer['for_sale'] == true,
+      'price': _readDouble(offer['price']),
+      'currency': offer['currency']?.toString() ?? 'BRL',
+      'notes': offer['notes']?.toString(),
+      'updated_at': offer['updated_at']?.toString(),
+      'list_type': 'have',
+    });
     return CommunityTradeMatch(
-      cardName: card['name']?.toString() ?? '',
+      item: binderItem,
       wantedQuantity: _readInt(json['wanted_quantity']) ?? 0,
+      ownerId: owner['id']?.toString() ?? '',
       ownerName: owner['display_name']?.toString().trim().isNotEmpty == true
           ? owner['display_name'].toString()
           : owner['username']?.toString() ?? 'Jogador',
+      ownerUsername: owner['username']?.toString(),
+      ownerAvatarUrl: owner['avatar_url']?.toString(),
+      ownerLocationCity: owner['location_city']?.toString(),
+      ownerLocationState: owner['location_state']?.toString(),
       sources: (json['sources'] as List? ?? const [])
           .map((entry) => entry.toString())
           .toList(growable: false),
-      price: _readDouble(offer['price']),
-      currency: offer['currency']?.toString(),
-      forTrade: offer['for_trade'] == true,
-      forSale: offer['for_sale'] == true,
     );
   }
+}
+
+class CommunityTradeMatchSearchResult {
+  const CommunityTradeMatchSearchResult({
+    required this.matches,
+    required this.source,
+    this.deckId,
+    this.message,
+    this.error,
+  });
+
+  final List<CommunityTradeMatch> matches;
+  final String source;
+  final String? deckId;
+  final String? message;
+  final String? error;
+
+  bool get failed => error != null;
 }
 
 /// Provider para o feed da comunidade (decks públicos)
@@ -405,20 +512,43 @@ class CommunityProvider extends ChangeNotifier {
   }
 
   Future<List<CommunityTradeMatch>> fetchTradeMatches({String? deckId}) async {
+    final result = await fetchTradeMatchResult(deckId: deckId);
+    return result.matches;
+  }
+
+  Future<CommunityTradeMatchSearchResult> fetchTradeMatchResult({
+    String? deckId,
+  }) async {
+    final normalizedDeckId = deckId?.trim();
+    final query = normalizedDeckId == null || normalizedDeckId.isEmpty
+        ? ''
+        : '?deck_id=${Uri.encodeQueryComponent(normalizedDeckId)}';
     try {
-      final query = deckId == null || deckId.isEmpty
-          ? ''
-          : '?deck_id=${Uri.encodeQueryComponent(deckId)}';
       final response = await _apiClient.get('/community/trade-matches$query');
       if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
-        final data = (response.data as Map<String, dynamic>)['matches'];
-        if (data is List) {
-          return data
-              .whereType<Map>()
-              .map((entry) => CommunityTradeMatch.fromJson(entry.cast()))
-              .toList(growable: false);
-        }
+        final payload = response.data as Map<String, dynamic>;
+        final data = payload['matches'];
+        final matches = data is List
+            ? data
+                  .whereType<Map>()
+                  .map((entry) => CommunityTradeMatch.fromJson(entry.cast()))
+                  .toList(growable: false)
+            : const <CommunityTradeMatch>[];
+        return CommunityTradeMatchSearchResult(
+          matches: matches,
+          source: payload['source']?.toString() ?? 'wishlist',
+          deckId: payload['deck_id']?.toString(),
+          message: payload['message']?.toString(),
+        );
       }
+      return CommunityTradeMatchSearchResult(
+        matches: const [],
+        source: normalizedDeckId == null || normalizedDeckId.isEmpty
+            ? 'wishlist'
+            : 'deck_missing_and_wishlist',
+        deckId: normalizedDeckId,
+        error: 'Não foi possível consultar os matches agora.',
+      );
     } catch (e, stackTrace) {
       debugPrint('[CommunityProvider] fetchTradeMatches error: $e');
       unawaited(
@@ -430,8 +560,16 @@ class CommunityProvider extends ChangeNotifier {
           extras: {'endpoint': '/community/trade-matches'},
         ),
       );
+      return CommunityTradeMatchSearchResult(
+        matches: const [],
+        source: normalizedDeckId == null || normalizedDeckId.isEmpty
+            ? 'wishlist'
+            : 'deck_missing_and_wishlist',
+        deckId: normalizedDeckId,
+        error:
+            'Não foi possível consultar os matches. Sua wishlist foi preservada.',
+      );
     }
-    return const <CommunityTradeMatch>[];
   }
 
   /// Limpa todo o estado do provider (chamado no logout)

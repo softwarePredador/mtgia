@@ -1002,8 +1002,12 @@ erDiagram
         uuid binder_item_id
         string direction
         uuid id PK
+        json item_snapshot
         uuid owner_id
         number quantity
+        datetime snapshot_captured_at
+        string snapshot_schema_version
+        string snapshot_status
         uuid trade_offer_id
     }
     trade_messages {
@@ -1115,4 +1119,4 @@ erDiagram
     }
 ```
 
-Tabelas: 79; views: 6; migrations: 57 (latest `057`).
+Tabelas: 79; views: 6; migrations: 58 (latest `058`).

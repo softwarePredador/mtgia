@@ -34,6 +34,6 @@ void main() {
       find.byKey(const Key('community-trade-growth-panel')),
       findsOneWidget,
     );
-    expect(find.text('Rede de decks e trocas'), findsOneWidget);
+    expect(find.text('Matches para suas faltantes'), findsOneWidget);
   });
 }

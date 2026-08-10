@@ -4,10 +4,11 @@ import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../cards/screens/card_detail_screen.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../models/mtg_set.dart';
 
@@ -159,27 +160,16 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
   }
 
   DeckCardItem _cardFromJson(Map<String, dynamic> json) {
-    return DeckCardItem(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? 'Carta sem nome',
-      manaCost: json['mana_cost']?.toString(),
-      typeLine: json['type_line']?.toString() ?? '',
-      oracleText: json['oracle_text']?.toString(),
-      colors:
-          (json['colors'] as List?)?.map((e) => e.toString()).toList() ?? [],
-      colorIdentity:
-          (json['color_identity'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      imageUrl: json['image_url']?.toString(),
-      setCode: json['set_code']?.toString() ?? _set?.code ?? '',
-      setName: json['set_name']?.toString() ?? _set?.name,
-      setReleaseDate: json['set_release_date']?.toString() ?? _set?.releaseDate,
-      rarity: json['rarity']?.toString() ?? '',
-      quantity: 1,
-      isCommander: false,
-    );
+    final normalized = Map<String, dynamic>.from(json)
+      ..['id'] = json['id']?.toString() ?? ''
+      ..['name'] = json['name']?.toString() ?? 'Carta sem nome'
+      ..['set_code'] = json['set_code']?.toString() ?? _set?.code ?? ''
+      ..['set_name'] = json['set_name']?.toString() ?? _set?.name
+      ..['set_release_date'] =
+          json['set_release_date']?.toString() ?? _set?.releaseDate
+      ..['quantity'] = 1
+      ..['is_commander'] = false;
+    return DeckCardItem.fromJson(normalized);
   }
 
   Future<void> _loadMore() async {
@@ -450,19 +440,15 @@ class _SetCardTile extends StatelessWidget {
             aspectRatio: 488 / 680,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              child: card.imageUrl == null || card.imageUrl!.isEmpty
-                  ? Container(
-                      color: AppTheme.surfaceElevated,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        color: AppTheme.textSecondary,
-                        size: 18,
-                      ),
-                    )
-                  : CachedCardImage(
-                      imageUrl: card.imageUrl,
-                      fit: BoxFit.contain,
-                    ),
+              child: CardArtwork(
+                variant: CardArtworkVariant.gallery,
+                imageUrl: card.printingImageUrl,
+                fallbackImageUrl: card.fallbackImageUrl,
+                semanticLabel: card.hasPrintingArtwork
+                    ? 'Arte da impressão ${card.name}'
+                    : 'Arte de referência de ${card.name}',
+                constrainAspectRatio: false,
+              ),
             ),
           ),
         ),
@@ -475,14 +461,30 @@ class _SetCardTile extends StatelessWidget {
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: AppTheme.space4),
-          child: Text(
-            '${card.typeLine.isEmpty ? '-' : card.typeLine} • ${card.rarity}',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppTheme.textSecondary),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                card.typeLine.isEmpty ? '-' : card.typeLine,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: AppTheme.textSecondary),
+              ),
+              const SizedBox(height: AppTheme.space3),
+              CardEditionMetadataLine(
+                setCode: card.setCode,
+                collectorNumber: card.collectorNumber,
+                setName: card.setName,
+                setReleaseDate: card.setReleaseDate,
+                rarity: card.rarity,
+                foil: card.foil,
+                warning: card.hasPrintingArtwork ? null : 'Arte de referência',
+              ),
+            ],
           ),
         ),
-        dense: true,
+        dense: false,
         onTap: () {
           openCardDetailRoute(context, card);
         },

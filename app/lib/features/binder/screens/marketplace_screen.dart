@@ -7,12 +7,14 @@ import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../cards/screens/card_detail_screen.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../trades/screens/create_trade_screen.dart';
+import '../../trades/trade_route_contract.dart';
 import '../providers/binder_provider.dart';
 
 /// Widget embeddable para uso como tab dentro do CollectionScreen.
@@ -75,6 +77,22 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
       forSale: _onlySale ? true : null,
       reset: true,
     );
+  }
+
+  bool get _hasActiveFilters =>
+      _searchController.text.trim().isNotEmpty ||
+      _conditionFilter != null ||
+      _onlyTrade ||
+      _onlySale;
+
+  void _clearFilters() {
+    setState(() {
+      _searchController.clear();
+      _conditionFilter = null;
+      _onlyTrade = false;
+      _onlySale = false;
+    });
+    _doSearch();
   }
 
   @override
@@ -247,12 +265,19 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     }
 
     if (provider.marketItems.isEmpty) {
-      return const AppStatePanel(
-        key: Key('marketplace-list-empty'),
-        iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.trade),
+      return AppStatePanel(
+        key: const Key('marketplace-list-empty'),
+        iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.trade),
         title: 'Nenhuma carta encontrada',
-        message: 'Tente outro nome, condição ou tipo de negociação.',
+        message: _hasActiveFilters
+            ? 'Nenhuma oferta combina com estes filtros. Limpe-os para voltar ao catálogo público.'
+            : 'Cadastre o que procura na wishlist para ativar matches automaticamente.',
         accent: AppTheme.brass400,
+        actionLabel: _hasActiveFilters ? 'Limpar filtros' : 'Abrir wishlist',
+        actionKey: const Key('marketplace-empty-action'),
+        onAction: _hasActiveFilters
+            ? _clearFilters
+            : () => context.go(wishlistRouteLocation),
       );
     }
 
@@ -296,13 +321,28 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                   cardId: mktItem.cardId,
                   cardName: mktItem.cardName,
                   cardImageUrl: mktItem.cardImageUrl,
+                  cardScryfallId: mktItem.cardScryfallId,
+                  cardOracleId: mktItem.cardOracleId,
+                  cardLayout: mktItem.cardLayout,
+                  cardFaceImageUrls: mktItem.cardFaceImageUrls,
                   cardSetCode: mktItem.cardSetCode,
+                  cardCollectorNumber: mktItem.cardCollectorNumber,
+                  cardSetName: mktItem.cardSetName,
+                  cardSetReleaseDate: mktItem.cardSetReleaseDate,
+                  cardManaCost: mktItem.cardManaCost,
+                  cardRarity: mktItem.cardRarity,
+                  cardTypeLine: mktItem.cardTypeLine,
+                  cardIsReserved: mktItem.cardIsReserved,
                   quantity: mktItem.quantity,
+                  availableQuantity: mktItem.availableQuantity,
                   condition: mktItem.condition,
                   isFoil: mktItem.isFoil,
                   forTrade: mktItem.forTrade,
                   forSale: mktItem.forSale,
                   price: mktItem.price,
+                  currency: mktItem.currency,
+                  notes: mktItem.notes,
+                  language: mktItem.language,
                   listType: 'have',
                 );
                 final type = mktItem.forSale && !mktItem.forTrade
@@ -311,7 +351,12 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                     ? 'trade'
                     : 'mixed';
                 context.push(
-                  '/trades/create/${Uri.encodeComponent(mktItem.ownerId)}',
+                  createTradeRouteLocation(
+                    receiverId: mktItem.ownerId,
+                    binderItemId: mktItem.id,
+                    type: type,
+                    source: 'marketplace',
+                  ),
                   extra: CreateTradeRouteArgs(
                     initialType: type,
                     preselectedItem: binderItem,
@@ -328,19 +373,24 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
   DeckCardItem _cardFromMarket(MarketplaceItem item) {
     return DeckCardItem(
       id: item.cardId,
+      oracleId: item.cardOracleId,
       name: item.cardName,
       manaCost: item.cardManaCost,
       typeLine: (item.cardTypeLine ?? '').trim().isEmpty
           ? 'Carta'
           : item.cardTypeLine!.trim(),
-      imageUrl: item.cardImageUrl,
+      imageUrl: item.cardPrintingImageUrl,
+      layout: item.cardLayout,
       setCode: item.cardSetCode ?? '',
+      setName: item.cardSetName,
+      setReleaseDate: item.cardSetReleaseDate,
       rarity: (item.cardRarity ?? '').trim().isEmpty
           ? 'unknown'
           : item.cardRarity!.trim(),
       isReserved: item.cardIsReserved,
       quantity: item.quantity,
       isCommander: false,
+      collectorNumber: item.cardCollectorNumber,
       foil: item.isFoil,
       condition: CardCondition.fromCode(item.condition),
     );
@@ -445,11 +495,18 @@ class _MarketplaceCard extends StatelessWidget {
             child: Row(
               children: [
                 // Card image
-                CachedCardImage(
-                  imageUrl: item.cardImageUrl,
+                SizedBox(
                   width: 50,
                   height: 70,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  child: CardArtwork(
+                    variant: CardArtworkVariant.gallery,
+                    imageUrl: item.cardPrintingImageUrl,
+                    fallbackImageUrl: item.cardFallbackImageUrl,
+                    semanticLabel: item.hasPrintingArtwork
+                        ? 'Arte da impressão ${item.cardName}'
+                        : 'Arte de referência de ${item.cardName}',
+                    constrainAspectRatio: false,
+                  ),
                 ),
                 const SizedBox(width: AppTheme.space12),
 
@@ -471,6 +528,20 @@ class _MarketplaceCard extends StatelessWidget {
                       ),
                       const SizedBox(height: AppTheme.space4),
 
+                      CardEditionMetadataLine(
+                        setCode: item.cardSetCode ?? '',
+                        collectorNumber: item.cardCollectorNumber,
+                        setName: item.cardSetName,
+                        setReleaseDate: item.cardSetReleaseDate,
+                        rarity: item.cardRarity,
+                        foil: item.isFoil,
+                        finishContext: CardFinishContext.physicalCopy,
+                        warning: item.hasPrintingArtwork
+                            ? null
+                            : 'Arte de referência',
+                      ),
+                      const SizedBox(height: AppTheme.space4),
+
                       // Badges
                       Wrap(
                         spacing: 6,
@@ -483,17 +554,6 @@ class _MarketplaceCard extends StatelessWidget {
                             item.language.toUpperCase(),
                             AppTheme.textSecondary,
                           ),
-                          if ((item.cardSetCode ?? '').isNotEmpty)
-                            _badge(
-                              item.cardSetCode!.toUpperCase(),
-                              AppTheme.textSecondary,
-                            ),
-                          if (item.isFoil)
-                            Icon(
-                              Icons.flare_rounded,
-                              size: 14,
-                              color: AppTheme.brass400.withValues(alpha: 0.8),
-                            ),
                           if (item.cardIsReserved)
                             _badge('Reserved', AppTheme.brass400),
                         ],
@@ -525,6 +585,29 @@ class _MarketplaceCard extends StatelessWidget {
                         const SizedBox(height: AppTheme.space6),
                         _priceInsight(item.priceInsight!),
                       ],
+                      const SizedBox(height: AppTheme.space4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.update_rounded,
+                            size: 13,
+                            color: AppTheme.textSecondary,
+                          ),
+                          const SizedBox(width: AppTheme.space4),
+                          Expanded(
+                            child: Text(
+                              item.offerFreshnessLabel(),
+                              key: Key('marketplace-freshness-${item.id}'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: AppTheme.fontXs,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: AppTheme.space6),
 
                       // Owner + location

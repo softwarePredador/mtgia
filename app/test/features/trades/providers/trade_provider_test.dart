@@ -32,6 +32,32 @@ class _TradeFailureApiClient extends ApiClient {
   }
 }
 
+class _TradeCreateApiClient extends ApiClient {
+  Map<String, dynamic>? lastBody;
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    expect(endpoint, '/trades');
+    lastBody = Map<String, dynamic>.from(body);
+    return ApiResponse(201, {'id': 'trade-counter-1', 'status': 'pending'});
+  }
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    expect(endpoint, '/trades?page=1&limit=20&role=all');
+    return ApiResponse(200, {
+      'data': const <Map<String, dynamic>>[],
+      'page': 1,
+      'limit': 20,
+      'total': 0,
+    });
+  }
+}
+
 class _RealtimeTradeApiClient extends ApiClient {
   final getEndpoints = <String>[];
 
@@ -173,6 +199,60 @@ class _TradeMessageReplayApiClient extends ApiClient {
 }
 
 void main() {
+  test('trade detail item preserves physical printing metadata', () {
+    final item = TradeItem.fromJson({
+      'id': 'item-1',
+      'binder_item_id': 'binder-1',
+      'direction': 'offering',
+      'quantity': 1,
+      'condition': 'LP',
+      'is_foil': true,
+      'language': 'pt-br',
+      'snapshot_status': 'captured',
+      'identity_status': 'preserved',
+      'card': {
+        'id': 'printing-1',
+        'name': 'Sol Ring',
+        'image_url':
+            'https://cards.scryfall.io/normal/front/a/a/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.jpg',
+        'scryfall_id': 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        'oracle_id': 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        'set_code': 'cmm',
+        'collector_number': '396',
+        'set_name': 'Commander Masters',
+        'set_release_date': '2023-08-04',
+        'rarity': 'uncommon',
+      },
+    });
+
+    expect(item.card.hasPrintingArtwork, isTrue);
+    expect(item.card.collectorNumber, '396');
+    expect(item.card.setName, 'Commander Masters');
+    expect(item.language, 'pt-br');
+    expect(item.isFoil, isTrue);
+    expect(item.hasPreservedIdentity, isTrue);
+    expect(item.identityWarning, isNull);
+  });
+
+  test('legacy trade item without a surviving binder row remains readable', () {
+    final item = TradeItem.fromJson({
+      'id': 'item-legacy',
+      'binder_item_id': null,
+      'direction': 'requesting',
+      'quantity': 1,
+      'snapshot_status': 'legacy_unavailable',
+      'identity_status': 'unavailable',
+      'card': const <String, dynamic>{},
+    });
+
+    expect(item.binderItemId, isEmpty);
+    expect(item.card.id, isEmpty);
+    expect(item.card.name, 'Carta histórica indisponível');
+    expect(item.card.fallbackImageUrl, isNull);
+    expect(item.isHistoricalIdentityUnavailable, isTrue);
+    expect(item.identityWarning, 'Identidade histórica indisponível');
+  });
+
   test(
     'createTrade maps item availability failure to friendly message',
     () async {
@@ -193,6 +273,28 @@ void main() {
         'Algum item desta proposta não está mais disponível. Atualize e tente novamente.',
       );
       expect(provider.errorMessage, isNot(contains('ownership')));
+    },
+  );
+
+  test(
+    'createTrade persists the backend reference for a counterproposal',
+    () async {
+      final api = _TradeCreateApiClient();
+      final provider = TradeProvider(apiClient: api);
+
+      final ok = await provider.createTrade(
+        receiverId: 'receiver-1',
+        myItems: const [
+          {'binder_item_id': 'mine-1', 'quantity': 1},
+        ],
+        requestedItems: const [
+          {'binder_item_id': 'theirs-1', 'quantity': 1},
+        ],
+        counterToTradeId: 'trade-original-1',
+      );
+
+      expect(ok, isTrue);
+      expect(api.lastBody?['counter_to_trade_id'], 'trade-original-1');
     },
   );
 

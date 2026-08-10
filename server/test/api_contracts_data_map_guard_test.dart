@@ -275,9 +275,12 @@ void main() {
       expect(addCard, contains('total_cards'));
       expect(addCard, contains('DeckRulesService'));
 
-      expect(bulkCards, contains('Existing `deck_cards.condition`'));
+      expect(bulkCards, contains('Existing legacy `deck_cards.condition`'));
       expect(bulkCards, contains('newly inserted bulk rows default to `NM`'));
-      expect(bulkCards, contains('must not drop physical condition metadata'));
+      expect(
+        bulkCards,
+        contains('must not drop legacy decklist condition metadata'),
+      );
 
       expect(setCard, contains('Success response'));
       expect(setCard, contains('replace_same_name=true'));

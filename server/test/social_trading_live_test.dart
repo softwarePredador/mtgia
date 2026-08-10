@@ -203,14 +203,16 @@ void main() {
           },
         );
         final binderItemId = binder['id'] as String;
-        addTearDown(
-          () => jsonRequest(
+        var binderDeleted = false;
+        addTearDown(() async {
+          if (binderDeleted) return;
+          await jsonRequest(
             'PUT',
             '/binder/$binderItemId',
             token: sellerToken,
             body: {'for_trade': false, 'for_sale': false},
-          ),
-        );
+          );
+        });
 
         final invalidTrade = await http.post(
           Uri.parse('$baseUrl/trades'),
@@ -257,6 +259,23 @@ void main() {
         expect(trade.keys, containsAll(['id', 'status', 'type', 'created_at']));
         expect(trade['status'], 'pending');
         final tradeId = trade['id'] as String;
+
+        final capturedDetail = await jsonRequest(
+          'GET',
+          '/trades/$tradeId',
+          token: buyerToken,
+        );
+        final capturedItems =
+            (capturedDetail['their_items'] as List<dynamic>)
+                .cast<Map<String, dynamic>>();
+        expect(capturedItems, hasLength(1));
+        expect(capturedItems.single['snapshot_status'], 'captured');
+        expect(capturedItems.single['identity_status'], 'preserved');
+        expect(capturedItems.single['condition'], 'NM');
+        final capturedCard =
+            capturedItems.single['card'] as Map<String, dynamic>;
+        final capturedCardId = capturedCard['id'];
+        final capturedCardName = capturedCard['name'];
 
         await Future<void>.delayed(const Duration(milliseconds: 1600));
         expect(await unreadCount(sellerToken), greaterThanOrEqualTo(1));
@@ -370,6 +389,50 @@ void main() {
         );
         expect(completed['old_status'], 'delivered');
         expect(completed['status'], 'completed');
+
+        await jsonRequest(
+          'PUT',
+          '/binder/$binderItemId',
+          token: sellerToken,
+          body: {'condition': 'LP', 'language': 'pt-br'},
+        );
+        final afterEdit = await jsonRequest(
+          'GET',
+          '/trades/$tradeId',
+          token: buyerToken,
+        );
+        final afterEditItem =
+            ((afterEdit['their_items'] as List<dynamic>).single
+                as Map<String, dynamic>);
+        expect(afterEditItem['condition'], 'NM');
+        expect(afterEditItem['language'], 'en');
+        expect(
+          (afterEditItem['card'] as Map<String, dynamic>)['id'],
+          capturedCardId,
+        );
+
+        final deleteBinder = await http.delete(
+          Uri.parse('$baseUrl/binder/$binderItemId'),
+          headers: jsonHeaders(sellerToken),
+        );
+        expect(deleteBinder.statusCode, 204, reason: deleteBinder.body);
+        binderDeleted = true;
+
+        final afterDelete = await jsonRequest(
+          'GET',
+          '/trades/$tradeId',
+          token: buyerToken,
+        );
+        final afterDeleteItems =
+            (afterDelete['their_items'] as List<dynamic>)
+                .cast<Map<String, dynamic>>();
+        expect(afterDeleteItems, hasLength(1));
+        expect(afterDeleteItems.single['binder_item_id'], isNull);
+        expect(afterDeleteItems.single['identity_status'], 'preserved');
+        expect(
+          (afterDeleteItems.single['card'] as Map<String, dynamic>)['name'],
+          capturedCardName,
+        );
 
         final conversation = await jsonRequest(
           'POST',

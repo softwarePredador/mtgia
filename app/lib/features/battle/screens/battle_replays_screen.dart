@@ -1043,6 +1043,22 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       onDeleteAnnotation: _deleteAnnotation,
       onReflectAtEvent: _recordWouldDoDifferently,
       onReportEvent: _reportReplayEvent,
+      onCreatePostGameEvidence: () {
+        final hash = report.identity.subjectDeckHash?.trim().toLowerCase();
+        final hasSnapshotHash =
+            hash != null && RegExp(r'^[0-9a-f]{64}$').hasMatch(hash);
+        final capturedAt = detail.summary.createdAt;
+        final uri = Uri(
+          path: '/decks/${widget.deckId}/post-game',
+          queryParameters: <String, String>{
+            'playSessionId': 'battle-replay:${detail.summary.id}',
+            if (hasSnapshotHash) 'deckSnapshotHash': hash,
+            if (hasSnapshotHash && capturedAt != null)
+              'deckVersionAt': capturedAt.millisecondsSinceEpoch.toString(),
+          },
+        );
+        context.push(uri.toString());
+      },
       view: _detailView,
       onViewChanged: (view) => setState(() => _detailView = view),
       onBack: () => _clearReplaySelection(syncLocation: true),
@@ -3295,6 +3311,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
     required this.onDeleteAnnotation,
     required this.onReflectAtEvent,
     required this.onReportEvent,
+    required this.onCreatePostGameEvidence,
     required this.view,
     required this.onViewChanged,
     required this.onBack,
@@ -3317,6 +3334,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
   final ValueChanged<BattleReplayAnnotation> onDeleteAnnotation;
   final ValueChanged<int> onReflectAtEvent;
   final ValueChanged<int> onReportEvent;
+  final VoidCallback onCreatePostGameEvidence;
   final _ReplayDetailView view;
   final ValueChanged<_ReplayDetailView> onViewChanged;
   final VoidCallback onBack;
@@ -3404,6 +3422,11 @@ class _BattleReplayDetailPane extends StatelessWidget {
           _ReplayDetailView.decisions => _ReplayDecisions(detail: detail),
         },
         const SizedBox(height: AppTheme.space12),
+        _ReplayEvidenceHandoffPanel(
+          detail: detail,
+          onCreateEvidence: onCreatePostGameEvidence,
+        ),
+        const SizedBox(height: AppTheme.space12),
         _BattlePostReportPanel(report: report),
         const SizedBox(height: AppTheme.space12),
         _BattleAnnotationsPanel(
@@ -3427,6 +3450,87 @@ class _BattleReplayDetailPane extends StatelessWidget {
         const SizedBox(height: AppTheme.space12),
         _ReplayTechnicalDetails(detail: detail),
       ],
+    );
+  }
+}
+
+class _ReplayEvidenceHandoffPanel extends StatelessWidget {
+  const _ReplayEvidenceHandoffPanel({
+    required this.detail,
+    required this.onCreateEvidence,
+  });
+
+  final BattleReplayDetail detail;
+  final VoidCallback onCreateEvidence;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final visibleCards = <BattleReplayVisualCard>{};
+    for (final snapshot in detail.visualSnapshots) {
+      for (final player in snapshot.players) {
+        visibleCards.addAll(player.battlefield);
+        visibleCards.addAll(player.graveyard);
+        visibleCards.addAll(player.exile);
+        visibleCards.addAll(player.command);
+      }
+      visibleCards.addAll(snapshot.stack);
+    }
+    final exactIdentityCount = visibleCards
+        .where(_hasExactBattleCardIdentity)
+        .length;
+
+    return Container(
+      key: const Key('battle-replay-evidence-handoff'),
+      padding: const EdgeInsets.all(AppTheme.space16),
+      decoration: BoxDecoration(
+        color: AppTheme.brass400.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.38)),
+      ),
+      child: Wrap(
+        spacing: AppTheme.space14,
+        runSpacing: AppTheme.space10,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const ManaLoomGlyph(
+            ManaLoomGlyphKind.battleReplay,
+            size: 28,
+            color: AppTheme.brass400,
+          ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 620),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Transformar replay em evidência do deck',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space4),
+                Text(
+                  '$exactIdentityCount carta(s) com identidade exata no replay. '
+                  'No pós-jogo, você confirma cartas reais da sua revisão e '
+                  'os problemas observados; o replay permanece imutável.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          FilledButton.icon(
+            key: const Key('battle-replay-create-evidence-button'),
+            onPressed: onCreateEvidence,
+            icon: const Icon(Icons.fact_check_outlined),
+            label: const Text('Registrar aprendizado'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -6304,7 +6408,7 @@ class _ReplayTextBlock extends StatelessWidget {
   }
 }
 
-String _battleCardImageUrl(
+String? _battleCardImageUrl(
   BattleReplayVisualCard card, {
   String version = 'small',
 }) {
@@ -6316,8 +6420,20 @@ String _battleCardImageUrl(
     }
     return provided;
   }
-  final encoded = Uri.encodeComponent(card.name.trim());
-  return 'https://api.scryfall.com/cards/named?exact=$encoded&format=image&version=$version';
+  if (!_hasExactBattleCardIdentity(card)) return null;
+  final cardId = card.id!.trim();
+  return Uri.https('api.scryfall.com', '/cards/$cardId', {
+    'format': 'image',
+    'version': version,
+  }).toString();
+}
+
+bool _hasExactBattleCardIdentity(BattleReplayVisualCard card) {
+  final cardId = card.id?.trim();
+  return cardId != null &&
+      RegExp(
+        r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+      ).hasMatch(cardId);
 }
 
 String _safeReplayKey(String value) {

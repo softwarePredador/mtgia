@@ -943,5 +943,39 @@ void main() {
         migrate.MigrationRollbackPolicy.manualOnly,
       );
     });
+
+    test('migration 058 preserves immutable historical trade identity', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '058',
+      );
+      final up = migration.up.toLowerCase();
+      final bootstrap =
+          File('database_setup.sql').readAsStringSync().toLowerCase();
+
+      expect(migration.name, equals('snapshot_trade_item_identity'));
+      for (final source in [up, bootstrap]) {
+        for (final column in const [
+          'snapshot_schema_version',
+          'snapshot_status',
+          'item_snapshot',
+          'snapshot_captured_at',
+        ]) {
+          expect(source, contains(column), reason: column);
+        }
+        expect(source, contains("'trade_item_snapshot_v1'"));
+        expect(source, contains("'legacy_recovered'"));
+        expect(source, contains("'legacy_unavailable'"));
+        expect(source, contains('jsonb_build_object'));
+        expect(source, contains('chk_trade_items_snapshot_lifecycle'));
+        expect(source, contains('manaloom_trade_item_snapshot_immutable'));
+        expect(source, contains("message = 'trade_item_snapshot_immutable'"));
+      }
+      expect(up, contains('join user_binder_items bi'));
+      expect(up, contains('join cards c'));
+      expect(
+        migrate.migrationRollbackPolicy('058'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
   });
 }

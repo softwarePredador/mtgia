@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../binder/providers/binder_provider.dart';
+import '../../trades/trade_route_contract.dart';
 import '../models/trade_match_summary.dart';
 
 class CommunityTradeGrowthPanel extends StatelessWidget {
@@ -25,7 +26,7 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
       key: const Key('community-trade-growth-panel'),
       color: AppTheme.transparent,
       child: InkWell(
-        onTap: () => context.push('/trades'),
+        onTap: () => context.push(tradeMatchesRouteLocation()),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Container(
           margin: const EdgeInsets.fromLTRB(
@@ -56,7 +57,7 @@ class CommunityTradeGrowthPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Rede de decks e trocas',
+                      'Matches para suas faltantes',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: AppTheme.textPrimary,
                         fontWeight: FontWeight.w800,

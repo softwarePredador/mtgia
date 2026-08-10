@@ -37,7 +37,15 @@ void main() {
         expect(engagement, isNot(contains('CREATE TABLE')));
         expect(engagement, isNot(contains('CREATE INDEX')));
         expect(engagement, contains('findTradeMatches'));
-        expect(engagement, contains("bi.list_type = 'want'"));
+        expect(engagement, contains('collection_availability_snapshot'));
+        expect(engagement, contains('wanted_missing_quantity'));
+        expect(engagement, contains('COALESCE(c.oracle_id, c.id)'));
+        expect(engagement, contains('binder_item_availability'));
+        expect(
+          engagement,
+          contains('item_availability.available_quantity > 0'),
+        );
+        expect(engagement, contains('bi.id AS binder_item_id'));
         expect(engagement, contains("bi.list_type = 'have'"));
         expect(commentsRoute, contains('HttpMethod.get'));
         expect(commentsRoute, contains('HttpMethod.post'));
@@ -56,6 +64,15 @@ void main() {
       expect(route, contains('visual_analysis'));
       expect(route, contains('_buildVisualAnalysis'));
       expect(route, contains('type_distribution'));
+      expect(route, contains('c.collector_number'));
+      expect(route, contains('c.foil'));
+      expect(route, contains('s.name AS set_name'));
+      expect(route, contains('s.release_date AS set_release_date'));
+      expect(route, contains('SELECT DISTINCT ON (LOWER(code))'));
+      expect(route, contains('printingId:'));
+      expect(route, contains('oracleId:'));
+      expect(route, isNot(contains('user_binder_items')));
+      expect(route, isNot(contains('card_localized_names')));
     });
 
     test(

@@ -11,15 +11,30 @@ import '../providers/social_provider.dart';
 import 'user_profile_screen.dart';
 
 class UserSearchScreen extends StatefulWidget {
-  const UserSearchScreen({super.key});
+  const UserSearchScreen({super.key, this.initialQuery = ''});
+
+  final String initialQuery;
 
   @override
   State<UserSearchScreen> createState() => _UserSearchScreenState();
 }
 
 class _UserSearchScreenState extends State<UserSearchScreen> {
-  final _searchController = TextEditingController();
+  late final TextEditingController _searchController;
   Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(text: widget.initialQuery);
+    if (widget.initialQuery.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<SocialProvider>().searchUsers(widget.initialQuery);
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -121,7 +136,9 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                       title: 'Falha ao buscar jogadores',
                       message: provider.searchError,
                       accent: AppTheme.error,
+                      status: AppStateStatus.error,
                       actionLabel: 'Tentar novamente',
+                      actionKey: const Key('user-search-retry'),
                       onAction: () =>
                           provider.searchUsers(_searchController.text.trim()),
                     );
@@ -139,12 +156,21 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   }
 
                   if (provider.searchResults.isEmpty) {
-                    return const AppStatePanel(
-                      key: Key('user-search-empty-results'),
-                      iconWidget: ManaLoomGlyph(ManaLoomGlyphKind.player),
+                    return AppStatePanel(
+                      key: const Key('user-search-empty-results'),
+                      iconWidget: const ManaLoomGlyph(ManaLoomGlyphKind.player),
                       title: 'Nenhum jogador encontrado',
-                      message: 'Revise o nome e tente novamente.',
+                      message:
+                          'Revise o nick ou limpe a busca para tentar outro jogador.',
                       accent: AppTheme.warning,
+                      status: AppStateStatus.noResults,
+                      actionLabel: 'Limpar busca',
+                      actionKey: const Key('user-search-empty-clear'),
+                      onAction: () {
+                        _debounce?.cancel();
+                        setState(_searchController.clear);
+                        provider.clearSearch();
+                      },
                     );
                   }
 

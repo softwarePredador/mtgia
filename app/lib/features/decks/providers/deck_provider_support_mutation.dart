@@ -2,6 +2,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
+import '../models/deck_optimization_event.dart';
 import 'deck_provider_support_common.dart';
 import 'deck_provider_support_generation.dart';
 
@@ -308,6 +309,37 @@ Future<Map<String, dynamic>> rollbackDeckOptimizationRequest(
   );
   final data = response.data;
   return data is Map ? data.cast<String, dynamic>() : const <String, dynamic>{};
+}
+
+List<DeckOptimizationEvent> parseDeckOptimizationHistoryResponse(
+  ApiResponse response,
+) {
+  if (response.statusCode != 200) {
+    ensureSuccessfulDeckMutationResponse(
+      response,
+      fallbackMessage: 'Falha ao carregar histórico da oficina',
+    );
+  }
+  final data = response.data;
+  if (data is! Map || data['events'] is! List) {
+    return const <DeckOptimizationEvent>[];
+  }
+  return (data['events'] as List)
+      .whereType<Map>()
+      .map(
+        (event) =>
+            DeckOptimizationEvent.fromJson(event.cast<String, dynamic>()),
+      )
+      .where((event) => event.id.isNotEmpty)
+      .toList(growable: false);
+}
+
+Future<List<DeckOptimizationEvent>> fetchDeckOptimizationHistoryRequest(
+  ApiClient apiClient, {
+  required String deckId,
+}) async {
+  final response = await apiClient.get('/decks/$deckId/optimizations');
+  return parseDeckOptimizationHistoryResponse(response);
 }
 
 Future<void> updateDeckDescriptionRequest(

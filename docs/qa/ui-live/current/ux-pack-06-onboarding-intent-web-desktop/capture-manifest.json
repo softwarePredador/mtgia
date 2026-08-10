@@ -1,0 +1,66 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T20:05:30.027007Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "onboarding_intent",
+  "profile": "web_onboarding_intent_desktop_1440x900",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Onboarding Intent controlled Flutter surface requested at 1440x900; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "45932d0c0ce9a87310a41e37edfb973d72092b70bc5f3d2a86ca9aacc8ea6c8e",
+  "checkpoint_count": 5,
+  "required_checkpoints": [
+    "onboarding_intent_00_first_run",
+    "onboarding_intent_01_build_path",
+    "onboarding_intent_02_resumed_plan",
+    "onboarding_intent_03_skipped_home",
+    "onboarding_intent_04_completed_home"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "onboarding_intent_00_first_run",
+      "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/onboarding_intent_00_first_run.png",
+      "sha256": "025abc436143cc76118970e3924a954b187c4cccab041a6cb6282a12a2573ec6",
+      "bytes": 183084,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "onboarding_intent_01_build_path",
+      "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/onboarding_intent_01_build_path.png",
+      "sha256": "cdc31d4b86332e916f023264ccec6cd0f580147dd22d3ccff6cc228f8ee51e22",
+      "bytes": 201441,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "onboarding_intent_02_resumed_plan",
+      "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/onboarding_intent_02_resumed_plan.png",
+      "sha256": "71080acfe1cfa8178c6b3d11ca6b387387b17c9004b4f2c04644f98e67c2fed4",
+      "bytes": 199907,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "onboarding_intent_03_skipped_home",
+      "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/onboarding_intent_03_skipped_home.png",
+      "sha256": "aecfb7bc00274ac9da0b8a24fb51f582efeb31455b34ddfe0b7472809f95411c",
+      "bytes": 249653,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "onboarding_intent_04_completed_home",
+      "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/onboarding_intent_04_completed_home.png",
+      "sha256": "24d1ca974b1af7a40b9abddd48f9ea655cedb950c52586f33a2c68cf8b304028",
+      "bytes": 245081,
+      "width": 1440,
+      "height": 900
+    }
+  ]
+}

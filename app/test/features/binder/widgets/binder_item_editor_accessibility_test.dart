@@ -24,7 +24,7 @@ void main() {
             item: BinderItem(
               id: 'binder-1',
               cardId: 'card-1',
-              cardName: 'Sol Ring',
+              cardName: '',
               listType: 'have',
             ),
           ),

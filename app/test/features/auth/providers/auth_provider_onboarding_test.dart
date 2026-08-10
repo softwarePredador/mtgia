@@ -56,6 +56,9 @@ class _OnboardingRepository implements OnboardingStateRepository {
   Future<void> saveProgress(
     String userId, {
     required String selectedFormat,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   }) async {}
 
   @override
@@ -63,6 +66,9 @@ class _OnboardingRepository implements OnboardingStateRepository {
     String userId, {
     required String selectedFormat,
     required OnboardingDisposition disposition,
+    OnboardingGoal? selectedGoal,
+    OnboardingExperience? experience,
+    OnboardingBuildMode? buildMode,
   }) async {}
 }
 

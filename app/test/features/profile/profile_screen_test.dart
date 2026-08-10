@@ -8,6 +8,7 @@ import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:manaloom/features/profile/profile_screen.dart';
+import 'package:manaloom/features/social/providers/social_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +30,7 @@ class _ProfileApiClient extends ApiClient {
     'id': 'user-1',
     'username': 'runtime_profile',
     'email': 'runtime_profile@example.com',
-    'display_name': 'Initial Runtime',
+    'display_name': 'Marina — Arquivista de Comandantes do Litoral',
     'avatar_url': null,
     'location_state': 'RJ',
     'location_city': 'Rio de Janeiro',
@@ -55,6 +56,18 @@ class _ProfileApiClient extends ApiClient {
         'schema_version': 1,
         'account': {'id': 'user-1', 'email': user['email']},
         'data': {'decks': <Object>[]},
+      });
+    }
+    if (endpoint == '/users/me/blocks') {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'blocked-1',
+            'username': 'ofertas_inseguras',
+            'display_name': 'Conta bloqueada',
+            'blocked_at': '2026-08-01T10:00:00Z',
+          },
+        ],
       });
     }
     fail('GET inesperado: $endpoint');
@@ -125,6 +138,9 @@ void main() {
             ChangeNotifierProvider<NotificationProvider>(
               create: (_) => NotificationProvider(),
             ),
+            ChangeNotifierProvider<SocialProvider>(
+              create: (_) => SocialProvider(apiClient: api),
+            ),
           ],
           child: MaterialApp(
             theme: AppTheme.darkTheme,
@@ -143,9 +159,19 @@ void main() {
         lessThanOrEqualTo(390),
       );
       expect(tester.takeException(), isNull);
-      expect(find.text('runtime_profile'), findsOneWidget);
+      expect(find.text('@runtime_profile'), findsOneWidget);
+      expect(
+        tester
+            .getSemantics(find.byKey(const Key('profile-identity-name')))
+            .label,
+        contains('Marina — Arquivista de Comandantes do Litoral'),
+      );
       expect(find.text('Initial notes'), findsOneWidget);
-      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+      expect(find.byKey(const Key('profile-identity-rail')), findsOneWidget);
+      expect(
+        find.byKey(const Key('profile-settings-workspace')),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const Key('profile-display-name-field')),
         findsOneWidget,
@@ -155,6 +181,9 @@ void main() {
         find.byKey(const Key('profile-trade-notes-field')),
         findsOneWidget,
       );
+      final saveButton = find.byKey(const Key('profile-save-button'));
+      expect(tester.widget<FilledButton>(saveButton).onPressed, isNull);
+      expect(find.text('Tudo salvo'), findsOneWidget);
 
       await tester.enterText(
         find.byKey(const Key('profile-display-name-field')),
@@ -168,13 +197,9 @@ void main() {
         find.byKey(const Key('profile-trade-notes-field')),
         'Runtime trade notes edited',
       );
-      final saveButton = find.byKey(const Key('profile-save-button'));
-      await tester.scrollUntilVisible(
-        saveButton,
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      expect(tester.widget<FilledButton>(saveButton).onPressed, isNotNull);
+      expect(find.text('Alterações não salvas'), findsOneWidget);
       await tester.tap(saveButton);
       await tester.pumpAndSettle();
 
@@ -188,6 +213,8 @@ void main() {
       expect(api.lastPatchBody?['trade_visibility'], 'everyone');
       expect(api.lastPatchBody?['trade_notes_visibility'], 'private');
       expect(auth.user?.displayName, 'Runtime Nick Edited');
+      expect(tester.widget<FilledButton>(saveButton).onPressed, isNull);
+      expect(find.text('Alterações salvas'), findsOneWidget);
 
       final refreshed = await auth.refreshProfile();
       expect(refreshed, isTrue);
@@ -210,7 +237,145 @@ void main() {
       await tester.pump(const Duration(seconds: 5));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('profile-delete-account-button')));
+      final avatarButton = find.byKey(const Key('profile-avatar-edit-button'));
+      await tester.scrollUntilVisible(
+        avatarButton,
+        -250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(avatarButton);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('profile-avatar-dialog')), findsOneWidget);
+      expect(
+        find.byKey(const Key('profile-avatar-privacy-notice')),
+        findsOneWidget,
+      );
+      await tester.enterText(
+        find.byKey(const Key('profile-avatar-url-field')),
+        'https://127.0.0.1/avatar.png',
+      );
+      await tester.tap(find.byKey(const Key('profile-avatar-apply-button')));
+      await tester.pump();
+      expect(
+        find.text(
+          'Use um endereço público; links locais ou de rede privada não são aceitos.',
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(const Key('profile-avatar-cancel-button')));
+      await tester.pumpAndSettle();
+
+      final changePassword = find.byKey(
+        const Key('profile-change-password-button'),
+      );
+      await tester.scrollUntilVisible(
+        changePassword,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(changePassword);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('profile-change-password-dialog')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('profile-password-requirements')),
+        findsOneWidget,
+      );
+      final newPasswordField = find.byKey(
+        const Key('profile-new-password-field'),
+      );
+      EditableText passwordEditor() => tester.widget<EditableText>(
+        find.descendant(
+          of: newPasswordField,
+          matching: find.byType(EditableText),
+        ),
+      );
+      expect(passwordEditor().obscureText, isTrue);
+      await tester.tap(
+        find.byKey(const Key('profile-new-password-visibility')),
+      );
+      await tester.pump();
+      expect(passwordEditor().obscureText, isFalse);
+      await tester.tap(
+        find.byKey(const Key('profile-change-password-confirm-button')),
+      );
+      await tester.pump();
+      expect(find.text('Informe sua senha atual.'), findsOneWidget);
+      await tester.tap(
+        find.byKey(const Key('profile-change-password-cancel-button')),
+      );
+      await tester.pumpAndSettle();
+
+      final revokeSessions = find.byKey(
+        const Key('profile-revoke-sessions-button'),
+      );
+      await tester.ensureVisible(revokeSessions);
+      await tester.tap(revokeSessions);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('profile-revoke-sessions-dialog')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('profile-revoke-password-visibility')),
+        findsOneWidget,
+      );
+      await tester.tap(
+        find.byKey(const Key('profile-revoke-sessions-confirm-button')),
+      );
+      await tester.pump();
+      expect(find.text('Informe sua senha atual.'), findsOneWidget);
+      await tester.tap(
+        find.byKey(const Key('profile-revoke-sessions-cancel-button')),
+      );
+      await tester.pumpAndSettle();
+
+      final blockedUsers = find.byKey(
+        const Key('profile-blocked-users-button'),
+      );
+      await tester.scrollUntilVisible(
+        blockedUsers,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(blockedUsers);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('profile-blocked-users-dialog')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('profile-blocked-users-list')),
+        findsOneWidget,
+      );
+      final blockedUsername = find.byKey(
+        const Key('profile-blocked-username-blocked-1'),
+      );
+      expect(find.text('@ofertas_inseguras'), findsOneWidget);
+      expect(tester.widget<Text>(blockedUsername).maxLines, 1);
+      expect(
+        tester.getRect(blockedUsername).right,
+        lessThanOrEqualTo(
+          tester
+              .getRect(find.byKey(const Key('profile-blocked-users-dialog')))
+              .right,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byKey(const Key('profile-blocked-users-close')));
+      await tester.pumpAndSettle();
+
+      final deleteAccount = find.byKey(
+        const Key('profile-delete-account-button'),
+      );
+      await tester.scrollUntilVisible(
+        deleteAccount,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(deleteAccount);
       await tester.pumpAndSettle();
       expect(
         find.byKey(const Key('profile-delete-account-dialog')),
@@ -237,6 +402,14 @@ void main() {
       );
       await tester.tap(deleteButton);
       await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('profile-delete-privacy-link')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('profile-delete-password-visibility')),
+        findsOneWidget,
+      );
       await tester.tap(find.byKey(const Key('profile-delete-confirm-button')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
@@ -245,6 +418,18 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Informe sua senha.'), findsOneWidget);
+      expect(
+        tester
+            .widget<InputDecorator>(
+              find.descendant(
+                of: find.byKey(const Key('profile-delete-confirmation-field')),
+                matching: find.byType(InputDecorator),
+              ),
+            )
+            .decoration
+            .errorMaxLines,
+        2,
+      );
 
       await tester.enterText(
         find.byKey(const Key('profile-delete-confirmation-field')),
@@ -266,12 +451,19 @@ void main() {
         findsOneWidget,
       );
 
-      tester.view.physicalSize = const Size(1280, 900);
+      tester.view.physicalSize = const Size(1920, 1080);
       await tester.pumpAndSettle();
-      expect(
-        tester.getSize(find.byKey(const Key('profile-content'))).width,
-        lessThanOrEqualTo(840),
+      final content = tester.getRect(find.byKey(const Key('profile-content')));
+      final identity = tester.getRect(
+        find.byKey(const Key('profile-identity-rail')),
       );
+      final workspace = tester.getRect(
+        find.byKey(const Key('profile-settings-workspace')),
+      );
+      expect(content.width, greaterThan(1100));
+      expect(content.width, lessThanOrEqualTo(1280));
+      expect(find.byKey(const Key('profile-wide-workbench')), findsOneWidget);
+      expect(identity.right, lessThan(workspace.left));
       expect(tester.takeException(), isNull);
     },
   );

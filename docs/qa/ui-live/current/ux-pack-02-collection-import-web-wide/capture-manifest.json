@@ -1,0 +1,84 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T19:57:34.560644Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "binder_import",
+  "profile": "web_binder_import_wide_1920x1080",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Binder Import controlled Flutter surface requested at 1920x1080; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "805392dc12fd5ec2d9d83ff2b7244fa2ed40fbd27a439a931d6e57bdc0d0bf17",
+  "checkpoint_count": 7,
+  "required_checkpoints": [
+    "binder_import_00_source",
+    "binder_import_01_review_duplicates",
+    "binder_import_02_plan",
+    "binder_import_03_confirmation",
+    "binder_import_04_partial_failure",
+    "binder_import_05_retry_success",
+    "binder_import_06_history"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "binder_import_00_source",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_00_source.png",
+      "sha256": "addecca2d148713c499471e7e3e09231d56c61222db2804387c399d34fb4dbab",
+      "bytes": 132993,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "binder_import_01_review_duplicates",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_01_review_duplicates.png",
+      "sha256": "c0ea20ae07e37f18240b5cbe2a34bab68922fed3c53581ffa0e524fa1cb3583b",
+      "bytes": 142922,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "binder_import_02_plan",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_02_plan.png",
+      "sha256": "bc4f8c1de05d81e68668720e0b707d941c2646504008dda9da8bc95f4aeac748",
+      "bytes": 162043,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "binder_import_03_confirmation",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_03_confirmation.png",
+      "sha256": "b3ed0c3c0b6ee349de0b860689eead3fadfd28ed0afdcd4a57f0ea367d7b592a",
+      "bytes": 134107,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "binder_import_04_partial_failure",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_04_partial_failure.png",
+      "sha256": "ae154df545ff22effa8e6ef6fb07ffd1fe2713e7e9cf68d4c2c550798ac419fe",
+      "bytes": 174123,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "binder_import_05_retry_success",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_05_retry_success.png",
+      "sha256": "9724177cb1afcbbf6f1a16034838f812c7d571b2440afe459b413747f57ccc43",
+      "bytes": 166329,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "binder_import_06_history",
+      "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/binder_import_06_history.png",
+      "sha256": "3fa4be8766ecd8ff023e98bcc3a5a5fabf2ed3a7f90f94de6295770295f0bb6b",
+      "bytes": 177861,
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}

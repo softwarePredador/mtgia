@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../lib/binder_item_contract.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
+import '../../lib/scryfall_image_url.dart';
 
 /// GET /binder  → Lista itens do binder do usuário autenticado
 /// POST /binder → Adiciona carta ao binder
@@ -114,14 +115,29 @@ Future<Response> _listBinder(RequestContext context) async {
         WHERE d.user_id = @userId
           AND d.deleted_at IS NULL
         GROUP BY COALESCE(deck_card.oracle_id, deck_card.id)
+      ),
+      canonical_sets AS (
+        SELECT DISTINCT ON (LOWER(code))
+          code,
+          name,
+          release_date
+        FROM sets
+        ORDER BY LOWER(code), release_date DESC NULLS LAST, code
       )
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
               bi.for_trade, bi.for_sale, bi.price, bi.currency,
               bi.notes, bi.language, bi.list_type, bi.created_at, bi.updated_at,
               c.name AS card_name, c.image_url AS card_image_url,
+              c.scryfall_id::text AS card_scryfall_id,
+              c.oracle_id::text AS card_oracle_id,
+              c.layout AS card_layout,
+              c.card_faces_json AS card_faces,
               c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
+              c.collector_number AS card_collector_number,
               c.type_line AS card_type_line, c.rarity AS card_rarity,
               c.is_reserved AS card_is_reserved,
+              s.name AS card_set_name,
+              s.release_date AS card_set_release_date,
               COALESCE(c.price_usd, c.price) AS card_market_price,
               c.price_source AS card_market_price_source,
               c.price_updated_at AS card_market_price_updated_at,
@@ -136,6 +152,7 @@ Future<Response> _listBinder(RequestContext context) async {
               COALESCE(item_availability.available_quantity, 0)::int AS available_quantity
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
       LEFT JOIN deck_usage du
         ON du.playable_card_id = COALESCE(c.oracle_id, c.id)
       LEFT JOIN collection_availability_snapshot availability
@@ -163,8 +180,25 @@ Future<Response> _listBinder(RequestContext context) async {
             'card': {
               'id': cols['card_id'],
               'name': cols['card_name'],
-              'image_url': cols['card_image_url'],
+              'image_url': normalizeScryfallImageUrl(
+                cols['card_image_url']?.toString(),
+                printingId: cols['card_scryfall_id']?.toString(),
+                oracleId: cols['card_oracle_id']?.toString(),
+              ),
+              'scryfall_id': cols['card_scryfall_id'],
+              'oracle_id': cols['card_oracle_id'],
+              'layout': cols['card_layout'],
+              'card_faces': cols['card_faces'],
               'set_code': cols['card_set_code'],
+              'collector_number': cols['card_collector_number'],
+              'set_name': cols['card_set_name'],
+              'set_release_date':
+                  cols['card_set_release_date'] is DateTime
+                      ? (cols['card_set_release_date'] as DateTime)
+                          .toIso8601String()
+                          .split('T')
+                          .first
+                      : cols['card_set_release_date']?.toString(),
               'mana_cost': cols['card_mana_cost'],
               'type_line': cols['card_type_line'],
               'rarity': cols['card_rarity'],

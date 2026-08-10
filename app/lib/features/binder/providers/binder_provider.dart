@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/models/user_trust_insight.dart';
+import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 
 // =====================================================================
@@ -12,7 +15,14 @@ class BinderItem {
   final String cardId;
   final String cardName;
   final String? cardImageUrl;
+  final String? cardScryfallId;
+  final String? cardOracleId;
+  final String? cardLayout;
+  final List<String> cardFaceImageUrls;
   final String? cardSetCode;
+  final String? cardCollectorNumber;
+  final String? cardSetName;
+  final String? cardSetReleaseDate;
   final String? cardManaCost;
   final String? cardRarity;
   final String? cardTypeLine;
@@ -48,7 +58,14 @@ class BinderItem {
     required this.cardId,
     required this.cardName,
     this.cardImageUrl,
+    this.cardScryfallId,
+    this.cardOracleId,
+    this.cardLayout,
+    this.cardFaceImageUrls = const [],
     this.cardSetCode,
+    this.cardCollectorNumber,
+    this.cardSetName,
+    this.cardSetReleaseDate,
     this.cardManaCost,
     this.cardRarity,
     this.cardTypeLine,
@@ -80,6 +97,28 @@ class BinderItem {
     this.listType = 'have',
   });
 
+  String? get cardPrintingImageUrl {
+    final image = cardImageUrl?.trim();
+    if (image != null &&
+        image.isNotEmpty &&
+        !_isReferenceImageUrl(
+          image,
+          scryfallId: cardScryfallId,
+          oracleId: cardOracleId,
+        )) {
+      return image;
+    }
+    for (final faceImage in cardFaceImageUrls) {
+      if (faceImage.trim().isNotEmpty) return faceImage.trim();
+    }
+    return null;
+  }
+
+  String? get cardFallbackImageUrl =>
+      ScryfallImageHelper.namedImageUrl(cardName);
+
+  bool get hasPrintingArtwork => cardPrintingImageUrl != null;
+
   factory BinderItem.fromJson(Map<String, dynamic> json) {
     final card = json['card'] as Map<String, dynamic>?;
     return BinderItem(
@@ -88,8 +127,26 @@ class BinderItem {
       cardName: card?['name'] as String? ?? json['card_name'] as String? ?? '',
       cardImageUrl:
           card?['image_url'] as String? ?? json['card_image_url'] as String?,
+      cardScryfallId:
+          card?['scryfall_id']?.toString() ??
+          json['card_scryfall_id']?.toString(),
+      cardOracleId:
+          card?['oracle_id']?.toString() ?? json['card_oracle_id']?.toString(),
+      cardLayout:
+          card?['layout']?.toString() ?? json['card_layout']?.toString(),
+      cardFaceImageUrls: _cardFaceImageUrls(
+        card?['card_faces'] ?? json['card_faces'],
+      ),
       cardSetCode:
           card?['set_code'] as String? ?? json['card_set_code'] as String?,
+      cardCollectorNumber:
+          card?['collector_number']?.toString() ??
+          json['card_collector_number']?.toString(),
+      cardSetName:
+          card?['set_name']?.toString() ?? json['card_set_name']?.toString(),
+      cardSetReleaseDate:
+          card?['set_release_date']?.toString() ??
+          json['card_set_release_date']?.toString(),
       cardManaCost:
           card?['mana_cost'] as String? ?? json['card_mana_cost'] as String?,
       cardRarity: card?['rarity'] as String? ?? json['card_rarity'] as String?,
@@ -131,6 +188,50 @@ class BinderItem {
       listType: json['list_type'] as String? ?? 'have',
     );
   }
+}
+
+bool _isReferenceImageUrl(
+  String value, {
+  String? scryfallId,
+  String? oracleId,
+}) {
+  final uri = Uri.tryParse(value);
+  if (uri?.host.toLowerCase() != 'api.scryfall.com') return false;
+  if (uri?.path == '/cards/named') return true;
+  final segments = uri?.pathSegments ?? const <String>[];
+  if (segments.length != 2 || segments.first != 'cards') return false;
+  final candidate = segments[1].toLowerCase();
+  final oracle = oracleId?.trim().toLowerCase();
+  final printing = scryfallId?.trim().toLowerCase();
+  return oracle != null && candidate == oracle && candidate != printing;
+}
+
+List<String> _cardFaceImageUrls(Object? value) {
+  Object? decoded = value;
+  if (value is String && value.trim().isNotEmpty) {
+    try {
+      decoded = jsonDecode(value);
+    } on FormatException {
+      return const [];
+    }
+  }
+  if (decoded is! List) return const [];
+
+  return decoded
+      .whereType<Map>()
+      .map((face) {
+        final imageUris = face['image_uris'];
+        if (imageUris is! Map) return face['image_url']?.toString().trim();
+        return (imageUris['normal'] ??
+                imageUris['large'] ??
+                imageUris['small'] ??
+                imageUris['png'])
+            ?.toString()
+            .trim();
+      })
+      .whereType<String>()
+      .where((url) => url.isNotEmpty)
+      .toList(growable: false);
 }
 
 class BinderDistributionEntry {
@@ -360,11 +461,20 @@ class MarketplaceItem extends BinderItem {
     required super.cardId,
     required super.cardName,
     super.cardImageUrl,
+    super.cardScryfallId,
+    super.cardOracleId,
+    super.cardLayout,
+    super.cardFaceImageUrls,
     super.cardSetCode,
+    super.cardCollectorNumber,
+    super.cardSetName,
+    super.cardSetReleaseDate,
     super.cardManaCost,
     super.cardRarity,
     super.cardTypeLine,
     super.cardIsReserved,
+    super.createdAt,
+    super.updatedAt,
     super.quantity,
     super.availableQuantity,
     super.condition,
@@ -395,11 +505,20 @@ class MarketplaceItem extends BinderItem {
       cardId: card?['id'] as String? ?? json['card_id'] as String? ?? '',
       cardName: card?['name'] as String? ?? '',
       cardImageUrl: card?['image_url'] as String?,
+      cardScryfallId: card?['scryfall_id']?.toString(),
+      cardOracleId: card?['oracle_id']?.toString(),
+      cardLayout: card?['layout']?.toString(),
+      cardFaceImageUrls: _cardFaceImageUrls(card?['card_faces']),
       cardSetCode: card?['set_code'] as String?,
+      cardCollectorNumber: card?['collector_number']?.toString(),
+      cardSetName: card?['set_name']?.toString(),
+      cardSetReleaseDate: card?['set_release_date']?.toString(),
       cardManaCost: card?['mana_cost'] as String?,
       cardRarity: card?['rarity'] as String?,
       cardTypeLine: card?['type_line'] as String?,
       cardIsReserved: card?['is_reserved'] as bool? ?? false,
+      createdAt: json['created_at']?.toString(),
+      updatedAt: json['updated_at']?.toString(),
       quantity: json['quantity'] as int? ?? 1,
       availableQuantity:
           json['available_quantity'] as int? ?? json['quantity'] as int? ?? 0,
@@ -438,6 +557,26 @@ class MarketplaceItem extends BinderItem {
     if (ownerLocationState != null) return ownerLocationState;
     return null;
   }
+
+  String offerFreshnessLabel({DateTime? now}) =>
+      marketplaceOfferFreshnessLabel(updatedAt, now: now);
+}
+
+String marketplaceOfferFreshnessLabel(String? value, {DateTime? now}) {
+  final updatedAt = DateTime.tryParse(value?.trim() ?? '')?.toUtc();
+  if (updatedAt == null) return 'Atualização não informada';
+
+  final reference = (now ?? DateTime.now()).toUtc();
+  final age = reference.difference(updatedAt);
+  if (age.isNegative || age.inMinutes < 2) return 'Atualizada agora';
+  if (age.inHours < 1) return 'Atualizada há ${age.inMinutes} min';
+  if (age.inDays < 1) return 'Atualizada há ${age.inHours} h';
+  if (age.inDays < 30) {
+    return 'Atualizada há ${age.inDays} dia${age.inDays == 1 ? '' : 's'}';
+  }
+  final day = updatedAt.day.toString().padLeft(2, '0');
+  final month = updatedAt.month.toString().padLeft(2, '0');
+  return 'Atualizada em $day/$month/${updatedAt.year}';
 }
 
 class MarketplacePriceInsight {
@@ -1011,6 +1150,43 @@ class BinderProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint(
         '[❌ BinderProvider] fetchPublicBinderDirect($userId, $listType): $e',
+      );
+      return null;
+    }
+  }
+
+  /// Resolves one currently public and available physical copy by stable ID.
+  ///
+  /// This is used to rebuild a trade draft after Web reload or a shared link.
+  /// The backend reapplies binder visibility, block and availability rules; URL
+  /// data is never treated as the physical-copy source of truth.
+  Future<BinderItem?> fetchPublicBinderItemDirect({
+    required String userId,
+    required String itemId,
+  }) async {
+    final normalizedUserId = userId.trim();
+    final normalizedItemId = itemId.trim();
+    if (normalizedUserId.isEmpty || normalizedItemId.isEmpty) return null;
+
+    try {
+      final uri = Uri(
+        path: '/community/binders/$normalizedUserId',
+        queryParameters: {
+          'page': '1',
+          'limit': '1',
+          'list_type': 'have',
+          'item_id': normalizedItemId,
+        },
+      );
+      final res = await _api.get(uri.toString());
+      if (res.statusCode != 200 || res.data is! Map) return null;
+      final data = res.data as Map<String, dynamic>;
+      final rows = data['data'] as List<dynamic>? ?? const [];
+      if (rows.isEmpty || rows.first is! Map) return null;
+      return BinderItem.fromJson((rows.first as Map).cast<String, dynamic>());
+    } catch (e) {
+      debugPrint(
+        '[❌ BinderProvider] fetchPublicBinderItemDirect($userId, $itemId): $e',
       );
       return null;
     }

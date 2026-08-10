@@ -10,6 +10,7 @@
     "docs/CONTEXTO_PRODUTO_ATUAL.md",
     "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
     "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
+    "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
     "docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md",
     "docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md",
     "docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md",
@@ -18,6 +19,7 @@
     "docs/adr/0002-battle-lab-execution-boundaries.md",
     "docs/adr/0003-xmage-human-spike-no-go.md",
     "docs/adr/0004-battle-live-polling-and-durable-checkpoints.md",
+    "docs/adr/0008-decklist-and-binder-physical-copy-boundary.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
@@ -377,6 +379,20 @@
       "tests": ["server/test/e2e_trade_tests.py", "app/test/features/trades/screens/trade_confirmation_flow_test.dart"],
       "tables": ["trade_offers", "trade_items", "trade_status_history"],
       "canonical_source": "server/doc/API_CONTRACTS_AND_DATA_MAP.md"
+    },
+    {
+      "rule": "Decklist preserva impressão e quantidade; identidade de cópia física pertence ao Binder e nunca é inferida de cards.foil.",
+      "implementation": [
+        "app/lib/features/cards/widgets/card_edition_metadata.dart",
+        "app/lib/features/decks/models/deck_card_item.dart",
+        "server/lib/collection_availability_contract.dart"
+      ],
+      "tests": [
+        "app/test/features/cards/widgets/card_printing_picker_test.dart",
+        "server/test/collection_availability_contract_test.dart"
+      ],
+      "tables": ["cards", "deck_cards", "user_binder_items"],
+      "canonical_source": "docs/adr/0008-decklist-and-binder-physical-copy-boundary.md"
     },
     {
       "rule": "Migrations live exigem aprovação explícita, backup, status e rollback conhecido.",

@@ -280,4 +280,66 @@ void main() {
     );
     expect((response['optimize_diagnostics'] as Map)['existing'], isTrue);
   });
+
+  test(
+    'post-game note id is bounded, cache-scoped, and authenticated later',
+    () {
+      final context =
+          parseOptimizeRouteRequest({
+            'deck_id': 'deck-6',
+            'archetype': 'artifacts',
+            'recommendation_context': {'post_game_note_id': 'note-42'},
+          }).recommendationContext;
+
+      expect(context.postGameNoteId, 'note-42');
+      expect(context.cacheSignature, contains('post_game_note_id=note-42'));
+      expect(
+        (context.toDiagnosticsJson()['server_support']
+            as Map)['post_game_note_id'],
+        'authenticated_lookup',
+      );
+
+      final unsafe =
+          parseOptimizeRouteRequest({
+            'deck_id': 'deck-6',
+            'archetype': 'artifacts',
+            'recommendation_context': {
+              'post_game_note_id': '../another-user/note',
+            },
+          }).recommendationContext;
+      expect(unsafe.postGameNoteId, isNull);
+    },
+  );
+
+  test('authenticated evidence is attached and converted to a safe prompt', () {
+    final evidence = <String, dynamic>{
+      'schema_version': 'post_game_optimize_evidence_v1',
+      'note_id': 'note-42',
+      'note_revision': 3,
+      'selected_card_count': 2,
+      'issues': ['speed', 'protection'],
+      'performed_well': [
+        {'name': 'Sol Ring', 'card_id': 'card-1'},
+      ],
+      'underperformed': [
+        {'name': 'Thought Vessel', 'card_id': 'card-2'},
+      ],
+      'deck_revision': {'matches_current': true},
+    };
+    final response = <String, dynamic>{};
+
+    attachPostGameEvidenceToOptimizeResponse(response, evidence);
+    final prompt = buildPostGameEvidencePrompt(evidence)!;
+
+    expect((response['post_game_evidence'] as Map)['note_id'], 'note-42');
+    expect(
+      ((response['optimize_diagnostics'] as Map)['post_game_evidence']
+          as Map)['status'],
+      'authenticated_and_loaded',
+    );
+    expect(prompt, contains('preservar_observado=Sol Ring'));
+    expect(prompt, contains('revisar_observado=Thought Vessel'));
+    expect(prompt, contains('nunca como autorizacao para aplicar trocas'));
+    expect(prompt, isNot(contains('freeform')));
+  });
 }

@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../providers/card_provider.dart';
-import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/models/deck_details.dart';
@@ -13,6 +13,7 @@ import '../../decks/utils/commander_eligibility.dart';
 import '../../decks/widgets/deck_details_aux_widgets.dart';
 import '../../collection/screens/sets_catalog_screen.dart';
 import '../widgets/card_edition_metadata.dart';
+import '../widgets/card_printing_picker.dart';
 import 'card_detail_screen.dart';
 import 'dart:async';
 
@@ -134,7 +135,49 @@ class _CardSearchScreenState extends State<CardSearchScreen>
     return null;
   }
 
-  void _addCardToDeck(DeckCardItem card) async {
+  Future<void> _handleCardAction(
+    DeckCardItem card, {
+    required int printingCount,
+  }) async {
+    var selectedCard = card;
+    if (!widget.isBinderMode && printingCount > 1) {
+      final selectedPrinting = await showCardPrintingPicker(
+        context: context,
+        card: card,
+        loadPrintings: context.read<CardProvider>().fetchPrintingsByName,
+      );
+      if (!mounted || selectedPrinting == null) return;
+      selectedCard = selectedPrinting;
+    }
+
+    if (widget.isBinderMode) {
+      final cardData = <String, dynamic>{
+        'id': selectedCard.id,
+        'oracle_id': selectedCard.oracleId,
+        'name': selectedCard.name,
+        'image_url': selectedCard.imageUrl,
+        'layout': selectedCard.layout,
+        'card_faces': selectedCard.cardFaces
+            .map((face) => {'name': face.name, 'image_url': face.imageUrl})
+            .toList(growable: false),
+        'set_code': selectedCard.setCode,
+        'set_name': selectedCard.setName,
+        'set_release_date': selectedCard.setReleaseDate,
+        'collector_number': selectedCard.collectorNumber,
+        'foil': selectedCard.foil,
+        'mana_cost': selectedCard.manaCost,
+        'type_line': selectedCard.typeLine,
+        'rarity': selectedCard.rarity,
+      };
+      Navigator.pop(context);
+      widget.onCardSelectedForBinder?.call(cardData);
+      return;
+    }
+
+    await _addCardToDeck(selectedCard);
+  }
+
+  Future<void> _addCardToDeck(DeckCardItem card) async {
     final deckProvider = context.read<DeckProvider>();
     if (!widget.isBinderMode &&
         deckProvider.selectedDeck?.id != widget.deckId) {
@@ -498,8 +541,13 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           );
         }
 
-        Widget buildResultTile(int resultIndex, {required bool inGrid}) {
+        Widget buildResultTile(
+          int resultIndex, {
+          required bool inGrid,
+          bool spotlight = false,
+        }) {
           final card = visibleResults[resultIndex];
+          final printingCount = provider.printingCountFor(card.id);
           final availability = provider.collectionAvailabilityFor(card.id);
           final isCommanderEligible = isPotentialCommander(
             card,
@@ -519,8 +567,10 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           return _CardSearchResultTile(
             key: Key('card-search-result-${card.id}'),
             inGrid: inGrid,
+            spotlight: spotlight,
             card: card,
-            printingCount: provider.printingCountFor(card.id),
+            printingCount: printingCount,
+            choosePrintingBeforeAdd: !widget.isBinderMode && printingCount > 1,
             availability: availability,
             showTypeLine: !widget.isBinderMode,
             warning:
@@ -535,22 +585,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
               openCardDetailRoute(context, card);
             },
             onAdd: canAdd
-                ? () {
-                    if (widget.isBinderMode) {
-                      final cardData = {
-                        'id': card.id,
-                        'name': card.name,
-                        'image_url': card.imageUrl,
-                        'set_code': card.setCode,
-                        'mana_cost': card.manaCost,
-                        'rarity': card.rarity,
-                      };
-                      Navigator.pop(context);
-                      widget.onCardSelectedForBinder?.call(cardData);
-                    } else {
-                      _addCardToDeck(card);
-                    }
-                  }
+                ? () => _handleCardAction(card, printingCount: printingCount)
                 : null,
           );
         }
@@ -582,7 +617,26 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                           horizontalPadding: pageGutter,
                         ),
                       ),
-                      if (useGrid)
+                      if (useGrid && visibleResults.length == 1)
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            pageGutter,
+                            AppTheme.space2,
+                            pageGutter,
+                            AppTheme.space12,
+                          ),
+                          sliver: SliverToBoxAdapter(
+                            key: const Key(
+                              'card-search-single-result-workspace',
+                            ),
+                            child: buildResultTile(
+                              0,
+                              inGrid: false,
+                              spotlight: true,
+                            ),
+                          ),
+                        )
+                      else if (useGrid)
                         SliverPadding(
                           padding: EdgeInsets.fromLTRB(
                             pageGutter,
@@ -738,8 +792,10 @@ class _CardSearchResultTile extends StatelessWidget {
   const _CardSearchResultTile({
     super.key,
     required this.inGrid,
+    this.spotlight = false,
     required this.card,
     required this.printingCount,
+    required this.choosePrintingBeforeAdd,
     required this.availability,
     required this.showTypeLine,
     required this.warning,
@@ -749,8 +805,10 @@ class _CardSearchResultTile extends StatelessWidget {
   });
 
   final bool inGrid;
+  final bool spotlight;
   final DeckCardItem card;
   final int printingCount;
+  final bool choosePrintingBeforeAdd;
   final CardCollectionAvailability? availability;
   final bool showTypeLine;
   final String? warning;
@@ -772,12 +830,12 @@ class _CardSearchResultTile extends StatelessWidget {
           onTap: onOpen,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Container(
-            constraints: const BoxConstraints(minHeight: 86),
-            padding: const EdgeInsets.fromLTRB(
-              AppTheme.space10,
-              AppTheme.space9,
-              AppTheme.space8,
-              AppTheme.space9,
+            constraints: BoxConstraints(minHeight: spotlight ? 214 : 86),
+            padding: EdgeInsets.fromLTRB(
+              spotlight ? AppTheme.space18 : AppTheme.space10,
+              spotlight ? AppTheme.space16 : AppTheme.space9,
+              spotlight ? AppTheme.space18 : AppTheme.space8,
+              spotlight ? AppTheme.space16 : AppTheme.space9,
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -807,13 +865,23 @@ class _CardSearchResultTile extends StatelessWidget {
                 ClipRRect(
                   key: Key('card-search-image-${card.id}'),
                   borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                  child: CachedCardImage(
-                    imageUrl: card.imageUrl,
-                    width: 54,
-                    height: 74,
+                  child: CardArtwork(
+                    variant: spotlight
+                        ? CardArtworkVariant.spotlight
+                        : CardArtworkVariant.gallery,
+                    imageUrl: card.printingImageUrl,
+                    fallbackImageUrl: card.fallbackImageUrl,
+                    semanticLabel: card.hasPrintingArtwork
+                        ? 'Arte da impressão ${card.name}'
+                        : 'Arte de referência de ${card.name}',
+                    width: spotlight ? 126 : 54,
+                    height: spotlight ? 176 : 74,
+                    constrainAspectRatio: false,
                   ),
                 ),
-                const SizedBox(width: AppTheme.space12),
+                SizedBox(
+                  width: spotlight ? AppTheme.space20 : AppTheme.space12,
+                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -821,12 +889,14 @@ class _CardSearchResultTile extends StatelessWidget {
                     children: [
                       Text(
                         card.name,
-                        maxLines: 1,
+                        maxLines: spotlight ? 2 : 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w900,
-                          fontSize: AppTheme.fontMd,
+                          fontSize: spotlight
+                              ? AppTheme.fontXxl
+                              : AppTheme.fontMd,
                           letterSpacing: -0.1,
                         ),
                       ),
@@ -834,12 +904,14 @@ class _CardSearchResultTile extends StatelessWidget {
                       if (showTypeLine && card.typeLine.trim().isNotEmpty)
                         Text(
                           card.typeLine,
-                          maxLines: 1,
+                          maxLines: spotlight ? 2 : 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontXs,
-                            height: 1.1,
+                            fontSize: spotlight
+                                ? AppTheme.fontMd
+                                : AppTheme.fontXs,
+                            height: spotlight ? 1.3 : 1.1,
                           ),
                         ),
                       const SizedBox(height: AppTheme.space4),
@@ -860,6 +932,8 @@ class _CardSearchResultTile extends StatelessWidget {
                               cardId: card.id,
                               count: printingCount,
                             ),
+                          if (!card.hasPrintingArtwork)
+                            const _SearchReferenceArtPill(),
                           if (card.colorIdentity.isNotEmpty)
                             _SearchIdentityPips(identity: card.colorIdentity),
                           if ((card.manaCost ?? '').trim().isNotEmpty)
@@ -876,35 +950,66 @@ class _CardSearchResultTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppTheme.space8),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: canAdd
-                        ? AppTheme.brass500.withValues(alpha: 0.16)
-                        : AppTheme.surfaceElevated.withValues(alpha: 0.72),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: canAdd
-                          ? AppTheme.brass400.withValues(alpha: 0.62)
-                          : AppTheme.outlineMuted,
-                    ),
-                  ),
-                  child: SizedBox(
-                    width: AppTheme.touchTargetMin,
-                    height: AppTheme.touchTargetMin,
-                    child: IconButton(
+                if (spotlight)
+                  Tooltip(
+                    message: !canAdd
+                        ? 'Indisponível'
+                        : choosePrintingBeforeAdd
+                        ? 'Escolher impressão'
+                        : 'Adicionar',
+                    child: FilledButton.icon(
                       key: Key('card-search-add-${card.id}'),
-                      tooltip: canAdd ? 'Adicionar' : 'Indisponível',
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.add_circle_outline,
-                        size: 20,
-                        color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
-                      ),
                       onPressed: onAdd,
+                      icon: Icon(
+                        choosePrintingBeforeAdd
+                            ? Icons.collections_bookmark_outlined
+                            : Icons.add_circle_outline,
+                      ),
+                      label: Text(
+                        !canAdd
+                            ? 'Indisponível'
+                            : choosePrintingBeforeAdd
+                            ? 'Escolher impressão'
+                            : 'Adicionar',
+                      ),
+                    ),
+                  )
+                else
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: canAdd
+                          ? AppTheme.brass500.withValues(alpha: 0.16)
+                          : AppTheme.surfaceElevated.withValues(alpha: 0.72),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: canAdd
+                            ? AppTheme.brass400.withValues(alpha: 0.62)
+                            : AppTheme.outlineMuted,
+                      ),
+                    ),
+                    child: SizedBox(
+                      width: AppTheme.touchTargetMin,
+                      height: AppTheme.touchTargetMin,
+                      child: IconButton(
+                        key: Key('card-search-add-${card.id}'),
+                        tooltip: !canAdd
+                            ? 'Indisponível'
+                            : choosePrintingBeforeAdd
+                            ? 'Escolher impressão'
+                            : 'Adicionar',
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          choosePrintingBeforeAdd
+                              ? Icons.collections_bookmark_outlined
+                              : Icons.add_circle_outline,
+                          size: 20,
+                          color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
+                        ),
+                        onPressed: onAdd,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -1045,6 +1150,36 @@ class _SearchPrintingCountPill extends StatelessWidget {
             color: AppTheme.brass400,
             fontSize: AppTheme.fontTiny,
             fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchReferenceArtPill extends StatelessWidget {
+  const _SearchReferenceArtPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'A imagem exibida é apenas uma referência da carta',
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.space5,
+          vertical: AppTheme.space2,
+        ),
+        decoration: BoxDecoration(
+          color: AppTheme.frost400.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+          border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.24)),
+        ),
+        child: const Text(
+          'Arte de referência',
+          style: TextStyle(
+            color: AppTheme.frost400,
+            fontSize: AppTheme.fontTiny,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -1215,10 +1350,16 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    child: CachedCardImage(
-                      imageUrl: widget.card.imageUrl,
+                    child: CardArtwork(
+                      variant: CardArtworkVariant.gallery,
+                      imageUrl: widget.card.printingImageUrl,
+                      fallbackImageUrl: widget.card.fallbackImageUrl,
+                      semanticLabel: widget.card.hasPrintingArtwork
+                          ? 'Arte da impressão ${widget.card.name}'
+                          : 'Arte de referência de ${widget.card.name}',
                       width: 82,
                       height: 114,
+                      constrainAspectRatio: false,
                     ),
                   ),
                   const SizedBox(width: AppTheme.space16),

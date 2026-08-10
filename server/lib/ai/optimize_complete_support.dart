@@ -257,6 +257,7 @@ OptimizeRecommendationContext _completeRecommendationContext({
     report: null,
     explainSwaps: null,
     includePriceRiskCurveBracket: null,
+    postGameNoteId: null,
     unknownKeys: const <String>[],
   );
 }
@@ -652,6 +653,7 @@ Future<void> runCompleteAiSuggestionLoop({
   required CompleteBuildAccumulator state,
   required String deckId,
   required String? userId,
+  String? postGameEvidenceContext,
   bool preferCollection = false,
   int? budgetLimitBrl,
   int maxIterations = 4,
@@ -707,6 +709,13 @@ Future<void> runCompleteAiSuggestionLoop({
     }
   }
 
+  final combinedEvidenceContext = [
+    if (state.commanderMetaEvidenceText?.trim().isNotEmpty == true)
+      state.commanderMetaEvidenceText!.trim(),
+    if (postGameEvidenceContext?.trim().isNotEmpty == true)
+      postGameEvidenceContext!.trim(),
+  ].join('\n\n');
+
   while (state.iterations < effectiveMaxIterations &&
       state.virtualTotal < maxTotal) {
     state.iterations++;
@@ -732,7 +741,10 @@ Future<void> runCompleteAiSuggestionLoop({
             keepTheme: keepTheme,
             detectedTheme: detectedTheme,
             coreCards: coreCards,
-            metaEvidenceContext: state.commanderMetaEvidenceText,
+            metaEvidenceContext:
+                combinedEvidenceContext.isEmpty
+                    ? null
+                    : combinedEvidenceContext,
             userId: userId,
             deckId: deckId,
             preferCollection: preferCollection,

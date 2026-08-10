@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -6,19 +7,32 @@ import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/config/visual_fixture.dart';
+import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/scryfall_image_helper.dart';
 import '../../core/widgets/card_artwork.dart';
 import '../../core/widgets/mana_symbols.dart';
 import '../../core/widgets/manaloom_glyph.dart';
 import 'life_counter_route.dart';
+import 'life_counter/life_counter_session.dart';
+import 'life_counter/life_counter_session_store.dart';
+import 'services/onboarding_state_store.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool? lifeCounterAvailable;
+  final String userId;
+  final OnboardingStateRepository? onboardingStateRepository;
+  final VoidCallback? onOnboardingSettled;
 
-  const HomeScreen({super.key, this.lifeCounterAvailable});
+  const HomeScreen({
+    super.key,
+    this.lifeCounterAvailable,
+    this.userId = '',
+    this.onboardingStateRepository,
+    this.onOnboardingSettled,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,6 +43,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool _requestedDeckBootstrap = false;
   bool _introStarted = false;
   late final AnimationController _introController;
+  late final OnboardingStateRepository _onboardingStateRepository;
+  OnboardingState? _onboardingState;
 
   @override
   void initState() {
@@ -37,6 +53,22 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 320),
     );
+    _onboardingStateRepository =
+        widget.onboardingStateRepository ?? OnboardingStateStore();
+    if (widget.userId.trim().isNotEmpty) {
+      unawaited(_loadOnboardingState());
+    }
+  }
+
+  Future<void> _loadOnboardingState() async {
+    try {
+      final state = await _onboardingStateRepository.load(widget.userId);
+      if (!mounted) return;
+      setState(() => _onboardingState = state);
+    } catch (_) {
+      // A Home continua funcional sem personalização quando o storage local
+      // está indisponível. O onboarding preserva o aviso e o retry próprios.
+    }
   }
 
   @override
@@ -70,6 +102,342 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  Future<void> _openPlayEntry(List<Deck> decks) async {
+    final store = LifeCounterSessionStore();
+    final storedSession = await store.load();
+    if (!mounted) return;
+    final activeSession =
+        storedSession?.playSessionId?.trim().isNotEmpty == true
+        ? storedSession
+        : null;
+    final selection = await showModalBottomSheet<_PlayEntrySelection>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppTheme.surfaceElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusXl),
+        ),
+      ),
+      builder: (_) =>
+          _PlayEntrySheet(decks: decks, activeSession: activeSession),
+    );
+    if (!mounted || selection == null) return;
+
+    switch (selection.action) {
+      case _PlayEntryAction.resume:
+        final session = activeSession;
+        if (session != null) await _openStoredLifeCounterSession(session);
+      case _PlayEntryAction.end:
+        final session = activeSession;
+        if (session != null) await _endStoredLifeCounterSession(session, store);
+      case _PlayEntryAction.quick:
+        final startedAt = DateTime.now().millisecondsSinceEpoch;
+        await store.clear();
+        await store.save(
+          LifeCounterSession.initial(
+            playSessionId: 'play-$startedAt',
+            startedAtEpochMs: startedAt,
+          ),
+        );
+        if (mounted) await _openLifeCounterAndPauseOnReturn();
+      case _PlayEntryAction.newDeck:
+        final deck = selection.deck;
+        if (deck != null) await _startDeckLifeCounter(deck, store);
+      case _PlayEntryAction.manageDecks:
+        context.go('/decks');
+    }
+  }
+
+  Future<void> _startDeckLifeCounter(
+    Deck deck,
+    LifeCounterSessionStore store,
+  ) async {
+    final provider = context.read<DeckProvider>();
+    await provider.fetchDeckDetails(deck.id);
+    if (!mounted) return;
+    final details = provider.selectedDeck;
+    final snapshotHash = details?.deckSnapshotHash?.trim();
+    final versionAt = details?.deckVersionAt;
+    if (details?.id != deck.id ||
+        snapshotHash == null ||
+        !RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(snapshotHash) ||
+        versionAt == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não foi possível confirmar a revisão deste deck. Tente novamente ou escolha o modo rápido.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    await store.clear();
+    if (!mounted) return;
+    await _openLifeCounterAndPauseOnReturn(
+      deckId: details!.id,
+      deckName: details.name,
+      deckSnapshotHash: snapshotHash.toLowerCase(),
+      deckVersionAtEpochMs: versionAt.millisecondsSinceEpoch,
+    );
+  }
+
+  Future<void> _openStoredLifeCounterSession(LifeCounterSession session) async {
+    await _openLifeCounterAndPauseOnReturn(
+      deckId: session.deckId,
+      deckName: session.deckName,
+      deckSnapshotHash: session.deckSnapshotHash,
+      deckVersionAtEpochMs: session.deckVersionAtEpochMs,
+    );
+  }
+
+  Future<void> _openLifeCounterAndPauseOnReturn({
+    String? deckId,
+    String? deckName,
+    String? deckSnapshotHash,
+    int? deckVersionAtEpochMs,
+  }) async {
+    final result = await openLifeCounterRoute<LifeCounterExitResult>(
+      context,
+      deckId: deckId,
+      deckName: deckName,
+      deckSnapshotHash: deckSnapshotHash,
+      deckVersionAtEpochMs: deckVersionAtEpochMs,
+    );
+    if (!mounted || result == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Sessão pausada. Abra “Jogar agora” para retomar ou encerrar e registrar.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _endStoredLifeCounterSession(
+    LifeCounterSession session,
+    LifeCounterSessionStore store,
+  ) async {
+    await store.clear();
+    if (!mounted) return;
+    final deckId = session.deckId?.trim();
+    if (deckId == null || deckId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Partida rápida encerrada. Como ela não tinha deck, não há revisão para otimizar.',
+          ),
+        ),
+      );
+      return;
+    }
+    final snapshotHash = session.deckSnapshotHash?.trim();
+    final versionAt = session.deckVersionAtEpochMs;
+    final hasCompleteVersion =
+        snapshotHash != null &&
+        RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(snapshotHash) &&
+        versionAt != null;
+    final uri = Uri(
+      path: '/decks/$deckId/post-game',
+      queryParameters: <String, String>{
+        if (session.playSessionId?.trim().isNotEmpty == true)
+          'playSessionId': session.playSessionId!.trim(),
+        if (session.startedAtEpochMs != null)
+          'startedAt': session.startedAtEpochMs.toString(),
+        'endedAt': DateTime.now().millisecondsSinceEpoch.toString(),
+        if (hasCompleteVersion) 'deckSnapshotHash': snapshotHash.toLowerCase(),
+        if (hasCompleteVersion) 'deckVersionAt': versionAt.toString(),
+      },
+    );
+    context.push(uri.toString());
+  }
+
+  Future<bool> _completePendingHomeIntent(OnboardingState state) async {
+    final goal = state.selectedGoal;
+    if (state.disposition != OnboardingDisposition.pending) return true;
+    if (goal == null || widget.userId.trim().isEmpty) return false;
+    try {
+      await _onboardingStateRepository.settle(
+        widget.userId,
+        selectedFormat: state.selectedFormat,
+        disposition: OnboardingDisposition.completed,
+        selectedGoal: goal,
+        experience: state.experience,
+        buildMode: state.buildMode,
+      );
+      final settled = state.copyWith(
+        disposition: OnboardingDisposition.completed,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      if (!mounted) return false;
+      setState(() => _onboardingState = settled);
+      widget.onOnboardingSettled?.call();
+      unawaited(
+        ActivationFunnelService.instance.trackOnce(
+          'onboarding:v${OnboardingStateStore.currentVersion}:${widget.userId}:completed',
+          'onboarding_completed',
+          format: state.selectedFormat,
+          source: 'home_intent',
+          metadata: {
+            'disposition': OnboardingDisposition.completed.name,
+            'goal': goal.name,
+            if (state.experience != null) 'experience': state.experience!.name,
+          },
+        ),
+      );
+      return true;
+    } catch (_) {
+      if (!mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não foi possível salvar a conclusão do guia. Tente novamente antes de continuar.',
+          ),
+        ),
+      );
+      return false;
+    }
+  }
+
+  Future<void> _runHomePrimaryAction(
+    List<Deck> decks,
+    bool lifeCounterAvailable,
+  ) async {
+    final state = _onboardingState;
+    final goal = state?.selectedGoal;
+    if (state == null || goal == null) {
+      if (lifeCounterAvailable) {
+        await _openPlayEntry(decks);
+      } else if (mounted) {
+        context.go('/onboarding/core-flow');
+      }
+      return;
+    }
+
+    final recentDeck = decks.isEmpty ? null : decks.first;
+    final fromOnboarding = state.disposition == OnboardingDisposition.pending
+        ? 'onboarding'
+        : null;
+    String route(String path, [Map<String, String?> parameters = const {}]) {
+      return Uri(
+        path: path,
+        queryParameters: {
+          ...parameters,
+          if (fromOnboarding != null) 'from': fromOnboarding,
+        }..removeWhere((_, value) => value == null || value.isEmpty),
+      ).toString();
+    }
+
+    switch (goal) {
+      case OnboardingGoal.buildDeck:
+        if (recentDeck != null && state.isSettled) {
+          context.go('/decks/${recentDeck.id}');
+          return;
+        }
+        if (state.buildMode == OnboardingBuildMode.manual) {
+          context.go(
+            route('/decks', {'create': '1', 'format': state.selectedFormat}),
+          );
+        } else {
+          context.go(
+            route('/decks/generate', {'format': state.selectedFormat}),
+          );
+        }
+        return;
+      case OnboardingGoal.importDeck:
+        if (recentDeck != null && state.isSettled) {
+          context.go('/decks/${recentDeck.id}');
+          return;
+        }
+        context.go(route('/decks/import', {'format': state.selectedFormat}));
+        return;
+      case OnboardingGoal.catalogCollection:
+        if (state.isSettled) {
+          context.go('/collection?tab=1');
+          return;
+        }
+        context.go(route('/collection/import', const {'list_type': 'have'}));
+        return;
+      case OnboardingGoal.play:
+        if (!lifeCounterAvailable) {
+          context.go('/onboarding/core-flow');
+          return;
+        }
+        if (!await _completePendingHomeIntent(state) || !mounted) return;
+        await _openPlayEntry(decks);
+        return;
+      case OnboardingGoal.improveDeck:
+        if (recentDeck == null) {
+          context.go('/onboarding/core-flow');
+          return;
+        }
+        if (!await _completePendingHomeIntent(state) || !mounted) return;
+        context.go('/decks/${recentDeck.id}?optimize=rebuild');
+        return;
+    }
+  }
+
+  _HomeHeroContent _heroContent(List<Deck> decks, bool lifeCounterAvailable) {
+    final state = _onboardingState;
+    final goal = state?.selectedGoal;
+    final recentDeck = decks.isEmpty ? null : decks.first;
+    if (goal == null) {
+      return _HomeHeroContent(
+        title: 'Olá,\nPlaneswalker',
+        subtitle: 'Sua próxima jogada começa aqui.',
+        actionLabel: lifeCounterAvailable ? 'Jogar agora' : 'Montar deck',
+      );
+    }
+    final completedDeck = state!.isSettled ? recentDeck : null;
+    return switch (goal) {
+      OnboardingGoal.buildDeck => _HomeHeroContent(
+        title: completedDeck == null
+            ? 'Seu primeiro\ndeck começa aqui'
+            : 'Continue\n${completedDeck.name}',
+        subtitle: completedDeck == null
+            ? state.buildMode == OnboardingBuildMode.manual
+                  ? 'Crie a estrutura e escolha seu comandante.'
+                  : 'Gere uma base e revise cada escolha.'
+            : 'Abra a lista e avance para o próximo ajuste.',
+        actionLabel: completedDeck == null
+            ? 'Continuar montagem'
+            : 'Abrir deck',
+      ),
+      OnboardingGoal.importDeck => _HomeHeroContent(
+        title: completedDeck == null
+            ? 'Sua lista,\nsem surpresas'
+            : 'Revise\n${completedDeck.name}',
+        subtitle: completedDeck == null
+            ? 'Confira cartas reconhecidas antes de criar.'
+            : 'O deck importado está pronto para sua revisão.',
+        actionLabel: completedDeck == null ? 'Revisar lista' : 'Abrir deck',
+      ),
+      OnboardingGoal.catalogCollection => _HomeHeroContent(
+        title: 'Sua coleção,\ncópia por cópia',
+        subtitle: 'Organize impressão, condição e disponibilidade.',
+        actionLabel: state.isSettled ? 'Abrir Fichário' : 'Importar cópias',
+      ),
+      OnboardingGoal.play => _HomeHeroContent(
+        title: 'Sua mesa\nestá pronta',
+        subtitle: 'Escolha um deck revisado ou jogue no modo rápido.',
+        actionLabel: lifeCounterAvailable ? 'Jogar agora' : 'Preparar deck',
+      ),
+      OnboardingGoal.improveDeck => _HomeHeroContent(
+        title: recentDeck == null
+            ? 'Escolha um deck\npara evoluir'
+            : 'Próxima revisão:\n${recentDeck.name}',
+        subtitle: recentDeck == null
+            ? 'Você precisa de uma lista antes de abrir a Oficina.'
+            : 'Compare mudanças, fontes e impacto antes de aplicar.',
+        actionLabel: recentDeck == null
+            ? 'Escolher outro objetivo'
+            : 'Abrir Oficina',
+      ),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDeckLoading = context.select<DeckProvider, bool>(
@@ -86,6 +454,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
     final recentDecks = decks.take(4).toList();
     final lifeCounterAvailable = widget.lifeCounterAvailable ?? true;
+    final heroContent = _heroContent(decks, lifeCounterAvailable);
 
     return Scaffold(
       backgroundColor: AppTheme.transparent,
@@ -112,11 +481,18 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     const _HomeHeader(),
                     const SizedBox(height: AppTheme.space12),
-                    _HomeHero(lifeCounterAvailable: lifeCounterAvailable),
+                    _HomeHero(
+                      content: heroContent,
+                      onAction: () =>
+                          _runHomePrimaryAction(decks, lifeCounterAvailable),
+                    ),
                     const SizedBox(height: AppTheme.space16),
                     const _SectionHeader(label: 'Acesso rápido'),
                     const SizedBox(height: AppTheme.space10),
-                    _QuickActions(lifeCounterAvailable: lifeCounterAvailable),
+                    _QuickActions(
+                      lifeCounterAvailable: lifeCounterAvailable,
+                      onPlay: () => _openPlayEntry(decks),
+                    ),
                     const SizedBox(height: AppTheme.space18),
                     _SectionHeader(
                       label: 'Decks recentes',
@@ -157,6 +533,315 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+enum _PlayEntryAction { resume, end, quick, newDeck, manageDecks }
+
+class _PlayEntrySelection {
+  const _PlayEntrySelection(this.action, {this.deck});
+
+  final _PlayEntryAction action;
+  final Deck? deck;
+}
+
+class _PlayEntrySheet extends StatelessWidget {
+  const _PlayEntrySheet({required this.decks, required this.activeSession});
+
+  final List<Deck> decks;
+  final LifeCounterSession? activeSession;
+
+  void _select(BuildContext context, _PlayEntryAction action, {Deck? deck}) {
+    Navigator.of(context).pop(_PlayEntrySelection(action, deck: deck));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final active = activeSession;
+    final availableDecks = decks.take(8).toList(growable: false);
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.88,
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppTheme.space20,
+          AppTheme.space14,
+          AppTheme.space20,
+          AppTheme.space20 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.outlineMuted,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppTheme.space16),
+            Row(
+              children: [
+                const ManaLoomGlyph(
+                  ManaLoomGlyphKind.lifeCounter,
+                  color: AppTheme.brass400,
+                  size: 28,
+                ),
+                const SizedBox(width: AppTheme.space10),
+                Expanded(
+                  child: Text(
+                    'Qual partida você vai abrir?',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.space6),
+            Text(
+              'Vincule uma revisão para transformar a mesa em aprendizado, ou declare um modo rápido sem deck.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.4,
+              ),
+            ),
+            if (active != null) ...[
+              const SizedBox(height: AppTheme.space16),
+              Container(
+                key: const Key('home-play-active-session'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppTheme.space14),
+                decoration: BoxDecoration(
+                  color: AppTheme.brass400.withValues(alpha: 0.09),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  border: Border.all(
+                    color: AppTheme.brass400.withValues(alpha: 0.38),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'SESSÃO PAUSADA',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppTheme.brass400,
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.space5),
+                    Text(
+                      active.deckName?.trim().isNotEmpty == true
+                          ? active.deckName!.trim()
+                          : active.deckId?.trim().isNotEmpty == true
+                          ? 'Deck vinculado'
+                          : 'Modo rápido · sem deck',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.space5),
+                    Text(
+                      active.deckSnapshotHash?.trim().isNotEmpty == true
+                          ? 'Revisão ${active.deckSnapshotHash!.substring(0, math.min(8, active.deckSnapshotHash!.length))} preservada'
+                          : 'Esta sessão não possui revisão de deck.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.space12),
+                    Wrap(
+                      spacing: AppTheme.space8,
+                      runSpacing: AppTheme.space8,
+                      children: [
+                        FilledButton.icon(
+                          key: const Key('home-play-resume-session'),
+                          onPressed: () =>
+                              _select(context, _PlayEntryAction.resume),
+                          icon: const Icon(Icons.play_arrow_rounded),
+                          label: const Text('Retomar'),
+                        ),
+                        OutlinedButton.icon(
+                          key: const Key('home-play-end-session'),
+                          onPressed: () =>
+                              _select(context, _PlayEntryAction.end),
+                          icon: const Icon(Icons.flag_outlined),
+                          label: Text(
+                            active.deckId?.trim().isNotEmpty == true
+                                ? 'Encerrar e registrar'
+                                : 'Encerrar modo rápido',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: AppTheme.space16),
+            Text(
+              'NOVA PARTIDA COM DECK',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: AppTheme.textHint,
+                letterSpacing: 1,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: AppTheme.space8),
+            if (availableDecks.isEmpty)
+              Container(
+                key: const Key('home-play-no-decks'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppTheme.space14),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceSlate,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                ),
+                child: Text(
+                  'Você ainda não tem um deck disponível. Pode jogar no modo rápido ou criar um deck primeiro.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              )
+            else
+              Flexible(
+                child: ListView.separated(
+                  key: const Key('home-play-deck-list'),
+                  shrinkWrap: true,
+                  itemCount: availableDecks.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(height: AppTheme.space8),
+                  itemBuilder: (context, index) {
+                    final deck = availableDecks[index];
+                    return _PlayEntryDeckTile(
+                      deck: deck,
+                      onTap: () => _select(
+                        context,
+                        _PlayEntryAction.newDeck,
+                        deck: deck,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            const SizedBox(height: AppTheme.space12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                key: const Key('home-play-quick-mode'),
+                onPressed: () => _select(context, _PlayEntryAction.quick),
+                icon: const Icon(Icons.bolt_outlined),
+                label: const Text('Nova partida rápida · sem deck'),
+              ),
+            ),
+            if (availableDecks.isEmpty) ...[
+              const SizedBox(height: AppTheme.space6),
+              Center(
+                child: TextButton(
+                  key: const Key('home-play-manage-decks'),
+                  onPressed: () =>
+                      _select(context, _PlayEntryAction.manageDecks),
+                  child: const Text('Criar ou importar deck'),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayEntryDeckTile extends StatelessWidget {
+  const _PlayEntryDeckTile({required this.deck, required this.onTap});
+
+  final Deck deck;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final artwork = deck.commanderImageUrl?.trim();
+    return Material(
+      key: Key('home-play-deck-${deck.id}'),
+      color: AppTheme.surfaceSlate,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 44,
+                height: 62,
+                child: artwork == null || artwork.isEmpty
+                    ? DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceElevated,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusXs,
+                          ),
+                        ),
+                        child: const Center(
+                          child: ManaLoomGlyph(
+                            ManaLoomGlyphKind.deck,
+                            color: AppTheme.textHint,
+                            size: 22,
+                          ),
+                        ),
+                      )
+                    : CardArtwork(
+                        variant: CardArtworkVariant.gallery,
+                        imageUrl: artwork,
+                        semanticLabel:
+                            'Comandante de ${deck.name} para iniciar partida',
+                        constrainAspectRatio: false,
+                        showStatusBadge: false,
+                      ),
+              ),
+              const SizedBox(width: AppTheme.space12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      deck.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.space4),
+                    Text(
+                      '${_formatLabel(deck.format)} · revisão confirmada antes de abrir',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: AppTheme.brass400),
+            ],
           ),
         ),
       ),
@@ -223,15 +908,28 @@ class _HomeHeader extends StatelessWidget {
   }
 }
 
-class _HomeHero extends StatelessWidget {
-  final bool lifeCounterAvailable;
+class _HomeHeroContent {
+  const _HomeHeroContent({
+    required this.title,
+    required this.subtitle,
+    required this.actionLabel,
+  });
 
-  const _HomeHero({required this.lifeCounterAvailable});
+  final String title;
+  final String subtitle;
+  final String actionLabel;
+}
+
+class _HomeHero extends StatelessWidget {
+  final _HomeHeroContent content;
+  final VoidCallback onAction;
+
+  const _HomeHero({required this.content, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final actionLabel = lifeCounterAvailable ? 'Jogar agora' : 'Montar deck';
+    final actionWidth = content.actionLabel.length > 12 ? 176.0 : 122.0;
     final wideArtwork = MediaQuery.sizeOf(context).width >= 840;
     final textScale = MediaQuery.textScalerOf(context).scale(1);
     final heroHeight = textScale >= 1.5 ? 280.0 : 190.0;
@@ -323,7 +1021,7 @@ class _HomeHero extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Olá,\nPlaneswalker',
+                    content.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.headlineMedium?.copyWith(
@@ -336,7 +1034,7 @@ class _HomeHero extends StatelessWidget {
                   ),
                   const SizedBox(height: AppTheme.space9),
                   Text(
-                    'Sua próxima jogada começa aqui.',
+                    content.subtitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -347,7 +1045,7 @@ class _HomeHero extends StatelessWidget {
                   ),
                   const Spacer(),
                   SizedBox(
-                    width: 122,
+                    width: actionWidth,
                     height: AppTheme.touchTargetMin,
                     child: FilledButton(
                       key: const Key('home-primary-action'),
@@ -362,9 +1060,7 @@ class _HomeHero extends StatelessWidget {
                           fontSize: AppTheme.fontSm,
                         ),
                       ),
-                      onPressed: lifeCounterAvailable
-                          ? () => openLifeCounterRoute(context)
-                          : () => context.go('/onboarding/core-flow'),
+                      onPressed: onAction,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -372,7 +1068,7 @@ class _HomeHero extends StatelessWidget {
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
-                              child: Text(actionLabel),
+                              child: Text(content.actionLabel),
                             ),
                           ),
                           const SizedBox(width: AppTheme.space8),
@@ -432,8 +1128,12 @@ class _SectionHeader extends StatelessWidget {
 
 class _QuickActions extends StatelessWidget {
   final bool lifeCounterAvailable;
+  final VoidCallback onPlay;
 
-  const _QuickActions({required this.lifeCounterAvailable});
+  const _QuickActions({
+    required this.lifeCounterAvailable,
+    required this.onPlay,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -443,7 +1143,7 @@ class _QuickActions extends StatelessWidget {
           glyph: ManaLoomGlyphKind.lifeCounter,
           title: 'Jogar agora',
           accent: AppTheme.brass400,
-          onTap: () => openLifeCounterRoute(context),
+          onTap: onPlay,
         )
       else
         _QuickActionData(
@@ -834,13 +1534,17 @@ class _DeckArtwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = deck.commanderImageUrl;
-    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+    final imageUrl = deck.commanderImageUrl?.trim();
+    final commanderName = deck.commanderName?.trim();
+    final fallbackImageUrl = ScryfallImageHelper.namedImageUrl(commanderName);
+    if ((imageUrl != null && imageUrl.isNotEmpty) || fallbackImageUrl != null) {
       return CardArtwork(
         variant: CardArtworkVariant.recentDeck,
         imageUrl: imageUrl,
-        fallbackImageUrl: ScryfallImageHelper.namedImageUrl(deck.commanderName),
-        semanticLabel: 'Carta do comandante ${deck.commanderName ?? deck.name}',
+        fallbackImageUrl: fallbackImageUrl,
+        semanticLabel: imageUrl == null || imageUrl.isEmpty
+            ? 'Arte de referência do comandante ${commanderName ?? deck.name}'
+            : 'Carta do comandante ${commanderName ?? deck.name}',
         constrainAspectRatio: false,
       );
     }

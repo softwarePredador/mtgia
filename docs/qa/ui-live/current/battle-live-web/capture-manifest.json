@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-03T18:20:50.966296Z",
-  "source_digest": "9a6f4dec081ae6413556bc1ab03e22590b7521162ad6414bad1df679f46e05ad",
+  "generated_at": "2026-08-07T20:44:10.468248Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
   "surface": "battle_live",
   "profile": "web_battle_live_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "be7e8376cea39cfb5c6bbce1cd213492717b5398fb17936a26c4552c520b87ff",
+  "log_sha256": "568b569ad648da769347b419a73b8cf2d32121f632ee141c04456020abbb73d0",
   "checkpoint_count": 5,
   "required_checkpoints": [
     "battle_live_00_waiting",
@@ -25,40 +25,40 @@
     {
       "checkpoint": "battle_live_00_waiting",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_00_waiting.png",
-      "sha256": "4b2bb9fcc937f474676c43d2a16de992a0ede7f4ad1b9be21b93c840609df2ab",
-      "bytes": 59677,
+      "sha256": "e249b496a404a9d879322b956da65741c2f36947e58188241f35811b1773ee67",
+      "bytes": 60431,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_live_01_active_feed",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_01_active_feed.png",
-      "sha256": "7c449d23f6f0f4a6a81c97bec16e9f131bb4ee135adc7781911b3a87a9f97a52",
-      "bytes": 83126,
+      "sha256": "6468fa87bc3b4bbf8a0d96c706746730651d6b6f23ae7e461a0eb93c7842bb99",
+      "bytes": 83829,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_live_02_recoverable_reconnect",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_02_recoverable_reconnect.png",
-      "sha256": "29848eb0d19fa93a6066003edc809d9150cbb40b8ea2b7eb6c4f03eddc7da5ff",
-      "bytes": 91004,
+      "sha256": "ef740e9dfd194221cc231c0ddcd3f669c7a7779933e9b79ac458c945707484c1",
+      "bytes": 91693,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_live_03_timeout_terminal",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_03_timeout_terminal.png",
-      "sha256": "985e4cd1bc2a77ed01cd554b7aeb7f0dd70f6a5ab3f27136cc3604b542bfd8a9",
-      "bytes": 99100,
+      "sha256": "68f32f182af99cca9ad60fcafc034f82e3c7e53dc9d69d1f9256de50b501b64b",
+      "bytes": 99386,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_live_04_completed_replay",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_04_completed_replay.png",
-      "sha256": "69268b1810a76f60cc6e1398512defb33e5db27f04940ae9f3ce82811f9a69db",
-      "bytes": 93058,
+      "sha256": "2c7889e1a8c29d8db07c9a2f0cbbd1118a1feaa17d82d0d46fca3893fc3e64f3",
+      "bytes": 93367,
       "width": 1440,
       "height": 900
     }

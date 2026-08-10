@@ -15,7 +15,7 @@ class _ProfileApiClient extends ApiClient {
         'user': {
           'id': 'user-2',
           'username': 'planeswalker',
-          'display_name': 'Planeswalker',
+          'display_name': 'Aurora — Pilota Azorius e organiza a Liga Paulista',
           'follower_count': 2,
           'following_count': 3,
           'public_deck_count': 0,
@@ -48,7 +48,7 @@ class _FailingPublicBinderProvider extends BinderProvider {
 }
 
 void main() {
-  testWidgets('UserProfileScreen preserva tabs mobile e limita desktop', (
+  testWidgets('UserProfileScreen preserva tabs mobile e recompõe desktop', (
     tester,
   ) async {
     final social = SocialProvider(apiClient: _ProfileApiClient());
@@ -57,7 +57,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    for (final size in const [Size(390, 844), Size(1280, 900)]) {
+    for (final size in const [Size(390, 844), Size(1920, 1080)]) {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       await tester.pumpWidget(
@@ -76,10 +76,39 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final contentWidth =
-          tester.getSize(find.byKey(const Key('user-profile-content'))).width;
-      expect(contentWidth, lessThanOrEqualTo(1120));
+      final contentWidth = tester
+          .getSize(find.byKey(const Key('user-profile-content')))
+          .width;
+      expect(contentWidth, lessThanOrEqualTo(1440));
       expect(contentWidth, lessThanOrEqualTo(size.width));
+      expect(find.text('Fichário'), findsOneWidget);
+      expect(
+        tester
+            .getSemantics(find.byKey(const Key('user-profile-identity-name')))
+            .label,
+        contains('Aurora — Pilota Azorius e organiza a Liga Paulista'),
+      );
+      expect(find.byKey(const Key('user-profile-decks-empty')), findsOneWidget);
+      if (size.width < 1000) {
+        expect(
+          find.byKey(const Key('user-profile-stacked-workbench')),
+          findsOneWidget,
+        );
+      } else {
+        final identity = tester.getRect(
+          find.byKey(const Key('user-profile-identity-rail')),
+        );
+        final workspace = tester.getRect(
+          find.byKey(const Key('user-profile-workspace')),
+        );
+        expect(
+          find.byKey(const Key('user-profile-wide-workbench')),
+          findsOneWidget,
+        );
+        expect(contentWidth, greaterThan(1200));
+        expect(identity.right, lessThan(workspace.left));
+        expect(workspace.width, greaterThan(identity.width * 2));
+      }
       expect(tester.takeException(), isNull);
     }
   });

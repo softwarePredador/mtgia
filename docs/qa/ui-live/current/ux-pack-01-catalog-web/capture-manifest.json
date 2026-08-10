@@ -1,0 +1,147 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-03T21:13:52.579447Z",
+  "source_digest": "eef339fc6c7dfbdfd2079029e7fad0f3ba140fbf8acf7f2e1eae7ae244806ba8",
+  "surface": "authenticated_catalog_ux_audit",
+  "profile": "web_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "c46b0753b6d9d56f505d04204f772c44672de49b1b6e466cd57b0f9394a1e5ea",
+  "checkpoint_count": 14,
+  "required_checkpoints": [
+    "post_game_empty",
+    "deck_generate_empty",
+    "deck_import_detected",
+    "collection_empty",
+    "sets_catalog",
+    "sets_catalog_route",
+    "latest_set",
+    "set_detail_tst",
+    "card_detail_success",
+    "card_detail_error",
+    "community_public_decks",
+    "community_tab_1",
+    "community_tab_2",
+    "community_tab_3"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "card_detail_error",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/card_detail_error.png",
+      "sha256": "b38b9e6c02e5d0228bb929cab13f197153e9b9e17f49913326cc8c0e63dab1b2",
+      "bytes": 28738,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "card_detail_success",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/card_detail_success.png",
+      "sha256": "0a089916f49c27d50ca37fdb4effb1ff7663829a0426069b49dcf5333474a1bb",
+      "bytes": 330012,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "collection_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/collection_empty.png",
+      "sha256": "533b1ef5e8153cd34244b0c564bb8cdf5b62c48cdcb68d940f545da2379cf898",
+      "bytes": 32082,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "community_public_decks",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/community_public_decks.png",
+      "sha256": "a143190c133dfce90524e106005c345cbeefc9fda05e2d52b7e84166016bd056",
+      "bytes": 113099,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "community_tab_1",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/community_tab_1.png",
+      "sha256": "bb3f2fccf47c12f30220e4856c0e423cc9c3399ac318b97865643a2c46d235e2",
+      "bytes": 46687,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "community_tab_2",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/community_tab_2.png",
+      "sha256": "9332453517256d6135151aaaabd4d2df513ca454de864651fddeb41b9dbf6fb5",
+      "bytes": 51466,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "community_tab_3",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/community_tab_3.png",
+      "sha256": "487c9d96be8f6d2ebe043c3e3fac3dbcd35705c831ef3cbf0ced0952f7a6864b",
+      "bytes": 35716,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_generate_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/deck_generate_empty.png",
+      "sha256": "30afe7c36e495ae6d018e9e3944191d716d49d0f4ea378f62c53c6464a2722fa",
+      "bytes": 64551,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_import_detected",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/deck_import_detected.png",
+      "sha256": "d170c520873db148b16f478fac1aa241e3df0109cbad8721a69eb1da29149a35",
+      "bytes": 50923,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "latest_set",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/latest_set.png",
+      "sha256": "812409458ab4faabf021b684a0a420dbb6a9c1e345e2e2f7c77b4d5491d1b014",
+      "bytes": 78467,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "post_game_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/post_game_empty.png",
+      "sha256": "c19758b57057b80bc5e991aaee45670586c61fc2e0cd77b40e99cd0eb987957e",
+      "bytes": 46000,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "set_detail_tst",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/set_detail_tst.png",
+      "sha256": "78b23e3ac570a1de207ce175569a30c555febb34fea19b1fe793a9b6c21d5fa4",
+      "bytes": 77266,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "sets_catalog",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/sets_catalog.png",
+      "sha256": "944050a8712356c655e0571cd93c77996d30915a3704aade1c6b581fae8e80dc",
+      "bytes": 84902,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "sets_catalog_route",
+      "path": "docs/qa/ui-live/current/ux-pack-01-catalog-web/sets_catalog_route.png",
+      "sha256": "585bf2d2e9f43c5524cf2a66ecb4648047f02b1c0e4b2e91591bd808552f731b",
+      "bytes": 78137,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

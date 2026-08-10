@@ -171,6 +171,36 @@ class _LoreholdSearchApiClient extends ApiClient {
   }
 }
 
+class _PrintingsApiClient extends ApiClient {
+  final List<String> requestedEndpoints = [];
+
+  @override
+  Future<ApiResponse> get(String endpoint, {Duration? timeout}) async {
+    requestedEndpoints.add(endpoint);
+    if (endpoint.startsWith('/cards/printings?')) {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'printing-1',
+            'name': 'Sol Ring',
+            'set_code': 'cmm',
+            'collector_number': '396',
+            'foil': false,
+          },
+          {
+            'id': 'printing-2',
+            'name': 'Sol Ring',
+            'set_code': 'cmm',
+            'collector_number': '396',
+            'foil': true,
+          },
+        ],
+      });
+    }
+    fail('Unexpected endpoint: $endpoint');
+  }
+}
+
 void main() {
   test('card search preserves multi-face artwork from the backend', () async {
     final provider = CardProvider(apiClient: _SearchApiClient());
@@ -262,6 +292,33 @@ void main() {
       api.requestedEndpoints.first,
       '/cards?name=Lorehold&limit=50&page=1&dedupe=false',
     );
+  });
+
+  test(
+    'printing picker requests every physical variant without sync',
+    () async {
+      final api = _PrintingsApiClient();
+      final provider = CardProvider(apiClient: api);
+
+      final printings = await provider.fetchPrintingsByName('Sol Ring');
+
+      expect(printings, hasLength(2));
+      expect(api.requestedEndpoints, [
+        '/cards/printings?name=Sol+Ring&limit=50&dedupe=false',
+      ]);
+    },
+  );
+
+  test('explicit printing sync also preserves physical variants', () async {
+    final api = _PrintingsApiClient();
+    final provider = CardProvider(apiClient: api);
+
+    final printings = await provider.resolveAndFetchPrintings('Sol Ring');
+
+    expect(printings, hasLength(2));
+    expect(api.requestedEndpoints, [
+      '/cards/printings?name=Sol+Ring&limit=50&dedupe=false&sync=true',
+    ]);
   });
 
   test('card detail reload resolves the exact backend card id', () async {

@@ -352,6 +352,7 @@ class _ExploreTabState extends State<_ExploreTab>
                   title: 'Comunidade indisponível',
                   message: provider.errorMessage!,
                   accent: AppTheme.error,
+                  status: AppStateStatus.unavailable,
                   actionLabel: 'Tentar novamente',
                   actionKey: const Key('community-explore-retry'),
                   onAction: () => provider.fetchPublicDecks(reset: true),
@@ -366,12 +367,14 @@ class _ExploreTabState extends State<_ExploreTab>
                   message:
                       'Compartilhe um deck para colocá-lo na mesa da comunidade.',
                   accent: AppTheme.brass400,
+                  status: AppStateStatus.firstUse,
                 );
               }
 
               return _CommunityResponsiveCollection(
                 collectionKey: const Key('community-explore-deck-list'),
                 controller: _scrollController,
+                contentItemCount: provider.decks.length,
                 desktopItemExtent: 144,
                 bottomPadding: MediaQuery.of(context).padding.bottom + 88,
                 itemCount: provider.decks.length + (provider.hasMore ? 1 : 0),
@@ -497,6 +500,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
             title: 'Não foi possível abrir a mesa',
             message: provider.feedError!,
             accent: AppTheme.error,
+            status: AppStateStatus.error,
             actionLabel: 'Tentar novamente',
             actionKey: const Key('community-following-retry'),
             onAction: () => provider.fetchFollowingFeed(reset: true),
@@ -511,6 +515,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
             message:
                 'Siga jogadores na aba Usuários para acompanhar os decks públicos deles.',
             accent: AppTheme.brass400,
+            status: AppStateStatus.firstUse,
           );
         }
 
@@ -520,6 +525,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
           child: _CommunityResponsiveCollection(
             collectionKey: const Key('community-following-deck-list'),
             controller: _scrollController,
+            contentItemCount: provider.followingFeed.length,
             desktopItemExtent: 112,
             bottomPadding: MediaQuery.of(context).padding.bottom + 88,
             itemCount:
@@ -690,11 +696,13 @@ class _UserSearchTabState extends State<_UserSearchTab>
                   title: 'Nenhum jogador encontrado',
                   message: 'Revise o nome e tente novamente.',
                   accent: AppTheme.warning,
+                  status: AppStateStatus.noResults,
                 );
               }
 
               return _CommunityResponsiveCollection(
                 collectionKey: const Key('community-users-list'),
+                contentItemCount: provider.searchResults.length,
                 desktopItemExtent: 94,
                 bottomPadding: MediaQuery.of(context).padding.bottom + 88,
                 itemCount: provider.searchResults.length,
@@ -721,6 +729,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
 class _CommunityResponsiveCollection extends StatelessWidget {
   const _CommunityResponsiveCollection({
     required this.collectionKey,
+    required this.contentItemCount,
     required this.itemCount,
     required this.itemBuilder,
     required this.desktopItemExtent,
@@ -729,6 +738,7 @@ class _CommunityResponsiveCollection extends StatelessWidget {
   });
 
   final Key collectionKey;
+  final int contentItemCount;
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
   final double desktopItemExtent;
@@ -754,7 +764,7 @@ class _CommunityResponsiveCollection extends StatelessWidget {
           AppTheme.space12 + bottomPadding,
         );
 
-        final collection = isDesktop
+        final collection = isDesktop && contentItemCount > 1
             ? GridView.builder(
                 key: collectionKey,
                 controller: controller,
@@ -800,156 +810,163 @@ class _CommunityDeckCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: AppTheme.space12),
-      child: Material(
-        color: AppTheme.transparent,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        child: InkWell(
-          key: Key('community-explore-deck-row-${deck.id}'),
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(AppTheme.space12),
-            decoration: BoxDecoration(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final spotlight = constraints.maxWidth >= AppTheme.breakpointMedium;
+          return Material(
+            color: AppTheme.transparent,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            child: InkWell(
+              key: Key('community-explore-deck-row-${deck.id}'),
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.surfaceSlate.withValues(alpha: 0.98),
-                  AppTheme.surfaceElevated.withValues(alpha: 0.62),
-                ],
-              ),
-              border: Border.all(
-                color: AppTheme.brass400.withValues(alpha: 0.20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.backgroundAbyss.withValues(alpha: 0.28),
-                  blurRadius: 22,
-                  offset: const Offset(0, 12),
+              onTap: onTap,
+              child: Container(
+                padding: const EdgeInsets.all(AppTheme.space12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppTheme.surfaceSlate.withValues(alpha: 0.98),
+                      AppTheme.surfaceElevated.withValues(alpha: 0.62),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: AppTheme.brass400.withValues(alpha: 0.20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.backgroundAbyss.withValues(alpha: 0.28),
+                      blurRadius: 22,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                // Commander image
-                CachedCardImage(
-                  imageUrl: deck.commanderImageUrl,
-                  width: 56,
-                  height: 78,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                ),
-                const SizedBox(width: AppTheme.space12),
-                // Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        deck.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: AppTheme.textPrimary,
-                          fontFamily: AppTheme.displayFontFamily,
-                          fontWeight: FontWeight.w900,
-                          fontSize: AppTheme.fontLg,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppTheme.space4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.person_outline,
-                            size: 14,
-                            color: AppTheme.textSecondary.withValues(
-                              alpha: 0.8,
-                            ),
-                          ),
-                          const SizedBox(width: AppTheme.space4),
-                          Expanded(
-                            child: GestureDetector(
-                              key: deck.ownerId != null
-                                  ? Key(
-                                      'community-explore-deck-owner-${deck.ownerId}',
-                                    )
-                                  : null,
-                              onTap: deck.ownerId != null
-                                  ? () => context.push(
-                                      '/community/user/${deck.ownerId!}',
-                                    )
-                                  : null,
-                              child: Text(
-                                deck.ownerUsername ?? 'Anônimo',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: deck.ownerId != null
-                                      ? AppTheme.textPrimary.withValues(
-                                          alpha: 0.92,
-                                        )
-                                      : AppTheme.textSecondary.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                  fontSize: AppTheme.fontSm,
-                                  fontWeight: deck.ownerId != null
-                                      ? FontWeight.w500
-                                      : FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppTheme.space12),
-                          _CommunityChip(label: _capitalize(deck.format)),
-                        ],
-                      ),
-                      const SizedBox(height: AppTheme.space4),
-                      Row(
+                child: Row(
+                  children: [
+                    // Commander image
+                    CachedCardImage(
+                      imageUrl: deck.commanderImageUrl,
+                      width: spotlight ? 84 : 56,
+                      height: spotlight ? 118 : 78,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    const SizedBox(width: AppTheme.space12),
+                    // Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${deck.cardCount} cartas',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
+                            deck.name,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontFamily: AppTheme.displayFontFamily,
+                              fontWeight: FontWeight.w900,
+                              fontSize: spotlight
+                                  ? AppTheme.fontXl
+                                  : AppTheme.fontLg,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          if (deck.synergyScore != null) ...[
-                            const SizedBox(width: AppTheme.space12),
-                            _CommunityChip(
-                              label: '${deck.synergyScore}%',
-                              icon: Icons.auto_awesome,
-                              accent: AppTheme.mythicGold,
+                          const SizedBox(height: AppTheme.space4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 14,
+                                color: AppTheme.textSecondary.withValues(
+                                  alpha: 0.8,
+                                ),
+                              ),
+                              const SizedBox(width: AppTheme.space4),
+                              Expanded(
+                                child: GestureDetector(
+                                  key: deck.ownerId != null
+                                      ? Key(
+                                          'community-explore-deck-owner-${deck.ownerId}',
+                                        )
+                                      : null,
+                                  onTap: deck.ownerId != null
+                                      ? () => context.push(
+                                          '/community/user/${deck.ownerId!}',
+                                        )
+                                      : null,
+                                  child: Text(
+                                    deck.ownerUsername ?? 'Anônimo',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: deck.ownerId != null
+                                          ? AppTheme.textPrimary.withValues(
+                                              alpha: 0.92,
+                                            )
+                                          : AppTheme.textSecondary.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                      fontSize: AppTheme.fontSm,
+                                      fontWeight: deck.ownerId != null
+                                          ? FontWeight.w500
+                                          : FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: AppTheme.space12),
+                              _CommunityChip(label: _capitalize(deck.format)),
+                            ],
+                          ),
+                          const SizedBox(height: AppTheme.space4),
+                          Row(
+                            children: [
+                              Text(
+                                '${deck.cardCount} cartas',
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                              if (deck.synergyScore != null) ...[
+                                const SizedBox(width: AppTheme.space12),
+                                _CommunityChip(
+                                  label: '${deck.synergyScore}%',
+                                  icon: Icons.auto_awesome,
+                                  accent: AppTheme.mythicGold,
+                                ),
+                              ],
+                            ],
+                          ),
+                          if (deck.description != null &&
+                              deck.description!.isNotEmpty) ...[
+                            const SizedBox(height: AppTheme.space4),
+                            Text(
+                              deck.description!,
+                              style: TextStyle(
+                                color: AppTheme.textSecondary.withValues(
+                                  alpha: 0.7,
+                                ),
+                                fontSize: AppTheme.fontSm,
+                              ),
+                              maxLines: spotlight ? 3 : 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ],
                       ),
-                      if (deck.description != null &&
-                          deck.description!.isNotEmpty) ...[
-                        const SizedBox(height: AppTheme.space4),
-                        Text(
-                          deck.description!,
-                          style: TextStyle(
-                            color: AppTheme.textSecondary.withValues(
-                              alpha: 0.7,
-                            ),
-                            fontSize: AppTheme.fontSm,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ],
-                  ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.textSecondary.withValues(alpha: 0.72),
+                      size: 20,
+                    ),
+                  ],
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppTheme.textSecondary.withValues(alpha: 0.72),
-                  size: 20,
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -969,87 +986,94 @@ class _FollowingDeckCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: AppTheme.space12),
-      child: Material(
-        color: AppTheme.transparent,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        child: InkWell(
-          key: Key('community-following-deck-row-${deck.id}'),
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(AppTheme.space12),
-            decoration: BoxDecoration(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final spotlight = constraints.maxWidth >= AppTheme.breakpointMedium;
+          return Material(
+            color: AppTheme.transparent,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            child: InkWell(
+              key: Key('community-following-deck-row-${deck.id}'),
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.surfaceSlate.withValues(alpha: 0.98),
-                  AppTheme.surfaceElevated.withValues(alpha: 0.62),
-                ],
-              ),
-              border: Border.all(
-                color: AppTheme.frost400.withValues(alpha: 0.18),
-              ),
-            ),
-            child: Row(
-              children: [
-                CachedCardImage(
-                  imageUrl: deck.commanderImageUrl,
-                  width: 56,
-                  height: 78,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                ),
-                const SizedBox(width: AppTheme.space12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        deck.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: AppTheme.textPrimary,
-                          fontFamily: AppTheme.displayFontFamily,
-                          fontWeight: FontWeight.w900,
-                          fontSize: AppTheme.fontLg,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppTheme.space4),
-                      Row(
-                        children: [
-                          _CommunityChip(label: _capitalize(deck.format)),
-                          const SizedBox(width: AppTheme.space8),
-                          Text(
-                            '${deck.cardCount} cartas',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
-                            ),
-                          ),
-                          if (deck.synergyScore != null) ...[
-                            const SizedBox(width: AppTheme.space8),
-                            _CommunityChip(
-                              label: '${deck.synergyScore}%',
-                              icon: Icons.auto_awesome,
-                              accent: AppTheme.mythicGold,
-                            ),
-                          ],
-                        ],
-                      ),
+              onTap: onTap,
+              child: Container(
+                padding: const EdgeInsets.all(AppTheme.space12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppTheme.surfaceSlate.withValues(alpha: 0.98),
+                      AppTheme.surfaceElevated.withValues(alpha: 0.62),
                     ],
                   ),
+                  border: Border.all(
+                    color: AppTheme.frost400.withValues(alpha: 0.18),
+                  ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppTheme.textSecondary.withValues(alpha: 0.72),
-                  size: 20,
+                child: Row(
+                  children: [
+                    CachedCardImage(
+                      imageUrl: deck.commanderImageUrl,
+                      width: spotlight ? 84 : 56,
+                      height: spotlight ? 118 : 78,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    const SizedBox(width: AppTheme.space12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            deck.name,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontFamily: AppTheme.displayFontFamily,
+                              fontWeight: FontWeight.w900,
+                              fontSize: spotlight
+                                  ? AppTheme.fontXl
+                                  : AppTheme.fontLg,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: AppTheme.space4),
+                          Row(
+                            children: [
+                              _CommunityChip(label: _capitalize(deck.format)),
+                              const SizedBox(width: AppTheme.space8),
+                              Text(
+                                '${deck.cardCount} cartas',
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                              if (deck.synergyScore != null) ...[
+                                const SizedBox(width: AppTheme.space8),
+                                _CommunityChip(
+                                  label: '${deck.synergyScore}%',
+                                  icon: Icons.auto_awesome,
+                                  accent: AppTheme.mythicGold,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.textSecondary.withValues(alpha: 0.72),
+                      size: 20,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -1511,196 +1535,76 @@ class _CotacoesTabState extends State<_CotacoesTab>
     required bool isGainer,
     required MarketProvider provider,
   }) {
-    return RefreshIndicator(
-      color: AppTheme.brass400,
-      backgroundColor: AppTheme.surfaceSlate,
-      onRefresh: () => provider.refresh(),
-      child: ListView.builder(
-        padding: EdgeInsets.fromLTRB(
-          AppTheme.space0,
-          AppTheme.space8,
-          AppTheme.space0,
-          AppTheme.space8 + MediaQuery.of(context).padding.bottom + 88,
-        ),
-        itemCount: movers.length,
-        itemBuilder: (context, index) {
-          final mover = movers[index];
-          final changeColor = isGainer ? AppTheme.success : AppTheme.error;
-          final changeIcon = isGainer
-              ? Icons.arrow_upward
-              : Icons.arrow_downward;
-          final changePrefix = isGainer ? '+' : '';
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boundedWidth = constraints.constrainWidth(
+          AppTheme.contentMaxWidth,
+        );
+        final useGrid =
+            boundedWidth >= AppTheme.breakpointMedium && movers.length > 1;
+        final bottom =
+            AppTheme.space8 + MediaQuery.of(context).padding.bottom + 88;
 
-          return Container(
-            margin: const EdgeInsets.symmetric(
-              horizontal: AppTheme.space12,
-              vertical: AppTheme.space4,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSlate,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(
-                color: index < 3
-                    ? AppTheme.outlineMuted.withValues(alpha: 0.45)
-                    : AppTheme.outlineMuted.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.space12),
-              child: Row(
-                children: [
-                  // Rank badge
-                  Container(
-                    width: AppTheme.touchTargetMin,
-                    height: AppTheme.touchTargetMin,
-                    decoration: BoxDecoration(
-                      color: index < 3
-                          ? AppTheme.surfaceElevated
-                          : AppTheme.surfaceElevated,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: index < 3
-                          ? Border.all(
-                              color: changeColor.withValues(alpha: 0.2),
-                              width: AppTheme.strokeThin,
-                            )
-                          : null,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '#${index + 1}',
-                      style: TextStyle(
-                        color: index < 3
-                            ? AppTheme.textPrimary.withValues(alpha: 0.9)
-                            : AppTheme.textSecondary,
-                        fontSize: AppTheme.fontSm,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.space10),
-                  // Card image
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    child: SizedBox(
-                      width: AppTheme.space36,
-                      height: 50,
-                      child: CachedCardImage(
-                        imageUrl: mover.imageUrl,
-                        fit: BoxFit.cover,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.space10),
-                  // Name + details
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          mover.name,
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: AppTheme.fontMd,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: AppTheme.space2),
-                        Row(
-                          children: [
-                            if (mover.setCode != null)
-                              Text(
-                                mover.setCode!.toUpperCase(),
-                                style: const TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                              ),
-                            if (mover.rarity != null) ...[
-                              const Text(
-                                ' • ',
-                                style: TextStyle(
-                                  color: AppTheme.outlineMuted,
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                              ),
-                              Text(
-                                _rarityLabel(mover.rarity!),
-                                style: TextStyle(
-                                  color: _rarityColor(
-                                    mover.rarity!,
-                                  ).withValues(alpha: 0.82),
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Price + change
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '\$${mover.priceToday.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.fontLg,
-                        ),
-                      ),
-                      const SizedBox(height: AppTheme.space2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.space6,
-                          vertical: AppTheme.space2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated,
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusSm,
-                          ),
-                          border: Border.all(
-                            color: changeColor.withValues(alpha: 0.22),
-                            width: AppTheme.strokeThin,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(changeIcon, size: 12, color: changeColor),
-                            const SizedBox(width: AppTheme.space2),
-                            Text(
-                              '$changePrefix${mover.changePct.toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                color: changeColor,
-                                fontSize: AppTheme.fontSm,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppTheme.space1),
-                      Text(
-                        '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          color: AppTheme.textSecondary.withValues(alpha: 0.78),
-                          fontSize: AppTheme.fontXs,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+        Widget buildMover(BuildContext context, int index) {
+          final mover = movers[index];
+          return _MarketMoverCard(
+            key: Key('community-market-mover-${mover.cardId}'),
+            mover: mover,
+            rank: index + 1,
+            isGainer: isGainer,
+            rarityLabel: mover.rarity == null
+                ? null
+                : _rarityLabel(mover.rarity!),
+            rarityColor: mover.rarity == null
+                ? null
+                : _rarityColor(mover.rarity!),
           );
-        },
-      ),
+        }
+
+        final collection = useGrid
+            ? GridView.builder(
+                key: const Key('community-market-movers-grid'),
+                padding: EdgeInsets.fromLTRB(
+                  AppTheme.pageGutter,
+                  AppTheme.space8,
+                  AppTheme.pageGutter,
+                  bottom,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: AppTheme.space12,
+                  mainAxisSpacing: AppTheme.space12,
+                  mainAxisExtent: 104,
+                ),
+                itemCount: movers.length,
+                itemBuilder: buildMover,
+              )
+            : ListView.builder(
+                key: const Key('community-market-movers-list'),
+                padding: EdgeInsets.fromLTRB(
+                  AppTheme.space12,
+                  AppTheme.space8,
+                  AppTheme.space12,
+                  bottom,
+                ),
+                itemCount: movers.length,
+                itemBuilder: buildMover,
+              );
+
+        return RefreshIndicator(
+          color: AppTheme.brass400,
+          backgroundColor: AppTheme.surfaceSlate,
+          onRefresh: () => provider.refresh(),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: boundedWidth,
+              height: constraints.maxHeight,
+              child: collection,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1730,5 +1634,177 @@ class _CotacoesTabState extends State<_CotacoesTab>
       'uncommon' => AppTheme.primarySoft,
       _ => AppTheme.textSecondary,
     };
+  }
+}
+
+class _MarketMoverCard extends StatelessWidget {
+  const _MarketMoverCard({
+    super.key,
+    required this.mover,
+    required this.rank,
+    required this.isGainer,
+    required this.rarityLabel,
+    required this.rarityColor,
+  });
+
+  final CardMover mover;
+  final int rank;
+  final bool isGainer;
+  final String? rarityLabel;
+  final Color? rarityColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final changeColor = isGainer ? AppTheme.success : AppTheme.error;
+    final changeIcon = isGainer ? Icons.arrow_upward : Icons.arrow_downward;
+    final changePrefix = isGainer ? '+' : '';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.space4),
+      child: Container(
+        padding: const EdgeInsets.all(AppTheme.space12),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(
+            color: AppTheme.outlineMuted.withValues(
+              alpha: rank <= 3 ? 0.45 : 0.3,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: AppTheme.touchTargetMin,
+              height: AppTheme.touchTargetMin,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: rank <= 3
+                    ? Border.all(
+                        color: changeColor.withValues(alpha: 0.2),
+                        width: AppTheme.strokeThin,
+                      )
+                    : null,
+              ),
+              child: Text(
+                '#$rank',
+                style: TextStyle(
+                  color: rank <= 3
+                      ? AppTheme.textPrimary.withValues(alpha: 0.9)
+                      : AppTheme.textSecondary,
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppTheme.space10),
+            SizedBox(
+              width: AppTheme.space36,
+              height: 50,
+              child: CachedCardImage(
+                imageUrl: mover.imageUrl,
+                fit: BoxFit.contain,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              ),
+            ),
+            const SizedBox(width: AppTheme.space10),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    mover.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: AppTheme.fontMd,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space2),
+                  Wrap(
+                    spacing: AppTheme.space5,
+                    children: [
+                      if (mover.setCode != null)
+                        Text(
+                          mover.setCode!.toUpperCase(),
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontSm,
+                          ),
+                        ),
+                      if (rarityLabel != null)
+                        Text(
+                          rarityLabel!,
+                          style: TextStyle(
+                            color: rarityColor!.withValues(alpha: 0.82),
+                            fontSize: AppTheme.fontSm,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppTheme.space8),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '\$${mover.priceToday.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppTheme.fontLg,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space2),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.space6,
+                    vertical: AppTheme.space2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: changeColor.withValues(alpha: 0.22),
+                      width: AppTheme.strokeThin,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(changeIcon, size: 12, color: changeColor),
+                      const SizedBox(width: AppTheme.space2),
+                      Text(
+                        '$changePrefix${mover.changePct.toStringAsFixed(1)}%',
+                        style: TextStyle(
+                          color: changeColor,
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space1),
+                Text(
+                  '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary.withValues(alpha: 0.78),
+                    fontSize: AppTheme.fontXs,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

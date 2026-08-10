@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../models/battle_job.dart';
 import '../models/battle_live_cursor.dart';
@@ -449,10 +450,24 @@ class _BattleLiveSpectatorScreenState extends State<BattleLiveSpectatorScreen>
             ],
           ),
           const SizedBox(height: AppTheme.space8),
-          Text(
-            'Partida ${_shortId(job.jobId)}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppTheme.textSecondary,
+          Tooltip(
+            message: 'Código da sessão: ${job.jobId}',
+            child: Semantics(
+              label: progressIsTerminal
+                  ? 'Registro final da partida'
+                  : 'Acompanhamento da partida em tempo real',
+              hint: 'Código da sessão disponível neste item',
+              child: ExcludeSemantics(
+                child: Text(
+                  progressIsTerminal
+                      ? 'Registro final da partida'
+                      : 'Acompanhamento em tempo real',
+                  key: const Key('battle-live-session-context'),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: AppTheme.space12),
@@ -954,11 +969,14 @@ class _BattleLiveTable extends StatelessWidget {
                 },
               ),
             const SizedBox(height: AppTheme.space14),
-            _PublicZoneSummary(
-              title: 'Pilha',
-              emptyLabel: 'Pilha vazia',
-              items: stack.map(_publicObjectName).toList(growable: false),
-            ),
+            if (stack.isEmpty)
+              const _PublicZoneSummary(
+                title: 'Pilha',
+                emptyLabel: 'Pilha vazia',
+                items: <String>[],
+              )
+            else
+              _BattleLivePublicCardZone(title: 'Pilha', cards: stack),
             const SizedBox(height: AppTheme.space10),
             _PublicZoneSummary(
               title: 'Combate',
@@ -982,6 +1000,10 @@ class _BattleLivePlayer extends StatelessWidget {
     final theme = Theme.of(context);
     final name =
         _safeText(player['name']) ?? _safeText(player['deck_key']) ?? 'Jogador';
+    final battlefield = _publicMapList(player['battlefield']);
+    final graveyard = _publicMapList(player['graveyard']);
+    final exile = _publicMapList(player['exile']);
+    final command = _publicMapList(player['command']);
     return Container(
       key: Key('battle-live-player-${_safeKey(name)}'),
       padding: const EdgeInsets.all(AppTheme.space12),
@@ -1037,7 +1059,125 @@ class _BattleLivePlayer extends StatelessWidget {
               ),
             ],
           ),
+          if (battlefield.isNotEmpty ||
+              graveyard.isNotEmpty ||
+              exile.isNotEmpty ||
+              command.isNotEmpty) ...[
+            const SizedBox(height: AppTheme.space12),
+            if (battlefield.isNotEmpty)
+              _BattleLivePublicCardZone(title: 'Campo', cards: battlefield),
+            if (graveyard.isNotEmpty) ...[
+              const SizedBox(height: AppTheme.space8),
+              _BattleLivePublicCardZone(title: 'Cemitério', cards: graveyard),
+            ],
+            if (exile.isNotEmpty) ...[
+              const SizedBox(height: AppTheme.space8),
+              _BattleLivePublicCardZone(title: 'Exílio', cards: exile),
+            ],
+            if (command.isNotEmpty) ...[
+              const SizedBox(height: AppTheme.space8),
+              _BattleLivePublicCardZone(title: 'Comando', cards: command),
+            ],
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _BattleLivePublicCardZone extends StatelessWidget {
+  const _BattleLivePublicCardZone({required this.title, required this.cards});
+
+  final String title;
+  final List<Map<String, dynamic>> cards;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: AppTheme.space5),
+        SizedBox(
+          key: Key('battle-live-zone-${_safeKey(title)}'),
+          height: 138,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: cards.length,
+            separatorBuilder: (_, __) => const SizedBox(width: AppTheme.space8),
+            itemBuilder: (context, index) =>
+                _BattleLivePublicCard(card: cards[index]),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BattleLivePublicCard extends StatelessWidget {
+  const _BattleLivePublicCard({required this.card});
+
+  final Map<String, dynamic> card;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = _publicObjectName(card);
+    final artwork = _battleLiveExactArtworkUrl(card['card_id']);
+    final tapped = card['tapped'] == true;
+    return Semantics(
+      label: '$name${tapped ? ', virada' : ''}',
+      child: SizedBox(
+        width: 84,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 72,
+              height: 101,
+              child: artwork == null
+                  ? DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceSlate,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                        border: Border.all(color: AppTheme.outlineMuted),
+                      ),
+                      child: const Icon(
+                        Icons.style_outlined,
+                        color: AppTheme.textHint,
+                        size: 18,
+                      ),
+                    )
+                  : Transform.rotate(
+                      angle: tapped ? -0.10 : 0,
+                      child: CardArtwork(
+                        key: Key('battle-live-card-art-${card['card_id']}'),
+                        variant: CardArtworkVariant.gallery,
+                        imageUrl: artwork,
+                        semanticLabel: 'Impressão exata de $name',
+                        constrainAspectRatio: false,
+                        showStatusBadge: false,
+                      ),
+                    ),
+            ),
+            const SizedBox(height: AppTheme.space3),
+            Text(
+              name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontXs,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1177,6 +1317,10 @@ class _BattleLiveTimelineRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isSnapshot = record.kind == BattleLiveRecordKind.snapshot;
+    final artwork = isSnapshot
+        ? null
+        : _battleLiveExactArtworkUrl(record.payload['card_id']);
+    final cardName = _safeText(record.payload['card_name']);
     return Container(
       key: Key('battle-live-record-${record.recordId}'),
       padding: const EdgeInsets.symmetric(vertical: AppTheme.space10),
@@ -1208,6 +1352,21 @@ class _BattleLiveTimelineRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppTheme.space10),
+          if (artwork != null) ...[
+            SizedBox(
+              width: 44,
+              height: 62,
+              child: CardArtwork(
+                key: Key('battle-live-event-card-${record.recordId}'),
+                variant: CardArtworkVariant.gallery,
+                imageUrl: artwork,
+                semanticLabel: 'Impressão exata de ${cardName ?? 'carta'}',
+                constrainAspectRatio: false,
+                showStatusBadge: false,
+              ),
+            ),
+            const SizedBox(width: AppTheme.space10),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1535,6 +1694,20 @@ String _publicObjectName(Map<String, dynamic> object) =>
     _safeText(object['card_name']) ??
     'Objeto público';
 
+String? _battleLiveExactArtworkUrl(Object? value) {
+  final cardId = _safeText(value);
+  if (cardId == null ||
+      !RegExp(
+        r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+      ).hasMatch(cardId)) {
+    return null;
+  }
+  return Uri.https('api.scryfall.com', '/cards/$cardId', {
+    'format': 'image',
+    'version': 'small',
+  }).toString();
+}
+
 String _combatSummary(Map<String, dynamic> combat) {
   final defender =
       _safeText(combat['defender_name']) ??
@@ -1552,9 +1725,6 @@ String? _safeText(Object? value) {
 }
 
 String? _safeNumber(Object? value) => value is int ? '$value' : null;
-
-String _shortId(String value) =>
-    value.length <= 12 ? value : '${value.substring(0, 8)}…';
 
 String _safeKey(String value) =>
     value.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '-');

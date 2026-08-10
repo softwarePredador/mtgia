@@ -64,6 +64,80 @@ void main() {
     expect(motif.variant, ManaLoomMotifVariant.battlefield);
   });
 
+  testWidgets('uses distinct language for each actionable state', (
+    tester,
+  ) async {
+    const cases = <AppStateStatus, String>{
+      AppStateStatus.firstUse: 'PRIMEIRO PASSO',
+      AppStateStatus.noResults: 'SEM RESULTADOS',
+      AppStateStatus.error: 'AÇÃO INTERROMPIDA',
+      AppStateStatus.offline: 'SEM CONEXÃO',
+      AppStateStatus.unavailable: 'INDISPONÍVEL',
+    };
+
+    for (final entry in cases.entries) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Scaffold(
+            body: AppStatePanel(
+              status: entry.key,
+              icon: Icons.search_off_outlined,
+              title: 'Estado contextual',
+              message: 'A orientação muda conforme o motivo.',
+              accent: AppTheme.frost400,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.text(entry.value), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('recomposes visual and copy side by side on wide canvases', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: const Scaffold(
+          body: AppStatePanel(
+            status: AppStateStatus.noResults,
+            icon: Icons.search_off_outlined,
+            title: 'Nada combina com os filtros',
+            message: 'Revise os termos para ampliar os resultados.',
+            accent: AppTheme.frost400,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final visual = tester.getRect(find.byIcon(Icons.search_off_outlined));
+    final title = tester.getRect(find.text('Nada combina com os filtros'));
+    final workbench = tester.getRect(
+      find.byKey(const Key('app-state-wide-workbench')),
+    );
+    final visualRail = tester.getRect(
+      find.byKey(const Key('app-state-visual-rail')),
+    );
+    final copyWorkspace = tester.getRect(
+      find.byKey(const Key('app-state-copy-workspace')),
+    );
+
+    expect(workbench.width, greaterThanOrEqualTo(1000));
+    expect(visual.right, lessThan(title.left));
+    expect(visualRail.right, lessThan(copyWorkspace.left));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('announces state changes as a live status region', (
     tester,
   ) async {

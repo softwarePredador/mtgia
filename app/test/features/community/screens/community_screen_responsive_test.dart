@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/community/providers/community_provider.dart';
 import 'package:manaloom/features/community/screens/community_screen.dart';
 import 'package:manaloom/features/market/providers/market_provider.dart';
@@ -50,6 +51,56 @@ void main() {
     expect(delegate.crossAxisCount, 2);
     expect(first.left, greaterThanOrEqualTo(AppTheme.pageGutter));
     expect(second.left, greaterThan(first.right));
+    expect(second.right, lessThanOrEqualTo(1260));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('one public deck becomes a full-width visual spotlight', (
+    tester,
+  ) async {
+    await _pumpCommunity(
+      tester,
+      const Size(1280, 900),
+      api: _CommunityGridApiFixture(deckCount: 1),
+    );
+
+    final collection = tester.widget(
+      find.byKey(const Key('community-explore-deck-list')),
+    );
+    final card = find.byKey(const Key('community-explore-deck-row-deck-1'));
+    final artwork = tester.widget<CachedCardImage>(
+      find.descendant(of: card, matching: find.byType(CachedCardImage)),
+    );
+    expect(collection, isA<ListView>());
+    expect(tester.getSize(card).width, greaterThan(1100));
+    expect(artwork.width, 84);
+    expect(artwork.height, 118);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('wide market uses a bounded two-column comparison grid', (
+    tester,
+  ) async {
+    await _pumpCommunity(
+      tester,
+      const Size(1280, 900),
+      initialTab: 3,
+      api: _CommunityGridApiFixture(withMarketMovers: true),
+    );
+
+    expect(
+      find.byKey(const Key('community-market-movers-grid')),
+      findsOneWidget,
+    );
+    final first = tester.getRect(
+      find.byKey(const Key('community-market-mover-card-market-1')),
+    );
+    final second = tester.getRect(
+      find.byKey(const Key('community-market-mover-card-market-2')),
+    );
+    expect((first.top - second.top).abs(), lessThan(0.1));
+    expect(second.left, greaterThan(first.right));
+    expect(first.left, greaterThanOrEqualTo(AppTheme.pageGutter));
     expect(second.right, lessThanOrEqualTo(1260));
     expect(tester.takeException(), isNull);
   });
@@ -181,16 +232,17 @@ Future<void> _pumpCommunity(
   WidgetTester tester,
   Size size, {
   int initialTab = 0,
+  ApiClient? api,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
 
-  final api = _CommunityGridApiFixture();
+  final resolvedApi = api ?? _CommunityGridApiFixture();
   await tester.pumpWidget(
     _CommunityProviders(
-      api: api,
+      api: resolvedApi,
       child: MaterialApp(
         theme: AppTheme.darkTheme,
         home: CommunityScreen(initialTab: initialTab),
@@ -226,10 +278,33 @@ class _CommunityProviders extends StatelessWidget {
 }
 
 class _CommunityGridApiFixture extends ApiClient {
+  _CommunityGridApiFixture({this.deckCount = 4, this.withMarketMovers = false});
+
+  final int deckCount;
+  final bool withMarketMovers;
+
   @override
   Future<ApiResponse> get(String endpoint) async {
     if (endpoint.startsWith('/market/movers')) {
-      return ApiResponse(200, {'data': const []});
+      if (!withMarketMovers) {
+        return ApiResponse(200, {
+          'gainers': const [],
+          'losers': const [],
+          'total_tracked': 0,
+          'message': 'Aguardando histórico de preços.',
+        });
+      }
+      return ApiResponse(200, {
+        'currency': 'USD',
+        'date': '2026-08-07',
+        'previous_date': '2026-08-06',
+        'total_tracked': 2,
+        'gainers': [
+          _moverJson('card-market-1', 'Sol Ring', 2.5, 2.25),
+          _moverJson('card-market-2', 'Arcane Signet', 1.8, 1.5),
+        ],
+        'losers': const [],
+      });
     }
     if (endpoint.startsWith('/community/decks/following')) {
       return ApiResponse(200, {'data': const [], 'total': 0});
@@ -237,7 +312,7 @@ class _CommunityGridApiFixture extends ApiClient {
     if (endpoint.startsWith('/community/decks?')) {
       return ApiResponse(200, {
         'data': List.generate(
-          4,
+          deckCount,
           (index) => {
             'id': 'deck-${index + 1}',
             'name': 'Deck público ${index + 1}',
@@ -249,9 +324,29 @@ class _CommunityGridApiFixture extends ApiClient {
             'created_at': '2026-07-16T12:00:00Z',
           },
         ),
-        'total': 4,
+        'total': deckCount,
       });
     }
     throw UnimplementedError('No GET handler for $endpoint');
+  }
+
+  static Map<String, dynamic> _moverJson(
+    String id,
+    String name,
+    double today,
+    double yesterday,
+  ) {
+    final change = today - yesterday;
+    return {
+      'card_id': id,
+      'name': name,
+      'set_code': 'CMM',
+      'rarity': 'uncommon',
+      'image_url': 'https://cards.scryfall.io/normal/front/a/b/$id.jpg',
+      'price_today': today,
+      'price_yesterday': yesterday,
+      'change_usd': change,
+      'change_pct': change / yesterday * 100,
+    };
   }
 }

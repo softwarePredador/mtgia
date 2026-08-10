@@ -1,0 +1,57 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-03T21:13:54.120041Z",
+  "source_digest": "eef339fc6c7dfbdfd2079029e7fad0f3ba140fbf8acf7f2e1eae7ae244806ba8",
+  "surface": "authenticated_community_ux_audit",
+  "profile": "web_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "96e27870aa257cc38e7784bc4f6f6281349eb40f9b097663c2df2ec0381ae27f",
+  "checkpoint_count": 4,
+  "required_checkpoints": [
+    "user_search_empty",
+    "user_search_results",
+    "user_profile_success",
+    "community_deck_success"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "community_deck_success",
+      "path": "docs/qa/ui-live/current/ux-pack-01-community-web/community_deck_success.png",
+      "sha256": "b9dce45d6fdb93d9c2cb016e3bb687de3fc6bb4a0eb19a2f0e2ca7c3fd8a3083",
+      "bytes": 62023,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "user_profile_success",
+      "path": "docs/qa/ui-live/current/ux-pack-01-community-web/user_profile_success.png",
+      "sha256": "57b0425d72aabe77d0f8a1dafd43e7e8cfca39ab576f3b3a9d9e405ced3450e7",
+      "bytes": 39864,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "user_search_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-01-community-web/user_search_empty.png",
+      "sha256": "e12c3bb329d7981375c335f6b65b98a0c32eb6cd1bafca737c65232a86485d5b",
+      "bytes": 31226,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "user_search_results",
+      "path": "docs/qa/ui-live/current/ux-pack-01-community-web/user_search_results.png",
+      "sha256": "b96ea24ebac0aeb581bc702363deb157a04b5d1557e795a489de989ed974c60d",
+      "bytes": 20067,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

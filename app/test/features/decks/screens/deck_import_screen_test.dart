@@ -14,6 +14,26 @@ class _ImportFailureDeckProvider extends DeckProvider {
   _ImportFailureDeckProvider() : super(apiClient: _NoopApiClient());
 
   @override
+  Future<Map<String, dynamic>> validateImportList({
+    required String format,
+    required String list,
+    String? commander,
+  }) async => {
+    'success': true,
+    'found_cards': const [
+      {
+        'card_id': 'sol-ring',
+        'name': 'Sol Ring',
+        'quantity': 1,
+        'image_url': '',
+      },
+    ],
+    'not_found_lines': const <String>[],
+    'warnings': const <String>[],
+    'localized_matches_count': 0,
+  };
+
+  @override
   Future<Map<String, dynamic>> importDeckFromList({
     required String name,
     required String format,
@@ -33,6 +53,26 @@ class _ImportFailureDeckProvider extends DeckProvider {
 
 class _PartialSuccessDeckProvider extends DeckProvider {
   _PartialSuccessDeckProvider() : super(apiClient: _NoopApiClient());
+
+  @override
+  Future<Map<String, dynamic>> validateImportList({
+    required String format,
+    required String list,
+    String? commander,
+  }) async => {
+    'success': true,
+    'found_cards': const [
+      {
+        'card_id': 'sol-ring',
+        'name': 'Sol Ring',
+        'quantity': 1,
+        'image_url': '',
+      },
+    ],
+    'not_found_lines': const ['1 Dragao Pira Funesta'],
+    'warnings': const ['Nenhum comandante foi marcado na lista.'],
+    'localized_matches_count': 0,
+  };
 
   @override
   Future<Map<String, dynamic>> importDeckFromList({
@@ -221,10 +261,18 @@ void main() {
       '1 Sol Ring',
     );
     await tester.pumpAndSettle();
+    expect(find.text('1 carta detectada'), findsOneWidget);
 
     final submitButton = find.byKey(
       const Key('deck-import-screen-submit-button'),
     );
+    await tester.ensureVisible(submitButton);
+    await tester.tap(submitButton);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('deck-import-preflight')), findsOneWidget);
+    expect(find.text('Criar deck revisado'), findsOneWidget);
+
     await tester.ensureVisible(submitButton);
     await tester.tap(submitButton);
     await tester.pumpAndSettle();
@@ -262,6 +310,14 @@ void main() {
     await tester.tap(submitButton);
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('deck-import-preflight')), findsOneWidget);
+    expect(find.text('Criar como rascunho'), findsOneWidget);
+    expect(find.text('1 não identificadas'), findsOneWidget);
+
+    await tester.ensureVisible(submitButton);
+    await tester.tap(submitButton);
+    await tester.pumpAndSettle();
+
     expect(find.text('Importação parcial'), findsOneWidget);
     expect(
       find.text(
@@ -270,7 +326,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Abrir rascunho'), findsOneWidget);
-    expect(find.text('1 cartas não identificadas'), findsOneWidget);
+    expect(find.text('1 carta não identificada'), findsOneWidget);
 
     final draft = await DeckEntryDraftStore().loadImport('local');
     expect(draft?['name'], 'Kaalia import');

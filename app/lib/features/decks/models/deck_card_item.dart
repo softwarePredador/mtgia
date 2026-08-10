@@ -103,19 +103,26 @@ class DeckCardItem {
   /// Número de colecionador (ex: "157", "157a")
   final String? collectorNumber;
 
-  /// Status foil: true=foil, false=non-foil, null=desconhecido
+  /// Capacidade foil da impressão no catálogo.
+  ///
+  /// Não representa o acabamento de uma cópia física do usuário; esse dado é
+  /// mantido em `user_binder_items.is_foil`.
   final bool? foil;
 
-  /// Condição física da carta (TCGPlayer standard)
+  /// Condição legada associada à linha da decklist (TCGPlayer standard).
+  ///
+  /// Não prova alocação de uma cópia do Binder.
   final CardCondition condition;
 
-  /// URL usada pela UI quando o backend/import ainda não trouxe `image_url`.
+  /// Arte vinculada à impressão ou a uma face persistida desta carta.
   ///
-  /// Mantém a URL explícita como fonte principal e cai para a imagem pública do
-  /// Scryfall por nome exato da carta apenas quando necessário.
-  String? get effectiveImageUrl {
+  /// Diferente de [effectiveImageUrl], nunca cai para uma busca por nome. Use
+  /// este getter quando a UI precisa distinguir imagem exata de referência.
+  String? get printingImageUrl {
     final explicit = imageUrl?.trim();
-    if (explicit != null && explicit.isNotEmpty) {
+    if (explicit != null &&
+        explicit.isNotEmpty &&
+        !_isReferenceArtworkUrl(explicit)) {
       return explicit;
     }
 
@@ -124,8 +131,30 @@ class DeckCardItem {
       if (faceImage != null && faceImage.isNotEmpty) return faceImage;
     }
 
-    return fallbackImageUrl;
+    return null;
   }
+
+  bool _isReferenceArtworkUrl(String value) {
+    final uri = Uri.tryParse(value);
+    if (uri?.host.toLowerCase() != 'api.scryfall.com') return false;
+    if (uri?.path == '/cards/named') return true;
+    final segments = uri?.pathSegments ?? const <String>[];
+    if (segments.length != 2 || segments.first != 'cards') return false;
+    final candidate = segments[1].toLowerCase();
+    final oracle = oracleId?.trim().toLowerCase();
+    return oracle != null &&
+        candidate == oracle &&
+        candidate != id.toLowerCase();
+  }
+
+  bool get hasPrintingArtwork => printingImageUrl != null;
+
+  /// URL usada pela UI quando o backend/import ainda não trouxe `image_url`.
+  ///
+  /// Mantém a arte da impressão como fonte principal e cai para a imagem
+  /// pública por nome somente como referência visual. Superfícies em que a
+  /// impressão física importa devem comunicar esse fallback explicitamente.
+  String? get effectiveImageUrl => printingImageUrl ?? fallbackImageUrl;
 
   bool get isMultiFaced => cardFaces.length > 1;
 

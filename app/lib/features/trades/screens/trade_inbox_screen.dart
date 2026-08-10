@@ -6,6 +6,7 @@ import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/trade_provider.dart';
+import '../trade_route_contract.dart';
 
 /// Widget embeddable para uso como tab dentro do CollectionScreen.
 /// Contém seu próprio TabBar aninhado (Recebidas / Enviadas / Finalizadas).
@@ -263,17 +264,32 @@ class _TradeListViewState extends State<_TradeListView> {
             title: 'Falha ao carregar trades',
             message: provider.errorMessage!,
             accent: AppTheme.error,
+            status: AppStateStatus.error,
             actionLabel: 'Tentar novamente',
             onAction: widget.onRefresh,
           );
         }
         if (provider.trades.isEmpty) {
-          return const AppStatePanel(
+          return AppStatePanel(
+            key: Key(
+              widget.status == 'completed'
+                  ? 'trade-inbox-empty-completed'
+                  : 'trade-inbox-empty-active',
+            ),
             icon: Icons.swap_horiz_rounded,
-            title: 'Nenhum trade encontrado',
-            message:
-                'Quando houver propostas, negociações ou finalizações, elas aparecem aqui.',
+            title: widget.status == 'completed'
+                ? 'Nenhuma troca finalizada'
+                : 'Nenhuma proposta nesta etapa',
+            message: widget.status == 'completed'
+                ? 'Seu histórico concluído aparecerá aqui sem misturar propostas em andamento.'
+                : 'Cruze suas faltantes com fichários públicos para iniciar uma proposta com contexto.',
             accent: AppTheme.brass400,
+            status: widget.status == 'completed'
+                ? AppStateStatus.noResults
+                : AppStateStatus.firstUse,
+            actionLabel: 'Encontrar matches',
+            actionKey: const Key('trade-inbox-empty-matches'),
+            onAction: () => context.push(tradeMatchesRouteLocation()),
           );
         }
         return ResponsivePageFrame(

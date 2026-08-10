@@ -9,6 +9,7 @@ import 'core/api/api_client.dart';
 import 'core/config/launch_features.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/image_cache_policy.dart';
+import 'core/services/activation_funnel_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
@@ -50,10 +51,13 @@ import 'features/social/providers/social_provider.dart';
 import 'features/social/screens/user_profile_screen.dart';
 import 'features/social/screens/user_search_screen.dart';
 import 'features/binder/providers/binder_provider.dart';
+import 'features/binder/screens/binder_import_screen.dart';
 import 'features/trades/providers/trade_provider.dart';
 import 'features/trades/screens/trade_inbox_screen.dart';
 import 'features/trades/screens/trade_detail_screen.dart';
 import 'features/trades/screens/create_trade_screen.dart';
+import 'features/trades/screens/trade_matches_screen.dart';
+import 'features/trades/trade_route_contract.dart';
 import 'features/collection/screens/collection_screen.dart';
 import 'features/collection/screens/latest_set_collection_screen.dart';
 import 'features/collection/screens/set_cards_screen.dart';
@@ -65,6 +69,7 @@ import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/notifications/widgets/notification_permission_boundary.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
+import 'features/home/services/onboarding_state_store.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
 import 'features/commercial/providers/commercial_provider.dart';
@@ -231,6 +236,39 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   late final CommercialProvider _commercialProvider;
   late final RealtimeNotificationCoordinator _realtimeCoordinator;
   late final GoRouter _router;
+
+  Future<bool> _completeOnboardingTask({
+    required OnboardingGoal goal,
+    required String format,
+  }) async {
+    final userId = _authProvider.user?.id.trim() ?? '';
+    if (userId.isEmpty) return false;
+    try {
+      await OnboardingStateStore().settle(
+        userId,
+        selectedFormat: format,
+        disposition: OnboardingDisposition.completed,
+        selectedGoal: goal,
+      );
+      _authProvider.markOnboardingSettled();
+      unawaited(
+        ActivationFunnelService.instance.trackOnce(
+          'onboarding:v${OnboardingStateStore.currentVersion}:$userId:completed',
+          'onboarding_completed',
+          format: format,
+          source: 'onboarding_task',
+          metadata: {
+            'disposition': OnboardingDisposition.completed.name,
+            'goal': goal.name,
+          },
+        ),
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   bool _hadAuthenticatedSession = false;
   Timer? _authenticatedWarmupTimer;
 
@@ -455,7 +493,13 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const HomeScreen(),
+              builder: (context, state) {
+                final auth = context.read<AuthProvider>();
+                return HomeScreen(
+                  userId: auth.user?.id ?? '',
+                  onOnboardingSettled: auth.markOnboardingSettled,
+                );
+              },
             ),
             GoRoute(
               path: '/onboarding/core-flow',
@@ -471,15 +515,39 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             ),
             GoRoute(
               path: '/decks',
-              builder: (context, state) => const DeckListScreen(),
+              builder: (context, state) {
+                final fromOnboarding =
+                    state.uri.queryParameters['from'] == 'onboarding';
+                final format = state.uri.queryParameters['format'];
+                return DeckListScreen(
+                  openCreateOnStart:
+                      fromOnboarding &&
+                      state.uri.queryParameters['create'] == '1',
+                  initialCreateFormat: format,
+                  onOnboardingTaskCompleted: fromOnboarding
+                      ? (completedFormat) => _completeOnboardingTask(
+                          goal: OnboardingGoal.buildDeck,
+                          format: completedFormat,
+                        )
+                      : null,
+                );
+              },
               routes: [
                 GoRoute(
                   path: 'generate',
                   builder: (context, state) {
                     final initialFormat = state.uri.queryParameters['format'];
+                    final fromOnboarding =
+                        state.uri.queryParameters['from'] == 'onboarding';
                     return DeckGenerateScreen(
                       initialFormat: initialFormat,
                       draftOwnerId: context.read<AuthProvider>().user?.id ?? '',
+                      onOnboardingTaskCompleted: fromOnboarding
+                          ? (completedFormat) => _completeOnboardingTask(
+                              goal: OnboardingGoal.buildDeck,
+                              format: completedFormat,
+                            )
+                          : null,
                     );
                   },
                 ),
@@ -487,9 +555,17 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                   path: 'import',
                   builder: (context, state) {
                     final initialFormat = state.uri.queryParameters['format'];
+                    final fromOnboarding =
+                        state.uri.queryParameters['from'] == 'onboarding';
                     return DeckImportScreen(
                       initialFormat: initialFormat,
                       draftOwnerId: context.read<AuthProvider>().user?.id ?? '',
+                      onOnboardingTaskCompleted: fromOnboarding
+                          ? (completedFormat) => _completeOnboardingTask(
+                              goal: OnboardingGoal.importDeck,
+                              format: completedFormat,
+                            )
+                          : null,
                     );
                   },
                 ),
@@ -501,6 +577,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                       deckId: id,
                       initialOptimizationIntent:
                           state.uri.queryParameters['optimize'],
+                      initialPostGameNoteId:
+                          state.uri.queryParameters['postGameNoteId'],
                     );
                   },
                   routes: [
@@ -535,6 +613,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                         );
                         return PostGameNotesScreen(
                           deckId: id,
+                          deckLoader: (deckId) async {
+                            final provider = context.read<DeckProvider>();
+                            await provider.fetchDeckDetails(deckId);
+                            final selected = provider.selectedDeck;
+                            return selected?.id == deckId ? selected : null;
+                          },
                           playSessionId:
                               state.uri.queryParameters['playSessionId'],
                           sessionStartedAt: startedAtMs == null
@@ -614,8 +698,38 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
               builder: (context, state) {
                 final tabStr = state.uri.queryParameters['tab'];
                 final tab = int.tryParse(tabStr ?? '') ?? 0;
-                return CollectionScreen(initialTab: tab);
+                return CollectionScreen(
+                  initialTab: tab,
+                  initialBinderList: state.uri.queryParameters['list'] == 'want'
+                      ? 'want'
+                      : 'have',
+                );
               },
+            ),
+            GoRoute(
+              path: '/collection/import',
+              builder: (context, state) {
+                final fromOnboarding =
+                    state.uri.queryParameters['from'] == 'onboarding';
+                return BinderImportScreen(
+                  ownerId: context.read<AuthProvider>().user?.id ?? '',
+                  initialListType:
+                      state.uri.queryParameters['list_type'] == 'want'
+                      ? 'want'
+                      : 'have',
+                  onOnboardingTaskCompleted: fromOnboarding
+                      ? () => _completeOnboardingTask(
+                          goal: OnboardingGoal.catalogCollection,
+                          format: 'commander',
+                        )
+                      : null,
+                );
+              },
+            ),
+            GoRoute(
+              path: '/collection/matches',
+              builder: (context, state) =>
+                  TradeMatchesScreen(deckId: state.uri.queryParameters['deck']),
             ),
             GoRoute(
               path: '/collection/latest-set',
@@ -636,7 +750,15 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             ),
             GoRoute(
               path: '/market',
-              redirect: (context, state) => '/community?tab=3',
+              redirect: (context, state) => quotesRouteLocation,
+            ),
+            GoRoute(
+              path: '/marketplace',
+              redirect: (context, state) => marketplaceRouteLocation,
+            ),
+            GoRoute(
+              path: '/quotes',
+              redirect: (context, state) => quotesRouteLocation,
             ),
             GoRoute(
               path: '/community',
@@ -649,7 +771,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
               routes: [
                 GoRoute(
                   path: 'search-users',
-                  builder: (context, state) => const UserSearchScreen(),
+                  builder: (context, state) => UserSearchScreen(
+                    initialQuery: state.uri.queryParameters['q'] ?? '',
+                  ),
                 ),
                 GoRoute(
                   path: 'user/:userId',
@@ -706,14 +830,19 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                   builder: (context, state) {
                     final receiverId = state.pathParameters['receiverId']!;
                     final args = state.extra;
+                    final deepLink = TradeProposalDeepLink.fromUri(state.uri);
                     return CreateTradeScreen(
                       receiverId: receiverId,
                       initialType: args is CreateTradeRouteArgs
                           ? args.initialType
-                          : 'trade',
+                          : deepLink.type,
                       preselectedItem: args is CreateTradeRouteArgs
                           ? args.preselectedItem
                           : null,
+                      initialBinderItemId: deepLink.binderItemId,
+                      source: deepLink.source,
+                      sourceDeckId: deepLink.deckId,
+                      counterTradeId: deepLink.counterTradeId,
                     );
                   },
                 ),

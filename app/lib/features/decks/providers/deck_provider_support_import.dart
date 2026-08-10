@@ -88,6 +88,10 @@ Map<String, dynamic> parseValidateImportListResponse(ApiResponse response) {
       'localized_matches': data['localized_matches'] ?? const <dynamic>[],
       'localized_matches_count': data['localized_matches_count'] ?? 0,
       'warnings': data['warnings'] ?? const <String>[],
+      'total_cards': data['total_cards'] ?? 0,
+      'total_unique': data['total_unique'] ?? 0,
+      'commander_detected': data['commander_detected'] == true,
+      'missing_commander': data['missing_commander'] == true,
     };
   }
 
@@ -102,10 +106,13 @@ Future<Map<String, dynamic>> validateImportListRequest(
   ApiClient apiClient, {
   required String format,
   required String list,
+  String? commander,
 }) async {
   final response = await apiClient.post('/import/validate', {
     'format': format,
     'list': list,
+    if (commander != null && commander.trim().isNotEmpty)
+      'commander': commander.trim(),
   });
   return parseValidateImportListResponse(response);
 }

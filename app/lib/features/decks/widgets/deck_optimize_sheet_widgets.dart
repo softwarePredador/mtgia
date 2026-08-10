@@ -8,7 +8,9 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/card_artwork.dart';
+import '../../../core/widgets/horizontal_discovery_rail.dart';
 import '../../../core/widgets/mana_symbols.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../models/deck_card_item.dart';
 import '../providers/deck_provider_support.dart';
 import 'deck_optimize_flow_support.dart';
@@ -173,6 +175,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
   final Map<String, dynamic> postAnalysis;
   final Map<String, dynamic> warnings;
   final Map<String, dynamic> metaReferenceContext;
+  final Map<String, dynamic> postGameEvidence;
   final Map<String, dynamic> optimizationContract;
   final Map<String, dynamic> battleValidation;
   final Map<String, dynamic> bracketPolicy;
@@ -201,6 +204,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
     required this.postAnalysis,
     required this.warnings,
     required this.metaReferenceContext,
+    this.postGameEvidence = const <String, dynamic>{},
     required this.optimizationContract,
     required this.battleValidation,
     this.bracketPolicy = const <String, dynamic>{},
@@ -556,6 +560,59 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     );
   }
 
+  Widget _pairedSwapList() {
+    final pairCount =
+        widget.displayRemovals.length < widget.displayAdditions.length
+        ? widget.displayRemovals.length
+        : widget.displayAdditions.length;
+    final visiblePairCount = pairCount > 20 ? 20 : pairCount;
+
+    return Column(
+      key: const Key('optimize-paired-swap-list'),
+      children: [
+        for (var index = 0; index < visiblePairCount; index++)
+          _PairedOptimizationSwap(
+            key: Key('optimize-paired-swap-$index'),
+            index: index,
+            selected:
+                _selectedRemovalIndexes.contains(index) &&
+                _selectedAdditionIndexes.contains(index),
+            removal: widget.displayRemovals[index],
+            addition: widget.displayAdditions[index],
+            loadRemoval: widget.loadCard == null
+                ? null
+                : () => _loadRecommendationCard(widget.displayRemovals[index]),
+            loadAddition: widget.loadCard == null
+                ? null
+                : () => _loadRecommendationCard(widget.displayAdditions[index]),
+            onChanged: (selected) {
+              setState(() => _setPairedSelection(index, selected));
+            },
+          ),
+        if (pairCount > visiblePairCount)
+          Padding(
+            padding: const EdgeInsets.only(top: AppTheme.space8),
+            child: Text(
+              '+ ${pairCount - visiblePairCount} trocas no plano completo',
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
+          ),
+        if (widget.displayRemovals.length != widget.displayAdditions.length)
+          const Padding(
+            padding: EdgeInsets.only(top: AppTheme.space8),
+            child: Text(
+              'Itens sem par não podem ser aplicados até a proposta ser recalculada.',
+              key: Key('optimize-unpaired-items-warning'),
+              style: TextStyle(
+                color: AppTheme.warning,
+                height: AppTheme.lineHeightCompact,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Map<String, dynamic> get _targetSwaps {
     final value = widget.optimizeIntensity['target_swaps'];
     return value is Map ? value.cast<String, dynamic>() : const {};
@@ -868,6 +925,10 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                 const SizedBox(height: AppTheme.space16),
                 _MetaReferenceSection(contextData: widget.metaReferenceContext),
               ],
+              if (widget.postGameEvidence.isNotEmpty) ...[
+                const SizedBox(height: AppTheme.space16),
+                _PostGameEvidenceSection(evidence: widget.postGameEvidence),
+              ],
               if (_isPartialSelection) ...[
                 const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
@@ -950,7 +1011,32 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                   ),
                 ),
               ],
-              if (widget.displayRemovals.isNotEmpty) ...[
+              if (_pairedSelectionRequired &&
+                  widget.displayRemovals.isNotEmpty &&
+                  widget.displayAdditions.isNotEmpty) ...[
+                const SizedBox(height: AppTheme.space16),
+                DialogSectionCard(
+                  title:
+                      'Trocas pareadas (${_selectedRemovalIndexes.length}/${widget.displayRemovals.length} aprovadas)',
+                  accent: AppTheme.brass400,
+                  icon: Icons.swap_horiz_rounded,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Cada decisão mantém o deck equilibrado: ao desmarcar uma troca, a saída e a entrada são removidas juntas.',
+                        key: Key('optimize-paired-selection-explanation'),
+                        style: TextStyle(
+                          color: AppTheme.textSecondary,
+                          height: AppTheme.lineHeightCompact,
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.space12),
+                      _pairedSwapList(),
+                    ],
+                  ),
+                ),
+              ] else if (widget.displayRemovals.isNotEmpty) ...[
                 const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title:
@@ -973,7 +1059,8 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                   ),
                 ),
               ],
-              if (widget.displayAdditions.isNotEmpty) ...[
+              if (!_pairedSelectionRequired &&
+                  widget.displayAdditions.isNotEmpty) ...[
                 const SizedBox(height: AppTheme.space16),
                 DialogSectionCard(
                   title:
@@ -1050,6 +1137,197 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     );
   }
 }
+
+class _PostGameEvidenceSection extends StatelessWidget {
+  const _PostGameEvidenceSection({required this.evidence});
+
+  final Map<String, dynamic> evidence;
+
+  List<Map<String, dynamic>> _cards(String key) {
+    return (evidence[key] as List? ?? const <Object>[])
+        .map((entry) {
+          if (entry is Map) return entry.cast<String, dynamic>();
+          return <String, dynamic>{'name': entry.toString()};
+        })
+        .where((entry) => entry['name']?.toString().trim().isNotEmpty == true)
+        .toList(growable: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final preserve = _cards('performed_well');
+    final review = _cards('underperformed');
+    final issues = (evidence['issues'] as List? ?? const <Object>[])
+        .map((entry) => entry.toString())
+        .where((entry) => entry.trim().isNotEmpty)
+        .toList(growable: false);
+    final revision = evidence['deck_revision'] is Map
+        ? (evidence['deck_revision'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final revisionMatches = revision['matches_current'] == true;
+    final noteId = evidence['note_id']?.toString() ?? '';
+
+    return DialogSectionCard(
+      key: const Key('optimize-preview-post-game-evidence'),
+      title: 'Evidência usada nesta recomendação',
+      accent: AppTheme.brass400,
+      icon: Icons.sports_score_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Registro ${noteId.length <= 10 ? noteId : '${noteId.substring(0, 8)}…'} · '
+            '${revisionMatches ? 'mesma revisão do deck' : 'revisão anterior identificada'}',
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          if (issues.isNotEmpty) ...[
+            const SizedBox(height: AppTheme.space8),
+            Wrap(
+              spacing: AppTheme.space6,
+              runSpacing: AppTheme.space6,
+              children: issues
+                  .map((issue) => Chip(label: Text(_postGameIssueLabel(issue))))
+                  .toList(growable: false),
+            ),
+          ],
+          if (preserve.isNotEmpty || review.isNotEmpty) ...[
+            const SizedBox(height: AppTheme.space10),
+            HorizontalDiscoveryRail(
+              key: const Key('optimize-post-game-evidence-discovery-rail'),
+              semanticLabel:
+                  '${preserve.length + review.length} cartas usadas como evidência da recomendação',
+              hintText: 'Deslize para conferir todas as evidências.',
+              backwardHintText: 'Volte às evidências anteriores.',
+              forwardSemanticLabel: 'Ver próximas evidências da recomendação',
+              backwardSemanticLabel:
+                  'Voltar às evidências anteriores da recomendação',
+              hintKey: const Key('optimize-post-game-evidence-hint'),
+              forwardButtonKey: const Key('optimize-post-game-evidence-next'),
+              backwardButtonKey: const Key(
+                'optimize-post-game-evidence-previous',
+              ),
+              builder: (context, controller) => SizedBox(
+                key: const Key('optimize-post-game-evidence-rail'),
+                height: 84,
+                child: ListView(
+                  controller: controller,
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    for (final card in preserve)
+                      _PostGameEvidenceCard(card: card, preserve: true),
+                    for (final card in review)
+                      _PostGameEvidenceCard(card: card, preserve: false),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: AppTheme.space8),
+          const Text(
+            'O registro foi reaberto pelo backend com o usuário e o deck autenticados. Ele orienta o preview, mas não autoriza aplicação automática.',
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              height: AppTheme.lineHeightCompact,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PostGameEvidenceCard extends StatelessWidget {
+  const _PostGameEvidenceCard({required this.card, required this.preserve});
+
+  final Map<String, dynamic> card;
+  final bool preserve;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = card['name']?.toString() ?? 'Carta';
+    final artwork = card['image_url']?.toString().trim();
+    final color = preserve ? AppTheme.success : AppTheme.warning;
+    return Container(
+      width: 176,
+      margin: const EdgeInsets.only(right: AppTheme.space8),
+      padding: const EdgeInsets.all(AppTheme.space6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: color.withValues(alpha: 0.32)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 45,
+            height: 64,
+            child: artwork == null || artwork.isEmpty
+                ? DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceElevated,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                    ),
+                    child: Icon(
+                      preserve
+                          ? Icons.shield_outlined
+                          : Icons.manage_search_rounded,
+                      color: color,
+                    ),
+                  )
+                : CardArtwork(
+                    variant: CardArtworkVariant.gallery,
+                    imageUrl: artwork,
+                    semanticLabel: 'Impressão de $name',
+                    constrainAspectRatio: false,
+                    showStatusBadge: false,
+                  ),
+          ),
+          const SizedBox(width: AppTheme.space8),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  preserve ? 'PRESERVAR' : 'REVISAR',
+                  style: TextStyle(
+                    color: color,
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                Text(
+                  name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontXs,
+                    height: 1.1,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _postGameIssueLabel(String issue) => switch (issue) {
+  'mana' => 'Mana',
+  'draw' => 'Compra',
+  'removal' => 'Remoção',
+  'win_condition' => 'Condição de vitória',
+  'speed' => 'Velocidade',
+  'protection' => 'Proteção',
+  _ => issue,
+};
 
 class _MetaReferenceSection extends StatelessWidget {
   final Map<String, dynamic> contextData;
@@ -1794,6 +2072,211 @@ class _TrustSignalCopy extends StatelessWidget {
   }
 }
 
+class _PairedOptimizationSwap extends StatelessWidget {
+  const _PairedOptimizationSwap({
+    super.key,
+    required this.index,
+    required this.selected,
+    required this.removal,
+    required this.addition,
+    required this.loadRemoval,
+    required this.loadAddition,
+    required this.onChanged,
+  });
+
+  final int index;
+  final bool selected;
+  final Map<String, dynamic> removal;
+  final Map<String, dynamic> addition;
+  final Future<DeckCardItem?> Function()? loadRemoval;
+  final Future<DeckCardItem?> Function()? loadAddition;
+  final ValueChanged<bool> onChanged;
+
+  String get _pairReason {
+    for (final item in [addition, removal]) {
+      final playerFacing = item['player_facing'];
+      if (playerFacing is Map) {
+        final summary = playerFacing['summary']?.toString().trim() ?? '';
+        if (summary.isNotEmpty) return summary;
+      }
+      final reason = item['reason']?.toString().trim() ?? '';
+      if (reason.isNotEmpty) return reason;
+    }
+    return 'A proposta preserva quantidade e passa por validação ao aplicar.';
+  }
+
+  Widget _lane({
+    required String label,
+    required IconData icon,
+    required Color accent,
+    required String keyPrefix,
+    required Map<String, dynamic> item,
+    required Future<DeckCardItem?> Function()? loadCard,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 16, color: accent),
+            const SizedBox(width: AppTheme.space5),
+            Text(
+              label,
+              style: TextStyle(
+                color: accent,
+                fontSize: AppTheme.fontSm,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTheme.space6),
+        _SelectableSuggestionLineItem(
+          key: Key('optimize-suggestion-$keyPrefix-$index'),
+          interactionKey: 'optimize-suggestion-$keyPrefix-$index',
+          item: item,
+          accent: accent,
+          selected: selected,
+          loadCard: loadCard,
+          showCheckbox: false,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      checked: selected,
+      label: 'Troca ${index + 1}: saída e entrada pareadas',
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        margin: const EdgeInsets.only(bottom: AppTheme.space12),
+        padding: const EdgeInsets.all(AppTheme.space12),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppTheme.brass400.withValues(alpha: 0.055)
+              : AppTheme.surfaceElevated.withValues(alpha: 0.52),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(
+            color: selected
+                ? AppTheme.brass400.withValues(alpha: 0.34)
+                : AppTheme.outlineMuted.withValues(alpha: 0.42),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Checkbox(
+                  key: Key('optimize-paired-swap-checkbox-$index'),
+                  value: selected,
+                  onChanged: (value) => onChanged(value ?? false),
+                  visualDensity: VisualDensity.compact,
+                ),
+                const SizedBox(width: AppTheme.space4),
+                Expanded(
+                  child: Text(
+                    'TROCA ${index + 1}',
+                    style: const TextStyle(
+                      color: AppTheme.brass400,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+                Text(
+                  selected ? 'Aprovada' : 'Fora do plano',
+                  style: TextStyle(
+                    color: selected ? AppTheme.success : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.space8),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final removalLane = _lane(
+                  label: 'SAI',
+                  icon: Icons.remove_circle_outline_rounded,
+                  accent: AppTheme.error,
+                  keyPrefix: 'remove',
+                  item: removal,
+                  loadCard: loadRemoval,
+                );
+                final additionLane = _lane(
+                  label: 'ENTRA',
+                  icon: Icons.add_circle_outline_rounded,
+                  accent: AppTheme.success,
+                  keyPrefix: 'add',
+                  item: addition,
+                  loadCard: loadAddition,
+                );
+                if (constraints.maxWidth >= 650) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: removalLane),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          AppTheme.space10,
+                          AppTheme.space32,
+                          AppTheme.space10,
+                          AppTheme.space0,
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          color: AppTheme.brass400,
+                          size: 24,
+                        ),
+                      ),
+                      Expanded(child: additionLane),
+                    ],
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    removalLane,
+                    const Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: AppTheme.space6),
+                        child: Icon(
+                          Icons.arrow_downward_rounded,
+                          color: AppTheme.brass400,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                    additionLane,
+                  ],
+                );
+              },
+            ),
+            Text(
+              _pairReason,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontSm,
+                height: AppTheme.lineHeightCompact,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SelectableSuggestionLineItem extends StatefulWidget {
   final String interactionKey;
   final Map<String, dynamic> item;
@@ -1801,6 +2284,7 @@ class _SelectableSuggestionLineItem extends StatefulWidget {
   final bool selected;
   final Future<DeckCardItem?> Function()? loadCard;
   final ValueChanged<bool>? onChanged;
+  final bool showCheckbox;
 
   const _SelectableSuggestionLineItem({
     super.key,
@@ -1810,6 +2294,7 @@ class _SelectableSuggestionLineItem extends StatefulWidget {
     required this.selected,
     this.loadCard,
     this.onChanged,
+    this.showCheckbox = true,
   });
 
   @override
@@ -2189,14 +2674,16 @@ class _SelectableSuggestionLineItemState
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Checkbox(
-                        value: selected,
-                        onChanged: widget.onChanged == null
-                            ? null
-                            : (value) => widget.onChanged!(value ?? false),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                      const SizedBox(width: AppTheme.space4),
+                      if (widget.showCheckbox) ...[
+                        Checkbox(
+                          value: selected,
+                          onChanged: widget.onChanged == null
+                              ? null
+                              : (value) => widget.onChanged!(value ?? false),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        const SizedBox(width: AppTheme.space4),
+                      ],
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2344,20 +2831,26 @@ class _RecommendationHoverPreview extends StatelessWidget {
                     CardArtwork(
                       key: const Key('recommendation-hover-card-artwork'),
                       variant: CardArtworkVariant.fullCard,
-                      imageUrl: _recommendationCardImageUrl(
+                      imageUrl: _recommendationPrintingImageUrl(
                         item,
                         card,
                         version: 'normal',
                       ),
-                      fallbackImageUrl: ScryfallImageHelper.namedImageUrl(
-                        name,
+                      fallbackImageUrl: _recommendationFallbackImageUrl(
+                        item,
+                        card,
                         version: 'normal',
                       ),
-                      semanticLabel: 'Imagem completa da carta $name',
+                      semanticLabel:
+                          _recommendationHasPrintingArtwork(item, card)
+                          ? 'Arte da impressão $name'
+                          : 'Arte de referência de $name',
                       errorPlaceholder: _RecommendationCardImageFallback(
                         name: name,
                       ),
                     ),
+                    const SizedBox(height: AppTheme.space8),
+                    _RecommendationEditionMetadata(item: item, card: card),
                   ],
                 ),
               ),
@@ -2410,7 +2903,10 @@ class _RecommendationCardReader extends StatelessWidget {
               card?.manaCost?.trim() ??
               item['mana_cost']?.toString().trim() ??
               '';
-          final setLabel = _recommendationSetLabel(item, card);
+          final hasEditionMetadata = _recommendationHasEditionMetadata(
+            item,
+            card,
+          );
 
           return Semantics(
             container: true,
@@ -2500,18 +2996,24 @@ class _RecommendationCardReader extends StatelessWidget {
                                     'recommendation-reader-card-artwork',
                                   ),
                                   variant: CardArtworkVariant.fullCard,
-                                  imageUrl: _recommendationCardImageUrl(
+                                  imageUrl: _recommendationPrintingImageUrl(
                                     item,
                                     card,
                                     version: 'large',
                                   ),
                                   fallbackImageUrl:
-                                      ScryfallImageHelper.namedImageUrl(
-                                        name,
+                                      _recommendationFallbackImageUrl(
+                                        item,
+                                        card,
                                         version: 'large',
                                       ),
                                   semanticLabel:
-                                      'Imagem ampliável da carta $name',
+                                      _recommendationHasPrintingArtwork(
+                                        item,
+                                        card,
+                                      )
+                                      ? 'Arte ampliável da impressão $name'
+                                      : 'Arte de referência ampliável de $name',
                                   constrainAspectRatio: false,
                                   width: double.infinity,
                                   height: double.infinity,
@@ -2544,7 +3046,7 @@ class _RecommendationCardReader extends StatelessWidget {
                         if (typeLine.isNotEmpty ||
                             manaCost.isNotEmpty ||
                             oracleText.isNotEmpty ||
-                            setLabel.isNotEmpty) ...[
+                            hasEditionMetadata) ...[
                           const SizedBox(height: AppTheme.space16),
                           Divider(
                             height: 1,
@@ -2579,12 +3081,11 @@ class _RecommendationCardReader extends StatelessWidget {
                             const SizedBox(height: AppTheme.space12),
                             OracleTextWidget(oracleText),
                           ],
-                          if (setLabel.isNotEmpty) ...[
+                          if (hasEditionMetadata) ...[
                             const SizedBox(height: AppTheme.space12),
-                            Text(
-                              setLabel,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: AppTheme.textSecondary),
+                            _RecommendationEditionMetadata(
+                              item: item,
+                              card: card,
                             ),
                           ],
                         ] else if (cardFuture != null &&
@@ -2662,14 +3163,19 @@ String _recommendationCardName(Map<String, dynamic> item, DeckCardItem? card) {
       : item['name']?.toString().trim() ?? '';
 }
 
-String? _recommendationCardImageUrl(
+String? _recommendationPrintingImageUrl(
   Map<String, dynamic> item,
   DeckCardItem? card, {
   required String version,
 }) {
-  String? explicitUrl = card?.effectiveImageUrl;
+  String? explicitUrl = card?.printingImageUrl;
   if (explicitUrl == null || explicitUrl.trim().isEmpty) {
-    explicitUrl = item['image_url']?.toString();
+    final itemUrl = item['image_url']?.toString().trim();
+    if (itemUrl != null &&
+        itemUrl.isNotEmpty &&
+        !_isRecommendationReferenceUrl(itemUrl)) {
+      explicitUrl = itemUrl;
+    }
   }
   if (explicitUrl == null || explicitUrl.trim().isEmpty) {
     final imageUris = item['image_uris'];
@@ -2681,25 +3187,85 @@ String? _recommendationCardImageUrl(
           imageUris['small']?.toString();
     }
   }
-  return ScryfallImageHelper.preferredImageUrl(
-    explicitUrl: explicitUrl,
-    cardName: _recommendationCardName(item, card),
-    version: version,
-  );
+  if (explicitUrl == null || explicitUrl.trim().isEmpty) return null;
+  return ScryfallImageHelper.withVersion(explicitUrl, version: version) ??
+      explicitUrl;
 }
 
-String _recommendationSetLabel(Map<String, dynamic> item, DeckCardItem? card) {
-  final setName =
-      card?.setName?.trim() ?? item['set_name']?.toString().trim() ?? '';
-  final setCode =
-      card?.setCode.trim() ?? item['set_code']?.toString().trim() ?? '';
-  final collector =
-      card?.collectorNumber?.trim() ??
-      item['collector_number']?.toString().trim() ??
-      '';
-  final edition = setName.isNotEmpty ? setName : setCode.toUpperCase();
-  if (edition.isEmpty) return '';
-  return collector.isEmpty ? edition : '$edition · #$collector';
+String? _recommendationFallbackImageUrl(
+  Map<String, dynamic> item,
+  DeckCardItem? card, {
+  required String version,
+}) {
+  final fallback = card?.fallbackImageUrl;
+  return ScryfallImageHelper.withVersion(fallback, version: version) ??
+      ScryfallImageHelper.namedImageUrl(
+        _recommendationCardName(item, card),
+        version: version,
+      );
+}
+
+bool _recommendationHasPrintingArtwork(
+  Map<String, dynamic> item,
+  DeckCardItem? card,
+) => _recommendationPrintingImageUrl(item, card, version: 'normal') != null;
+
+bool _isRecommendationReferenceUrl(String value) {
+  final uri = Uri.tryParse(value);
+  if (uri?.host.toLowerCase() != 'api.scryfall.com') return false;
+  return uri?.path == '/cards/named';
+}
+
+String _recommendationText(
+  Map<String, dynamic> item,
+  DeckCardItem? card,
+  String field,
+) {
+  final fromCard = switch (field) {
+    'set_code' => card?.setCode,
+    'collector_number' => card?.collectorNumber,
+    'set_name' => card?.setName,
+    'set_release_date' => card?.setReleaseDate,
+    'rarity' => card?.rarity,
+    _ => null,
+  };
+  final cardText = fromCard?.trim() ?? '';
+  if (cardText.isNotEmpty) return cardText;
+  return item[field]?.toString().trim() ?? '';
+}
+
+bool _recommendationHasEditionMetadata(
+  Map<String, dynamic> item,
+  DeckCardItem? card,
+) {
+  return !_recommendationHasPrintingArtwork(item, card) ||
+      const [
+        'set_code',
+        'collector_number',
+        'set_name',
+        'set_release_date',
+        'rarity',
+      ].any((field) => _recommendationText(item, card, field).isNotEmpty);
+}
+
+class _RecommendationEditionMetadata extends StatelessWidget {
+  const _RecommendationEditionMetadata({required this.item, this.card});
+
+  final Map<String, dynamic> item;
+  final DeckCardItem? card;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPrintingArtwork = _recommendationHasPrintingArtwork(item, card);
+    return CardEditionMetadataLine(
+      setCode: _recommendationText(item, card, 'set_code'),
+      collectorNumber: _recommendationText(item, card, 'collector_number'),
+      setName: _recommendationText(item, card, 'set_name'),
+      setReleaseDate: _recommendationText(item, card, 'set_release_date'),
+      rarity: _recommendationText(item, card, 'rarity'),
+      warning: hasPrintingArtwork ? null : 'Arte de referência',
+    );
+  }
 }
 
 String _friendlyRoleLabel(String role) {

@@ -15,6 +15,13 @@ void main() {
         expect(source, contains("'for_trade': cols['for_trade']"));
         expect(source, contains("'for_sale': cols['for_sale']"));
         expect(source, contains("'set_code': cols['card_set_code']"));
+        expect(
+          source,
+          contains("'collector_number': cols['card_collector_number']"),
+        );
+        expect(source, contains("'set_name': cols['card_set_name']"));
+        expect(source, contains("'scryfall_id': cols['card_scryfall_id']"));
+        expect(source, contains('normalizeScryfallImageUrl('));
         expect(source, contains("'rarity': cols['card_rarity']"));
         expect(source, contains("'owned_quantity': cols['owned_quantity']"));
         expect(
@@ -46,6 +53,8 @@ void main() {
       expect(updateSource, contains('readBinderCondition'));
       expect(createSource, contains('readBinderLanguage'));
       expect(updateSource, contains('readBinderLanguage'));
+      expect(updateSource, contains("body.containsKey('card_id')"));
+      expect(updateSource, contains('readBinderCardId'));
       expect(contractSource, contains('binder_quantity_invalid'));
       expect(contractSource, contains('binder_condition_invalid'));
       expect(contractSource, contains('binder_list_type_invalid'));
@@ -58,16 +67,22 @@ void main() {
       expect(source, contains('ON CONFLICT ('));
       expect(
         source,
-        contains(
-          'user_id, card_id, condition, is_foil, language, list_type',
-        ),
+        contains('user_id, card_id, condition, is_foil, language, list_type'),
       );
       expect(source, contains('binder_item_identity_conflict'));
     });
 
+    test('existing physical item may change printing after validation', () {
+      final source = File('routes/binder/[id]/index.dart').readAsStringSync();
+
+      expect(source, contains('card_id = @cardId'));
+      expect(source, contains('SELECT id FROM cards WHERE id = @cardId'));
+      expect(source, contains("params['cardId'] != current['card_id']"));
+      expect(source, contains('physicalIdentityChanged'));
+    });
+
     test('committed binder items are locked before update or delete', () {
-      final source =
-          File('routes/binder/[id]/index.dart').readAsStringSync();
+      final source = File('routes/binder/[id]/index.dart').readAsStringSync();
 
       expect(source, contains('pool.runTx'));
       expect(source, contains('FOR UPDATE'));

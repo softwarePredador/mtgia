@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/mana_symbols.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../models/card_recognition_result.dart';
@@ -102,18 +102,20 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
               horizontal: AppTheme.space40,
               vertical: AppTheme.space8,
             ),
-            child: card.imageUrl != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    child: CachedNetworkImage(
-                      imageUrl: card.imageUrl!,
-                      fit: BoxFit.contain,
-                      placeholder: (_, __) => _imagePlaceholder(),
-                      errorWidget: (_, __, ___) =>
-                          _imagePlaceholder(icon: Icons.image_not_supported),
-                    ),
-                  )
-                : _imagePlaceholder(icon: Icons.style),
+            child: CardArtwork(
+              variant: CardArtworkVariant.fullCard,
+              imageUrl: card.printingImageUrl,
+              fallbackImageUrl: card.fallbackImageUrl,
+              semanticLabel: card.hasPrintingArtwork
+                  ? 'Imagem da impressão ${card.name}'
+                  : 'Imagem de referência de ${card.name}',
+              imageIsReference: !card.hasPrintingArtwork,
+              constrainAspectRatio: false,
+              loadingPlaceholder: _imagePlaceholder(),
+              errorPlaceholder: _imagePlaceholder(
+                icon: Icons.image_not_supported,
+              ),
+            ),
           ),
         ),
       ),
@@ -564,16 +566,23 @@ class _EditionTile extends StatelessWidget {
                 child: SizedBox(
                   width: AppTheme.space28,
                   height: AppTheme.space40,
-                  child: card.imageUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: card.imageUrl!,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) =>
-                              Container(color: AppTheme.surfaceSlate),
-                          errorWidget: (_, __, ___) =>
-                              Container(color: AppTheme.surfaceSlate),
-                        )
-                      : Container(color: AppTheme.surfaceSlate),
+                  child: CardArtwork(
+                    variant: CardArtworkVariant.gallery,
+                    imageUrl: card.printingImageUrl,
+                    fallbackImageUrl: card.fallbackImageUrl,
+                    semanticLabel: card.hasPrintingArtwork
+                        ? 'Miniatura da impressão ${card.name}'
+                        : 'Miniatura de referência de ${card.name}',
+                    imageIsReference: !card.hasPrintingArtwork,
+                    constrainAspectRatio: false,
+                    showStatusBadge: false,
+                    loadingPlaceholder: const ColoredBox(
+                      color: AppTheme.surfaceSlate,
+                    ),
+                    errorPlaceholder: const ColoredBox(
+                      color: AppTheme.surfaceSlate,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: AppTheme.space12),

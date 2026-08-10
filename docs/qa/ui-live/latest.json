@@ -1,131 +1,275 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "9a6f4dec081ae6413556bc1ab03e22590b7521162ad6414bad1df679f46e05ad",
+  "source_digest": "f45f96e34ca6b00c34952b25631c6ff3157e85e39afc06e1f8394e1484f0e90e",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-03T18:55:27Z",
+    "verified_at": "2026-08-06T19:55:31Z",
     "commands": [
-      "flutter test da tela Battle Live, incluindo promoção de estágio e sincronização terminal (22 testes aprovados)",
-      "flutter test dos contratos de evidência e integração Battle Live (25 testes aprovados)",
-      "dart test dos contratos backend Battle Job/Live/readiness/migrations (55 testes aprovados)",
-      "python3 -m unittest server/test/native_battle_sidecar_test.py (6 testes aprovados)",
-      "flutter drive --release -d chrome --target=integration_test/app_existing_user_visual_audit_test.dart (54 web_mobile_390x844, 53 web_desktop_1440x900, 53 web_wide_1920x1080 checkpoints)",
-      "flutter drive --profile -d emulator-5554 --target=integration_test/app_existing_user_visual_audit_test.dart (54/54 checkpoints no emulador Android 14, incluindo Life Counter nativo em landscape)",
-      "flutter test --release -d chrome integration_test/battle_live_visual_runtime_proof_test.dart (5/5 estados Battle Live Web)",
-      "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix"
+      "flutter test --no-pub --no-version-check --reporter compact",
+      "dart test --reporter compact no servidor",
+      "analyzers Flutter e servidor",
+      "./scripts/manaloom_p0_runtime_capture.sh nos três perfis Web e no Samsung SM-A135M físico",
+      "./scripts/manaloom_binder_import_visual_qa.sh",
+      "./scripts/manaloom_deck_workshop_visual_qa.sh",
+      "./scripts/manaloom_battle_learning_visual_qa.sh",
+      "./scripts/manaloom_social_trade_visual_qa.sh",
+      "./scripts/manaloom_onboarding_intent_visual_qa.sh",
+      "./scripts/manaloom_visual_system_workspace_qa.sh",
+      "./scripts/manaloom_critical_overlays_states_visual_qa.sh",
+      "flutter test --release -d chrome integration_test/battle_live_visual_runtime_proof_test.dart"
     ]
   },
   "runtime": {
     "status": "PASS_RUNTIME",
     "capture_manifests": [
       {
-        "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "cc7ecf34db470f101b56f876ec1b0b2b2d23931fdff5c64a9b62635b4d73ca75"
+        "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
+        "sha256": "1bd32c295b273e1ec7a60936d83b140e661a1b9b16cc42286de37937d3bdb5cb"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "71c13988437a6cc5edcf57d6f624e1adfa091c175664685a463516f2340eb34a"
+        "sha256": "eba8af16484de3775190655c01618e90f9c4d80e325cd1f9fb7e6843875a1b5d"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "5bc2543ee71656b29186fe83bd6908b06d85dadc56bc8f81737cf8f266c0622e"
+        "sha256": "b566d5c9fd0a3e603cfa16af56d93a216e78d8d868cc465624bdf9b8e5aa6742"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "aa26db8f298a99b5897cbdf348ef33434c498c965f32735a0e775c337f8286ac"
+        "sha256": "76dbfee3973147f2b309540d220d3dd9b5e4b9e7526f1225e2e5d45825a4d4d4"
       },
       {
         "path": "docs/qa/ui-live/current/battle-live-web/capture-manifest.json",
-        "sha256": "c09623791507716f75d740b364298378aaec9e8d0d07a6af64e6629d84e14b92"
+        "sha256": "8fe94f18086cd1e25df89811337f73cdf75f2f0d851c2dffc132faeb1706463a"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-mobile/capture-manifest.json",
+        "sha256": "f928cee7a5e10787219f6259bd9cde3d0ef44205e9e2498b35e1ff1759da35ad"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/capture-manifest.json",
+        "sha256": "6465d7bd1f11b5fa70a69323a949364ded931752840757f110c2675463752bac"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/capture-manifest.json",
+        "sha256": "aa8a3e8d95185c5c9d339d41b382aa80ba33dce3a709836cc37892025f40e407"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/capture-manifest.json",
+        "sha256": "a1db912e6de9f22501f82280d6c91c254e5c155462bc7d09bf3d6d0e90d6a153"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/capture-manifest.json",
+        "sha256": "fb3cfa58153da0bb520e934619b3b97bccacc9d155267e8dc38d9f8f88863e25"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-wide/capture-manifest.json",
+        "sha256": "d7aec27aa0687154ebdce1a9ab4eb3a4a49bd7149676694d2a90611ac4997ca4"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/capture-manifest.json",
+        "sha256": "4281a1867bed6da056300c67bb5c34c715fdd0cf840b86cd98fafa62bf74be3d"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/capture-manifest.json",
+        "sha256": "a35214b6e835bcbe3943a7aac7420f48a404745b6847178ad8b7ae4d0581a330"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/capture-manifest.json",
+        "sha256": "d49bcd0e9f16794a22c871c385edba7a5c7ff382c72e2cf086f3df6c98810d4c"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/capture-manifest.json",
+        "sha256": "04dab07e28b0f4521f1bbdef7f85feda4e633e7d91810b94569f96377a07cb8a"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/capture-manifest.json",
+        "sha256": "4b2c33a0dfddd8dccbd4d7a3bc5abbe4027dbf30d31b2721df342d6c9a92cfa3"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/capture-manifest.json",
+        "sha256": "f1443ba83748500f34104a50dd697934c27d041ae25de8c4f0297e6e4f7be46a"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/capture-manifest.json",
+        "sha256": "0b935c8ce5ad991e12fe184c55bf296c03e5a004cc3b3dbea583f14df3cfac90"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/capture-manifest.json",
+        "sha256": "4b51916676fea751deca73c495ea66dbf203b72ebddfdbc687d3f81d89e9bf9b"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-wide/capture-manifest.json",
+        "sha256": "d6f972d6e1b4c517f3341c449f398311882c32e53f712b639e118400f7418473"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/capture-manifest.json",
+        "sha256": "5dabc2c70f355279e54b5f1917ad94b561c01fb9d851ef5f949e187aba4d2257"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/capture-manifest.json",
+        "sha256": "445c898b7ca97dc9bc4c17a9e82ab35c6db013729fa3fd9581e4e5b12879af61"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-wide/capture-manifest.json",
+        "sha256": "f3fdc7c74053eb04688f447e35ceae7c7794fdddf719e1d47fe3f1c4b4cbb693"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/capture-manifest.json",
+        "sha256": "dc208780cef2d0421597cfa683a6754496ece1ecb2e96ebf7ae755ce3804ff2e"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-desktop/capture-manifest.json",
+        "sha256": "7d4ad6521ed265b08412d625531a10292c0b133350537c87ed46c38af1a7ee8a"
+      },
+      {
+        "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/capture-manifest.json",
+        "sha256": "6dc05740adce737f0be2f74d6b826bd80aa6f800ef023182fca7b29ac27be8c5"
       }
     ],
     "evidence_notes": [
-      "As 160 capturas Web e as 54 capturas Android da matriz P0 foram recapturadas integralmente no digest atual, sem carry-forward.",
-      "O emulador Android 14 concluiu 54/54 checkpoints, incluindo o Life Counter nativo em landscape 2400×1080; esta rodada não reivindica crédito de aparelho físico.",
-      "O Battle Live foi recapturado no build Web release em cinco estados: espera inicial, feed público ativo com estágio promovido para partida em andamento, reconexão recuperável preservando dados, timeout terminal e conclusão sincronizada com replay.",
-      "Todas as 219 capturas referenciadas foram abertas e revisadas no digest atual; manifestos opcionais antigos de Battle Coach não receberam crédito nesta rodada.",
-      "A matriz P0 usou PostgreSQL/API loopback descartáveis e o Battle Live usou um harness determinístico que valida a UI real sem inventar percentual de progresso."
+      "Os quatro perfis P0, Battle Live e os sete pacotes focais 02–08 foram recapturados integralmente no mesmo digest, sem carry-forward de PNGs do aggregate anterior.",
+      "Os 26 manifests referenciam 453 capturas PASS_RUNTIME; cada PNG foi aberto individualmente e bytes, dimensões e SHA-256 foram reconciliados.",
+      "O Samsung SM-A135M físico concluiu 54/54 checkpoints em Android 14, incluindo captura ADB nativa do Life Counter em landscape.",
+      "Os 12 perfis adicionados pelos Packs 05–08 cobrem Social/Trade, Onboarding Intent, Visual System Workspace e Critical Overlays and States em 390x844, 1440x900 e 1920x1080.",
+      "Fixtures de QA ficaram limitadas a loopback ou gateways em memória, foram encerradas e não escreveram em PostgreSQL live, Hermes ou SQLite."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-03T18:55:27Z",
+    "reviewed_at": "2026-08-06T19:55:31Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
     },
-    "visual_thesis": "ManaLoom assume a identidade original de um utilitário arcano de mesa: Obsidian organiza o fundo, Frost sustenta leitura, Brass indica prioridade e ações, e os painéis de estado tornam a Battle observável sem reproduzir marcas proprietárias da Wizards.",
-    "content_plan": "Acompanhamento apresenta status e tempo primeiro, depois mesa pública, timeline e ação terminal; dados já recebidos permanecem visíveis durante reconexão e o replay aparece quando efetivamente persistido.",
-    "interaction_thesis": "A próxima ação permanece identificável por hierarquia, foco e feedback; espera, atividade, falha recuperável, timeout e conclusão têm comportamentos distintos, sem bloquear o usuário com um percentual fictício.",
+    "visual_thesis": "ManaLoom apresenta uma mesa arcana contemporânea: Obsidian organiza o fundo, Frost sustenta leitura, Brass indica prioridade e arte de carta ou ilustração própria ancora as jornadas em Magic sem copiar trade dress proprietário.",
+    "content_plan": "Cada superfície prioriza identidade e contexto, depois estado, evidência, próxima ação e recuperação; arte exata é usada quando a identidade está disponível e o fallback permanece textual quando não está.",
+    "interaction_thesis": "A próxima ação permanece encontrável, com espera, progresso, erro recuperável, confirmação, conclusão e histórico visualmente distintos; operações destrutivas exigem confirmação e nenhuma fixture executa escrita live.",
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "As 219 capturas preservam título, contexto, estado e CTA em ordem clara; no Battle Live, status/tempo precedem mesa, timeline e ação terminal."
+        "note": "Nas 453 capturas, títulos, contexto, evidência e CTA mantêm ordem clara; Home, decks, Binder, Oficina, Battle, onboarding, perfis e Trade possuem âncoras próprias."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
-        "note": "Cartas, Commander, legalidade, mão, grimório, campo, cemitério, pilha, combate, mana e vida comunicam o domínio sem copiar trade dress proprietária."
+        "note": "Decks, Commander, cartas, mana, zonas, vida, replay, coleção e trocas comunicam Magic; Obsidian/Frost/Brass e ilustrações ManaLoom evitam aparência genérica de painel administrativo."
       },
       "color_and_contrast": {
         "status": "pass",
-        "note": "Frost sobre Obsidian mantém legibilidade, Brass destaca ações e estados também usam texto e ícone, não apenas cor."
+        "note": "Frost sobre Obsidian preserva leitura, Brass concentra prioridade, azul e verde apoiam informação e sucesso, e erros/risco usam texto e ícone além da cor."
       },
       "typography": {
         "status": "pass",
-        "note": "Títulos, labels, ajuda, dados de mesa e timeline mantêm escala e peso coerentes nos três viewports Web e no emulador Android."
+        "note": "A combinação serifada para identidade e sans-serif para operação permaneceu legível nos três viewports Web e no Samsung; truncamentos responsivos restantes foram registrados como follow-up."
       },
       "spacing_and_density": {
         "status": "pass",
-        "note": "Cards, campos, listas e painéis preservam gutters e ritmo; não foi observado overlap, corte de CTA ou compressão crítica."
+        "note": "Formulários, modais e barras fixas preservam gutters e alvos sem sobreposição destrutiva; telas desktop/wide com pouco conteúdo ainda precisam de recomposição e densidade proporcional."
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 no emulador Android e 5 do Battle Live Web. O Life Counter foi validado em landscape 2400×1080 e nenhuma superfície apresentou overflow bloqueante."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, cinco de Battle Live e 234 focais; não houve overflow bloqueante, campo estreito ou perda permanente de navegação."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Reconectar preserva os registros já vistos; timeout oferece nova tentativa e retorno; conclusão oferece abertura explícita do replay final."
+        "note": "Importação, criação, busca, propostas, sessão, replay, pós-jogo e Optimize explicam o próximo passo; ações críticas distinguem cancelar, retry e confirmação, e o seletor de comandante focal foi reconhecido como componente isolado da ação do formulário."
       },
       "state_coverage": {
         "status": "pass",
-        "note": "A matriz cobre 54 checkpoints P0 por perfil aplicável e o Battle Live cobre espera, progresso real, desconexão recuperável, timeout e conclusão."
+        "note": "A prova cobre vazio, preenchido, loading, validação, saving, erro, retry, histórico, reconnect, timeout, conclusão, consentimento, sessão expirada, permissão negada e indisponibilidade."
       },
       "accessibility_visual": {
         "status": "pass",
-        "note": "Foco visível, labels, redundância de estado e alvos foram inspecionados; o roteiro humano TalkBack continua pendente e não recebeu crédito visual."
+        "note": "Labels, foco, redundância por texto/ícone e alvos foram inspecionados; TalkBack humano e teclado Web de hardware continuam pendentes e não receberam crédito."
       },
       "attractiveness": {
         "status": "pass",
-        "note": "A composição é coesa e reconhecível como produto para jogadores de MTG; o Battle Live parece uma mesa de observação útil, com densidade controlada e ações de latão."
+        "note": "As jornadas principais são reconhecíveis e image-led, especialmente Home, decks, carta, Binder, Battle e Trade; densidade wide, carrosséis e estados administrativos permanecem no backlog de polish."
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "cc7ecf34db470f101b56f876ec1b0b2b2d23931fdff5c64a9b62635b4d73ca75",
-      "71c13988437a6cc5edcf57d6f624e1adfa091c175664685a463516f2340eb34a",
-      "5bc2543ee71656b29186fe83bd6908b06d85dadc56bc8f81737cf8f266c0622e",
-      "aa26db8f298a99b5897cbdf348ef33434c498c965f32735a0e775c337f8286ac",
-      "c09623791507716f75d740b364298378aaec9e8d0d07a6af64e6629d84e14b92"
+      "1bd32c295b273e1ec7a60936d83b140e661a1b9b16cc42286de37937d3bdb5cb",
+      "eba8af16484de3775190655c01618e90f9c4d80e325cd1f9fb7e6843875a1b5d",
+      "b566d5c9fd0a3e603cfa16af56d93a216e78d8d868cc465624bdf9b8e5aa6742",
+      "76dbfee3973147f2b309540d220d3dd9b5e4b9e7526f1225e2e5d45825a4d4d4",
+      "8fe94f18086cd1e25df89811337f73cdf75f2f0d851c2dffc132faeb1706463a",
+      "f928cee7a5e10787219f6259bd9cde3d0ef44205e9e2498b35e1ff1759da35ad",
+      "6465d7bd1f11b5fa70a69323a949364ded931752840757f110c2675463752bac",
+      "aa8a3e8d95185c5c9d339d41b382aa80ba33dce3a709836cc37892025f40e407",
+      "a1db912e6de9f22501f82280d6c91c254e5c155462bc7d09bf3d6d0e90d6a153",
+      "fb3cfa58153da0bb520e934619b3b97bccacc9d155267e8dc38d9f8f88863e25",
+      "d7aec27aa0687154ebdce1a9ab4eb3a4a49bd7149676694d2a90611ac4997ca4",
+      "4281a1867bed6da056300c67bb5c34c715fdd0cf840b86cd98fafa62bf74be3d",
+      "a35214b6e835bcbe3943a7aac7420f48a404745b6847178ad8b7ae4d0581a330",
+      "d49bcd0e9f16794a22c871c385edba7a5c7ff382c72e2cf086f3df6c98810d4c",
+      "04dab07e28b0f4521f1bbdef7f85feda4e633e7d91810b94569f96377a07cb8a",
+      "4b2c33a0dfddd8dccbd4d7a3bc5abbe4027dbf30d31b2721df342d6c9a92cfa3",
+      "f1443ba83748500f34104a50dd697934c27d041ae25de8c4f0297e6e4f7be46a",
+      "0b935c8ce5ad991e12fe184c55bf296c03e5a004cc3b3dbea583f14df3cfac90",
+      "4b51916676fea751deca73c495ea66dbf203b72ebddfdbc687d3f81d89e9bf9b",
+      "d6f972d6e1b4c517f3341c449f398311882c32e53f712b639e118400f7418473",
+      "5dabc2c70f355279e54b5f1917ad94b561c01fb9d851ef5f949e187aba4d2257",
+      "445c898b7ca97dc9bc4c17a9e82ab35c6db013729fa3fd9581e4e5b12879af61",
+      "f3fdc7c74053eb04688f447e35ceae7c7794fdddf719e1d47fe3f1c4b4cbb693",
+      "dc208780cef2d0421597cfa683a6754496ece1ecb2e96ebf7ae755ce3804ff2e",
+      "7d4ad6521ed265b08412d625531a10292c0b133350537c87ed46c38af1a7ee8a",
+      "6dc05740adce737f0be2f74d6b826bd80aa6f800ef023182fca7b29ac27be8c5"
     ],
     "reviewed_profiles": [
-      "android_emulator_manaloom_api34",
+      "android_physical_sm_a135m",
       "web_desktop_1440x900",
       "web_mobile_390x844",
       "web_wide_1920x1080",
-      "web_battle_live_1440x900"
+      "web_battle_live_1440x900",
+      "web_binder_import_mobile_390x844",
+      "web_binder_import_desktop_1440x900",
+      "web_binder_import_wide_1920x1080",
+      "web_deck_workshop_mobile_390x844",
+      "web_deck_workshop_desktop_1440x900",
+      "web_deck_workshop_wide_1920x1080",
+      "web_battle_learning_mobile_390x844",
+      "web_battle_learning_desktop_1440x900",
+      "web_battle_learning_wide_1920x1080",
+      "web_social_trade_mobile_390x844",
+      "web_social_trade_desktop_1440x900",
+      "web_social_trade_wide_1920x1080",
+      "web_onboarding_intent_mobile_390x844",
+      "web_onboarding_intent_desktop_1440x900",
+      "web_onboarding_intent_wide_1920x1080",
+      "web_visual_system_mobile_390x844",
+      "web_visual_system_desktop_1440x900",
+      "web_visual_system_wide_1920x1080",
+      "web_critical_overlays_mobile_390x844",
+      "web_critical_overlays_desktop_1440x900",
+      "web_critical_overlays_wide_1920x1080"
     ],
-    "reviewed_screenshot_count": 219,
+    "reviewed_screenshot_count": 453,
     "blocking_findings": [],
     "follow_up_findings": [
-      "Legal/privacy continua conciso demais para um documento jurídico completo; revisar conteúdo e governança antes de promoção comercial.",
-      "No viewport Web wide, o texto do botão Reconstruir na tela Pós-jogo pode quebrar a última letra; é uma melhoria cosmética não bloqueante e não faz parte do fluxo Battle Live desta entrega.",
-      "O smoke em aparelho Samsung físico e a navegação humana com TalkBack permanecem verificações separadas de release; esta rodada não reivindica esse crédito."
+      "P1 — Detalhes do Deck corta Visão Geral para Visão Ge em mobile/Android; preservar acesso e corrigir compactação ou affordance das abas.",
+      "P1 — telas desktop/wide com um único resultado, estado vazio ou conteúdo administrativo subutilizam o canvas e parecem uma composição mobile ampliada.",
+      "P2 — identidades muito longas quebram agressivamente no Profile e devem ter regras consistentes de wrap/ellipsis sem perder o nome acessível.",
+      "P2 — carrosséis móveis de cartas, edições e evidências deixam o próximo item parcialmente visível, mas não explicam claramente a rolagem horizontal.",
+      "P2 — a captura focal de recuperação de comandante isola somente o seletor e produz grande área vazia; manter a prova de recuperação, mas adicionar contexto do CTA pai em uma futura matriz.",
+      "P2 — a fixture de Battle Learning expõe o texto artificial Revisão aaaaaaaa preservada; substituir por dado determinístico com aparência realista na próxima recaptura que tocar a superfície.",
+      "P2 — Legal/Privacy permanece informativo de beta, usa grande área vazia em alguns anchors e requer revisão jurídica externa antes de lançamento comercial.",
+      "TalkBack humano, hardware smoke Android e teclado Web real permanecem verificações de release separadas."
     ]
   },
   "release_checks": {
     "android_talkback_human": "pending",
     "android_hardware_smoke": "pending",
+    "android_physical_p0_matrix": "pass_current_digest",
+    "web_hardware_keyboard": "pending",
     "battle_live_web_real": "pass_current_digest",
+    "binder_import_web_real": "pass_current_digest",
+    "deck_workshop_web_real": "pass_current_digest",
+    "battle_learning_web_real": "pass_current_digest",
+    "social_trade_web_real": "pass_current_digest",
+    "onboarding_intent_web_real": "pass_current_digest",
+    "visual_system_workspace_web_real": "pass_current_digest",
+    "critical_overlays_states_web_real": "pass_current_digest",
     "battle_coach_optional_manifests": "stale_not_claimed",
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }

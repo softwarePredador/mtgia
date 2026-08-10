@@ -10,7 +10,7 @@ import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/manaloom_glyph.dart';
 import '../providers/deck_provider.dart';
 import '../services/deck_entry_draft_store.dart';
@@ -18,6 +18,7 @@ import '../models/deck_analysis.dart';
 import '../models/commander_bracket.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
+import '../models/deck_optimization_event.dart';
 import '../../cards/providers/card_provider.dart';
 import '../widgets/deck_analysis_tab.dart';
 import '../widgets/deck_add_cards_menu.dart';
@@ -33,6 +34,7 @@ import '../widgets/deck_optimize_sections.dart';
 import '../widgets/deck_optimize_ui_support.dart';
 import '../widgets/deck_progress_indicator.dart';
 import '../widgets/sample_hand_widget.dart';
+import '../widgets/deck_workshop_tab.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../battle/screens/battle_coach_screen.dart';
 import '../../battle/screens/battle_replays_screen.dart';
@@ -41,6 +43,8 @@ import '../../cards/widgets/card_edition_metadata.dart';
 import '../../commercial/models/manaloom_plan.dart';
 import '../../commercial/widgets/ai_usage_gate.dart';
 import '../../home/life_counter_route.dart';
+import '../../retention/models/post_game_note.dart';
+import '../../retention/services/post_game_note_store.dart';
 
 class _GuidedRebuildPaywallBlocked implements Exception {
   const _GuidedRebuildPaywallBlocked();
@@ -49,11 +53,13 @@ class _GuidedRebuildPaywallBlocked implements Exception {
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
   final String? initialOptimizationIntent;
+  final String? initialPostGameNoteId;
 
   const DeckDetailsScreen({
     super.key,
     required this.deckId,
     this.initialOptimizationIntent,
+    this.initialPostGameNoteId,
   });
 
   @override
@@ -102,7 +108,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(_handleTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DeckProvider>().fetchDeckDetails(widget.deckId);
@@ -117,7 +123,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     final deckChanged = oldWidget.deckId != widget.deckId;
     final optimizationIntentChanged =
         oldWidget.initialOptimizationIntent != widget.initialOptimizationIntent;
-    if (!deckChanged && !optimizationIntentChanged) {
+    final postGameEvidenceChanged =
+        oldWidget.initialPostGameNoteId != widget.initialPostGameNoteId;
+    if (!deckChanged &&
+        !optimizationIntentChanged &&
+        !postGameEvidenceChanged) {
       return;
     }
 
@@ -198,6 +208,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   void _handleTabChanged() {
     if (_tabController.index == _selectedTabIndex) return;
     setState(() => _selectedTabIndex = _tabController.index);
+    if (_tabController.index == 3) {
+      unawaited(
+        context.read<DeckProvider>().fetchOptimizationHistory(widget.deckId),
+      );
+    }
   }
 
   void _openInitialOptimizationIntent() {
@@ -205,7 +220,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     final intent = widget.initialOptimizationIntent?.trim();
     if (intent != 'post_game' && intent != 'rebuild') return;
     _autoOpenedOptimization = true;
-    _showOptimizationOptions(context, initialIntent: intent);
+    _showOptimizationOptions(
+      context,
+      initialIntent: intent,
+      postGameNoteId: widget.initialPostGameNoteId,
+    );
   }
 
   void _openBattleReplays() {
@@ -437,13 +456,44 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               constraints: const BoxConstraints(
                 maxWidth: AppTheme.contentMaxWidth,
               ),
-              child: TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Visão Geral'),
-                  Tab(text: 'Cartas'),
-                  Tab(text: 'Análise'),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact =
+                      constraints.maxWidth < AppTheme.breakpointCompact;
+                  return TabBar(
+                    key: const Key('deck-details-tab-bar'),
+                    controller: _tabController,
+                    isScrollable: compact,
+                    tabAlignment: compact
+                        ? TabAlignment.start
+                        : TabAlignment.fill,
+                    padding: compact
+                        ? const EdgeInsets.symmetric(
+                            horizontal: AppTheme.space8,
+                          )
+                        : EdgeInsets.zero,
+                    labelPadding: compact
+                        ? const EdgeInsets.symmetric(
+                            horizontal: AppTheme.space12,
+                          )
+                        : null,
+                    tabs: const [
+                      Tab(
+                        key: Key('deck-details-tab-overview'),
+                        text: 'Visão Geral',
+                      ),
+                      Tab(key: Key('deck-details-tab-cards'), text: 'Cartas'),
+                      Tab(
+                        key: Key('deck-details-tab-analysis'),
+                        text: 'Análise',
+                      ),
+                      Tab(
+                        key: Key('deck-details-tab-workshop'),
+                        text: 'Oficina',
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -530,6 +580,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           final diagnosticAnalysis = context
               .select<DeckProvider, DeckAnalysisData?>(
                 (p) => p.deckAnalysisFor(deck.id),
+              );
+          final optimizationHistory = context
+              .select<DeckProvider, List<DeckOptimizationEvent>>(
+                (provider) => provider.optimizationHistoryFor(deck.id),
+              );
+          final optimizationHistoryLoading = context.select<DeckProvider, bool>(
+            (provider) => provider.isOptimizationHistoryLoading(deck.id),
+          );
+          final optimizationHistoryError = context
+              .select<DeckProvider, String?>(
+                (provider) => provider.optimizationHistoryErrorFor(deck.id),
               );
           final cardQuery = _cardSearchController.text.trim().toLowerCase();
           List<DeckCardItem> filterCards(List<DeckCardItem> cards) {
@@ -765,6 +826,39 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     ),
                   ),
                 ),
+              ),
+
+              // Tab 4: Oficina
+              DeckWorkshopTab(
+                deck: deck,
+                events: optimizationHistory,
+                isLoading: optimizationHistoryLoading,
+                errorMessage: optimizationHistoryError,
+                onRefresh: () => context
+                    .read<DeckProvider>()
+                    .fetchOptimizationHistory(deck.id, forceRefresh: true),
+                onOptimize: () => _showOptimizationOptions(context),
+                onValidate: () => unawaited(_validateDeck()),
+                onRollback: (event) async {
+                  final provider = context.read<DeckProvider>();
+                  await provider.rollbackOptimization(
+                    deckId: deck.id,
+                    eventId: event.id,
+                  );
+                  await provider.fetchOptimizationHistory(
+                    deck.id,
+                    forceRefresh: true,
+                  );
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('O deck voltou ao snapshot anterior.'),
+                      backgroundColor: AppTheme.success,
+                    ),
+                  );
+                },
+                onOpenSampleHand: () => _tabController.animateTo(2),
+                onOpenBattle: _openBattleReplays,
               ),
             ],
           );
@@ -1011,20 +1105,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           onTap: () => _showCardDetails(context, card),
           child: Stack(
             children: [
-              if (isCommanderCard && card.effectiveImageUrl != null)
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    child: Opacity(
-                      opacity: 0.08,
-                      child: CachedCardImage(
-                        imageUrl: card.effectiveImageUrl,
-                        fallbackImageUrl: card.fallbackImageUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
               if (isCommanderCard)
                 Positioned(
                   top: 10,
@@ -1052,11 +1132,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      child: CachedCardImage(
-                        imageUrl: card.effectiveImageUrl,
+                      child: CardArtwork(
+                        variant: CardArtworkVariant.gallery,
+                        imageUrl: card.printingImageUrl,
                         fallbackImageUrl: card.fallbackImageUrl,
+                        semanticLabel: card.hasPrintingArtwork
+                            ? 'Arte da impressão ${card.name}'
+                            : 'Arte de referência de ${card.name}',
+                        imageIsReference: !card.hasPrintingArtwork,
                         width: AppTheme.touchTargetMin,
                         height: 62,
+                        constrainAspectRatio: false,
                       ),
                     ),
                     const SizedBox(width: AppTheme.space12),
@@ -1126,7 +1212,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 ),
                               if (card.foil != null)
                                 _buildDeckCardMetaPill(
-                                  label: cardFoilLabel(card.foil),
+                                  label: cardCatalogFinishLabel(card.foil),
                                   textColor: AppTheme.mythicGold,
                                   backgroundColor: AppTheme.mythicGold
                                       .withValues(alpha: 0.12),
@@ -1490,6 +1576,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   Future<void> _showOptimizationOptions(
     BuildContext context, {
     String? initialIntent,
+    String? postGameNoteId,
     String? resumeJobId,
     String? resumeArchetype,
   }) async {
@@ -1527,6 +1614,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               : OptimizeIntensity.focused,
           initialRebuildIntent: startsFromRebuild ? 'optimized' : 'upgraded',
           startsFromPostGame: startsFromPostGame || startsFromRebuild,
+          postGameNoteId: postGameNoteId,
           initialResumeJobId: resumeJobId,
           initialResumeArchetype: resumeArchetype,
         ),
@@ -1808,6 +1896,7 @@ class _OptimizationSheet extends StatefulWidget {
   final OptimizeIntensity initialIntensity;
   final String initialRebuildIntent;
   final bool startsFromPostGame;
+  final String? postGameNoteId;
   final String? initialResumeJobId;
   final String? initialResumeArchetype;
 
@@ -1817,6 +1906,7 @@ class _OptimizationSheet extends StatefulWidget {
     this.initialIntensity = OptimizeIntensity.focused,
     this.initialRebuildIntent = 'upgraded',
     this.startsFromPostGame = false,
+    this.postGameNoteId,
     this.initialResumeJobId,
     this.initialResumeArchetype,
   });
@@ -1827,6 +1917,7 @@ class _OptimizationSheet extends StatefulWidget {
 
 class _OptimizationSheetState extends State<_OptimizationSheet> {
   late Future<List<Map<String, dynamic>>> _optionsFuture;
+  Future<PostGameNote?>? _postGameEvidenceFuture;
   int _selectedBracket = 2;
   bool _showAllStrategies = true;
   bool _keepTheme = true;
@@ -1836,6 +1927,18 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   double _budgetLimit = 100;
   late String _rebuildIntent;
   bool _initialResumeStarted = false;
+
+  Future<PostGameNote?> _loadPostGameEvidence() async {
+    final noteId = widget.postGameNoteId?.trim();
+    if (noteId == null || noteId.isEmpty) return null;
+    final notes = await PostGameNoteStore(
+      remoteClient: ApiPostGameNoteRemoteClient(),
+    ).loadNotes(widget.deckId);
+    for (final note in notes) {
+      if (note.id == noteId) return note;
+    }
+    return null;
+  }
 
   String? get _currentArchetype {
     final deck = context.read<DeckProvider>().selectedDeck;
@@ -2107,6 +2210,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             postAnalysis: preview.postAnalysis,
             warnings: preview.warnings,
             metaReferenceContext: preview.metaReferenceContext,
+            postGameEvidence: preview.postGameEvidence,
             optimizationContract: preview.optimizationContract,
             battleValidation: preview.battleValidation,
             bracketPolicy: preview.bracketPolicy,
@@ -2147,6 +2251,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           closeLoadingDialog();
           if (!context.mounted) return;
           final eventId = deckProvider.lastAppliedOptimizationEventId;
+          unawaited(
+            deckProvider.fetchOptimizationHistory(
+              widget.deckId,
+              forceRefresh: true,
+            ),
+          );
           closeOptimizeSheetAndShowSuccess(
             context,
             onUndo: eventId == null || eventId.isEmpty
@@ -2156,6 +2266,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       await deckProvider.rollbackOptimization(
                         deckId: widget.deckId,
                         eventId: eventId,
+                      );
+                      await deckProvider.fetchOptimizationHistory(
+                        widget.deckId,
+                        forceRefresh: true,
                       );
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -2233,6 +2347,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(
       widget.deckId,
     );
+    if (widget.postGameNoteId?.trim().isNotEmpty == true) {
+      _postGameEvidenceFuture = _loadPostGameEvidence();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _initialResumeStarted) return;
       final jobId = widget.initialResumeJobId?.trim();
@@ -2253,38 +2370,52 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     final theme = Theme.of(context);
     final savedArchetype = _currentArchetype;
 
-    return OptimizationSheetBody(
-      savedArchetype: savedArchetype,
-      selectedBracket: _selectedBracket,
-      keepTheme: _keepTheme,
-      selectedIntensity: _selectedIntensity,
-      preferCollection: _preferCollection,
-      budgetEnabled: _budgetEnabled,
-      budgetLimit: _budgetLimit,
-      rebuildIntent: _rebuildIntent,
-      startsFromPostGame: widget.startsFromPostGame,
-      showAllStrategies: _showAllStrategies,
-      optionsFuture: _optionsFuture,
-      scrollController: widget.scrollController,
-      accent: theme.colorScheme.primary,
-      onBracketChanged: (value) => setState(() => _selectedBracket = value),
-      onKeepThemeChanged: (value) => setState(() => _keepTheme = value),
-      onIntensityChanged: (value) => setState(() => _selectedIntensity = value),
-      onPreferCollectionChanged: (value) =>
-          setState(() => _preferCollection = value),
-      onBudgetEnabledChanged: (value) => setState(() => _budgetEnabled = value),
-      onBudgetLimitChanged: (value) => setState(() => _budgetLimit = value),
-      onRebuildIntentChanged: (value) => setState(() => _rebuildIntent = value),
-      onToggleStrategyVisibility: () =>
-          setState(() => _showAllStrategies = !_showAllStrategies),
-      onRetryOptions: () {
-        setState(() {
-          _optionsFuture = context
-              .read<DeckProvider>()
-              .fetchOptimizationOptions(widget.deckId);
-        });
-      },
-      onApplyArchetype: (title) => _applyOptimization(context, title),
+    return FutureBuilder<PostGameNote?>(
+      future: _postGameEvidenceFuture,
+      builder: (context, evidenceSnapshot) => OptimizationSheetBody(
+        savedArchetype: savedArchetype,
+        selectedBracket: _selectedBracket,
+        keepTheme: _keepTheme,
+        selectedIntensity: _selectedIntensity,
+        preferCollection: _preferCollection,
+        budgetEnabled: _budgetEnabled,
+        budgetLimit: _budgetLimit,
+        rebuildIntent: _rebuildIntent,
+        startsFromPostGame: widget.startsFromPostGame,
+        postGameEvidence: evidenceSnapshot.data,
+        postGameEvidenceLoading:
+            _postGameEvidenceFuture != null &&
+            evidenceSnapshot.connectionState == ConnectionState.waiting,
+        postGameEvidenceMissing:
+            _postGameEvidenceFuture != null &&
+            evidenceSnapshot.connectionState == ConnectionState.done &&
+            evidenceSnapshot.data == null,
+        showAllStrategies: _showAllStrategies,
+        optionsFuture: _optionsFuture,
+        scrollController: widget.scrollController,
+        accent: theme.colorScheme.primary,
+        onBracketChanged: (value) => setState(() => _selectedBracket = value),
+        onKeepThemeChanged: (value) => setState(() => _keepTheme = value),
+        onIntensityChanged: (value) =>
+            setState(() => _selectedIntensity = value),
+        onPreferCollectionChanged: (value) =>
+            setState(() => _preferCollection = value),
+        onBudgetEnabledChanged: (value) =>
+            setState(() => _budgetEnabled = value),
+        onBudgetLimitChanged: (value) => setState(() => _budgetLimit = value),
+        onRebuildIntentChanged: (value) =>
+            setState(() => _rebuildIntent = value),
+        onToggleStrategyVisibility: () =>
+            setState(() => _showAllStrategies = !_showAllStrategies),
+        onRetryOptions: () {
+          setState(() {
+            _optionsFuture = context
+                .read<DeckProvider>()
+                .fetchOptimizationOptions(widget.deckId);
+          });
+        },
+        onApplyArchetype: (title) => _applyOptimization(context, title),
+      ),
     );
   }
 
@@ -2294,6 +2425,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       budgetEnabled: _budgetEnabled,
       budgetLimit: _budgetLimit,
       rebuildIntent: _rebuildIntent,
+      postGameNoteId: widget.postGameNoteId,
     );
   }
 }

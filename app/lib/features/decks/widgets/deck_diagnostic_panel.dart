@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
@@ -803,13 +803,19 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CachedCardImage(
-                imageUrl: imageUrl,
+              CardArtwork(
+                variant: CardArtworkVariant.gallery,
+                imageUrl: card?.printingImageUrl ?? imageUrl,
                 fallbackImageUrl:
                     card?.fallbackImageUrl ?? _scryfallImageUrl(entry.name),
+                semanticLabel: card?.hasPrintingArtwork == true
+                    ? 'Arte da impressão ${entry.name}'
+                    : 'Arte de referência de ${entry.name}',
+                imageIsReference: card?.hasPrintingArtwork != true,
                 width: AppTheme.touchTargetMin,
                 height: 64,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                constrainAspectRatio: false,
               ),
               const SizedBox(width: AppTheme.space12),
               Expanded(

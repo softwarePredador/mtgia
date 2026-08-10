@@ -406,6 +406,7 @@ Map<String, dynamic>? normalizeXmageBattleLiveEvent(
           _publicZones.contains(fromZone) &&
           _publicZones.contains(toZone));
   if (identityIsPublic) {
+    _copyString(result, 'card_id', source['card_id']);
     _copyString(result, 'card_name', source['card_name']);
     if (eventType == 'zone_transition') result['visibility'] = 'public';
   }
@@ -521,12 +522,37 @@ Map<String, dynamic> _normalizeXmagePlayer(Map<String, dynamic> source) {
     aliases: const ['command_size', 'command_count'],
     listKey: 'command',
   );
+  for (final zone in const ['battlefield', 'graveyard', 'exile', 'command']) {
+    final cards = source[zone];
+    if (cards is List) {
+      result[zone] = cards
+          .map(_stringMap)
+          .whereType<Map<String, dynamic>>()
+          .map(_normalizeXmagePublicZoneObject)
+          .toList(growable: false);
+    }
+  }
+  return result;
+}
+
+Map<String, dynamic> _normalizeXmagePublicZoneObject(
+  Map<String, dynamic> source,
+) {
+  final result = <String, dynamic>{};
+  _copyString(result, 'object_id', source['object_id'] ?? source['id']);
+  _copyString(result, 'card_id', source['card_id']);
+  _copyString(result, 'name', source['name']);
+  _copyString(result, 'card_name', source['card_name'] ?? source['name']);
+  _copyString(result, 'power', source['power']);
+  _copyString(result, 'toughness', source['toughness']);
+  _copyBool(result, 'tapped', source['tapped']);
   return result;
 }
 
 Map<String, dynamic> _normalizeXmageStackObject(Map<String, dynamic> source) {
   final result = <String, dynamic>{};
   _copyString(result, 'object_id', source['object_id'] ?? source['id']);
+  _copyString(result, 'card_id', source['card_id']);
   _copyString(result, 'name', source['name']);
   _copyString(result, 'card_name', source['card_name'] ?? source['name']);
   _copyString(result, 'object_type', source['object_type']);
@@ -562,6 +588,7 @@ Map<String, dynamic> _normalizeXmageCombatGroup(Map<String, dynamic> source) {
 Map<String, dynamic> _normalizeXmageCombatObject(Map<String, dynamic> source) {
   final result = <String, dynamic>{};
   _copyString(result, 'object_id', source['object_id'] ?? source['id']);
+  _copyString(result, 'card_id', source['card_id']);
   _copyString(result, 'name', source['name']);
   _copyString(result, 'card_name', source['card_name'] ?? source['name']);
   _copyString(result, 'power', source['power']);

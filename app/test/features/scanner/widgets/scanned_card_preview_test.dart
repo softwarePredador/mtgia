@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/card_artwork.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/scanner/models/card_recognition_result.dart';
 import 'package:manaloom/features/scanner/widgets/scanned_card_preview.dart';
@@ -55,7 +56,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('Lightning Bolt'), findsOneWidget);
     expect(find.text('Instant'), findsOneWidget);
@@ -63,6 +64,9 @@ void main() {
     expect(find.text('NM'), findsOneWidget);
     expect(find.text('LEA'), findsOneWidget);
     expect(find.text('92%'), findsOneWidget);
+    final artwork = tester.widget<CardArtwork>(find.byType(CardArtwork));
+    expect(artwork.imageIsReference, isTrue);
+    expect(artwork.variant, CardArtworkVariant.fullCard);
   });
 
   testWidgets('card not found widget keeps manual recovery path visible', (

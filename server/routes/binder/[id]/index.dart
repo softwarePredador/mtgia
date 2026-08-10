@@ -528,7 +528,7 @@ Map<String, List<Map<String, dynamic>>> _mapDistributions(Result rows) {
 }
 
 /// PUT /binder/:id
-/// Body: { quantity?, condition?, is_foil?, for_trade?, for_sale?, price?, notes?, language? }
+/// Body: { card_id?, quantity?, condition?, is_foil?, for_trade?, for_sale?, price?, notes?, language? }
 Future<Response> _updateBinderItem(RequestContext context, String id) async {
   try {
     final userId = context.read<String>();
@@ -545,6 +545,12 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
     // Build dynamic SET
     final setClauses = <String>['updated_at = CURRENT_TIMESTAMP'];
     final params = <String, dynamic>{'id': id, 'userId': userId};
+
+    if (body.containsKey('card_id')) {
+      final cardId = readBinderCardId(body['card_id']);
+      setClauses.add('card_id = @cardId');
+      params['cardId'] = cardId;
+    }
 
     if (body.containsKey('quantity')) {
       final qty = readBinderQuantity(body['quantity']);
@@ -597,7 +603,8 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
     return pool.runTx((transaction) async {
       final locked = await transaction.execute(
         Sql.named('''
-          SELECT id, quantity, condition, is_foil, language, list_type
+          SELECT id, card_id::text AS card_id, quantity, condition, is_foil,
+                 language, list_type
           FROM user_binder_items
           WHERE id = @id AND user_id = @userId
           FOR UPDATE
@@ -609,6 +616,19 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
           statusCode: HttpStatus.notFound,
           body: {'error': 'Item não encontrado ou não pertence a você'},
         );
+      }
+
+      if (params['cardId'] case final String cardId) {
+        final cardExists = await transaction.execute(
+          Sql.named('SELECT id FROM cards WHERE id = @cardId'),
+          parameters: {'cardId': cardId},
+        );
+        if (cardExists.isEmpty) {
+          return Response.json(
+            statusCode: HttpStatus.notFound,
+            body: {'error': 'Carta não encontrada'},
+          );
+        }
       }
 
       final committedResult = await transaction.execute(
@@ -628,6 +648,8 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
       final committedQuantity = _toInt(committedResult.first[0]);
       final current = locked.first.toColumnMap();
       final physicalIdentityChanged =
+          (body.containsKey('card_id') &&
+              params['cardId'] != current['card_id']?.toString()) ||
           (body.containsKey('condition') &&
               params['condition'] != current['condition']) ||
           (body.containsKey('is_foil') &&

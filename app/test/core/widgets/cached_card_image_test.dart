@@ -6,6 +6,29 @@ import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 
 void main() {
+  test('defaults to containing the complete card image', () {
+    const image = CachedCardImage(imageUrl: 'https://example.test/card.jpg');
+
+    expect(image.fit, BoxFit.contain);
+  });
+
+  testWidgets('reports a missing source through the shared image taxonomy', (
+    tester,
+  ) async {
+    CardImageLoadState? observed;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CachedCardImage(
+          imageUrl: null,
+          onLoadStateChanged: (state) => observed = state,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(observed, CardImageLoadState.missing);
+  });
+
   testWidgets('uses an original card-frame fallback when artwork is absent', (
     tester,
   ) async {

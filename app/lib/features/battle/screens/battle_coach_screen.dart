@@ -342,6 +342,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        key: const Key('battle-coach-concede-dialog'),
         title: const Text('Conceder esta partida?'),
         content: const Text(
           'A sessão será encerrada e o replay parcial continuará disponível '
@@ -349,6 +350,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
         ),
         actions: [
           TextButton(
+            key: const Key('battle-coach-cancel-concede-button'),
             onPressed: () => Navigator.of(context).pop(false),
             child: const Text('Continuar jogando'),
           ),
@@ -1569,7 +1571,7 @@ class _BattleCard extends StatelessWidget {
             imageUrl: card.effectiveImageUrl,
             width: width,
             height: height,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             errorPlaceholder: _CardFallback(name: card.name),
           ),
@@ -1714,7 +1716,7 @@ class _BattleCardPreviewTargetState extends State<_BattleCardPreviewTarget> {
                     imageUrl: widget.card.effectiveImageUrl,
                     width: previewWidth - AppTheme.space16,
                     height: (previewWidth - AppTheme.space16) * 1.39,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     errorPlaceholder: _CardFallback(name: widget.card.name),
                   ),
@@ -1850,7 +1852,7 @@ Future<void> _showCoachCardPreview(
                   imageUrl: card.effectiveImageUrl,
                   width: 220,
                   height: 306,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   errorPlaceholder: _CardFallback(name: card.name),
                 ),
@@ -2210,7 +2212,7 @@ class _PromptOptionTile extends StatelessWidget {
                       imageUrl: card.effectiveImageUrl,
                       width: 45,
                       height: 63,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                       borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                       errorPlaceholder: _CardFallback(name: card.name),
                     ),

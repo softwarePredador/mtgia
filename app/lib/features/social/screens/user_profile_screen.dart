@@ -6,10 +6,13 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/manaloom_theme_motif.dart';
+import '../../../core/widgets/player_identity_name.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../binder/providers/binder_provider.dart';
 import '../../messages/providers/message_provider.dart';
 import '../../trades/screens/create_trade_screen.dart';
+import '../../trades/trade_route_contract.dart';
 import '../providers/social_provider.dart';
 import '../widgets/social_report_dialog.dart';
 
@@ -225,271 +228,397 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           }
 
           if (provider.profileError != null) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppTheme.textSecondary,
-                  ),
-                  const SizedBox(height: AppTheme.space12),
-                  Text(
-                    provider.profileError!,
-                    style: const TextStyle(color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: AppTheme.space12),
-                  ElevatedButton(
-                    onPressed: () => provider.fetchUserProfile(widget.userId),
-                    child: const Text('Tentar novamente'),
-                  ),
-                ],
-              ),
+            return AppStatePanel(
+              key: const Key('user-profile-error'),
+              status: AppStateStatus.error,
+              icon: Icons.person_off_outlined,
+              title: 'Perfil indisponível',
+              message: provider.profileError!,
+              accent: AppTheme.error,
+              actionLabel: 'Tentar novamente',
+              actionKey: const Key('user-profile-retry-button'),
+              onAction: () => provider.fetchUserProfile(widget.userId),
             );
           }
 
           final user = provider.visitedUser;
-          if (user == null) return const SizedBox.shrink();
+          if (user == null) {
+            return const AppStatePanel(
+              key: Key('user-profile-unavailable'),
+              status: AppStateStatus.unavailable,
+              icon: Icons.person_search_outlined,
+              title: 'Perfil não encontrado',
+              message: 'Este jogador não está disponível para consulta.',
+              accent: AppTheme.frost400,
+            );
+          }
 
           final compactTabs =
               MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact;
           return ResponsivePageFrame(
-            maxWidth: 1120,
-            padding: EdgeInsets.symmetric(
-              horizontal: compactTabs ? AppTheme.space16 : AppTheme.space24,
+            maxWidth: 1440,
+            padding: EdgeInsets.fromLTRB(
+              compactTabs ? AppTheme.space16 : AppTheme.space24,
+              AppTheme.space16,
+              compactTabs ? AppTheme.space16 : AppTheme.space24,
+              AppTheme.space12,
             ),
-            child: Column(
-              key: const Key('user-profile-content'),
-              children: [
-                // === Header do perfil ===
-                Container(
-                  padding: const EdgeInsets.all(AppTheme.space20),
-                  color: AppTheme.surfaceElevated,
-                  child: Column(
-                    children: [
-                      // Avatar
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: AppTheme.brass400.withValues(
-                          alpha: 0.16,
-                        ),
-                        backgroundImage: user.avatarUrl != null
-                            ? CachedNetworkImageProvider(user.avatarUrl!)
-                            : null,
-                        child: user.avatarUrl == null
-                            ? Text(
-                                user.username[0].toUpperCase(),
-                                style: const TextStyle(
-                                  color: AppTheme.brass400,
-                                  fontSize: AppTheme.fontDisplay,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            : null,
-                      ),
-                      const SizedBox(height: AppTheme.space12),
-                      // Display name
-                      Text(
-                        user.displayName ?? user.username,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: AppTheme.fontXxl,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (user.displayName != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: AppTheme.space4),
-                          child: Text(
-                            '@${user.username}',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontMd,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: AppTheme.space16),
-                      // Stats row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: _StatItem(
-                              label: 'Decks',
-                              value: user.publicDeckCount,
-                              icon: Icons.style,
-                            ),
-                          ),
-                          Expanded(
-                            child: _StatItem(
-                              label: 'Seguidores',
-                              value: user.followerCount,
-                              icon: Icons.people,
-                              onTap: () {
-                                _tabController.animateTo(1);
-                                _loadTab(1);
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: _StatItem(
-                              label: 'Seguindo',
-                              value: user.followingCount,
-                              icon: Icons.person_add,
-                              onTap: () {
-                                _tabController.animateTo(2);
-                                _loadTab(2);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppTheme.space16),
-                      // Follow button (only if not own profile)
-                      if (provider.isOwnProfile != true)
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 10,
-                          runSpacing: 10,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final wide = constraints.maxWidth >= 1000;
+                final identity = _buildPublicIdentity(
+                  provider,
+                  user,
+                  compact: !wide,
+                );
+                final workspace = _buildPublicWorkspace(
+                  provider,
+                  compactTabs: compactTabs,
+                );
+
+                return KeyedSubtree(
+                  key: const Key('user-profile-content'),
+                  child: wide
+                      ? Row(
+                          key: const Key('user-profile-wide-workbench'),
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SizedBox(
-                              width: 160,
-                              height: AppTheme.touchTargetMin,
-                              child: ElevatedButton.icon(
-                                onPressed: _isToggling ? null : _toggleFollow,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: provider.isFollowingVisited
-                                      ? AppTheme.surfaceSlate
-                                      : AppTheme.brass500,
-                                  foregroundColor: provider.isFollowingVisited
-                                      ? AppTheme.brass400
-                                      : AppTheme.backgroundAbyss,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppTheme.radiusXl,
-                                    ),
-                                    side: provider.isFollowingVisited
-                                        ? const BorderSide(
-                                            color: AppTheme.outlineMuted,
-                                          )
-                                        : BorderSide.none,
-                                  ),
-                                ),
-                                icon: _isToggling
-                                    ? const SizedBox(
-                                        width: AppTheme.space16,
-                                        height: AppTheme.space16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: AppTheme.textPrimary,
-                                        ),
-                                      )
-                                    : Icon(
-                                        provider.isFollowingVisited
-                                            ? Icons.person_remove
-                                            : Icons.person_add,
-                                        size: 18,
-                                      ),
-                                label: Text(
-                                  provider.isFollowingVisited
-                                      ? 'Deixar de seguir'
-                                      : 'Seguir',
-                                  style: const TextStyle(
-                                    fontSize: AppTheme.fontSm,
-                                  ),
-                                ),
-                              ),
+                              width: AppTheme.identityRailWidth,
+                              child: identity,
                             ),
-                            SizedBox(
-                              height: AppTheme.touchTargetMin,
-                              child: OutlinedButton.icon(
-                                onPressed: () => _openChat(widget.userId),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppTheme.brass400,
-                                  side: const BorderSide(
-                                    color: AppTheme.outlineMuted,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppTheme.radiusXl,
-                                    ),
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.chat_bubble_outline,
-                                  size: 18,
-                                ),
-                                label: const Text(
-                                  'Mensagem',
-                                  style: TextStyle(fontSize: AppTheme.fontSm),
-                                ),
-                              ),
-                            ),
+                            const SizedBox(width: AppTheme.space24),
+                            Expanded(child: workspace),
+                          ],
+                        )
+                      : Column(
+                          key: const Key('user-profile-stacked-workbench'),
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            identity,
+                            const SizedBox(height: AppTheme.space12),
+                            Expanded(child: workspace),
                           ],
                         ),
-                    ],
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPublicIdentity(
+    SocialProvider provider,
+    PublicUser user, {
+    required bool compact,
+  }) {
+    final theme = Theme.of(context);
+    final avatar = CircleAvatar(
+      radius: compact ? 38 : 48,
+      backgroundColor: AppTheme.brass400.withValues(alpha: 0.16),
+      backgroundImage: user.avatarUrl != null
+          ? CachedNetworkImageProvider(user.avatarUrl!)
+          : null,
+      child: user.avatarUrl == null
+          ? Text(
+              user.username.isEmpty ? '?' : user.username[0].toUpperCase(),
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: AppTheme.brass400,
+                fontWeight: FontWeight.w900,
+              ),
+            )
+          : null,
+    );
+    final identityCopy = Column(
+      crossAxisAlignment: compact
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        PlayerIdentityName(
+          key: const Key('user-profile-identity-name'),
+          name: user.displayName ?? user.username,
+          textAlign: compact ? TextAlign.start : TextAlign.center,
+          semanticPrefix: 'Nome público do jogador',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: AppTheme.textPrimary,
+            fontFamily: AppTheme.displayFontFamily,
+            fontWeight: FontWeight.w900,
+            height: 1.05,
+          ),
+        ),
+        const SizedBox(height: AppTheme.space4),
+        Text(
+          '@${user.username}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: AppTheme.frost400,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        if (user.createdAt != null) ...[
+          const SizedBox(height: AppTheme.space5),
+          Text(
+            'No ManaLoom desde ${user.createdAt!.year}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+
+    return ManaLoomThemeMotif(
+      variant: ManaLoomMotifVariant.cardWeave,
+      intensity: 0.70,
+      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+      child: Container(
+        key: const Key('user-profile-identity-rail'),
+        padding: EdgeInsets.all(compact ? AppTheme.space16 : AppTheme.space20),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.22)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'IDENTIDADE PÚBLICA',
+                textAlign: compact ? TextAlign.start : TextAlign.center,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppTheme.brass400,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: AppTheme.space14),
+              if (compact)
+                Row(
+                  children: [
+                    avatar,
+                    const SizedBox(width: AppTheme.space14),
+                    Expanded(child: identityCopy),
+                  ],
+                )
+              else ...[
+                Center(child: avatar),
+                const SizedBox(height: AppTheme.space14),
+                identityCopy,
+              ],
+              const SizedBox(height: AppTheme.space18),
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatItem(
+                      label: 'Decks',
+                      value: user.publicDeckCount,
+                      icon: Icons.style_outlined,
+                    ),
+                  ),
+                  Expanded(
+                    child: _StatItem(
+                      label: 'Seguidores',
+                      value: user.followerCount,
+                      icon: Icons.people_outline,
+                      onTap: () {
+                        _tabController.animateTo(1);
+                        _loadTab(1);
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: _StatItem(
+                      label: 'Seguindo',
+                      value: user.followingCount,
+                      icon: Icons.person_add_outlined,
+                      onTap: () {
+                        _tabController.animateTo(2);
+                        _loadTab(2);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              if (provider.isOwnProfile != true) ...[
+                const SizedBox(height: AppTheme.space18),
+                _buildProfileActions(provider, compact: compact),
+              ],
+              if (!compact && provider.visitedUserDecks.isNotEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppTheme.space20),
+                  child: Divider(height: 1),
+                ),
+                Text(
+                  'DECK EM DESTAQUE',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.9,
                   ),
                 ),
-                // === Tabs ===
-                Container(
-                  color: AppTheme.backgroundAbyss,
-                  child: TabBar(
-                    key: const Key('user-profile-tabs'),
-                    controller: _tabController,
-                    isScrollable: compactTabs,
-                    tabAlignment: compactTabs
-                        ? TabAlignment.start
-                        : TabAlignment.fill,
-                    indicatorColor: AppTheme.brass400,
-                    labelColor: AppTheme.brass400,
-                    unselectedLabelColor: AppTheme.textSecondary,
-                    tabs: [
-                      Tab(text: 'Decks (${provider.visitedUserDecks.length})'),
-                      const Tab(text: 'Seguidores'),
-                      const Tab(text: 'Seguindo'),
-                      const Tab(text: 'Fichário'),
-                    ],
-                  ),
-                ),
-                // === Tab content ===
+                const SizedBox(height: AppTheme.space10),
+                _FeaturedPublicDeck(deck: provider.visitedUserDecks.first),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileActions(
+    SocialProvider provider, {
+    required bool compact,
+  }) {
+    final follow = FilledButton.icon(
+      key: const Key('user-profile-follow-button'),
+      onPressed: _isToggling ? null : _toggleFollow,
+      style: FilledButton.styleFrom(
+        backgroundColor: provider.isFollowingVisited
+            ? AppTheme.surfaceElevated
+            : AppTheme.brass500,
+        foregroundColor: provider.isFollowingVisited
+            ? AppTheme.brass400
+            : AppTheme.backgroundAbyss,
+      ),
+      icon: _isToggling
+          ? const SizedBox(
+              width: AppTheme.space16,
+              height: AppTheme.space16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(
+              provider.isFollowingVisited
+                  ? Icons.person_remove_outlined
+                  : Icons.person_add_outlined,
+              size: 18,
+            ),
+      label: Text(provider.isFollowingVisited ? 'Deixar de seguir' : 'Seguir'),
+    );
+    final message = OutlinedButton.icon(
+      key: const Key('user-profile-message-button'),
+      onPressed: () => _openChat(widget.userId),
+      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+      label: const Text('Mensagem'),
+    );
+
+    if (compact) {
+      return Wrap(
+        spacing: AppTheme.space10,
+        runSpacing: AppTheme.space10,
+        children: [follow, message],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        follow,
+        const SizedBox(height: AppTheme.space8),
+        message,
+      ],
+    );
+  }
+
+  Widget _buildPublicWorkspace(
+    SocialProvider provider, {
+    required bool compactTabs,
+  }) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('user-profile-workspace'),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: AppTheme.outlineMuted.withValues(alpha: 0.76)),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.space4,
+              AppTheme.space16,
+              AppTheme.space4,
+              AppTheme.space12,
+            ),
+            child: Row(
+              children: [
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _DecksTab(decks: provider.visitedUserDecks),
-                      _UsersListTab(
-                        users: provider.followers,
-                        isLoading: provider.isLoadingFollowers,
-                        errorMessage: provider.followersError,
-                        emptyMessage: 'Nenhum seguidor ainda',
-                        hasMore: provider.hasMoreFollowers,
-                        onLoadMore: () =>
-                            provider.fetchFollowers(widget.userId),
+                      Text(
+                        'MESA PÚBLICA',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppTheme.brass400,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.1,
+                        ),
                       ),
-                      _UsersListTab(
-                        users: provider.following,
-                        isLoading: provider.isLoadingFollowing,
-                        errorMessage: provider.followingError,
-                        emptyMessage: 'Não segue ninguém ainda',
-                        hasMore: provider.hasMoreFollowing,
-                        onLoadMore: () =>
-                            provider.fetchFollowing(widget.userId),
-                      ),
-                      Consumer<BinderProvider>(
-                        builder: (context, binder, _) {
-                          return _PublicBinderTabHaveWant(
-                            userId: widget.userId,
-                          );
-                        },
+                      const SizedBox(height: AppTheme.space4),
+                      Text(
+                        'Decks, comunidade e cartas disponíveis',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontFamily: AppTheme.displayFontFamily,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-          );
-        },
+          ),
+          TabBar(
+            key: const Key('user-profile-tabs'),
+            controller: _tabController,
+            isScrollable: compactTabs,
+            tabAlignment: compactTabs ? TabAlignment.start : TabAlignment.fill,
+            labelPadding: EdgeInsets.symmetric(
+              horizontal: compactTabs ? AppTheme.space10 : AppTheme.space8,
+            ),
+            indicatorColor: AppTheme.brass400,
+            labelColor: AppTheme.brass400,
+            unselectedLabelColor: AppTheme.textSecondary,
+            tabs: [
+              Tab(text: 'Decks (${provider.visitedUserDecks.length})'),
+              const Tab(text: 'Seguidores'),
+              const Tab(text: 'Seguindo'),
+              const Tab(text: 'Fichário'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _DecksTab(decks: provider.visitedUserDecks),
+                _UsersListTab(
+                  users: provider.followers,
+                  isLoading: provider.isLoadingFollowers,
+                  errorMessage: provider.followersError,
+                  emptyMessage: 'Nenhum seguidor ainda',
+                  hasMore: provider.hasMoreFollowers,
+                  onLoadMore: () => provider.fetchFollowers(widget.userId),
+                ),
+                _UsersListTab(
+                  users: provider.following,
+                  isLoading: provider.isLoadingFollowing,
+                  errorMessage: provider.followingError,
+                  emptyMessage: 'Não segue ninguém ainda',
+                  hasMore: provider.hasMoreFollowing,
+                  onLoadMore: () => provider.fetchFollowing(widget.userId),
+                ),
+                _PublicBinderTabHaveWant(userId: widget.userId),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -545,6 +674,75 @@ class _StatItem extends StatelessWidget {
 // Decks Tab
 // =====================================================================
 
+class _FeaturedPublicDeck extends StatelessWidget {
+  const _FeaturedPublicDeck({required this.deck});
+
+  final PublicDeckSummary deck;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.surfaceElevated.withValues(alpha: 0.82),
+      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      child: InkWell(
+        key: const Key('user-profile-featured-deck'),
+        onTap: () => context.push('/community/decks/${deck.id}'),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space10),
+          child: Row(
+            children: [
+              CachedCardImage(
+                imageUrl: deck.commanderImageUrl,
+                width: 62,
+                height: 86,
+                fit: BoxFit.cover,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              ),
+              const SizedBox(width: AppTheme.space12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      deck.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (deck.commanderName != null) ...[
+                      const SizedBox(height: AppTheme.space4),
+                      Text(
+                        deck.commanderName!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: AppTheme.space8),
+                    Text(
+                      'Abrir deck  →',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppTheme.brass400,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _DecksTab extends StatelessWidget {
   final List<PublicDeckSummary> decks;
 
@@ -553,148 +751,155 @@ class _DecksTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (decks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.style,
-              size: 48,
-              color: AppTheme.textSecondary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: AppTheme.space12),
-            const Text(
-              'Nenhum deck público',
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: AppTheme.fontLg,
-              ),
-            ),
-          ],
-        ),
+      return const AppStatePanel(
+        key: Key('user-profile-decks-empty'),
+        status: AppStateStatus.firstUse,
+        icon: Icons.style_outlined,
+        title: 'Nenhum deck público por enquanto',
+        message:
+            'Quando este jogador publicar um deck, as cartas e o comandante aparecem aqui.',
+        accent: AppTheme.brass400,
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppTheme.space12),
-      itemCount: decks.length,
-      itemBuilder: (context, index) {
-        final deck = decks[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: AppTheme.space10),
-          color: AppTheme.surfaceSlate,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            side: const BorderSide(
-              color: AppTheme.outlineMuted,
-              width: AppTheme.strokeHairline,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useGrid = constraints.maxWidth >= 760;
+        if (useGrid) {
+          return GridView.builder(
+            key: const Key('user-profile-decks-grid'),
+            padding: const EdgeInsets.all(AppTheme.space16),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 430,
+              mainAxisExtent: 126,
+              crossAxisSpacing: AppTheme.space12,
+              mainAxisSpacing: AppTheme.space12,
             ),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            onTap: () {
-              context.push('/community/decks/${deck.id}');
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.space12),
-              child: Row(
-                children: [
-                  // Commander image
-                  CachedCardImage(
-                    imageUrl: deck.commanderImageUrl,
-                    width: 50,
-                    height: 70,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  ),
-                  const SizedBox(width: AppTheme.space12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          deck.name,
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: AppTheme.fontMd,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: AppTheme.space4),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppTheme.space6,
-                                vertical: AppTheme.space2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppTheme.manaViolet.withValues(
-                                  alpha: 0.2,
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusXs,
-                                ),
-                              ),
-                              child: Text(
-                                _capitalize(deck.format),
-                                style: const TextStyle(
-                                  color: AppTheme.manaViolet,
-                                  fontSize: AppTheme.fontXs,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: AppTheme.space8),
-                            Text(
-                              '${deck.cardCount} cartas',
-                              style: const TextStyle(
-                                color: AppTheme.textSecondary,
-                                fontSize: AppTheme.fontSm,
-                              ),
-                            ),
-                            if (deck.synergyScore != null) ...[
-                              const SizedBox(width: AppTheme.space8),
-                              Icon(
-                                Icons.auto_awesome,
-                                size: 12,
-                                color: AppTheme.mythicGold.withValues(
-                                  alpha: 0.8,
-                                ),
-                              ),
-                              const SizedBox(width: AppTheme.space2),
-                              Text(
-                                '${deck.synergyScore}%',
-                                style: TextStyle(
-                                  color: AppTheme.mythicGold.withValues(
-                                    alpha: 0.8,
-                                  ),
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppTheme.textSecondary,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
+            itemCount: decks.length,
+            itemBuilder: (context, index) =>
+                _PublicDeckTile(deck: decks[index]),
+          );
+        }
+
+        return ListView.separated(
+          key: const Key('user-profile-decks-list'),
+          padding: const EdgeInsets.all(AppTheme.space12),
+          itemCount: decks.length,
+          separatorBuilder: (_, _) => const SizedBox(height: AppTheme.space10),
+          itemBuilder: (context, index) => _PublicDeckTile(deck: decks[index]),
         );
       },
     );
   }
+}
 
-  String _capitalize(String s) =>
-      s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+class _PublicDeckTile extends StatelessWidget {
+  const _PublicDeckTile({required this.deck});
+
+  final PublicDeckSummary deck;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.surfaceSlate.withValues(alpha: 0.82),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        side: BorderSide(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.78),
+          width: AppTheme.strokeHairline,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/community/decks/${deck.id}'),
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.space12),
+          child: Row(
+            children: [
+              CachedCardImage(
+                imageUrl: deck.commanderImageUrl,
+                width: 66,
+                height: 92,
+                fit: BoxFit.cover,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              ),
+              const SizedBox(width: AppTheme.space12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      deck.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: AppTheme.fontMd,
+                      ),
+                    ),
+                    if (deck.commanderName != null) ...[
+                      const SizedBox(height: AppTheme.space3),
+                      Text(
+                        deck.commanderName!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: AppTheme.space8),
+                    Wrap(
+                      spacing: AppTheme.space8,
+                      runSpacing: AppTheme.space4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          _capitalize(deck.format),
+                          style: const TextStyle(
+                            color: AppTheme.manaViolet,
+                            fontSize: AppTheme.fontXs,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          '${deck.cardCount} cartas',
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontSm,
+                          ),
+                        ),
+                        if (deck.synergyScore != null)
+                          Text(
+                            'Sinergia ${deck.synergyScore}%',
+                            style: TextStyle(
+                              color: AppTheme.mythicGold.withValues(alpha: 0.9),
+                              fontSize: AppTheme.fontSm,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward,
+                color: AppTheme.brass400,
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _capitalize(String value) =>
+      value.isEmpty ? value : '${value[0].toUpperCase()}${value.substring(1)}';
 }
 
 // =====================================================================
@@ -756,52 +961,26 @@ class _UsersListTabState extends State<_UsersListTab> {
     }
 
     if (widget.errorMessage != null && widget.users.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppTheme.textSecondary,
-            ),
-            const SizedBox(height: AppTheme.space12),
-            Text(
-              widget.errorMessage!,
-              style: const TextStyle(color: AppTheme.textSecondary),
-            ),
-            if (widget.onLoadMore != null) ...[
-              const SizedBox(height: AppTheme.space12),
-              ElevatedButton(
-                onPressed: widget.onLoadMore,
-                child: const Text('Tentar novamente'),
-              ),
-            ],
-          ],
-        ),
+      return AppStatePanel(
+        key: const Key('user-profile-connections-error'),
+        status: AppStateStatus.error,
+        icon: Icons.cloud_off_outlined,
+        title: 'Conexões não carregadas',
+        message: widget.errorMessage!,
+        accent: AppTheme.error,
+        actionLabel: widget.onLoadMore == null ? null : 'Tentar novamente',
+        onAction: widget.onLoadMore,
       );
     }
 
     if (widget.users.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.people_outline,
-              size: 48,
-              color: AppTheme.textSecondary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: AppTheme.space12),
-            Text(
-              widget.emptyMessage,
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: AppTheme.fontLg,
-              ),
-            ),
-          ],
-        ),
+      return AppStatePanel(
+        key: const Key('user-profile-connections-empty'),
+        status: AppStateStatus.firstUse,
+        icon: Icons.people_outline,
+        title: widget.emptyMessage,
+        message: 'Novas conexões públicas aparecerão nesta área.',
+        accent: AppTheme.frost400,
       );
     }
 
@@ -1243,7 +1422,12 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
 
   void _openCreateTrade(String type, BinderItem targetItem) {
     context.push(
-      '/trades/create/${Uri.encodeComponent(widget.userId)}',
+      createTradeRouteLocation(
+        receiverId: widget.userId,
+        binderItemId: targetItem.id,
+        type: type,
+        source: 'profile',
+      ),
       extra: CreateTradeRouteArgs(
         initialType: type,
         preselectedItem: targetItem,

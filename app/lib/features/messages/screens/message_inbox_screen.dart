@@ -77,19 +77,24 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
               message:
                   'Verifique sua conexão e tente novamente. Suas conversas não foram apagadas.',
               accent: AppTheme.error,
+              status: AppStateStatus.error,
               actionLabel: 'Tentar novamente',
               onAction: () => provider.fetchConversations(),
             );
           }
 
           if (provider.conversations.isEmpty) {
-            return const AppStatePanel(
-              key: Key('messages-inbox-empty'),
+            return AppStatePanel(
+              key: const Key('messages-inbox-empty'),
               icon: Icons.chat_bubble_outline_rounded,
               title: 'Nenhuma conversa',
               message:
                   'Quando você começar uma conversa a partir do perfil de outro jogador, ela aparece aqui.',
               accent: AppTheme.brass400,
+              status: AppStateStatus.firstUse,
+              actionLabel: 'Buscar jogadores',
+              actionKey: const Key('messages-inbox-empty-search-users'),
+              onAction: () => context.push('/community/search-users'),
             );
           }
 

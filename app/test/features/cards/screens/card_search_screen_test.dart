@@ -14,11 +14,13 @@ class _FixedCardProvider extends CardProvider {
     this._results, {
     this.errorMessageOverride,
     this.availability = const {},
+    this.printings = const [],
   });
 
   final List<DeckCardItem> _results;
   final String? errorMessageOverride;
   final Map<String, CardCollectionAvailability> availability;
+  final List<Map<String, dynamic>> printings;
 
   @override
   List<DeckCardItem> get searchResults => _results;
@@ -46,6 +48,10 @@ class _FixedCardProvider extends CardProvider {
     }
     return 1;
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchPrintingsByName(String name) async =>
+      printings;
 }
 
 class _FakeSetsApiClient extends ApiClient {
@@ -253,7 +259,7 @@ void main() {
 
       expect(find.text(card.name), findsOneWidget);
       expect(find.textContaining('C16 #28'), findsOneWidget);
-      expect(find.textContaining('Non-foil'), findsNothing);
+      expect(find.textContaining('Sem foil'), findsNothing);
       expect(find.byType(CardDetailScreen), findsNothing);
 
       await tester.tap(find.byKey(Key('card-search-result-${card.id}')));
@@ -261,8 +267,8 @@ void main() {
       expect(find.byType(CardDetailScreen), findsOneWidget);
       expect(find.text('Código'), findsOneWidget);
       expect(find.text('C16 #28'), findsOneWidget);
-      expect(find.text('Acabamento'), findsOneWidget);
-      expect(find.text('Non-foil'), findsOneWidget);
+      expect(find.text('Disponibilidade foil'), findsOneWidget);
+      expect(find.text('Sem foil'), findsOneWidget);
 
       Navigator.of(tester.element(find.byType(CardDetailScreen))).pop();
       await tester.pumpAndSettle();
@@ -272,8 +278,95 @@ void main() {
 
       expect(selectedCard, isNotNull);
       expect(selectedCard!['id'], card.id);
+      expect(selectedCard!['set_code'], 'c16');
+      expect(selectedCard!['collector_number'], '28');
+      expect(selectedCard!['foil'], isFalse);
+      expect(selectedCard!['set_name'], 'Commander 2016');
+      expect(selectedCard!['set_release_date'], '2016-11-11');
+      expect(selectedCard!['mana_cost'], '{G}{W}{U}{B}');
+      expect(
+        selectedCard!['type_line'],
+        'Legendary Creature — Phyrexian Angel',
+      );
+      expect(selectedCard!['rarity'], 'mythic');
+      expect(selectedCard!['card_faces'], isEmpty);
     },
   );
+
+  testWidgets('grouped deck result requires an exact printing before adding', (
+    tester,
+  ) async {
+    final card = _nonCommanderCard().copyWith(printingCount: 2);
+    final apiClient = _FakeDeckApiClient(
+      deckDetails: _deckDetailsWithCommanderJson(),
+    );
+    final printings = [
+      {
+        'id': 'sol-ring-cmm',
+        'oracle_id': 'oracle-sol-ring',
+        'name': 'Sol Ring',
+        'mana_cost': '{1}',
+        'type_line': 'Artifact',
+        'set_code': 'cmm',
+        'set_name': 'Commander Masters',
+        'collector_number': '396',
+        'rarity': 'uncommon',
+        'foil': false,
+      },
+      {
+        'id': 'sol-ring-ltc',
+        'oracle_id': 'oracle-sol-ring',
+        'name': 'Sol Ring',
+        'mana_cost': '{1}',
+        'type_line': 'Artifact',
+        'set_code': 'ltc',
+        'set_name': 'The Lord of the Rings Commander',
+        'collector_number': '284',
+        'rarity': 'uncommon',
+        'foil': true,
+      },
+    ];
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<CardProvider>(
+            create: (_) => _FixedCardProvider([card], printings: printings),
+          ),
+          ChangeNotifierProvider<DeckProvider>(
+            create: (_) => DeckProvider(apiClient: apiClient),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'deck-1'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Escolher impressão'), findsOneWidget);
+    await tester.tap(find.byTooltip('Escolher impressão'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Escolha a impressão'), findsOneWidget);
+    expect(find.text('CMM #396'), findsOneWidget);
+    expect(find.text('LTC #284'), findsOneWidget);
+    expect(apiClient.postBodies, isEmpty);
+
+    await tester.tap(
+      find.byKey(const Key('card-printing-option-sol-ring-ltc')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card-printing-picker-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(apiClient.postBodies, hasLength(1));
+    expect(apiClient.postBodies.single['card_id'], 'sol-ring-ltc');
+    expect(apiClient.postBodies.single['quantity'], 1);
+    expect(apiClient.postBodies.single['is_commander'], isFalse);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('search area exposes collections tab and opens set detail', (
     tester,
@@ -362,6 +455,43 @@ void main() {
     expect((first.top - second.top).abs(), lessThan(0.1));
     expect(second.left, greaterThan(first.left));
     expect(first.left, greaterThanOrEqualTo(AppTheme.pageGutter - 0.1));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a single wide result becomes an image-led workspace', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create: (_) => _FixedCardProvider(_sampleCards(1)),
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'binder-1', mode: 'binder'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('card-search-single-result-workspace')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('card-search-results-grid')), findsNothing);
+    final result = tester.getRect(
+      find.byKey(const Key('card-search-result-card-1')),
+    );
+    final artwork = tester.getSize(
+      find.byKey(const Key('card-search-image-card-1')),
+    );
+    expect(result.width, greaterThan(1000));
+    expect(result.height, greaterThanOrEqualTo(214));
+    expect(artwork, const Size(126, 176));
+    expect(find.byTooltip('Adicionar'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

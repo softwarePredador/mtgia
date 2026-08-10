@@ -11,6 +11,7 @@ import '../models/deck.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
 import '../models/deck_card_item.dart';
+import '../models/deck_optimization_event.dart';
 import 'deck_provider_support.dart';
 
 export 'deck_provider_support.dart'
@@ -70,6 +71,9 @@ class DeckProvider extends ChangeNotifier {
   final Map<String, bool> _deckAnalysisLoading = {};
   final Map<String, String> _deckAnalysisErrors = {};
   final Map<String, Future<DeckAnalysisData?>> _deckAnalysisInFlight = {};
+  final Map<String, List<DeckOptimizationEvent>> _optimizationHistory = {};
+  final Map<String, bool> _optimizationHistoryLoading = {};
+  final Map<String, String> _optimizationHistoryErrors = {};
   static const _cacheDuration = Duration(minutes: 5);
 
   List<Deck> get decks => List.unmodifiable(_decks);
@@ -89,6 +93,14 @@ class DeckProvider extends ChangeNotifier {
   bool isDeckAnalysisLoading(String deckId) =>
       _deckAnalysisLoading[deckId] == true;
   String? deckAnalysisErrorFor(String deckId) => _deckAnalysisErrors[deckId];
+  List<DeckOptimizationEvent> optimizationHistoryFor(String deckId) =>
+      List<DeckOptimizationEvent>.unmodifiable(
+        _optimizationHistory[deckId] ?? const <DeckOptimizationEvent>[],
+      );
+  bool isOptimizationHistoryLoading(String deckId) =>
+      _optimizationHistoryLoading[deckId] == true;
+  String? optimizationHistoryErrorFor(String deckId) =>
+      _optimizationHistoryErrors[deckId];
 
   @visibleForTesting
   bool get isDisposedForTesting => _isDisposed;
@@ -1150,6 +1162,44 @@ class DeckProvider extends ChangeNotifier {
     return true;
   }
 
+  Future<List<DeckOptimizationEvent>> fetchOptimizationHistory(
+    String deckId, {
+    bool forceRefresh = false,
+  }) async {
+    final cached = _optimizationHistory[deckId];
+    if (!forceRefresh && cached != null) return cached;
+    if (_optimizationHistoryLoading[deckId] == true) {
+      return cached ?? const <DeckOptimizationEvent>[];
+    }
+
+    _optimizationHistoryLoading[deckId] = true;
+    _optimizationHistoryErrors.remove(deckId);
+    notifyListeners();
+    try {
+      final events = await fetchDeckOptimizationHistoryRequest(
+        _apiClient,
+        deckId: deckId,
+      );
+      _optimizationHistory[deckId] = events;
+      return events;
+    } catch (error, stackTrace) {
+      _optimizationHistoryErrors[deckId] = FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.deckDetails,
+      );
+      _captureProviderException(
+        error,
+        stackTrace: stackTrace,
+        operation: 'fetchOptimizationHistory',
+        extras: {'deck_id': deckId},
+      );
+      return cached ?? const <DeckOptimizationEvent>[];
+    } finally {
+      _optimizationHistoryLoading[deckId] = false;
+      notifyListeners();
+    }
+  }
+
   /// Aplica as sugestões de otimização ao deck
   /// Recebe uma lista de cartas para remover e adicionar (por nome)
   /// Busca os IDs das cartas e atualiza o deck
@@ -1380,6 +1430,9 @@ class DeckProvider extends ChangeNotifier {
     _deckAnalysisErrors.clear();
     _deckAnalysisLoading.clear();
     _deckAnalysisInFlight.clear();
+    _optimizationHistory.clear();
+    _optimizationHistoryErrors.clear();
+    _optimizationHistoryLoading.clear();
   }
 
   /// Importa um deck a partir de uma lista de texto (ex: "1 Sol Ring")
@@ -1441,8 +1494,14 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> validateImportList({
     required String format,
     required String list,
+    String? commander,
   }) => runConnectionSafeMapRequest(
-    () => validateImportListRequest(_apiClient, format: format, list: list),
+    () => validateImportListRequest(
+      _apiClient,
+      format: format,
+      list: list,
+      commander: commander,
+    ),
   );
 
   /// Importa uma lista de cartas para um deck EXISTENTE

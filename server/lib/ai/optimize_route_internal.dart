@@ -23,6 +23,7 @@ import '../ai_generate_internal_url_support.dart';
 import '../internal_ai_request_token.dart';
 import '../logger.dart';
 import '../observability.dart';
+import '../retention/post_game_note_service.dart';
 
 Future<void> processOptimizeModeAsync({
   required Pool pool,
@@ -305,6 +306,37 @@ Future<void> processCompleteModeAsync({
       requestMode: 'complete_async',
       jobId: jobId,
     );
+    Map<String, dynamic>? postGameEvidence;
+    final postGameNoteId = recommendationContext.postGameNoteId;
+    if (postGameNoteId != null && userId != null && userId.isNotEmpty) {
+      postGameEvidence = await telemetry.trackAsync(
+        'complete.post_game_evidence',
+        () => PostGameNoteService(pool).loadOptimizeEvidence(
+          userId: userId,
+          deckId: deckId,
+          noteId: postGameNoteId,
+        ),
+      );
+      if (postGameEvidence == null) {
+        await OptimizeJobStore.fail(
+          pool,
+          jobId,
+          error: 'A evidência pós-jogo não está mais disponível.',
+          qualityError: const {
+            'code': 'POST_GAME_EVIDENCE_NOT_FOUND',
+            'can_apply': false,
+          },
+        );
+        return;
+      }
+    }
+    final postGameEvidenceContext = buildPostGameEvidencePrompt(
+      postGameEvidence,
+    );
+    final completeCoreCards = <String>{
+      ...themeProfile.coreCards,
+      ...postGameEvidenceCardNames(postGameEvidence, key: 'performed_well'),
+    }.toList(growable: false);
     if (!await OptimizeJobStore.progress(
       pool,
       jobId,
@@ -355,11 +387,12 @@ Future<void> processCompleteModeAsync({
           bracket: bracket,
           keepTheme: keepTheme,
           detectedTheme: themeProfile.theme,
-          coreCards: themeProfile.coreCards,
+          coreCards: completeCoreCards,
           maxTotal: maxTotal,
           state: state,
           deckId: deckId,
           userId: userId,
+          postGameEvidenceContext: postGameEvidenceContext,
           preferCollection: recommendationContext.preferCollection == true,
           budgetLimitBrl: recommendationContext.budgetLimitBrl,
         ),
@@ -424,7 +457,7 @@ Future<void> processCompleteModeAsync({
         bracket: bracket,
         keepTheme: keepTheme,
         detectedTheme: themeProfile.theme,
-        coreCards: themeProfile.coreCards,
+        coreCards: completeCoreCards,
         maxTotal: maxTotal,
         state: state,
         userId: userId,
@@ -443,7 +476,7 @@ Future<void> processCompleteModeAsync({
         bracket: bracket,
         keepTheme: keepTheme,
         detectedTheme: themeProfile.theme,
-        coreCards: themeProfile.coreCards,
+        coreCards: completeCoreCards,
         maxTotal: maxTotal,
         state: state,
         userId: userId,
@@ -555,6 +588,7 @@ Future<void> processCompleteModeAsync({
         responseBody,
         recommendationContext,
       );
+      attachPostGameEvidenceToOptimizeResponse(responseBody, postGameEvidence);
       if (!await OptimizeJobStore.progress(
         pool,
         jobId,

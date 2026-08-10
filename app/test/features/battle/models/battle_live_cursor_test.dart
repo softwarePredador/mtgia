@@ -93,6 +93,51 @@ void main() {
       );
     });
 
+    test('accepts exact identities only in public events and public zones', () {
+      final event = _eventRecord(sequence: 1, recordId: 'event-1');
+      (event['event'] as Map<String, dynamic>)['card_id'] =
+          '11111111-1111-4111-8111-111111111111';
+      final snapshot = _snapshotRecord(sequence: 2, recordId: 'snapshot-2');
+      final snapshotPayload = snapshot['snapshot'] as Map<String, dynamic>;
+      final player =
+          (snapshotPayload['players'] as List).first as Map<String, dynamic>;
+      player['battlefield'] = [
+        {
+          'object_id': 'permanent-1',
+          'card_id': '22222222-2222-4222-8222-222222222222',
+          'name': 'Arcane Signet',
+          'tapped': false,
+        },
+      ];
+      player['graveyard'] = [
+        {'name': 'Public Graveyard Card'},
+      ];
+      player['exile'] = <Map<String, dynamic>>[];
+      player['command'] = [
+        {
+          'card_id': '33333333-3333-4333-8333-333333333333',
+          'name': 'Public Commander',
+        },
+      ];
+
+      final page = BattleLivePage.fromJson(_pageJson(items: [event, snapshot]));
+      final parsedEvent = page.items.first.payload;
+      final parsedPlayer =
+          (page.items.last.payload['players'] as List).first as Map;
+
+      expect(parsedEvent['card_id'], '11111111-1111-4111-8111-111111111111');
+      expect(
+        ((parsedPlayer['battlefield'] as List).single as Map)['card_id'],
+        '22222222-2222-4222-8222-222222222222',
+      );
+      expect(
+        ((parsedPlayer['command'] as List).single as Map)['name'],
+        'Public Commander',
+      );
+      expect(parsedPlayer, isNot(contains('hand')));
+      expect(parsedPlayer, isNot(contains('library')));
+    });
+
     test('validates terminal state and delivers the final replay once', () {
       final page = BattleLivePage.fromJson(
         _pageJson(

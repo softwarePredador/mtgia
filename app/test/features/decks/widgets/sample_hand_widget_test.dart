@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
-import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/card_artwork.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
@@ -16,6 +16,9 @@ void main() {
     required String typeLine,
     String? manaCost,
     String? oracleText,
+    String? imageUrl,
+    String collectorNumber = '1',
+    bool? foil = false,
     int quantity = 1,
     bool isCommander = false,
   }) {
@@ -25,14 +28,19 @@ void main() {
       typeLine: typeLine,
       manaCost: manaCost,
       oracleText: oracleText,
+      imageUrl: imageUrl,
       setCode: 'TST',
+      setName: 'Test Set',
+      setReleaseDate: '2026-01-01',
       rarity: 'common',
       quantity: quantity,
       isCommander: isCommander,
+      collectorNumber: collectorNumber,
+      foil: foil,
     );
   }
 
-  DeckDetails makeDeck() {
+  DeckDetails makeDeck({String? imageUrl}) {
     return DeckDetails(
       id: 'deck-sample-hand',
       name: 'Talrand Tempo',
@@ -58,6 +66,7 @@ void main() {
             id: 'land',
             name: 'Island',
             typeLine: 'Basic Land - Island',
+            imageUrl: imageUrl,
             quantity: 35,
           ),
           card(
@@ -66,6 +75,7 @@ void main() {
             typeLine: 'Artifact',
             manaCost: '{2}',
             oracleText: '{T}: Add one mana of any color.',
+            imageUrl: imageUrl,
             quantity: 4,
           ),
           card(
@@ -74,6 +84,7 @@ void main() {
             typeLine: 'Instant',
             manaCost: '{U}{U}',
             oracleText: 'Counter target spell.',
+            imageUrl: imageUrl,
             quantity: 8,
           ),
           card(
@@ -83,6 +94,7 @@ void main() {
             manaCost: '{1}{U}',
             oracleText:
                 'Draw two cards. Then discard a card unless you attacked this turn.',
+            imageUrl: imageUrl,
             quantity: 8,
           ),
           card(
@@ -92,6 +104,7 @@ void main() {
             manaCost: '{U}',
             oracleText:
                 'Look at the top card of your library. You may put that card into your graveyard. Draw a card.',
+            imageUrl: imageUrl,
             quantity: 8,
           ),
           card(
@@ -100,6 +113,7 @@ void main() {
             typeLine: 'Creature - Salamander Drake',
             manaCost: '{U}',
             oracleText: 'Flying',
+            imageUrl: imageUrl,
             quantity: 37,
           ),
         ],
@@ -112,6 +126,7 @@ void main() {
     double width = 300,
     ValueChanged<DeckCardItem>? onShowCardDetails,
     ValueChanged<SampleHandDecision>? onDecision,
+    DeckDetails? deck,
   }) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
@@ -120,7 +135,7 @@ void main() {
           width: width,
           child: SingleChildScrollView(
             child: SampleHandWidget(
-              deck: makeDeck(),
+              deck: deck ?? makeDeck(),
               compact: compact,
               randomSeed: 7,
               onShowCardDetails: onShowCardDetails,
@@ -170,6 +185,8 @@ void main() {
         ),
         findsOneWidget,
       );
+      await tester.ensureVisible(find.byKey(const Key('sample-hand-keep')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('sample-hand-keep')));
       await tester.pumpAndSettle();
 
@@ -253,6 +270,7 @@ void main() {
 
       expect(selectedCard, isNotNull);
       expect(selectedCard!.isCommander, isFalse);
+      expect(selectedCard!.quantity, 1);
     });
 
     testWidgets('drawn hand uses carousel snap without layout issues', (
@@ -265,6 +283,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('sample-hand-carousel')), findsOneWidget);
+      expect(
+        find.byKey(const Key('sample-hand-carousel-hint')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('de 7 · deslize'), findsOneWidget);
 
       await tester.drag(
         find.byKey(const Key('sample-hand-carousel')),
@@ -273,6 +296,27 @@ void main() {
       await tester.pumpAndSettle();
 
       expectNoLayoutExceptions(tester);
+    });
+
+    testWidgets('shows exact printing art and focused printing metadata', (
+      tester,
+    ) async {
+      const imageUrl =
+          'https://cards.scryfall.io/normal/front/a/a/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.jpg';
+      await tester.pumpWidget(
+        createSubject(deck: makeDeck(imageUrl: imageUrl)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sample-hand-draw')));
+      await tester.pumpAndSettle();
+
+      final artwork = tester.widgetList<CardArtwork>(find.byType(CardArtwork));
+      expect(artwork, isNotEmpty);
+      expect(artwork.every((item) => item.imageUrl == imageUrl), isTrue);
+      expect(find.text('TST #1'), findsOneWidget);
+      expect(find.text('Non-foil'), findsNothing);
+      expect(find.text('Arte de referência'), findsNothing);
     });
 
     testWidgets('supports compact mode and mulligan without overflow', (
@@ -313,20 +357,23 @@ void main() {
         await tester.tap(find.byKey(const Key('sample-hand-draw')));
         await tester.pumpAndSettle();
 
-        final images = tester.widgetList<CachedCardImage>(
-          find.byType(CachedCardImage),
-        );
+        final images = tester.widgetList<CardArtwork>(find.byType(CardArtwork));
         expect(images, isNotEmpty);
         expect(
           images.every(
             (image) =>
-                image.imageUrl != null &&
-                image.imageUrl!.startsWith('https://api.scryfall.com/'),
+                image.imageUrl == null &&
+                image.fallbackImageUrl != null &&
+                image.fallbackImageUrl!.startsWith('https://api.scryfall.com/'),
           ),
           isTrue,
         );
+        expect(find.text('Arte de referência'), findsOneWidget);
+        expect(find.text('TST #1'), findsOneWidget);
 
         await tester.tap(find.byKey(const Key('sample-hand-mulligan')));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.byKey(const Key('sample-hand-keep')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('sample-hand-keep')));
         await tester.pumpAndSettle();

@@ -120,6 +120,7 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '055': 'create_battle_job_live_records',
   '056': 'create_interactive_battle_sessions',
   '057': 'expand_battle_job_async_timeout',
+  '058': 'snapshot_trade_item_identity',
 };
 
 const releaseSchemaReadinessSql = '''
@@ -144,11 +145,12 @@ const releaseSchemaReadinessSql = '''
       ('054', 'create_battle_jobs'),
       ('055', 'create_battle_job_live_records'),
       ('056', 'create_interactive_battle_sessions'),
-      ('057', 'expand_battle_job_async_timeout')
+      ('057', 'expand_battle_job_async_timeout'),
+      ('058', 'snapshot_trade_item_identity')
   )
   SELECT
     (
-      SELECT COUNT(*) = 20
+      SELECT COUNT(*) = 21
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
@@ -157,7 +159,7 @@ const releaseSchemaReadinessSql = '''
     COALESCE(
       (SELECT MAX(version) FROM public.schema_migrations),
       ''
-    ) = '057' AS latest_migration_ready,
+    ) = '058' AS latest_migration_ready,
     (
       SELECT COUNT(*)
       FROM pg_class
@@ -331,6 +333,45 @@ const releaseSchemaReadinessSql = '''
         AND indisvalid
         AND indisready
     ) = 9 AS social_safety_indexes_ready,
+    (
+      (
+        SELECT COUNT(*)
+        FROM (
+          VALUES
+            ('snapshot_schema_version'),
+            ('snapshot_status'),
+            ('item_snapshot'),
+            ('snapshot_captured_at')
+        ) AS required(column_name)
+        WHERE EXISTS (
+          SELECT 1
+          FROM information_schema.columns actual
+          WHERE actual.table_schema = 'public'
+            AND actual.table_name = 'trade_items'
+            AND actual.column_name = required.column_name
+        )
+      ) = 4
+      AND (
+        SELECT COUNT(*)
+        FROM pg_constraint
+        WHERE conrelid = to_regclass('public.trade_items')
+          AND conname IN (
+            'chk_trade_items_snapshot_schema',
+            'chk_trade_items_snapshot_status',
+            'chk_trade_items_snapshot_payload',
+            'chk_trade_items_snapshot_lifecycle'
+          )
+          AND convalidated
+      ) = 4
+      AND EXISTS (
+        SELECT 1
+        FROM pg_trigger
+        WHERE tgrelid = to_regclass('public.trade_items')
+          AND tgname = 'manaloom_trade_item_snapshot_immutable'
+          AND NOT tgisinternal
+          AND tgenabled <> 'D'
+      )
+    ) AS trade_item_snapshot_contract_ready,
     (
       to_regclass('public.battle_simulation_attempts') IS NOT NULL
       AND (
@@ -587,13 +628,13 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
         .timeout(const Duration(seconds: 5));
     final row = result.first;
     final healthy =
-        row.length >= 15 && row.take(15).every((value) => value == true);
+        row.length >= 16 && row.take(16).every((value) => value == true);
     return ReleaseSchemaReadiness(
       healthy: healthy,
       check: {
         'status': healthy ? 'healthy' : 'unhealthy',
-        'required_range': '038-057',
-        'latest_migration': '057',
+        'required_range': '038-058',
+        'latest_migration': '058',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -605,8 +646,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: false,
       check: {
         'status': 'unhealthy',
-        'required_range': '038-057',
-        'latest_migration': '057',
+        'required_range': '038-058',
+        'latest_migration': '058',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),

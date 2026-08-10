@@ -137,6 +137,27 @@ class _FakeApiClient extends ApiClient {
         'warnings': <String>[],
       });
     }
+    if (endpoint == '/import/validate') {
+      return ApiResponse(200, {
+        'found_cards': [
+          {
+            'card_id': 'sol-ring',
+            'name': 'Sol Ring',
+            'quantity': 1,
+            'image_url': '',
+          },
+          {
+            'card_id': 'arcane-signet',
+            'name': 'Arcane Signet',
+            'quantity': 1,
+            'image_url': '',
+          },
+        ],
+        'not_found_lines': <String>[],
+        'warnings': <String>[],
+        'localized_matches_count': 0,
+      });
+    }
     throw UnimplementedError('No POST handler for $endpoint');
   }
 }
@@ -211,7 +232,10 @@ void main() {
     );
   }
 
-  Widget wrapWithRouter(DeckProvider deckProvider) {
+  Widget wrapWithRouter(
+    DeckProvider deckProvider, {
+    Future<bool> Function(String format)? onOnboardingTaskCompleted,
+  }) {
     return MaterialApp.router(
       theme: AppTheme.darkTheme.copyWith(
         splashFactory: InkRipple.splashFactory,
@@ -223,16 +247,32 @@ void main() {
             path: '/generate',
             builder: (_, __) => ChangeNotifierProvider<DeckProvider>.value(
               value: deckProvider,
-              child: const DeckGenerateScreen(),
+              child: DeckGenerateScreen(
+                onOnboardingTaskCompleted: onOnboardingTaskCompleted,
+              ),
             ),
           ),
           GoRoute(path: '/decks', builder: (_, __) => const SizedBox.shrink()),
+          GoRoute(
+            path: '/home',
+            builder: (_, __) =>
+                const SizedBox(key: Key('onboarding-completed-home')),
+          ),
+          GoRoute(
+            path: '/onboarding/core-flow',
+            builder: (_, __) =>
+                const SizedBox(key: Key('onboarding-storage-recovery')),
+          ),
         ],
       ),
     );
   }
 
-  Widget wrapImportWithRouter(DeckProvider deckProvider, String ownerId) {
+  Widget wrapImportWithRouter(
+    DeckProvider deckProvider,
+    String ownerId, {
+    Future<bool> Function(String format)? onOnboardingTaskCompleted,
+  }) {
     return MaterialApp.router(
       theme: AppTheme.darkTheme.copyWith(
         splashFactory: InkRipple.splashFactory,
@@ -244,7 +284,10 @@ void main() {
             path: '/import',
             builder: (_, __) => ChangeNotifierProvider<DeckProvider>.value(
               value: deckProvider,
-              child: DeckImportScreen(draftOwnerId: ownerId),
+              child: DeckImportScreen(
+                draftOwnerId: ownerId,
+                onOnboardingTaskCompleted: onOnboardingTaskCompleted,
+              ),
             ),
           ),
           GoRoute(
@@ -252,6 +295,16 @@ void main() {
             builder: (_, __) => const SizedBox.shrink(),
           ),
           GoRoute(path: '/decks', builder: (_, __) => const SizedBox.shrink()),
+          GoRoute(
+            path: '/home',
+            builder: (_, __) =>
+                const SizedBox(key: Key('onboarding-completed-home')),
+          ),
+          GoRoute(
+            path: '/onboarding/core-flow',
+            builder: (_, __) =>
+                const SizedBox(key: Key('onboarding-storage-recovery')),
+          ),
         ],
       ),
     );
@@ -788,9 +841,17 @@ void main() {
       cardList: '1 Sol Ring\n1 Arcane Signet',
     );
     final apiClient = _FakeApiClient();
+    final completedFormats = <String>[];
 
     await tester.pumpWidget(
-      wrapImportWithRouter(DeckProvider(apiClient: apiClient), owner),
+      wrapImportWithRouter(
+        DeckProvider(apiClient: apiClient),
+        owner,
+        onOnboardingTaskCompleted: (format) async {
+          completedFormats.add(format);
+          return true;
+        },
+      ),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
@@ -799,16 +860,31 @@ void main() {
     await tester.tap(submit);
     await tester.pumpAndSettle();
 
+    expect(apiClient.postCalls, contains('/import/validate'));
+    expect(find.byKey(const Key('deck-import-preflight')), findsOneWidget);
+    await tester.ensureVisible(submit);
+    await tester.tap(submit);
+    await tester.pumpAndSettle();
+
     expect(apiClient.postCalls, contains('/import'));
     expect(await store.loadImport(owner), isNull);
+    expect(completedFormats, ['commander']);
+    expect(find.byKey(const Key('onboarding-completed-home')), findsOneWidget);
   });
 
   testWidgets(
     'DeckGenerateScreen save learned deck POSTs 99 main + 1 commander',
     (tester) async {
       final apiClient = _FakeApiClient();
+      final completedFormats = <String>[];
       await tester.pumpWidget(
-        wrapWithRouter(DeckProvider(apiClient: apiClient)),
+        wrapWithRouter(
+          DeckProvider(apiClient: apiClient),
+          onOnboardingTaskCompleted: (format) async {
+            completedFormats.add(format);
+            return true;
+          },
+        ),
       );
       await tester.pump();
 
@@ -838,6 +914,11 @@ void main() {
       final deckCall = apiClient.postCalls.any((call) => call == '/decks');
       expect(deckCall, isTrue);
       expect(await DeckEntryDraftStore().loadGenerate('local'), isNull);
+      expect(completedFormats, ['commander']);
+      expect(
+        find.byKey(const Key('onboarding-completed-home')),
+        findsOneWidget,
+      );
 
       for (final body in apiClient.postBodies) {
         if (body.containsKey('cards')) {

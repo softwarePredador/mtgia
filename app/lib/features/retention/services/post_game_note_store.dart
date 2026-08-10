@@ -376,13 +376,6 @@ class PostGameNoteStore {
     final sessionEndedAt = remote.sessionEndedAt ?? local.sessionEndedAt;
     final deckSnapshotHash = remote.deckSnapshotHash ?? local.deckSnapshotHash;
     final deckVersionAt = remote.deckVersionAt ?? local.deckVersionAt;
-    if (playSessionId == remote.playSessionId &&
-        sessionStartedAt == remote.sessionStartedAt &&
-        sessionEndedAt == remote.sessionEndedAt &&
-        deckSnapshotHash == remote.deckSnapshotHash &&
-        deckVersionAt == remote.deckVersionAt) {
-      return remote;
-    }
     return PostGameNote(
       id: remote.id,
       deckId: remote.deckId,
@@ -390,14 +383,54 @@ class PostGameNoteStore {
       result: remote.result,
       tableLevel: remote.tableLevel,
       notes: remote.notes,
-      performedWell: remote.performedWell,
-      underperformed: remote.underperformed,
+      performedWellEvidence: _mergeCardEvidence(
+        remote.performedWellEvidence,
+        local.performedWellEvidence,
+      ),
+      underperformedEvidence: _mergeCardEvidence(
+        remote.underperformedEvidence,
+        local.underperformedEvidence,
+      ),
       issues: remote.issues,
       playSessionId: playSessionId,
       sessionStartedAt: sessionStartedAt,
       sessionEndedAt: sessionEndedAt,
       deckSnapshotHash: deckSnapshotHash,
       deckVersionAt: deckVersionAt,
+      revision: remote.revision,
     );
+  }
+
+  static List<PostGameCardEvidence> _mergeCardEvidence(
+    List<PostGameCardEvidence> remote,
+    List<PostGameCardEvidence> local,
+  ) {
+    final localByKey = <String, PostGameCardEvidence>{
+      for (final card in local) _cardEvidenceKey(card): card,
+    };
+    return remote
+        .map((card) {
+          final localCard = localByKey[_cardEvidenceKey(card)];
+          if (localCard == null || card.imageUrl?.trim().isNotEmpty == true) {
+            return card;
+          }
+          return PostGameCardEvidence(
+            name: card.name,
+            cardId: card.cardId ?? localCard.cardId,
+            imageUrl: localCard.imageUrl,
+            setCode: card.setCode ?? localCard.setCode,
+            collectorNumber: card.collectorNumber ?? localCard.collectorNumber,
+            quantity: card.quantity,
+            isCommander: card.isCommander || localCard.isCommander,
+          );
+        })
+        .toList(growable: false);
+  }
+
+  static String _cardEvidenceKey(PostGameCardEvidence card) {
+    final id = card.cardId?.trim().toLowerCase();
+    return id == null || id.isEmpty
+        ? 'name:${card.name.trim().toLowerCase()}'
+        : 'id:$id';
   }
 }

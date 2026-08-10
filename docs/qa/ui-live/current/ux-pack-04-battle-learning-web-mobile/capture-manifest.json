@@ -1,0 +1,111 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T20:29:53.769884Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "battle_learning",
+  "profile": "web_battle_learning_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Battle Learning controlled Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "224002dd09e65cef927f7bd17a1f926dc97ac1b7079632d040f13c01c27100c7",
+  "checkpoint_count": 10,
+  "required_checkpoints": [
+    "battle_learning_00_play_entry",
+    "battle_learning_01_active_session",
+    "battle_learning_02_live_table",
+    "battle_learning_03_reconnect",
+    "battle_learning_04_timeout",
+    "battle_learning_05_completed",
+    "battle_learning_06_replay_evidence",
+    "battle_learning_07_postgame_signals",
+    "battle_learning_08_postgame_receipt",
+    "battle_learning_09_optimize_evidence"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "battle_learning_00_play_entry",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_00_play_entry.png",
+      "sha256": "9bf5dfc0167ea9fe13c4b72345384f04d6f9f735c1deadb0be9abc2f51a51020",
+      "bytes": 121577,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_01_active_session",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_01_active_session.png",
+      "sha256": "333ce177c283c6fc4e4b36f1fa639f92b811c72a9f0bccf1cc83175c94c73319",
+      "bytes": 115584,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_02_live_table",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_02_live_table.png",
+      "sha256": "21ed24005440c6e869e7e43b185d77711d146ad5cf53cf826f230a68d039ff3e",
+      "bytes": 69727,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_03_reconnect",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_03_reconnect.png",
+      "sha256": "c76106d09d80502399d431cc7b537d2d545d52b4c910e41c18ffe7ae33066c88",
+      "bytes": 79353,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_04_timeout",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_04_timeout.png",
+      "sha256": "d2145366cd074743c8333252ba51974b3e99b2f2dfc8ab5a0b5f7383d2906872",
+      "bytes": 57057,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_05_completed",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_05_completed.png",
+      "sha256": "4972223b4b5ec7f028b516fe9938596e66f96781935ecd5d4e447f5e3d896487",
+      "bytes": 53434,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_06_replay_evidence",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_06_replay_evidence.png",
+      "sha256": "5de519ac03f28f0cdba95d1854e0f4b444ff22414af48c73652a8974a3ca343e",
+      "bytes": 69591,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_07_postgame_signals",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_07_postgame_signals.png",
+      "sha256": "402850aab1c18e96c3bea10ab2b2dae09665c1b787d47b254e3aca1abcca4325",
+      "bytes": 105134,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_08_postgame_receipt",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_08_postgame_receipt.png",
+      "sha256": "036d4ee78321fb39b4ff99be01bf5783fa3edab2af6c81cb5146d9fcaa62145c",
+      "bytes": 91090,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "battle_learning_09_optimize_evidence",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_09_optimize_evidence.png",
+      "sha256": "d9d88e832ab393beb4da8da5dcd096111793c6eeef6f00f53ab15e7425287539",
+      "bytes": 65744,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

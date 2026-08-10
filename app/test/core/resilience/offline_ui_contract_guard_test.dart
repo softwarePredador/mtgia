@@ -18,7 +18,8 @@ void main() {
 
     expect(claims, <String>{
       'lib/core/resilience/offline_capability.dart',
-      'lib/features/home/onboarding_core_flow_screen.dart',
+      'lib/core/widgets/app_state_panel.dart',
+      'lib/core/widgets/card_artwork.dart',
     });
   });
 

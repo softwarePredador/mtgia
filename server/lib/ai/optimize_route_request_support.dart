@@ -11,6 +11,7 @@ class OptimizeRecommendationContext {
     required this.report,
     required this.explainSwaps,
     required this.includePriceRiskCurveBracket,
+    required this.postGameNoteId,
     required this.unknownKeys,
   });
 
@@ -23,6 +24,7 @@ class OptimizeRecommendationContext {
       report = null,
       explainSwaps = null,
       includePriceRiskCurveBracket = null,
+      postGameNoteId = null,
       unknownKeys = const <String>[];
 
   final bool rawWasPresent;
@@ -33,6 +35,7 @@ class OptimizeRecommendationContext {
   final String? report;
   final bool? explainSwaps;
   final bool? includePriceRiskCurveBracket;
+  final String? postGameNoteId;
   final List<String> unknownKeys;
 
   bool get isPresent =>
@@ -43,7 +46,8 @@ class OptimizeRecommendationContext {
           rebuildIntent != null ||
           report != null ||
           explainSwaps != null ||
-          includePriceRiskCurveBracket != null);
+          includePriceRiskCurveBracket != null ||
+          postGameNoteId != null);
 
   Map<String, dynamic> toRequestJson() {
     final json = <String, dynamic>{};
@@ -64,6 +68,9 @@ class OptimizeRecommendationContext {
     }
     if (includePriceRiskCurveBracket != null) {
       json['include_price_risk_curve_bracket'] = includePriceRiskCurveBracket;
+    }
+    if (postGameNoteId != null) {
+      json['post_game_note_id'] = postGameNoteId;
     }
     return json;
   }
@@ -87,6 +94,8 @@ class OptimizeRecommendationContext {
             includePriceRiskCurveBracket == true
                 ? 'source_dependent'
                 : 'not_requested',
+        'post_game_note_id':
+            postGameNoteId == null ? 'not_requested' : 'authenticated_lookup',
       },
     };
     return diagnostics;
@@ -257,6 +266,7 @@ OptimizeRecommendationContext parseOptimizeRecommendationContext(
       report: null,
       explainSwaps: null,
       includePriceRiskCurveBracket: null,
+      postGameNoteId: null,
       unknownKeys: const <String>[],
     );
   }
@@ -269,6 +279,7 @@ OptimizeRecommendationContext parseOptimizeRecommendationContext(
     'report',
     'explain_swaps',
     'include_price_risk_curve_bracket',
+    'post_game_note_id',
   };
   final unknownKeys =
       context.keys
@@ -288,6 +299,10 @@ OptimizeRecommendationContext parseOptimizeRecommendationContext(
     explainSwaps: _readBool(context['explain_swaps']),
     includePriceRiskCurveBracket: _readBool(
       context['include_price_risk_curve_bracket'],
+    ),
+    postGameNoteId: _readIdentifier(
+      context['post_game_note_id'],
+      maxLength: 128,
     ),
     unknownKeys: unknownKeys,
   );
@@ -330,6 +345,77 @@ void attachRecommendationContextToOptimizeResponse(
   };
 }
 
+void attachPostGameEvidenceToOptimizeResponse(
+  Map<String, dynamic> responseBody,
+  Map<String, dynamic>? evidence,
+) {
+  if (evidence == null || evidence.isEmpty) return;
+  responseBody['post_game_evidence'] = evidence;
+  final existingDiagnostics =
+      responseBody['optimize_diagnostics'] is Map
+          ? (responseBody['optimize_diagnostics'] as Map)
+              .cast<String, dynamic>()
+          : <String, dynamic>{};
+  responseBody['optimize_diagnostics'] = {
+    ...existingDiagnostics,
+    'post_game_evidence': {
+      'status': 'authenticated_and_loaded',
+      'note_id': evidence['note_id'],
+      'selected_card_count': evidence['selected_card_count'] ?? 0,
+      'deck_revision_matches_current':
+          _asMap(evidence['deck_revision'])['matches_current'] == true,
+    },
+  };
+}
+
+String? buildPostGameEvidencePrompt(Map<String, dynamic>? evidence) {
+  if (evidence == null || evidence.isEmpty) return null;
+  final preserve = postGameEvidenceCardNames(evidence, key: 'performed_well');
+  final review = postGameEvidenceCardNames(evidence, key: 'underperformed');
+  final issues = (evidence['issues'] as List? ?? const <Object>[])
+      .map((entry) => entry.toString().trim())
+      .where((entry) => entry.isNotEmpty)
+      .take(12)
+      .toList(growable: false);
+  final revision = _asMap(evidence['deck_revision']);
+  return <String>[
+    'EVIDENCIA_POS_JOGO_AUTENTICADA:',
+    'note_id=${evidence['note_id']}',
+    'revisao_atual=${revision['matches_current'] == true ? 'igual' : 'divergente'}',
+    if (issues.isNotEmpty) 'problemas=${issues.join(', ')}',
+    if (preserve.isNotEmpty)
+      'preservar_observado=${preserve.take(20).join(', ')}',
+    if (review.isNotEmpty) 'revisar_observado=${review.take(20).join(', ')}',
+    'Use estes sinais como evidencia do usuario, nunca como autorizacao para aplicar trocas.',
+  ].join('\n');
+}
+
+List<String> postGameEvidenceCardNames(
+  Map<String, dynamic>? evidence, {
+  required String key,
+}) {
+  if (evidence == null) return const <String>[];
+  final values = evidence[key];
+  if (values is! List) return const <String>[];
+  final names = <String>[];
+  final seen = <String>{};
+  for (final value in values) {
+    final name =
+        value is Map
+            ? value['name']?.toString().trim() ?? ''
+            : value.toString().trim();
+    if (name.isEmpty || !seen.add(name.toLowerCase())) continue;
+    names.add(name);
+  }
+  return List<String>.unmodifiable(names);
+}
+
+Map<String, dynamic> _asMap(Object? value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return value.cast<String, dynamic>();
+  return const <String, dynamic>{};
+}
+
 bool? _readBool(dynamic value) {
   if (value is bool) return value;
   if (value is String) {
@@ -359,4 +445,12 @@ String? _readToken(dynamic value, {required int maxLength}) {
   return normalized.length <= maxLength
       ? normalized
       : normalized.substring(0, maxLength);
+}
+
+String? _readIdentifier(dynamic value, {required int maxLength}) {
+  if (value is! String) return null;
+  final normalized = value.trim();
+  if (normalized.isEmpty || normalized.length > maxLength) return null;
+  if (!RegExp(r'^[A-Za-z0-9._:-]+$').hasMatch(normalized)) return null;
+  return normalized;
 }

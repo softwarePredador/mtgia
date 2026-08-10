@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../../binder/providers/binder_provider.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../providers/trade_provider.dart';
+import '../trade_route_contract.dart';
 import '../widgets/trade_safety_notice.dart';
 
 class CreateTradeRouteArgs {
@@ -26,12 +28,20 @@ class CreateTradeScreen extends StatefulWidget {
   final String receiverId;
   final String initialType; // 'trade', 'sale', 'mixed'
   final BinderItem? preselectedItem;
+  final String? initialBinderItemId;
+  final String? source;
+  final String? sourceDeckId;
+  final String? counterTradeId;
 
   const CreateTradeScreen({
     super.key,
     required this.receiverId,
     this.initialType = 'trade',
     this.preselectedItem,
+    this.initialBinderItemId,
+    this.source,
+    this.sourceDeckId,
+    this.counterTradeId,
   });
 
   @override
@@ -39,8 +49,6 @@ class CreateTradeScreen extends StatefulWidget {
 }
 
 class _CreateTradeScreenState extends State<CreateTradeScreen> {
-  static const _supportedTypes = {'trade', 'sale', 'mixed'};
-
   late String _type;
   final _messageCtrl = TextEditingController();
   final _paymentCtrl = TextEditingController();
@@ -57,20 +65,30 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   bool _loadingMyBinder = false;
   String? _myBinderError;
 
+  bool _loadingRequestedItem = false;
+  String? _requestedItemError;
+
   bool _isSubmitting = false;
+  String? _submitError;
 
   @override
   void initState() {
     super.initState();
-    _type = _supportedTypes.contains(widget.initialType)
-        ? widget.initialType
-        : 'trade';
+    _type = normalizeTradeProposalType(widget.initialType);
     if (widget.preselectedItem != null) {
       _requestedItems.add(
         _SelectedItem(binderItem: widget.preselectedItem!, quantity: 1),
       );
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadMyBinder());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadMyBinder();
+      if (!mounted) return;
+      if (widget.counterTradeId?.trim().isNotEmpty == true) {
+        await _restoreCounterTrade();
+      } else if (widget.preselectedItem == null) {
+        await _restoreRequestedItem();
+      }
+    });
   }
 
   @override
@@ -94,7 +112,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       if (!mounted) return;
       if (items != null) {
         setState(() {
-          _myBinderItems = items;
+          _myBinderItems = items
+              .where((item) => item.availableQuantity > 0)
+              .toList(growable: false);
           _myBinderError = null;
         });
       } else {
@@ -116,6 +136,154 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     } finally {
       if (mounted) setState(() => _loadingMyBinder = false);
     }
+  }
+
+  Future<void> _restoreRequestedItem() async {
+    final itemId = widget.initialBinderItemId?.trim();
+    if (itemId == null || itemId.isEmpty || _loadingRequestedItem) return;
+
+    setState(() {
+      _loadingRequestedItem = true;
+      _requestedItemError = null;
+    });
+    final item = await context
+        .read<BinderProvider>()
+        .fetchPublicBinderItemDirect(userId: widget.receiverId, itemId: itemId);
+    if (!mounted) return;
+
+    setState(() {
+      _loadingRequestedItem = false;
+      if (item == null) {
+        _requestedItemError =
+            'A oferta não está mais pública ou disponível. Escolha outra cópia para continuar.';
+        return;
+      }
+      if (_requestedItems.every(
+        (selected) => selected.binderItem.id != item.id,
+      )) {
+        _requestedItems.add(_SelectedItem(binderItem: item, quantity: 1));
+      }
+    });
+  }
+
+  Future<void> _restoreCounterTrade() async {
+    final tradeId = widget.counterTradeId?.trim();
+    if (tradeId == null || tradeId.isEmpty || _loadingRequestedItem) return;
+
+    setState(() {
+      _loadingRequestedItem = true;
+      _requestedItemError = null;
+    });
+
+    final tradeProvider = context.read<TradeProvider>();
+    await tradeProvider.fetchTradeDetail(tradeId);
+    if (!mounted) return;
+
+    final sourceTrade = tradeProvider.selectedTrade;
+    if (sourceTrade == null || sourceTrade.id != tradeId) {
+      setState(() {
+        _loadingRequestedItem = false;
+        _requestedItemError =
+            'A proposta original não pôde ser reaberta. Você ainda pode montar uma nova proposta manualmente.';
+      });
+      return;
+    }
+    if (sourceTrade.status != 'pending' ||
+        sourceTrade.sender.id != widget.receiverId ||
+        sourceTrade.type != 'trade') {
+      setState(() {
+        _loadingRequestedItem = false;
+        _requestedItemError = sourceTrade.status != 'pending'
+            ? 'A proposta original já foi respondida e não aceita contraproposta.'
+            : 'A contraproposta automática está disponível para trocas puras entre os mesmos jogadores.';
+      });
+      return;
+    }
+
+    final resolvedMyItems = <_SelectedItem>[];
+    for (final originalItem in sourceTrade.myItems) {
+      final binderItem = _binderItemFromTradeSnapshot(originalItem);
+      if (binderItem == null) {
+        setState(() {
+          _loadingRequestedItem = false;
+          _requestedItemError =
+              'Um item histórico seu não pode ser revalidado. Monte a contraproposta manualmente.';
+        });
+        return;
+      }
+      resolvedMyItems.add(
+        _SelectedItem(binderItem: binderItem, quantity: originalItem.quantity),
+      );
+    }
+
+    final resolvedRequestedItems = <_SelectedItem>[];
+    for (final originalItem in sourceTrade.theirItems) {
+      final binderItem = _binderItemFromTradeSnapshot(originalItem);
+      if (binderItem == null) {
+        setState(() {
+          _loadingRequestedItem = false;
+          _requestedItemError =
+              'Um item histórico não pode ser revalidado. Escolha outra cópia para continuar.';
+        });
+        return;
+      }
+      resolvedRequestedItems.add(
+        _SelectedItem(binderItem: binderItem, quantity: originalItem.quantity),
+      );
+    }
+
+    if (resolvedMyItems.isEmpty || resolvedRequestedItems.isEmpty) {
+      setState(() {
+        _loadingRequestedItem = false;
+        _requestedItemError =
+            'A troca original não possui itens recuperáveis dos dois lados.';
+      });
+      return;
+    }
+
+    setState(() {
+      _type = 'trade';
+      _myItems
+        ..clear()
+        ..addAll(resolvedMyItems);
+      _requestedItems
+        ..clear()
+        ..addAll(resolvedRequestedItems);
+      _loadingRequestedItem = false;
+      _requestedItemError = null;
+    });
+  }
+
+  BinderItem? _binderItemFromTradeSnapshot(TradeItem item) {
+    final binderItemId = item.binderItemId.trim();
+    final cardId = item.card.id.trim();
+    if (binderItemId.isEmpty || cardId.isEmpty || item.quantity < 1) {
+      return null;
+    }
+    return BinderItem(
+      id: binderItemId,
+      cardId: cardId,
+      cardName: item.card.name,
+      cardImageUrl: item.card.imageUrl,
+      cardScryfallId: item.card.scryfallId,
+      cardOracleId: item.card.oracleId,
+      cardLayout: item.card.layout,
+      cardFaceImageUrls: item.card.faceImageUrls,
+      cardSetCode: item.card.setCode,
+      cardCollectorNumber: item.card.collectorNumber,
+      cardSetName: item.card.setName,
+      cardSetReleaseDate: item.card.setReleaseDate,
+      cardManaCost: item.card.manaCost,
+      cardRarity: item.card.rarity,
+      quantity: item.quantity,
+      availableQuantity: item.quantity,
+      condition: item.condition ?? 'NM',
+      isFoil: item.isFoil ?? false,
+      forTrade: true,
+      price: item.agreedPrice,
+      language: item.language ?? 'en',
+      listType: 'have',
+    );
   }
 
   Future<void> _submit() async {
@@ -143,7 +311,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     final confirmed = await _showProposalReviewDialog();
     if (!confirmed || !mounted) return;
 
-    setState(() => _isSubmitting = true);
+    setState(() {
+      _isSubmitting = true;
+      _submitError = null;
+    });
 
     try {
       final myItemsPayload = _usesOfferedItems
@@ -186,20 +357,33 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         paymentMethod: paymentAmount != null && paymentAmount > 0
             ? _paymentMethod
             : null,
+        counterToTradeId: widget.counterTradeId,
       );
 
       if (!mounted) return;
 
       if (ok) {
-        _showSnack('Proposta enviada com sucesso! 🎉', isError: false);
+        _showSnack(
+          widget.counterTradeId?.trim().isNotEmpty == true
+              ? 'Contraproposta enviada com sucesso.'
+              : 'Proposta enviada com sucesso! 🎉',
+          isError: false,
+        );
         Navigator.pop(context, true);
       } else {
         final err = FriendlyErrorMapper.fromException(
           context.read<TradeProvider>().errorMessage,
           context: FriendlyErrorContext.tradeCreate,
         );
-        _showSnack(err);
+        setState(() => _submitError = err);
       }
+    } catch (error) {
+      if (!mounted) return;
+      final err = FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.tradeCreate,
+      );
+      setState(() => _submitError = err);
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -392,19 +576,92 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   Widget _reviewItemLine(_SelectedItem selected) {
     final item = selected.binderItem;
-    final price = item.price != null
-        ? ' • R\$ ${(item.price! * selected.quantity).toStringAsFixed(2)}'
-        : '';
     final language = item.language.trim().isEmpty
-        ? 'idioma não informado'
-        : item.language;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppTheme.space6),
-      child: Text(
-        '${selected.quantity}x ${item.cardName} • ${item.condition} • $language$price',
-        style: const TextStyle(
-          color: AppTheme.textSecondary,
-          fontSize: AppTheme.fontSm,
+        ? 'Idioma não informado'
+        : item.language.toUpperCase();
+    return Semantics(
+      container: true,
+      label: [
+        '${selected.quantity} cópia de ${item.cardName}',
+        cardEditionFullLabel({
+          'set_code': item.cardSetCode,
+          'collector_number': item.cardCollectorNumber,
+          'set_name': item.cardSetName,
+          'set_release_date': item.cardSetReleaseDate,
+          'rarity': item.cardRarity,
+          'foil': item.isFoil,
+        }),
+        item.condition,
+        language,
+        if (item.price != null)
+          'R\$ ${(item.price! * selected.quantity).toStringAsFixed(2)}',
+      ].where((part) => part.trim().isNotEmpty).join(', '),
+      child: Padding(
+        key: Key('create-trade-review-item-${item.id}'),
+        padding: const EdgeInsets.only(bottom: AppTheme.space6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 44,
+              height: 61,
+              child: ExcludeSemantics(
+                child: CardArtwork(
+                  variant: CardArtworkVariant.gallery,
+                  imageUrl: item.cardPrintingImageUrl,
+                  fallbackImageUrl: item.cardFallbackImageUrl,
+                  semanticLabel: item.hasPrintingArtwork
+                      ? 'Arte da impressão ${item.cardName}'
+                      : 'Arte de referência de ${item.cardName}',
+                  constrainAspectRatio: false,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppTheme.space8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${selected.quantity}x ${item.cardName}',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space2),
+                  CardEditionMetadataLine(
+                    setCode: item.cardSetCode ?? '',
+                    collectorNumber: item.cardCollectorNumber,
+                    setName: item.cardSetName,
+                    setReleaseDate: item.cardSetReleaseDate,
+                    rarity: item.cardRarity,
+                    foil: item.isFoil,
+                    finishContext: CardFinishContext.physicalCopy,
+                    warning: item.hasPrintingArtwork
+                        ? null
+                        : 'Arte de referência',
+                  ),
+                  const SizedBox(height: AppTheme.space2),
+                  Text(
+                    [
+                      item.condition,
+                      language,
+                      if (item.price != null)
+                        'R\$ ${(item.price! * selected.quantity).toStringAsFixed(2)}',
+                    ].join(' • '),
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontXs,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -452,6 +709,11 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   bool get _usesPayment => _type == 'sale' || _type == 'mixed';
 
+  bool get _hasCompleteDraft =>
+      _requestedItems.isNotEmpty &&
+      (!_usesOfferedItems || _myItems.isNotEmpty) &&
+      (!_usesPayment || _effectivePaymentAmount > 0);
+
   double get _effectivePaymentAmount {
     if (!_usesPayment) return 0;
     final amount = _parsedPaymentAmount();
@@ -459,7 +721,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }
 
   void _changeType(String value) {
-    if (value == _type || !_supportedTypes.contains(value)) return;
+    if (value == _type || !supportedTradeProposalTypes.contains(value)) return;
     setState(() {
       if (value == 'trade') {
         _paymentCtrl.clear();
@@ -505,6 +767,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     }
 
     _showItemPicker(
+      keyPrefix: 'requested',
       title: 'Itens do outro jogador',
       items: available,
       onSelect: (item) {
@@ -532,6 +795,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     }
 
     _showItemPicker(
+      keyPrefix: 'offered',
       title: 'Meus itens para oferecer',
       items: available,
       onSelect: (item) {
@@ -543,6 +807,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }
 
   void _showItemPicker({
+    required String keyPrefix,
     required String title,
     required List<BinderItem> items,
     required ValueChanged<BinderItem> onSelect,
@@ -557,10 +822,21 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (ctx) {
+        final viewportHeight = MediaQuery.sizeOf(ctx).height;
+        final desiredHeight = (112.0 + (items.length * 76.0)).clamp(
+          196.0,
+          viewportHeight * 0.9,
+        );
+        final initialChildSize = (desiredHeight / viewportHeight).clamp(
+          0.18,
+          0.9,
+        );
+        final minChildSize = initialChildSize.clamp(0.18, 0.3);
         return DraggableScrollableSheet(
-          initialChildSize: 0.7,
+          key: Key('create-trade-item-picker-$keyPrefix'),
+          initialChildSize: initialChildSize,
           maxChildSize: 0.9,
-          minChildSize: 0.3,
+          minChildSize: minChildSize,
           expand: false,
           builder: (ctx2, scrollCtrl) {
             return Column(
@@ -600,12 +876,20 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     itemBuilder: (ctx3, i) {
                       final item = items[i];
                       return ListTile(
-                        leading: CachedCardImage(
-                          imageUrl: item.cardImageUrl,
+                        key: Key(
+                          'create-trade-picker-item-$keyPrefix-${item.id}',
+                        ),
+                        leading: SizedBox(
                           width: 36,
                           height: 50,
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusSm,
+                          child: CardArtwork(
+                            variant: CardArtworkVariant.gallery,
+                            imageUrl: item.cardPrintingImageUrl,
+                            fallbackImageUrl: item.cardFallbackImageUrl,
+                            semanticLabel: item.hasPrintingArtwork
+                                ? 'Arte da impressão ${item.cardName}'
+                                : 'Arte de referência de ${item.cardName}',
+                            constrainAspectRatio: false,
                           ),
                         ),
                         title: Text(
@@ -615,39 +899,61 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                             fontSize: AppTheme.fontMd,
                           ),
                         ),
-                        subtitle: Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              '×${item.quantity}',
-                              style: TextStyle(
-                                color: AppTheme.brass500,
-                                fontSize: AppTheme.fontSm,
-                              ),
+                            CardEditionMetadataLine(
+                              setCode: item.cardSetCode ?? '',
+                              collectorNumber: item.cardCollectorNumber,
+                              setName: item.cardSetName,
+                              setReleaseDate: item.cardSetReleaseDate,
+                              rarity: item.cardRarity,
+                              foil: item.isFoil,
+                              finishContext: CardFinishContext.physicalCopy,
+                              warning: item.hasPrintingArtwork
+                                  ? null
+                                  : 'Arte de referência',
                             ),
-                            Text(
-                              item.condition,
-                              style: TextStyle(
-                                color: AppTheme.conditionColor(item.condition),
-                                fontSize: AppTheme.fontSm,
-                              ),
-                            ),
-                            if (item.isFoil)
-                              const Icon(
-                                Icons.auto_awesome,
-                                size: 12,
-                                color: AppTheme.brass400,
-                              ),
-                            if (item.price != null)
-                              Text(
-                                'R\$ ${item.price!.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  color: AppTheme.brass400,
-                                  fontSize: AppTheme.fontSm,
+                            const SizedBox(height: AppTheme.space3),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  '×${item.quantity}',
+                                  style: const TextStyle(
+                                    color: AppTheme.brass500,
+                                    fontSize: AppTheme.fontSm,
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  item.condition,
+                                  style: TextStyle(
+                                    color: AppTheme.conditionColor(
+                                      item.condition,
+                                    ),
+                                    fontSize: AppTheme.fontSm,
+                                  ),
+                                ),
+                                Text(
+                                  item.language.toUpperCase(),
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: AppTheme.fontSm,
+                                  ),
+                                ),
+                                if (item.price != null)
+                                  Text(
+                                    'R\$ ${item.price!.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: AppTheme.brass400,
+                                      fontSize: AppTheme.fontSm,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ],
                         ),
                         trailing: const Icon(
@@ -688,6 +994,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               final requestPane = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (_hasOriginContext) ...[
+                    _buildOriginContextBanner(),
+                    const SizedBox(height: AppTheme.space20),
+                  ],
                   _sectionTitle('Tipo de Negociação'),
                   const SizedBox(height: AppTheme.space8),
                   _buildTypeSelector(),
@@ -738,6 +1048,132 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     );
   }
 
+  bool get _hasOriginContext =>
+      (widget.initialBinderItemId?.trim().isNotEmpty ?? false) ||
+      (widget.source?.trim().isNotEmpty ?? false) ||
+      (widget.counterTradeId?.trim().isNotEmpty ?? false);
+
+  Widget _buildOriginContextBanner() {
+    final item = _requestedItems.isEmpty
+        ? widget.preselectedItem
+        : _requestedItems.first.binderItem;
+    final sourceLabel = switch (widget.source) {
+      'deck_missing' => 'Carta faltante do seu deck',
+      'wishlist' => 'Match da sua wishlist',
+      'trade_match' => 'Match para sua coleção',
+      'profile' => 'Proposta iniciada pelo perfil',
+      'counter' => 'Contraproposta à negociação anterior',
+      _ => 'Oferta aberta no Marketplace',
+    };
+    final printing = <String>[
+      if ((item?.cardSetCode ?? '').trim().isNotEmpty)
+        item!.cardSetCode!.toUpperCase(),
+      if ((item?.cardCollectorNumber ?? '').trim().isNotEmpty)
+        '#${item!.cardCollectorNumber}',
+    ].join(' ');
+
+    final isCounter = widget.counterTradeId?.trim().isNotEmpty == true;
+    final status = _loadingRequestedItem
+        ? 'Confirmando a cópia pública e a disponibilidade atual…'
+        : _requestedItemError != null
+        ? _requestedItemError!
+        : isCounter && _requestedItems.isNotEmpty && _myItems.isNotEmpty
+        ? '${_myItems.length} ${_myItems.length == 1 ? 'item seu' : 'itens seus'} e '
+              '${_requestedItems.length} ${_requestedItems.length == 1 ? 'item pedido' : 'itens pedidos'} revalidados.'
+        : item == null
+        ? 'A identidade da cópia será confirmada antes de enviar.'
+        : <String>[
+            item.cardName,
+            if (printing.isNotEmpty) printing,
+            item.condition,
+            item.language.toUpperCase(),
+            '${item.availableQuantity} ${item.availableQuantity == 1 ? 'disponível' : 'disponíveis'}',
+          ].join(' • ');
+
+    return Container(
+      key: const Key('create-trade-origin-context'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.space14),
+      decoration: BoxDecoration(
+        color: AppTheme.brass400.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color:
+              (_requestedItemError == null
+                      ? AppTheme.brass400
+                      : AppTheme.warning)
+                  .withValues(alpha: 0.42),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            _requestedItemError == null
+                ? Icons.link_rounded
+                : Icons.link_off_rounded,
+            color: _requestedItemError == null
+                ? AppTheme.brass400
+                : AppTheme.warning,
+          ),
+          const SizedBox(width: AppTheme.space10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sourceLabel,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space4),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  child: Text(
+                    status,
+                    key: Key(
+                      _loadingRequestedItem
+                          ? 'create-trade-origin-loading'
+                          : _requestedItemError != null
+                          ? 'create-trade-origin-error'
+                          : 'create-trade-origin-ready',
+                    ),
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.space4),
+                const Text(
+                  'Só usamos os dados públicos necessários; preço e disponibilidade são reconfirmados pelo backend.',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontXs,
+                  ),
+                ),
+                if (_requestedItemError != null)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      key: const Key('create-trade-origin-retry'),
+                      onPressed: _loadingRequestedItem
+                          ? null
+                          : _restoreRequestedItem,
+                      child: const Text('Verificar novamente'),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTermsPane({required bool desktop}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -780,6 +1216,43 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         const SizedBox(height: AppTheme.space20),
         const TradeSafetyNotice(),
         const SizedBox(height: AppTheme.space24),
+        if (_submitError != null) ...[
+          Semantics(
+            liveRegion: true,
+            container: true,
+            child: Container(
+              key: const Key('create-trade-submit-error'),
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppTheme.space12),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color: AppTheme.error.withValues(alpha: 0.62),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.error_outline, color: AppTheme.error),
+                  const SizedBox(width: AppTheme.space8),
+                  Expanded(
+                    child: Text(
+                      _submitError!,
+                      style: const TextStyle(color: AppTheme.textPrimary),
+                    ),
+                  ),
+                  TextButton(
+                    key: const Key('create-trade-submit-retry'),
+                    onPressed: _isSubmitting ? null : _submit,
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppTheme.space12),
+        ],
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
@@ -830,7 +1303,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   Widget _buildSubmitButton() {
     return ElevatedButton.icon(
       key: const ValueKey('create-trade-submit-button'),
-      onPressed: _isSubmitting ? null : _submit,
+      onPressed: _isSubmitting || _loadingRequestedItem || !_hasCompleteDraft
+          ? null
+          : _submit,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppTheme.brass500,
         foregroundColor: AppTheme.backgroundAbyss,
@@ -840,6 +1315,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       ),
       icon: _isSubmitting
           ? const SizedBox(
+              key: Key('create-trade-submitting'),
               width: AppTheme.space20,
               height: AppTheme.space20,
               child: CircularProgressIndicator(
@@ -1086,6 +1562,9 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     Color accentColor,
   ) {
     final item = sel.binderItem;
+    final maxQuantity = keyPrefix == 'offered' && item.availableQuantity > 0
+        ? item.availableQuantity
+        : item.quantity;
     return Card(
       key: Key('create-trade-selected-item-$keyPrefix-$index'),
       margin: const EdgeInsets.only(bottom: AppTheme.space6),
@@ -1101,11 +1580,18 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         padding: const EdgeInsets.all(AppTheme.space8),
         child: Row(
           children: [
-            CachedCardImage(
-              imageUrl: item.cardImageUrl,
+            SizedBox(
               width: 36,
               height: 50,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              child: CardArtwork(
+                variant: CardArtworkVariant.gallery,
+                imageUrl: item.cardPrintingImageUrl,
+                fallbackImageUrl: item.cardFallbackImageUrl,
+                semanticLabel: item.hasPrintingArtwork
+                    ? 'Arte da impressão ${item.cardName}'
+                    : 'Arte de referência de ${item.cardName}',
+                constrainAspectRatio: false,
+              ),
             ),
             const SizedBox(width: AppTheme.space8),
             Expanded(
@@ -1123,6 +1609,19 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppTheme.space2),
+                  CardEditionMetadataLine(
+                    setCode: item.cardSetCode ?? '',
+                    collectorNumber: item.cardCollectorNumber,
+                    setName: item.cardSetName,
+                    setReleaseDate: item.cardSetReleaseDate,
+                    rarity: item.cardRarity,
+                    foil: item.isFoil,
+                    finishContext: CardFinishContext.physicalCopy,
+                    warning: item.hasPrintingArtwork
+                        ? null
+                        : 'Arte de referência',
+                  ),
+                  const SizedBox(height: AppTheme.space3),
                   Wrap(
                     spacing: 6,
                     runSpacing: 4,
@@ -1135,11 +1634,20 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                           fontSize: AppTheme.fontXs,
                         ),
                       ),
-                      if (item.isFoil)
-                        const Icon(
-                          Icons.auto_awesome,
-                          size: 10,
-                          color: AppTheme.brass400,
+                      Text(
+                        item.language.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontXs,
+                        ),
+                      ),
+                      if (keyPrefix == 'offered')
+                        Text(
+                          'Disponível $maxQuantity',
+                          style: const TextStyle(
+                            color: AppTheme.success,
+                            fontSize: AppTheme.fontXs,
+                          ),
                         ),
                       if (item.price != null)
                         Text(
@@ -1209,7 +1717,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                   ),
                   Semantics(
                     button: true,
-                    enabled: sel.quantity < item.quantity,
+                    enabled: sel.quantity < maxQuantity,
                     label: 'Aumentar quantidade da carta na troca',
                     child: Tooltip(
                       message: 'Aumentar quantidade',
@@ -1223,13 +1731,13 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusSm,
                           ),
-                          onTap: sel.quantity < item.quantity
+                          onTap: sel.quantity < maxQuantity
                               ? () => onQtyChange(index, sel.quantity + 1)
                               : null,
                           child: Icon(
                             Icons.add,
                             size: 16,
-                            color: sel.quantity < item.quantity
+                            color: sel.quantity < maxQuantity
                                 ? accentColor
                                 : AppTheme.textSecondary,
                           ),
@@ -1275,6 +1783,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         TextField(
           key: const Key('create-trade-payment-field'),
           controller: _paymentCtrl,
+          onChanged: (_) => setState(() {}),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           style: const TextStyle(color: AppTheme.textPrimary),
           decoration: InputDecoration(

@@ -10,6 +10,14 @@ import '../services/scryfall_image_request_policy.dart';
 import '../theme/app_theme.dart';
 import 'manaloom_glyph.dart';
 
+enum CardImageLoadState {
+  missing,
+  loading,
+  primaryReady,
+  fallbackReady,
+  failed,
+}
+
 /// Widget centralizado para exibir imagens de cartas MTG com cache local.
 ///
 /// Usa [CachedNetworkImage] internamente para:
@@ -46,6 +54,7 @@ class CachedCardImage extends StatelessWidget {
   final BorderRadius? borderRadius;
   final Widget? loadingPlaceholder;
   final Widget? errorPlaceholder;
+  final ValueChanged<CardImageLoadState>? onLoadStateChanged;
 
   const CachedCardImage({
     super.key,
@@ -54,11 +63,12 @@ class CachedCardImage extends StatelessWidget {
     this.networkImageKey,
     this.width,
     this.height,
-    this.fit = BoxFit.cover,
+    this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
     this.borderRadius,
     this.loadingPlaceholder,
     this.errorPlaceholder,
+    this.onLoadStateChanged,
   });
 
   @visibleForTesting
@@ -188,6 +198,7 @@ class CachedCardImage extends StatelessWidget {
         alignment: alignment,
         loadingWidget: _loadingWidget,
         errorWidget: _errorWidget,
+        onLoadStateChanged: _notifyLoadState,
       );
     }
 
@@ -203,6 +214,16 @@ class CachedCardImage extends StatelessWidget {
       memCacheHeight: decodeTarget.height,
       fadeInDuration: const Duration(milliseconds: 200),
       placeholder: (_, __) => _loadingWidget(),
+      imageBuilder: (_, provider) {
+        _notifyLoadState(CardImageLoadState.primaryReady);
+        return Image(
+          image: provider,
+          width: width,
+          height: height,
+          fit: fit,
+          alignment: alignment,
+        );
+      },
       errorWidget: (_, __, error) {
         debugPrint(
           '[🖼️ CachedCardImage] falha ao carregar $effectiveImageUrl -> $error',
@@ -219,6 +240,16 @@ class CachedCardImage extends StatelessWidget {
             memCacheHeight: decodeTarget.height,
             fadeInDuration: const Duration(milliseconds: 120),
             placeholder: (_, __) => _loadingWidget(),
+            imageBuilder: (_, provider) {
+              _notifyLoadState(CardImageLoadState.fallbackReady);
+              return Image(
+                image: provider,
+                width: width,
+                height: height,
+                fit: fit,
+                alignment: alignment,
+              );
+            },
             errorWidget: (_, __, ___) => _errorWidget(),
           );
         }
@@ -253,6 +284,7 @@ class CachedCardImage extends StatelessWidget {
 
   /// Placeholder estático quando não há URL (sem imagem para carregar)
   Widget _placeholder() {
+    _notifyLoadState(CardImageLoadState.missing);
     if (errorPlaceholder != null) {
       return SizedBox(width: width, height: height, child: errorPlaceholder);
     }
@@ -267,6 +299,7 @@ class CachedCardImage extends StatelessWidget {
 
   /// Placeholder enquanto a imagem está baixando (sem spinner para não parecer "loading" permanente)
   Widget _loadingWidget() {
+    _notifyLoadState(CardImageLoadState.loading);
     if (loadingPlaceholder != null) {
       return SizedBox(width: width, height: height, child: loadingPlaceholder);
     }
@@ -280,6 +313,7 @@ class CachedCardImage extends StatelessWidget {
   }
 
   Widget _errorWidget() {
+    _notifyLoadState(CardImageLoadState.failed);
     if (errorPlaceholder != null) {
       return SizedBox(width: width, height: height, child: errorPlaceholder);
     }
@@ -290,6 +324,12 @@ class CachedCardImage extends StatelessWidget {
       borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
       loading: false,
     );
+  }
+
+  void _notifyLoadState(CardImageLoadState state) {
+    final callback = onLoadStateChanged;
+    if (callback == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) => callback(state));
   }
 }
 
@@ -487,6 +527,7 @@ class _ScryfallWebCardImage extends StatefulWidget {
     required this.alignment,
     required this.loadingWidget,
     required this.errorWidget,
+    required this.onLoadStateChanged,
   });
 
   final String primaryUrl;
@@ -497,6 +538,7 @@ class _ScryfallWebCardImage extends StatefulWidget {
   final Alignment alignment;
   final Widget Function() loadingWidget;
   final Widget Function() errorWidget;
+  final ValueChanged<CardImageLoadState> onLoadStateChanged;
 
   @override
   State<_ScryfallWebCardImage> createState() => _ScryfallWebCardImageState();
@@ -646,9 +688,11 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
   @override
   Widget build(BuildContext context) {
     if (_terminalError) {
+      widget.onLoadStateChanged(CardImageLoadState.failed);
       return widget.errorWidget();
     }
     if (!_requestReady) {
+      widget.onLoadStateChanged(CardImageLoadState.loading);
       return widget.loadingWidget();
     }
 
@@ -665,7 +709,14 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
       alignment: widget.alignment,
       webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
       frameBuilder: (_, child, frame, wasSynchronouslyLoaded) {
-        if (wasSynchronouslyLoaded || frame != null) return child;
+        if (wasSynchronouslyLoaded || frame != null) {
+          widget.onLoadStateChanged(
+            _currentUrl == widget.primaryUrl
+                ? CardImageLoadState.primaryReady
+                : CardImageLoadState.fallbackReady,
+          );
+          return child;
+        }
         return widget.loadingWidget();
       },
       errorBuilder: (_, error, __) {

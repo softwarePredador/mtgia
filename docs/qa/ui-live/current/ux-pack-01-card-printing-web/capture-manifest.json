@@ -1,0 +1,39 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-03T21:13:49.561144Z",
+  "source_digest": "eef339fc6c7dfbdfd2079029e7fad0f3ba140fbf8acf7f2e1eae7ae244806ba8",
+  "surface": "authenticated_deck_detail_printing_picker_ux_audit",
+  "profile": "web_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "42d658021669f1e8490a704895d7e28f705521ffb5f2f2f4c4db4c4e0aeed456",
+  "checkpoint_count": 2,
+  "required_checkpoints": [
+    "card_search_printing_picker",
+    "card_search_printing_selected"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "card_search_printing_picker",
+      "path": "docs/qa/ui-live/current/ux-pack-01-card-printing-web/card_search_printing_picker.png",
+      "sha256": "60c1c71b7a7fee9f547edf0d7e92cc0880e4f9c0b8096797a9775f5a232970d7",
+      "bytes": 75052,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "card_search_printing_selected",
+      "path": "docs/qa/ui-live/current/ux-pack-01-card-printing-web/card_search_printing_selected.png",
+      "sha256": "a6eeb894fa6522ae9565d848f3d4d4aed7323769253bda0852c9891ab2cce2fa",
+      "bytes": 75732,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

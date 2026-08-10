@@ -11,6 +11,10 @@ import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/splash_screen.dart';
+import 'package:manaloom/features/cards/widgets/card_printing_picker.dart';
+import 'package:manaloom/features/decks/models/deck_card_item.dart';
+import 'package:manaloom/features/decks/providers/deck_provider_support.dart';
+import 'package:manaloom/features/decks/widgets/deck_optimize_dialogs.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/main.dart' as app;
@@ -32,6 +36,16 @@ const _auditUserId = String.fromEnvironment('MANALOOM_VISUAL_USER_ID');
 const _auditPeerUserId = String.fromEnvironment('MANALOOM_VISUAL_PEER_USER_ID');
 const _auditPeerUsername = String.fromEnvironment(
   'MANALOOM_VISUAL_PEER_USERNAME',
+);
+const _auditBinderItemId = String.fromEnvironment(
+  'MANALOOM_VISUAL_BINDER_ITEM_ID',
+);
+const _auditPeerBinderItemId = String.fromEnvironment(
+  'MANALOOM_VISUAL_PEER_BINDER_ITEM_ID',
+);
+const _auditTradeId = String.fromEnvironment('MANALOOM_VISUAL_TRADE_ID');
+const _auditFixtureImageUrl = String.fromEnvironment(
+  'MANALOOM_VISUAL_FIXTURE_IMAGE_URL',
 );
 const _auditResumeFrom = String.fromEnvironment('MANALOOM_VISUAL_RESUME_FROM');
 const _auditSegment = String.fromEnvironment(
@@ -71,6 +85,7 @@ const _supportedAuditSegments = <String>{
   'community',
   'profile_battle',
   'trades_commercial',
+  'ux_pack_01_completion',
 };
 
 const _supportedIsolatedCheckpoints = <String>{
@@ -78,6 +93,7 @@ const _supportedIsolatedCheckpoints = <String>{
   'deck_detail_below_fold',
   'card_search_empty',
   'card_search_results',
+  'card_search_printing_picker',
 };
 
 List<String> get _p0ProofCheckpoints => <String>[
@@ -136,6 +152,52 @@ List<String> get _p0ProofCheckpoints => <String>[
   'user_search_results',
   'verify_email_signed_out',
 ];
+
+List<String> get _focusedProofCheckpoints {
+  if (_auditCheckpoint == 'card_search_printing_picker') {
+    return const <String>[
+      'card_search_printing_picker',
+      'card_search_printing_selected',
+    ];
+  }
+  if (_auditCheckpoint.isNotEmpty) return <String>[_auditCheckpoint];
+  return switch (_auditSegment) {
+    'catalog' => <String>[
+      'post_game_empty',
+      'deck_generate_empty',
+      'deck_import_detected',
+      'collection_empty',
+      'sets_catalog',
+      'sets_catalog_route',
+      'latest_set',
+      'set_detail_tst',
+      'card_detail_success',
+      'card_detail_error',
+      'community_public_decks',
+      'community_tab_1',
+      'community_tab_2',
+      'community_tab_3',
+    ],
+    'community' => <String>[
+      'user_search_empty',
+      'user_search_results',
+      'user_profile_success',
+      'community_deck_success',
+    ],
+    'ux_pack_01_completion' => <String>[
+      'sample_hand_drawn',
+      'optimize_card_reader',
+      'binder_physical_identity',
+      'binder_editor_identity',
+      'binder_add_editor_identity',
+      'marketplace_physical_identity',
+      'trade_create_requested_identity',
+      'trade_create_offered_identity',
+      'trade_detail_items_identity',
+    ],
+    _ => const <String>[],
+  };
+}
 
 bool get _capturesBoot =>
     _auditSegment == 'all' || _auditSegment == 'auth_home';
@@ -245,7 +307,7 @@ void main() {
       reason:
           'MANALOOM_VISUAL_SEGMENT must be all, auth_home, decks, '
           'deck_list, deck_detail, catalog, social, community, '
-          'profile_battle or trades_commercial.',
+          'profile_battle, trades_commercial or ux_pack_01_completion.',
     );
     expect(
       _interactiveBattleEnabled,
@@ -254,11 +316,14 @@ void main() {
           'The P0 live matrix must compile the gated Battle Coach route so '
           'its welcome state and real Web focus can be audited.',
     );
-    if (_auditSegment == 'all') {
+    final proofCheckpoints = _auditSegment == 'all'
+        ? _p0ProofCheckpoints
+        : _focusedProofCheckpoints;
+    if (_auditSegment == 'all' || proofCheckpoints.isNotEmpty) {
       expect(
         _uiSourceDigest,
         matches(RegExp(r'^[0-9a-f]{64}$')),
-        reason: 'The full P0 proof must be bound to the current UI digest.',
+        reason: 'Runtime proof must be bound to the current UI digest.',
       );
       expect(_uiProofProfile, isNotEmpty);
       expect(const {
@@ -271,7 +336,7 @@ void main() {
       // indexed into a current manifest.
       // ignore: avoid_print
       print(
-        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'authenticated_p0_matrix', 'source_digest': _uiSourceDigest, 'profile': _uiProofProfile, 'runtime': 'flutter_drive', 'target': _uiProofTarget, 'device_contract': _uiProofDeviceContract, 'required_checkpoints': _p0ProofCheckpoints})}',
+        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': _auditSegment == 'all' ? 'authenticated_p0_matrix' : 'authenticated_${_auditSegment}_ux_audit', 'source_digest': _uiSourceDigest, 'profile': _uiProofProfile, 'runtime': 'flutter_drive', 'target': _uiProofTarget, 'device_contract': _uiProofDeviceContract, 'required_checkpoints': proofCheckpoints})}',
       );
     }
     expect(
@@ -281,8 +346,22 @@ void main() {
       isTrue,
       reason:
           'MANALOOM_VISUAL_CHECKPOINT is only supported with the deck_detail '
-          'segment and must identify one of its four runtime checkpoints.',
+          'segment and must identify one of its five runtime checkpoints.',
     );
+    if (_auditSegment == 'ux_pack_01_completion') {
+      expect(
+        <String>[
+          _auditBinderItemId,
+          _auditPeerBinderItemId,
+          _auditTradeId,
+          _auditFixtureImageUrl,
+        ],
+        everyElement(isNotEmpty),
+        reason:
+            'UX-PACK-01 runtime proof requires the disposable binder, trade '
+            'and local image fixture ids.',
+      );
+    }
     if (kIsWeb) {
       await binding.setSurfaceSize(
         Size(_auditWidth.toDouble(), _auditHeight.toDouble()),
@@ -515,6 +594,11 @@ void main() {
 
     if (_auditSegment == 'auth_home') return;
 
+    if (_auditSegment == 'ux_pack_01_completion') {
+      await _runUxPack01Completion(binding, tester);
+      return;
+    }
+
     if (_runsDeckList) {
       await _authenticateVisualUser(
         email: _auditEmptyEmail,
@@ -636,14 +720,16 @@ void main() {
       final runsCardSearch =
           _auditCheckpoint.isEmpty ||
           _auditCheckpoint == 'card_search_empty' ||
-          _auditCheckpoint == 'card_search_results';
+          _auditCheckpoint == 'card_search_results' ||
+          _auditCheckpoint == 'card_search_printing_picker';
       if (runsCardSearch) {
         await _goRoute(tester, '/decks/$_auditDeckId/search');
         await pumpUntilFound(
           tester,
           find.byKey(const Key('card-search-field')),
         );
-        if (_auditCheckpoint != 'card_search_results') {
+        if (_auditCheckpoint != 'card_search_results' &&
+            _auditCheckpoint != 'card_search_printing_picker') {
           await _captureDeckDetailRuntimeCheckpoint(
             binding,
             tester,
@@ -661,12 +747,48 @@ void main() {
           find.byKey(const Key('card-search-results-frame')),
           attempts: 120,
         );
-        await _captureDeckDetailRuntimeCheckpoint(
-          binding,
-          tester,
-          'card_search_results',
-        );
-        if (_auditCheckpoint == 'card_search_results') return;
+        if (_auditCheckpoint != 'card_search_printing_picker') {
+          await _captureDeckDetailRuntimeCheckpoint(
+            binding,
+            tester,
+            'card_search_results',
+          );
+          if (_auditCheckpoint == 'card_search_results') return;
+        }
+        if (_auditCheckpoint == 'card_search_printing_picker') {
+          await tester.tap(find.byTooltip('Escolher impressão'));
+          await pumpUntilFound(
+            tester,
+            find.byKey(const Key('card-printing-picker-options')),
+            attempts: 120,
+          );
+          final confirmation = find.byKey(
+            const Key('card-printing-picker-confirm'),
+          );
+          expect(confirmation, findsOneWidget);
+          expect(
+            tester.getRect(confirmation).bottom,
+            lessThanOrEqualTo(_auditHeight.toDouble()),
+          );
+          await _captureDeckDetailRuntimeCheckpoint(
+            binding,
+            tester,
+            'card_search_printing_picker',
+          );
+          await tester.tap(find.byType(CardPrintingOptionTile).last);
+          await tester.pumpAndSettle();
+          expect(find.text('T2S #777 selecionada'), findsOneWidget);
+          expect(
+            tester.widget<FilledButton>(confirmation).onPressed,
+            isNotNull,
+          );
+          await _captureDeckDetailRuntimeCheckpoint(
+            binding,
+            tester,
+            'card_search_printing_selected',
+          );
+          return;
+        }
       }
     }
 
@@ -693,11 +815,7 @@ void main() {
         tester,
         find.byKey(const Key('deck-import-screen-list-field')),
       );
-      await tester.enterText(
-        find.byKey(const Key('deck-import-screen-list-field')),
-        '1 Sol Ring',
-      );
-      await tester.pump(const Duration(milliseconds: 300));
+      await _prepareDeckImportDetectedState(tester);
       await _capture(binding, tester, 'deck_import_detected');
 
       await _goRoute(tester, '/collection?tab=0');
@@ -978,7 +1096,18 @@ Future<void> _capture(
   String name,
 ) async {
   await tester.pump(const Duration(milliseconds: 250));
-  await captureRuntimeCheckpoint(binding, tester, name);
+  await captureRuntimeCheckpoint(
+    binding,
+    tester,
+    name,
+    beforeTakeScreenshot: () async {
+      // A real Web release build can require more than one raster frame after
+      // convertFlutterSurfaceToImage. Without this, the first host PNG can be
+      // structurally valid but nearly black while later checkpoints are fine.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+    },
+  );
   await _assertClean(tester, name);
 }
 
@@ -1006,6 +1135,226 @@ Future<void> _captureDeckDetailRuntimeCheckpoint(
     return;
   }
   await _capture(binding, tester, name);
+}
+
+Future<void> _runUxPack01Completion(
+  IntegrationTestWidgetsFlutterBinding binding,
+  WidgetTester tester,
+) async {
+  await _goRoute(tester, '/decks/$_auditDeckId');
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('deck-overview-hero')),
+    attempts: 120,
+  );
+  // The Overview keeps the playtest below its diagnostics. Exercise that
+  // discoverable copy instead of depending on TabBarView offstage ordering.
+  final drawHand = find.byKey(const Key('sample-hand-draw')).first;
+  await pumpUntilFound(tester, drawHand);
+  await tester.ensureVisible(drawHand);
+  await tester.pump(const Duration(milliseconds: 250));
+  await tester.tap(drawHand);
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('sample-hand-focused-printing')),
+  );
+  // The draw expands below the original viewport. Frame the complete decision
+  // flow so the governed capture proves both the exact art and Keep/Mulligan,
+  // instead of preserving the pre-draw scroll offset and cutting the actions.
+  final keepHand = find.byKey(const Key('sample-hand-keep'));
+  await pumpUntilFound(tester, keepHand);
+  await tester.ensureVisible(keepHand);
+  await tester.pump(const Duration(milliseconds: 750));
+  await _capture(binding, tester, 'sample_hand_drawn');
+
+  final deckContext = tester.element(
+    find.byKey(const Key('sample-hand-focused-printing')),
+  );
+  unawaited(
+    showOptimizationPreviewDialog(
+      deckContext,
+      mode: 'optimize',
+      archetype: 'Controle de artefatos',
+      keepTheme: true,
+      preservedTheme: 'valor e interação',
+      reasoning:
+          'A troca preserva o plano do deck e torna a aceleração mais estável.',
+      intensity: OptimizeIntensity.focused,
+      optimizeIntensity: const <String, dynamic>{
+        'label': 'Equilibrado',
+        'target_swaps': <String, int>{'min': 1, 'max': 3},
+      },
+      qualityWarning: null,
+      deckAnalysis: const <String, dynamic>{
+        'average_cmc': 3.2,
+        'total_cards': 100,
+      },
+      postAnalysis: const <String, dynamic>{
+        'average_cmc': 3.1,
+        'total_cards': 100,
+      },
+      warnings: const <String, dynamic>{},
+      metaReferenceContext: const <String, dynamic>{
+        'label': 'Fixture UX isolada',
+      },
+      displayRemovals: const <Map<String, dynamic>>[
+        <String, dynamic>{
+          'card_id': 'visual-removal-wastes',
+          'name': 'Wastes',
+          'quantity': 1,
+          'reason': 'Abrir um espaço sem alterar a identidade de cor.',
+          'set_code': 'TST',
+          'collector_number': '184',
+          'set_name': 'S3-07 Visual Fixture Set',
+          'set_release_date': '2026-07-21',
+          'rarity': 'common',
+        },
+      ],
+      displayAdditions: <Map<String, dynamic>>[
+        <String, dynamic>{
+          'card_id': _auditCardId,
+          'name': 'Sol Ring',
+          'quantity': 1,
+          'reason': 'Aceleração reconhecível e verificável antes de aplicar.',
+          'set_code': 'TST',
+          'collector_number': '001',
+          'set_name': 'S3-07 Visual Fixture Set',
+          'set_release_date': '2026-07-21',
+          'rarity': 'uncommon',
+          'image_url': _auditFixtureImageUrl,
+        },
+      ],
+      loadCard: (_) async => DeckCardItem(
+        id: _auditCardId,
+        name: 'Sol Ring',
+        manaCost: '{1}',
+        typeLine: 'Artifact',
+        oracleText: '{T}: Add {C}{C}.',
+        imageUrl: _auditFixtureImageUrl,
+        setCode: 'TST',
+        setName: 'S3-07 Visual Fixture Set',
+        setReleaseDate: '2026-07-21',
+        rarity: 'uncommon',
+        quantity: 1,
+        isCommander: false,
+        collectorNumber: '001',
+      ),
+    ),
+  );
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('optimize-preview-dialog')),
+  );
+  final readerButton = find.byKey(
+    const Key('optimize-suggestion-add-0-preview-button'),
+  );
+  await tester.ensureVisible(readerButton);
+  await tester.tap(readerButton);
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('recommendation-reader-card-artwork')),
+  );
+  await tester.pump(const Duration(milliseconds: 750));
+  await _capture(binding, tester, 'optimize_card_reader');
+  await tester.tap(find.byTooltip('Fechar').last);
+  await tester.pumpAndSettle();
+  Navigator.of(
+    tester.element(find.byKey(const Key('optimize-preview-dialog'))),
+    rootNavigator: true,
+  ).pop();
+  await tester.pumpAndSettle();
+
+  await _goRoute(tester, '/collection?tab=0');
+  final binderCard = find.byKey(Key('binder-item-card-$_auditBinderItemId'));
+  await pumpUntilFound(tester, binderCard, attempts: 120);
+  await tester.pump(const Duration(milliseconds: 750));
+  await _capture(binding, tester, 'binder_physical_identity');
+  await tester.tap(binderCard);
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('binder-editor-save-button')),
+  );
+  await tester.pump(const Duration(milliseconds: 500));
+  await _capture(binding, tester, 'binder_editor_identity');
+  Navigator.of(
+    tester.element(find.byKey(const Key('binder-editor-save-button'))),
+    rootNavigator: true,
+  ).pop();
+  await tester.pumpAndSettle();
+
+  final addBinderCard = find.byKey(const Key('binder-add-card-action'));
+  await pumpUntilFound(tester, addBinderCard);
+  await tester.ensureVisible(addBinderCard);
+  await tester.tap(addBinderCard);
+  final binderSearchField = find.byKey(const Key('card-search-field'));
+  await pumpUntilFound(tester, binderSearchField, attempts: 120);
+  await _enterTextField(tester, binderSearchField, 'Sol Ring');
+  final binderSearchResult = find.byKey(
+    Key('card-search-result-$_auditCardId'),
+  );
+  await pumpUntilFound(tester, binderSearchResult, attempts: 120);
+  final addExactPrinting = find.byKey(Key('card-search-add-$_auditCardId'));
+  await tester.ensureVisible(addExactPrinting);
+  await tester.tap(addExactPrinting);
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('binder-editor-save-button')),
+    attempts: 120,
+  );
+  await tester.pump(const Duration(milliseconds: 750));
+  await _capture(binding, tester, 'binder_add_editor_identity');
+  Navigator.of(
+    tester.element(find.byKey(const Key('binder-editor-save-button'))),
+    rootNavigator: true,
+  ).pop();
+  await tester.pumpAndSettle();
+
+  await _goRoute(tester, '/collection?tab=1');
+  final marketCard = find.byKey(
+    Key('marketplace-item-card-$_auditPeerBinderItemId'),
+  );
+  await pumpUntilFound(tester, marketCard, attempts: 120);
+  await tester.pump(const Duration(milliseconds: 750));
+  await _capture(binding, tester, 'marketplace_physical_identity');
+
+  await _goRoute(tester, '/trades/create/$_auditPeerUserId');
+  await pumpUntilFound(
+    tester,
+    find.byKey(const Key('create-trade-content')),
+    attempts: 120,
+  );
+  final addRequested = find.byKey(const Key('create-trade-add-item-requested'));
+  await tester.ensureVisible(addRequested);
+  await tester.tap(addRequested);
+  await pumpUntilFound(tester, find.text('Itens do outro jogador'));
+  await tester.tap(find.text('Sol Ring').last);
+  final requestedCard = find.byKey(
+    const Key('create-trade-selected-item-requested-0'),
+  );
+  await pumpUntilFound(tester, requestedCard);
+  await tester.ensureVisible(requestedCard);
+  await tester.pump(const Duration(milliseconds: 500));
+  await _capture(binding, tester, 'trade_create_requested_identity');
+
+  final addOffered = find.byKey(const Key('create-trade-add-item-offered'));
+  await tester.ensureVisible(addOffered);
+  await tester.tap(addOffered);
+  await pumpUntilFound(tester, find.text('Meus itens para oferecer'));
+  await tester.tap(find.text('Sol Ring').last);
+  final offeredCard = find.byKey(
+    const Key('create-trade-selected-item-offered-0'),
+  );
+  await pumpUntilFound(tester, offeredCard);
+  await tester.ensureVisible(offeredCard);
+  await tester.pump(const Duration(milliseconds: 500));
+  await _capture(binding, tester, 'trade_create_offered_identity');
+
+  await _goRoute(tester, '/trades/$_auditTradeId');
+  final tradeItems = find.byKey(const Key('trade-detail-outgoing-items'));
+  await pumpUntilFound(tester, tradeItems, attempts: 120);
+  await tester.ensureVisible(tradeItems);
+  await tester.pump(const Duration(milliseconds: 750));
+  await _capture(binding, tester, 'trade_detail_items_identity');
 }
 
 Future<void> _tapMainDestination(WidgetTester tester, String label) async {
@@ -1049,6 +1398,58 @@ Future<void> _enterTextField(
   field.onChanged?.call(value);
   await tester.pump(const Duration(milliseconds: 120));
   expect(field.controller?.text, value);
+}
+
+Future<void> _prepareDeckImportDetectedState(WidgetTester tester) async {
+  const importedList = '1 Sol Ring';
+  const detectedLabel = '1 carta detectada';
+  final listField = find.byKey(const Key('deck-import-screen-list-field'));
+  final countStatus = find.byKey(const Key('deck-import-screen-count-status'));
+  final detectedText = find.descendant(
+    of: countStatus,
+    matching: find.text(detectedLabel),
+  );
+
+  // TextInput emulation can focus the real field without committing text on
+  // every host/device combination. Drive the same controller-backed path used
+  // by the other governed checkpoints and fail before capture if the promised
+  // state is not actually present in the widget tree.
+  await _enterTextField(tester, listField, importedList);
+  await pumpUntil(
+    tester,
+    () {
+      final field = tester.widget<TextField>(listField);
+      return field.controller?.text == importedList &&
+          finderExists(detectedText);
+    },
+    description: 'the deck import text and detected-card status',
+    attempts: 20,
+    step: const Duration(milliseconds: 100),
+  );
+
+  await tester.ensureVisible(countStatus);
+  await tester.pump(const Duration(milliseconds: 300));
+
+  final field = tester.widget<TextField>(listField);
+  expect(
+    field.controller?.text,
+    importedList,
+    reason: 'deck_import_detected must visibly retain the imported list',
+  );
+  expect(
+    detectedText,
+    findsOneWidget,
+    reason: 'deck_import_detected must prove the detected-card count',
+  );
+  final viewportHeight =
+      tester.view.physicalSize.height / tester.view.devicePixelRatio;
+  final statusRect = tester.getRect(countStatus);
+  expect(statusRect.top, greaterThanOrEqualTo(0));
+  expect(
+    statusRect.bottom,
+    lessThanOrEqualTo(viewportHeight),
+    reason: 'the detected-card status must be inside the captured viewport',
+  );
 }
 
 Future<bool> _scrollVerticalParentBy(

@@ -137,6 +137,45 @@ concessão, envio em progresso e terminal/replay. Rode:
 TalkBack físico e teclado Web real não são inferidos da revisão de imagem e
 continuam itens de release separados.
 
+### UX-PACK-08 — overlays e estados críticos
+
+A fonte executável deste recorte é a superfície `critical_overlays_states` em
+`app/test/ui/fixtures/ui_live_evidence_policy.json`. Cada linha abaixo liga
+estado, anchor, teste e política de mutation; o runtime é
+`app/integration_test/critical_overlays_states_runtime_proof_test.dart` e a
+captura é `scripts/manaloom_critical_overlays_states_visual_qa.sh`.
+
+| Checkpoint | Estado/decisão | Anchor estável | Teste automatizado | Mutation na fixture |
+|---|---|---|---|---|
+| `ux_pack08_00_profile_security_below_fold` | ações de segurança alcançáveis abaixo da dobra | `profile-change-password-button` | `profile_screen_test.dart` | read-only |
+| `ux_pack08_01_profile_avatar_dialog` | dialog de avatar aberto | `profile-avatar-dialog` | `profile_screen_test.dart` | cancelada |
+| `ux_pack08_02_profile_blocked_loading` | bloqueados carregando | `profile-blocked-users-loading` | `profile_screen_test.dart` | read-only |
+| `ux_pack08_03_profile_blocked_error_retry` | erro de bloqueados com retry | `profile-blocked-users-error` | `profile_screen_test.dart` | read-only |
+| `ux_pack08_04_profile_blocked_recovered` | lista recuperada | `profile-blocked-users-list` | `profile_screen_test.dart` | read-only |
+| `ux_pack08_05_profile_password_validation` | validação de troca de senha | `profile-change-password-dialog` | `profile_screen_test.dart` | somente validação |
+| `ux_pack08_06_profile_revoke_validation` | validação de revogação de sessões | `profile-revoke-sessions-dialog` | `profile_screen_test.dart` | somente validação |
+| `ux_pack08_07_profile_delete_validation` | validação de exclusão da conta | `profile-delete-account-dialog` | `profile_screen_test.dart` | somente validação |
+| `ux_pack08_08_deck_seeded_action_context` | deck e contexto antes da ação | `deck-options-<deckId>` | `deck_list_responsive_test.dart` | read-only |
+| `ux_pack08_09_deck_delete_action_menu` | ação destrutiva revelada | `deck-delete-menu-<deckId>` | `deck_list_responsive_test.dart` | read-only |
+| `ux_pack08_10_deck_delete_confirmation` | confirmação de exclusão aberta | `deck-delete-dialog-<deckId>` | `deck_list_responsive_test.dart` | cancelada |
+| `ux_pack08_11_deck_delete_cancelled` | deck preservado após cancelar | `deck-list-row-<deckId>` | `deck_list_responsive_test.dart` | cancelada |
+| `ux_pack08_12_commander_selection_recovered` | comandante recuperado | `deck-create-commander-selected` | `deck_list_responsive_test.dart` | read-only |
+| `ux_pack08_13_binder_printings_error_retry` | falha de edições com retry | `binder-editor-printings-error` | `binder_item_editor_validation_test.dart` | read-only |
+| `ux_pack08_14_binder_printings_recovered` | edições e identidade recuperadas | `binder-editor-printings-list` | `binder_item_editor_validation_test.dart` | read-only |
+| `ux_pack08_15_binder_delete_confirmation` | confirmação de remoção do Fichário | `binder-editor-delete-dialog` | `binder_item_editor_validation_test.dart` | cancelada |
+| `ux_pack08_16_binder_save_error` | erro preserva o editor | `binder-editor-save-error` | `binder_item_editor_validation_test.dart` | falha interceptada |
+| `ux_pack08_17_trade_item_picker` | picker de item aberto | `create-trade-item-picker-<side>` | `trade_confirmation_flow_test.dart` | read-only |
+| `ux_pack08_18_trade_review_exact_identity` | revisão com printing exata | `create-trade-review-item-<binderItemId>` | `trade_confirmation_flow_test.dart` | read-only |
+| `ux_pack08_19_trade_submit_error_retry` | erro preserva proposta e retry | `create-trade-submit-error` | `trade_confirmation_flow_test.dart` | falha interceptada |
+| `ux_pack08_20_session_expired` | contrato de sessão expirada | `critical-contract-state-panel` | `app_state_panel_test.dart` | estado sintético |
+| `ux_pack08_21_permission_denied` | contrato de permissão negada | `critical-contract-state-panel` | `app_state_panel_test.dart` | estado sintético |
+
+Os três perfis Web reais exigem `22/22` checkpoints cada, totalizando 66 PNGs.
+O Battle Coach mantém uma prova Android separada de nove checkpoints, incluindo
+confirmação, progresso e terminal de concessão; ela não recebe crédito visual
+focal do Pack 08 sem recaptura no runtime Android elegível. TalkBack humano e
+teclado Web de hardware continuam gates de release distintos.
+
 ## Matriz executável de estados — S3-02
 
 `app/test/ui/fixtures/ui_state_matrix.json` classifica, nos mesmos 18 domínios

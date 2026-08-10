@@ -2174,4 +2174,44 @@ void main() {
       expect(copied['success'], isTrue);
     },
   );
+
+  test(
+    'optimization history request parses reversible owner-visible events',
+    () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1/optimizations': () => ApiResponse(200, {
+            'events': [
+              {
+                'id': 'event-1',
+                'event_type': 'optimize_apply',
+                'selected_change_count': 2,
+                'removals': [
+                  {'card_id': 'old-1', 'name': 'Old Card'},
+                ],
+                'additions': [
+                  {'card_id': 'new-1', 'name': 'New Card'},
+                ],
+                'can_rollback': true,
+                'source_summary': {
+                  'post_analysis_source':
+                      'server_recomputed_from_persisted_selection',
+                },
+              },
+            ],
+          }),
+        },
+      );
+
+      final events = await fetchDeckOptimizationHistoryRequest(
+        apiClient,
+        deckId: 'deck-1',
+      );
+
+      expect(events, hasLength(1));
+      expect(events.single.id, 'event-1');
+      expect(events.single.pairCount, 1);
+      expect(events.single.canRollback, isTrue);
+    },
+  );
 }

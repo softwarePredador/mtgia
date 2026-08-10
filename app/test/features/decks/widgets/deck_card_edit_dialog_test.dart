@@ -33,25 +33,25 @@ void main() {
                       context: context,
                       card: card,
                       deckFormat: 'commander',
-                      loadPrintings:
-                          (_) async => [
-                            {
-                              'id': 'card-1',
-                              'set_code': 'TST',
-                              'set_name': 'Test Set',
-                              'set_release_date': '2026-01-01',
-                              'rarity': 'rare',
-                              'foil': false,
-                            },
-                          ],
-                      onSave: ({
-                        required selectedCardId,
-                        required quantity,
-                        required selectedCondition,
-                        required consolidateSameName,
-                      }) async {
-                        saveCalls++;
-                      },
+                      loadPrintings: (_) async => [
+                        {
+                          'id': 'card-1',
+                          'set_code': 'TST',
+                          'set_name': 'Test Set',
+                          'set_release_date': '2026-01-01',
+                          'rarity': 'rare',
+                          'foil': false,
+                        },
+                      ],
+                      onSave:
+                          ({
+                            required selectedCardId,
+                            required quantity,
+                            required selectedCondition,
+                            required consolidateSameName,
+                          }) async {
+                            saveCalls++;
+                          },
                     );
                   },
                   child: const Text('abrir'),
@@ -97,27 +97,27 @@ void main() {
                       context: context,
                       card: card,
                       deckFormat: 'commander',
-                      loadPrintings:
-                          (_) async => [
-                            {
-                              'id': 'card-1',
-                              'set_code': 'TST',
-                              'set_name': 'Test Set',
-                              'set_release_date': '2026-01-01',
-                              'rarity': 'rare',
-                              'foil': false,
-                            },
-                          ],
-                      onSave: ({
-                        required selectedCardId,
-                        required quantity,
-                        required selectedCondition,
-                        required consolidateSameName,
-                      }) async {
-                        savedQty = quantity;
-                        savedCardId = selectedCardId;
-                        savedConsolidate = consolidateSameName;
-                      },
+                      loadPrintings: (_) async => [
+                        {
+                          'id': 'card-1',
+                          'set_code': 'TST',
+                          'set_name': 'Test Set',
+                          'set_release_date': '2026-01-01',
+                          'rarity': 'rare',
+                          'foil': false,
+                        },
+                      ],
+                      onSave:
+                          ({
+                            required selectedCardId,
+                            required quantity,
+                            required selectedCondition,
+                            required consolidateSameName,
+                          }) async {
+                            savedQty = quantity;
+                            savedCardId = selectedCardId;
+                            savedConsolidate = consolidateSameName;
+                          },
                     );
                   },
                   child: const Text('abrir'),
@@ -132,7 +132,7 @@ void main() {
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Non-foil'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('Sem foil'), findsAtLeastNWidgets(1));
     expect(find.textContaining('Rare'), findsAtLeastNWidgets(1));
 
     await tester.enterText(
@@ -171,37 +171,37 @@ void main() {
                       context: context,
                       card: card,
                       deckFormat: 'commander',
-                      loadPrintings:
-                          (_) async => [
-                            {
-                              'id': 'card-1',
-                              'set_code': 'TST',
-                              'set_name': 'Test Set',
-                              'set_release_date': '2026-01-01',
-                              'collector_number': '42',
-                              'rarity': 'mythic',
-                              'foil': false,
-                            },
-                            {
-                              'id': 'card-2',
-                              'set_code': 'OTH',
-                              'set_name': 'Other Set',
-                              'set_release_date': '2025-01-01',
-                              'collector_number': '7',
-                              'rarity': 'mythic',
-                              'foil': false,
-                            },
-                          ],
-                      onSave: ({
-                        required selectedCardId,
-                        required quantity,
-                        required selectedCondition,
-                        required consolidateSameName,
-                      }) async {
-                        savedQty = quantity;
-                        savedCardId = selectedCardId;
-                        savedConsolidate = consolidateSameName;
-                      },
+                      loadPrintings: (_) async => [
+                        {
+                          'id': 'card-1',
+                          'set_code': 'TST',
+                          'set_name': 'Test Set',
+                          'set_release_date': '2026-01-01',
+                          'collector_number': '42',
+                          'rarity': 'mythic',
+                          'foil': false,
+                        },
+                        {
+                          'id': 'card-2',
+                          'set_code': 'OTH',
+                          'set_name': 'Other Set',
+                          'set_release_date': '2025-01-01',
+                          'collector_number': '7',
+                          'rarity': 'mythic',
+                          'foil': false,
+                        },
+                      ],
+                      onSave:
+                          ({
+                            required selectedCardId,
+                            required quantity,
+                            required selectedCondition,
+                            required consolidateSameName,
+                          }) async {
+                            savedQty = quantity;
+                            savedCardId = selectedCardId;
+                            savedConsolidate = consolidateSameName;
+                          },
                     );
                   },
                   child: const Text('abrir'),

@@ -122,6 +122,52 @@ void main() {
   );
 
   test(
+    'remote merge keeps locally resolved art for the same exact card',
+    () async {
+      final createdAt = DateTime.parse('2026-07-02T15:00:00Z');
+      const cardId = '11111111-1111-4111-8111-111111111111';
+      final local = PostGameNote.create(
+        deckId: 'deck-evidence-art',
+        result: 'vitória',
+        tableLevel: 'casual',
+        notes: '',
+        performedWellEvidence: const [
+          PostGameCardEvidence(
+            name: 'Sol Ring',
+            cardId: cardId,
+            imageUrl: 'https://cards.example/sol-ring.jpg',
+            setCode: 'cmm',
+            collectorNumber: '396',
+          ),
+        ],
+        createdAt: createdAt,
+      );
+      final remote = PostGameNote.create(
+        deckId: 'deck-evidence-art',
+        result: 'vitória sincronizada',
+        tableLevel: 'casual',
+        notes: '',
+        performedWellEvidence: const [
+          PostGameCardEvidence(name: 'Sol Ring', cardId: cardId),
+        ],
+        createdAt: createdAt,
+      );
+      await PostGameNoteStore().addNote(local);
+
+      final merged = await PostGameNoteStore(
+        remoteClient: _FakePostGameRemoteClient([remote]),
+      ).loadNotes(local.deckId);
+
+      expect(merged.single.result, 'vitória sincronizada');
+      expect(
+        merged.single.performedWellEvidence.single.imageUrl,
+        'https://cards.example/sol-ring.jpg',
+      );
+      expect(merged.single.performedWellEvidence.single.setCode, 'cmm');
+    },
+  );
+
+  test(
     'failed upsert stays queued and retries automatically on load',
     () async {
       final note = PostGameNote.create(

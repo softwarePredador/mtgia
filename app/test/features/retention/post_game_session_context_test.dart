@@ -93,8 +93,23 @@ void main() {
       find.byKey(const Key('post-game-life-counter-session')),
       findsOneWidget,
     );
-    expect(find.textContaining('1h 15min'), findsOneWidget);
-    expect(find.textContaining('versão aaaaaaaa'), findsOneWidget);
+    final sessionContext = find.byKey(
+      const Key('post-game-life-counter-session'),
+    );
+    expect(
+      find.descendant(
+        of: sessionContext,
+        matching: find.textContaining('1h 15min'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: sessionContext,
+        matching: find.textContaining('versão aaaaaaaa'),
+      ),
+      findsOneWidget,
+    );
 
     await tester.enterText(
       find.byKey(const Key('post-game-result-field')),

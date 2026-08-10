@@ -8,6 +8,10 @@ import '../../lib/logger.dart';
 import '../../lib/observability.dart';
 import '../../lib/request_trace.dart';
 
+final RegExp _uuidPattern = RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+);
+
 /// GET  /trades  → Listar trades do usuário
 /// POST /trades  → Criar proposta de trade
 Future<Response> onRequest(RequestContext context) async {
@@ -33,6 +37,7 @@ Future<Response> _createTrade(RequestContext context) async {
         (body['requested_items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     final paymentAmount = body['payment_amount'];
     final paymentMethod = body['payment_method'] as String?;
+    final counterToTradeId = body['counter_to_trade_id']?.toString().trim();
 
     // Validações básicas
     if (receiverId == null || receiverId.isEmpty) {
@@ -51,6 +56,23 @@ Future<Response> _createTrade(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {'error': 'Tipo inválido. Use: trade, sale, mixed'},
+      );
+    }
+    if (counterToTradeId != null &&
+        counterToTradeId.isNotEmpty &&
+        !_uuidPattern.hasMatch(counterToTradeId)) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': 'counter_to_trade_id inválido'},
+      );
+    }
+    if (counterToTradeId?.isNotEmpty == true && type != 'trade') {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error':
+              'Contraproposta automática está disponível apenas para troca pura',
+        },
       );
     }
     if (paymentMethod != null &&
@@ -233,6 +255,33 @@ Future<Response> _createTrade(RequestContext context) async {
         );
         if (activeUsers.length != 2) return null;
 
+        Map<String, dynamic>? counteredTrade;
+        if (counterToTradeId?.isNotEmpty == true) {
+          final counterResult = await session.execute(
+            Sql.named('''
+              SELECT id, sender_id, receiver_id, status, type
+              FROM trade_offers
+              WHERE id = CAST(@counterToTradeId AS uuid)
+              FOR UPDATE
+            '''),
+            parameters: {'counterToTradeId': counterToTradeId},
+          );
+          if (counterResult.isEmpty) {
+            return <String, dynamic>{'error': 'counter_trade_not_found'};
+          }
+          counteredTrade = counterResult.first.toColumnMap();
+          if (counteredTrade['receiver_id'].toString() != userId ||
+              counteredTrade['sender_id'].toString() != receiverId) {
+            return <String, dynamic>{'error': 'counter_trade_forbidden'};
+          }
+          if (counteredTrade['status'] != 'pending') {
+            return <String, dynamic>{'error': 'counter_trade_not_pending'};
+          }
+          if (counteredTrade['type'] != 'trade') {
+            return <String, dynamic>{'error': 'counter_trade_type_unsupported'};
+          }
+        }
+
         final interactionPolicy = await session.execute(
           Sql.named('''
             SELECT
@@ -262,6 +311,17 @@ Future<Response> _createTrade(RequestContext context) async {
         if (visibility == 'none' ||
             (visibility == 'followers' && policy['sender_follows'] != true)) {
           return <String, dynamic>{'error': 'trades_not_allowed'};
+        }
+
+        if (counteredTrade != null) {
+          await session.execute(
+            Sql.named('''
+              UPDATE trade_offers
+              SET status = 'declined', updated_at = CURRENT_TIMESTAMP
+              WHERE id = CAST(@counterToTradeId AS uuid)
+            '''),
+            parameters: {'counterToTradeId': counterToTradeId},
+          );
         }
 
         final binderItemIds =
@@ -312,53 +372,91 @@ Future<Response> _createTrade(RequestContext context) async {
           )
           RETURNING id, status, type, message, payment_amount, payment_currency, created_at
         ),
-        offering_items AS (
-          INSERT INTO trade_items (
-            trade_offer_id,
-            binder_item_id,
-            owner_id,
-            direction,
-            quantity,
-            agreed_price
-          )
+        requested_trade_items AS (
           SELECT
-            offer.id,
             item.binder_item_id,
-            @senderId,
-            'offering',
             item.quantity,
-            item.agreed_price
-          FROM offer
-          JOIN LATERAL jsonb_to_recordset(@myItems::jsonb) AS item(
+            item.agreed_price,
+            CAST(@senderId AS uuid) AS owner_id,
+            'offering'::text AS direction
+          FROM jsonb_to_recordset(@myItems::jsonb) AS item(
             binder_item_id uuid,
             quantity int,
             agreed_price numeric
-          ) ON TRUE
-          RETURNING 1
+          )
+          UNION ALL
+          SELECT
+            item.binder_item_id,
+            item.quantity,
+            item.agreed_price,
+            CAST(@receiverId AS uuid) AS owner_id,
+            'requesting'::text AS direction
+          FROM jsonb_to_recordset(@requestedItems::jsonb) AS item(
+            binder_item_id uuid,
+            quantity int,
+            agreed_price numeric
+          )
         ),
-        requesting_items AS (
+        captured_items AS (
           INSERT INTO trade_items (
             trade_offer_id,
             binder_item_id,
             owner_id,
             direction,
             quantity,
-            agreed_price
+            agreed_price,
+            snapshot_schema_version,
+            snapshot_status,
+            item_snapshot,
+            snapshot_captured_at
           )
           SELECT
             offer.id,
             item.binder_item_id,
-            @receiverId,
-            'requesting',
+            item.owner_id,
+            item.direction,
             item.quantity,
-            item.agreed_price
+            item.agreed_price,
+            'trade_item_snapshot_v1',
+            'captured',
+            jsonb_build_object(
+              'schema_version', 'trade_item_snapshot_v1',
+              'card', jsonb_strip_nulls(jsonb_build_object(
+                'id', card.id::text,
+                'scryfall_id', card.scryfall_id::text,
+                'oracle_id', card.oracle_id::text,
+                'name', card.name,
+                'image_url', card.image_url,
+                'layout', card.layout,
+                'card_faces', card.card_faces_json,
+                'set_code', card.set_code,
+                'collector_number', card.collector_number,
+                'set_name', canonical_set.name,
+                'set_release_date',
+                  TO_CHAR(canonical_set.release_date, 'YYYY-MM-DD'),
+                'mana_cost', card.mana_cost,
+                'type_line', card.type_line,
+                'rarity', card.rarity
+              )),
+              'physical', jsonb_build_object(
+                'condition', binder.condition,
+                'is_foil', binder.is_foil,
+                'language', binder.language
+              )
+            ),
+            CURRENT_TIMESTAMP
           FROM offer
-          JOIN LATERAL jsonb_to_recordset(@requestedItems::jsonb) AS item(
-            binder_item_id uuid,
-            quantity int,
-            agreed_price numeric
-          ) ON TRUE
-          RETURNING 1
+          JOIN requested_trade_items item ON TRUE
+          JOIN user_binder_items binder ON binder.id = item.binder_item_id
+          JOIN cards card ON card.id = binder.card_id
+          LEFT JOIN LATERAL (
+            SELECT set_row.name, set_row.release_date
+            FROM sets set_row
+            WHERE LOWER(set_row.code) = LOWER(card.set_code)
+            ORDER BY set_row.release_date DESC NULLS LAST, set_row.code
+            LIMIT 1
+          ) canonical_set ON TRUE
+          RETURNING direction
         ),
         history AS (
           INSERT INTO trade_status_history (
@@ -368,7 +466,7 @@ Future<Response> _createTrade(RequestContext context) async {
             changed_by,
             notes
           )
-          SELECT offer.id, NULL, 'pending', @senderId, 'Proposta criada'
+          SELECT offer.id, NULL, 'pending', @senderId, @historyNotes
           FROM offer
           RETURNING 1
         )
@@ -380,8 +478,16 @@ Future<Response> _createTrade(RequestContext context) async {
           offer.payment_amount,
           offer.payment_currency,
           offer.created_at,
-          (SELECT COUNT(*)::int FROM offering_items) AS my_items_count,
-          (SELECT COUNT(*)::int FROM requesting_items) AS requested_items_count
+          (
+            SELECT COUNT(*)::int
+            FROM captured_items
+            WHERE direction = 'offering'
+          ) AS my_items_count,
+          (
+            SELECT COUNT(*)::int
+            FROM captured_items
+            WHERE direction = 'requesting'
+          ) AS requested_items_count
         FROM offer, history
       '''),
           parameters: {
@@ -394,12 +500,61 @@ Future<Response> _createTrade(RequestContext context) async {
                     ? double.tryParse(paymentAmount.toString())
                     : null,
             'paymentMethod': paymentMethod,
+            'historyNotes':
+                counterToTradeId?.isNotEmpty == true
+                    ? 'Contraproposta da proposta $counterToTradeId'
+                    : 'Proposta criada',
             'myItems': jsonEncode(parsedMyItems.rows),
             'requestedItems': jsonEncode(parsedRequestedItems.rows),
           },
         );
         final offer = result.first.toColumnMap();
         final tradeId = offer['id'] as String;
+
+        if (counteredTrade != null) {
+          final counterMessage =
+              'Contraproposta enviada em uma nova negociação: $tradeId';
+          await session.execute(
+            Sql.named('''
+              INSERT INTO trade_status_history (
+                trade_offer_id,
+                old_status,
+                new_status,
+                changed_by,
+                notes
+              ) VALUES (
+                CAST(@counterToTradeId AS uuid),
+                'pending',
+                'declined',
+                CAST(@senderId AS uuid),
+                @counterMessage
+              )
+            '''),
+            parameters: {
+              'counterToTradeId': counterToTradeId,
+              'senderId': userId,
+              'counterMessage': counterMessage,
+            },
+          );
+          await session.execute(
+            Sql.named('''
+              INSERT INTO trade_messages (
+                trade_offer_id,
+                sender_id,
+                message
+              ) VALUES (
+                CAST(@counterToTradeId AS uuid),
+                CAST(@senderId AS uuid),
+                @counterMessage
+              )
+            '''),
+            parameters: {
+              'counterToTradeId': counterToTradeId,
+              'senderId': userId,
+              'counterMessage': counterMessage,
+            },
+          );
+        }
 
         if (offer['created_at'] is DateTime) {
           offer['created_at'] =
@@ -418,6 +573,8 @@ Future<Response> _createTrade(RequestContext context) async {
           'payment_currency': offer['payment_currency'],
           'my_items_count': offer['my_items_count'],
           'requested_items_count': offer['requested_items_count'],
+          if (counterToTradeId?.isNotEmpty == true)
+            'counter_to_trade_id': counterToTradeId,
           'created_at': offer['created_at'],
         };
       });
@@ -434,12 +591,25 @@ Future<Response> _createTrade(RequestContext context) async {
       );
     }
     if (tradeResult['error'] case final error?) {
+      final errorCode = error.toString();
+      final statusCode = switch (errorCode) {
+        'counter_trade_not_found' => HttpStatus.notFound,
+        'counter_trade_not_pending' ||
+        'counter_trade_type_unsupported' => HttpStatus.conflict,
+        _ => HttpStatus.forbidden,
+      };
+      final message = switch (errorCode) {
+        'counter_trade_not_found' => 'A proposta original não foi encontrada.',
+        'counter_trade_forbidden' =>
+          'Somente quem recebeu a proposta pode contrapropor.',
+        'counter_trade_not_pending' => 'A proposta original já foi respondida.',
+        'counter_trade_type_unsupported' =>
+          'Esta negociação não aceita contraproposta automática.',
+        _ => 'Este usuario nao aceita novas propostas.',
+      };
       return Response.json(
-        statusCode: HttpStatus.forbidden,
-        body: {
-          'error': error,
-          'message': 'Este usuario nao aceita novas propostas.',
-        },
+        statusCode: statusCode,
+        body: {'error': errorCode, 'message': message},
       );
     }
 
@@ -448,7 +618,11 @@ Future<Response> _createTrade(RequestContext context) async {
       actorUserId: userId,
       userId: receiverId,
       type: 'trade_offer_received',
-      titleBuilder: (senderName) => '$senderName enviou uma proposta de trade',
+      titleBuilder:
+          (senderName) =>
+              counterToTradeId?.isNotEmpty == true
+                  ? '$senderName enviou uma contraproposta de trade'
+                  : '$senderName enviou uma proposta de trade',
       body: message,
       referenceId: tradeResult['id'] as String?,
       endpoint: 'POST /trades',

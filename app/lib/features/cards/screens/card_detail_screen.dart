@@ -565,8 +565,8 @@ class CardDetailScreen extends StatelessWidget {
                 _detailRow(
                   theme,
                   icon: Icons.flare_rounded,
-                  label: 'Acabamento',
-                  value: cardFoilLabel(card.foil),
+                  label: 'Disponibilidade foil',
+                  value: cardCatalogFinishLabel(card.foil),
                 ),
                 _detailDivider(),
               ],

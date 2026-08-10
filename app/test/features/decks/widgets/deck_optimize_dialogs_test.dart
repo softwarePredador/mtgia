@@ -767,7 +767,12 @@ void main() {
     await tester.pumpAndSettle();
 
     final checkboxes = find.byType(Checkbox);
-    expect(checkboxes, findsNWidgets(4));
+    expect(checkboxes, findsNWidgets(2));
+    expect(find.byKey(const Key('optimize-paired-swap-list')), findsOneWidget);
+    expect(
+      find.byKey(const Key('optimize-paired-selection-explanation')),
+      findsOneWidget,
+    );
     expect(
       find.byKey(const Key('optimize-preview-partial-recompute-message')),
       findsNothing,
@@ -905,6 +910,9 @@ void main() {
         find.byKey(const Key('recommendation-hover-card-artwork')),
       );
       expect(artwork.imageUrl, contains('arcane-signet.jpg'));
+      expect(find.text('CMM #380'), findsOneWidget);
+      expect(find.text('Non-foil'), findsNothing);
+      expect(find.text('Arte de referência'), findsNothing);
 
       await mouse.moveTo(const Offset(8, 8));
       await tester.pump();
@@ -1067,11 +1075,13 @@ void main() {
       final artwork = tester.widget<CardArtwork>(
         find.byKey(const Key('recommendation-reader-card-artwork')),
       );
-      expect(artwork.imageUrl, contains('/cards/named'));
+      expect(artwork.imageUrl, isNull);
+      expect(artwork.fallbackImageUrl, contains('/cards/named'));
       expect(
-        Uri.parse(artwork.imageUrl!).queryParameters['exact'],
+        Uri.parse(artwork.fallbackImageUrl!).queryParameters['exact'],
         'The One Ring',
       );
+      expect(find.text('Arte de referência'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -1239,9 +1249,11 @@ DeckCardItem _previewCard() {
     imageUrl: 'https://cards.scryfall.io/normal/front/a/b/arcane-signet.jpg',
     setCode: 'cmm',
     setName: 'Commander Masters',
+    setReleaseDate: '2023-08-04',
     rarity: 'uncommon',
     quantity: 1,
     isCommander: false,
     collectorNumber: '380',
+    foil: false,
   );
 }

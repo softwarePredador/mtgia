@@ -41,6 +41,34 @@ class _SequenceBinderProvider extends BinderProvider {
   }
 }
 
+class _StatsBinderProvider extends _SequenceBinderProvider {
+  _StatsBinderProvider()
+    : super([
+        [
+          BinderItem(
+            id: 'binder-summary',
+            cardId: 'card-summary',
+            cardName: 'Sol Ring',
+          ),
+        ],
+      ]);
+
+  @override
+  BinderStats get stats => BinderStats(
+    totalItems: 24,
+    uniqueCards: 16,
+    duplicateCopies: 8,
+    forTradeCount: 4,
+    forSaleCount: 2,
+    wishlistCount: 3,
+    priceMissingCount: 5,
+    cardsUsedInDecks: 9,
+    ownedQuantity: 24,
+    allocatedQuantity: 8,
+    freeQuantity: 16,
+  );
+}
+
 class _ControlledBinderRequest {
   _ControlledBinderRequest({required this.page, required this.search});
 
@@ -80,7 +108,7 @@ class _ControlledBinderProvider extends BinderProvider {
   }
 }
 
-Widget _subject(_SequenceBinderProvider provider) {
+Widget _subject(BinderProvider provider) {
   return ChangeNotifierProvider<BinderProvider>.value(
     value: provider,
     child: MaterialApp(
@@ -109,6 +137,26 @@ BinderItem _item(int index) {
 }
 
 void main() {
+  testWidgets('compact binder makes summary and filter overflow explicit', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_subject(_StatsBinderProvider()));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('binder-stats-rail')), findsOneWidget);
+    expect(find.byKey(const Key('binder-stats-rail-hint')), findsOneWidget);
+    expect(find.byKey(const Key('binder-stats-rail-next')), findsOneWidget);
+    expect(find.byKey(const Key('binder-filters-rail')), findsOneWidget);
+    expect(find.byKey(const Key('binder-filters-rail-hint')), findsOneWidget);
+    expect(find.byKey(const Key('binder-filters-rail-next')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'binder distinguishes physical entry availability from playable total',
     (tester) async {
@@ -181,7 +229,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final list = find.byKey(const Key('binder-list-have'));
-      await tester.drag(list, const Offset(0, -1800));
+      await tester.drag(list, const Offset(0, -10000));
       await tester.pumpAndSettle();
 
       expect(
@@ -222,7 +270,7 @@ void main() {
 
       await tester.drag(
         find.byKey(const Key('binder-list-have')),
-        const Offset(0, -1800),
+        const Offset(0, -10000),
       );
       await tester.pump();
       expect(provider.requests, hasLength(2));

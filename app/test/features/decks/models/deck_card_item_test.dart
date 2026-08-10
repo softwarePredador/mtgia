@@ -131,6 +131,8 @@ void main() {
         isCommander: false,
       );
 
+      expect(card.printingImageUrl, 'https://cards.example/sol-ring.jpg');
+      expect(card.hasPrintingArtwork, isTrue);
       expect(card.effectiveImageUrl, 'https://cards.example/sol-ring.jpg');
       expect(
         card.fallbackImageUrl,
@@ -149,6 +151,8 @@ void main() {
         isCommander: false,
       );
 
+      expect(card.printingImageUrl, isNull);
+      expect(card.hasPrintingArtwork, isFalse);
       expect(
         card.effectiveImageUrl,
         'https://api.scryfall.com/cards/named?exact=Battlefield+Forge&format=image&version=normal',
@@ -157,6 +161,31 @@ void main() {
         card.fallbackImageUrl,
         'https://api.scryfall.com/cards/named?exact=Battlefield+Forge&format=image&version=normal',
       );
+    });
+
+    test('named e oracle image endpoints são apenas arte de referência', () {
+      final named = DeckCardItem(
+        id: 'printing-1',
+        oracleId: 'oracle-1',
+        name: 'Sol Ring',
+        typeLine: 'Artifact',
+        imageUrl:
+            'https://api.scryfall.com/cards/named?exact=Sol%20Ring&format=image',
+        setCode: 'cmm',
+        rarity: 'uncommon',
+        quantity: 1,
+        isCommander: false,
+      );
+      final oracleEndpoint = named.copyWith(
+        imageUrl:
+            'https://api.scryfall.com/cards/oracle-1?format=image&version=normal',
+      );
+
+      expect(named.printingImageUrl, isNull);
+      expect(named.hasPrintingArtwork, isFalse);
+      expect(oracleEndpoint.printingImageUrl, isNull);
+      expect(oracleEndpoint.hasPrintingArtwork, isFalse);
+      expect(named.effectiveImageUrl, contains('/cards/named'));
     });
 
     test('usa a face frontal quando a carta dupla não tem imagem raiz', () {
@@ -187,6 +216,11 @@ void main() {
         'Fable of the Mirror-Breaker',
         'Reflection of Kiki-Jiki',
       ]);
+      expect(
+        card.printingImageUrl,
+        'https://cards.scryfall.io/normal/front/dfc-1.jpg',
+      );
+      expect(card.hasPrintingArtwork, isTrue);
       expect(
         card.effectiveImageUrl,
         'https://cards.scryfall.io/normal/front/dfc-1.jpg',

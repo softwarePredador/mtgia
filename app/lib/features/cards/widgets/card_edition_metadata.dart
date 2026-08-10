@@ -9,9 +9,20 @@ String cardEditionCodeLabel({String? setCode, String? collectorNumber}) {
   return collector.isEmpty ? code : '$code #$collector';
 }
 
-String cardFoilLabel(bool? foil) {
+enum CardFinishContext { catalogPrinting, physicalCopy }
+
+/// Capacidade conhecida da impressão no catálogo.
+///
+/// Não descreve o acabamento de uma cópia possuída; essa informação pertence
+/// ao Binder e usa [cardPhysicalFinishLabel].
+String cardCatalogFinishLabel(bool? foil) {
   if (foil == null) return '';
-  return foil ? 'Foil' : 'Non-foil';
+  return foil ? 'Foil disponível' : 'Sem foil';
+}
+
+String cardPhysicalFinishLabel(bool? isFoil) {
+  if (isFoil == null) return '';
+  return isFoil ? 'Foil' : 'Non-foil';
 }
 
 String cardEditionDescription({
@@ -29,7 +40,7 @@ String cardEditionDescription({
     if ((setName ?? '').trim().isNotEmpty) setName!.trim(),
     if (releaseLabel.isNotEmpty) releaseLabel,
     if ((rarity ?? '').trim().isNotEmpty) _capitalize(rarity!.trim()),
-    if (cardFoilLabel(foil).isNotEmpty) cardFoilLabel(foil),
+    if (cardCatalogFinishLabel(foil).isNotEmpty) cardCatalogFinishLabel(foil),
   ];
   return parts.join(' • ');
 }
@@ -40,7 +51,7 @@ String cardEditionFullLabel(Map<String, dynamic> printing) {
       setCode: printing['set_code']?.toString(),
       collectorNumber: printing['collector_number']?.toString(),
     ),
-    cardFoilLabel(printing['foil'] as bool?),
+    cardCatalogFinishLabel(printing['foil'] as bool?),
     if ((printing['set_name'] ?? '').toString().trim().isNotEmpty)
       printing['set_name'].toString().trim(),
     if ((printing['rarity'] ?? '').toString().trim().isNotEmpty)
@@ -60,6 +71,7 @@ class CardEditionMetadataLine extends StatelessWidget {
     this.setReleaseDate,
     this.rarity,
     this.foil,
+    this.finishContext = CardFinishContext.catalogPrinting,
     this.warning,
   });
 
@@ -69,6 +81,7 @@ class CardEditionMetadataLine extends StatelessWidget {
   final String? setReleaseDate;
   final String? rarity;
   final bool? foil;
+  final CardFinishContext finishContext;
   final String? warning;
 
   @override
@@ -81,53 +94,39 @@ class CardEditionMetadataLine extends StatelessWidget {
       setName: setName,
       setReleaseDate: setReleaseDate,
       rarity: rarity,
-      foil: foil,
       releaseYearOnly: true,
     );
+    final finishLabel = switch (finishContext) {
+      CardFinishContext.catalogPrinting => cardCatalogFinishLabel(foil),
+      CardFinishContext.physicalCopy => cardPhysicalFinishLabel(foil),
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            if (codeLabel.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTheme.space6,
-                  vertical: AppTheme.space2,
-                ),
-                margin: const EdgeInsets.only(right: AppTheme.space6),
-                decoration: BoxDecoration(
-                  color: AppTheme.frost400.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                  border: Border.all(
-                    color: AppTheme.frost400.withValues(alpha: 0.36),
-                  ),
-                ),
-                child: Text(
-                  codeLabel,
-                  style: const TextStyle(
-                    fontSize: AppTheme.fontXs,
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.frost400,
-                    letterSpacing: 0.35,
-                  ),
-                ),
-              ),
-            Flexible(
-              child: Text(
-                description,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: AppTheme.fontSm,
-                ),
-              ),
+        if (codeLabel.isNotEmpty || finishLabel.isNotEmpty)
+          Wrap(
+            spacing: AppTheme.space6,
+            runSpacing: AppTheme.space3,
+            children: [
+              if (codeLabel.isNotEmpty) _CardEditionPill(label: codeLabel),
+              if (finishLabel.isNotEmpty) _CardEditionPill(label: finishLabel),
+            ],
+          ),
+        if (description.isNotEmpty) ...[
+          if (codeLabel.isNotEmpty || finishLabel.isNotEmpty)
+            const SizedBox(height: AppTheme.space3),
+          Text(
+            description,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontSm,
             ),
-          ],
-        ),
+          ),
+        ],
         if ((warning ?? '').isNotEmpty) ...[
           const SizedBox(height: AppTheme.space3),
           Text(
@@ -141,6 +140,36 @@ class CardEditionMetadataLine extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _CardEditionPill extends StatelessWidget {
+  const _CardEditionPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.space6,
+        vertical: AppTheme.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.frost400.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.36)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w800,
+          color: AppTheme.frost400,
+          letterSpacing: 0.35,
+        ),
+      ),
     );
   }
 }

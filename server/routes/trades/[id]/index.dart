@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/scryfall_image_url.dart';
 
 /// GET  /trades/:id           → Detalhe do trade
 /// PUT  /trades/:id           → (não usado diretamente, sub-rotas respond/status)
@@ -79,18 +80,74 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
     // Buscar items com dados da carta
     final itemsFuture = pool.execute(
       Sql.named('''
+      WITH canonical_sets AS (
+        SELECT DISTINCT ON (LOWER(code))
+          code,
+          name,
+          release_date
+        FROM sets
+        ORDER BY LOWER(code), release_date DESC NULLS LAST, code
+      )
       SELECT
         ti.id, ti.direction, ti.quantity, ti.agreed_price,
-        ti.owner_id, ti.binder_item_id,
-        bi.condition, bi.is_foil,
-        c.id as card_id, c.name as card_name, c.image_url as card_image_url,
-        c.set_code as card_set_code, c.mana_cost as card_mana_cost,
-        c.rarity as card_rarity
+        ti.owner_id, ti.binder_item_id, ti.snapshot_status,
+        COALESCE(
+          ti.item_snapshot #>> '{physical,condition}', bi.condition
+        ) AS condition,
+        COALESCE(
+          (ti.item_snapshot #>> '{physical,is_foil}')::boolean, bi.is_foil
+        ) AS is_foil,
+        COALESCE(
+          ti.item_snapshot #>> '{physical,language}', bi.language
+        ) AS language,
+        COALESCE(
+          ti.item_snapshot #>> '{card,id}', c.id::text
+        ) AS card_id,
+        COALESCE(
+          ti.item_snapshot #>> '{card,name}', c.name
+        ) AS card_name,
+        COALESCE(
+          ti.item_snapshot #>> '{card,image_url}', c.image_url
+        ) AS card_image_url,
+        COALESCE(
+          ti.item_snapshot #>> '{card,scryfall_id}', c.scryfall_id::text
+        ) AS card_scryfall_id,
+        COALESCE(
+          ti.item_snapshot #>> '{card,oracle_id}', c.oracle_id::text
+        ) AS card_oracle_id,
+        COALESCE(
+          ti.item_snapshot #>> '{card,layout}', c.layout
+        ) AS card_layout,
+        COALESCE(
+          ti.item_snapshot #> '{card,card_faces}', c.card_faces_json
+        ) AS card_faces,
+        COALESCE(
+          ti.item_snapshot #>> '{card,set_code}', c.set_code
+        ) AS card_set_code,
+        COALESCE(
+          ti.item_snapshot #>> '{card,mana_cost}', c.mana_cost
+        ) AS card_mana_cost,
+        COALESCE(
+          ti.item_snapshot #>> '{card,collector_number}', c.collector_number
+        ) AS card_collector_number,
+        COALESCE(
+          ti.item_snapshot #>> '{card,rarity}', c.rarity
+        ) AS card_rarity,
+        COALESCE(
+          ti.item_snapshot #>> '{card,set_name}', s.name
+        ) AS card_set_name,
+        COALESCE(
+          ti.item_snapshot #>> '{card,set_release_date}',
+          TO_CHAR(s.release_date, 'YYYY-MM-DD')
+        ) AS card_set_release_date
       FROM trade_items ti
-      JOIN user_binder_items bi ON bi.id = ti.binder_item_id
-      JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+      LEFT JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
       WHERE ti.trade_offer_id = @tradeId
-      ORDER BY ti.direction, c.name
+      ORDER BY
+        ti.direction,
+        COALESCE(ti.item_snapshot #>> '{card,name}', c.name, '')
     '''),
       parameters: {'tradeId': id},
     );
@@ -141,10 +198,21 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
 
     for (final row in itemsResult) {
       final m = row.toColumnMap();
+      final snapshotStatus =
+          m['snapshot_status']?.toString() ?? 'legacy_unavailable';
+      final hasCardIdentity =
+          (m['card_id']?.toString().trim().isNotEmpty ?? false) &&
+          (m['card_name']?.toString().trim().isNotEmpty ?? false);
+      final identityStatus =
+          snapshotStatus == 'legacy_unavailable'
+              ? (hasCardIdentity ? 'live_fallback' : 'unavailable')
+              : 'preserved';
       final item = {
         'id': m['id'],
         'binder_item_id': m['binder_item_id'],
         'direction': m['direction'],
+        'snapshot_status': snapshotStatus,
+        'identity_status': identityStatus,
         'quantity': m['quantity'],
         'agreed_price':
             m['agreed_price'] != null
@@ -152,11 +220,26 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
                 : null,
         'condition': m['condition'],
         'is_foil': m['is_foil'],
+        'language': m['language'],
         'card': {
-          'id': m['card_id'],
-          'name': m['card_name'],
-          'image_url': m['card_image_url'],
+          'id': m['card_id']?.toString() ?? '',
+          'name':
+              hasCardIdentity
+                  ? m['card_name']?.toString()
+                  : 'Carta histórica indisponível',
+          'image_url': normalizeScryfallImageUrl(
+            m['card_image_url']?.toString(),
+            printingId: m['card_scryfall_id']?.toString(),
+            oracleId: m['card_oracle_id']?.toString(),
+          ),
+          'scryfall_id': m['card_scryfall_id'],
+          'oracle_id': m['card_oracle_id'],
+          'layout': m['card_layout'],
+          'card_faces': m['card_faces'],
           'set_code': m['card_set_code'],
+          'collector_number': m['card_collector_number'],
+          'set_name': m['card_set_name'],
+          'set_release_date': m['card_set_release_date']?.toString(),
           'mana_cost': m['card_mana_cost'],
           'rarity': m['card_rarity'],
         },

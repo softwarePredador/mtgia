@@ -1,0 +1,39 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-03T21:13:51.015219Z",
+  "source_digest": "eef339fc6c7dfbdfd2079029e7fad0f3ba140fbf8acf7f2e1eae7ae244806ba8",
+  "surface": "authenticated_deck_detail_ux_audit",
+  "profile": "web_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Flutter surface requested at 390x844; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "79c303abcf5b202dbe7e00c440d9f91d8802c54d553a4f4467a970ad44bcef11",
+  "checkpoint_count": 2,
+  "required_checkpoints": [
+    "deck_detail_top",
+    "deck_detail_below_fold"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "deck_detail_below_fold",
+      "path": "docs/qa/ui-live/current/ux-pack-01-deck-detail-web/deck_detail_below_fold.png",
+      "sha256": "b5de8b45703ff5f21b58782b45f74f38fe7fc05e5d502a883ed361537a9ff707",
+      "bytes": 75539,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_detail_top",
+      "path": "docs/qa/ui-live/current/ux-pack-01-deck-detail-web/deck_detail_top.png",
+      "sha256": "181074d3ebc1f0c7ae8cff267474ff90aad4947b62f578d7c5e1af538ceba447",
+      "bytes": 118962,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

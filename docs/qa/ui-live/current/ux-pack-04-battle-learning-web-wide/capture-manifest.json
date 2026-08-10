@@ -1,0 +1,111 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-07T20:32:21.377485Z",
+  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "surface": "battle_learning",
+  "profile": "web_battle_learning_wide_1920x1080",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome real release build; Battle Learning controlled Flutter surface requested at 1920x1080; device metrics DPR 1; symmetric near-white host margins cropped by the driver when present",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "e26f4cda1f1d406c3b614ece2faf66788c0e278efb6410b3b863246d3407ea87",
+  "checkpoint_count": 10,
+  "required_checkpoints": [
+    "battle_learning_00_play_entry",
+    "battle_learning_01_active_session",
+    "battle_learning_02_live_table",
+    "battle_learning_03_reconnect",
+    "battle_learning_04_timeout",
+    "battle_learning_05_completed",
+    "battle_learning_06_replay_evidence",
+    "battle_learning_07_postgame_signals",
+    "battle_learning_08_postgame_receipt",
+    "battle_learning_09_optimize_evidence"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "battle_learning_00_play_entry",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_00_play_entry.png",
+      "sha256": "b6ce461e21a496d6dad6b5392043efa2572c7ab64a8898f36768c637b0698e48",
+      "bytes": 222330,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_01_active_session",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_01_active_session.png",
+      "sha256": "94b0de5d49ad166677c2927c889ad182933e32de717056485fca812cc8fdfec5",
+      "bytes": 233930,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_02_live_table",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_02_live_table.png",
+      "sha256": "7fffefa935cc0ec318670c3d2eb1d7cf91fff4dfab65f8a196a19b065318e5ed",
+      "bytes": 134469,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_03_reconnect",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_03_reconnect.png",
+      "sha256": "52d34a8edb63a8158d712850d84b681a82dee4dda91733a01a341cf552fe106f",
+      "bytes": 131278,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_04_timeout",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_04_timeout.png",
+      "sha256": "7da76dc3111df77ab79e76a8b64a85a4eeb79fad979a6427ba47efd384df3c46",
+      "bytes": 132801,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_05_completed",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_05_completed.png",
+      "sha256": "0bd5e671ae0e053d20af2a629e9dbc011cefd0753bd8af955baef2978478940f",
+      "bytes": 134652,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_06_replay_evidence",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_06_replay_evidence.png",
+      "sha256": "57d769a93ecfe7dae324c23e5cfac91af049f529087d4f35cf8150ab2e4015dd",
+      "bytes": 132012,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_07_postgame_signals",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_07_postgame_signals.png",
+      "sha256": "5cb155640baae816d47428a681467d712c48f1a57e1f57f34709b182bbf653ab",
+      "bytes": 222280,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_08_postgame_receipt",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_08_postgame_receipt.png",
+      "sha256": "c43fc0485e33ae0b5db6e4597b12ff9fb09ca3da9ec46367bcd5b0145fbb3167",
+      "bytes": 175484,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "checkpoint": "battle_learning_09_optimize_evidence",
+      "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/battle_learning_09_optimize_evidence.png",
+      "sha256": "8ca9fe1dc1883e458744ede993f052ab35c6a3cc2b81aab5d84d4af7179237fa",
+      "bytes": 127142,
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}

@@ -42,6 +42,83 @@ extension PostGameIssueLabel on PostGameIssue {
   }
 }
 
+/// A card signal selected from the exact deck revision used by the player.
+///
+/// Legacy post-game notes may only have [name]. New notes created by the app
+/// keep the exact printing [cardId] and its already-resolved artwork. The UI
+/// must never manufacture artwork from [name] when [cardId] is absent.
+class PostGameCardEvidence {
+  const PostGameCardEvidence({
+    required this.name,
+    this.cardId,
+    this.imageUrl,
+    this.setCode,
+    this.collectorNumber,
+    this.quantity = 1,
+    this.isCommander = false,
+  });
+
+  final String name;
+  final String? cardId;
+  final String? imageUrl;
+  final String? setCode;
+  final String? collectorNumber;
+  final int quantity;
+  final bool isCommander;
+
+  bool get hasExactIdentity => cardId != null && cardId!.trim().isNotEmpty;
+
+  factory PostGameCardEvidence.fromJson(Object? value) {
+    if (value is Map) {
+      final json = value.map((key, nested) => MapEntry(key.toString(), nested));
+      return PostGameCardEvidence(
+        name: _cleanText(json['name']) ?? _cleanText(json['card_name']) ?? '',
+        cardId: _cleanText(json['card_id']),
+        imageUrl: _cleanText(json['image_url']),
+        setCode: _cleanText(json['set_code']),
+        collectorNumber: _cleanText(json['collector_number']),
+        quantity: _positiveInt(json['quantity']) ?? 1,
+        isCommander: json['is_commander'] == true,
+      );
+    }
+    return PostGameCardEvidence(name: _cleanText(value) ?? '');
+  }
+
+  Object toJsonValue() {
+    if (!hasExactIdentity &&
+        imageUrl == null &&
+        setCode == null &&
+        collectorNumber == null &&
+        quantity == 1 &&
+        !isCommander) {
+      return name;
+    }
+    return <String, dynamic>{
+      'card_id': cardId,
+      'name': name,
+      if (imageUrl != null) 'image_url': imageUrl,
+      if (setCode != null) 'set_code': setCode,
+      if (collectorNumber != null) 'collector_number': collectorNumber,
+      'quantity': quantity,
+      if (isCommander) 'is_commander': true,
+    };
+  }
+
+  static String? _cleanText(Object? value) {
+    final normalized = value?.toString().trim();
+    return normalized == null || normalized.isEmpty ? null : normalized;
+  }
+
+  static int? _positiveInt(Object? value) {
+    final parsed = switch (value) {
+      int() => value,
+      num() => value.toInt(),
+      _ => int.tryParse(value?.toString() ?? ''),
+    };
+    return parsed == null || parsed < 1 ? null : parsed;
+  }
+}
+
 class PostGameNote {
   final String id;
   final String deckId;
@@ -49,14 +126,15 @@ class PostGameNote {
   final String result;
   final String tableLevel;
   final String notes;
-  final List<String> performedWell;
-  final List<String> underperformed;
+  final List<PostGameCardEvidence> performedWellEvidence;
+  final List<PostGameCardEvidence> underperformedEvidence;
   final List<PostGameIssue> issues;
   final String? playSessionId;
   final DateTime? sessionStartedAt;
   final DateTime? sessionEndedAt;
   final String? deckSnapshotHash;
   final DateTime? deckVersionAt;
+  final int revision;
 
   const PostGameNote({
     required this.id,
@@ -65,14 +143,15 @@ class PostGameNote {
     required this.result,
     required this.tableLevel,
     required this.notes,
-    this.performedWell = const <String>[],
-    this.underperformed = const <String>[],
+    this.performedWellEvidence = const <PostGameCardEvidence>[],
+    this.underperformedEvidence = const <PostGameCardEvidence>[],
     this.issues = const <PostGameIssue>[],
     this.playSessionId,
     this.sessionStartedAt,
     this.sessionEndedAt,
     this.deckSnapshotHash,
     this.deckVersionAt,
+    this.revision = 1,
   });
 
   factory PostGameNote.create({
@@ -82,6 +161,10 @@ class PostGameNote {
     required String notes,
     List<String> performedWell = const <String>[],
     List<String> underperformed = const <String>[],
+    List<PostGameCardEvidence> performedWellEvidence =
+        const <PostGameCardEvidence>[],
+    List<PostGameCardEvidence> underperformedEvidence =
+        const <PostGameCardEvidence>[],
     List<PostGameIssue> issues = const <PostGameIssue>[],
     String? playSessionId,
     DateTime? sessionStartedAt,
@@ -102,8 +185,18 @@ class PostGameNote {
       result: result.trim(),
       tableLevel: tableLevel.trim(),
       notes: notes.trim(),
-      performedWell: _cleanList(performedWell),
-      underperformed: _cleanList(underperformed),
+      performedWellEvidence: _cleanEvidence([
+        ...performedWellEvidence,
+        ..._cleanList(
+          performedWell,
+        ).map((name) => PostGameCardEvidence(name: name)),
+      ]),
+      underperformedEvidence: _cleanEvidence([
+        ...underperformedEvidence,
+        ..._cleanList(
+          underperformed,
+        ).map((name) => PostGameCardEvidence(name: name)),
+      ]),
       issues: List<PostGameIssue>.unmodifiable(issues),
       playSessionId: _cleanOptional(playSessionId),
       sessionStartedAt: _validSessionDate(sessionStartedAt),
@@ -131,8 +224,8 @@ class PostGameNote {
       result: json['result']?.toString() ?? '',
       tableLevel: json['table_level']?.toString() ?? '',
       notes: json['notes']?.toString() ?? '',
-      performedWell: _readStringList(json['performed_well']),
-      underperformed: _readStringList(json['underperformed']),
+      performedWellEvidence: _readEvidenceList(json['performed_well']),
+      underperformedEvidence: _readEvidenceList(json['underperformed']),
       issues: _readStringList(
         json['issues'],
       ).map(PostGameIssueLabel.fromId).toList(growable: false),
@@ -143,6 +236,7 @@ class PostGameNote {
           ? normalizedDeckSnapshotHash
           : null,
       deckVersionAt: hasCompleteDeckVersion ? normalizedDeckVersionAt : null,
+      revision: _positiveRevision(json['revision']),
     );
   }
 
@@ -154,9 +248,14 @@ class PostGameNote {
       'result': result,
       'table_level': tableLevel,
       'notes': notes,
-      'performed_well': performedWell,
-      'underperformed': underperformed,
+      'performed_well': performedWellEvidence
+          .map((card) => card.toJsonValue())
+          .toList(growable: false),
+      'underperformed': underperformedEvidence
+          .map((card) => card.toJsonValue())
+          .toList(growable: false),
       'issues': issues.map((issue) => issue.id).toList(),
+      'revision': revision,
       if (playSessionId != null) 'play_session_id': playSessionId,
       if (sessionStartedAt != null)
         'session_started_at': sessionStartedAt!.toIso8601String(),
@@ -177,6 +276,24 @@ class PostGameNote {
     return endedAt.difference(startedAt);
   }
 
+  List<String> get performedWell => performedWellEvidence
+      .map((card) => card.name)
+      .where((name) => name.isNotEmpty)
+      .toList(growable: false);
+
+  List<String> get underperformed => underperformedEvidence
+      .map((card) => card.name)
+      .where((name) => name.isNotEmpty)
+      .toList(growable: false);
+
+  String? get battleReplayId {
+    const prefix = 'battle-replay:';
+    final sessionId = playSessionId;
+    if (sessionId == null || !sessionId.startsWith(prefix)) return null;
+    final replayId = sessionId.substring(prefix.length).trim();
+    return replayId.isEmpty ? null : replayId;
+  }
+
   List<String> get automaticSuggestions {
     final lines = <String>[
       for (final issue in issues) issue.suggestion,
@@ -194,6 +311,33 @@ class PostGameNote {
         .where((value) => value.isNotEmpty)
         .toSet()
         .toList(growable: false);
+  }
+
+  static List<PostGameCardEvidence> _cleanEvidence(
+    Iterable<PostGameCardEvidence> values,
+  ) {
+    final byIdentity = <String, PostGameCardEvidence>{};
+    for (final value in values) {
+      final name = value.name.trim();
+      if (name.isEmpty) continue;
+      final cardId = _cleanOptional(value.cardId);
+      final key = cardId == null
+          ? 'name:${name.toLowerCase()}'
+          : 'id:${cardId.toLowerCase()}';
+      byIdentity.putIfAbsent(
+        key,
+        () => PostGameCardEvidence(
+          name: name,
+          cardId: cardId,
+          imageUrl: _cleanOptional(value.imageUrl),
+          setCode: _cleanOptional(value.setCode),
+          collectorNumber: _cleanOptional(value.collectorNumber),
+          quantity: value.quantity < 1 ? 1 : value.quantity,
+          isCommander: value.isCommander,
+        ),
+      );
+    }
+    return List<PostGameCardEvidence>.unmodifiable(byIdentity.values);
   }
 
   static String? _cleanOptional(String? value) {
@@ -223,6 +367,20 @@ class PostGameNote {
         .map((entry) => entry.toString().trim())
         .where((entry) => entry.isNotEmpty)
         .toList(growable: false);
+  }
+
+  static List<PostGameCardEvidence> _readEvidenceList(Object? value) {
+    if (value is! List) return const <PostGameCardEvidence>[];
+    return _cleanEvidence(value.map(PostGameCardEvidence.fromJson));
+  }
+
+  static int _positiveRevision(Object? value) {
+    final parsed = switch (value) {
+      int() => value,
+      num() => value.toInt(),
+      _ => int.tryParse(value?.toString() ?? ''),
+    };
+    return parsed == null || parsed < 1 ? 1 : parsed;
   }
 }
 

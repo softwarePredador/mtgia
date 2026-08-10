@@ -518,6 +518,45 @@ void main() {
     expect(find.text('Adicionar Cartas'), findsNothing);
   });
 
+  testWidgets('DeckDetailsScreen keeps the full overview tab label on mobile', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final apiClient = _FakeApiClient(
+      getHandlers: {
+        '/decks/deck-1': () => ApiResponse(
+          200,
+          _buildDeckDetailsJson(
+            {'spell-1': 1, 'land-1': 36},
+            deckId: 'deck-1',
+            name: 'Talrand compacto',
+          ),
+        ),
+      },
+    );
+
+    final provider = DeckProvider(apiClient: apiClient);
+    await _pumpScreen(tester, apiClient: apiClient, provider: provider);
+    await tester.pumpAndSettle();
+
+    final tabBar = tester.widget<TabBar>(
+      find.byKey(const Key('deck-details-tab-bar')),
+    );
+    final overviewLabel = find.text('Visão Geral');
+    final overviewRect = tester.getRect(overviewLabel);
+
+    expect(tabBar.isScrollable, isTrue);
+    expect(overviewLabel, findsOneWidget);
+    expect(overviewRect.left, greaterThanOrEqualTo(0));
+    expect(overviewRect.right, lessThanOrEqualTo(390));
+    expect(find.text('Visão Ge'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'DeckDetailsScreen keeps overview actions reachable at 844x390 landscape',
     (tester) async {

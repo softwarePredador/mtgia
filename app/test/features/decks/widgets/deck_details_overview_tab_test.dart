@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/card_artwork.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/widgets/deck_details_aux_widgets.dart';
@@ -375,15 +376,23 @@ void main() {
       tester.getSize(find.byKey(const Key('deck-overview-hero'))).width,
       lessThanOrEqualTo(AppTheme.contentMaxWidth),
     );
+    final heroArt = tester.widget<CardArtwork>(
+      find.descendant(
+        of: find.byKey(const Key('deck-overview-hero-art-frame')),
+        matching: find.byType(CardArtwork),
+      ),
+    );
+    expect(heroArt.variant, CardArtworkVariant.fullCard);
+    expect(heroArt.imageUrl, contains('/normal/'));
+    expect(heroArt.imageUrl, isNot(contains('art_crop')));
+    expect(heroArt.showStatusBadge, isFalse);
 
-    final primaryLeft =
-        tester
-            .getTopLeft(find.byKey(const Key('deck-overview-primary-pane')))
-            .dx;
-    final inspectorLeft =
-        tester
-            .getTopLeft(find.byKey(const Key('deck-overview-inspector-pane')))
-            .dx;
+    final primaryLeft = tester
+        .getTopLeft(find.byKey(const Key('deck-overview-primary-pane')))
+        .dx;
+    final inspectorLeft = tester
+        .getTopLeft(find.byKey(const Key('deck-overview-inspector-pane')))
+        .dx;
     expect(primaryLeft, lessThan(inspectorLeft));
   });
 

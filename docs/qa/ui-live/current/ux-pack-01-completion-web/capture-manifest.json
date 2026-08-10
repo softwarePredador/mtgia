@@ -1,0 +1,157 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-05T11:49:59.567500Z",
+  "source_digest": "6efb9f15642856061840d8edc86d97fa81e916174e3dcd8cc4fce4550d73a9b6",
+  "surface": "authenticated_ux_pack_01_completion_ux_audit",
+  "profile": "web_mobile_390x844",
+  "runtime": "flutter_drive",
+  "target": "web_real_build",
+  "device_contract": "Chrome 150.0.7871.188 real release build; Flutter surface 390x844; device metrics DPR 1",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "visual_review": {
+    "status": "PASS_VISUAL_REVIEWED",
+    "reviewed_at": "2026-08-05T11:50:39Z",
+    "reviewed_all_captures": true,
+    "reviewer": {
+      "kind": "agent",
+      "name": "Codex /root"
+    },
+    "visual_thesis": "Obsidian e slate preservam a mesa escura; Frost identifica metadados verificáveis da impressão e Brass fica reservado para escolha, valor e ação.",
+    "content_plan": "A pessoa reconhece a arte e o nome, confirma set e collector, escolhe explicitamente a edição, registra condição, idioma e foil, verifica disponibilidade e só então salva ou negocia.",
+    "interaction_thesis": "A Busca entrega uma impressão explícita ao editor sem substituição silenciosa; Keep/Mulligan continua humano e a troca diferencia com clareza o que a pessoa entrega e recebe.",
+    "scope_limit": "Aprovação focal do build Web mobile 390x844; não concede aprovação global, Android físico, TalkBack humano, teclado Web real ou release.",
+    "criteria": {
+      "visual_hierarchy": {
+        "status": "pass",
+        "note": "Arte, nome, edição, estado físico e ação seguem ordem consistente nos nove checkpoints."
+      },
+      "brand_and_mtg_identity": {
+        "status": "pass",
+        "note": "A carta e suas impressões são reconhecíveis; Obsidian, Frost e Brass permanecem coerentes com ManaLoom."
+      },
+      "color_and_contrast": {
+        "status": "pass",
+        "note": "Texto, chips, seleção e ações mantêm contraste legível no tema escuro."
+      },
+      "typography": {
+        "status": "pass",
+        "note": "Títulos, metadados e instruções têm pesos e tamanhos distinguíveis em 390x844."
+      },
+      "spacing_and_density": {
+        "status": "pass",
+        "note": "O novo editor de adição acomoda arte, duas edições e identidade física sem overflow; as demais superfícies continuam escaneáveis."
+      },
+      "responsive_fit": {
+        "status": "pass",
+        "note": "Os nove checkpoints cabem no viewport Web mobile governado e preservam sua decisão focal."
+      },
+      "interaction_clarity": {
+        "status": "pass",
+        "note": "A edição recebida já aparece selecionada, alternativas são explícitas e salvar ou enviar proposta mantém prioridade clara."
+      },
+      "state_coverage": {
+        "status": "pass",
+        "note": "A revisão cobre criação e edição do Binder, mão, Optimize, Marketplace, seleção bilateral e detalhe de Trade."
+      },
+      "accessibility_visual": {
+        "status": "pass",
+        "note": "Seleção, acabamento, condição e direção da troca aparecem em texto e não dependem apenas de cor."
+      },
+      "attractiveness": {
+        "status": "pass",
+        "note": "A arte ancora reconhecimento, enquanto metadados e ações permanecem úteis sem aspecto de formulário genérico."
+      }
+    }
+  },
+  "log_sha256": "70041171b68c2ddbcb543e2e36b38624a2f3a814a9cc5a2d6a9b2d3023ac5198",
+  "checkpoint_count": 9,
+  "required_checkpoints": [
+    "binder_add_editor_identity",
+    "binder_editor_identity",
+    "binder_physical_identity",
+    "marketplace_physical_identity",
+    "optimize_card_reader",
+    "sample_hand_drawn",
+    "trade_create_offered_identity",
+    "trade_create_requested_identity",
+    "trade_detail_items_identity"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "binder_add_editor_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/binder_add_editor_identity.png",
+      "sha256": "900d6be8f248ef459fc4c07072b93cd427944c39dfd999cecebb467a7e3cc8d3",
+      "bytes": 117845,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "binder_editor_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/binder_editor_identity.png",
+      "sha256": "1fa05b370c16824196267a5b582efd1ebcd3fa0b7ce8fc9a2685ca084c47efce",
+      "bytes": 113366,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "binder_physical_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/binder_physical_identity.png",
+      "sha256": "43e173d9b3c6115b7957b288a6693d756342534c856f5ae2489963e0484aa03b",
+      "bytes": 50400,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "marketplace_physical_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/marketplace_physical_identity.png",
+      "sha256": "27e77e9cff08be80cf25996194c8f33997cc93e3aa880a9554d3062fb03daa76",
+      "bytes": 73540,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "optimize_card_reader",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/optimize_card_reader.png",
+      "sha256": "e9bd3e43a1e060dc9d2442a0ac9cecc50c02193d059db6c698eba0b333386cee",
+      "bytes": 282416,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "sample_hand_drawn",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/sample_hand_drawn.png",
+      "sha256": "601dc77a709c384a34583921558cee96931048a806b7f495c4da9b3a0560973e",
+      "bytes": 79837,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "trade_create_offered_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/trade_create_offered_identity.png",
+      "sha256": "e5874e8dc2da0af3b96848a6bd65bda0903cd4823c157a5aa9a81255abb74fc9",
+      "bytes": 60320,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "trade_create_requested_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/trade_create_requested_identity.png",
+      "sha256": "32f9b263799129f28c1d072718fc4a18baa9f684a4a314d2b68098163e17adc6",
+      "bytes": 53836,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "trade_detail_items_identity",
+      "path": "docs/qa/ui-live/current/ux-pack-01-completion-web/trade_detail_items_identity.png",
+      "sha256": "f08c5e58d7880c19823ca4d40a188152f0b7acafe4db8031c666cfb58e744840",
+      "bytes": 73295,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

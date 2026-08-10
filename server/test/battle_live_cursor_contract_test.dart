@@ -17,6 +17,7 @@ void main() {
               'event_type': 'spell_cast',
               'turn': 2,
               'actor_side': 'deck_a',
+              'card_id': '11111111-1111-4111-8111-111111111111',
               'card_name': 'Library of Alexandria',
               'message':
                   'Library of Alexandria is public; hand, options and '
@@ -51,6 +52,24 @@ void main() {
                   'life': 38,
                   'hand_size': 6,
                   'library_size': 91,
+                  'battlefield': [
+                    {
+                      'object_id': 'permanent-1',
+                      'card_id': '22222222-2222-4222-8222-222222222222',
+                      'name': 'Arcane Signet',
+                      'tapped': false,
+                    },
+                  ],
+                  'graveyard': [
+                    {'name': 'Public Graveyard Card'},
+                  ],
+                  'exile': <Map<String, dynamic>>[],
+                  'command': [
+                    {
+                      'card_id': '33333333-3333-4333-8333-333333333333',
+                      'name': 'Public Commander',
+                    },
+                  ],
                   'hand': ['Secret Hand Card'],
                   'library': ['Hidden Library Card'],
                   'available_options': ['Private option'],
@@ -60,6 +79,7 @@ void main() {
               'stack': [
                 {
                   'object_id': 'stack-1',
+                  'card_id': '44444444-4444-4444-8444-444444444444',
                   'name': 'Lightning Bolt',
                   'controller_side': 'deck_a',
                   'options': ['Private option'],
@@ -118,6 +138,7 @@ void main() {
       expect(event['schema_version'], battleLiveCursorSchemaVersion);
       expect(event['cursor'], startsWith('blc1.'));
       expect(eventPayload['card_name'], 'Library of Alexandria');
+      expect(eventPayload['card_id'], '11111111-1111-4111-8111-111111111111');
       expect(
         eventPayload['message'],
         'Library of Alexandria is public; hand, options and '
@@ -130,6 +151,14 @@ void main() {
       });
       expect(player['hand_size'], 6);
       expect(player['library_size'], 91);
+      expect(
+        ((player['battlefield'] as List).single as Map)['card_id'],
+        '22222222-2222-4222-8222-222222222222',
+      );
+      expect(
+        ((player['command'] as List).single as Map)['name'],
+        'Public Commander',
+      );
       expect(
         (snapshotPayload['stack'] as List).single,
         containsPair('name', 'Lightning Bolt'),

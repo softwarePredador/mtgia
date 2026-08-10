@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import 'scryfall_image_url.dart';
 import 'social_safety_service.dart';
 
 class CommunityEngagementService {
@@ -192,48 +193,68 @@ class CommunityEngagementService {
     final wantedSql =
         includeDeckMissing
             ? '''
-          WITH owned AS (
-            SELECT card_id, COALESCE(SUM(quantity), 0)::int AS owned_quantity
-            FROM user_binder_items
-            WHERE user_id = CAST(@userId AS uuid)
-              AND list_type = 'have'
-            GROUP BY card_id
-          ),
-          wanted AS (
+          WITH deck_demand AS (
             SELECT
-              dc.card_id,
-              c.name AS card_name,
-              GREATEST(dc.quantity - COALESCE(owned.owned_quantity, 0), 1)::int
-                AS wanted_quantity,
-              'deck_missing'::text AS source
+              COALESCE(c.oracle_id, c.id) AS playable_card_id,
+              MIN(c.name) AS card_name,
+              COALESCE(SUM(dc.quantity), 0)::int AS required_quantity
             FROM deck_cards dc
             JOIN cards c ON c.id = dc.card_id
-            LEFT JOIN owned ON owned.card_id = dc.card_id
             WHERE dc.deck_id = CAST(@deckId AS uuid)
-              AND COALESCE(owned.owned_quantity, 0) < dc.quantity
-            UNION ALL
+            GROUP BY COALESCE(c.oracle_id, c.id)
+          ),
+          owned AS (
             SELECT
-              bi.card_id,
-              c.name AS card_name,
-              bi.quantity AS wanted_quantity,
-              'wishlist'::text AS source
+              COALESCE(c.oracle_id, c.id) AS playable_card_id,
+              COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
             FROM user_binder_items bi
             JOIN cards c ON c.id = bi.card_id
             WHERE bi.user_id = CAST(@userId AS uuid)
-              AND bi.list_type = 'want'
+              AND bi.list_type = 'have'
+            GROUP BY COALESCE(c.oracle_id, c.id)
+          ),
+          wanted AS (
+            SELECT
+              demand.playable_card_id,
+              demand.card_name,
+              GREATEST(
+                demand.required_quantity - COALESCE(owned.owned_quantity, 0),
+                0
+              )::int AS wanted_quantity,
+              'deck_missing'::text AS source
+            FROM deck_demand demand
+            LEFT JOIN owned USING (playable_card_id)
+            WHERE demand.required_quantity > COALESCE(owned.owned_quantity, 0)
+            UNION ALL
+            SELECT
+              availability.playable_card_id,
+              availability.canonical_name AS card_name,
+              availability.wanted_missing_quantity AS wanted_quantity,
+              'wishlist'::text AS source
+            FROM collection_availability_snapshot availability
+            WHERE availability.user_id = CAST(@userId AS uuid)
+              AND availability.wanted_missing_quantity > 0
           )
         '''
             : '''
           WITH wanted AS (
             SELECT
-              bi.card_id,
-              c.name AS card_name,
-              bi.quantity AS wanted_quantity,
+              availability.playable_card_id,
+              availability.canonical_name AS card_name,
+              availability.missing_quantity AS wanted_quantity,
+              'deck_missing'::text AS source
+            FROM collection_availability_snapshot availability
+            WHERE availability.user_id = CAST(@userId AS uuid)
+              AND availability.missing_quantity > 0
+            UNION ALL
+            SELECT
+              availability.playable_card_id,
+              availability.canonical_name AS card_name,
+              availability.wanted_missing_quantity AS wanted_quantity,
               'wishlist'::text AS source
-            FROM user_binder_items bi
-            JOIN cards c ON c.id = bi.card_id
-            WHERE bi.user_id = CAST(@userId AS uuid)
-              AND bi.list_type = 'want'
+            FROM collection_availability_snapshot availability
+            WHERE availability.user_id = CAST(@userId AS uuid)
+              AND availability.wanted_missing_quantity > 0
           )
         ''';
 
@@ -242,27 +263,42 @@ class CommunityEngagementService {
         $wantedSql,
         dedup_wanted AS (
           SELECT
-            card_id,
-            card_name,
-            SUM(wanted_quantity)::int AS wanted_quantity,
+            playable_card_id,
+            MIN(card_name) AS card_name,
+            MAX(wanted_quantity)::int AS wanted_quantity,
             ARRAY_AGG(DISTINCT source ORDER BY source) AS sources
           FROM wanted
-          GROUP BY card_id, card_name
+          GROUP BY playable_card_id
         )
         SELECT
-          w.card_id,
+          c.id AS card_id,
           w.card_name,
           w.wanted_quantity,
           w.sources,
           bi.id AS binder_item_id,
-          bi.quantity AS available_quantity,
+          item_availability.available_quantity,
           bi.condition,
           bi.is_foil,
+          bi.language,
           bi.for_trade,
           bi.for_sale,
           bi.price,
           bi.currency,
           bi.notes,
+          bi.updated_at AS offer_updated_at,
+          c.image_url AS card_image_url,
+          c.scryfall_id::text AS card_scryfall_id,
+          c.oracle_id::text AS card_oracle_id,
+          c.layout AS card_layout,
+          c.card_faces_json AS card_faces,
+          c.set_code AS card_set_code,
+          c.collector_number AS card_collector_number,
+          c.mana_cost AS card_mana_cost,
+          c.rarity AS card_rarity,
+          c.type_line AS card_type_line,
+          c.is_reserved AS card_is_reserved,
+          card_set.name AS card_set_name,
+          card_set.release_date AS card_set_release_date,
           u.id AS owner_id,
           u.username AS owner_username,
           u.display_name AS owner_display_name,
@@ -276,8 +312,19 @@ class CommunityEngagementService {
             ELSE NULL
           END AS owner_location_state
         FROM dedup_wanted w
-        JOIN user_binder_items bi ON bi.card_id = w.card_id
+        JOIN cards c
+          ON COALESCE(c.oracle_id, c.id) = w.playable_card_id
+        JOIN user_binder_items bi ON bi.card_id = c.id
+        JOIN binder_item_availability item_availability
+          ON item_availability.binder_item_id = bi.id
         JOIN users u ON u.id = bi.user_id
+        LEFT JOIN LATERAL (
+          SELECT s.name, s.release_date
+          FROM sets s
+          WHERE LOWER(s.code) = LOWER(c.set_code)
+          ORDER BY s.release_date DESC NULLS LAST, s.code
+          LIMIT 1
+        ) card_set ON TRUE
         WHERE bi.user_id <> CAST(@userId AS uuid)
           AND u.deleted_at IS NULL
           AND u.profile_visibility = 'public'
@@ -307,6 +354,7 @@ class CommunityEngagementService {
           )
           AND bi.list_type = 'have'
           AND (bi.for_trade = TRUE OR bi.for_sale = TRUE)
+          AND item_availability.available_quantity > 0
         ORDER BY w.card_name ASC, bi.for_trade DESC, bi.price ASC NULLS LAST
         LIMIT @limit
       '''),
@@ -321,7 +369,27 @@ class CommunityEngagementService {
         .map((row) {
           final m = row.toColumnMap();
           return {
-            'card': {'id': m['card_id']?.toString(), 'name': m['card_name']},
+            'card': {
+              'id': m['card_id']?.toString(),
+              'name': m['card_name'],
+              'image_url': normalizeScryfallImageUrl(
+                m['card_image_url']?.toString(),
+                printingId: m['card_scryfall_id']?.toString(),
+                oracleId: m['card_oracle_id']?.toString(),
+              ),
+              'scryfall_id': m['card_scryfall_id'],
+              'oracle_id': m['card_oracle_id'],
+              'layout': m['card_layout'],
+              'card_faces': m['card_faces'],
+              'set_code': m['card_set_code'],
+              'collector_number': m['card_collector_number'],
+              'set_name': m['card_set_name'],
+              'set_release_date': _dateString(m['card_set_release_date']),
+              'mana_cost': m['card_mana_cost'],
+              'rarity': m['card_rarity'],
+              'type_line': m['card_type_line'],
+              'is_reserved': m['card_is_reserved'] == true,
+            },
             'wanted_quantity': m['wanted_quantity'],
             'sources': _stringList(m['sources']),
             'offer': {
@@ -329,11 +397,13 @@ class CommunityEngagementService {
               'quantity': m['available_quantity'],
               'condition': m['condition'],
               'is_foil': m['is_foil'],
+              'language': m['language'],
               'for_trade': m['for_trade'],
               'for_sale': m['for_sale'],
               'price': _toDouble(m['price']),
               'currency': m['currency'],
               'notes': m['notes'],
+              'updated_at': _dateString(m['offer_updated_at']),
             },
             'owner': {
               'id': m['owner_id']?.toString(),
@@ -348,7 +418,10 @@ class CommunityEngagementService {
         .toList(growable: false);
 
     return {
-      'source': includeDeckMissing ? 'deck_missing_and_wishlist' : 'wishlist',
+      'source':
+          includeDeckMissing
+              ? 'deck_missing_and_wishlist'
+              : 'all_deck_missing_and_wishlist',
       'deck_id': includeDeckMissing ? deckId.trim() : null,
       'matches': matches,
       'match_count': matches.length,

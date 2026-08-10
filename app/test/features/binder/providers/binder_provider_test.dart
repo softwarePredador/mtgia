@@ -8,9 +8,29 @@ class _FakeBinderApiClient extends ApiClient {
   var deletedItemId = '';
   Map<String, dynamic>? lastPostBody;
   Map<String, dynamic>? lastPutBody;
+  String? lastGetEndpoint;
 
   @override
   Future<ApiResponse> get(String endpoint) async {
+    lastGetEndpoint = endpoint;
+    if (endpoint.startsWith('/community/binders/user-1?')) {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'binder-public-1',
+            'card_id': 'printing-public-1',
+            'card_name': 'Rhystic Study',
+            'quantity': 2,
+            'available_quantity': 1,
+            'condition': 'LP',
+            'for_trade': true,
+            'language': 'pt-br',
+            'list_type': 'have',
+            'updated_at': '2026-08-06T10:00:00Z',
+          },
+        ],
+      });
+    }
     if (endpoint.startsWith('/binder?')) {
       return ApiResponse(200, {
         'data': [
@@ -158,6 +178,43 @@ void main() {
 
     expect(binderItem.cardIsReserved, isTrue);
     expect(marketplaceItem.cardIsReserved, isTrue);
+  });
+
+  test('preserves printing identity and distinguishes reference artwork', () {
+    final exact = BinderItem.fromJson({
+      'id': 'binder-exact',
+      'card': {
+        'id': 'printing-1',
+        'name': 'Sol Ring',
+        'image_url':
+            'https://cards.scryfall.io/normal/front/a/a/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.jpg',
+        'scryfall_id': 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        'oracle_id': 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        'set_code': 'cmm',
+        'collector_number': '396',
+        'set_name': 'Commander Masters',
+        'set_release_date': '2023-08-04',
+      },
+      'is_foil': true,
+      'language': 'pt-br',
+    });
+    final reference = BinderItem.fromJson({
+      'id': 'binder-reference',
+      'card': {
+        'id': 'printing-2',
+        'name': 'Sol Ring',
+        'image_url':
+            'https://api.scryfall.com/cards/named?exact=Sol%20Ring&format=image',
+      },
+    });
+
+    expect(exact.hasPrintingArtwork, isTrue);
+    expect(exact.cardCollectorNumber, '396');
+    expect(exact.cardSetName, 'Commander Masters');
+    expect(exact.language, 'pt-br');
+    expect(reference.hasPrintingArtwork, isFalse);
+    expect(reference.cardPrintingImageUrl, isNull);
+    expect(reference.cardFallbackImageUrl, contains('/cards/named'));
   });
 
   test('parses the canonical owned, allocated, free and missing contract', () {
@@ -314,4 +371,42 @@ void main() {
       expect(provider.items.single.listType, 'want');
     },
   );
+
+  test(
+    'restores one public physical copy through its stable backend id',
+    () async {
+      final api = _FakeBinderApiClient();
+      final provider = BinderProvider(apiClient: api);
+
+      final item = await provider.fetchPublicBinderItemDirect(
+        userId: 'user-1',
+        itemId: 'binder-public-1',
+      );
+
+      expect(item?.id, 'binder-public-1');
+      expect(item?.cardId, 'printing-public-1');
+      expect(item?.availableQuantity, 1);
+      expect(item?.condition, 'LP');
+      expect(item?.language, 'pt-br');
+      expect(api.lastGetEndpoint, contains('list_type=have'));
+      expect(api.lastGetEndpoint, contains('item_id=binder-public-1'));
+    },
+  );
+
+  test('offer freshness is explicit for recent, stale and unknown data', () {
+    final now = DateTime.utc(2026, 8, 6, 12);
+
+    expect(
+      marketplaceOfferFreshnessLabel('2026-08-06T11:45:00Z', now: now),
+      'Atualizada há 15 min',
+    );
+    expect(
+      marketplaceOfferFreshnessLabel('2026-07-01T12:00:00Z', now: now),
+      'Atualizada em 01/07/2026',
+    );
+    expect(
+      marketplaceOfferFreshnessLabel(null, now: now),
+      'Atualização não informada',
+    );
+  });
 }

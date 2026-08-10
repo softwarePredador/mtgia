@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
-import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/card_artwork.dart';
+import '../../cards/widgets/card_printing_picker.dart';
 import '../models/deck_card_item.dart';
 import 'deck_details_aux_widgets.dart';
 import 'deck_ui_components.dart';
@@ -312,58 +313,16 @@ Future<void> showDeckEditionPicker({
                       separatorBuilder: (_, __) => const Divider(height: 1),
                       itemBuilder: (context, index) {
                         final it = list[index];
-                        final id = (it['id'] ?? '').toString();
-                        final setCode = (it['set_code'] ?? '')
-                            .toString()
-                            .toUpperCase();
-                        final setName = (it['set_name'] ?? it['set_code'] ?? '')
-                            .toString();
-                        final collector = (it['collector_number'] ?? '')
-                            .toString();
-                        final foil = it['foil'] == true;
-                        final date = (it['set_release_date'] ?? '').toString();
-                        final rarity = (it['rarity'] ?? '').toString();
-                        final price = it['price'];
-                        final priceText = (price is num)
-                            ? '\$${price.toStringAsFixed(2)}'
-                            : (price is String && price.trim().isNotEmpty)
-                            ? '\$$price'
-                            : '—';
-
+                        final option = CardPrintingOption.fromJson(
+                          it,
+                          fallbackCard: card,
+                        );
+                        final id = option.card.id;
                         final isSelected = id == card.id;
 
-                        return ListTile(
+                        return CardPrintingOptionTile(
                           key: Key('deck-edition-option-$id'),
-                          leading: CachedCardImage(
-                            imageUrl: it['image_url'],
-                            fallbackImageUrl: card.fallbackImageUrl,
-                            width: 40,
-                            height: 56,
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusXs,
-                            ),
-                          ),
-                          title: Text(
-                            _editionTitle(
-                              setCode: setCode,
-                              collectorNumber: collector,
-                              foil: foil,
-                              fallback: setName.isEmpty ? id : setName,
-                            ),
-                          ),
-                          subtitle: Text(
-                            [
-                              if (setName.isNotEmpty) setName,
-                              if (date.isNotEmpty) date,
-                              if (rarity.isNotEmpty) rarity,
-                              if (isSelected) 'Atual',
-                            ].join(' • '),
-                          ),
-                          trailing: Text(
-                            priceText,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
+                          option: option,
                           selected: isSelected,
                           onTap: isSelected
                               ? null
@@ -541,12 +500,17 @@ class _DeckCardDetailsImage extends StatelessWidget {
         ),
       ),
       clipBehavior: Clip.antiAlias,
-      child: CachedCardImage(
-        imageUrl: card.effectiveImageUrl,
+      child: CardArtwork(
+        variant: CardArtworkVariant.fullCard,
+        imageUrl: card.printingImageUrl,
         fallbackImageUrl: card.fallbackImageUrl,
+        semanticLabel: card.hasPrintingArtwork
+            ? 'Arte da impressão ${card.name}'
+            : 'Arte de referência de ${card.name}',
+        imageIsReference: !card.hasPrintingArtwork,
         width: width,
         height: height,
-        fit: BoxFit.contain,
+        constrainAspectRatio: false,
       ),
     );
   }
@@ -666,13 +630,13 @@ bool _hasEditionInfo(DeckCardItem card) {
 String _editionTitle({
   required String setCode,
   required String collectorNumber,
-  required bool foil,
+  required bool foilAvailable,
   required String fallback,
 }) {
   final parts = [
     if (setCode.trim().isNotEmpty) setCode.trim().toUpperCase(),
     if (collectorNumber.trim().isNotEmpty) '#${collectorNumber.trim()}',
-    if (foil) 'foil',
+    if (foilAvailable) 'foil disponível',
   ];
   if (parts.isEmpty) return fallback;
   return parts.join(' ');
@@ -691,7 +655,7 @@ class _DeckEditionInfo extends StatelessWidget {
     final editionTitle = _editionTitle(
       setCode: setCode,
       collectorNumber: collector,
-      foil: card.foil == true,
+      foilAvailable: card.foil == true,
       fallback: 'Edição não informada',
     );
     final editionSubtitle = [
