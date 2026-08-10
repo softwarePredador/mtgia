@@ -164,7 +164,10 @@ MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
   >"$BACKEND_LOG" 2>&1 &
 BACKEND_PID=$!
 
-for _ in $(seq 1 360); do
+# A cold Dart Frog build can take several minutes on the governed local
+# toolchain. Keep the fixture fail-closed, but allow up to ten minutes for its
+# READY contract instead of rejecting a healthy first build after 90 seconds.
+for _ in $(seq 1 2400); do
   if grep -q '^READY: isolated browser QA fixture$' "$BACKEND_LOG" 2>/dev/null; then
     break
   fi

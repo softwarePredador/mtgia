@@ -117,10 +117,19 @@ de UI. Qualquer mudança nesses arquivos gera novo digest e invalida o crédito
 corrente de `25 manifests/402 capturas Web`, ainda que o conteúdo Flutter seja
 visualmente idêntico.
 
-O digest local depois da implementação é
+O digest local depois da implementação do host foi
 `df08241c0cbdf1f3ca52ac08ce2b711675a107f4c44afa1979ea8128edfd8925`.
 Consequentemente, os manifests Web do digest anterior não são apresentados
 como prova corrente e o aggregate oficial não foi promovido.
+
+Na continuação da recaptura, o primeiro build frio do Dart Frog excedeu duas
+vezes o limite histórico de 90 segundos da fixture, embora tenha terminado
+saudável depois desse prazo. O timeout do contrato `READY` foi ampliado para
+dez minutos, sem relaxar checks de processo, coordenadas loopback, egress,
+cleanup ou falha fechada. O novo digest definitivo para a reancoragem é
+`4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c`.
+As duas tentativas abortadas comprovaram banco removido, listeners zerados e
+credenciais removidas antes da nova execução.
 
 ## Implementação e validação focal de 2026-08-10
 
