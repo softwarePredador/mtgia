@@ -1,147 +1,123 @@
 # ManaLoom — pendências e prioridades UX após o UX-PACK-08
 
-**Atualizado em:** 2026-08-07
+**Atualizado em:** 2026-08-10
+
 **Escopo:** fechamento técnico da auditoria UX integral e ordem restante de
-release; nenhuma autorização de migration, escrita live, deploy, commit ou push
+release
+
 **Digest UI final:**
-`c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be`
+`4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c`
 
 ## Leitura executiva
 
-- `UX-PACK-01` a `UX-PACK-08`, polish responsivo P1 e polish P2 estão
-  concluídos no escopo local autorizado.
-- Os 25 manifests Web correntes somam 402 capturas em `PASS_RUNTIME`; todas as
-  402 foram cobertas pela revisão visual final e reconciliadas sem divergência
-  de arquivo, SHA-256, bytes, dimensão ou caminho duplicado.
-- As 54 capturas obrigatórias do Samsung SM-A135M pertencem ao digest antigo e
-  continuam `STALE`; o emulador disponível não foi aceito como substituto.
-- O aggregate oficial não foi promovido. Enquanto o perfil físico estiver
-  stale, os gates globais permanecem corretamente `FAIL-CLOSED`.
-- A pesquisa jurídica em fontes oficiais e o briefing para o profissional
-  habilitado estão prontos. Conforme a ordem definida pelo responsável do
-  produto, o parecer jurídico externo assinado será a última etapa.
+- `UX-PACK-01` a `UX-PACK-08`, o polish responsivo autorizado e a correção
+  do canvas Web estão concluídos no escopo local.
+- Os 26 manifests correntes somam 456 capturas no mesmo digest; todas foram
+  abertas e reconciliadas sem divergência de caminho, SHA-256, bytes ou
+  dimensão.
+- O aggregate oficial em
+  [`docs/qa/ui-live/latest.json`](ui-live/latest.json) registra
+  `PASS_AUTOMATED · PASS_RUNTIME · PASS_VISUAL_REVIEWED`.
+- Evidence gate, `ui-proof` e `ui-audit` passaram; o `ui-audit` concluiu
+  analyzer limpo e `56/56` testes.
+- A etapa técnica de recaptura P0/aggregate está encerrada. Restam checks
+  humanos/hardware e, por último, o parecer jurídico externo assinado.
 
 O ledger completo está em
 [`MANALOOM_P0_GLOBAL_REANCHOR_CONTINUATION_2026-08-07.md`](MANALOOM_P0_GLOBAL_REANCHOR_CONTINUATION_2026-08-07.md).
 
-Nova atividade autorizada antes da prova física:
-[`MANALOOM_WEB_HOST_CANVAS_CONTINUITY_ACTIVITY_2026-08-10.md`](MANALOOM_WEB_HOST_CANVAS_CONTINUITY_ACTIVITY_2026-08-10.md).
-Ela elimina o fundo branco externo à superfície Flutter. Como o shell Web
-participa do digest, a implementação local já produziu novo digest e agora
-exige reancoragem Web antes do Samsung e do aggregate final.
-
 ## Estado dos pacotes
 
-| Pacote | Estado técnico/visual atual | O que ainda pertence ao fechamento |
+| Pacote | Estado atual | Próximo cuidado |
 |---|---|---|
-| `UX-PACK-01` — identidade/printing | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | somente participar do aggregate final depois da prova física |
-| `UX-PACK-02` — coleção | `PHASE_1_COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | localização estruturada e scanner são decisões futuras de produto, não pendências do pacote fechado |
-| `UX-PACK-03` — Oficina/Optimize | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | nenhum ajuste obrigatório; preservar preview, decisão humana, histórico e undo |
-| `UX-PACK-04` — partida/aprendizado | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | nenhum ajuste obrigatório; preservar privacidade, exact-ID e handoff pós-jogo |
-| `UX-PACK-05` — social/trades | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | pagamento, entrega, disputa e localização privada exigem contratos próprios antes de futura implementação |
-| `UX-PACK-06` — onboarding/Home | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | progresso cross-device é decisão futura e exigiria contrato backend próprio |
-| `UX-PACK-07` — sistema visual/wide | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED` | nenhum ajuste obrigatório; preservar estados, quota e dirty/save |
-| `UX-PACK-08` — estados/prova/acessibilidade | `COMPLETE_LOCAL · CURRENT_WEB_REVIEWED · PHYSICAL_STALE` | recapturar o Samsung, fechar aggregate e executar verificações humanas |
-| `POLISH-RESPONSIVO-P1/P2` | `COMPLETE_LOCAL · AUTOMATED_PASS · CURRENT_WEB_REVIEWED` | dois follow-ups P2 opcionais; nenhuma nova mudança antes da prova física é recomendada |
+| `UX-PACK-01` — identidade/printing | `COMPLETE · CURRENT_REVIEWED` | preservar exact-ID e printing |
+| `UX-PACK-02` — coleção | `COMPLETE · CURRENT_REVIEWED` | localização estruturada e scanner são decisões futuras |
+| `UX-PACK-03` — Workshop/Optimize | `COMPLETE · CURRENT_REVIEWED` | preservar preview, decisão humana, histórico e undo |
+| `UX-PACK-04` — partida/aprendizado | `COMPLETE · CURRENT_REVIEWED` | preservar privacidade, replay e handoff pós-jogo |
+| `UX-PACK-05` — social/trades | `COMPLETE · CURRENT_REVIEWED` | pagamento, entrega e disputa exigem contratos próprios |
+| `UX-PACK-06` — onboarding/Home | `COMPLETE · CURRENT_REVIEWED` | progresso cross-device exige contrato backend próprio |
+| `UX-PACK-07` — sistema visual/wide | `COMPLETE · CURRENT_REVIEWED` | priorizar densidade adaptativa como próxima frente de polish |
+| `UX-PACK-08` — estados/prova/acessibilidade | `COMPLETE · CURRENT_REVIEWED` | executar checks humanos separados |
+| Canvas Web Obsidian | `COMPLETE · CURRENT_REVIEWED` | impedir regressão para fundo branco |
+| Aggregate global | `26/26 · 456/456 · PASS` | invalidar e recapturar quando houver nova mudança app-facing |
 
 ## Evidência corrente
 
 | Superfície | Manifests | Capturas | Estado |
 |---|---:|---:|---|
-| Web P0 + Battle Live + UX-PACKs 02–08 | 25 | 402 | `PASS_RUNTIME · VISUAL_REVIEWED · RECONCILED` |
-| Samsung SM-A135M físico | 1 | 54 | `STALE · DEVICE_NOT_CONNECTED · NOT_PROMOTABLE` |
-| **Política total** | **26** | **456** | **`GLOBAL_AGGREGATE_PENDING`** |
+| P0 Web mobile/desktop/wide | 3 | 160 | `PASS_RUNTIME · VISUAL_REVIEWED` |
+| Samsung SM-A135M físico | 1 | 54 | `PASS_RUNTIME · VISUAL_REVIEWED` |
+| Battle Live | 1 | 5 | `PASS_RUNTIME · VISUAL_REVIEWED` |
+| UX-PACKs 02–08 | 21 | 237 | `PASS_RUNTIME · VISUAL_REVIEWED` |
+| **Política total** | **26** | **456** | **`GLOBAL_AGGREGATE_PASS`** |
 
-Na revisão final, 129 imagens novas ou alteradas foram reabertas
-individualmente; as outras 273 eram byte a byte idênticas a imagens já abertas
-na mesma auditoria. Assim, a cobertura Web corrente é `402/402`, mas a cobertura
-global corrente não pode ser chamada de `456/456` enquanto o perfil físico não
-for recapturado.
+## Prioridades restantes
 
-## Prioridades restantes, na ordem correta
+### P0-A — verificações humanas e de hardware
 
-### P1-A — continuidade do canvas Web, implementada localmente
+Estas verificações continuam obrigatórias para release, mas não invalidam o
+fechamento técnico da auditoria:
 
-O host HTML já usa canvas Obsidian contínuo e passou por contrato automatizado,
-build release e inspeção focal Web real em `390×844`, `1440×900` e
-`1920×1080`. A prova integral ainda precisa ser reancorada no digest novo;
-esta permanece a última mudança app-facing planejada antes do congelamento.
+1. TalkBack humano no Samsung físico;
+2. navegação Web com teclado de hardware real;
+3. smoke de câmera, scanner, deep links e comportamento de release no aparelho
+   físico, somente onde a feature estiver habilitada;
+4. VoiceOver/iOS se iOS entrar no escopo da release.
 
-### P0-A — recaptura física obrigatória
+Widget test, golden, emulador e inspeção automatizada não substituem esses
+checks.
 
-Dependência externa: conectar o Samsung SM-A135M esperado e confirmar sua
-identidade por ADB.
+### P0-B — parecer jurídico externo assinado, por último
 
-Depois disso:
-
-1. iniciar somente a fixture PostgreSQL loopback descartável;
-2. recapturar os 54 checkpoints físicos no digest final;
-3. abrir individualmente as 54 imagens novas;
-4. corrigir qualquer blocker real antes de gerar o aggregate;
-5. encerrar a fixture e comprovar banco, listeners e credenciais removidos.
-
-Não substituir o aparelho pelo emulador e não tratar `skipped` como saudável.
-
-### P0-B — aggregate e gates oficiais
-
-Somente depois da recaptura e revisão física:
-
-1. reconciliar `26/26` manifests e `456/456` PNGs;
-2. gerar `docs/qa/ui-live/latest.json` pela ferramenta oficial;
-3. executar o evidence gate;
-4. executar `./scripts/quality_gate.sh ui-proof`;
-5. executar `./scripts/quality_gate.sh ui-audit`;
-6. exigir `PASS_AUTOMATED · PASS_RUNTIME · PASS_VISUAL_REVIEWED`, sem
-   carry-forward de crédito stale.
-
-### P0-C — verificações humanas e de hardware
-
-- TalkBack humano no Android físico;
-- navegação Web com teclado de hardware real;
-- smoke de câmera, scanner, deep links e comportamento de release no aparelho
-  físico, apenas onde a feature estiver habilitada para esse escopo;
-- VoiceOver/iOS somente se iOS entrar na release.
-
-Essas verificações não podem ser substituídas por widget test, golden,
-emulador ou inspeção automatizada.
-
-### P0-D — parecer jurídico externo assinado, por último
-
-Quando P0-A, P0-B e P0-C estiverem concluídos, encaminhar o briefing já pronto
-a advogado habilitado para revisar LGPD, menores, consumidor, termos, beta/Pro,
-social/trades, transferências internacionais e uso de propriedade intelectual.
+Depois dos checks humanos/hardware, encaminhar o briefing a advogado
+habilitado para revisar LGPD, menores, consumidor, termos, beta/Pro,
+social/trades, transferências internacionais e propriedade intelectual.
 
 Até existir parecer assinado, o lançamento comercial permanece bloqueado. A
-pesquisa preparada pelo Codex organiza fontes e perguntas, mas não substitui
-responsabilidade profissional nem constitui parecer jurídico.
+pesquisa preparada pelo Codex organiza fontes e perguntas, mas não constitui
+parecer jurídico e não substitui responsabilidade profissional.
 
 Briefing:
 [`MANALOOM_EXTERNAL_LEGAL_REVIEW_BRIEF_2026-08-07.md`](MANALOOM_EXTERNAL_LEGAL_REVIEW_BRIEF_2026-08-07.md).
 
-## Backlog futuro que não bloqueia o fechamento atual
+## Próxima frente app-facing recomendada
 
-| Prioridade futura | Tema | Condição para iniciar |
+Quando o responsável sinalizar uma nova rodada de UI, a ordem sugerida é:
+
+| Prioridade | Tema | Resultado esperado |
 |---|---|---|
-| `P1 PRODUTO · DECISÃO` | localização estruturada da coleção | autorizar contrato de área/caixa/fichário/posição antes de qualquer migration |
-| `P1 PRODUTO · DECISÃO` | scanner físico | homologar flag, hardware, permissão, fallback e contrato de release |
-| `P1 PRODUTO · DECISÃO` | onboarding cross-device | definir persistência backend e política de sincronização |
-| `P1 PRODUTO/LEGAL/SEGURANÇA` | pagamento, entrega, disputa e localização em Trade | definir mediação, privacidade, fraude, suporte e responsabilidades |
-| `P2 EXPERIÊNCIA` | compartilhamento estruturado, diff e thread de feedback | promover a frente a pacote próprio com critérios de aceite |
-| `P2 EXPERIÊNCIA` | usernames artificiais longos nas fixtures | trocar por nomes determinísticos realistas quando uma futura mudança já exigir recaptura |
-| `P2 EXPERIÊNCIA` | padding sob o compositor persistente de Trade | revisar em uma futura rodada compacta sem reabrir o digest atual apenas por esse detalhe |
+| `P1` | composição adaptativa desktop/wide | usar melhor o canvas em resultados únicos, vazios e superfícies administrativas |
+| `P1` | abas compactas de detalhe de deck | substituir “Visão Ge” por affordance legível e acessível |
+| `P2` | nomes e identidades longas | aplicar wrap/ellipsis consistente sem perder o nome acessível |
+| `P2` | carrosséis móveis | tornar a possibilidade de rolagem horizontal explícita |
+| `P2` | fixtures realistas | remover “Revisão aaaaaaaa” e usernames artificiais |
+| `P2` | consentimento no cadastro | corrigir o anchor do título “Criar conta” após scroll |
+| `P2` | prova de recuperação do comandante | mostrar o contexto do CTA pai, reduzindo vazio focal |
+| `P2/LEGAL` | Legal/Privacy | ajustar conteúdo e composição depois do parecer externo |
 
-Qualquer nova alteração app-facing muda o digest e exige recaptura aplicável.
-Por isso, a recomendação é congelar a UI até fechar P0-A a P0-C e deixar o
-advogado como P0-D, último passo.
+Esses itens são não bloqueantes para a evidência atual. Iniciá-los muda o
+digest e requer recaptura aplicável.
+
+## Backlog de produto não autorizado nesta atividade
+
+| Tema | Condição para iniciar |
+|---|---|
+| localização estruturada da coleção | definir área/caixa/fichário/posição antes de migration |
+| scanner físico | homologar flag, hardware, permissão, fallback e contrato de release |
+| onboarding cross-device | definir persistência backend e política de sincronização |
+| pagamento, entrega, disputa e localização em Trade | definir mediação, privacidade, fraude, suporte e responsabilidades |
+| compartilhamento estruturado, diff e thread de feedback | promover a frente a pacote próprio com critérios de aceite |
+
+Nenhum desses itens autoriza migration, PostgreSQL live, Hermes/SQLite, deploy,
+push, pins, regras ou decks.
 
 ## Próximo sinal operacional
 
-O único sinal necessário para continuar a execução técnica é:
+Para continuar trabalhando no app sem misturar o fechamento da auditoria com
+uma nova recaptura, o sinal recomendado é:
 
 ```text
-SAMSUNG SM-A135M CONECTADO E DESBLOQUEADO PARA RECAPTURA P0
+INICIAR POLISH UX P1 — COMPOSIÇÃO ADAPTATIVA DESKTOP/WIDE
 ```
 
-Esse sinal autoriza apenas a fixture descartável de QA e a recaptura/revisão
-previstas. Não autoriza migration, banco live, Hermes/SQLite, deploy, commit,
-push, pins, regras ou decks.
+O parecer jurídico permanece a última etapa de release comercial.

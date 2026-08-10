@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-07T20:44:10.468248Z",
-  "source_digest": "c25eb28be42b00787c8c40ffa24e15013de176d67015f098d10d8172b24099be",
+  "generated_at": "2026-08-10T15:24:55.839249Z",
+  "source_digest": "4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c",
   "surface": "battle_live",
   "profile": "web_battle_live_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "568b569ad648da769347b419a73b8cf2d32121f632ee141c04456020abbb73d0",
+  "log_sha256": "16c50ad402065458be614856e135593196999f8d3a7b0ee991d12913236b5ad2",
   "checkpoint_count": 5,
   "required_checkpoints": [
     "battle_live_00_waiting",
@@ -25,24 +25,24 @@
     {
       "checkpoint": "battle_live_00_waiting",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_00_waiting.png",
-      "sha256": "e249b496a404a9d879322b956da65741c2f36947e58188241f35811b1773ee67",
-      "bytes": 60431,
+      "sha256": "1b9fbab87ba0dcf722e3b1a793c0e5955db1b274f0b2578a64ff2f00895884f4",
+      "bytes": 60427,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_live_01_active_feed",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_01_active_feed.png",
-      "sha256": "6468fa87bc3b4bbf8a0d96c706746730651d6b6f23ae7e461a0eb93c7842bb99",
-      "bytes": 83829,
+      "sha256": "7d6b2a4b1ba499dd44acd19f7f10d4fd2216770d6f27f91e73e7f96598d2d488",
+      "bytes": 83857,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_live_02_recoverable_reconnect",
       "path": "docs/qa/ui-live/current/battle-live-web/battle_live_02_recoverable_reconnect.png",
-      "sha256": "ef740e9dfd194221cc231c0ddcd3f669c7a7779933e9b79ac458c945707484c1",
-      "bytes": 91693,
+      "sha256": "4260ebd3b08a083e9982bc18ff42a7c76cace4dee5bcefcdddd240f37799db9a",
+      "bytes": 91705,
       "width": 1440,
       "height": 900
     },

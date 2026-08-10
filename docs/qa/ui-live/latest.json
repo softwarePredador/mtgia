@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "f45f96e34ca6b00c34952b25631c6ff3157e85e39afc06e1f8394e1484f0e90e",
+  "source_digest": "4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-06T19:55:31Z",
+    "verified_at": "2026-08-10T16:10:00Z",
     "commands": [
       "flutter test --no-pub --no-version-check --reporter compact",
       "dart test --reporter compact no servidor",
@@ -25,120 +25,120 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "1bd32c295b273e1ec7a60936d83b140e661a1b9b16cc42286de37937d3bdb5cb"
+        "sha256": "d9106e19e042e7a84f8341d1ee31737de9f32f7edfc05c2146ac2f03ec6c8cf8"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "eba8af16484de3775190655c01618e90f9c4d80e325cd1f9fb7e6843875a1b5d"
+        "sha256": "bc02777f46b00f0cd294cb07205dc6e019b5e414fe55454ea3e3252ba5f117c4"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "b566d5c9fd0a3e603cfa16af56d93a216e78d8d868cc465624bdf9b8e5aa6742"
+        "sha256": "6877218ed84bdff4f4844ff5e279e4ae001359dc2c25fcf55fee23ce40e74161"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "76dbfee3973147f2b309540d220d3dd9b5e4b9e7526f1225e2e5d45825a4d4d4"
+        "sha256": "4bd41770483ac09f2683de9025172c2b25d280af3359391b996a125e28c5269d"
       },
       {
         "path": "docs/qa/ui-live/current/battle-live-web/capture-manifest.json",
-        "sha256": "8fe94f18086cd1e25df89811337f73cdf75f2f0d851c2dffc132faeb1706463a"
+        "sha256": "72b5fb6aa2f5e1483d0361b8b6843afd8553fce165caabf6e4b25c94fce629dd"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-mobile/capture-manifest.json",
-        "sha256": "f928cee7a5e10787219f6259bd9cde3d0ef44205e9e2498b35e1ff1759da35ad"
+        "sha256": "88bf33455539b58f307fe49f9672f010c2ef57cfd23f760f52a719d5f04e3ada"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/capture-manifest.json",
-        "sha256": "6465d7bd1f11b5fa70a69323a949364ded931752840757f110c2675463752bac"
+        "sha256": "35d18047872a5a784867bef63b0c929bc3f06676ec7a0b163e12dbae7fd3aa11"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/capture-manifest.json",
-        "sha256": "aa8a3e8d95185c5c9d339d41b382aa80ba33dce3a709836cc37892025f40e407"
+        "sha256": "a892fb30858a10b16f8974aa2d58996871c7e79b0b1554b74fe5c7dd71e208c0"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/capture-manifest.json",
-        "sha256": "a1db912e6de9f22501f82280d6c91c254e5c155462bc7d09bf3d6d0e90d6a153"
+        "sha256": "b1aee9ccbfd6d6666a1b8548c87517df4895a018605c669c5bcbee80ca69318f"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/capture-manifest.json",
-        "sha256": "fb3cfa58153da0bb520e934619b3b97bccacc9d155267e8dc38d9f8f88863e25"
+        "sha256": "45369318dddfcaa2baafc73a3be27727893b7c590939cbdd011b54f9cfcf5ded"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-wide/capture-manifest.json",
-        "sha256": "d7aec27aa0687154ebdce1a9ab4eb3a4a49bd7149676694d2a90611ac4997ca4"
+        "sha256": "4c181e25c5a352b95292aaebfa81382b4cdde892aed86a3300653f03da86cb7d"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/capture-manifest.json",
-        "sha256": "4281a1867bed6da056300c67bb5c34c715fdd0cf840b86cd98fafa62bf74be3d"
+        "sha256": "d923d90f15fff7eca3a785cf4f8aa88ab87ac3be3b8b9cedce98efc1fb20b7c7"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/capture-manifest.json",
-        "sha256": "a35214b6e835bcbe3943a7aac7420f48a404745b6847178ad8b7ae4d0581a330"
+        "sha256": "d8f24d3db2a870b6e947ae663fef1aecae92130af3aa2387cf5ce74a71305b89"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/capture-manifest.json",
-        "sha256": "d49bcd0e9f16794a22c871c385edba7a5c7ff382c72e2cf086f3df6c98810d4c"
+        "sha256": "37053f0518a7f923fc944c795c852b73334cd919b0cae567fb7fade54e7708f3"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/capture-manifest.json",
-        "sha256": "04dab07e28b0f4521f1bbdef7f85feda4e633e7d91810b94569f96377a07cb8a"
+        "sha256": "a80c1cb525beebf16bff1d0381d890af9dc3ad15177ea23954c83da64a5106e6"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/capture-manifest.json",
-        "sha256": "4b2c33a0dfddd8dccbd4d7a3bc5abbe4027dbf30d31b2721df342d6c9a92cfa3"
+        "sha256": "bb037d75a18767d94b96f8d93476c7b5856d69a1a0ba8192df81c83ba29ca3ba"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/capture-manifest.json",
-        "sha256": "f1443ba83748500f34104a50dd697934c27d041ae25de8c4f0297e6e4f7be46a"
+        "sha256": "508416fa96886cc636e8cc16c59814c95465ce615e6c10f71ba5325dbe95a62a"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/capture-manifest.json",
-        "sha256": "0b935c8ce5ad991e12fe184c55bf296c03e5a004cc3b3dbea583f14df3cfac90"
+        "sha256": "f6968967cf02afbde7863cf1f99f32b0cd353d59dafc45e6877a8373beda9c4b"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/capture-manifest.json",
-        "sha256": "4b51916676fea751deca73c495ea66dbf203b72ebddfdbc687d3f81d89e9bf9b"
+        "sha256": "0ed774c084f7491bcd06ba682634aecdd3d798af44fd7941e342e20ce70e85fb"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-wide/capture-manifest.json",
-        "sha256": "d6f972d6e1b4c517f3341c449f398311882c32e53f712b639e118400f7418473"
+        "sha256": "1430a455b3659b0240e0a26658597080fc2989354dde82278cbb6333d7e4f201"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/capture-manifest.json",
-        "sha256": "5dabc2c70f355279e54b5f1917ad94b561c01fb9d851ef5f949e187aba4d2257"
+        "sha256": "3e908a8d06f6de1b9b78356eb21d5022597c728b6242e0854c820b69b2a05bd1"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/capture-manifest.json",
-        "sha256": "445c898b7ca97dc9bc4c17a9e82ab35c6db013729fa3fd9581e4e5b12879af61"
+        "sha256": "d3b172972cff365a1dd372b7838cab12fab469aa07f801309325a7e9fe433082"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-wide/capture-manifest.json",
-        "sha256": "f3fdc7c74053eb04688f447e35ceae7c7794fdddf719e1d47fe3f1c4b4cbb693"
+        "sha256": "d0d56e8116c6bb9b8ce3940f7e3ad17189bce59887835a84dcdf83087e2442fd"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/capture-manifest.json",
-        "sha256": "dc208780cef2d0421597cfa683a6754496ece1ecb2e96ebf7ae755ce3804ff2e"
+        "sha256": "d92afaa1c80dc2db5337bbbee2de96e476f5d330a93cfaa527994180790c18e0"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-desktop/capture-manifest.json",
-        "sha256": "7d4ad6521ed265b08412d625531a10292c0b133350537c87ed46c38af1a7ee8a"
+        "sha256": "c676dffaf9487d3c1b49fd25bbee97ad12a4071c15aa590861ad7c0373948a24"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/capture-manifest.json",
-        "sha256": "6dc05740adce737f0be2f74d6b826bd80aa6f800ef023182fca7b29ac27be8c5"
+        "sha256": "ceb03f6f3c857bc6102c90b21778defacf90ea907bf2d9f4e9d7baef05f8e991"
       }
     ],
     "evidence_notes": [
       "Os quatro perfis P0, Battle Live e os sete pacotes focais 02–08 foram recapturados integralmente no mesmo digest, sem carry-forward de PNGs do aggregate anterior.",
-      "Os 26 manifests referenciam 453 capturas PASS_RUNTIME; cada PNG foi aberto individualmente e bytes, dimensões e SHA-256 foram reconciliados.",
+      "Os 26 manifests referenciam 456 capturas PASS_RUNTIME; as 456 telas foram abertas em 85 pranchas de revisão visual, e bytes, dimensões e SHA-256 foram reconciliados sem divergências.",
       "O Samsung SM-A135M físico concluiu 54/54 checkpoints em Android 14, incluindo captura ADB nativa do Life Counter em landscape.",
-      "Os 12 perfis adicionados pelos Packs 05–08 cobrem Social/Trade, Onboarding Intent, Visual System Workspace e Critical Overlays and States em 390x844, 1440x900 e 1920x1080.",
-      "Fixtures de QA ficaram limitadas a loopback ou gateways em memória, foram encerradas e não escreveram em PostgreSQL live, Hermes ou SQLite."
+      "Os Packs 02–08 somam 237 capturas focais e cobrem Binder, Workshop, Battle Learning, Social/Trade, Onboarding Intent, Visual System Workspace e Critical Overlays and States nos três breakpoints Web.",
+      "Fixtures de QA ficaram limitadas a PostgreSQL loopback ou gateways em memória, foram encerradas e não escreveram em PostgreSQL live, Hermes ou SQLite."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-06T19:55:31Z",
+    "reviewed_at": "2026-08-10T16:10:00Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -149,7 +149,7 @@
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "Nas 453 capturas, títulos, contexto, evidência e CTA mantêm ordem clara; Home, decks, Binder, Oficina, Battle, onboarding, perfis e Trade possuem âncoras próprias."
+        "note": "Nas 456 capturas, títulos, contexto, evidência e CTA mantêm ordem clara; Home, decks, Binder, Oficina, Battle, onboarding, perfis e Trade possuem âncoras próprias."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -169,7 +169,7 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, cinco de Battle Live e 234 focais; não houve overflow bloqueante, campo estreito ou perda permanente de navegação."
+        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, cinco de Battle Live e 237 focais; não houve overflow bloqueante, campo estreito ou perda permanente de navegação."
       },
       "interaction_clarity": {
         "status": "pass",
@@ -189,32 +189,32 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "1bd32c295b273e1ec7a60936d83b140e661a1b9b16cc42286de37937d3bdb5cb",
-      "eba8af16484de3775190655c01618e90f9c4d80e325cd1f9fb7e6843875a1b5d",
-      "b566d5c9fd0a3e603cfa16af56d93a216e78d8d868cc465624bdf9b8e5aa6742",
-      "76dbfee3973147f2b309540d220d3dd9b5e4b9e7526f1225e2e5d45825a4d4d4",
-      "8fe94f18086cd1e25df89811337f73cdf75f2f0d851c2dffc132faeb1706463a",
-      "f928cee7a5e10787219f6259bd9cde3d0ef44205e9e2498b35e1ff1759da35ad",
-      "6465d7bd1f11b5fa70a69323a949364ded931752840757f110c2675463752bac",
-      "aa8a3e8d95185c5c9d339d41b382aa80ba33dce3a709836cc37892025f40e407",
-      "a1db912e6de9f22501f82280d6c91c254e5c155462bc7d09bf3d6d0e90d6a153",
-      "fb3cfa58153da0bb520e934619b3b97bccacc9d155267e8dc38d9f8f88863e25",
-      "d7aec27aa0687154ebdce1a9ab4eb3a4a49bd7149676694d2a90611ac4997ca4",
-      "4281a1867bed6da056300c67bb5c34c715fdd0cf840b86cd98fafa62bf74be3d",
-      "a35214b6e835bcbe3943a7aac7420f48a404745b6847178ad8b7ae4d0581a330",
-      "d49bcd0e9f16794a22c871c385edba7a5c7ff382c72e2cf086f3df6c98810d4c",
-      "04dab07e28b0f4521f1bbdef7f85feda4e633e7d91810b94569f96377a07cb8a",
-      "4b2c33a0dfddd8dccbd4d7a3bc5abbe4027dbf30d31b2721df342d6c9a92cfa3",
-      "f1443ba83748500f34104a50dd697934c27d041ae25de8c4f0297e6e4f7be46a",
-      "0b935c8ce5ad991e12fe184c55bf296c03e5a004cc3b3dbea583f14df3cfac90",
-      "4b51916676fea751deca73c495ea66dbf203b72ebddfdbc687d3f81d89e9bf9b",
-      "d6f972d6e1b4c517f3341c449f398311882c32e53f712b639e118400f7418473",
-      "5dabc2c70f355279e54b5f1917ad94b561c01fb9d851ef5f949e187aba4d2257",
-      "445c898b7ca97dc9bc4c17a9e82ab35c6db013729fa3fd9581e4e5b12879af61",
-      "f3fdc7c74053eb04688f447e35ceae7c7794fdddf719e1d47fe3f1c4b4cbb693",
-      "dc208780cef2d0421597cfa683a6754496ece1ecb2e96ebf7ae755ce3804ff2e",
-      "7d4ad6521ed265b08412d625531a10292c0b133350537c87ed46c38af1a7ee8a",
-      "6dc05740adce737f0be2f74d6b826bd80aa6f800ef023182fca7b29ac27be8c5"
+      "d9106e19e042e7a84f8341d1ee31737de9f32f7edfc05c2146ac2f03ec6c8cf8",
+      "bc02777f46b00f0cd294cb07205dc6e019b5e414fe55454ea3e3252ba5f117c4",
+      "6877218ed84bdff4f4844ff5e279e4ae001359dc2c25fcf55fee23ce40e74161",
+      "4bd41770483ac09f2683de9025172c2b25d280af3359391b996a125e28c5269d",
+      "72b5fb6aa2f5e1483d0361b8b6843afd8553fce165caabf6e4b25c94fce629dd",
+      "88bf33455539b58f307fe49f9672f010c2ef57cfd23f760f52a719d5f04e3ada",
+      "35d18047872a5a784867bef63b0c929bc3f06676ec7a0b163e12dbae7fd3aa11",
+      "a892fb30858a10b16f8974aa2d58996871c7e79b0b1554b74fe5c7dd71e208c0",
+      "b1aee9ccbfd6d6666a1b8548c87517df4895a018605c669c5bcbee80ca69318f",
+      "45369318dddfcaa2baafc73a3be27727893b7c590939cbdd011b54f9cfcf5ded",
+      "4c181e25c5a352b95292aaebfa81382b4cdde892aed86a3300653f03da86cb7d",
+      "d923d90f15fff7eca3a785cf4f8aa88ab87ac3be3b8b9cedce98efc1fb20b7c7",
+      "d8f24d3db2a870b6e947ae663fef1aecae92130af3aa2387cf5ce74a71305b89",
+      "37053f0518a7f923fc944c795c852b73334cd919b0cae567fb7fade54e7708f3",
+      "a80c1cb525beebf16bff1d0381d890af9dc3ad15177ea23954c83da64a5106e6",
+      "bb037d75a18767d94b96f8d93476c7b5856d69a1a0ba8192df81c83ba29ca3ba",
+      "508416fa96886cc636e8cc16c59814c95465ce615e6c10f71ba5325dbe95a62a",
+      "f6968967cf02afbde7863cf1f99f32b0cd353d59dafc45e6877a8373beda9c4b",
+      "0ed774c084f7491bcd06ba682634aecdd3d798af44fd7941e342e20ce70e85fb",
+      "1430a455b3659b0240e0a26658597080fc2989354dde82278cbb6333d7e4f201",
+      "3e908a8d06f6de1b9b78356eb21d5022597c728b6242e0854c820b69b2a05bd1",
+      "d3b172972cff365a1dd372b7838cab12fab469aa07f801309325a7e9fe433082",
+      "d0d56e8116c6bb9b8ce3940f7e3ad17189bce59887835a84dcdf83087e2442fd",
+      "d92afaa1c80dc2db5337bbbee2de96e476f5d330a93cfaa527994180790c18e0",
+      "c676dffaf9487d3c1b49fd25bbee97ad12a4071c15aa590861ad7c0373948a24",
+      "ceb03f6f3c857bc6102c90b21778defacf90ea907bf2d9f4e9d7baef05f8e991"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",
@@ -244,7 +244,7 @@
       "web_critical_overlays_desktop_1440x900",
       "web_critical_overlays_wide_1920x1080"
     ],
-    "reviewed_screenshot_count": 453,
+    "reviewed_screenshot_count": 456,
     "blocking_findings": [],
     "follow_up_findings": [
       "P1 — Detalhes do Deck corta Visão Geral para Visão Ge em mobile/Android; preservar acesso e corrigir compactação ou affordance das abas.",
@@ -253,6 +253,7 @@
       "P2 — carrosséis móveis de cartas, edições e evidências deixam o próximo item parcialmente visível, mas não explicam claramente a rolagem horizontal.",
       "P2 — a captura focal de recuperação de comandante isola somente o seletor e produz grande área vazia; manter a prova de recuperação, mas adicionar contexto do CTA pai em uma futura matriz.",
       "P2 — a fixture de Battle Learning expõe o texto artificial Revisão aaaaaaaa preservada; substituir por dado determinístico com aparência realista na próxima recaptura que tocar a superfície.",
+      "P2 — em alguns estados de consentimento do cadastro mobile, o título Criar conta fica parcialmente acima do frame após a rolagem; manter ações acessíveis e ajustar o anchor/offset visual.",
       "P2 — Legal/Privacy permanece informativo de beta, usa grande área vazia em alguns anchors e requer revisão jurídica externa antes de lançamento comercial.",
       "TalkBack humano, hardware smoke Android e teclado Web real permanecem verificações de release separadas."
     ]

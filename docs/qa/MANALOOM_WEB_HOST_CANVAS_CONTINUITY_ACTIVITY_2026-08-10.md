@@ -1,8 +1,8 @@
 # ManaLoom — atividade de continuidade do canvas Web
 
 Data: 2026-08-10
-Estado: `IMPLEMENTED_LOCAL · AUTOMATED_PASS · TARGETED_RUNTIME_PASS · FULL_REANCHOR_PENDING`
-Prioridade: `P1 QA/VISUAL · BEFORE_FINAL_REANCHOR`
+Estado: `IMPLEMENTED_LOCAL · AUTOMATED_PASS · FULL_REANCHOR_PASS · PASS_VISUAL_REVIEWED`
+Prioridade: `CLOSED · FOLLOW-UPS_NON_BLOCKING`
 Origem: revisão humana da janela Chrome que executava o checkpoint
 `battle_learning_00_play_entry`
 
@@ -107,8 +107,9 @@ com a interface.
 - abrir individualmente cada captura nova aplicável;
 - confirmar continuidade Obsidian, hierarquia preservada e ausência de flash
   ou margem branca;
-- não conceder `PASS_VISUAL_REVIEWED` global enquanto o Samsung físico estiver
-  stale.
+- conceder `PASS_VISUAL_REVIEWED` global somente depois de recapturar o
+  Samsung físico no mesmo digest, abrir todas as capturas e reconciliar o
+  aggregate sem divergências.
 
 ## Impacto na evidência existente
 
@@ -154,25 +155,44 @@ Validações aprovadas:
 - `flutter build web --release --no-pub --no-web-resources-cdn --base-href /app/`;
 - inspeção visual focal nos três viewports oficiais.
 
-Esta inspeção focal demonstra a correção do host, mas não substitui a
-recaptura/revisão integral dos fluxos nem concede `PASS_VISUAL_REVIEWED`
-global.
+Naquele checkpoint, a inspeção focal demonstrava a correção do host, mas ainda
+não substituía a recaptura/revisão integral dos fluxos nem concedia
+`PASS_VISUAL_REVIEWED` global.
 
-O gate `./scripts/quality_gate.sh ui-proof` foi executado depois da mudança e
-falhou de forma esperada e saudável: o review e os manifests ainda apontam
-para o digest anterior, os hashes não cobrem as capturas do digest novo e a
-contagem revisada não cobre todo o runtime. Nenhuma evidência antiga foi
+O gate `./scripts/quality_gate.sh ui-proof` executado imediatamente depois da
+mudança falhou de forma esperada e saudável: naquele momento, review e
+manifests ainda apontavam para o digest anterior. Nenhuma evidência antiga foi
 promovida ou marcada como corrente.
 
-Depois da implementação, a sequência obrigatória é:
+Depois da implementação, a sequência obrigatória foi executada:
 
-1. gerar e registrar o novo digest;
-2. executar testes automatizados focais;
-3. recapturar e revisar os perfis Web exigidos pela política;
-4. conectar o Samsung SM-A135M e recapturar 54 checkpoints físicos;
-5. reconciliar `26 manifests/456 capturas` e gerar o aggregate oficial;
-6. executar gates humanos/hardware;
-7. por último, obter o parecer jurídico externo assinado.
+1. o digest definitivo `4aee8114…` foi registrado;
+2. os testes automatizados focais passaram;
+3. os perfis Web exigidos pela política foram recapturados;
+4. o Samsung SM-A135M físico foi atestado por ADB e concluiu 54 checkpoints;
+5. os `26 manifests/456 capturas` foram reconciliados sem divergências;
+6. todas as 456 capturas foram abertas e o aggregate oficial recebeu
+   `PASS_VISUAL_REVIEWED`;
+7. evidence gate, `ui-proof` e `ui-audit` passaram.
+
+## Encerramento integral de 2026-08-10
+
+A atividade está fechada no digest
+`4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c`.
+A revisão abriu 456/456 capturas em 85 pranchas, incluindo 214 P0, cinco de
+Battle Live e 237 focais dos UX-PACKs 02–08. Não houve faixa branca, overflow
+bloqueante, perda de CTA ou campo permanentemente estreito.
+
+O aggregate corrente está em
+`docs/qa/ui-live/latest.json` com
+`PASS_AUTOMATED · PASS_RUNTIME · PASS_VISUAL_REVIEWED`. Permanecem somente
+follow-ups não bloqueantes de densidade desktop/wide, truncamento de texto,
+affordance de carrossel e polish de anchors.
+
+TalkBack humano, teclado Web de hardware real e smoke físico de release
+continuam checks separados. O parecer jurídico externo assinado permanece,
+por decisão do responsável do produto, como a última etapa antes de qualquer
+lançamento comercial.
 
 ## Rollback
 
