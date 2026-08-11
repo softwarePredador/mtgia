@@ -25,6 +25,10 @@ void main() {
         'Escolha uma senha menos previsível, sem sequências ou dados da conta.',
       );
       expect(
+        validateRegistrationPassword('BrewTact!2026-safe'),
+        'Escolha uma senha menos previsível, sem sequências ou dados da conta.',
+      );
+      expect(
         validateRegistrationPassword('xx12345678yy'),
         'Escolha uma senha menos previsível, sem sequências ou dados da conta.',
       );

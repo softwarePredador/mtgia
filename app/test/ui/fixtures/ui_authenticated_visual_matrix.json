@@ -243,7 +243,7 @@
       "route": "/",
       "auth": "initializing",
       "states": ["success", "above_fold"],
-      "anchor": "ManaLoom splash art",
+      "anchor": "assets/branding/splash_art.png",
       "source": "lib/features/auth/screens/splash_screen.dart"
     },
     {

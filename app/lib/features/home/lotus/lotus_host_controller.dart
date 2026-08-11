@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/observability/app_observability.dart';
 import '../../../core/theme/app_theme.dart';
 import '../life_counter/life_counter_day_night_state.dart';
@@ -638,10 +639,10 @@ class LotusHostController
         LotusLiveStoragePatchCoordinator,
         LotusStorageFlushBarrier {
   static const String _bundleLoadErrorMessage =
-      'O ManaLoom não conseguiu abrir o contador de vida. '
+      'O ${ProductIdentity.displayName} não conseguiu abrir o contador de vida. '
       'Tente carregar novamente.';
   static const String _storageBootstrapErrorMessage =
-      'O ManaLoom não conseguiu restaurar o estado do contador de vida. '
+      'O ${ProductIdentity.displayName} não conseguiu restaurar o estado do contador de vida. '
       'Tente carregar novamente.';
 
   LotusHostController({
@@ -1771,7 +1772,9 @@ class LotusHostController
   }
 
   void _notifyBlockedNavigation(String url) {
-    _onShellMessageRequested('ManaLoom blocked an external link: $url');
+    _onShellMessageRequested(
+      '${ProductIdentity.displayName} blocked an external link: $url',
+    );
   }
 
   void _handleConsoleMessage(JavaScriptConsoleMessage message) {

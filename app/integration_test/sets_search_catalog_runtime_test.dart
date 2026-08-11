@@ -21,7 +21,7 @@ void main() {
         ChangeNotifierProvider<CardProvider>(
           create: (_) => CardProvider(),
           child: MaterialApp(
-            title: 'ManaLoom Search Sets Runtime',
+            title: 'BrewTact Search Sets Runtime',
             theme: AppTheme.darkTheme,
             home: const CardSearchScreen(deckId: 'runtime', mode: 'binder'),
           ),

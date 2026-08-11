@@ -14,7 +14,7 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          title: 'ManaLoom Sets Runtime',
+          title: 'BrewTact Sets Runtime',
           theme: AppTheme.darkTheme,
           home: const SetsCatalogScreen(),
         ),

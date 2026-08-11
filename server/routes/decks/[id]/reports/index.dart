@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/http_responses.dart';
+import '../../../../lib/public_site_url.dart';
 import '../../../../lib/reports/shareable_report_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -29,13 +30,13 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     );
     if (report == null) return notFound('Deck nao encontrado.');
 
-    final publicUrl = _publicReportUrl(report['id']?.toString() ?? '');
+    final publicUrl = buildPublicReportUrl(
+      Platform.environment,
+      report['id']?.toString() ?? '',
+    );
     return Response.json(
       statusCode: HttpStatus.created,
-      body: {
-        'report': report,
-        'public_url': publicUrl,
-      },
+      body: {'report': report, 'public_url': publicUrl},
     );
   } catch (error) {
     return internalServerError(
@@ -43,13 +44,4 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       details: error,
     );
   }
-}
-
-String _publicReportUrl(String reportId) {
-  final base = (Platform.environment['MANALOOM_PUBLIC_SITE_URL'] ??
-          Platform.environment['NEXT_PUBLIC_SITE_URL'] ??
-          'https://manaloom.com')
-      .trim()
-      .replaceFirst(RegExp(r'/+$'), '');
-  return '$base/reports/$reportId';
 }

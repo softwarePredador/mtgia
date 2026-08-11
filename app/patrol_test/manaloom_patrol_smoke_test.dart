@@ -65,7 +65,7 @@ void main() {
   ) async {
     await _pumpProductApp($, initialLocation: '/login');
 
-    expect($('ManaLoom'), findsOneWidget);
+    expect($('BrewTact'), findsOneWidget);
 
     await $(find.byKey(const Key('login-submit-button'))).tap();
     expect($('Digite seu email'), findsOneWidget);
@@ -78,7 +78,7 @@ void main() {
     ).enterText('Password123!');
     await $(find.byKey(const Key('login-submit-button'))).tap();
 
-    await _expectTextEventually($, 'Vamos preparar seu primeiro deck');
+    await _expectTextEventually($, 'O que você quer fazer primeiro?');
     await _scrollUntilVisibleAndTap($, const Key('onboarding-skip-action'));
     await _expectTextEventually($, 'Beta gratuita');
     expect($(find.byKey(const Key('ai-usage-meter'))), findsOneWidget);

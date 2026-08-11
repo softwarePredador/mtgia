@@ -58,6 +58,51 @@ void main() {
     );
   });
 
+  test('live eval carries source limits and incomplete-deck constraints', () {
+    final cases = (suite['cases'] as List).cast<Map<String, dynamic>>();
+    final sourceCase = cases.firstWhere(
+      (testCase) =>
+          testCase['id'] == 'otaria_low_profile_sparse_corpus_bracket2',
+    );
+    final incompleteCase = cases.firstWhere(
+      (testCase) =>
+          testCase['id'] == 'konrad_collection_only_zero_budget_incomplete',
+    );
+
+    final sourcePrompt =
+        jsonDecode(buildCommanderAiLiveEvalPrompt(sourceCase))
+            as Map<String, dynamic>;
+    final incompletePrompt =
+        jsonDecode(buildCommanderAiLiveEvalPrompt(incompleteCase))
+            as Map<String, dynamic>;
+    final sourceConstraints =
+        (sourcePrompt['constraints'] as Map).cast<String, dynamic>();
+    final incompleteConstraints =
+        (incompletePrompt['constraints'] as Map).cast<String, dynamic>();
+
+    expect(sourcePrompt['reference_context'], isNotEmpty);
+    expect(
+      sourceConstraints['disclose_profile_and_corpus_limitations'],
+      isTrue,
+    );
+    expect(incompletePrompt['deck_state'], containsPair('target_size', 100));
+    expect(incompleteConstraints['collection_only_is_hard'], isTrue);
+    expect(incompleteConstraints['acknowledge_incomplete_deck'], isTrue);
+
+    final candidates = buildCommanderAiLiveEvalSameLaneCandidates(
+      incompleteCase,
+    );
+    expect(candidates, isNotEmpty);
+    expect(
+      candidates.every((candidate) => candidate['collection_match'] == true),
+      isTrue,
+    );
+    expect(
+      candidates.where((candidate) => candidate['in'] == 'Mind Stone'),
+      isEmpty,
+    );
+  });
+
   test('live eval runner applies the existing deterministic scorer', () async {
     final candidate =
         (lorehold['candidate_response'] as Map).cast<String, dynamic>();

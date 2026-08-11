@@ -15,6 +15,8 @@ void main() {
     test('portable export omits credentials and is never cacheable', () {
       expect(exportRoute, contains("'Cache-Control': 'no-store, max-age=0'"));
       expect(exportRoute, contains("'Content-Disposition':"));
+      expect(exportRoute, contains('brewtact-user-data-'));
+      expect(exportRoute, isNot(contains('manaloom-user-data-')));
       expect(service, contains("'schema_version': 1"));
       expect(service, contains("'decks': decks"));
       expect(service, contains("'deck_learning_events': deckLearningEvents"));

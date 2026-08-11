@@ -84,7 +84,7 @@ class ResendEmailConfiguration {
     }
 
     final configuredName = environment[resendFromNameEnvironment];
-    final fromName = configuredName?.trim() ?? 'ManaLoom';
+    final fromName = configuredName?.trim() ?? 'BrewTact';
     if (fromName.isEmpty ||
         fromName.length > 100 ||
         fromName.contains('<') ||

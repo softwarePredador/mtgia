@@ -13,7 +13,7 @@ class BillingResult {
   final Map<String, dynamic> body;
 }
 
-/// Billing is deliberately unavailable while ManaLoom is a free beta.
+/// Billing is deliberately unavailable while BrewTact is a free beta.
 ///
 /// This provider has no environment escape hatch. Re-enabling purchases must
 /// introduce a reviewed provider adapter, signed checkout sessions, idempotent
@@ -41,7 +41,7 @@ class ManaLoomPaymentProvider {
         'billing_enabled': false,
         'purchase_available': false,
         'message':
-            'O ManaLoom está em beta gratuita. Nenhuma compra ou cobrança está disponível.',
+            'O BrewTact está em beta gratuita. Nenhuma compra ou cobrança está disponível.',
       },
     );
   }

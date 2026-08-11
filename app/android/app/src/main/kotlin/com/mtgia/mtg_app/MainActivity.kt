@@ -32,7 +32,7 @@ class MainActivity : FlutterActivity() {
 
         val channel = NotificationChannel(
             PUSH_NOTIFICATION_CHANNEL,
-            "ManaLoom",
+            "BrewTact",
             NotificationManager.IMPORTANCE_DEFAULT,
         ).apply {
             description = "Notificações de mensagens, trocas e comunidade"

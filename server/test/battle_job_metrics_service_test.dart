@@ -14,6 +14,7 @@ void main() {
     final snapshot = BattleJobMetricsService.snapshotFromRow({
       'jobs_created': 9,
       'jobs_active': 2,
+      'oldest_active_seconds': 181,
       'jobs_completed': 4,
       'jobs_censored': 1,
       'jobs_timeout': 1,
@@ -45,6 +46,18 @@ void main() {
 
     expect(snapshot['schema_version'], battleJobMetricsSchemaVersion);
     expect(snapshot['status'], 'ok');
+    expect(snapshot['jobs'], {
+      'created': 9,
+      'active': 2,
+      'oldest_active_seconds': 181,
+      'completed': 4,
+      'censored': 1,
+      'timeout': 1,
+      'coverage_error': 1,
+      'engine_error': 1,
+      'cancelled': 0,
+      'persistence_error': 1,
+    });
     expect(snapshot['queue'], {
       'depth': 2,
       'oldest_wait_seconds': 7,
@@ -74,6 +87,7 @@ void main() {
         File('routes/health/dashboard/index.dart').readAsStringSync();
 
     expect(sql, contains('queue_wait_p95_ms'));
+    expect(sql, contains('oldest_active_seconds'));
     expect(sql, contains('duration_p95_ms'));
     expect(sql, contains('octet_length(request_payload::text)'));
     expect(sql, contains('events_truncated OR snapshots_truncated'));
@@ -81,5 +95,6 @@ void main() {
     expect(sql, contains("status = 'persistence_error'"));
     expect(dashboard, contains('BattleJobMetricsService(pool).snapshot()'));
     expect(dashboard, contains("'battle_jobs': battleJobs"));
+    expect(dashboard, contains('battleJobs: battleJobs'));
   });
 }

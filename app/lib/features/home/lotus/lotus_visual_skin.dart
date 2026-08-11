@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../../core/branding/product_identity.dart';
 import 'lotus_runtime_flags.dart';
 import 'lotus_webview_contract.dart';
 
@@ -2374,7 +2375,7 @@ textarea:focus-visible {
 
   const syncPtBrCopy = () => {
     document.documentElement.lang = 'pt-BR';
-    document.title = 'ManaLoom • Contador de vida';
+    document.title = '${ProductIdentity.lifeCounterTitlePtBr}';
     const roots = document.querySelectorAll([
       '.menu-button-overlay',
       '.settings-overlay',

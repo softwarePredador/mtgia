@@ -23,10 +23,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </span>
             <span className="min-w-0">
               <span className="block truncate font-display text-lg font-semibold leading-none text-ivory-100 sm:text-xl">
-                ManaLoom
+                BrewTact
               </span>
               <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-brass-400 sm:block">
-                Tecendo estratégias
+                Monte melhor. Jogue melhor.
               </span>
             </span>
           </Link>
@@ -54,7 +54,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               <span className="relative h-10 w-10 overflow-hidden rounded-xl border border-brass-400/25">
                 <Image src="/branding/app_logo.png" alt="" fill sizes="40px" className="object-cover" />
               </span>
-              <div className="font-display text-xl font-semibold">ManaLoom</div>
+              <div className="font-display text-xl font-semibold">BrewTact</div>
             </div>
             <p className="mt-3 max-w-md text-sm leading-6 text-mist-300">
               Sua próxima jogada começa no app: decks, coleção, preços e trocas no mesmo lugar.

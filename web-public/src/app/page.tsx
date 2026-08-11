@@ -9,8 +9,8 @@ import { loadPublicSiteFeed, type MarketplaceCardSummary } from "@/lib/public-se
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "ManaLoom",
-  description: "Commander, coleção, mercado e IA em uma experiência ManaLoom."
+  title: "BrewTact",
+  description: "Commander, coleção, mercado e IA em uma experiência BrewTact."
 };
 
 export const revalidate = 300;
@@ -88,11 +88,11 @@ export default async function HomePage() {
         <Container className="relative flex min-h-[calc(100svh-11rem)] items-center py-8 sm:py-10">
           <div className="w-full max-w-[calc(100vw-2.5rem)] sm:max-w-3xl">
             <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-[18px] border border-brass-400/28 bg-obsidian-950 shadow-brass sm:mb-6 sm:h-24 sm:w-24 sm:rounded-[26px]">
-              <Image src="/branding/app_logo.png" alt="ManaLoom" fill sizes="(min-width: 640px) 96px, 80px" className="object-cover" />
+              <Image src="/branding/app_logo.png" alt="BrewTact" fill sizes="(min-width: 640px) 96px, 80px" className="object-cover" />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-brass-400 sm:text-sm">Commander, coleção e mercado</p>
             <h1 className="mt-3 max-w-4xl break-words font-display text-[3.2rem] font-semibold leading-[0.98] text-ivory-100 sm:mt-4 sm:text-7xl sm:leading-[0.95]">
-              ManaLoom
+              BrewTact
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-mist-300 sm:mt-5 sm:text-lg sm:leading-8">
               Construa decks, acompanhe sua coleção e encontre oportunidades de troca com cartas e preços reais.
@@ -116,7 +116,7 @@ export default async function HomePage() {
         <Container className="grid gap-12 lg:grid-cols-[0.68fr_1.32fr]">
           <SectionHeader eyebrow="Produto" title="Da primeira lista ao upgrade da mesa.">
             <p>
-              ManaLoom organiza deck, coleção e mercado em um fluxo só para Commander.
+              BrewTact organiza deck, coleção e mercado em um fluxo só para Commander.
             </p>
           </SectionHeader>
           <div className="grid gap-4 md:grid-cols-2">

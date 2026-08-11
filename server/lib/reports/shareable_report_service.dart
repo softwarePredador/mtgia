@@ -36,7 +36,7 @@ class ShareableReportService {
     final title =
         _cleanString(body['title']).isNotEmpty
             ? _cleanString(body['title'])
-            : 'Relatorio ManaLoom - ${deck['name']}';
+            : 'Relatorio BrewTact - ${deck['name']}';
     final description =
         _cleanString(body['description']).isNotEmpty
             ? _cleanString(body['description'])
@@ -199,8 +199,10 @@ class ShareableReportService {
     return {
       'id': map['id']?.toString() ?? '',
       'deck_id': map['deck_id']?.toString(),
-      'title': map['title']?.toString() ?? '',
-      'description': map['description']?.toString() ?? '',
+      'title': normalizeShareableReportTitle(map['title']?.toString() ?? ''),
+      'description': normalizeShareableReportDescription(
+        map['description']?.toString() ?? '',
+      ),
       'payload': _jsonMap(map['payload']),
       'is_public': map['is_public'] == true,
       'created_at': _dateString(map['created_at']),
@@ -215,7 +217,7 @@ class ShareableReportService {
   ) {
     final type = payload['type']?.toString();
     if (type == 'optimization_preview') {
-      return 'Relatorio antes/depois gerado pelo ManaLoom para revisar trocas antes de aplicar.';
+      return 'Relatorio antes/depois gerado pelo BrewTact para revisar trocas antes de aplicar.';
     }
     return 'Relatorio compartilhavel do deck ${deck['name']}.';
   }
@@ -247,4 +249,17 @@ class ShareableReportService {
         ).join();
     return 'rpt_${DateTime.now().microsecondsSinceEpoch}_$suffix';
   }
+}
+
+String normalizeShareableReportTitle(String value) {
+  const legacyPrefix = 'Relatorio ManaLoom - ';
+  if (!value.startsWith(legacyPrefix)) return value;
+  return 'Relatorio BrewTact - ${value.substring(legacyPrefix.length)}';
+}
+
+String normalizeShareableReportDescription(String value) {
+  const legacyDescription =
+      'Relatorio antes/depois gerado pelo ManaLoom para revisar trocas antes de aplicar.';
+  if (value != legacyDescription) return value;
+  return 'Relatorio antes/depois gerado pelo BrewTact para revisar trocas antes de aplicar.';
 }

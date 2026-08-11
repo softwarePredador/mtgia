@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/branding/product_identity.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/login_screen.dart';
@@ -48,7 +49,7 @@ void main() {
     await tester.pumpWidget(_buildWithAuth(const LoginScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('ManaLoom'), findsOneWidget);
+    expect(find.text(ProductIdentity.displayName), findsOneWidget);
     expect(
       find.text('Acesse decks, coleção, trades e partidas.'),
       findsOneWidget,
@@ -103,7 +104,7 @@ void main() {
     await tester.pumpWidget(_buildWithAuth(const RegisterScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Comece no ManaLoom'), findsNothing);
+    expect(find.text('Comece no ${ProductIdentity.displayName}'), findsNothing);
     expect(find.text('Criar conta'), findsNWidgets(2));
     expect(
       find.text('Configure seu acesso em menos de um minuto.'),

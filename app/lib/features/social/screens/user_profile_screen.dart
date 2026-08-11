@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -362,7 +363,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         if (user.createdAt != null) ...[
           const SizedBox(height: AppTheme.space5),
           Text(
-            'No ManaLoom desde ${user.createdAt!.year}',
+            'No ${ProductIdentity.displayName} desde ${user.createdAt!.year}',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
             ),

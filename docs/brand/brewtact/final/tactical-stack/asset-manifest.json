@@ -1,0 +1,545 @@
+{
+  "brand": "BrewTact",
+  "direction": "Tactical Stack",
+  "palette": {
+    "abyss": "#0B0D12",
+    "slate": "#151821",
+    "elevated_slate": "#1D222C",
+    "brass": "#C58B2A",
+    "brass_highlight": "#E0A93B",
+    "brass_shadow": "#8E641B",
+    "frost": "#6FA8DC",
+    "deep_frost": "#3E5F8A",
+    "ivory": "#F3EFE3",
+    "mist": "#B8C0CC",
+    "muted_outline": "#293041"
+  },
+  "generator": "scripts/generate_brewtact_brand_assets.py",
+  "files": [
+    {
+      "path": "app/android/app/src/main/res/drawable/ic_launcher_monochrome.xml",
+      "sha256": "e8d49211d84f28abdeef6f051d59a0b7d9faafb908a5c2a025c080e4988ea7b6",
+      "bytes": 631
+    },
+    {
+      "path": "app/android/app/src/main/res/drawable/ic_stat_manaloom_notification.xml",
+      "sha256": "a37d6a0a5659bc2133285dc031c1f1311bbd1a06289fbb2406f89f45b1ebfaaf",
+      "bytes": 629
+    },
+    {
+      "path": "app/android/app/src/main/res/drawable/launch_background.xml",
+      "sha256": "9e175b1f1729db39881e9f21df6a8081aaef6e6ce701fe48f9e9446e7220fa44",
+      "bytes": 282
+    },
+    {
+      "path": "app/android/app/src/main/res/drawable/launch_mark.xml",
+      "sha256": "7fd5d3ef187869402629af418756c138ae849edbbceafa0a4a901632ebb1cf61",
+      "bytes": 1042
+    },
+    {
+      "path": "app/android/app/src/main/res/drawable-nodpi/ic_launcher_foreground.png",
+      "sha256": "701eb3e1f5ba9dda5234e5f43622f0bcd50064433e0f055e7c596cabd50e419b",
+      "bytes": 7683
+    },
+    {
+      "path": "app/android/app/src/main/res/drawable-nodpi/launch_image.png",
+      "sha256": "b34821a15c52f24d9e1345036266bb58cbd01d4bdf5e6776daec8df537f4cfa6",
+      "bytes": 21228
+    },
+    {
+      "path": "app/android/app/src/main/res/drawable-v21/launch_background.xml",
+      "sha256": "9e175b1f1729db39881e9f21df6a8081aaef6e6ce701fe48f9e9446e7220fa44",
+      "bytes": 282
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "32715ff646f6b9fef7c321138e4a14556c4a1f98a87b06070b56f41643dad718",
+      "bytes": 270
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "sha256": "32715ff646f6b9fef7c321138e4a14556c4a1f98a87b06070b56f41643dad718",
+      "bytes": 270
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml",
+      "sha256": "bbaf996b7b1356da55819d20c1920c34e20b1288fe7cec441aefeda5ea53d24a",
+      "bytes": 341
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-anydpi-v33/ic_launcher_round.xml",
+      "sha256": "bbaf996b7b1356da55819d20c1920c34e20b1288fe7cec441aefeda5ea53d24a",
+      "bytes": 341
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "sha256": "2eca15e7cf4f498f476e2aa5bec2f4f3c58fe9447eafc748e2473bf435ea4fe4",
+      "bytes": 2581
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+      "sha256": "2eca15e7cf4f498f476e2aa5bec2f4f3c58fe9447eafc748e2473bf435ea4fe4",
+      "bytes": 2581
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "sha256": "086b6adae5c61f9ae024bb5ba2f84ba972c2c1ca34334df3211025adb0fbf7ee",
+      "bytes": 1704
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+      "sha256": "086b6adae5c61f9ae024bb5ba2f84ba972c2c1ca34334df3211025adb0fbf7ee",
+      "bytes": 1704
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "sha256": "5b6f26511b1cd2240ed8706907597e75458f5dd62180665e02d40bce468c2bbf",
+      "bytes": 3418
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+      "sha256": "5b6f26511b1cd2240ed8706907597e75458f5dd62180665e02d40bce468c2bbf",
+      "bytes": 3418
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "sha256": "1e47e8a39ac1b4dd15df3a071c246f990af0dfbb61f75313c20a28d583255d9b",
+      "bytes": 4917
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "sha256": "1e47e8a39ac1b4dd15df3a071c246f990af0dfbb61f75313c20a28d583255d9b",
+      "bytes": 4917
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "sha256": "7b8324421aeae2d9423b4db28c8b379dd101e7e9655916a83745eedff000268f",
+      "bytes": 6360
+    },
+    {
+      "path": "app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "sha256": "7b8324421aeae2d9423b4db28c8b379dd101e7e9655916a83745eedff000268f",
+      "bytes": 6360
+    },
+    {
+      "path": "app/android/app/src/main/res/values/colors.xml",
+      "sha256": "223f26521fd7c297504be30afc256979b4fa8fa95e5fb0778040f5ad436c4c9f",
+      "bytes": 175
+    },
+    {
+      "path": "app/android/app/src/main/res/values-night-v31/styles.xml",
+      "sha256": "8144e418b38587923a4b92e85911450b2fd974849ab55e383e80ef29939287d0",
+      "bytes": 612
+    },
+    {
+      "path": "app/android/app/src/main/res/values-v31/styles.xml",
+      "sha256": "df368366feff5ff9f92cc5f27a1bf2969b4de6a68d096d80224a33fc59d231a7",
+      "bytes": 612
+    },
+    {
+      "path": "app/assets/branding/app_logo.png",
+      "sha256": "4ec4158ee301028dbb7c5f3dd690bb2eec9b31b4c1c71bb1245968aa72e8d91b",
+      "bytes": 18310
+    },
+    {
+      "path": "app/assets/branding/brewtact_lockup_horizontal.svg",
+      "sha256": "0b9677ba6fd11f0367cc66d6e28de514e1d9c60a78035f1e5ad175cb94d297c1",
+      "bytes": 21136
+    },
+    {
+      "path": "app/assets/branding/brewtact_lockup_stacked.svg",
+      "sha256": "87f88677dca6e891f1d65939a7a338ffd90ecfb0c4d7b41826b2d319e77c98ba",
+      "bytes": 21136
+    },
+    {
+      "path": "app/assets/branding/brewtact_wordmark.svg",
+      "sha256": "632d54080559fc2659d4c2e14765476d62d8d4fed42ff755f605e4d4b27ef99f",
+      "bytes": 20501
+    },
+    {
+      "path": "app/assets/branding/home_hero.png",
+      "sha256": "b7438fa2d559a7acd7654901a6398e0fa49c4b888a51d7669f1fa3aa5ad6a9d5",
+      "bytes": 57601
+    },
+    {
+      "path": "app/assets/branding/home_hero_banner.png",
+      "sha256": "20d14f32fe232c8b01416e78df25ec93dd2a1f2754a195ae06fc968436a83095",
+      "bytes": 20358
+    },
+    {
+      "path": "app/assets/branding/splash_art.png",
+      "sha256": "b2fe3404ece960cd08284d09777ee3e2a8ec509a91123dfaa1a27d1c1683b19a",
+      "bytes": 44691
+    },
+    {
+      "path": "app/assets/branding/splash_art_wide.png",
+      "sha256": "10ec389aba5990f03c228567917ce01797a1d596ee66773e17580fd0d9ac4fa9",
+      "bytes": 46027
+    },
+    {
+      "path": "app/assets/icons/brand.svg",
+      "sha256": "a63216b456ce49baa2630f007e3c24a4d92ad5b09ce157b5ac314f41338223d7",
+      "bytes": 798
+    },
+    {
+      "path": "app/assets/lotus/images/app-icon.svg",
+      "sha256": "1739d8c544bc1913935edecf08724428abb84a36feb13de9d16a33b0c38e99f1",
+      "bytes": 886
+    },
+    {
+      "path": "app/assets/lotus/images/dagger.svg",
+      "sha256": "85f12ee40094d352f87dc4b9ae35705249220c440829e7886859c25581adea55",
+      "bytes": 467
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "sha256": "3b1e214f466ffedff74baa5598ad5c4421130eea6bc8d57b8fe23435e8280ae4",
+      "bytes": 2519
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png",
+      "sha256": "4ec4158ee301028dbb7c5f3dd690bb2eec9b31b4c1c71bb1245968aa72e8d91b",
+      "bytes": 18310
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png",
+      "sha256": "ebbd2d71e690317312073986234e10c47497c7ab4c60a03372507090f3683541",
+      "bytes": 642
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png",
+      "sha256": "55ee52b56eb233dd6110d4d263f7cee71cfb60bc608ff8ceb0cce85055728167",
+      "bytes": 1371
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png",
+      "sha256": "8bbc7e9966aaefcf374cef55fb012640e723e00c24052cd1bf588c18c2b26b22",
+      "bytes": 2150
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png",
+      "sha256": "28522202faaadb2979ee098ed95cd3f99088d482468e82fc0de0886ed9447134",
+      "bytes": 951
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png",
+      "sha256": "62823bb3bd27479e6527e81d2c7da9be58401a105f2bafba352c9ba2bea291d9",
+      "bytes": 2084
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png",
+      "sha256": "7bcd7953b657b93a715da5f1c313f112e2b5371e77addc40fc9cbd95bccfc46c",
+      "bytes": 3076
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png",
+      "sha256": "55ee52b56eb233dd6110d4d263f7cee71cfb60bc608ff8ceb0cce85055728167",
+      "bytes": 1371
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png",
+      "sha256": "6dd39afafce71409c4851d533b61831638b303cbfaa61d59a628d66ee8f00365",
+      "bytes": 2809
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png",
+      "sha256": "87387fac85e5ea81badec23c65f0ee048dd8be08420de457953eec36ee4fcfd3",
+      "bytes": 4209
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png",
+      "sha256": "87387fac85e5ea81badec23c65f0ee048dd8be08420de457953eec36ee4fcfd3",
+      "bytes": 4209
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png",
+      "sha256": "d13b3b1233af2ea88e6a3a96cf81326e8f43448e36031a5a018f657844fe513a",
+      "bytes": 6019
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png",
+      "sha256": "2e8ce30d92457240c602f528923f57655f9b9a2015e78f5b7248e20de5d7f9be",
+      "bytes": 2702
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png",
+      "sha256": "956c9c2a93872d87fe4cc247ea95621210f0e75cfb519d83492e3e86f89a8125",
+      "bytes": 5170
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png",
+      "sha256": "8bfdc52a9ebba782ce3a3215c98788793c5923f03cf14f2a811b382cfa2b7d76",
+      "bytes": 5638
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+      "sha256": "ccc7950fd5f5b82067c85f667940a9d59189151460761ece8098ca78daa19469",
+      "bytes": 391
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+      "sha256": "1c6d16ca7801975f09fa295a495870f9c65cbb0124b86fe31be9dba8f2fc8af3",
+      "bytes": 6609
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+      "sha256": "862385fb318141ab8ade3638502b94df64195240f8d944d9493a662913e020d5",
+      "bytes": 13914
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+      "sha256": "e4a78e498ee789e3ba92da9b0d4d3e3c0ccc40e1a026f6f2acd01a23f14a888a",
+      "bytes": 24123
+    },
+    {
+      "path": "app/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+      "sha256": "0e5cc8c8d391d41f93daccca6e7afa3ceefba8b8ffe1438bfbef6437b46dbeef",
+      "bytes": 249
+    },
+    {
+      "path": "app/ios/Runner/Base.lproj/LaunchScreen.storyboard",
+      "sha256": "80de5dde282a8c8b1b6d29da6d8084d2611535a55b64a8c49119069b19a584f0",
+      "bytes": 2699
+    },
+    {
+      "path": "app/web/favicon.ico",
+      "sha256": "c83ff2e3569a59c03386e96501b768a82db39ab3d4daeb3d35e6db6051a9c236",
+      "bytes": 34494
+    },
+    {
+      "path": "app/web/favicon.png",
+      "sha256": "ae841e53b0a318400f6fe863fa4ead5c77d59f23873fb009bee3c50a65534242",
+      "bytes": 1445
+    },
+    {
+      "path": "app/web/icons/Icon-192.png",
+      "sha256": "7b8324421aeae2d9423b4db28c8b379dd101e7e9655916a83745eedff000268f",
+      "bytes": 6360
+    },
+    {
+      "path": "app/web/icons/Icon-512.png",
+      "sha256": "1fdefded62c6b482b07a0d466a847af444a9a17892fccbb279e61c30e609c8a1",
+      "bytes": 14256
+    },
+    {
+      "path": "app/web/icons/Icon-maskable-192.png",
+      "sha256": "e8a9cbc6d12a57a31de049d0087aef5a73222b749f678fac1d7ed462bb87d46a",
+      "bytes": 4935
+    },
+    {
+      "path": "app/web/icons/Icon-maskable-512.png",
+      "sha256": "fdebc722cdd6b78dfe4a7258957ee03e1d7f2d74598753dd33f10751d9f9c026",
+      "bytes": 11206
+    },
+    {
+      "path": "app/web/manifest.json",
+      "sha256": "49dfa7ef5159063c7970dad6d3d9e195595057c09081583c55b38df6093c641b",
+      "bytes": 939
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-adaptive-foreground.svg",
+      "sha256": "8332a5e7dcec9f21306ead274ad256d2c8e966472fd4864808e679e965dfc225",
+      "bytes": 850
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-app-icon-maskable.svg",
+      "sha256": "ef720e8f3d51d942d8afaa4ab8d10fd7128a8886a9e46efcf636af88065ab726",
+      "bytes": 893
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-app-icon.svg",
+      "sha256": "12f544056793538d2fb862b725b6dc6abd60a3df04cac6b3e3f023705db524e3",
+      "bytes": 893
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-favicon-optical.svg",
+      "sha256": "57d5e389e0399c31383fff28fa40cf49c8f21a12c40c374b84dd47f603c8da9b",
+      "bytes": 896
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-home-hero-banner.svg",
+      "sha256": "6ee39ebde9deb6503608eb478def76bcedfc8e9dc29e36cb4d9ee902a6dce2f5",
+      "bytes": 1862
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-home-hero.svg",
+      "sha256": "3b2e41fe38c58e8ccc88d774e8f4ccbedc59be21e49b602636986ee8f6467695",
+      "bytes": 2259
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-lockup-horizontal-mono.svg",
+      "sha256": "597437cd2720ed26185bad870a271ae408bf8377cd4e5fe5751d36541541bb20",
+      "bytes": 21136
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-lockup-horizontal.svg",
+      "sha256": "0b9677ba6fd11f0367cc66d6e28de514e1d9c60a78035f1e5ad175cb94d297c1",
+      "bytes": 21136
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-lockup-stacked.svg",
+      "sha256": "87f88677dca6e891f1d65939a7a338ffd90ecfb0c4d7b41826b2d319e77c98ba",
+      "bytes": 21136
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-splash-portrait.svg",
+      "sha256": "8589ac95cde74b7bf885d815faf872d805eff75fc24e74425bb3851bc6c9f11e",
+      "bytes": 1883
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-splash-wide.svg",
+      "sha256": "c8975f539f7449ccb16ab69677df5257fb53a7dabfc2ab579719d5bd0efc3a1e",
+      "bytes": 1888
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-tactical-stack-mark-mono-dark.svg",
+      "sha256": "c1ea8cd91ff07182028b81f159826ad676f09dcc0d6b0a27474b0d62851a6680",
+      "bytes": 798
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-tactical-stack-mark-mono-light.svg",
+      "sha256": "fc88a7ce3975e5fc020d5db2b55e3747bacb01825d105d9f2b12cbe3c19da981",
+      "bytes": 798
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-tactical-stack-mark.svg",
+      "sha256": "a63216b456ce49baa2630f007e3c24a4d92ad5b09ce157b5ac314f41338223d7",
+      "bytes": 798
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-wordmark-mono.svg",
+      "sha256": "ae584e56d58a0bad4ad7f39ff967a1ad328014405e7b84c086cdf3fa76050f1a",
+      "bytes": 20501
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/master/brewtact-wordmark.svg",
+      "sha256": "632d54080559fc2659d4c2e14765476d62d8d4fed42ff755f605e4d4b27ef99f",
+      "bytes": 20501
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/app-icon-1024.png",
+      "sha256": "4ec4158ee301028dbb7c5f3dd690bb2eec9b31b4c1c71bb1245968aa72e8d91b",
+      "bytes": 18310
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/favicon-16.png",
+      "sha256": "4824a94299e9775e87bbdee6ecaebbb3119f3a9c68b9e442e954987903e0e1d7",
+      "bytes": 647
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/favicon-32.png",
+      "sha256": "ae841e53b0a318400f6fe863fa4ead5c77d59f23873fb009bee3c50a65534242",
+      "bytes": 1445
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/favicon-48.png",
+      "sha256": "6f266fa6ab163c9a15aa87235b0eef483599fd2ab4f23ca43b3bcfd6f13dce01",
+      "bytes": 2145
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/favicon-optical-1024.png",
+      "sha256": "8a1a93b6510cb5527195fd6940c7b61f4424967a38aa1fb0f7f3ad5ec8fce88d",
+      "bytes": 23009
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/horizontal-lockup.png",
+      "sha256": "12f7c54b4576aaa2f8a95000d42893c64c12da06418257041ed9f7a2acd8bb04",
+      "bytes": 49910
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/mark-16.png",
+      "sha256": "2f343221fa998624e6c042eff3adf1645d6f510d4b01652480d6fe07c8e94717",
+      "bytes": 623
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/mark-256.png",
+      "sha256": "5c1064e9428948d8edfa3d22dc8ce1ec89bd755ba56cef20e4ca3e657338d6f9",
+      "bytes": 4693
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/mark-32.png",
+      "sha256": "da17c3db615a181c8cdee0ed90c5ec50b9daf39539ffd5146c26606297b9e277",
+      "bytes": 1166
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/mark-64.png",
+      "sha256": "9a8747b3610a0f0ef6f339036f5c44423e06517fa3f1279171623b21950e4932",
+      "bytes": 2277
+    },
+    {
+      "path": "docs/brand/brewtact/final/tactical-stack/previews/stacked-lockup.png",
+      "sha256": "bc95b9e62725a4204babd47d97f8db863b318e2134a0c4ac0defd1f103034333",
+      "bytes": 46297
+    },
+    {
+      "path": "web-public/public/branding/app_logo.png",
+      "sha256": "4ec4158ee301028dbb7c5f3dd690bb2eec9b31b4c1c71bb1245968aa72e8d91b",
+      "bytes": 18310
+    },
+    {
+      "path": "web-public/public/branding/brewtact_lockup_horizontal.svg",
+      "sha256": "0b9677ba6fd11f0367cc66d6e28de514e1d9c60a78035f1e5ad175cb94d297c1",
+      "bytes": 21136
+    },
+    {
+      "path": "web-public/public/branding/brewtact_lockup_stacked.svg",
+      "sha256": "87f88677dca6e891f1d65939a7a338ffd90ecfb0c4d7b41826b2d319e77c98ba",
+      "bytes": 21136
+    },
+    {
+      "path": "web-public/public/branding/brewtact_mark.svg",
+      "sha256": "a63216b456ce49baa2630f007e3c24a4d92ad5b09ce157b5ac314f41338223d7",
+      "bytes": 798
+    },
+    {
+      "path": "web-public/public/branding/brewtact_wordmark.svg",
+      "sha256": "632d54080559fc2659d4c2e14765476d62d8d4fed42ff755f605e4d4b27ef99f",
+      "bytes": 20501
+    },
+    {
+      "path": "web-public/public/branding/home_hero.png",
+      "sha256": "b7438fa2d559a7acd7654901a6398e0fa49c4b888a51d7669f1fa3aa5ad6a9d5",
+      "bytes": 57601
+    },
+    {
+      "path": "web-public/public/branding/home_hero_banner.png",
+      "sha256": "20d14f32fe232c8b01416e78df25ec93dd2a1f2754a195ae06fc968436a83095",
+      "bytes": 20358
+    },
+    {
+      "path": "web-public/public/branding/splash_art_wide.png",
+      "sha256": "10ec389aba5990f03c228567917ce01797a1d596ee66773e17580fd0d9ac4fa9",
+      "bytes": 46027
+    },
+    {
+      "path": "web-public/public/favicon.ico",
+      "sha256": "c83ff2e3569a59c03386e96501b768a82db39ab3d4daeb3d35e6db6051a9c236",
+      "bytes": 34494
+    },
+    {
+      "path": "web-public/public/favicon.png",
+      "sha256": "ae841e53b0a318400f6fe863fa4ead5c77d59f23873fb009bee3c50a65534242",
+      "bytes": 1445
+    },
+    {
+      "path": "web-public/public/icons/Icon-192.png",
+      "sha256": "7b8324421aeae2d9423b4db28c8b379dd101e7e9655916a83745eedff000268f",
+      "bytes": 6360
+    },
+    {
+      "path": "web-public/public/icons/Icon-512.png",
+      "sha256": "1fdefded62c6b482b07a0d466a847af444a9a17892fccbb279e61c30e609c8a1",
+      "bytes": 14256
+    },
+    {
+      "path": "web-public/public/icons/Icon-maskable-192.png",
+      "sha256": "e8a9cbc6d12a57a31de049d0087aef5a73222b749f678fac1d7ed462bb87d46a",
+      "bytes": 4935
+    },
+    {
+      "path": "web-public/public/icons/Icon-maskable-512.png",
+      "sha256": "fdebc722cdd6b78dfe4a7258957ee03e1d7f2d74598753dd33f10751d9f9c026",
+      "bytes": 11206
+    }
+  ]
+}

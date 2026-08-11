@@ -80,7 +80,7 @@ class _RuntimeApiClient extends ApiClient {
   Map<String, dynamic> profile = <String, dynamic>{
     'id': 'visual-profile-user',
     'username': 'mestre_do_fichario',
-    'email': 'jogador@manaloom.local',
+    'email': 'jogador@brewtact.local',
     'display_name': 'Marina — Arquivista de Comandantes do Litoral',
     'avatar_url': null,
     'location_state': 'SP',
@@ -401,7 +401,7 @@ void main() {
         tokenStore: AuthTokenStore(secureBackend: _MemorySecureTokenBackend()),
       );
       expect(
-        await authProvider.login('jogador@manaloom.local', 'VisualOnly123!'),
+        await authProvider.login('jogador@brewtact.local', 'VisualOnly123!'),
         isTrue,
       );
       final router = _router(apiClient);

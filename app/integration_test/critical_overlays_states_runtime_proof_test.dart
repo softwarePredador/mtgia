@@ -7,6 +7,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/branding/product_identity.dart';
 import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/app_state_panel.dart';
@@ -120,7 +121,7 @@ class _CriticalApiClient extends ApiClient {
   final profile = <String, dynamic>{
     'id': 'pack08-profile-user',
     'username': 'guardiao_do_fichario',
-    'email': 'guardiao@manaloom.local',
+    'email': 'guardiao@brewtact.local',
     'display_name': 'Guardião do Fichário',
     'avatar_url': null,
     'location_state': 'SP',
@@ -568,7 +569,7 @@ class _ContractStateScreen extends StatelessWidget {
               : 'Sua sessão expirou',
           message: permissionDenied
               ? 'As preferências de privacidade ou segurança impedem a abertura deste conteúdo. Volte à Comunidade para continuar.'
-              : 'Entre novamente para proteger sua conta. Depois da autenticação, o ManaLoom pode retomar o destino solicitado.',
+              : 'Entre novamente para proteger sua conta. Depois da autenticação, o ${ProductIdentity.displayName} pode retomar o destino solicitado.',
           accent: permissionDenied ? AppTheme.warning : AppTheme.error,
           status: permissionDenied
               ? AppStateStatus.unavailable
@@ -613,7 +614,7 @@ void main() {
         tokenStore: AuthTokenStore(secureBackend: _MemorySecureTokenBackend()),
       );
       expect(
-        await auth.login('guardiao@manaloom.local', 'VisualOnly123!'),
+        await auth.login('guardiao@brewtact.local', 'VisualOnly123!'),
         isTrue,
       );
       await tester.pumpWidget(_profileApp(api: api, auth: auth));

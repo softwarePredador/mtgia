@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'package:server/battle/battle_job_contract.dart';
 import 'package:server/battle/interactive_battle_contract.dart';
+import 'package:server/battle/interactive_battle_metrics_service.dart';
 import 'package:server/battle/interactive_battle_runtime_client.dart';
 import 'package:server/battle/interactive_battle_service.dart';
 import 'package:server/battle/interactive_battle_store.dart';
@@ -111,6 +112,57 @@ void main() {
       expect(waiting.prompt?.id, _promptId);
       expect(waiting.privateState['own_hand'], hasLength(1));
 
+      await pool.execute(
+        Sql.named('''
+          UPDATE interactive_battle_sessions
+          SET prompt_deadline_at = CURRENT_TIMESTAMP - INTERVAL '1 second'
+          WHERE id = CAST(@session_id AS uuid)
+            AND user_id = CAST(@user_id AS uuid)
+        '''),
+        parameters: {'session_id': _sessionId, 'user_id': _ownerId},
+      );
+      final overdueMetrics =
+          await InteractiveBattleMetricsService(pool).snapshot();
+      final overdueActive = overdueMetrics['active'] as Map<String, dynamic>;
+      expect(overdueActive['total'], 1);
+      expect(overdueActive['waiting_for_action'], 1);
+      expect(overdueActive['waiting_past_prompt_deadline'], 1);
+      expect(overdueActive['ttl_expired_non_terminal'], 0);
+      expect(overdueActive['max_age_seconds'], isA<int>());
+      expect(overdueActive['max_prompt_overdue_seconds'], isA<int>());
+      await expectLater(
+        store.reserveAction(
+          userId: _ownerId,
+          id: _sessionId,
+          action: InteractiveBattleActionInput(
+            stateVersion: 4,
+            promptId: _promptId,
+            responseKind: InteractiveBattleResponseKind.delegate,
+            idempotencyKey: 'interactive-action-after-deadline',
+          ),
+        ),
+        throwsA(isA<InteractiveBattleStaleActionException>()),
+      );
+      final lateActionRecords = await pool.execute(
+        Sql.named('''
+          SELECT COUNT(*)::int
+          FROM interactive_battle_records
+          WHERE session_id = CAST(@session_id AS uuid)
+            AND record_kind = 'action_submitted'
+        '''),
+        parameters: {'session_id': _sessionId},
+      );
+      expect(lateActionRecords.single.single, 0);
+      await pool.execute(
+        Sql.named('''
+          UPDATE interactive_battle_sessions
+          SET prompt_deadline_at = CURRENT_TIMESTAMP + INTERVAL '1 minute'
+          WHERE id = CAST(@session_id AS uuid)
+            AND user_id = CAST(@user_id AS uuid)
+        '''),
+        parameters: {'session_id': _sessionId, 'user_id': _ownerId},
+      );
+
       final action = InteractiveBattleActionInput.parse({
         'state_version': 4,
         'prompt_id': _promptId,
@@ -187,6 +239,11 @@ void main() {
       );
       expect(terminal.status, InteractiveBattleStatus.abandoned);
       expect(terminal.finishedAt, isNotNull);
+      final terminalMetrics =
+          await InteractiveBattleMetricsService(pool).snapshot();
+      expect((terminalMetrics['active'] as Map)['total'], 0);
+      expect((terminalMetrics['terminals_24h'] as Map)['total'], 1);
+      expect((terminalMetrics['terminals_24h'] as Map)['abandoned'], 1);
 
       await pool.execute(
         Sql.named('DELETE FROM users WHERE id = CAST(@id AS uuid)'),

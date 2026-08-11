@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 
 void main() {
-  test('ships every original ManaLoom glyph as a 24 by 24 SVG', () {
+  test('ships product glyphs and the BrewTact mark as scalable SVGs', () {
     final pubspec = File('pubspec.yaml').readAsStringSync();
     expect(pubspec, contains('- assets/icons/'));
 
@@ -19,9 +19,14 @@ void main() {
       );
 
       final source = asset.readAsStringSync();
-      expect(source, contains('viewBox="0 0 24 24"'));
-      expect(source, contains('fill="none"'));
-      expect(source, contains('stroke-linecap="round"'));
+      if (kind == ManaLoomGlyphKind.brand) {
+        expect(source, contains('viewBox="0 0 256 256"'));
+        expect(source, contains('BrewTact Tactical Stack mark'));
+      } else {
+        expect(source, contains('viewBox="0 0 24 24"'));
+        expect(source, contains('fill="none"'));
+        expect(source, contains('stroke-linecap="round"'));
+      }
       expect(source, isNot(contains('<text')));
     }
   });

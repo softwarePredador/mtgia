@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 
 class TradeSafetyNotice extends StatelessWidget {
@@ -8,7 +9,7 @@ class TradeSafetyNotice extends StatelessWidget {
   final bool compact;
 
   static const String message =
-      'O ManaLoom registra a proposta e a conversa, mas não recebe, guarda '
+      'O ${ProductIdentity.displayName} registra a proposta e a conversa, mas não recebe, guarda '
       'nem protege pagamentos. Confira cartas, valores, identidade e entrega '
       'diretamente com o outro jogador.';
 

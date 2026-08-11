@@ -16,7 +16,8 @@ Future<Response> onRequest(RequestContext context, String id) async {
     // Verificar propriedade
     final deckResult = await conn.execute(
       Sql.named(
-          'SELECT name, format FROM decks WHERE id = @deckId AND user_id = @userId'),
+        'SELECT name, format FROM decks WHERE id = @deckId AND user_id = @userId',
+      ),
       parameters: {'deckId': id, 'userId': userId},
     );
 
@@ -48,7 +49,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
     final buffer = StringBuffer();
     buffer.writeln('// $deckName ($deckFormat)');
-    buffer.writeln('// Exported from ManaLoom');
+    buffer.writeln('// Exported from BrewTact');
     buffer.writeln();
 
     final commanders = <String>[];
@@ -61,7 +62,9 @@ Future<Response> onRequest(RequestContext context, String id) async {
       final setCode = (row[3] as String?) ?? '';
 
       final line =
-          setCode.isNotEmpty ? '${quantity}x $name ($setCode)' : '${quantity}x $name';
+          setCode.isNotEmpty
+              ? '${quantity}x $name ($setCode)'
+              : '${quantity}x $name';
 
       if (isCommander) {
         commanders.add(line);
@@ -87,12 +90,14 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
     final text = buffer.toString();
 
-    return Response.json(body: {
-      'deck_name': deckName,
-      'format': deckFormat,
-      'text': text,
-      'card_count': commanders.length + mainCards.length,
-    });
+    return Response.json(
+      body: {
+        'deck_name': deckName,
+        'format': deckFormat,
+        'text': text,
+        'card_count': commanders.length + mainCards.length,
+      },
+    );
   } catch (e) {
     print('[ERROR] Failed to export deck: $e');
     return Response.json(

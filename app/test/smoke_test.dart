@@ -1,4 +1,4 @@
-/// Smoke tests para o app Flutter ManaLoom.
+/// Smoke tests para o app Flutter BrewTact.
 /// Estes testes validam que os widgets principais renderizam corretamente.
 library;
 
@@ -12,13 +12,13 @@ void main() {
         const MaterialApp(
           home: Scaffold(
             body: Center(
-              child: Text('ManaLoom'),
+              child: Text('BrewTact'),
             ),
           ),
         ),
       );
 
-      expect(find.text('ManaLoom'), findsOneWidget);
+      expect(find.text('BrewTact'), findsOneWidget);
     });
   });
 }

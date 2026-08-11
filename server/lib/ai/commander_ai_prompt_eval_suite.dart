@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 const commanderAiPromptEvalSchemaVersion =
-    'commander_ai_prompt_eval_v2_2026-07-22';
+    'commander_ai_prompt_eval_v3_2026-08-11';
 
 Map<String, dynamic> evaluateCommanderAiPromptSuite(
   Map<String, dynamic> suite, {
@@ -90,9 +90,12 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
   final bracket = _intValue(testCase['bracket']);
   final expected = _mapValue(testCase['expected']);
   final context = _mapValue(testCase['recommendation_context']);
+  final referenceContext = _mapValue(testCase['reference_context']);
+  final deckState = _mapValue(testCase['deck_state']);
   final blockedPairs = _blockedPairs(testCase['blocked_pairs']);
   final battleEvidenceAllowed = testCase['battle_evidence_allowed'] == true;
   final swaps = _mapList(candidateResponse['swaps']);
+  final summaryText = candidateResponse['summary']?.toString().trim() ?? '';
 
   void addCheck(
     String status,
@@ -147,6 +150,7 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
   var collectionMatches = 0;
   var unknownCards = 0;
   final appliedSwaps = <Map<String, String>>[];
+  final collectionOnlyViolations = <String>[];
 
   for (var i = 0; i < swaps.length; i++) {
     final swap = swaps[i];
@@ -227,8 +231,11 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
       if (owned) {
         collectionMatches++;
       } else {
+        collectionOnlyViolations.add(inName);
         totalPurchaseBrl += _doubleValue(inMeta['price_brl']) ?? 0;
       }
+    } else {
+      collectionOnlyViolations.add(inName);
     }
 
     if (outMeta != null && inMeta != null) {
@@ -305,6 +312,18 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
     },
   );
 
+  final collectionOnly = context['collection_only'] == true;
+  if (collectionOnly) {
+    requireCheck(
+      collectionOnlyViolations.isEmpty,
+      'collection_only_respected',
+      'Every suggested addition is present in the declared collection.',
+      'collection_only forbids unowned or unknown additions.',
+      weight: 12,
+      details: {'violations': collectionOnlyViolations},
+    );
+  }
+
   final minCollectionMatches =
       _intValue(expected['min_collection_matches']) ?? 0;
   requireCheck(
@@ -348,6 +367,117 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
     );
   }
 
+  final commandZone = _stringList(testCase['command_zone']);
+  final pairingMechanics = _validatedCommanderPairingMechanics(
+    testCase,
+    catalog,
+  );
+  if (commandZone.isNotEmpty) {
+    final commandZoneKeys = commandZone.map(_normalizeName).toSet();
+    requireCheck(
+      commandZone.length == commandZoneKeys.length &&
+          (commandZone.length == 1 || commandZone.length == 2),
+      'command_zone_shape',
+      'Command-zone input has one solo commander or one validated pair.',
+      'command_zone must contain one or two distinct cards.',
+      weight: 10,
+      details: {'command_zone': commandZone},
+    );
+    requireCheck(
+      commandZoneKeys.every(deckNames.contains) &&
+          commandZoneKeys.every(catalog.containsKey),
+      'command_zone_catalog_and_deck_backed',
+      'Every command-zone card exists in the deck and card catalog.',
+      'Every command-zone card must exist in the deck and card catalog.',
+      weight: 12,
+    );
+    requireCheck(
+      commandZoneKeys.every(protectedNames.contains),
+      'command_zone_protected',
+      'Every command-zone card is protected from cuts.',
+      'Every command-zone card must be protected from cuts.',
+      weight: 12,
+    );
+    if (commandZone.length == 2) {
+      requireCheck(
+        pairingMechanics.isNotEmpty,
+        'commander_pairing_verified',
+        'The two-card command zone has a structurally verified pairing rule.',
+        'A two-card command zone requires verified partner, background, or Doctor\'s companion evidence.',
+        weight: 14,
+        details: {'verified_mechanics': pairingMechanics.toList()..sort()},
+      );
+    }
+  }
+
+  final sourceStates = _sourceStates(testCase);
+  if (referenceContext.isNotEmpty) {
+    final fallback = referenceContext['fallback']?.toString().trim() ?? '';
+    requireCheck(
+      fallback.isNotEmpty,
+      'reference_fallback_declared',
+      'Reference limitations have an explicit deterministic fallback.',
+      'Missing, low-confidence, or sparse references require an explicit fallback.',
+      weight: 10,
+    );
+    for (final state in sourceStates) {
+      requireCheck(
+        _summaryDisclosesSourceState(summaryText, state),
+        'source_state_${state}_disclosed',
+        'The response discloses $state source limitations.',
+        'The response must disclose the derived $state source limitation.',
+        weight: 12,
+      );
+    }
+    if (sourceStates.isNotEmpty) {
+      requireCheck(
+        _foldEvidenceText(summaryText).contains('fallback'),
+        'reference_fallback_disclosed',
+        'The response tells the user that a fallback was used.',
+        'The response must disclose that it used a fallback.',
+        weight: 10,
+      );
+      requireCheck(
+        !_containsUnsupportedReferenceClaim(
+          _combinedResponseText(candidateResponse),
+        ),
+        'no_unsupported_reference_confidence_claim',
+        'The response does not overstate profile or corpus confidence.',
+        'The response overstates confidence despite limited reference evidence.',
+        weight: 12,
+      );
+    }
+  }
+
+  final targetDeckSize = _intValue(deckState['target_size']);
+  if (targetDeckSize != null) {
+    requireCheck(
+      targetDeckSize > 0 && _intValue(deckState['current_size']) == deck.length,
+      'deck_state_matches_input',
+      'Declared deck size matches the actual eval deck input.',
+      'deck_state.current_size must equal the actual deck length and target_size must be positive.',
+      weight: 10,
+      details: {
+        'declared_current_size': _intValue(deckState['current_size']),
+        'actual_current_size': deck.length,
+        'target_size': targetDeckSize,
+      },
+    );
+    if (deck.length < targetDeckSize) {
+      requireCheck(
+        _summaryAcknowledgesIncompleteDeck(summaryText),
+        'incomplete_deck_acknowledged',
+        'The response explicitly treats the input as an incomplete deck.',
+        'Recommendations for a partial list must disclose that the deck is incomplete.',
+        weight: 12,
+      );
+    }
+  }
+
+  final exercisedLayouts = _validatedIncomingLayouts(testCase, catalog);
+  final colorFeatures = _validatedColorFeatures(testCase, catalog);
+  final constraintStates = _constraintStates(testCase);
+
   final score = _scoreChecks(checks);
   final hardFailures =
       checks.where((entry) => entry['status'] == 'fail').toList();
@@ -364,6 +494,11 @@ Map<String, dynamic> evaluateCommanderAiPromptCase(
     'archetype_family': testCase['archetype_family']?.toString() ?? '',
     'bracket': bracket,
     'color_bucket': _commanderColorBucket(testCase['color_identity']),
+    'commander_pairing_mechanics': pairingMechanics.toList()..sort(),
+    'exercised_card_layouts': exercisedLayouts.toList()..sort(),
+    'color_features': colorFeatures.toList()..sort(),
+    'source_states': sourceStates.toList()..sort(),
+    'constraint_states': constraintStates.toList()..sort(),
     'status': status,
     'score': score,
     'minimum_score': minScoreForCase,
@@ -402,6 +537,13 @@ String commanderAiPromptEvalMarkdown(Map<String, dynamic> report) {
       ..writeln('- brackets: `${coverage['brackets']}`')
       ..writeln('- color buckets: `${coverage['color_buckets']}`')
       ..writeln('- archetype families: `${coverage['archetype_family_count']}`')
+      ..writeln(
+        '- commander pairings: `${coverage['commander_pairing_mechanics']}`',
+      )
+      ..writeln('- color features: `${coverage['color_features']}`')
+      ..writeln('- card layouts: `${coverage['card_layouts']}`')
+      ..writeln('- source states: `${coverage['source_states']}`')
+      ..writeln('- constraint states: `${coverage['constraint_states']}`')
       ..writeln();
     final failures = _mapList(coverage['failures']);
     if (failures.isNotEmpty) {
@@ -453,7 +595,7 @@ Map<String, dynamic> _evaluateSuiteCoverage(
   }
 
   const requiredSplit = 'held_out';
-  const minimumCaseCount = 6;
+  const minimumCaseCount = 12;
   const requiredBrackets = <int>{1, 2, 3, 4, 5};
   const requiredColorBuckets = <String>{
     'colorless',
@@ -461,7 +603,20 @@ Map<String, dynamic> _evaluateSuiteCoverage(
     'two',
     'three_plus',
   };
-  const minimumArchetypeFamilyCount = 6;
+  const minimumArchetypeFamilyCount = 10;
+  const requiredCommanderPairingMechanics = <String>{'background'};
+  const requiredColorFeatures = <String>{'five_color', 'hybrid_mana'};
+  const requiredCardLayouts = <String>{'modal_dfc', 'split', 'adventure'};
+  const requiredSourceStates = <String>{
+    'profile_missing',
+    'profile_low_confidence',
+    'corpus_sparse',
+  };
+  const requiredConstraintStates = <String>{
+    'collection_only',
+    'zero_budget',
+    'incomplete_deck',
+  };
   final declared = _mapValue(suite['coverage_requirements']);
   final failures = <Map<String, dynamic>>[];
 
@@ -483,6 +638,26 @@ Map<String, dynamic> _evaluateSuiteCoverage(
   final declaredBrackets = _intList(declared['required_brackets']).toSet();
   final declaredColorBuckets =
       _stringList(declared['required_color_buckets']).toSet();
+  final declaredPairingMechanics =
+      _stringList(
+        declared['required_commander_pairing_mechanics'],
+      ).map(_normalizeToken).toSet();
+  final declaredColorFeatures =
+      _stringList(
+        declared['required_color_features'],
+      ).map(_normalizeToken).toSet();
+  final declaredCardLayouts =
+      _stringList(
+        declared['required_card_layouts'],
+      ).map(_normalizeToken).toSet();
+  final declaredSourceStates =
+      _stringList(
+        declared['required_source_states'],
+      ).map(_normalizeToken).toSet();
+  final declaredConstraintStates =
+      _stringList(
+        declared['required_constraint_states'],
+      ).map(_normalizeToken).toSet();
   requireCoverage(
     suite['schema_version'] == commanderAiPromptEvalSchemaVersion,
     'fixture_schema_current',
@@ -496,7 +671,14 @@ Map<String, dynamic> _evaluateSuiteCoverage(
         declaredBrackets.containsAll(requiredBrackets) &&
         declaredColorBuckets.containsAll(requiredColorBuckets) &&
         (_intValue(declared['minimum_archetype_family_count']) ?? 0) >=
-            minimumArchetypeFamilyCount,
+            minimumArchetypeFamilyCount &&
+        declaredPairingMechanics.containsAll(
+          requiredCommanderPairingMechanics,
+        ) &&
+        declaredColorFeatures.containsAll(requiredColorFeatures) &&
+        declaredCardLayouts.containsAll(requiredCardLayouts) &&
+        declaredSourceStates.containsAll(requiredSourceStates) &&
+        declaredConstraintStates.containsAll(requiredConstraintStates),
     'coverage_contract_declared',
     'Fixture declares the complete held-out coverage contract.',
     'Fixture coverage requirements cannot weaken the product eval contract.',
@@ -525,6 +707,21 @@ Map<String, dynamic> _evaluateSuiteCoverage(
           )
           .where((entry) => entry.isNotEmpty)
           .toSet();
+  final observedPairingMechanics = <String>{};
+  final observedColorFeatures = <String>{};
+  final observedCardLayouts = <String>{};
+  final observedSourceStates = <String>{};
+  final observedConstraintStates = <String>{};
+  for (final testCase in cases) {
+    final catalog = _catalog(testCase['card_catalog']);
+    observedPairingMechanics.addAll(
+      _validatedCommanderPairingMechanics(testCase, catalog),
+    );
+    observedColorFeatures.addAll(_validatedColorFeatures(testCase, catalog));
+    observedCardLayouts.addAll(_validatedIncomingLayouts(testCase, catalog));
+    observedSourceStates.addAll(_sourceStates(testCase));
+    observedConstraintStates.addAll(_constraintStates(testCase));
+  }
 
   requireCoverage(
     cases.length >= minimumCaseCount,
@@ -573,6 +770,67 @@ Map<String, dynamic> _evaluateSuiteCoverage(
       'observed': observedArchetypeFamilies.toList()..sort(),
     },
   );
+  requireCoverage(
+    observedPairingMechanics.containsAll(requiredCommanderPairingMechanics),
+    'required_commander_pairing_mechanics',
+    'Required multi-commander mechanics are structurally exercised.',
+    'Held-out suite must structurally exercise a background command-zone pairing.',
+    details: {
+      'observed': observedPairingMechanics.toList()..sort(),
+      'missing':
+          requiredCommanderPairingMechanics
+              .difference(observedPairingMechanics)
+              .toList()
+            ..sort(),
+    },
+  );
+  requireCoverage(
+    observedColorFeatures.containsAll(requiredColorFeatures),
+    'required_color_features',
+    'Required color-identity features are exercised.',
+    'Held-out suite must exercise exact five-color identity and an incoming hybrid-mana card.',
+    details: {
+      'observed': observedColorFeatures.toList()..sort(),
+      'missing':
+          requiredColorFeatures.difference(observedColorFeatures).toList()
+            ..sort(),
+    },
+  );
+  requireCoverage(
+    observedCardLayouts.containsAll(requiredCardLayouts),
+    'required_card_layouts',
+    'Required multiface layouts are exercised by candidate additions.',
+    'Held-out suite must exercise verified MDFC, split, and adventure additions.',
+    details: {
+      'observed': observedCardLayouts.toList()..sort(),
+      'missing':
+          requiredCardLayouts.difference(observedCardLayouts).toList()..sort(),
+    },
+  );
+  requireCoverage(
+    observedSourceStates.containsAll(requiredSourceStates),
+    'required_source_states',
+    'Required profile and corpus limitations are represented by numeric source evidence.',
+    'Held-out suite must represent missing profile, low-confidence profile, and sparse corpus states.',
+    details: {
+      'observed': observedSourceStates.toList()..sort(),
+      'missing':
+          requiredSourceStates.difference(observedSourceStates).toList()
+            ..sort(),
+    },
+  );
+  requireCoverage(
+    observedConstraintStates.containsAll(requiredConstraintStates),
+    'required_constraint_states',
+    'Required collection, budget, and incomplete-deck constraints are represented.',
+    'Held-out suite must represent collection_only, zero budget, and an actually incomplete deck.',
+    details: {
+      'observed': observedConstraintStates.toList()..sort(),
+      'missing':
+          requiredConstraintStates.difference(observedConstraintStates).toList()
+            ..sort(),
+    },
+  );
 
   return {
     'status': failures.isEmpty ? 'pass' : 'fail',
@@ -582,8 +840,264 @@ Map<String, dynamic> _evaluateSuiteCoverage(
     'color_buckets': observedColorBuckets.toList()..sort(),
     'archetype_families': observedArchetypeFamilies.toList()..sort(),
     'archetype_family_count': observedArchetypeFamilies.length,
+    'commander_pairing_mechanics': observedPairingMechanics.toList()..sort(),
+    'color_features': observedColorFeatures.toList()..sort(),
+    'card_layouts': observedCardLayouts.toList()..sort(),
+    'source_states': observedSourceStates.toList()..sort(),
+    'constraint_states': observedConstraintStates.toList()..sort(),
     'failures': failures,
   };
+}
+
+Set<String> _validatedCommanderPairingMechanics(
+  Map<String, dynamic> testCase,
+  Map<String, Map<String, dynamic>> catalog,
+) {
+  final commandZone = _stringList(testCase['command_zone']);
+  if (commandZone.length != 2 || commandZone.toSet().length != 2) {
+    return <String>{};
+  }
+  final deckNames = _stringList(testCase['deck']).map(_normalizeName).toSet();
+  final metas = <Map<String, dynamic>>[];
+  for (final cardName in commandZone) {
+    final key = _normalizeName(cardName);
+    final meta = catalog[key];
+    if (!deckNames.contains(key) ||
+        meta == null ||
+        !_roleSet(meta).contains('commander')) {
+      return <String>{};
+    }
+    metas.add(meta);
+  }
+
+  final combinedIdentity = <String>{};
+  for (final meta in metas) {
+    combinedIdentity.addAll(_identitySet(meta['color_identity']));
+  }
+  if (!_setEquals(combinedIdentity, _identitySet(testCase['color_identity']))) {
+    return <String>{};
+  }
+
+  final oracleTexts = metas
+      .map((meta) => _foldEvidenceText(meta['oracle_text']?.toString() ?? ''))
+      .toList(growable: false);
+  final typeLines = metas
+      .map((meta) => _foldEvidenceText(meta['type_line']?.toString() ?? ''))
+      .toList(growable: false);
+  final mechanics = <String>{};
+  final hasChooseBackground = oracleTexts.any(
+    (text) => text.contains('choose a background'),
+  );
+  final hasBackground = typeLines.any(
+    (text) => RegExp(r'\bbackground\b').hasMatch(text),
+  );
+  if (hasChooseBackground && hasBackground) {
+    mechanics.add('background');
+  }
+  if (oracleTexts.every((text) => RegExp(r'\bpartner\b').hasMatch(text))) {
+    mechanics.add('partner');
+  }
+  final hasDoctor = typeLines.any(
+    (text) => RegExp(r'\bdoctor\b').hasMatch(text),
+  );
+  final hasDoctorsCompanion = oracleTexts.any(
+    (text) => text.contains("doctor's companion"),
+  );
+  if (hasDoctor && hasDoctorsCompanion) {
+    mechanics.add('doctors_companion');
+  }
+  return mechanics;
+}
+
+Set<String> _validatedIncomingLayouts(
+  Map<String, dynamic> testCase,
+  Map<String, Map<String, dynamic>> catalog,
+) {
+  const supportedLayouts = <String>{'modal_dfc', 'split', 'adventure'};
+  final layouts = <String>{};
+  final candidate = _mapValue(testCase['candidate_response']);
+  for (final swap in _mapList(candidate['swaps'])) {
+    final incomingName = swap['in']?.toString().trim() ?? '';
+    final meta = catalog[_normalizeName(incomingName)];
+    if (meta == null) continue;
+    final layout = _normalizeToken(meta['layout']?.toString() ?? '');
+    if (!supportedLayouts.contains(layout)) continue;
+    final nameFaces = incomingName
+        .split(' // ')
+        .map(_normalizeName)
+        .where((name) => name.isNotEmpty)
+        .toList(growable: false);
+    final declaredFaces = _stringList(
+      meta['faces'],
+    ).map(_normalizeName).toList(growable: false);
+    final faceTypes = _stringList(
+      meta['face_types'],
+    ).map(_foldEvidenceText).toList(growable: false);
+    if (nameFaces.length != 2 ||
+        declaredFaces.length != 2 ||
+        faceTypes.length != 2 ||
+        !_orderedListEquals(nameFaces, declaredFaces) ||
+        !_faceTypesMatchLayout(layout, faceTypes)) {
+      continue;
+    }
+    layouts.add(layout);
+  }
+  return layouts;
+}
+
+bool _faceTypesMatchLayout(String layout, List<String> faceTypes) {
+  bool hasType(String type) =>
+      faceTypes.any((faceType) => RegExp('\\b$type\\b').hasMatch(faceType));
+
+  return switch (layout) {
+    'modal_dfc' => hasType('land'),
+    'split' => faceTypes.every(
+      (faceType) =>
+          RegExp(r'\binstant\b').hasMatch(faceType) ||
+          RegExp(r'\bsorcery\b').hasMatch(faceType),
+    ),
+    'adventure' => hasType('creature') && hasType('adventure'),
+    _ => false,
+  };
+}
+
+Set<String> _validatedColorFeatures(
+  Map<String, dynamic> testCase,
+  Map<String, Map<String, dynamic>> catalog,
+) {
+  final features = <String>{};
+  if (_setEquals(_identitySet(testCase['color_identity']), const <String>{
+    'W',
+    'U',
+    'B',
+    'R',
+    'G',
+  })) {
+    features.add('five_color');
+  }
+  final candidate = _mapValue(testCase['candidate_response']);
+  final hybridPattern = RegExp(
+    r'\{(?:[WUBRG]/[WUBRG])\}',
+    caseSensitive: false,
+  );
+  for (final swap in _mapList(candidate['swaps'])) {
+    final meta = catalog[_normalizeName(swap['in']?.toString() ?? '')];
+    final manaCost = meta?['mana_cost']?.toString() ?? '';
+    if (hybridPattern.hasMatch(manaCost)) {
+      features.add('hybrid_mana');
+    }
+  }
+  return features;
+}
+
+Set<String> _sourceStates(Map<String, dynamic> testCase) {
+  final context = _mapValue(testCase['reference_context']);
+  if (context.isEmpty) return <String>{};
+  final states = <String>{};
+  final profile = _mapValue(context['profile']);
+  if (profile.isEmpty) {
+    states.add('profile_missing');
+  } else {
+    final confidence = _doubleValue(profile['confidence']);
+    final minimum = _doubleValue(context['minimum_profile_confidence']);
+    if (confidence != null && minimum != null && confidence < minimum) {
+      states.add('profile_low_confidence');
+    }
+  }
+  final corpus = _mapValue(context['corpus']);
+  final usableDeckCount = _intValue(corpus['usable_deck_count']);
+  final minimumUsableDeckCount = _intValue(corpus['minimum_usable_deck_count']);
+  if (usableDeckCount != null &&
+      minimumUsableDeckCount != null &&
+      usableDeckCount < minimumUsableDeckCount) {
+    states.add('corpus_sparse');
+  }
+  return states;
+}
+
+Set<String> _constraintStates(Map<String, dynamic> testCase) {
+  final states = <String>{};
+  final context = _mapValue(testCase['recommendation_context']);
+  if (context['collection_only'] == true) {
+    states.add('collection_only');
+  }
+  if (_doubleValue(context['budget_limit_brl']) == 0) {
+    states.add('zero_budget');
+  }
+  final deckState = _mapValue(testCase['deck_state']);
+  final targetSize = _intValue(deckState['target_size']);
+  if (targetSize != null && _stringList(testCase['deck']).length < targetSize) {
+    states.add('incomplete_deck');
+  }
+  return states;
+}
+
+bool _summaryDisclosesSourceState(String summary, String state) {
+  final text = _foldEvidenceText(summary);
+  return switch (state) {
+    'profile_missing' => _containsAny(text, const [
+      'sem profile',
+      'profile ausente',
+      'profile indisponivel',
+      'no profile',
+    ]),
+    'profile_low_confidence' => _containsAny(text, const [
+      'profile de baixa confianca',
+      'confianca baixa',
+      'low-confidence profile',
+      'low confidence profile',
+    ]),
+    'corpus_sparse' => _containsAny(text, const [
+      'corpus escasso',
+      'corpus insuficiente',
+      'sparse corpus',
+    ]),
+    _ => false,
+  };
+}
+
+bool _summaryAcknowledgesIncompleteDeck(String summary) {
+  final text = _foldEvidenceText(summary);
+  return _containsAny(text, const [
+    'deck incompleto',
+    'lista incompleta',
+    'lista parcial',
+    'partial deck',
+    'incomplete deck',
+  ]);
+}
+
+String _combinedResponseText(Map<String, dynamic> response) {
+  final values = <String>[response['summary']?.toString() ?? ''];
+  for (final swap in _mapList(response['swaps'])) {
+    values.add(_combinedSwapText(swap));
+  }
+  return values.join(' ').toLowerCase();
+}
+
+bool _containsUnsupportedReferenceClaim(String text) {
+  final folded = _foldEvidenceText(text);
+  return _containsAny(folded, const [
+    'exact profile',
+    'profile exato',
+    'high confidence',
+    'alta confianca',
+    'confianca alta',
+    'meta proven',
+    'meta comprovado',
+  ]);
+}
+
+bool _setEquals(Set<String> left, Set<String> right) {
+  return left.length == right.length && left.containsAll(right);
+}
+
+bool _orderedListEquals(List<String> left, List<String> right) {
+  if (left.length != right.length) return false;
+  for (var index = 0; index < left.length; index++) {
+    if (left[index] != right[index]) return false;
+  }
+  return true;
 }
 
 String _commanderColorBucket(dynamic raw) {

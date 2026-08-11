@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2560" height="1440"
+  viewBox="0 0 2560 1440" role="img" aria-labelledby="title">
+  <title id="title">BrewTact splash background</title>
+  <rect width="2560" height="1440" fill="#0B0D12"/>
+  <ellipse cx="1280.0" cy="561.6" rx="1177.6" ry="489.6" fill="#151821" fill-opacity="0.42"/>
+  <ellipse cx="1280.0" cy="561.6" rx="819.2" ry="331.2" fill="#1D222C" fill-opacity="0.24"/>
+  <g opacity="0.52">
+    <rect x="838.4" y="310.8" width="384.0" height="545.3" rx="32.6" fill="#151821" fill-opacity="0.46" stroke="#3E5F8A" stroke-width="7.1" transform="rotate(-14 1030.4 561.6)"/>
+    <rect x="1337.6" y="310.8" width="384.0" height="545.3" rx="32.6" fill="#1D222C" fill-opacity="0.46" stroke="#8E641B" stroke-width="7.1" transform="rotate(14 1529.6 561.6)"/>
+    <rect x="1088.0" y="261.7" width="384.0" height="545.3" rx="32.6" fill="#151821" fill-opacity="0.64" stroke="#C58B2A" stroke-width="8.5"/>
+  </g>
+  <g opacity="0.58">
+    <circle cx="358.4" cy="878.4" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="588.8" cy="828.0" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="844.8" cy="842.4" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="1075.2" cy="885.6" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="1484.8" cy="828.0" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="1740.8" cy="763.2" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="2022.4" cy="712.8" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="2227.2" cy="662.4" r="4.9" fill="#6FA8DC" fill-opacity="0.58"/>
+    <circle cx="204.8" cy="892.8" r="15.1" fill="#E0A93B"/>
+    <circle cx="1331.2" cy="864.0" r="15.1" fill="#6FA8DC"/>
+    <circle cx="2355.2" cy="633.6" r="15.1" fill="#C58B2A"/>
+  </g>
+</svg>

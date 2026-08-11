@@ -22,6 +22,21 @@ String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
     testCase,
   );
   final preferCollection = recommendationContext['prefer_collection'] == true;
+  final collectionOnly = recommendationContext['collection_only'] == true;
+  final referenceContext =
+      testCase['reference_context'] is Map
+          ? (testCase['reference_context'] as Map)
+          : const <String, dynamic>{};
+  final deckState =
+      testCase['deck_state'] is Map
+          ? (testCase['deck_state'] as Map)
+          : const <String, dynamic>{};
+  final currentDeckSize = (testCase['deck'] as List?)?.length;
+  final targetDeckSize = switch (deckState['target_size']) {
+    final num value => value.toInt(),
+    final String value => int.tryParse(value.trim()),
+    _ => null,
+  };
   final ownedCandidateAvailable = sameLaneCandidates.any(
     (candidate) => candidate['collection_match'] == true,
   );
@@ -30,6 +45,8 @@ String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
     'task':
         'Recommend safe one-for-one Commander deck swaps using only the supplied catalog.',
     'commander': testCase['commander'],
+    if (testCase['command_zone'] != null)
+      'command_zone': testCase['command_zone'],
     'archetype': testCase['archetype'],
     'intensity': testCase['intensity'],
     'bracket': testCase['bracket'],
@@ -38,6 +55,8 @@ String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
     'protected_cards': testCase['protected_cards'],
     'blocked_pairs': testCase['blocked_pairs'],
     'recommendation_context': testCase['recommendation_context'],
+    if (referenceContext.isNotEmpty) 'reference_context': referenceContext,
+    if (deckState.isNotEmpty) 'deck_state': deckState,
     'card_catalog': testCase['card_catalog'],
     'deterministic_same_lane_candidates': sameLaneCandidates,
     'constraints': {
@@ -47,6 +66,12 @@ String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
       'candidate_cards_must_exist_in_catalog': true,
       'every_swap_must_share_at_least_one_catalog_role': true,
       'respect_color_identity_budget_collection_and_bracket': true,
+      'collection_only_is_hard': collectionOnly,
+      'disclose_profile_and_corpus_limitations': referenceContext.isNotEmpty,
+      'acknowledge_incomplete_deck':
+          currentDeckSize != null &&
+          targetDeckSize != null &&
+          currentDeckSize < targetDeckSize,
       'minimum_role_counts_after_swaps':
           expected['role_count_after_at_least'] ?? const <String, dynamic>{},
       'prefer_owned_candidates_when_requested': preferCollection,
@@ -94,6 +119,11 @@ List<Map<String, dynamic>> buildCommanderAiLiveEvalSameLaneCandidates(
           .toSet() ??
       const <String>{};
   final bracket = (testCase['bracket'] as num?)?.toInt();
+  final recommendationContext =
+      testCase['recommendation_context'] is Map
+          ? (testCase['recommendation_context'] as Map)
+          : const <String, dynamic>{};
+  final collectionOnly = recommendationContext['collection_only'] == true;
   final candidates = <Map<String, dynamic>>[];
 
   for (final outName in deck) {
@@ -109,6 +139,7 @@ List<Map<String, dynamic>> buildCommanderAiLiveEvalSameLaneCandidates(
       if (deckKeys.contains(_normalizeCardName(inName))) continue;
       final inData = entry.value;
       if (inData is! Map) continue;
+      if (collectionOnly && inData['owned'] != true) continue;
       final inRoles = _catalogRoles(inData);
       final sharedRoles = outRoles.intersection(inRoles).toList()..sort();
       if (sharedRoles.isEmpty) continue;

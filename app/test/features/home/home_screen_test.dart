@@ -309,7 +309,7 @@ void main() {
     await tester.pumpWidget(_buildSubject());
     await tester.pump(const Duration(milliseconds: 900));
 
-    expect(find.text('ManaLoom'), findsOneWidget);
+    expect(find.text('BrewTact'), findsOneWidget);
     expect(find.text('Olá,\nPlaneswalker'), findsOneWidget);
     expect(find.text('Acesso rápido'), findsOneWidget);
     expect(find.text('Jogar agora'), findsWidgets);

@@ -145,16 +145,38 @@ void main() {
 
     final android = manual['android'] as Map<String, dynamic>;
     expect(android['reader'], 'TalkBack');
-    expect(android['status'], anyOf('pending_physical', 'pass'));
-    expect((android['required_routes'] as List<dynamic>).toSet(), {
-      '/login',
-      '/home',
-      '/decks',
-      '/collection',
-      '/community',
-      '/profile',
-      '/battle/replays',
-      '/decks/:id/battle-coach',
+    expect(android['status'], 'pending_physical');
+    expect(android['evidence'], isNull);
+    expect(_stringSet(android['completed_surface_ids']), isEmpty);
+
+    final requiredRoutes = _stringSet(android['required_routes']);
+    expect(requiredRoutes, isNot(contains('/battle/replays')));
+    expect(requiredRoutes, contains('/decks/:id/battle-replays'));
+    expect(requiredRoutes, contains('/decks/:id/battle-live/:jobId'));
+    expect(requiredRoutes, contains('/decks/:id/battle-coach'));
+    expect(requiredRoutes, contains('/decks/:id/battle-coach/:sessionId'));
+    expect(
+      requiredRoutes,
+      containsAll(<String>{
+        '/login',
+        '/home',
+        '/decks',
+        '/decks/generate',
+        '/decks/import',
+        '/decks/:id',
+        '/collection',
+        '/community',
+        '/profile',
+      }),
+    );
+
+    expect(_stringSet(android['required_human_checks']), {
+      'reading_order',
+      'accessible_name_role_state',
+      'live_region_announcement',
+      'focus_continuity',
+      'touch_exploration',
+      'text_200_percent',
     });
 
     final ios = manual['ios'] as Map<String, dynamic>;
@@ -163,10 +185,95 @@ void main() {
     expect(ios['deferred_reason'], 'ios_not_in_web_android_beta_scope');
     expect(ios['required_routes'], isEmpty);
   });
+
+  test('TalkBack contract covers critical Deckbuilder and Battle surfaces', () {
+    final manual = matrix['manual_screen_reader'] as Map<String, dynamic>;
+    final android = manual['android'] as Map<String, dynamic>;
+    final requiredRoutes = _stringSet(android['required_routes']);
+    final surfaces = <String, Map<String, dynamic>>{
+      for (final surface in _objectList(android['critical_surfaces']))
+        surface['id'] as String: surface,
+    };
+    final expectedSurfaceRoutes = <String, Set<String>>{
+      'deck_list_create': {'/decks'},
+      'deck_generate': {'/decks/generate'},
+      'deck_import': {'/decks/import'},
+      'deck_details': {'/decks/:id'},
+      'deck_workshop': {'/decks/:id'},
+      'deck_optimize_preview': {'/decks/:id'},
+      'deck_sample_hand': {'/decks/:id'},
+      'battle_replays': {'/decks/:id/battle-replays'},
+      'battle_live': {'/decks/:id/battle-live/:jobId'},
+      'battle_coach': {
+        '/decks/:id/battle-coach',
+        '/decks/:id/battle-coach/:sessionId',
+      },
+    };
+
+    expect(
+      _objectList(android['critical_surfaces']),
+      hasLength(expectedSurfaceRoutes.length),
+      reason: 'Critical surface IDs must be unique.',
+    );
+    expect(surfaces.keys.toSet(), expectedSurfaceRoutes.keys.toSet());
+    expect(
+      _stringSet(android['pending_surface_ids']),
+      expectedSurfaceRoutes.keys.toSet(),
+      reason: 'Every critical surface remains pending until human evidence.',
+    );
+
+    for (final entry in expectedSurfaceRoutes.entries) {
+      final surface = surfaces[entry.key]!;
+      final domain = surface['domain'];
+      expect(domain, anyOf('decks', 'battle'), reason: entry.key);
+      final routes = _stringSet(surface['routes']);
+      expect(routes, entry.value, reason: '${entry.key} routes');
+      expect(requiredRoutes, containsAll(routes), reason: entry.key);
+      expect(
+        _stringSet(surface['required_states']),
+        isNotEmpty,
+        reason: '${entry.key} has no TalkBack state contract',
+      );
+
+      final sources = _stringList(surface['sources']);
+      expect(sources, isNotEmpty, reason: '${entry.key} has no source');
+      for (final path in sources) {
+        expect(File(path).existsSync(), isTrue, reason: 'missing $path');
+      }
+
+      final tests = _stringList(surface['automated_tests']);
+      expect(tests, isNotEmpty, reason: '${entry.key} has no automated test');
+      for (final path in tests) {
+        final file = File(path);
+        expect(file.existsSync(), isTrue, reason: 'missing $path');
+        final source = file.readAsStringSync();
+        expect(
+          source.contains('test(') || source.contains('testWidgets('),
+          isTrue,
+          reason: '$path is not executable evidence',
+        );
+      }
+    }
+  });
 }
 
 Map<String, dynamic> _loadJson(String path) {
   return jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+}
+
+Set<String> _stringSet(dynamic value) => _stringList(value).toSet();
+
+List<String> _stringList(dynamic value) {
+  if (value is! List) return const <String>[];
+  return value.map((item) => item.toString()).toList(growable: false);
+}
+
+List<Map<String, dynamic>> _objectList(dynamic value) {
+  if (value is! List) return const <Map<String, dynamic>>[];
+  return value
+      .whereType<Map>()
+      .map((item) => item.map((key, child) => MapEntry(key.toString(), child)))
+      .toList(growable: false);
 }
 
 Iterable<File> _dartFiles(Directory root) {

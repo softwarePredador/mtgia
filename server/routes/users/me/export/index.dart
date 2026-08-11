@@ -19,7 +19,7 @@ Future<Response> onRequest(RequestContext context) async {
         'Cache-Control': 'no-store, max-age=0',
         'Pragma': 'no-cache',
         'Content-Disposition':
-            'attachment; filename="manaloom-user-data-$userId.json"',
+            'attachment; filename="brewtact-user-data-$userId.json"',
       },
     );
   } on UserDataNotFoundException {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../legal_policy.dart';
@@ -136,20 +137,20 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                         title: 'Termos de uso',
                         icon: Icons.description_outlined,
                         body:
-                            'ManaLoom ajuda a criar, analisar, otimizar e acompanhar decks de Magic. O usuário continua responsável por revisar legalidade, preços, recomendações, compras, trades e decisões de mesa antes de agir.',
+                            '${ProductIdentity.displayName} ajuda a criar, analisar, otimizar e acompanhar decks de Magic. O usuário continua responsável por revisar legalidade, preços, recomendações, compras, trades e decisões de mesa antes de agir.',
                       ),
                       const _LegalDocumentSection(
                         title: 'IP e conteúdo',
                         icon: Icons.copyright_outlined,
                         body:
-                            'Magic: The Gathering e nomes de cartas pertencem aos seus respectivos titulares. ManaLoom não reivindica propriedade sobre IP de terceiros. Listas, notas e comentários criados pelo usuário permanecem vinculados à conta do usuário.',
+                            'Magic: The Gathering e nomes de cartas pertencem aos seus respectivos titulares. ${ProductIdentity.displayName} não reivindica propriedade sobre IP de terceiros. Listas, notas e comentários criados pelo usuário permanecem vinculados à conta do usuário.',
                       ),
                       const _LegalDocumentSection(
                         anchorKey: Key('legal-card-source-section'),
                         title: 'Conteúdo de fã e fonte das cartas',
                         icon: Icons.image_outlined,
                         body:
-                            'ManaLoom é conteúdo de fã não oficial permitido sob a Política de Conteúdo de Fãs. Não é aprovado nem endossado pela Wizards. Partes dos materiais usados são propriedade da Wizards of the Coast. © Wizards of the Coast LLC. Dados e imagens de cartas são fornecidos por Scryfall; Scryfall não produz, aprova ou endossa o ManaLoom.',
+                            '${ProductIdentity.displayName} é conteúdo de fã não oficial permitido sob a Política de Conteúdo de Fãs. Não é aprovado nem endossado pela Wizards. Partes dos materiais usados são propriedade da Wizards of the Coast. © Wizards of the Coast LLC. Dados e imagens de cartas são fornecidos por Scryfall; Scryfall não produz, aprova ou endossa o ${ProductIdentity.displayName}.',
                       ),
                       const _LegalDocumentSection(
                         title: 'Disclaimer de IA',
@@ -161,7 +162,7 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                         title: 'Trocas entre usuários',
                         icon: Icons.swap_horiz_rounded,
                         body:
-                            'ManaLoom coordena propostas e conversas, mas não recebe, guarda ou protege pagamentos e não garante entrega, estado ou autenticidade das cartas. Os usuários devem verificar os itens e combinar pagamento e envio diretamente entre si.',
+                            '${ProductIdentity.displayName} coordena propostas e conversas, mas não recebe, guarda ou protege pagamentos e não garante entrega, estado ou autenticidade das cartas. Os usuários devem verificar os itens e combinar pagamento e envio diretamente entre si.',
                       ),
                       const _LegalDocumentSection(
                         anchorKey: Key('legal-monetization-section'),
@@ -214,7 +215,7 @@ class _LegalHeader extends StatelessWidget {
         ),
         const SizedBox(height: AppTheme.space8),
         Text(
-          'Leia o que rege o uso do ManaLoom e como seus dados são tratados.',
+          'Leia o que rege o uso do ${ProductIdentity.displayName} e como seus dados são tratados.',
           style: theme.textTheme.bodyLarge?.copyWith(
             color: AppTheme.textSecondary,
             height: AppTheme.lineHeightComfortable,

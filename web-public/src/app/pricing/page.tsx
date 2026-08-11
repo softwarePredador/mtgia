@@ -6,7 +6,7 @@ import { productPlans } from "@/lib/product-data";
 
 export const metadata: Metadata = {
   title: "Planos",
-  description: "Planos Free e Pro do ManaLoom para IA, decks e coleção."
+  description: "Planos Free e Pro do BrewTact para IA, decks e coleção."
 };
 
 function formatPlanValue(plan: (typeof productPlans)[number]) {

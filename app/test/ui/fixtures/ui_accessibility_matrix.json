@@ -43,7 +43,93 @@
     "android": {
       "status": "pending_physical",
       "reader": "TalkBack",
-      "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/battle/replays","/decks/:id/battle-coach"]
+      "evidence": null,
+      "required_routes": ["/login","/home","/decks","/decks/generate","/decks/import","/decks/:id","/collection","/community","/profile","/decks/:id/battle-replays","/decks/:id/battle-live/:jobId","/decks/:id/battle-coach","/decks/:id/battle-coach/:sessionId"],
+      "required_human_checks": ["reading_order","accessible_name_role_state","live_region_announcement","focus_continuity","touch_exploration","text_200_percent"],
+      "completed_surface_ids": [],
+      "pending_surface_ids": ["deck_list_create","deck_generate","deck_import","deck_details","deck_workshop","deck_optimize_preview","deck_sample_hand","battle_replays","battle_live","battle_coach"],
+      "critical_surfaces": [
+        {
+          "id": "deck_list_create",
+          "domain": "decks",
+          "routes": ["/decks"],
+          "sources": ["lib/features/decks/screens/deck_list_screen.dart"],
+          "automated_tests": ["test/features/decks/screens/deck_list_responsive_test.dart"],
+          "required_states": ["list","empty","create_dialog","validation_error"]
+        },
+        {
+          "id": "deck_generate",
+          "domain": "decks",
+          "routes": ["/decks/generate"],
+          "sources": ["lib/features/decks/screens/deck_generate_screen.dart"],
+          "automated_tests": ["test/features/decks/screens/deck_flow_entry_screens_test.dart"],
+          "required_states": ["initial","keyboard_visible","submitting","error"]
+        },
+        {
+          "id": "deck_import",
+          "domain": "decks",
+          "routes": ["/decks/import"],
+          "sources": ["lib/features/decks/screens/deck_import_screen.dart"],
+          "automated_tests": ["test/features/decks/screens/deck_import_screen_test.dart"],
+          "required_states": ["input","detected_commander","submitting","error"]
+        },
+        {
+          "id": "deck_details",
+          "domain": "decks",
+          "routes": ["/decks/:id"],
+          "sources": ["lib/features/decks/screens/deck_details_screen.dart"],
+          "automated_tests": ["test/features/decks/screens/deck_details_screen_smoke_test.dart"],
+          "required_states": ["overview","tabs","loading","error"]
+        },
+        {
+          "id": "deck_workshop",
+          "domain": "decks",
+          "routes": ["/decks/:id"],
+          "sources": ["lib/features/decks/widgets/deck_workshop_tab.dart"],
+          "automated_tests": ["test/features/decks/widgets/deck_workshop_tab_test.dart"],
+          "required_states": ["paired_swaps","partial_selection","card_reader","history_undo","conflict"]
+        },
+        {
+          "id": "deck_optimize_preview",
+          "domain": "decks",
+          "routes": ["/decks/:id"],
+          "sources": ["lib/features/decks/widgets/deck_optimize_sheet_widgets.dart"],
+          "automated_tests": ["test/features/decks/widgets/deck_optimize_dialogs_test.dart"],
+          "required_states": ["recommendations","selection","apply","recoverable_error","card_reader"]
+        },
+        {
+          "id": "deck_sample_hand",
+          "domain": "decks",
+          "routes": ["/decks/:id"],
+          "sources": ["lib/features/decks/widgets/sample_hand_widget.dart"],
+          "automated_tests": ["test/features/decks/widgets/sample_hand_widget_test.dart"],
+          "required_states": ["carousel","card_identity","navigation","card_details"]
+        },
+        {
+          "id": "battle_replays",
+          "domain": "battle",
+          "routes": ["/decks/:id/battle-replays"],
+          "sources": ["lib/features/battle/screens/battle_replays_screen.dart"],
+          "automated_tests": ["test/features/battle/screens/battle_replays_screen_test.dart"],
+          "required_states": ["empty","setup","replay","timeout","recoverable_error"]
+        },
+        {
+          "id": "battle_live",
+          "domain": "battle",
+          "routes": ["/decks/:id/battle-live/:jobId"],
+          "sources": ["lib/features/battle/screens/battle_live_spectator_screen.dart"],
+          "automated_tests": ["test/features/battle/screens/battle_live_spectator_screen_test.dart"],
+          "required_states": ["waiting","active","reconnect","timeout","completed"]
+        },
+        {
+          "id": "battle_coach",
+          "domain": "battle",
+          "routes": ["/decks/:id/battle-coach","/decks/:id/battle-coach/:sessionId"],
+          "sources": ["lib/features/battle/screens/battle_coach_screen.dart"],
+          "automated_tests": ["test/features/battle/screens/battle_coach_screen_test.dart"],
+          "required_states": ["welcome","decision_prompt","recoverable_error","action_progress","terminal_replay"]
+        }
+      ]
     },
     "ios": {
       "status": "DEFERRED_BY_SCOPE",

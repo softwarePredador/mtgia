@@ -331,7 +331,7 @@ Widget _runtimeApp({
       ),
     ],
     child: MaterialApp(
-      title: 'ManaLoom Binder Dashboard Runtime',
+      title: 'BrewTact Binder Dashboard Runtime',
       theme: AppTheme.darkTheme,
       home: home,
     ),

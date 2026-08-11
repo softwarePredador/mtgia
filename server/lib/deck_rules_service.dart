@@ -579,7 +579,7 @@ String unsupportedDeckSectionsMessage(Iterable<String> labels) {
           .toList()
         ..sort();
   final suffix = uniqueLabels.isEmpty ? '' : ' (${uniqueLabels.join(', ')}).';
-  return 'Regra violada: ManaLoom ainda não suporta sideboard, wishboard, maybeboard ou cartas "outside the game" em decks salvos$suffix '
+  return 'Regra violada: BrewTact ainda não suporta sideboard, wishboard, maybeboard ou cartas "outside the game" em decks salvos$suffix '
       'Importe apenas o deck principal e marque comandante pelo campo/tag de comandante.';
 }
 

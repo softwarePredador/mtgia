@@ -378,13 +378,13 @@ InteractiveBattleSession _waitingSession() => InteractiveBattleSession.fromJson(
       'turn': 6,
       'phase': 'COMBAT',
       'step': 'DECLARE_ATTACKERS',
-      'active_player': 'ManaLoom',
-      'priority_player': 'ManaLoom',
-      'own_player': 'ManaLoom',
+      'active_player': 'Você',
+      'priority_player': 'Você',
+      'own_player': 'Você',
       'priority_time_seconds': 60,
       'players': [
         {
-          'name': 'ManaLoom',
+          'name': 'Você',
           'life': 31,
           'library_count': 78,
           'hand_count': 5,
@@ -501,11 +501,11 @@ InteractiveBattleSession _terminalSession({String status = 'completed'}) =>
         'turn': 7,
         'phase': 'POSTCOMBAT_MAIN',
         'step': 'MAIN',
-        'priority_player': 'ManaLoom',
-        'own_player': 'ManaLoom',
+        'priority_player': 'Você',
+        'own_player': 'Você',
         'players': [
           {
-            'name': 'ManaLoom',
+            'name': 'Você',
             'life': 31,
             'library_count': 77,
             'hand_count': 4,

@@ -21,11 +21,17 @@ void main() {
       r'|SizedBox\((width|height):\s*[0-9]'
       r'|Gap\([0-9]',
     );
+    final sizedBoxWithContent = RegExp(r'SizedBox\([^\n]*child:');
     final countsByFile = <String, int>{};
 
     for (final entity in Directory('lib').listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
-      final count = entity.readAsLinesSync().where(pattern.hasMatch).length;
+      final count = entity.readAsLinesSync().where((line) {
+        if (!pattern.hasMatch(line)) return false;
+        // A dimensioned SizedBox that owns content is a layout constraint,
+        // not raw spacing debt (for example a fixed-width side rail).
+        return !sizedBoxWithContent.hasMatch(line);
+      }).length;
       if (count > 0) countsByFile[entity.path] = count;
     }
 

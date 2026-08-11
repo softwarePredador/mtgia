@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 
+import '../../core/branding/product_identity.dart';
 import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
 import 'services/onboarding_state_store.dart';
@@ -591,7 +592,7 @@ class _OnboardingHero extends StatelessWidget {
                       const SizedBox(height: AppTheme.space8),
                       Text(
                         selectedGoal == null
-                            ? 'Escolha um objetivo. O ManaLoom prepara somente o caminho necessário.'
+                            ? 'Escolha um objetivo. O ${ProductIdentity.displayName} prepara somente o caminho necessário.'
                             : _goalCopy(selectedGoal!).heroConfirmation,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: AppTheme.textSecondary,

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-10T15:35:55.766719Z",
-  "source_digest": "4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c",
+  "generated_at": "2026-08-11T18:15:54.009267Z",
+  "source_digest": "643fa0af0cbf0c99d3fcdef7355b17f1b89d04ece14934a02946214c5957d6af",
   "surface": "battle_learning",
   "profile": "web_battle_learning_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "3374034bf0a21295abb68eb48d2b49b9f6533955b2ed5a565844cde7c599a802",
+  "log_sha256": "c673191af89dc3a7856720796e3c833f7012b21f3fa2e32452398cb5eafb20f4",
   "checkpoint_count": 10,
   "required_checkpoints": [
     "battle_learning_00_play_entry",
@@ -30,16 +30,16 @@
     {
       "checkpoint": "battle_learning_00_play_entry",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_00_play_entry.png",
-      "sha256": "4395d80f8a66e066a0a8cab00ff95fb5615e58d77e58c86316cc6d83d2a82e81",
-      "bytes": 215705,
+      "sha256": "951e92513b477982862e43e1b24cf452da7ff5bcfd0801e3eb01a6dedca72b3d",
+      "bytes": 115421,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_learning_01_active_session",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_01_active_session.png",
-      "sha256": "e7f6ba617a62a3811f8582ff33580dccbfabeaff203c7904564cbe3b390ff331",
-      "bytes": 227512,
+      "sha256": "9659a1e0876d13642ac1fe6c16e1425120c800a413138d8f509343e0cb4efaef",
+      "bytes": 127160,
       "width": 1440,
       "height": 900
     },
@@ -86,16 +86,16 @@
     {
       "checkpoint": "battle_learning_07_postgame_signals",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_07_postgame_signals.png",
-      "sha256": "a1987c049d589efd568742f2e694b17c5cbd5aaf81c553aea630e057660b71cd",
-      "bytes": 118783,
+      "sha256": "ef843f61030ae803eb4961fd2a0e706c691c1ae713554ab48f16dd2718264509",
+      "bytes": 118944,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_learning_08_postgame_receipt",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_08_postgame_receipt.png",
-      "sha256": "378d50729db2c235fa6fe8625f65a238904ee318581b342adeef4fe1686230f9",
-      "bytes": 161676,
+      "sha256": "671b11fb6a7979d5e3c7c56744dadd7d85018929ce1bbef50f0b78af90040867",
+      "bytes": 161523,
       "width": 1440,
       "height": 900
     },

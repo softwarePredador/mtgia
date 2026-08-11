@@ -365,7 +365,7 @@ _RuntimeApp _runtimeApp({
       ChangeNotifierProvider<TradeProvider>.value(value: trades),
     ],
     child: MaterialApp.router(
-      title: 'ManaLoom Android FCM Runtime',
+      title: 'BrewTact Android FCM Runtime',
       theme: AppTheme.darkTheme,
       routerConfig: router,
     ),

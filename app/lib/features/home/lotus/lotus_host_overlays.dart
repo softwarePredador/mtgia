@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 
 class LotusLoadingOverlay extends StatelessWidget {
@@ -29,7 +30,7 @@ class LotusLoadingOverlay extends StatelessWidget {
                 ),
                 SizedBox(height: AppTheme.space20),
                 Text(
-                  'ManaLoom',
+                  ProductIdentity.displayName,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: AppTheme.fontXxl,
@@ -165,7 +166,7 @@ class _LotusShellBadge extends StatelessWidget {
           vertical: AppTheme.space7,
         ),
         child: Text(
-          'Interface ManaLoom',
+          'Interface ${ProductIdentity.displayName}',
           style: TextStyle(
             color: AppTheme.primarySoft,
             fontSize: AppTheme.fontSm,
@@ -180,16 +181,16 @@ class _LotusShellBadge extends StatelessWidget {
 
 String _localizedHostMessage(String message) {
   final normalized = message.trim();
-  if (normalized.startsWith('O ManaLoom ')) {
+  if (normalized.startsWith('O ${ProductIdentity.displayName} ')) {
     return normalized;
   }
   return switch (normalized) {
-    'ManaLoom could not open the embedded life counter. Check the local bundle and try again.' =>
-      'O ManaLoom não conseguiu abrir o contador de vida. Tente novamente.',
-    'ManaLoom could not safely restore the life counter state. Try loading it again.' =>
-      'O ManaLoom não conseguiu restaurar o estado da partida com segurança. Tente carregar novamente.',
-    'ManaLoom could not open the Life Counter in this browser. Reload the page and try again.' =>
-      'O ManaLoom não conseguiu abrir o contador de vida neste navegador. Recarregue a página e tente novamente.',
+    '${ProductIdentity.displayName} could not open the embedded life counter. Check the local bundle and try again.' =>
+      'O ${ProductIdentity.displayName} não conseguiu abrir o contador de vida. Tente novamente.',
+    '${ProductIdentity.displayName} could not safely restore the life counter state. Try loading it again.' =>
+      'O ${ProductIdentity.displayName} não conseguiu restaurar o estado da partida com segurança. Tente carregar novamente.',
+    '${ProductIdentity.displayName} could not open the Life Counter in this browser. Reload the page and try again.' =>
+      'O ${ProductIdentity.displayName} não conseguiu abrir o contador de vida neste navegador. Recarregue a página e tente novamente.',
     _ =>
       'Não foi possível carregar o contador de vida. Tente novamente em instantes.',
   };

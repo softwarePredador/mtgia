@@ -4,7 +4,7 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/trades/widgets/trade_safety_notice.dart';
 
 void main() {
-  testWidgets('explica claramente o limite de intermediação do ManaLoom', (
+  testWidgets('explica claramente o limite de intermediação do BrewTact', (
     tester,
   ) async {
     await tester.pumpWidget(

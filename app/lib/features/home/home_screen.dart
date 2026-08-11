@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/branding/product_identity.dart';
 import '../../core/config/visual_fixture.dart';
 import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -882,7 +883,7 @@ class _HomeHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: AppTheme.space7),
                     Text(
-                      'ManaLoom',
+                      ProductIdentity.displayName,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: AppTheme.brass400,
                         fontWeight: FontWeight.w900,

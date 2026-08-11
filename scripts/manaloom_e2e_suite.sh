@@ -49,6 +49,12 @@ has_postgres_runner_approvals() {
     manaloom_has_postgres_write_approval
 }
 
+has_read_only_postgres_runner_prerequisites() {
+  local env_file="${MANALOOM_NEW_SERVER_ENV:-${MTGIA_ENV_FILE:-$ROOT_DIR/server/.env}}"
+  [[ -f "$env_file" ]] &&
+    [[ "${MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256:-}" =~ ^SHA256:[A-Za-z0-9+/]{43}$ ]]
+}
+
 slugify() {
   printf '%s' "$1" \
     | tr '[:upper:]' '[:lower:]' \
@@ -125,6 +131,18 @@ run_postgres_runner_step() {
     skip_step \
       "$label" \
       "runner PostgreSQL requer os tokens canonicos de mutacao live e escrita PostgreSQL"
+    return
+  fi
+  run_step "$label" "$command"
+}
+
+run_read_only_postgres_step() {
+  local label="$1"
+  local command="$2"
+  if ! has_read_only_postgres_runner_prerequisites; then
+    skip_step \
+      "$label" \
+      "leitura PostgreSQL requer env do servidor novo e MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256 aprovado; nenhuma autorizacao de mutacao e necessaria"
     return
   fi
   run_step "$label" "$command"
@@ -492,10 +510,10 @@ main() {
   run_step "App AI bridge and Commander prompt eval" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" ai-bridge"
 
-  run_postgres_runner_step "PostgreSQL Hermes SQLite contract" \
+  run_read_only_postgres_step "PostgreSQL Hermes SQLite contract" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" pg-contract"
 
-  run_postgres_runner_step "Deep AI alignment with deckbuilder battle logs" \
+  run_read_only_postgres_step "Deep AI alignment with deckbuilder battle logs" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" deep-ai"
 
   run_optional_flutter_runtime_e2e

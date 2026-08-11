@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="520"
+  viewBox="0 0 1200 520" role="img" aria-labelledby="title">
+  <title id="title">BrewTact home hero banner</title>
+  <rect width="1200" height="520" fill="#0B0D12"/>
+  <path d="M456 0H1200V520H354Z" fill="#151821" fill-opacity="0.58"/>
+  <path d="M704 0H1200V520H570Z" fill="#1D222C" fill-opacity="0.34"/>
+  <g transform="translate(670 -76) scale(0.72)" opacity="0.96">
+    <rect x="210" y="130" width="360" height="520" rx="36" fill="#151821" stroke="#293041" stroke-width="8" transform="rotate(-14 390 390)"/>
+    <rect x="300" y="106" width="360" height="520" rx="36" fill="#1D222C" stroke="#8E641B" stroke-width="8" transform="rotate(11 480 366)"/>
+    <rect x="374" y="160" width="360" height="520" rx="36" fill="#151821" stroke="#C58B2A" stroke-width="9"/>
+    <g transform="translate(426 238) scale(1.02)">
+  <g id="tactical-stack-mark">
+    <path fill="#C58B2A" d="M44 52L178 89Q190 92 190 105V132Q190 140 183 144L153 161V130L160 126V114L76 91V125L112 145L84 162L52 144Q44 139 44 130Z"/>
+    <path fill="#E0A93B" d="M44 52L178 89Q190 92 190 105V114L160 114L76 91V101L44 92Z"/>
+    <path fill="#8E641B" d="M76 101V125L112 145L84 162L52 144Q44 139 44 130V113Z"/>
+    <path fill="#6FA8DC" d="M107 144L160 116L190 125V154L146 178V207L114 226V176L86 191V160Z"/>
+    <path fill="#3E5F8A" d="M146 178V207L114 226V176Z"/>
+  </g>
+    </g>
+  </g>
+  <path d="M592 442C706 362 792 450 888 356C974 272 1018 306 1150 206" fill="#0B0D12" fill-opacity="0" stroke="#6FA8DC" stroke-opacity="0.42" stroke-width="5" stroke-linecap="round" stroke-dasharray="5 18"/>
+  <circle cx="592" cy="442" r="9" fill="#E0A93B"/>
+  <circle cx="888" cy="356" r="9" fill="#6FA8DC"/>
+  <circle cx="1150" cy="206" r="9" fill="#C58B2A"/>
+</svg>

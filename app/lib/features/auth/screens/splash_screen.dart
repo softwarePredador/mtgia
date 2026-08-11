@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../auth_redirect.dart';
 import '../providers/auth_provider.dart';
@@ -85,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
           Image.asset(
             'assets/branding/splash_art.png',
             fit: BoxFit.cover,
-            semanticLabel: 'ManaLoom splash art',
+            semanticLabel: 'Arte de abertura do ${ProductIdentity.displayName}',
           ),
           DecoratedBox(
             decoration: BoxDecoration(
@@ -144,13 +145,14 @@ class _SplashScreenState extends State<SplashScreen>
                               child: Image.asset(
                                 'assets/branding/app_logo.png',
                                 fit: BoxFit.cover,
-                                semanticLabel: 'ManaLoom logo',
+                                semanticLabel:
+                                    'Logo do ${ProductIdentity.displayName}',
                               ),
                             ),
                           ),
                           const SizedBox(height: AppTheme.space22),
                           Text(
-                            'ManaLoom',
+                            ProductIdentity.displayName,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.headlineLarge
                                 ?.copyWith(
@@ -164,7 +166,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                           const SizedBox(height: AppTheme.space8),
                           Text(
-                            'Tecendo estratégias lendárias',
+                            ProductIdentity.taglinePtBr,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(

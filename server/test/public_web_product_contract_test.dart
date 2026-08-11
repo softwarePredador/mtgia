@@ -140,6 +140,9 @@ void main() {
       expect(smoke, isNot(contains(r'cd "$WEB_DIR"')));
       expect(smoke, contains('npm run lint'));
       expect(smoke, contains('npm audit --omit=dev --audit-level=moderate'));
+      expect(smoke, contains("grep -Fq 'BrewTact'"));
+      expect(smoke, contains("grep -Fq 'ManaLoom'"));
+      expect(smoke, contains('Legacy public brand is still visible'));
       expect(
         smoke,
         contains(r'exec env HOSTNAME=127.0.0.1 PORT="$PORT" node server.js'),

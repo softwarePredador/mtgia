@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <!--
       O plugin de câmera declara áudio e armazenamento para gravação de vídeo,
-      mas o ManaLoom usa apenas frames da câmera para OCR. Remova essas
+      mas o BrewTact usa apenas frames da câmera para OCR. Remova essas
       permissões do manifesto mesclado para não ampliar o acesso da beta.
     -->
     <uses-permission
@@ -22,7 +22,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
     
     <application
-        android:label="ManaLoom"
+        android:label="BrewTact"
         android:name="${applicationName}"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

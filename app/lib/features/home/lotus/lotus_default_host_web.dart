@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web/web.dart' as web;
 
+import '../../../core/branding/product_identity.dart';
 import '../life_counter/life_counter_day_night_state_store.dart';
 import '../life_counter/life_counter_game_timer_state_store.dart';
 import '../life_counter/life_counter_history_store.dart';
@@ -71,7 +72,7 @@ class LotusWebHostController
         'allow-scripts allow-same-origin allow-downloads allow-modals',
       )
       ..setAttribute('allow', 'clipboard-write')
-      ..setAttribute('title', 'ManaLoom Life Counter');
+      ..setAttribute('title', ProductIdentity.lifeCounterDisplayName);
     _frame.style
       ..border = '0'
       ..width = '100%'
@@ -89,7 +90,7 @@ class LotusWebHostController
   static const int _storageReadStabilityAttempts = 8;
 
   static const String _loadErrorMessage =
-      'O ManaLoom não conseguiu abrir o contador de vida neste navegador. '
+      'O ${ProductIdentity.displayName} não conseguiu abrir o contador de vida neste navegador. '
       'Recarregue a página e tente novamente.';
 
   static String _createBridgeToken() =>

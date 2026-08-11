@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../core/branding/product_identity.dart';
 import 'lotus_js_bridges.dart';
 import 'lotus_webview_contract.dart';
 
@@ -71,7 +72,7 @@ String get lotusShellCleanupScript {
   const SUPPRESSED_ATTR = 'data-manaloom-shell-suppressed';
   const TELEMETRY_ATTR = 'data-manaloom-telemetry-seen';
   const SHELL_CHANNEL = '${LotusJavaScriptBridges.shellChannelName}';
-  document.title = 'ManaLoom Life Counter';
+  document.title = '${ProductIdentity.lifeCounterDisplayName}';
   const postShellMessage = (payload) => {
     try {
       if (

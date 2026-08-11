@@ -41,8 +41,9 @@ Future<Map<String, dynamic>?> _probeViaShellBridge(
   required String javascriptBody,
 }) async {
   final requestId = DateTime.now().microsecondsSinceEpoch;
-  final shellProbeType =
-      probeType.startsWith('debug_') ? probeType : 'debug_$probeType';
+  final shellProbeType = probeType.startsWith('debug_')
+      ? probeType
+      : 'debug_$probeType';
   screenState.debugClearLastShellMessage();
   await screenState.debugRunJavaScript('''
 (() => {
@@ -221,7 +222,8 @@ Future<Map<String, dynamic>> _clickLifeButtonAndProbe(
     tester,
     screenState,
     probeType: '${probeType}_click',
-    javascriptBody: '''
+    javascriptBody:
+        '''
 const target = document.querySelector($selector);
 if (!target) {
   return { clicked: false, reason: 'target_not_found' };
@@ -552,7 +554,7 @@ void main() {
       expect(await WakelockPlus.enabled, isTrue);
       expect(
         find.text(
-          'External shortcut disabled while ManaLoom owns the life counter shell.',
+          'External shortcut disabled while BrewTact owns the life counter shell.',
         ),
         findsNothing,
       );

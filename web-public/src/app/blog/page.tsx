@@ -6,7 +6,7 @@ import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
   title: "Publicações",
-  description: "Atualizações e guias públicos do ManaLoom."
+  description: "Atualizações e guias públicos do BrewTact."
 };
 
 export default function BlogPage() {

@@ -1,11 +1,11 @@
 {
-    "name": "ManaLoom",
-    "short_name": "ManaLoom",
+    "name": "BrewTact",
+    "short_name": "BrewTact",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0F1115",
-    "theme_color": "#0F1115",
-    "description": "ManaLoom - AI-powered MTG deck builder.",
+    "background_color": "#0B0D12",
+    "theme_color": "#0B0D12",
+    "description": "BrewTact — Build, analyze, test, and track your Magic decks.",
     "orientation": "any",
     "prefer_related_applications": false,
     "icons": [

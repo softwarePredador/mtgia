@@ -283,6 +283,44 @@ void main() {
     },
   );
 
+  test('expired prompt reservation never reaches the runtime', () async {
+    final store = _Store(rejectActionsAfterPromptDeadline: true);
+    final runtime = _Runtime();
+    final service = _service(
+      store: store,
+      runtime: runtime,
+      persistence: _Persistence(),
+    );
+    final created = await service.create(
+      userId: _userId,
+      input: const InteractiveBattleCreateInput(
+        deckId: _deckAId,
+        opponentDeckId: _deckBId,
+        ttlSeconds: 600,
+        promptTimeoutSeconds: 60,
+        idempotencyKey: 'create-before-expired-prompt-action',
+      ),
+    );
+    final prompt = created.session.prompt!;
+
+    await expectLater(
+      service.respond(
+        userId: _userId,
+        id: created.session.id,
+        action: InteractiveBattleActionInput(
+          stateVersion: prompt.stateVersion,
+          promptId: prompt.id,
+          responseKind: InteractiveBattleResponseKind.delegate,
+          idempotencyKey: 'action-after-prompt-deadline',
+        ),
+      ),
+      throwsA(isA<InteractiveBattleStaleActionException>()),
+    );
+
+    expect(runtime.responseAttempts, 0);
+    expect(store.actionKeys, isEmpty);
+  });
+
   test('concede persists and links the partial public replay', () async {
     final store = _Store();
     final runtime = _Runtime();
@@ -575,10 +613,12 @@ class _Persistence implements InteractiveBattlePersistence {
 class _Store implements InteractiveBattleStoreApi {
   _Store({
     this.failAttemptAttachment = false,
+    this.rejectActionsAfterPromptDeadline = false,
     List<InteractiveBattleSession> listedSessions = const [],
   }) : listedSessions = List<InteractiveBattleSession>.from(listedSessions);
 
   final bool failAttemptAttachment;
+  final bool rejectActionsAfterPromptDeadline;
   final List<InteractiveBattleSession> listedSessions;
   InteractiveBattleSession? current;
   String? attachedAttemptId;
@@ -677,11 +717,18 @@ class _Store implements InteractiveBattleStoreApi {
     required String userId,
     required String id,
     required InteractiveBattleActionInput action,
-  }) async => InteractiveBattleActionReservation(
-    session: current!,
-    prompt: current!.prompt,
-    duplicate: !actionKeys.add(action.idempotencyKey),
-  );
+  }) async {
+    if (rejectActionsAfterPromptDeadline) {
+      throw const InteractiveBattleStaleActionException(
+        'interactive_battle_action_stale',
+      );
+    }
+    return InteractiveBattleActionReservation(
+      session: current!,
+      prompt: current!.prompt,
+      duplicate: !actionKeys.add(action.idempotencyKey),
+    );
+  }
 
   @override
   Future<InteractiveBattleSession> terminalize({

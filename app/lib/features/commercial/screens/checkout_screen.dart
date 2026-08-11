@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/commercial_launch_policy.dart';
@@ -161,7 +162,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           const SizedBox(height: AppTheme.space12),
                           const _CheckoutLine(
                             label: 'Plano',
-                            value: 'ManaLoom Pro',
+                            value: ProductIdentity.proDisplayName,
                           ),
                           _CheckoutLine(
                             key: const Key('checkout-price-line'),

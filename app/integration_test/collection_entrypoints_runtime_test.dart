@@ -30,7 +30,7 @@ void main() {
           ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ],
         child: MaterialApp(
-          title: 'ManaLoom Collection Runtime',
+          title: 'BrewTact Collection Runtime',
           theme: AppTheme.darkTheme,
           home: const CollectionScreen(),
         ),

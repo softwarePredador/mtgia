@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:server/ai/commander_reference_readiness_cli_support.dart';
 import 'package:server/ai/commander_reference_readiness_support.dart';
 import 'package:server/database.dart';
 
 const _defaultArtifactDir =
-    'test/artifacts/commander_reference_readiness_2026-05-13';
+    '/tmp/manaloom_commander_reference_readiness_scorecard';
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -13,28 +14,40 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final commanders = _readCommanders(args);
-  if (commanders.isEmpty) {
-    throw ArgumentError(
-      'Informe --commander=<nome> ou --commanders="A;B;C".',
-    );
-  }
+  final selection = parseCommanderReferenceReadinessSelection(args);
 
-  final artifactDir =
-      Directory(_readArg(args, '--artifact-dir=') ?? _defaultArtifactDir);
+  final artifactDir = Directory(
+    resolveCommanderReferenceReadinessArtifactDir(args),
+  );
   await artifactDir.create(recursive: true);
   final runtimeSummaryPath = _readArg(args, '--runtime-summary=');
-  final runtimeProof = runtimeSummaryPath == null
-      ? null
-      : parseCommanderReferenceReadinessRuntimeProof(
-          _readJsonObject(runtimeSummaryPath),
-        );
+  final runtimeProof =
+      runtimeSummaryPath == null
+          ? null
+          : parseCommanderReferenceReadinessRuntimeProof(
+            _readJsonObject(runtimeSummaryPath),
+          );
 
   final database = Database();
   await database.connect();
   final startedAt = DateTime.now().toUtc();
 
   try {
+    final commanders =
+        selection.allActiveProfiles
+            ? await discoverActiveUsableCommanderReferenceProfiles(
+              query: (sql) async {
+                final rows = await database.connection.execute(sql);
+                return <Object?>[for (final row in rows) row[0]];
+              },
+            )
+            : selection.commanders;
+    if (commanders.isEmpty) {
+      throw StateError(
+        'Nenhum commander com profile persistido e confidence >= medium.',
+      );
+    }
+
     final scorecards = <Map<String, dynamic>>[];
     for (final commander in commanders) {
       final scorecard = await buildCommanderReferenceReadinessScorecard(
@@ -46,9 +59,10 @@ Future<void> main(List<String> args) async {
     }
 
     final summary = {
-      'status': scorecards.every((card) => card['expansion_ready'] == true)
-          ? 'PASS'
-          : 'PASS_WITH_RISKS',
+      'status':
+          scorecards.every((card) => card['expansion_ready'] == true)
+              ? 'PASS'
+              : 'PASS_WITH_RISKS',
       'version': commanderReferenceReadinessVersion,
       'mode': 'read_only_scorecard',
       'db_mutations': false,
@@ -69,46 +83,28 @@ Future<void> main(List<String> args) async {
 
     final outputPath = '${artifactDir.path}/readiness_scorecard_summary.json';
     await _writeJson(outputPath, summary);
-    print(jsonEncode({
-      'status': summary['status'],
-      'commander_count': summary['commander_count'],
-      'ready_count': summary['ready_count'],
-      'artifact': outputPath,
-      'scorecards': [
-        for (final card in scorecards)
-          {
-            'commander_name': card['commander_name'],
-            'score': card['score'],
-            'status': card['status'],
-            'expansion_ready': card['expansion_ready'],
-            'blockers': card['blockers'],
-            'warnings': card['warnings'],
-          }
-      ],
-    }));
+    print(
+      jsonEncode({
+        'status': summary['status'],
+        'commander_count': summary['commander_count'],
+        'ready_count': summary['ready_count'],
+        'artifact': outputPath,
+        'scorecards': [
+          for (final card in scorecards)
+            {
+              'commander_name': card['commander_name'],
+              'score': card['score'],
+              'status': card['status'],
+              'expansion_ready': card['expansion_ready'],
+              'blockers': card['blockers'],
+              'warnings': card['warnings'],
+            },
+        ],
+      }),
+    );
   } finally {
     await database.close();
   }
-}
-
-List<String> _readCommanders(List<String> args) {
-  final commanders = <String>[];
-  for (final arg in args) {
-    if (arg.startsWith('--commander=')) {
-      final value = arg.substring('--commander='.length).trim();
-      if (value.isNotEmpty) commanders.add(value);
-    }
-  }
-  final rawMany = _readArg(args, '--commanders=');
-  if (rawMany != null) {
-    commanders.addAll(
-      rawMany
-          .split(RegExp(r'[;\n]'))
-          .map((value) => value.trim())
-          .where((value) => value.isNotEmpty),
-    );
-  }
-  return commanders.toSet().toList(growable: false)..sort();
 }
 
 Map<String, dynamic> _readJsonObject(String path) {
@@ -127,6 +123,10 @@ Future<void> _writeJson(String path, Map<String, dynamic> payload) async {
   await File(path).writeAsString('${encoder.convert(payload)}\n');
 }
 
+String resolveCommanderReferenceReadinessArtifactDir(List<String> args) {
+  return _readArg(args, '--artifact-dir=') ?? _defaultArtifactDir;
+}
+
 String? _readArg(List<String> args, String prefix) {
   for (final arg in args) {
     if (arg.startsWith(prefix)) return arg.substring(prefix.length);
@@ -139,8 +139,12 @@ void _printUsage() {
 Usage:
   dart run bin/commander_reference_readiness_scorecard.dart --commander="Lorehold, the Historian"
   dart run bin/commander_reference_readiness_scorecard.dart --commanders="Lorehold, the Historian;Dina, Soul Steeper"
+  dart run bin/commander_reference_readiness_scorecard.dart --all-active-profiles
   dart run bin/commander_reference_readiness_scorecard.dart --commander="Lorehold, the Historian" --runtime-summary=test/artifacts/.../summary.json
+  dart run bin/commander_reference_readiness_scorecard.dart --commander="Lorehold, the Historian" --artifact-dir=/path/to/output
 
 Read-only scorecard. No database mutations.
+Selection modes are mutually exclusive. --all-active-profiles selects persisted profiles with confidence >= medium.
+Default output: $_defaultArtifactDir
 ''');
 }

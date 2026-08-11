@@ -210,7 +210,7 @@ void main() {
     expect(visualSkin, contains('syncPtBrCopy();'));
     expect(
       visualSkin,
-      contains("document.title = 'ManaLoom • Contador de vida';"),
+      contains("document.title = '\${ProductIdentity.lifeCounterTitlePtBr}';"),
     );
   });
 }

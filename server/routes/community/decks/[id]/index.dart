@@ -285,7 +285,7 @@ Map<String, dynamic> _buildVisualAnalysis({
   return {
     'headline':
         commanderName == null || commanderName.isEmpty
-            ? 'Deck publico ManaLoom'
+            ? 'Deck publico BrewTact'
             : 'Plano publico de $commanderName',
     'color_identity_hint': nonZeroColors.isEmpty ? ['C'] : nonZeroColors,
     'top_type_buckets': topTypes

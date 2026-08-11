@@ -1,13 +1,17 @@
-# ManaLoom Web Public
+# BrewTact Web Public
 
-Camada publica React/Next.js do ManaLoom.
+Camada publica React/Next.js do BrewTact.
 
-Arquitetura alvo:
+Arquitetura atual:
 
-- `manaloom.com/*`: Next.js publico para SEO, descoberta, compartilhamento e conversao.
-- `manaloom.com/app/*`: Flutter Web logado para deck builder, IA, colecao, pos-jogo, comunidade, trade e notificacoes.
-- Integração atual: home, marketplace, decks públicos e relatórios compartilháveis leem status, anúncios, imagens, preços, decks, reports e market movers do servidor ManaLoom quando disponível.
+- `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/*`: Next.js publico para SEO, descoberta, compartilhamento e conversao.
+- `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/*`: Flutter Web logado para deck builder, IA, colecao, pos-jogo, comunidade, trade e notificacoes.
+- Integração atual: home, marketplace, decks públicos e relatórios compartilháveis leem status, anúncios, imagens, preços, decks, reports e market movers do servidor BrewTact quando disponível.
 - Planos e capacidades públicas refletem contratos existentes do app/backend; não há cards, posts, perfis ou relatórios de demonstração.
+
+O domínio comercial definitivo ainda não foi adquirido. Até essa decisão, SEO,
+links compartilháveis e metadata usam o host HTTPS público atual do EasyPanel;
+o projeto não presume `brewtact.com` nem qualquer outro domínio de terceiros.
 
 ## Instalar
 
@@ -36,7 +40,7 @@ NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://seu-backend.example.com npm run dev
 - Public web: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
 - Flutter autenticado: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/`
 - Android: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/downloads/manaloom-android.apk`
-- API ManaLoom: `https://evolution-cartinhas.2ta7qx.easypanel.host`
+- API BrewTact: `https://evolution-cartinhas.2ta7qx.easypanel.host`
 - Serviço EasyPanel/Swarm: `evolution_manaloom-web-public`
 - Serviço Flutter EasyPanel/Swarm: `evolution_manaloom-app`
 
@@ -96,7 +100,7 @@ Substituicao recomendada para novas áreas:
 - O template usa Next.js App Router, TypeScript e Tailwind CSS.
 - CTAs de produto apontam para `/app`.
 - Open Graph foi configurado para deck e relatorio via metadata das paginas.
-- `sitemap.ts` e `robots.ts` usam `NEXT_PUBLIC_SITE_URL` quando definido; fallback: `https://manaloom.com`.
+- `sitemap.ts` e `robots.ts` usam uma origem HTTPS válida em `NEXT_PUBLIC_SITE_URL` quando definida; o fallback seguro é o host público atual do EasyPanel.
 - Textos legais sao drafts operacionais e precisam de revisao juridica.
 
 ## Proximos passos

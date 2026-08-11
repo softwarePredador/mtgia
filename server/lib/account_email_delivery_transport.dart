@@ -16,19 +16,19 @@ enum AccountEmailTemplate {
   passwordReset(
     wireName: 'password_reset',
     actionField: 'reset_url',
-    subject: 'Redefina sua senha no ManaLoom',
+    subject: 'Redefina sua senha no BrewTact',
     heading: 'Redefinição de senha',
     introduction:
-        'Recebemos uma solicitação para redefinir a senha da sua conta.',
+        'Recebemos uma solicitação para redefinir a senha da sua conta BrewTact.',
     actionLabel: 'Redefinir senha',
   ),
   emailVerification(
     wireName: 'email_verification',
     actionField: 'verification_url',
-    subject: 'Verifique seu email no ManaLoom',
+    subject: 'Verifique seu email no BrewTact',
     heading: 'Verifique seu email',
     introduction:
-        'Confirme este endereço para liberar os recursos da sua conta.',
+        'Confirme este endereço para liberar os recursos da sua conta BrewTact.',
     actionLabel: 'Verificar email',
   );
 

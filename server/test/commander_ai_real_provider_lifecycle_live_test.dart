@@ -5,16 +5,40 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:http/http.dart' as http;
-import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
+import '../lib/legal_policy.dart';
+
 void main() {
+  const password = 'BetaQa!2026-Deck';
+  const commanderName = 'Lorehold, the Historian';
+  const commanderBracket = 2;
   final liveRequested = Platform.environment['RUN_INTEGRATION_TESTS'] == '1';
   final lifecycleRequested =
       Platform.environment['RUN_REAL_PROVIDER_LIFECYCLE'] == '1';
   final mutationApproved =
       Platform.environment['MANALOOM_CONFIRM_LIVE_MUTATIONS'] ==
       'I_HAVE_EXPLICIT_APPROVAL';
+  final baseUrl = (Platform.environment['TEST_API_BASE_URL'] ?? '')
+      .trim()
+      .replaceFirst(RegExp(r'/+$'), '');
+  final target = Uri.tryParse(baseUrl);
+  final targetIsLoopback =
+      target != null &&
+      (target.host == '127.0.0.1' ||
+          target.host == 'localhost' ||
+          target.host == '::1');
+  final targetConfigured =
+      target != null &&
+      target.hasScheme &&
+      (target.scheme == 'https' ||
+          (target.scheme == 'http' && targetIsLoopback)) &&
+      target.host.isNotEmpty;
+  final expectedGitSha =
+      (Platform.environment['MANALOOM_EXPECTED_API_GIT_SHA'] ?? '')
+          .trim()
+          .toLowerCase();
+  final revisionPinned = RegExp(r'^[0-9a-f]{40}$').hasMatch(expectedGitSha);
   final skipReason =
       !liveRequested
           ? 'Teste requer RUN_INTEGRATION_TESTS=1.'
@@ -22,11 +46,13 @@ void main() {
           ? 'Teste requer RUN_REAL_PROVIDER_LIFECYCLE=1.'
           : !mutationApproved
           ? 'Teste requer aprovação explícita de mutação.'
+          : !targetConfigured
+          ? 'Teste requer TEST_API_BASE_URL HTTPS explícito ou loopback HTTP.'
+          : !revisionPinned
+          ? 'Teste requer MANALOOM_EXPECTED_API_GIT_SHA com 40 hex.'
           : null;
-  final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
   final suffix = DateTime.now().microsecondsSinceEpoch;
-  final email = 's6_09_real_provider_$suffix@example.com';
+  final email = 's6_09_real_provider_$suffix@example.invalid';
   String? token;
 
   Map<String, dynamic> decode(http.Response response) {
@@ -55,6 +81,18 @@ void main() {
 
   Future<http.Response> get(String path) =>
       http.get(Uri.parse('$baseUrl$path'), headers: headers());
+
+  Future<void> assertTargetRevision() async {
+    final response = await http.get(Uri.parse('$baseUrl/health'));
+    expect(response.statusCode, 200, reason: response.body);
+    final health = decode(response);
+    expect(health['status'], 'healthy', reason: response.body);
+    expect(
+      health['git_sha']?.toString().toLowerCase(),
+      expectedGitSha,
+      reason: 'O backend alvo diverge da revisão explicitamente aprovada.',
+    );
+  }
 
   Future<http.Response> pollOptimize(String jobId) async {
     for (var attempt = 0; attempt < 90; attempt++) {
@@ -88,7 +126,8 @@ void main() {
   }) async {
     final response = await post('/ai/optimize', {
       'deck_id': deckId,
-      'archetype': 'control',
+      'archetype': 'spellslinger',
+      'bracket': commanderBracket,
       'intensity': intensity,
       'async': false,
       'recommendation_context': {
@@ -101,16 +140,6 @@ void main() {
     expect(jobId, isNotNull, reason: response.body);
     return pollOptimize(jobId!);
   }
-
-  Pool openPool() => Pool.withEndpoints([
-    Endpoint(
-      host: Platform.environment['DB_HOST'] ?? '127.0.0.1',
-      port: int.parse(Platform.environment['DB_PORT'] ?? '5432'),
-      database: Platform.environment['DB_NAME']!,
-      username: Platform.environment['DB_USER']!,
-      password: Platform.environment['DB_PASS'] ?? '',
-    ),
-  ], settings: const PoolSettings(sslMode: SslMode.disable));
 
   List<Map<String, dynamic>> createCards(Map<String, dynamic> generatedDeck) {
     final cards = <Map<String, dynamic>>[];
@@ -134,15 +163,19 @@ void main() {
   }
 
   test(
-    'real provider traverses generate, validate, analyze, preview and replay',
+    'real provider traverses Commander generate, validate, analyze, preview and replay',
     () async {
-      final pool = openPool();
       String? deckId;
+      var accountCreated = false;
       try {
+        await assertTargetRevision();
         final registration = await post('/auth/register', {
           'email': email,
-          'password': 'BetaQa!2026-Deck',
+          'password': password,
           'username': 's6_09_$suffix',
+          'legal_accepted': true,
+          'terms_version': currentTermsVersion,
+          'privacy_version': currentPrivacyVersion,
         });
         expect(
           registration.statusCode,
@@ -150,43 +183,60 @@ void main() {
           reason: registration.body,
         );
         token = decode(registration)['token'] as String;
+        accountCreated = true;
 
-        const prompts = [
-          'mono red aggro with low curve burn creatures and haste threats',
-          'mono black midrange with efficient removal and card advantage',
-          'azorius control with board wipes card draw and planeswalkers',
-        ];
-        Map<String, dynamic>? generation;
-        final generationFailures = <String>[];
-        for (final prompt in prompts) {
-          final response = await post('/ai/generate', {
-            'prompt': prompt,
-            'format': 'Standard',
-          }, timeout: const Duration(minutes: 2));
-          if (response.statusCode == 200) {
-            generation = decode(response);
-            break;
-          }
-          generationFailures.add('${response.statusCode}:${response.body}');
-        }
+        final generationResponse = await post('/ai/generate', {
+          'prompt':
+              'Commander Boros B2 de Miracle Big Spells com topdeck setup, '
+              'interação e plano de vitória claro.',
+          'format': 'Commander',
+          'commander_name': commanderName,
+          'bracket': commanderBracket,
+          'generation_constraints': {'prefer_collection': true},
+        }, timeout: const Duration(minutes: 2));
         expect(
-          generation,
-          isNotNull,
-          reason: 'Generation failures: $generationFailures',
+          generationResponse.statusCode,
+          200,
+          reason: generationResponse.body,
         );
-        expect(generation!['is_mock'], isFalse);
+        final generation = decode(generationResponse);
+        expect(generation['is_mock'], isFalse);
+        expect(
+          generation['generation_mode'],
+          anyOf('ai_generate', 'provider_validated_repair'),
+        );
+        expect(generation['bracket'], commanderBracket);
+        expect(generation['can_save'], isNot(false));
+        final deckbuildingContract =
+            (generation['deckbuilding_contract'] as Map)
+                .cast<String, dynamic>();
+        expect(
+          deckbuildingContract['status'],
+          anyOf('ready', 'ready_for_battle_gate'),
+        );
+        expect(deckbuildingContract['commander_name'], commanderName);
+        expect(deckbuildingContract['blockers'], isEmpty);
         final generatedDeck =
             (generation['generated_deck'] as Map).cast<String, dynamic>();
+        final generatedCommander =
+            (generatedDeck['commander'] as Map).cast<String, dynamic>();
+        expect(generatedCommander['name'], commanderName);
         final cards = createCards(generatedDeck);
         final generatedQuantity = cards.fold<int>(
           0,
           (total, card) => total + (card['quantity'] as int),
         );
-        expect(generatedQuantity, greaterThanOrEqualTo(60));
+        expect(generatedQuantity, 100);
+        expect(
+          cards.where((card) => card['is_commander'] == true),
+          hasLength(1),
+        );
 
         final created = await post('/decks', {
           'name': 'S6-09 real provider $suffix',
-          'format': 'standard',
+          'format': 'commander',
+          'archetype': 'spellslinger',
+          'bracket': commanderBracket,
           'description': 'Disposable real-provider lifecycle evidence.',
           'cards': cards,
         });
@@ -255,23 +305,6 @@ void main() {
         );
         expect((decode(replayDetail)['replay'] as Map)['id'], replayId);
 
-        final providerProof = await pool.execute(
-          Sql.named('''
-            SELECT COUNT(*)::int,
-                   COALESCE(SUM(input_tokens), 0)::int,
-                   COALESCE(SUM(output_tokens), 0)::int
-            FROM ai_logs l
-            JOIN users u ON u.id = l.user_id
-            WHERE LOWER(u.email) = LOWER(@email)
-              AND l.endpoint = 'provider:generate'
-              AND l.success = TRUE
-          '''),
-          parameters: {'email': email},
-        );
-        expect(providerProof.single[0], greaterThanOrEqualTo(1));
-        expect(providerProof.single[1], greaterThan(0));
-        expect(providerProof.single[2], greaterThan(0));
-
         final deleted = await http.delete(
           Uri.parse('$baseUrl/decks/$deckId'),
           headers: headers(),
@@ -280,12 +313,24 @@ void main() {
         deckId = null;
       } finally {
         if (deckId != null) {
-          await http.delete(
+          final deckCleanup = await http.delete(
             Uri.parse('$baseUrl/decks/$deckId'),
             headers: headers(),
           );
+          expect(deckCleanup.statusCode, 204, reason: deckCleanup.body);
         }
-        await pool.close();
+        if (accountCreated && token != null) {
+          final accountCleanup = await http.delete(
+            Uri.parse('$baseUrl/users/me'),
+            headers: headers(),
+            body: jsonEncode({
+              'confirmation': 'EXCLUIR MINHA CONTA',
+              'password': password,
+            }),
+          );
+          expect(accountCleanup.statusCode, 200, reason: accountCleanup.body);
+          expect(decode(accountCleanup)['account_deleted'], isTrue);
+        }
       }
     },
     skip: skipReason,

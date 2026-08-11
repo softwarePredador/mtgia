@@ -555,7 +555,7 @@ Commander reference profile active:
 - Role targets: $roleTargets.
 - Prioritize these package signals when legal and budget/bracket appropriate: $packages.
 - Avoid: $avoid.
-- Do not copy a public decklist. Build a legal, functional ManaLoom list from aggregate signals.
+- Do not copy a public decklist. Build a legal, functional BrewTact list from aggregate signals.
 ''';
 }
 

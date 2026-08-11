@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/branding/product_identity.dart';
 import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
@@ -1972,7 +1973,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     try {
       final response = await ApiClient()
           .post('/decks/${Uri.encodeComponent(widget.deckId)}/reports', {
-            'title': 'Relatorio ManaLoom - otimizacao',
+            'title': 'Relatorio ${ProductIdentity.displayName} - otimizacao',
             'description':
                 'Relatorio antes/depois gerado pelo preview de otimizacao.',
             'payload': payload,

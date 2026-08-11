@@ -2,8 +2,6 @@
 set -u -o pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
-source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 REPORT_DIR="${MANALOOM_DEEP_AI_REPORT_DIR:-/tmp/manaloom_deep_ai_alignment_reports}"
 TS="$(date -u +%Y%m%d_%H%M%S)"
 RUN_ID="deep_ai_alignment_${TS}"
@@ -74,7 +72,7 @@ run_auditors() {
     "python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py\" --out-prefix \"$REPORT_DIR/legacy_contamination_audit_${TS}_deep_ai_tester\""
 
   run_step "PG Hermes SQLite contract audit through new PostgreSQL" \
-    "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --write-approved python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py\" --out-prefix \"$REPORT_DIR/pg_hermes_sqlite_contract_audit_${TS}_deep_ai_tester\""
+    "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --read-only python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py\" --out-prefix \"$REPORT_DIR/pg_hermes_sqlite_contract_audit_${TS}_deep_ai_tester\""
 }
 
 write_final_summary() {
@@ -107,9 +105,8 @@ main() {
   if [[ -x "$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh" ]]; then
     run_step "ManaLoom server target audit" "\"$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh\""
   fi
-  require_live_mutation_approval "ManaLoom deep AI PostgreSQL runners" || exit $?
-  require_postgres_write_approval "ManaLoom deep AI PostgreSQL runners" || exit $?
-  run_step "New PostgreSQL migration status" "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --write-approved bash -lc 'cd \"$ROOT_DIR/server\" && dart run bin/migrate.dart --status'"
+  run_step "New PostgreSQL migration status" \
+    "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --read-only dart run \"$ROOT_DIR/server/bin/migrate.dart\" --status"
   run_pg_counts
   run_auditors
 

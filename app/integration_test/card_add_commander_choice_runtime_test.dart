@@ -111,7 +111,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
-          title: 'ManaLoom Commander Choice Runtime',
+          title: 'BrewTact Commander Choice Runtime',
           theme: AppTheme.darkTheme,
           home: const CardSearchScreen(deckId: 'runtime-commander-choice'),
         ),

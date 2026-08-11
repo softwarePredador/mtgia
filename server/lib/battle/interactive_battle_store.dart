@@ -480,6 +480,7 @@ class InteractiveBattleStore implements InteractiveBattleStoreApi {
             AND status = 'waiting_for_action'
             AND state_version = @state_version
             AND active_prompt_id = @prompt_id
+            AND prompt_deadline_at > CURRENT_TIMESTAMP
           RETURNING $interactiveBattleSelectColumns
         '''),
         parameters: {

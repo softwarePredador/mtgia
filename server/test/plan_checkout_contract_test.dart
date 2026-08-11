@@ -66,6 +66,6 @@ void main() {
       expect(source, isNot(contains('adaptador do provedor')));
     }
 
-    expect(sources.join('\n'), contains('O ManaLoom está em beta gratuita.'));
+    expect(sources.join('\n'), contains('O BrewTact está em beta gratuita.'));
   });
 }

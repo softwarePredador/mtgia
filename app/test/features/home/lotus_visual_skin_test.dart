@@ -113,7 +113,7 @@ void main() {
         'assets/lotus/images/dagger.svg',
       ).readAsStringSync();
 
-      expect(commanderMark, contains('Dano de comandante ManaLoom'));
+      expect(commanderMark, contains('Dano de comandante BrewTact'));
       expect(commanderMark, contains('M14.5 17.5 3 6V3h3'));
       expect(commanderMark, isNot(contains('M22.5 27.18')));
       expect(lotusInjectedVisualSkinScript, contains('.switch-to-own-damage'));
@@ -335,7 +335,10 @@ void main() {
         lotusInjectedVisualSkinScript,
         contains("'dano de comandante de ' + playerName"),
       );
-      expect(lotusInjectedVisualSkinScript, contains("removeAttribute('role')"));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("removeAttribute('role')"),
+      );
       expect(
         lotusInjectedVisualSkinScript,
         contains("'aria-label', 'Voltar ao jogo'"),
@@ -375,7 +378,7 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains("['Cancel', 'Cancelar']"));
       expect(
         lotusInjectedVisualSkinScript,
-        contains("document.title = 'ManaLoom • Contador de vida'"),
+        contains("document.title = 'BrewTact • Contador de vida'"),
       );
     });
 

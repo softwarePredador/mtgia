@@ -1,57 +1,15 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ManaLoom app icon">
-  <defs>
-    <linearGradient id="bg" x1="78" y1="40" x2="436" y2="470" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#171B22"/>
-      <stop offset="0.56" stop-color="#0F1115"/>
-      <stop offset="1" stop-color="#080A0D"/>
-    </linearGradient>
-    <radialGradient id="frost" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 247) rotate(90) scale(224 176)">
-      <stop offset="0" stop-color="#6FA8DC" stop-opacity="0.44"/>
-      <stop offset="0.58" stop-color="#6FA8DC" stop-opacity="0.12"/>
-      <stop offset="1" stop-color="#6FA8DC" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="brass" x1="157" y1="119" x2="358" y2="421" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#F0C15A"/>
-      <stop offset="0.34" stop-color="#E0A93B"/>
-      <stop offset="1" stop-color="#A5681E"/>
-    </linearGradient>
-    <linearGradient id="pageLeft" x1="171" y1="142" x2="259" y2="423" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#2A241B"/>
-      <stop offset="1" stop-color="#15171D"/>
-    </linearGradient>
-    <linearGradient id="pageRight" x1="341" y1="142" x2="253" y2="423" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#312614"/>
-      <stop offset="1" stop-color="#17191E"/>
-    </linearGradient>
-    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="7" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="512" height="512" fill="#0F1115"/>
-  <rect x="4" y="4" width="504" height="504" rx="110" fill="url(#bg)"/>
-  <rect x="32" y="32" width="448" height="448" rx="96" fill="none" stroke="#C58B2A" stroke-opacity="0.26" stroke-width="8"/>
-  <rect x="50" y="50" width="412" height="412" rx="82" fill="none" stroke="#6FA8DC" stroke-opacity="0.08" stroke-width="3"/>
-  <ellipse cx="256" cy="247" rx="178" ry="222" fill="url(#frost)"/>
-
-  <path d="M256 82 382 184 348 386 256 448 164 386 130 184 256 82Z" fill="#11151C" stroke="url(#brass)" stroke-width="14" stroke-linejoin="round"/>
-  <path d="M256 120C220 134 184 162 158 203l31 151c19 31 40 52 67 70V120Z" fill="url(#pageLeft)" stroke="#C58B2A" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M256 120c36 14 72 42 98 83l-31 151c-19 31-40 52-67 70V120Z" fill="url(#pageRight)" stroke="#E0A93B" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M256 122v302" stroke="#6FA8DC" stroke-width="7" stroke-linecap="round" filter="url(#softGlow)"/>
-
-  <path d="M165 213c49 31 133 31 182 0" fill="none" stroke="#6FA8DC" stroke-width="9" stroke-linecap="round" stroke-opacity="0.95"/>
-  <path d="M186 309c40 26 100 26 140 0" fill="none" stroke="#6FA8DC" stroke-width="7" stroke-linecap="round" stroke-opacity="0.86"/>
-  <path d="M189 177 326 336M323 177 186 336" fill="none" stroke="#C58B2A" stroke-width="6" stroke-linecap="round" stroke-opacity="0.72"/>
-
-  <path d="M256 63 284 94 256 125 228 94 256 63Z" fill="#E0A93B" stroke="#F0C15A" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M256 387 283 416 256 445 229 416 256 387Z" fill="#0F1115" stroke="#E0A93B" stroke-width="5" stroke-linejoin="round"/>
-  <circle cx="256" cy="256" r="34" fill="#0F1115" stroke="#E0A93B" stroke-width="8"/>
-  <path d="M239 256h34M256 239v34" stroke="#6FA8DC" stroke-width="7" stroke-linecap="round" filter="url(#softGlow)"/>
-  <circle cx="165" cy="213" r="8" fill="#E0A93B"/>
-  <circle cx="347" cy="213" r="8" fill="#E0A93B"/>
-  <circle cx="186" cy="309" r="7" fill="#6FA8DC"/>
-  <circle cx="326" cy="309" r="7" fill="#6FA8DC"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"
+  viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">BrewTact app icon</title>
+  <rect width="512" height="512" fill="#0B0D12"/>
+  <g transform="translate(47.740 8.580) scale(1.78)">
+  <g id="tactical-stack-mark">
+    <path fill="#C58B2A" d="M44 52L178 89Q190 92 190 105V132Q190 140 183 144L153 161V130L160 126V114L76 91V125L112 145L84 162L52 144Q44 139 44 130Z"/>
+    <path fill="#E0A93B" d="M44 52L178 89Q190 92 190 105V114L160 114L76 91V101L44 92Z"/>
+    <path fill="#8E641B" d="M76 101V125L112 145L84 162L52 144Q44 139 44 130V113Z"/>
+    <path fill="#6FA8DC" d="M107 144L160 116L190 125V154L146 178V207L114 226V176L86 191V160Z"/>
+    <path fill="#3E5F8A" d="M146 178V207L114 226V176Z"/>
+  </g>
+  </g>
 </svg>

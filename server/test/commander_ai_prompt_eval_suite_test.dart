@@ -23,7 +23,7 @@ void main() {
 
       expect(report['schema_version'], commanderAiPromptEvalSchemaVersion);
       expect(report['status'], 'pass');
-      expect(report['case_count'], 6);
+      expect(report['case_count'], 12);
       expect(report['failed_case_count'], 0);
       expect(report['score'], greaterThanOrEqualTo(90));
       final coverage = report['coverage'] as Map<String, dynamic>;
@@ -35,7 +35,20 @@ void main() {
         'three_plus',
         'two',
       ]);
-      expect(coverage['archetype_family_count'], 6);
+      expect(coverage['archetype_family_count'], 12);
+      expect(coverage['commander_pairing_mechanics'], ['background']);
+      expect(coverage['color_features'], ['five_color', 'hybrid_mana']);
+      expect(coverage['card_layouts'], ['adventure', 'modal_dfc', 'split']);
+      expect(coverage['source_states'], [
+        'corpus_sparse',
+        'profile_low_confidence',
+        'profile_missing',
+      ]);
+      expect(coverage['constraint_states'], [
+        'collection_only',
+        'incomplete_deck',
+        'zero_budget',
+      ]);
     });
 
     test('fails closed when a held-out coverage bucket is removed', () {
@@ -76,6 +89,181 @@ void main() {
 
       expect(report['status'], 'fail');
       expect(failureCodes, contains('fixture_schema_current'));
+    });
+
+    test('does not credit multiface labels without matching face evidence', () {
+      final malformed = jsonDecode(jsonEncode(fixture)) as Map<String, dynamic>;
+      final cases = (malformed['cases'] as List).cast<Map<String, dynamic>>();
+      final layoutCase = cases.firstWhere(
+        (entry) => entry['id'] == 'marchesa_multiface_layouts_bracket3',
+      );
+      final catalog =
+          (layoutCase['card_catalog'] as Map).cast<String, dynamic>();
+      (catalog['Wear // Tear'] as Map).remove('faces');
+
+      final report = evaluateCommanderAiPromptSuite(malformed);
+      final coverage = report['coverage'] as Map<String, dynamic>;
+      final failureCodes =
+          (coverage['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(report['status'], 'fail');
+      expect(coverage['card_layouts'], isNot(contains('split')));
+      expect(failureCodes, contains('required_card_layouts'));
+    });
+
+    test('does not credit background pairing without oracle/type evidence', () {
+      final malformed = jsonDecode(jsonEncode(fixture)) as Map<String, dynamic>;
+      final cases = (malformed['cases'] as List).cast<Map<String, dynamic>>();
+      final backgroundCase = cases.firstWhere(
+        (entry) => entry['id'] == 'wilson_background_pair_bracket2',
+      );
+      final catalog =
+          (backgroundCase['card_catalog'] as Map).cast<String, dynamic>();
+      (catalog['Wilson, Refined Grizzly'] as Map)['oracle_text'] =
+          'Vigilance, reach. Wilson cannot be countered.';
+
+      final report = evaluateCommanderAiPromptSuite(malformed);
+      final coverage = report['coverage'] as Map<String, dynamic>;
+      final failureCodes =
+          (coverage['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+      final evaluatedCase = (report['cases'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (entry) => entry['id'] == 'wilson_background_pair_bracket2',
+          );
+      final caseFailureCodes =
+          (evaluatedCase['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(report['status'], 'fail');
+      expect(failureCodes, contains('required_commander_pairing_mechanics'));
+      expect(caseFailureCodes, contains('commander_pairing_verified'));
+    });
+
+    test('does not credit hybrid coverage from five-color label alone', () {
+      final malformed = jsonDecode(jsonEncode(fixture)) as Map<String, dynamic>;
+      final cases = (malformed['cases'] as List).cast<Map<String, dynamic>>();
+      final hybridCase = cases.firstWhere(
+        (entry) => entry['id'] == 'kenrith_five_color_hybrid_bracket3',
+      );
+      final catalog =
+          (hybridCase['card_catalog'] as Map).cast<String, dynamic>();
+      (catalog['Kitchen Finks'] as Map).remove('mana_cost');
+
+      final report = evaluateCommanderAiPromptSuite(malformed);
+      final coverage = report['coverage'] as Map<String, dynamic>;
+      final failureCodes =
+          (coverage['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(report['status'], 'fail');
+      expect(coverage['color_features'], contains('five_color'));
+      expect(coverage['color_features'], isNot(contains('hybrid_mana')));
+      expect(failureCodes, contains('required_color_features'));
+    });
+
+    test('requires source-limit disclosures derived from numeric evidence', () {
+      final sourceCase = (fixture['cases'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (entry) =>
+                entry['id'] == 'otaria_low_profile_sparse_corpus_bracket2',
+          );
+      final candidate =
+          jsonDecode(jsonEncode(sourceCase['candidate_response']))
+              as Map<String, dynamic>;
+      candidate['summary'] = 'Esta recomendação tem confiança alta e exata.';
+
+      final evaluated = evaluateCommanderAiPromptCase(
+        sourceCase,
+        candidateResponse: candidate,
+        minimumScore: 90,
+      );
+      final failureCodes =
+          (evaluated['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(
+        failureCodes,
+        contains('source_state_profile_low_confidence_disclosed'),
+      );
+      expect(failureCodes, contains('source_state_corpus_sparse_disclosed'));
+      expect(failureCodes, contains('reference_fallback_disclosed'));
+      expect(
+        failureCodes,
+        contains('no_unsupported_reference_confidence_claim'),
+      );
+    });
+
+    test('collection_only rejects an unowned zero-price addition', () {
+      final constraintCase = (fixture['cases'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (entry) =>
+                entry['id'] == 'konrad_collection_only_zero_budget_incomplete',
+          );
+      final candidate =
+          jsonDecode(jsonEncode(constraintCase['candidate_response']))
+              as Map<String, dynamic>;
+      ((candidate['swaps'] as List).single as Map)['in'] = 'Mind Stone';
+
+      final evaluated = evaluateCommanderAiPromptCase(
+        constraintCase,
+        candidateResponse: candidate,
+        minimumScore: 90,
+      );
+      final checks = (evaluated['checks'] as List).cast<Map<String, dynamic>>();
+      final failureCodes =
+          (evaluated['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(failureCodes, contains('collection_only_respected'));
+      expect(
+        checks.firstWhere(
+          (entry) => entry['code'] == 'budget_limit_respected',
+        )['status'],
+        'pass',
+      );
+    });
+
+    test('requires an actual incomplete deck to be acknowledged', () {
+      final constraintCase = (fixture['cases'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (entry) =>
+                entry['id'] == 'konrad_collection_only_zero_budget_incomplete',
+          );
+      final candidate =
+          jsonDecode(jsonEncode(constraintCase['candidate_response']))
+              as Map<String, dynamic>;
+      candidate['summary'] = 'Uma troca conservadora usando a coleção.';
+
+      final evaluated = evaluateCommanderAiPromptCase(
+        constraintCase,
+        candidateResponse: candidate,
+        minimumScore: 90,
+      );
+      final failureCodes =
+          (evaluated['failures'] as List)
+              .cast<Map<String, dynamic>>()
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(failureCodes, contains('incomplete_deck_acknowledged'));
     });
 
     test('blocks exact add/cut pairs rejected by battle feedback', () {

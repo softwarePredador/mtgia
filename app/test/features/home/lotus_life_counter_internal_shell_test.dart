@@ -827,7 +827,7 @@ void main() {
       });
     });
 
-    testWidgets('shows ManaLoom-owned feedback for blocked external links', (
+    testWidgets('shows BrewTact-owned feedback for blocked external links', (
       tester,
     ) async {
       late _FakeLotusHost host;
@@ -852,7 +852,7 @@ void main() {
       await tester.pump();
 
       host.emitShellMessage(
-        'ManaLoom blocked an external link: https://play.google.com/store/apps/details?id=com.vanilla.mtgcounter',
+        'BrewTact blocked an external link: https://play.google.com/store/apps/details?id=com.vanilla.mtgcounter',
       );
       await tester.pump();
 

@@ -22,11 +22,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: report.title,
-    description: report.description ?? "Relatorio compartilhavel ManaLoom.",
+    description: report.description ?? "Relatorio compartilhavel BrewTact.",
     openGraph: {
       type: "article",
       title: report.title,
-      description: report.description ?? "Relatorio compartilhavel ManaLoom.",
+      description: report.description ?? "Relatorio compartilhavel BrewTact.",
       url: absoluteUrl(routes.report(report.id))
     }
   };
@@ -102,7 +102,7 @@ export default async function PublicReportPage({ params }: PageProps) {
             <div className="border-l-2 border-brass-500 pl-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-brass-400">Resumo</p>
               <h2 className="mt-2 font-display text-3xl font-semibold">
-                {text(payload.deck_name ?? deck.name, "Deck ManaLoom")}
+                {text(payload.deck_name ?? deck.name, "Deck BrewTact")}
               </h2>
               <p className="mt-3 text-sm leading-6 text-mist-300">
                 {isOptimization
@@ -110,7 +110,7 @@ export default async function PublicReportPage({ params }: PageProps) {
                   : "Snapshot publico gerado a partir dos dados reais do deck."}
               </p>
               <div className="mt-7">
-                <ButtonLink href={routes.app}>Abrir ManaLoom</ButtonLink>
+                <ButtonLink href={routes.app}>Abrir BrewTact</ButtonLink>
               </div>
             </div>
           </aside>

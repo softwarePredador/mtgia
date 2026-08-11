@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:server/account_email_delivery_config.dart';
 import 'package:server/account_email_delivery_transport.dart';
 import 'package:server/email_verification_delivery_service.dart';
 import 'package:server/password_reset_delivery_service.dart';
@@ -13,6 +14,17 @@ void main() {
   const verificationToken = 'verification-token-test-only';
   const resendApiKey = "re_test_only_never_real_'_123456789";
   final expiresAt = DateTime.utc(2026, 7, 30, 18, 30);
+
+  test('Resend sender defaults to the BrewTact public brand', () {
+    final configuration = ResendEmailConfiguration.fromEnvironment(const {
+      'RESEND_API_KEY': resendApiKey,
+      'RESEND_FROM_EMAIL': 'conta@mail.example.test',
+      'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
+    });
+
+    expect(configuration.fromName, 'BrewTact');
+    expect(configuration.formattedFrom, 'BrewTact <conta@mail.example.test>');
+  });
 
   test('generic webhook keeps Authorization and canonical payload', () async {
     late http.Request captured;
@@ -67,7 +79,7 @@ void main() {
         'MANALOOM_EMAIL_DELIVERY_PROVIDER': 'resend',
         'RESEND_API_KEY': resendApiKey,
         'RESEND_FROM_EMAIL': "o'connor@mail.example.test",
-        'RESEND_FROM_NAME': "ManaLoom O'Connor",
+        'RESEND_FROM_NAME': "BrewTact O'Connor",
         'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
         'EMAIL_VERIFICATION_APP_URL':
             'https://app.example.test/app/#/verify-email?source=account',
@@ -95,12 +107,9 @@ void main() {
     expect(idempotencyKey, isNot(contains('player@example.test')));
 
     final payload = jsonDecode(captured.body) as Map<String, dynamic>;
-    expect(
-      payload['from'],
-      "ManaLoom O'Connor <o'connor@mail.example.test>",
-    );
+    expect(payload['from'], "BrewTact O'Connor <o'connor@mail.example.test>");
     expect(payload['to'], ['player@example.test']);
-    expect(payload['subject'], 'Verifique seu email no ManaLoom');
+    expect(payload['subject'], 'Verifique seu email no BrewTact');
     expect(payload, isNot(contains('template')));
     expect(payload, isNot(contains('recipient')));
     expect(
@@ -122,7 +131,7 @@ void main() {
         'MANALOOM_EMAIL_DELIVERY_PROVIDER': 'resend',
         'RESEND_API_KEY': resendApiKey,
         'RESEND_FROM_EMAIL': 'conta@mail.example.test',
-        'RESEND_FROM_NAME': 'ManaLoom',
+        'RESEND_FROM_NAME': 'BrewTact',
         'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
         'EMAIL_VERIFICATION_APP_URL':
             'https://app.example.test/app/#/verify-email',
@@ -159,7 +168,7 @@ void main() {
         'MANALOOM_EMAIL_DELIVERY_PROVIDER': 'resend',
         'RESEND_API_KEY': resendApiKey,
         'RESEND_FROM_EMAIL': 'conta@mail.example.test',
-        'RESEND_FROM_NAME': 'ManaLoom',
+        'RESEND_FROM_NAME': 'BrewTact',
         'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
         'PASSWORD_RESET_APP_URL':
             'https://app.example.test/app/#/reset-password',

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
+import 'core/branding/product_identity.dart';
 import 'core/config/launch_features.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/image_cache_policy.dart';
@@ -1014,7 +1015,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         ChangeNotifierProvider.value(value: _commercialProvider),
       ],
       child: MaterialApp.router(
-        title: 'ManaLoom - Deck Builder',
+        title: ProductIdentity.appTitle,
         theme: AppTheme.darkTheme,
         scrollBehavior: const ManaLoomScrollBehavior(),
         routerConfig: _router,

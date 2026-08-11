@@ -28,6 +28,7 @@ void main() {
         'aaaaaaaaaaaa',
         '😀😀😀😀😀😀😀😀😀😀😀😀',
         r'P@ssw0rd!2026',
+        'BrewTactBeta2026!',
         'ManaLoomBeta2026!',
       ]) {
         final result = PasswordPolicy.validate(password);

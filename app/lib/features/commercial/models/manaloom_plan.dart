@@ -1,3 +1,5 @@
+import '../../../core/branding/product_identity.dart';
+
 enum ManaLoomPlanTier { free, pro }
 
 enum AiUsageKind {
@@ -62,7 +64,7 @@ class ManaLoomPlan {
     monthlyAiLimit: 120,
     billingTerms: ManaLoomBillingTerms.free,
     description:
-        'Acesso aos recursos disponíveis no ManaLoom durante a beta pública.',
+        'Acesso aos recursos disponíveis no ${ProductIdentity.displayName} durante a beta pública.',
     features: [
       '120 ações de IA por mês',
       'Geração, análise e otimização com revisão antes de aplicar',

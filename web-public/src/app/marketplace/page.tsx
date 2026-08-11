@@ -10,7 +10,7 @@ import { routes } from "@/lib/routes";
 export const metadata: Metadata = {
   title: "Marketplace",
   description:
-    "Cartas disponíveis para compra e troca no ManaLoom."
+    "Cartas disponíveis para compra e troca no BrewTact."
 };
 
 export const revalidate = 300;
@@ -220,7 +220,7 @@ export default async function MarketplacePage() {
             <Surface className="p-5">
               <h2 className="text-lg font-bold">Continuar no app</h2>
               <p className="mt-3 text-sm leading-6 text-mist-300">
-                Cadastre cartas, publique seu fichário e responda propostas com seu perfil ManaLoom.
+                Cadastre cartas, publique seu fichário e responda propostas com seu perfil BrewTact.
               </p>
               <div className="mt-5">
                 <ButtonLink href={routes.app} variant="secondary">

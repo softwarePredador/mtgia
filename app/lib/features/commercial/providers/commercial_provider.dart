@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/branding/product_identity.dart';
 import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
 
@@ -199,7 +200,7 @@ class CommercialProvider extends ChangeNotifier {
                 : checkoutUrl,
         message:
             data['message']?.toString() ??
-            'O ManaLoom Pro ainda não está disponível para contratação.',
+            'O ${ProductIdentity.proDisplayName} ainda não está disponível para contratação.',
       );
     } catch (error) {
       debugPrint('[CommercialProvider] startProCheckout failed: $error');

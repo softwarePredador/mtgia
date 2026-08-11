@@ -394,7 +394,7 @@ _RuntimeApp _runtimeApp({
       ChangeNotifierProvider<TradeProvider>.value(value: trades),
     ],
     child: MaterialApp.router(
-      title: 'ManaLoom Realtime Notifications Runtime',
+      title: 'BrewTact Realtime Notifications Runtime',
       theme: AppTheme.darkTheme,
       routerConfig: router,
     ),

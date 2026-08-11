@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 
 class AuthVisualShell extends StatelessWidget {
@@ -149,7 +150,7 @@ class AuthBrandHeader extends StatelessWidget {
               'assets/branding/app_logo.png',
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
-              semanticLabel: 'Logo do ManaLoom',
+              semanticLabel: 'Logo do ${ProductIdentity.displayName}',
             ),
           ),
         ),

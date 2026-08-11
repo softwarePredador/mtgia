@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
+import '../../../core/branding/product_identity.dart';
 import '../../../core/config/visual_fixture.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -2297,7 +2298,7 @@ class _DeckEmptyState extends StatelessWidget {
             icon: Icons.content_paste_go_outlined,
             title: 'Importar lista',
             description:
-                'Cole uma lista externa e continue o trabalho no ManaLoom.',
+                'Cole uma lista externa e continue o trabalho no ${ProductIdentity.displayName}.',
             accent: AppTheme.frost400,
             onTap: onImport,
             showDivider: false,

@@ -56,7 +56,13 @@ bool _isCommonPattern(String canonical, String original) {
   if (exactCommonPasswords.contains(canonical)) return true;
 
   final leetFolded = _foldLeet(canonical);
-  const forbiddenWords = <String>['password', 'senha', 'qwerty', 'manaloom'];
+  const forbiddenWords = <String>[
+    'password',
+    'senha',
+    'qwerty',
+    'brewtact',
+    'manaloom',
+  ];
   if (forbiddenWords.any(leetFolded.contains)) return true;
 
   const forbiddenSequences = <String>[
@@ -67,6 +73,7 @@ bool _isCommonPattern(String canonical, String original) {
     'qwerty',
     'asdfgh',
     'zxcvbn',
+    'brewtact',
     'manaloom',
   ];
   if (forbiddenSequences.any(canonical.contains)) return true;

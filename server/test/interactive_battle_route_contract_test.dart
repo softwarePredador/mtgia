@@ -71,4 +71,17 @@ void main() {
           'registros vencidos são finalizados quando consultados.',
     );
   });
+
+  test('action reservation enforces the prompt deadline atomically', () {
+    final store =
+        File('lib/battle/interactive_battle_store.dart').readAsStringSync();
+
+    expect(
+      store,
+      contains('AND prompt_deadline_at > CURRENT_TIMESTAMP'),
+      reason:
+          'A reserva precisa validar o relógio do PostgreSQL no mesmo UPDATE '
+          'que troca waiting_for_action por action_pending.',
+    );
+  });
 }

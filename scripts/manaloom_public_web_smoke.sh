@@ -145,7 +145,11 @@ curl --silent --show-error --fail --max-time 15 \
   --output "$RUN_DIR/root.body" \
   "$BASE_URL/"
 
-grep -Fq 'ManaLoom' "$RUN_DIR/root.body"
+grep -Fq 'BrewTact' "$RUN_DIR/root.body"
+if grep -Fq 'ManaLoom' "$RUN_DIR/root.body"; then
+  echo "Legacy public brand is still visible on the landing page." >&2
+  exit 1
+fi
 grep -Eqi '^x-content-type-options:[[:space:]]*nosniff' "$RUN_DIR/root.headers"
 grep -Eqi '^x-frame-options:[[:space:]]*SAMEORIGIN' "$RUN_DIR/root.headers"
 grep -Eqi '^referrer-policy:[[:space:]]*strict-origin-when-cross-origin' "$RUN_DIR/root.headers"

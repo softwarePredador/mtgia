@@ -114,7 +114,7 @@ void main() {
           'EMAIL_VERIFICATION_APP_URL': 'https://app.example/#/verify-email',
           'RESEND_API_KEY': 're_test_only_never_real_123456789',
           'RESEND_FROM_EMAIL': 'conta@mail.example.test',
-          'RESEND_FROM_NAME': 'ManaLoom Conta',
+          'RESEND_FROM_NAME': 'BrewTact Conta',
           'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
         }),
         returnsNormally,
@@ -128,7 +128,7 @@ void main() {
         'EMAIL_VERIFICATION_APP_URL': 'https://app.example/#/verify-email',
         'RESEND_API_KEY': 're_test_only_never_real_123456789',
         'RESEND_FROM_EMAIL': 'conta@mail.example.test',
-        'RESEND_FROM_NAME': 'ManaLoom Conta',
+        'RESEND_FROM_NAME': 'BrewTact Conta',
         'RESEND_VERIFIED_DOMAIN': 'mail.example.test',
       };
       expect(

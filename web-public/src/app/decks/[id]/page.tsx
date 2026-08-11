@@ -25,11 +25,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${deck.name} - deck público`,
-    description: deck.description ?? `Deck público ${deck.name} no ManaLoom.`,
+    description: deck.description ?? `Deck público ${deck.name} no BrewTact.`,
     openGraph: {
       type: "article",
       title: deck.name,
-      description: deck.description ?? `Deck público ${deck.name} no ManaLoom.`,
+      description: deck.description ?? `Deck público ${deck.name} no BrewTact.`,
       url: absoluteUrl(routes.deck(deck.id))
     }
   };

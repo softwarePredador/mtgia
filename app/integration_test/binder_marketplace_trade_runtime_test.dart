@@ -51,10 +51,9 @@ class _RuntimeApi {
   Future<Map<String, dynamic>> getJson(String endpoint, {String? token}) async {
     final response = await _sendWithRateLimitRetry(
       endpoint: endpoint,
-      request:
-          () => _client
-              .get(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
-              .timeout(const Duration(seconds: 20)),
+      request: () => _client
+          .get(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
+          .timeout(const Duration(seconds: 20)),
     );
     return _decode(response, expected: {200});
   }
@@ -67,14 +66,13 @@ class _RuntimeApi {
   }) async {
     final response = await _sendWithRateLimitRetry(
       endpoint: endpoint,
-      request:
-          () => _client
-              .post(
-                Uri.parse('$baseUrl$endpoint'),
-                headers: _headers(token),
-                body: jsonEncode(body),
-              )
-              .timeout(const Duration(seconds: 20)),
+      request: () => _client
+          .post(
+            Uri.parse('$baseUrl$endpoint'),
+            headers: _headers(token),
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 20)),
     );
     return _decode(response, expected: expected);
   }
@@ -86,14 +84,13 @@ class _RuntimeApi {
   }) async {
     final response = await _sendWithRateLimitRetry(
       endpoint: endpoint,
-      request:
-          () => _client
-              .put(
-                Uri.parse('$baseUrl$endpoint'),
-                headers: _headers(token),
-                body: jsonEncode(body),
-              )
-              .timeout(const Duration(seconds: 20)),
+      request: () => _client
+          .put(
+            Uri.parse('$baseUrl$endpoint'),
+            headers: _headers(token),
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 20)),
     );
     return _decode(response, expected: {200});
   }
@@ -101,10 +98,9 @@ class _RuntimeApi {
   Future<void> delete(String endpoint, {required String token}) async {
     final response = await _sendWithRateLimitRetry(
       endpoint: endpoint,
-      request:
-          () => _client
-              .delete(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
-              .timeout(const Duration(seconds: 20)),
+      request: () => _client
+          .delete(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
+          .timeout(const Duration(seconds: 20)),
     );
     if (response.statusCode != 200 && response.statusCode != 204) {
       fail('DELETE $endpoint -> ${response.statusCode}: ${response.body}');
@@ -1030,7 +1026,7 @@ Widget _runtimeApp({
       ChangeNotifierProvider<NotificationProvider>.value(value: notifications),
     ],
     child: MaterialApp(
-      title: 'ManaLoom Binder Marketplace Trade Runtime',
+      title: 'BrewTact Binder Marketplace Trade Runtime',
       theme: AppTheme.darkTheme,
       home: home,
     ),
@@ -1050,9 +1046,8 @@ Widget _runtimeRouterApp({
       GoRoute(path: '/', builder: (_, __) => const NotificationScreen()),
       GoRoute(
         path: '/trades/:id',
-        builder:
-            (_, state) =>
-                TradeDetailScreen(tradeId: state.pathParameters['id']!),
+        builder: (_, state) =>
+            TradeDetailScreen(tradeId: state.pathParameters['id']!),
       ),
     ],
   );
@@ -1067,7 +1062,7 @@ Widget _runtimeRouterApp({
       ChangeNotifierProvider<NotificationProvider>.value(value: notifications),
     ],
     child: MaterialApp.router(
-      title: 'ManaLoom Notifications Runtime',
+      title: 'BrewTact Notifications Runtime',
       theme: AppTheme.darkTheme,
       routerConfig: router,
     ),
@@ -1087,9 +1082,8 @@ Widget _runtimeMessagesRouterApp({
       GoRoute(path: '/', builder: (_, __) => const MessageInboxScreen()),
       GoRoute(
         path: '/messages/:id',
-        builder:
-            (_, state) =>
-                ChatScreen(conversationId: state.pathParameters['id']!),
+        builder: (_, state) =>
+            ChatScreen(conversationId: state.pathParameters['id']!),
       ),
     ],
   );
@@ -1104,7 +1098,7 @@ Widget _runtimeMessagesRouterApp({
       ChangeNotifierProvider<NotificationProvider>.value(value: notifications),
     ],
     child: MaterialApp.router(
-      title: 'ManaLoom Messages Runtime',
+      title: 'BrewTact Messages Runtime',
       theme: AppTheme.darkTheme,
       routerConfig: router,
     ),
@@ -1157,22 +1151,18 @@ class _BinderEditorRuntimeHarness extends StatelessWidget {
       cardId: cardId,
       cardName: cardName,
       cardImageUrl: cardImageUrl,
-      onSave:
-          (data) => provider.addItem(
-            cardId: data['card_id'] as String,
-            quantity: data['quantity'] as int? ?? 1,
-            condition: data['condition'] as String? ?? 'NM',
-            isFoil: data['is_foil'] as bool? ?? false,
-            forTrade: data['for_trade'] as bool? ?? false,
-            forSale: data['for_sale'] as bool? ?? false,
-            price:
-                data['price'] != null
-                    ? (data['price'] as num).toDouble()
-                    : null,
-            notes: data['notes'] as String?,
-            language: data['language'] as String? ?? 'en',
-            listType: data['list_type'] as String? ?? 'have',
-          ),
+      onSave: (data) => provider.addItem(
+        cardId: data['card_id'] as String,
+        quantity: data['quantity'] as int? ?? 1,
+        condition: data['condition'] as String? ?? 'NM',
+        isFoil: data['is_foil'] as bool? ?? false,
+        forTrade: data['for_trade'] as bool? ?? false,
+        forSale: data['for_sale'] as bool? ?? false,
+        price: data['price'] != null ? (data['price'] as num).toDouble() : null,
+        notes: data['notes'] as String?,
+        language: data['language'] as String? ?? 'en',
+        listType: data['list_type'] as String? ?? 'have',
+      ),
     );
   }
 

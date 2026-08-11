@@ -74,6 +74,8 @@ void main() {
       expect(source, contains("'deck_name': deckName"));
       expect(source, contains("'format': deckFormat"));
       expect(source, contains("'text': text"));
+      expect(source, contains('// Exported from BrewTact'));
+      expect(source, isNot(contains('// Exported from ManaLoom')));
       expect(
         source,
         contains("'card_count': commanders.length + mainCards.length"),
@@ -112,6 +114,7 @@ void main() {
           contains('SELECT @newDeckId, card_id, quantity, is_commander'),
         );
         expect(source, contains('DeckRulesService(session).validateAndThrow'));
+        expect(source, contains('Deck publico BrewTact'));
         expect(source, contains('statusCode: HttpStatus.unprocessableEntity'));
         expect(source, isNot(contains('condition)')));
       },

@@ -5,15 +5,15 @@ import { Container, SectionHeader } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Privacidade",
-  description: "Política pública de privacidade do ManaLoom."
+  description: "Política pública de privacidade do BrewTact."
 };
 
 export default function PrivacyPage() {
   return (
     <main className="py-16">
       <Container className="max-w-3xl">
-        <BrandPageIntro eyebrow="Privacidade ManaLoom" title="Política de privacidade">
-          <p>Como ManaLoom trata decks, perfis, relatórios e sinais de troca compartilhados pelo usuário.</p>
+        <BrandPageIntro eyebrow="Privacidade BrewTact" title="Política de privacidade">
+          <p>Como BrewTact trata decks, perfis, relatórios e sinais de troca compartilhados pelo usuário.</p>
         </BrandPageIntro>
         <div className="mt-10">
           <SectionHeader eyebrow="Dados públicos" title="Compartilhamento com opt-in." />

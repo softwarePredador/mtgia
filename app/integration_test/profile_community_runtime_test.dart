@@ -269,7 +269,10 @@ void main() {
       await pumpUntilFound(tester, find.text(editedNotes));
 
       await tester.pumpWidget(
-        _runtimeApp(auth: auth, home: UserProfileScreen(userId: creator.id)),
+        _runtimeApp(
+          auth: auth,
+          home: UserProfileScreen(userId: creator.id),
+        ),
       );
       await tester.pump();
       await pumpUntilFound(tester, find.text(creator.username));
@@ -304,11 +307,10 @@ void main() {
       );
       await pumpUntil(
         tester,
-        () async =>
-            !(await api.isFollowing(
-              token: viewer.token,
-              targetUserId: creator.id,
-            )),
+        () async => !(await api.isFollowing(
+          token: viewer.token,
+          targetUserId: creator.id,
+        )),
         description: 'unfollow persisted',
       );
 
@@ -324,11 +326,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
       await pumpUntil(
         tester,
-        () async =>
-            find
-                .byKey(Key('user-search-row-${creator.id}'))
-                .evaluate()
-                .isNotEmpty,
+        () async => find
+            .byKey(Key('user-search-row-${creator.id}'))
+            .evaluate()
+            .isNotEmpty,
         description: 'user search result for ${creator.username}',
       );
       await captureVisualProof(
@@ -412,11 +413,10 @@ void main() {
       await tester.pump();
       await pumpUntil(
         tester,
-        () async =>
-            find
-                .byKey(const Key('community-users-search-field'))
-                .evaluate()
-                .isNotEmpty,
+        () async => find
+            .byKey(const Key('community-users-search-field'))
+            .evaluate()
+            .isNotEmpty,
         description: 'community users search field',
       );
       await tester.enterText(
@@ -426,11 +426,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
       await pumpUntil(
         tester,
-        () async =>
-            find
-                .byKey(Key('community-users-row-${creator.id}'))
-                .evaluate()
-                .isNotEmpty,
+        () async => find
+            .byKey(Key('community-users-row-${creator.id}'))
+            .evaluate()
+            .isNotEmpty,
         description: 'community user tab result for ${creator.username}',
       );
       await captureVisualProof(
@@ -470,7 +469,7 @@ Widget _runtimeApp({required AuthProvider auth, required Widget home}) {
       ChangeNotifierProvider<DeckProvider>(create: (_) => DeckProvider()),
     ],
     child: MaterialApp(
-      title: 'ManaLoom Profile Community Runtime',
+      title: 'BrewTact Profile Community Runtime',
       theme: AppTheme.darkTheme,
       home: home,
     ),

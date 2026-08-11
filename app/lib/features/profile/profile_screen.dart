@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/api/api_client.dart';
+import '../../core/branding/product_identity.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/manaloom_theme_motif.dart';
 import '../../core/widgets/player_identity_name.dart';
@@ -336,9 +337,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     await Share.shareXFiles(
       [file],
-      subject: 'Meus dados do ManaLoom',
-      text: 'Exportação portátil da conta ManaLoom.',
-      fileNameOverrides: const ['manaloom-user-data.json'],
+      subject: 'Meus dados do ${ProductIdentity.displayName}',
+      text: 'Exportação portátil da conta ${ProductIdentity.displayName}.',
+      fileNameOverrides: const ['brewtact-user-data.json'],
     );
   }
 

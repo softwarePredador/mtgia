@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-10T15:44:10.170100Z",
-  "source_digest": "4aee811479449e64c388e9ebd977ecb1c97e7f9626b38e720afa35cea1c6170c",
+  "generated_at": "2026-08-11T18:23:38.388106Z",
+  "source_digest": "643fa0af0cbf0c99d3fcdef7355b17f1b89d04ece14934a02946214c5957d6af",
   "surface": "onboarding_intent",
   "profile": "web_onboarding_intent_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "2705af16bdfc0a98e1e468fbe34f2a06ffd32026fa8518485a4da16724d5bb4f",
+  "log_sha256": "3badbe1831fba808f8f3342995ec24b01cd154ebbcb9fe960d5bd845a06dd14a",
   "checkpoint_count": 5,
   "required_checkpoints": [
     "onboarding_intent_00_first_run",
@@ -25,8 +25,8 @@
     {
       "checkpoint": "onboarding_intent_00_first_run",
       "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/onboarding_intent_00_first_run.png",
-      "sha256": "7de1ae780dc0d8e25c15778a04749176b49a0918425f8f4e96e8ba98b0ec06f7",
-      "bytes": 94702,
+      "sha256": "8418a11100a5dbd69d58cf116b3f0e4c351acdcfe43e92d71b7b17de5b82a712",
+      "bytes": 74031,
       "width": 390,
       "height": 844
     },
@@ -41,24 +41,24 @@
     {
       "checkpoint": "onboarding_intent_02_resumed_plan",
       "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/onboarding_intent_02_resumed_plan.png",
-      "sha256": "0f2c963b1a7b07ca8cce279a59732762f8d21f806afccebd69cb4a6068e0d75f",
-      "bytes": 92098,
+      "sha256": "38e9217cc141d28607c2ffbe33d3848fd4e6b62c0d9b69e81d8e653ceb7c4110",
+      "bytes": 71144,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "onboarding_intent_03_skipped_home",
       "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/onboarding_intent_03_skipped_home.png",
-      "sha256": "8c6bd4ec1cc7e47494c5378dc859151b380579f658eb8edd6443a11caf2da872",
-      "bytes": 129405,
+      "sha256": "2b33e4a8726b79c2190d72aa0dfaf8c49f9b19ddb8ff7822df83e5bb8299cc46",
+      "bytes": 78776,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "onboarding_intent_04_completed_home",
       "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/onboarding_intent_04_completed_home.png",
-      "sha256": "9e14d1c983e0dbc63c05add8a03378a0461c6aee12e52fe7b2dde948b172a872",
-      "bytes": 127005,
+      "sha256": "067ff4d2f4e24030f1771224d4acfe6a37b01115f1c0b89a8a0ad7b6990daf0b",
+      "bytes": 73936,
       "width": 390,
       "height": 844
     }

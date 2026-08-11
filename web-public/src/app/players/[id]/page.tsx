@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const label = profile.displayName || profile.username || "Perfil público";
   return {
     title: `${label} - perfil público`,
-    description: `Perfil público ManaLoom com ${profile.publicDeckCount ?? profile.publicDecks.length} decks públicos.`
+    description: `Perfil público BrewTact com ${profile.publicDeckCount ?? profile.publicDecks.length} decks públicos.`
   };
 }
 
@@ -35,7 +35,7 @@ export default async function PublicPlayerPage({ params }: PageProps) {
   const profile = await loadPublicUserProfile(id);
   if (!profile) notFound();
 
-  const label = profile.displayName || profile.username || "Perfil ManaLoom";
+  const label = profile.displayName || profile.username || "Perfil BrewTact";
 
   return (
     <main className="py-16">

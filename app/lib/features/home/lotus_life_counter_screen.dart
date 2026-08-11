@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/branding/product_identity.dart';
 import '../../core/observability/app_observability.dart';
 import '../../core/theme/app_theme.dart';
 import 'life_counter/life_counter_day_night_state.dart';
@@ -656,7 +657,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     );
 
     var shouldShowBlockedExternalFeedback = message.startsWith(
-      'ManaLoom blocked an external link:',
+      '${ProductIdentity.displayName} blocked an external link:',
     );
 
     try {

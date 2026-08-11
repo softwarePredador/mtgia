@@ -21,7 +21,7 @@ bool mayExposePasswordResetTokenForTesting(Map<String, String> environment) {
 
 /// Delivers a reset link through the configured account-email provider.
 ///
-/// ManaLoom never logs or persists the raw token. Production rejects an absent
+/// BrewTact never logs or persists the raw token. Production rejects an absent
 /// or invalid delivery target; local development may omit delivery and use the
 /// explicitly guarded test response instead.
 class PasswordResetDeliveryService {

@@ -56,6 +56,7 @@ final class BattleJobMetricsService {
       'jobs': {
         'created': integer('jobs_created'),
         'active': integer('jobs_active'),
+        'oldest_active_seconds': integer('oldest_active_seconds'),
         'completed': integer('jobs_completed'),
         'censored': integer('jobs_censored'),
         'timeout': integer('jobs_timeout'),
@@ -120,6 +121,11 @@ const _aggregateSql = r'''
       FROM battle_jobs
       WHERE status IN ('queued', 'claimed', 'running', 'cancel_pending')
     ) AS jobs_active,
+    COALESCE((
+      SELECT EXTRACT(EPOCH FROM (NOW() - MIN(created_at)))::int
+      FROM battle_jobs
+      WHERE status IN ('queued', 'claimed', 'running', 'cancel_pending')
+    ), 0) AS oldest_active_seconds,
     (SELECT COUNT(*)::int FROM scoped_jobs WHERE status = 'completed')
       AS jobs_completed,
     (SELECT COUNT(*)::int FROM scoped_jobs WHERE status = 'censored')

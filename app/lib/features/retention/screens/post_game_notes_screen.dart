@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/card_artwork.dart';
@@ -1633,7 +1634,7 @@ class _EmptyHistoryPanel extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: const Text(
-        'Nenhuma partida registrada. Depois do primeiro jogo, o ManaLoom começa a apontar padrões de evolução.',
+        'Nenhuma partida registrada. Depois do primeiro jogo, o ${ProductIdentity.displayName} começa a apontar padrões de evolução.',
         style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
       ),
     );

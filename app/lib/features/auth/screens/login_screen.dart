@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../auth_redirect.dart';
 import '../providers/auth_provider.dart';
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           const AuthBrandHeader(
-            title: 'ManaLoom',
+            title: ProductIdentity.displayName,
             subtitle: 'Acesse decks, coleção, trades e partidas.',
           ),
           const SizedBox(height: AppTheme.space20),

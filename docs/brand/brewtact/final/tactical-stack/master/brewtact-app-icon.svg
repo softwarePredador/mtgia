@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024"
+  viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">BrewTact app icon</title>
+  <rect width="1024" height="1024" fill="#0B0D12"/>
+  <g transform="translate(96.650 18.550) scale(3.55)">
+  <g id="tactical-stack-mark">
+    <path fill="#C58B2A" d="M44 52L178 89Q190 92 190 105V132Q190 140 183 144L153 161V130L160 126V114L76 91V125L112 145L84 162L52 144Q44 139 44 130Z"/>
+    <path fill="#E0A93B" d="M44 52L178 89Q190 92 190 105V114L160 114L76 91V101L44 92Z"/>
+    <path fill="#8E641B" d="M76 101V125L112 145L84 162L52 144Q44 139 44 130V113Z"/>
+    <path fill="#6FA8DC" d="M107 144L160 116L190 125V154L146 178V207L114 226V176L86 191V160Z"/>
+    <path fill="#3E5F8A" d="M146 178V207L114 226V176Z"/>
+  </g>
+  </g>
+</svg>

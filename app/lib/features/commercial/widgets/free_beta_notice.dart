@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/commercial_launch_policy.dart';
 
@@ -8,7 +9,7 @@ class FreeBetaNotice extends StatelessWidget {
     super.key,
     this.title = 'Tudo o que está disponível agora, sem cobrança',
     this.description =
-        'Use o ManaLoom para preparar decks, organizar sua coleção e acompanhar partidas enquanto refinamos a experiência com a comunidade.',
+        'Use o ${ProductIdentity.displayName} para preparar decks, organizar sua coleção e acompanhar partidas enquanto refinamos a experiência com a comunidade.',
   });
 
   final String title;

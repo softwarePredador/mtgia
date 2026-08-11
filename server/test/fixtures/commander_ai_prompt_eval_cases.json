@@ -1,12 +1,25 @@
 {
-  "schema_version": "commander_ai_prompt_eval_v2_2026-07-22",
+  "schema_version": "commander_ai_prompt_eval_v3_2026-08-11",
   "minimum_score": 90,
   "coverage_requirements": {
     "split": "held_out",
-    "minimum_case_count": 6,
+    "minimum_case_count": 12,
     "required_brackets": [1, 2, 3, 4, 5],
     "required_color_buckets": ["colorless", "mono", "two", "three_plus"],
-    "minimum_archetype_family_count": 6
+    "minimum_archetype_family_count": 10,
+    "required_commander_pairing_mechanics": ["background"],
+    "required_color_features": ["five_color", "hybrid_mana"],
+    "required_card_layouts": ["modal_dfc", "split", "adventure"],
+    "required_source_states": [
+      "profile_missing",
+      "profile_low_confidence",
+      "corpus_sparse"
+    ],
+    "required_constraint_states": [
+      "collection_only",
+      "zero_budget",
+      "incomplete_deck"
+    ]
   },
   "cases": [
     {
@@ -754,6 +767,577 @@
             "category": "Mana Ramp",
             "reasoning": "Funcao: mantem ramp incolor. Risco: exige pagar para desvirar e pode causar dano. Curva: reduz de 3 para 1 mana. Preco: BRL 480 dentro do budget. Bracket: fast mana coerente com bracket 5.",
             "priority": "High"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wilson_background_pair_bracket2",
+      "split": "held_out",
+      "archetype_family": "background_voltron",
+      "intensity": "focused",
+      "commander": "Wilson, Refined Grizzly + Cultist of the Absolute",
+      "command_zone": [
+        "Wilson, Refined Grizzly",
+        "Cultist of the Absolute"
+      ],
+      "archetype": "golgari background voltron",
+      "bracket": 2,
+      "color_identity": ["B", "G"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 25,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Wilson, Refined Grizzly",
+        "Cultist of the Absolute",
+        "Murder",
+        "Putrefy",
+        "Forest"
+      ],
+      "protected_cards": [
+        "Wilson, Refined Grizzly",
+        "Cultist of the Absolute"
+      ],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"removal": 2, "payoff": 1},
+        "role_delta_at_least": {"removal": 0}
+      },
+      "card_catalog": {
+        "Wilson, Refined Grizzly": {
+          "roles": ["commander", "threat"],
+          "color_identity": ["G"],
+          "type_line": "Legendary Creature — Bear Warrior",
+          "oracle_text": "Vigilance, reach. Wilson can't be countered. Choose a Background.",
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Cultist of the Absolute": {
+          "roles": ["commander", "payoff", "protection"],
+          "color_identity": ["B"],
+          "type_line": "Legendary Enchantment — Background",
+          "oracle_text": "Commander creatures you own get +3/+3 and have flying and ward.",
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Murder": {
+          "roles": ["removal"],
+          "color_identity": ["B"],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Go for the Throat": {
+          "roles": ["removal"],
+          "color_identity": ["B"],
+          "price_brl": 8,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Putrefy": {
+          "roles": ["removal"],
+          "color_identity": ["B", "G"],
+          "price_brl": 3,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Forest": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Wilson e seu Background ficam protegidos enquanto a remoção ganha eficiência.",
+        "swaps": [
+          {
+            "out": "Murder",
+            "in": "Go for the Throat",
+            "category": "Removal",
+            "reasoning": "Funcao: preserva a lane de removal instantâneo. Risco: não atinge artefatos. Curva: cai de 3 para 2 manas. Preco: BRL 8 dentro do budget. Bracket: interação adequada ao bracket 2.",
+            "priority": "High"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kenrith_five_color_hybrid_bracket3",
+      "split": "held_out",
+      "archetype_family": "five_color_value",
+      "intensity": "focused",
+      "commander": "Kenrith, the Returned King",
+      "archetype": "five-color creature value",
+      "bracket": 3,
+      "color_identity": ["W", "U", "B", "R", "G"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 30,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Kenrith, the Returned King",
+        "Centaur Healer",
+        "Farseek",
+        "Command Tower"
+      ],
+      "protected_cards": ["Kenrith, the Returned King"],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"life_gain": 1, "creature_value": 1},
+        "role_delta_at_least": {"life_gain": 0, "creature_value": 0}
+      },
+      "card_catalog": {
+        "Kenrith, the Returned King": {
+          "roles": ["commander", "engine", "payoff"],
+          "color_identity": ["W", "U", "B", "R", "G"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Centaur Healer": {
+          "roles": ["life_gain", "creature_value"],
+          "color_identity": ["W", "G"],
+          "mana_cost": "{1}{G}{W}",
+          "price_brl": 1,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Kitchen Finks": {
+          "roles": ["life_gain", "creature_value"],
+          "color_identity": ["W", "G"],
+          "mana_cost": "{1}{G/W}{G/W}",
+          "price_brl": 18,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Farseek": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 6,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Command Tower": {
+          "roles": ["land", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 8,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Kenrith mantém o plano de valor e usa uma opção híbrida legal dentro das cinco cores.",
+        "swaps": [
+          {
+            "out": "Centaur Healer",
+            "in": "Kitchen Finks",
+            "category": "Synergy",
+            "reasoning": "Funcao: mantém life gain e creature value com persist. Risco: o marcador -1/-1 reduz recursões repetidas. Curva: preserva mana value 3. Preco: BRL 18 dentro do budget. Bracket: valor resiliente adequado ao bracket 3.",
+            "priority": "Medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "marchesa_multiface_layouts_bracket3",
+      "split": "held_out",
+      "archetype_family": "multiface_midrange",
+      "intensity": "focused",
+      "commander": "Queen Marchesa",
+      "archetype": "mardu multiface midrange",
+      "bracket": 3,
+      "color_identity": ["W", "B", "R"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 70,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Queen Marchesa",
+        "Gods Willing",
+        "Disenchant",
+        "Flametongue Kavu",
+        "Command Tower"
+      ],
+      "protected_cards": ["Queen Marchesa"],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"protection": 1, "removal": 2, "threat": 1},
+        "role_delta_at_least": {"protection": 0, "removal": 0}
+      },
+      "card_catalog": {
+        "Queen Marchesa": {
+          "roles": ["commander", "draw", "threat"],
+          "color_identity": ["W", "B", "R"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Gods Willing": {
+          "roles": ["protection"],
+          "color_identity": ["W"],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Sejiri Shelter // Sejiri Glacier": {
+          "roles": ["protection", "land"],
+          "color_identity": ["W"],
+          "layout": "modal_dfc",
+          "faces": ["Sejiri Shelter", "Sejiri Glacier"],
+          "face_types": ["Instant", "Land"],
+          "price_brl": 4,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Disenchant": {
+          "roles": ["removal"],
+          "color_identity": ["W"],
+          "price_brl": 1,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Wear // Tear": {
+          "roles": ["removal"],
+          "color_identity": ["W", "R"],
+          "layout": "split",
+          "faces": ["Wear", "Tear"],
+          "face_types": ["Instant", "Instant"],
+          "price_brl": 5,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Flametongue Kavu": {
+          "roles": ["removal", "threat"],
+          "color_identity": ["R"],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Bonecrusher Giant // Stomp": {
+          "roles": ["removal", "threat"],
+          "color_identity": ["R"],
+          "layout": "adventure",
+          "faces": ["Bonecrusher Giant", "Stomp"],
+          "face_types": ["Creature — Giant", "Instant — Adventure"],
+          "price_brl": 12,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Command Tower": {
+          "roles": ["land", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 8,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Marchesa ganha flexibilidade real com MDFC, split e adventure sem sair da identidade Mardu.",
+        "swaps": [
+          {
+            "out": "Gods Willing",
+            "in": "Sejiri Shelter // Sejiri Glacier",
+            "category": "Protection",
+            "reasoning": "Funcao: mantém protection e também pode ocupar land drop. Risco: a face de terreno entra virada. Curva: a mágica continua custando 2. Preco: BRL 4 dentro do budget. Bracket: flexibilidade justa para bracket 3.",
+            "priority": "High"
+          },
+          {
+            "out": "Disenchant",
+            "in": "Wear // Tear",
+            "category": "Removal",
+            "reasoning": "Funcao: preserva removal com opção de atingir dois tipos de permanente. Risco: fundir exige as duas cores. Curva: mantém custo baixo. Preco: BRL 5 dentro do budget. Bracket: interação adequada ao bracket 3.",
+            "priority": "Medium"
+          },
+          {
+            "out": "Flametongue Kavu",
+            "in": "Bonecrusher Giant // Stomp",
+            "category": "Removal",
+            "reasoning": "Funcao: mantém removal e threat em uma carta adventure. Risco: Stomp causa menos dano que o gatilho do Kavu. Curva: divide a ação entre 2 e 3 manas. Preco: BRL 12 dentro do budget. Bracket: valor modular correto para bracket 3.",
+            "priority": "Medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruxa_missing_profile_fallback_bracket1",
+      "split": "held_out",
+      "archetype_family": "vanilla_creature_value",
+      "intensity": "light",
+      "commander": "Ruxa, Patient Professor",
+      "archetype": "mono-green vanilla creature value",
+      "bracket": 1,
+      "color_identity": ["G"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 25,
+        "include_price_risk_curve_bracket": true
+      },
+      "reference_context": {
+        "minimum_profile_confidence": 0.7,
+        "corpus": {
+          "usable_deck_count": 6,
+          "minimum_usable_deck_count": 4
+        },
+        "fallback": "generic_role_floor_v1"
+      },
+      "deck": [
+        "Ruxa, Patient Professor",
+        "Colossal Dreadmaw",
+        "Cultivate",
+        "Forest"
+      ],
+      "protected_cards": ["Ruxa, Patient Professor"],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"payoff": 1, "ramp": 1},
+        "role_delta_at_least": {"payoff": 0}
+      },
+      "card_catalog": {
+        "Ruxa, Patient Professor": {
+          "roles": ["commander", "engine"],
+          "color_identity": ["G"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Colossal Dreadmaw": {
+          "roles": ["payoff", "threat"],
+          "color_identity": ["G"],
+          "price_brl": 1,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Goreclaw, Terror of Qal Sisma": {
+          "roles": ["payoff", "threat"],
+          "color_identity": ["G"],
+          "price_brl": 22,
+          "owned": false,
+          "min_bracket": 1
+        },
+        "Cultivate": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 4,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Forest": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Sem profile disponível, uso fallback determinístico de pisos de função e não atribuo confiança de meta.",
+        "swaps": [
+          {
+            "out": "Colossal Dreadmaw",
+            "in": "Goreclaw, Terror of Qal Sisma",
+            "category": "Synergy",
+            "reasoning": "Funcao: mantém payoff e threat para criaturas grandes. Risco: Goreclaw é mais vulnerável antes do combate. Curva: cai de 6 para 4 manas. Preco: BRL 22 dentro do budget. Bracket: upgrade temático adequado ao bracket 1.",
+            "priority": "Medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "otaria_low_profile_sparse_corpus_bracket2",
+      "split": "held_out",
+      "archetype_family": "lands_graveyard",
+      "intensity": "focused",
+      "commander": "The Lady of Otaria",
+      "archetype": "gruul lands graveyard",
+      "bracket": 2,
+      "color_identity": ["R", "G"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 20,
+        "include_price_risk_curve_bracket": true
+      },
+      "reference_context": {
+        "profile": {
+          "version": "otaria_experimental_profile_v1",
+          "confidence": 0.35
+        },
+        "minimum_profile_confidence": 0.7,
+        "corpus": {
+          "usable_deck_count": 1,
+          "minimum_usable_deck_count": 4
+        },
+        "fallback": "generic_role_floor_v1"
+      },
+      "deck": [
+        "The Lady of Otaria",
+        "Fire Diamond",
+        "Life from the Loam",
+        "Forest"
+      ],
+      "protected_cards": ["The Lady of Otaria", "Life from the Loam"],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {"ramp": 1, "engine": 1},
+        "role_delta_at_least": {"ramp": 0, "engine": 0}
+      },
+      "card_catalog": {
+        "The Lady of Otaria": {
+          "roles": ["commander", "engine"],
+          "color_identity": ["R", "G"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Fire Diamond": {
+          "roles": ["ramp", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Talisman of Impulse": {
+          "roles": ["ramp", "mana_fixing"],
+          "color_identity": ["R", "G"],
+          "price_brl": 14,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Life from the Loam": {
+          "roles": ["engine", "recursion"],
+          "color_identity": ["G"],
+          "price_brl": 45,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Forest": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Profile de baixa confiança e corpus escasso: uso fallback determinístico de pisos de função.",
+        "swaps": [
+          {
+            "out": "Fire Diamond",
+            "in": "Talisman of Impulse",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: mantém ramp e melhora o fixing Gruul. Risco: pode causar dano ao gerar mana colorida. Curva: preserva mana value 2. Preco: BRL 14 dentro do budget. Bracket: rock justo para bracket 2.",
+            "priority": "Medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "konrad_collection_only_zero_budget_incomplete",
+      "split": "held_out",
+      "archetype_family": "graveyard_drain_partial",
+      "intensity": "light",
+      "commander": "Syr Konrad, the Grim",
+      "archetype": "mono-black graveyard drain",
+      "bracket": 2,
+      "color_identity": ["B"],
+      "recommendation_context": {
+        "prefer_collection": true,
+        "collection_only": true,
+        "budget_limit_brl": 0,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck_state": {"current_size": 5, "target_size": 100},
+      "deck": [
+        "Syr Konrad, the Grim",
+        "Leaden Myr",
+        "Morbid Opportunist",
+        "Victimize",
+        "Swamp"
+      ],
+      "protected_cards": ["Syr Konrad, the Grim", "Morbid Opportunist"],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 1,
+        "role_count_after_at_least": {"ramp": 1, "draw": 1},
+        "role_delta_at_least": {"ramp": 0, "draw": 0}
+      },
+      "card_catalog": {
+        "Syr Konrad, the Grim": {
+          "roles": ["commander", "engine", "payoff"],
+          "color_identity": ["B"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Leaden Myr": {
+          "roles": ["ramp", "artifact"],
+          "color_identity": ["B"],
+          "price_brl": 3,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Charcoal Diamond": {
+          "roles": ["ramp", "artifact"],
+          "color_identity": [],
+          "price_brl": 6,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Mind Stone": {
+          "roles": ["ramp", "artifact"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": false,
+          "min_bracket": 1
+        },
+        "Morbid Opportunist": {
+          "roles": ["draw", "engine"],
+          "color_identity": ["B"],
+          "price_brl": 4,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Victimize": {
+          "roles": ["recursion"],
+          "color_identity": ["B"],
+          "price_brl": 5,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Swamp": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Deck incompleto (5/100): avalio apenas uma troca segura da coleção, com orçamento zero, sem alegar lista final.",
+        "swaps": [
+          {
+            "out": "Leaden Myr",
+            "in": "Charcoal Diamond",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: mantém ramp usando somente a coleção. Risco: o Diamond entra virado. Curva: preserva mana value 2. Preco: owned, BRL 0 de compra. Bracket: troca conservadora para bracket 2.",
+            "priority": "Medium"
           }
         ]
       }

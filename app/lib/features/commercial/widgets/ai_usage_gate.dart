@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
@@ -107,7 +108,7 @@ class AiPaywallDialog extends StatelessWidget {
           Text(
             isFreeBeta
                 ? 'Compras e upgrades não estão disponíveis nesta fase. Seu acesso volta quando o próximo período de uso começar.'
-                : 'No Pro, o ManaLoom libera mais uso mensal, otimização por coleção/orçamento, relatório antes/depois e acompanhamento pós-jogo.',
+                : 'No Pro, o ${ProductIdentity.displayName} libera mais uso mensal, otimização por coleção/orçamento, relatório antes/depois e acompanhamento pós-jogo.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.4,

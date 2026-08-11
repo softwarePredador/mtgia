@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/card_artwork.dart';
@@ -506,7 +507,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     }
 
     return [
-      'ManaLoom - Relatório antes/depois',
+      '${ProductIdentity.displayName} - Relatório antes/depois',
       'Plano: $_planLabel',
       'Estratégia: ${widget.archetype}',
       if (widget.bracketPolicy.isNotEmpty)
@@ -1763,7 +1764,7 @@ class GuidedRebuildActionDialog extends StatelessWidget {
             ),
             const SizedBox(height: AppTheme.space12),
             const Text(
-              'O ManaLoom pode criar um rascunho reconstruído sem alterar o deck original.',
+              'O ${ProductIdentity.displayName} pode criar um rascunho reconstruído sem alterar o deck original.',
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 height: AppTheme.lineHeightCompact,

@@ -22,20 +22,24 @@
     "lib/features/decks/widgets/deck_import_list_dialog.dart"
   ],
   "manual_web": {
-    "status": "pass",
-    "observed_route": "/login,/home,/decks,/collection,/community,/profile,/decks/:id",
-    "passed": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","browser_back","reduced_motion","authenticated_routes"],
+    "status": "pending",
+    "observed_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id"],
+    "passed": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","browser_back","reduced_motion"],
     "console_errors": 0,
-    "remaining": [],
-    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id/battle-replays","/decks/:id/battle-coach"]
+    "remaining": ["Executar teclado Web real nas rotas Battle obrigatorias.","Vincular o manifesto Battle Coach ao digest corrente e ao aggregate revisado."],
+    "remaining_routes": ["/decks/:id/battle-replays","/decks/:id/battle-coach"],
+    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id","/decks/:id/battle-replays","/decks/:id/battle-coach"]
   },
   "surface_followups": {
     "battle_coach": {
       "route": "/decks/:id/battle-coach[/sessionId]",
       "widget_evidence": "test/features/battle/screens/battle_coach_screen_test.dart",
       "android_runtime_evidence": "../docs/qa/ui-live/latest.json",
-      "web_keyboard_status": "governed_by_live_evidence",
+      "web_keyboard_status": "pending_current_digest",
       "web_runtime_evidence": "../docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
+      "aggregate_review": "../docs/qa/ui-live/latest.json",
+      "aggregate_manifest_path": "docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json",
+      "aggregate_release_check": "web_hardware_keyboard",
       "required_interactions": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","reduced_motion"]
     }
   }

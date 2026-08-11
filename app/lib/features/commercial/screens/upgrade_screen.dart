@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/commercial_launch_policy.dart';
@@ -55,7 +56,7 @@ class UpgradeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: AppTheme.space10),
                           Text(
-                            'ManaLoom Pro',
+                            ProductIdentity.proDisplayName,
                             style: Theme.of(context).textTheme.headlineSmall
                                 ?.copyWith(
                                   color: AppTheme.textPrimary,
@@ -184,7 +185,7 @@ class _FreeBetaUpgradeScreen extends StatelessWidget {
                       key: Key('upgrade-beta-notice'),
                       title: 'Você já está na versão disponível',
                       description:
-                          'Não é necessário fazer upgrade para acessar os recursos liberados nesta fase do ManaLoom.',
+                          'Não é necessário fazer upgrade para acessar os recursos liberados nesta fase do ${ProductIdentity.displayName}.',
                     ),
                     const SizedBox(height: AppTheme.space16),
                     if (isCompact)

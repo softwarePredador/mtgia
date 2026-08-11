@@ -15,8 +15,8 @@ WRAPPER_PATH = REPO_ROOT / "server" / "bin" / WRAPPER_NAME
 EXPECTED_SHELL_MODES = {
     "scripts/manaloom_deep_ai_alignment_tester.sh": (
         "--read-only",
-        "--write-approved",
-        "--write-approved",
+        "--read-only",
+        "--read-only",
     ),
     "scripts/manaloom_deploy_backend_image.sh": (
         "--read-only",

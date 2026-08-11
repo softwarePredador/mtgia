@@ -1,5 +1,29 @@
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://manaloom.com";
+export const currentPublicSiteFallbackUrl =
+  "https://evolution-manaloom-web-public.2ta7qx.easypanel.host";
+
+function resolveSiteUrl(configuredValue: string | undefined) {
+  const candidate = configuredValue?.trim();
+  if (!candidate) return currentPublicSiteFallbackUrl;
+
+  try {
+    const parsed = new URL(candidate);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.username ||
+      parsed.password ||
+      parsed.search ||
+      parsed.hash ||
+      (parsed.pathname !== "" && parsed.pathname !== "/")
+    ) {
+      return currentPublicSiteFallbackUrl;
+    }
+    return parsed.origin;
+  } catch {
+    return currentPublicSiteFallbackUrl;
+  }
+}
+
+export const siteUrl = resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 export const routes = {
   home: "/",
