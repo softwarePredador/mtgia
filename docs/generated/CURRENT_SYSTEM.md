@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `e317bfba21587741558839a93be496fb10ce0a788108b9a73cf6c55e6dc144cf`
+**Digest das fontes:** `575a5de838c0f6108af082ad888bfe7865ab19eeb1f7f9d868384715028b0e7a`
 
 ## Fontes de verdade
 

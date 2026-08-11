@@ -2,4 +2,12 @@
 set -euo pipefail
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+# Git invokes hooks with repository-local variables such as GIT_DIR exported.
+# The full gate creates disposable repositories; do not leak the caller's Git
+# plumbing into those nested commands.
+while IFS= read -r git_local_variable; do
+  unset "$git_local_variable"
+done < <(git rev-parse --local-env-vars)
+
 exec "$ROOT_DIR/scripts/manaloom_local_ci.sh" full

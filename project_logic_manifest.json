@@ -16,7 +16,7 @@
       "docs/generated/TRACEABILITY_MATRIX.md"
     ]
   },
-  "source_digest_sha256": "e317bfba21587741558839a93be496fb10ce0a788108b9a73cf6c55e6dc144cf",
+  "source_digest_sha256": "575a5de838c0f6108af082ad888bfe7865ab19eeb1f7f9d868384715028b0e7a",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
