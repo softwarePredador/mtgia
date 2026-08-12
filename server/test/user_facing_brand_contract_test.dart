@@ -24,20 +24,23 @@ void main() {
       expect(userFacingSources, isNot(contains('manaloom.com')));
     });
 
-    test('Web and backend defaults never claim an unowned domain', () {
+    test('Web and backend defaults use the owned BrewTact domain', () {
       final routes = File('../web-public/src/lib/routes.ts').readAsStringSync();
       final dockerfile = File('../web-public/Dockerfile').readAsStringSync();
       final environment = File('.env.example').readAsStringSync();
 
       for (final source in [routes, dockerfile, environment]) {
         expect(source, isNot(contains('https://manaloom.com')));
-        expect(
-          source,
-          contains(
-            'https://evolution-manaloom-web-public.2ta7qx.easypanel.host',
-          ),
-        );
+        expect(source, contains('https://brewtact.com'));
       }
+      expect(
+        environment,
+        contains('MANALOOM_PUBLIC_SITE_URL=https://brewtact.com'),
+      );
+      expect(
+        environment,
+        contains('NEXT_PUBLIC_SITE_URL=https://brewtact.com'),
+      );
       expect(environment, contains('RESEND_FROM_NAME=BrewTact'));
     });
 

@@ -12,9 +12,7 @@ from typing import NoReturn
 from urllib.parse import urlsplit
 
 
-DEFAULT_REQUIRED_ORIGIN = (
-    "https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
-)
+DEFAULT_REQUIRED_ORIGIN = "https://brewtact.com"
 NETLOC_RE = re.compile(r"[a-z0-9.-]+(?::[1-9][0-9]{0,4})?")
 
 

@@ -20,6 +20,7 @@
     "docs/adr/0003-xmage-human-spike-no-go.md",
     "docs/adr/0004-battle-live-polling-and-durable-checkpoints.md",
     "docs/adr/0008-decklist-and-binder-physical-copy-boundary.md",
+    "docs/adr/0011-brewtact-production-domain.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",

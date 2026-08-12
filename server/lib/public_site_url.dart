@@ -1,5 +1,4 @@
-const currentPublicSiteFallbackUrl =
-    'https://evolution-manaloom-web-public.2ta7qx.easypanel.host';
+const currentPublicSiteFallbackUrl = 'https://brewtact.com';
 
 String resolvePublicSiteBaseUrl(Map<String, String> environment) {
   final production =

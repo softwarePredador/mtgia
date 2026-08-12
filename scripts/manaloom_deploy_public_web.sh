@@ -36,7 +36,7 @@ IMAGE_REPO="${MANALOOM_PUBLIC_WEB_IMAGE_REPO:-localhost:5000/manaloom/web-public
 REMOTE_BUILD_ROOT="${MANALOOM_REMOTE_BUILD_ROOT:-/opt/manaloom/deploy}"
 PUBLIC_BASE_URL="${MANALOOM_WEB_PUBLIC_URL:-https://evolution-manaloom-web-public.2ta7qx.easypanel.host}"
 API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
-SITE_URL="${NEXT_PUBLIC_SITE_URL:-$PUBLIC_BASE_URL}"
+SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://brewtact.com}"
 REMOTE_DIR=""
 HEADERS_FILE=""
 DEPLOY_MUTATION_STARTED=0
@@ -202,7 +202,7 @@ validate_manaloom_release_api_base_url "$API_BASE_URL"
 validate_manaloom_exact_coordinate public_base_url "$PUBLIC_BASE_URL" \
   "https://$MANALOOM_PRODUCTION_PUBLIC_HOST"
 validate_manaloom_exact_coordinate site_url "$SITE_URL" \
-  "https://$MANALOOM_PRODUCTION_PUBLIC_HOST"
+  "$MANALOOM_PRODUCTION_CANONICAL_SITE_URL"
 validate_manaloom_exact_coordinate public_web_service "$SERVICE" \
   evolution_manaloom-web-public
 validate_manaloom_exact_coordinate project "$EASYPANEL_PROJECT" \

@@ -1,5 +1,5 @@
 export const currentPublicSiteFallbackUrl =
-  "https://evolution-manaloom-web-public.2ta7qx.easypanel.host";
+  "https://brewtact.com";
 
 function resolveSiteUrl(configuredValue: string | undefined) {
   const candidate = configuredValue?.trim();

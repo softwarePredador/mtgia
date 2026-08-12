@@ -65,7 +65,8 @@ load_manaloom_env_keys "$ENV_FILE" \
   RESEND_FROM_NAME RESEND_VERIFIED_DOMAIN \
   PASSWORD_RESET_WEBHOOK_URL PASSWORD_RESET_WEBHOOK_TOKEN \
   PASSWORD_RESET_APP_URL EMAIL_VERIFICATION_WEBHOOK_URL \
-  EMAIL_VERIFICATION_WEBHOOK_TOKEN EMAIL_VERIFICATION_APP_URL SENTRY_DSN
+  EMAIL_VERIFICATION_WEBHOOK_TOKEN EMAIL_VERIFICATION_APP_URL \
+  MANALOOM_PUBLIC_SITE_URL SENTRY_DSN
 
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-${EASYPANEL_SSH_USER:-root}@${EASYPANEL_SERVER_IP:-}}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-${EASYPANEL_SSH_KEY:-}}"
@@ -82,7 +83,12 @@ EXPECTED_XMAGE_URL="${MANALOOM_EXPECTED_XMAGE_URL:-http://xmage-sidecar:8080}"
 EXPECTED_FORGE_URL="${MANALOOM_EXPECTED_FORGE_URL:-http://forge-sidecar:8080}"
 EXPECTED_NATIVE_URL="${MANALOOM_EXPECTED_NATIVE_URL:-http://${EASYPANEL_PROJECT}_manaloom-ops:8080}"
 API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
-REQUIRED_WEB_ORIGIN="https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
+LEGACY_WEB_ORIGIN="https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
+REQUIRED_WEB_ORIGIN="https://brewtact.com"
+DEFAULT_ALLOWED_ORIGINS="$LEGACY_WEB_ORIGIN,$REQUIRED_WEB_ORIGIN,https://www.brewtact.com"
+CANONICAL_PUBLIC_SITE_URL="https://brewtact.com"
+CANONICAL_PASSWORD_RESET_APP_URL="$CANONICAL_PUBLIC_SITE_URL/app/#/reset-password"
+CANONICAL_EMAIL_VERIFICATION_APP_URL="$CANONICAL_PUBLIC_SITE_URL/app/#/verify-email"
 
 require_tool() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -175,10 +181,13 @@ if [[ ! "$XMAGE_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ||
 fi
 readonly HEALTH_PROBE_IMAGE XMAGE_EXPECTED_COMMIT
 readonly XMAGE_EXPECTED_PATCH_COMMIT XMAGE_EXPECTED_VERSION
-MANALOOM_ALLOWED_ORIGINS="${MANALOOM_ALLOWED_ORIGINS:-$REQUIRED_WEB_ORIGIN}"
+MANALOOM_ALLOWED_ORIGINS="${MANALOOM_ALLOWED_ORIGINS:-$DEFAULT_ALLOWED_ORIGINS}"
+MANALOOM_PUBLIC_SITE_URL="${MANALOOM_PUBLIC_SITE_URL:-$CANONICAL_PUBLIC_SITE_URL}"
+PASSWORD_RESET_APP_URL="${PASSWORD_RESET_APP_URL:-$CANONICAL_PASSWORD_RESET_APP_URL}"
+EMAIL_VERIFICATION_APP_URL="${EMAIL_VERIFICATION_APP_URL:-$CANONICAL_EMAIL_VERIFICATION_APP_URL}"
 ENVIRONMENT="${ENVIRONMENT:-production}"
 MANALOOM_EMAIL_DELIVERY_PROVIDER="${MANALOOM_EMAIL_DELIVERY_PROVIDER:-webhook}"
-RESEND_FROM_NAME="${RESEND_FROM_NAME:-ManaLoom}"
+RESEND_FROM_NAME="${RESEND_FROM_NAME:-BrewTact}"
 case "$MANALOOM_EMAIL_DELIVERY_PROVIDER" in
   resend)
     PASSWORD_RESET_WEBHOOK_URL="${PASSWORD_RESET_WEBHOOK_URL:-}"
@@ -205,6 +214,12 @@ validate_manaloom_exact_coordinate trusted_proxy_peers \
   "$MANALOOM_TRUSTED_PROXY_PEERS" \
   "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS"
 validate_manaloom_exact_coordinate environment "$ENVIRONMENT" production
+validate_manaloom_exact_coordinate public_site_url \
+  "$MANALOOM_PUBLIC_SITE_URL" "$CANONICAL_PUBLIC_SITE_URL"
+validate_manaloom_exact_coordinate password_reset_app_url \
+  "$PASSWORD_RESET_APP_URL" "$CANONICAL_PASSWORD_RESET_APP_URL"
+validate_manaloom_exact_coordinate email_verification_app_url \
+  "$EMAIL_VERIFICATION_APP_URL" "$CANONICAL_EMAIL_VERIFICATION_APP_URL"
 validate_manaloom_easypanel_base_url "${EASYPANEL_BASE_URL:-}"
 MANALOOM_EXPECTED_SENTRY_DSN_SHA256="${MANALOOM_EXPECTED_SENTRY_DSN_SHA256:-$MANALOOM_PRODUCTION_SENTRY_DSN_SHA256}"
 validate_manaloom_exact_coordinate sentry_dsn_sha256 \
@@ -1000,6 +1015,7 @@ required_keys=(
   SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN
   DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL
   MANALOOM_ALLOWED_ORIGINS ENVIRONMENT JWT_SECRET
+  MANALOOM_PUBLIC_SITE_URL
   MANALOOM_TRUSTED_PROXY_HOPS MANALOOM_TRUSTED_PROXY_PEERS
   MANALOOM_EMAIL_DELIVERY_PROVIDER PASSWORD_RESET_APP_URL
   EMAIL_VERIFICATION_APP_URL SENTRY_DSN
@@ -1032,6 +1048,8 @@ ALLOWED_ORIGINS_CANONICAL="$(
       --required-origin "$REQUIRED_WEB_ORIGIN"
 )"
 ALLOWED_ORIGINS_SHA256="$(printf '%s' "$ALLOWED_ORIGINS_CANONICAL" | shasum -a 256 | awk '{print $1}')"
+PUBLIC_URLS_CONTRACT="MANALOOM_PUBLIC_SITE_URL=$MANALOOM_PUBLIC_SITE_URL|PASSWORD_RESET_APP_URL=$PASSWORD_RESET_APP_URL|EMAIL_VERIFICATION_APP_URL=$EMAIL_VERIFICATION_APP_URL"
+PUBLIC_URLS_SHA256="$(printf '%s' "$PUBLIC_URLS_CONTRACT" | shasum -a 256 | awk '{print $1}')"
 
 if [[ "$DB_HOST" != "$EXPECTED_DB_HOST" ||
       "$DB_PORT" != "$EXPECTED_DB_PORT" ||
@@ -1391,6 +1409,7 @@ email_verification_webhook_token_b64="$(
 email_verification_app_url_b64="$(
   encode_remote_value "$EMAIL_VERIFICATION_APP_URL"
 )"
+public_site_url_b64="$(encode_remote_value "$MANALOOM_PUBLIC_SITE_URL")"
 sentry_dsn_b64="$(encode_remote_value "$SENTRY_DSN")"
 
 # Swarm must keep the full repo@sha256 reference in both its spec and running
@@ -1415,6 +1434,7 @@ password_reset_app_url=\$(decode_b64 '$password_reset_app_url_b64')
 email_verification_webhook_url=\$(decode_b64 '$email_verification_webhook_url_b64')
 email_verification_webhook_token=\$(decode_b64 '$email_verification_webhook_token_b64')
 email_verification_app_url=\$(decode_b64 '$email_verification_app_url_b64')
+public_site_url=\$(decode_b64 '$public_site_url_b64')
 sentry_dsn=\$(decode_b64 '$sentry_dsn_b64')
 docker service update \
   --update-order stop-first \
@@ -1428,6 +1448,7 @@ docker service update \
   --env-add GIT_SHA='$sha' \
   --env-add DEPLOY_TIMESTAMP="\$deploy_timestamp_value" \
   --env-add MANALOOM_ALLOWED_ORIGINS="\$allowed_origins" \
+  --env-add MANALOOM_PUBLIC_SITE_URL="\$public_site_url" \
   --env-add MANALOOM_TRUSTED_PROXY_HOPS="\$trusted_proxy_hops" \
   --env-add MANALOOM_TRUSTED_PROXY_PEERS="\$trusted_proxy_peers" \
   --env-add MANALOOM_EMAIL_DELIVERY_PROVIDER="\$email_delivery_provider" \
@@ -1489,6 +1510,24 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
 ")"
 if [[ "$spec_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ]]; then
   echo "deploy convergiu sem a allowlist CORS exata na spec do servico" >&2
+  exit 2
+fi
+spec_public_urls_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk -F= '
+    /^MANALOOM_PUBLIC_SITE_URL=/{site_count++; site=substr(\$0,index(\$0,\"=\")+1)}
+    /^PASSWORD_RESET_APP_URL=/{reset_count++; reset=substr(\$0,index(\$0,\"=\")+1)}
+    /^EMAIL_VERIFICATION_APP_URL=/{verify_count++; verify=substr(\$0,index(\$0,\"=\")+1)}
+    END{
+      if(site_count==1 && reset_count==1 && verify_count==1)
+        printf \"MANALOOM_PUBLIC_SITE_URL=%s|PASSWORD_RESET_APP_URL=%s|EMAIL_VERIFICATION_APP_URL=%s\",site,reset,verify;
+      else
+        printf \"__invalid_counts_%d_%d_%d__\",site_count,reset_count,verify_count
+    }' |
+  sha256sum | awk '{print \$1}'
+")"
+if [[ "$spec_public_urls_sha256" != "$PUBLIC_URLS_SHA256" ]]; then
+  echo "deploy convergiu sem as URLs publicas BrewTact exatas na spec" >&2
   exit 2
 fi
 spec_interactive_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
@@ -1614,6 +1653,21 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     END{if(count==1) printf \"%s\",value; else printf \"__invalid_count_%d__\",count}' |
   sha256sum | awk '{print \$1}'
 ")"
+runtime_public_urls_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
+docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
+  awk -F= '
+    /^MANALOOM_PUBLIC_SITE_URL=/{site_count++; site=substr(\$0,index(\$0,\"=\")+1)}
+    /^PASSWORD_RESET_APP_URL=/{reset_count++; reset=substr(\$0,index(\$0,\"=\")+1)}
+    /^EMAIL_VERIFICATION_APP_URL=/{verify_count++; verify=substr(\$0,index(\$0,\"=\")+1)}
+    END{
+      if(site_count==1 && reset_count==1 && verify_count==1)
+        printf \"MANALOOM_PUBLIC_SITE_URL=%s|PASSWORD_RESET_APP_URL=%s|EMAIL_VERIFICATION_APP_URL=%s\",site,reset,verify;
+      else
+        printf \"__invalid_counts_%d_%d_%d__\",site_count,reset_count,verify_count
+    }' |
+  sha256sum | awk '{print \$1}'
+")"
 runtime_interactive_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -1680,6 +1734,7 @@ if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_
       "$runtime_proxy_peers_count" != "1" ||
       "$runtime_proxy_peers" != "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" ||
       "$runtime_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ||
+      "$runtime_public_urls_sha256" != "$PUBLIC_URLS_SHA256" ||
       "$runtime_interactive_contract" != "$expected_interactive_contract" ||
       "$runtime_live_spectator_contract" != "1|$BATTLE_LIVE_SPECTATOR_ENABLED" ||
       "$runtime_email_contract" != "$expected_email_contract" ||

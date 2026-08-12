@@ -3,17 +3,13 @@ import 'package:test/test.dart';
 
 void main() {
   group('public site URL contract', () {
-    test(
-      'uses the current public EasyPanel host when no domain is configured',
-      () {
-        expect(
-          resolvePublicSiteBaseUrl(const {'ENVIRONMENT': 'production'}),
-          currentPublicSiteFallbackUrl,
-        );
-        expect(currentPublicSiteFallbackUrl, startsWith('https://'));
-        expect(currentPublicSiteFallbackUrl, isNot(contains('manaloom.com')));
-      },
-    );
+    test('uses the owned BrewTact domain when no override is configured', () {
+      expect(
+        resolvePublicSiteBaseUrl(const {'ENVIRONMENT': 'production'}),
+        currentPublicSiteFallbackUrl,
+      );
+      expect(currentPublicSiteFallbackUrl, 'https://brewtact.com');
+    });
 
     test(
       'accepts a configured HTTPS origin and removes its trailing slash',

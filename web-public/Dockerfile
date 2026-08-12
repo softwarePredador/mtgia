@@ -9,7 +9,7 @@ FROM node:22.23.1-alpine3.24@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://evolution-cartinhas.2ta7qx.easypanel.host
-ARG NEXT_PUBLIC_SITE_URL=https://evolution-manaloom-web-public.2ta7qx.easypanel.host
+ARG NEXT_PUBLIC_SITE_URL=https://brewtact.com
 ENV NEXT_PUBLIC_MANALOOM_API_BASE_URL=$NEXT_PUBLIC_MANALOOM_API_BASE_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 COPY --from=deps /app/node_modules ./node_modules

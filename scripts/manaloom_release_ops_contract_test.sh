@@ -198,7 +198,7 @@ if python3 "$ROOT_DIR/scripts/manaloom_read_env.py" \
   exit 1
 fi
 
-REQUIRED_WEB_ORIGIN='https://evolution-manaloom-web-public.2ta7qx.easypanel.host'
+REQUIRED_WEB_ORIGIN='https://brewtact.com'
 VALID_ORIGINS="$REQUIRED_WEB_ORIGIN,https://admin.manaloom.example"
 VALIDATED_ORIGINS="$(
   MANALOOM_ALLOWED_ORIGINS="$VALID_ORIGINS" \
@@ -211,7 +211,8 @@ fi
 INVALID_ORIGIN_LISTS=(
   '*'
   "$REQUIRED_WEB_ORIGIN/"
-  "http://evolution-manaloom-web-public.2ta7qx.easypanel.host"
+  'http://brewtact.com'
+  'https://evolution-manaloom-web-public.2ta7qx.easypanel.host'
   "$REQUIRED_WEB_ORIGIN,https://localhost"
   "$REQUIRED_WEB_ORIGIN,$REQUIRED_WEB_ORIGIN"
 )
@@ -452,9 +453,13 @@ grep -Fq 'run_battle_gate' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
 BACKEND_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'allowed_origins_b64="$(encode_remote_value "$ALLOWED_ORIGINS_CANONICAL")"' \
   "$BACKEND_DEPLOY"
+grep -Fq 'public_site_url_b64="$(encode_remote_value "$MANALOOM_PUBLIC_SITE_URL")"' \
+  "$BACKEND_DEPLOY"
 grep -Fq 'resend_api_key_b64="$(encode_remote_value "$RESEND_API_KEY")"' \
   "$BACKEND_DEPLOY"
 grep -Fq -- '--env-add MANALOOM_ALLOWED_ORIGINS="\$allowed_origins"' \
+  "$BACKEND_DEPLOY"
+grep -Fq -- '--env-add MANALOOM_PUBLIC_SITE_URL="\$public_site_url"' \
   "$BACKEND_DEPLOY"
 grep -Fq -- '--env-add RESEND_API_KEY="\$resend_api_key"' \
   "$BACKEND_DEPLOY"
@@ -478,6 +483,8 @@ grep -Fq "'XMAGE_INTERACTIVE_MAX_ACTIVE=\$INTERACTIVE_MAX_ACTIVE'" "$ROOT_DIR/sc
 grep -Fq 'backend_interactive_enabled":false' "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
 grep -Fq 'spec_allowed_origins_sha256' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'runtime_allowed_origins_sha256' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'spec_public_urls_sha256' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'runtime_public_urls_sha256' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "source \"\$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh\"" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'BEGIN TRANSACTION READ ONLY;' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "name = 'add_privacy_and_post_game_sync_contracts'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

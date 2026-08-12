@@ -16,7 +16,7 @@
       "docs/generated/TRACEABILITY_MATRIX.md"
     ]
   },
-  "source_digest_sha256": "7e534a881928cf59498589f05cb9a857f10786821484694d98c2ae3d1ed8125e",
+  "source_digest_sha256": "cb7dd3683053d75a711c5532cfb548b0ad1a7d5fb7cea17c6df4cf244554f611",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -37,6 +37,7 @@
     "docs/adr/0003-xmage-human-spike-no-go.md",
     "docs/adr/0004-battle-live-polling-and-durable-checkpoints.md",
     "docs/adr/0008-decklist-and-binder-physical-copy-boundary.md",
+    "docs/adr/0011-brewtact-production-domain.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
@@ -61,7 +62,7 @@
     "database_views": 6,
     "migrations": 58,
     "scripts_and_jobs": 673,
-    "environment_variables": 692,
+    "environment_variables": 693,
     "tests": 1207,
     "flows": 8,
     "traceability_rules": 12
@@ -36104,25 +36105,25 @@
       "name": "_isLoopbackHost",
       "kind": "function",
       "source": "server/lib/public_site_url.dart",
-      "line": 54
+      "line": 53
     },
     {
       "name": "_normalizePublicSiteOrigin",
       "kind": "function",
       "source": "server/lib/public_site_url.dart",
-      "line": 31
+      "line": 30
     },
     {
       "name": "buildPublicReportUrl",
       "kind": "function",
       "source": "server/lib/public_site_url.dart",
-      "line": 26
+      "line": 25
     },
     {
       "name": "resolvePublicSiteBaseUrl",
       "kind": "function",
       "source": "server/lib/public_site_url.dart",
-      "line": 4
+      "line": 3
     },
     {
       "name": "FcmDeliveryOutcome",
@@ -161425,7 +161426,7 @@
       },
       {
         "source": "server/lib/public_site_url.dart",
-        "line": 16,
+        "line": 15,
         "caller": "resolvePublicSiteBaseUrl",
         "kind": "method",
         "lexical_target": "_normalizePublicSiteOrigin",
@@ -161436,7 +161437,7 @@
       },
       {
         "source": "server/lib/public_site_url.dart",
-        "line": 28,
+        "line": 27,
         "caller": "buildPublicReportUrl",
         "kind": "method",
         "lexical_target": "resolvePublicSiteBaseUrl",
@@ -161447,7 +161448,7 @@
       },
       {
         "source": "server/lib/public_site_url.dart",
-        "line": 48,
+        "line": 47,
         "caller": "_normalizePublicSiteOrigin",
         "kind": "method",
         "lexical_target": "_isLoopbackHost",
@@ -242337,13 +242338,13 @@
         },
         {
           "package": "brace-expansion",
-          "version": "5.0.8",
+          "version": "5.0.9",
           "dev": true,
           "optional": false
         },
         {
           "package": "brace-expansion",
-          "version": "1.1.16",
+          "version": "1.1.18",
           "dev": true,
           "optional": false
         },
@@ -243225,7 +243226,7 @@
         },
         {
           "package": "js-yaml",
-          "version": "4.3.0",
+          "version": "4.3.1",
           "dev": true,
           "optional": false
         },
@@ -257795,6 +257796,7 @@
         "EASYPANEL_SERVER_IP",
         "EASYPANEL_SSH_KEY",
         "EASYPANEL_SSH_USER",
+        "EMAIL_VERIFICATION_APP_URL",
         "EMAIL_VERIFICATION_WEBHOOK_TOKEN",
         "EMAIL_VERIFICATION_WEBHOOK_URL",
         "ENVIRONMENT",
@@ -257818,6 +257820,7 @@
         "MANALOOM_EXPECTED_SENTRY_DSN_SHA256",
         "MANALOOM_EXPECTED_XMAGE_URL",
         "MANALOOM_NEW_SERVER_ENV",
+        "MANALOOM_PUBLIC_SITE_URL",
         "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR",
         "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE",
         "MANALOOM_RELEASE_INTERACTIVE_PER_USER_ACTIVE_LIMIT",
@@ -257825,6 +257828,7 @@
         "MANALOOM_REMOTE_BUILD_ROOT",
         "MANALOOM_TRUSTED_PROXY_HOPS",
         "MANALOOM_TRUSTED_PROXY_PEERS",
+        "PASSWORD_RESET_APP_URL",
         "PASSWORD_RESET_WEBHOOK_TOKEN",
         "PASSWORD_RESET_WEBHOOK_URL",
         "RESEND_API_KEY",
@@ -260986,6 +260990,7 @@
       "name": "EMAIL_VERIFICATION_APP_URL",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_deploy_backend_image.sh",
         "server/lib/email_verification_delivery_service.dart"
       ],
       "value_captured": false
@@ -264313,6 +264318,7 @@
       "name": "MANALOOM_PUBLIC_SITE_URL",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_deploy_backend_image.sh",
         "server/lib/public_site_url.dart"
       ],
       "value_captured": false
@@ -265424,6 +265430,14 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_xmage_pin_transition_audit.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "PASSWORD_RESET_APP_URL",
+      "classification": "sensitive_name_only",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
       ],
       "value_captured": false
     },
@@ -269230,6 +269244,7 @@
       "docs/adr/0003-xmage-human-spike-no-go.md",
       "docs/adr/0004-battle-live-polling-and-durable-checkpoints.md",
       "docs/adr/0008-decklist-and-binder-physical-copy-boundary.md",
+      "docs/adr/0011-brewtact-production-domain.md",
       "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
       "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
       "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
