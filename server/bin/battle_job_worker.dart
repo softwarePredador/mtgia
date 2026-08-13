@@ -6,10 +6,37 @@ import '../lib/battle/battle_job_runner.dart';
 import '../lib/battle/battle_job_store.dart';
 import '../lib/battle/battle_job_worker_daemon.dart';
 import '../lib/database.dart';
+import '../lib/release_capability_policy.dart';
 import '../lib/runtime_environment.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> arguments) async {
+  final releasePolicy = ReleaseCapabilityPolicy.load();
+  if (arguments.contains('--release-capability-status')) {
+    stdout.write(
+      releasePolicy.isAllowed('battle_batch')
+          ? 'enabled'
+          : releasePolicy.isValid
+          ? 'disabled'
+          : 'invalid',
+    );
+    return;
+  }
+
   final environment = loadRuntimeEnvironment();
+  final workerRequested =
+      (environment['BATTLE_JOB_WORKER_ENABLED'] ?? 'false')
+          .trim()
+          .toLowerCase() ==
+      'true';
+  if (!workerRequested || !releasePolicy.isAllowed('battle_batch')) {
+    stderr.writeln(
+      '[battle-job-worker] disabled by release capability policy; '
+      'refusing database connection and queue claim',
+    );
+    if (!releasePolicy.isValid) exitCode = 78;
+    return;
+  }
+
   final database = Database();
   await database.connect();
   if (!database.isConnected) {

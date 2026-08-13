@@ -3,45 +3,29 @@ import 'package:manaloom/features/commercial/models/commercial_launch_policy.dar
 import 'package:manaloom/features/commercial/models/manaloom_plan.dart';
 
 void main() {
-  test('free tier is presented as the no-cost public beta', () {
+  test('controlled beta exposes one free non-commercial offer', () {
     expect(CommercialLaunchPolicy.paidCheckoutEnabled, isFalse);
     expect(CommercialLaunchPolicy.isFreeBeta, isTrue);
+    expect(ManaLoomPlanTier.values, [ManaLoomPlanTier.free]);
     expect(ManaLoomPlanTier.free.label, 'Beta gratuita');
-    expect(ManaLoomPlan.free.priceLabel, 'Sem custo');
-    expect(ManaLoomPlan.free.billingTerms.recurrenceLabel, 'Sem cobrança');
-    expect(
-      ManaLoomPlan.free.billingTerms.checkoutGuardrail,
-      contains('não exige checkout'),
-    );
+    expect(ManaLoomPlan.free.priceLabel, 'Sem cobrança');
+    expect(ManaLoomPlan.free.monthlyAiLimit, 120);
+
+    final copy = <String>[
+      ManaLoomPlan.free.description,
+      ...ManaLoomPlan.free.features,
+      ...ManaLoomPlan.free.limits,
+    ].join(' ').toLowerCase();
+    expect(copy, contains('teto operacional'));
+    expect(copy, contains('não define preço'));
+    expect(copy, contains('servidor'));
+    expect(copy, isNot(contains('2.500')));
+    expect(copy, isNot(contains('r\$')));
   });
 
-  test(
-    'Pro reflects the real quota entitlement without gating open features',
-    () {
-      final freeFeatures = ManaLoomPlan.free.features.join(' ').toLowerCase();
-      final proFeatures = ManaLoomPlan.pro.features.join(' ').toLowerCase();
-
-      expect(ManaLoomPlan.free.monthlyAiLimit, 120);
-      expect(ManaLoomPlan.pro.monthlyAiLimit, 2500);
-      expect(freeFeatures, contains('pós-jogo'));
-      expect(freeFeatures, contains('comunidade'));
-      expect(proFeatures, isNot(contains('pós-jogo')));
-      expect(proFeatures, isNot(contains('social')));
-      expect(
-        ManaLoomPlan.pro.limits.join(' '),
-        contains('continuam disponíveis'),
-      );
-    },
-  );
-
-  test('Pro billing copy is centralized and explicit before checkout', () {
-    final terms = ManaLoomPlan.pro.billingTerms;
-
-    expect(ManaLoomPlan.pro.priceLabel, 'R\$ 19,90/mês');
-    expect(terms.recurrenceLabel, 'Assinatura mensal recorrente');
-    expect(terms.renewalDisclosure.toLowerCase(), contains('renovação'));
-    expect(terms.cancellationDisclosure, startsWith('Cancelamento:'));
-    expect(terms.refundDisclosure, startsWith('Reembolso:'));
-    expect(terms.checkoutGuardrail, contains('não conclua'));
+  test('legacy plan identifiers normalize to the free beta', () {
+    expect(ManaLoomPlanTierLabel.fromId('pro'), ManaLoomPlanTier.free);
+    expect(ManaLoomPlanTierLabel.fromId('unknown'), ManaLoomPlanTier.free);
+    expect(ManaLoomPlan.forTier(ManaLoomPlanTier.free), ManaLoomPlan.free);
   });
 }

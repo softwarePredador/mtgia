@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Auto-promove learned decks de alta qualidade que ainda nao estao promovidos.
+"""Audita candidatos a learned deck sem promover nenhum deles.
 
 Criterios minimos:
   - card_count == 100 por padrao
@@ -8,12 +8,13 @@ Criterios minimos:
   - Ainda nao promovido (nao existe em deck_promotions)
   - Tem deck alvo correspondente na tabela decks (mesmo commander)
 
-Seguro para rodar em cron: idempotente (checa deck_promotions antes de inserir).
+O caminho automatico de promocao fica fail-closed ate existir o receipt
+versionado DCK-P0-05. O modo padrao e dry-run e nao altera nem mesmo o SQLite
+Hermes. ``--apply`` e qualquer opt-in legado de apply terminam com erro.
 """
 
 import argparse, os, re, sqlite3, sys, json
 from pathlib import Path
-from datetime import datetime, timezone
 
 
 def _resolve_repo_root() -> Path:
@@ -46,54 +47,6 @@ def _columns(db, table_name):
     if not _table_exists(db, table_name):
         return set()
     return {row[1] for row in db.execute(f"PRAGMA table_info({table_name})")}
-
-
-def _ensure_deck_promotions_schema(db):
-    db.execute(
-        """
-        CREATE TABLE IF NOT EXISTS deck_promotions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            promoted_at TEXT NOT NULL,
-            target_deck_id INTEGER NOT NULL,
-            learned_deck_id INTEGER NOT NULL,
-            previous_deck_name TEXT,
-            new_deck_name TEXT,
-            previous_card_count INTEGER DEFAULT 0,
-            new_card_count INTEGER DEFAULT 0,
-            actual_card_count INTEGER DEFAULT 0,
-            migration_verified INTEGER DEFAULT 0,
-            migration_checked_at TEXT,
-            notes TEXT
-        )
-        """
-    )
-    existing = _columns(db, "deck_promotions")
-    for name, ddl in {
-        "target_deck_id": "INTEGER",
-        "learned_deck_id": "INTEGER",
-        "previous_deck_name": "TEXT",
-        "new_deck_name": "TEXT",
-        "previous_card_count": "INTEGER DEFAULT 0",
-        "new_card_count": "INTEGER DEFAULT 0",
-        "actual_card_count": "INTEGER DEFAULT 0",
-        "migration_verified": "INTEGER DEFAULT 0",
-        "migration_checked_at": "TEXT",
-        "notes": "TEXT",
-    }.items():
-        if name not in existing:
-            db.execute(f"ALTER TABLE deck_promotions ADD COLUMN {name} {ddl}")
-    db.execute(
-        """
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_deck_promotions_learned
-        ON deck_promotions (learned_deck_id)
-        """
-    )
-    db.execute(
-        """
-        CREATE INDEX IF NOT EXISTS idx_deck_promotions_target
-        ON deck_promotions (target_deck_id)
-        """
-    )
 
 
 def _normalize_name(name):
@@ -150,19 +103,24 @@ def _commander_gate(commander, card_count, card_list):
 def _learned_candidates(db):
     if not _table_exists(db, "learned_decks") or not _table_exists(db, "decks"):
         return []
-    return db.execute(
+    already_promoted_filter = ""
+    if _table_exists(db, "deck_promotions"):
+        already_promoted_filter = """
+          AND ld.id NOT IN (
+            SELECT learned_deck_id
+            FROM deck_promotions
+            WHERE learned_deck_id IS NOT NULL
+          )
         """
+    return db.execute(
+        f"""
         SELECT ld.id as learned_id, ld.commander, ld.deck_name, ld.card_count,
                ld.card_list, ld.wincon_primary
         FROM learned_decks ld
         WHERE ld.card_count >= ?
           AND LOWER(ld.commander) NOT LIKE '%lorehold%'
           AND ld.commander != ''
-          AND ld.id NOT IN (
-            SELECT learned_deck_id
-            FROM deck_promotions
-            WHERE learned_deck_id IS NOT NULL
-          )
+          {already_promoted_filter}
         ORDER BY ld.commander, ld.card_count DESC
         """,
         (MIN_CARD_COUNT,),
@@ -216,36 +174,54 @@ def _target_deck_card_state(db, deck_id):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Auto-promote Hermes learned decks")
-    parser.add_argument(
+    parser = argparse.ArgumentParser(
+        description="Audit Hermes learned deck promotion candidates",
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         "--dry-run",
         action="store_true",
-        help="Valida candidatos sem gravar deck_promotions",
+        help="Audita candidatos sem gravar (padrao)",
+    )
+    mode.add_argument(
+        "--apply",
+        action="store_true",
+        help="Bloqueado ate o receipt DCK-P0-05",
     )
     args = parser.parse_args(argv)
-    dry_run = args.dry_run or os.environ.get("HERMES_AUTO_PROMOTE_DRY_RUN") == "1"
+
+    apply_requested = args.apply or os.environ.get("HERMES_AUTO_PROMOTE_APPLY") == "1"
+    if apply_requested:
+        print(
+            "BLOCKED_DCK_P0_05: automatic learned-deck promotion is disabled; "
+            "a reviewed, versioned promotion receipt is required.",
+            file=sys.stderr,
+        )
+        return 2
+
+    if not Path(SQLITE_DB).is_file():
+        print(
+            f"Nenhum SQLite Hermes encontrado em {SQLITE_DB}; "
+            "dry-run sem efeito."
+        )
+        return 0
 
     db = sqlite3.connect(SQLITE_DB)
-    print("=== Auto-promote learned decks ===")
-    print(f"mode={'dry_run' if dry_run else 'apply'} db={SQLITE_DB}")
+    print("=== Learned deck promotion candidate audit ===")
+    print(f"mode=dry_run db={SQLITE_DB} promotion_allowed=false")
 
-    _ensure_deck_promotions_schema(db)
     candidates = _learned_candidates(db)
 
     if not candidates:
         print("Nenhum candidato elegivel.")
-        if not dry_run:
-            db.commit()
         db.close()
         return 0
 
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    promoted = 0
-
     seen_cmd = set()
+    eligible = 0
     skipped = 0
     unverified = 0
-    for learned_id, commander, deck_name, card_count, card_list, wincon in candidates:
+    for learned_id, commander, _deck_name, card_count, card_list, wincon in candidates:
         if commander in seen_cmd:
             continue
         seen_cmd.add(commander)
@@ -261,13 +237,15 @@ def main(argv=None):
             print(f"SKIP {commander}: no_target_deck")
             skipped += 1
             continue
-        deck_id, target_name, target_cards = target
+        deck_id, _target_name, _target_cards = target
 
         # Verifica se ja foi promovido
-        already = db.execute(
-            "SELECT id FROM deck_promotions WHERE learned_deck_id=? OR target_deck_id=?",
-            (learned_id, deck_id),
-        ).fetchone()
+        already = None
+        if _table_exists(db, "deck_promotions"):
+            already = db.execute(
+                "SELECT id FROM deck_promotions WHERE learned_deck_id=? OR target_deck_id=?",
+                (learned_id, deck_id),
+            ).fetchone()
         if already:
             print(f"SKIP {commander}: already promoted")
             skipped += 1
@@ -287,31 +265,17 @@ def main(argv=None):
             unverified += 1
             continue
 
-        notes = f"Auto-promoted: {card_count} cards"
-        if wincon:
-            notes += f", wincon: {wincon[:120]}"
+        print(
+            f"CANDIDATE_ONLY {commander}: learned={learned_id} deck={deck_id} "
+            f"cards={card_count} wincon={wincon[:80] if wincon else 'None'} "
+            "promotion_allowed=false receipt_required=DCK-P0-05"
+        )
+        eligible += 1
 
-        if not dry_run:
-            db.execute(
-                """INSERT INTO deck_promotions
-                   (promoted_at, target_deck_id, learned_deck_id,
-                    previous_deck_name, new_deck_name,
-                    previous_card_count, new_card_count, actual_card_count,
-                    migration_verified, migration_checked_at, notes)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    now, deck_id, learned_id,
-                    target_name, deck_name,
-                    target_cards or 0, card_count, actual_cards,
-                    migration_verified, now, notes,
-                ),
-            )
-        print(f"PROMOTED {commander}: learned={learned_id} deck={deck_id} cards={card_count} wincon={wincon[:80] if wincon else 'None'}")
-        promoted += 1
-
-    if not dry_run:
-        db.commit()
-    print(f"\nTOTALS promoted={promoted} skipped={skipped} unverified={unverified}")
+    print(
+        f"\nTOTALS eligible_candidates={eligible} promoted=0 "
+        f"skipped={skipped} unverified={unverified}"
+    )
     db.close()
     return 0
 

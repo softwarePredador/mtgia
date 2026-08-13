@@ -327,11 +327,23 @@ def build_report() -> dict[str, object]:
         _check(
             "scripts/manaloom_deploy_ops_image.sh",
             contains=(
+                "manaloom_load_release_capabilities_from_git",
+                "MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=0",
+                "MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0",
+                "MANALOOM_BOOT_PULL_PENDING_EVENTS=0",
+                "HERMES_AUTO_SYNC_APPLY=0",
+                "HERMES_AUTO_PROMOTE_APPLY=0",
+                "MANALOOM_IMPORT_APPLY=0",
+                "MANALOOM_BATTLE_RULES_APPLY_PG=0",
+                "disabled_by_release_capability",
+                "['hermes_cron_governor_report']",
+                "manaloom_battle_product_gate.sh",
+            ),
+            absent=(
                 "MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1",
                 "MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1",
-                "known_cards_canonical_snapshot.runtime.json",
-                "native_reviewed_rules_execution",
-                "manaloom_battle_product_gate.sh",
+                "sync_pg_target_deck_to_hermes.py",
+                "--apply",
             ),
         ),
         _check(

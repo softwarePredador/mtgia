@@ -165,8 +165,17 @@ String stableOptimizeHash(String value) =>
 Future<Map<String, dynamic>?> loadOptimizeCache({
   required Pool pool,
   required String cacheKey,
+  required String userId,
+  required String deckId,
+  required String deckSignature,
 }) async {
-  return optimize_cache.loadOptimizeCache(pool: pool, cacheKey: cacheKey);
+  return optimize_cache.loadOptimizeCache(
+    pool: pool,
+    cacheKey: cacheKey,
+    userId: userId,
+    deckId: deckId,
+    deckSignature: deckSignature,
+  );
 }
 
 Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
@@ -361,29 +370,9 @@ Future<List<String>> loadCommanderCompetitivePriorities({
         .toList(growable: false);
   }
 
-  List<dynamic> fallback = const [];
-  try {
-    fallback = await pool.execute(
-      Sql.named('''
-        SELECT card_name, usage_count, meta_deck_count
-        FROM card_meta_insights
-        WHERE @commander = ANY(common_commanders)
-        ORDER BY meta_deck_count DESC, usage_count DESC, card_name ASC
-        LIMIT @limit
-      '''),
-      parameters: {'commander': commanderName, 'limit': limit},
-    );
-  } catch (_) {
-    fallback = const [];
-  }
-
-  if (fallback.isEmpty) return const [];
-
-  return fallback
-      .map((row) => (row[0] as String?) ?? '')
-      .where((name) => name.trim().isNotEmpty)
-      .take(limit)
-      .toList();
+  // No implicit schema fallback: BT-AI-017 must define provenance/freshness
+  // before another Commander reference source can become a runtime consumer.
+  return const [];
 }
 
 Future<MetaDeckReferenceSelectionResult> loadCommanderMetaReferenceSelection({

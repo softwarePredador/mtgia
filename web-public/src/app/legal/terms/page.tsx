@@ -13,15 +13,15 @@ export default function TermsPage() {
     <main className="py-16">
       <Container className="max-w-3xl">
         <BrandPageIntro eyebrow="Legal BrewTact" title="Termos de uso">
-          <p>Regras básicas para usar BrewTact, publicar conteúdo e contratar recursos do app.</p>
+          <p>Regras básicas para usar o BrewTact e os recursos liberados durante a beta.</p>
         </BrandPageIntro>
         <div className="mt-10">
           <SectionHeader eyebrow="Uso do produto" title="Responsabilidades e limites." />
         </div>
         <div className="mt-10 grid gap-6 text-base leading-7 text-mist-300">
-          <p>O BrewTact oferece ferramentas para criar, organizar, compartilhar e analisar decks. O usuário é responsável pelo conteúdo que publica e pelas decisões tomadas a partir das recomendações exibidas.</p>
-          <p>O acesso a recursos Free ou Pro pode depender de conta, plano ativo, limites de uso e políticas vigentes no app.</p>
-          <p>Conteúdo público pode ser indexado por mecanismos de busca quando o usuário habilitar compartilhamento. Dados privados não devem ser publicados sem autorização explícita.</p>
+          <p>O BrewTact oferece ferramentas para criar, organizar, compartilhar relatórios autorizados e analisar decks. O usuário é responsável pelo conteúdo que registra e pelas decisões tomadas a partir das recomendações exibidas.</p>
+          <p>A beta é gratuita e tem acesso controlado. A disponibilidade de recursos e os limites operacionais podem depender da conta e das políticas vigentes no app.</p>
+          <p>Decks e coleções permanecem privados. Um relatório só pode ser acessado fora do ambiente autenticado quando o usuário solicitar seu compartilhamento.</p>
         </div>
       </Container>
     </main>

@@ -28,6 +28,7 @@ WORKDIR /app/server
 COPY --from=build --chown=10001:10001 /out/manaloom-server /app/server/manaloom-server
 COPY --from=build --chown=10001:10001 /out/manaloom-battle-worker /app/server/manaloom-battle-worker
 COPY --from=build --chown=10001:10001 /app/server/bin/api_with_battle_worker.sh /app/server/api_with_battle_worker.sh
+COPY --from=build --chown=10001:10001 /app/server/config/release_capabilities.json /app/server/config/release_capabilities.json
 
 ENV PORT=8080
 EXPOSE 8080

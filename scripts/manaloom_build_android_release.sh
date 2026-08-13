@@ -7,30 +7,20 @@ KEYSTORE="${MANALOOM_ANDROID_KEYSTORE:-$HOME/.manaloom/signing/android/manaloom-
 KEY_ALIAS="${MANALOOM_ANDROID_KEY_ALIAS:-manaloom-upload}"
 STORE_PASSWORD_SERVICE="${MANALOOM_ANDROID_STORE_PASSWORD_SERVICE:-manaloom-android-upload-store-password}"
 KEY_PASSWORD_SERVICE="${MANALOOM_ANDROID_KEY_PASSWORD_SERVICE:-manaloom-android-upload-key-password}"
-# This release decision is accepted only from the invoking process. It is
-# intentionally opt-in and is never inferred from an app/server environment.
+# The current committed free-beta policy is all-OFF. Legacy caller flags are
+# parsed only so a stale release command fails before any build work starts.
 RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
 RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"
-if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
-      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
-  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF" >&2
   exit 2
 fi
-if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" &&
-      "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "1" ]]; then
-  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1" >&2
+if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0 enquanto a matriz free-beta estiver all-OFF" >&2
   exit 2
 fi
-if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
-  INTERACTIVE_BATTLE_DART_DEFINE=true
-else
-  INTERACTIVE_BATTLE_DART_DEFINE=false
-fi
-if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" == "1" ]]; then
-  BATTLE_LIVE_SPECTATOR_DART_DEFINE=true
-else
-  BATTLE_LIVE_SPECTATOR_DART_DEFINE=false
-fi
+INTERACTIVE_BATTLE_DART_DEFINE=false
+BATTLE_LIVE_SPECTATOR_DART_DEFINE=false
 readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_BATTLE_DART_DEFINE
 readonly RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR BATTLE_LIVE_SPECTATOR_DART_DEFINE
 
@@ -77,6 +67,7 @@ SHA="$(jq -r '.git_sha' <<<"$IDENTITY_JSON")"
 SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
 VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
 SOURCE_COMMITTED_AT="$(jq -r '.source_committed_at' <<<"$IDENTITY_JSON")"
+RELEASE_CAPABILITIES_JSON="$(jq -cer '.release_capabilities' <<<"$IDENTITY_JSON")"
 VERSION_CODE="${VERSION##*+}"
 if [[ -n "${MANALOOM_ANDROID_MIN_VERSION_CODE:-}" &&
       ! "${MANALOOM_ANDROID_MIN_VERSION_CODE}" =~ ^[1-9][0-9]*$ ]]; then
@@ -146,6 +137,7 @@ jq -n \
   --arg aapt_sha256 "$AAPT_SHA256" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     schema_version: 1,
     status: "release",
@@ -157,6 +149,7 @@ jq -n \
     },
     git_sha: $git_sha,
     version: $version,
+    release_capabilities: $release_capabilities,
     api_base_url: $api_base_url,
     sentry_dsn_sha256: (if ($sentry_dsn_sha256 | length) > 0 then $sentry_dsn_sha256 else null end),
     toolchain: {
@@ -288,6 +281,7 @@ jq -n \
   --argjson sentry_configured "$([[ -n "$SENTRY_RELEASE_DSN" ]] && printf true || printf false)" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     schema_version: 1,
     product: "manaloom",
@@ -296,6 +290,7 @@ jq -n \
     git_sha: $git_sha,
     short_sha: $short_sha,
     source_committed_at: $source_committed_at,
+    release_capabilities: $release_capabilities,
     api_base_url: $api_base_url,
     features: {
       battle_live_spectator_enabled: $battle_live_spectator_enabled,
@@ -328,6 +323,7 @@ jq -n \
   --arg api_base_url "$API_BASE_URL" \
   --arg sentry_dsn_sha256 "$MANALOOM_RELEASE_SENTRY_DSN_SHA256_RESOLVED" \
   --arg builder "scripts/manaloom_build_android_release.sh" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     _type: "https://in-toto.io/Statement/v1",
     subject: [
@@ -345,6 +341,7 @@ jq -n \
           git_sha: $git_sha,
           version: $version,
           api_base_url: $api_base_url,
+          release_capabilities: $release_capabilities,
           sentry_dsn_sha256: (if ($sentry_dsn_sha256 | length) > 0 then $sentry_dsn_sha256 else null end)
         },
         internalParameters: {builder_script: $builder},
@@ -368,5 +365,18 @@ jq -n \
     osv-scan.json > SHA256SUMS
 )
 
-printf '{"status":"built","version":"%s","git_sha":"%s","apk":"%s","aab":"%s","certificate_sha256":"%s","manifest":"%s","sbom":"%s","osv_scan":"%s","provenance":"%s"}\n' \
-  "$VERSION" "$SHA" "$APK" "$AAB" "$APK_CERT" "$RELEASE_DIR/release-manifest.json" "$RELEASE_DIR/sbom.cdx.json" "$RELEASE_DIR/osv-scan.json" "$RELEASE_DIR/provenance.intoto.json"
+jq -cn \
+  --arg version "$VERSION" \
+  --arg git_sha "$SHA" \
+  --arg apk "$APK" \
+  --arg aab "$AAB" \
+  --arg certificate_sha256 "$APK_CERT" \
+  --arg manifest "$RELEASE_DIR/release-manifest.json" \
+  --arg sbom "$RELEASE_DIR/sbom.cdx.json" \
+  --arg osv_scan "$RELEASE_DIR/osv-scan.json" \
+  --arg provenance "$RELEASE_DIR/provenance.intoto.json" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '{status:"built", version:$version, git_sha:$git_sha, apk:$apk, aab:$aab,
+    certificate_sha256:$certificate_sha256, manifest:$manifest, sbom:$sbom,
+    osv_scan:$osv_scan, provenance:$provenance,
+    release_capabilities:$release_capabilities}'

@@ -11,6 +11,34 @@ import 'plan_service.dart';
 bool isSuccessfulAiPlanActionStatus(int statusCode) =>
     statusCode >= HttpStatus.ok && statusCode < HttpStatus.multipleChoices;
 
+enum AiPlanReservationSettlementDirective { finalize, release, deferred }
+
+AiPlanReservationSettlementDirective aiPlanReservationSettlementDirective({
+  required AiPlanReservationHandle handle,
+  required int responseStatusCode,
+}) {
+  if (handle.waivedForReusedJob) {
+    return AiPlanReservationSettlementDirective.release;
+  }
+  if (handle.settlementDeferred && responseStatusCode == HttpStatus.accepted) {
+    return AiPlanReservationSettlementDirective.deferred;
+  }
+  return isSuccessfulAiPlanActionStatus(responseStatusCode)
+      ? AiPlanReservationSettlementDirective.finalize
+      : AiPlanReservationSettlementDirective.release;
+}
+
+int aiPlanUsedAfterRequest({
+  required int usedBeforeRequest,
+  required int responseStatusCode,
+  required AiPlanReservationHandle handle,
+}) {
+  final consumesQuota =
+      isSuccessfulAiPlanActionStatus(responseStatusCode) &&
+      !handle.waivedForReusedJob;
+  return usedBeforeRequest + (consumesQuota ? 1 : 0);
+}
+
 Middleware aiPlanLimitMiddleware() {
   return (handler) {
     return (context) async {
@@ -111,23 +139,27 @@ Middleware aiPlanLimitMiddleware() {
         rethrow;
       }
 
-      final succeeded = isSuccessfulAiPlanActionStatus(response.statusCode);
-      final deferredAccepted =
-          reservationHandle.settlementDeferred &&
-          response.statusCode == HttpStatus.accepted;
-      if (!deferredAccepted) {
+      final settlementDirective = aiPlanReservationSettlementDirective(
+        handle: reservationHandle,
+        responseStatusCode: response.statusCode,
+      );
+      if (settlementDirective !=
+          AiPlanReservationSettlementDirective.deferred) {
         try {
-          if (succeeded) {
-            await planService.finalizeAiActionReservation(
-              userId: userId,
-              reservationId: reservationId,
-              latencyMs: stopwatch.elapsedMilliseconds,
-            );
-          } else {
-            await planService.releaseAiActionReservation(
-              userId: userId,
-              reservationId: reservationId,
-            );
+          switch (settlementDirective) {
+            case AiPlanReservationSettlementDirective.finalize:
+              await planService.finalizeAiActionReservation(
+                userId: userId,
+                reservationId: reservationId,
+                latencyMs: stopwatch.elapsedMilliseconds,
+              );
+            case AiPlanReservationSettlementDirective.release:
+              await planService.releaseAiActionReservation(
+                userId: userId,
+                reservationId: reservationId,
+              );
+            case AiPlanReservationSettlementDirective.deferred:
+              break;
           }
         } catch (error) {
           Log.w(
@@ -136,7 +168,11 @@ Middleware aiPlanLimitMiddleware() {
         }
       }
 
-      final usedAfterRequest = snapshot.aiRequestsUsed + (succeeded ? 1 : 0);
+      final usedAfterRequest = aiPlanUsedAfterRequest(
+        usedBeforeRequest: snapshot.aiRequestsUsed,
+        responseStatusCode: response.statusCode,
+        handle: reservationHandle,
+      );
       return response.copyWith(
         headers: {
           ...response.headers,

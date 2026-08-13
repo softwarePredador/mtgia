@@ -1,5 +1,9 @@
 # ManaLoom App Implementation Readiness Plan - 2026-07-01
 
+> **HISTORICAL / SUPERSEDED.** Este plano de duas semanas não é o plano de
+> lançamento atual. Preserve-o como evidência e use o backlog mestre BrewTact
+> para escopo, dependências e gates vigentes.
+
 Status: `launch_readiness_plan_phase1_started`.
 
 Scope:

@@ -72,13 +72,28 @@ class AiProviderCostEstimate {
   final double coverageRatio;
 }
 
+/// Raised when legacy code tries to activate a paid plan during the free beta.
+///
+/// Keeping the API fail-closed avoids turning a dormant caller into an
+/// entitlement write. Reintroducing paid plans requires a new product decision
+/// and a reviewed billing implementation.
+class PaidPlanActivationDisabled implements Exception {
+  const PaidPlanActivationDisabled();
+
+  @override
+  String toString() =>
+      'PaidPlanActivationDisabled: paid plans are unavailable in the free beta';
+}
+
 class PlanService {
   const PlanService(this.pool);
 
   final Pool pool;
 
-  static const _defaultFreeLimit = 120;
-  static const _proLimit = 2500;
+  /// Cost/capacity ceiling for eligible AI actions, not a commercial promise.
+  static const freeBetaAiMonthlyOperationalLimit = 120;
+  static const activeOfferName = 'free';
+  static const activeOfferStatus = 'active';
   static const _reservationTtl = Duration(minutes: 10);
   static const providerTelemetrySqlPredicate = aiProviderTelemetrySqlPredicate;
   static const estimatedCostPricingVersion = 'openai-2026-07-16';
@@ -98,34 +113,12 @@ class PlanService {
     );
   }
 
+  @Deprecated('Paid plans are unavailable during the controlled free beta.')
   Future<UserPlanSnapshot> activatePro(String userId) async {
-    await pool.execute(
-      Sql.named('''
-        INSERT INTO user_plans (
-          user_id,
-          plan_name,
-          status,
-          started_at,
-          renews_at,
-          updated_at
-        )
-        VALUES (
-          @userId,
-          'pro',
-          'active',
-          NOW(),
-          NOW() + INTERVAL '30 days',
-          NOW()
-        )
-        ON CONFLICT (user_id) DO UPDATE SET
-          plan_name = 'pro',
-          status = 'active',
-          renews_at = NOW() + INTERVAL '30 days',
-          updated_at = NOW()
-      '''),
-      parameters: {'userId': userId},
-    );
-    return getSnapshot(userId);
+    if (userId.trim().isEmpty) {
+      throw ArgumentError.value(userId, 'userId', 'must not be empty');
+    }
+    throw const PaidPlanActivationDisabled();
   }
 
   Future<UserPlanSnapshot> getSnapshot(String userId) async {
@@ -260,26 +253,12 @@ class PlanService {
   }
 
   Future<UserPlanSnapshot> _loadSnapshot(Session session, String userId) async {
-    final planResult = await session.execute(
-      Sql.named('''
-        SELECT plan_name, status
-        FROM user_plans
-        WHERE user_id = @userId
-        LIMIT 1
-      '''),
-      parameters: {'userId': userId},
-    );
-
-    final planName =
-        planResult.isNotEmpty
-            ? (planResult.first[0] as String? ?? 'free')
-            : 'free';
-    final status =
-        planResult.isNotEmpty
-            ? (planResult.first[1] as String? ?? 'active')
-            : 'active';
-
-    final aiMonthlyLimit = planName == 'pro' ? _proLimit : _defaultFreeLimit;
+    // Legacy rows are deliberately left untouched in PostgreSQL. They cannot
+    // grant an entitlement in the current offer: every public snapshot is
+    // normalized to the single controlled free-beta offer.
+    const planName = activeOfferName;
+    const status = activeOfferStatus;
+    const aiMonthlyLimit = freeBetaAiMonthlyOperationalLimit;
 
     final usageResult = await session.execute(
       Sql.named('''

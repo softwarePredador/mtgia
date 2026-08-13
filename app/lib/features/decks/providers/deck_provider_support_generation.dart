@@ -769,6 +769,14 @@ List<String> generatedDeckSaveBlockingReasons(Map<String, dynamic>? result) {
   if (reviewBlockers.isNotEmpty) return reviewBlockers;
   if (result == null) return const ['Nenhum deck foi gerado para salvar.'];
 
+  final generationMode =
+      result['generation_mode']?.toString().trim().toLowerCase() ?? '';
+  if (result['is_mock'] == true || generationMode.startsWith('mock')) {
+    return const [
+      'Esta lista é uma prévia de desenvolvimento e não pode ser salva.',
+    ];
+  }
+
   final constraintAudit = _asStringMap(result['generation_constraints']);
   if (result['can_save'] == false || constraintAudit['can_save'] == false) {
     final blockers = constraintAudit['blockers'];

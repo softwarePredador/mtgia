@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
 import 'package:manaloom/features/collection/screens/collection_screen.dart';
@@ -99,6 +100,10 @@ void main() {
   Widget collectionScreen() {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+        ),
         ChangeNotifierProvider<BinderProvider>(
           create: (_) => _CollectionBinderProvider(),
         ),
@@ -182,6 +187,10 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider(
+            create: (_) =>
+                ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+          ),
           ChangeNotifierProvider<BinderProvider>(
             create: (_) => _CollectionBinderProvider(),
           ),
@@ -205,10 +214,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
 
     TabBar tabs = tester.widget(find.byKey(const Key('collection-hub-tabs')));
-    expect(tabs.controller?.index, 3);
+    expect(tabs.controller?.index, 0);
     expect(
       router.routeInformationProvider.value.uri.toString(),
-      '/collection?tab=3',
+      '/collection?tab=0',
     );
 
     router.go('/collection?tab=1');

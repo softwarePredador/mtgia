@@ -24,12 +24,17 @@ eles não substituem este contrato.
   conhecido de produção é bloqueado nelas.
 - Um `SKIP` precisa declarar pré-requisito e comando de ativação. Ele não pode
   ser apresentado como `PASS`.
+- Gate e release são fail-closed: `PASS` é o único resultado com exit code
+  zero. O modo diagnóstico que tolera `PARTIAL` exige `--allow-partial`, é
+  marcado como não elegível para gate/release e nunca pode ser descrito como
+  sucesso do gate.
 
 ## Perfis canônicos
 
 | Perfil | Escopo | Rede/escrita | Entrada | Resultado esperado |
 | --- | --- | --- | --- | --- |
-| `deterministic-read-only` | app, server, deckbuilder, battle, contratos, PG/Hermes read-only | sem mutação de produto | `./scripts/quality_gate.sh e2e` | `PARTIAL` quando as camadas opcionais forem declaradamente puladas; zero falhas/bloqueios |
+| `deterministic-read-only` | app, server, deckbuilder, battle, contratos, PG/Hermes read-only | sem mutação de produto | `./scripts/quality_gate.sh e2e` | gate estrito: `PASS` somente sem `SKIP`; `PARTIAL` retorna 3 |
+| `diagnostic-allow-partial` | mesmo inventário, para mapear pré-requisitos ainda ausentes | sem crédito de gate/release | `./scripts/manaloom_e2e_suite.sh --allow-partial` | pode retornar zero em `PARTIAL`, mas grava `execution_policy=diagnostic-allow-partial` e `gate_eligible=false` |
 | `isolated-mutating` | corpus Commander completo em ambiente aprovado | cria e remove usuários/decks de validação | `MANALOOM_RUN_MUTATING_RESOLUTION_E2E=1` + token PostgreSQL | `PASS` somente com cleanup e resumo do corpus |
 | `live-smoke` | Flutter runtime, API viva e smoke comercial | pode criar/apagar dados e chamar serviços externos | flags `MANALOOM_RUN_*_E2E=1` + tokens live/PG aplicáveis | `PASS` somente no alvo explicitamente aprovado |
 | `release-target` | build instalável, device/simulador, saúde e SHA implantado | depende do alvo de release | checklist desta página | conclusão de release, não apenas conclusão local |
@@ -40,9 +45,14 @@ válidos são:
 
 - `PASS`: todas as etapas solicitadas executaram e passaram;
 - `PARTIAL`: não houve falha, mas camadas opcionais não solicitadas foram
-  registradas como `SKIP`;
+  registradas como `SKIP`; retorna 3 no gate estrito e só retorna zero no modo
+  diagnóstico explicitamente selecionado;
 - `BLOCKED`: uma camada foi solicitada sem autorização ou pré-requisito;
 - `FAIL`: pelo menos uma etapa executada falhou.
+
+O mapeamento canônico é `PASS=0`, `FAIL=1`, `BLOCKED=2` e `PARTIAL=3`.
+`quality_gate.sh e2e`, `manaloom_local_ci.sh e2e` e o wrapper PowerShell sempre
+selecionam `--strict`; portanto nenhum deles propaga `PARTIAL` como sucesso.
 
 ## Matriz mínima de gates
 

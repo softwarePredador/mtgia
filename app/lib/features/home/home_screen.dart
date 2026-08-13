@@ -7,6 +7,7 @@ import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/branding/product_identity.dart';
+import '../../core/config/release_capabilities.dart';
 import '../../core/config/visual_fixture.dart';
 import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -83,13 +84,18 @@ class _HomeScreenState extends State<HomeScreen>
         _introController.forward();
       }
     }
-    if (_requestedDeckBootstrap) {
+    final capabilities = context.watch<ReleaseCapabilitiesProvider>();
+    if (!capabilities.isAllowed(ReleaseCapability.decksPrivate)) {
+      _requestedDeckBootstrap = false;
       return;
     }
+    if (_requestedDeckBootstrap) return;
 
     _requestedDeckBootstrap = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      final capabilities = context.read<ReleaseCapabilitiesProvider>();
+      if (!capabilities.isAllowed(ReleaseCapability.decksPrivate)) return;
       final provider = context.read<DeckProvider>();
       if (provider.decks.isEmpty && !provider.isLoading) {
         provider.fetchDecks();
@@ -104,9 +110,21 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _openPlayEntry(List<Deck> decks) async {
+    var capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_lifeCounterAllowed(capabilities)) return;
+    var decksAllowed = capabilities.isAllowed(ReleaseCapability.decksPrivate);
+    var learningWritesAllowed = capabilities.isAllowed(
+      ReleaseCapability.learningWrites,
+    );
     final store = LifeCounterSessionStore();
     final storedSession = await store.load();
     if (!mounted) return;
+    capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_lifeCounterAllowed(capabilities)) return;
+    decksAllowed = capabilities.isAllowed(ReleaseCapability.decksPrivate);
+    learningWritesAllowed = capabilities.isAllowed(
+      ReleaseCapability.learningWrites,
+    );
     final activeSession =
         storedSession?.playSessionId?.trim().isNotEmpty == true
         ? storedSession
@@ -121,10 +139,15 @@ class _HomeScreenState extends State<HomeScreen>
           top: Radius.circular(AppTheme.radiusXl),
         ),
       ),
-      builder: (_) =>
-          _PlayEntrySheet(decks: decks, activeSession: activeSession),
+      builder: (_) => _PlayEntrySheet(
+        decks: decksAllowed ? decks : const <Deck>[],
+        activeSession: activeSession,
+        decksAllowed: decksAllowed,
+        learningWritesAllowed: learningWritesAllowed,
+      ),
     );
     if (!mounted || selection == null) return;
+    capabilities = context.read<ReleaseCapabilitiesProvider>();
 
     switch (selection.action) {
       case _PlayEntryAction.resume:
@@ -134,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen>
         final session = activeSession;
         if (session != null) await _endStoredLifeCounterSession(session, store);
       case _PlayEntryAction.quick:
+        if (!_lifeCounterAllowed(capabilities)) return;
         final startedAt = DateTime.now().millisecondsSinceEpoch;
         await store.clear();
         await store.save(
@@ -144,10 +168,16 @@ class _HomeScreenState extends State<HomeScreen>
         );
         if (mounted) await _openLifeCounterAndPauseOnReturn();
       case _PlayEntryAction.newDeck:
+        if (!_lifeCounterAllowed(capabilities) ||
+            !capabilities.isAllowed(ReleaseCapability.decksPrivate)) {
+          return;
+        }
         final deck = selection.deck;
         if (deck != null) await _startDeckLifeCounter(deck, store);
       case _PlayEntryAction.manageDecks:
-        context.go('/decks');
+        if (capabilities.isAllowed(ReleaseCapability.decksPrivate)) {
+          context.go('/decks');
+        }
     }
   }
 
@@ -155,9 +185,19 @@ class _HomeScreenState extends State<HomeScreen>
     Deck deck,
     LifeCounterSessionStore store,
   ) async {
+    var capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_lifeCounterAllowed(capabilities) ||
+        !capabilities.isAllowed(ReleaseCapability.decksPrivate)) {
+      return;
+    }
     final provider = context.read<DeckProvider>();
     await provider.fetchDeckDetails(deck.id);
     if (!mounted) return;
+    capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_lifeCounterAllowed(capabilities) ||
+        !capabilities.isAllowed(ReleaseCapability.decksPrivate)) {
+      return;
+    }
     final details = provider.selectedDeck;
     final snapshotHash = details?.deckSnapshotHash?.trim();
     final versionAt = details?.deckVersionAt;
@@ -186,11 +226,14 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _openStoredLifeCounterSession(LifeCounterSession session) async {
+    final capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_lifeCounterAllowed(capabilities)) return;
+    final decksAllowed = capabilities.isAllowed(ReleaseCapability.decksPrivate);
     await _openLifeCounterAndPauseOnReturn(
-      deckId: session.deckId,
-      deckName: session.deckName,
-      deckSnapshotHash: session.deckSnapshotHash,
-      deckVersionAtEpochMs: session.deckVersionAtEpochMs,
+      deckId: decksAllowed ? session.deckId : null,
+      deckName: decksAllowed ? session.deckName : null,
+      deckSnapshotHash: decksAllowed ? session.deckSnapshotHash : null,
+      deckVersionAtEpochMs: decksAllowed ? session.deckVersionAtEpochMs : null,
     );
   }
 
@@ -200,6 +243,8 @@ class _HomeScreenState extends State<HomeScreen>
     String? deckSnapshotHash,
     int? deckVersionAtEpochMs,
   }) async {
+    final capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_lifeCounterAllowed(capabilities)) return;
     final result = await openLifeCounterRoute<LifeCounterExitResult>(
       context,
       deckId: deckId,
@@ -223,14 +268,17 @@ class _HomeScreenState extends State<HomeScreen>
   ) async {
     await store.clear();
     if (!mounted) return;
+    final capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!capabilities.isAllowed(ReleaseCapability.decksPrivate)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Partida encerrada.')));
+      return;
+    }
     final deckId = session.deckId?.trim();
     if (deckId == null || deckId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Partida rápida encerrada. Como ela não tinha deck, não há revisão para otimizar.',
-          ),
-        ),
+        const SnackBar(content: Text('Partida rápida encerrada.')),
       );
       return;
     }
@@ -253,6 +301,11 @@ class _HomeScreenState extends State<HomeScreen>
       },
     );
     context.push(uri.toString());
+  }
+
+  bool _lifeCounterAllowed(ReleaseCapabilitiesProvider capabilities) {
+    return (widget.lifeCounterAvailable ?? true) &&
+        capabilities.isAllowed(ReleaseCapability.lifeCounterLocal);
   }
 
   Future<bool> _completePendingHomeIntent(OnboardingState state) async {
@@ -306,18 +359,36 @@ class _HomeScreenState extends State<HomeScreen>
     List<Deck> decks,
     bool lifeCounterAvailable,
   ) async {
+    if (!mounted) return;
+    final capabilities = context.read<ReleaseCapabilitiesProvider>();
+    final decksAllowed = capabilities.isAllowed(ReleaseCapability.decksPrivate);
+    final collectionAllowed = capabilities.isAllowed(
+      ReleaseCapability.collectionPrivate,
+    );
+    final generateAllowed = capabilities.isAllowed(
+      ReleaseCapability.aiGenerateRebuild,
+    );
+    final lifeAllowed =
+        lifeCounterAvailable && _lifeCounterAllowed(capabilities);
+    Future<void> runDefaultAction() async {
+      if (lifeAllowed) {
+        await _openPlayEntry(decksAllowed ? decks : const <Deck>[]);
+      } else if (decksAllowed) {
+        context.go('/decks');
+      } else if (collectionAllowed) {
+        context.go('/collection?tab=0');
+      }
+    }
+
     final state = _onboardingState;
     final goal = state?.selectedGoal;
     if (state == null || goal == null) {
-      if (lifeCounterAvailable) {
-        await _openPlayEntry(decks);
-      } else if (mounted) {
-        context.go('/onboarding/core-flow');
-      }
+      await runDefaultAction();
       return;
     }
 
-    final recentDeck = decks.isEmpty ? null : decks.first;
+    final visibleDecks = decksAllowed ? decks : const <Deck>[];
+    final recentDeck = visibleDecks.isEmpty ? null : visibleDecks.first;
     final fromOnboarding = state.disposition == OnboardingDisposition.pending
         ? 'onboarding'
         : null;
@@ -333,11 +404,15 @@ class _HomeScreenState extends State<HomeScreen>
 
     switch (goal) {
       case OnboardingGoal.buildDeck:
+        if (!decksAllowed) {
+          await runDefaultAction();
+          return;
+        }
         if (recentDeck != null && state.isSettled) {
           context.go('/decks/${recentDeck.id}');
           return;
         }
-        if (state.buildMode == OnboardingBuildMode.manual) {
+        if (state.buildMode == OnboardingBuildMode.manual || !generateAllowed) {
           context.go(
             route('/decks', {'create': '1', 'format': state.selectedFormat}),
           );
@@ -348,6 +423,10 @@ class _HomeScreenState extends State<HomeScreen>
         }
         return;
       case OnboardingGoal.importDeck:
+        if (!decksAllowed) {
+          await runDefaultAction();
+          return;
+        }
         if (recentDeck != null && state.isSettled) {
           context.go('/decks/${recentDeck.id}');
           return;
@@ -355,92 +434,211 @@ class _HomeScreenState extends State<HomeScreen>
         context.go(route('/decks/import', {'format': state.selectedFormat}));
         return;
       case OnboardingGoal.catalogCollection:
+        if (!collectionAllowed) {
+          await runDefaultAction();
+          return;
+        }
         if (state.isSettled) {
-          context.go('/collection?tab=1');
+          context.go('/collection?tab=0');
           return;
         }
         context.go(route('/collection/import', const {'list_type': 'have'}));
         return;
       case OnboardingGoal.play:
-        if (!lifeCounterAvailable) {
-          context.go('/onboarding/core-flow');
+        if (!lifeAllowed) {
+          await runDefaultAction();
           return;
         }
         if (!await _completePendingHomeIntent(state) || !mounted) return;
-        await _openPlayEntry(decks);
+        await _openPlayEntry(visibleDecks);
         return;
       case OnboardingGoal.improveDeck:
-        if (recentDeck == null) {
-          context.go('/onboarding/core-flow');
+        if (!decksAllowed) {
+          await runDefaultAction();
           return;
         }
-        if (!await _completePendingHomeIntent(state) || !mounted) return;
-        context.go('/decks/${recentDeck.id}?optimize=rebuild');
+        if (recentDeck == null) {
+          context.go('/decks');
+          return;
+        }
+        if (generateAllowed) {
+          if (!await _completePendingHomeIntent(state) || !mounted) return;
+          final refreshedCapabilities = context
+              .read<ReleaseCapabilitiesProvider>();
+          if (!refreshedCapabilities.isAllowed(
+                ReleaseCapability.decksPrivate,
+              ) ||
+              !refreshedCapabilities.isAllowed(
+                ReleaseCapability.aiGenerateRebuild,
+              )) {
+            return;
+          }
+          context.go('/decks/${recentDeck.id}?optimize=rebuild');
+          return;
+        }
+        context.go('/decks/${recentDeck.id}');
         return;
     }
   }
 
-  _HomeHeroContent _heroContent(List<Deck> decks, bool lifeCounterAvailable) {
+  _HomeHeroContent _heroContent(
+    List<Deck> decks, {
+    required bool decksAllowed,
+    required bool collectionAllowed,
+    required bool generateAllowed,
+    required bool analyzeOptimizeAllowed,
+    required bool lifeCounterAllowed,
+  }) {
     final state = _onboardingState;
     final goal = state?.selectedGoal;
     final recentDeck = decks.isEmpty ? null : decks.first;
-    if (goal == null) {
-      return _HomeHeroContent(
+    final fallback = _defaultHeroContent(
+      decksAllowed: decksAllowed,
+      collectionAllowed: collectionAllowed,
+      lifeCounterAllowed: lifeCounterAllowed,
+    );
+    if (goal == null) return fallback;
+    final completedDeck = state!.isSettled ? recentDeck : null;
+    switch (goal) {
+      case OnboardingGoal.buildDeck:
+        if (!decksAllowed) return fallback;
+        final guidedGenerationAllowed =
+            state.buildMode == OnboardingBuildMode.guided && generateAllowed;
+        return _HomeHeroContent(
+          title: completedDeck == null
+              ? 'Seu primeiro\ndeck começa aqui'
+              : 'Continue\n${completedDeck.name}',
+          subtitle: completedDeck == null
+              ? guidedGenerationAllowed
+                    ? 'Gere uma base e revise cada escolha.'
+                    : 'Crie a estrutura e escolha seu comandante.'
+              : 'Abra a lista e avance para o próximo ajuste.',
+          actionLabel: completedDeck == null
+              ? guidedGenerationAllowed
+                    ? 'Continuar montagem'
+                    : 'Criar deck'
+              : 'Abrir deck',
+        );
+      case OnboardingGoal.importDeck:
+        if (!decksAllowed) return fallback;
+        return _HomeHeroContent(
+          title: completedDeck == null
+              ? 'Sua lista,\nsem surpresas'
+              : 'Revise\n${completedDeck.name}',
+          subtitle: completedDeck == null
+              ? 'Confira cartas reconhecidas antes de criar.'
+              : 'O deck importado está pronto para sua revisão.',
+          actionLabel: completedDeck == null ? 'Revisar lista' : 'Abrir deck',
+        );
+      case OnboardingGoal.catalogCollection:
+        if (!collectionAllowed) return fallback;
+        return _HomeHeroContent(
+          title: 'Sua coleção,\ncópia por cópia',
+          subtitle: 'Organize impressão, condição e disponibilidade.',
+          actionLabel: state.isSettled ? 'Abrir Fichário' : 'Importar cópias',
+        );
+      case OnboardingGoal.play:
+        if (!lifeCounterAllowed) return fallback;
+        return _HomeHeroContent(
+          title: 'Sua mesa\nestá pronta',
+          subtitle: decksAllowed
+              ? 'Escolha um deck revisado ou jogue no modo rápido.'
+              : 'Abra uma partida rápida sem vincular um deck.',
+          actionLabel: 'Jogar agora',
+        );
+      case OnboardingGoal.improveDeck:
+        if (!decksAllowed) return fallback;
+        if (recentDeck == null) {
+          return const _HomeHeroContent(
+            title: 'Escolha um deck\npara evoluir',
+            subtitle: 'Abra seus decks para escolher a próxima revisão.',
+            actionLabel: 'Ver decks',
+          );
+        }
+        if (generateAllowed) {
+          return _HomeHeroContent(
+            title: 'Próxima revisão:\n${recentDeck.name}',
+            subtitle: 'Compare mudanças, fontes e impacto antes de aplicar.',
+            actionLabel: 'Abrir Oficina',
+          );
+        }
+        return _HomeHeroContent(
+          title: 'Revise\n${recentDeck.name}',
+          subtitle: analyzeOptimizeAllowed
+              ? 'Abra o deck para consultar a análise disponível.'
+              : 'Abra a lista para revisar suas escolhas.',
+          actionLabel: 'Abrir deck',
+        );
+    }
+  }
+
+  _HomeHeroContent _defaultHeroContent({
+    required bool decksAllowed,
+    required bool collectionAllowed,
+    required bool lifeCounterAllowed,
+  }) {
+    if (lifeCounterAllowed) {
+      return const _HomeHeroContent(
         title: 'Olá,\nPlaneswalker',
         subtitle: 'Sua próxima jogada começa aqui.',
-        actionLabel: lifeCounterAvailable ? 'Jogar agora' : 'Montar deck',
+        actionLabel: 'Jogar agora',
       );
     }
-    final completedDeck = state!.isSettled ? recentDeck : null;
-    return switch (goal) {
-      OnboardingGoal.buildDeck => _HomeHeroContent(
-        title: completedDeck == null
-            ? 'Seu primeiro\ndeck começa aqui'
-            : 'Continue\n${completedDeck.name}',
-        subtitle: completedDeck == null
-            ? state.buildMode == OnboardingBuildMode.manual
-                  ? 'Crie a estrutura e escolha seu comandante.'
-                  : 'Gere uma base e revise cada escolha.'
-            : 'Abra a lista e avance para o próximo ajuste.',
-        actionLabel: completedDeck == null
-            ? 'Continuar montagem'
-            : 'Abrir deck',
-      ),
-      OnboardingGoal.importDeck => _HomeHeroContent(
-        title: completedDeck == null
-            ? 'Sua lista,\nsem surpresas'
-            : 'Revise\n${completedDeck.name}',
-        subtitle: completedDeck == null
-            ? 'Confira cartas reconhecidas antes de criar.'
-            : 'O deck importado está pronto para sua revisão.',
-        actionLabel: completedDeck == null ? 'Revisar lista' : 'Abrir deck',
-      ),
-      OnboardingGoal.catalogCollection => _HomeHeroContent(
-        title: 'Sua coleção,\ncópia por cópia',
-        subtitle: 'Organize impressão, condição e disponibilidade.',
-        actionLabel: state.isSettled ? 'Abrir Fichário' : 'Importar cópias',
-      ),
-      OnboardingGoal.play => _HomeHeroContent(
-        title: 'Sua mesa\nestá pronta',
-        subtitle: 'Escolha um deck revisado ou jogue no modo rápido.',
-        actionLabel: lifeCounterAvailable ? 'Jogar agora' : 'Preparar deck',
-      ),
-      OnboardingGoal.improveDeck => _HomeHeroContent(
-        title: recentDeck == null
-            ? 'Escolha um deck\npara evoluir'
-            : 'Próxima revisão:\n${recentDeck.name}',
-        subtitle: recentDeck == null
-            ? 'Você precisa de uma lista antes de abrir a Oficina.'
-            : 'Compare mudanças, fontes e impacto antes de aplicar.',
-        actionLabel: recentDeck == null
-            ? 'Escolher outro objetivo'
-            : 'Abrir Oficina',
-      ),
-    };
+    if (decksAllowed) {
+      return const _HomeHeroContent(
+        title: 'Seus decks,\nno seu ritmo',
+        subtitle: 'Crie, importe ou revise uma lista privada.',
+        actionLabel: 'Abrir decks',
+      );
+    }
+    if (collectionAllowed) {
+      return const _HomeHeroContent(
+        title: 'Sua coleção,\norganizada',
+        subtitle: 'Consulte seu fichário privado.',
+        actionLabel: 'Abrir coleção',
+      );
+    }
+    return const _HomeHeroContent(
+      title: 'Beta em\npreparação',
+      subtitle: 'Os recursos desta versão ainda não foram liberados.',
+      actionLabel: null,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final capabilities = context.watch<ReleaseCapabilitiesProvider>();
+    final decksAllowed = capabilities.isAllowed(ReleaseCapability.decksPrivate);
+    final collectionAllowed = capabilities.isAllowed(
+      ReleaseCapability.collectionPrivate,
+    );
+    final generateAllowed = capabilities.isAllowed(
+      ReleaseCapability.aiGenerateRebuild,
+    );
+    final analyzeOptimizeAllowed = capabilities.isAllowed(
+      ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+    );
+    final lifeCounterAllowed = _lifeCounterAllowed(capabilities);
+    final tradesAllowed = capabilities.isAllowed(ReleaseCapability.trades);
+    final communityAllowed = const {
+      ReleaseCapability.galleryPublic,
+      ReleaseCapability.follows,
+      ReleaseCapability.userSearch,
+      ReleaseCapability.marketplace,
+    }.any(capabilities.isAllowed);
+    if (!decksAllowed && !collectionAllowed && !lifeCounterAllowed) {
+      return const Scaffold(
+        backgroundColor: AppTheme.transparent,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppTheme.space24),
+              child: _BetaPreparationState(),
+            ),
+          ),
+        ),
+      );
+    }
     final isDeckLoading = context.select<DeckProvider, bool>(
       (dp) => dp.isLoading,
     );
@@ -453,9 +651,16 @@ class _HomeScreenState extends State<HomeScreen>
     final deckStatusCode = context.select<DeckProvider, int?>(
       (dp) => dp.listStatusCode,
     );
-    final recentDecks = decks.take(4).toList();
-    final lifeCounterAvailable = widget.lifeCounterAvailable ?? true;
-    final heroContent = _heroContent(decks, lifeCounterAvailable);
+    final visibleDecks = decksAllowed ? decks : const <Deck>[];
+    final recentDecks = visibleDecks.take(4).toList();
+    final heroContent = _heroContent(
+      visibleDecks,
+      decksAllowed: decksAllowed,
+      collectionAllowed: collectionAllowed,
+      generateAllowed: generateAllowed,
+      analyzeOptimizeAllowed: analyzeOptimizeAllowed,
+      lifeCounterAllowed: lifeCounterAllowed,
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.transparent,
@@ -484,58 +689,107 @@ class _HomeScreenState extends State<HomeScreen>
                     const SizedBox(height: AppTheme.space12),
                     _HomeHero(
                       content: heroContent,
-                      onAction: () =>
-                          _runHomePrimaryAction(decks, lifeCounterAvailable),
+                      onAction: () => _runHomePrimaryAction(
+                        visibleDecks,
+                        lifeCounterAllowed,
+                      ),
                     ),
                     const SizedBox(height: AppTheme.space16),
                     const _SectionHeader(label: 'Acesso rápido'),
                     const SizedBox(height: AppTheme.space10),
                     _QuickActions(
-                      lifeCounterAvailable: lifeCounterAvailable,
-                      onPlay: () => _openPlayEntry(decks),
+                      lifeCounterAvailable: lifeCounterAllowed,
+                      decksAllowed: decksAllowed,
+                      collectionAllowed: collectionAllowed,
+                      generateAllowed: generateAllowed,
+                      communityAllowed: communityAllowed,
+                      tradesAllowed: tradesAllowed,
+                      onPlay: () => _openPlayEntry(visibleDecks),
                     ),
-                    const SizedBox(height: AppTheme.space18),
-                    _SectionHeader(
-                      label: 'Decks recentes',
-                      trailing: TextButton(
-                        onPressed: () => context.go('/decks'),
-                        child: const Text('Ver todos'),
+                    if (decksAllowed) ...[
+                      const SizedBox(height: AppTheme.space18),
+                      _SectionHeader(
+                        label: 'Decks recentes',
+                        trailing: TextButton(
+                          onPressed: () => context.go('/decks'),
+                          child: const Text('Ver todos'),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppTheme.space10),
-                    if (deckStatusCode == 401)
-                      const _DecksSessionExpiredState()
-                    else if (recentDecks.isNotEmpty)
-                      Column(
-                        children: [
-                          if (isDeckLoading) ...[
-                            const _CachedDecksStatus(
-                              isLoading: true,
-                              message: 'Atualizando seus decks...',
-                            ),
-                            const SizedBox(height: AppTheme.space8),
-                          ] else if (deckError != null) ...[
-                            _CachedDecksStatus(
-                              isLoading: false,
-                              message: deckError,
-                            ),
-                            const SizedBox(height: AppTheme.space8),
+                      const SizedBox(height: AppTheme.space10),
+                      if (deckStatusCode == 401)
+                        const _DecksSessionExpiredState()
+                      else if (recentDecks.isNotEmpty)
+                        Column(
+                          children: [
+                            if (isDeckLoading) ...[
+                              const _CachedDecksStatus(
+                                isLoading: true,
+                                message: 'Atualizando seus decks...',
+                              ),
+                              const SizedBox(height: AppTheme.space8),
+                            ] else if (deckError != null) ...[
+                              _CachedDecksStatus(
+                                isLoading: false,
+                                message: deckError,
+                              ),
+                              const SizedBox(height: AppTheme.space8),
+                            ],
+                            _RecentDecksRail(decks: recentDecks),
                           ],
-                          _RecentDecksRail(decks: recentDecks),
-                        ],
-                      )
-                    else if (isDeckLoading)
-                      const _DecksLoadingState()
-                    else if (deckError != null)
-                      _DecksErrorState(message: deckError)
-                    else
-                      const _EmptyDecksState(),
+                        )
+                      else if (isDeckLoading)
+                        const _DecksLoadingState()
+                      else if (deckError != null)
+                        _DecksErrorState(message: deckError)
+                      else
+                        const _EmptyDecksState(),
+                    ],
                   ],
                 ),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BetaPreparationState extends StatelessWidget {
+  const _BetaPreparationState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 460),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.construction_rounded,
+            size: 44,
+            color: AppTheme.brass400,
+          ),
+          const SizedBox(height: AppTheme.space14),
+          Text(
+            'Beta em preparação',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: AppTheme.space8),
+          Text(
+            'Os recursos desta versão ainda não foram liberados para uso.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -551,10 +805,17 @@ class _PlayEntrySelection {
 }
 
 class _PlayEntrySheet extends StatelessWidget {
-  const _PlayEntrySheet({required this.decks, required this.activeSession});
+  const _PlayEntrySheet({
+    required this.decks,
+    required this.activeSession,
+    required this.decksAllowed,
+    required this.learningWritesAllowed,
+  });
 
   final List<Deck> decks;
   final LifeCounterSession? activeSession;
+  final bool decksAllowed;
+  final bool learningWritesAllowed;
 
   void _select(BuildContext context, _PlayEntryAction action, {Deck? deck}) {
     Navigator.of(context).pop(_PlayEntrySelection(action, deck: deck));
@@ -564,7 +825,17 @@ class _PlayEntrySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final active = activeSession;
-    final availableDecks = decks.take(8).toList(growable: false);
+    final capabilities = context.watch<ReleaseCapabilitiesProvider>();
+    final canUseDecks =
+        decksAllowed && capabilities.isAllowed(ReleaseCapability.decksPrivate);
+    final canWriteLearning =
+        learningWritesAllowed &&
+        capabilities.isAllowed(ReleaseCapability.learningWrites);
+    final availableDecks = canUseDecks
+        ? decks.take(8).toList(growable: false)
+        : const <Deck>[];
+    final activeHasVisibleDeck =
+        canUseDecks && active?.deckId?.trim().isNotEmpty == true;
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.sizeOf(context).height * 0.88,
@@ -612,7 +883,11 @@ class _PlayEntrySheet extends StatelessWidget {
             ),
             const SizedBox(height: AppTheme.space6),
             Text(
-              'Vincule uma revisão para transformar a mesa em aprendizado, ou declare um modo rápido sem deck.',
+              canUseDecks && canWriteLearning
+                  ? 'Vincule uma revisão para transformar a mesa em aprendizado, ou declare um modo rápido sem deck.'
+                  : canUseDecks
+                  ? 'Vincule um deck para registrar a partida, ou use o modo rápido sem deck.'
+                  : 'Abra uma partida rápida sem vincular um deck.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
                 height: 1.4,
@@ -644,9 +919,10 @@ class _PlayEntrySheet extends StatelessWidget {
                     ),
                     const SizedBox(height: AppTheme.space5),
                     Text(
-                      active.deckName?.trim().isNotEmpty == true
+                      activeHasVisibleDeck &&
+                              active.deckName?.trim().isNotEmpty == true
                           ? active.deckName!.trim()
-                          : active.deckId?.trim().isNotEmpty == true
+                          : activeHasVisibleDeck
                           ? 'Deck vinculado'
                           : 'Modo rápido · sem deck',
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -656,9 +932,10 @@ class _PlayEntrySheet extends StatelessWidget {
                     ),
                     const SizedBox(height: AppTheme.space5),
                     Text(
-                      active.deckSnapshotHash?.trim().isNotEmpty == true
+                      activeHasVisibleDeck &&
+                              active.deckSnapshotHash?.trim().isNotEmpty == true
                           ? 'Revisão ${active.deckSnapshotHash!.substring(0, math.min(8, active.deckSnapshotHash!.length))} preservada'
-                          : 'Esta sessão não possui revisão de deck.',
+                          : 'Sessão local sem revisão vinculada.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: AppTheme.textSecondary,
                       ),
@@ -681,7 +958,7 @@ class _PlayEntrySheet extends StatelessWidget {
                               _select(context, _PlayEntryAction.end),
                           icon: const Icon(Icons.flag_outlined),
                           label: Text(
-                            active.deckId?.trim().isNotEmpty == true
+                            activeHasVisibleDeck
                                 ? 'Encerrar e registrar'
                                 : 'Encerrar modo rápido',
                           ),
@@ -692,54 +969,56 @@ class _PlayEntrySheet extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: AppTheme.space16),
-            Text(
-              'NOVA PARTIDA COM DECK',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: AppTheme.textHint,
-                letterSpacing: 1,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: AppTheme.space8),
-            if (availableDecks.isEmpty)
-              Container(
-                key: const Key('home-play-no-decks'),
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppTheme.space14),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSlate,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            if (canUseDecks) ...[
+              const SizedBox(height: AppTheme.space16),
+              Text(
+                'NOVA PARTIDA COM DECK',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppTheme.textHint,
+                  letterSpacing: 1,
+                  fontWeight: FontWeight.w900,
                 ),
-                child: Text(
-                  'Você ainda não tem um deck disponível. Pode jogar no modo rápido ou criar um deck primeiro.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                    height: 1.4,
+              ),
+              const SizedBox(height: AppTheme.space8),
+              if (availableDecks.isEmpty)
+                Container(
+                  key: const Key('home-play-no-decks'),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppTheme.space14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSlate,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  ),
+                  child: Text(
+                    'Você ainda não tem um deck disponível. Pode jogar no modo rápido ou criar um deck primeiro.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                )
+              else
+                Flexible(
+                  child: ListView.separated(
+                    key: const Key('home-play-deck-list'),
+                    shrinkWrap: true,
+                    itemCount: availableDecks.length,
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: AppTheme.space8),
+                    itemBuilder: (context, index) {
+                      final deck = availableDecks[index];
+                      return _PlayEntryDeckTile(
+                        deck: deck,
+                        onTap: () => _select(
+                          context,
+                          _PlayEntryAction.newDeck,
+                          deck: deck,
+                        ),
+                      );
+                    },
                   ),
                 ),
-              )
-            else
-              Flexible(
-                child: ListView.separated(
-                  key: const Key('home-play-deck-list'),
-                  shrinkWrap: true,
-                  itemCount: availableDecks.length,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(height: AppTheme.space8),
-                  itemBuilder: (context, index) {
-                    final deck = availableDecks[index];
-                    return _PlayEntryDeckTile(
-                      deck: deck,
-                      onTap: () => _select(
-                        context,
-                        _PlayEntryAction.newDeck,
-                        deck: deck,
-                      ),
-                    );
-                  },
-                ),
-              ),
+            ],
             const SizedBox(height: AppTheme.space12),
             SizedBox(
               width: double.infinity,
@@ -750,7 +1029,7 @@ class _PlayEntrySheet extends StatelessWidget {
                 label: const Text('Nova partida rápida · sem deck'),
               ),
             ),
-            if (availableDecks.isEmpty) ...[
+            if (canUseDecks && availableDecks.isEmpty) ...[
               const SizedBox(height: AppTheme.space6),
               Center(
                 child: TextButton(
@@ -918,19 +1197,20 @@ class _HomeHeroContent {
 
   final String title;
   final String subtitle;
-  final String actionLabel;
+  final String? actionLabel;
 }
 
 class _HomeHero extends StatelessWidget {
   final _HomeHeroContent content;
-  final VoidCallback onAction;
+  final VoidCallback? onAction;
 
   const _HomeHero({required this.content, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final actionWidth = content.actionLabel.length > 12 ? 176.0 : 122.0;
+    final actionLabel = content.actionLabel;
+    final actionWidth = (actionLabel?.length ?? 0) > 12 ? 176.0 : 122.0;
     final wideArtwork = MediaQuery.sizeOf(context).width >= 840;
     final textScale = MediaQuery.textScalerOf(context).scale(1);
     final heroHeight = textScale >= 1.5 ? 280.0 : 190.0;
@@ -1045,39 +1325,40 @@ class _HomeHero extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  SizedBox(
-                    width: actionWidth,
-                    height: AppTheme.touchTargetMin,
-                    child: FilledButton(
-                      key: const Key('home-primary-action'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppTheme.brass400,
-                        foregroundColor: AppTheme.backgroundAbyss,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.space18,
-                        ),
-                        textStyle: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          fontSize: AppTheme.fontSm,
-                        ),
-                      ),
-                      onPressed: onAction,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Text(content.actionLabel),
-                            ),
+                  if (actionLabel != null && onAction != null)
+                    SizedBox(
+                      width: actionWidth,
+                      height: AppTheme.touchTargetMin,
+                      child: FilledButton(
+                        key: const Key('home-primary-action'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppTheme.brass400,
+                          foregroundColor: AppTheme.backgroundAbyss,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppTheme.space18,
                           ),
-                          const SizedBox(width: AppTheme.space8),
-                          const Icon(Icons.arrow_forward_rounded, size: 17),
-                        ],
+                          textStyle: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            fontSize: AppTheme.fontSm,
+                          ),
+                        ),
+                        onPressed: onAction,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(actionLabel),
+                              ),
+                            ),
+                            const SizedBox(width: AppTheme.space8),
+                            const Icon(Icons.arrow_forward_rounded, size: 17),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -1129,10 +1410,20 @@ class _SectionHeader extends StatelessWidget {
 
 class _QuickActions extends StatelessWidget {
   final bool lifeCounterAvailable;
+  final bool decksAllowed;
+  final bool collectionAllowed;
+  final bool generateAllowed;
+  final bool communityAllowed;
+  final bool tradesAllowed;
   final VoidCallback onPlay;
 
   const _QuickActions({
     required this.lifeCounterAvailable,
+    required this.decksAllowed,
+    required this.collectionAllowed,
+    required this.generateAllowed,
+    required this.communityAllowed,
+    required this.tradesAllowed,
     required this.onPlay,
   });
 
@@ -1146,37 +1437,42 @@ class _QuickActions extends StatelessWidget {
           accent: AppTheme.brass400,
           onTap: onPlay,
         )
-      else
+      else if (communityAllowed)
         _QuickActionData(
           icon: Icons.groups_outlined,
           title: 'Comunidade',
           accent: AppTheme.brass400,
           onTap: () => context.go('/community'),
         ),
-      _QuickActionData(
-        glyph: ManaLoomGlyphKind.deck,
-        title: 'Construir deck',
-        accent: AppTheme.brass500,
-        onTap: () => context.go('/onboarding/core-flow'),
-      ),
-      _QuickActionData(
-        glyph: ManaLoomGlyphKind.deck,
-        title: 'Meus Decks',
-        accent: AppTheme.textSecondary,
-        onTap: () => context.go('/decks'),
-      ),
-      _QuickActionData(
-        glyph: ManaLoomGlyphKind.collection,
-        title: 'Coleção',
-        accent: AppTheme.textSecondary,
-        onTap: () => context.go('/collection'),
-      ),
-      _QuickActionData(
-        glyph: ManaLoomGlyphKind.trade,
-        title: 'Trocas',
-        accent: AppTheme.brass500,
-        onTap: () => context.go('/collection?tab=2'),
-      ),
+      if (decksAllowed)
+        _QuickActionData(
+          glyph: ManaLoomGlyphKind.deck,
+          title: generateAllowed ? 'Construir deck' : 'Criar deck',
+          accent: AppTheme.brass500,
+          onTap: () =>
+              context.go(generateAllowed ? '/onboarding/core-flow' : '/decks'),
+        ),
+      if (decksAllowed)
+        _QuickActionData(
+          glyph: ManaLoomGlyphKind.deck,
+          title: 'Meus Decks',
+          accent: AppTheme.textSecondary,
+          onTap: () => context.go('/decks'),
+        ),
+      if (collectionAllowed)
+        _QuickActionData(
+          glyph: ManaLoomGlyphKind.collection,
+          title: 'Coleção',
+          accent: AppTheme.textSecondary,
+          onTap: () => context.go('/collection'),
+        ),
+      if (collectionAllowed && tradesAllowed)
+        _QuickActionData(
+          glyph: ManaLoomGlyphKind.trade,
+          title: 'Trocas',
+          accent: AppTheme.brass500,
+          onTap: () => context.go('/collection?tab=2'),
+        ),
     ];
 
     return LayoutBuilder(
@@ -1734,7 +2030,7 @@ class _DecksErrorState extends StatelessWidget {
           const SizedBox(height: AppTheme.space12),
           OutlinedButton.icon(
             key: const Key('home-decks-retry'),
-            onPressed: () => context.read<DeckProvider>().fetchDecks(),
+            onPressed: () => _retryDeckFetch(context),
             icon: const Icon(Icons.refresh_rounded),
             label: const Text('Tentar novamente'),
           ),
@@ -1849,7 +2145,7 @@ class _CachedDecksStatus extends StatelessWidget {
           if (!isLoading)
             IconButton(
               key: const Key('home-decks-cache-retry'),
-              onPressed: () => context.read<DeckProvider>().fetchDecks(),
+              onPressed: () => _retryDeckFetch(context),
               icon: const Icon(Icons.refresh_rounded),
               tooltip: 'Tentar novamente',
               color: AppTheme.brass400,
@@ -1892,6 +2188,12 @@ class _DecksLoadingState extends StatelessWidget {
       ),
     );
   }
+}
+
+void _retryDeckFetch(BuildContext context) {
+  final capabilities = context.read<ReleaseCapabilitiesProvider>();
+  if (!capabilities.isAllowed(ReleaseCapability.decksPrivate)) return;
+  unawaited(context.read<DeckProvider>().fetchDecks());
 }
 
 int _deckTarget(String format) {

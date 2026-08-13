@@ -36,13 +36,14 @@ void main() {
     expect(planMiddleware, isNot(contains('Faça upgrade para continuar')));
   });
 
-  test('plan service persists Pro with renewal window', () {
+  test('plan service keeps legacy Pro activation fail-closed', () {
     final service = File('lib/plan_service.dart').readAsStringSync();
 
     expect(service, contains('Future<UserPlanSnapshot> activatePro'));
-    expect(service, contains("plan_name = 'pro'"));
-    expect(service, contains("renews_at = NOW() + INTERVAL '30 days'"));
-    expect(service, contains('ON CONFLICT (user_id) DO UPDATE'));
+    expect(service, contains('PaidPlanActivationDisabled'));
+    expect(service, isNot(contains("plan_name = 'pro'")));
+    expect(service, isNot(contains("renews_at = NOW() + INTERVAL '30 days'")));
+    expect(service, isNot(contains('2500')));
   });
 
   test('commercial surfaces do not expose deployment instructions', () {

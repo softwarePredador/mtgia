@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-11T18:27:06.598917Z",
-  "source_digest": "643fa0af0cbf0c99d3fcdef7355b17f1b89d04ece14934a02946214c5957d6af",
+  "generated_at": "2026-08-13T17:03:21.932946Z",
+  "source_digest": "7cf7c82d73fbd64a773e926692bf8bc131f8cbab6cd4b2357e76d84efd2c6e01",
   "surface": "visual_system_workspace",
   "profile": "web_visual_system_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "61f59314af15f8dabc6475fcf55fb0014192354d00de3690ae2ea3ab1aaff812",
+  "log_sha256": "289fb787095001f3700f832a2e0875f6b75122261adf484b6f54a644b5b4581a",
   "checkpoint_count": 10,
   "required_checkpoints": [
     "visual_system_00_profile_clean",
@@ -30,40 +30,40 @@
     {
       "checkpoint": "visual_system_00_profile_clean",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_00_profile_clean.png",
-      "sha256": "10c153ec943ac1d4463f24e3f108a89213a8d68ea00576d1e5da51377b5ad4cf",
-      "bytes": 73926,
+      "sha256": "773e92ee6c89c057d3122168020191f55b42065f8f9b034fec5ba5d29071bf4d",
+      "bytes": 72759,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_01_profile_dirty",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_01_profile_dirty.png",
-      "sha256": "a79769b41d59fba8e67a2ddc4b01889e973427ba2a02234a49ab42dd32378b15",
-      "bytes": 71182,
+      "sha256": "630986c6ed52281f4d518cc83e66b91ee0a9267d4fd829a143b5fc8d831c1441",
+      "bytes": 69990,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_02_profile_saving",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_02_profile_saving.png",
-      "sha256": "182e3bfc46399a66b0493b4fe6637333a31964b6865773ecbc0c333813972ce8",
-      "bytes": 70453,
+      "sha256": "2366a37363b7f2b59dbe9a2979872120e83d6b8642fc7e21ed891a36bfed6614",
+      "bytes": 69252,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_03_profile_error",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_03_profile_error.png",
-      "sha256": "3ba72f1dd018451ef0eb9cb7ec9c5cdea2792fa55030fe87c548e7756a98a4bc",
-      "bytes": 72158,
+      "sha256": "96d527f229a81ddb3e1e8a1853fe1f8bf4931704b492151cb923d3ddd96d1d8e",
+      "bytes": 70955,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_04_profile_saved",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_04_profile_saved.png",
-      "sha256": "8c8bc972a9553c781db7cade386a1d5ed8504d9af4d7f3ad525c89b79076b403",
-      "bytes": 70944,
+      "sha256": "9498c926b295179a22a7cb3c48bb6ac2c38b56111d1cff80dd60945b111a7bb2",
+      "bytes": 69741,
       "width": 390,
       "height": 844
     },
@@ -78,8 +78,8 @@
     {
       "checkpoint": "visual_system_06_decks_first_use",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_06_decks_first_use.png",
-      "sha256": "b910e448d1129e709f0078c0f06d3eb4bda1546cac20464e3df982373f053ef8",
-      "bytes": 53965,
+      "sha256": "10cd2dcb198abd3908c3b3b83981e5341b91307da79492ade0f1f2741f049580",
+      "bytes": 49101,
       "width": 390,
       "height": 844
     },

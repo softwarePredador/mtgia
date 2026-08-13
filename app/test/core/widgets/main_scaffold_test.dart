@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/main_scaffold.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
@@ -50,6 +52,7 @@ Future<void> _pumpAt(
   WidgetTester tester, {
   required Size size,
   required String location,
+  ReleaseCapabilitiesProvider? capabilities,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -57,8 +60,14 @@ Future<void> _pumpAt(
   addTearDown(tester.view.resetDevicePixelRatio);
   final router = _routerFor(location);
   addTearDown(router.dispose);
+  final app = MaterialApp.router(
+    theme: AppTheme.darkTheme,
+    routerConfig: router,
+  );
   await tester.pumpWidget(
-    MaterialApp.router(theme: AppTheme.darkTheme, routerConfig: router),
+    capabilities == null
+        ? app
+        : ChangeNotifierProvider.value(value: capabilities, child: app),
   );
   await tester.pumpAndSettle();
 }
@@ -68,7 +77,17 @@ void main() {
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
-    await _pumpAt(tester, size: const Size(390, 844), location: '/home');
+    final capabilities = ReleaseCapabilitiesProvider.seeded(const {
+      ReleaseCapability.decksPrivate,
+      ReleaseCapability.collectionPrivate,
+    });
+    addTearDown(capabilities.dispose);
+    await _pumpAt(
+      tester,
+      size: const Size(390, 844),
+      location: '/home',
+      capabilities: capabilities,
+    );
 
     expect(find.byKey(const Key('main-bottom-navigation')), findsOneWidget);
     expect(find.byKey(const Key('main-navigation-rail')), findsNothing);
@@ -89,7 +108,6 @@ void main() {
     );
     for (final kind in const [
       ManaLoomGlyphKind.brand,
-      ManaLoomGlyphKind.community,
       ManaLoomGlyphKind.player,
     ]) {
       expect(
@@ -99,8 +117,41 @@ void main() {
         findsWidgets,
       );
     }
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph &&
+            widget.kind == ManaLoomGlyphKind.community,
+      ),
+      findsNothing,
+    );
     await expectManaLoomBaselineAccessibility(tester);
     semantics.dispose();
+  });
+
+  testWidgets('shows Community when one composable surface is allowed', (
+    tester,
+  ) async {
+    final capabilities = ReleaseCapabilitiesProvider.seeded(const {
+      ReleaseCapability.galleryPublic,
+    });
+    addTearDown(capabilities.dispose);
+
+    await _pumpAt(
+      tester,
+      size: const Size(390, 844),
+      location: '/home',
+      capabilities: capabilities,
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ManaLoomGlyph &&
+            widget.kind == ManaLoomGlyphKind.community,
+      ),
+      findsWidgets,
+    );
   });
 
   testWidgets('uses navigation rail on wide primary screens', (tester) async {

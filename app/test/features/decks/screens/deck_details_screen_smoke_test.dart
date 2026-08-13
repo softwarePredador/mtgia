@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
@@ -208,6 +209,10 @@ Future<GoRouter> _pumpScreen(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+        ),
         ChangeNotifierProvider<DeckProvider>.value(value: provider),
         ChangeNotifierProvider<CardProvider>(
           create: (_) => CardProvider(apiClient: apiClient),
@@ -388,6 +393,10 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(
+              create: (_) =>
+                  ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+            ),
             ChangeNotifierProvider<DeckProvider>.value(value: provider),
             ChangeNotifierProvider<CardProvider>(
               create: (_) => CardProvider(apiClient: apiClient),

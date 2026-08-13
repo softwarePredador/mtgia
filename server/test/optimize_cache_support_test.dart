@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
@@ -40,13 +42,14 @@ void main() {
         intensity: 'aggressive',
       );
 
-      expect(focused, startsWith('v19:'));
+      expect(focused, startsWith('v20:'));
+      expect(focused.split(':').last, hasLength(64));
       expect(focused, equals(focusedAgain));
       expect(aggressive, isNot(equals(focused)));
     });
 
     test(
-      'buildOptimizeCacheKey keeps legacy key unless context is present',
+      'buildOptimizeCacheKey keeps base key shape unless context is present',
       () {
         final withoutContext = cache_support.buildOptimizeCacheKey(
           deckId: 'deck-1',
@@ -169,13 +172,32 @@ void main() {
       },
     );
 
-    test('stableOptimizeHash returns deterministic lowercase hex', () {
+    test('stableOptimizeHash returns deterministic SHA-256 lowercase hex', () {
       final first = cache_support.stableOptimizeHash('mana-loom');
       final second = cache_support.stableOptimizeHash('mana-loom');
 
       expect(first, equals(second));
-      expect(first, matches(RegExp(r'^[0-9a-f]+$')));
+      expect(
+        first,
+        '713c200c7b37efe69a885f11ddc33e978e44aece898e361f0301915ec5d3cce6',
+      );
+      expect(first, matches(RegExp(r'^[0-9a-f]{64}$')));
       expect(cache_support.stableOptimizeHash('mana-loon'), isNot(first));
+    });
+
+    test('cache reads are scoped to tenant, deck and exact signature', () {
+      final source =
+          File('lib/ai/optimize_cache_support.dart').readAsStringSync();
+
+      expect(source, contains('required String userId'));
+      expect(source, contains('required String deckId'));
+      expect(source, contains('required String deckSignature'));
+      expect(source, contains('AND user_id = CAST(@user_id AS uuid)'));
+      expect(source, contains('AND deck_id = CAST(@deck_id AS uuid)'));
+      expect(source, contains('AND deck_signature = @deck_signature'));
+      expect(source, contains("'user_id': userId"));
+      expect(source, contains("'deck_id': deckId"));
+      expect(source, contains("'deck_signature': deckSignature"));
     });
   });
 }

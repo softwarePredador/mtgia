@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
@@ -243,6 +244,10 @@ Future<void> _pumpDecks(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+        ),
         ChangeNotifierProvider<DeckProvider>(
           create: (_) => deckProvider ?? _StaticDeckProvider(decks ?? _decks()),
         ),
@@ -301,6 +306,10 @@ Future<void> _pumpOnboardingCreate(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+        ),
         ChangeNotifierProvider<DeckProvider>.value(value: deckProvider),
         ChangeNotifierProvider<CardProvider>(
           create: (_) => _CommanderCardProvider(const []),

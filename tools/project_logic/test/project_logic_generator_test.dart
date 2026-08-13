@@ -99,6 +99,7 @@ void main() {
           .length,
       greaterThanOrEqualTo(130),
     );
+    expect(digestInputs.toSet().length, digestInputs.length);
   });
 
   test('keeps the complete battle sidecar source surface in lineage', () {
@@ -149,6 +150,220 @@ void main() {
       canonicalDocuments,
       contains('docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md'),
     );
+    expect(
+      canonicalDocuments,
+      contains('docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md'),
+    );
+    expect(
+      canonicalDocuments,
+      contains('docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md'),
+    );
+    expect(
+      canonicalDocuments,
+      contains('docs/adr/0012-xmage-human-spike-go.md'),
+    );
+    expect(
+      canonicalDocuments,
+      isNot(contains('docs/adr/0004-xmage-human-spike-go.md')),
+    );
+  });
+
+  test(
+    'publishes a validated task registry with an acyclic dependency DAG',
+    () {
+      final registry = result.manifest['task_registry'] as Map<String, Object?>;
+      final tasks = (registry['tasks'] as List<dynamic>)
+          .cast<Map<String, Object?>>();
+      final ids = tasks.map((task) => task['id']! as String).toList();
+      final idsSet = ids.toSet();
+      final topologicalOrder = (registry['topological_order'] as List<dynamic>)
+          .cast<String>();
+      final guards = registry['guards'] as Map<String, Object?>;
+
+      expect(registry['schema_version'], 1);
+      expect(registry['task_count'], 217);
+      expect(tasks, hasLength(217));
+      expect(idsSet, hasLength(ids.length));
+      expect(ids.where((id) => id.contains('*') || id.contains('..')), isEmpty);
+      expect(topologicalOrder, hasLength(tasks.length));
+      expect(topologicalOrder.toSet(), idsSet);
+      expect(
+        tasks.expand(
+          (task) => (task['depends_on'] as List<dynamic>).cast<String>(),
+        ),
+        everyElement(isIn(idsSet)),
+      );
+      expect(guards, containsPair('dependency_graph_acyclic', true));
+      expect(guards, containsPair('out_of_table_task_definitions', 0));
+
+      final databaseBaseline = tasks.singleWhere(
+        (task) => task['id'] == 'BT-DB-005',
+      );
+      final legacyAiLane = tasks.singleWhere(
+        (task) => task['id'] == 'BT-AI-027',
+      );
+      expect(databaseBaseline['depends_on'], ['BT-DB-001']);
+      expect(legacyAiLane['depends_on'], contains('BT-DB-005'));
+
+      final generated =
+          jsonDecode(result.outputs['docs/generated/TASK_REGISTRY.json']!)
+              as Map<String, dynamic>;
+      expect(
+        generated['project_logic_source_digest_sha256'],
+        result.manifest['source_digest_sha256'],
+      );
+      expect(generated['task_count'], tasks.length);
+    },
+  );
+
+  test(
+    'rejects duplicate, unresolved, cyclic and shorthand task definitions',
+    () {
+      final generator = ProjectLogicGenerator(root);
+      const header = '''
+| ID | Pri. | Estado | Entrega | Depende de | Aceite mínimo |
+|---|---|---|---|---|---|
+''';
+      String row(String id, String dependencies) =>
+          '| `$id` | P1 | TODO | Entrega. | $dependencies | Aceite. |';
+
+      expect(
+        () => generator.taskBacklogForTesting(
+          '$header${row('BT-TST-001', '—')}\n'
+          '${row('BT-TST-001', '—')}',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      expect(
+        () => generator.taskBacklogForTesting(
+          '$header${row('BT-TST-001', '`BT-TST-404`')}',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      expect(
+        () => generator.taskBacklogForTesting(
+          '$header${row('BT-TST-001', '`BT-TST-002`')}\n'
+          '${row('BT-TST-002', '`BT-TST-001`')}',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      expect(
+        () => generator.taskBacklogForTesting(
+          '$header${row('BT-TST-001', '`BT-TST-002..003`')}',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      expect(
+        () => generator.taskBacklogForTesting(
+          '- `BT-TST-001`: definição fora da tabela',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      expect(
+        () => generator.taskBacklogForTesting(
+          '$header| BT-TST-001 | P1 | TODO | Entrega. | — | Aceite. |',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+    },
+  );
+
+  test('resolves document lifecycle, route consumers and receipt bindings', () {
+    final registry = result.manifest['task_registry'] as Map<String, Object?>;
+    final lifecycle =
+        registry['documentation_lifecycle'] as Map<String, Object?>;
+    final canonical = (lifecycle['canonical_documents'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+    final overrides = (lifecycle['document_overrides'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+    final routes = (registry['route_consumers'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+    final receipts = (registry['receipt_contracts'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+
+    expect(
+      canonical.singleWhere(
+        (document) =>
+            document['path'] == 'docs/status/CURRENT_PRODUCT_DECISION.md',
+      )['state'],
+      'current_decision',
+    );
+    expect(
+      canonical.singleWhere(
+        (document) =>
+            document['path'] ==
+            'docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md',
+      )['state'],
+      'current_task_index',
+    );
+    for (final path in [
+      'docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md',
+      'docs/MANALOOM_BATTLE_LAB_TRACKER.md',
+    ]) {
+      expect(
+        overrides.singleWhere((document) => document['path'] == path)['state'],
+        'historical_evidence',
+      );
+      expect(
+        canonical.map((document) => document['path']),
+        isNot(contains(path)),
+      );
+    }
+
+    final generate = routes.singleWhere(
+      (route) =>
+          route['flow_id'] == 'deck_ai' &&
+          route['entrypoint'] == '/ai/generate',
+    );
+    expect(generate['surfaces'], contains('api'));
+    expect(
+      generate['consumers'],
+      contains(
+        'app/lib/features/decks/providers/deck_provider_support_ai.dart',
+      ),
+    );
+    expect(
+      generate['receipt_contract_ids'],
+      contains('deck_ai_learning_gate_v2'),
+    );
+    final battleCoach = routes.singleWhere(
+      (route) =>
+          route['flow_id'] == 'battle_replay' &&
+          route['entrypoint'] == '/decks/{id}/battle-coach',
+    );
+    expect(battleCoach['surfaces'], contains('app'));
+
+    final deckReceipt = receipts.singleWhere(
+      (receipt) => receipt['id'] == 'deck_ai_learning_gate_v2',
+    );
+    expect(
+      deckReceipt['required_bindings'],
+      containsAll([
+        'project_logic_source_digest',
+        'source.start',
+        'source.end',
+        'source.stable',
+        'evidence.artifact_manifest_sha256',
+        'release_eligible',
+      ]),
+    );
+    expect(deckReceipt['allowed_statuses'], [
+      'PASS_CODE_ONLY',
+      'PASS',
+      'BLOCKED',
+      'FAIL',
+    ]);
+
+    final e2eReceipt = receipts.singleWhere(
+      (receipt) => receipt['id'] == 'manaloom_e2e_suite_v1',
+    );
+    final statusSemantics =
+        e2eReceipt['status_semantics'] as Map<String, dynamic>;
+    expect(statusSemantics['PARTIAL'], {
+      'strict_exit_code': 3,
+      'diagnostic_gate_eligible': false,
+    });
+    expect(e2eReceipt['required_bindings'], contains('gate_eligible'));
   });
 
   test('extracts imported SQL schema constants without comment pollution', () {

@@ -82,6 +82,8 @@ run_shell_contracts() {
   print_header "Contratos dos gates locais"
   bash -n \
     "$ROOT_DIR/scripts/manaloom_local_ci.sh" \
+    "$ROOT_DIR/scripts/manaloom_e2e_suite.sh" \
+    "$ROOT_DIR/scripts/quality_gate.sh" \
     "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" \
     "$ROOT_DIR/scripts/manaloom_ui_source_digest.sh" \
     "$ROOT_DIR/scripts/manaloom_tbls_local_gate.sh" \
@@ -204,6 +206,13 @@ run_battle_gate() {
   "$ROOT_DIR/scripts/quality_gate.sh" battle
 }
 
+run_strict_e2e_gate() {
+  print_header "E2E integrado estrito"
+  # O local CI nunca seleciona --allow-partial. Um SKIP/PARTIAL precisa
+  # interromper o wrapper antes da mensagem final de PASS.
+  "$ROOT_DIR/scripts/quality_gate.sh" e2e
+}
+
 run_quick() {
   run_shell_contracts
   run_commander_game_changer_source
@@ -239,7 +248,7 @@ case "$MODE" in
     ;;
   e2e)
     run_full
-    "$ROOT_DIR/scripts/quality_gate.sh" e2e
+    run_strict_e2e_gate
     ;;
   release)
     run_full

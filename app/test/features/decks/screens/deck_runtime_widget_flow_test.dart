@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/widgets/manaloom_glyph.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/login_screen.dart';
@@ -492,6 +493,16 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+            ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+              create: (_) => ReleaseCapabilitiesProvider.seeded(const [
+                ReleaseCapability.accountRegistration,
+                ReleaseCapability.catalogPrivate,
+                ReleaseCapability.decksPrivate,
+                ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+                ReleaseCapability.aiGenerateRebuild,
+                ReleaseCapability.deckReplaceAll,
+              ]),
+            ),
             ChangeNotifierProvider<DeckProvider>.value(value: deckProvider),
             ChangeNotifierProvider<CardProvider>(
               create: (_) => CardProvider(apiClient: apiClient),

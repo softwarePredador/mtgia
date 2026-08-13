@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | BrewTact"
   },
   description:
-    "Construa, otimize e acompanhe decks de Commander com IA, relatórios compartilháveis e mercado de cartas.",
+    "Construa, organize e revise decks de Commander com IA explicável e relatórios compartilháveis.",
   icons: {
     icon: "/branding/app_logo.png",
     apple: "/branding/app_logo.png"
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "BrewTact",
     title: "BrewTact - Commander com IA explicável",
     description:
-      "Deck builder, relatórios de otimização, coleção e mercado para Commander.",
+      "Deck builder, coleção privada e sugestões revisáveis para Commander.",
     url: absoluteUrl("/")
   }
 };

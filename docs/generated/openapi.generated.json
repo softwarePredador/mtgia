@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "cb7dd3683053d75a711c5532cfb548b0ad1a7d5fb7cea17c6df4cf244554f611",
+  "x-manaloom-source-digest-sha256": "81ac7eb69bd81aced48e59b6d5fbcb0c14d38caa9976cc43cfb73a04b8a3b6a6",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1595,6 +1595,30 @@
               "type": "string"
             }
           }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/capabilities": {
+      "get": {
+        "operationId": "getCapabilities",
+        "summary": "GET /capabilities",
+        "tags": [
+          "capabilities"
+        ],
+        "x-manaloom-source": "server/routes/capabilities/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/test/core/config/release_capabilities_test.dart"
         ],
         "security": [
           {

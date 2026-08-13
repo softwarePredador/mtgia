@@ -48,6 +48,18 @@ void main() {
       },
     );
 
+    test('generate previews never write product-learning events', () {
+      final generateRoute =
+          File('routes/ai/generate/index.dart').readAsStringSync();
+      final learningSupport =
+          File('lib/ai/deck_learning_event_support.dart').readAsStringSync();
+
+      expect(generateRoute, isNot(contains('logGeneratedDeckForLearning')));
+      expect(generateRoute, isNot(contains("source: 'ai_generated'")));
+      expect(learningSupport, isNot(contains('logGeneratedDeckForLearning')));
+      expect(learningSupport, isNot(contains('gen_random_uuid()')));
+    });
+
     test(
       'deterministic generate source precedence names learned deck first',
       () {

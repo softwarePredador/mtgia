@@ -11,6 +11,7 @@ import 'battle/battle_live_source_client.dart';
 import 'battle/interactive_battle_contract.dart';
 import 'battle/interactive_battle_runtime_client.dart';
 import 'openai_runtime_config.dart';
+import 'release_capability_policy.dart';
 
 class AiRuntimeReadiness {
   const AiRuntimeReadiness({required this.healthy, required this.check});
@@ -97,6 +98,16 @@ class ReleaseSchemaReadiness {
 
   final bool healthy;
   final Map<String, dynamic> check;
+}
+
+class ReleaseCapabilityRuntimeReadiness {
+  const ReleaseCapabilityRuntimeReadiness({
+    required this.healthy,
+    required this.checks,
+  });
+
+  final bool healthy;
+  final Map<String, dynamic> checks;
 }
 
 const requiredReleaseSchemaMigrations = <String, String>{
@@ -1634,6 +1645,87 @@ AiRuntimeReadiness evaluateAiRuntimeReadiness(DotEnv env) {
       if (!healthy) 'error_code': 'ai_provider_not_ready',
     },
   );
+}
+
+/// Evaluates only runtime dependencies for capabilities exposed by the
+/// current release policy. Disabled capabilities are healthy-by-absence: they
+/// do not probe providers, workers, engines, schemas, or PostgreSQL.
+Future<ReleaseCapabilityRuntimeReadiness>
+evaluateReleaseCapabilityRuntimeReadiness({
+  required ReleaseCapabilityPolicy policy,
+  required DotEnv env,
+  Pool? pool,
+}) async {
+  final checks = <String, dynamic>{};
+  var healthy = true;
+
+  if (policy.isAllowed('battle_batch')) {
+    final worker = evaluateBattleJobWorkerReadiness(env);
+    checks['battle_job_worker'] = worker.check;
+    healthy = healthy && worker.healthy;
+
+    final runtime = await evaluateBattleRuntimeReadiness(env);
+    checks['battle_runtime'] = runtime.check;
+    healthy = healthy && runtime.healthy;
+  } else {
+    checks['battle_job_worker'] = disabledReleaseCapabilityReadinessCheck(
+      policy,
+      'battle_batch',
+    );
+    checks['battle_runtime'] = disabledReleaseCapabilityReadinessCheck(
+      policy,
+      'battle_batch',
+    );
+  }
+
+  if (policy.isAllowed('ai_analyze_optimize_advisory') ||
+      policy.isAllowed('ai_generate_rebuild')) {
+    final runtime = evaluateAiRuntimeReadiness(env);
+    checks['ai_runtime'] = runtime.check;
+    healthy = healthy && runtime.healthy;
+  } else {
+    checks['ai_runtime'] = disabledReleaseCapabilityReadinessCheck(
+      policy,
+      'ai_analyze_optimize_advisory',
+    );
+  }
+
+  if (policy.isAllowed('battle_live')) {
+    final live = await evaluateBattleLiveSpectatorReadiness(env, pool);
+    checks['battle_live_spectator'] = live.check;
+    healthy = healthy && live.healthy;
+  } else {
+    checks['battle_live_spectator'] = disabledReleaseCapabilityReadinessCheck(
+      policy,
+      'battle_live',
+    );
+  }
+
+  if (policy.isAllowed('battle_coach')) {
+    final interactive = await evaluateInteractiveBattleReadiness(env, pool);
+    checks['interactive_battle'] = interactive.check;
+    healthy = healthy && interactive.healthy;
+  } else {
+    checks['interactive_battle'] = disabledReleaseCapabilityReadinessCheck(
+      policy,
+      'battle_coach',
+    );
+  }
+
+  return ReleaseCapabilityRuntimeReadiness(healthy: healthy, checks: checks);
+}
+
+Map<String, Object?> disabledReleaseCapabilityReadinessCheck(
+  ReleaseCapabilityPolicy policy,
+  String capability,
+) {
+  final entry = policy.entry(capability);
+  return {
+    'status': 'disabled',
+    'capability': capability,
+    'release_capability': entry.releaseCapability,
+    'policy_digest_sha256': policy.policyDigestSha256,
+  };
 }
 
 Map<String, dynamic> buildReadinessResponseBody({

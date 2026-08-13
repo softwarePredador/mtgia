@@ -1,5 +1,11 @@
 # Hermes next steps - PostgreSQL optimizer loop
 
+> **HISTORICAL / SUPERSEDED — DO NOT EXECUTE.** Os comandos abaixo registram
+> uma operação de 2026-06-09 e não autorizam segredo, sync, `--apply-pg` ou
+> qualquer escrita. Use o fluxo corrente e as contenções em
+> `../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md` e as tasks
+> `BT-AI-014`, `BT-DB-004` e `DCK-P0-05`.
+
 Date: 2026-06-09
 Scope: make Hermes use PostgreSQL as the reviewable source of truth for battle
 rules and keep SQLite only as the fast runtime cache for simulations.

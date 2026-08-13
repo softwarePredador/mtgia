@@ -140,7 +140,7 @@ void main() {
     await _pumpAt(tester, const Size(390, 900), const CheckoutScreen());
 
     expect(find.byKey(const Key('checkout-beta-notice')), findsOneWidget);
-    expect(find.text('Checkout não é necessário'), findsOneWidget);
+    expect(find.text('Checkout não está disponível'), findsOneWidget);
     expect(find.byKey(const Key('checkout-confirm-button')), findsNothing);
     expect(find.textContaining('R\$'), findsNothing);
     expect(
@@ -180,7 +180,7 @@ void main() {
     await _pumpAt(tester, const Size(390, 1000), const UpgradeScreen());
 
     expect(find.byKey(const Key('upgrade-beta-notice')), findsOneWidget);
-    expect(find.text('Você já está na versão disponível'), findsOneWidget);
+    expect(find.text('Não há upgrade nesta fase'), findsOneWidget);
     expect(
       find.byKey(const Key('upgrade-start-checkout-button')),
       findsNothing,

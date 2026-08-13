@@ -1,5 +1,9 @@
 # ManaLoom Project Revalidation And Global Card Queue
 
+> **HISTORICAL / SUPERSEDED.** O alinhamento descrito aqui pertence à rodada de
+> 2026-07-14; não autoriza fila global, import, promoção ou escrita atual. Use o
+> mapa corrente e as capabilities default-off.
+
 Date: 2026-07-14
 
 ## Verdict

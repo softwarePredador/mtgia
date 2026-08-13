@@ -15,6 +15,7 @@ const _allowedEvents = <String>{
   'deck_created',
   'deck_generated',
   'deck_optimized',
+  'optimize_preview_received',
   'deck_rebuild_created',
   'onboarding_completed',
   'onboarding_skipped',

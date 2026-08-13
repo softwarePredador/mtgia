@@ -5,8 +5,8 @@
 ```mermaid
 flowchart LR
     UI["Flutter app (20 módulos)"] --> API["Dart Frog routes"]
-    WEB["Next.js público (14 rotas)"] --> API
-    API --> DOMAIN["Backend services (131 módulos)"]
+    WEB["Next.js público (11 rotas)"] --> API
+    API --> DOMAIN["Backend services (133 módulos)"]
     DOMAIN --> PG[("PostgreSQL — fonte de verdade")]
     DOMAIN --> AI["Deckbuilder / Optimize"]
     DOMAIN --> BATTLE["Battle router"]

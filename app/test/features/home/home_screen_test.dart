@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/widgets/card_artwork.dart';
@@ -31,6 +32,15 @@ class _IdleDeckProvider extends DeckProvider {
 
   @override
   Future<void> fetchDecks({bool silent = false}) async {}
+}
+
+class _CountingDeckProvider extends _IdleDeckProvider {
+  int fetchCalls = 0;
+
+  @override
+  Future<void> fetchDecks({bool silent = false}) async {
+    fetchCalls += 1;
+  }
 }
 
 class _SeededDeckProvider extends _IdleDeckProvider {
@@ -150,15 +160,37 @@ class _MemoryOnboardingRepository implements OnboardingStateRepository {
   }
 }
 
+const _homeFixtureCapabilities = <ReleaseCapability>{
+  ReleaseCapability.catalogPrivate,
+  ReleaseCapability.decksPrivate,
+  ReleaseCapability.collectionPrivate,
+  ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+  ReleaseCapability.aiGenerateRebuild,
+  ReleaseCapability.lifeCounterLocal,
+  ReleaseCapability.galleryPublic,
+  ReleaseCapability.profilesPublic,
+  ReleaseCapability.comments,
+  ReleaseCapability.follows,
+  ReleaseCapability.userSearch,
+  ReleaseCapability.binderPublic,
+  ReleaseCapability.trades,
+  ReleaseCapability.marketplace,
+  ReleaseCapability.learningWrites,
+};
+
 Widget _buildSubject({
   bool? lifeCounterAvailable,
   List<Deck> decks = const [],
   DeckProvider? deckProvider,
   bool disableAnimations = false,
   double textScale = 1,
+  Set<ReleaseCapability> allowedCapabilities = _homeFixtureCapabilities,
 }) {
   return MultiProvider(
     providers: [
+      ChangeNotifierProvider(
+        create: (_) => ReleaseCapabilitiesProvider.seeded(allowedCapabilities),
+      ),
       ChangeNotifierProvider<AuthProvider>(
         create: (_) => AuthProvider(apiClient: _NoopApiClient()),
       ),
@@ -198,6 +230,7 @@ Future<GoRouter> _pumpNavigationSubject(
   String userId = '',
   OnboardingStateRepository? onboardingStateRepository,
   VoidCallback? onOnboardingSettled,
+  Set<ReleaseCapability> allowedCapabilities = _homeFixtureCapabilities,
 }) async {
   final router = GoRouter(
     initialLocation: '/home',
@@ -257,6 +290,10 @@ Future<GoRouter> _pumpNavigationSubject(
     MultiProvider(
       key: ValueKey<GoRouter>(router),
       providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              ReleaseCapabilitiesProvider.seeded(allowedCapabilities),
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (_) => AuthProvider(apiClient: _NoopApiClient()),
         ),
@@ -350,6 +387,40 @@ void main() {
     );
   });
 
+  testWidgets(
+    'all-off release exposes no product CTA and starts no deck fetch',
+    (tester) async {
+      final deckProvider = _CountingDeckProvider();
+
+      await tester.pumpWidget(
+        _buildSubject(
+          deckProvider: deckProvider,
+          allowedCapabilities: const {},
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 900));
+
+      expect(find.text('Beta em preparação'), findsOneWidget);
+      expect(
+        find.text(
+          'Os recursos desta versão ainda não foram liberados para uso.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('home-hero-frame')), findsNothing);
+      expect(find.text('Jogar agora'), findsNothing);
+      expect(find.text('Construir deck'), findsNothing);
+      expect(find.text('Abrir coleção'), findsNothing);
+      expect(find.text('Comunidade'), findsNothing);
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byType(OutlinedButton), findsNothing);
+      expect(find.byType(TextButton), findsNothing);
+      expect(find.byType(IconButton), findsNothing);
+      expect(deckProvider.fetchCalls, 0);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('reduced motion skips the home entrance animation', (
     tester,
   ) async {
@@ -370,7 +441,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('Jogar agora'), findsNothing);
-    expect(find.text('Montar deck'), findsOneWidget);
+    expect(find.text('Abrir decks'), findsOneWidget);
     expect(find.text('Comunidade'), findsOneWidget);
     expect(find.text('Construir deck'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -467,7 +538,7 @@ void main() {
     tester,
   ) async {
     final cases = <({Finder finder, String route})>[
-      (finder: find.text('Montar deck'), route: '/onboarding/core-flow'),
+      (finder: find.text('Abrir decks'), route: '/decks'),
       (finder: find.text('Comunidade'), route: '/community'),
       (finder: find.text('Construir deck'), route: '/onboarding/core-flow'),
       (finder: find.text('Meus Decks'), route: '/decks'),
@@ -555,7 +626,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Seu primeiro\ndeck começa aqui'), findsOneWidget);
-    expect(find.text('Continuar montagem'), findsOneWidget);
+    expect(find.text('Criar deck'), findsWidgets);
     expect(find.text('Continue\nDeck anterior'), findsNothing);
 
     await tester.tap(find.byKey(const Key('home-primary-action')));
@@ -897,7 +968,7 @@ void main() {
       expect(frame.right, lessThanOrEqualTo(size.width), reason: '$size right');
       expect(frame.height, 190, reason: '$size height');
       expect(find.byKey(const Key('home-quick-actions-list')), findsOneWidget);
-      expect(find.text('Montar deck'), findsOneWidget);
+      expect(find.text('Abrir decks'), findsOneWidget);
       expect(tester.takeException(), isNull, reason: '$size overflow');
     }
   });
@@ -920,7 +991,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Montar deck'), findsOneWidget);
+    expect(find.text('Abrir decks'), findsOneWidget);
     expect(find.text('Decks recentes'), findsOneWidget);
     expect(
       tester.getSize(find.byKey(const Key('home-hero-frame'))).height,

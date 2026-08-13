@@ -1,5 +1,9 @@
 # Hermes Analysis: UI Actionable Tasks
 
+> **HISTORICAL / SUPERSEDED.** Não abra nem priorize trabalho deste backlog.
+> Toda task corrente deve existir em
+> `../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.
+
 > Status atual: backlog UI/produto.
 > Nao e contrato Hermes runtime. Revalide visualmente no app antes de tratar
 > qualquer item como atual.

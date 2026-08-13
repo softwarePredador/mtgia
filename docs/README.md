@@ -1,4 +1,4 @@
-# Documentacao ativa do ManaLoom
+# Documentação ativa do BrewTact
 
 Este diretorio agora serve como indice curto. Relatorios antigos continuam no
 repositorio como historico/prova, mas nao devem guiar implementacao sem checar
@@ -6,6 +6,22 @@ as fontes canônicas abaixo.
 
 ## Entrada canônica atual
 
+1. `docs/status/CURRENT_PRODUCT_DECISION.md`
+   - decisão curta que prevalece para estado de release, beta gratuita,
+     plataformas, destinos, oferta e matriz de capabilities. Se uma evidência
+     datada divergir dela, a evidência continua histórica e não reabre escopo.
+     Com a matriz totalmente `OFF`, a Web pública é informativa e não oferece
+     CTA ou link para `/app`.
+1. `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`
+   - backlog mestre vigente de produto, lógica, arquitetura, UX image-led,
+     dados, Battle horizontal, segurança, release e jurídico. Ele define
+     prioridades, dependências, critérios de aceite e o que fica fora de cada
+     fase; não substitui manifesto gerado, contratos nem receipts de prova.
+1. `docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`
+   - mapa manual canônico do fluxo real de Deckbuilder, Analyze, Generate,
+     Optimize/Complete, Rebuild, aprendizado e Battle; separa PostgreSQL de
+     Hermes, telemetria de promoção, contenções já aplicadas e gaps que precisam
+     fechar antes dos ajustes finais.
 1. `docs/generated/CURRENT_SYSTEM.md` e `project_logic_manifest.json`
    - inventário estrutural e semântico gerado de módulos, símbolos, tipos e
      chamadas resolvidos, rotas, API, migrations, tabelas, scripts, variáveis
@@ -25,35 +41,29 @@ as fontes canônicas abaixo.
        impedem chamar a rodada de concluída ou publicada. No Lorehold, `16/16`
        valida apenas o mecanismo estatístico; o gate real continua `BLOCKED` e
        o deck `607` permanece como baseline protegido.
-2. `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`
-   - decisão go/no-go da beta gratuita Web + Android: escopo, segurança,
-     identidade de mesma SHA, evidências confirmadas, bloqueios, ordem de
-     promoção, rollback e checklist final. E2E, resolution, Patrol, builds,
-     runtime local, restore isolado e `full` já têm prova; gates externos
-     e demais P0 permanecem abertos, portanto o estado continua NO-GO.
-3. `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md`
+1. `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md`
    - auditoria canônica de produto e experiência do app: inventário de rotas e
      telas, necessidades dos jogadores, sistema visual, fluxos interligados,
      correções, riscos P0-P2 e estado verificável dos gates.
-4. `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`
+1. `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`
    - contratos fail-closed de build/publicação, CORS, observabilidade,
      backup off-site, restore isolado, SBOM/provenance e provas externas.
-5. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
+1. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
    - perfis de execução, autorização de mutações, matriz de gates e critérios
      separados de conclusão local e de release.
-6. `docs/CONTEXTO_PRODUTO_ATUAL.md`
+1. `docs/CONTEXTO_PRODUTO_ATUAL.md`
    - prioridade operacional vigente e ponte para a evidência mais recente.
-7. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
+1. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
    - evidência fechada, remoções, resultados, resíduos e bloqueadores de release
      da rodada anterior; não substitui os gates do candidato de 2026-07-16.
-8. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
+1. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
    - auditoria final de battle, deckbuilder, famílias, cargas PostgreSQL,
      cobertura externa e pendências de produto.
-9. `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md`
+1. `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md`
    - programa posterior à baseline da Sprint 5: integridade dos logs, entrada
      pela Análise, replay visual, insights, acompanhamento ao vivo, spike XMage
      e Coach Mode, com dependências, critérios de aceite, gates e estimativas.
-10. `docs/MANALOOM_BATTLE_LAB_TRACKER.md`
+1. `docs/MANALOOM_BATTLE_LAB_TRACKER.md`
     - estado operacional do programa pós-S10, dependências, owners, gates e
       evidências por sprint, sem reabrir a prova histórica de S5.
 
@@ -62,6 +72,13 @@ as fontes canônicas abaixo.
 Os documentos abaixo preservam decisões e provas de suas datas. Consulte-os
 quando a área exigir profundidade, mas não use um status antigo para substituir
 o contrato ou a evidência corrente.
+
+1. `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`
+   - `HISTORICAL_EVIDENCE`: candidato antigo que incluía Battle, social e
+     trades. Não representa o escopo reduzido nem a oferta atual.
+1. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_LIFE_COUNTER_RELEASE_2026-07-17.md`
+   - `HISTORICAL_EVIDENCE`: fechamento local dos três módulos naquela revisão;
+     não habilita Battle, não comprova deploy e não substitui a decisão atual.
 
 1. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
     - snapshot mestre da lógica em 2026-06-11. Continua útil para profundidade,
@@ -120,7 +137,8 @@ o contrato ou a evidência corrente.
      promotion gate, correção de chave por `card_id` no cache operacional e
      próximos templates P1 para battle/deckbuilding.
 15. `server/manual-de-instrucao.md`
-   - diario operacional e ultimas decisoes aplicadas.
+   - diário histórico/superseded; preserva contexto, mas não é fonte de ordem,
+     comando ou decisão operacional corrente.
 16. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
 17. `app/doc/APP_AUDIT_2026-04-29.md`
@@ -174,12 +192,11 @@ o contrato ou a evidência corrente.
 - Tags funcionais/deck analysis: `server/doc/RELATORIO_FUNCTIONAL_CARD_TAGS_V1_2026-05-18.md` e
   `server/doc/RELATORIO_FUNCTIONAL_CARD_TAGS_MASS_AUDIT_2026-05-18.md`.
 
-## Scanner
+## Scanner — evidência histórica
 
-O Scanner/OCR integra o alvo Android release desde a prova S4-07. O script
-assinado e os probes Android locais passam `ENABLE_SCANNER_RELEASE=true`; Web,
-desenvolvimento comum e iOS sem cadeia física mantêm a rota ausente e recuperam
-deep links para busca manual. A evidência canônica está em
+O Scanner/OCR integrou um candidato Android na prova S4-07. Isso não o habilita
+na beta corrente: `BT-SCN-00` exige capability OFF no app e na API até os gates
+de impressão, hardware e arte fecharem. A evidência histórica está em
 `docs/qa/MANALOOM_SPRINT4_CORE_EVIDENCE_2026-07-22.md`; documentos antigos de
 scanner continuam históricos e não substituem essa prova.
 
@@ -195,5 +212,6 @@ scanner continuam históricos e não substituem essa prova.
 - Artefatos com payload sensivel devem ser redigidos ou removidos; nao versionar
   JWT, tokens, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails reais,
   decklists completas ou headers de Authorization.
-- Ao criar nova decisao app-facing, atualize primeiro `server/manual-de-instrucao.md`
+- Ao criar decisão app-facing, atualize primeiro o backlog/contrato/ADR vigente
   e `server/doc/API_CONTRACTS_AND_DATA_MAP.md` quando houver contrato envolvido.
+  Não atualize o manual histórico como fonte de autoridade.

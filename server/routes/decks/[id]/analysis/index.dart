@@ -14,6 +14,7 @@ import '../../../../lib/ai/optimization_ramp_profile.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../../lib/meta/meta_deck_format_support.dart';
+import '../../../../lib/release_capability_policy.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.get) {
@@ -526,6 +527,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           format: format,
           hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
           hasSemanticV2: hasSemanticV2,
+          releasePolicy: context.read<ReleaseCapabilityPolicy>(),
         ),
         'meta_analysis': metaAnalysis,
         'mana_curve': manaCurve.map(
@@ -551,17 +553,24 @@ Map<String, dynamic> _buildLaunchCapabilities({
   required String format,
   required bool hasCardIntelligenceSnapshot,
   required bool hasSemanticV2,
+  required ReleaseCapabilityPolicy releasePolicy,
 }) {
   final normalizedFormat = format.toLowerCase().trim();
   final isCommander =
       normalizedFormat == 'commander' || normalizedFormat == 'edh';
-  final betaSurfacesEnabled = _envFlag('MANALOOM_BETA_SURFACES', true);
+  final deckAnalysisEnabled = releasePolicy.isAllowed('decks_private');
+  final advisoryAiEnabled = releasePolicy.isAllowed(
+    'ai_analyze_optimize_advisory',
+  );
 
   return {
     'schema_version': 'launch_capabilities_v1_2026-07-01',
-    'release_channel': betaSurfacesEnabled ? 'beta' : 'stable_only',
+    'release_channel': releasePolicy.releaseChannel,
+    'offer_mode': releasePolicy.offerMode,
+    'policy_digest_sha256': releasePolicy.policyDigestSha256,
+    'configuration_status': releasePolicy.configurationStatus,
     'flags': {
-      'beta_surfaces_enabled': betaSurfacesEnabled,
+      'beta_surfaces_enabled': advisoryAiEnabled,
       'card_intelligence_snapshot': hasCardIntelligenceSnapshot,
       'semantic_v2_available': hasSemanticV2 || hasCardIntelligenceSnapshot,
     },
@@ -569,35 +578,37 @@ Map<String, dynamic> _buildLaunchCapabilities({
       {
         'key': 'deck_analysis',
         'label': 'Análise de deck',
-        'enabled': true,
+        'enabled': deckAnalysisEnabled,
         'stage': 'stable',
         'requires_review': false,
       },
       {
         'key': 'commander_contract',
         'label': 'Plano Commander',
-        'enabled': betaSurfacesEnabled && isCommander,
+        'enabled': advisoryAiEnabled && isCommander,
         'stage': 'beta',
         'requires_review': true,
       },
       {
         'key': 'battle_readiness',
         'label': 'Battle readiness',
-        'enabled': betaSurfacesEnabled && hasCardIntelligenceSnapshot,
+        'enabled':
+            releasePolicy.isAllowed('battle_batch') &&
+            hasCardIntelligenceSnapshot,
         'stage': 'beta',
         'requires_review': true,
       },
       {
         'key': 'optimize_explanations',
         'label': 'Explicações de optimize',
-        'enabled': betaSurfacesEnabled,
+        'enabled': advisoryAiEnabled,
         'stage': 'beta',
         'requires_review': true,
       },
       {
         'key': 'recommendations',
         'label': 'Recomendações',
-        'enabled': true,
+        'enabled': releasePolicy.isAllowed('legacy_ai_routes'),
         'stage': 'advisory',
         'requires_review': true,
       },
@@ -1036,14 +1047,6 @@ int _intValue(Object? value) {
   if (value is int) return value;
   if (value is num) return value.round();
   return int.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-bool _envFlag(String key, bool defaultValue) {
-  final value = Platform.environment[key]?.trim().toLowerCase();
-  if (value == null || value.isEmpty) return defaultValue;
-  if (value == '0' || value == 'false' || value == 'no') return false;
-  if (value == '1' || value == 'true' || value == 'yes') return true;
-  return defaultValue;
 }
 
 class ManaAnalysis {

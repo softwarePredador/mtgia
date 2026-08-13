@@ -7,19 +7,19 @@ import '../models/commercial_launch_policy.dart';
 class FreeBetaNotice extends StatelessWidget {
   const FreeBetaNotice({
     super.key,
-    this.title = 'Tudo o que está disponível agora, sem cobrança',
+    this.title = 'Beta controlada, gratuita e sem cobrança',
     this.description =
-        'Use o ${ProductIdentity.displayName} para preparar decks, organizar sua coleção e acompanhar partidas enquanto refinamos a experiência com a comunidade.',
+        'O ${ProductIdentity.displayName} confirma no servidor quais recursos estão liberados antes de apresentá-los ou executá-los. Estar na beta não abre automaticamente todas as funções.',
   });
 
   final String title;
   final String description;
 
   static const _capabilities = <(IconData, String)>[
-    (Icons.auto_awesome_outlined, 'Decks e IA com revisão'),
-    (Icons.style_outlined, 'Coleção e fichário'),
-    (Icons.people_alt_outlined, 'Trocas e comunidade'),
-    (Icons.favorite_border_rounded, 'Life Counter e pós-jogo'),
+    (Icons.money_off_csred_outlined, 'Sem preço ou assinatura'),
+    (Icons.verified_user_outlined, 'Disponibilidade pelo servidor'),
+    (Icons.rule_outlined, 'IA revisável quando liberada'),
+    (Icons.speed_outlined, 'Teto operacional, não comercial'),
   ];
 
   @override
@@ -107,7 +107,7 @@ class FreeBetaNotice extends StatelessWidget {
               SizedBox(width: AppTheme.space10),
               Expanded(
                 child: Text(
-                  'Não há assinatura, checkout ou cobrança nesta beta. Qualquer oferta futura será apresentada separadamente e exigirá confirmação explícita.',
+                  'Não há assinatura, checkout, renovação, anúncio ou paywall nesta beta. Uma oferta futura exigirá outra decisão e será apresentada separadamente.',
                   style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
                 ),
               ),

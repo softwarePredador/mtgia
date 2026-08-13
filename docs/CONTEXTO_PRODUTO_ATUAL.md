@@ -1,7 +1,34 @@
 # Contexto Produto Atual
 
-> Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
-> fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
+> A decisão curta que prevalece para escopo, oferta e release está em
+> `docs/status/CURRENT_PRODUCT_DECISION.md`. O backlog mestre define a ordem de
+> execução e `docs/MANALOOM_E2E_RELEASE_CONTRACT.md` define validação e
+> conclusão. O restante deste arquivo preserva contexto por data.
+
+## Decisão vigente — 2026-08-13
+
+- estado: `NO_GO_PUBLIC_RELEASE`;
+- candidato pretendido: beta gratuita, coorte controlada, Web + Android;
+- oferta: uma única Beta gratuita, sem Pro, preço, checkout, assinatura,
+  anúncios ou paywall;
+- core privado e Analyze/Optimize só abrem após os P0 e receipts próprios;
+- enquanto toda a matriz estiver `OFF`, a Web pública permanece informativa e
+  não apresenta CTA ou link para `/app`;
+- Generate/Rebuild, learning, Battle, Scanner, social, marketplace e trades
+  permanecem `OFF` por padrão;
+- baseline estrutural deste checkout: migration `058`, com `58` migrations; o
+  estado do PostgreSQL live continua desconhecido até receipt read-only fresco;
+- nenhum status local altera `live_verified_as_of` sem prova same-SHA fresca.
+
+## Atualização de prioridade — 2026-08-12
+
+O índice de execução vigente é
+`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`. Ele consolida os
+achados posteriores deste documento, separa blockers da beta core dos blockers
+de Battle, Scanner, Social e monetização e incorpora a direção visual orientada
+por imagens de cartas. As seções abaixo continuam como histórico e contexto das
+decisões implementadas nas respectivas datas; não devem substituir o estado,
+as dependências ou os critérios de aceite do backlog mestre.
 
 ## Segurança do optimizer Commander — 2026-07-30
 
@@ -13,7 +40,7 @@
   recebe penalidade temática quando não sustenta `Miracle Big Spells`;
 - Complete e Optimize compartilham gates de bracket, identidade, fundação de
   mana, ramp, compra, interação, wipes, orçamento/coleção e qualidade final.
-  Cache anterior é invalidado pelo contrato `v19`;
+  Cache anterior é invalidado pelo contrato atual `v20`;
 - todos os cinco brackets mantêm intenção distinta: B1/B2/B3/B4 projetam
   janelas 9+/8+/6+/4+ e apenas B5 usa automaticamente o metagame cEDH;
 - Generate e Rebuild também falham fechado na avaliação final; o contrato
@@ -46,7 +73,7 @@
   PostgreSQL. `shared_preferences` não é storage durável de Battle;
 - migrations 052–055 passaram em PostgreSQL descartável. Elas não foram
   aplicadas nem consultadas no banco live e não recebem crédito de deploy;
-- BL7 foi reaberto e recebeu `GO` técnico limitado no ADR 0004: três partidas
+- BL7 foi reaberto e recebeu `GO` técnico limitado no ADR 0012: três partidas
   XMage humanas isoladas concluíram com 251/251 respostas aceitas, zero
   deadlock/leak identificável e timeout com concessão confirmada. Não existe
   takeover humano→IA; a política é conceder e terminar. BL8 está pronto para
@@ -135,13 +162,14 @@
   restore. A revisão dos engines já está registrada em
   `docs/qa/MANALOOM_ENGINE_DELTA_REVIEW_2026-07-23.md`.
 
-## Escopo e estado operacional vigente
+## Registro operacional de 2026-07-23 — histórico
 
 - produto ativo: `app/` + `server/`; PostgreSQL/backend é a verdade e
   Hermes/SQLite é cache ou laboratório;
-- o plano executável é
-  `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` e o estado por task fica em
-  `docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md`;
+- o plano executável naquela rodada era
+  `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md` e o estado por task ficava em
+  `docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md`; ambos são registros históricos
+  e não substituem o backlog mestre vigente;
 - a evolução Battle Lab/Live Spectator/Coach está registrada em
   `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md` e
   `docs/MANALOOM_BATTLE_LAB_TRACKER.md`; BL0–BL6 foram implementados
@@ -157,7 +185,7 @@
   pagamento ou entrega;
 - nenhum artefato deste checkout deve ser descrito como publicado.
 
-## Próxima ação oficial
+## Sequência oficial daquela rodada — histórica, não executar como plano atual
 
 1. concluir startup Android, matriz autenticada p50/p95, métrica Web de
    imagens e matriz E2E externa de falhas/cancelamento da Sprint 8; o abort
@@ -527,17 +555,21 @@ Se um pedido novo nao disser o contrario:
 4. toda tela do fluxo core precisa preservar contexto do usuario, especialmente `formato`, `deckId`, feedback de erro e estado de carregamento
 5. toda melhoria de UX precisa ser acompanhada de validacao tecnica minimamente repetivel
 
-## Ultima Atualizacao
+## Registro histórico — atualização de 2026-05-30
 
 - data: 2026-05-30
-- status: ativo
+- status: `HISTORICAL_SNAPSHOT`; não usar como prioridade corrente
 - prioridade atual: consolidar confiabilidade do core de decks, reduzir gargalos de codigo, expandir cobertura de Game Changers e bracket policy
 - regra nova: `BracketCategory` enum expandido de 5 para 10 categorias, cobrindo 53/53 Game Changers oficiais
-- regra nova: `card_deck_profiles` integrado ao `filterUnsafeOptimizeSwapsByCardData` para proteger cartas core e priorizar fillers
+- registro histórico de 2026-05-30: `card_deck_profiles` foi declarado
+  integrado ao `filterUnsafeOptimizeSwapsByCardData`; a auditoria source-backed
+  de 2026-08-12 mostrou que o caller não fornecia esse payload e que o
+  vocabulário/import não pertencia ao schema canônico 058. O caminho morto foi
+  retirado do runtime e só pode voltar após `BT-AI-016`.
 - regra nova: Hermes Agent operacional com 14 crons ativos gerando analises, auditorias e IMPLEMENTATION_TASKS.md
 - regra nova: fallback de providers configurado (openrouter → deepseek → opencode-go)
 
-## Aditivo - Estado Atual Em 2026-05-30
+## Aditivo histórico — estado observado em 2026-05-30
 
 ### Reducao de Gargalos (F0-F3)
 
@@ -626,7 +658,8 @@ Essas areas aumentam utilidade e retencao, mas nao podem consumir a prioridade d
   continua como calibração P2, sem remover a correção/busca manual; push
   notifications e compartilhamento ainda exigem validação própria em device
 - 29/53 Game Changers oficiais nao eram detectados pelo bracket policy (RESOLVIDO em 2026-05-30)
-- `card_deck_profiles` (670 perfis) nao era consultado pelo optimize (INTEGRADO em 2026-05-30)
+- registro histórico: `card_deck_profiles` (670 perfis) foi marcado como
+  integrado em 2026-05-30; estado corrente: `REMOVED_FROM_RUNTIME_PENDING_BT_AI_016`.
 
 ## Norte De Qualidade
 

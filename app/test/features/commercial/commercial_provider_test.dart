@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -36,13 +37,13 @@ void main() {
     );
   });
 
-  test('Pro plan raises AI usage limit and persists tier', () async {
+  test('legacy local Pro state is normalized to the free beta', () async {
     SharedPreferences.setMockInitialValues({'manaloom.commercial.plan': 'pro'});
     final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
     await provider.load();
 
-    expect(provider.tier, ManaLoomPlanTier.pro);
-    expect(provider.monthlyAiLimit, 2500);
+    expect(provider.tier, ManaLoomPlanTier.free);
+    expect(provider.monthlyAiLimit, 120);
     expect(
       await provider.consumeAiAction(AiUsageKind.deckOptimization),
       isTrue,
@@ -50,7 +51,7 @@ void main() {
 
     final reloaded = CommercialProvider(now: () => DateTime(2026, 7, 1));
     await reloaded.load();
-    expect(reloaded.tier, ManaLoomPlanTier.pro);
+    expect(reloaded.tier, ManaLoomPlanTier.free);
     expect(reloaded.usedAiActions, 1);
   });
 
@@ -69,7 +70,7 @@ void main() {
     expect(provider.remainingAiActions, 119);
   });
 
-  test('remote plan snapshot becomes the source for AI usage limits', () async {
+  test('legacy remote Pro snapshot cannot raise the beta ceiling', () async {
     ApiClient.resetForTesting(
       token: 'test-token',
       httpClient: MockClient((request) async {
@@ -96,11 +97,11 @@ void main() {
     await provider.refreshFromServer();
 
     expect(provider.isRemoteSynced, isTrue);
-    expect(provider.tier, ManaLoomPlanTier.pro);
-    expect(provider.monthlyAiLimit, 2500);
-    expect(provider.usedAiActions, 2499);
+    expect(provider.tier, ManaLoomPlanTier.free);
+    expect(provider.monthlyAiLimit, 120);
+    expect(provider.usedAiActions, 120);
     expect(provider.periodKey, '2026-06');
-    expect(provider.remainingAiActions, 1);
+    expect(provider.remainingAiActions, 0);
   });
 
   test('concurrent remote refreshes share one authoritative request', () async {
@@ -150,12 +151,12 @@ void main() {
             jsonEncode(
               requestCount == 1
                   ? {
-                    'plan': {
-                      'plan_name': 'pro',
-                      'ai_monthly_limit': 2500,
-                      'ai_requests_used': 8,
-                    },
-                  }
+                      'plan': {
+                        'plan_name': 'pro',
+                        'ai_monthly_limit': 2500,
+                        'ai_requests_used': 8,
+                      },
+                    }
                   : {'plan': 'invalid'},
             ),
             200,
@@ -239,7 +240,7 @@ void main() {
 
     expect(requestCount, 1);
     expect(provider.isRemoteSynced, isTrue);
-    expect(provider.tier, ManaLoomPlanTier.pro);
+    expect(provider.tier, ManaLoomPlanTier.free);
     expect(provider.usedAiActions, 21);
   });
 
@@ -266,7 +267,7 @@ void main() {
       );
       final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
       await provider.refreshFromServer();
-      expect(provider.tier, ManaLoomPlanTier.pro);
+      expect(provider.tier, ManaLoomPlanTier.free);
       expect(provider.usedAiActions, 37);
 
       await provider.clearRemoteSnapshot();
@@ -282,24 +283,13 @@ void main() {
     },
   );
 
-  test('free beta refuses checkout without contacting the backend', () async {
-    var requestCount = 0;
-    ApiClient.resetForTesting(
-      token: 'test-token',
-      httpClient: MockClient((request) async {
-        requestCount += 1;
-        return http.Response('{}', 500);
-      }),
-    );
+  test('commercial provider has no checkout or paid activation API', () {
+    final source = File(
+      'lib/features/commercial/providers/commercial_provider.dart',
+    ).readAsStringSync();
 
-    final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
-    final result = await provider.startProCheckout();
-
-    expect(result.activated, isFalse);
-    expect(result.requiresExternalPayment, isFalse);
-    expect(result.checkoutUrl, isNull);
-    expect(result.message, contains('beta gratuita'));
-    expect(requestCount, 0);
-    expect(provider.tier, ManaLoomPlanTier.free);
+    expect(source, isNot(contains('/users/me/plan/checkout')));
+    expect(source, isNot(contains('startProCheckout')));
+    expect(source, isNot(contains('CommercialCheckoutResult')));
   });
 }

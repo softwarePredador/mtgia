@@ -6,6 +6,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/battle/models/battle_job.dart';
@@ -222,6 +223,15 @@ Widget _homeApp(DeckDetails deck, {Key? key}) {
   return MultiProvider(
     key: key,
     providers: [
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+        value: ReleaseCapabilitiesProvider.seeded(const {
+          ReleaseCapability.decksPrivate,
+          ReleaseCapability.lifeCounterLocal,
+          ReleaseCapability.battleBatch,
+          ReleaseCapability.battleLive,
+          ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+        }),
+      ),
       ChangeNotifierProvider<AuthProvider>(
         create: (_) => AuthProvider(apiClient: _NoopApiClient()),
       ),

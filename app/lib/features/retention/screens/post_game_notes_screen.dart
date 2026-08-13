@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/branding/product_identity.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/card_artwork.dart';
@@ -358,6 +360,15 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
   }
 
   void _openOptimize(PostGameNote note, {bool rebuild = false}) {
+    final capabilities = context.read<ReleaseCapabilitiesProvider?>();
+    final requiredCapability = rebuild
+        ? ReleaseCapability.aiGenerateRebuild
+        : ReleaseCapability.aiAnalyzeOptimizeAdvisory;
+    final decksAllowed =
+        capabilities?.isAllowed(ReleaseCapability.decksPrivate) ?? false;
+    final actionAllowed = capabilities?.isAllowed(requiredCapability) ?? false;
+    if (!decksAllowed || !actionAllowed) return;
+
     final uri = Uri(
       path: '/decks/${widget.deckId}',
       queryParameters: <String, String>{
@@ -370,6 +381,16 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final optimizeAllowed =
+        capabilities?.isAllowed(ReleaseCapability.aiAnalyzeOptimizeAdvisory) ??
+        false;
+    final rebuildAllowed =
+        capabilities?.isAllowed(ReleaseCapability.aiGenerateRebuild) ?? false;
+    final battleReplayAllowed =
+        capabilities?.isAllowed(ReleaseCapability.battleBatch) ?? false;
+    final hasBattleReplay =
+        widget.playSessionId?.startsWith('battle-replay:') == true;
     final horizontalGutter =
         MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
         ? 16.0
@@ -415,10 +436,12 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                       summary: _summary,
                       contentSizedActions: isDesktop,
                       evidenceNote: optimizeEvidence,
-                      onOptimize: optimizeEvidence == null
+                      showOptimize: optimizeAllowed,
+                      showRebuild: rebuildAllowed,
+                      onOptimize: !optimizeAllowed || optimizeEvidence == null
                           ? null
                           : () => _openOptimize(optimizeEvidence),
-                      onRebuild: optimizeEvidence == null
+                      onRebuild: !rebuildAllowed || optimizeEvidence == null
                           ? null
                           : () =>
                                 _openOptimize(optimizeEvidence, rebuild: true),
@@ -433,20 +456,19 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                           startedAt: widget.sessionStartedAt,
                           endedAt: widget.sessionEndedAt,
                           deckSnapshotHash: widget.deckSnapshotHash,
+                          revealBattleReplay: battleReplayAllowed,
                         ),
                         const SizedBox(height: AppTheme.space12),
                         if (_lastSavedEvidence != null) ...[
                           _EvidenceReceiptPanel(
                             note: _lastSavedEvidence!,
-                            onOptimize: () =>
-                                _openOptimize(_lastSavedEvidence!),
+                            onOptimize: optimizeAllowed
+                                ? () => _openOptimize(_lastSavedEvidence!)
+                                : null,
                           ),
                           const SizedBox(height: AppTheme.space12),
                         ],
-                        if (widget.playSessionId != null &&
-                            widget.playSessionId!.startsWith(
-                              'battle-replay:',
-                            )) ...[
+                        if (battleReplayAllowed && hasBattleReplay) ...[
                           _ReplayEvidenceLinkPanel(
                             replayId: widget.playSessionId!.substring(
                               'battle-replay:'.length,
@@ -454,7 +476,8 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                             deckId: widget.deckId,
                           ),
                           const SizedBox(height: AppTheme.space12),
-                        ] else if (widget.playSessionId != null) ...[
+                        ] else if (!hasBattleReplay &&
+                            widget.playSessionId != null) ...[
                           _LifeCounterSessionPanel(
                             startedAt: widget.sessionStartedAt,
                             endedAt: widget.sessionEndedAt,
@@ -588,6 +611,7 @@ class _PostGameSourceHero extends StatelessWidget {
     required this.startedAt,
     required this.endedAt,
     required this.deckSnapshotHash,
+    required this.revealBattleReplay,
   });
 
   final DeckDetails? deck;
@@ -596,6 +620,7 @@ class _PostGameSourceHero extends StatelessWidget {
   final DateTime? startedAt;
   final DateTime? endedAt;
   final String? deckSnapshotHash;
+  final bool revealBattleReplay;
 
   @override
   Widget build(BuildContext context) {
@@ -604,10 +629,13 @@ class _PostGameSourceHero extends StatelessWidget {
         ? null
         : deck!.commander.first;
     final exactArtwork = commander?.printingImageUrl;
-    final replayLinked = playSessionId?.startsWith('battle-replay:') == true;
+    final hasBattleReplay = playSessionId?.startsWith('battle-replay:') == true;
+    final replayLinked = revealBattleReplay && hasBattleReplay;
     final sessionLinked = playSessionId?.trim().isNotEmpty == true;
     final sourceLabel = replayLinked
         ? 'Replay persistido'
+        : hasBattleReplay
+        ? 'Sessão vinculada'
         : sessionLinked
         ? 'Sessão do Life Counter'
         : 'Registro manual · sem sessão vinculada';
@@ -654,9 +682,13 @@ class _PostGameSourceHero extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                         border: Border.all(color: AppTheme.outlineMuted),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: ManaLoomGlyph(
-                          ManaLoomGlyphKind.battleReplay,
+                          replayLinked
+                              ? ManaLoomGlyphKind.battleReplay
+                              : sessionLinked && !hasBattleReplay
+                              ? ManaLoomGlyphKind.lifeCounter
+                              : ManaLoomGlyphKind.deck,
                           size: 34,
                           color: AppTheme.brass400,
                         ),
@@ -728,7 +760,7 @@ class _EvidenceReceiptPanel extends StatelessWidget {
   const _EvidenceReceiptPanel({required this.note, required this.onOptimize});
 
   final PostGameNote note;
-  final VoidCallback onOptimize;
+  final VoidCallback? onOptimize;
 
   @override
   Widget build(BuildContext context) {
@@ -752,17 +784,18 @@ class _EvidenceReceiptPanel extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 560),
             child: Text(
               'Evidência ${_shortEvidenceId(note.id)} salva localmente · '
-              '${note.issues.length} problema(s) · $signalCount carta(s). '
-              'O Optimize validará este registro no backend antes de usá-lo.',
+              '${note.issues.length} problema(s) · $signalCount carta(s).'
+              '${onOptimize == null ? '' : ' O Optimize validará este registro no backend antes de usá-lo.'}',
               style: const TextStyle(color: AppTheme.textPrimary, height: 1.35),
             ),
           ),
-          FilledButton.icon(
-            key: const Key('post-game-optimize-evidence-button'),
-            onPressed: onOptimize,
-            icon: const Icon(Icons.auto_fix_high_rounded),
-            label: const Text('Usar no Optimize'),
-          ),
+          if (onOptimize != null)
+            FilledButton.icon(
+              key: const Key('post-game-optimize-evidence-button'),
+              onPressed: onOptimize,
+              icon: const Icon(Icons.auto_fix_high_rounded),
+              label: const Text('Usar no Optimize'),
+            ),
         ],
       ),
     );
@@ -803,9 +836,16 @@ class _ReplayEvidenceLinkPanel extends StatelessWidget {
           ),
           TextButton(
             key: const Key('post-game-open-replay-button'),
-            onPressed: () => context.push(
-              '/decks/${Uri.encodeComponent(deckId)}/battle-replays?replay=${Uri.encodeQueryComponent(replayId)}',
-            ),
+            onPressed: () {
+              final capabilities = context.read<ReleaseCapabilitiesProvider?>();
+              if (!(capabilities?.isAllowed(ReleaseCapability.battleBatch) ??
+                  false)) {
+                return;
+              }
+              context.push(
+                '/decks/${Uri.encodeComponent(deckId)}/battle-replays?replay=${Uri.encodeQueryComponent(replayId)}',
+              );
+            },
             child: const Text('Abrir replay'),
           ),
         ],
@@ -923,6 +963,8 @@ class _EvolutionSummaryPanel extends StatelessWidget {
     required this.onOptimize,
     required this.onRebuild,
     required this.evidenceNote,
+    required this.showOptimize,
+    required this.showRebuild,
     this.contentSizedActions = false,
   });
 
@@ -930,12 +972,25 @@ class _EvolutionSummaryPanel extends StatelessWidget {
   final PostGameNote? evidenceNote;
   final VoidCallback? onOptimize;
   final VoidCallback? onRebuild;
+  final bool showOptimize;
+  final bool showRebuild;
   final bool contentSizedActions;
 
   @override
   Widget build(BuildContext context) {
     final mainIssues = summary.issueCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
+    final showAiHandoff = showOptimize || showRebuild;
+    final handoffLabel = showOptimize && showRebuild
+        ? 'Optimize e reconstrução guiada'
+        : showOptimize
+        ? 'Optimize'
+        : 'reconstrução guiada';
+    final nextActionLabel = showOptimize && showRebuild
+        ? 'Próxima revisão'
+        : showOptimize
+        ? 'Próxima análise'
+        : 'Próxima reconstrução';
 
     return Container(
       key: const Key('post-game-evolution-summary'),
@@ -982,7 +1037,7 @@ class _EvolutionSummaryPanel extends StatelessWidget {
                   )
                   .toList(),
             ),
-          if (summary.suggestions.isNotEmpty) ...[
+          if (showOptimize && summary.suggestions.isNotEmpty) ...[
             const SizedBox(height: AppTheme.space12),
             ...summary.suggestions
                 .take(3)
@@ -1017,47 +1072,55 @@ class _EvolutionSummaryPanel extends StatelessWidget {
             const SizedBox(height: AppTheme.space12),
             _CardSignalRows(summary: summary),
           ],
-          if (evidenceNote == null) ...[
-            const SizedBox(height: AppTheme.space12),
-            const Text(
-              'Salve uma evidência para habilitar o handoff autenticado ao Optimize.',
-              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
-            ),
-          ] else ...[
+          if (showAiHandoff && evidenceNote == null) ...[
             const SizedBox(height: AppTheme.space12),
             Text(
-              'Próxima análise: evidência ${_shortEvidenceId(evidenceNote!.id)}',
+              'Salve uma evidência para habilitar o handoff autenticado ao $handoffLabel.',
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ] else if (showAiHandoff) ...[
+            const SizedBox(height: AppTheme.space12),
+            Text(
+              '$nextActionLabel: evidência ${_shortEvidenceId(evidenceNote!.id)}',
               style: const TextStyle(
                 color: AppTheme.brass400,
                 fontWeight: FontWeight.w800,
               ),
             ),
           ],
-          const SizedBox(height: AppTheme.space14),
-          if (contentSizedActions)
-            Wrap(
-              alignment: WrapAlignment.end,
-              spacing: 10,
-              runSpacing: 8,
-              children: [
-                SizedBox(
-                  width: AppTheme.space150,
-                  child: _buildOptimizeButton(),
-                ),
-                SizedBox(
-                  width: AppTheme.space150,
-                  child: _buildRebuildButton(),
-                ),
-              ],
-            )
-          else
-            Row(
-              children: [
-                Expanded(child: _buildOptimizeButton()),
-                const SizedBox(width: AppTheme.space10),
-                Expanded(child: _buildRebuildButton()),
-              ],
-            ),
+          if (showAiHandoff) ...[
+            const SizedBox(height: AppTheme.space14),
+            if (contentSizedActions)
+              Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 10,
+                runSpacing: 8,
+                children: [
+                  if (showOptimize)
+                    SizedBox(
+                      width: AppTheme.space150,
+                      child: _buildOptimizeButton(),
+                    ),
+                  if (showRebuild)
+                    SizedBox(
+                      width: AppTheme.space150,
+                      child: _buildRebuildButton(),
+                    ),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  if (showOptimize) Expanded(child: _buildOptimizeButton()),
+                  if (showOptimize && showRebuild)
+                    const SizedBox(width: AppTheme.space10),
+                  if (showRebuild) Expanded(child: _buildRebuildButton()),
+                ],
+              ),
+          ],
         ],
       ),
     );

@@ -19,7 +19,7 @@ class DeckWorkshopTab extends StatefulWidget {
     required this.onValidate,
     required this.onRollback,
     required this.onOpenSampleHand,
-    required this.onOpenBattle,
+    this.onOpenBattle,
   });
 
   final DeckDetails deck;
@@ -31,7 +31,7 @@ class DeckWorkshopTab extends StatefulWidget {
   final VoidCallback onValidate;
   final Future<void> Function(DeckOptimizationEvent event) onRollback;
   final VoidCallback onOpenSampleHand;
-  final VoidCallback onOpenBattle;
+  final VoidCallback? onOpenBattle;
 
   @override
   State<DeckWorkshopTab> createState() => _DeckWorkshopTabState();
@@ -740,13 +740,10 @@ class _HistoryCardRef extends StatelessWidget {
 }
 
 class _WorkshopNextStep extends StatelessWidget {
-  const _WorkshopNextStep({
-    required this.onOpenSampleHand,
-    required this.onOpenBattle,
-  });
+  const _WorkshopNextStep({required this.onOpenSampleHand, this.onOpenBattle});
 
   final VoidCallback onOpenSampleHand;
-  final VoidCallback onOpenBattle;
+  final VoidCallback? onOpenBattle;
 
   @override
   Widget build(BuildContext context) {
@@ -779,9 +776,11 @@ class _WorkshopNextStep extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppTheme.space4),
-                const Text(
-                  'Mão inicial ajuda a enxergar a curva. Battle e replays produzem evidência de desempenho; a IA não declara um deck “ideal”.',
-                  style: TextStyle(
+                Text(
+                  onOpenBattle == null
+                      ? 'Teste mãos iniciais para enxergar curva, terrenos e ritmo antes da próxima partida.'
+                      : 'Mão inicial ajuda a enxergar a curva. Battle e replays produzem evidência de desempenho; a IA não declara um deck “ideal”.',
+                  style: const TextStyle(
                     color: AppTheme.textSecondary,
                     height: AppTheme.lineHeightCompact,
                   ),
@@ -796,11 +795,12 @@ class _WorkshopNextStep extends StatelessWidget {
                       icon: const Icon(Icons.back_hand_outlined),
                       label: const Text('Testar mão inicial'),
                     ),
-                    TextButton.icon(
-                      onPressed: onOpenBattle,
-                      icon: const Icon(Icons.sports_esports_outlined),
-                      label: const Text('Abrir Battle / replays'),
-                    ),
+                    if (onOpenBattle != null)
+                      TextButton.icon(
+                        onPressed: onOpenBattle,
+                        icon: const Icon(Icons.sports_esports_outlined),
+                        label: const Text('Abrir Battle / replays'),
+                      ),
                   ],
                 ),
               ],

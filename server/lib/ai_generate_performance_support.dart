@@ -10,7 +10,7 @@ import 'ai_job_lifecycle.dart';
 // Bump whenever the player-facing generate response contract changes. Cached
 // payloads are returned as-is, so an older key could omit safety diagnostics
 // such as deckbuilding_contract until its TTL expires.
-const aiGenerateCacheContractVersion = 'v7';
+const aiGenerateCacheContractVersion = 'v8';
 const aiGenerateMaxPromptLength = 8000;
 const aiGenerateMaxFormatLength = 80;
 const aiGenerateMaxCommanderNameLength = 300;
@@ -258,7 +258,7 @@ String buildAiGenerateCacheKey({
   final normalizedCommander = normalizeAiGenerateCommanderName(commanderName);
   final normalizedProfileVersion = referenceProfileVersion?.trim() ?? '';
   final payload = {
-    'version': 3,
+    'version': 4,
     'prompt': normalizeAiGeneratePrompt(prompt),
     'format': normalizeAiGenerateFormat(format),
     'bracket': normalizeAiGenerateBracket(bracket),
@@ -410,11 +410,20 @@ Map<String, dynamic> cloneAiGenerateJsonMap(Map<String, dynamic> payload) {
   return (jsonDecode(jsonEncode(payload)) as Map).cast<String, dynamic>();
 }
 
-Map<String, dynamic>? readAiGenerateCache(String cacheKey) {
+Map<String, dynamic>? readAiGenerateCache(
+  String cacheKey, {
+  String? requestedCommanderName,
+}) {
   final cached = EndpointCache.instance.get(cacheKey);
   if (cached == null) return null;
 
   final payload = cloneAiGenerateJsonMap(cached);
+  if (!aiGenerateCachedPayloadMatchesRequestedCommander(
+    payload,
+    requestedCommanderName: requestedCommanderName,
+  )) {
+    return null;
+  }
   payload.remove('timings');
   payload['cache'] = {
     ...(payload['cache'] as Map? ?? const {}),
@@ -424,11 +433,31 @@ Map<String, dynamic>? readAiGenerateCache(String cacheKey) {
   return payload;
 }
 
+bool aiGenerateCachedPayloadMatchesRequestedCommander(
+  Map<String, dynamic> payload, {
+  required String? requestedCommanderName,
+}) {
+  final requested = normalizeAiGenerateCommanderName(requestedCommanderName);
+  if (requested.isEmpty) return true;
+
+  final generatedDeck = payload['generated_deck'];
+  if (generatedDeck is! Map) return false;
+
+  final commander = generatedDeck['commander'];
+  final cachedCommanderName = switch (commander) {
+    Map() => commander['name']?.toString(),
+    String() => commander,
+    _ => null,
+  };
+  return normalizeAiGenerateCommanderName(cachedCommanderName) == requested;
+}
+
 void writeAiGenerateCache({
   required String cacheKey,
   required Map<String, dynamic> payload,
   required Duration ttl,
 }) {
+  if (payload['is_mock'] == true) return;
   final cachedPayload = cloneAiGenerateJsonMap(payload);
   cachedPayload['cache'] = {
     ...(cachedPayload['cache'] as Map? ?? const {}),

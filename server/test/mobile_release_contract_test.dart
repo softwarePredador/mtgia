@@ -84,7 +84,9 @@ void main() {
     );
     expect(
       build,
-      contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+      contains(
+        'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF',
+      ),
     );
     expect(
       build,
@@ -94,12 +96,14 @@ void main() {
     final invalidInteractiveFlag = Process.runSync(
       '/bin/bash',
       [File('../scripts/manaloom_build_android_release.sh').absolute.path],
-      environment: {'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE': 'yes'},
+      environment: {'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE': '1'},
     );
     expect(invalidInteractiveFlag.exitCode, 2);
     expect(
       invalidInteractiveFlag.stderr,
-      contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+      contains(
+        'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF',
+      ),
     );
     expect(releaseManifest, contains('android.permission.CAMERA'));
     expect(releaseManifest, contains('android.hardware.camera.any'));

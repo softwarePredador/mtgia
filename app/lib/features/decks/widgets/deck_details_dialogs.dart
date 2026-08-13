@@ -347,7 +347,7 @@ Future<void> showDeckEditionPicker({
 Future<void> showDeckCardDetailsDialog({
   required BuildContext context,
   required DeckCardItem card,
-  required Future<void> Function() onShowAiExplanation,
+  Future<void> Function()? onShowAiExplanation,
   required Future<void> Function() onShowEditionPicker,
   required Future<void> Function() onOpenFullDetails,
 }) async {
@@ -427,12 +427,12 @@ Future<void> showDeckCardDetailsDialog({
 class _DeckCardDetailsDialogBody extends StatelessWidget {
   const _DeckCardDetailsDialogBody({
     required this.card,
-    required this.onShowAiExplanation,
+    this.onShowAiExplanation,
     required this.onShowEditionPicker,
   });
 
   final DeckCardItem card;
-  final Future<void> Function() onShowAiExplanation;
+  final Future<void> Function()? onShowAiExplanation;
   final Future<void> Function() onShowEditionPicker;
 
   @override
@@ -519,12 +519,12 @@ class _DeckCardDetailsImage extends StatelessWidget {
 class _DeckCardDetailsInfo extends StatelessWidget {
   const _DeckCardDetailsInfo({
     required this.card,
-    required this.onShowAiExplanation,
+    this.onShowAiExplanation,
     required this.onShowEditionPicker,
   });
 
   final DeckCardItem card;
-  final Future<void> Function() onShowAiExplanation;
+  final Future<void> Function()? onShowAiExplanation;
   final Future<void> Function() onShowEditionPicker;
 
   @override
@@ -589,23 +589,24 @@ class _DeckCardDetailsInfo extends StatelessWidget {
                 ),
                 onPressed: onShowEditionPicker,
               ),
-            ActionChip(
-              avatar: const Icon(
-                Icons.auto_awesome_rounded,
-                size: 16,
-                color: AppTheme.frost400,
+            if (onShowAiExplanation != null)
+              ActionChip(
+                avatar: const Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 16,
+                  color: AppTheme.frost400,
+                ),
+                label: const Text('Explicar com IA'),
+                labelStyle: const TextStyle(
+                  color: AppTheme.frost400,
+                  fontWeight: FontWeight.w800,
+                ),
+                backgroundColor: AppTheme.frost400.withValues(alpha: 0.12),
+                side: BorderSide(
+                  color: AppTheme.frost400.withValues(alpha: 0.28),
+                ),
+                onPressed: onShowAiExplanation,
               ),
-              label: const Text('Explicar com IA'),
-              labelStyle: const TextStyle(
-                color: AppTheme.frost400,
-                fontWeight: FontWeight.w800,
-              ),
-              backgroundColor: AppTheme.frost400.withValues(alpha: 0.12),
-              side: BorderSide(
-                color: AppTheme.frost400.withValues(alpha: 0.28),
-              ),
-              onPressed: onShowAiExplanation,
-            ),
           ],
         ),
         if (card.oracleText != null) ...[

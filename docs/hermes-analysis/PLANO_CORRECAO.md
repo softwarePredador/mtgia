@@ -1,5 +1,14 @@
 # Plano de Correcao — Audit de Estrutura
 
+> **HISTORICAL / SUPERSEDED — NAO EXECUTE ESTE PLANO COMO FILA ATUAL.**
+>
+> Este plano preserva a triagem estrutural de 2026-06; cada item pode ter sido
+> resolvido, substituido ou reclassificado. Para o fluxo vigente de
+> Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > Status atual: plano de correcao estrutural app/backend.
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.

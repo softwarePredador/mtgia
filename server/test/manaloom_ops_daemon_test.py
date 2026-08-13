@@ -8,6 +8,9 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+import urllib.error
+import urllib.request
+from copy import deepcopy
 from pathlib import Path
 
 
@@ -54,13 +57,19 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
 
     def test_collect_boot_jobs_runs_pull_for_pending_events(self) -> None:
         module = _load_module()
-        with tempfile.TemporaryDirectory() as tmp:
-            planned = module._collect_boot_jobs(
-                {"DB_HOST": "example"},
-                knowledge_db_path=Path(tmp) / "knowledge.db",
-                knowledge_db_has_validator_tables=lambda _: True,
-                pending_learning_events_count=lambda _: 2,
-            )
+        original_pull = module.BOOT_PULL_PENDING_EVENTS
+        try:
+            module.BOOT_PULL_PENDING_EVENTS = True
+            with tempfile.TemporaryDirectory() as tmp:
+                planned = module._collect_boot_jobs(
+                    {"DB_HOST": "example"},
+                    knowledge_db_path=Path(tmp) / "knowledge.db",
+                    knowledge_db_has_validator_tables=lambda _: True,
+                    pending_learning_events_count=lambda _: 2,
+                    learning_writes_allowed=True,
+                )
+        finally:
+            module.BOOT_PULL_PENDING_EVENTS = original_pull
         self.assertIn(("pull_learning_events", "pending_learning_events=2"), planned)
 
     def test_collect_boot_jobs_runs_preflight_for_missing_tables(self) -> None:
@@ -71,8 +80,199 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                 knowledge_db_path=Path(tmp) / "knowledge.db",
                 knowledge_db_has_validator_tables=lambda _: False,
                 pending_learning_events_count=lambda _: 0,
+                preflight_allowed=True,
             )
         self.assertIn(("master_optimizer_preflight", "knowledge_db_missing_validator_tables"), planned)
+
+    def test_collect_boot_jobs_suppresses_legacy_triggers_when_capabilities_are_off(
+        self,
+    ) -> None:
+        module = _load_module()
+        original_pull = module.BOOT_PULL_PENDING_EVENTS
+        original_preflight = module.RUN_PREFLIGHT_ON_BOOT
+        try:
+            module.BOOT_PULL_PENDING_EVENTS = True
+            module.RUN_PREFLIGHT_ON_BOOT = True
+            planned = module._collect_boot_jobs(
+                {"DB_HOST": "must-not-be-used"},
+                knowledge_db_path=Path("/definitely/missing/knowledge.db"),
+                knowledge_db_has_validator_tables=lambda _: False,
+                pending_learning_events_count=lambda _: 99,
+                learning_writes_allowed=False,
+                preflight_allowed=False,
+            )
+        finally:
+            module.BOOT_PULL_PENDING_EVENTS = original_pull
+            module.RUN_PREFLIGHT_ON_BOOT = original_preflight
+
+        self.assertEqual(planned, [])
+
+    def test_release_policy_requires_exact_schema_and_fails_closed(self) -> None:
+        module = _load_module()
+        source = module.REPO_ROOT / "server/config/release_capabilities.json"
+        payload = json.loads(source.read_text(encoding="utf-8"))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            candidate = Path(tmp) / "release_capabilities.json"
+            candidate.write_text(json.dumps(payload), encoding="utf-8")
+            valid = module._load_release_policy(candidate)
+            self.assertTrue(valid.valid)
+            self.assertEqual(set(valid.capabilities), module.EXPECTED_RELEASE_CAPABILITIES)
+            self.assertFalse(any(valid.capabilities.values()))
+
+            malformed = deepcopy(payload)
+            malformed["unexpected"] = True
+            candidate.write_text(json.dumps(malformed), encoding="utf-8")
+            self.assertFalse(module._load_release_policy(candidate).valid)
+
+            malformed = deepcopy(payload)
+            malformed["capabilities"]["learning_writes"]["unexpected"] = True
+            candidate.write_text(json.dumps(malformed), encoding="utf-8")
+            self.assertFalse(module._load_release_policy(candidate).valid)
+
+            malformed = deepcopy(payload)
+            malformed["capabilities"]["learning_writes"].update(
+                {"release_capability": "on", "allowed": False}
+            )
+            candidate.write_text(json.dumps(malformed), encoding="utf-8")
+            self.assertFalse(module._load_release_policy(candidate).valid)
+
+        missing = module._load_release_policy(Path(tmp) / "missing.json")
+        self.assertFalse(missing.valid)
+        self.assertFalse(missing.allowed("learning_writes"))
+        self.assertFalse(missing.allowed("battle_batch"))
+
+    def test_all_off_or_invalid_policy_schedules_only_safe_governor(self) -> None:
+        module = _load_module()
+        all_off = module._load_release_policy(
+            module.REPO_ROOT / "server/config/release_capabilities.json"
+        )
+        invalid = module.ReleasePolicy(False, "invalid", {})
+
+        for policy in (all_off, invalid):
+            self.assertEqual(
+                [job.name for job in module._jobs_for_release_policy(policy)],
+                ["hermes_cron_governor_report"],
+            )
+
+        self.assertEqual(
+            {job.name for job in module.JOBS},
+            set(module.JOB_REQUIRED_CAPABILITIES),
+        )
+
+    def test_unclassified_future_job_is_fail_closed(self) -> None:
+        module = _load_module()
+        policy = module._load_release_policy(
+            module.REPO_ROOT / "server/config/release_capabilities.json"
+        )
+        unexpected = module.Job(
+            name="future_unclassified_job",
+            schedule="* * * * *",
+            lockfile=Path("/tmp/future-unclassified.lock"),
+            command="false",
+            script_name="future_unclassified.sh",
+        )
+        original_jobs = module.JOBS
+        try:
+            module.JOBS = [*original_jobs, unexpected]
+            names = [job.name for job in module._jobs_for_release_policy(policy)]
+        finally:
+            module.JOBS = original_jobs
+
+        self.assertNotIn(unexpected.name, names)
+
+    def test_base_env_neutralizes_legacy_true_flags(self) -> None:
+        module = _load_module()
+        legacy_flags = {
+            "HERMES_AUTO_PROMOTE_APPLY",
+            "HERMES_AUTO_SYNC_APPLY",
+            "MANALOOM_BATTLE_RULES_APPLY_PG",
+            "MANALOOM_BOOT_PULL_PENDING_EVENTS",
+            "MANALOOM_ENABLE_LEARNED_DECK_WRITES",
+            "MANALOOM_ENABLE_LEARNING_WRITES",
+            "MANALOOM_IMPORT_APPLY",
+            "MANALOOM_LEARNING_WRITES",
+            "MANALOOM_NATIVE_BATTLE_HTTP_ENABLED",
+            "MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT",
+            "MANALOOM_RUN_PREFLIGHT_ON_BOOT",
+            "MANALOOM_SYNC_CARD_LEGALITIES_APPLY",
+            "MTGIA_SYNC_GIT_PULL",
+        }
+        previous = {key: os.environ.get(key) for key in legacy_flags}
+        try:
+            os.environ.update({key: "1" for key in legacy_flags})
+            env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        finally:
+            for key, value in previous.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
+
+        for key in legacy_flags:
+            self.assertEqual(env[key], "0", key)
+
+    def test_native_sync_and_server_do_not_start_when_battle_batch_is_off(
+        self,
+    ) -> None:
+        module = _load_module()
+        original_sync = module.NATIVE_BATTLE_SYNC_ON_BOOT
+        original_http = module.NATIVE_BATTLE_HTTP_ENABLED
+        original_run = module.subprocess.run
+        try:
+            module.NATIVE_BATTLE_SYNC_ON_BOOT = True
+            module.NATIVE_BATTLE_HTTP_ENABLED = True
+            module.subprocess.run = lambda *args, **kwargs: self.fail(
+                "native sync subprocess must not execute"
+            )
+            module._sync_native_battle_rules({}, battle_batch_allowed=False)
+            self.assertIsNone(
+                module._start_native_battle_http(battle_batch_allowed=False)
+            )
+        finally:
+            module.NATIVE_BATTLE_SYNC_ON_BOOT = original_sync
+            module.NATIVE_BATTLE_HTTP_ENABLED = original_http
+            module.subprocess.run = original_run
+
+    def test_disabled_runtime_exposes_health_without_battle_surface(self) -> None:
+        module = _load_module()
+        policy = module._load_release_policy(
+            module.REPO_ROOT / "server/config/release_capabilities.json"
+        )
+        server = module._start_disabled_ops_health(
+            policy,
+            enabled_jobs=("hermes_cron_governor_report",),
+            host="127.0.0.1",
+            port=0,
+        )
+        try:
+            host, port = server.server_address
+            with urllib.request.urlopen(
+                f"http://{host}:{port}/health", timeout=2
+            ) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.headers["Cache-Control"], "no-store")
+            self.assertEqual(payload["status"], "ok")
+            self.assertEqual(
+                payload["engine_contract"], "disabled_by_release_capability"
+            )
+            self.assertEqual(payload["operational_mode"], "safe_housekeeping_only")
+            self.assertEqual(
+                payload["enabled_jobs"], ["hermes_cron_governor_report"]
+            )
+            self.assertEqual(
+                payload["release_capabilities"]["battle_batch"], "off"
+            )
+            self.assertEqual(
+                payload["release_capabilities"]["learning_writes"], "off"
+            )
+
+            with self.assertRaises(urllib.error.HTTPError) as blocked:
+                urllib.request.urlopen(f"http://{host}:{port}/simulate", timeout=2)
+            self.assertEqual(blocked.exception.code, 404)
+        finally:
+            server.shutdown()
+            server.server_close()
 
     def test_knowledge_db_has_validator_tables_checks_required_tables(self) -> None:
         module = _load_module()

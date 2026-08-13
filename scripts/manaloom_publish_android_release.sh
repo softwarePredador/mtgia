@@ -54,6 +54,7 @@ IDENTITY_JSON="$(
 SOURCE_SHA="$(jq -r '.git_sha' <<<"$IDENTITY_JSON")"
 SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
 IDENTITY_VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
+RELEASE_CAPABILITIES_JSON="$(jq -cer '.release_capabilities' <<<"$IDENTITY_JSON")"
 VERSION="${MANALOOM_RELEASE_VERSION:-$IDENTITY_VERSION}"
 if [[ "$VERSION" != "$IDENTITY_VERSION" ]]; then
   echo "versao solicitada diverge da identidade do source: requested=$VERSION source=$IDENTITY_VERSION" >&2
@@ -72,6 +73,7 @@ ANDROID_VERIFICATION="$RELEASE_DIR/android-verification.json"
 OBSERVABILITY_EVIDENCE="${MANALOOM_RELEASE_OBSERVABILITY_EVIDENCE:-}"
 PUBLIC_HOST="${MANALOOM_WEB_PUBLIC_HOST:-evolution-manaloom-web-public.2ta7qx.easypanel.host}"
 PUBLIC_URL="https://$PUBLIC_HOST/downloads/manaloom-android.apk"
+PUBLIC_RELEASE_URL="https://$PUBLIC_HOST/downloads/release.json"
 PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"
 SERVICE="${MANALOOM_RELEASE_SERVICE:-manaloom-releases}"
 SWARM_SERVICE="${PROJECT}_${SERVICE}"
@@ -125,12 +127,20 @@ fi
   shasum -a 256 -c SHA256SUMS >/dev/null
 )
 jq -e --arg sha "$SOURCE_SHA" --arg version "$VERSION" \
-  '.git_sha == $sha and .version == $version and .platform == "android" and .permissions_gate == "passed" and .sentry_configured == true' \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '.git_sha == $sha and .version == $version and .platform == "android" and
+   .permissions_gate == "passed" and .sentry_configured == true and
+   .release_capabilities == $release_capabilities' \
   "$RELEASE_MANIFEST" >/dev/null
 jq -e --arg sha "$SOURCE_SHA" --arg version "$VERSION" \
-  '.git_sha == $sha and .version == $version' "$RELEASE_IDENTITY" >/dev/null
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '.git_sha == $sha and .version == $version and
+   .release_capabilities == $release_capabilities' "$RELEASE_IDENTITY" >/dev/null
 jq -e --arg sha "$SOURCE_SHA" \
-  '.predicate.buildDefinition.externalParameters.git_sha == $sha' "$PROVENANCE" >/dev/null
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '.predicate.buildDefinition.externalParameters.git_sha == $sha and
+   .predicate.buildDefinition.externalParameters.release_capabilities == $release_capabilities' \
+  "$PROVENANCE" >/dev/null
 APK_HASH="$(shasum -a 256 "$APK" | awk '{print $1}')"
 AAB_HASH="$(shasum -a 256 "$AAB" | awk '{print $1}')"
 SBOM_HASH="$(shasum -a 256 "$SBOM" | awk '{print $1}')"
@@ -188,6 +198,7 @@ jq -e \
   --arg version "$VERSION" \
   --arg api_base_url "$API_BASE_URL" \
   --arg sentry_dsn_sha256 "$MANALOOM_RELEASE_SENTRY_DSN_SHA256_RESOLVED" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   --arg flutter_version "$MANALOOM_RELEASE_FLUTTER_VERSION" \
   --arg flutter_revision "$MANALOOM_RELEASE_FLUTTER_REVISION" \
   --arg engine_revision "$MANALOOM_RELEASE_FLUTTER_ENGINE_REVISION" \
@@ -201,6 +212,7 @@ jq -e \
   --arg aapt_sha256 "$MANALOOM_ANDROID_AAPT_SHA256" \
   '.status == "release" and .release_identity_embedded == true and
    .git_sha == $git_sha and .version == $version and
+   .release_capabilities == $release_capabilities and
    .api_base_url == $api_base_url and .sentry_dsn_sha256 == $sentry_dsn_sha256 and
    .toolchain.flutter_version == $flutter_version and
    .toolchain.flutter_revision == $flutter_revision and
@@ -493,10 +505,12 @@ jq -n \
   --arg certificate_sha256 "$CERTIFICATE_SHA256" \
   --arg api_base_url "$API_BASE_URL" \
   --arg sentry_dsn_sha256 "$MANALOOM_RELEASE_SENTRY_DSN_SHA256_RESOLVED" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     schema_version: 1,
     version: $version,
     git_sha: $git_sha,
+    release_capabilities: $release_capabilities,
     platform: "android",
     artifact: $artifact,
     sha256: $sha256,
@@ -664,6 +678,17 @@ if [[ "$PUBLIC_HASH" != "$APK_HASH" ]]; then
   echo "download publico diverge do APK assinado" >&2
   exit 1
 fi
+PUBLIC_RELEASE_JSON="$(curl -fsS "$PUBLIC_RELEASE_URL")"
+if ! jq -e \
+    --arg sha "$SOURCE_SHA" \
+    --arg version "$VERSION" \
+    --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+    '.git_sha == $sha and .version == $version and .platform == "android" and
+     .release_capabilities == $release_capabilities' \
+    >/dev/null <<<"$PUBLIC_RELEASE_JSON"; then
+  echo "release identity publica Android diverge do SHA/policy candidato" >&2
+  exit 1
+fi
 
 REMOTE_AAB_HASH="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "sha256sum '$REMOTE_RELEASE/$(basename "$AAB")' | awk '{print \$1}'")"
 if [[ "$REMOTE_AAB_HASH" != "$AAB_HASH" ]]; then
@@ -683,5 +708,22 @@ if [[ "$REMOTE_OBSERVABILITY_HASH" != "$OBSERVABILITY_HASH" ]]; then
 fi
 
 DEPLOY_COMMITTED=1
-printf '{"status":"published","version":"%s","git_sha":"%s","image":"%s","image_digest_ref":"%s","download_url":"%s","apk_sha256":"%s","aab_sha256":"%s","sbom_sha256":"%s","osv_scan_sha256":"%s","provenance_sha256":"%s","observability_sha256":"%s","private_aab_backup":true,"private_release_evidence":true}\n' \
-  "$VERSION" "$SOURCE_SHA" "$IMAGE" "$IMAGE_DIGEST_REF" "$PUBLIC_URL" "$APK_HASH" "$AAB_HASH" "$SBOM_HASH" "$OSV_SCAN_HASH" "$PROVENANCE_HASH" "$OBSERVABILITY_HASH"
+jq -cn \
+  --arg version "$VERSION" \
+  --arg git_sha "$SOURCE_SHA" \
+  --arg image "$IMAGE" \
+  --arg image_digest_ref "$IMAGE_DIGEST_REF" \
+  --arg download_url "$PUBLIC_URL" \
+  --arg apk_sha256 "$APK_HASH" \
+  --arg aab_sha256 "$AAB_HASH" \
+  --arg sbom_sha256 "$SBOM_HASH" \
+  --arg osv_scan_sha256 "$OSV_SCAN_HASH" \
+  --arg provenance_sha256 "$PROVENANCE_HASH" \
+  --arg observability_sha256 "$OBSERVABILITY_HASH" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '{status:"published", version:$version, git_sha:$git_sha, image:$image,
+    image_digest_ref:$image_digest_ref, download_url:$download_url,
+    apk_sha256:$apk_sha256, aab_sha256:$aab_sha256, sbom_sha256:$sbom_sha256,
+    osv_scan_sha256:$osv_scan_sha256, provenance_sha256:$provenance_sha256,
+    observability_sha256:$observability_sha256, private_aab_backup:true,
+    private_release_evidence:true, release_capabilities:$release_capabilities}'

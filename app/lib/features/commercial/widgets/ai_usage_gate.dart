@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/api/api_client.dart';
-import '../../../core/branding/product_identity.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
 
@@ -29,15 +26,10 @@ Future<bool> reserveAiActionOrShowPaywall(
   }
 
   if (!context.mounted) return false;
-  final openUpgrade = await showDialog<bool>(
+  await showDialog<void>(
     context: context,
-    builder: (_) => AiPaywallDialog(kind: kind, provider: provider!),
+    builder: (_) => AiQuotaLimitDialog(kind: kind, provider: provider!),
   );
-  if (CommercialLaunchPolicy.paidCheckoutEnabled &&
-      openUpgrade == true &&
-      context.mounted) {
-    context.push('/upgrade');
-  }
   return false;
 }
 
@@ -60,8 +52,8 @@ Future<void> refreshAiUsageAfterAction(BuildContext context) async {
   await provider.refreshFromServer();
 }
 
-class AiPaywallDialog extends StatelessWidget {
-  const AiPaywallDialog({
+class AiQuotaLimitDialog extends StatelessWidget {
+  const AiQuotaLimitDialog({
     super.key,
     required this.kind,
     required this.provider,
@@ -74,23 +66,13 @@ class AiPaywallDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final snapshot = provider.usageSnapshot;
     final theme = Theme.of(context);
-    final isFreeBeta = CommercialLaunchPolicy.isFreeBeta;
     return AlertDialog(
-      key: const Key('ai-paywall-dialog'),
+      key: const Key('ai-quota-limit-dialog'),
       title: Row(
         children: [
-          Icon(
-            isFreeBeta ? Icons.hourglass_bottom_rounded : Icons.lock_outline,
-            color: AppTheme.brass400,
-          ),
+          const Icon(Icons.hourglass_bottom_rounded, color: AppTheme.brass400),
           const SizedBox(width: AppTheme.space10),
-          Expanded(
-            child: Text(
-              isFreeBeta
-                  ? '${kind.label}: limite da beta atingido'
-                  : '${kind.label} precisa do Pro',
-            ),
-          ),
+          Expanded(child: Text('${kind.label}: limite da beta atingido')),
         ],
       ),
       content: Column(
@@ -98,7 +80,7 @@ class AiPaywallDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Você usou ${snapshot.used}/${snapshot.limit} ações de IA ${isFreeBeta ? 'na beta gratuita' : 'no plano ${snapshot.plan.tier.label}'}.',
+            'Você usou ${snapshot.used}/${snapshot.limit} ações de IA elegíveis na beta gratuita.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.4,
@@ -106,9 +88,7 @@ class AiPaywallDialog extends StatelessWidget {
           ),
           const SizedBox(height: AppTheme.space12),
           Text(
-            isFreeBeta
-                ? 'Compras e upgrades não estão disponíveis nesta fase. Seu acesso volta quando o próximo período de uso começar.'
-                : 'No Pro, o ${ProductIdentity.displayName} libera mais uso mensal, otimização por coleção/orçamento, relatório antes/depois e acompanhamento pós-jogo.',
+            'Não existe compra, upgrade ou paywall nesta fase. O teto é operacional e o saldo volta no próximo período UTC; a disponibilidade de cada recurso continua sendo confirmada pelo servidor.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.4,
@@ -117,23 +97,11 @@ class AiPaywallDialog extends StatelessWidget {
         ],
       ),
       actions: [
-        if (isFreeBeta)
-          ElevatedButton(
-            key: const Key('ai-beta-limit-dismiss-button'),
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Entendi'),
-          )
-        else ...[
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Agora não'),
-          ),
-          ElevatedButton(
-            key: const Key('ai-paywall-upgrade-button'),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Ver upgrade'),
-          ),
-        ],
+        ElevatedButton(
+          key: const Key('ai-beta-limit-dismiss-button'),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Entendi'),
+        ),
       ],
     );
   }

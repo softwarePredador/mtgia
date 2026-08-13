@@ -18,7 +18,7 @@ void main() {
     expect(
       source,
       matches(
-        RegExp(r'battleLiveSpectatorEnabled[\s\S]*?defaultValue:\s*false'),
+        RegExp(r'battleLiveSpectatorSupported[\s\S]*?defaultValue:\s*false'),
       ),
     );
   });
@@ -32,7 +32,9 @@ void main() {
     expect(features, contains("'ENABLE_INTERACTIVE_BATTLE'"));
     expect(
       features,
-      matches(RegExp(r'interactiveBattleEnabled[\s\S]*?defaultValue:\s*false')),
+      matches(
+        RegExp(r'interactiveBattleSupported[\s\S]*?defaultValue:\s*false'),
+      ),
     );
 
     final routes = File('lib/main.dart').readAsStringSync();
@@ -40,7 +42,7 @@ void main() {
       routes,
       matches(
         RegExp(
-          r"if \(LaunchFeatures\.interactiveBattleEnabled\)\s+GoRoute\(\s+path: 'battle-coach/:sessionId'",
+          r"if \(LaunchFeatures\.interactiveBattleSupported\)\s+GoRoute\(\s+path: 'battle-coach/:sessionId'",
           multiLine: true,
         ),
       ),
@@ -49,7 +51,7 @@ void main() {
       routes,
       matches(
         RegExp(
-          r"if \(LaunchFeatures\.interactiveBattleEnabled\)\s+GoRoute\(\s+path: 'battle-coach'",
+          r"if \(LaunchFeatures\.interactiveBattleSupported\)\s+GoRoute\(\s+path: 'battle-coach'",
           multiLine: true,
         ),
       ),
@@ -63,14 +65,19 @@ void main() {
       source,
       matches(
         RegExp(
-          r"if \(LaunchFeatures\.scannerEnabled\)\s+GoRoute\(\s+path: 'scan'",
+          r"if \(LaunchFeatures\.scannerSupported\)\s+GoRoute\(\s+path: 'scan'",
           multiLine: true,
         ),
       ),
     );
-    expect(source, contains("uriPath.endsWith('/scan')"));
-    expect(source, contains("RegExp(r'/scan\$')"));
-    expect(source, contains("'/search'"));
+    expect(source, contains('ReleaseCapabilityRouteGuard.redirectFor'));
+    final guard = File(
+      'lib/core/config/release_capabilities.dart',
+    ).readAsStringSync();
+    expect(guard, contains('buildSupport.scanner'));
+    expect(guard, contains('ReleaseCapability.scanner'));
+    expect(guard, contains("RegExp(r'/scan\$')"));
+    expect(guard, contains("'/search'"));
   });
 
   test('signed Android beta fixes the scanner launch flag to false', () {
@@ -84,7 +91,7 @@ void main() {
     expect(build, isNot(contains('scanner_release_enabled: true')));
   });
 
-  test('release build scripts keep interactive Battle caller-only', () {
+  test('release build scripts keep interactive Battle disabled', () {
     for (final path in const [
       '../scripts/manaloom_build_android_release.sh',
       '../scripts/manaloom_deploy_flutter_web.sh',
@@ -108,7 +115,9 @@ void main() {
       );
       expect(
         source,
-        contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+        contains(
+          'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF',
+        ),
         reason: path,
       );
       expect(

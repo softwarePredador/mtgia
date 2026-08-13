@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "test:contract": "node tests/free-beta-offer-contract.mjs"
   },
   "overrides": {
     "next": {

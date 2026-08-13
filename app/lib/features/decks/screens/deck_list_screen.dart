@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 import '../../../core/branding/product_identity.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/config/visual_fixture.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -50,7 +51,10 @@ class _DeckListScreenState extends State<DeckListScreen> {
     // Busca os decks ao abrir a tela
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshDecksIfVisible(force: true);
-      if (widget.openCreateOnStart && !_openedInitialCreate && mounted) {
+      if (widget.openCreateOnStart &&
+          !_openedInitialCreate &&
+          mounted &&
+          _isCapabilityAllowed(ReleaseCapability.decksPrivate)) {
         _openedInitialCreate = true;
         _showCreateDeckDialog(context);
       }
@@ -59,6 +63,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
   void _refreshDecksIfVisible({bool force = false}) {
     if (!mounted) return;
+    if (!_isCapabilityAllowed(ReleaseCapability.decksPrivate)) return;
     final route = ModalRoute.of(context);
     if (route != null && !route.isCurrent) return;
 
@@ -73,6 +78,13 @@ class _DeckListScreenState extends State<DeckListScreen> {
     context.read<DeckProvider>().fetchDecks(silent: !force);
   }
 
+  bool _isCapabilityAllowed(ReleaseCapability capability) {
+    return context.read<ReleaseCapabilitiesProvider?>()?.isAllowed(
+          capability,
+        ) ??
+        false;
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -80,6 +92,10 @@ class _DeckListScreenState extends State<DeckListScreen> {
   }
 
   Future<void> _showCreateDeckDialog(BuildContext context) async {
+    final capabilities = context.read<ReleaseCapabilitiesProvider?>();
+    if (!(capabilities?.isAllowed(ReleaseCapability.decksPrivate) ?? false)) {
+      return;
+    }
     final parentContext = context;
     const formats = [
       'commander',
@@ -251,19 +267,40 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                     ),
                                     if (isCommanderStyleDeckFormat(
                                       selectedFormat,
-                                    )) ...[
-                                      const SizedBox(height: AppTheme.space14),
-                                      DeckCommanderSelector(
-                                        format: selectedFormat,
-                                        selectedCard: selectedCommander,
-                                        onChanged: (card) {
-                                          setState(() {
-                                            selectedCommander = card;
-                                            submitError = null;
-                                          });
-                                        },
+                                    ))
+                                      Consumer<ReleaseCapabilitiesProvider?>(
+                                        builder:
+                                            (context, currentCapabilities, _) {
+                                              if (!(currentCapabilities
+                                                      ?.isAllowed(
+                                                        ReleaseCapability
+                                                            .catalogPrivate,
+                                                      ) ??
+                                                  false)) {
+                                                return const SizedBox.shrink();
+                                              }
+                                              return Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const SizedBox(
+                                                    height: AppTheme.space14,
+                                                  ),
+                                                  DeckCommanderSelector(
+                                                    format: selectedFormat,
+                                                    selectedCard:
+                                                        selectedCommander,
+                                                    onChanged: (card) {
+                                                      setState(() {
+                                                        selectedCommander =
+                                                            card;
+                                                        submitError = null;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
                                       ),
-                                    ],
                                     const SizedBox(height: AppTheme.space14),
                                     TextField(
                                       key: const Key(
@@ -281,23 +318,46 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                         }
                                       },
                                     ),
-                                    const SizedBox(height: AppTheme.space12),
-                                    SwitchListTile(
-                                      key: const Key(
-                                        'deck-create-public-switch',
-                                      ),
-                                      title: const Text('Deck público'),
-                                      subtitle: const Text(
-                                        'Visível na comunidade',
-                                      ),
-                                      value: isPublic,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isPublic = value;
-                                          submitError = null;
-                                        });
-                                      },
-                                      contentPadding: EdgeInsets.zero,
+                                    Consumer<ReleaseCapabilitiesProvider?>(
+                                      builder:
+                                          (context, currentCapabilities, _) {
+                                            if (!(currentCapabilities
+                                                    ?.isAllowed(
+                                                      ReleaseCapability
+                                                          .galleryPublic,
+                                                    ) ??
+                                                false)) {
+                                              return const SizedBox.shrink();
+                                            }
+                                            return Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const SizedBox(
+                                                  height: AppTheme.space12,
+                                                ),
+                                                SwitchListTile(
+                                                  key: const Key(
+                                                    'deck-create-public-switch',
+                                                  ),
+                                                  title: const Text(
+                                                    'Deck público',
+                                                  ),
+                                                  subtitle: const Text(
+                                                    'Visível na comunidade',
+                                                  ),
+                                                  value: isPublic,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      isPublic = value;
+                                                      submitError = null;
+                                                    });
+                                                  },
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                ),
+                                              ],
+                                            );
+                                          },
                                     ),
                                     if (submitError != null &&
                                         keyboardCramped) ...[
@@ -359,6 +419,28 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                   return;
                                 }
 
+                                final currentCapabilities = dialogContext
+                                    .read<ReleaseCapabilitiesProvider?>();
+                                if (!(currentCapabilities?.isAllowed(
+                                      ReleaseCapability.decksPrivate,
+                                    ) ??
+                                    false)) {
+                                  setState(() {
+                                    submitError =
+                                        'A criação de decks não está disponível nesta versão.';
+                                  });
+                                  return;
+                                }
+                                final canPublishNow =
+                                    currentCapabilities?.isAllowed(
+                                      ReleaseCapability.galleryPublic,
+                                    ) ??
+                                    false;
+                                final canUseCatalogNow =
+                                    currentCapabilities?.isAllowed(
+                                      ReleaseCapability.catalogPrivate,
+                                    ) ??
+                                    false;
                                 final deckProvider = dialogContext
                                     .read<DeckProvider>();
                                 setState(() {
@@ -373,9 +455,10 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                   description: trimmedDescription.isEmpty
                                       ? null
                                       : trimmedDescription,
-                                  isPublic: isPublic,
+                                  isPublic: canPublishNow && isPublic,
                                   cards:
-                                      isCommanderStyleDeckFormat(
+                                      canUseCatalogNow &&
+                                          isCommanderStyleDeckFormat(
                                             selectedFormat,
                                           ) &&
                                           selectedCommander != null
@@ -509,10 +592,19 @@ class _DeckListScreenState extends State<DeckListScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final canUsePrivateDecks =
+        capabilities?.isAllowed(ReleaseCapability.decksPrivate) ?? false;
+    final canGenerate =
+        capabilities?.isAllowed(ReleaseCapability.aiGenerateRebuild) ?? false;
+    final canUseCollection =
+        capabilities?.isAllowed(ReleaseCapability.collectionPrivate) ?? false;
     final deckCount = context.select<DeckProvider, int>((p) => p.decks.length);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refreshDecksIfVisible();
-    });
+    if (canUsePrivateDecks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _refreshDecksIfVisible();
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
@@ -531,7 +623,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<DeckProvider>().fetchDecks(),
+            onPressed: canUsePrivateDecks
+                ? () => context.read<DeckProvider>().fetchDecks()
+                : null,
             tooltip: 'Recarregar',
           ),
           const ShellAppBarActions(),
@@ -539,6 +633,18 @@ class _DeckListScreenState extends State<DeckListScreen> {
       ),
       body: Builder(
         builder: (context) {
+          if (!canUsePrivateDecks) {
+            return const AppStatePanel(
+              key: Key('deck-list-capability-unavailable'),
+              icon: Icons.style_outlined,
+              title: 'Decks indisponíveis',
+              message:
+                  'Esta versão ainda não liberou o acesso aos decks privados.',
+              accent: AppTheme.textHint,
+              status: AppStateStatus.unavailable,
+            );
+          }
+
           final deckIsLoading = context.select<DeckProvider, bool>(
             (p) => p.isLoading,
           );
@@ -574,7 +680,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
               accent: AppTheme.error,
               status: AppStateStatus.error,
               actionLabel: 'Tentar novamente',
-              onAction: () => context.read<DeckProvider>().fetchDecks(),
+              onAction: canUsePrivateDecks
+                  ? () => context.read<DeckProvider>().fetchDecks()
+                  : null,
             );
           }
 
@@ -582,7 +690,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
           if (decks.isEmpty) {
             return _DeckEmptyState(
               onCreate: () => _showCreateDeckDialog(context),
-              onGenerate: () => context.go('/decks/generate'),
+              onGenerate: canGenerate
+                  ? () => context.go('/decks/generate')
+                  : null,
               onImport: () => context.go('/decks/import'),
             );
           }
@@ -811,9 +921,13 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           itemBuilder: (context, index) {
                             if (index == visibleDecks.length) {
                               return _SparseDeckActions(
-                                onGenerate: () => context.go('/decks/generate'),
+                                onGenerate: canGenerate
+                                    ? () => context.go('/decks/generate')
+                                    : null,
                                 onImport: () => context.go('/decks/import'),
-                                onSearch: () => context.go('/collection'),
+                                onSearch: canUseCollection
+                                    ? () => context.go('/collection')
+                                    : null,
                               );
                             }
                             final deck = visibleDecks[index];
@@ -858,9 +972,13 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         ],
                       );
                       final actions = _SparseDeckActions(
-                        onGenerate: () => context.go('/decks/generate'),
+                        onGenerate: canGenerate
+                            ? () => context.go('/decks/generate')
+                            : null,
                         onImport: () => context.go('/decks/import'),
-                        onSearch: () => context.go('/collection'),
+                        onSearch: canUseCollection
+                            ? () => context.go('/collection')
+                            : null,
                       );
                       final sideBySide =
                           constraints.crossAxisExtent >=
@@ -923,7 +1041,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           );
         },
       ),
-      floatingActionButton: deckCount == 0
+      floatingActionButton: !canUsePrivateDecks || deckCount == 0
           ? null
           : PopupMenuButton<String>(
               key: const Key('deck-list-fab-menu'),
@@ -933,7 +1051,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     _showCreateDeckDialog(context);
                     break;
                   case 'generate':
-                    context.go('/decks/generate');
+                    if (canGenerate) context.go('/decks/generate');
                     break;
                   case 'import':
                     context.go('/decks/import');
@@ -957,20 +1075,21 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     dense: true,
                   ),
                 ),
-                PopupMenuItem(
-                  key: const Key('deck-list-menu-generate'),
-                  value: 'generate',
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.auto_awesome,
-                      color: theme.colorScheme.secondary,
+                if (canGenerate)
+                  PopupMenuItem(
+                    key: const Key('deck-list-menu-generate'),
+                    value: 'generate',
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.auto_awesome,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      title: const Text('Gerar com IA'),
+                      subtitle: const Text('Descreva e a IA monta'),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
                     ),
-                    title: const Text('Gerar com IA'),
-                    subtitle: const Text('Descreva e a IA monta'),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
                   ),
-                ),
                 PopupMenuItem(
                   key: const Key('deck-list-menu-import'),
                   value: 'import',
@@ -1225,14 +1344,14 @@ String _compactDeckPrice(double value, String? currency) {
 
 class _SparseDeckActions extends StatelessWidget {
   const _SparseDeckActions({
-    required this.onGenerate,
+    this.onGenerate,
     required this.onImport,
-    required this.onSearch,
+    this.onSearch,
   });
 
-  final VoidCallback onGenerate;
+  final VoidCallback? onGenerate;
   final VoidCallback onImport;
-  final VoidCallback onSearch;
+  final VoidCallback? onSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -1266,21 +1385,23 @@ class _SparseDeckActions extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _QuickDeckAction(
-                icon: Icons.auto_fix_high_rounded,
-                label: 'Criar com IA',
-                onTap: onGenerate,
-              ),
+              if (onGenerate != null)
+                _QuickDeckAction(
+                  icon: Icons.auto_fix_high_rounded,
+                  label: 'Criar com IA',
+                  onTap: onGenerate!,
+                ),
               _QuickDeckAction(
                 icon: Icons.content_paste_rounded,
                 label: 'Importar lista',
                 onTap: onImport,
               ),
-              _QuickDeckAction(
-                icon: Icons.search_rounded,
-                label: 'Buscar cartas',
-                onTap: onSearch,
-              ),
+              if (onSearch != null)
+                _QuickDeckAction(
+                  icon: Icons.search_rounded,
+                  label: 'Buscar cartas',
+                  onTap: onSearch!,
+                ),
             ],
           ),
         ],
@@ -2105,12 +2226,12 @@ class _DeckFallbackArt extends StatelessWidget {
 class _DeckEmptyState extends StatelessWidget {
   const _DeckEmptyState({
     required this.onCreate,
-    required this.onGenerate,
+    this.onGenerate,
     required this.onImport,
   });
 
   final VoidCallback onCreate;
-  final VoidCallback onGenerate;
+  final VoidCallback? onGenerate;
   final VoidCallback onImport;
 
   @override
@@ -2207,7 +2328,9 @@ class _DeckEmptyState extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
           child: Text(
-            'Monte do zero, descreva sua ideia para a IA ou importe uma lista que você já joga.',
+            onGenerate == null
+                ? 'Monte do zero ou importe uma lista que você já joga.'
+                : 'Monte do zero, descreva sua ideia para a IA ou importe uma lista que você já joga.',
             textAlign: textAlign,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
@@ -2233,13 +2356,15 @@ class _DeckEmptyState extends StatelessWidget {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Criar novo deck'),
             ),
-            const SizedBox(height: AppTheme.space10),
-            OutlinedButton.icon(
-              key: const Key('deck-list-empty-generate-button'),
-              onPressed: onGenerate,
-              icon: const Icon(Icons.auto_fix_high, size: 18),
-              label: const Text('Gerar com IA'),
-            ),
+            if (onGenerate != null) ...[
+              const SizedBox(height: AppTheme.space10),
+              OutlinedButton.icon(
+                key: const Key('deck-list-empty-generate-button'),
+                onPressed: onGenerate,
+                icon: const Icon(Icons.auto_fix_high, size: 18),
+                label: const Text('Gerar com IA'),
+              ),
+            ],
             const SizedBox(height: AppTheme.space10),
             TextButton.icon(
               key: const Key('deck-list-empty-import-button'),
@@ -2284,15 +2409,16 @@ class _DeckEmptyState extends StatelessWidget {
             accent: AppTheme.brass400,
             onTap: onCreate,
           ),
-          _DeckStartOption(
-            optionKey: const Key('deck-list-empty-generate-button'),
-            icon: Icons.auto_awesome_outlined,
-            title: 'Gerar com IA',
-            description:
-                'Transforme uma estratégia ou tema em uma primeira lista.',
-            accent: AppTheme.manaViolet,
-            onTap: onGenerate,
-          ),
+          if (onGenerate != null)
+            _DeckStartOption(
+              optionKey: const Key('deck-list-empty-generate-button'),
+              icon: Icons.auto_awesome_outlined,
+              title: 'Gerar com IA',
+              description:
+                  'Transforme uma estratégia ou tema em uma primeira lista.',
+              accent: AppTheme.manaViolet,
+              onTap: onGenerate!,
+            ),
           _DeckStartOption(
             optionKey: const Key('deck-list-empty-import-button'),
             icon: Icons.content_paste_go_outlined,

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
@@ -263,6 +264,11 @@ void main() {
   });
 
   testWidgets('Enter and Space activate shell actions', (tester) async {
+    final capabilities = ReleaseCapabilitiesProvider.seeded(const {
+      ReleaseCapability.directMessages,
+      ReleaseCapability.socialPush,
+    });
+    addTearDown(capabilities.dispose);
     final router = GoRouter(
       initialLocation: '/home',
       routes: [
@@ -281,11 +287,16 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider.value(value: capabilities),
           ChangeNotifierProvider(create: (_) => MessageProvider()),
           ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ],
         child: MaterialApp.router(
-          theme: AppTheme.darkTheme,
+          // Avoid coupling this keyboard contract to a cached engine shader;
+          // activation semantics do not depend on the splash renderer.
+          theme: AppTheme.darkTheme.copyWith(
+            splashFactory: NoSplash.splashFactory,
+          ),
           routerConfig: router,
         ),
       ),

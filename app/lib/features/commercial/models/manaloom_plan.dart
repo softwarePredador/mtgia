@@ -1,6 +1,6 @@
 import '../../../core/branding/product_identity.dart';
 
-enum ManaLoomPlanTier { free, pro }
+enum ManaLoomPlanTier { free }
 
 enum AiUsageKind {
   deckGeneration,
@@ -11,22 +11,12 @@ enum AiUsageKind {
 }
 
 extension ManaLoomPlanTierLabel on ManaLoomPlanTier {
-  String get id => switch (this) {
-    ManaLoomPlanTier.free => 'free',
-    ManaLoomPlanTier.pro => 'pro',
-  };
+  String get id => 'free';
 
-  String get label => switch (this) {
-    ManaLoomPlanTier.free => 'Beta gratuita',
-    ManaLoomPlanTier.pro => 'Pro',
-  };
+  String get label => 'Beta gratuita';
 
-  static ManaLoomPlanTier fromId(String? id) {
-    return switch (id) {
-      'pro' => ManaLoomPlanTier.pro,
-      _ => ManaLoomPlanTier.free,
-    };
-  }
+  /// Legacy/local values (including `pro`) never create an entitlement.
+  static ManaLoomPlanTier fromId(String? _) => ManaLoomPlanTier.free;
 }
 
 extension AiUsageKindLabel on AiUsageKind {
@@ -40,9 +30,10 @@ extension AiUsageKindLabel on AiUsageKind {
 }
 
 class ManaLoomPlan {
+  static const operationalAiMonthlyCeiling = 120;
+
   final ManaLoomPlanTier tier;
   final int monthlyAiLimit;
-  final ManaLoomBillingTerms billingTerms;
   final String description;
   final List<String> features;
   final List<String> limits;
@@ -50,101 +41,32 @@ class ManaLoomPlan {
   const ManaLoomPlan({
     required this.tier,
     required this.monthlyAiLimit,
-    required this.billingTerms,
     required this.description,
     required this.features,
     required this.limits,
   });
 
-  bool get isPro => tier == ManaLoomPlanTier.pro;
-  String get priceLabel => billingTerms.priceLabel;
+  String get priceLabel => 'Sem cobrança';
 
   static const free = ManaLoomPlan(
     tier: ManaLoomPlanTier.free,
-    monthlyAiLimit: 120,
-    billingTerms: ManaLoomBillingTerms.free,
+    monthlyAiLimit: operationalAiMonthlyCeiling,
     description:
-        'Acesso aos recursos disponíveis no ${ProductIdentity.displayName} durante a beta pública.',
+        'Acesso gratuito somente aos recursos liberados pelo servidor durante a beta controlada do ${ProductIdentity.displayName}.',
     features: [
-      '120 ações de IA por mês',
-      'Geração, análise e otimização com revisão antes de aplicar',
-      'Coleção, fichário, trocas e comunidade',
-      'Life Counter e acompanhamento pós-jogo',
+      'Sem assinatura, checkout, renovação ou cobrança',
+      'Disponibilidade de cada recurso confirmada pelo servidor',
+      'Ações de IA revisáveis quando o recurso correspondente estiver liberado',
     ],
     limits: [
-      'Ações de IA param ao atingir o limite mensal',
+      'Até 120 ações de IA elegíveis por mês UTC como teto operacional',
+      'O teto não garante que um recurso de IA esteja disponível',
+      'O teto não define preço nem direito permanente de uso',
       'O saldo de IA não é acumulado para o mês seguinte',
     ],
   );
 
-  static const pro = ManaLoomPlan(
-    tier: ManaLoomPlanTier.pro,
-    monthlyAiLimit: 2500,
-    billingTerms: ManaLoomBillingTerms.pro,
-    description:
-        'Para quem usa IA com frequência e precisa de um limite mensal maior.',
-    features: [
-      '2.500 ações de IA por mês',
-      'Geração, análise e otimização com a mesma revisão segura',
-      'Limite sincronizado com o plano da sua conta',
-    ],
-    limits: [
-      'Social, trocas e pós-jogo continuam disponíveis no Free',
-      'Ativação depende da confirmação do provedor de pagamento',
-      'O saldo de IA não é acumulado para o mês seguinte',
-    ],
-  );
-
-  static ManaLoomPlan forTier(ManaLoomPlanTier tier) {
-    return switch (tier) {
-      ManaLoomPlanTier.free => free,
-      ManaLoomPlanTier.pro => pro,
-    };
-  }
-}
-
-/// Fonte única para preço, recorrência e condições mostradas antes do checkout.
-///
-/// O provedor externo continua sendo a fonte final do total e da data de
-/// cobrança. Se houver divergência, a compra não deve ser concluída.
-class ManaLoomBillingTerms {
-  final String priceLabel;
-  final String recurrenceLabel;
-  final String renewalDisclosure;
-  final String cancellationDisclosure;
-  final String refundDisclosure;
-  final String checkoutGuardrail;
-
-  const ManaLoomBillingTerms({
-    required this.priceLabel,
-    required this.recurrenceLabel,
-    required this.renewalDisclosure,
-    required this.cancellationDisclosure,
-    required this.refundDisclosure,
-    required this.checkoutGuardrail,
-  });
-
-  static const free = ManaLoomBillingTerms(
-    priceLabel: 'Sem custo',
-    recurrenceLabel: 'Sem cobrança',
-    renewalDisclosure: 'A beta gratuita não tem renovação paga.',
-    cancellationDisclosure: 'Não há assinatura para cancelar durante a beta.',
-    refundDisclosure: 'Não há cobrança da beta para reembolsar.',
-    checkoutGuardrail: 'A beta gratuita não exige checkout.',
-  );
-
-  static const pro = ManaLoomBillingTerms(
-    priceLabel: 'R\$ 19,90/mês',
-    recurrenceLabel: 'Assinatura mensal recorrente',
-    renewalDisclosure:
-        'Renovação automática a cada mês até o cancelamento. O checkout confirma a próxima cobrança antes do pagamento.',
-    cancellationDisclosure:
-        'Cancelamento: esta versão ainda não oferece gestão dentro do app. Solicite pelo canal indicado pelo provedor antes da próxima cobrança.',
-    refundDisclosure:
-        'Reembolso: não é automático; solicitações seguem a legislação aplicável e as regras informadas pelo provedor no checkout.',
-    checkoutGuardrail:
-        'Confira preço, periodicidade e total no checkout externo. Se houver divergência, não conclua a compra.',
-  );
+  static ManaLoomPlan forTier(ManaLoomPlanTier _) => free;
 }
 
 class AiUsageSnapshot {

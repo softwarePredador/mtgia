@@ -1,5 +1,15 @@
 # ManaLoom Project Logic Full Report - 2026-06-11
 
+> **HISTORICAL / SUPERSEDED — NAO USE COMO ESTADO, CONTRATO OU PLANO ATUAL.**
+>
+> Este relatorio preserva a fotografia do checkout de 2026-06-11. Hosts,
+> prioridades, status, crons, fluxos de IA/aprendizado e recomendacoes abaixo
+> podem estar obsoletos e nao devem ser executados sem revalidacao.
+> Para o fluxo vigente de Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > Relatorio canonico de arquitetura, logica de produto, banco, IA, Hermes,
 > crons, regras e validacao do ManaLoom no estado atual do repositorio.
 >

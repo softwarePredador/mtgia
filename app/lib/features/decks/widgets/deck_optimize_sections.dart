@@ -15,6 +15,7 @@ class OptimizationConfigSection extends StatelessWidget {
   final ValueChanged<int> onBracketChanged;
   final ValueChanged<bool> onKeepThemeChanged;
   final ValueChanged<OptimizeIntensity> onIntensityChanged;
+  final bool allowRebuild;
   final Color accent;
 
   const OptimizationConfigSection({
@@ -25,6 +26,7 @@ class OptimizationConfigSection extends StatelessWidget {
     required this.onBracketChanged,
     required this.onKeepThemeChanged,
     required this.onIntensityChanged,
+    this.allowRebuild = true,
     required this.accent,
   });
 
@@ -64,6 +66,7 @@ class OptimizationConfigSection extends StatelessWidget {
           _OptimizationIntensitySelector(
             selected: selectedIntensity,
             onChanged: onIntensityChanged,
+            allowRebuild: allowRebuild,
           ),
           const SizedBox(height: AppTheme.space12),
           Material(
@@ -109,6 +112,7 @@ class RecommendationContextSection extends StatelessWidget {
     required this.onBudgetEnabledChanged,
     required this.onBudgetLimitChanged,
     required this.onRebuildIntentChanged,
+    this.showRebuildIntent = true,
   });
 
   final bool preferCollection;
@@ -119,6 +123,7 @@ class RecommendationContextSection extends StatelessWidget {
   final ValueChanged<bool> onBudgetEnabledChanged;
   final ValueChanged<double> onBudgetLimitChanged;
   final ValueChanged<String> onRebuildIntentChanged;
+  final bool showRebuildIntent;
 
   @override
   Widget build(BuildContext context) {
@@ -172,34 +177,41 @@ class RecommendationContextSection extends StatelessWidget {
             onChanged: budgetEnabled ? onBudgetLimitChanged : null,
           ),
           const SizedBox(height: AppTheme.space6),
-          InputDecorator(
-            decoration: const InputDecoration(labelText: 'Intenção do rebuild'),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                key: const Key('optimize-rebuild-intent-field'),
-                value: rebuildIntent,
-                isExpanded: true,
-                items: const [
-                  DropdownMenuItem(value: 'casual', child: Text('Casual')),
-                  DropdownMenuItem(value: 'upgraded', child: Text('Upgraded')),
-                  DropdownMenuItem(
-                    value: 'optimized',
-                    child: Text('Optimized'),
-                  ),
-                  DropdownMenuItem(value: 'cedh', child: Text('cEDH')),
-                ],
-                onChanged: (value) {
-                  if (value != null) onRebuildIntentChanged(value);
-                },
+          if (showRebuildIntent)
+            InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Intenção do rebuild',
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  key: const Key('optimize-rebuild-intent-field'),
+                  value: rebuildIntent,
+                  isExpanded: true,
+                  items: const [
+                    DropdownMenuItem(value: 'casual', child: Text('Casual')),
+                    DropdownMenuItem(
+                      value: 'upgraded',
+                      child: Text('Upgraded'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'optimized',
+                      child: Text('Optimized'),
+                    ),
+                    DropdownMenuItem(value: 'cedh', child: Text('cEDH')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) onRebuildIntentChanged(value);
+                  },
+                ),
               ),
             ),
-          ),
           const SizedBox(height: AppTheme.space12),
           _RecommendationContextSummary(
             preferCollection: preferCollection,
             budgetEnabled: budgetEnabled,
             budgetLimit: budgetLimit,
             rebuildIntent: rebuildIntent,
+            showRebuildIntent: showRebuildIntent,
           ),
           const SizedBox(height: AppTheme.space12),
           const _RecommendationTrustNote(),
@@ -215,12 +227,14 @@ class _RecommendationContextSummary extends StatelessWidget {
     required this.budgetEnabled,
     required this.budgetLimit,
     required this.rebuildIntent,
+    this.showRebuildIntent = true,
   });
 
   final bool preferCollection;
   final bool budgetEnabled;
   final double budgetLimit;
   final String rebuildIntent;
+  final bool showRebuildIntent;
 
   String get _budgetLabel {
     if (!budgetEnabled) return 'Sem limite definido';
@@ -276,10 +290,11 @@ class _RecommendationContextSummary extends StatelessWidget {
                 icon: Icons.payments_outlined,
                 label: _budgetLabel,
               ),
-              _RecommendationConstraintChip(
-                icon: Icons.speed_outlined,
-                label: _intentLabel,
-              ),
+              if (showRebuildIntent)
+                _RecommendationConstraintChip(
+                  icon: Icons.speed_outlined,
+                  label: _intentLabel,
+                ),
               const _RecommendationConstraintChip(
                 icon: Icons.compare_arrows_outlined,
                 label: 'Antes/depois',
@@ -366,10 +381,12 @@ class _RecommendationTrustNote extends StatelessWidget {
 class _OptimizationIntensitySelector extends StatelessWidget {
   final OptimizeIntensity selected;
   final ValueChanged<OptimizeIntensity> onChanged;
+  final bool allowRebuild;
 
   const _OptimizationIntensitySelector({
     required this.selected,
     required this.onChanged,
+    required this.allowRebuild,
   });
 
   String _title(OptimizeIntensity intensity) {
@@ -418,22 +435,28 @@ class _OptimizationIntensitySelector extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: OptimizeIntensity.values.map((intensity) {
-            final isSelected = selected == intensity;
-            final accent = _accent(intensity);
-            return ChoiceChip(
-              key: Key('optimize-intensity-${intensity.name}'),
-              label: Text(_title(intensity)),
-              selected: isSelected,
-              onSelected: (_) => onChanged(intensity),
-              selectedColor: accent.withValues(alpha: 0.22),
-              side: BorderSide(
-                color: isSelected
-                    ? accent
-                    : AppTheme.outlineMuted.withValues(alpha: 0.7),
-              ),
-            );
-          }).toList(),
+          children: OptimizeIntensity.values
+              .where(
+                (intensity) =>
+                    allowRebuild || intensity != OptimizeIntensity.rebuild,
+              )
+              .map((intensity) {
+                final isSelected = selected == intensity;
+                final accent = _accent(intensity);
+                return ChoiceChip(
+                  key: Key('optimize-intensity-${intensity.name}'),
+                  label: Text(_title(intensity)),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(intensity),
+                  selectedColor: accent.withValues(alpha: 0.22),
+                  side: BorderSide(
+                    color: isSelected
+                        ? accent
+                        : AppTheme.outlineMuted.withValues(alpha: 0.7),
+                  ),
+                );
+              })
+              .toList(),
         ),
         const SizedBox(height: AppTheme.space8),
         Container(
@@ -713,6 +736,7 @@ class OptimizationSheetBody extends StatelessWidget {
   final VoidCallback onToggleStrategyVisibility;
   final VoidCallback onRetryOptions;
   final ValueChanged<String> onApplyArchetype;
+  final bool allowRebuild;
 
   const OptimizationSheetBody({
     super.key,
@@ -742,6 +766,7 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.onToggleStrategyVisibility,
     required this.onRetryOptions,
     required this.onApplyArchetype,
+    this.allowRebuild = true,
   });
 
   @override
@@ -794,6 +819,7 @@ class OptimizationSheetBody extends StatelessWidget {
           onBracketChanged: onBracketChanged,
           onKeepThemeChanged: onKeepThemeChanged,
           onIntensityChanged: onIntensityChanged,
+          allowRebuild: allowRebuild,
         ),
         const SizedBox(height: AppTheme.space16),
         RecommendationContextSection(
@@ -805,6 +831,7 @@ class OptimizationSheetBody extends StatelessWidget {
           onBudgetEnabledChanged: onBudgetEnabledChanged,
           onBudgetLimitChanged: onBudgetLimitChanged,
           onRebuildIntentChanged: onRebuildIntentChanged,
+          showRebuildIntent: allowRebuild,
         ),
       ],
     );

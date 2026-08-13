@@ -969,14 +969,15 @@ void main() {
       );
       await _capture(binding, tester, 'battle_coach_welcome');
 
-      await _goRoute(
-        tester,
-        '/decks/$_auditDeckId/battle-live/00000000-0000-0000-0000-000000000000',
-      );
+      // A build without Live support must not register/navigate to the
+      // spectator route. Prove the safe Replays surface has no Live jobs strip
+      // instead of depending on the obsolete in-route disabled placeholder.
+      await _goRoute(tester, '/decks/$_auditDeckId/battle-replays');
       await pumpUntilFound(
         tester,
-        find.byKey(const Key('battle-live-disabled-state')),
+        find.byKey(const Key('battle-replays-empty-state')),
       );
+      expect(find.byKey(const Key('battle-live-jobs-strip')), findsNothing);
       await _capture(binding, tester, 'battle_live_disabled');
 
       await _goRoute(tester, '/messages');
@@ -1039,15 +1040,17 @@ void main() {
       await _goRoute(tester, '/upgrade');
       await pumpUntilFound(
         tester,
-        find.byKey(const Key('upgrade-beta-notice')),
+        find.byKey(const Key('beta-free-access-panel')),
       );
+      expect(find.byKey(const Key('upgrade-beta-notice')), findsNothing);
       await _capture(binding, tester, 'upgrade_success');
 
       await _goRoute(tester, '/checkout');
       await pumpUntilFound(
         tester,
-        find.byKey(const Key('checkout-beta-notice')),
+        find.byKey(const Key('beta-free-access-panel')),
       );
+      expect(find.byKey(const Key('checkout-beta-notice')), findsNothing);
       await _capture(binding, tester, 'checkout_success');
 
       await _goRoute(tester, '/legal');

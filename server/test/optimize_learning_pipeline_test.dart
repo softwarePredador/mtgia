@@ -40,8 +40,6 @@ void main() {
       'captures rejected optimize outcome with reasons and priority source',
       () {
         final entry = optimize_route.buildOptimizationAnalysisLogEntry(
-          deckId: 'deck-1',
-          userId: 'user-1',
           commanderName: 'Talrand, Sky Summoner',
           commanderColors: const ['U'],
           operationMode: 'optimize',
@@ -94,8 +92,10 @@ void main() {
         final decisions =
             (entry['decisions_reasoning'] as Map).cast<String, dynamic>();
         expect(decisions['validation_run_token'], equals('validation_run_123'));
-        expect(decisions['deck_id'], equals('deck-1'));
-        expect(decisions['user_id'], equals('user-1'));
+        expect(entry, isNot(contains('deck_id')));
+        expect(entry, isNot(contains('user_id')));
+        expect(decisions, isNot(contains('deck_id')));
+        expect(decisions, isNot(contains('user_id')));
         expect(decisions['status_code'], equals(422));
         expect(
           decisions['quality_error_code'],
@@ -118,6 +118,15 @@ void main() {
         expect(acceptedPairs.first['add'], equals('Force of Will'));
       },
     );
+  });
+
+  test('optimize preview never records automatic ML acceptance', () {
+    final routeSource =
+        File('routes/ai/optimize/index.dart').readAsStringSync();
+
+    expect(routeSource, isNot(contains('recordOptimizeMlFeedback')));
+    expect(routeSource, isNot(contains('buildOptimizeMlFeedback')));
+    expect(File('lib/ai/optimize_feedback_support.dart').existsSync(), isFalse);
   });
 
   test(

@@ -816,6 +816,34 @@ void main() {
     ]);
   });
 
+  test('mock generated deck remains reviewable but cannot be materialized', () {
+    final payload = <String, dynamic>{
+      'generated_deck': {
+        'cards': const [
+          {'name': 'Island', 'quantity': 60},
+        ],
+      },
+      'validation': {
+        'is_valid': true,
+        'errors': const <String>[],
+        'invalid_cards': const <String>[],
+      },
+      'stats': {'invalid_cards': 0},
+      'is_mock': true,
+      'can_save': true,
+      'learning_eligible': true,
+    };
+
+    expect(isReviewableGeneratedDeckResult(payload), isTrue);
+    expect(generatedDeckSaveBlockingReasons(payload), [
+      'Esta lista é uma prévia de desenvolvimento e não pode ser salva.',
+    ]);
+
+    payload['is_mock'] = false;
+    payload['generation_mode'] = 'mock_fallback';
+    expect(generatedDeckSaveBlockingReasons(payload), isNotEmpty);
+  });
+
   test('parseImportToDeckResponse maps failure payload', () {
     final result = parseImportToDeckResponse(
       ApiResponse(422, {

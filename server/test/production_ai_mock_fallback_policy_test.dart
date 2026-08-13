@@ -13,6 +13,10 @@ void main() {
         fallback: 'OPENAI_API_KEY nao configurada',
       );
       expect(source, contains('HttpStatus.serviceUnavailable'));
+      expect(source, contains("if (body['is_mock'] == true) return false;"));
+      expect(source, contains("'can_save': false"));
+      expect(source, contains("'learning_eligible': false"));
+      expect(source, contains("'mock_generation_non_persistable'"));
     });
 
     test(
@@ -124,6 +128,14 @@ void main() {
         fallback: '_heuristicAnalysis(',
       );
       expect(source, contains('HttpStatus.serviceUnavailable'));
+      expect(source, contains('if (!isMock) {'));
+      expect(source, contains("'source': analysisSource"));
+      expect(source, contains("'is_mock': isMock"));
+      expect(source, contains("'persisted': !isMock"));
+      expect(source, contains("const {'Cache-Control': 'no-store'}"));
+      expect(source, contains("'source': 'provider_unavailable'"));
+      expect(source, contains("'source': 'provider_failure'"));
+      expect(source, isNot(contains("'cached': true")));
     });
   });
 }

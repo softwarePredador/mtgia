@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_client.dart';
-import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -75,8 +74,8 @@ class BattleReplaysScreen extends StatefulWidget {
     this.gateway,
     this.jobGateway,
     this.initialReplayId,
-    this.battleLiveEnabled = LaunchFeatures.battleLiveSpectatorEnabled,
-    this.interactiveBattleEnabled = LaunchFeatures.interactiveBattleEnabled,
+    this.battleLiveEnabled = false,
+    this.interactiveBattleEnabled = false,
   });
 
   final String deckId;
@@ -149,6 +148,17 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         if (widget.battleLiveEnabled) unawaited(_loadJobs());
       });
       return;
+    }
+    if (oldWidget.battleLiveEnabled != widget.battleLiveEnabled) {
+      if (widget.battleLiveEnabled) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) unawaited(_loadJobs());
+        });
+      } else {
+        _jobsLoading = false;
+        _jobsError = null;
+        _jobs = const <BattleJob>[];
+      }
     }
     final previousReplayId = _normalizedReplayId(oldWidget.initialReplayId);
     final nextReplayId = _normalizedReplayId(widget.initialReplayId);
@@ -466,6 +476,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   void _openBattleCoach() {
+    if (!widget.interactiveBattleEnabled) return;
     context.push('/decks/${Uri.encodeComponent(widget.deckId)}/battle-coach');
   }
 
@@ -473,6 +484,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     BattleTestSetup setup,
     _BattleExecutionContext execution,
   ) async {
+    if (!widget.battleLiveEnabled) return;
     final requestFingerprint = jsonEncode({
       'deck_id': widget.deckId,
       ...setup.toRequestJson(),
@@ -526,6 +538,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     BattleTestSetup setup,
     _BattleExecutionContext execution,
   ) async {
+    if (!widget.battleLiveEnabled) return;
     final cancellation = BattleJobSeriesCancellation();
     final runner = BattleJobSeriesRunner(gateway: _jobGateway);
     final seriesId = ApiClient.generateRequestId();
@@ -601,6 +614,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Future<void> _openLiveJob(BattleJob job) async {
+    if (!widget.battleLiveEnabled) return;
     await context.push<void>(battleLiveRouteLocation(widget.deckId, job.jobId));
     if (mounted) unawaited(_loadJobs(quiet: true));
   }

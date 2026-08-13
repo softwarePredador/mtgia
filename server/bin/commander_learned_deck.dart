@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:server/ai/commander_learned_deck_support.dart';
-import 'package:server/database.dart';
 
 const _defaultArtifactDir = 'test/artifacts/commander_learned_deck_import';
 
@@ -12,18 +11,24 @@ Future<void> main(List<String> args) async {
     return;
   }
 
+  final apply = args.contains('--apply');
+  if (apply && args.contains('--dry-run')) {
+    throw ArgumentError('Use apenas um modo: --dry-run ou --apply.');
+  }
+  if (apply) {
+    throw StateError(
+      'BLOCKED_$commanderLearnedDeckPromotionReceiptTask: importacao '
+      'automatica de learned deck em PostgreSQL esta desabilitada ate existir '
+      'um receipt de promocao revisado e versionado.',
+    );
+  }
+
   final inputPath = _readArg(args, '--input-json=');
   if (inputPath == null || inputPath.trim().isEmpty) {
     throw ArgumentError('Informe --input-json=<arquivo>.');
   }
 
-  final apply = args.contains('--apply');
-  final dryRun = args.contains('--dry-run') || !apply;
-  final strict = args.contains('--strict') || apply;
-  if (apply && args.contains('--dry-run')) {
-    throw ArgumentError('Use apenas um modo: --dry-run ou --apply.');
-  }
-  final deactivateOtherActive = !args.contains('--keep-other-active');
+  final strict = args.contains('--strict');
 
   final artifactDir = Directory(
     _readArg(args, '--artifact-dir=') ?? _defaultArtifactDir,
@@ -41,54 +46,43 @@ Future<void> main(List<String> args) async {
   }
   final startedAt = DateTime.now().toUtc();
 
-  final database = Database();
-  await database.connect();
-  final pool = database.connection;
-
-  try {
-    if (apply) {
-      await ensureCommanderLearnedDecksTable(pool);
-      await upsertCommanderLearnedDeck(
-        pool,
-        input,
-        deactivateOtherActive: deactivateOtherActive,
-      );
-    }
-
-    final summary = {
-      'status': 'PASS',
-      'mode': dryRun ? 'dry_run' : 'apply',
-      'db_mutations': apply,
-      'started_at': startedAt.toIso8601String(),
-      'finished_at': DateTime.now().toUtc().toIso8601String(),
-      'commander': input.commanderName,
-      'commander_name_normalized': input.commanderNameNormalized,
-      'deck_name': input.deckName,
-      'source_system': input.sourceSystem,
-      'source_ref': input.sourceRef,
-      'card_count': input.cardCount,
-      'parsed_card_count': input.cards.fold<int>(
-        0,
-        (sum, card) => sum + card.quantity,
-      ),
-      'validation': validation.toJson(),
-      'is_active': input.isActive,
-      'deactivate_other_active': deactivateOtherActive,
-      'metadata': input.metadata,
-      'safety': {
-        'idempotent_key': 'source_system+source_ref',
-        'no_secrets_recorded': true,
-        'dry_run_default': true,
-      },
-    };
-    final safeName = input.commanderNameNormalized
-        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
-        .replaceAll(RegExp(r'_+'), '_')
-        .replaceAll(RegExp(r'^_|_$'), '');
-    final outputPath =
-        '${artifactDir.path}/${safeName}_${input.sourceRef.replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '_')}_${dryRun ? 'dry_run' : 'apply'}_summary.json';
-    await _writeJson(outputPath, summary);
-    print(jsonEncode({
+  final summary = {
+    'status': 'PASS',
+    'mode': 'dry_run',
+    'db_mutations': false,
+    'started_at': startedAt.toIso8601String(),
+    'finished_at': DateTime.now().toUtc().toIso8601String(),
+    'commander': input.commanderName,
+    'commander_name_normalized': input.commanderNameNormalized,
+    'deck_name': input.deckName,
+    'source_system': input.sourceSystem,
+    'source_ref': input.sourceRef,
+    'card_count': input.cardCount,
+    'parsed_card_count': input.cards.fold<int>(
+      0,
+      (sum, card) => sum + card.quantity,
+    ),
+    'validation': validation.toJson(),
+    'is_active': input.isActive,
+    'metadata': input.metadata,
+    'safety': {
+      'idempotent_key': 'source_system+source_ref',
+      'no_secrets_recorded': true,
+      'dry_run_default': true,
+      'postgres_connected': false,
+      'promotion_allowed': false,
+      'promotion_receipt_required': commanderLearnedDeckPromotionReceiptTask,
+    },
+  };
+  final safeName = input.commanderNameNormalized
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'_+'), '_')
+      .replaceAll(RegExp(r'^_|_$'), '');
+  final outputPath =
+      '${artifactDir.path}/${safeName}_${input.sourceRef.replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '_')}_dry_run_summary.json';
+  await _writeJson(outputPath, summary);
+  print(
+    jsonEncode({
       'status': summary['status'],
       'mode': summary['mode'],
       'db_mutations': summary['db_mutations'],
@@ -96,10 +90,8 @@ Future<void> main(List<String> args) async {
       'source_ref': summary['source_ref'],
       'card_count': summary['card_count'],
       'artifact': outputPath,
-    }));
-  } finally {
-    await database.close();
-  }
+    }),
+  );
 }
 
 Map<String, dynamic> _readJsonObject(String path) {
@@ -127,11 +119,10 @@ void _printUsage() {
   print('''
 Usage:
   dart run bin/commander_learned_deck.dart --input-json=<path> --dry-run
-  dart run bin/commander_learned_deck.dart --input-json=<path> --apply
+  dart run bin/commander_learned_deck.dart --input-json=<path> --apply  # bloqueado ate DCK-P0-05
 
 Options:
   --strict                 Falha tambem em dry-run se nao for Commander 100/99+1.
-  --keep-other-active      Nao desativa outros decks ativos do mesmo comandante.
   --artifact-dir=<path>    Diretorio para resumo sanitizado.
 
 Formato minimo:
@@ -142,7 +133,7 @@ Formato minimo:
   "deck_name": "Lorehold Best-of Learned No Premium Mox 2026-06-02",
   "card_list": "1 Lorehold, the Historian\\n1 Sol Ring\\n...",
   "card_count": 100,
-  "is_active": true
+  "is_active": false
 }
 
 Tambem aceita payload bruto Hermes com campos "id" e "commander".

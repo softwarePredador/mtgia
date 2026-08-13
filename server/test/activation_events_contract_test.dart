@@ -14,7 +14,8 @@ void main() {
             '../app/lib/features/decks/providers/deck_provider.dart',
           ).readAsStringSync();
 
-      expect(deckProviderSource, contains("'deck_optimized'"));
+      expect(deckProviderSource, contains("'optimize_preview_received'"));
+      expect(routeSource, contains("'optimize_preview_received'"));
       expect(routeSource, contains("'deck_optimized'"));
 
       expect(deckProviderSource, contains("'deck_generated'"));

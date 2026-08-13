@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-quick}"
+DECK_AI_GATE_PROFILE="${2:-${MANALOOM_DECK_AI_GATE_PROFILE:-local}}"
 FLUTTER_TEST_TIMEOUT_SECONDS="${FLUTTER_TEST_TIMEOUT_SECONDS:-1200}"
 TEST_CONCURRENCY="${QUALITY_GATE_TEST_CONCURRENCY:-2}"
 BACKEND_TEST_BATCH_SIZE="${QUALITY_GATE_BACKEND_TEST_BATCH_SIZE:-8}"
@@ -13,27 +14,41 @@ source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 resolve_manaloom_dart
 DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
 
-if [[ -n "${MANALOOM_FLUTTER_BIN:-}" ]]; then
-  FLUTTER_BIN="$MANALOOM_FLUTTER_BIN"
-elif [[ -x "$PINNED_FLUTTER" ]]; then
-  FLUTTER_BIN="$PINNED_FLUTTER"
+# deck-ai-learning is deliberately server-only. It must remain runnable on a
+# host without Flutter and cannot invoke pub implicitly. Every other historical
+# quality-gate mode preserves the pinned Flutter requirement.
+QUALITY_GATE_NEEDS_FLUTTER=1
+if [[ "$MODE" == "deck-ai-learning" ]]; then
+  QUALITY_GATE_NEEDS_FLUTTER=0
+fi
+
+FLUTTER_BIN=""
+if [[ "$QUALITY_GATE_NEEDS_FLUTTER" == "1" ]]; then
+  if [[ -n "${MANALOOM_FLUTTER_BIN:-}" ]]; then
+    FLUTTER_BIN="$MANALOOM_FLUTTER_BIN"
+  elif [[ -x "$PINNED_FLUTTER" ]]; then
+    FLUTTER_BIN="$PINNED_FLUTTER"
+  else
+    FLUTTER_BIN="$(command -v flutter 2>/dev/null || true)"
+  fi
+
+  if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]]; then
+    echo "❌ Flutter configurado não é executável: $FLUTTER_BIN" >&2
+    exit 2
+  fi
+  if [[ "$FLUTTER_BIN" == */* ]]; then
+    FLUTTER_BIN="$(cd "$(dirname "$FLUTTER_BIN")" && pwd)/$(basename "$FLUTTER_BIN")"
+  fi
+  readonly FLUTTER_BIN
+
+  # Nested gates inherit the same Dart and Flutter SDKs selected above.
+  flutter_bin_dir="$(dirname "$FLUTTER_BIN")"
+  export PATH="$(dirname "$DART_BIN"):$flutter_bin_dir:$PATH"
 else
-  FLUTTER_BIN="$(command -v flutter 2>/dev/null || true)"
+  readonly FLUTTER_BIN
+  export PATH="$(dirname "$DART_BIN"):$PATH"
 fi
-
-if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]]; then
-  echo "❌ Flutter configurado não é executável: $FLUTTER_BIN" >&2
-  exit 2
-fi
-if [[ "$FLUTTER_BIN" == */* ]]; then
-  FLUTTER_BIN="$(cd "$(dirname "$FLUTTER_BIN")" && pwd)/$(basename "$FLUTTER_BIN")"
-fi
-readonly FLUTTER_BIN
-
-# Nested gates inherit the same Dart and Flutter SDKs selected above.
-flutter_bin_dir="$(dirname "$FLUTTER_BIN")"
 export MANALOOM_DART_BIN="$DART_BIN"
-export PATH="$(dirname "$DART_BIN"):$flutter_bin_dir:$PATH"
 
 trap 'echo "❌ Quality gate interrompido." >&2; exit 130' INT
 trap 'echo "❌ Quality gate encerrado." >&2; exit 143' TERM
@@ -244,6 +259,12 @@ run_deep_ai_alignment() {
   "$ROOT_DIR/scripts/manaloom_deep_ai_alignment_tester.sh"
 }
 
+run_deck_ai_learning_gate() {
+  print_header "ManaLoom Deckbuilder / AI / Learning containment gate"
+  "$ROOT_DIR/scripts/manaloom_deck_ai_learning_gate.sh" \
+    --profile "$DECK_AI_GATE_PROFILE"
+}
+
 run_battle_product_gate() {
   print_header "ManaLoom canonical battle product gate"
   "$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
@@ -308,8 +329,8 @@ run_project_logic_docs() {
 }
 
 run_e2e_suite() {
-  print_header "ManaLoom E2E suite"
-  "$ROOT_DIR/scripts/manaloom_e2e_suite.sh"
+  print_header "ManaLoom E2E suite (strict gate)"
+  "$ROOT_DIR/scripts/manaloom_e2e_suite.sh" --strict
 }
 
 ensure_cmd() {
@@ -329,8 +350,10 @@ ensure_prerequisites() {
     exit 2
   fi
   ensure_cmd "$DART_BIN"
-  ensure_cmd "$FLUTTER_BIN"
-  ensure_cmd perl
+  if [[ "$QUALITY_GATE_NEEDS_FLUTTER" == "1" ]]; then
+    ensure_cmd "$FLUTTER_BIN"
+    ensure_cmd perl
+  fi
   ensure_cmd python3
 }
 
@@ -354,13 +377,14 @@ Uso:
   ./scripts/quality_gate.sh report-retention # bloqueia dados brutos/locais sem uso em reports
   ./scripts/quality_gate.sh pg-contract # valida PG/Hermes/SQLite pelo wrapper do servidor novo
   ./scripts/quality_gate.sh deep-ai # tester profundo IA + dados + battle/deckbuilder
+  ./scripts/quality_gate.sh deck-ai-learning [local|release-read-only] # containment local sem Flutter/pub/live
   ./scripts/quality_gate.sh battle # gate canônico battle: native, Forge, XMage, Python e Dart
   ./scripts/quality_gate.sh battle-lab # Battle Lab: contratos focados, Battle, performance, retenção e drift
   ./scripts/quality_gate.sh engine-capabilities # uso, limites e evidencias XMage/Forge
   ./scripts/quality_gate.sh engine-transition # classifica todas as cartas do avanço de pin XMage
   ./scripts/quality_gate.sh engine-delta # auditoria manual/read-only dos pins contra upstream oficial
   ./scripts/quality_gate.sh project-logic # manifesto, Mermaid, OpenAPI, ERD e drift documental
-  ./scripts/quality_gate.sh e2e # suite E2E local: app, deckbuilder, battle, IA, contratos e logs
+  ./scripts/quality_gate.sh e2e # gate E2E estrito: PARTIAL/SKIP retorna nao-zero
 
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
@@ -386,8 +410,14 @@ Dica:
   de cada carta adicionada/modificada; PASS estrutural não libera deploy quando
   a qualificação permanece review_required.
   Use 'engine-delta' para consultar explicitamente o GitHub oficial e gerar JSON de revisão; nunca avança pins nem executa deploy/promoção.
+  Use 'deck-ai-learning' para validar preview/learning/promotion/cache e as
+  superfícies Commander sem Flutter, pub ou rede. O perfil local retorna
+  PASS_CODE_ONLY; release-read-only exige receipt PG read-only fresco.
   Use 'project-logic' para bloquear drift entre código, rotas, migrations, manifesto e documentação gerada.
-  Use 'e2e' para varredura completa local de deckbuilder, battle, IA, logs e contratos; exporte MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 ou MANALOOM_RUN_LIVE_PRODUCT_E2E=1 para camadas vivas opcionais.
+  Use 'e2e' como gate estrito da varredura completa: somente PASS retorna zero;
+  PARTIAL/SKIP retorna 3, BLOCKED retorna 2 e FAIL retorna 1. Para inventario
+  diagnostico sem credito de gate/release, execute diretamente
+  scripts/manaloom_e2e_suite.sh --allow-partial.
 
 Exemplos:
   ./scripts/quality_gate.sh full
@@ -406,6 +436,7 @@ Exemplos:
   ./scripts/quality_gate.sh report-retention
   ./scripts/quality_gate.sh pg-contract
   ./scripts/quality_gate.sh deep-ai
+  ./scripts/quality_gate.sh deck-ai-learning local
   ./scripts/quality_gate.sh battle
   ./scripts/quality_gate.sh battle-lab
   ./scripts/quality_gate.sh engine-capabilities
@@ -475,6 +506,9 @@ main() {
     deep-ai)
       run_deep_ai_alignment
       ;;
+    deck-ai-learning)
+      run_deck_ai_learning_gate
+      ;;
     battle)
       run_battle_product_gate
       ;;
@@ -510,6 +544,8 @@ main() {
   print_header "Quality gate concluído"
   if [[ "$MODE" == "engine-transition" ]]; then
     echo "✅ Integridade da evidência passou; a qualificação de deploy é reportada separadamente pelo auditor."
+  elif [[ "$MODE" == "deck-ai-learning" && "$DECK_AI_GATE_PROFILE" == "local" ]]; then
+    echo "✅ Contratos locais passaram (PASS_CODE_ONLY); PG/runtime não foram executados."
   else
     echo "✅ Todos os checks do modo '$MODE' passaram."
   fi

@@ -7,25 +7,209 @@
     "human_decisions": "ADRs and current canonical contracts; generated files never infer architectural intent"
   },
   "canonical_documents": [
+    "docs/status/CURRENT_PRODUCT_DECISION.md",
     "docs/CONTEXTO_PRODUTO_ATUAL.md",
+    "docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md",
+    "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
     "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
     "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
     "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
-    "docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md",
-    "docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md",
-    "docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md",
-    "docs/MANALOOM_BATTLE_LAB_TRACKER.md",
     "docs/adr/0001-generated-project-logic.md",
     "docs/adr/0002-battle-lab-execution-boundaries.md",
     "docs/adr/0003-xmage-human-spike-no-go.md",
     "docs/adr/0004-battle-live-polling-and-durable-checkpoints.md",
+    "docs/adr/0005-interactive-battle-coach-alpha.md",
+    "docs/adr/0006-commander-optimizer-bracket-and-apply-safety.md",
+    "docs/adr/0007-commander-reference-generation-timeout.md",
     "docs/adr/0008-decklist-and-binder-physical-copy-boundary.md",
+    "docs/adr/0009-social-trade-navigation-context-and-counterproposal.md",
+    "docs/adr/0010-brewtact-public-brand-transition.md",
     "docs/adr/0011-brewtact-production-domain.md",
+    "docs/adr/0012-xmage-human-spike-go.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
     "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+    "docs/hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",
     "app/doc/UI_TEST_SURFACE_MAP.md"
+  ],
+  "documentation_lifecycle": {
+    "schema_version": 1,
+    "states": [
+      {
+        "id": "current_decision",
+        "priority_authority": true,
+        "mutation_authority": false
+      },
+      {
+        "id": "current_task_index",
+        "priority_authority": true,
+        "mutation_authority": false
+      },
+      {
+        "id": "current_contract",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "id": "current_context",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "id": "generated_snapshot",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "id": "historical_evidence",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "id": "supporting_reference_non_authoritative",
+        "priority_authority": false,
+        "mutation_authority": false
+      }
+    ],
+    "canonical_default_state": "current_contract",
+    "default_state": "supporting_reference_non_authoritative",
+    "document_overrides": [
+      {
+        "path": "docs/status/CURRENT_PRODUCT_DECISION.md",
+        "state": "current_decision",
+        "reason": "single current product and release-scope decision"
+      },
+      {
+        "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
+        "state": "current_task_index",
+        "reason": "single current task priority and dependency index"
+      },
+      {
+        "path": "docs/CONTEXTO_PRODUTO_ATUAL.md",
+        "state": "current_context",
+        "reason": "context router whose historical body cannot override the current decision or task index"
+      },
+      {
+        "path": "docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md",
+        "state": "historical_evidence",
+        "reason": "superseded S0-S10 execution program"
+      },
+      {
+        "path": "docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md",
+        "state": "historical_evidence",
+        "reason": "superseded S0-S10 execution record"
+      },
+      {
+        "path": "docs/MANALOOM_ACTIVE_PRODUCT_BACKLOG_2026-07-06.md",
+        "state": "historical_evidence",
+        "reason": "superseded product backlog"
+      },
+      {
+        "path": "docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md",
+        "state": "historical_evidence",
+        "reason": "prior deployed-alpha program; current public capability remains off"
+      },
+      {
+        "path": "docs/MANALOOM_BATTLE_LAB_TRACKER.md",
+        "state": "historical_evidence",
+        "reason": "prior deployed-alpha execution record; not current rollout authority"
+      },
+      {
+        "path": "docs/adr/0004-xmage-human-spike-go.md",
+        "state": "historical_evidence",
+        "reason": "duplicate ADR id superseded by ADR 0012"
+      }
+    ],
+    "prefix_rules": [
+      {
+        "prefix": "docs/generated/",
+        "state": "generated_snapshot"
+      },
+      {
+        "prefix": "docs/archive/",
+        "state": "historical_evidence"
+      },
+      {
+        "prefix": "docs/qa/",
+        "state": "historical_evidence"
+      },
+      {
+        "prefix": "docs/hermes-analysis/archive/",
+        "state": "historical_evidence"
+      },
+      {
+        "prefix": "docs/hermes-analysis/deduplicated-report-content/",
+        "state": "historical_evidence"
+      },
+      {
+        "prefix": "docs/hermes-analysis/master_optimizer_reports/",
+        "state": "historical_evidence"
+      }
+    ],
+    "guards": {
+      "historical_or_generated_may_set_priority": false,
+      "document_may_authorize_live_mutation": false,
+      "historical_commands_are_examples_only": true,
+      "current_priority_precedence": [
+        "current_decision",
+        "current_task_index"
+      ]
+    }
+  },
+  "receipt_contracts": [
+    {
+      "id": "project_logic_manifest_v1",
+      "flows": ["release_operations"],
+      "producers": ["scripts/manaloom_project_logic.sh"],
+      "consumers": ["scripts/manaloom_local_ci.sh", ".githooks/pre-commit", ".githooks/pre-push"],
+      "durability": "tracked_generated",
+      "allowed_statuses": ["pass", "drift"],
+      "required_bindings": ["source_digest_sha256", "lineage.digest_inputs", "generator.version"]
+    },
+    {
+      "id": "deck_ai_learning_gate_v2",
+      "flows": ["deck_ai"],
+      "producers": ["scripts/manaloom_deck_ai_learning_gate.sh", "scripts/manaloom_deck_ai_learning_release_receipt.sh"],
+      "consumers": ["scripts/quality_gate.sh", "scripts/manaloom_local_ci.sh"],
+      "schemas": ["manaloom.deck_ai_learning_gate_run.v2", "manaloom.deck_ai_learning_release_receipt.v2"],
+      "durability": "ephemeral_until_reviewed_and_tracked",
+      "allowed_statuses": ["PASS_CODE_ONLY", "PASS", "BLOCKED", "FAIL"],
+      "required_bindings": ["policy.id", "profile", "git_sha", "worktree_digest_sha256", "project_logic_source_digest", "source.start", "source.end", "source.stable", "target.identity_sha256", "target.schema", "checks", "evidence.artifact_manifest_sha256", "release_eligible"]
+    },
+    {
+      "id": "manaloom_e2e_suite_v1",
+      "flows": ["release_operations"],
+      "producers": ["scripts/manaloom_e2e_suite.sh"],
+      "consumers": ["scripts/quality_gate.sh", "scripts/manaloom_local_ci.sh"],
+      "durability": "ephemeral_until_reviewed_and_tracked",
+      "allowed_statuses": ["PASS", "PARTIAL", "BLOCKED", "FAIL"],
+      "required_bindings": ["requested_profile", "execution_policy", "result", "gate_eligible", "summary.step_count", "summary.skipped", "steps"],
+      "status_semantics": {
+        "PASS": {"strict_exit_code": 0, "gate_eligible": true},
+        "PARTIAL": {"strict_exit_code": 3, "diagnostic_gate_eligible": false},
+        "BLOCKED": {"strict_exit_code": 2, "gate_eligible": false},
+        "FAIL": {"strict_exit_code": 1, "gate_eligible": false}
+      }
+    },
+    {
+      "id": "ui_live_evidence_v1",
+      "flows": ["release_operations"],
+      "producers": ["scripts/manaloom_ui_live_evidence_gate.sh"],
+      "consumers": ["scripts/quality_gate.sh", "scripts/manaloom_local_ci.sh"],
+      "durability": "reviewed_tracked_evidence",
+      "allowed_statuses": ["PASS_AUTOMATED", "PASS_RUNTIME", "PASS_VISUAL_REVIEWED", "BLOCKED", "FAIL"],
+      "required_bindings": ["ui_source_digest", "runtime_target", "screenshot_paths", "screenshot_sha256", "reviewed_all"]
+    },
+    {
+      "id": "release_identity_v1",
+      "flows": ["release_operations"],
+      "producers": ["scripts/manaloom_release_identity.sh"],
+      "consumers": ["scripts/manaloom_local_ci.sh", "scripts/manaloom_release_ops_contract_test.sh"],
+      "durability": "release_artifact",
+      "allowed_statuses": ["candidate", "deployed", "blocked"],
+      "required_bindings": ["git_sha", "artifact_digests", "capability_matrix", "schema_range", "surface"]
+    }
   ],
   "api_method_overrides": {
     "/health/live": ["GET"],
@@ -143,22 +327,44 @@
       "name": "Gerar, analisar e otimizar deck com IA",
       "status": "experimental_guarded",
       "source_of_truth": "Commander deckbuilding contract plus backend deterministic and quality gates",
-      "entrypoints": ["/ai/generate", "/ai/optimize", "/ai/rebuild", "/decks/{id}/analysis"],
+      "entrypoints": ["/ai/generate", "/ai/optimize", "/ai/rebuild", "/ai/commander-reference", "/ai/commander-learning", "/decks/{id}/analysis", "/decks/{id}/ai-analysis"],
       "implementation": [
         "server/routes/ai/generate/index.dart",
         "server/routes/ai/optimize/index.dart",
+        "server/routes/ai/rebuild/index.dart",
+        "server/routes/ai/commander-reference/index.dart",
+        "server/routes/ai/commander-learning/index.dart",
+        "server/routes/decks/[id]/analysis/index.dart",
+        "server/routes/decks/[id]/ai-analysis/index.dart",
+        "server/lib/deck_rules_service.dart",
+        "server/lib/ai_generate_job.dart",
+        "server/lib/ai/optimize_job.dart",
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
-        "app/lib/features/decks/providers/deck_provider_support_ai.dart"
+        "server/lib/ai/optimize_cache_support.dart",
+        "server/lib/ai/deck_learning_event_support.dart",
+        "server/lib/ai/rebuild_guided_service.dart",
+        "app/lib/features/decks/providers/deck_provider_support_ai.dart",
+        "app/lib/features/decks/providers/deck_provider_support_generation.dart",
+        "app/lib/features/decks/widgets/deck_analysis_tab.dart"
       ],
-      "storage": ["decks", "deck_cards", "ai_generate_jobs", "ai_optimize_jobs", "ai_optimize_cache", "commander_learned_decks", "commander_card_usage"],
+      "storage": ["decks", "deck_cards", "ai_generate_jobs", "ai_optimize_jobs", "ai_optimize_cache", "deck_learning_events", "commander_learned_decks", "commander_card_usage"],
       "tests": [
         "server/test/ai_generate_create_optimize_flow_test.dart",
+        "server/test/ai_generate_learning_boundary_test.dart",
+        "server/test/ai_generate_performance_support_test.dart",
         "server/test/ai_optimize_flow_test.dart",
+        "server/test/optimize_cache_support_test.dart",
+        "server/test/optimize_learning_pipeline_test.dart",
         "server/test/optimization_quality_gate_test.dart",
-        "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
+        "server/test/commander_learned_deck_support_test.dart",
+        "server/test/commander_reference_read_only_contract_test.dart",
+        "server/test/production_ai_mock_fallback_policy_test.dart",
+        "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+        "app/test/features/decks/providers/deck_provider_support_test.dart",
+        "app/test/features/decks/widgets/deck_analysis_tab_test.dart"
       ],
-      "gates": ["scripts/manaloom_deep_ai_alignment_tester.sh", "scripts/manaloom_ai_prompt_eval.sh"],
+      "gates": ["scripts/manaloom_deck_ai_learning_gate.sh", "scripts/manaloom_deep_ai_alignment_tester.sh", "scripts/manaloom_ai_prompt_eval.sh"],
       "sequence": [
         {"from": "Flutter", "to": "AI API", "message": "objetivo, deck e intenção"},
         {"from": "AI API", "to": "PostgreSQL", "message": "estado, legalidade e intelligence snapshot"},
@@ -171,11 +377,11 @@
       "id": "battle_replay",
       "name": "Battle, evidência de carta e replay",
       "status": "active_guarded",
-      "source_of_truth": "battle request plus persisted battle_simulations; external pins do not promote native rules",
+      "source_of_truth": "persisted battle attempts, jobs and replays plus pinned execution identity; external pins do not promote native rules",
       "entrypoints": ["/ai/simulate", "/ai/battle/jobs", "/ai/battle/jobs/{id}", "/ai/battle/jobs/{id}/live", "/decks/{id}/battle-preflight", "/decks/{id}/battle-coach", "/decks/{id}/battle-coach/{sessionId}", "/decks/{id}/battle-replays", "/decks/{id}/battle-replays/{replayId}/annotations"],
       "implementation": [
         "server/lib/ai/battle_engine_config.dart",
-        "server/lib/ai/battle_simulator.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
         "server/routes/ai/simulate/index.dart",
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",

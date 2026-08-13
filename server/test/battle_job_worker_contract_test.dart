@@ -44,10 +44,109 @@ void main() {
     expect(entrypoint, contains('/app/server/manaloom-server'));
     expect(entrypoint, contains('/app/server/manaloom-battle-worker'));
     expect(entrypoint, contains(r'kill -0 "$worker_pid"'));
-    expect(entrypoint, contains(r'${BATTLE_JOB_WORKER_ENABLED:-true}'));
-    expect(deploy, contains('--env-add BATTLE_JOB_WORKER_ENABLED=true'));
+    expect(entrypoint, contains(r'${BATTLE_JOB_WORKER_ENABLED:-false}'));
+    expect(entrypoint, contains('--release-capability-status'));
+    expect(deploy, contains('--env-add BATTLE_JOB_WORKER_ENABLED=false'));
+    expect(deploy, isNot(contains('--env-add BATTLE_JOB_WORKER_ENABLED=true')));
+    expect(
+      deploy,
+      contains(
+        'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0',
+      ),
+    );
+    expect(
+      deploy,
+      contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0'),
+    );
     expect(deploy, contains('runtime_battle_worker'));
+    expect(deploy, contains(r'$runtime_battle_worker" != "false'));
+    expect(
+      deploy,
+      contains(
+        'manaloom_load_release_capabilities_from_git "\$ROOT_DIR" "\$sha"',
+      ),
+    );
+    expect(
+      deploy.indexOf('manaloom_load_release_capabilities_from_git'),
+      lessThan(deploy.indexOf('docker service update \\')),
+    );
+    expect(
+      deploy,
+      isNot(contains('require_xmage_interactive_release_contract "\$sha"')),
+    );
+    for (final check
+        in const {
+          'battle_job_worker': 'battle_batch',
+          'battle_runtime': 'battle_batch',
+          'ai_runtime': 'ai_analyze_optimize_advisory',
+          'battle_live_spectator': 'battle_live',
+          'interactive_battle': 'battle_coach',
+        }.entries) {
+      expect(
+        deploy,
+        contains('disabled_by_policy(.checks.${check.key}; "${check.value}")'),
+      );
+    }
+    expect(deploy, isNot(contains('.checks.ai_runtime.status == "healthy"')));
+    expect(
+      deploy,
+      isNot(contains('.checks.battle_runtime.engines.xmage.status')),
+    );
   });
+
+  test('worker checks battle_batch before connecting or claiming', () {
+    final source = File('bin/battle_job_worker.dart').readAsStringSync();
+    final policyLoad = source.indexOf('ReleaseCapabilityPolicy.load()');
+    final capabilityGate = source.indexOf(
+      "if (!workerRequested || !releasePolicy.isAllowed('battle_batch'))",
+    );
+    final database = source.indexOf('final database = Database()');
+
+    expect(policyLoad, greaterThanOrEqualTo(0));
+    expect(capabilityGate, greaterThan(policyLoad));
+    expect(capabilityGate, lessThan(database));
+    expect(source, contains("'BATTLE_JOB_WORKER_ENABLED'"));
+    expect(source, contains('--release-capability-status'));
+  });
+
+  test(
+    'legacy enable flag cannot bypass a closed or invalid release policy',
+    () async {
+      final workerEntrypoint = File('bin/battle_job_worker.dart').absolute.path;
+
+      final closedPolicy = await Process.run(
+        Platform.resolvedExecutable,
+        ['run', workerEntrypoint],
+        environment: const {'BATTLE_JOB_WORKER_ENABLED': 'true'},
+      );
+      expect(closedPolicy.exitCode, 0);
+      expect(
+        '${closedPolicy.stdout}${closedPolicy.stderr}',
+        contains('refusing database connection and queue claim'),
+      );
+
+      final missingPolicyDirectory = Directory.systemTemp.createTempSync(
+        'brewtact-battle-worker-invalid-policy-',
+      );
+      addTearDown(() => missingPolicyDirectory.deleteSync(recursive: true));
+      final invalidPolicy = await Process.run(
+        Platform.resolvedExecutable,
+        ['run', workerEntrypoint],
+        workingDirectory: missingPolicyDirectory.path,
+        environment: const {'BATTLE_JOB_WORKER_ENABLED': 'true'},
+      );
+
+      expect(invalidPolicy.exitCode, 78);
+      expect(
+        '${invalidPolicy.stdout}${invalidPolicy.stderr}',
+        contains('refusing database connection and queue claim'),
+      );
+      expect(
+        '${invalidPolicy.stdout}${invalidPolicy.stderr}',
+        isNot(contains('database connection failed')),
+      );
+    },
+  );
 
   test('daemon refuses an unrecorded terminal transition', () {
     final source =

@@ -208,15 +208,19 @@ void main() {
       expect(aiAnalysis, contains("readOptionalJsonBool(body, 'force')"));
     });
 
-    test('deck ai-analysis exposes cached and fresh contract fields', () {
+    test('deck ai-analysis exposes provenance and never caches fallback', () {
       final aiAnalysis =
           File('routes/decks/[id]/ai-analysis/index.dart').readAsStringSync();
 
       expect(aiAnalysis, contains("'archetype': archetype"));
       expect(aiAnalysis, contains("'bracket': bracket"));
-      expect(aiAnalysis, contains("'cached': true"));
+      expect(aiAnalysis, isNot(contains("'cached': true")));
+      expect(aiAnalysis, contains("'cached': false"));
       expect(aiAnalysis, contains("'metrics': metrics.toJson()"));
-      expect(aiAnalysis, contains("if (isMock) 'is_mock': true"));
+      expect(aiAnalysis, contains("'source': analysisSource"));
+      expect(aiAnalysis, contains("'is_mock': isMock"));
+      expect(aiAnalysis, contains("'persisted': !isMock"));
+      expect(aiAnalysis, contains('if (!isMock) {'));
     });
 
     test('deck analysis uses card intelligence snapshot when available', () {

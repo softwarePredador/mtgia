@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Pull deck_learning_events do PG e importa no SQLite Hermes para aprendizado.
+"""Pull deck_learning_events do PG para telemetria classificada no Hermes.
 
 Faz parte do loop App → Hermes:
-  App cria/salva deck → PG deck_learning_events → este script → SQLite Hermes → aprendizado
+  App salva deck → PG deck_learning_events → este script → SQLite Hermes
+
+Somente eventos ``user_created`` podem ser elegiveis para treinamento. Outras
+fontes permanecem no SQLite apenas como telemetria em quarentena.
 
 Execucao idempotente: eventos ja sincronizados sao ignorados.
 """
@@ -47,6 +50,7 @@ PG_NAME = os.environ.get("PGDATABASE") or os.environ.get("DB_NAME") or ""
 PG_USER = os.environ.get("PGUSER") or os.environ.get("DB_USER") or ""
 PG_PASS = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASS") or ""
 MIN_TRAINING_CARD_COUNT = int(os.environ.get("HERMES_MIN_TRAINING_CARD_COUNT", "90"))
+USER_CREATED_SOURCE = "user_created"
 
 
 def main():
@@ -114,11 +118,16 @@ def main():
         commander = (ev["commander_name"] or "").strip()
         fmt = ev["format"]
         card_count = ev["card_count"]
-        source = ev["source"] or "user_created"
+        source = (ev["source"] or "").strip().lower()
         event_data = ev["event_data"] or {}
         created_at = ev["created_at"]
 
-        classification = _classify_learning_event(fmt, card_count, commander)
+        classification = _classify_learning_event(
+            fmt,
+            card_count,
+            commander,
+            source,
+        )
 
         print(
             "  event="
@@ -127,7 +136,11 @@ def main():
         )
 
         # Importa commander se tiver nome
-        if commander and fmt.lower() == "commander":
+        if (
+            source == USER_CREATED_SOURCE
+            and commander
+            and (fmt or "").lower() == "commander"
+        ):
             _import_commander(sqlite, commander)
 
         # Loga evento no SQLite
@@ -182,7 +195,8 @@ def main():
           COUNT(*) AS imported_total,
           SUM(CASE WHEN training_eligible = 1 THEN 1 ELSE 0 END) AS trainable,
           SUM(CASE WHEN learning_status = 'partial_telemetry' THEN 1 ELSE 0 END) AS partial,
-          SUM(CASE WHEN learning_status = 'non_commander_telemetry' THEN 1 ELSE 0 END) AS non_commander
+          SUM(CASE WHEN learning_status = 'non_commander_telemetry' THEN 1 ELSE 0 END) AS non_commander,
+          SUM(CASE WHEN learning_status = 'quarantined_source' THEN 1 ELSE 0 END) AS quarantined
         FROM user_learning_events
         """
     ).fetchone()
@@ -193,7 +207,8 @@ def main():
         f"stored_total={totals[0] or 0} "
         f"trainable={totals[1] or 0} "
         f"partial={totals[2] or 0} "
-        f"non_commander={totals[3] or 0}"
+        f"non_commander={totals[3] or 0} "
+        f"quarantined={totals[4] or 0}"
     )
     sqlite.close()
     cur.close()
@@ -209,7 +224,7 @@ def _ensure_tables(sqlite):
             commander TEXT,
             format TEXT,
             card_count INTEGER DEFAULT 0,
-            source TEXT DEFAULT 'user_created',
+            source TEXT DEFAULT '',
             event_data TEXT DEFAULT '{}',
             created_at TEXT,
             imported_at TEXT,
@@ -218,6 +233,12 @@ def _ensure_tables(sqlite):
             learning_reason TEXT DEFAULT ''
         )
     """)
+    _ensure_column(
+        sqlite,
+        "user_learning_events",
+        "source",
+        "TEXT DEFAULT ''",
+    )
     _ensure_column(
         sqlite,
         "user_learning_events",
@@ -259,10 +280,18 @@ def _ensure_column(sqlite, table, column, definition):
         sqlite.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
 
-def _classify_learning_event(fmt, card_count, commander):
+def _classify_learning_event(fmt, card_count, commander, source):
     normalized_format = (fmt or "").strip().lower()
     normalized_commander = (commander or "").strip()
+    normalized_source = (source or "").strip().lower()
     count = int(card_count or 0)
+
+    if normalized_source != USER_CREATED_SOURCE:
+        return {
+            "training_eligible": False,
+            "learning_status": "quarantined_source",
+            "learning_reason": f"source={normalized_source or 'unknown'}",
+        }
 
     if normalized_format != "commander":
         return {
@@ -295,15 +324,17 @@ def _classify_learning_event(fmt, card_count, commander):
 def _backfill_learning_classification(sqlite):
     rows = sqlite.execute(
         """
-        SELECT event_id, format, card_count, commander
+        SELECT event_id, format, card_count, commander, source
         FROM user_learning_events
-        WHERE learning_status IS NULL
-           OR learning_status = ''
-           OR learning_status = 'unknown'
         """
     ).fetchall()
-    for event_id, fmt, card_count, commander in rows:
-        classification = _classify_learning_event(fmt, card_count, commander)
+    for event_id, fmt, card_count, commander, source in rows:
+        classification = _classify_learning_event(
+            fmt,
+            card_count,
+            commander,
+            source,
+        )
         sqlite.execute(
             """
             UPDATE user_learning_events

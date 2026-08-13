@@ -219,8 +219,6 @@ Future<bool> hasOptimizeTable(Pool pool, String tableName) async {
 
 Future<void> recordOptimizeAnalysisOutcome({
   required Pool pool,
-  required String deckId,
-  required String? userId,
   required String commanderName,
   required List<String> commanderColors,
   required String operationMode,
@@ -245,8 +243,6 @@ Future<void> recordOptimizeAnalysisOutcome({
 }) async {
   await optimize_analysis.recordOptimizeAnalysisOutcome(
     pool: pool,
-    deckId: deckId,
-    userId: userId,
     commanderName: commanderName,
     commanderColors: commanderColors,
     operationMode: operationMode,

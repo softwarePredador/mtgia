@@ -14,9 +14,50 @@ FAILED_STEPS=()
 SKIPPED_STEPS=()
 BLOCKED_STEPS=()
 FINAL_STATUS=""
+E2E_EXECUTION_POLICY="strict-gate"
 
-mkdir -p "$RUN_DIR"
-: >"$STEP_MANIFEST_FILE"
+print_usage() {
+  cat <<'EOF'
+Uso: ./scripts/manaloom_e2e_suite.sh [--strict|--allow-partial]
+
+  --strict         Gate canonico (default). PASS e o unico resultado com exit 0;
+                   PARTIAL=3, BLOCKED=2 e FAIL=1.
+  --allow-partial  Diagnostico explicito. Preserva o inventario PARTIAL com
+                   exit 0, mas a evidencia fica marcada como nao elegivel para
+                   gate/release e nunca deve ser apresentada como PASS.
+EOF
+}
+
+parse_args() {
+  if [[ "$#" -gt 1 ]]; then
+    echo "BLOCKED: informe somente --strict ou --allow-partial" >&2
+    print_usage >&2
+    return 2
+  fi
+
+  case "${1:---strict}" in
+    --strict)
+      E2E_EXECUTION_POLICY="strict-gate"
+      ;;
+    --allow-partial)
+      E2E_EXECUTION_POLICY="diagnostic-allow-partial"
+      ;;
+    -h|--help)
+      print_usage
+      return 64
+      ;;
+    *)
+      echo "BLOCKED: argumento E2E invalido: $1" >&2
+      print_usage >&2
+      return 2
+      ;;
+  esac
+}
+
+initialize_run_dir() {
+  mkdir -p "$RUN_DIR"
+  : >"$STEP_MANIFEST_FILE"
+}
 
 derive_profile() {
   local live_requested=0
@@ -77,6 +118,7 @@ write_summary_header() {
 - repo: \`$ROOT_DIR\`
 - logs: \`$RUN_DIR\`
 - requested_profile: \`$E2E_PROFILE\`
+- execution_policy: \`$E2E_EXECUTION_POLICY\`
 
 ## Steps
 
@@ -418,6 +460,7 @@ write_summary_json() {
     "$SUMMARY_JSON_FILE" \
     "$FINAL_STATUS" \
     "$E2E_PROFILE" \
+    "$E2E_EXECUTION_POLICY" \
     "$RUN_DIR" \
     "$STAMP" <<'PY'
 import json
@@ -428,8 +471,9 @@ manifest_path = Path(sys.argv[1])
 summary_path = Path(sys.argv[2])
 result = sys.argv[3]
 profile = sys.argv[4]
-run_dir = sys.argv[5]
-stamp = sys.argv[6]
+execution_policy = sys.argv[5]
+run_dir = sys.argv[6]
+stamp = sys.argv[7]
 
 steps = []
 counts = {"PASS": 0, "FAIL": 0, "SKIP": 0, "BLOCKED": 0}
@@ -453,7 +497,9 @@ payload = {
     "schema_version": 1,
     "run_id": f"manaloom_e2e_suite_{stamp}",
     "requested_profile": profile,
+    "execution_policy": execution_policy,
     "result": result.lower(),
+    "gate_eligible": execution_policy == "strict-gate" and result == "PASS",
     "run_dir": run_dir,
     "summary": {
         "step_count": len(steps),
@@ -468,7 +514,44 @@ summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", en
 PY
 }
 
+e2e_exit_code_for_status() {
+  local status="$1"
+  local execution_policy="$2"
+
+  case "$status" in
+    PASS)
+      printf '0\n'
+      ;;
+    PARTIAL)
+      if [[ "$execution_policy" == "diagnostic-allow-partial" ]]; then
+        printf '0\n'
+      else
+        printf '3\n'
+      fi
+      ;;
+    BLOCKED)
+      printf '2\n'
+      ;;
+    FAIL)
+      printf '1\n'
+      ;;
+    *)
+      printf '4\n'
+      ;;
+  esac
+}
+
 main() {
+  local parse_status=0
+  parse_args "$@" || parse_status=$?
+  if [[ "$parse_status" -eq 64 ]]; then
+    return 0
+  fi
+  if [[ "$parse_status" -ne 0 ]]; then
+    return "$parse_status"
+  fi
+
+  initialize_run_dir
   write_summary_header
 
   run_step "Patrol product E2E local" \
@@ -528,11 +611,21 @@ main() {
   echo "Summary JSON: $SUMMARY_JSON_FILE"
   echo "Logs: $RUN_DIR"
 
-  case "$FINAL_STATUS" in
-    PASS|PARTIAL) exit 0 ;;
-    BLOCKED) exit 2 ;;
-    *) exit 1 ;;
-  esac
+  if [[ "$FINAL_STATUS" == "PARTIAL" ]]; then
+    if [[ "$E2E_EXECUTION_POLICY" == "diagnostic-allow-partial" ]]; then
+      echo "PARTIAL_DIAGNOSTIC: skips inventariados; sem credito de gate ou release."
+    else
+      echo "PARTIAL: gate estrito incompleto; consulte os SKIPs e execute os pre-requisitos solicitados." >&2
+    fi
+  fi
+
+  local final_exit_code
+  final_exit_code="$(
+    e2e_exit_code_for_status "$FINAL_STATUS" "$E2E_EXECUTION_POLICY"
+  )"
+  return "$final_exit_code"
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

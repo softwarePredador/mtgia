@@ -10,14 +10,12 @@ RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:
 RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"
 INTERACTIVE_MAX_ACTIVE="${MANALOOM_RELEASE_XMAGE_INTERACTIVE_MAX_ACTIVE:-4}"
 INTERACTIVE_PER_USER_ACTIVE_LIMIT="${MANALOOM_RELEASE_INTERACTIVE_PER_USER_ACTIVE_LIMIT:-1}"
-if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
-      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
-  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto battle_coach estiver off" >&2
   exit 2
 fi
-if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" &&
-      "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "1" ]]; then
-  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1" >&2
+if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0 enquanto battle_live estiver off" >&2
   exit 2
 fi
 if [[ ! "$INTERACTIVE_MAX_ACTIVE" =~ ^[1-9][0-9]*$ ||
@@ -56,10 +54,9 @@ load_manaloom_env_keys "$ENV_FILE" \
   MANALOOM_BACKEND_SERVICE MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS \
   MANALOOM_DEPLOY_READINESS_ATTEMPTS MANALOOM_EASYPANEL_INSECURE_TLS \
   MANALOOM_EASYPANEL_SSH_HOST MANALOOM_EASYPANEL_SSH_KEY \
-  MANALOOM_EXPECTED_BATTLE_ENGINE MANALOOM_EXPECTED_DB_HOST \
+  MANALOOM_EXPECTED_DB_HOST \
   MANALOOM_EXPECTED_DB_NAME MANALOOM_EXPECTED_DB_PORT \
-  MANALOOM_EXPECTED_FORGE_URL MANALOOM_EXPECTED_NATIVE_URL \
-  MANALOOM_EXPECTED_XMAGE_URL MANALOOM_REMOTE_BUILD_ROOT \
+  MANALOOM_REMOTE_BUILD_ROOT \
   MANALOOM_TRUSTED_PROXY_HOPS MANALOOM_TRUSTED_PROXY_PEERS JWT_SECRET \
   MANALOOM_EMAIL_DELIVERY_PROVIDER RESEND_API_KEY RESEND_FROM_EMAIL \
   RESEND_FROM_NAME RESEND_VERIFIED_DOMAIN \
@@ -78,10 +75,6 @@ REMOTE_BUILD_ROOT="${MANALOOM_REMOTE_BUILD_ROOT:-/opt/manaloom/deploy}"
 EXPECTED_DB_HOST="${MANALOOM_EXPECTED_DB_HOST:-evolution_manaloom-postgres}"
 EXPECTED_DB_PORT="${MANALOOM_EXPECTED_DB_PORT:-5432}"
 EXPECTED_DB_NAME="${MANALOOM_EXPECTED_DB_NAME:-halder}"
-EXPECTED_BATTLE_ENGINE="${MANALOOM_EXPECTED_BATTLE_ENGINE:-auto}"
-EXPECTED_XMAGE_URL="${MANALOOM_EXPECTED_XMAGE_URL:-http://xmage-sidecar:8080}"
-EXPECTED_FORGE_URL="${MANALOOM_EXPECTED_FORGE_URL:-http://forge-sidecar:8080}"
-EXPECTED_NATIVE_URL="${MANALOOM_EXPECTED_NATIVE_URL:-http://${EASYPANEL_PROJECT}_manaloom-ops:8080}"
 API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
 LEGACY_WEB_ORIGIN="https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
 REQUIRED_WEB_ORIGIN="https://brewtact.com"
@@ -126,20 +119,14 @@ fi
 # vindas do mesmo .env que carrega credenciais.
 # shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
+# shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
 XMAGE_INTERACTIVE_SERVICE="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE"
 XMAGE_INTERACTIVE_DNS="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS"
 XMAGE_INTERACTIVE_URL="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL"
 PROJECT_NETWORK="easypanel-$EASYPANEL_PROJECT"
-if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
-  INTERACTIVE_BATTLE_ENABLED=true
-else
-  INTERACTIVE_BATTLE_ENABLED=false
-fi
-if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" == "1" ]]; then
-  BATTLE_LIVE_SPECTATOR_ENABLED=true
-else
-  BATTLE_LIVE_SPECTATOR_ENABLED=false
-fi
+INTERACTIVE_BATTLE_ENABLED=false
+BATTLE_LIVE_SPECTATOR_ENABLED=false
 readonly XMAGE_INTERACTIVE_SERVICE XMAGE_INTERACTIVE_DNS
 readonly XMAGE_INTERACTIVE_URL PROJECT_NETWORK INTERACTIVE_BATTLE_ENABLED
 readonly BATTLE_LIVE_SPECTATOR_ENABLED
@@ -1219,8 +1206,7 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master 2>/dev/null || tr
   echo "HEAD local nao esta alinhado com origin/master; faca push antes do deploy." >&2
   exit 2
 fi
-
-require_xmage_interactive_release_contract "$sha"
+manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$sha"
 
 if [[ "$LIVE_MUTATION_APPROVED" != "1" ]]; then
   echo "deploy recusado: aprovacao live do processo chamador nao foi preservada" >&2
@@ -1255,13 +1241,7 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
     /^DB_HOST=/{host=\$2}
     /^DB_PORT=/{port=\$2}
     /^DB_NAME=/{name=\$2}
-    /^BATTLE_ENGINE=/{engine=\$2}
-    /^XMAGE_SIDECAR_URL=/{xmage=\$2}
-    /^FORGE_SIDECAR_URL=/{forge=\$2}
-    /^NATIVE_BATTLE_SIDECAR_URL=/{native=\$2}
     /^ENVIRONMENT=/{environment=\$2}
-    /^OPENAI_PROFILE=/{profile=\$2}
-    /^OPENAI_API_KEY=/{openai=(length(substr(\$0,index(\$0,\"=\")+1))>0 ? 1 : 0)}
     /^MANALOOM_OPS_API_KEY=/{ops=(length(substr(\$0,index(\$0,\"=\")+1))>=32 ? 1 : 0)}
     /^JWT_SECRET=/ {
       value=substr(\$0,index(\$0,\"=\")+1)
@@ -1276,19 +1256,17 @@ docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.Container
       value=substr(\$0,index(\$0,\"=\")+1)
       trusted_proxy_peers_configured=(length(value)>0 && value !~ /(^|,)(0\.0\.0\.0\/0|::\/0)(,|$)/) ? 1 : 0
     }
-    END{print host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native \"|\" environment \"|\" profile \"|\" openai \"|\" ops \"|\" jwt_secret_configured \"|\" trusted_proxy_configured \"|\" trusted_proxy_peers_configured}'
+    END{print host \"|\" port \"|\" name \"|\" environment \"|\" ops \"|\" jwt_secret_configured \"|\" trusted_proxy_configured \"|\" trusted_proxy_peers_configured}'
 ")"
-IFS='|' read -r spec_db_host spec_db_port spec_db_name spec_battle_engine spec_xmage_url spec_forge_url spec_native_url spec_environment spec_openai_profile spec_openai_configured spec_ops_configured spec_jwt_secret_configured spec_trusted_proxy_configured spec_trusted_proxy_peers_configured <<<"$runtime_spec_contract"
-if [[ "$spec_db_host|$spec_db_port|$spec_db_name|$spec_battle_engine|$spec_xmage_url|$spec_forge_url|$spec_native_url" != "$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|$EXPECTED_BATTLE_ENGINE|$EXPECTED_XMAGE_URL|$EXPECTED_FORGE_URL|$EXPECTED_NATIVE_URL" ]]; then
-  echo "deploy recusado: contrato PostgreSQL/battle da spec do backend esta divergente" >&2
+IFS='|' read -r spec_db_host spec_db_port spec_db_name spec_environment spec_ops_configured spec_jwt_secret_configured spec_trusted_proxy_configured spec_trusted_proxy_peers_configured <<<"$runtime_spec_contract"
+if [[ "$spec_db_host|$spec_db_port|$spec_db_name" != "$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME" ]]; then
+  echo "deploy recusado: contrato PostgreSQL da spec do backend esta divergente" >&2
   exit 2
 fi
 if [[ "$spec_environment" != "production" ||
-      ( -n "$spec_openai_profile" && "$spec_openai_profile" != "prod" ) ||
-      "$spec_openai_configured" != "1" ||
       "$spec_ops_configured" != "1" ||
       "$spec_jwt_secret_configured" != "1" ]]; then
-  echo "deploy recusado: runtime de autenticacao/IA/operacoes nao esta fail-closed para producao" >&2
+  echo "deploy recusado: runtime de autenticacao/operacoes nao esta fail-closed para producao" >&2
   exit 2
 fi
 
@@ -1465,7 +1443,7 @@ docker service update \
   --env-add SENTRY_DSN="\$sentry_dsn" \
   --env-add SENTRY_ENVIRONMENT=production \
   --env-add SENTRY_RELEASE='manaloom-backend@$short_sha' \
-  --env-add BATTLE_JOB_WORKER_ENABLED=true \
+  --env-add BATTLE_JOB_WORKER_ENABLED=false \
   --env-add BATTLE_LIVE_SPECTATOR_ENABLED='$BATTLE_LIVE_SPECTATOR_ENABLED' \
   --env-add INTERACTIVE_BATTLE_ENABLED='$INTERACTIVE_BATTLE_ENABLED' \
   --env-add XMAGE_INTERACTIVE_SIDECAR_URL='$XMAGE_INTERACTIVE_URL' \
@@ -1626,14 +1604,8 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     /^DB_HOST=/{host=\$2}
     /^DB_PORT=/{port=\$2}
     /^DB_NAME=/{name=\$2}
-    /^BATTLE_ENGINE=/{engine=\$2}
-    /^XMAGE_SIDECAR_URL=/{xmage=\$2}
-    /^FORGE_SIDECAR_URL=/{forge=\$2}
-    /^NATIVE_BATTLE_SIDECAR_URL=/{native=\$2}
     /^BATTLE_JOB_WORKER_ENABLED=/{battle_worker=\$2}
     /^ENVIRONMENT=/{environment=\$2}
-    /^OPENAI_PROFILE=/{profile=\$2}
-    /^OPENAI_API_KEY=/{openai=(length(substr(\$0,index(\$0,\"=\")+1))>0 ? 1 : 0)}
     /^MANALOOM_OPS_API_KEY=/{ops=(length(substr(\$0,index(\$0,\"=\")+1))>=32 ? 1 : 0)}
     /^JWT_SECRET=/ {
       value=substr(\$0,index(\$0,\"=\")+1)
@@ -1642,9 +1614,9 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     }
     /^MANALOOM_TRUSTED_PROXY_HOPS=/{proxy_hops_count++; proxy_hops=substr(\$0,index(\$0,\"=\")+1)}
     /^MANALOOM_TRUSTED_PROXY_PEERS=/{proxy_peers_count++; proxy_peers=substr(\$0,index(\$0,\"=\")+1)}
-    END{print sha \"|\" host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native \"|\" battle_worker \"|\" environment \"|\" profile \"|\" openai \"|\" ops \"|\" jwt \"|\" proxy_hops_count \"|\" proxy_hops \"|\" proxy_peers_count \"|\" proxy_peers}'
+    END{print sha \"|\" host \"|\" port \"|\" name \"|\" battle_worker \"|\" environment \"|\" ops \"|\" jwt \"|\" proxy_hops_count \"|\" proxy_hops \"|\" proxy_peers_count \"|\" proxy_peers}'
 ")"
-IFS='|' read -r runtime_sha runtime_db_host runtime_db_port runtime_db_name runtime_battle_engine runtime_xmage_url runtime_forge_url runtime_native_url runtime_battle_worker runtime_environment runtime_openai_profile runtime_openai_configured runtime_ops_configured runtime_jwt_configured runtime_proxy_hops_count runtime_proxy_hops runtime_proxy_peers_count runtime_proxy_peers <<<"$runtime_contract"
+IFS='|' read -r runtime_sha runtime_db_host runtime_db_port runtime_db_name runtime_battle_worker runtime_environment runtime_ops_configured runtime_jwt_configured runtime_proxy_hops_count runtime_proxy_hops runtime_proxy_peers_count runtime_proxy_peers <<<"$runtime_contract"
 runtime_allowed_origins_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -1722,11 +1694,9 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     /^SENTRY_RELEASE=/{release_count++; release=substr(\$0,index(\$0,\"=\")+1)}
     END{printf \"%d|%s|%d|%s\",environment_count,environment,release_count,release}'
 ")"
-if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_battle_engine|$runtime_xmage_url|$runtime_forge_url|$runtime_native_url" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|$EXPECTED_BATTLE_ENGINE|$EXPECTED_XMAGE_URL|$EXPECTED_FORGE_URL|$EXPECTED_NATIVE_URL" ||
+if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME" ||
       "$runtime_environment" != "production" ||
-      "$runtime_battle_worker" != "true" ||
-      ( -n "$runtime_openai_profile" && "$runtime_openai_profile" != "prod" ) ||
-      "$runtime_openai_configured" != "1" ||
+      "$runtime_battle_worker" != "false" ||
       "$runtime_ops_configured" != "1" ||
       "$runtime_jwt_configured" != "1" ||
       "$runtime_proxy_hops_count" != "1" ||
@@ -1741,7 +1711,7 @@ if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_
       "$runtime_resend_api_key_sha256" != "$RESEND_API_KEY_SHA256" ||
       "$runtime_sentry_dsn_sha256" != "$MANALOOM_PRODUCTION_SENTRY_DSN_SHA256" ||
       "$runtime_sentry_metadata" != "1|production|1|manaloom-backend@$short_sha" ]]; then
-  echo "deploy convergiu com SHA ou contrato PostgreSQL/battle/IA/auth/CORS/Sentry divergente" >&2
+  echo "deploy convergiu com SHA ou contrato PostgreSQL/capabilities/auth/CORS/Sentry divergente" >&2
   exit 2
 fi
 
@@ -1754,53 +1724,30 @@ fi
 for attempt in $(seq 1 "$readiness_attempts"); do
   if readiness_payload="$(curl -fsS "$API_BASE_URL/health/ready" 2>/dev/null)" &&
      jq -e \
-       --arg live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_ENABLED" \
-       --arg interactive_enabled "$INTERACTIVE_BATTLE_ENABLED" \
-       --argjson interactive_maximum_active "$INTERACTIVE_MAX_ACTIVE" '
+       --arg policy_version "$(jq -r '.policy_version' <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")" \
+       --arg offer_mode "$(jq -r '.offer_mode' <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")" \
+       --arg policy_digest_sha256 "$MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256" '
+       def disabled_by_policy($check; $capability):
+         $check.status == "disabled" and
+         $check.capability == $capability and
+         $check.release_capability == "off" and
+         $check.policy_digest_sha256 == $policy_digest_sha256;
        .status == "ready" and
        .environment == "production" and
+       .checks.release_capabilities.status == "healthy" and
+       .checks.release_capabilities.configuration_status == "valid" and
+       .checks.release_capabilities.policy_version == $policy_version and
+       .checks.release_capabilities.offer_mode == $offer_mode and
+       .checks.release_capabilities.policy_digest_sha256 == $policy_digest_sha256 and
        .checks.release_schema.status == "healthy" and
        .checks.release_schema.required_range == "038-058" and
        .checks.release_schema.latest_migration == "058" and
        .checks.battle_job_schema.status == "healthy" and
-       (
-         if $live_spectator_enabled == "true" then
-           .checks.battle_live_spectator.status == "ready" and
-           .checks.battle_live_spectator.enabled == true and
-           .checks.battle_live_spectator.database == "ready" and
-           .checks.battle_live_spectator.source == "ready" and
-           .checks.battle_live_spectator.configuration == "ready"
-         else
-           .checks.battle_live_spectator.status == "disabled" and
-           .checks.battle_live_spectator.enabled == false
-         end
-       ) and
-       (
-         if $interactive_enabled == "true" then
-           .checks.interactive_battle.status == "ready" and
-           .checks.interactive_battle.enabled == true and
-           .checks.interactive_battle.runtime_isolation ==
-             "dedicated_interactive_sidecar" and
-           .checks.interactive_battle.runtime_schema_version ==
-             "interactive_battle_runtime_v1" and
-           .checks.interactive_battle.maximum_active ==
-             $interactive_maximum_active and
-           .checks.interactive_battle.database == "ready" and
-           .checks.interactive_battle.source == "ready" and
-           .checks.interactive_battle.configuration == "ready"
-         else
-           .checks.interactive_battle.status == "disabled" and
-           .checks.interactive_battle.enabled == false
-         end
-       ) and
-       .checks.ai_runtime.status == "healthy" and
-       .checks.ai_runtime.provider_configured == true and
-       .checks.ai_runtime.mock_fallbacks_allowed == false and
-       .checks.battle_runtime.status == "healthy" and
-       .checks.battle_runtime.mode == "auto" and
-       .checks.battle_runtime.engines.xmage.status == "healthy" and
-       .checks.battle_runtime.engines.forge.status == "healthy" and
-       .checks.battle_runtime.engines.native.status == "healthy"
+       disabled_by_policy(.checks.battle_job_worker; "battle_batch") and
+       disabled_by_policy(.checks.battle_runtime; "battle_batch") and
+       disabled_by_policy(.checks.ai_runtime; "ai_analyze_optimize_advisory") and
+       disabled_by_policy(.checks.battle_live_spectator; "battle_live") and
+       disabled_by_policy(.checks.interactive_battle; "battle_coach")
      ' >/dev/null <<<"$readiness_payload"; then
     break
   fi
@@ -1811,9 +1758,12 @@ for attempt in $(seq 1 "$readiness_attempts"); do
   fi
 done
 if [[ -z "$readiness_payload" ]]; then
-  echo "deploy convergiu, mas o readiness de IA/Battle recusou o runtime" >&2
+  echo "deploy convergiu, mas o readiness all-OFF recusou o runtime" >&2
   exit 2
 fi
+capabilities_payload="$(curl -fsS "$API_BASE_URL/capabilities")"
+manaloom_require_exact_release_capabilities \
+  "backend /capabilities" "$capabilities_payload"
 
 runtime_image_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 spec_image=\$(docker service inspect '$SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
@@ -1852,12 +1802,14 @@ jq -cn \
   --arg remote_dir_removed "$remote_dir" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_ENABLED" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_ENABLED" \
+  --argjson release_capabilities "$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON" \
   '{
     status: "deployed",
     service: $service,
     image: $image,
     image_digest_ref: $image_digest_ref,
     git_sha: $git_sha,
+    release_capabilities: $release_capabilities,
     xmage_engine_commit: $xmage_engine_commit,
     xmage_patch_commit: $xmage_patch_commit,
     battle_live_spectator_enabled: $battle_live_spectator_enabled,

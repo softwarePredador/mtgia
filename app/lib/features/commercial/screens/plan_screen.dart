@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/commercial_launch_policy.dart';
-import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
 import '../widgets/ai_usage_meter.dart';
 import '../widgets/free_beta_notice.dart';
@@ -21,14 +20,9 @@ class PlanScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          CommercialLaunchPolicy.isFreeBeta ? 'Beta gratuita' : 'Planos',
-        ),
-      ),
+      appBar: AppBar(title: const Text(CommercialLaunchPolicy.betaLabel)),
       body: LayoutBuilder(
         builder: (context, viewport) {
-          final isDesktop = viewport.maxWidth >= AppTheme.breakpointMedium;
           final horizontalGutter =
               viewport.maxWidth < AppTheme.breakpointCompact ? 16.0 : 24.0;
           return ListView(
@@ -41,204 +35,35 @@ class PlanScreen extends StatelessWidget {
                 key: const Key('plans-responsive-frame'),
                 maxWidth: AppTheme.contentMaxWidth,
                 padding: EdgeInsets.symmetric(horizontal: horizontalGutter),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: AppTheme.readingMaxWidth,
-                        ),
-                        child: const AiUsageMeter(),
-                      ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppTheme.readingMaxWidth,
                     ),
-                    const SizedBox(height: AppTheme.space16),
-                    if (CommercialLaunchPolicy.isFreeBeta)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: AppTheme.readingMaxWidth,
-                          ),
-                          child: const FreeBetaNotice(
-                            key: Key('beta-free-access-panel'),
-                          ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const AiUsageMeter(),
+                        const SizedBox(height: AppTheme.space16),
+                        const FreeBetaNotice(
+                          key: Key('beta-free-access-panel'),
                         ),
-                      )
-                    else if (isDesktop)
-                      Row(
-                        key: const Key('plans-desktop-grid'),
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _PlanComparisonCard(
-                              plan: ManaLoomPlan.free,
-                              active: provider.tier == ManaLoomPlanTier.free,
-                              onAction: null,
-                              fullWidthAction: false,
-                            ),
-                          ),
-                          const SizedBox(width: AppTheme.paneGap),
-                          Expanded(
-                            child: _PlanComparisonCard(
-                              plan: ManaLoomPlan.pro,
-                              active: provider.tier == ManaLoomPlanTier.pro,
-                              featured: true,
-                              onAction: () => context.push('/upgrade'),
-                              fullWidthAction: false,
-                            ),
-                          ),
+                        if (provider.isRemoteSynced ||
+                            provider.lastRemoteError != null) ...[
+                          const SizedBox(height: AppTheme.space16),
+                          _RemotePlanStatusPanel(provider: provider),
                         ],
-                      )
-                    else
-                      Column(
-                        key: const Key('plans-mobile-stack'),
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _PlanComparisonCard(
-                            plan: ManaLoomPlan.free,
-                            active: provider.tier == ManaLoomPlanTier.free,
-                            onAction: null,
-                          ),
-                          const SizedBox(height: AppTheme.space12),
-                          _PlanComparisonCard(
-                            plan: ManaLoomPlan.pro,
-                            active: provider.tier == ManaLoomPlanTier.pro,
-                            featured: true,
-                            onAction: () => context.push('/upgrade'),
-                          ),
-                        ],
-                      ),
-                    const SizedBox(height: AppTheme.space16),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: AppTheme.readingMaxWidth,
-                        ),
-                        child: Column(
-                          children: [
-                            if (provider.isRemoteSynced ||
-                                provider.lastRemoteError != null) ...[
-                              _RemotePlanStatusPanel(provider: provider),
-                              const SizedBox(height: AppTheme.space16),
-                            ],
-                            const _LegalShortcutPanel(),
-                          ],
-                        ),
-                      ),
+                        const SizedBox(height: AppTheme.space16),
+                        const _LegalShortcutPanel(),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _PlanComparisonCard extends StatelessWidget {
-  const _PlanComparisonCard({
-    required this.plan,
-    required this.active,
-    required this.onAction,
-    this.featured = false,
-    this.fullWidthAction = true,
-  });
-
-  final ManaLoomPlan plan;
-  final bool active;
-  final bool featured;
-  final bool fullWidthAction;
-  final VoidCallback? onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = featured ? AppTheme.brass400 : AppTheme.frost400;
-    final theme = Theme.of(context);
-    return Container(
-      key: Key('plan-card-${plan.tier.id}'),
-      padding: const EdgeInsets.all(AppTheme.space16),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
-          color: active ? AppTheme.success : accent.withValues(alpha: 0.32),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  plan.tier.label,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              if (active)
-                const Chip(
-                  label: Text('Atual'),
-                  avatar: Icon(Icons.check_circle, size: 16),
-                )
-              else
-                Text(
-                  plan.priceLabel,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: accent,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppTheme.space8),
-          Text(
-            plan.description,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppTheme.textSecondary,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: AppTheme.space12),
-          ...plan.features.map(
-            (feature) => _PlanLine(icon: Icons.check, text: feature),
-          ),
-          const SizedBox(height: AppTheme.space8),
-          ...plan.limits.map(
-            (limit) =>
-                _PlanLine(icon: Icons.info_outline, text: limit, muted: true),
-          ),
-          const SizedBox(height: AppTheme.space14),
-          Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-              width: fullWidthAction ? double.infinity : 180,
-              child: featured
-                  ? ElevatedButton(
-                      key: const Key('plan-pro-upgrade-button'),
-                      onPressed: active ? null : onAction,
-                      child: Text(active ? 'Pro ativo' : 'Fazer upgrade'),
-                    )
-                  : OutlinedButton(
-                      onPressed: active ? null : onAction,
-                      child: Text(
-                        active
-                            ? 'Free ativo'
-                            : onAction == null
-                            ? 'Incluído no Pro'
-                            : 'Usar Free',
-                      ),
-                    ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -270,46 +95,11 @@ class _RemotePlanStatusPanel extends StatelessWidget {
           Expanded(
             child: Text(
               synced
-                  ? 'Plano sincronizado. Seus limites de uso estão atualizados.'
-                  : provider.lastRemoteError ?? 'Plano remoto indisponível.',
+                  ? 'Teto operacional sincronizado com o servidor.'
+                  : provider.lastRemoteError ??
+                        'Não foi possível confirmar o teto operacional agora.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
-                height: 1.35,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PlanLine extends StatelessWidget {
-  const _PlanLine({required this.icon, required this.text, this.muted = false});
-
-  final IconData icon;
-  final String text;
-  final bool muted;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppTheme.space7),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            size: 17,
-            color: muted ? AppTheme.textSecondary : AppTheme.success,
-          ),
-          const SizedBox(width: AppTheme.space8),
-          Expanded(
-            child: Text(
-              text,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: muted ? AppTheme.textSecondary : AppTheme.textPrimary,
                 height: 1.35,
               ),
             ),
@@ -339,9 +129,7 @@ class _LegalShortcutPanel extends StatelessWidget {
           const SizedBox(width: AppTheme.space10),
           Expanded(
             child: Text(
-              CommercialLaunchPolicy.isFreeBeta
-                  ? 'Consulte como tratamos privacidade, conteúdo e sugestões de IA durante a beta.'
-                  : 'Termos, privacidade, IP e disclaimer ficam disponíveis antes do upgrade.',
+              'Consulte como tratamos privacidade, conteúdo e sugestões de IA durante a beta.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
                 height: 1.35,

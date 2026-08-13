@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-11T18:36:01.159299Z",
-  "source_digest": "643fa0af0cbf0c99d3fcdef7355b17f1b89d04ece14934a02946214c5957d6af",
+  "generated_at": "2026-08-13T17:12:06.651153Z",
+  "source_digest": "7cf7c82d73fbd64a773e926692bf8bc131f8cbab6cd4b2357e76d84efd2c6e01",
   "surface": "critical_overlays_states",
   "profile": "web_critical_overlays_wide_1920x1080",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "85e32d82f31cd4125fa496bd1cadd7ccf9fc2beee7cc5d7f0ca32eafa6b0c71e",
+  "log_sha256": "ce300d7395b71c97b24736972e497b2e32d36d0068ce9101824200f6ceb8ab6a",
   "checkpoint_count": 22,
   "required_checkpoints": [
     "ux_pack08_00_profile_security_below_fold",
@@ -42,96 +42,96 @@
     {
       "checkpoint": "ux_pack08_00_profile_security_below_fold",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_00_profile_security_below_fold.png",
-      "sha256": "5808da2d8668fe39b2cb7bba820aa8a3a5ba362f741a390583413267dcb561a5",
-      "bytes": 152620,
+      "sha256": "d9c97cec165362013e69fc217981d0bb531c2a3cbba5634213d8321931aa04dd",
+      "bytes": 152085,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_01_profile_avatar_dialog",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_01_profile_avatar_dialog.png",
-      "sha256": "31987bc228650dcc0d529f419691495c102a5330028630f5f9b5d40e3f107adb",
-      "bytes": 157130,
+      "sha256": "e5d632d281d46b0853340496a75bd2388fe6959a229a0dc4a89144deedc2ff9c",
+      "bytes": 156675,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_02_profile_blocked_loading",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_02_profile_blocked_loading.png",
-      "sha256": "16a0b7770b2b399629f3267f21cdb2e9429f0ede5a93a90cf7407f6a7c07befd",
-      "bytes": 118784,
+      "sha256": "a51b70c61adaac5f61be71012b429a443cb189ab760e87684b5e626d9d4aa2e3",
+      "bytes": 118300,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_03_profile_blocked_error_retry",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_03_profile_blocked_error_retry.png",
-      "sha256": "81b04b65cf59c0cdc0daf3291785a076aff2ee1233f84d20ae17edc2da1839b6",
-      "bytes": 129271,
+      "sha256": "eadf487545af84d2deb39a3b068229c5d7df192124e7a588ee1bd2f6fbe90c39",
+      "bytes": 128780,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_04_profile_blocked_recovered",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_04_profile_blocked_recovered.png",
-      "sha256": "7c1bafd01569704780cec6368199c52cdadd1043025683b657e341c48960ff02",
-      "bytes": 128623,
+      "sha256": "211be50daa366047bee8bd2ccc77ea150543f3b117dfbda00ae0d8b7f2af12af",
+      "bytes": 128113,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_05_profile_password_validation",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_05_profile_password_validation.png",
-      "sha256": "d863ed54c49bce31140e5c0d0da15e803a2b56f7a8245dc81ffd3c1eac21023a",
-      "bytes": 125536,
+      "sha256": "6b7468862071d6e18cbf919d69fda10e2cf17704a9cb0af1bb4c4f3cc4552fd4",
+      "bytes": 125097,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_06_profile_revoke_validation",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_06_profile_revoke_validation.png",
-      "sha256": "0e88de064d98bdbc7ec86de364f88093547bd9f50143a04291afa27f8bd10b0d",
-      "bytes": 143153,
+      "sha256": "31cbcc11a0213e299404f92a144301508914e55916a9b6ba9f778a1be7446278",
+      "bytes": 142685,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_07_profile_delete_validation",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_07_profile_delete_validation.png",
-      "sha256": "ba56c7072ae229fa86d6bb39631317a20dc746663fb49e2ffd943d07de846b9b",
-      "bytes": 139292,
+      "sha256": "a501226f9ed3db0255adc6c867316417ca93d3c894be8745174ba63eca997a18",
+      "bytes": 138808,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_08_deck_seeded_action_context",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_08_deck_seeded_action_context.png",
-      "sha256": "50fa73bf3f7980f8ac99a230e7ebc63c6c9d4b4ae48524f967559bc5796e3a03",
-      "bytes": 164547,
+      "sha256": "9107a7b78e5d01d9725b63226746758657a37f574d2dd231a33356c102f72579",
+      "bytes": 160884,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_09_deck_delete_action_menu",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_09_deck_delete_action_menu.png",
-      "sha256": "c46362ca706e0080847ffd8906cf9841fa68e708ad4de115a9afcd6f640a0077",
-      "bytes": 163546,
+      "sha256": "40b528b255a71ebed6e267f9ea4e58694c31047dd2ddb3dc80e01e2554c6440a",
+      "bytes": 159791,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_10_deck_delete_confirmation",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_10_deck_delete_confirmation.png",
-      "sha256": "2ed2ee74a760a2a749dce8cf71890125770a74fcbc0d90eb62752f3fe4abb1d1",
-      "bytes": 138246,
+      "sha256": "506c6fa158146ce26cf35b328d2b42a012af549666850e79b15be008511bc767",
+      "bytes": 134967,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "ux_pack08_11_deck_delete_cancelled",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/ux_pack08_11_deck_delete_cancelled.png",
-      "sha256": "50fa73bf3f7980f8ac99a230e7ebc63c6c9d4b4ae48524f967559bc5796e3a03",
-      "bytes": 164547,
+      "sha256": "9107a7b78e5d01d9725b63226746758657a37f574d2dd231a33356c102f72579",
+      "bytes": 160884,
       "width": 1920,
       "height": 1080
     },

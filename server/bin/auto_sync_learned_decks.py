@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Auto-sync: detecta decks aprendidos promovidos no Hermes SQLite e importa no PG.
-Default seguro: dry-run estrito. Use --apply ou HERMES_AUTO_SYNC_APPLY=1 para mutar PG.
-Regras: Lorehold -> PULA; qualquer outro -> export JSON e importador Commander 100/99+1.
+"""Audita o sync de learned decks do Hermes SQLite para PostgreSQL.
+
+O modo padrao e dry-run. A escrita automatica em PostgreSQL fica fail-closed:
+``--apply`` e ``HERMES_AUTO_SYNC_APPLY=1`` retornam erro ate existir o receipt
+versionado DCK-P0-05. Lorehold continua sujeito a revisao manual separada.
 """
 
 import argparse, os, shutil, sqlite3, subprocess, sys
@@ -33,34 +35,6 @@ TRACKING_FILE = ARTIFACT_DIR / "synced_learned_ids.txt"
 SERVER_DIR = Path(os.environ.get("MTGIA_SYNC_SERVER_DIR", str(SYNC_PROJECT_DIR / "server")))
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 REQUIRED_CARD_COUNT = int(os.environ.get("HERMES_AUTO_SYNC_REQUIRED_CARD_COUNT", "100"))
-ALLOW_RUNTIME_GIT_PULL = os.environ.get("MTGIA_SYNC_GIT_PULL", "0") == "1"
-
-ENV_FILES = [
-    os.environ.get("MTGIA_ENV_FILE"),
-    str(SERVER_DIR / ".env"),
-    os.environ.get("MANALOOM_POSTGRES_ENV"),
-    "/opt/data/secrets/manaloom-postgres.env",
-]
-
-
-def _load_env():
-    for env_file in ENV_FILES:
-        if not env_file or not os.path.isfile(env_file):
-            continue
-        with open(env_file) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#") or "=" not in line:
-                    continue
-                key, _, value = line.partition("=")
-                key = key.strip()
-                value = value.strip().strip("\"'")
-                if key and key not in os.environ:
-                    os.environ[key] = value
-
-
-_load_env()
-
 def _export_script_path():
     for candidate in EXPORT_SCRIPT_CANDIDATES:
         if candidate and os.path.exists(candidate):
@@ -138,26 +112,43 @@ def _count_invalid_promoted_rows(db):
 
 def _ensure_artifact_storage():
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
-    if not TRACKING_FILE.exists():
-        TRACKING_FILE.write_text("")
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Auto-sync Hermes learned decks")
-    parser.add_argument("--apply", action="store_true", help="Aplica no PG")
+    parser = argparse.ArgumentParser(description="Audit Hermes learned deck sync")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Valida candidatos sem mutar PostgreSQL (padrao)",
+    )
+    mode.add_argument(
+        "--apply",
+        action="store_true",
+        help="Bloqueado ate o receipt DCK-P0-05",
+    )
     args = parser.parse_args(argv)
-    _ensure_artifact_storage()
-    apply = args.apply or os.environ.get("HERMES_AUTO_SYNC_APPLY") == "1"
+    apply_requested = args.apply or os.environ.get("HERMES_AUTO_SYNC_APPLY") == "1"
+    if apply_requested:
+        print(
+            "BLOCKED_DCK_P0_05: automatic learned-deck PostgreSQL sync is "
+            "disabled; a reviewed, versioned promotion receipt is required.",
+            file=sys.stderr,
+        )
+        return 2
+
     export_script = _export_script_path()
     print("=== Auto-sync find_promoted ===")
-    print(f"mode={'apply' if apply else 'dry_run'} export_script={export_script}")
+    print(
+        f"mode=dry_run export_script={export_script} "
+        "pg_mutations=false promotion_allowed=false"
+    )
 
-    # Pull latest sync copy
-    if ALLOW_RUNTIME_GIT_PULL and SYNC_PROJECT_DIR.is_dir():
-        subprocess.run(
-            ["git", "-C", str(SYNC_PROJECT_DIR), "pull", "--ff-only", "origin", "master"],
-            capture_output=True, timeout=30,
-        )
+    if not Path(SQLITE_DB).is_file():
+        print(f"Nenhum SQLite Hermes encontrado em {SQLITE_DB}; dry-run sem efeito.")
+        return 0
+
+    _ensure_artifact_storage()
 
     db = sqlite3.connect(SQLITE_DB)
     rows = _find_promoted_rows(db)
@@ -175,15 +166,22 @@ def main(argv=None):
         return 0
 
     synced_ids = set()
-    with TRACKING_FILE.open() as f:
-        for line in f:
-            line = line.strip()
-            if line.isdigit():
-                synced_ids.add(int(line))
+    if TRACKING_FILE.exists():
+        with TRACKING_FILE.open() as f:
+            for line in f:
+                line = line.strip()
+                if line.isdigit():
+                    synced_ids.add(int(line))
 
-    applied, dry_run_ok, already_synced, skipped, invalid_skipped, failed = 0, 0, 0, 0, invalid_promoted, 0
+    dry_run_ok, already_synced, skipped, invalid_skipped, failed = (
+        0,
+        0,
+        0,
+        invalid_promoted,
+        0,
+    )
 
-    for deck_id, commander, deck_name, card_count, promoted_at in rows:
+    for deck_id, commander, deck_name, card_count, _promoted_at in rows:
         # Lorehold — freio manual de Mox
         if "lorehold" in commander.lower():
             print(f'SKIP Lorehold (manual review): learned_id={deck_id} "{deck_name}"')
@@ -209,10 +207,9 @@ def main(argv=None):
             failed += 1
             continue
 
-        mode_arg = "--apply" if apply else "--dry-run"
         app = subprocess.run(
             [DART_BIN, "run", "bin/commander_learned_deck.dart",
-             f"--input-json={json_path}", mode_arg, "--strict",
+             f"--input-json={json_path}", "--dry-run", "--strict",
              f"--artifact-dir={ARTIFACT_DIR}"],
             capture_output=True, text=True, timeout=60,
             cwd=str(SERVER_DIR),
@@ -223,29 +220,23 @@ def main(argv=None):
                 "falhou no gate de importacao" in app_error
                 or "deck Commander aprendido precisa" in app_error
                 or "card_count declarado" in app_error
+                or "legal_status precisa" in app_error
             ):
                 print(f"  INVALID_SKIPPED: {app_error[-500:]}")
                 invalid_skipped += 1
                 continue
-            print(f"  APPLY_FAILED: {app_error[-500:]}")
+            print(f"  DRY_RUN_FAILED: {app_error[-500:]}")
             failed += 1
             continue
 
-        if apply:
-            synced_ids.add(deck_id)
-            applied += 1
-            print("  APPLY_OK")
-        else:
-            dry_run_ok += 1
-            print("  DRY_RUN_OK")
+        dry_run_ok += 1
+        print("  DRY_RUN_OK")
 
-    # Persiste tracking
-    with TRACKING_FILE.open("w") as f:
-        for sid in sorted(synced_ids):
-            f.write(f"{sid}\n")
+    # Dry-run never advances the tracking ledger. It reflects only successful
+    # materializations from a future, separately approved promotion path.
 
     print(
-        f"\nTOTALS applied={applied} dry_run_ok={dry_run_ok} "
+        f"\nTOTALS applied=0 dry_run_ok={dry_run_ok} "
         f"already_synced={already_synced} skipped={skipped} "
         f"invalid_skipped={invalid_skipped} failed={failed}"
     )

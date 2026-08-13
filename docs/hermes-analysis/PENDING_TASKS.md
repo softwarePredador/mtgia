@@ -1,5 +1,14 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
+> **HISTORICAL / SUPERSEDED — NAO USE COMO LISTA DE PENDENCIAS ATUAL.**
+>
+> Este handoff preserva tarefas e conclusoes do engine antigo; macros, status e
+> comandos abaixo nao definem a fila viva. Para o fluxo vigente de
+> Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > **Handoff: 2026-06-09.**  
 > 25/25 itens implementados no battle_analyst_v9.py (6900+ linhas).
 > 0 macros pendentes nesta lista. Gaps avançados continuam rastreados em `IMPLEMENTATION_GAPS.md`.

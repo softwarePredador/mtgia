@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
 
@@ -20,9 +19,6 @@ class AiUsageMeter extends StatelessWidget {
       provider.load();
     }
     final snapshot = provider.usageSnapshot;
-    final planLabel = CommercialLaunchPolicy.isFreeBeta && !snapshot.plan.isPro
-        ? CommercialLaunchPolicy.betaLabel
-        : snapshot.plan.tier.label;
     final accent = snapshot.isExhausted
         ? AppTheme.error
         : snapshot.isNearLimit
@@ -46,7 +42,7 @@ class AiUsageMeter extends StatelessWidget {
               const SizedBox(width: AppTheme.space8),
               Expanded(
                 child: Text(
-                  'Ações de IA · $planLabel',
+                  'Ações de IA · ${snapshot.plan.tier.label}',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w800,

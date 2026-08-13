@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
@@ -98,8 +97,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     Map<String, dynamic>? refreshSummary;
     if (shouldRefresh) {
-      refreshSummary = await _refreshCommanderFromMtgTop8(
-        pool: pool,
+      refreshSummary = await _buildCommanderMtgTop8RefreshPreview(
         commander: commander,
       );
     }
@@ -175,10 +173,7 @@ Future<Response> onRequest(RequestContext context) async {
 
       final edhrecProfile =
           (shouldRefresh || cachedProfile == null || needsCacheUpgrade)
-              ? await _buildAndPersistEdhrecProfile(
-                pool: pool,
-                commander: commander,
-              )
+              ? await _buildEdhrecProfile(commander: commander)
               : cachedProfile;
 
       if (edhrecProfile != null) {
@@ -192,6 +187,7 @@ Future<Response> onRequest(RequestContext context) async {
         return Response.json(
           body: {
             'commander': commander,
+            'persistence': false,
             'meta_decks_found': 0,
             'reference_cards':
                 edhrecCards
@@ -230,65 +226,15 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      List<dynamic> fallback = const [];
-      try {
-        fallback = await pool.execute(
-          Sql.named('''
-            SELECT card_name, usage_count, meta_deck_count
-            FROM card_meta_insights
-            WHERE @commander = ANY(common_commanders)
-            ORDER BY meta_deck_count DESC, usage_count DESC, card_name ASC
-            LIMIT @limit
-          '''),
-          parameters: {'commander': commander, 'limit': limit},
-        );
-      } catch (_) {
-        fallback = const [];
-      }
-
-      if (fallback.isEmpty) {
-        return Response.json(
-          body: {
-            'commander': commander,
-            'meta_decks_found': 0,
-            'reference_cards': <Map<String, dynamic>>[],
-            'sample_decks': <Map<String, dynamic>>[],
-            'message':
-                'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
-            'meta_scope': _buildMetaScopePayload(requestedMetaScope),
-            if (cachedProfile != null) 'commander_profile': cachedProfile,
-            if (commanderLearning != null)
-              'commander_learning': commanderLearning,
-          },
-        );
-      }
-
-      final cards =
-          fallback.map((row) {
-            final name = (row[0] as String?) ?? '';
-            final usage = (row[1] as int?) ?? 0;
-            final metaCount = (row[2] as int?) ?? 0;
-            return {
-              'name': name,
-              'total_copies': usage,
-              'appears_in_decks': metaCount,
-              'usage_rate': 0.0,
-            };
-          }).toList();
-
       return Response.json(
         body: {
           'commander': commander,
+          'persistence': false,
           'meta_decks_found': 0,
-          'reference_cards': cards,
+          'reference_cards': <Map<String, dynamic>>[],
           'sample_decks': <Map<String, dynamic>>[],
-          'model': {
-            'type': 'commander_competitive_reference',
-            'generated_from_meta_decks': 0,
-            'generated_from_card_meta_insights': true,
-            'meta_scope': requestedMetaScope,
-            'top_non_basic_cards': cards.map((e) => e['name']).toList(),
-          },
+          'message':
+              'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
           'meta_scope': _buildMetaScopePayload(requestedMetaScope),
           if (cachedProfile != null) 'commander_profile': cachedProfile,
           if (commanderLearning != null)
@@ -384,6 +330,7 @@ Future<Response> onRequest(RequestContext context) async {
     return Response.json(
       body: {
         'commander': commander,
+        'persistence': false,
         'meta_decks_found': totalDecks,
         'reference_cards': references,
         'sample_decks': sampleDecks,
@@ -536,6 +483,14 @@ Future<Map<String, dynamic>> _loadUsageStatsSafe({
   required Pool pool,
   required String commanderName,
 }) async {
+  if (!commanderUsageCorpusReadsEnabled()) {
+    return {
+      'available': false,
+      'reason': 'commander_usage_corpus_reads_disabled',
+      'provenance_status': 'pending_$commanderLearnedDeckPromotionReceiptTask',
+      'hot_cards': const <Map<String, dynamic>>[],
+    };
+  }
   try {
     final hotCards = await loadUsageHotCards(
       pool: pool,
@@ -545,10 +500,11 @@ Future<Map<String, dynamic>> _loadUsageStatsSafe({
     return {
       'available': true,
       'hot_cards': hotCards,
-      'total_users': hotCards.fold<int>(
+      'historical_observation_count': hotCards.fold<int>(
         0,
         (sum, c) => sum + intValue(c['usage_count']),
       ),
+      'provenance_status': 'pending_$commanderLearnedDeckPromotionReceiptTask',
     };
   } catch (_) {
     return {'available': false, 'hot_cards': const <Map<String, dynamic>>[]};
@@ -559,6 +515,7 @@ Future<Map<String, dynamic>?> _loadPromotedCommanderLearnedDeck({
   required Pool pool,
   required String commanderName,
 }) async {
+  if (!promotedCommanderLearnedDeckReadsEnabled()) return null;
   try {
     final result = await pool.execute(
       Sql.named('''
@@ -1008,8 +965,7 @@ Future<Map<String, dynamic>?> _loadCommanderProfileCache({
   return null;
 }
 
-Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
-  required Pool pool,
+Future<Map<String, dynamic>?> _buildEdhrecProfile({
   required String commander,
 }) async {
   final service = EdhrecService();
@@ -1102,6 +1058,7 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
     'reference_bases': {
       'provider': 'edhrec',
       'category': 'commander_only',
+      'persistence': false,
       'description':
           'Base específica de commander (não representa meta global cross-commander).',
       'saved_fields': [
@@ -1124,35 +1081,6 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
     'top_cards': topCards.take(120).toList(),
   };
 
-  await pool.execute(
-    Sql.named('''
-      INSERT INTO commander_reference_profiles (
-        commander_name,
-        source,
-        deck_count,
-        profile_json,
-        updated_at
-      ) VALUES (
-        @commander,
-        'edhrec',
-        @deckCount,
-        @profile::jsonb,
-        NOW()
-      )
-      ON CONFLICT (commander_name)
-      DO UPDATE SET
-        source = EXCLUDED.source,
-        deck_count = EXCLUDED.deck_count,
-        profile_json = EXCLUDED.profile_json,
-        updated_at = NOW()
-    '''),
-    parameters: {
-      'commander': commander,
-      'deckCount': data.deckCount,
-      'profile': jsonEncode(profile),
-    },
-  );
-
   return profile;
 }
 
@@ -1171,8 +1099,7 @@ bool _hasExtendedCommanderReferenceBase(Map<String, dynamic> profile) {
   return category == 'commander_only';
 }
 
-Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
-  required Pool pool,
+Future<Map<String, dynamic>> _buildCommanderMtgTop8RefreshPreview({
   required String commander,
 }) async {
   final formats = metaDeckFormatCodesForCommanderScope('commander');
@@ -1185,10 +1112,12 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
       'scanned_events': 0,
       'scanned_decks': 0,
       'matched_commander': false,
+      'persistence': false,
+      'mode': 'read_only_preview',
     };
   }
 
-  var imported = 0;
+  var candidatesFound = 0;
   var scannedEvents = 0;
   var scannedDecks = 0;
   var matchedCommander = false;
@@ -1233,13 +1162,6 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
         if (parsedRow == null) continue;
 
         scannedDecks += 1;
-        final deckUrl = parsedRow.deckUrl;
-
-        final exists = await pool.execute(
-          Sql.named('SELECT 1 FROM meta_decks WHERE source_url = @url LIMIT 1'),
-          parameters: {'url': deckUrl},
-        );
-        if (exists.isNotEmpty) continue;
 
         final exportUrl = '$mtgTop8BaseUrl/mtgo?d=${parsedRow.deckId}';
         final exportRes = await _tryGetMtgTop8(Uri.parse(exportUrl));
@@ -1251,32 +1173,20 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
         }
 
         matchedCommander = true;
-        await pool.execute(
-          Sql.named('''
-            INSERT INTO meta_decks (format, archetype, source_url, card_list, placement)
-            VALUES (@format, @archetype, @url, @list, @placement)
-            ON CONFLICT (source_url) DO NOTHING
-          '''),
-          parameters: {
-            'format': parsedRow.formatCode,
-            'archetype': parsedRow.archetype,
-            'url': deckUrl,
-            'list': cardList,
-            'placement': parsedRow.placement,
-          },
-        );
-
-        imported += 1;
+        candidatesFound += 1;
       }
     }
   }
 
   return {
     'enabled': true,
-    'imported': imported,
+    'imported': 0,
+    'candidates_found': candidatesFound,
     'scanned_events': scannedEvents,
     'scanned_decks': scannedDecks,
     'matched_commander': matchedCommander,
+    'persistence': false,
+    'mode': 'read_only_preview',
     'timed_out': timedOut,
     'elapsed_ms': refreshStopwatch.elapsedMilliseconds,
   };

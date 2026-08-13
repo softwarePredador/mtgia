@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/services/activation_funnel_service.dart'
     as activation;
 import 'package:manaloom/core/theme/app_theme.dart';
@@ -180,6 +181,11 @@ Widget _runtimeApp({
   final api = _NoopApiClient();
   return MultiProvider(
     providers: [
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+        value: ReleaseCapabilitiesProvider.seeded(const {
+          ReleaseCapability.decksPrivate,
+        }),
+      ),
       ChangeNotifierProvider<DeckProvider>.value(value: deckProvider),
       ChangeNotifierProvider<MessageProvider>(
         create: (_) => MessageProvider(apiClient: api),

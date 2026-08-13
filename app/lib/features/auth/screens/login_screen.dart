@@ -8,9 +8,14 @@ import '../providers/auth_provider.dart';
 import '../widgets/auth_visual_shell.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.redirectPath});
+  const LoginScreen({
+    super.key,
+    this.redirectPath,
+    this.registrationAllowed = false,
+  });
 
   final String? redirectPath;
+  final bool registrationAllowed;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -90,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           const AuthBrandHeader(
             title: ProductIdentity.displayName,
-            subtitle: 'Acesse decks, coleção, trades e partidas.',
+            subtitle: 'Acesse sua conta e acompanhe a disponibilidade da beta.',
           ),
           const SizedBox(height: AppTheme.space20),
           AuthFormSurface(
@@ -281,31 +286,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppTheme.space14),
 
-                  // Link para registro
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        'Não tem uma conta? ',
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      TextButton(
-                        key: const Key('login-open-register-button'),
-                        style: AppTheme.accessibleTextButtonStyle,
-                        onPressed: () => context.push(
-                          buildAuthLocation('/register', widget.redirectPath),
+                  if (widget.registrationAllowed) ...[
+                    // Link para registro somente quando o servidor autoriza.
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          'Não tem uma conta? ',
+                          style: theme.textTheme.bodyMedium,
                         ),
-                        child: const Text(
-                          'Criar conta',
-                          style: TextStyle(
-                            color: AppTheme.brass400,
-                            fontWeight: FontWeight.bold,
+                        TextButton(
+                          key: const Key('login-open-register-button'),
+                          style: AppTheme.accessibleTextButtonStyle,
+                          onPressed: () => context.push(
+                            buildAuthLocation('/register', widget.redirectPath),
+                          ),
+                          child: const Text(
+                            'Criar conta',
+                            style: TextStyle(
+                              color: AppTheme.brass400,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

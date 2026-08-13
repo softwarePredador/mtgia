@@ -11,8 +11,15 @@ import 'runtime_environment.dart';
 
 const manaloomOpsApiKeyHeader = 'x-manaloom-ops-key';
 
-bool isPublicHealthPath(String path) =>
-    path == '/health' || path == '/health/live' || path == '/health/ready';
+bool isPublicHealthPath(String path) {
+  final normalized =
+      path.length > 1 && path.endsWith('/')
+          ? path.substring(0, path.length - 1)
+          : path;
+  return normalized == '/health' ||
+      normalized == '/health/live' ||
+      normalized == '/health/ready';
+}
 
 bool isConfiguredOpsRequestKey({
   required Map<String, String> headers,

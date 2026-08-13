@@ -46,12 +46,14 @@ void main() {
   testWidgets('login screen keeps CTA dominant and loads neutral shell', (
     tester,
   ) async {
-    await tester.pumpWidget(_buildWithAuth(const LoginScreen()));
+    await tester.pumpWidget(
+      _buildWithAuth(const LoginScreen(registrationAllowed: true)),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text(ProductIdentity.displayName), findsOneWidget);
     expect(
-      find.text('Acesse decks, coleção, trades e partidas.'),
+      find.text('Acesse sua conta e acompanhe a disponibilidade da beta.'),
       findsOneWidget,
     );
     expect(find.text('Tecendo estratégias lendárias'), findsNothing);
@@ -61,6 +63,17 @@ void main() {
     expect(find.byKey(const Key('login-password-field')), findsOneWidget);
     expect(find.byKey(const Key('login-submit-button')), findsOneWidget);
     expect(find.byKey(const Key('login-open-register-button')), findsOneWidget);
+  });
+
+  testWidgets('login hides account creation while registration is closed', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildWithAuth(const LoginScreen()));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('login-open-register-button')), findsNothing);
+    expect(find.text('Criar conta'), findsNothing);
+    expect(find.byKey(const Key('login-submit-button')), findsOneWidget);
   });
 
   testWidgets('login text fields expose native screen-reader labels', (

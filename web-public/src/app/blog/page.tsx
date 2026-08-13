@@ -20,12 +20,12 @@ export default function BlogPage() {
         </BrandPageIntro>
         <Surface className="mt-12 p-6">
           <p className="text-sm leading-6 text-mist-300">
-            Os próximos conteúdos devem cobrir upgrades de Commander, leitura de curva de mana e uso responsável da IA.
+            Os próximos conteúdos devem cobrir evolução de decks Commander, leitura de curva de mana e uso responsável da IA.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <ButtonLink href={routes.home}>Voltar ao início</ButtonLink>
-            <ButtonLink href={routes.marketplace} variant="secondary">
-              Ver mercado
+            <ButtonLink href={routes.pricing} variant="secondary">
+              Conhecer a beta
             </ButtonLink>
           </div>
         </Surface>

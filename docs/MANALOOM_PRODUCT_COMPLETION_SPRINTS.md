@@ -1,15 +1,21 @@
 # Sprints canônicas de conclusão do produto ManaLoom
 
-**Estado:** `ACTIVE / EXECUTION_REQUIRED`
+> `SUPERSEDED_FOR_PRIORITIZATION`: o programa abaixo permanece como histórico
+> executável S0–S10. A ordem e o escopo vigentes estão em
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.
+
+**Estado:** `HISTORICAL_EXECUTION_RECORD / DO_NOT_START_NEW_WORK_HERE`
 
 **Atualizado em:** 2026-07-23
 
 **Escopo:** produto Web + Android da beta gratuita; iOS somente quando entrar no
 alvo declarado
 
-**Autoridade:** este arquivo organiza a execução. O significado de `PASS`,
-`PARTIAL`, `BLOCKED`, escrita live e conclusão continua definido por
-`docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
+**Autoridade histórica:** este arquivo preserva a organização da execução
+S0–S10. Não abra, repriorize nem dê continuidade a trabalho a partir dele. O
+índice vigente é `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`; o
+significado de `PASS`, `PARTIAL`, `BLOCKED`, escrita live e conclusão continua
+definido por `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
 O estado operacional, owners, arquivos pretendidos, gates e links de evidência
 de cada task ficam em `docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md`.
@@ -86,9 +92,11 @@ não fecha uma tarefa atual.
     estado importante, não decoração.
 15. Evidência bruta fica em `/tmp`. Somente resumo sanitizado, revisado e
     manifestado entra em `docs/`.
-16. Exit code zero do E2E não basta: `PARTIAL` também retorna zero. Baseline
-    local inventaria skips; fechamento exige `summary.json` com `result=pass` e
-    failed/blocked/skipped iguais a zero.
+16. Esta regra registrava o comportamento histórico em que `PARTIAL` também
+    retornava zero. O gate corrente é estrito (`PARTIAL=3`); apenas o modo
+    diagnóstico explícito `--allow-partial` pode retornar zero sem crédito de
+    gate/release. Fechamento continua exigindo `summary.json` com `result=pass`
+    e failed/blocked/skipped iguais a zero.
 17. `report-retention` roda no baseline e novamente depois de todos os
     produtores de Battle, Deep AI, Lorehold e E2E.
 
@@ -479,9 +487,9 @@ git diff --check
 
 `full` já inclui Web pública; `ai-bridge` já inclui partes de `ai-eval` e
 `server-target`. A repetição individual é intencional para preservar evidência
-por gate. No perfil determinístico, `e2e` pode terminar `PARTIAL` com exit zero;
-o baseline só aceita skips guardados inventariados, nunca infere `PASS` pelo
-exit code.
+por gate. Este bloco preserva a descrição histórica anterior ao gate estrito;
+no contrato corrente, `e2e` retorna `PARTIAL=3`, e skips só podem ser
+inventariados com `--allow-partial`, sem crédito de `PASS`.
 
 ### PostgreSQL/mutação guardados
 

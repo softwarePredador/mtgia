@@ -1,12 +1,21 @@
 # Tracker executável de conclusão do ManaLoom
 
+> `SUPERSEDED_FOR_PRIORITIZATION`: este tracker preserva owners, gates e
+> evidências do programa S0–S10. Novas tasks, dependências e prioridades devem
+> ser abertas a partir de
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`; nenhum `PASS`
+> histórico é promovido automaticamente ao backlog novo.
+
 **Plano de escopo:** `docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md`
 
-**Estado inicial:** nenhuma task recebeu `PASS` herdado.
+**Estado:** `HISTORICAL_EXECUTION_RECORD / DO_NOT_UPDATE_FOR_NEW_WORK`
 
-Este é o registro vivo de execução. O plano define objetivo e aceite; este
-arquivo define quem pode editar, em que ordem, qual gate foi executado e onde
-está a evidência.
+**Estado inicial histórico:** nenhuma task recebeu `PASS` herdado.
+
+Este foi o registro vivo da execução S0–S10. Ele agora preserva owners, gates e
+evidências já produzidas, mas não recebe novas tasks nem redefine a ordem atual.
+Use `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` para todo trabalho
+novo.
 
 ## Protocolo de atualização
 

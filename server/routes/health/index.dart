@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 
 import '../../lib/e2e_validation_policy.dart';
 import '../../lib/http_responses.dart';
+import '../../lib/release_capability_policy.dart';
 
 /// GET /health - Liveness check (básico, sem dependências externas)
 ///
@@ -14,6 +15,8 @@ Response onRequest(RequestContext context) {
     return methodNotAllowed();
   }
 
+  final releasePolicy = context.read<ReleaseCapabilityPolicy>();
+
   return Response.json(
     body: {
       'status': 'healthy',
@@ -23,6 +26,7 @@ Response onRequest(RequestContext context) {
       'version': Platform.environment['APP_VERSION'] ?? '1.0.0',
       'git_sha': Platform.environment['GIT_SHA'],
       'e2e_isolated_runtime': isManaloomE2eIsolatedRuntime(),
+      'release_capabilities': releasePolicy.readinessCheck(),
       'checks': {
         'process': {'status': 'healthy'},
       },

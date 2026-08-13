@@ -701,7 +701,7 @@ class DeckProvider extends ChangeNotifier {
     }
 
     _trackActivationInBackground(
-      'deck_optimized',
+      'optimize_preview_received',
       deckId: deckId,
       source: 'deck_provider.optimizeDeck',
       metadata: {

@@ -13,15 +13,16 @@ export default function PrivacyPage() {
     <main className="py-16">
       <Container className="max-w-3xl">
         <BrandPageIntro eyebrow="Privacidade BrewTact" title="Política de privacidade">
-          <p>Como BrewTact trata decks, perfis, relatórios e sinais de troca compartilhados pelo usuário.</p>
+          <p>Como o BrewTact trata decks, coleções, relatórios e informações de conta.</p>
         </BrandPageIntro>
         <div className="mt-10">
-          <SectionHeader eyebrow="Dados públicos" title="Compartilhamento com opt-in." />
+          <SectionHeader eyebrow="Dados do usuário" title="Privado por padrão." />
         </div>
         <div className="mt-10 grid gap-6 text-base leading-7 text-mist-300">
-          <p>Decks, relatórios, perfis e sinais de trade só devem aparecer publicamente quando marcados como públicos ou autorizados pelo usuário.</p>
+          <p>Decks, coleções e informações de conta pertencem ao ambiente autenticado e não são publicados como diretório aberto.</p>
+          <p>Um relatório pode receber um link de compartilhamento somente quando o usuário solicitar essa ação. O link deve expor apenas os dados necessários para exibir o relatório.</p>
           <p>Coleção, histórico de partidas, preferências de IA e informações de conta pertencem ao ambiente autenticado.</p>
-          <p>Dados públicos e dados privados devem permanecer separados, com permissões aplicadas antes de qualquer compartilhamento.</p>
+          <p>Dados compartilhados e dados privados devem permanecer separados, com permissões aplicadas antes de qualquer acesso externo.</p>
         </div>
       </Container>
     </main>

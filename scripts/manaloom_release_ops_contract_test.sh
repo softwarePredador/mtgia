@@ -54,6 +54,31 @@ if ! grep -Fq 'IMAGE_DIGEST_OUTPUT="$(ssh ' "$OPS_DEPLOY_SOURCE" ||
   echo "deploy manaloom-ops nao filtra o MOTD antes de validar RepoDigest" >&2
   exit 1
 fi
+for required_ops_marker in \
+  'manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$sha"' \
+  'MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=0' \
+  'MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0' \
+  'MANALOOM_BOOT_PULL_PENDING_EVENTS=0' \
+  'HERMES_AUTO_SYNC_APPLY=0' \
+  'HERMES_AUTO_PROMOTE_APPLY=0' \
+  'MANALOOM_IMPORT_APPLY=0' \
+  'MANALOOM_BATTLE_RULES_APPLY_PG=0' \
+  'disabled_by_release_capability' \
+  "['hermes_cron_governor_report']"; do
+  if ! grep -Fq "$required_ops_marker" "$OPS_DEPLOY_SOURCE"; then
+    echo "deploy manaloom-ops sem contencao all-OFF: $required_ops_marker" >&2
+    exit 1
+  fi
+done
+for forbidden_ops_marker in \
+  'MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1' \
+  'MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1' \
+  'sync_pg_target_deck_to_hermes.py'; do
+  if grep -Fq "$forbidden_ops_marker" "$OPS_DEPLOY_SOURCE"; then
+    echo "deploy manaloom-ops reativou caminho legado: $forbidden_ops_marker" >&2
+    exit 1
+  fi
+done
 grep -Fq 'flutter_web_release_marker()' \
   "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'printf '\''flutter_bootstrap.js:%s'\''' \
@@ -89,6 +114,8 @@ fi
 
 SHELL_SCRIPTS=(
   scripts/lib/manaloom_flutter_release_sdk.sh
+  scripts/lib/manaloom_public_web_surface_contract.sh
+  scripts/lib/manaloom_release_capabilities_contract.sh
   scripts/lib/manaloom_release_runtime_contract.sh
   scripts/lib/manaloom_safe_env.sh
   scripts/manaloom_build_android_release.sh
@@ -98,6 +125,7 @@ SHELL_SCRIPTS=(
   scripts/manaloom_deep_ai_alignment_tester.sh
   scripts/manaloom_deploy_backend_image.sh
   scripts/manaloom_deploy_flutter_web.sh
+  scripts/manaloom_deploy_ops_image.sh
   scripts/manaloom_deploy_public_web.sh
   scripts/manaloom_easypanel_backup.sh
   scripts/manaloom_full_restore_drill.sh
@@ -106,8 +134,10 @@ SHELL_SCRIPTS=(
   scripts/manaloom_xmage_pin_transition_audit.sh
   scripts/manaloom_offsite_backup.sh
   scripts/manaloom_pg_hermes_sqlite_contract_audit.sh
+  scripts/manaloom_public_web_surface_contract_test.sh
   scripts/manaloom_publish_android_release.sh
   scripts/manaloom_release_identity.sh
+  scripts/manaloom_release_capabilities_contract_test.sh
   scripts/manaloom_release_observability_gate.sh
   scripts/manaloom_secret_scan.sh
   scripts/manaloom_verify_android_release_artifacts.sh
@@ -120,6 +150,8 @@ SHELL_SCRIPTS=(
 for relative in "${SHELL_SCRIPTS[@]}"; do
   bash -n "$ROOT_DIR/$relative"
 done
+bash "$ROOT_DIR/scripts/manaloom_public_web_surface_contract_test.sh"
+bash "$ROOT_DIR/scripts/manaloom_release_capabilities_contract_test.sh"
 
 GLOBAL_CLOSURE="$ROOT_DIR/scripts/manaloom_global_battle_closure.sh"
 grep -Fq 'load_manaloom_env_keys "$SERVER_ENV"' "$GLOBAL_CLOSURE"
@@ -314,7 +346,7 @@ IDENTITY_REPO="$TMP_DIR/identity-repo"
 git init --quiet --bare --initial-branch=master "$IDENTITY_ORIGIN"
 git init --quiet --initial-branch=master "$IDENTITY_REPO"
 git -C "$IDENTITY_REPO" remote add origin "$IDENTITY_ORIGIN"
-mkdir -p "$IDENTITY_REPO/app"
+mkdir -p "$IDENTITY_REPO/app" "$IDENTITY_REPO/server/config"
 {
   printf 'name: manaloom_contract\nversion: 1.2.3+45\n'
   # Keep enough committed content after `version` to make an early-exit pipe
@@ -324,7 +356,9 @@ mkdir -p "$IDENTITY_REPO/app"
       "$padding_index"
   done
 } > "$IDENTITY_REPO/app/pubspec.yaml"
-git -C "$IDENTITY_REPO" add app/pubspec.yaml
+cp "$ROOT_DIR/server/config/release_capabilities.json" \
+  "$IDENTITY_REPO/server/config/release_capabilities.json"
+git -C "$IDENTITY_REPO" add app/pubspec.yaml server/config/release_capabilities.json
 git -C "$IDENTITY_REPO" \
   -c user.name='ManaLoom Contract' \
   -c user.email='contract@manaloom.invalid' \
@@ -338,7 +372,10 @@ IDENTITY_JSON="$(
     "$ROOT_DIR/scripts/manaloom_release_identity.sh"
 )"
 jq -e --arg sha "$(git -C "$IDENTITY_REPO" rev-parse HEAD)" \
-  '.git_sha == $sha and (.version | test("^[0-9]+\\.[0-9]+\\.[0-9]+\\+[1-9][0-9]*$"))' \
+  '.git_sha == $sha and (.version | test("^[0-9]+\\.[0-9]+\\.[0-9]+\\+[1-9][0-9]*$")) and
+   .release_capabilities.schema_version == "release_capabilities_v1" and
+   .release_capabilities.configuration_status == "valid" and
+   .release_capabilities.capability_count == 29' \
   <<<"$IDENTITY_JSON" >/dev/null
 
 SOURCE_COMMITTED_AT="$(git -C "$ROOT_DIR" show -s --format=%cI HEAD)"
@@ -419,26 +456,37 @@ grep -Fq -- '--dart-define="ENABLE_BATTLE_LIVE_SPECTATOR=$BATTLE_LIVE_SPECTATOR_
 grep -Fq -- '--dart-define="ENABLE_BATTLE_LIVE_SPECTATOR=$BATTLE_LIVE_SPECTATOR_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq -- '--dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq -- '--dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
-grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
-grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
-grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
-grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0 enquanto a matriz free-beta estiver all-OFF' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0 enquanto a matriz free-beta estiver all-OFF' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'battle_live_spectator_enabled' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'battle_live_spectator_enabled' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'interactive_battle_enabled' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'interactive_battle_enabled' "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 for live_release_script in \
   "$ROOT_DIR/scripts/manaloom_build_android_release.sh" \
-  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh" \
-  "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"; do
+  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"; do
   live_release_error="$TMP_DIR/$(basename "$live_release_script").live-flag.err"
-  if MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR=invalid \
+  if MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR=1 \
       "$live_release_script" >"$TMP_DIR/live-flag.out" 2>"$live_release_error"; then
     echo "script de release aceitou opt-in Live inválido: $live_release_script" >&2
     exit 1
   fi
-  grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' \
+  grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0 enquanto a matriz free-beta estiver all-OFF' \
     "$live_release_error"
+done
+for backend_flag in \
+  MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR \
+  MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE; do
+  backend_flag_error="$TMP_DIR/backend-$backend_flag.err"
+  if env "$backend_flag=1" \
+      "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh" \
+      >"$TMP_DIR/backend-flag.out" 2>"$backend_flag_error"; then
+    echo "deploy backend aceitou opt-in proibido: $backend_flag" >&2
+    exit 1
+  fi
+  grep -Fq 'deve permanecer 0 enquanto' "$backend_flag_error"
 done
 grep -Fq 'scanner_release_enabled: false' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 ! grep -Fq 'ENABLE_SCANNER_RELEASE=true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
@@ -470,13 +518,13 @@ if grep -Fq -- "--env-add RESEND_API_KEY='\$RESEND_API_KEY'" \
 fi
 grep -Fq 'RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq -- "--env-add BATTLE_LIVE_SPECTATOR_ENABLED='\$BATTLE_LIVE_SPECTATOR_ENABLED'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.battle_live_spectator.database == "ready"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'disabled_by_policy(.checks.battle_live_spectator; "battle_live")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq -- "--env-add INTERACTIVE_BATTLE_ENABLED='\$INTERACTIVE_BATTLE_ENABLED'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq "require_xmage_interactive_release_contract \"\$sha\"" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.interactive_battle.runtime_isolation ==' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.interactive_battle.maximum_active ==' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+! grep -Fq "require_xmage_interactive_release_contract \"\$sha\"" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'disabled_by_policy(.checks.interactive_battle; "battle_coach")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE="evolution_xmage-interactive"' "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 grep -Fq "'XMAGE_RUNTIME_MODE=interactive'" "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
 grep -Fq "'XMAGE_INTERACTIVE_MAX_ACTIVE=\$INTERACTIVE_MAX_ACTIVE'" "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
@@ -506,14 +554,13 @@ grep -Fq '.checks.release_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloo
 grep -Fq '.checks.release_schema.required_range == "038-058"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.release_schema.latest_migration == "058"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_job_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.battle_live_spectator.status == "disabled"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.interactive_battle.status == "disabled"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'require_live_mutation_approval "deploy do backend ManaLoom"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.battle_runtime.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.battle_runtime.engines.xmage.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.battle_runtime.engines.forge.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.battle_runtime.engines.native.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'disabled_by_policy(.checks.battle_job_worker; "battle_batch")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'disabled_by_policy(.checks.battle_runtime; "battle_batch")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'disabled_by_policy(.checks.ai_runtime; "ai_analyze_optimize_advisory")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+! grep -Fq '.checks.ai_runtime.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+! grep -Fq '.checks.battle_runtime.engines.' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_runtime.mode == "auto"' "$ROOT_DIR/scripts/manaloom_product_smoke.sh"
 grep -Fq 'FROM dart:3.12.2@sha256:13140e26d84f4fda57cea31942222112aeb2eec10e5e6874c1c0f70beed189ab' "$ROOT_DIR/server/Dockerfile"
 grep -Fq 'RUN mkdir -p /out' "$ROOT_DIR/server/Dockerfile"

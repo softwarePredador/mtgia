@@ -21,58 +21,54 @@ void main() {
         'commercial AI usage states keep the ManaLoom visual contract',
         fileName: 'manaloom_commercial_ai_usage_states',
         constraints: manaloomGoldenViewport,
-        builder:
-            () => GoldenTestGroup(
-              columns: 1,
-              scenarioConstraints: manaloomGoldenScenarioConstraints,
-              children: [
-                GoldenTestScenario(
-                  name: 'Free near limit',
-                  child: _meterScenario(_freeNearLimitProvider()),
-                ),
-                GoldenTestScenario(
-                  name: 'Free exhausted paywall',
-                  child: _paywallScenario(_freeExhaustedProvider()),
-                ),
-                GoldenTestScenario(
-                  name: 'Pro active usage',
-                  child: _meterScenario(_proActiveProvider()),
-                ),
-              ],
+        builder: () => GoldenTestGroup(
+          columns: 1,
+          scenarioConstraints: manaloomGoldenScenarioConstraints,
+          children: [
+            GoldenTestScenario(
+              name: 'Free near limit',
+              child: _meterScenario(_freeNearLimitProvider()),
             ),
+            GoldenTestScenario(
+              name: 'Free exhausted limit notice',
+              child: _limitNoticeScenario(_freeExhaustedProvider()),
+            ),
+            GoldenTestScenario(
+              name: 'Free regular usage',
+              child: _meterScenario(_freeRegularProvider()),
+            ),
+          ],
+        ),
       );
 
       goldenTest(
         'free beta plans screen keeps the ManaLoom visual contract',
         fileName: 'manaloom_commercial_beta_plans',
         constraints: manaloomFullScreenGoldenConstraints,
-        builder:
-            () => _commercialScreenShell(
-              provider: _freeNearLimitProvider(),
-              child: const PlanScreen(),
-            ),
+        builder: () => _commercialScreenShell(
+          provider: _freeNearLimitProvider(),
+          child: const PlanScreen(),
+        ),
       );
 
       goldenTest(
         'free beta upgrade fallback keeps the ManaLoom visual contract',
         fileName: 'manaloom_commercial_beta_upgrade',
         constraints: manaloomFullScreenGoldenConstraints,
-        builder:
-            () => _commercialScreenShell(
-              provider: _freeNearLimitProvider(),
-              child: const UpgradeScreen(),
-            ),
+        builder: () => _commercialScreenShell(
+          provider: _freeNearLimitProvider(),
+          child: const UpgradeScreen(),
+        ),
       );
 
       goldenTest(
         'free beta checkout fallback keeps the ManaLoom visual contract',
         fileName: 'manaloom_commercial_beta_checkout',
         constraints: manaloomFullScreenGoldenConstraints,
-        builder:
-            () => _commercialScreenShell(
-              provider: _freeNearLimitProvider(),
-              child: const CheckoutScreen(),
-            ),
+        builder: () => _commercialScreenShell(
+          provider: _freeNearLimitProvider(),
+          child: const CheckoutScreen(),
+        ),
       );
     },
   );
@@ -94,7 +90,7 @@ void main() {
             children: [
               _meterScenario(_freeNearLimitProvider()),
               const SizedBox(height: 16),
-              _paywallScenario(_freeExhaustedProvider()),
+              _limitNoticeScenario(_freeExhaustedProvider()),
             ],
           ),
         ),
@@ -102,7 +98,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('ai-usage-meter')), findsOneWidget);
-      expect(find.byKey(const Key('ai-paywall-dialog')), findsOneWidget);
+      expect(find.byKey(const Key('ai-quota-limit-dialog')), findsOneWidget);
       await expectManaLoomBaselineAccessibility(tester);
     } finally {
       semantics.dispose();
@@ -114,10 +110,10 @@ Widget _meterScenario(CommercialProvider provider) {
   return _commercialShell(provider: provider, child: const AiUsageMeter());
 }
 
-Widget _paywallScenario(CommercialProvider provider) {
+Widget _limitNoticeScenario(CommercialProvider provider) {
   return _commercialShell(
     provider: provider,
-    child: AiPaywallDialog(
+    child: AiQuotaLimitDialog(
       kind: AiUsageKind.deckOptimization,
       provider: provider,
     ),
@@ -170,12 +166,12 @@ _CommercialProviderFixture _freeExhaustedProvider() {
   );
 }
 
-_CommercialProviderFixture _proActiveProvider() {
+_CommercialProviderFixture _freeRegularProvider() {
   return _CommercialProviderFixture(
     snapshot: const AiUsageSnapshot(
-      plan: ManaLoomPlan.pro,
+      plan: ManaLoomPlan.free,
       periodKey: '2026-07',
-      used: 1120,
+      used: 24,
     ),
   );
 }

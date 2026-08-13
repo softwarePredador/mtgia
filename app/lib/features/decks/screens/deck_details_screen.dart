@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/branding/product_identity.dart';
 import '../../../core/config/launch_features.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
@@ -51,6 +52,10 @@ class _GuidedRebuildPaywallBlocked implements Exception {
   const _GuidedRebuildPaywallBlocked();
 }
 
+class _GuidedRebuildCapabilityBlocked implements Exception {
+  const _GuidedRebuildCapabilityBlocked();
+}
+
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
   final String? initialOptimizationIntent;
@@ -68,7 +73,7 @@ class DeckDetailsScreen extends StatefulWidget {
 }
 
 class _DeckDetailsScreenState extends State<DeckDetailsScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final DeckEntryDraftStore _draftStore = DeckEntryDraftStore();
   late TabController _tabController;
   Map<String, dynamic>? _pricing;
@@ -83,6 +88,37 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   Set<String> _invalidCardNames = {};
   String? _lastValidationDeckSignature;
   int _selectedTabIndex = 0;
+
+  bool _isReleaseCapabilityAllowed(
+    ReleaseCapability capability, {
+    bool buildSupported = true,
+  }) {
+    return context.read<ReleaseCapabilitiesProvider?>()?.isAllowed(
+          capability,
+          buildSupported: buildSupported,
+        ) ??
+        false;
+  }
+
+  bool get _canUseAnalyzeOptimize =>
+      _isReleaseCapabilityAllowed(ReleaseCapability.aiAnalyzeOptimizeAdvisory);
+
+  bool get _canUseGenerateRebuild =>
+      _isReleaseCapabilityAllowed(ReleaseCapability.aiGenerateRebuild);
+
+  void _replaceTabController(int length) {
+    if (_tabController.length == length) return;
+    final previous = _tabController;
+    final nextIndex = previous.index < length ? previous.index : length - 1;
+    previous.removeListener(_handleTabChanged);
+    _tabController = TabController(
+      length: length,
+      initialIndex: nextIndex,
+      vsync: this,
+    )..addListener(_handleTabChanged);
+    _selectedTabIndex = nextIndex;
+    previous.dispose();
+  }
 
   /// Extrai o nome da carta problemática do resultado da validação.
   /// Usa o campo estruturado 'card_name' quando disponível,
@@ -109,13 +145,32 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    // Capabilities are fail-closed until the server-authoritative snapshot is
+    // available. didChangeDependencies expands the tabs when AI is allowed.
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DeckProvider>().fetchDeckDetails(widget.deckId);
       _openInitialOptimizationIntent();
       unawaited(_offerResumableOptimization());
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final canUseAnalyzeOptimize =
+        capabilities?.isAllowed(ReleaseCapability.aiAnalyzeOptimizeAdvisory) ??
+        false;
+    _replaceTabController(canUseAnalyzeOptimize ? 4 : 2);
+    if (canUseAnalyzeOptimize) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _openInitialOptimizationIntent();
+        unawaited(_offerResumableOptimization());
+      });
+    }
   }
 
   @override
@@ -170,6 +225,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
   Future<void> _offerResumableOptimization() async {
     if (_resumableOptimizationChecked || !mounted) return;
+    if (!_canUseAnalyzeOptimize) return;
     _resumableOptimizationChecked = true;
     try {
       final job = await context.read<DeckProvider>().fetchLatestOptimizeJob(
@@ -209,7 +265,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   void _handleTabChanged() {
     if (_tabController.index == _selectedTabIndex) return;
     setState(() => _selectedTabIndex = _tabController.index);
-    if (_tabController.index == 3) {
+    if (_tabController.index == 3 && _canUseAnalyzeOptimize) {
       unawaited(
         context.read<DeckProvider>().fetchOptimizationHistory(widget.deckId),
       );
@@ -220,6 +276,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     if (_autoOpenedOptimization || !mounted) return;
     final intent = widget.initialOptimizationIntent?.trim();
     if (intent != 'post_game' && intent != 'rebuild') return;
+    if (!_canUseAnalyzeOptimize) return;
+    if (intent == 'rebuild' && !_canUseGenerateRebuild) return;
     _autoOpenedOptimization = true;
     _showOptimizationOptions(
       context,
@@ -229,14 +287,24 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }
 
   void _openBattleReplays() {
+    if (!_isReleaseCapabilityAllowed(ReleaseCapability.battleBatch)) return;
     context.push(battleReplaysRouteLocation(widget.deckId));
   }
 
   void _openBattleCoach() {
+    if (!_isReleaseCapabilityAllowed(
+      ReleaseCapability.battleCoach,
+      buildSupported: LaunchFeatures.interactiveBattleSupported,
+    )) {
+      return;
+    }
     context.push(battleCoachRouteLocation(widget.deckId));
   }
 
   Future<void> _openLifeCounterForDeck(DeckDetails deck) async {
+    if (!_isReleaseCapabilityAllowed(ReleaseCapability.lifeCounterLocal)) {
+      return;
+    }
     final result = await openLifeCounterRoute<LifeCounterExitResult>(
       context,
       deckId: deck.id,
@@ -329,6 +397,26 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final releaseCapabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final canUseAnalyzeOptimize =
+        releaseCapabilities?.isAllowed(
+          ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+        ) ??
+        false;
+    final canUseBattleBatch =
+        releaseCapabilities?.isAllowed(ReleaseCapability.battleBatch) ?? false;
+    final canUseBattleCoach =
+        releaseCapabilities?.isAllowed(
+          ReleaseCapability.battleCoach,
+          buildSupported: LaunchFeatures.interactiveBattleSupported,
+        ) ??
+        false;
+    final canUsePublicGallery =
+        releaseCapabilities?.isAllowed(ReleaseCapability.galleryPublic) ??
+        false;
+    final canUseLifeCounter =
+        releaseCapabilities?.isAllowed(ReleaseCapability.lifeCounterLocal) ??
+        false;
 
     return Scaffold(
       appBar: AppBar(
@@ -400,16 +488,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     dense: true,
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'battle_replays',
-                  child: ListTile(
-                    leading: ManaLoomGlyph(ManaLoomGlyphKind.battleReplay),
-                    title: Text('Battle / replays'),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
+                if (canUseBattleBatch)
+                  const PopupMenuItem(
+                    value: 'battle_replays',
+                    child: ListTile(
+                      leading: ManaLoomGlyph(ManaLoomGlyphKind.battleReplay),
+                      title: Text('Battle / replays'),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
                   ),
-                ),
-                if (LaunchFeatures.interactiveBattleEnabled)
+                if (canUseBattleCoach)
                   const PopupMenuItem(
                     value: 'battle_coach',
                     child: ListTile(
@@ -419,15 +508,20 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       dense: true,
                     ),
                   ),
-                PopupMenuItem(
-                  value: 'toggle_public',
-                  child: ListTile(
-                    leading: Icon(isPublic ? Icons.lock_outline : Icons.public),
-                    title: Text(isPublic ? 'Tornar Privado' : 'Tornar Público'),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
+                if (canUsePublicGallery)
+                  PopupMenuItem(
+                    value: 'toggle_public',
+                    child: ListTile(
+                      leading: Icon(
+                        isPublic ? Icons.lock_outline : Icons.public,
+                      ),
+                      title: Text(
+                        isPublic ? 'Tornar Privado' : 'Tornar Público',
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
                   ),
-                ),
                 const PopupMenuItem(
                   value: 'share',
                   child: ListTile(
@@ -478,20 +572,25 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             horizontal: AppTheme.space12,
                           )
                         : null,
-                    tabs: const [
-                      Tab(
+                    tabs: [
+                      const Tab(
                         key: Key('deck-details-tab-overview'),
                         text: 'Visão Geral',
                       ),
-                      Tab(key: Key('deck-details-tab-cards'), text: 'Cartas'),
-                      Tab(
-                        key: Key('deck-details-tab-analysis'),
-                        text: 'Análise',
+                      const Tab(
+                        key: Key('deck-details-tab-cards'),
+                        text: 'Cartas',
                       ),
-                      Tab(
-                        key: Key('deck-details-tab-workshop'),
-                        text: 'Oficina',
-                      ),
+                      if (canUseAnalyzeOptimize) ...[
+                        const Tab(
+                          key: Key('deck-details-tab-analysis'),
+                          text: 'Análise',
+                        ),
+                        const Tab(
+                          key: Key('deck-details-tab-workshop'),
+                          text: 'Oficina',
+                        ),
+                      ],
                     ],
                   );
                 },
@@ -662,11 +761,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 onOpenCards: () => _tabController.animateTo(1),
                 onForcePricingRefresh: () => _loadPricing(force: true),
                 onShowPricingDetails: _showPricingDetails,
-                onTogglePublic: _togglePublic,
-                onPlay: () => _openLifeCounterForDeck(deck),
-                onShowOptimizationOptions: () =>
-                    _showOptimizationOptions(context),
-                onOpenBattleReplays: _openBattleReplays,
+                onTogglePublic: canUsePublicGallery ? _togglePublic : null,
+                onPlay: canUseLifeCounter
+                    ? () => _openLifeCounterForDeck(deck)
+                    : null,
+                onShowOptimizationOptions: canUseAnalyzeOptimize
+                    ? () => _showOptimizationOptions(context)
+                    : null,
+                onOpenBattleReplays: canUseBattleBatch
+                    ? _openBattleReplays
+                    : null,
                 onSelectCommander: () =>
                     context.go('/decks/${widget.deckId}/search?mode=commander'),
                 onImportList: () => _showImportListDialog(context),
@@ -800,67 +904,76 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 ),
               ),
 
-              // Tab 3: Análise
-              Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: AppTheme.contentMaxWidth,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SampleHandWidget(
-                          deck: deck,
-                          onShowCardDetails: (card) =>
-                              _showCardDetails(context, card),
-                        ),
-                        DeckAnalysisTab(
-                          deck: deck,
-                          onOpenBattleLab: _openBattleReplays,
-                          onOpenBattleCoach:
-                              LaunchFeatures.interactiveBattleEnabled
-                              ? _openBattleCoach
-                              : null,
-                        ),
-                      ],
+              if (canUseAnalyzeOptimize) ...[
+                // Tab 3: Análise
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppTheme.contentMaxWidth,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SampleHandWidget(
+                            deck: deck,
+                            onShowCardDetails: (card) =>
+                                _showCardDetails(context, card),
+                          ),
+                          DeckAnalysisTab(
+                            deck: deck,
+                            onOpenBattleLab: canUseBattleBatch
+                                ? _openBattleReplays
+                                : null,
+                            onOpenBattleCoach: canUseBattleCoach
+                                ? _openBattleCoach
+                                : null,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              // Tab 4: Oficina
-              DeckWorkshopTab(
-                deck: deck,
-                events: optimizationHistory,
-                isLoading: optimizationHistoryLoading,
-                errorMessage: optimizationHistoryError,
-                onRefresh: () => context
-                    .read<DeckProvider>()
-                    .fetchOptimizationHistory(deck.id, forceRefresh: true),
-                onOptimize: () => _showOptimizationOptions(context),
-                onValidate: () => unawaited(_validateDeck()),
-                onRollback: (event) async {
-                  final provider = context.read<DeckProvider>();
-                  await provider.rollbackOptimization(
-                    deckId: deck.id,
-                    eventId: event.id,
-                  );
-                  await provider.fetchOptimizationHistory(
-                    deck.id,
-                    forceRefresh: true,
-                  );
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('O deck voltou ao snapshot anterior.'),
-                      backgroundColor: AppTheme.success,
-                    ),
-                  );
-                },
-                onOpenSampleHand: () => _tabController.animateTo(2),
-                onOpenBattle: _openBattleReplays,
-              ),
+                // Tab 4: Oficina
+                DeckWorkshopTab(
+                  deck: deck,
+                  events: optimizationHistory,
+                  isLoading: optimizationHistoryLoading,
+                  errorMessage: optimizationHistoryError,
+                  onRefresh: () async {
+                    if (!_canUseAnalyzeOptimize) return;
+                    await context.read<DeckProvider>().fetchOptimizationHistory(
+                      deck.id,
+                      forceRefresh: true,
+                    );
+                  },
+                  onOptimize: () => _showOptimizationOptions(context),
+                  onValidate: () => unawaited(_validateDeck()),
+                  onRollback: (event) async {
+                    if (!_canUseAnalyzeOptimize) return;
+                    final provider = context.read<DeckProvider>();
+                    await provider.rollbackOptimization(
+                      deckId: deck.id,
+                      eventId: event.id,
+                    );
+                    if (!_canUseAnalyzeOptimize) return;
+                    await provider.fetchOptimizationHistory(
+                      deck.id,
+                      forceRefresh: true,
+                    );
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('O deck voltou ao snapshot anterior.'),
+                        backgroundColor: AppTheme.success,
+                      ),
+                    );
+                  },
+                  onOpenSampleHand: () => _tabController.animateTo(2),
+                  onOpenBattle: canUseBattleBatch ? _openBattleReplays : null,
+                ),
+              ],
             ],
           );
         },
@@ -1368,13 +1481,26 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
   /// Menu expansível para adicionar cartas (busca ou scanner)
   Widget _buildAddCardsMenu(BuildContext context) {
+    final scannerEnabled =
+        context.read<ReleaseCapabilitiesProvider?>()?.isAllowed(
+          ReleaseCapability.scanner,
+          buildSupported: LaunchFeatures.scannerSupported,
+        ) ??
+        false;
     return DeckAddCardsMenu(
+      scannerEnabled: scannerEnabled,
       onSelected: (value) {
         switch (value) {
           case 'search':
             context.go('/decks/${widget.deckId}/search');
             break;
           case 'scan':
+            if (!_isReleaseCapabilityAllowed(
+              ReleaseCapability.scanner,
+              buildSupported: LaunchFeatures.scannerSupported,
+            )) {
+              return;
+            }
             context.go('/decks/${widget.deckId}/scan');
             break;
         }
@@ -1406,6 +1532,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   // ───── Social / Sharing ─────
 
   Future<void> _togglePublic() async {
+    if (!_isReleaseCapabilityAllowed(ReleaseCapability.galleryPublic)) return;
     final provider = context.read<DeckProvider>();
     final deck = provider.selectedDeck;
     if (deck == null) return;
@@ -1546,7 +1673,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     showDeckCardDetailsDialog(
       context: context,
       card: card,
-      onShowAiExplanation: () => _showAiExplanation(context, card),
+      onShowAiExplanation: _canUseAnalyzeOptimize
+          ? () => _showAiExplanation(context, card)
+          : null,
       onShowEditionPicker: () => _showEditionPicker(context, card),
       onOpenFullDetails: () => openCardDetailRoute(context, card),
     );
@@ -1556,11 +1685,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     BuildContext context,
     DeckCardItem card,
   ) async {
+    if (!_isReleaseCapabilityAllowed(
+      ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+    )) {
+      return;
+    }
     final hasAiQuota = await reserveAiActionOrShowPaywall(
       context,
       kind: AiUsageKind.cardExplanation,
     );
-    if (!hasAiQuota || !context.mounted) return;
+    if (!hasAiQuota ||
+        !context.mounted ||
+        !_isReleaseCapabilityAllowed(
+          ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+        )) {
+      return;
+    }
     try {
       await showDeckAiExplanationFlow(
         context: context,
@@ -1581,13 +1721,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     String? resumeJobId,
     String? resumeArchetype,
   }) async {
+    if (!_canUseAnalyzeOptimize) return;
+    if (initialIntent == 'rebuild' && !_canUseGenerateRebuild) return;
     final hasAiQuota = resumeJobId != null
         ? true
         : await reserveAiActionOrShowPaywall(
             context,
             kind: AiUsageKind.deckAnalysis,
           );
-    if (!hasAiQuota || !context.mounted) return;
+    if (!hasAiQuota || !context.mounted || !_canUseAnalyzeOptimize) return;
+    if (initialIntent == 'rebuild' && !_canUseGenerateRebuild) return;
 
     final startsFromPostGame = initialIntent == 'post_game';
     final startsFromRebuild = initialIntent == 'rebuild';
@@ -1618,6 +1761,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           postGameNoteId: postGameNoteId,
           initialResumeJobId: resumeJobId,
           initialResumeArchetype: resumeArchetype,
+          canUseGenerateRebuild: _canUseGenerateRebuild,
         ),
       ),
     );
@@ -1900,6 +2044,7 @@ class _OptimizationSheet extends StatefulWidget {
   final String? postGameNoteId;
   final String? initialResumeJobId;
   final String? initialResumeArchetype;
+  final bool canUseGenerateRebuild;
 
   const _OptimizationSheet({
     required this.deckId,
@@ -1910,6 +2055,7 @@ class _OptimizationSheet extends StatefulWidget {
     this.postGameNoteId,
     this.initialResumeJobId,
     this.initialResumeArchetype,
+    required this.canUseGenerateRebuild,
   });
 
   @override
@@ -1929,7 +2075,21 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   late String _rebuildIntent;
   bool _initialResumeStarted = false;
 
+  bool _isReleaseCapabilityAllowed(ReleaseCapability capability) {
+    return context.read<ReleaseCapabilitiesProvider?>()?.isAllowed(
+          capability,
+        ) ??
+        false;
+  }
+
+  bool get _canUseAnalyzeOptimize =>
+      _isReleaseCapabilityAllowed(ReleaseCapability.aiAnalyzeOptimizeAdvisory);
+
+  bool get _canUseGenerateRebuild =>
+      _isReleaseCapabilityAllowed(ReleaseCapability.aiGenerateRebuild);
+
   Future<PostGameNote?> _loadPostGameEvidence() async {
+    if (!_canUseAnalyzeOptimize) return null;
     final noteId = widget.postGameNoteId?.trim();
     if (noteId == null || noteId.isEmpty) return null;
     final notes = await PostGameNoteStore(
@@ -1970,6 +2130,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   Future<String?> _createOptimizationShareLink(
     Map<String, dynamic> payload,
   ) async {
+    if (!_isReleaseCapabilityAllowed(ReleaseCapability.galleryPublic)) {
+      return null;
+    }
     try {
       final response = await ApiClient()
           .post('/decks/${Uri.encodeComponent(widget.deckId)}/reports', {
@@ -1996,6 +2159,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     DeckAiFlowException error, {
     required String archetype,
   }) async {
+    if (!_canUseAnalyzeOptimize) return;
     final sheetNavigator = Navigator.of(context);
     final rootNavigator = Navigator.of(context, rootNavigator: true);
     final dialogContext = rootNavigator.context;
@@ -2014,6 +2178,17 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       extractDeckAiReasons(error),
     );
     if (presentation.kind == DeckAiFailureKind.needsRepair) {
+      if (!_canUseGenerateRebuild) {
+        await showOutcomeInfoDialog(
+          context,
+          title: 'Revisão estrutural necessária',
+          message:
+              'Este deck precisa de uma reconstrução, mas essa ação não está '
+              'disponível para esta conta nesta versão.',
+          reasons: presentation.reasons,
+        );
+        return;
+      }
       final shouldRebuild = await showGuidedRebuildActionDialog(
         context,
         message: presentation.message,
@@ -2036,12 +2211,18 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             required rebuildScope,
             required saveMode,
           }) async {
+            if (!_canUseGenerateRebuild) {
+              throw const _GuidedRebuildCapabilityBlocked();
+            }
             final hasAiQuota = await reserveAiActionOrShowPaywall(
               context,
               kind: AiUsageKind.guidedRebuild,
             );
             if (!hasAiQuota) {
               throw const _GuidedRebuildPaywallBlocked();
+            }
+            if (!_canUseGenerateRebuild) {
+              throw const _GuidedRebuildCapabilityBlocked();
             }
             try {
               return await deckProvider.rebuildDeck(
@@ -2089,7 +2270,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         );
       },
       onRebuildGenericError: (rebuildError) {
-        if (rebuildError is _GuidedRebuildPaywallBlocked) return;
+        if (rebuildError is _GuidedRebuildPaywallBlocked ||
+            rebuildError is _GuidedRebuildCapabilityBlocked) {
+          return;
+        }
         if (!mounted) return;
         showGuidedRebuildErrorSnackBar(context, rebuildError);
       },
@@ -2109,13 +2293,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     String archetype, {
     String? resumeJobId,
   }) async {
+    if (!_canUseAnalyzeOptimize) return;
     final hasAiQuota = resumeJobId != null
         ? true
         : await reserveAiActionOrShowPaywall(
             context,
             kind: AiUsageKind.deckOptimization,
           );
-    if (!hasAiQuota || !context.mounted) return;
+    if (!hasAiQuota || !context.mounted || !_canUseAnalyzeOptimize) return;
 
     final deckProvider = context.read<DeckProvider>();
     final cancellation = OptimizeJobCancellation();
@@ -2171,23 +2356,36 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               required keepTheme,
               required intensity,
               required onProgress,
-            }) => resumeJobId == null
-            ? deckProvider.optimizeDeck(
-                deckId,
-                archetype,
-                bracket: bracket,
-                keepTheme: keepTheme,
-                intensity: intensity,
-                onProgress: onProgress,
-                cancellation: cancellation,
-                recommendationContext: _recommendationContext(),
-              )
-            : deckProvider.resumeOptimizeJob(
-                jobId: resumeJobId,
-                deckId: deckId,
-                onProgress: onProgress,
-                cancellation: cancellation,
-              ),
+            }) {
+              if (!_canUseAnalyzeOptimize) {
+                return Future<Map<String, dynamic>>.error(
+                  StateError('Capability de otimização indisponível.'),
+                );
+              }
+              if (intensity == OptimizeIntensity.rebuild &&
+                  !_canUseGenerateRebuild) {
+                return Future<Map<String, dynamic>>.error(
+                  StateError('Capability de reconstrução indisponível.'),
+                );
+              }
+              return resumeJobId == null
+                  ? deckProvider.optimizeDeck(
+                      deckId,
+                      archetype,
+                      bracket: bracket,
+                      keepTheme: keepTheme,
+                      intensity: intensity,
+                      onProgress: onProgress,
+                      cancellation: cancellation,
+                      recommendationContext: _recommendationContext(),
+                    )
+                  : deckProvider.resumeOptimizeJob(
+                      jobId: resumeJobId,
+                      deckId: deckId,
+                      onProgress: onProgress,
+                      cancellation: cancellation,
+                    );
+            },
         onProgressUpdate: (state) {
           progressState.value = state;
         },
@@ -2233,9 +2431,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                     showOptimizeDebugCopiedSnackBar(context);
                   }
                 : null,
-            onCreateShareLink: _createOptimizationShareLink,
+            onCreateShareLink:
+                _isReleaseCapabilityAllowed(ReleaseCapability.galleryPublic)
+                ? _createOptimizationShareLink
+                : null,
           );
-          if (selection == null) return null;
+          if (selection == null || !_canUseAnalyzeOptimize) return null;
           return buildOptimizeApplyPlan(preview, selection: selection);
         },
         onApplyStart: () {
@@ -2252,17 +2453,20 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           closeLoadingDialog();
           if (!context.mounted) return;
           final eventId = deckProvider.lastAppliedOptimizationEventId;
-          unawaited(
-            deckProvider.fetchOptimizationHistory(
-              widget.deckId,
-              forceRefresh: true,
-            ),
-          );
+          if (_canUseAnalyzeOptimize) {
+            unawaited(
+              deckProvider.fetchOptimizationHistory(
+                widget.deckId,
+                forceRefresh: true,
+              ),
+            );
+          }
           closeOptimizeSheetAndShowSuccess(
             context,
             onUndo: eventId == null || eventId.isEmpty
                 ? null
                 : () async {
+                    if (!_canUseAnalyzeOptimize) return;
                     try {
                       await deckProvider.rollbackOptimization(
                         deckId: widget.deckId,
@@ -2301,12 +2505,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           if (error is OptimizeJobCancelledException) return;
           showOptimizeApplyErrorSnackBar(context, error);
         },
-        addBulk: (deckId, cards, {mutationContext}) =>
-            deckProvider.addCardsBulk(
-              deckId: deckId,
-              cards: cards,
-              mutationContext: mutationContext,
-            ),
+        addBulk: (deckId, cards, {mutationContext}) {
+          if (!_canUseAnalyzeOptimize) return Future<bool>.value(false);
+          return deckProvider.addCardsBulk(
+            deckId: deckId,
+            cards: cards,
+            mutationContext: mutationContext,
+          );
+        },
         applyWithIds:
             (
               deckId,
@@ -2314,20 +2520,25 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               additionsDetailed, {
               expectedDeckSignature,
               mutationContext,
-            }) => deckProvider.applyOptimizationWithIds(
-              deckId: deckId,
-              removalsDetailed: removalsDetailed,
-              additionsDetailed: additionsDetailed,
-              expectedDeckSignature: expectedDeckSignature,
-              mutationContext: mutationContext,
-            ),
-        applyByNames: (deckId, removals, additions, {mutationContext}) =>
-            deckProvider.applyOptimization(
-              deckId: deckId,
-              cardsToRemove: removals,
-              cardsToAdd: additions,
-              mutationContext: mutationContext,
-            ),
+            }) {
+              if (!_canUseAnalyzeOptimize) return Future<bool>.value(false);
+              return deckProvider.applyOptimizationWithIds(
+                deckId: deckId,
+                removalsDetailed: removalsDetailed,
+                additionsDetailed: additionsDetailed,
+                expectedDeckSignature: expectedDeckSignature,
+                mutationContext: mutationContext,
+              );
+            },
+        applyByNames: (deckId, removals, additions, {mutationContext}) {
+          if (!_canUseAnalyzeOptimize) return Future<bool>.value(false);
+          return deckProvider.applyOptimization(
+            deckId: deckId,
+            cardsToRemove: removals,
+            cardsToAdd: additions,
+            mutationContext: mutationContext,
+          );
+        },
       );
     } finally {
       if (context.mounted) {
@@ -2340,19 +2551,28 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedIntensity = widget.initialIntensity;
+    final canUseAnalyzeOptimize = _canUseAnalyzeOptimize;
+    final canUseGenerateRebuild =
+        widget.canUseGenerateRebuild && _canUseGenerateRebuild;
+    _selectedIntensity =
+        widget.initialIntensity == OptimizeIntensity.rebuild &&
+            !canUseGenerateRebuild
+        ? OptimizeIntensity.focused
+        : widget.initialIntensity;
     _rebuildIntent = widget.initialRebuildIntent;
     final deck = context.read<DeckProvider>().selectedDeck;
     final savedBracket = deck?.bracket;
     if (isCommanderBracket(savedBracket)) _selectedBracket = savedBracket!;
-    _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(
-      widget.deckId,
-    );
+    _optionsFuture = canUseAnalyzeOptimize
+        ? context.read<DeckProvider>().fetchOptimizationOptions(widget.deckId)
+        : Future<List<Map<String, dynamic>>>.value(
+            const <Map<String, dynamic>>[],
+          );
     if (widget.postGameNoteId?.trim().isNotEmpty == true) {
       _postGameEvidenceFuture = _loadPostGameEvidence();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _initialResumeStarted) return;
+      if (!mounted || _initialResumeStarted || !_canUseAnalyzeOptimize) return;
       final jobId = widget.initialResumeJobId?.trim();
       final archetype = widget.initialResumeArchetype?.trim();
       if (jobId == null ||
@@ -2367,9 +2587,30 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final canUseGenerateRebuild =
+        capabilities?.isAllowed(ReleaseCapability.aiGenerateRebuild) ?? false;
+    if (!canUseGenerateRebuild &&
+        _selectedIntensity == OptimizeIntensity.rebuild) {
+      _selectedIntensity = OptimizeIntensity.focused;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    if (!(capabilities?.isAllowed(
+          ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+        ) ??
+        false)) {
+      return const SizedBox.shrink();
+    }
     final theme = Theme.of(context);
     final savedArchetype = _currentArchetype;
+    final canUseGenerateRebuild =
+        capabilities?.isAllowed(ReleaseCapability.aiGenerateRebuild) ?? false;
 
     return FutureBuilder<PostGameNote?>(
       future: _postGameEvidenceFuture,
@@ -2395,20 +2636,28 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         optionsFuture: _optionsFuture,
         scrollController: widget.scrollController,
         accent: theme.colorScheme.primary,
+        allowRebuild: canUseGenerateRebuild,
         onBracketChanged: (value) => setState(() => _selectedBracket = value),
         onKeepThemeChanged: (value) => setState(() => _keepTheme = value),
-        onIntensityChanged: (value) =>
-            setState(() => _selectedIntensity = value),
+        onIntensityChanged: (value) {
+          if (value == OptimizeIntensity.rebuild && !_canUseGenerateRebuild) {
+            return;
+          }
+          setState(() => _selectedIntensity = value);
+        },
         onPreferCollectionChanged: (value) =>
             setState(() => _preferCollection = value),
         onBudgetEnabledChanged: (value) =>
             setState(() => _budgetEnabled = value),
         onBudgetLimitChanged: (value) => setState(() => _budgetLimit = value),
-        onRebuildIntentChanged: (value) =>
-            setState(() => _rebuildIntent = value),
+        onRebuildIntentChanged: (value) {
+          if (!_canUseGenerateRebuild) return;
+          setState(() => _rebuildIntent = value);
+        },
         onToggleStrategyVisibility: () =>
             setState(() => _showAllStrategies = !_showAllStrategies),
         onRetryOptions: () {
+          if (!_canUseAnalyzeOptimize) return;
           setState(() {
             _optionsFuture = context
                 .read<DeckProvider>()
@@ -2421,12 +2670,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   }
 
   Map<String, dynamic> _recommendationContext() {
-    return buildOptimizeRecommendationContext(
+    final result = buildOptimizeRecommendationContext(
       preferCollection: _preferCollection,
       budgetEnabled: _budgetEnabled,
       budgetLimit: _budgetLimit,
       rebuildIntent: _rebuildIntent,
       postGameNoteId: widget.postGameNoteId,
     );
+    if (!_canUseGenerateRebuild) result.remove('rebuild_intent');
+    return result;
   }
 }

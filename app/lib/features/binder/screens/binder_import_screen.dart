@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/config/launch_features.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/card_artwork.dart';
@@ -28,6 +29,7 @@ class BinderImportScreen extends StatefulWidget {
     this.apiClient,
     this.draftStore,
     this.onOnboardingTaskCompleted,
+    this.scannerBuildSupported = LaunchFeatures.scannerEnabled,
   });
 
   final String ownerId;
@@ -35,6 +37,7 @@ class BinderImportScreen extends StatefulWidget {
   final ApiClient? apiClient;
   final BinderImportDraftStore? draftStore;
   final Future<bool> Function()? onOnboardingTaskCompleted;
+  final bool scannerBuildSupported;
 
   @override
   State<BinderImportScreen> createState() => _BinderImportScreenState();
@@ -193,6 +196,13 @@ class _BinderImportScreenState extends State<BinderImportScreen> {
   }
 
   Future<void> _openScannerSession() async {
+    final scannerAllowed = context
+        .read<ReleaseCapabilitiesProvider?>()
+        ?.isAllowed(
+          ReleaseCapability.scanner,
+          buildSupported: widget.scannerBuildSupported,
+        );
+    if (scannerAllowed != true) return;
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (_) => CardScannerScreen(
@@ -227,6 +237,12 @@ class _BinderImportScreenState extends State<BinderImportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scannerAllowed = context
+        .watch<ReleaseCapabilitiesProvider?>()
+        ?.isAllowed(
+          ReleaseCapability.scanner,
+          buildSupported: widget.scannerBuildSupported,
+        );
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Consumer<BinderImportProvider>(
@@ -290,7 +306,7 @@ class _BinderImportScreenState extends State<BinderImportScreen> {
                                       provider: provider,
                                       listType: _listType,
                                       onDiscard: _discardDraft,
-                                      onScan: LaunchFeatures.scannerEnabled
+                                      onScan: scannerAllowed == true
                                           ? _openScannerSession
                                           : null,
                                     ),
@@ -326,7 +342,7 @@ class _BinderImportScreenState extends State<BinderImportScreen> {
                                 provider: provider,
                                 listType: _listType,
                                 onDiscard: _discardDraft,
-                                onScan: LaunchFeatures.scannerEnabled
+                                onScan: scannerAllowed == true
                                     ? _openScannerSession
                                     : null,
                               ),

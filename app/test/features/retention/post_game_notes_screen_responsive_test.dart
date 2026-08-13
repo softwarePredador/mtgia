@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/retention/screens/post_game_notes_screen.dart';
 import 'package:manaloom/features/retention/services/post_game_note_store.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -58,11 +60,15 @@ Future<void> _pumpPostGame(WidgetTester tester, Size size) async {
   addTearDown(tester.view.resetPhysicalSize);
 
   await tester.pumpWidget(
-    MaterialApp(
-      theme: AppTheme.darkTheme,
-      home: PostGameNotesScreen(
-        deckId: 'deck-responsive',
-        store: PostGameNoteStore(),
+    ChangeNotifierProvider(
+      create: (_) =>
+          ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: PostGameNotesScreen(
+          deckId: 'deck-responsive',
+          store: PostGameNoteStore(),
+        ),
       ),
     ),
   );

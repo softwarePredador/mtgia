@@ -18,6 +18,7 @@ IDENTITY_JSON="$(
 SHA="$(jq -r '.git_sha' <<<"$IDENTITY_JSON")"
 SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
 VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
+RELEASE_CAPABILITIES_JSON="$(jq -cer '.release_capabilities' <<<"$IDENTITY_JSON")"
 RELEASE_DIR="${MANALOOM_RELEASE_DIR:-$HOME/.manaloom/releases/$VERSION/$SHORT_SHA}"
 mkdir -p "$RELEASE_DIR"
 
@@ -55,10 +56,14 @@ done
 )
 
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
-  '.git_sha == $sha and .version == $version and .platform == "android"' \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '.git_sha == $sha and .version == $version and .platform == "android" and
+   .release_capabilities == $release_capabilities' \
   "$ANDROID_MANIFEST" >/dev/null
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
-  '.git_sha == $sha and .version == $version and .platform == "web"' \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '.git_sha == $sha and .version == $version and .platform == "web" and
+   .release_capabilities == $release_capabilities' \
   "$WEB_MANIFEST" >/dev/null
 
 APK_SHA256="$(shasum -a 256 "$APK" | awk '{print $1}')"
@@ -82,6 +87,7 @@ jq -n \
   --arg android_manifest_sha256 "$ANDROID_MANIFEST_SHA256" \
   --arg web_manifest_sha256 "$WEB_MANIFEST_SHA256" \
   --argjson publishable_with_sentry "$PUBLISHABLE_WITH_SENTRY" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     schema_version: 1,
     status: "candidate_built",
@@ -89,6 +95,7 @@ jq -n \
     version: $version,
     git_sha: $git_sha,
     short_sha: $short_sha,
+    release_capabilities: $release_capabilities,
     publishable_with_sentry: $publishable_with_sentry,
     subjects: {
       android_apk: {file: $apk, sha256: $apk_sha256},
@@ -96,7 +103,7 @@ jq -n \
       android_manifest: {file: "release-manifest.json", sha256: $android_manifest_sha256},
       web_manifest: {file: "web/release.json", sha256: $web_manifest_sha256}
     },
-    identity_invariant: "web.git_sha == android.git_sha == source.git_sha"
+    identity_invariant: "web.git_sha == android.git_sha == source.git_sha and web.release_capabilities == android.release_capabilities == source.release_capabilities"
   }' > "$RELEASE_DIR/beta-candidate.json"
 
 (
@@ -104,5 +111,12 @@ jq -n \
   shasum -a 256 beta-candidate.json > beta-candidate.SHA256SUMS
 )
 
-printf '{"status":"candidate_built","channel":"free_beta","version":"%s","git_sha":"%s","release_dir":"%s","manifest":"%s"}\n' \
-  "$VERSION" "$SHA" "$RELEASE_DIR" "$RELEASE_DIR/beta-candidate.json"
+jq -cn \
+  --arg version "$VERSION" \
+  --arg git_sha "$SHA" \
+  --arg release_dir "$RELEASE_DIR" \
+  --arg manifest "$RELEASE_DIR/beta-candidate.json" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  '{status:"candidate_built", channel:"free_beta", version:$version,
+    git_sha:$git_sha, release_dir:$release_dir, manifest:$manifest,
+    release_capabilities:$release_capabilities}'

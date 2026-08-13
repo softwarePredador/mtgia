@@ -38,17 +38,13 @@ void main() {
             value: provider,
             child: MaterialApp(
               home: Builder(
-                builder:
-                    (context) => Scaffold(
-                      body: TextButton(
-                        onPressed:
-                            () => reserveAiActionOrShowPaywall(
-                              context,
-                              kind: kind,
-                            ),
-                        child: const Text('run'),
-                      ),
-                    ),
+                builder: (context) => Scaffold(
+                  body: TextButton(
+                    onPressed: () =>
+                        reserveAiActionOrShowPaywall(context, kind: kind),
+                    child: const Text('run'),
+                  ),
+                ),
               ),
             ),
           ),
@@ -57,21 +53,17 @@ void main() {
         await tester.tap(find.text('run'));
         await tester.pumpAndSettle();
 
-        expect(find.byKey(const Key('ai-paywall-dialog')), findsOneWidget);
+        expect(find.byKey(const Key('ai-quota-limit-dialog')), findsOneWidget);
         expect(
           find.text('${kind.label}: limite da beta atingido'),
           findsOneWidget,
-        );
-        expect(
-          find.byKey(const Key('ai-paywall-upgrade-button')),
-          findsNothing,
         );
         expect(
           find.byKey(const Key('ai-beta-limit-dismiss-button')),
           findsOneWidget,
         );
         expect(
-          find.textContaining('Compras e upgrades não estão'),
+          find.textContaining('Não existe compra, upgrade ou paywall'),
           findsOneWidget,
         );
       },
@@ -110,22 +102,20 @@ void main() {
           value: provider,
           child: MaterialApp(
             home: Builder(
-              builder:
-                  (context) => Scaffold(
-                    body: TextButton(
-                      onPressed: () async {
-                        allowed = await reserveAiActionOrShowPaywall(
-                          context,
-                          kind: AiUsageKind.deckGeneration,
-                        );
-                        usedImmediatelyAfterReservation =
-                            provider.usedAiActions;
-                        remoteUsed = 120;
-                        await refreshAiUsageAfterAction(context);
-                      },
-                      child: const Text('run'),
-                    ),
-                  ),
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () async {
+                    allowed = await reserveAiActionOrShowPaywall(
+                      context,
+                      kind: AiUsageKind.deckGeneration,
+                    );
+                    usedImmediatelyAfterReservation = provider.usedAiActions;
+                    remoteUsed = 120;
+                    await refreshAiUsageAfterAction(context);
+                  },
+                  child: const Text('run'),
+                ),
+              ),
             ),
           ),
         ),
@@ -138,7 +128,7 @@ void main() {
       expect(usedImmediatelyAfterReservation, 119);
       expect(provider.usedAiActions, 120);
       expect(provider.remainingAiActions, 0);
-      expect(find.byKey(const Key('ai-paywall-dialog')), findsNothing);
+      expect(find.byKey(const Key('ai-quota-limit-dialog')), findsNothing);
     },
   );
 }

@@ -28,6 +28,13 @@ Arquivo-base:
 
 ## Sidecars de battle
 
+> **BLOQUEADO PELA DECISÃO FREE BETA (2026-08-13).** Esta seção descreve a
+> topologia histórica/projetada do laboratório. A matriz commitada
+> `server/config/release_capabilities.json` mantém Battle/Coach/Live OFF; os
+> scripts de sidecar e backend recusam ativação antes de qualquer mutação. Não
+> execute os comandos de deploy abaixo até uma nova decisão, capability e
+> receipt same-SHA substituírem explicitamente este bloqueio.
+
 O runtime global de regras usa dois serviços internos, sem domínio público:
 
 - `evolution/xmage-sidecar`: executor primário pinado;
@@ -41,8 +48,8 @@ O Battle Coach pode usar um terceiro serviço privado e independente:
   `XMAGE_RUNTIME_MODE=interactive`;
 - capacidade default `XMAGE_INTERACTIVE_MAX_ACTIVE=4`.
 
-Esse terceiro serviço e o backend permanecem desligados por padrão. O deploy
-coordenado normal continua:
+Esse terceiro serviço e o backend permanecem desligados. O procedimento
+histórico/projetado abaixo não deve ser executado na matriz Free Beta atual:
 
 ```bash
 MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
@@ -58,8 +65,7 @@ dois health checks internos passarem. As URLs internas são
 `http://xmage-sidecar:8080` e `http://forge-sidecar:8080`; os sidecars não devem
 ser publicados na internet.
 
-Para preparar e depois habilitar o Battle Coach, a mesma intenção caller-only
-deve ser fornecida separadamente nas duas etapas:
+O procedimento caller-only abaixo é histórico e não é executável na Free Beta:
 
 ```bash
 MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1 \
@@ -72,7 +78,7 @@ MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
   ./scripts/manaloom_deploy_backend_image.sh
 ```
 
-A primeira etapa publica/prova o serviço privado, mas mantém
+A arquitetura pretendida faria a primeira etapa publicar/provar o serviço privado, mas mantém
 `INTERACTIVE_BATTLE_ENABLED=false` no backend. A segunda recusa habilitar até
 provar digest, label de SHA, ausência de porta pública, alias privado,
 identidade XMage, `runtime_mode=interactive`,

@@ -1,0 +1,185 @@
+{
+  "schema_version": "release_capabilities_v1",
+  "policy_version": "brewtact_free_beta_2026-08-13",
+  "product": "brewtact",
+  "release_channel": "free_beta",
+  "offer_mode": "free_beta_no_commerce",
+  "implementation_status": "implemented_guarded",
+  "live_verified_as_of": null,
+  "capabilities": {
+    "account_registration": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "catalog_private": {
+      "implementation_status": "implemented_p0_open",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "decks_private": {
+      "implementation_status": "implemented_p0_open",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "collection_private": {
+      "implementation_status": "implemented_p0_open",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "life_counter_local": {
+      "implementation_status": "implemented_p0_open",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "ai_analyze_optimize_advisory": {
+      "implementation_status": "experimental_p0_open",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "ai_generate_rebuild": {
+      "implementation_status": "experimental_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "battle_batch": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "battle_live": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "battle_coach": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "scanner": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "gallery_public": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "profiles_public": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "comments": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "follows": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "user_search": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "direct_messages": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "social_push": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "binder_public": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "trades": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "marketplace": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "billing_checkout": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "subscriptions": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "ads": {
+      "implementation_status": "not_implemented",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "art_paywall": {
+      "implementation_status": "not_implemented",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "learning_reads": {
+      "implementation_status": "contained_legacy",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "learning_writes": {
+      "implementation_status": "contained_legacy",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "legacy_ai_routes": {
+      "implementation_status": "contained_legacy",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    },
+    "deck_replace_all": {
+      "implementation_status": "implemented_guarded",
+      "release_capability": "off",
+      "allowed": false,
+      "live_verified_as_of": null
+    }
+  }
+}

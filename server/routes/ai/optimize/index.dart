@@ -45,7 +45,6 @@ import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
-import '../../../lib/ai/optimize_feedback_support.dart' as optimize_feedback;
 import '../../../lib/ai/optimize_format_legality_support.dart';
 import '../../../lib/ai/optimize_route_final_gate_support.dart'
     as optimize_route_final_gate;
@@ -249,8 +248,6 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
 );
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
-  required String deckId,
-  required String? userId,
   required String commanderName,
   required List<String> commanderColors,
   required String operationMode,
@@ -274,8 +271,6 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required int executionTimeMs,
   String? validationRunToken,
 }) => optimize_analysis.buildOptimizationAnalysisLogEntry(
-  deckId: deckId,
-  userId: userId,
   commanderName: commanderName,
   commanderColors: commanderColors,
   operationMode: operationMode,
@@ -593,6 +588,9 @@ Future<Response> onRequest(RequestContext context) async {
       final jobId = creation.jobId;
       final planReservation =
           creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
+      if (!creation.isNew) {
+        waiveAiPlanReservationForReusedJobIfAvailable(context);
+      }
       final syncPayload =
           Map<String, dynamic>.from(body)
             ..['_force_sync'] = true
@@ -707,7 +705,13 @@ Future<Response> onRequest(RequestContext context) async {
                 SemanticV2OptimizeEnforcementMode.disabled
             ? await telemetry.trackAsync(
               'request.cache_lookup',
-              () => loadOptimizeCache(pool: pool, cacheKey: cacheKey),
+              () => loadOptimizeCache(
+                pool: pool,
+                cacheKey: cacheKey,
+                userId: authenticatedUserId,
+                deckId: deckId,
+                deckSignature: deckSignature,
+              ),
             )
             : null;
     if (cachedResponse != null) {
@@ -1078,8 +1082,6 @@ Future<Response> onRequest(RequestContext context) async {
       if (persistOutcome) {
         await recordOptimizeAnalysisOutcome(
           pool: pool,
-          deckId: deckId,
-          userId: userId,
           commanderName: commanderNameForLogs,
           commanderColors: commanderColorIdentity.toList(),
           operationMode: responseBody['mode']?.toString() ?? effectiveMode,
@@ -1102,27 +1104,6 @@ Future<Response> onRequest(RequestContext context) async {
           cacheKey: cacheKey,
           executionTimeMs: requestStopwatch.elapsedMilliseconds,
         );
-        if (responseBody['learning_eligible'] != false) {
-          await optimize_feedback.recordOptimizeMlFeedback(
-            connection: pool,
-            feedback: optimize_feedback.buildOptimizeMlFeedback(
-              deckId: deckId,
-              userId: userId,
-              archetype: targetArchetype,
-              commanderName: commanderNameForLogs,
-              operationMode: responseBody['mode']?.toString() ?? effectiveMode,
-              outcomeCode:
-                  responseBody['outcome_code']?.toString() ?? 'unknown',
-              statusCode: statusCode,
-              removals: resolvedRemovals,
-              additions: resolvedAdditions,
-              qualityError: resolvedQualityError,
-              validationWarnings: resolvedValidationWarnings,
-              blockedByColorIdentity: blockedByColorIdentityOverride,
-              blockedByBracket: blockedByBracketOverride,
-            ),
-          );
-        }
       }
 
       telemetry.logSummary();
@@ -1388,6 +1369,9 @@ Future<Response> onRequest(RequestContext context) async {
       final jobId = creation.jobId;
       final planReservation =
           creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
+      if (!creation.isNew) {
+        waiveAiPlanReservationForReusedJobIfAvailable(context);
+      }
 
       // Fire-and-forget: processamento pesado roda em background.
       // A closure captura todas as variáveis do setup (pool, allCardData, etc.)

@@ -1,5 +1,12 @@
 # Candidato de release da beta gratuita do ManaLoom
 
+> Lifecycle: `HISTORICAL_EVIDENCE`
+> Superado para escopo, oferta e prioridade por
+> `docs/status/CURRENT_PRODUCT_DECISION.md`. Este relatório preserva a prova da
+> revisão de 2026-07-16; suas inclusões de Battle, social, Scanner ou trades não
+> habilitam essas capabilities na beta corrente e seus comandos não devem ser
+> executados como plano atual.
+
 **Data de corte:** 2026-07-16; validação técnica atualizada em 2026-07-17
 
 **Alvo:** Web + Android

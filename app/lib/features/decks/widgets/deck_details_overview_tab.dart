@@ -33,9 +33,9 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final VoidCallback onOpenCards;
   final VoidCallback onForcePricingRefresh;
   final VoidCallback onShowPricingDetails;
-  final VoidCallback onTogglePublic;
-  final VoidCallback onPlay;
-  final VoidCallback onShowOptimizationOptions;
+  final VoidCallback? onTogglePublic;
+  final VoidCallback? onPlay;
+  final VoidCallback? onShowOptimizationOptions;
   final VoidCallback? onOpenBattleReplays;
   final VoidCallback onSelectCommander;
   final VoidCallback onImportList;
@@ -61,9 +61,9 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.onOpenCards,
     required this.onForcePricingRefresh,
     required this.onShowPricingDetails,
-    required this.onTogglePublic,
-    required this.onPlay,
-    required this.onShowOptimizationOptions,
+    this.onTogglePublic,
+    this.onPlay,
+    this.onShowOptimizationOptions,
     this.onOpenBattleReplays,
     required this.onSelectCommander,
     required this.onImportList,
@@ -239,17 +239,18 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                           icon: _validationStateIcon,
                           prominent: true,
                         ),
-                        DeckMetaChip(
-                          onTap: onTogglePublic,
-                          label: deck.isPublic ? 'Público' : 'Privado',
-                          color: deck.isPublic
-                              ? AppTheme.frost400
-                              : AppTheme.textPrimary.withValues(alpha: 0.86),
-                          icon: deck.isPublic
-                              ? Icons.public
-                              : Icons.lock_outline,
-                          prominent: true,
-                        ),
+                        if (onTogglePublic != null)
+                          DeckMetaChip(
+                            onTap: onTogglePublic,
+                            label: deck.isPublic ? 'Público' : 'Privado',
+                            color: deck.isPublic
+                                ? AppTheme.frost400
+                                : AppTheme.textPrimary.withValues(alpha: 0.86),
+                            icon: deck.isPublic
+                                ? Icons.public
+                                : Icons.lock_outline,
+                            prominent: true,
+                          ),
                       ],
                     ),
                   ],
@@ -315,12 +316,14 @@ class DeckDetailsOverviewTab extends StatelessWidget {
           description: deck.description,
           onEditDescription: onEditDescription,
         );
-        final diagnostics = DeckDiagnosticPanel(
-          deck: deck,
-          analysis: diagnosticAnalysis,
-          onOpenBattleReplays: onOpenBattleReplays,
-          onShowCardDetails: onShowCardDetails,
-        );
+        final diagnostics = onShowOptimizationOptions == null
+            ? null
+            : DeckDiagnosticPanel(
+                deck: deck,
+                analysis: diagnosticAnalysis,
+                onOpenBattleReplays: onOpenBattleReplays,
+                onShowCardDetails: onShowCardDetails,
+              );
         final playtest = SampleHandWidget(
           deck: deck,
           compact: true,
@@ -365,11 +368,14 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       ),
                     ),
                   ] else ...[
-                    _OverviewQuickActions(
-                      onPlay: onPlay,
-                      onOptimize: onShowOptimizationOptions,
-                    ),
-                    const SizedBox(height: AppTheme.space14),
+                    if (onPlay != null ||
+                        onShowOptimizationOptions != null) ...[
+                      _OverviewQuickActions(
+                        onPlay: onPlay,
+                        onOptimize: onShowOptimizationOptions,
+                      ),
+                      const SizedBox(height: AppTheme.space14),
+                    ],
                     _CommanderDeckSummaryGrid(
                       deck: deck,
                       totalCards: totalCards,
@@ -405,8 +411,10 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                               key: const Key('deck-overview-primary-pane'),
                               child: Column(
                                 children: [
-                                  diagnostics,
-                                  const SizedBox(height: AppTheme.paneGap),
+                                  if (diagnostics != null) ...[
+                                    diagnostics,
+                                    const SizedBox(height: AppTheme.paneGap),
+                                  ],
                                   playtest,
                                 ],
                               ),
@@ -441,8 +449,10 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       const SizedBox(height: AppTheme.space16),
                       description,
                       const SizedBox(height: AppTheme.space16),
-                      diagnostics,
-                      const SizedBox(height: AppTheme.space16),
+                      if (diagnostics != null) ...[
+                        diagnostics,
+                        const SizedBox(height: AppTheme.space16),
+                      ],
                       playtest,
                       const SizedBox(height: AppTheme.space24),
                       pricingPanel,
@@ -1417,55 +1427,61 @@ class _DescriptionSection extends StatelessWidget {
 }
 
 class _OverviewQuickActions extends StatelessWidget {
-  final VoidCallback onPlay;
-  final VoidCallback onOptimize;
+  final VoidCallback? onPlay;
+  final VoidCallback? onOptimize;
 
   const _OverviewQuickActions({required this.onPlay, required this.onOptimize});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final playButton = FilledButton.icon(
-      onPressed: onPlay,
-      style: FilledButton.styleFrom(
-        minimumSize: const Size(0, AppTheme.touchTargetMin),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.space18,
-          vertical: AppTheme.space12,
-        ),
-        backgroundColor: AppTheme.brass400,
-        foregroundColor: AppTheme.backgroundAbyss,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-      ),
-      icon: const Icon(Icons.favorite_rounded, size: 19),
-      label: Text(
-        'Jogar agora',
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: AppTheme.backgroundAbyss,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-    final optimizeButton = OutlinedButton.icon(
-      key: const Key('deck-optimize-button'),
-      onPressed: onOptimize,
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(0, AppTheme.touchTargetMin),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.space18,
-          vertical: AppTheme.space12,
-        ),
-        foregroundColor: AppTheme.textPrimary,
-        side: BorderSide(color: AppTheme.frost400.withValues(alpha: 0.55)),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-      ),
-      icon: const Icon(Icons.auto_fix_high, size: 19),
-      label: const Text('Otimizar'),
-    );
+    final playButton = onPlay == null
+        ? null
+        : FilledButton.icon(
+            onPressed: onPlay,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(0, AppTheme.touchTargetMin),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space18,
+                vertical: AppTheme.space12,
+              ),
+              backgroundColor: AppTheme.brass400,
+              foregroundColor: AppTheme.backgroundAbyss,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              ),
+            ),
+            icon: const Icon(Icons.favorite_rounded, size: 19),
+            label: Text(
+              'Jogar agora',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: AppTheme.backgroundAbyss,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          );
+    final optimizeButton = onOptimize == null
+        ? null
+        : OutlinedButton.icon(
+            key: const Key('deck-optimize-button'),
+            onPressed: onOptimize,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, AppTheme.touchTargetMin),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space18,
+                vertical: AppTheme.space12,
+              ),
+              foregroundColor: AppTheme.textPrimary,
+              side: BorderSide(
+                color: AppTheme.frost400.withValues(alpha: 0.55),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              ),
+            ),
+            icon: const Icon(Icons.auto_fix_high, size: 19),
+            label: const Text('Otimizar'),
+          );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1473,9 +1489,10 @@ class _OverviewQuickActions extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              playButton,
-              const SizedBox(height: AppTheme.space8),
-              optimizeButton,
+              if (playButton != null) playButton,
+              if (playButton != null && optimizeButton != null)
+                const SizedBox(height: AppTheme.space8),
+              if (optimizeButton != null) optimizeButton,
             ],
           );
         }
@@ -1484,7 +1501,10 @@ class _OverviewQuickActions extends StatelessWidget {
           child: Wrap(
             spacing: 10,
             runSpacing: 8,
-            children: [optimizeButton, playButton],
+            children: [
+              if (optimizeButton != null) optimizeButton,
+              if (playButton != null) playButton,
+            ],
           ),
         );
       },
@@ -1530,14 +1550,14 @@ class _StrategySummaryCard extends StatelessWidget {
   final String? archetype;
   final int? bracket;
   final String Function(int bracket) bracketLabel;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _StrategySummaryCard({
     required this.hasArchetype,
     required this.archetype,
     required this.bracket,
     required this.bracketLabel,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
@@ -1569,7 +1589,9 @@ class _StrategySummaryCard extends StatelessWidget {
                     Text('Estratégia', style: theme.textTheme.titleMedium),
                     const SizedBox(height: AppTheme.space2),
                     Text(
-                      hasArchetype
+                      onTap == null
+                          ? 'Direção registrada para este deck.'
+                          : hasArchetype
                           ? 'Direção principal que orienta análise e otimização.'
                           : 'Defina o plano do deck para melhorar recomendações.',
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -1579,11 +1601,12 @@ class _StrategySummaryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              TextButton.icon(
-                onPressed: onTap,
-                icon: const Icon(Icons.tune, size: 18),
-                label: Text(hasArchetype ? 'Alterar' : 'Definir'),
-              ),
+              if (onTap != null)
+                TextButton.icon(
+                  onPressed: onTap,
+                  icon: const Icon(Icons.tune, size: 18),
+                  label: Text(hasArchetype ? 'Alterar' : 'Definir'),
+                ),
             ],
           ),
           const SizedBox(height: AppTheme.space12),
@@ -1641,7 +1664,7 @@ class _StrategySummaryCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (!hasArchetype) ...[
+                        if (!hasArchetype && onTap != null) ...[
                           const SizedBox(height: AppTheme.space8),
                           Text(
                             'Toque para escolher um plano de jogo antes de otimizar.',
@@ -1654,10 +1677,11 @@ class _StrategySummaryCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: toneColor.withValues(alpha: 0.85),
-                  ),
+                  if (onTap != null)
+                    Icon(
+                      Icons.chevron_right,
+                      color: toneColor.withValues(alpha: 0.85),
+                    ),
                 ],
               ),
             ),

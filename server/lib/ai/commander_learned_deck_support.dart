@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:postgres/postgres.dart';
 
@@ -6,6 +7,13 @@ import 'commander_reference_helpers.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderLearnedDecksTable = 'commander_learned_decks';
+const commanderLearnedDeckPromotionReceiptTask = 'DCK-P0-05';
+const promotedCommanderLearnedDeckReadsEnvironment =
+    'MANALOOM_ENABLE_PROMOTED_LEARNED_DECK_READS';
+const promotedCommanderLearnedDeckReadsCapability =
+    'promoted_learned_deck_reads';
+const promotedCommanderLearnedDeckReadsDisabledCode =
+    'promoted_learned_deck_reads_disabled';
 const commanderLearnedDeckRoleSummarySourceCanonical =
     'card_list_canonicalized';
 const commanderLearnedDeckRoleSummarySourcePersistedFallback =
@@ -16,6 +24,13 @@ const commanderLearnedDeckRoleSummaryFallbackReasonNoResolvableCardNames =
     'no_resolvable_card_names';
 const commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed =
     'metadata_canonicalization_failed';
+
+bool promotedCommanderLearnedDeckReadsEnabled({
+  Map<String, String>? environment,
+}) =>
+    (environment ??
+        Platform.environment)[promotedCommanderLearnedDeckReadsEnvironment] ==
+    '1';
 
 class CommanderLearnedDeckCardLine {
   const CommanderLearnedDeckCardLine({
@@ -471,7 +486,7 @@ CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
     legalStatus: _stringValue(payload['legal_status']),
     notes: _stringValue(payload['notes']),
     metadata: metadata,
-    isActive: _boolValue(payload['is_active'], defaultValue: true),
+    isActive: _boolValue(payload['is_active'], defaultValue: false),
     promotedAt: _dateTimeValue(payload['promoted_at']),
   );
 }
@@ -660,7 +675,11 @@ List<CommanderLearnedDeckCardLine>? _tryParseCommanderLearnedDeckJsonCards(
 Future<CommanderLearnedDeckInput?> loadActiveCommanderLearnedDeck({
   required Pool pool,
   required String commanderName,
+  Map<String, String>? environment,
 }) async {
+  if (!promotedCommanderLearnedDeckReadsEnabled(environment: environment)) {
+    return null;
+  }
   final commander = commanderName.trim();
   if (commander.isEmpty) return null;
   try {
@@ -763,68 +782,22 @@ String _cleanCommanderLearnedDeckCardName(String value) {
   return name.trim();
 }
 
-Future<void> ensureCommanderLearnedDecksTable(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_learned_decks (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      commander_name TEXT NOT NULL,
-      commander_name_normalized TEXT NOT NULL,
-      deck_name TEXT NOT NULL,
-      source_system TEXT NOT NULL,
-      source_ref TEXT NOT NULL,
-      source_url TEXT,
-      archetype TEXT,
-      card_list TEXT NOT NULL,
-      card_count INTEGER NOT NULL,
-      score NUMERIC,
-      wincon_primary TEXT,
-      wincon_backup TEXT,
-      legal_status TEXT,
-      notes TEXT,
-      metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
-      is_active BOOLEAN NOT NULL DEFAULT FALSE,
-      promoted_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (source_system, source_ref)
-    )
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
-    ON commander_learned_decks (
-      commander_name_normalized,
-      is_active,
-      promoted_at DESC,
-      updated_at DESC
-    )
-  ''');
-}
-
 Future<void> upsertCommanderLearnedDeck(
   Pool pool,
-  CommanderLearnedDeckInput input, {
-  bool deactivateOtherActive = true,
-}) async {
-  final metadata = await canonicalizeCommanderLearnedDeckMetadata(pool, input);
-
-  if (input.isActive && deactivateOtherActive) {
-    await pool.execute(
-      Sql.named('''
-        UPDATE commander_learned_decks
-        SET is_active = FALSE,
-            updated_at = NOW()
-        WHERE commander_name_normalized = @commander
-          AND is_active = TRUE
-          AND (source_system, source_ref) <> (@source_system, @source_ref)
-      '''),
-      parameters: {
-        'commander': input.commanderNameNormalized,
-        'source_system': input.sourceSystem,
-        'source_ref': input.sourceRef,
-      },
+  CommanderLearnedDeckInput input,
+) async {
+  if (input.isActive) {
+    throw StateError(
+      'Learned-deck activation is disabled until the reviewed, versioned '
+      'promotion receipt $commanderLearnedDeckPromotionReceiptTask exists.',
     );
   }
 
+  final metadata = await canonicalizeCommanderLearnedDeckMetadata(pool, input);
+
+  // New/imported material is candidate-only. The conflict predicate also
+  // prevents a candidate refresh from changing any pre-existing active row;
+  // those baselines remain byte-for-byte under the explicit promotion gate.
   await pool.execute(
     Sql.named('''
       INSERT INTO commander_learned_decks (
@@ -861,8 +834,8 @@ Future<void> upsertCommanderLearnedDeck(
         @legal_status,
         @notes,
         @metadata::jsonb,
-        @is_active,
-        @promoted_at
+        FALSE,
+        NULL
       )
       ON CONFLICT (source_system, source_ref)
       DO UPDATE SET
@@ -879,9 +852,8 @@ Future<void> upsertCommanderLearnedDeck(
         legal_status = EXCLUDED.legal_status,
         notes = EXCLUDED.notes,
         metadata = EXCLUDED.metadata,
-        is_active = EXCLUDED.is_active,
-        promoted_at = EXCLUDED.promoted_at,
         updated_at = NOW()
+      WHERE commander_learned_decks.is_active = FALSE
     '''),
     parameters: {
       'commander_name': input.commanderName,
@@ -899,8 +871,6 @@ Future<void> upsertCommanderLearnedDeck(
       'legal_status': input.legalStatus,
       'notes': input.notes,
       'metadata': jsonEncode(metadata),
-      'is_active': input.isActive,
-      'promoted_at': input.promotedAt,
     },
   );
 }

@@ -12,6 +12,8 @@ READY_MANIFEST="$RUN_DIR/ready.json"
 CREDENTIALS_FILE="$RUN_DIR/visual-credentials.env"
 SUMMARY_FILE="$RUN_DIR/cleanup-summary.json"
 WEB_BUILD_DIR="$RUN_DIR/web-build"
+ISOLATED_CAPABILITIES_FILE="$RUN_DIR/release-capabilities.visual-fixture.json"
+ISOLATED_CAPABILITIES_DIGEST=""
 BACKEND_PID=""
 WEB_PID=""
 DATABASE=""
@@ -49,7 +51,7 @@ require_postgres_write_approval \
 require_live_mutation_approval \
   "S3-07 visual QA in disposable loopback API"
 
-for tool in curl jq pg_isready psql python3 shasum; do
+for tool in curl htpasswd jq pg_isready psql python3 shasum; do
   command -v "$tool" >/dev/null 2>&1 || {
     echo "ferramenta obrigatória ausente: $tool" >&2
     exit 2
@@ -65,6 +67,53 @@ if ! pg_isready -h 127.0.0.1 -p 5432 >/dev/null 2>&1; then
 fi
 
 mkdir -p "$RUN_DIR"
+
+jq '
+  .policy_version = (.policy_version + ".isolated_visual_fixture")
+  | .implementation_status = "isolated_visual_fixture"
+  | .live_verified_as_of = null
+  | .capabilities |= with_entries(
+      .key as $key
+      | if ([
+          "account_registration",
+          "catalog_private",
+          "decks_private",
+          "collection_private",
+          "life_counter_local",
+          "ai_analyze_optimize_advisory",
+          "ai_generate_rebuild",
+          "battle_batch",
+          "battle_live",
+          "battle_coach",
+          "scanner",
+          "gallery_public",
+          "profiles_public",
+          "comments",
+          "follows",
+          "user_search",
+          "direct_messages",
+          "social_push",
+          "binder_public",
+          "trades",
+          "marketplace",
+          "learning_reads",
+          "legacy_ai_routes",
+          "deck_replace_all"
+        ] | index($key)) != null
+        then .value.implementation_status = "isolated_visual_fixture"
+          | .value.release_capability = "on"
+          | .value.allowed = true
+          | .value.live_verified_as_of = null
+        else .value.release_capability = "off"
+          | .value.allowed = false
+          | .value.live_verified_as_of = null
+        end
+    )
+' "$ROOT_DIR/server/config/release_capabilities.json" \
+  >"$ISOLATED_CAPABILITIES_FILE"
+ISOLATED_CAPABILITIES_DIGEST="$(
+  shasum -a 256 "$ISOLATED_CAPABILITIES_FILE" | awk '{print $1}'
+)"
 
 listener_count() {
   local port="$1"
@@ -140,9 +189,11 @@ cleanup() {
       web_listeners: ($web_listeners | tonumber? // $web_listeners),
       api_listeners: ($api_listeners | tonumber? // $api_listeners),
       original_exit_code: $original_exit_code,
-      credentials_file_removed: true
+      credentials_file_removed: true,
+      capability_policy_file_removed: true
     }' >"$SUMMARY_FILE"
   rm -f "$CREDENTIALS_FILE"
+  rm -f "$ISOLATED_CAPABILITIES_FILE"
   printf 'cleanup_summary=%s\n' "$SUMMARY_FILE"
 
   if [[ "$database_remaining" != "0" || "$web_listeners" != "0" ||
@@ -158,6 +209,9 @@ trap 'exit 143' TERM
 
 MANALOOM_HOLD_FOR_BROWSER_QA=1 \
 MANALOOM_ALLOW_DEV_ORIGINS=true \
+MANALOOM_E2E_ISOLATED_RUNTIME=1 \
+MANALOOM_ISOLATED_RELEASE_CAPABILITIES_FILE="$ISOLATED_CAPABILITIES_FILE" \
+MANALOOM_CONFIRM_ISOLATED_RELEASE_CAPABILITIES=I_UNDERSTAND_THIS_IS_DISPOSABLE_TEST_ONLY \
 MANALOOM_CONFIRM_POSTGRES_WRITES="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
 MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
   "$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh" \
@@ -190,68 +244,76 @@ fi
 seed_suffix="$(date -u +%s)_$$"
 SEED_EMAIL="visual-s307-$seed_suffix@example.invalid"
 seed_username="visuals307${seed_suffix//_/}"
-register_response="$(curl -fsS --max-time 20 \
-  -H 'Content-Type: application/json' \
-  -d "$(jq -cn --arg username "$seed_username" --arg email "$SEED_EMAIL" \
-    --arg password "$SEED_PASSWORD" \
-    --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
-    --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
-    '{
-      username: $username,
-      email: $email,
-      password: $password,
-      legal_accepted: true,
-      terms_version: $terms_version,
-      privacy_version: $privacy_version
-    }')" \
-  "$API_BASE_URL/auth/register")"
-seed_token="$(jq -er '.token' <<<"$register_response")"
-SEED_USER_ID="$(jq -er '.user.id' <<<"$register_response")"
-
 EMPTY_EMAIL="visual-empty-$seed_suffix@example.invalid"
 empty_username="visualempty${seed_suffix//_/}"
-empty_response="$(curl -fsS --max-time 20 \
-  -H 'Content-Type: application/json' \
-  -d "$(jq -cn --arg username "$empty_username" --arg email "$EMPTY_EMAIL" \
-    --arg password "$SEED_PASSWORD" \
-    --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
-    --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
-    '{
-      username: $username,
-      email: $email,
-      password: $password,
-      legal_accepted: true,
-      terms_version: $terms_version,
-      privacy_version: $privacy_version
-    }')" \
-  "$API_BASE_URL/auth/register")"
-empty_token="$(jq -er '.token' <<<"$empty_response")"
-EMPTY_USER_ID="$(jq -er '.user.id' <<<"$empty_response")"
+SEED_PEER_USERNAME="visualpeer${seed_suffix//_/}"
+peer_email="visual-peer-$seed_suffix@example.invalid"
+visual_password_hash="$(
+  htpasswd -bnBC 10 '' "$SEED_PASSWORD" | tr -d ':\n'
+)"
+seeded_users="$(
+  psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -d "$DATABASE" \
+    -At -F '|' \
+    -v seed_username="$seed_username" \
+    -v seed_email="$SEED_EMAIL" \
+    -v empty_username="$empty_username" \
+    -v empty_email="$EMPTY_EMAIL" \
+    -v peer_username="$SEED_PEER_USERNAME" \
+    -v peer_email="$peer_email" \
+    -v password_hash="$visual_password_hash" \
+    -v terms_version="$MANALOOM_CURRENT_TERMS_VERSION" \
+    -v privacy_version="$MANALOOM_CURRENT_PRIVACY_VERSION" <<'SQL'
+WITH inserted AS (
+  INSERT INTO users (
+    username, email, password_hash,
+    terms_version, terms_accepted_at,
+    privacy_version, privacy_accepted_at
+  ) VALUES
+    (:'seed_username', :'seed_email', :'password_hash',
+     :'terms_version', CURRENT_TIMESTAMP,
+     :'privacy_version', CURRENT_TIMESTAMP),
+    (:'empty_username', :'empty_email', :'password_hash',
+     :'terms_version', CURRENT_TIMESTAMP,
+     :'privacy_version', CURRENT_TIMESTAMP),
+    (:'peer_username', :'peer_email', :'password_hash',
+     :'terms_version', CURRENT_TIMESTAMP,
+     :'privacy_version', CURRENT_TIMESTAMP)
+  RETURNING id, email
+), plans AS (
+  INSERT INTO user_plans (user_id, plan_name, status)
+  SELECT id, 'free', 'active' FROM inserted
+  RETURNING user_id
+)
+SELECT email, id FROM inserted ORDER BY email;
+SQL
+)"
+SEED_USER_ID="$(awk -F '|' -v email="$SEED_EMAIL" '$1 == email {print $2}' <<<"$seeded_users")"
+EMPTY_USER_ID="$(awk -F '|' -v email="$EMPTY_EMAIL" '$1 == email {print $2}' <<<"$seeded_users")"
+SEED_PEER_USER_ID="$(awk -F '|' -v email="$peer_email" '$1 == email {print $2}' <<<"$seeded_users")"
+for required_user_id in "$SEED_USER_ID" "$EMPTY_USER_ID" "$SEED_PEER_USER_ID"; do
+  [[ "$required_user_id" =~ ^[0-9a-f-]{36}$ ]] || {
+    echo "direct disposable user seed did not return a UUID" >&2
+    exit 1
+  }
+done
+
+login_fixture_user() {
+  local email="$1"
+  curl -fsS --max-time 20 \
+    -H 'Content-Type: application/json' \
+    -d "$(jq -cn --arg email "$email" --arg password "$SEED_PASSWORD" \
+      '{email: $email, password: $password}')" \
+    "$API_BASE_URL/auth/login"
+}
+seed_token="$(login_fixture_user "$SEED_EMAIL" | jq -er '.token')"
+empty_token="$(login_fixture_user "$EMPTY_EMAIL" | jq -er '.token')"
+peer_token="$(login_fixture_user "$peer_email" | jq -er '.token')"
+
 empty_decks_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $empty_token" \
   "$API_BASE_URL/decks")"
 jq -e 'type == "array" and length == 0' \
   <<<"$empty_decks_response" >/dev/null
-
-SEED_PEER_USERNAME="visualpeer${seed_suffix//_/}"
-peer_response="$(curl -fsS --max-time 20 \
-  -H 'Content-Type: application/json' \
-  -d "$(jq -cn --arg username "$SEED_PEER_USERNAME" \
-    --arg email "visual-peer-$seed_suffix@example.invalid" \
-    --arg password "$SEED_PASSWORD" \
-    --arg terms_version "$MANALOOM_CURRENT_TERMS_VERSION" \
-    --arg privacy_version "$MANALOOM_CURRENT_PRIVACY_VERSION" \
-    '{
-      username: $username,
-      email: $email,
-      password: $password,
-      legal_accepted: true,
-      terms_version: $terms_version,
-      privacy_version: $privacy_version
-    }')" \
-  "$API_BASE_URL/auth/register")"
-SEED_PEER_USER_ID="$(jq -er '.user.id' <<<"$peer_response")"
-peer_token="$(jq -er '.token' <<<"$peer_response")"
 
 card_response="$(curl -fsS --max-time 20 \
   -H "Authorization: Bearer $seed_token" \
@@ -495,6 +557,7 @@ jq -n \
   --arg seed_trade_id "$SEED_TRADE_ID" \
   --arg fixture_image_url "$fixture_image_url" \
   --arg bundle_sha256 "$bundle_sha256" \
+  --arg capability_policy_digest_sha256 "$ISOLATED_CAPABILITIES_DIGEST" \
   '{
     status: "ready",
     scope: $scope,
@@ -520,6 +583,13 @@ jq -n \
     seed_trade_id: $seed_trade_id,
     fixture_image_url: $fixture_image_url,
     bundle_sha256: $bundle_sha256,
+    capability_policy: {
+      scope: "isolated_visual_fixture",
+      digest_sha256: $capability_policy_digest_sha256,
+      account_registration: "ui_route_enabled_no_signup_submission",
+      learning_writes: false,
+      commerce: false
+    },
     cleanup: "trap_registered"
   }' >"$READY_MANIFEST"
 

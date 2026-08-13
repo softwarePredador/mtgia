@@ -1,5 +1,14 @@
 # ManaLoom Code Structure Audit
 
+> **HISTORICAL / SUPERSEDED — NAO USE COMO AUDITORIA DO CHECKOUT ATUAL.**
+>
+> Este arquivo preserva resultados textuais e revalidacoes de checkouts
+> antigos; contagens, duplicacoes e recomendacoes abaixo exigem nova prova no
+> codigo vivo. Para o fluxo vigente de Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > Status atual: auditoria estrutural grande e historica.
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.

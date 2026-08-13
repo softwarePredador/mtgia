@@ -170,29 +170,17 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
         self.assertIn("require_clean_worktree", ops_deploy)
         self.assertGreaterEqual(ops_deploy.count("require_clean_worktree"), 3)
         self.assertIn(
-            "MANALOOM_CANONICAL_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
+            "manaloom_load_release_capabilities_from_git",
             ops_deploy,
         )
-        self.assertIn(
-            "MANALOOM_TARGET_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
-            ops_deploy,
-        )
-        self.assertIn(
-            "test -r /app/scripts/lib/manaloom_mutation_guard.sh",
-            ops_deploy,
-        )
-        self.assertIn(
-            "/app/docs/hermes-analysis/manaloom-knowledge/scripts/"
-            "sync_pg_target_deck_to_hermes.py",
-            ops_deploy,
-        )
-        self.assertIn(
-            "/app/docs/hermes-analysis/manaloom-knowledge/scripts/"
-            "battle_target_deck_identity_guard.py",
-            ops_deploy,
-        )
-        self.assertIn("--protected-pg-deck-id", ops_deploy)
-        self.assertIn("deploy_guard_$short_sha.json", ops_deploy)
+        self.assertIn("MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=0", ops_deploy)
+        self.assertIn("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0", ops_deploy)
+        self.assertIn("MANALOOM_BATTLE_RULES_APPLY_PG=0", ops_deploy)
+        self.assertIn("disabled_by_release_capability", ops_deploy)
+        self.assertIn("['hermes_cron_governor_report']", ops_deploy)
+        self.assertNotIn("sync_pg_target_deck_to_hermes.py", ops_deploy)
+        self.assertNotIn("battle_target_deck_identity_guard.py", ops_deploy)
+        self.assertNotIn("--protected-pg-deck-id", ops_deploy)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,11 @@
 - Programa: `BL8–BL10`
 - Release: `NO_GO`, capacidade default-off
 
+> Emenda 2026-08-13: a decisão técnica de arquitetura permanece registrada,
+> mas o mecanismo caller-only descrito abaixo está superseded para a Free
+> Beta. A matriz commitada mantém Coach/Battle/Live OFF e os scripts recusam
+> `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1` antes de qualquer mutação.
+
 ## Contexto
 
 O GO limitado do ADR 0004 provou que um participante humano pode responder a
@@ -46,12 +51,10 @@ forma silenciosa.
    sessão, prompt, ação ou replay.
 10. Backend e app permanecem protegidos, respectivamente, por
     `INTERACTIVE_BATTLE_ENABLED=false` e
-    `ENABLE_INTERACTIVE_BATTLE=false`. O release do backend continua
-    default-off e só aceita habilitação quando o processo chamador fornece
-    `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1`. Antes de alterar a flag, o
-    deploy prova um serviço XMage privado separado do batch, no mesmo SHA,
-    pinado por digest e com identidade, modo e capacidade exatos. O bundle do
-    app continua fora deste opt-in e permanece desabilitado.
+    `ENABLE_INTERACTIVE_BATTLE=false`. Na Free Beta, backend e bundles recusam
+    qualquer habilitação caller-only; a arquitetura de prova por serviço
+    privado, mesmo SHA, digest, identidade, modo e capacidade só volta a ser
+    acionável após nova decisão/versionamento de capability e receipt.
 
 ## Lifecycle
 

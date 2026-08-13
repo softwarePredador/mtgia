@@ -10,6 +10,8 @@ void main() {
     expect(isDatabaseIndependentHealthPath('/health/'), isTrue);
     expect(isDatabaseIndependentHealthPath('/health/live'), isTrue);
     expect(isDatabaseIndependentHealthPath('/health/live/'), isTrue);
+    expect(isDatabaseIndependentHealthPath('/capabilities'), isTrue);
+    expect(isDatabaseIndependentHealthPath('/capabilities/'), isTrue);
     expect(isDatabaseIndependentHealthPath('/health/ready'), isFalse);
     expect(isDatabaseIndependentHealthPath('/ready'), isFalse);
     expect(isDatabaseIndependentHealthPath('/health/metrics'), isFalse);
@@ -32,6 +34,10 @@ void main() {
     expect(
       source,
       contains("'e2e_isolated_runtime': isManaloomE2eIsolatedRuntime()"),
+    );
+    expect(
+      source,
+      contains("'release_capabilities': releasePolicy.readinessCheck()"),
     );
   });
 }

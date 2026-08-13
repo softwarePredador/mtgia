@@ -91,7 +91,7 @@ void main() {
         expect(webPage, contains('loadPublicReport'));
         expect(webPage, contains('if (!report) notFound();'));
         expect(webPage, contains('Relatorio compartilhavel'));
-        expect(webPage, contains('Trocas sugeridas'));
+        expect(webPage, contains('Alterações sugeridas'));
       },
     );
 

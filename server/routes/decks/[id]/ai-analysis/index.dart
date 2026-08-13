@@ -19,10 +19,14 @@ import '../../../../lib/runtime_environment.dart';
 
 /// POST /decks/:id/ai-analysis
 ///
-/// Gera (ou atualiza) os campos de análise do deck:
+/// Gera uma análise do deck. Somente uma resposta real do provedor atualiza:
 /// - decks.synergy_score
 /// - decks.strengths
 /// - decks.weaknesses
+///
+/// O fallback heurístico é diagnóstico não persistível e nunca vira cache
+/// canônico. Enquanto a tabela não registra provenance por análise, a rota não
+/// reutiliza os campos persistidos como cache de resposta.
 ///
 /// Body opcional:
 /// { "force": true }
@@ -36,11 +40,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
   try {
     final body = decodeOptionalJsonObject(await context.request.body());
-    final force = readOptionalJsonBool(body, 'force');
+    readOptionalJsonBool(body, 'force');
 
     final deckResult = await pool.execute(
       Sql.named(
-        'SELECT id, format, COALESCE(archetype, \'\') as archetype, bracket, synergy_score, strengths, weaknesses '
+        'SELECT id, format, COALESCE(archetype, \'\') as archetype, bracket '
         'FROM decks WHERE id = @deckId AND user_id = @userId',
       ),
       parameters: {'deckId': deckId, 'userId': userId},
@@ -57,28 +61,6 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     final format = (deckRow['format'] as String).toLowerCase();
     final archetype = (deckRow['archetype'] as String?)?.trim() ?? '';
     final bracket = deckRow['bracket'] as int?;
-
-    final existingScore = deckRow['synergy_score'] as int?;
-    final existingStrengths = deckRow['strengths'] as String?;
-    final existingWeaknesses = deckRow['weaknesses'] as String?;
-
-    if (!force &&
-        existingScore != null &&
-        existingScore > 0 &&
-        (existingStrengths ?? '').trim().isNotEmpty &&
-        (existingWeaknesses ?? '').trim().isNotEmpty) {
-      return Response.json(
-        body: {
-          'deck_id': deckId,
-          'archetype': archetype,
-          'bracket': bracket,
-          'synergy_score': existingScore,
-          'strengths': existingStrengths,
-          'weaknesses': existingWeaknesses,
-          'cached': true,
-        },
-      );
-    }
 
     final hasCardIntelligenceSnapshot = await _hasTable(
       pool,
@@ -185,11 +167,17 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
     Map<String, dynamic> analysis;
     var isMock = false;
+    var analysisSource = 'ai_provider';
     if (apiKey == null || apiKey.isEmpty) {
       if (!aiConfig.allowsMockFallbacks) {
         return Response.json(
           statusCode: HttpStatus.serviceUnavailable,
-          body: {'error': 'AI provider is not configured'},
+          body: const {
+            'error': 'AI provider is not configured',
+            'source': 'provider_unavailable',
+            'is_mock': false,
+            'persisted': false,
+          },
         );
       }
       analysis = _heuristicAnalysis(
@@ -199,6 +187,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         metrics: metrics,
       );
       isMock = true;
+      analysisSource = 'heuristic_missing_provider';
     } else {
       try {
         analysis = await _aiAnalysis(
@@ -216,10 +205,16 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         if (!aiConfig.allowsMockFallbacks) {
           return Response.json(
             statusCode: HttpStatus.badGateway,
-            body: {'error': 'AI provider failed'},
+            body: const {
+              'error': 'AI provider failed',
+              'source': 'provider_failure',
+              'is_mock': false,
+              'persisted': false,
+            },
           );
         }
         isMock = true;
+        analysisSource = 'heuristic_provider_failure';
         analysis = _heuristicAnalysis(
           format: format,
           archetype: archetype,
@@ -233,24 +228,30 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     final strengths = (analysis['strengths'] as String?)?.trim() ?? '';
     final weaknesses = (analysis['weaknesses'] as String?)?.trim() ?? '';
 
-    await pool.execute(
-      Sql.named('''
-        UPDATE decks
-        SET synergy_score = @score,
-            strengths = @strengths,
-            weaknesses = @weaknesses
-        WHERE id = @deckId AND user_id = @userId
-      '''),
-      parameters: {
-        'score': synergyScore,
-        'strengths': strengths,
-        'weaknesses': weaknesses,
-        'deckId': deckId,
-        'userId': userId,
-      },
-    );
+    if (!isMock) {
+      await pool.execute(
+        Sql.named('''
+          UPDATE decks
+          SET synergy_score = @score,
+              strengths = @strengths,
+              weaknesses = @weaknesses
+          WHERE id = @deckId AND user_id = @userId
+        '''),
+        parameters: {
+          'score': synergyScore,
+          'strengths': strengths,
+          'weaknesses': weaknesses,
+          'deckId': deckId,
+          'userId': userId,
+        },
+      );
+    }
 
     return Response.json(
+      headers:
+          isMock
+              ? const {'Cache-Control': 'no-store'}
+              : const <String, Object>{},
       body: {
         'deck_id': deckId,
         'archetype': archetype,
@@ -259,7 +260,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         'strengths': strengths,
         'weaknesses': weaknesses,
         'metrics': metrics.toJson(),
-        if (isMock) 'is_mock': true,
+        'source': analysisSource,
+        'is_mock': isMock,
+        'cached': false,
+        'persisted': !isMock,
       },
     );
   } on JsonObjectValidationException catch (error) {

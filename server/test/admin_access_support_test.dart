@@ -20,13 +20,13 @@ void main() {
   test('operational key is configured, case-insensitive and exact', () {
     final env =
         DotEnv()..addAll({
-          'MANALOOM_OPS_API_KEY': '0123456789abcdef0123456789abcdef',
+          'MANALOOM_OPS_API_KEY': 'fixture_fixture_fixture_fixture_',
         });
 
     expect(
       isConfiguredOpsRequestKey(
         headers: const {
-          'X-ManaLoom-Ops-Key': '0123456789abcdef0123456789abcdef',
+          'X-ManaLoom-Ops-Key': 'fixture_fixture_fixture_fixture_',
         },
         env: env,
       ),
@@ -35,7 +35,7 @@ void main() {
     expect(
       isConfiguredOpsRequestKey(
         headers: const {
-          'x-manaloom-ops-key': '0123456789abcdef0123456789abcdee',
+          'x-manaloom-ops-key': 'fixture_fixture_fixture_fixture_x',
         },
         env: env,
       ),
@@ -54,6 +54,9 @@ void main() {
     expect(isPublicHealthPath('/health'), isTrue);
     expect(isPublicHealthPath('/health/live'), isTrue);
     expect(isPublicHealthPath('/health/ready'), isTrue);
+    expect(isPublicHealthPath('/health/'), isTrue);
+    expect(isPublicHealthPath('/health/live/'), isTrue);
+    expect(isPublicHealthPath('/health/ready/'), isTrue);
     expect(isPublicHealthPath('/health/metrics'), isFalse);
     expect(isPublicHealthPath('/health/dashboard'), isFalse);
     expect(isPublicHealthPath('/health/commercial'), isFalse);
@@ -66,7 +69,7 @@ void main() {
         File('routes/ai/commander-reference/index.dart').readAsStringSync();
     final guardIndex = source.indexOf('if (shouldRefresh)');
     final refreshIndex = source.indexOf(
-      'refreshSummary = await _refreshCommanderFromMtgTop8',
+      'refreshSummary = await _buildCommanderMtgTop8RefreshPreview',
     );
 
     expect(guardIndex, isNonNegative);

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/branding/product_identity.dart';
+import '../../core/config/release_capabilities.dart';
 import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
 import 'services/onboarding_state_store.dart';
@@ -67,6 +69,17 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
     unawaited(_loadState());
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!context.read<ReleaseCapabilitiesProvider>().isAllowed(
+          ReleaseCapability.aiGenerateRebuild,
+        ) &&
+        _buildMode != OnboardingBuildMode.manual) {
+      _buildMode = OnboardingBuildMode.manual;
+    }
+  }
+
   Future<void> _loadState() async {
     if (widget.userId.trim().isEmpty) {
       if (!mounted) return;
@@ -86,7 +99,12 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
         _selectedFormat = state.selectedFormat;
         _selectedGoal = state.selectedGoal;
         _experience = state.experience;
-        _buildMode = state.buildMode;
+        _buildMode =
+            context.read<ReleaseCapabilitiesProvider>().isAllowed(
+              ReleaseCapability.aiGenerateRebuild,
+            )
+            ? state.buildMode
+            : OnboardingBuildMode.manual;
         _disposition = state.disposition;
         _resumedProgress =
             state.selectedGoal != null ||
@@ -139,6 +157,12 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
   }
 
   void _selectBuildMode(OnboardingBuildMode mode) {
+    if (mode == OnboardingBuildMode.guided &&
+        !context.read<ReleaseCapabilitiesProvider>().isAllowed(
+          ReleaseCapability.aiGenerateRebuild,
+        )) {
+      return;
+    }
     if (_buildMode == mode || _loading || _working) return;
     setState(() => _buildMode = mode);
     _queueProgressWrite(
@@ -217,6 +241,19 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
     final goal = _selectedGoal;
     final experience = _experience;
     if (goal == null || experience == null || _working) return;
+    final capabilities = context.read<ReleaseCapabilitiesProvider>();
+    if (!_goalIsAllowed(goal, capabilities)) {
+      setState(() {
+        _persistenceError =
+            'Este caminho ainda não está disponível nesta versão da beta.';
+      });
+      return;
+    }
+    final effectiveBuildMode =
+        goal == OnboardingGoal.buildDeck &&
+            !capabilities.isAllowed(ReleaseCapability.aiGenerateRebuild)
+        ? OnboardingBuildMode.manual
+        : _buildMode;
     setState(() {
       _working = true;
       _persistenceError = null;
@@ -228,7 +265,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
         selectedFormat: _selectedFormat,
         selectedGoal: goal,
         experience: experience,
-        buildMode: _buildMode,
+        buildMode: effectiveBuildMode,
       );
     } catch (_) {
       if (!mounted) return;
@@ -243,22 +280,22 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
 
     unawaited(
       _eventTracker.trackOnce(
-        _eventKey('task:${goal.name}:${_buildMode.name}'),
+        _eventKey('task:${goal.name}:${effectiveBuildMode.name}'),
         'onboarding_task_started',
         format: _selectedFormat,
         source: 'onboarding',
         metadata: {
           'goal': goal.name,
           'experience': experience.name,
-          'build_mode': _buildMode.name,
+          'build_mode': effectiveBuildMode.name,
         },
       ),
     );
     if (!mounted) return;
-    context.go(_taskRoute(goal));
+    context.go(_taskRoute(goal, effectiveBuildMode));
   }
 
-  String _taskRoute(OnboardingGoal goal) {
+  String _taskRoute(OnboardingGoal goal, OnboardingBuildMode buildMode) {
     final continuesOnboarding = _disposition == OnboardingDisposition.pending
         ? 'onboarding'
         : null;
@@ -276,7 +313,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
       OnboardingGoal.catalogCollection => route('/collection/import', const {
         'list_type': 'have',
       }).toString(),
-      OnboardingGoal.buildDeck when _buildMode == OnboardingBuildMode.manual =>
+      OnboardingGoal.buildDeck when buildMode == OnboardingBuildMode.manual =>
         route('/decks', {'create': '1', 'format': _selectedFormat}).toString(),
       OnboardingGoal.buildDeck => route('/decks/generate', {
         'format': _selectedFormat,
@@ -338,11 +375,46 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
   String _eventKey(String suffix) =>
       'onboarding:v${OnboardingStateStore.currentVersion}:${widget.userId}:$suffix';
 
+  bool _goalIsAllowed(
+    OnboardingGoal goal,
+    ReleaseCapabilitiesProvider capabilities,
+  ) {
+    return switch (goal) {
+      OnboardingGoal.buildDeck || OnboardingGoal.importDeck =>
+        capabilities.isAllowed(ReleaseCapability.decksPrivate),
+      OnboardingGoal.catalogCollection =>
+        capabilities.isAllowed(ReleaseCapability.catalogPrivate) &&
+            capabilities.isAllowed(ReleaseCapability.collectionPrivate),
+      OnboardingGoal.play => capabilities.isAllowed(
+        ReleaseCapability.lifeCounterLocal,
+      ),
+      OnboardingGoal.improveDeck =>
+        capabilities.isAllowed(ReleaseCapability.decksPrivate) &&
+            capabilities.isAllowed(
+              ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+            ) &&
+            capabilities.isAllowed(ReleaseCapability.aiGenerateRebuild),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final capabilities = context.watch<ReleaseCapabilitiesProvider>();
+    final availableGoals = _goalOrder
+        .where((goal) => _goalIsAllowed(goal, capabilities))
+        .toList(growable: false);
+    final effectiveGoal = availableGoals.contains(_selectedGoal)
+        ? _selectedGoal
+        : null;
+    final generateAllowed = capabilities.isAllowed(
+      ReleaseCapability.aiGenerateRebuild,
+    );
+    final effectiveBuildMode = generateAllowed
+        ? _buildMode
+        : OnboardingBuildMode.manual;
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     final canStart =
-        !_loading && !_working && _selectedGoal != null && _experience != null;
+        !_loading && !_working && effectiveGoal != null && _experience != null;
     return Scaffold(
       key: const Key('onboarding-intent-screen'),
       backgroundColor: AppTheme.backgroundAbyss,
@@ -377,11 +449,12 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                       children: [
                         _OnboardingHero(
                           returning:
-                              _selectedGoal != null ||
+                              effectiveGoal != null ||
                               _experience != null ||
                               _disposition != OnboardingDisposition.pending,
                           resumed: _resumedProgress,
-                          selectedGoal: _selectedGoal,
+                          selectedGoal: effectiveGoal,
+                          generateAllowed: generateAllowed,
                         ),
                         if (_loading) ...[
                           const SizedBox(height: AppTheme.space12),
@@ -402,7 +475,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                         ],
                         const SizedBox(height: AppTheme.space16),
                         _JourneyProgress(
-                          hasGoal: _selectedGoal != null,
+                          hasGoal: effectiveGoal != null,
                           hasContext: _experience != null,
                         ),
                         const SizedBox(height: AppTheme.space14),
@@ -413,7 +486,9 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                               SizedBox(
                                 width: 390,
                                 child: _GoalRail(
-                                  selectedGoal: _selectedGoal,
+                                  selectedGoal: effectiveGoal,
+                                  goals: availableGoals,
+                                  generateAllowed: generateAllowed,
                                   enabled: !_loading && !_working,
                                   onSelected: _selectGoal,
                                 ),
@@ -421,10 +496,11 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                               const SizedBox(width: AppTheme.space18),
                               Expanded(
                                 child: _JourneyComposer(
-                                  selectedGoal: _selectedGoal,
+                                  selectedGoal: effectiveGoal,
                                   experience: _experience,
                                   selectedFormat: _selectedFormat,
-                                  buildMode: _buildMode,
+                                  buildMode: effectiveBuildMode,
+                                  generateAllowed: generateAllowed,
                                   enabled: !_loading && !_working,
                                   canStart: canStart,
                                   working: _working,
@@ -439,16 +515,19 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                           )
                         else ...[
                           _GoalRail(
-                            selectedGoal: _selectedGoal,
+                            selectedGoal: effectiveGoal,
+                            goals: availableGoals,
+                            generateAllowed: generateAllowed,
                             enabled: !_loading && !_working,
                             onSelected: _selectGoal,
                           ),
                           const SizedBox(height: AppTheme.space14),
                           _JourneyComposer(
-                            selectedGoal: _selectedGoal,
+                            selectedGoal: effectiveGoal,
                             experience: _experience,
                             selectedFormat: _selectedFormat,
-                            buildMode: _buildMode,
+                            buildMode: effectiveBuildMode,
+                            generateAllowed: generateAllowed,
                             enabled: !_loading && !_working,
                             canStart: canStart,
                             working: _working,
@@ -495,11 +574,13 @@ class _OnboardingHero extends StatelessWidget {
     required this.returning,
     required this.resumed,
     required this.selectedGoal,
+    required this.generateAllowed,
   });
 
   final bool returning;
   final bool resumed;
   final OnboardingGoal? selectedGoal;
+  final bool generateAllowed;
 
   @override
   Widget build(BuildContext context) {
@@ -593,7 +674,10 @@ class _OnboardingHero extends StatelessWidget {
                       Text(
                         selectedGoal == null
                             ? 'Escolha um objetivo. O ${ProductIdentity.displayName} prepara somente o caminho necessário.'
-                            : _goalCopy(selectedGoal!).heroConfirmation,
+                            : _goalCopy(
+                                selectedGoal!,
+                                generateAllowed: generateAllowed,
+                              ).heroConfirmation,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: AppTheme.textSecondary,
                           height: 1.35,
@@ -676,11 +760,15 @@ class _ProgressSegment extends StatelessWidget {
 class _GoalRail extends StatelessWidget {
   const _GoalRail({
     required this.selectedGoal,
+    required this.goals,
+    required this.generateAllowed,
     required this.enabled,
     required this.onSelected,
   });
 
   final OnboardingGoal? selectedGoal;
+  final List<OnboardingGoal> goals;
+  final bool generateAllowed;
   final bool enabled;
   final ValueChanged<OnboardingGoal> onSelected;
 
@@ -726,13 +814,14 @@ class _GoalRail extends StatelessWidget {
               ],
             ),
           ),
-          for (final goal in _goalOrder) ...[
+          for (final goal in goals) ...[
             Divider(
               height: 1,
               color: AppTheme.outlineMuted.withValues(alpha: 0.7),
             ),
             _GoalRow(
               goal: goal,
+              generateAllowed: generateAllowed,
               selected: selectedGoal == goal,
               enabled: enabled,
               onTap: () => onSelected(goal),
@@ -747,19 +836,21 @@ class _GoalRail extends StatelessWidget {
 class _GoalRow extends StatelessWidget {
   const _GoalRow({
     required this.goal,
+    required this.generateAllowed,
     required this.selected,
     required this.enabled,
     required this.onTap,
   });
 
   final OnboardingGoal goal;
+  final bool generateAllowed;
   final bool selected;
   final bool enabled;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final copy = _goalCopy(goal);
+    final copy = _goalCopy(goal, generateAllowed: generateAllowed);
     final theme = Theme.of(context);
     return Semantics(
       button: true,
@@ -849,6 +940,7 @@ class _JourneyComposer extends StatelessWidget {
     required this.experience,
     required this.selectedFormat,
     required this.buildMode,
+    required this.generateAllowed,
     required this.enabled,
     required this.canStart,
     required this.working,
@@ -863,6 +955,7 @@ class _JourneyComposer extends StatelessWidget {
   final OnboardingExperience? experience;
   final String selectedFormat;
   final OnboardingBuildMode buildMode;
+  final bool generateAllowed;
   final bool enabled;
   final bool canStart;
   final bool working;
@@ -929,7 +1022,7 @@ class _JourneyComposer extends StatelessWidget {
             decoration: const InputDecoration(
               labelText: 'Formato principal',
               helperText:
-                  'Usaremos isso para preparar decks, listas e sugestões.',
+                  'Usaremos isso como contexto para o caminho escolhido.',
               helperMaxLines: 2,
             ),
             items: _OnboardingCoreFlowScreenState._formats
@@ -967,6 +1060,7 @@ class _JourneyComposer extends StatelessWidget {
                     key: ValueKey(selectedGoal),
                     goal: selectedGoal!,
                     buildMode: buildMode,
+                    generateAllowed: generateAllowed,
                     enabled: enabled,
                     canStart: canStart,
                     working: working,
@@ -1010,6 +1104,7 @@ class _GoalTask extends StatelessWidget {
     super.key,
     required this.goal,
     required this.buildMode,
+    required this.generateAllowed,
     required this.enabled,
     required this.canStart,
     required this.working,
@@ -1019,6 +1114,7 @@ class _GoalTask extends StatelessWidget {
 
   final OnboardingGoal goal;
   final OnboardingBuildMode buildMode;
+  final bool generateAllowed;
   final bool enabled;
   final bool canStart;
   final bool working;
@@ -1028,7 +1124,7 @@ class _GoalTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final copy = _goalCopy(goal);
+    final copy = _goalCopy(goal, generateAllowed: generateAllowed);
     return Semantics(
       liveRegion: true,
       child: Column(
@@ -1053,6 +1149,7 @@ class _GoalTask extends StatelessWidget {
             const SizedBox(height: AppTheme.space14),
             _BuildModeSelector(
               selected: buildMode,
+              generateAllowed: generateAllowed,
               enabled: enabled,
               onSelected: onBuildModeSelected,
             ),
@@ -1120,11 +1217,13 @@ class _GoalTask extends StatelessWidget {
 class _BuildModeSelector extends StatelessWidget {
   const _BuildModeSelector({
     required this.selected,
+    required this.generateAllowed,
     required this.enabled,
     required this.onSelected,
   });
 
   final OnboardingBuildMode selected;
+  final bool generateAllowed;
   final bool enabled;
   final ValueChanged<OnboardingBuildMode> onSelected;
 
@@ -1133,40 +1232,39 @@ class _BuildModeSelector extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final stack = constraints.maxWidth < 520;
-        final options = [
-          _BuildModeTile(
-            key: const Key('onboarding-build-guided'),
-            title: 'Gerar uma base',
-            subtitle: 'Mais rápido · revisão antes de salvar',
-            icon: Icons.auto_awesome_rounded,
-            selected: selected == OnboardingBuildMode.guided,
-            enabled: enabled,
-            onTap: () => onSelected(OnboardingBuildMode.guided),
-          ),
-          _BuildModeTile(
-            key: const Key('onboarding-build-manual'),
-            title: 'Criar do zero',
-            subtitle: 'Controle carta por carta',
-            icon: Icons.edit_note_rounded,
-            selected: selected == OnboardingBuildMode.manual,
-            enabled: enabled,
-            onTap: () => onSelected(OnboardingBuildMode.manual),
-          ),
-        ];
+        final manual = _BuildModeTile(
+          key: const Key('onboarding-build-manual'),
+          title: 'Criar do zero',
+          subtitle: 'Controle carta por carta',
+          icon: Icons.edit_note_rounded,
+          selected: selected == OnboardingBuildMode.manual,
+          enabled: enabled,
+          onTap: () => onSelected(OnboardingBuildMode.manual),
+        );
+        if (!generateAllowed) return manual;
+        final guided = _BuildModeTile(
+          key: const Key('onboarding-build-guided'),
+          title: 'Gerar uma base',
+          subtitle: 'Mais rápido · revisão antes de salvar',
+          icon: Icons.auto_awesome_rounded,
+          selected: selected == OnboardingBuildMode.guided,
+          enabled: enabled,
+          onTap: () => onSelected(OnboardingBuildMode.guided),
+        );
         if (stack) {
           return Column(
             children: [
-              options.first,
+              guided,
               const SizedBox(height: AppTheme.space8),
-              options.last,
+              manual,
             ],
           );
         }
         return Row(
           children: [
-            Expanded(child: options.first),
+            Expanded(child: guided),
             const SizedBox(width: AppTheme.space8),
-            Expanded(child: options.last),
+            Expanded(child: manual),
           ],
         );
       },
@@ -1331,15 +1429,22 @@ const _goalOrder = <OnboardingGoal>[
   IconData icon,
   IconData actionIcon,
 })
-_goalCopy(OnboardingGoal goal) {
+_goalCopy(OnboardingGoal goal, {bool generateAllowed = true}) {
   return switch (goal) {
     OnboardingGoal.buildDeck => (
       title: 'Montar um deck',
-      description: 'Comece do zero ou gere uma base para revisar.',
-      heroConfirmation: 'Vamos transformar uma ideia em uma lista jogável.',
-      actionTitle: 'Escolha como começar',
-      actionDescription:
-          'Criar do zero dá controle total. Gerar uma base acelera o primeiro rascunho.',
+      description: generateAllowed
+          ? 'Comece do zero ou gere uma base para revisar.'
+          : 'Comece do zero e mantenha controle carta por carta.',
+      heroConfirmation: generateAllowed
+          ? 'Vamos transformar uma ideia em uma lista jogável.'
+          : 'Vamos abrir uma lista vazia para você montar no seu ritmo.',
+      actionTitle: generateAllowed
+          ? 'Escolha como começar'
+          : 'Comece manualmente',
+      actionDescription: generateAllowed
+          ? 'Criar do zero dá controle total. Gerar uma base acelera o primeiro rascunho.'
+          : 'Defina nome, formato e comandante; depois adicione cada carta.',
       icon: Icons.style_outlined,
       actionIcon: Icons.auto_awesome_rounded,
     ),

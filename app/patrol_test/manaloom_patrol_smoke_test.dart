@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/auth/screens/login_screen.dart';
@@ -87,7 +88,11 @@ void main() {
   patrolTest('auth register validates mismatch and accepts corrected form', (
     $,
   ) async {
-    await _pumpProductApp($, initialLocation: '/login');
+    await _pumpProductApp(
+      $,
+      initialLocation: '/login',
+      allowedCapabilities: const {ReleaseCapability.accountRegistration},
+    );
 
     await $(find.byKey(const Key('login-open-register-button'))).tap();
     await _expectTextEventually($, 'Criar conta');
@@ -140,7 +145,7 @@ void main() {
 
       await $(find.byKey(const Key('patrol-open-ai-paywall-button'))).tap();
 
-      expect($(find.byKey(const Key('ai-paywall-dialog'))), findsOneWidget);
+      expect($(find.byKey(const Key('ai-quota-limit-dialog'))), findsOneWidget);
       expect($('Otimizar deck: limite da beta atingido'), findsOneWidget);
       expect(
         $(find.byKey(const Key('ai-paywall-upgrade-button'))),
@@ -149,7 +154,7 @@ void main() {
 
       await $(find.byKey(const Key('ai-beta-limit-dismiss-button'))).tap();
 
-      expect($(find.byKey(const Key('ai-paywall-dialog'))), findsNothing);
+      expect($(find.byKey(const Key('ai-quota-limit-dialog'))), findsNothing);
     },
   );
 
@@ -513,6 +518,7 @@ Future<void> _pumpProductApp(
   PatrolIntegrationTester $, {
   required String initialLocation,
   Map<String, Object> initialPreferences = const {},
+  Set<ReleaseCapability> allowedCapabilities = const {},
 }) async {
   // ignore: invalid_use_of_visible_for_testing_member
   SharedPreferences.setMockInitialValues(initialPreferences);
@@ -521,6 +527,10 @@ Future<void> _pumpProductApp(
 
   final apiClient = _PatrolProductApiClient();
   final authProvider = AuthProvider(apiClient: apiClient);
+  // ignore: invalid_use_of_visible_for_testing_member
+  final releaseCapabilitiesProvider = ReleaseCapabilitiesProvider.seeded(
+    allowedCapabilities,
+  );
   final commercialProvider = CommercialProvider(
     apiClient: apiClient,
     now: () => DateTime(2026, 7, 6),
@@ -544,7 +554,14 @@ Future<void> _pumpProductApp(
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+      GoRoute(
+        path: '/login',
+        builder: (_, _) => LoginScreen(
+          registrationAllowed: releaseCapabilitiesProvider.isAllowed(
+            ReleaseCapability.accountRegistration,
+          ),
+        ),
+      ),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
       GoRoute(
         path: '/verify-email',
@@ -576,6 +593,9 @@ Future<void> _pumpProductApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+        ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+          value: releaseCapabilitiesProvider,
+        ),
         ChangeNotifierProvider<CommercialProvider>.value(
           value: commercialProvider,
         ),
@@ -596,6 +616,7 @@ Future<void> _pumpProductApp(
 
   addTearDown(router.dispose);
   addTearDown(authProvider.dispose);
+  addTearDown(releaseCapabilitiesProvider.dispose);
   addTearDown(commercialProvider.dispose);
 }
 

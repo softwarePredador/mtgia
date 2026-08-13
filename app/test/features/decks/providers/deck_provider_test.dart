@@ -1264,7 +1264,7 @@ void main() {
           '/ai/optimize/jobs/job-aggressive',
           '/ai/optimize/jobs/job-aggressive',
         ]);
-        expect(trackedEvents, ['deck_optimized']);
+        expect(trackedEvents, ['optimize_preview_received']);
       },
     );
 

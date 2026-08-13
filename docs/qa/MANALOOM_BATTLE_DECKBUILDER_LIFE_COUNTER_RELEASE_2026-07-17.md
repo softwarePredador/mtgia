@@ -1,5 +1,11 @@
 # Fechamento de Battle, Deckbuilder e Life Counter — 2026-07-17
 
+> Lifecycle: `HISTORICAL_EVIDENCE`
+> Superado para escopo, oferta e prioridade por
+> `docs/status/CURRENT_PRODUCT_DECISION.md`. Este relatório comprova apenas a
+> rodada local descrita abaixo; não abre Battle/Life na beta corrente, não prova
+> deploy e não deve ser usado como plano operacional atual.
+
 **Escopo:** beta gratuita Web + Android
 **Versão local:** `1.0.0+2`
 **Estado do código:** gates locais aprovados

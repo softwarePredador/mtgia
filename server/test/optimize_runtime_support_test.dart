@@ -10,6 +10,37 @@ import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
 void main() {
+  group('declared optimizer schema boundaries', () {
+    test(
+      'does not revive undeclared deck profiles or commander array columns',
+      () {
+        final qualityGateSource =
+            File('lib/ai/optimization_quality_gate.dart').readAsStringSync();
+        final runtimeSource =
+            File('lib/ai/optimize_runtime_support.dart').readAsStringSync();
+        final priorityLoaderSource = runtimeSource.substring(
+          runtimeSource.indexOf(
+            'Future<List<String>> loadCommanderCompetitivePriorities',
+          ),
+          runtimeSource.indexOf(
+            'Future<MetaDeckReferenceSelectionResult> '
+            'loadCommanderMetaReferenceSelection',
+          ),
+        );
+
+        // BT-AI-016/017 must first define migration, vocabulary, provenance,
+        // freshness and bounded consumers. Until then these names are not a
+        // valid runtime contract and must not return as silent fallbacks.
+        expect(qualityGateSource, isNot(contains('cardDeckProfiles')));
+        expect(qualityGateSource, isNot(contains('card_deck_profiles')));
+        expect(runtimeSource, isNot(contains('common_commanders')));
+        expect(priorityLoaderSource, isNot(contains('try {')));
+        expect(priorityLoaderSource, isNot(contains('catch (')));
+        expect(priorityLoaderSource, contains('return const [];'));
+      },
+    );
+  });
+
   group('extractRecommendedLandsFromProfile', () {
     test('never leaves the target below the role minimum', () {
       expect(
@@ -228,8 +259,8 @@ void main() {
       );
 
       expect(light, isNot(equals(aggressive)));
-      expect(light, startsWith('v19:'));
-      expect(aggressive, startsWith('v19:'));
+      expect(light, startsWith('v20:'));
+      expect(aggressive, startsWith('v20:'));
     });
   });
 

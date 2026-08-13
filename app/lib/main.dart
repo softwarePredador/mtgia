@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
 import 'core/branding/product_identity.dart';
 import 'core/config/launch_features.dart';
+import 'core/config/release_capabilities.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/image_cache_policy.dart';
 import 'core/services/activation_funnel_service.dart';
@@ -74,6 +75,7 @@ import 'features/home/services/onboarding_state_store.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
 import 'features/commercial/providers/commercial_provider.dart';
+import 'features/commercial/models/commercial_launch_policy.dart';
 import 'features/commercial/screens/checkout_screen.dart';
 import 'features/commercial/screens/legal_screen.dart';
 import 'features/commercial/screens/plan_screen.dart';
@@ -100,6 +102,13 @@ const bool _disableFirebasePerformanceInit = bool.fromEnvironment(
   'DISABLE_FIREBASE_PERFORMANCE_INIT',
   defaultValue: false,
 );
+const ReleaseRouteBuildSupport _releaseRouteBuildSupport =
+    ReleaseRouteBuildSupport(
+      scanner: LaunchFeatures.scannerSupported,
+      battleLive: LaunchFeatures.battleLiveSpectatorSupported,
+      battleCoach: LaunchFeatures.interactiveBattleSupported,
+      billingCheckout: CommercialLaunchPolicy.paidCheckoutEnabled,
+    );
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -128,30 +137,15 @@ Future<void> _initializePostFirstFramePlatformServices() async {
     return;
   }
 
-  var fcmTokenPresent = false;
   if (_disablePushInit) {
     debugPrint('[Main] Firebase push desabilitado por DISABLE_PUSH_INIT.');
-  } else {
-    await _runStartupTask(
-      label: 'Firebase push',
-      timeout: const Duration(seconds: 8),
-      task: () => PushNotificationService().init(),
-    );
-    if (AppObservability.instance.releaseStartupProofEnabled &&
-        PushNotificationService().isFirebaseInitialized) {
-      try {
-        fcmTokenPresent = await PushNotificationService()
-            .probeReleaseFcmTokenAvailability()
-            .timeout(const Duration(seconds: 8));
-      } catch (error) {
-        debugPrint('[Main] Prova FCM da release indisponivel: $error');
-      }
-    }
   }
 
+  // Push is intentionally absent from generic startup. It is initialized only
+  // after the server-authoritative `social_push` capability is loaded.
   await AppObservability.instance.captureReleaseStartupProof(
-    fcmInitialized: PushNotificationService().isFirebaseInitialized,
-    fcmTokenPresent: fcmTokenPresent,
+    fcmInitialized: false,
+    fcmTokenPresent: false,
   );
 
   if (_disableFirebasePerformanceInit) {
@@ -225,6 +219,7 @@ class ManaLoomApp extends StatefulWidget {
 
 class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   late final AuthProvider _authProvider;
+  late final ReleaseCapabilitiesProvider _releaseCapabilitiesProvider;
   late final DeckProvider _deckProvider;
   late final CardProvider _cardProvider;
   late final MarketProvider _marketProvider;
@@ -271,6 +266,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   }
 
   bool _hadAuthenticatedSession = false;
+  String? _authenticatedAccountId;
+  bool _pushWasEnabledForSession = false;
   Timer? _authenticatedWarmupTimer;
 
   @override
@@ -283,6 +280,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     // required for reload, browser back/forward, bookmarks, and shared links.
     GoRouter.optionURLReflectsImperativeAPIs = true;
     _authProvider = AuthProvider();
+    _releaseCapabilitiesProvider = ReleaseCapabilitiesProvider();
     ApiClient.setSessionExpiredHandler(_authProvider.expireSession);
     _deckProvider = DeckProvider();
     _cardProvider = CardProvider();
@@ -298,6 +296,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
     // Iniciar/parar polling de notificações quando autenticado
     _authProvider.addListener(_onAuthChanged);
+    _releaseCapabilitiesProvider.addListener(_onReleaseCapabilitiesChanged);
+    unawaited(_releaseCapabilitiesProvider.refresh());
     unawaited(_authProvider.initialize());
 
     // Log da URL da API no boot
@@ -305,7 +305,10 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
     _router = GoRouter(
       initialLocation: _debugBootIntoLifeCounter ? lifeCounterRoutePath : '/',
-      refreshListenable: _authProvider,
+      refreshListenable: Listenable.merge([
+        _authProvider,
+        _releaseCapabilitiesProvider,
+      ]),
       observers: [
         PerformanceNavigatorObserver(),
         AppObservabilityNavigatorObserver(),
@@ -316,13 +319,19 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
         debugPrint('[🧭 Router] redirect: status=$status');
 
+        if (location == '/register' &&
+            !_releaseCapabilitiesProvider.isAllowed(
+              ReleaseCapability.accountRegistration,
+            )) {
+          debugPrint('[🧭 Router] → login (cadastro fechado)');
+          return buildAuthLocation(
+            '/login',
+            state.uri.queryParameters['redirect'],
+          );
+        }
+
         // Sempre permite a Splash (ela decide para onde ir).
         if (location == '/') return null;
-
-        if (_debugBootIntoLifeCounter && location == lifeCounterRoutePath) {
-          debugPrint('[🧭 Router] → null (debug life counter direto)');
-          return null;
-        }
 
         final isAuthRoute =
             location == '/login' ||
@@ -333,8 +342,11 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             location.startsWith('/home') ||
             location.startsWith('/decks') ||
             location.startsWith('/cards') ||
+            location.startsWith('/sets') ||
             location.startsWith('/market') ||
+            location.startsWith('/quotes') ||
             location.startsWith('/collection') ||
+            location.startsWith('/binder') ||
             location.startsWith('/profile') ||
             location.startsWith('/community') ||
             location.startsWith('/trades') ||
@@ -356,8 +368,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
               location == '/forgot-password' ||
               location == '/reset-password' ||
               location == '/verify-email' ||
-              location == '/legal' ||
-              (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
+              location == '/legal';
           if (!isBootSafeRoute) {
             final redirectTarget = state.uri.toString();
             final splashUri = Uri(
@@ -414,14 +425,14 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
           return target;
         }
 
-        final uriPath = state.uri.path;
-        if (!LaunchFeatures.scannerEnabled && uriPath.endsWith('/scan')) {
-          final fallbackPath = uriPath.replaceFirst(
-            RegExp(r'/scan$'),
-            '/search',
-          );
-          debugPrint('[🧭 Router] → busca (scanner deferred neste build)');
-          return fallbackPath;
+        final capabilityRedirect = ReleaseCapabilityRouteGuard.redirectFor(
+          uri: state.uri,
+          capabilities: _releaseCapabilitiesProvider.snapshot,
+          buildSupport: _releaseRouteBuildSupport,
+        );
+        if (capabilityRedirect != null) {
+          debugPrint('[🧭 Router] → fallback de capability da release');
+          return capabilityRedirect;
         }
 
         debugPrint('[🧭 Router] → null (sem redirect)');
@@ -436,8 +447,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
         GoRoute(
           path: '/login',
-          builder: (context, state) =>
-              LoginScreen(redirectPath: state.uri.queryParameters['redirect']),
+          builder: (context, state) => LoginScreen(
+            redirectPath: state.uri.queryParameters['redirect'],
+            registrationAllowed: _releaseCapabilitiesProvider.isAllowed(
+              ReleaseCapability.accountRegistration,
+            ),
+          ),
         ),
         GoRoute(
           path: '/register',
@@ -591,7 +606,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                         return CardSearchScreen(deckId: id, mode: mode);
                       },
                     ),
-                    if (LaunchFeatures.scannerEnabled)
+                    if (LaunchFeatures.scannerSupported)
                       GoRoute(
                         path: 'scan',
                         builder: (context, state) {
@@ -642,12 +657,26 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                     ),
                     GoRoute(
                       path: 'battle-replays',
-                      builder: (context, state) => BattleReplaysScreen(
-                        deckId: state.pathParameters['id']!,
-                        initialReplayId: state.uri.queryParameters['replay'],
-                      ),
+                      builder: (context, state) {
+                        final capabilities = context
+                            .watch<ReleaseCapabilitiesProvider>();
+                        return BattleReplaysScreen(
+                          deckId: state.pathParameters['id']!,
+                          initialReplayId: state.uri.queryParameters['replay'],
+                          battleLiveEnabled: capabilities.isAllowed(
+                            ReleaseCapability.battleLive,
+                            buildSupported:
+                                LaunchFeatures.battleLiveSpectatorSupported,
+                          ),
+                          interactiveBattleEnabled: capabilities.isAllowed(
+                            ReleaseCapability.battleCoach,
+                            buildSupported:
+                                LaunchFeatures.interactiveBattleSupported,
+                          ),
+                        );
+                      },
                     ),
-                    if (LaunchFeatures.interactiveBattleEnabled)
+                    if (LaunchFeatures.interactiveBattleSupported)
                       GoRoute(
                         path: 'battle-coach/:sessionId',
                         builder: (context, state) => BattleCoachScreen(
@@ -655,20 +684,21 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                           sessionId: state.pathParameters['sessionId']!,
                         ),
                       ),
-                    if (LaunchFeatures.interactiveBattleEnabled)
+                    if (LaunchFeatures.interactiveBattleSupported)
                       GoRoute(
                         path: 'battle-coach',
                         builder: (context, state) => BattleCoachScreen(
                           deckId: state.pathParameters['id']!,
                         ),
                       ),
-                    GoRoute(
-                      path: 'battle-live/:jobId',
-                      builder: (context, state) => BattleLiveSpectatorScreen(
-                        deckId: state.pathParameters['id']!,
-                        jobId: state.pathParameters['jobId']!,
+                    if (LaunchFeatures.battleLiveSpectatorSupported)
+                      GoRoute(
+                        path: 'battle-live/:jobId',
+                        builder: (context, state) => BattleLiveSpectatorScreen(
+                          deckId: state.pathParameters['id']!,
+                          jobId: state.pathParameters['jobId']!,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],
@@ -873,25 +903,61 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
     final pushService = PushNotificationService();
     pushService.onForegroundMessage = (message) {
+      if (!_canHandleRealtimeData(message.data)) return;
       unawaited(_realtimeCoordinator.handleForegroundData(message.data));
     };
     pushService.onMessageTap = (message) {
+      if (!_canHandleRealtimeData(message.data)) return;
       _realtimeCoordinator.handleMessageTapData(message.data);
     };
+  }
+
+  bool _canHandleRealtimeData(Map<String, dynamic> data) {
+    if (!_releaseCapabilitiesProvider.isAllowed(ReleaseCapability.socialPush)) {
+      return false;
+    }
+
+    final payload = PushNotificationPayload.fromData(data);
+    if (payload == null) return false;
+    if (payload.isDirectMessage) {
+      return _releaseCapabilitiesProvider.isAllowed(
+        ReleaseCapability.directMessages,
+      );
+    }
+    if (payload.isTradeEvent) {
+      return _releaseCapabilitiesProvider.isAllowed(ReleaseCapability.trades);
+    }
+    if (payload.isFollower) {
+      return _releaseCapabilitiesProvider.isAllowed(ReleaseCapability.follows);
+    }
+    return true;
   }
 
   void _onAuthChanged() {
     final status = _authProvider.status;
 
     if (_authProvider.isAuthenticated) {
-      if (_hadAuthenticatedSession) {
+      final accountId = _authProvider.user?.id.trim();
+      if (accountId == null || accountId.isEmpty) return;
+      if (_hadAuthenticatedSession && _authenticatedAccountId == accountId) {
         unawaited(AppObservability.instance.setUserContext(_authProvider.user));
         return;
       }
 
+      if (_hadAuthenticatedSession) {
+        _authenticatedWarmupTimer?.cancel();
+        _authenticatedWarmupTimer = null;
+        _notificationProvider.stopPolling();
+        _messageProvider.stopPolling();
+        _disablePushForSession();
+        _releaseCapabilitiesProvider.reset();
+        _clearAllProvidersState();
+      }
+
       _hadAuthenticatedSession = true;
+      _authenticatedAccountId = accountId;
       unawaited(AppObservability.instance.setUserContext(_authProvider.user));
-      _scheduleAuthenticatedWarmup();
+      unawaited(_refreshCapabilitiesAndWarmup(expectedAccountId: accountId));
       return;
     }
 
@@ -910,14 +976,48 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
       // Remove FCM token do server apenas quando houve sessão autenticada antes.
       // Evita chamadas redundantes no boot/login sem token válido no backend.
-      if (_hadAuthenticatedSession) {
-        if (!_disableFirebaseStartup && !_disablePushInit) {
-          unawaited(PushNotificationService().unregister());
-        }
-      }
+      _disablePushForSession();
       _hadAuthenticatedSession = false;
+      _authenticatedAccountId = null;
+      _releaseCapabilitiesProvider.reset();
+      // Registration and the public pre-auth shell are capability-controlled.
+      // Reset invalidates any response tied to a previous account/session, but
+      // anonymous users still need a fresh server-authoritative matrix.
+      unawaited(_releaseCapabilitiesProvider.refresh());
 
       _clearAllProvidersState();
+    }
+  }
+
+  void _onReleaseCapabilitiesChanged() {
+    if (!_releaseCapabilitiesProvider.isAllowed(
+      ReleaseCapability.directMessages,
+    )) {
+      _messageProvider.stopPolling();
+    }
+    if (!_releaseCapabilitiesProvider.isAllowed(ReleaseCapability.socialPush)) {
+      _notificationProvider.stopPolling();
+      if (_releaseCapabilitiesProvider.loadState !=
+          ReleaseCapabilitiesLoadState.loading) {
+        _disablePushForSession();
+      }
+    }
+
+    if (_authProvider.isAuthenticated && _hadAuthenticatedSession) {
+      _scheduleAuthenticatedWarmup();
+    }
+  }
+
+  Future<void> _refreshCapabilitiesAndWarmup({
+    String? expectedAccountId,
+  }) async {
+    final accountId = expectedAccountId ?? _authenticatedAccountId;
+    await _releaseCapabilitiesProvider.refresh();
+    if (_authProvider.isAuthenticated &&
+        _hadAuthenticatedSession &&
+        accountId != null &&
+        _authenticatedAccountId == accountId) {
+      _scheduleAuthenticatedWarmup();
     }
   }
 
@@ -927,14 +1027,90 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       _authenticatedWarmupTimer = null;
       if (!_authProvider.isAuthenticated || !_hadAuthenticatedSession) return;
 
-      _notificationProvider.startPolling();
-      _messageProvider.startPolling();
-      unawaited(_commercialProvider.refreshFromServer());
+      if (_releaseCapabilitiesProvider.isAllowed(
+        ReleaseCapability.directMessages,
+      )) {
+        _messageProvider.startPolling();
+      } else {
+        _messageProvider.stopPolling();
+      }
+      if (_releaseCapabilitiesProvider.isAllowed(
+        ReleaseCapability.socialPush,
+      )) {
+        _notificationProvider.startPolling();
+      } else {
+        _notificationProvider.stopPolling();
+      }
+      final needsRemotePlan =
+          _releaseCapabilitiesProvider.isAllowed(
+            ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+          ) ||
+          _releaseCapabilitiesProvider.isAllowed(
+            ReleaseCapability.aiGenerateRebuild,
+          ) ||
+          _releaseCapabilitiesProvider.isAllowed(
+            ReleaseCapability.subscriptions,
+          );
+      if (needsRemotePlan) {
+        unawaited(_commercialProvider.refreshFromServer());
+      }
 
-      if (!_disableFirebaseStartup && !_disablePushInit) {
-        unawaited(PushNotificationService().registerIfAuthorized());
+      if (_releaseCapabilitiesProvider.isAllowed(
+            ReleaseCapability.socialPush,
+          ) &&
+          !_disableFirebaseStartup &&
+          !_disablePushInit) {
+        unawaited(_initializeCapabilityAllowedPush());
       }
     });
+  }
+
+  Future<void> _initializeCapabilityAllowedPush() async {
+    if (!_authProvider.isAuthenticated ||
+        !_releaseCapabilitiesProvider.isAllowed(ReleaseCapability.socialPush)) {
+      return;
+    }
+
+    _pushWasEnabledForSession = true;
+    final pushService = PushNotificationService();
+    await _runStartupTask(
+      label: 'Firebase push',
+      timeout: const Duration(seconds: 8),
+      task: () async {
+        await pushService.init();
+        if (_authProvider.isAuthenticated &&
+            _releaseCapabilitiesProvider.isAllowed(
+              ReleaseCapability.socialPush,
+            )) {
+          await pushService.registerIfAuthorized();
+        }
+      },
+    );
+
+    var fcmTokenPresent = false;
+    if (AppObservability.instance.releaseStartupProofEnabled &&
+        pushService.isFirebaseInitialized &&
+        _releaseCapabilitiesProvider.isAllowed(ReleaseCapability.socialPush)) {
+      try {
+        fcmTokenPresent = await pushService
+            .probeReleaseFcmTokenAvailability()
+            .timeout(const Duration(seconds: 8));
+      } catch (error) {
+        debugPrint('[Main] Prova FCM da release indisponivel: $error');
+      }
+    }
+    await AppObservability.instance.captureReleaseStartupProof(
+      fcmInitialized: pushService.isFirebaseInitialized,
+      fcmTokenPresent: fcmTokenPresent,
+    );
+  }
+
+  void _disablePushForSession() {
+    if (!_pushWasEnabledForSession) return;
+    _pushWasEnabledForSession = false;
+    if (!_disableFirebaseStartup && !_disablePushInit) {
+      unawaited(PushNotificationService().unregister());
+    }
   }
 
   @override
@@ -942,7 +1118,11 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         if (_authProvider.isAuthenticated && _hadAuthenticatedSession) {
-          _scheduleAuthenticatedWarmup();
+          unawaited(
+            _refreshCapabilitiesAndWarmup(
+              expectedAccountId: _authenticatedAccountId,
+            ),
+          );
         }
         return;
       case AppLifecycleState.inactive:
@@ -977,6 +1157,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _authenticatedWarmupTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _authProvider.removeListener(_onAuthChanged);
+    _releaseCapabilitiesProvider.removeListener(_onReleaseCapabilitiesChanged);
     ApiClient.setSessionExpiredHandler(null);
     _notificationProvider.stopPolling();
     _messageProvider.stopPolling();
@@ -994,6 +1175,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _messageProvider.dispose();
     _notificationProvider.dispose();
     _commercialProvider.dispose();
+    _releaseCapabilitiesProvider.dispose();
     _authProvider.dispose();
     super.dispose();
   }
@@ -1003,6 +1185,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: _authProvider),
+        ChangeNotifierProvider.value(value: _releaseCapabilitiesProvider),
         ChangeNotifierProvider.value(value: _deckProvider),
         ChangeNotifierProvider.value(value: _cardProvider),
         ChangeNotifierProvider.value(value: _marketProvider),

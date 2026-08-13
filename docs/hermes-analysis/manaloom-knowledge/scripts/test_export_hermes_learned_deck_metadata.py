@@ -266,6 +266,25 @@ class ExportHermesLearnedDeckMetadataTests(unittest.TestCase):
             self.assertEqual(payload["metadata"]["total_lands"], 1)
             self.assertEqual(payload["metadata"]["ramp_count"], 1)
             self.assertEqual(payload["metadata"]["draw_count"], 0)
+            self.assertFalse(payload["is_active"])
+            self.assertEqual(
+                payload["legal_status"],
+                "registered_pending_card_rule_validation",
+            )
+            self.assertIsNone(payload["promoted_at"])
+            self.assertEqual(
+                payload["metadata"]["learning_candidate_state"],
+                "candidate_inactive",
+            )
+            self.assertFalse(payload["metadata"]["promotion_allowed"])
+            self.assertEqual(
+                payload["metadata"]["promotion_receipt_required"],
+                "DCK-P0-05",
+            )
+            self.assertEqual(
+                payload["metadata"]["hermes_source_promotion_observed_at"],
+                "2026-06-18T00:00:00Z",
+            )
 
 
 if __name__ == "__main__":

@@ -137,7 +137,10 @@ void main() {
     final configuredProof = source.indexOf(
       'web-public convergiu sem o digest exato na origem EasyPanel',
     );
-    final smoke = source.indexOf('for route in / /pricing /marketplace');
+    final smoke = source.indexOf(
+      'manaloom_public_web_required_routes',
+      configuredProof,
+    );
 
     expect(swarmConvergence, greaterThanOrEqualTo(0));
     expect(sourceMutation, greaterThan(swarmConvergence));

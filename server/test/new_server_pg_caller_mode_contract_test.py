@@ -18,6 +18,10 @@ EXPECTED_SHELL_MODES = {
         "--read-only",
         "--read-only",
     ),
+    "scripts/manaloom_deck_ai_learning_release_receipt.sh": (
+        "--read-only",
+        "--read-only",
+    ),
     "scripts/manaloom_deploy_backend_image.sh": (
         "--read-only",
         "--read-only",

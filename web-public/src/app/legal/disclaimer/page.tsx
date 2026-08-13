@@ -5,7 +5,7 @@ import { Container, SectionHeader } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Disclaimer",
-  description: "Avisos sobre IA, preços, Commander Brackets e propriedade intelectual."
+  description: "Avisos sobre IA, regras de Commander e propriedade intelectual."
 };
 
 export default function DisclaimerPage() {
@@ -13,14 +13,14 @@ export default function DisclaimerPage() {
     <main className="py-16">
       <Container className="max-w-3xl">
         <BrandPageIntro eyebrow="IA e dados" title="Disclaimer">
-          <p>Recomendações públicas ajudam na decisão, mas não substituem revisão de mesa, orçamento e disponibilidade.</p>
+          <p>Recomendações ajudam na decisão, mas não substituem a revisão do usuário e o acordo da mesa.</p>
         </BrandPageIntro>
         <div className="mt-10">
-          <SectionHeader eyebrow="Leitura responsável" title="IA, preços e propriedade intelectual." />
+          <SectionHeader eyebrow="Leitura responsável" title="IA, regras e propriedade intelectual." />
         </div>
         <div className="mt-10 grid gap-6 text-base leading-7 text-mist-300">
-          <p>A IA pode sugerir trocas com base em dados, objetivo informado, orçamento e campos públicos. O usuário deve revisar contexto de mesa, regras atuais, disponibilidade e preço real antes de aplicar qualquer mudança.</p>
-          <p>Preços exibidos são estimativas e podem variar por região, idioma, condição, edição e disponibilidade. Negociações devem ser confirmadas entre usuários antes de qualquer fechamento.</p>
+          <p>A IA pode sugerir alterações com base nos dados da lista e no objetivo informado. O usuário deve revisar o contexto da mesa, as regras atuais e a disponibilidade das cartas antes de aplicar qualquer mudança.</p>
+          <p>Resultados gerados podem conter imprecisões. O BrewTact apresenta a recomendação para revisão e não aplica mudanças sem uma ação do usuário.</p>
           <p>Commander Brackets, formatos e nomes de cartas pertencem aos respectivos titulares quando aplicável. BrewTact não é afiliado, endossado ou patrocinado por editoras ou marcas de terceiros.</p>
         </div>
       </Container>

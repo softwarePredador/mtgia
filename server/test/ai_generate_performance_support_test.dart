@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotenv/dotenv.dart';
 import 'package:test/test.dart';
 
@@ -165,12 +167,12 @@ void main() {
 
         expect(first, equals(second));
         expect(first, isNot(equals(differentBracket)));
-        expect(first, startsWith('ai_generate:v7:'));
+        expect(first, startsWith('ai_generate:v8:'));
         expect(first, isNot(contains('mono red')));
       },
     );
 
-    test('omits commander profile material unless explicitly supplied', () {
+    test('separates requested commanders without reference guidance', () {
       final legacy = buildAiGenerateCacheKey(
         prompt: 'boros miracle big spells',
         format: 'Commander',
@@ -193,8 +195,20 @@ void main() {
         commanderName: 'Lorehold, the Historian',
         referenceProfileVersion: 'future_profile_version',
       );
+      final loreholdWithoutProfile = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+        commanderName: '  LOREHOLD,   THE HISTORIAN ',
+      );
+      final featherWithoutProfile = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+        commanderName: 'Feather, the Redeemed',
+      );
 
       expect(legacy, equals(stillLegacy));
+      expect(loreholdWithoutProfile, isNot(equals(legacy)));
+      expect(featherWithoutProfile, isNot(equals(loreholdWithoutProfile)));
       expect(loreholdProfile, isNot(equals(legacy)));
       expect(loreholdProfileV2, isNot(equals(loreholdProfile)));
       expect(loreholdProfile, isNot(contains('Lorehold')));
@@ -217,7 +231,7 @@ void main() {
       );
 
       expect(v5, isNot(equals(v4)));
-      expect(v5, startsWith('ai_generate:v7:'));
+      expect(v5, startsWith('ai_generate:v8:'));
     });
 
     test('generation constraints participate in the cache key', () {
@@ -283,6 +297,94 @@ void main() {
       expect(
         ((secondHit!['generated_deck'] as Map)['cards'] as List).length,
         equals(2),
+      );
+    });
+
+    test('refuses mock generated payloads at the cache write boundary', () {
+      final cacheKey = buildAiGenerateCacheKey(
+        prompt: 'mock cache boundary regression',
+        format: 'standard',
+      );
+
+      writeAiGenerateCache(
+        cacheKey: cacheKey,
+        payload: const {
+          'is_mock': true,
+          'can_save': true,
+          'learning_eligible': true,
+          'generated_deck': {
+            'cards': [
+              {'name': 'Island', 'quantity': 60},
+            ],
+          },
+        },
+        ttl: const Duration(minutes: 5),
+      );
+
+      expect(readAiGenerateCache(cacheKey), isNull);
+    });
+
+    test('rejects a cached payload for a different requested commander', () {
+      final cacheKey = buildAiGenerateCacheKey(
+        prompt: 'spellslinger',
+        format: 'commander',
+        commanderName: 'Talrand, Sky Summoner',
+      );
+      writeAiGenerateCache(
+        cacheKey: cacheKey,
+        payload: {
+          'generated_deck': {
+            'commander': {'name': 'Krenko, Mob Boss'},
+            'cards': const [],
+          },
+        },
+        ttl: const Duration(minutes: 5),
+      );
+
+      expect(
+        readAiGenerateCache(
+          cacheKey,
+          requestedCommanderName: 'Talrand, Sky Summoner',
+        ),
+        isNull,
+      );
+      expect(
+        readAiGenerateCache(
+          cacheKey,
+          requestedCommanderName: '  KRENKO,   MOB BOSS ',
+        ),
+        isNotNull,
+      );
+    });
+
+    test('sync and async route fingerprints always receive commander name', () {
+      final source = File('routes/ai/generate/index.dart').readAsStringSync();
+
+      expect(
+        source,
+        isNot(
+          contains(
+            'commanderName: referenceGuidanceEnabled ? requestedCommanderName : null',
+          ),
+        ),
+      );
+      expect(
+        source,
+        isNot(contains('referenceCacheVersion == null\n            ? null')),
+      );
+      expect(
+        RegExp(
+          r'buildAiGenerateCacheKey\([\s\S]*?commanderName: requestedCommanderName,[\s\S]*?constraints: generationConstraints',
+        ).hasMatch(source),
+        isTrue,
+      );
+      expect(
+        RegExp(
+          r'buildAiGenerateCacheKey\([\s\S]*?commanderName: body\['
+          r"'commander_name'"
+          r'\]\?\.toString\(\),[\s\S]*?constraints: constraints',
+        ).hasMatch(source),
+        isTrue,
       );
     });
 

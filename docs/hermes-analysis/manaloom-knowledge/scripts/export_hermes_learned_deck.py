@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""Exporta um learned deck ativo do SQLite Hermes para JSON aceito por
+"""Exporta um learned deck do SQLite Hermes como candidato inativo para
    dart run bin/commander_learned_deck.dart --input-json=<path>.
+
+Hermes e laboratorio/cache: o export nunca afirma legalidade e nunca cria um
+payload ativo. Promocao exige o receipt versionado DCK-P0-05.
 
 Uso:
   python3 export_hermes_learned_deck.py [--db <sqlite_path>] [--out <json_path>]
@@ -191,7 +194,8 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     db = sqlite3.connect(db_path)
     db.row_factory = sqlite3.Row
 
-    # Find the active learned + promoted deck
+    # Historical Hermes promotion is only a source-selection signal. It does
+    # not authorize activation or establish Commander legality in PostgreSQL.
     clauses = []
     params = []
     if column_exists(db, "deck_promotions", "migration_verified"):
@@ -254,6 +258,12 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     # be rederived from that persisted list instead of trusting stale summary
     # counters in `decks`, which can diverge from the promoted composition.
     metadata = build_metadata(db, target_deck_id, output_card_list, commander)
+    metadata.update({
+        "learning_candidate_state": "candidate_inactive",
+        "promotion_allowed": False,
+        "promotion_receipt_required": "DCK-P0-05",
+        "hermes_source_promotion_observed_at": promoted_at,
+    })
 
     output = {
         "source_system": source,
@@ -262,16 +272,19 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
         "deck_name": deck_name,
         "card_list": output_card_list,
         "card_count": output_card_count,
-        "is_active": True,
+        "is_active": False,
         "score": score,
         "wincon_primary": wincon_primary,
         "wincon_backup": wincon_backup,
-        "legal_status": "commander_legal",
+        "legal_status": "registered_pending_card_rule_validation",
         "source_url": row["source_url"],
         "archetype": row["archetype"],
         "metadata": metadata,
-        "promoted_at": promoted_at,
-        "notes": row["notes"] or f"Exported from Hermes SQLite learned_deck:{learned_id_val}",
+        "promoted_at": None,
+        "notes": row["notes"] or (
+            f"Inactive candidate exported from Hermes SQLite "
+            f"learned_deck:{learned_id_val}; promotion requires DCK-P0-05"
+        ),
     }
 
     if dry_run:

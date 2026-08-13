@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="${MANALOOM_RELEASE_ROOT_DIR:-$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)}"
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+ROOT_DIR="${MANALOOM_RELEASE_ROOT_DIR:-$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)}"
 SOURCE_SHA="${MANALOOM_RELEASE_SOURCE_SHA:-$(git -C "$ROOT_DIR" rev-parse HEAD)}"
 REQUIRE_CLEAN="${MANALOOM_RELEASE_REQUIRE_CLEAN:-1}"
 FETCH_ORIGIN="${MANALOOM_RELEASE_FETCH_ORIGIN:-1}"
@@ -13,7 +14,7 @@ require_tool() {
   }
 }
 
-for tool in git jq; do
+for tool in git jq shasum; do
   require_tool "$tool"
 done
 
@@ -72,12 +73,16 @@ fi
 
 SHORT_SHA="$(git -C "$ROOT_DIR" rev-parse --short=12 "$SHA")"
 SOURCE_COMMITTED_AT="$(git -C "$ROOT_DIR" show -s --format=%cI "$SHA")"
+# shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+source "$SCRIPT_DIR/lib/manaloom_release_capabilities_contract.sh"
+manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$SHA"
 
 jq -n \
   --arg version "$VERSION" \
   --arg git_sha "$SHA" \
   --arg short_sha "$SHORT_SHA" \
   --arg source_committed_at "$SOURCE_COMMITTED_AT" \
+  --argjson release_capabilities "$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON" \
   --argjson worktree_clean "$([[ "$REQUIRE_CLEAN" == "1" ]] && printf true || printf false)" \
   '{
     schema_version: 1,
@@ -87,5 +92,6 @@ jq -n \
     short_sha: $short_sha,
     source_committed_at: $source_committed_at,
     source_ref: "origin/master",
-    worktree_clean_required: $worktree_clean
+    worktree_clean_required: $worktree_clean,
+    release_capabilities: $release_capabilities
   }'

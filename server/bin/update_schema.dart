@@ -1,52 +1,15 @@
 import 'dart:io';
 
-import 'package:server/sql_statement_splitter.dart';
-
-import '../lib/database.dart';
-
-Future<void> main() async {
-  final db = Database();
-  await db.connect();
-  final conn = db.connection;
-
-  try {
-    print('Iniciando atualização do schema...');
-
-    // 1. Dropar tabelas que precisam ser recriadas (Decks e DeckCards)
-    // Não vamos dropar 'cards' para manter os dados.
-    print(
-      'Removendo tabelas antigas (decks, deck_cards, matchups, simulations)...',
-    );
-    await conn.execute('DROP TABLE IF EXISTS battle_simulations');
-    await conn.execute('DROP TABLE IF EXISTS deck_matchups');
-    await conn.execute('DROP TABLE IF EXISTS deck_cards');
-    await conn.execute('DROP TABLE IF EXISTS decks');
-
-    // 2. Ler e executar o script de setup completo
-    print('Lendo database_setup.sql...');
-    final sqlScript = await File('database_setup.sql').readAsString();
-
-    final commands = splitPostgresStatements(sqlScript);
-
-    print(
-      'Executando criação das novas tabelas (Users, Rules, Legalities, Decks)...',
-    );
-
-    for (final command in commands) {
-      try {
-        await conn.execute(command);
-      } catch (e) {
-        // Ignora erro se a tabela já existe (ex: cards), mas mostra outros erros
-        if (!e.toString().contains('already exists')) {
-          print('Aviso ao executar comando: $e');
-        }
-      }
-    }
-
-    print('Schema atualizado com sucesso!');
-  } catch (e) {
-    print('Erro fatal na atualização: $e');
-  } finally {
-    await conn.close();
-  }
+/// Historical schema reset entrypoint.
+///
+/// Product schema changes must use the versioned migration runner and the
+/// disposable loopback schema gate. Keeping this filename as a fail-closed
+/// tombstone prevents old runbooks or shell history from dropping product
+/// tables.
+void main() {
+  stderr.writeln(
+    'BLOCKED: server/bin/update_schema.dart is a retired destructive schema '
+    'reset entrypoint. Use bin/migrate.dart and the governed schema gate.',
+  );
+  exitCode = 2;
 }

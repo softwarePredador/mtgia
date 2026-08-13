@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
@@ -12,8 +13,19 @@ import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context) async {
+  return commanderLearningRequest(context, environment: Platform.environment);
+}
+
+Future<Response> commanderLearningRequest(
+  RequestContext context, {
+  required Map<String, String> environment,
+}) async {
   if (context.request.method != HttpMethod.get) {
     return methodNotAllowed();
+  }
+
+  if (!promotedCommanderLearnedDeckReadsEnabled(environment: environment)) {
+    return _commanderLearningDisabled();
   }
 
   final commander =
@@ -33,9 +45,10 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    final learnedDeck = await _loadActiveLearnedDeck(
+    final learnedDeck = await loadActiveCommanderLearnedDeck(
       pool: pool,
       commanderName: commander,
+      environment: environment,
     );
     if (learnedDeck == null) {
       return Response.json(
@@ -87,55 +100,16 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck({
-  required Pool pool,
-  required String commanderName,
-}) async {
-  try {
-    final result = await pool.execute(
-      Sql.named('''
-        SELECT
-          commander_name,
-          deck_name,
-          source_system,
-          source_ref,
-          source_url,
-          archetype,
-          card_list,
-          card_count,
-          score,
-          wincon_primary,
-          wincon_backup,
-          legal_status,
-          notes,
-          metadata,
-          is_active,
-          promoted_at,
-          updated_at
-        FROM commander_learned_decks
-        WHERE commander_name_normalized = @commander
-          AND is_active = TRUE
-        ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
-        LIMIT 10
-      '''),
-      parameters: {'commander': normalizeCommanderReferenceName(commanderName)},
-    );
-    if (result.isEmpty) return null;
-    for (final row in result) {
-      final candidate = _learnedDeckFromRow(
-        row,
-        fallbackCommanderName: commanderName,
-      );
-      if (isCompleteCommanderLearnedDeckInput(candidate)) {
-        return candidate;
-      }
-    }
-    return null;
-  } catch (error) {
-    if (isUndefinedLearnedDeckTableError(error)) return null;
-    rethrow;
-  }
-}
+Response _commanderLearningDisabled() => Response.json(
+  statusCode: HttpStatus.serviceUnavailable,
+  headers: const {'Cache-Control': 'no-store'},
+  body: const {
+    'available': false,
+    'capability': promotedCommanderLearnedDeckReadsCapability,
+    'error': promotedCommanderLearnedDeckReadsDisabledCode,
+    'message': 'Leitura de decks aprendidos promovidos indisponivel.',
+  },
+);
 
 Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries(
   Pool pool,
@@ -237,32 +211,6 @@ Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries(
     if (isUndefinedLearnedDeckTableError(error)) return const [];
     rethrow;
   }
-}
-
-CommanderLearnedDeckInput _learnedDeckFromRow(
-  ResultRow row, {
-  String fallbackCommanderName = '',
-}) {
-  final commanderName = row[0]?.toString() ?? fallbackCommanderName;
-  return CommanderLearnedDeckInput(
-    commanderName: commanderName,
-    deckName: row[1]?.toString() ?? commanderName,
-    sourceSystem: row[2]?.toString() ?? 'unknown',
-    sourceRef: row[3]?.toString() ?? 'unknown',
-    sourceUrl: row[4]?.toString(),
-    archetype: row[5]?.toString(),
-    cardList: row[6]?.toString() ?? '',
-    cardCount: intValue(row[7]),
-    score: nullableDouble(row[8]),
-    winconPrimary: row[9]?.toString(),
-    winconBackup: row[10]?.toString(),
-    legalStatus: row[11]?.toString(),
-    notes: row[12]?.toString(),
-    metadata: jsonObject(row[13]),
-    isActive: row[14] == true,
-    promotedAt: dateTimeValue(row[15]),
-    updatedAt: dateTimeValue(row[16]),
-  );
 }
 
 Future<Map<String, dynamic>> _buildRecommendedDeck({

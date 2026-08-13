@@ -1,5 +1,10 @@
 # ManaLoom Central Auditor Orders
 
+> **HISTORICAL / SUPERSEDED — NO CURRENT AUTHORITY.** Este arquivo preserva o
+> modelo de uma thread de 2026-06-20. Ele não atribui ownership atual, não
+> autoriza PostgreSQL/live e não deve orientar execução. A prioridade vigente
+> está em `../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.
+
 Last updated: 2026-06-20 21:08 -0300
 Owner: Auditor Central / single operator
 Status: active, single-operator mode

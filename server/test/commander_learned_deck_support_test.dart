@@ -1,11 +1,106 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_frog/dart_frog.dart';
+import 'package:postgres/postgres.dart';
 import 'package:server/ai/commander_learned_deck_support.dart';
 import 'package:server/ai/commander_reference_profile_support.dart';
 import 'package:test/test.dart';
 
+import '../routes/ai/commander-learning/index.dart' as commander_learning_route;
+
 void main() {
   group('Commander learned deck support', () {
+    test('promoted learned-deck reads require the exact explicit opt-in', () {
+      expect(
+        promotedCommanderLearnedDeckReadsEnabled(environment: const {}),
+        isFalse,
+      );
+      for (final value in const ['0', 'true', 'TRUE', ' 1 ', 'yes']) {
+        expect(
+          promotedCommanderLearnedDeckReadsEnabled(
+            environment: {promotedCommanderLearnedDeckReadsEnvironment: value},
+          ),
+          isFalse,
+          reason: 'value=$value must remain fail-closed',
+        );
+      }
+      expect(
+        promotedCommanderLearnedDeckReadsEnabled(
+          environment: const {
+            promotedCommanderLearnedDeckReadsEnvironment: '1',
+          },
+        ),
+        isTrue,
+      );
+    });
+
+    test(
+      'active learned-deck loader does not touch PG while disabled',
+      () async {
+        final pool = _LearnedDeckReadTrapPool();
+
+        final result = await loadActiveCommanderLearnedDeck(
+          pool: pool,
+          commanderName: 'Talrand, Sky Summoner',
+          environment: const {},
+        );
+
+        expect(result, isNull);
+        expect(pool.executeCalls, isZero);
+      },
+    );
+
+    test(
+      'active learned-deck loader reaches PG only with explicit opt-in',
+      () async {
+        final pool = _LearnedDeckReadTrapPool();
+
+        await expectLater(
+          loadActiveCommanderLearnedDeck(
+            pool: pool,
+            commanderName: 'Talrand, Sky Summoner',
+            environment: const {
+              promotedCommanderLearnedDeckReadsEnvironment: '1',
+            },
+          ),
+          throwsA(isA<StateError>()),
+        );
+
+        expect(pool.executeCalls, equals(1));
+      },
+    );
+
+    test('commander-learning list and detail fail before reading PG', () async {
+      for (final path in const [
+        '/ai/commander-learning',
+        '/ai/commander-learning?commander=Talrand%2C%20Sky%20Summoner',
+      ]) {
+        final context = _LearnedDeckDisabledRequestContext(
+          Request('GET', Uri.parse('http://localhost$path')),
+        );
+
+        final response = await commander_learning_route
+            .commanderLearningRequest(context, environment: const {});
+        final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+
+        expect(response.statusCode, equals(HttpStatus.serviceUnavailable));
+        expect(response.headers['cache-control'], equals('no-store'));
+        expect(body, {
+          'available': false,
+          'capability': promotedCommanderLearnedDeckReadsCapability,
+          'error': promotedCommanderLearnedDeckReadsDisabledCode,
+          'message': 'Leitura de decks aprendidos promovidos indisponivel.',
+        });
+        expect(body, isNot(contains('source')));
+        expect(body, isNot(contains('count')));
+        expect(body, isNot(contains('commanders')));
+        expect(body, isNot(contains('promoted_deck')));
+        expect(body, isNot(contains('recommended_deck')));
+        expect(context.readCalls, isZero);
+      }
+    });
+
     test('parses raw Hermes learned deck payload into idempotent PG input', () {
       final input = parseCommanderLearnedDeckInput({
         'id': 82,
@@ -25,8 +120,51 @@ void main() {
       expect(input.cards.map((card) => card.name), contains('Sol Ring'));
       expect(input.metadata['hermes_learned_deck_id'], equals(82));
       expect(input.metadata['hermes_active_deck_id'], equals(6));
+      expect(input.isActive, isFalse);
+    });
+
+    test('explicit activation remains visible for the write guard', () {
+      final input = parseCommanderLearnedDeckInput({
+        'id': 86,
+        'commander': 'Talrand, Sky Summoner',
+        'card_list': '1 Talrand, Sky Summoner\n1 Island',
+        'is_active': true,
+      });
+
       expect(input.isActive, isTrue);
     });
+
+    test(
+      'automatic import is fail-closed and runtime code owns no schema DDL',
+      () {
+        final support =
+            File(
+              'lib/ai/commander_learned_deck_support.dart',
+            ).readAsStringSync();
+        final cli = File('bin/commander_learned_deck.dart').readAsStringSync();
+
+        expect(
+          support,
+          contains("commanderLearnedDeckPromotionReceiptTask = 'DCK-P0-05'"),
+        );
+        expect(support, contains('if (input.isActive)'));
+        expect(support, contains('VALUES ('));
+        expect(support, contains('FALSE,'));
+        expect(
+          support,
+          contains('WHERE commander_learned_decks.is_active = FALSE'),
+        );
+        expect(support, isNot(contains('CREATE TABLE IF NOT EXISTS')));
+        expect(support, isNot(contains('ensureCommanderLearnedDecksTable')));
+        expect(
+          cli,
+          contains('BLOCKED_\$commanderLearnedDeckPromotionReceiptTask'),
+        );
+        expect(cli, contains("'postgres_connected': false"));
+        expect(cli, isNot(contains("package:server/database.dart")));
+        expect(cli, isNot(contains('ensureCommanderLearnedDecksTable')));
+      },
+    );
 
     test(
       'parses bullets, comments, collection suffixes and duplicate names',
@@ -320,6 +458,17 @@ void main() {
         expect(fallbackIndex, greaterThanOrEqualTo(0));
         expect(promotedIndex, lessThan(fallbackIndex));
         expect(route, contains("'source': 'promoted_learned_deck_pg'"));
+
+        final loader = _sectionBetween(
+          route,
+          'Future<Map<String, dynamic>?> _loadPromotedCommanderLearnedDeck',
+          'Map<String, dynamic> _promotedLearnedDeckSummary',
+        );
+        expect(loader, contains('promotedCommanderLearnedDeckReadsEnabled()'));
+        expect(
+          loader.indexOf('promotedCommanderLearnedDeckReadsEnabled()'),
+          lessThan(loader.indexOf('pool.execute(')),
+        );
       },
     );
 
@@ -367,7 +516,7 @@ void main() {
       final listLoader = _sectionBetween(
         route,
         'Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries',
-        'CommanderLearnedDeckInput _learnedDeckFromRow',
+        'Future<Map<String, dynamic>> _buildRecommendedDeck',
       );
 
       for (final field in const [
@@ -617,6 +766,40 @@ void main() {
       },
     );
   });
+}
+
+class _LearnedDeckReadTrapPool implements Pool {
+  int executeCalls = 0;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    if (invocation.memberName == #execute) {
+      executeCalls++;
+      throw StateError('PostgreSQL read reached test trap.');
+    }
+    return super.noSuchMethod(invocation);
+  }
+}
+
+class _LearnedDeckDisabledRequestContext implements RequestContext {
+  _LearnedDeckDisabledRequestContext(this.request);
+
+  @override
+  final Request request;
+
+  int readCalls = 0;
+
+  @override
+  Map<String, String> get mountedParams => const {};
+
+  @override
+  RequestContext provide<T extends Object?>(T Function() create) => this;
+
+  @override
+  T read<T>() {
+    readCalls++;
+    throw StateError('Disabled route must not read providers.');
+  }
 }
 
 String _sectionBetween(String source, String startMarker, String endMarker) {

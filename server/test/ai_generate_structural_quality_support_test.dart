@@ -216,18 +216,18 @@ void main() {
     });
 
     test(
-      'route gates provider and fallback payloads before learning/cache',
+      'route gates provider and fallback payloads before cache and never learns from previews',
       () {
         final route = File('routes/ai/generate/index.dart').readAsStringSync();
         final primaryApplication = route.indexOf(
           'responseBody = applyAiGenerateCommanderStructuralContract(',
         );
-        final learningBoundary = route.indexOf(
-          '// Fire-and-forget: loga deck gerado para aprendizado',
-        );
+        final finalCacheWrite = route.lastIndexOf('writeAiGenerateCache(');
 
         expect(primaryApplication, greaterThanOrEqualTo(0));
-        expect(learningBoundary, greaterThan(primaryApplication));
+        expect(finalCacheWrite, greaterThan(primaryApplication));
+        expect(route, isNot(contains('logGeneratedDeckForLearning(')));
+        expect(route, isNot(contains('recordUserCreatedDeckLearning(')));
         expect(route, contains('resolvedCards: validation.resolvedCards'));
         expect(
           route,

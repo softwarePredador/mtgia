@@ -1,5 +1,9 @@
 # Hermes Analysis: Backend Actionable Tasks
 
+> **HISTORICAL / SUPERSEDED.** Não abra nem priorize trabalho deste backlog.
+> Toda task corrente deve existir em
+> `../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.
+
 > Status atual: backlog backend/produto.
 > Nao e contrato operacional Hermes. Revalide qualquer item contra codigo vivo
 > antes de implementar.

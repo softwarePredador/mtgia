@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/retention/models/post_game_note.dart';
 import 'package:manaloom/features/retention/screens/post_game_notes_screen.dart';
 import 'package:manaloom/features/retention/services/post_game_note_store.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -71,13 +73,19 @@ void main() {
       final slowCardId = deck.mainBoard['Artifact']!.single.id;
 
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.darkTheme,
-          home: PostGameNotesScreen(
-            deckId: deck.id,
-            store: store,
-            playSessionId: 'battle-replay:replay-42',
-            deckLoader: (_) async => deck,
+        ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+          create: (_) => ReleaseCapabilitiesProvider.seeded(const [
+            ReleaseCapability.decksPrivate,
+            ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+          ]),
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: PostGameNotesScreen(
+              deckId: deck.id,
+              store: store,
+              playSessionId: 'battle-replay:replay-42',
+              deckLoader: (_) async => deck,
+            ),
           ),
         ),
       );

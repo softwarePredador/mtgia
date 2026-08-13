@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../config/release_capabilities.dart';
 import '../theme/app_theme.dart';
 import 'manaloom_glyph.dart';
 
@@ -9,60 +11,72 @@ class MainScaffold extends StatelessWidget {
 
   const MainScaffold({super.key, required this.child});
 
-  static const _primaryPaths = <String>{
-    '/home',
-    '/decks',
-    '/collection',
-    '/community',
-    '/profile',
-    '/market',
-    '/trades',
-  };
-
-  void _selectDestination(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go('/home');
-        break;
-      case 1:
-        context.go('/decks');
-        break;
-      case 2:
-        context.go('/collection');
-        break;
-      case 3:
-        context.go('/community');
-        break;
-      case 4:
-        context.go('/profile');
-        break;
-    }
+  void _selectDestination(
+    BuildContext context,
+    int index,
+    List<_MainDestination> destinations,
+  ) {
+    if (index < 0 || index >= destinations.length) return;
+    context.go(destinations[index].path);
   }
 
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    int? currentIndex;
-    if (location == '/home' || location.startsWith('/home/')) {
-      currentIndex = 0;
-    }
-    if (location.startsWith('/decks')) {
-      currentIndex = 1;
-    } else if (location.startsWith('/collection') ||
-        location.startsWith('/trades') ||
-        location.startsWith('/market')) {
-      currentIndex = 2;
-    } else if (location.startsWith('/community')) {
-      currentIndex = 3;
-    } else if (location.startsWith('/profile')) {
-      currentIndex = 4;
-    }
+    final releaseCapabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final decksAllowed =
+        releaseCapabilities?.isAllowed(ReleaseCapability.decksPrivate) ?? false;
+    final collectionAllowed =
+        releaseCapabilities?.isAllowed(ReleaseCapability.collectionPrivate) ??
+        false;
+    final communityAllowed =
+        releaseCapabilities != null &&
+        (releaseCapabilities.isAllowed(ReleaseCapability.galleryPublic) ||
+            releaseCapabilities.isAllowed(ReleaseCapability.marketplace) ||
+            (releaseCapabilities.isAllowed(ReleaseCapability.profilesPublic) &&
+                releaseCapabilities.isAllowed(ReleaseCapability.userSearch)));
+    final destinations = <_MainDestination>[
+      const _MainDestination(
+        path: '/home',
+        label: 'Início',
+        icon: ManaLoomGlyphKind.brand,
+      ),
+      if (decksAllowed)
+        const _MainDestination(
+          path: '/decks',
+          label: 'Decks',
+          icon: ManaLoomGlyphKind.deck,
+        ),
+      if (collectionAllowed)
+        const _MainDestination(
+          path: '/collection',
+          label: 'Coleção',
+          icon: ManaLoomGlyphKind.collection,
+        ),
+      if (communityAllowed)
+        const _MainDestination(
+          path: '/community',
+          label: 'Comunidade',
+          icon: ManaLoomGlyphKind.community,
+        ),
+      const _MainDestination(
+        path: '/profile',
+        label: 'Perfil',
+        icon: ManaLoomGlyphKind.player,
+      ),
+    ];
+    final selectedIndex = destinations.indexWhere(
+      (destination) => destination.matches(location),
+    );
+    final currentIndex = selectedIndex < 0 ? null : selectedIndex;
 
     final content = DecoratedBox(
       decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
       child: child,
     );
-    final isPrimaryRoot = _primaryPaths.contains(location);
+    final isPrimaryRoot = destinations.any(
+      (destination) => destination.path == location,
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -84,37 +98,14 @@ class MainScaffold extends StatelessWidget {
                         ? null
                         : NavigationRailLabelType.selected,
                     onDestinationSelected: (index) =>
-                        _selectDestination(context, index),
-                    destinations: const [
-                      NavigationRailDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
-                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
-                        label: Text('Início'),
-                      ),
-                      NavigationRailDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
-                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
-                        label: Text('Decks'),
-                      ),
-                      NavigationRailDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.collection),
-                        selectedIcon: ManaLoomGlyph(
-                          ManaLoomGlyphKind.collection,
+                        _selectDestination(context, index, destinations),
+                    destinations: [
+                      for (final destination in destinations)
+                        NavigationRailDestination(
+                          icon: ManaLoomGlyph(destination.icon),
+                          selectedIcon: ManaLoomGlyph(destination.icon),
+                          label: Text(destination.label),
                         ),
-                        label: Text('Coleção'),
-                      ),
-                      NavigationRailDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.community),
-                        selectedIcon: ManaLoomGlyph(
-                          ManaLoomGlyphKind.community,
-                        ),
-                        label: Text('Comunidade'),
-                      ),
-                      NavigationRailDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.player),
-                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.player),
-                        label: Text('Perfil'),
-                      ),
                     ],
                   ),
                 ),
@@ -139,37 +130,14 @@ class MainScaffold extends StatelessWidget {
                   child: NavigationBar(
                     selectedIndex: currentIndex ?? 0,
                     onDestinationSelected: (index) =>
-                        _selectDestination(context, index),
-                    destinations: const [
-                      NavigationDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
-                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.brand),
-                        label: 'Início',
-                      ),
-                      NavigationDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
-                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.deck),
-                        label: 'Decks',
-                      ),
-                      NavigationDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.collection),
-                        selectedIcon: ManaLoomGlyph(
-                          ManaLoomGlyphKind.collection,
+                        _selectDestination(context, index, destinations),
+                    destinations: [
+                      for (final destination in destinations)
+                        NavigationDestination(
+                          icon: ManaLoomGlyph(destination.icon),
+                          selectedIcon: ManaLoomGlyph(destination.icon),
+                          label: destination.label,
                         ),
-                        label: 'Coleção',
-                      ),
-                      NavigationDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.community),
-                        selectedIcon: ManaLoomGlyph(
-                          ManaLoomGlyphKind.community,
-                        ),
-                        label: 'Comunidade',
-                      ),
-                      NavigationDestination(
-                        icon: ManaLoomGlyph(ManaLoomGlyphKind.player),
-                        selectedIcon: ManaLoomGlyph(ManaLoomGlyphKind.player),
-                        label: 'Perfil',
-                      ),
                     ],
                   ),
                 )
@@ -177,5 +145,30 @@ class MainScaffold extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+@immutable
+class _MainDestination {
+  const _MainDestination({
+    required this.path,
+    required this.label,
+    required this.icon,
+  });
+
+  final String path;
+  final String label;
+  final ManaLoomGlyphKind icon;
+
+  bool matches(String location) {
+    if (path == '/home') {
+      return location == path || location.startsWith('/home/');
+    }
+    if (path == '/collection') {
+      return location.startsWith('/collection') ||
+          location.startsWith('/trades') ||
+          location.startsWith('/market');
+    }
+    return location == path || location.startsWith('$path/');
   }
 }

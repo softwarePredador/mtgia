@@ -60,8 +60,7 @@ void main() {
     expect(
       RegExp(r'background-color: #0B0D12;').allMatches(index),
       hasLength(3),
-      reason:
-          'root, document and Flutter host must share one Obsidian canvas',
+      reason: 'root, document and Flutter host must share one Obsidian canvas',
     );
     expect(
       nginx,
@@ -109,7 +108,9 @@ void main() {
     );
     expect(
       deploy,
-      contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+      contains(
+        'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF',
+      ),
     );
     expect(
       deploy,
@@ -193,12 +194,14 @@ void main() {
       final invalidInteractiveFlag = Process.runSync(
         '/bin/bash',
         [File('../scripts/manaloom_deploy_flutter_web.sh').absolute.path],
-        environment: {'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE': 'yes'},
+        environment: {'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE': '1'},
       );
       expect(invalidInteractiveFlag.exitCode, 2);
       expect(
         invalidInteractiveFlag.stderr,
-        contains('MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1'),
+        contains(
+          'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF',
+        ),
       );
     } finally {
       fixture.deleteSync(recursive: true);

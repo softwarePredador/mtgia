@@ -5,9 +5,52 @@ import 'package:test/test.dart';
 
 import '../lib/ai/battle_engine_config.dart';
 import '../lib/health_readiness_support.dart';
+import '../lib/release_capability_policy.dart';
 
 void main() {
   group('health_readiness_support', () {
+    test(
+      'release capabilities OFF disable optional runtimes without failing core readiness',
+      () async {
+        final policy = ReleaseCapabilityPolicy.load();
+        final runtime = await evaluateReleaseCapabilityRuntimeReadiness(
+          policy: policy,
+          env: DotEnv(quiet: true),
+        );
+
+        expect(
+          policy.capabilities.values.every((entry) => !entry.allowed),
+          true,
+        );
+        expect(runtime.healthy, isTrue);
+        for (final key in const [
+          'battle_job_worker',
+          'ai_runtime',
+          'battle_runtime',
+          'battle_live_spectator',
+          'interactive_battle',
+        ]) {
+          expect(runtime.checks[key], containsPair('status', 'disabled'));
+        }
+
+        final body = buildReadinessResponseBody(
+          checks: {
+            'database': const {'status': 'healthy'},
+            'release_capabilities': policy.readinessCheck(),
+            ...runtime.checks,
+          },
+          allHealthy: runtime.healthy,
+          now: DateTime.parse('2026-08-13T12:00:00.000Z'),
+        );
+        expect(body['status'], 'ready');
+        final checks = body['checks'] as Map<String, dynamic>;
+        expect(
+          checks['release_capabilities'],
+          containsPair('policy_digest_sha256', policy.policyDigestSha256),
+        );
+      },
+    );
+
     test('builds ready response body', () {
       final body = buildReadinessResponseBody(
         checks: const {
@@ -523,6 +566,8 @@ void main() {
 
     test('readiness reports latency without leaking dependency exceptions', () {
       final route = File('routes/health/ready/index.dart').readAsStringSync();
+      final support =
+          File('lib/health_readiness_support.dart').readAsStringSync();
 
       expect(route, contains('databaseStopwatch.elapsedMilliseconds'));
       expect(route, contains('cardsStopwatch.elapsedMilliseconds'));
@@ -531,19 +576,17 @@ void main() {
       expect(route, isNot(contains("'error': e.toString()")));
       expect(route, isNot(contains("'latency_ms': null")));
       expect(route, contains('isManaloomE2eIsolatedRuntime()'));
-      expect(route, contains("checks['ai_runtime'] = aiRuntime.check"));
-      expect(route, contains("checks['battle_runtime'] = battleRuntime.check"));
-      expect(
-        route,
-        contains("checks['battle_live_spectator'] = battleLiveSpectator.check"),
-      );
+      expect(route, contains('evaluateReleaseCapabilityRuntimeReadiness('));
+      expect(support, contains("checks['ai_runtime'] = runtime.check"));
+      expect(support, contains("checks['battle_runtime'] = runtime.check"));
+      expect(support, contains("checks['battle_live_spectator'] = live.check"));
       expect(
         route,
         contains("checks['battle_job_schema'] = battleJobSchema.check"),
       );
       expect(
-        route,
-        contains("checks['interactive_battle'] = interactiveBattle.check"),
+        support,
+        contains("checks['interactive_battle'] = interactive.check"),
       );
       expect(
         route,

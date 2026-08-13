@@ -1,18 +1,14 @@
 /// Política de lançamento do cliente.
 ///
-/// A beta pública é gratuita por padrão. A arquitetura de checkout permanece
-/// compilável, mas só volta a ser acionável em um build futuro que habilite a
-/// flag depois de o fluxo de pagamento e seus contratos serem aprovados.
+/// A oferta corrente é uma beta gratuita única. Não existe flag de build para
+/// reativar checkout: monetização exige uma nova decisão de produto e uma nova
+/// implementação revisada de ponta a ponta.
 abstract final class CommercialLaunchPolicy {
-  static const bool paidCheckoutEnabled = bool.fromEnvironment(
-    'ENABLE_PAID_CHECKOUT',
-    defaultValue: false,
-  );
-
-  static const bool isFreeBeta = !paidCheckoutEnabled;
+  static const bool paidCheckoutEnabled = false;
+  static const bool isFreeBeta = true;
 
   static const String betaLabel = 'Beta gratuita';
   static const String betaCheckoutMessage =
-      'A beta gratuita não aceita pagamentos. Os recursos disponíveis agora '
-      'continuam sem cobrança.';
+      'A beta gratuita não aceita pagamentos, assinatura ou upgrade. Somente '
+      'os recursos liberados pelo servidor ficam disponíveis nesta fase.';
 }

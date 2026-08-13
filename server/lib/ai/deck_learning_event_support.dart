@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:postgres/postgres.dart';
 
@@ -30,6 +31,14 @@ const loadUsageHotCardsSql = '''
 ''';
 
 const usageHotCardsGenerationCandidateLimit = 50;
+const deckLearningUserCreatedSource = 'user_created';
+const commanderUsageCorpusReadsEnvironment =
+    'MANALOOM_ENABLE_COMMANDER_USAGE_CORPUS_READS';
+
+bool commanderUsageCorpusReadsEnabled({Map<String, String>? environment}) =>
+    (environment ??
+        Platform.environment)[commanderUsageCorpusReadsEnvironment] ==
+    '1';
 
 Future<void> upsertCommanderCardUsage({
   required Pool pool,
@@ -108,7 +117,7 @@ Future<void> recordUserCreatedDeckLearning({
       commanderName: commanderName,
       format: format,
       cardCount: cardCount,
-      source: 'user_created',
+      source: deckLearningUserCreatedSource,
       eventData: eventData,
     );
   });
@@ -148,7 +157,11 @@ Future<List<Map<String, dynamic>>> loadUsageHotCards({
   required Pool pool,
   required String commanderName,
   int limit = 30,
+  Map<String, String>? environment,
 }) async {
+  if (!commanderUsageCorpusReadsEnabled(environment: environment)) {
+    return const [];
+  }
   final normalized = normalizeCommanderReferenceName(commanderName);
   try {
     final result = await pool.execute(
@@ -175,10 +188,10 @@ String buildUsageHotCardsPrompt(List<Map<String, dynamic>> hotCards) {
   if (hotCards.isEmpty) return '';
   final top = hotCards.take(12).toList();
   final lines = <String>[
-    'Real-player usage data for this commander:',
+    'Quarantined historical aggregate signals for this commander:',
     for (final card in top)
-      '- ${card["canonical_name"] ?? card["card_name_normalized"]} (saved ${card["usage_count"]}x by users)',
-    'Prefer these cards only when legal, on-color, and structurally appropriate for the deck.',
+      '- ${card["canonical_name"] ?? card["card_name_normalized"]} (historical observations: ${card["usage_count"]})',
+    'Treat these as candidate-only evidence with provenance pending; never as user acceptance or promotion proof.',
   ];
   return lines.join('\n');
 }
@@ -199,81 +212,18 @@ List<String> usageHotCardCanonicalNames(
       .toList(growable: false);
 }
 
-Future<void> logGeneratedDeckForLearning({
-  required Pool pool,
-  required Map<String, dynamic> responseBody,
-  String source = 'ai_generated',
-  Map<String, String>? environment,
-}) async {
-  if (!shouldWriteProductLearning(environment: environment)) return;
-  try {
-    final generatedDeck = responseBody['generated_deck'];
-    if (generatedDeck is! Map) return;
-
-    final commander = generatedDeck['commander'];
-    final commanderName =
-        commander is Map
-            ? commander['name']?.toString()
-            : commander?.toString();
-    final cards =
-        (generatedDeck['cards'] as List?)
-            ?.whereType<Map>()
-            .map((c) => c.cast<String, dynamic>())
-            .toList() ??
-        const <Map<String, dynamic>>[];
-
-    if (commanderName == null || commanderName.isEmpty) return;
-    if (cards.isEmpty) return;
-
-    final cardCount =
-        cards.fold<int>(0, (sum, c) {
-          return sum + _quantityValue(c['quantity']);
-        }) +
-        (commanderName.isNotEmpty ? 1 : 0);
-
-    final eventData = <String, dynamic>{
-      'generation_mode': source,
-      'cards':
-          cards
-              .map(
-                (c) => {
-                  'name': c['name']?.toString() ?? '',
-                  'quantity': c['quantity'],
-                },
-              )
-              .take(200)
-              .toList(),
-    };
-
-    await pool.execute(
-      Sql.named('''
-        INSERT INTO deck_learning_events (
-          deck_id, commander_name, format, card_count, source, event_data
-        ) VALUES (
-          gen_random_uuid(), @commanderName, 'commander', @cardCount, @source, @eventData::jsonb
-        )
-      '''),
-      parameters: {
-        'commanderName': commanderName,
-        'cardCount': cardCount,
-        'source': source,
-        'eventData': jsonEncode(eventData),
-      },
-    );
-  } catch (_) {}
-}
-
 Future<void> logDeckLearningEvent({
   required Pool pool,
   required String deckId,
   String? commanderName,
   required String format,
   required int cardCount,
-  String source = 'user_created',
+  String source = deckLearningUserCreatedSource,
   Map<String, dynamic> eventData = const {},
   Map<String, String>? environment,
 }) async {
   if (!shouldWriteProductLearning(environment: environment)) return;
+  if (source != deckLearningUserCreatedSource) return;
   try {
     await _insertDeckLearningEvent(
       session: pool,

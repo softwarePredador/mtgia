@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -17,55 +18,167 @@ import '../../social/providers/social_provider.dart';
 import '../../growth/widgets/community_trade_growth_panel.dart';
 import '../../binder/providers/binder_provider.dart';
 
-class CommunityScreen extends StatefulWidget {
+class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key, this.initialTab = 0});
 
   final int initialTab;
 
   @override
-  State<CommunityScreen> createState() => _CommunityScreenState();
+  Widget build(BuildContext context) {
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final sections = _CommunitySection.values
+        .where((section) => section.isAllowed(capabilities))
+        .toList(growable: false);
+    final showTradeGrowth =
+        capabilities?.isAllowed(ReleaseCapability.trades) ?? false;
+
+    if (sections.isEmpty) {
+      return const _CommunityUnavailableScaffold();
+    }
+
+    final sectionKey = sections.map((section) => section.routeId).join(',');
+    return _CommunityTabs(
+      key: ValueKey('community-tabs-$sectionKey-trades:$showTradeGrowth'),
+      sections: sections,
+      requestedRouteId: initialTab,
+      showTradeGrowth: showTradeGrowth,
+    );
+  }
 }
 
-class _CommunityScreenState extends State<CommunityScreen>
+enum _CommunitySection {
+  explore(
+    routeId: 0,
+    requiredCapabilities: {ReleaseCapability.galleryPublic},
+    tabKey: 'community-tab-explore',
+    label: 'Explorar',
+    icon: Icons.public,
+  ),
+  following(
+    routeId: 1,
+    requiredCapabilities: {
+      ReleaseCapability.galleryPublic,
+      ReleaseCapability.follows,
+    },
+    tabKey: 'community-tab-following',
+    label: 'Seguindo',
+    icon: Icons.people,
+  ),
+  users(
+    routeId: 2,
+    requiredCapabilities: {
+      ReleaseCapability.profilesPublic,
+      ReleaseCapability.userSearch,
+    },
+    tabKey: 'community-tab-users',
+    label: 'Usuários',
+    icon: Icons.person_search,
+  ),
+  quotes(
+    routeId: 3,
+    requiredCapabilities: {ReleaseCapability.marketplace},
+    tabKey: 'community-tab-quotes',
+    label: 'Cotações',
+    icon: Icons.trending_up,
+  );
+
+  const _CommunitySection({
+    required this.routeId,
+    required this.requiredCapabilities,
+    required this.tabKey,
+    required this.label,
+    required this.icon,
+  });
+
+  final int routeId;
+  final Set<ReleaseCapability> requiredCapabilities;
+  final String tabKey;
+  final String label;
+  final IconData icon;
+
+  bool isAllowed(ReleaseCapabilitiesProvider? capabilities) {
+    return capabilities?.areAllAllowed(requiredCapabilities) ?? false;
+  }
+
+  Tab buildTab() {
+    return Tab(key: Key(tabKey), icon: Icon(icon, size: 18), text: label);
+  }
+
+  Widget buildContent({required bool showTradeGrowth}) {
+    return switch (this) {
+      _CommunitySection.explore => _ExploreTab(
+        showTradeGrowth: showTradeGrowth,
+      ),
+      _CommunitySection.following => const _FollowingFeedTab(),
+      _CommunitySection.users => const _UserSearchTab(),
+      _CommunitySection.quotes => const _CotacoesTab(),
+    };
+  }
+}
+
+class _CommunityTabs extends StatefulWidget {
+  const _CommunityTabs({
+    super.key,
+    required this.sections,
+    required this.requestedRouteId,
+    required this.showTradeGrowth,
+  });
+
+  final List<_CommunitySection> sections;
+  final int requestedRouteId;
+  final bool showTradeGrowth;
+
+  @override
+  State<_CommunityTabs> createState() => _CommunityTabsState();
+}
+
+class _CommunityTabsState extends State<_CommunityTabs>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int? _lastActivatedTab;
+  int? _lastActivatedRouteId;
   bool _applyingRouteTab = false;
 
-  int get _routeTab => widget.initialTab.clamp(0, 3).toInt();
+  int get _requestedVisibleIndex {
+    final index = widget.sections.indexWhere(
+      (section) => section.routeId == widget.requestedRouteId,
+    );
+    return index < 0 ? 0 : index;
+  }
+
+  _CommunitySection get _selectedSection {
+    return widget.sections[_tabController.index];
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 4,
-      initialIndex: _routeTab,
+      length: widget.sections.length,
+      initialIndex: _requestedVisibleIndex,
       vsync: this,
     );
     _tabController.addListener(_onTabChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<CommunityProvider>().fetchPublicDecks(reset: true);
-      _fetchBinderStatsIfAvailable();
-      _activateTab(_tabController.index);
-      _syncCanonicalLocation(_tabController.index);
+      _activateSection(_selectedSection);
+      _syncCanonicalLocation(_selectedSection.routeId);
     });
   }
 
   @override
-  void didUpdateWidget(covariant CommunityScreen oldWidget) {
+  void didUpdateWidget(covariant _CommunityTabs oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final targetTab = _routeTab;
-    if (_tabController.index != targetTab) {
+    final targetIndex = _requestedVisibleIndex;
+    if (_tabController.index != targetIndex) {
       _applyingRouteTab = true;
-      _tabController.index = targetTab;
+      _tabController.index = targetIndex;
       _applyingRouteTab = false;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _tabController.index != targetTab) return;
-      _activateTab(targetTab);
-      _syncCanonicalLocation(targetTab);
+      if (!mounted || _tabController.index != targetIndex) return;
+      _activateSection(_selectedSection);
+      _syncCanonicalLocation(_selectedSection.routeId);
     });
   }
 
@@ -86,31 +199,37 @@ class _CommunityScreenState extends State<CommunityScreen>
 
   void _onTabChanged() {
     if (_applyingRouteTab || _tabController.indexIsChanging) return;
-    final tab = _tabController.index;
-    _activateTab(tab);
-    _syncCanonicalLocation(tab);
+    _activateSection(_selectedSection);
+    _syncCanonicalLocation(_selectedSection.routeId);
   }
 
-  void _activateTab(int tab) {
-    if (_lastActivatedTab == tab) return;
-    _lastActivatedTab = tab;
+  void _activateSection(_CommunitySection section) {
+    if (_lastActivatedRouteId == section.routeId) return;
+    _lastActivatedRouteId = section.routeId;
 
-    if (tab == 1) {
-      // Aba "Seguindo": carregar feed
-      context.read<SocialProvider>().fetchFollowingFeed(reset: true);
-    } else if (tab == 3) {
-      // Aba "Cotações": carregar market movers
-      context.read<MarketProvider>().fetchMovers();
+    switch (section) {
+      case _CommunitySection.explore:
+        context.read<CommunityProvider>().fetchPublicDecks(reset: true);
+        if (widget.showTradeGrowth) _fetchBinderStatsIfAvailable();
+        break;
+      case _CommunitySection.following:
+        context.read<SocialProvider>().fetchFollowingFeed(reset: true);
+        break;
+      case _CommunitySection.users:
+        break;
+      case _CommunitySection.quotes:
+        context.read<MarketProvider>().fetchMovers();
+        break;
     }
   }
 
-  void _syncCanonicalLocation(int tab) {
+  void _syncCanonicalLocation(int routeId) {
     final router = GoRouter.maybeOf(context);
     if (router == null) return;
 
     final canonicalUri = Uri(
       path: '/community',
-      queryParameters: {'tab': '$tab'},
+      queryParameters: {'tab': '$routeId'},
     );
     final currentUri = GoRouterState.of(context).uri;
     // Nested community routes render over this parent route. Canonicalizing
@@ -154,24 +273,51 @@ class _CommunityScreenState extends State<CommunityScreen>
           ),
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          tabs: const [
-            Tab(icon: Icon(Icons.public, size: 18), text: 'Explorar'),
-            Tab(icon: Icon(Icons.people, size: 18), text: 'Seguindo'),
-            Tab(icon: Icon(Icons.person_search, size: 18), text: 'Usuários'),
-            Tab(icon: Icon(Icons.trending_up, size: 18), text: 'Cotações'),
-          ],
+          tabs: widget.sections
+              .map((section) => section.buildTab())
+              .toList(growable: false),
         ),
       ),
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
         child: TabBarView(
           controller: _tabController,
-          children: const [
-            _ExploreTab(),
-            _FollowingFeedTab(),
-            _UserSearchTab(),
-            _CotacoesTab(),
-          ],
+          children: widget.sections
+              .map(
+                (section) => section.buildContent(
+                  showTradeGrowth: widget.showTradeGrowth,
+                ),
+              )
+              .toList(growable: false),
+        ),
+      ),
+    );
+  }
+}
+
+class _CommunityUnavailableScaffold extends StatelessWidget {
+  const _CommunityUnavailableScaffold();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundAbyss,
+      appBar: AppBar(
+        toolbarHeight: 54,
+        title: const Text('Comunidade'),
+        centerTitle: true,
+        backgroundColor: AppTheme.backgroundAbyss,
+        surfaceTintColor: AppTheme.transparent,
+        actions: const [ShellAppBarActions()],
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(AppTheme.space24),
+          child: Text(
+            'Comunidade indisponível nesta versão.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppTheme.textSecondary),
+          ),
         ),
       ),
     );
@@ -182,7 +328,9 @@ class _CommunityScreenState extends State<CommunityScreen>
 // TAB 1: Explorar (decks públicos — antigo conteúdo da CommunityScreen)
 // =====================================================================
 class _ExploreTab extends StatefulWidget {
-  const _ExploreTab();
+  const _ExploreTab({required this.showTradeGrowth});
+
+  final bool showTradeGrowth;
 
   @override
   State<_ExploreTab> createState() => _ExploreTabState();
@@ -243,11 +391,12 @@ class _ExploreTabState extends State<_ExploreTab>
     super.build(context);
     return Column(
       children: [
-        const ResponsivePageFrame(
-          maxWidth: AppTheme.contentMaxWidth,
-          padding: EdgeInsets.zero,
-          child: CommunityTradeGrowthPanel(),
-        ),
+        if (widget.showTradeGrowth)
+          const ResponsivePageFrame(
+            maxWidth: AppTheme.contentMaxWidth,
+            padding: EdgeInsets.zero,
+            child: CommunityTradeGrowthPanel(),
+          ),
         // Search bar + filters
         ResponsivePageFrame(
           key: const Key('community-explore-controls-frame'),
@@ -460,9 +609,6 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SocialProvider>().fetchFollowingFeed(reset: true);
-    });
   }
 
   @override
@@ -1268,9 +1414,6 @@ class _CotacoesTabState extends State<_CotacoesTab>
   void initState() {
     super.initState();
     _subTabController = TabController(length: 2, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MarketProvider>().fetchMovers();
-    });
   }
 
   @override

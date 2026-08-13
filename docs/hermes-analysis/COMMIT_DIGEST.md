@@ -1,5 +1,14 @@
 # Hermes Analysis: Commit Digest
 
+> **HISTORICAL / SUPERSEDED — NAO USE COMO ESTADO DE DEPLOY OU DECISAO ATUAL.**
+>
+> Este digest preserva commits, hosts e avaliacoes de uma rodada antiga. Nada
+> abaixo autoriza sync, promocao, deploy ou escrita. Para o fluxo vigente de
+> Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > Status atual: historico de commits.
 > Nao use como fonte operacional atual. Use para contexto, depois revalide em
 > codigo/docs canonicos.

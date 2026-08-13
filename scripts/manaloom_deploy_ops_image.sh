@@ -17,6 +17,8 @@ require_tool() {
 }
 
 require_tool python3
+require_tool jq
+require_tool shasum
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "arquivo de ambiente ausente: $ENV_FILE" >&2
@@ -27,6 +29,8 @@ fi
 source "$ROOT_DIR/scripts/lib/manaloom_safe_env.sh"
 # shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
+# shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
 load_manaloom_env_keys "$ENV_FILE" \
   DB_HOST DB_NAME DB_PORT \
   EASYPANEL_SERVER_IP EASYPANEL_SSH_KEY EASYPANEL_SSH_USER \
@@ -96,6 +100,7 @@ DEPLOY_COMMITTED=0
 PREVIOUS_SPEC_IMAGE=""
 PREVIOUS_RUNNING_IMAGE=""
 PREVIOUS_UPDATE_STATE=""
+PREVIOUS_HEALTH_CONTRACT=""
 
 cleanup_remote_build_dir() {
   local proof expected
@@ -162,16 +167,17 @@ for attempt in \$(seq 1 60); do
   running=\$(docker service ps '$SERVICE' --filter desired-state=running --format '{{.Image}}' | head -1)
   update=\$(docker service inspect '$SERVICE' --format '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{end}}')
   container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
-  health=0
-  if [ -n \"\$container\" ] && docker exec \"\$container\" python3 -c \
-    \"import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); assert d['status']=='ok'; assert d['engine_contract']=='native_reviewed_rules_execution'\" \
-    >/dev/null 2>&1; then
-    health=1
+  health=''
+  if [ -n \"\$container\" ]; then
+    health=\$(docker exec \"\$container\" python3 -c \
+      \"import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); print(d['status']+'|'+d['engine_contract']+'|'+str(d.get('release_capabilities',{}).get('configuration_status','legacy')))\" \
+      2>/dev/null || true)
   fi
   if [ \"\$replicas\" = '1/1' ] && [ \"\$spec\" = '$PREVIOUS_SPEC_IMAGE' ] && \\
-     [ \"\$running\" = '$PREVIOUS_SPEC_IMAGE' ] && [ \"\$health\" = 1 ] && \\
+     [ \"\$running\" = '$PREVIOUS_SPEC_IMAGE' ] && \\
+     [ \"\$health\" = '$PREVIOUS_HEALTH_CONTRACT' ] && \\
      { [ -z \"\$update\" ] || [ \"\$update\" = completed ] || [ \"\$update\" = rollback_completed ]; }; then
-    printf '%s|%s|%s|health=ok' \"\$replicas\" \"\$spec\" \"\$running\"
+    printf '%s|%s|%s|health=%s' \"\$replicas\" \"\$spec\" \"\$running\" \"\$health\"
     exit 0
   fi
   case \"\$update\" in paused|rollback_paused) break ;; esac
@@ -204,6 +210,13 @@ if [[ "$sha" != "$(git rev-parse origin/master 2>/dev/null || true)" ]]; then
   echo "HEAD must match origin/master before ops deploy" >&2
   exit 2
 fi
+
+# The candidate image and the runtime health must carry the exact policy blob
+# committed in this SHA. The current Free Beta contract accepts only the
+# canonical 28-key all-OFF matrix; a dirty or permissive working-tree file
+# cannot enable an ops job.
+manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$sha"
+readonly RELEASE_CAPABILITIES_DIGEST_SHA256="$MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256"
 
 runtime_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
@@ -245,12 +258,14 @@ previous_health_proof="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 set -euo pipefail
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker exec \"\$container\" python3 -c \
-  \"import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); print(d['status']+'|'+d['engine_contract'])\"
+  \"import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); print(d['status']+'|'+d['engine_contract']+'|'+str(d.get('release_capabilities',{}).get('configuration_status','legacy')))\"
 ")"
-if [[ "$previous_health_proof" != "ok|native_reviewed_rules_execution" ]]; then
+if [[ "$previous_health_proof" != "ok|native_reviewed_rules_execution|legacy" &&
+      "$previous_health_proof" != "ok|disabled_by_release_capability|valid" ]]; then
   echo "deploy recusado: baseline manaloom-ops sem health rollback-safe: $previous_health_proof" >&2
   exit 2
 fi
+PREVIOUS_HEALTH_CONTRACT="$previous_health_proof"
 
 REMOTE_DIR_CLEANUP_REQUIRED=1
 git archive HEAD server docs/hermes-analysis/manaloom-knowledge scripts/lib tools/manaloom_lints |
@@ -319,21 +334,23 @@ docker service update \
   --image '$IMAGE_DIGEST_REF' \
   --env-add GIT_SHA='$sha' \
   --env-add DEPLOY_TIMESTAMP='$deploy_timestamp' \
-  --env-add MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1 \
-  --env-add MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1 \
+  --env-add MANALOOM_RELEASE_CAPABILITIES_FILE=/app/server/config/release_capabilities.json \
+  --env-add MANALOOM_BOOT_PULL_PENDING_EVENTS=0 \
+  --env-add MANALOOM_RUN_PREFLIGHT_ON_BOOT=0 \
+  --env-add MTGIA_SYNC_GIT_PULL=0 \
+  --env-add HERMES_AUTO_SYNC_APPLY=0 \
+  --env-add HERMES_AUTO_PROMOTE_APPLY=0 \
+  --env-add MANALOOM_IMPORT_APPLY=0 \
+  --env-add MANALOOM_ENABLE_LEARNING_WRITES=0 \
+  --env-add MANALOOM_ENABLE_LEARNED_DECK_WRITES=0 \
+  --env-add MANALOOM_LEARNING_WRITES=0 \
+  --env-add MANALOOM_BATTLE_RULES_APPLY_PG=0 \
+  --env-add MANALOOM_SYNC_CARD_LEGALITIES_APPLY=0 \
+  --env-add MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=0 \
+  --env-add MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0 \
   --env-add MANALOOM_NATIVE_BATTLE_HOST=0.0.0.0 \
   --env-add MANALOOM_NATIVE_BATTLE_PORT=8080 \
-  --env-add MANALOOM_CANONICAL_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
-  --env-add MANALOOM_TARGET_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
   --env-add MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=0 \
-  --env-add MANALOOM_BATTLE_GATE_SUMMARY=/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json \
-  --env-add MANALOOM_BATTLE_STRATEGY_BASE_DIR=/data/manaloom-ops \
-  --env-add MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT=/data/manaloom-ops/artifacts/battle-strategy-audit \
-  --env-add 'MANALOOM_BATTLE_STRATEGY_AUDIT_CRON=5 0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *' \
-  --env-add MANALOOM_BATTLE_STRATEGY_SEEDS=16 \
-  --env-add 'MANALOOM_BATTLE_STRATEGY_NIGHTLY_CRON=5 6 * * *' \
-  --env-add MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS=64 \
-  --env-add MANALOOM_CANONICAL_KNOWN_CARDS_JSON=/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json \
   '$SERVICE'
 
 for attempt in \$(seq 1 60); do
@@ -345,41 +362,12 @@ for attempt in \$(seq 1 60); do
         "\$running_image" == '$IMAGE_DIGEST_REF' &&
         ( -z "\$update_state" || "\$update_state" == completed ) ]]; then
     container="\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)"
-    if docker exec "\$container" test -s \
-        /data/manaloom-ops/known_cards_canonical_snapshot.runtime.json && \
+    if docker exec "\$container" python3 -c \
+        "import hashlib,json,urllib.request; policy_path='/app/server/config/release_capabilities.json'; raw=open(policy_path,'rb').read(); assert hashlib.sha256(raw).hexdigest()=='$RELEASE_CAPABILITIES_DIGEST_SHA256'; policy=json.loads(raw); assert len(policy['capabilities'])==29; assert all(row['release_capability']=='off' and row['allowed'] is False for row in policy['capabilities'].values()); data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='disabled_by_release_capability'; assert data['git_sha']=='$sha'; assert data['operational_mode']=='safe_housekeeping_only'; assert data['enabled_jobs']==['hermes_cron_governor_report']; caps=data['release_capabilities']; assert caps['configuration_status']=='valid'; assert caps['policy_digest_sha256']=='$RELEASE_CAPABILITIES_DIGEST_SHA256'; assert caps['battle_batch']=='off'; assert caps['learning_writes']=='off'" \
+        >/dev/null 2>&1 && \
       docker exec "\$container" python3 -c \
-        "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='native_reviewed_rules_execution'; assert data['git_sha']=='$sha'; assert data['verified_rule_count']>0" \
+        "import json; jobs=json.load(open('/data/manaloom-ops/cron/jobs.json')); assert [row['name'] for row in jobs]==['hermes_cron_governor_report']; assert all(row['enabled'] is True for row in jobs)" \
         >/dev/null 2>&1; then
-      docker exec "\$container" grep -Fq \
-        "oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)" \
-        /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
-      docker exec "\$container" grep -Fq \
-        "def backfill_trusted_oracle_hashes" \
-        /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
-      docker exec "\$container" test -x /app/server/bin/manaloom_battle_strategy_audit.sh
-      docker exec "\$container" test -r /app/scripts/lib/manaloom_mutation_guard.sh
-      docker exec "\$container" /app/server/bin/manaloom_battle_strategy_audit.sh \
-        --dry-run --seeds 1 >/dev/null
-      docker exec "\$container" python3 -c \
-        "import json; jobs=json.load(open('/data/manaloom-ops/cron/jobs.json')); names={row['name'] for row in jobs}; assert {'manaloom_battle_strategy_audit','manaloom_battle_strategy_nightly'} <= names"
-      docker exec "\$container" mkdir -p \
-        /data/manaloom-ops/artifacts/target-deck-identity
-      docker exec "\$container" python3 \
-        /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py \
-        --sqlite-db /data/manaloom-ops/knowledge.db \
-        --pg-deck-id 8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
-        --protected-pg-deck-id 8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
-        --target-deck-id 6 \
-        --apply \
-        --report /data/manaloom-ops/artifacts/target-deck-identity/deploy_sync_$short_sha.json \
-        >/dev/null
-      docker exec "\$container" python3 \
-        /app/docs/hermes-analysis/manaloom-knowledge/scripts/battle_target_deck_identity_guard.py \
-        --sqlite-db /data/manaloom-ops/knowledge.db \
-        --target-deck-id 6 \
-        --expected-pg-deck-id 8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
-        --output /data/manaloom-ops/artifacts/target-deck-identity/deploy_guard_$short_sha.json \
-        >/dev/null
       docker exec "\$container" python3 -c \
         "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); print(json.dumps(data, sort_keys=True))"
       docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'
@@ -400,9 +388,29 @@ REMOTE
 deployed_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
-  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2} /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2} /^MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=/{override=\$2} /^MANALOOM_CANONICAL_PG_DECK_ID=/{canonical=\$2} /^MANALOOM_TARGET_PG_DECK_ID=/{target=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" http \"|\" sync \"|\" override \"|\" canonical \"|\" target}'
+  awk -F= '
+    /^GIT_SHA=/{sha=\$2}
+    /^DB_HOST=/{host=\$2}
+    /^DB_PORT=/{port=\$2}
+    /^DB_NAME=/{name=\$2}
+    /^MANALOOM_RELEASE_CAPABILITIES_FILE=/{policy=\$2}
+    /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2}
+    /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2}
+    /^MANALOOM_BOOT_PULL_PENDING_EVENTS=/{pull=\$2}
+    /^MANALOOM_RUN_PREFLIGHT_ON_BOOT=/{preflight=\$2}
+    /^HERMES_AUTO_SYNC_APPLY=/{autosync=\$2}
+    /^HERMES_AUTO_PROMOTE_APPLY=/{promote=\$2}
+    /^MANALOOM_IMPORT_APPLY=/{import_apply=\$2}
+    /^MANALOOM_ENABLE_LEARNING_WRITES=/{learning_enable=\$2}
+    /^MANALOOM_ENABLE_LEARNED_DECK_WRITES=/{learned_enable=\$2}
+    /^MANALOOM_LEARNING_WRITES=/{learning=\$2}
+    /^MANALOOM_BATTLE_RULES_APPLY_PG=/{battle_pg=\$2}
+    /^MANALOOM_SYNC_CARD_LEGALITIES_APPLY=/{legalities=\$2}
+    /^MTGIA_SYNC_GIT_PULL=/{git_pull=\$2}
+    /^MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=/{override=\$2}
+    END{print sha \"|\" host \"|\" port \"|\" name \"|\" policy \"|\" http \"|\" sync \"|\" pull \"|\" preflight \"|\" autosync \"|\" promote \"|\" import_apply \"|\" learning_enable \"|\" learned_enable \"|\" learning \"|\" battle_pg \"|\" legalities \"|\" git_pull \"|\" override}'
 ")"
-if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|1|1|0|8938b746-1a9e-46ce-b0d9-c2ec932ddddd|8938b746-1a9e-46ce-b0d9-c2ec932ddddd" ]]; then
+if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|/app/server/config/release_capabilities.json|0|0|0|0|0|0|0|0|0|0|0|0|0|0" ]]; then
   echo "deploy convergiu com SHA ou alvo PostgreSQL divergente" >&2
   exit 2
 fi
@@ -411,12 +419,12 @@ release_proof="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 set -euo pipefail
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 health=\$(docker exec \"\$container\" python3 -c \
-  \"import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); print(d['status']+'|'+d['engine_contract']+'|'+d['git_sha'])\")
+  \"import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); c=d['release_capabilities']; print(d['status']+'|'+d['engine_contract']+'|'+d['git_sha']+'|'+c['configuration_status']+'|'+c['policy_digest_sha256']+'|'+c['battle_batch']+'|'+c['learning_writes'])\")
 spec=\$(docker service inspect '$SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
 running=\$(docker service ps '$SERVICE' --filter desired-state=running --format '{{.Image}}' | head -1)
 printf '%s|%s|%s' \"\$spec\" \"\$running\" \"\$health\"
 ")"
-if [[ "$release_proof" != "$IMAGE_DIGEST_REF|$IMAGE_DIGEST_REF|ok|native_reviewed_rules_execution|$sha" ]]; then
+if [[ "$release_proof" != "$IMAGE_DIGEST_REF|$IMAGE_DIGEST_REF|ok|disabled_by_release_capability|$sha|valid|$RELEASE_CAPABILITIES_DIGEST_SHA256|off|off" ]]; then
   echo "deploy manaloom-ops sem prova exata de spec=tarefa=digest e health: $release_proof" >&2
   exit 2
 fi
@@ -425,5 +433,7 @@ DEPLOY_COMMITTED=1
 
 cleanup_remote_build_dir
 
-printf '{"status":"deployed","service":"%s","image_digest_ref":"%s","git_sha":"%s","release_proof":"%s","remote_cleanup_proof":"%s"}\n' \
-  "$SERVICE" "$IMAGE_DIGEST_REF" "$sha" "$release_proof" "$REMOTE_CLEANUP_PROOF"
+printf '{"status":"deployed","service":"%s","image_digest_ref":"%s","git_sha":"%s","release_capabilities_digest_sha256":"%s","release_proof":"%s","remote_cleanup_proof":"%s"}\n' \
+  "$SERVICE" "$IMAGE_DIGEST_REF" "$sha" \
+  "$RELEASE_CAPABILITIES_DIGEST_SHA256" "$release_proof" \
+  "$REMOTE_CLEANUP_PROOF"

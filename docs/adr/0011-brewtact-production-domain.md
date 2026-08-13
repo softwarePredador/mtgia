@@ -76,3 +76,12 @@ aplica CORS por origem HTTPS exata.
 
 Revisar ao migrar a API para domínio próprio, alterar registrador/DNS, ativar
 HSTS preload, remover o alias EasyPanel ou publicar aplicativos nas lojas.
+
+## Adendo de escopo da Beta gratuita — 2026-08-13
+
+Esta decisão fixa coordenadas e identidade pública; ela não habilita produto.
+Na revisão corrente, a matriz server-authoritative permanece totalmente
+`OFF`, o site é apenas informativo e não oferece CTA para `/app`. Os retornos
+`200` históricos de `/app` e das rotas profundas não valem como receipt da
+revisão atual. Qualquer abertura futura exige capability, artefato e prova
+same-SHA próprios, conforme a decisão corrente de produto.

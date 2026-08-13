@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/config/launch_features.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_state_panel.dart';
@@ -21,9 +22,14 @@ import '../../trades/trade_route_contract.dart';
 /// Não possui Scaffold/AppBar — apenas o body content.
 /// Agora possui 2 sub-tabs: "Tenho" (have) e "Quero" (want).
 class BinderTabContent extends StatefulWidget {
-  const BinderTabContent({super.key, this.initialListType = 'have'});
+  const BinderTabContent({
+    super.key,
+    this.initialListType = 'have',
+    this.scannerBuildSupported = LaunchFeatures.scannerEnabled,
+  });
 
   final String initialListType;
+  final bool scannerBuildSupported;
 
   @override
   State<BinderTabContent> createState() => _BinderTabContentState();
@@ -124,9 +130,15 @@ class _BinderTabContentState extends State<BinderTabContent>
               Expanded(
                 child: TabBarView(
                   controller: _subTabController,
-                  children: const [
-                    _BinderListView(listType: 'have'),
-                    _BinderListView(listType: 'want'),
+                  children: [
+                    _BinderListView(
+                      listType: 'have',
+                      scannerBuildSupported: widget.scannerBuildSupported,
+                    ),
+                    _BinderListView(
+                      listType: 'want',
+                      scannerBuildSupported: widget.scannerBuildSupported,
+                    ),
                   ],
                 ),
               ),
@@ -144,7 +156,11 @@ class _BinderTabContentState extends State<BinderTabContent>
 
 class _BinderListView extends StatefulWidget {
   final String listType; // 'have' or 'want'
-  const _BinderListView({required this.listType});
+  final bool scannerBuildSupported;
+  const _BinderListView({
+    required this.listType,
+    required this.scannerBuildSupported,
+  });
 
   @override
   State<_BinderListView> createState() => _BinderListViewState();
@@ -339,6 +355,13 @@ class _BinderListViewState extends State<_BinderListView>
   }
 
   void _openScanCard() {
+    final scannerAllowed = context
+        .read<ReleaseCapabilitiesProvider?>()
+        ?.isAllowed(
+          ReleaseCapability.scanner,
+          buildSupported: widget.scannerBuildSupported,
+        );
+    if (scannerAllowed != true) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -419,6 +442,12 @@ class _BinderListViewState extends State<_BinderListView>
     super.build(context);
     final isHave = widget.listType == 'have';
     final stats = context.select<BinderProvider, BinderStats?>((p) => p.stats);
+    final scannerAllowed = context
+        .watch<ReleaseCapabilitiesProvider?>()
+        ?.isAllowed(
+          ReleaseCapability.scanner,
+          buildSupported: widget.scannerBuildSupported,
+        );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -439,7 +468,7 @@ class _BinderListViewState extends State<_BinderListView>
                 stats: stats,
                 onAdd: _openAddCard,
                 onImport: _openBulkImport,
-                onScan: LaunchFeatures.scannerEnabled ? _openScanCard : null,
+                onScan: scannerAllowed == true ? _openScanCard : null,
                 onMatches: () => context.push(tradeMatchesRouteLocation()),
               ),
 
@@ -447,7 +476,7 @@ class _BinderListViewState extends State<_BinderListView>
               _CompactCollectionActions(
                 onImport: _openBulkImport,
                 onAdd: _openAddCard,
-                onScan: LaunchFeatures.scannerEnabled ? _openScanCard : null,
+                onScan: scannerAllowed == true ? _openScanCard : null,
               ),
 
             // Search + filters
@@ -505,14 +534,16 @@ class _BinderListViewState extends State<_BinderListView>
             ),
 
             // List
-            Expanded(child: _buildList(isHave)),
+            Expanded(
+              child: _buildList(isHave, scannerAllowed: scannerAllowed == true),
+            ),
           ],
         );
       },
     );
   }
 
-  Widget _buildList(bool isHave) {
+  Widget _buildList(bool isHave, {required bool scannerAllowed}) {
     if (_isLoading && _items.isEmpty) {
       return AppStatePanel.loading(
         key: Key('binder-list-loading-${widget.listType}'),
@@ -623,8 +654,9 @@ class _BinderListViewState extends State<_BinderListView>
                         side: const BorderSide(color: AppTheme.outlineMuted),
                       ),
                     ),
-                    if (LaunchFeatures.scannerEnabled)
+                    if (scannerAllowed == true)
                       OutlinedButton.icon(
+                        key: Key('binder-empty-scan-${widget.listType}'),
                         onPressed: _openScanCard,
                         icon: const Icon(Icons.camera_alt),
                         label: const Text('Escanear'),

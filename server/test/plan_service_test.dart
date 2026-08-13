@@ -59,4 +59,38 @@ void main() {
       expect(source, contains('created_at <'));
     },
   );
+
+  test('free beta is the only entitlement exposed by plan snapshots', () {
+    final source = File('lib/plan_service.dart').readAsStringSync();
+
+    expect(PlanService.activeOfferName, 'free');
+    expect(PlanService.activeOfferStatus, 'active');
+    expect(PlanService.freeBetaAiMonthlyOperationalLimit, 120);
+    expect(source, contains('const planName = activeOfferName'));
+    expect(source, contains('const aiMonthlyLimit ='));
+    expect(source, isNot(contains('_proLimit')));
+    expect(source, isNot(contains("plan_name = 'pro'")));
+    expect(
+      source,
+      isNot(contains("VALUES (\n          @userId,\n          'pro'")),
+    );
+  });
+
+  test('legacy Pro activation API fails closed without a database write', () {
+    final source = File('lib/plan_service.dart').readAsStringSync();
+    final activationStart = source.indexOf(
+      'Future<UserPlanSnapshot> activatePro',
+    );
+    final snapshotStart = source.indexOf(
+      'Future<UserPlanSnapshot> getSnapshot',
+    );
+    final activationSource = source.substring(activationStart, snapshotStart);
+
+    expect(activationStart, greaterThanOrEqualTo(0));
+    expect(snapshotStart, greaterThan(activationStart));
+    expect(activationSource, contains('PaidPlanActivationDisabled'));
+    expect(activationSource, isNot(contains('pool.execute')));
+    expect(activationSource, isNot(contains('INSERT INTO')));
+    expect(activationSource, isNot(contains('UPDATE SET')));
+  });
 }

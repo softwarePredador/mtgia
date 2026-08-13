@@ -131,38 +131,39 @@ void main() {
       );
     });
 
-    test('route gates every generated payload before learning and caching', () {
-      final route = File('routes/ai/generate/index.dart').readAsStringSync();
-      final bracketApplication = route.indexOf(
-        'return applyAiGenerateCommanderBracketContract(',
-      );
-      final learningBoundary = route.indexOf(
-        '// Fire-and-forget: loga deck gerado para aprendizado',
-      );
-      final finalCacheWrite = route.lastIndexOf('writeAiGenerateCache(');
+    test(
+      'route gates generated payloads before caching and never learns from previews',
+      () {
+        final route = File('routes/ai/generate/index.dart').readAsStringSync();
+        final bracketApplication = route.indexOf(
+          'applyAiGenerateCommanderBracketContract(',
+        );
+        final finalCacheWrite = route.lastIndexOf('writeAiGenerateCache(');
 
-      expect(bracketApplication, greaterThan(-1));
-      expect(learningBoundary, greaterThan(bracketApplication));
-      expect(finalCacheWrite, greaterThan(learningBoundary));
-      expect(
-        RegExp(
-          r'aiGenerateCommanderBracketMustReject\(\s*responseBody,?\s*\)',
-        ).hasMatch(route),
-        isTrue,
-      );
-      expect(route, contains('buildAiGenerateCommanderBracketPrompt('));
-      expect(route, contains('selectAiGenerateOpenAiMaxTokens('));
-      expect(route, contains('buildAiGenerateOutputTruncatedPayload()'));
-      expect(route, contains("'Retry-After': '1'"));
-      expect(route, contains('ai_generate_reference_prompt_v9'));
-      expect(route, contains('requestedBracket == 5'));
-      expect(
-        route,
-        isNot(contains('resolveCommanderMetaScopeFromPromptText(prompt)')),
-      );
-      expect(route, contains('Never treat every Commander deck'));
-      expect(route, isNot(contains('build a competitive, consistent')));
-    });
+        expect(bracketApplication, greaterThan(-1));
+        expect(finalCacheWrite, greaterThan(bracketApplication));
+        expect(route, isNot(contains('logGeneratedDeckForLearning(')));
+        expect(route, isNot(contains('recordUserCreatedDeckLearning(')));
+        expect(
+          RegExp(
+            r'aiGenerateCommanderBracketMustReject\(\s*responseBody,?\s*\)',
+          ).hasMatch(route),
+          isTrue,
+        );
+        expect(route, contains('buildAiGenerateCommanderBracketPrompt('));
+        expect(route, contains('selectAiGenerateOpenAiMaxTokens('));
+        expect(route, contains('buildAiGenerateOutputTruncatedPayload()'));
+        expect(route, contains("'Retry-After': '1'"));
+        expect(route, contains('ai_generate_reference_prompt_v9'));
+        expect(route, contains('requestedBracket == 5'));
+        expect(
+          route,
+          isNot(contains('resolveCommanderMetaScopeFromPromptText(prompt)')),
+        );
+        expect(route, contains('Never treat every Commander deck'));
+        expect(route, isNot(contains('build a competitive, consistent')));
+      },
+    );
   });
 }
 

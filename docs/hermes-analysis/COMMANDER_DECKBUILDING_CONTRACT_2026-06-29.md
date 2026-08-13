@@ -2,6 +2,19 @@
 
 Status: `frozen_operating_contract`.
 
+## Addendum operacional — 2026-08-12
+
+O mapa corrente de implementação está em
+`../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md` e prevalece para a
+fronteira de learning. Preview de Generate/Optimize não grava aceite nem
+aprendizado; writes de produto ficam default-off; qualquer source diferente de
+`user_created` é telemetria em quarentena. Export Hermes cria candidato
+inativo, import/auto-sync/auto-promotion com apply estão bloqueados e Battle
+continua apenas evidência. Learned deck já ativo em PostgreSQL permanece como
+dado legado para inventário: reads ficam desligadas por padrão e ele só volta
+a ser input com capability explícita, backfill validado e receipt. Nenhum
+candidato novo vira ativo sem a state machine e o receipt de `DCK-P0-05`.
+
 Este é o contrato canônico compacto. O diário completo de decisões e pacotes
 foi separado, sem perda de bytes, em
 `archive/COMMANDER_DECKBUILDING_EVIDENCE_LOG_2026-06-29_TO_2026-07-15.md`.
@@ -122,7 +135,8 @@ Há uma pipeline Commander para todos os comandantes:
 1. dados e legalidade oficiais;
 2. perfil de intenção;
 3. corpus externo/de referência;
-4. learned deck e uso local;
+4. learned deck e uso local, somente quando capability, inventário e receipt
+   aprovados estiverem vigentes; caso contrário esta lane fica `unavailable`;
 5. shell legal determinístico;
 6. proposta de optimizer/IA;
 7. validação, matriz, Battle e replay.

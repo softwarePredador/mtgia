@@ -2,6 +2,13 @@
 
 Status: `current_operating_standard`.
 
+Release capability amendment (2026-08-13): este contrato continua descrevendo
+o executor e seus gates de laboratório, mas não autoriza deploy público. A
+matriz Free Beta commitada mantém `battle_batch`, `battle_live` e
+`battle_coach` OFF; deploys de sidecar/backend e bundles públicos recusam
+qualquer opt-in legado antes de mutar ou construir. Reativação exige nova
+decisão versionada, capability, receipt same-SHA e revisão deste contrato.
+
 Operational closure, residual compaction, and resumable mass-battle commands
 are defined in
 `docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`.
@@ -74,16 +81,18 @@ scope was reconciled read-only. Runtime health, coverage, simulations and
 interactive replays publish `engine_patch_commit`; the backend rejects a
 missing or different patch identity. Product UI remains engine-neutral.
 
-Interactive XMage release is a separate, default-off lane. When the invoking
-process supplies `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1`, the sidecar
-deploy may create or update the private direct-Swarm service
+Interactive XMage remains a separate, default-off laboratory lane. The former
+caller-only opt-in via `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1` is
+superseded and rejected by the current Free Beta release scripts. A future
+approved release may create or update the private direct-Swarm service
 `evolution_xmage-interactive` from the same immutable XMage digest. It publishes
 no port or Traefik route and proves the private network alias, image revision,
 engine identity, `runtime_mode=interactive`,
 `batch_simulation_available=false`, and bounded capacity. That first stage
-keeps `INTERACTIVE_BATTLE_ENABLED=false`; only a second backend deploy with the
-same caller-only flag may enable it, after proving the service is same-SHA and
-ready. Neither persistent dotenv nor a healthy batch executor can opt in.
+keeps `INTERACTIVE_BATTLE_ENABLED=false`. Any future enablement requires a new
+versioned release policy and same-SHA receipt after proving the service ready;
+the legacy caller flag, persistent dotenv and a healthy batch executor cannot
+opt in.
 
 All three battle deploy scripts execute
 `scripts/manaloom_battle_product_gate.sh` before deployment. The live product

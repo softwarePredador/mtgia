@@ -44,11 +44,12 @@ class PullLearningEventsSchemaTest(unittest.TestCase):
                 conn.execute(
                     """
                     INSERT INTO user_learning_events (
-                        event_id, deck_id, commander, format, card_count
+                        event_id, deck_id, commander, format, card_count, source
                     )
                     VALUES
-                        ('event-full', 'deck-1', 'Talrand, Sky Summoner', 'commander', 100),
-                        ('event-partial', 'deck-2', 'Atraxa, Praetors'' Voice', 'commander', 1)
+                        ('event-full', 'deck-1', 'Talrand, Sky Summoner', 'commander', 100, 'user_created'),
+                        ('event-partial', 'deck-2', 'Atraxa, Praetors'' Voice', 'commander', 1, 'user_created'),
+                        ('event-preview', 'deck-3', 'Muldrotha, the Gravetide', 'commander', 100, 'ai_generated')
                     """
                 )
 
@@ -68,13 +69,26 @@ class PullLearningEventsSchemaTest(unittest.TestCase):
                     "commander",
                     100,
                     "Talrand, Sky Summoner",
+                    "user_created",
                 )
                 partial = module._classify_learning_event(
                     "commander",
                     1,
                     "Atraxa, Praetors' Voice",
+                    "user_created",
                 )
-                non_commander = module._classify_learning_event("standard", 60, "")
+                non_commander = module._classify_learning_event(
+                    "standard",
+                    60,
+                    "",
+                    "user_created",
+                )
+                quarantined = module._classify_learning_event(
+                    "commander",
+                    100,
+                    "Muldrotha, the Gravetide",
+                    "ai_generated",
+                )
 
                 self.assertTrue(trainable["training_eligible"])
                 self.assertEqual(
@@ -88,6 +102,24 @@ class PullLearningEventsSchemaTest(unittest.TestCase):
                     non_commander["learning_status"],
                     "non_commander_telemetry",
                 )
+                self.assertFalse(quarantined["training_eligible"])
+                self.assertEqual(
+                    quarantined["learning_status"],
+                    "quarantined_source",
+                )
+
+                # Existing rows are always reclassified. This repairs previews
+                # that an older importer had already marked as trainable.
+                conn.execute(
+                    """
+                    UPDATE user_learning_events
+                    SET training_eligible = 1,
+                        learning_status = 'trainable_commander_deck',
+                        learning_reason = 'legacy_classifier'
+                    WHERE event_id = 'event-preview'
+                    """
+                )
+                module._ensure_tables(conn)
 
                 module._import_commander(conn, "Talrand, Sky Summoner")
                 self.assertEqual(
@@ -110,6 +142,10 @@ class PullLearningEventsSchemaTest(unittest.TestCase):
                 self.assertEqual(
                     statuses["event-partial"],
                     ("partial_telemetry", 0),
+                )
+                self.assertEqual(
+                    statuses["event-preview"],
+                    ("quarantined_source", 0),
                 )
             finally:
                 conn.close()

@@ -108,7 +108,7 @@ void main() {
       }
     });
 
-    test('live fixture registrations follow the current legal policy', () {
+    test('live fixture identities follow the current legal policy', () {
       for (final relativePath in const [
         'scripts/manaloom_ai_paywall_e2e.sh',
         'scripts/manaloom_product_smoke.sh',
@@ -120,7 +120,15 @@ void main() {
           script,
           contains('load_manaloom_legal_policy_versions "\$ROOT_DIR"'),
         );
-        expect(script, matches(RegExp(r'legal_accepted:\s*true')));
+        if (relativePath ==
+            'scripts/manaloom_authenticated_visual_qa_isolated.sh') {
+          expect(script, contains('terms_version, terms_accepted_at'));
+          expect(script, contains('privacy_version, privacy_accepted_at'));
+          expect(script, contains(":'terms_version', CURRENT_TIMESTAMP"));
+          expect(script, contains(":'privacy_version', CURRENT_TIMESTAMP"));
+        } else {
+          expect(script, matches(RegExp(r'legal_accepted:\s*true')));
+        }
         expect(script, contains(r'$MANALOOM_CURRENT_TERMS_VERSION'));
         expect(script, contains(r'$MANALOOM_CURRENT_PRIVACY_VERSION'));
         if (relativePath !=

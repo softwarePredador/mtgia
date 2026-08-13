@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import os
+import hashlib
 import json
+import os
 import re
 import sqlite3
 import subprocess
@@ -9,6 +10,7 @@ import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Callable
 
@@ -45,9 +47,140 @@ ENV_FILE = Path(os.environ.get("MTGIA_ENV_FILE", str(REPO_ROOT / "server/.env"))
 PYTHON_BIN = os.environ.get("PYTHON_BIN", "python3")
 MANALOOM_DART_BIN = os.environ.get("MANALOOM_DART_BIN", "dart")
 RUN_PREFLIGHT_ON_BOOT = os.environ.get("MANALOOM_RUN_PREFLIGHT_ON_BOOT", "0") == "1"
-BOOT_PULL_PENDING_EVENTS = os.environ.get("MANALOOM_BOOT_PULL_PENDING_EVENTS", "1") == "1"
-NATIVE_BATTLE_HTTP_ENABLED = os.environ.get("MANALOOM_NATIVE_BATTLE_HTTP_ENABLED", "1") == "1"
-NATIVE_BATTLE_SYNC_ON_BOOT = os.environ.get("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT", "1") == "1"
+BOOT_PULL_PENDING_EVENTS = os.environ.get("MANALOOM_BOOT_PULL_PENDING_EVENTS", "0") == "1"
+NATIVE_BATTLE_HTTP_ENABLED = os.environ.get("MANALOOM_NATIVE_BATTLE_HTTP_ENABLED", "0") == "1"
+NATIVE_BATTLE_SYNC_ON_BOOT = os.environ.get("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT", "0") == "1"
+RELEASE_CAPABILITIES_FILE = Path(
+    os.environ.get(
+        "MANALOOM_RELEASE_CAPABILITIES_FILE",
+        str(REPO_ROOT / "server/config/release_capabilities.json"),
+    )
+).resolve()
+
+EXPECTED_RELEASE_CAPABILITIES = {
+    "account_registration",
+    "ads",
+    "ai_analyze_optimize_advisory",
+    "ai_generate_rebuild",
+    "art_paywall",
+    "battle_batch",
+    "battle_coach",
+    "battle_live",
+    "billing_checkout",
+    "binder_public",
+    "catalog_private",
+    "collection_private",
+    "comments",
+    "deck_replace_all",
+    "decks_private",
+    "direct_messages",
+    "follows",
+    "gallery_public",
+    "learning_reads",
+    "learning_writes",
+    "legacy_ai_routes",
+    "life_counter_local",
+    "marketplace",
+    "profiles_public",
+    "scanner",
+    "social_push",
+    "subscriptions",
+    "trades",
+    "user_search",
+}
+EXPECTED_RELEASE_POLICY_KEYS = {
+    "schema_version",
+    "policy_version",
+    "product",
+    "release_channel",
+    "offer_mode",
+    "implementation_status",
+    "live_verified_as_of",
+    "capabilities",
+}
+EXPECTED_RELEASE_CAPABILITY_ENTRY_KEYS = {
+    "implementation_status",
+    "release_capability",
+    "allowed",
+    "live_verified_as_of",
+}
+RELEASE_CAPABILITY_VALUES = {"on", "off", "experimental_allowlist"}
+_UTC_TIMESTAMP_RE = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:"
+    r"[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?Z$"
+)
+
+
+@dataclass(frozen=True)
+class ReleasePolicy:
+    valid: bool
+    digest: str
+    capabilities: dict[str, bool]
+
+    def allowed(self, key: str) -> bool:
+        return self.valid and self.capabilities.get(key, False)
+
+
+def _is_nonempty_string(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _is_valid_timestamp(value: object) -> bool:
+    return value is None or (
+        isinstance(value, str) and _UTC_TIMESTAMP_RE.fullmatch(value) is not None
+    )
+
+
+def _load_release_policy(path: Path = RELEASE_CAPABILITIES_FILE) -> ReleasePolicy:
+    try:
+        raw = path.read_bytes()
+        payload = json.loads(raw.decode("utf-8"))
+        valid = (
+            isinstance(payload, dict)
+            and set(payload) == EXPECTED_RELEASE_POLICY_KEYS
+            and payload.get("schema_version") == "release_capabilities_v1"
+            and payload.get("product") == "brewtact"
+            and payload.get("release_channel") == "free_beta"
+            and payload.get("offer_mode") == "free_beta_no_commerce"
+            and _is_nonempty_string(payload.get("policy_version"))
+            and _is_nonempty_string(payload.get("implementation_status"))
+            and _is_valid_timestamp(payload.get("live_verified_as_of"))
+        )
+        capabilities = payload.get("capabilities") if valid else None
+        valid = (
+            valid
+            and isinstance(capabilities, dict)
+            and set(capabilities) == EXPECTED_RELEASE_CAPABILITIES
+        )
+        allowed: dict[str, bool] = {}
+        if valid:
+            for key, entry in capabilities.items():
+                if (
+                    not isinstance(entry, dict)
+                    or set(entry) != EXPECTED_RELEASE_CAPABILITY_ENTRY_KEYS
+                    or not _is_nonempty_string(entry.get("implementation_status"))
+                    or not _is_valid_timestamp(entry.get("live_verified_as_of"))
+                ):
+                    valid = False
+                    break
+                release_capability = entry.get("release_capability")
+                entry_allowed = entry.get("allowed")
+                if release_capability not in RELEASE_CAPABILITY_VALUES:
+                    valid = False
+                    break
+                if not isinstance(entry_allowed, bool) or entry_allowed != (
+                    release_capability == "on"
+                ):
+                    valid = False
+                    break
+                allowed[key] = entry_allowed
+        digest = hashlib.sha256(raw).hexdigest()
+        if valid:
+            return ReleasePolicy(True, digest, allowed)
+        return ReleasePolicy(False, digest, {})
+    except Exception:
+        marker = str(path).encode("utf-8")
+        return ReleasePolicy(False, hashlib.sha256(marker).hexdigest(), {})
 
 
 @dataclass(frozen=True)
@@ -63,7 +196,8 @@ class Job:
 STATE_WRITE_LOCK = threading.Lock()
 
 
-def _base_env() -> dict[str, str]:
+def _base_env(policy: ReleasePolicy | None = None) -> dict[str, str]:
+    effective_policy = policy or ReleasePolicy(False, "unavailable", {})
     env = dict(os.environ)
     if ENV_FILE.is_file():
         for raw_line in ENV_FILE.read_text(encoding="utf-8").splitlines():
@@ -82,6 +216,42 @@ def _base_env() -> dict[str, str]:
             "MTGIA_SYNC_SERVER_DIR": str(REPO_ROOT / "server"),
             "MTGIA_ENV_FILE": str(ENV_FILE),
             "MTGIA_SYNC_GIT_PULL": "0",
+            # A release capability never makes a legacy apply flag an
+            # authorization token. These paths remain neutralized until their
+            # versioned receipt/state-machine contracts are implemented.
+            "HERMES_AUTO_PROMOTE_APPLY": "0",
+            "HERMES_AUTO_SYNC_APPLY": "0",
+            "MANALOOM_BATTLE_RULES_APPLY_PG": "0",
+            "MANALOOM_ENABLE_LEARNED_DECK_WRITES": "0",
+            "MANALOOM_ENABLE_LEARNING_WRITES": "0",
+            "MANALOOM_IMPORT_APPLY": "0",
+            "MANALOOM_LEARNING_WRITES": "0",
+            "MANALOOM_SYNC_CARD_LEGALITIES_APPLY": "0",
+            "MANALOOM_BOOT_PULL_PENDING_EVENTS": (
+                "1"
+                if effective_policy.allowed("learning_writes")
+                and BOOT_PULL_PENDING_EVENTS
+                else "0"
+            ),
+            "MANALOOM_NATIVE_BATTLE_HTTP_ENABLED": (
+                "1"
+                if effective_policy.allowed("battle_batch")
+                and NATIVE_BATTLE_HTTP_ENABLED
+                else "0"
+            ),
+            "MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT": (
+                "1"
+                if effective_policy.allowed("battle_batch")
+                and NATIVE_BATTLE_SYNC_ON_BOOT
+                else "0"
+            ),
+            "MANALOOM_RUN_PREFLIGHT_ON_BOOT": (
+                "1"
+                if effective_policy.allowed("ai_analyze_optimize_advisory")
+                and effective_policy.allowed("battle_batch")
+                and RUN_PREFLIGHT_ON_BOOT
+                else "0"
+            ),
             "PYTHON_BIN": PYTHON_BIN,
             "MANALOOM_DART_BIN": MANALOOM_DART_BIN,
             "HERMES_KNOWLEDGE_DB": str(KNOWLEDGE_DB),
@@ -141,8 +311,10 @@ def _base_env() -> dict[str, str]:
     return env
 
 
-def _sync_native_battle_rules(env: dict[str, str]) -> None:
-    if not NATIVE_BATTLE_SYNC_ON_BOOT:
+def _sync_native_battle_rules(
+    env: dict[str, str], *, battle_batch_allowed: bool
+) -> None:
+    if not battle_batch_allowed or not NATIVE_BATTLE_SYNC_ON_BOOT:
         return
     script = (
         REPO_ROOT
@@ -177,8 +349,8 @@ def _sync_native_battle_rules(env: dict[str, str]) -> None:
     )
 
 
-def _start_native_battle_http() -> object | None:
-    if not NATIVE_BATTLE_HTTP_ENABLED:
+def _start_native_battle_http(*, battle_batch_allowed: bool) -> object | None:
+    if not battle_batch_allowed or not NATIVE_BATTLE_HTTP_ENABLED:
         return None
     os.environ["MANALOOM_KNOWLEDGE_DB"] = str(KNOWLEDGE_DB)
     os.environ["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] = str(CANONICAL_SNAPSHOT)
@@ -197,6 +369,80 @@ def _start_native_battle_http() -> object | None:
         f"[manaloom-ops] native battle HTTP started address={server.server_address}",
         flush=True,
     )
+    return server
+
+
+def _start_disabled_ops_health(
+    policy: ReleasePolicy,
+    *,
+    enabled_jobs: tuple[str, ...] = (),
+    host: str | None = None,
+    port: int | None = None,
+) -> ThreadingHTTPServer:
+    battle_batch_allowed = policy.allowed("battle_batch")
+    learning_writes_allowed = policy.allowed("learning_writes")
+    engine_contract = (
+        "disabled_by_release_capability"
+        if not battle_batch_allowed
+        else "disabled_by_runtime_configuration"
+    )
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:  # noqa: N802
+            if self.path.split("?", 1)[0] != "/health":
+                self.send_error(404)
+                return
+            body = json.dumps(
+                {
+                    "status": "ok",
+                    "engine_contract": engine_contract,
+                    "git_sha": os.environ.get("GIT_SHA"),
+                    "operational_mode": "safe_housekeeping_only",
+                    "enabled_jobs": list(enabled_jobs),
+                    "release_capabilities": {
+                        "configuration_status": (
+                            "valid" if policy.valid else "invalid_fail_closed"
+                        ),
+                        "policy_digest_sha256": policy.digest,
+                        "battle_batch": (
+                            "on" if battle_batch_allowed else "off"
+                        ),
+                        "learning_writes": (
+                            "on" if learning_writes_allowed else "off"
+                        ),
+                    },
+                },
+                sort_keys=True,
+            ).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, _format: str, *args: object) -> None:
+            return
+
+    server = ThreadingHTTPServer(
+        (
+            host
+            if host is not None
+            else os.environ.get("MANALOOM_NATIVE_BATTLE_HOST", "0.0.0.0"),
+            port
+            if port is not None
+            else int(os.environ.get("MANALOOM_NATIVE_BATTLE_PORT", "8080")),
+        ),
+        Handler,
+    )
+    thread = threading.Thread(
+        target=server.serve_forever,
+        name="manaloom-ops-disabled-health",
+        daemon=True,
+    )
+    thread.start()
+    if not thread.is_alive():
+        raise RuntimeError("disabled ops health thread failed to start")
     return server
 
 
@@ -268,9 +514,11 @@ def _collect_boot_jobs(
     knowledge_db_path: Path,
     knowledge_db_has_validator_tables: Callable[[Path], bool] = _knowledge_db_has_validator_tables,
     pending_learning_events_count: Callable[[dict[str, str]], int | None] = _pg_pending_learning_events_count,
+    learning_writes_allowed: bool = False,
+    preflight_allowed: bool = False,
 ) -> list[tuple[str, str]]:
     planned: list[tuple[str, str]] = []
-    if BOOT_PULL_PENDING_EVENTS:
+    if learning_writes_allowed and BOOT_PULL_PENDING_EVENTS:
         pending_events = pending_learning_events_count(env)
         if pending_events and pending_events > 0:
             planned.append(
@@ -280,7 +528,10 @@ def _collect_boot_jobs(
                 )
             )
 
-    if RUN_PREFLIGHT_ON_BOOT or not knowledge_db_has_validator_tables(knowledge_db_path):
+    if preflight_allowed and (
+        RUN_PREFLIGHT_ON_BOOT
+        or not knowledge_db_has_validator_tables(knowledge_db_path)
+    ):
         reason = (
             "env_enabled"
             if RUN_PREFLIGHT_ON_BOOT
@@ -435,6 +686,42 @@ JOBS = [
         script_name="hermes_cron_governor_report.sh",
     ),
 ]
+
+JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
+    "manaloom_ai_runtime_cleanup": ("ai_analyze_optimize_advisory",),
+    "pull_learning_events": ("learning_writes",),
+    "auto_sync_learned_decks": ("learning_writes",),
+    "manaloom_sync_card_legalities_from_scryfall": ("catalog_private",),
+    "manaloom_new_card_candidate_review": ("catalog_private",),
+    "manaloom_card_data_gap_review": ("catalog_private",),
+    "manaloom_battle_rule_review_queue": ("battle_batch",),
+    "manaloom_battle_rule_focused_evidence": ("battle_batch",),
+    "manaloom_battle_rule_promotion_gate": ("battle_batch",),
+    "auto_promote_learned_decks": ("learning_writes",),
+    "manaloom_battle_strategy_audit": ("battle_batch",),
+    "manaloom_battle_strategy_nightly": ("battle_batch",),
+    "master_optimizer_preflight": (
+        "ai_analyze_optimize_advisory",
+        "battle_batch",
+    ),
+    "manaloom_knowledge_import": ("learning_writes",),
+    "hermes_mana_base_validator": ("ai_analyze_optimize_advisory",),
+    # This report only summarizes the local scheduler manifest/log status. It
+    # is the sole explicitly capability-free liveness/housekeeping job.
+    "hermes_cron_governor_report": (),
+}
+
+
+def _jobs_for_release_policy(policy: ReleasePolicy) -> list[Job]:
+    return [
+        job
+        for job in JOBS
+        if job.name in JOB_REQUIRED_CAPABILITIES
+        and all(
+            policy.allowed(capability)
+            for capability in JOB_REQUIRED_CAPABILITIES[job.name]
+        )
+    ]
 
 
 def _matches_part(value: int, expr: str) -> bool:
@@ -644,7 +931,12 @@ def _tail_excerpt(path: Path, max_lines: int = 6) -> str:
     return " | ".join(line.strip() for line in lines[-max_lines:] if line.strip())[:600]
 
 
-def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]]) -> None:
+def _run_job(
+    job: Job,
+    env: dict[str, str],
+    state: dict[str, dict[str, object]],
+    manifest_jobs: list[Job] = JOBS,
+) -> None:
     started_at = datetime.now().isoformat(timespec="seconds")
     log_path = _job_log_path(job)
     with STATE_WRITE_LOCK:
@@ -657,7 +949,7 @@ def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]])
             "last_error": None,
             "latest_output": str(log_path),
         }
-        _write_jobs_manifest(JOBS, state)
+        _write_jobs_manifest(manifest_jobs, state)
     print(
         f"[manaloom-ops] run name={job.name} schedule={job.schedule} "
         f"at={started_at} log={log_path}",
@@ -689,7 +981,7 @@ def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]])
             "last_error": None,
             "latest_output": str(log_path),
         }
-        _write_jobs_manifest(JOBS, state)
+        _write_jobs_manifest(manifest_jobs, state)
     excerpt = _tail_excerpt(log_path)
     print(
         f"[manaloom-ops] done name={job.name} exit_code={result.returncode}",
@@ -705,6 +997,7 @@ def _start_background_job(
     state: dict[str, dict[str, object]],
     active_jobs: dict[str, threading.Thread],
     active_jobs_lock: threading.Lock,
+    manifest_jobs: list[Job] = JOBS,
 ) -> bool:
     with active_jobs_lock:
         current = active_jobs.get(job.name)
@@ -714,7 +1007,7 @@ def _start_background_job(
 
         def run() -> None:
             try:
-                _run_job(job, env, state)
+                _run_job(job, env, state, manifest_jobs)
             except Exception as exc:
                 finished_at = datetime.now().isoformat(timespec="seconds")
                 with STATE_WRITE_LOCK:
@@ -725,7 +1018,7 @@ def _start_background_job(
                         "last_exit_code": 1,
                         "last_error": str(exc),
                     }
-                    _write_jobs_manifest(JOBS, state)
+                    _write_jobs_manifest(manifest_jobs, state)
                 print(
                     f"[manaloom-ops] background error name={job.name} error={exc}",
                     flush=True,
@@ -751,11 +1044,28 @@ def main() -> int:
     CRON_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     KNOWLEDGE_DB.parent.mkdir(parents=True, exist_ok=True)
 
-    env = _base_env()
-    _sync_native_battle_rules(env)
-    native_battle_server = _start_native_battle_http()
-    state = _load_existing_state(JOBS)
-    _write_jobs_manifest(JOBS, state)
+    policy = _load_release_policy()
+    runtime_jobs = _jobs_for_release_policy(policy)
+    battle_batch_allowed = policy.allowed("battle_batch")
+    learning_writes_allowed = policy.allowed("learning_writes")
+    env = _base_env(policy)
+    _sync_native_battle_rules(
+        env,
+        battle_batch_allowed=battle_batch_allowed,
+    )
+    native_battle_server = _start_native_battle_http(
+        battle_batch_allowed=battle_batch_allowed,
+    )
+    disabled_health_server = (
+        None
+        if native_battle_server is not None
+        else _start_disabled_ops_health(
+            policy,
+            enabled_jobs=tuple(job.name for job in runtime_jobs),
+        )
+    )
+    state = _load_existing_state(runtime_jobs)
+    _write_jobs_manifest(runtime_jobs, state)
     active_jobs: dict[str, threading.Thread] = {}
     active_jobs_lock = threading.Lock()
 
@@ -767,31 +1077,50 @@ def main() -> int:
     print(f"[manaloom-ops] jobs_json={JOBS_JSON}", flush=True)
     print(f"[manaloom-ops] cron_output_dir={CRON_OUTPUT_DIR}", flush=True)
     print(
+        "[manaloom-ops] release_capabilities="
+        f"{'valid' if policy.valid else 'invalid_fail_closed'} "
+        f"digest={policy.digest}",
+        flush=True,
+    )
+    print(
         f"[manaloom-ops] native_battle_http={'enabled' if native_battle_server else 'disabled'}",
         flush=True,
     )
-    for job in JOBS:
+    if disabled_health_server is not None:
+        print("[manaloom-ops] safe housekeeping mode enabled", flush=True)
+    for job in runtime_jobs:
         print(
             f"[manaloom-ops] job name={job.name} schedule={job.schedule} script={job.script_name}",
             flush=True,
         )
 
-    for job_name, reason in _collect_boot_jobs(env, knowledge_db_path=KNOWLEDGE_DB):
-        job = next((candidate for candidate in JOBS if candidate.name == job_name), None)
+    for job_name, reason in _collect_boot_jobs(
+        env,
+        knowledge_db_path=KNOWLEDGE_DB,
+        learning_writes_allowed=learning_writes_allowed,
+        preflight_allowed=(
+            policy.allowed("ai_analyze_optimize_advisory")
+            and battle_batch_allowed
+        ),
+    ):
+        job = next(
+            (candidate for candidate in runtime_jobs if candidate.name == job_name),
+            None,
+        )
         if job is None:
             continue
         print(
             f"[manaloom-ops] boot trigger name={job_name} reason={reason}",
             flush=True,
         )
-        _run_job(job, env, state)
+        _run_job(job, env, state, runtime_jobs)
 
     last_minute: str | None = None
     while True:
         now = datetime.now()
         minute_key = now.strftime("%Y-%m-%d %H:%M")
         if minute_key != last_minute:
-            for job in JOBS:
+            for job in runtime_jobs:
                 try:
                     if _matches_schedule(job.schedule, now):
                         if job.background:
@@ -801,9 +1130,10 @@ def main() -> int:
                                 state,
                                 active_jobs,
                                 active_jobs_lock,
+                                runtime_jobs,
                             )
                         else:
-                            _run_job(job, env, state)
+                            _run_job(job, env, state, runtime_jobs)
                 except Exception as exc:  # keep scheduler alive even on bad schedule
                     print(
                         f"[manaloom-ops] error name={job.name} schedule={job.schedule} "

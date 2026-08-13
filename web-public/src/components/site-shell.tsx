@@ -3,12 +3,11 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 
 import { routes } from "@/lib/routes";
-import { Container, RouteLink } from "./ui";
+import { AccessPending, Container } from "./ui";
 
 const navItems = [
   { href: `${routes.home}#produto`, label: "Produto" },
-  { href: routes.marketplace, label: "Mercado" },
-  { href: routes.pricing, label: "Planos" },
+  { href: routes.pricing, label: "Beta" },
   { href: routes.disclaimer, label: "IA e dados" }
 ];
 
@@ -37,13 +36,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <RouteLink
-            href={routes.app}
-            className="focus-ring inline-flex h-11 shrink-0 items-center justify-center rounded-lg border border-brass-400 bg-brass-400 px-3 text-sm font-bold text-obsidian-950 transition hover:bg-brass-300 sm:px-4"
-          >
-            <span className="sm:hidden">App</span>
-            <span className="hidden sm:inline">Abrir app</span>
-          </RouteLink>
+          <AccessPending compact />
         </Container>
       </header>
       {children}
@@ -57,18 +50,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
               <div className="font-display text-xl font-semibold">BrewTact</div>
             </div>
             <p className="mt-3 max-w-md text-sm leading-6 text-mist-300">
-              Sua próxima jogada começa no app: decks, coleção, preços e trocas no mesmo lugar.
+              Beta gratuita em preparação: decks, coleção e sugestões revisáveis no mesmo lugar quando o acesso for liberado.
             </p>
           </div>
           <div className="grid gap-2 text-sm text-mist-300">
             <Link href={`${routes.home}#produto`} className="hover:text-brass-300">
               Produto
             </Link>
-            <Link href={routes.marketplace} className="hover:text-brass-300">
-              Mercado
-            </Link>
             <Link href={routes.pricing} className="hover:text-brass-300">
-              Planos
+              Beta gratuita
             </Link>
           </div>
           <div className="grid gap-2 text-sm text-mist-300">

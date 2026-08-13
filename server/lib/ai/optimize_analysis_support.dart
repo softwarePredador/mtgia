@@ -7,8 +7,6 @@ import '../logger.dart';
 import 'optimization_validator.dart';
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
-  required String deckId,
-  required String? userId,
   required String commanderName,
   required List<String> commanderColors,
   required String operationMode,
@@ -74,8 +72,6 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   }
 
   return {
-    'deck_id': deckId,
-    'user_id': userId,
     'commander_name': commanderName,
     'commander_colors': commanderColors,
     'initial_card_count': _extractDeckCardCount(deckAnalysis),
@@ -104,8 +100,6 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
     'decisions_reasoning': {
       if (normalizedValidationRunToken != null)
         'validation_run_token': normalizedValidationRunToken,
-      'deck_id': deckId,
-      if (userId != null && userId.trim().isNotEmpty) 'user_id': userId.trim(),
       'status_code': statusCode,
       'requested_mode': requestedMode,
       'response_mode': operationMode,
@@ -156,8 +150,6 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
 
 Future<void> recordOptimizeAnalysisOutcome({
   required Pool pool,
-  required String deckId,
-  required String? userId,
   required String commanderName,
   required List<String> commanderColors,
   required String operationMode,
@@ -183,8 +175,6 @@ Future<void> recordOptimizeAnalysisOutcome({
 }) async {
   try {
     final entry = buildOptimizationAnalysisLogEntry(
-      deckId: deckId,
-      userId: userId,
       commanderName: commanderName,
       commanderColors: commanderColors,
       operationMode: operationMode,

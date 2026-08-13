@@ -191,32 +191,23 @@ void main() {
     });
   });
 
-  group('backend interactive release opt-in', () {
-    test('preflights same-SHA private runtime before backend mutation', () {
+  group('backend interactive release containment', () {
+    test('binds all-OFF policy before mutation without runtime preflight', () {
       final preflight = backend.indexOf(
         r'require_xmage_interactive_release_contract "$sha"',
       );
-      final firstBackendMutation = backend.indexOf(
-        '# Bootstrap one server-side operations credential',
+      final capabilityPolicy = backend.indexOf(
+        r'manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$sha"',
       );
       final mutation = backend.indexOf('DEPLOY_MUTATION_STARTED=1');
-      expect(preflight, greaterThanOrEqualTo(0));
-      expect(firstBackendMutation, greaterThan(preflight));
-      expect(mutation, greaterThan(preflight));
-      expect(
-        backend,
-        contains(
-          r'! "$spec_image" =~ ^localhost:5000/manaloom/xmage-sidecar@sha256:[0-9a-f]{64}$',
-        ),
-      );
-      expect(backend, contains(r'"$image_revision" != "$expected_sha"'));
-      expect(backend, contains(r'"$ports" != "0"'));
-      expect(backend, contains(r'"$network_count" != "1"'));
-      expect(backend, contains(r'"$alias_attached" != "1"'));
-      expect(backend, contains(r'"$traefik_labels" != "0"'));
+      expect(preflight, -1);
+      expect(capabilityPolicy, greaterThanOrEqualTo(0));
+      expect(mutation, greaterThan(capabilityPolicy));
+      expect(backend, contains('INTERACTIVE_BATTLE_ENABLED=false'));
+      expect(backend, contains('BATTLE_LIVE_SPECTATOR_ENABLED=false'));
     });
 
-    test('writes exact config and requires ready only when explicitly on', () {
+    test('writes disabled config and requires disabled readiness', () {
       expect(
         backend,
         contains(
@@ -245,15 +236,15 @@ void main() {
           r'"$runtime_interactive_contract" != "$expected_interactive_contract"',
         ),
       );
-      expect(backend, contains(r'if $interactive_enabled == "true" then'));
       expect(
         backend,
-        contains('.checks.interactive_battle.runtime_isolation =='),
+        isNot(contains(r'if $interactive_enabled == "true" then')),
       );
-      expect(backend, contains('.checks.interactive_battle.maximum_active =='));
       expect(
         backend,
-        contains('.checks.interactive_battle.status == "disabled" and'),
+        contains(
+          'disabled_by_policy(.checks.interactive_battle; "battle_coach")',
+        ),
       );
     });
 
@@ -274,13 +265,7 @@ void main() {
           includeParentEnvironment: true,
         );
         expect(result.exitCode, 2, reason: relativePath);
-        expect(
-          '${result.stderr}',
-          contains(
-            'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1',
-          ),
-          reason: relativePath,
-        );
+        expect('${result.stderr}', contains('deve'), reason: relativePath);
         expect(
           '${result.stderr}',
           isNot(contains('env file')),

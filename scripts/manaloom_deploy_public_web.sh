@@ -3,6 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
+# shellcheck source=scripts/lib/manaloom_public_web_surface_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_public_web_surface_contract.sh"
 
 # Approval must be supplied by the invoking process before any persistent
 # environment or remote tooling is consulted.
@@ -25,7 +27,8 @@ load_manaloom_env_keys "$ENV_FILE" \
   MANALOOM_EASYPANEL_SSH_KEY MANALOOM_PUBLIC_WEB_IMAGE_REPO \
   MANALOOM_PUBLIC_WEB_EASYPANEL_SERVICE \
   MANALOOM_PUBLIC_WEB_SWARM_SERVICE MANALOOM_REMOTE_BUILD_ROOT \
-  MANALOOM_WEB_PUBLIC_URL NEXT_PUBLIC_SITE_URL
+  MANALOOM_WEB_PUBLIC_URL MANALOOM_PUBLIC_WEB_REPORT_FIXTURE_ID \
+  NEXT_PUBLIC_SITE_URL
 
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-${EASYPANEL_SSH_USER:-root}@${EASYPANEL_SERVER_IP:-}}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-${EASYPANEL_SSH_KEY:-}}"
@@ -37,8 +40,10 @@ REMOTE_BUILD_ROOT="${MANALOOM_REMOTE_BUILD_ROOT:-/opt/manaloom/deploy}"
 PUBLIC_BASE_URL="${MANALOOM_WEB_PUBLIC_URL:-https://evolution-manaloom-web-public.2ta7qx.easypanel.host}"
 API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
 SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://brewtact.com}"
+REPORT_FIXTURE_ID="${MANALOOM_PUBLIC_WEB_REPORT_FIXTURE_ID:-}"
 REMOTE_DIR=""
 HEADERS_FILE=""
+PROBE_DIR=""
 DEPLOY_MUTATION_STARTED=0
 DEPLOY_COMMITTED=0
 SOURCE_MUTATED=0
@@ -176,6 +181,9 @@ cleanup() {
   fi
   if [[ -n "$HEADERS_FILE" ]]; then
     rm -f "$HEADERS_FILE"
+  fi
+  if [[ -n "$PROBE_DIR" ]]; then
+    rm -rf "$PROBE_DIR"
   fi
   if [[ "$LIVE_MUTATION_APPROVED" == "1" && -n "$REMOTE_DIR" &&
         -n "${MANALOOM_SECURE_SSH_KNOWN_HOSTS:-}" ]]; then
@@ -401,15 +409,61 @@ fi
 
 HEALTH_BODY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/healthz")"
 [[ "$HEALTH_BODY" == "ok" ]]
-for route in / /pricing /marketplace /blog /legal/privacy /legal/terms /legal/disclaimer /robots.txt /sitemap.xml; do
+PROBE_DIR="$(mktemp -d /tmp/manaloom-public-web-probe.XXXXXX)"
+HEADERS_FILE="$PROBE_DIR/headers"
+while IFS= read -r route; do
   status="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL$route")"
   if [[ "$status" != "200" ]]; then
     echo "smoke publico falhou em $route: HTTP $status" >&2
     exit 1
   fi
-done
+done < <(manaloom_public_web_required_routes)
 
-HEADERS_FILE="$(mktemp /tmp/manaloom_public_web_headers.XXXXXX)"
+while IFS= read -r route; do
+  : >"$HEADERS_FILE"
+  status="$(curl -sS --max-time 20 -D "$HEADERS_FILE" \
+    -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL$route")"
+  location="$(awk '
+    tolower($1) == "location:" {
+      $1 = ""
+      sub(/^[[:space:]]+/, "")
+      sub(/\r$/, "")
+      print
+      exit
+    }
+  ' "$HEADERS_FILE")"
+  manaloom_public_web_assert_removed_response \
+    "$route" "$status" "$location" "$PUBLIC_BASE_URL"
+done < <(manaloom_public_web_removed_routes)
+
+MISSING_REPORT_ROUTE="/reports/public-web-deploy-missing-${SHA:0:12}"
+: >"$HEADERS_FILE"
+MISSING_REPORT_STATUS="$(curl -sS --max-time 20 -D "$HEADERS_FILE" \
+  -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL$MISSING_REPORT_ROUTE")"
+if [[ "$MISSING_REPORT_STATUS" != "404" ]] ||
+   grep -Eqi '^location:' "$HEADERS_FILE"; then
+  echo "relatorio publico inexistente nao falhou fechado: HTTP $MISSING_REPORT_STATUS" >&2
+  exit 1
+fi
+
+if [[ -n "$REPORT_FIXTURE_ID" ]]; then
+  manaloom_public_web_validate_report_fixture_id "$REPORT_FIXTURE_ID"
+  REPORT_FIXTURE_STATUS="$(curl -sS --max-time 20 -o /dev/null \
+    -w '%{http_code}' "$PUBLIC_BASE_URL/reports/$REPORT_FIXTURE_ID")"
+  if [[ "$REPORT_FIXTURE_STATUS" != "200" ]]; then
+    echo "fixture de relatorio compartilhado falhou: HTTP $REPORT_FIXTURE_STATUS" >&2
+    exit 1
+  fi
+fi
+
+curl -fsS --max-time 20 "$PUBLIC_BASE_URL/" >"$PROBE_DIR/root.html"
+curl -fsS --max-time 20 "$PUBLIC_BASE_URL/pricing" >"$PROBE_DIR/pricing.html"
+curl -fsS --max-time 20 "$PUBLIC_BASE_URL/sitemap.xml" >"$PROBE_DIR/sitemap.xml"
+manaloom_public_web_assert_free_beta_files \
+  "$PROBE_DIR/root.html" "$PROBE_DIR/pricing.html"
+manaloom_public_web_assert_sitemap_file "$PROBE_DIR/sitemap.xml"
+
+: >"$HEADERS_FILE"
 curl -fsS --max-time 20 -D "$HEADERS_FILE" -o /dev/null "$PUBLIC_BASE_URL/"
 grep -Eqi '^x-content-type-options:[[:space:]]*nosniff' "$HEADERS_FILE"
 grep -Eqi '^x-frame-options:[[:space:]]*SAMEORIGIN' "$HEADERS_FILE"

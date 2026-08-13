@@ -26,17 +26,38 @@ fi
 readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_MAX_ACTIVE
 readonly INTERACTIVE_PER_USER_ACTIVE_LIMIT
 
-# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
-source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
-require_live_mutation_approval "deploy dos battle sidecars"
-require_postgres_write_approval "deploy dos battle sidecars com runtime PostgreSQL"
-
 require_tool() {
   command -v "$1" >/dev/null 2>&1 || {
     echo "required tool missing: $1" >&2
     exit 2
   }
 }
+
+for tool in git jq shasum; do
+  require_tool "$tool"
+done
+
+# shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
+release_source_sha="$(git -C "$ROOT_DIR" rev-parse HEAD)"
+if ! manaloom_load_release_capabilities_from_git \
+  "$ROOT_DIR" "$release_source_sha"; then
+  echo "BLOCKED: deploy dos battle sidecars exige matriz committed valida" >&2
+  exit 2
+fi
+if jq -e '
+  .capabilities.battle_batch.release_capability == "off" and
+  .capabilities.battle_live.release_capability == "off" and
+  .capabilities.battle_coach.release_capability == "off"
+' >/dev/null <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON"; then
+  echo "BLOCKED: battle_batch, battle_live e battle_coach estao off no SHA committed; nenhum sidecar sera publicado" >&2
+  exit 2
+fi
+
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "deploy dos battle sidecars"
+require_postgres_write_approval "deploy dos battle sidecars com runtime PostgreSQL"
 
 for tool in base64 curl git jq python3 shasum ssh; do
   require_tool "$tool"

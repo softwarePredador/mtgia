@@ -4,30 +4,20 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 BUILD_ONLY="${MANALOOM_RELEASE_BUILD_ONLY:-0}"
-# Capture the release decision before loading the persistent server
-# environment. Only the invoking process may opt this public artifact in.
+# Capture legacy caller flags before loading persistent state. The committed
+# free-beta policy is all-OFF, so any nonzero value is rejected pre-mutation.
 RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"
 RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR="${MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR:-0}"
-if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" &&
-      "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "1" ]]; then
-  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve ser 0 ou 1" >&2
+if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" != "0" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0 enquanto a matriz free-beta estiver all-OFF" >&2
   exit 2
 fi
-if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" &&
-      "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "1" ]]; then
-  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve ser 0 ou 1" >&2
+if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" != "0" ]]; then
+  echo "MANALOOM_RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR deve permanecer 0 enquanto a matriz free-beta estiver all-OFF" >&2
   exit 2
 fi
-if [[ "$RELEASE_ENABLE_INTERACTIVE_BATTLE" == "1" ]]; then
-  INTERACTIVE_BATTLE_DART_DEFINE=true
-else
-  INTERACTIVE_BATTLE_DART_DEFINE=false
-fi
-if [[ "$RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR" == "1" ]]; then
-  BATTLE_LIVE_SPECTATOR_DART_DEFINE=true
-else
-  BATTLE_LIVE_SPECTATOR_DART_DEFINE=false
-fi
+INTERACTIVE_BATTLE_DART_DEFINE=false
+BATTLE_LIVE_SPECTATOR_DART_DEFINE=false
 readonly RELEASE_ENABLE_INTERACTIVE_BATTLE INTERACTIVE_BATTLE_DART_DEFINE
 readonly RELEASE_ENABLE_BATTLE_LIVE_SPECTATOR BATTLE_LIVE_SPECTATOR_DART_DEFINE
 
@@ -306,6 +296,7 @@ SHA="$(jq -r '.git_sha' <<<"$IDENTITY_JSON")"
 SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
 VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
 SOURCE_COMMITTED_AT="$(jq -r '.source_committed_at' <<<"$IDENTITY_JSON")"
+RELEASE_CAPABILITIES_JSON="$(jq -cer '.release_capabilities' <<<"$IDENTITY_JSON")"
 IMAGE="$IMAGE_REPO:$SHORT_SHA"
 RELEASE_DIR="${MANALOOM_RELEASE_DIR:-$HOME/.manaloom/releases/$VERSION/$SHORT_SHA}"
 WORKTREE_DIR="$(mktemp -d /tmp/manaloom-app-web-source.XXXXXX)"
@@ -403,6 +394,7 @@ jq -n \
   --argjson sentry_configured "$([[ -n "$SENTRY_RELEASE_DSN" ]] && printf true || printf false)" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     schema_version: 1,
     product: "manaloom",
@@ -412,6 +404,7 @@ jq -n \
     short_sha: $short_sha,
     built_at: $built_at,
     source_committed_at: $source_committed_at,
+    release_capabilities: $release_capabilities,
     api_base_url: $api_base_url,
     features: {
       battle_live_spectator_enabled: $battle_live_spectator_enabled,
@@ -438,9 +431,11 @@ jq -n \
     }
   }' > "$WORKTREE_DIR/app/build/web/release.json"
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '.git_sha == $sha and .version == $version and .platform == "web" and
+   .release_capabilities == $release_capabilities and
    .features.battle_live_spectator_enabled == $battle_live_spectator_enabled and
    .features.interactive_battle_enabled == $interactive_battle_enabled' \
   "$WORKTREE_DIR/app/build/web/release.json" >/dev/null
@@ -469,8 +464,15 @@ if [[ "$BUILD_ONLY" == "1" ]]; then
   )
   rm -rf "$WEB_RELEASE_DIR"
   mv "$WEB_RELEASE_TMP" "$WEB_RELEASE_DIR"
-  printf '{"status":"built","platform":"web","version":"%s","git_sha":"%s","release_dir":"%s","manifest":"%s"}\n' \
-    "$VERSION" "$SHA" "$WEB_RELEASE_DIR" "$WEB_RELEASE_DIR/release.json"
+  jq -cn \
+    --arg version "$VERSION" \
+    --arg git_sha "$SHA" \
+    --arg release_dir "$WEB_RELEASE_DIR" \
+    --arg manifest "$WEB_RELEASE_DIR/release.json" \
+    --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+    '{status:"built", platform:"web", version:$version, git_sha:$git_sha,
+      release_dir:$release_dir, manifest:$manifest,
+      release_capabilities:$release_capabilities}'
   exit 0
 fi
 
@@ -651,9 +653,11 @@ ROOT_CODE="$(curl -sS -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL/")"
 [[ "$ROOT_CODE" == "200" ]]
 grep -Fq '<base href="/app/">' /tmp/manaloom_app_web_deep.html
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '.git_sha == $sha and .version == $version and .platform == "web" and
+   .release_capabilities == $release_capabilities and
    .features.battle_live_spectator_enabled == $battle_live_spectator_enabled and
    .features.interactive_battle_enabled == $interactive_battle_enabled' \
   /tmp/manaloom_app_release.json >/dev/null
@@ -681,6 +685,7 @@ jq -cn \
   --argjson bootstrap_code "$BOOTSTRAP_CODE" \
   --argjson release_code "$RELEASE_CODE" \
   --argjson deep_link_code "$DEEP_LINK_CODE" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
   '{
     status: "deployed",
     service: $service,
@@ -688,6 +693,7 @@ jq -cn \
     image_digest_ref: $image_digest_ref,
     version: $version,
     git_sha: $git_sha,
+    release_capabilities: $release_capabilities,
     app_url: $app_url,
     root_code: $root_code,
     app_code: $app_code,

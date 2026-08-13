@@ -47,12 +47,25 @@ void main() {
       for (final path in const [
         'bin/migrate.dart',
         'bin/setup_database.dart',
-        'bin/update_schema.dart',
       ]) {
         final source = File(path).readAsStringSync();
         expect(source, contains('splitPostgresStatements('), reason: path);
         expect(source, isNot(contains(".split(';')")), reason: path);
       }
+    });
+
+    test('retired update_schema entrypoint is a fail-closed tombstone', () {
+      final source = File('bin/update_schema.dart').readAsStringSync();
+
+      expect(source, contains('BLOCKED:'));
+      expect(source, contains('retired destructive schema'));
+      expect(source, contains('reset entrypoint'));
+      expect(source, contains('bin/migrate.dart'));
+      expect(source, contains('exitCode = 2'));
+      expect(source, isNot(contains('Database()')));
+      expect(source, isNot(contains('DROP TABLE')));
+      expect(source, isNot(contains('database_setup.sql')));
+      expect(source, isNot(contains('execute(')));
     });
   });
 }

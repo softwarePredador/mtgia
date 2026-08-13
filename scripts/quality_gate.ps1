@@ -207,9 +207,14 @@ function Run-PatrolSmoke {
 }
 
 function Run-E2ESuite {
-  Write-Header "ManaLoom E2E suite"
+  Write-Header "ManaLoom E2E suite (strict gate)"
   Ensure-Command "bash"
-  bash (Join-Path $RootDir "scripts/manaloom_e2e_suite.sh")
+  bash (Join-Path $RootDir "scripts/manaloom_e2e_suite.sh") --strict
+  $e2eExitCode = $LASTEXITCODE
+  if ($e2eExitCode -ne 0) {
+    Write-Host "❌ Gate E2E estrito terminou com exit $e2eExitCode; PARTIAL/SKIP nao recebe credito de PASS."
+    exit $e2eExitCode
+  }
 }
 
 function Run-ProjectLogic {
@@ -259,13 +264,15 @@ Uso:
   .\scripts\quality_gate.ps1 custom-lint # roda regras customizadas ManaLoom no app/server
   .\scripts\quality_gate.ps1 patrol-smoke # valida fluxos E2E criticos do Patrol
   .\scripts\quality_gate.ps1 project-logic # manifesto, OpenAPI, ERD e drift documental
-  .\scripts\quality_gate.ps1 e2e # suite E2E local: app, deckbuilder, battle, IA, contratos e logs
+  .\scripts\quality_gate.ps1 e2e # gate E2E estrito: PARTIAL/SKIP retorna nao-zero
 
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
   O modo 'full' é determinístico e exclui tags live/live_backend/live_db_write/live_external.
   Use o perfil E2E live guardado para chamadas contra uma API real.
-  Use 'e2e' para varredura completa local; exporte MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 ou MANALOOM_RUN_LIVE_PRODUCT_E2E=1 para camadas vivas opcionais.
+  Use 'e2e' como gate estrito: somente PASS retorna zero. Para diagnostico
+  PARTIAL sem credito de gate/release, execute no bash:
+  ./scripts/manaloom_e2e_suite.sh --allow-partial
 
 Exemplos:
   .\scripts\quality_gate.ps1 full

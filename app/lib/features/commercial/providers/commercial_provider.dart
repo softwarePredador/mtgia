@@ -2,25 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/api_client.dart';
-import '../../../core/branding/product_identity.dart';
-import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
 
 typedef SharedPreferencesLoader = Future<SharedPreferences> Function();
-
-class CommercialCheckoutResult {
-  const CommercialCheckoutResult({
-    required this.activated,
-    required this.requiresExternalPayment,
-    required this.message,
-    this.checkoutUrl,
-  });
-
-  final bool activated;
-  final bool requiresExternalPayment;
-  final String message;
-  final String? checkoutUrl;
-}
 
 class CommercialProvider extends ChangeNotifier {
   CommercialProvider({
@@ -59,7 +43,6 @@ class CommercialProvider extends ChangeNotifier {
   String? get lastRemoteError => _lastRemoteError;
   ManaLoomPlanTier get tier => _tier;
   ManaLoomPlan get plan => ManaLoomPlan.forTier(_tier);
-  bool get isPro => _tier == ManaLoomPlanTier.pro;
   String get periodKey => _periodKey;
   int get usedAiActions => _usedAiActions;
   int get monthlyAiLimit => _monthlyAiLimitOverride ?? plan.monthlyAiLimit;
@@ -83,6 +66,7 @@ class CommercialProvider extends ChangeNotifier {
     final prefs = await _preferencesLoader();
     _preferences = prefs;
     _tier = ManaLoomPlanTierLabel.fromId(prefs.getString(_planKey));
+    await prefs.setString(_planKey, _tier.id);
     _periodKey = prefs.getString(_usagePeriodKey) ?? _periodFrom(_now());
     _usedAiActions = prefs.getInt(_usageCountKey) ?? 0;
     await _rolloverIfNeeded();
@@ -158,60 +142,6 @@ class CommercialProvider extends ChangeNotifier {
     return true;
   }
 
-  Future<CommercialCheckoutResult> startProCheckout() async {
-    await load();
-    if (CommercialLaunchPolicy.isFreeBeta) {
-      return const CommercialCheckoutResult(
-        activated: false,
-        requiresExternalPayment: false,
-        message: CommercialLaunchPolicy.betaCheckoutMessage,
-      );
-    }
-    try {
-      final response = await _apiClient.post('/users/me/plan/checkout', {
-        'plan_name': ManaLoomPlanTier.pro.id,
-      });
-      final data =
-          response.data is Map<String, dynamic>
-              ? response.data as Map<String, dynamic>
-              : const <String, dynamic>{};
-
-      final planPayload = data['plan'];
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          planPayload is Map<String, dynamic>) {
-        await _applyRemotePlan(planPayload);
-        _isRemoteSynced = true;
-        notifyListeners();
-        return CommercialCheckoutResult(
-          activated: true,
-          requiresExternalPayment: false,
-          message: data['message']?.toString() ?? 'Plano Pro ativado.',
-          checkoutUrl: data['checkout_url']?.toString(),
-        );
-      }
-
-      final checkoutUrl = data['checkout_url']?.toString();
-      return CommercialCheckoutResult(
-        activated: false,
-        requiresExternalPayment: true,
-        checkoutUrl:
-            checkoutUrl == null || checkoutUrl.trim().isEmpty
-                ? null
-                : checkoutUrl,
-        message:
-            data['message']?.toString() ??
-            'O ${ProductIdentity.proDisplayName} ainda não está disponível para contratação.',
-      );
-    } catch (error) {
-      debugPrint('[CommercialProvider] startProCheckout failed: $error');
-      return const CommercialCheckoutResult(
-        activated: false,
-        requiresExternalPayment: true,
-        message: 'Não foi possível iniciar o checkout agora.',
-      );
-    }
-  }
-
   Future<void> clearRemoteSnapshot() {
     _remoteRefreshGeneration += 1;
     _remoteRefreshFuture = null;
@@ -263,9 +193,9 @@ class CommercialProvider extends ChangeNotifier {
       planPayload['plan_name']?.toString(),
     );
     final used = _readInt(planPayload['ai_requests_used']) ?? 0;
-    final limit =
-        _readInt(planPayload['ai_monthly_limit']) ??
-        ManaLoomPlan.forTier(tier).monthlyAiLimit;
+    final reportedLimit = _readInt(planPayload['ai_monthly_limit']);
+    final limit = (reportedLimit ?? ManaLoomPlan.operationalAiMonthlyCeiling)
+        .clamp(0, ManaLoomPlan.operationalAiMonthlyCeiling);
 
     _tier = tier;
     _usedAiActions = used.clamp(0, limit);

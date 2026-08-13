@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import importlib.util
+import contextlib
+import io
 import json
 import os
 import sqlite3
@@ -13,6 +15,7 @@ from pathlib import Path
 
 
 def _load_module(tmp: str):
+    os.environ.pop("HERMES_AUTO_PROMOTE_APPLY", None)
     os.environ["HERMES_KNOWLEDGE_DB"] = str(Path(tmp) / "knowledge.db")
     root = Path(__file__).resolve().parents[1]
     path = root / "bin" / "auto_promote_learned_decks.py"
@@ -68,7 +71,7 @@ def _create_reduced_schema(conn: sqlite3.Connection) -> None:
 
 
 class AutoPromoteLearnedDecksTest(unittest.TestCase):
-    def test_reduced_schema_promotes_only_verified_target_deck(self) -> None:
+    def test_default_dry_run_reports_candidate_without_sqlite_mutation(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             module = _load_module(tmp)
             db_path = os.environ["HERMES_KNOWLEDGE_DB"]
@@ -121,20 +124,38 @@ class AutoPromoteLearnedDecksTest(unittest.TestCase):
             finally:
                 conn.close()
 
-            self.assertEqual(module.main([]), 0)
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(module.main([]), 0)
 
             conn = sqlite3.connect(db_path)
             try:
-                row = conn.execute(
-                    """
-                    SELECT learned_deck_id, target_deck_id, new_card_count,
-                           actual_card_count, migration_verified
-                    FROM deck_promotions
-                    """
-                ).fetchone()
-                self.assertEqual(row, (1, 10, 100, 100, 1))
+                self.assertFalse(module._table_exists(conn, "deck_promotions"))
             finally:
                 conn.close()
+            self.assertIn("CANDIDATE_ONLY Talrand, Sky Summoner", output.getvalue())
+            self.assertIn("promoted=0", output.getvalue())
+
+    def test_apply_is_blocked_before_opening_or_mutating_sqlite(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            module = _load_module(tmp)
+            db_path = Path(os.environ["HERMES_KNOWLEDGE_DB"])
+
+            error = io.StringIO()
+            with contextlib.redirect_stderr(error):
+                self.assertEqual(module.main(["--apply"]), 2)
+
+            self.assertFalse(db_path.exists())
+            self.assertIn("BLOCKED_DCK_P0_05", error.getvalue())
+
+    def test_legacy_apply_environment_is_also_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            module = _load_module(tmp)
+            os.environ["HERMES_AUTO_PROMOTE_APPLY"] = "1"
+            try:
+                self.assertEqual(module.main([]), 2)
+            finally:
+                os.environ.pop("HERMES_AUTO_PROMOTE_APPLY", None)
 
     def test_incomplete_target_deck_is_not_promoted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -185,8 +206,7 @@ class AutoPromoteLearnedDecksTest(unittest.TestCase):
 
             conn = sqlite3.connect(db_path)
             try:
-                count = conn.execute("SELECT COUNT(*) FROM deck_promotions").fetchone()[0]
-                self.assertEqual(count, 0)
+                self.assertFalse(module._table_exists(conn, "deck_promotions"))
             finally:
                 conn.close()
 

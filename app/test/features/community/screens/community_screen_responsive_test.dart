@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/community/providers/community_provider.dart';
@@ -150,10 +151,10 @@ void main() {
     await tester.pumpAndSettle();
 
     TabBar tabs = tester.widget(find.byKey(const Key('community-tabs')));
-    expect(tabs.controller?.index, 3);
+    expect(tabs.controller?.index, 0);
     expect(
       router.routeInformationProvider.value.uri.toString(),
-      '/community?tab=3',
+      '/community?tab=0',
     );
 
     router.go('/community?tab=1');
@@ -262,6 +263,10 @@ class _CommunityProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+        ),
         ChangeNotifierProvider(
           create: (_) => CommunityProvider(apiClient: api),
         ),

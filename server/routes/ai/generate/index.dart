@@ -116,11 +116,12 @@ Future<Response> onRequest(RequestContext context) async {
                 'generation_constraint_guidance':
                     generationConstraintGuidance.diagnostics,
               };
-      return applyAiGenerateCommanderBracketContract(
+      final bracketChecked = applyAiGenerateCommanderBracketContract(
         format: format,
         requestedBracket: requestedBracket,
         responseBody: withGuidance,
       );
+      return _applyMockGeneratePersistenceBoundary(bracketChecked);
     }
 
     Map<String, dynamic>? referenceProfile;
@@ -205,7 +206,7 @@ Future<Response> onRequest(RequestContext context) async {
       prompt: prompt,
       format: format,
       bracket: requestedBracket,
-      commanderName: referenceGuidanceEnabled ? requestedCommanderName : null,
+      commanderName: requestedCommanderName,
       referenceProfileVersion: referenceProfileVersion,
       constraints: generationConstraints,
     );
@@ -248,7 +249,10 @@ Future<Response> onRequest(RequestContext context) async {
     final cachedBody =
         generationConstraints.isRequested
             ? null
-            : readAiGenerateCache(cacheKey);
+            : readAiGenerateCache(
+              cacheKey,
+              requestedCommanderName: requestedCommanderName,
+            );
     timings['cache_lookup_ms'] = cacheLookupStopwatch.elapsedMilliseconds;
     if (cachedBody != null) {
       final bracketCheckedCachedBody = applyAiGenerateCommanderBracketContract(
@@ -1021,20 +1025,6 @@ $commanderBracketPrompt
       resolvedCards: validation.resolvedCards,
     );
 
-    // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
-    if (format.toLowerCase() == 'commander' &&
-        validation.isValid &&
-        validation.invalidCards.isEmpty &&
-        responseBody['can_save'] != false) {
-      unawaited(
-        logGeneratedDeckForLearning(
-          pool: pool,
-          responseBody: responseBody,
-          source: 'ai_generated',
-        ),
-      );
-    }
-
     if (validation.invalidCards.isNotEmpty || validation.warnings.isNotEmpty) {
       responseBody['warnings'] = {
         'invalid_cards': validation.invalidCards,
@@ -1395,10 +1385,7 @@ Future<Response> _startAiGenerateAsyncJob({
     prompt: prompt,
     format: format,
     bracket: body['bracket'],
-    commanderName:
-        referenceCacheVersion == null
-            ? null
-            : body['commander_name']?.toString(),
+    commanderName: body['commander_name']?.toString(),
     referenceProfileVersion: referenceCacheVersion,
     constraints: constraints,
   );
@@ -1427,6 +1414,9 @@ Future<Response> _startAiGenerateAsyncJob({
   final jobId = creation.jobId;
   final planReservation =
       creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
+  if (!creation.isNew) {
+    waiveAiPlanReservationForReusedJobIfAvailable(context);
+  }
 
   final syncPayload = buildAiGenerateSyncPayloadForAsyncJob(body);
   final authorization = context.request.headers['authorization'];
@@ -1774,6 +1764,7 @@ bool _shouldUseReferenceGuidedDeterministicFastPath({
 }
 
 bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
+  if (body['is_mock'] == true) return false;
   if (body['can_save'] == false) return false;
   if (aiGenerateCommanderBracketMustReject(body)) return false;
   if (aiGenerateCommanderStructuralMustReject(body)) return false;
@@ -1800,6 +1791,18 @@ bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
   }
 
   return true;
+}
+
+Map<String, dynamic> _applyMockGeneratePersistenceBoundary(
+  Map<String, dynamic> body,
+) {
+  if (body['is_mock'] != true) return body;
+  return {
+    ...body,
+    'can_save': false,
+    'learning_eligible': false,
+    'learning_exclusion_reason': 'mock_generation_non_persistable',
+  };
 }
 
 Map<String, dynamic>? _extractReferenceDeterministicDeckDiagnostics(

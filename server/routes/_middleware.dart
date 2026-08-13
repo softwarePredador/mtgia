@@ -12,12 +12,14 @@ import '../lib/logger.dart';
 import '../lib/observability.dart';
 import '../lib/request_metrics_service.dart';
 import '../lib/request_trace.dart';
+import '../lib/release_capability_policy.dart';
 import '../lib/runtime_environment.dart';
 
 final _db = Database();
 var _connected = false;
 const _socialSlowRequestThresholdMs = 1000;
 final _runtimeEnvironment = loadRuntimeEnvironment();
+final _releaseCapabilityPolicy = ReleaseCapabilityPolicy.load();
 final _corsPolicy = CorsPolicy.fromEnvironment({
   'ENVIRONMENT': _runtimeEnvironment['ENVIRONMENT'] ?? 'development',
   'MANALOOM_ALLOWED_ORIGINS':
@@ -90,6 +92,32 @@ Handler middleware(Handler handler) {
       );
     }
 
+    final releaseCapabilityDecision = _releaseCapabilityPolicy.decisionFor(
+      path: context.request.uri.path,
+      method: context.request.method.name,
+      queryParameters: context.request.uri.queryParameters,
+    );
+    if (!releaseCapabilityDecision.allowed) {
+      final capability = releaseCapabilityDecision.capability!;
+      final entry = _releaseCapabilityPolicy.entry(capability);
+      return Response.json(
+        statusCode: releaseCapabilityDecision.statusCode!,
+        body: {
+          'error': releaseCapabilityDecision.errorCode,
+          'capability': capability,
+          'release_capability': entry.releaseCapability,
+          'policy_version': _releaseCapabilityPolicy.policyVersion,
+          'policy_digest_sha256': _releaseCapabilityPolicy.policyDigestSha256,
+          'offer_mode': _releaseCapabilityPolicy.offerMode,
+        },
+        headers: {
+          ...responseHeaders,
+          'Cache-Control': 'no-store',
+          'x-request-id': requestId,
+        },
+      );
+    }
+
     try {
       if (!processLiveness) {
         await ensureObservabilityInitialized();
@@ -109,9 +137,20 @@ Handler middleware(Handler handler) {
 
       var response =
           processLiveness
-              ? await handler.use(provider<RequestTrace>((_) => trace))(context)
+              ? await handler
+                  .use(
+                    provider<ReleaseCapabilityPolicy>(
+                      (_) => _releaseCapabilityPolicy,
+                    ),
+                  )
+                  .use(provider<RequestTrace>((_) => trace))(context)
               : await handler
                   .use(provider<Pool>((_) => _db.connection))
+                  .use(
+                    provider<ReleaseCapabilityPolicy>(
+                      (_) => _releaseCapabilityPolicy,
+                    ),
+                  )
                   .use(provider<RequestTrace>((_) => trace))(context);
 
       final contentLength = int.tryParse(
@@ -182,7 +221,9 @@ Handler middleware(Handler handler) {
 /// Process liveness must stay independent from PostgreSQL and telemetry.
 /// Readiness remains dependency-aware at `/health/ready` and `/ready`.
 bool isDatabaseIndependentHealthPath(String path) {
-  return path == '/health' ||
+  return path == '/capabilities' ||
+      path == '/capabilities/' ||
+      path == '/health' ||
       path == '/health/' ||
       path == '/health/live' ||
       path == '/health/live/';

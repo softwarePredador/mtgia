@@ -1,4 +1,10 @@
-# ADR 0004 — GO limitado do spike XMage humano contra IA
+# Registro histórico — GO limitado do spike XMage humano contra IA
+
+> Status: `historical_duplicate_id · superseded_by_adr_0012`.
+> Este arquivo recebeu o número 0004 quando o repositório já possuía o ADR
+> 0004 de Battle Live. Ele permanece byte-oriented como evidência histórica,
+> mas não deve ser citado como decisão canônica. A decisão vigente e sem
+> ambiguidade está em `0012-xmage-human-spike-go.md`.
 
 - Estado: aceito
 - Data: 2026-07-27

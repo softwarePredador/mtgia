@@ -1,5 +1,10 @@
 # Hermes Analysis: Project Memory
 
+> **HISTORICAL / SUPERSEDED.** Host, branch, SHA, contagens, precedência e
+> comandos abaixo são memória de uma rodada antiga. Não sincronize, aplique,
+> faça commit ou escolha prioridade a partir deste arquivo. Use
+> `../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md` e o backlog mestre.
+
 > Status atual: memoria historica do agente.
 > Quando houver conflito, `README.md` e
 > `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md` prevalecem.

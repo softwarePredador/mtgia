@@ -202,7 +202,9 @@ void main() {
     expect(source, contains('.checks.battle_job_schema.status == "healthy"'));
     expect(
       source,
-      contains('.checks.battle_live_spectator.status == "disabled"'),
+      contains(
+        'disabled_by_policy(.checks.battle_live_spectator; "battle_live")',
+      ),
     );
   });
 

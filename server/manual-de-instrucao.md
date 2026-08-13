@@ -1,3 +1,13 @@
+> **HISTORICAL / SUPERSEDED — NAO USE COMO RUNBOOK OU PLANO ATUAL.**
+>
+> Este manual continuo preserva decisoes e operacoes de checkouts anteriores.
+> Entradas abaixo sobre hosts, deploy, crons, sync, IA, aprendizado ou promocao
+> podem estar obsoletas e nao autorizam nenhuma mutacao. Para o fluxo vigente
+> de Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+>
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
@@ -3666,7 +3676,7 @@ Riscos restantes:
 - Runtime PASS no Android fisico `SM A135M` (`R58T300SREH`, Android 14/API 34)
   contra o backend publico. Deck salvo:
   `18da672e-f48b-4e6c-8a65-bb828e6a28b8`.
-- Validacao API: `validation_ok=true`, `main_qty=99`,
+- Validacao do endpoint: `validation_ok=true`, `main_qty=99`,
   `total_with_commander=100`, `lorehold_commander_count=1`,
   `lorehold_in_99_count=0`, `off_identity_count=0`,
   `classification=on_theme`, `on_theme_reference_matches=33`.
@@ -9321,6 +9331,12 @@ dart run bin/seed_database.dart
 
 ### 3.4. Atualização do Schema (Evolução do Banco)
 
+> **HISTÓRICO — NÃO EXECUTAR:** a estratégia destrutiva descrita abaixo foi
+> aposentada. `bin/update_schema.dart` é agora um tombstone fail-closed e retorna
+> código 2 sem abrir PostgreSQL. Mudanças atuais usam somente
+> `bin/migrate.dart` e o schema gate descartável/loopback. Este trecho permanece
+> apenas para explicar a evolução antiga.
+
 **Mudança:**
 Adicionamos tabelas para `users`, `rules` e `card_legalities`, e atualizamos a tabela `decks` para pertencer a um usuário.
 
@@ -9553,7 +9569,7 @@ Future<Response> onRequest(RequestContext context) async {
 **Response (201 Created):**
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token": "<jwt-ficticio>",
   "user": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "username": "joao123",
@@ -9585,7 +9601,7 @@ Future<Response> onRequest(RequestContext context) async {
 **Response (200 OK):**
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token": "<jwt-ficticio>",
   "user": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "username": "joao123",
@@ -15406,11 +15422,16 @@ Comportamento:
 - busca decks em `meta_decks` (formatos `EDH` e `cEDH`) contendo o comandante no `card_list`;
 - fallback por `archetype ILIKE` com token do comandante quando não houver match direto no `card_list`;
 - gera modelo de referência com cartas mais frequentes (não-básicas), taxa de aparição e amostra de decks fonte;
-- fallback resiliente para schema parcial (quando coluna `common_commanders` não existe), sem quebrar a rota.
+- sem fallback para colunas não declaradas: depois das fontes canônicas de
+  referência Commander, a ausência de prioridade retorna lista vazia. O
+  vocabulário/provenance futuro depende de `BT-AI-016`/`BT-AI-017` e de
+  migration explícita antes de qualquer consumer runtime.
 
 Integração no `optimize/complete`:
 - arquivo: `server/routes/ai/optimize/index.dart`
-- adição de `_loadCommanderCompetitivePriorities(...)` com mesma lógica de fallback (`card_list` -> `archetype` -> `card_meta_insights` quando disponível);
+- prioridades competitivas usam somente a seleção canônica de
+  `meta_decks`; quando ela não entrega cartas, o runtime retorna vazio em vez
+  de consultar coluna/tabela auxiliar não declarada;
 - nomes prioritários do modelo competitivo entram no solver como preferência (boost de ranking), tornando as sugestões menos arbitrárias e mais ancoradas no acervo competitivo local.
 
 ### 81.3 Validação
@@ -18558,7 +18579,10 @@ Retenção recomendada: DELETE > 90 dias para evitar acúmulo sem consumidor.
 - Adapter F1 (`resolveCardFunctionalRoles`): unificado em `optimization_functional_roles.dart`
 - F3 modularização: `optimize_filler_loader_support.dart`, `optimize_route_internal.dart`, `optimize_response_support.dart`
 - Bracket expansion: 5 novas categorias (boardWipe, cardAdvantage, stax, protection, valueEngine) — 53/53 GCs detectados
-- `card_deck_profiles` (670 perfis) integrado ao `filterUnsafeOptimizeSwapsByCardData`
+- correção vigente: a integração histórica de `card_deck_profiles` nunca
+  teve schema/vocabulário/consumer fechado no runtime atual e foi retirada do
+  `filterUnsafeOptimizeSwapsByCardData`; eventual retorno depende de
+  `BT-AI-016` com migration e contrato explícitos
 - `_looksLikePayoff` expandido para detectar payoffs de dano direto (Impact Tremors, Guttersnipe)
 
 ## 2026-06-04 — Hermes AWS operational audit

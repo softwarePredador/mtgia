@@ -13,29 +13,29 @@ type RouteLinkProps = {
   className?: string;
 };
 
-function crossesIntoFlutterApp(href: string) {
-  return (
-    href === "/app" ||
-    href.startsWith("/app/") ||
-    href.startsWith("/app?") ||
-    href.startsWith("/app#")
-  );
-}
-
 export function RouteLink({ href, children, className }: RouteLinkProps) {
-  if (crossesIntoFlutterApp(href)) {
-    // /app is served by the Flutter service, outside the Next.js router.
-    return (
-      <a href={href} className={className}>
-        {children}
-      </a>
-    );
-  }
-
   return (
     <Link href={href} className={className}>
       {children}
     </Link>
+  );
+}
+
+export function AccessPending({ compact = false }: { compact?: boolean }) {
+  return (
+    <span
+      role="status"
+      className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-mist-700 bg-obsidian-900/78 px-4 py-2 text-sm font-bold text-mist-300"
+    >
+      {compact ? (
+        <>
+          <span className="sm:hidden">Em preparação</span>
+          <span className="hidden sm:inline">Acesso ainda não liberado</span>
+        </>
+      ) : (
+        "Acesso ainda não liberado"
+      )}
+    </span>
   );
 }
 

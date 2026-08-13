@@ -1,5 +1,14 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
 
+> **HISTORICAL / SUPERSEDED — NAO EXECUTE ESTA FILA COMO BACKLOG ATUAL.**
+>
+> Este arquivo preserva tarefas, hipoteses e conclusoes de checkouts antigos;
+> seus status e instrucoes nao provam o comportamento vivo. Para o fluxo
+> vigente de Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > Status atual: backlog grande de implementacao.
 > Use como fila de ideias/tarefas, nao como prova de estado atual. Revalide
 > contra codigo vivo antes de executar.

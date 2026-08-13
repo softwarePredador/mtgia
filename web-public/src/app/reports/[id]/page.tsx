@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ButtonLink, Container, Pill, Stat, Surface } from "@/components/ui";
+import { AccessPending, Container, Pill, Stat, Surface } from "@/components/ui";
 import { loadPublicReport } from "@/lib/public-server";
 import { absoluteUrl, routes } from "@/lib/routes";
 
@@ -110,7 +110,7 @@ export default async function PublicReportPage({ params }: PageProps) {
                   : "Snapshot publico gerado a partir dos dados reais do deck."}
               </p>
               <div className="mt-7">
-                <ButtonLink href={routes.app}>Abrir BrewTact</ButtonLink>
+                <AccessPending />
               </div>
             </div>
           </aside>
@@ -152,7 +152,7 @@ export default async function PublicReportPage({ params }: PageProps) {
             {removals.length + additions.length > 0 ? (
               <Surface className="overflow-hidden">
                 <div className="border-b border-mist-700 p-5">
-                  <h2 className="text-lg font-bold">Trocas sugeridas</h2>
+                  <h2 className="text-lg font-bold">Alterações sugeridas</h2>
                 </div>
                 <div className="grid gap-0 divide-y divide-mist-700 md:grid-cols-2 md:divide-x md:divide-y-0">
                   <div className="divide-y divide-mist-700">

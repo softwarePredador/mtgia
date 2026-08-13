@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/app_state_panel.dart';
@@ -304,6 +305,12 @@ Widget _runtimeApp({
 }) {
   return MultiProvider(
     providers: [
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+        value: ReleaseCapabilitiesProvider.seeded(const {
+          ReleaseCapability.decksPrivate,
+          ReleaseCapability.galleryPublic,
+        }),
+      ),
       ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
       ChangeNotifierProvider<SocialProvider>(
         create: (_) => SocialProvider(apiClient: apiClient),

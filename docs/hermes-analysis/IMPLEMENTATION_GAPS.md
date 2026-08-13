@@ -1,5 +1,14 @@
 # Implementation Gaps — PDF Spec vs Codebase
 
+> **HISTORICAL / SUPERSEDED — NAO USE COMO INVENTARIO DE GAPS ATUAL.**
+>
+> Este arquivo preserva achados e revalidacoes de checkouts antigos; seus
+> status nao substituem codigo, PostgreSQL nem contratos vigentes. Para o fluxo
+> vigente de Deckbuilder/IA/aprendizado, use
+> [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md).
+> Para tarefas e prioridades vigentes, use
+> [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
+
 > Mapeamento da "Especificação técnica de regras faltantes para o ManaLoom Commander"
 > para o código atual do battle_analyst_v9.py (engine ativo).
 > Status: 2026-06-11

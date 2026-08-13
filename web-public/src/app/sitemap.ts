@@ -6,7 +6,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     routes.home,
     routes.pricing,
-    routes.marketplace,
     routes.blog,
     routes.terms,
     routes.privacy,
@@ -15,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return staticRoutes.map((route) => ({
     url: absoluteUrl(route),
-    lastModified: new Date("2026-08-11"),
+    lastModified: new Date("2026-08-13"),
     changeFrequency: "weekly",
     priority: route === routes.home ? 1 : 0.7
   }));

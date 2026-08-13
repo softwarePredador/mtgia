@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,7 +12,27 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
-const _generatorVersion = '1.2.2';
+const _generatorVersion = '1.3.0';
+const _taskBacklogPath = 'docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md';
+const _taskRegistrySchemaVersion = 1;
+const _taskRequiredColumns = <String>[
+  'id',
+  'pri',
+  'estado',
+  'entrega',
+  'depende de',
+  'aceite minimo',
+];
+const _taskAllowedStatuses = <String>{
+  'TODO',
+  'BLOCKED_BY_P0',
+  'DEFERRED_BY_SCOPE',
+  'WAITING_EXTERNAL',
+  'EVIDENCE_REQUIRED',
+  'IN_PROGRESS_CONTAINED',
+  'IMPLEMENTED_LOCAL_PENDING_FULL_GATE',
+  'PASS',
+};
 
 // Product dependency inventory remains scoped to deployable packages.
 // Release-tool lockfiles are versioned for reproducible gates, but are not
@@ -72,6 +93,7 @@ class ProjectLogicGenerator {
     'docs/generated/openapi.generated.json',
     'docs/generated/DATABASE_ERD.md',
     'docs/generated/TRACEABILITY_MATRIX.md',
+    'docs/generated/TASK_REGISTRY.json',
   ];
 
   Future<Map<String, Object?>> dependencyInventoryForTesting() =>
@@ -80,6 +102,9 @@ class ProjectLogicGenerator {
   List<String> dependencyInputPathsForTesting() =>
       _dependencyFiles().map(_relative).toList();
 
+  Map<String, Object?> taskBacklogForTesting(String source) =>
+      _parseTaskBacklog(source, sourcePath: _taskBacklogPath);
+
   Future<ProjectLogicResult> generate() async {
     final contractFile = _file('docs/project_logic_contracts.json');
     final inventoryFile = _file(
@@ -87,12 +112,14 @@ class ProjectLogicGenerator {
     );
     final migrationFile = _file('server/bin/migrate.dart');
     final databaseSetupFile = _file('server/database_setup.sql');
+    final taskBacklogFile = _file(_taskBacklogPath);
 
     for (final file in [
       contractFile,
       inventoryFile,
       migrationFile,
       databaseSetupFile,
+      taskBacklogFile,
     ]) {
       if (!file.existsSync()) {
         throw ProjectLogicException('Required source is missing: ${file.path}');
@@ -131,10 +158,18 @@ class ProjectLogicGenerator {
 
     _validateDeclaredPaths(contracts);
     _validateDeclaredTables(contracts, database);
+    final taskRegistryBase = _taskRegistry(
+      taskBacklogFile,
+      contracts,
+      apiRoutes,
+      appRoutes,
+      webRoutes,
+    );
 
     final canonicalDocumentFiles = _canonicalDocumentFiles(contracts);
 
-    final digestInputs = <File>{
+    final digestInputByPath = <String, File>{};
+    for (final file in <File>[
       contractFile,
       inventoryFile,
       migrationFile,
@@ -148,10 +183,22 @@ class ProjectLogicGenerator {
       ..._dependencyFiles(),
       ..._generatorSourceFiles(),
       ..._governanceFiles(),
-    }.toList()..sort((a, b) => _relative(a).compareTo(_relative(b)));
+    ]) {
+      digestInputByPath[_relative(file)] = file;
+    }
+    final digestInputs = digestInputByPath.entries.toList()
+      ..sort((left, right) => left.key.compareTo(right.key));
 
-    final sourceDigest = _sourceDigest(digestInputs);
-    final digestInputPaths = digestInputs.map(_relative).toList()..sort();
+    final sourceDigest = _sourceDigest(
+      digestInputs.map((entry) => entry.value).toList(growable: false),
+    );
+    final digestInputPaths = digestInputs
+        .map((entry) => entry.key)
+        .toList(growable: false);
+    final taskRegistry = <String, Object?>{
+      ...taskRegistryBase,
+      'project_logic_source_digest_sha256': sourceDigest,
+    };
     final symbols =
         units
             .expand((unit) => unit.symbols)
@@ -201,6 +248,13 @@ class ProjectLogicGenerator {
         'tests': tests.length,
         'flows': flows.length,
         'traceability_rules': traceability.length,
+        'tasks': (taskRegistry['tasks'] as List<dynamic>).length,
+        'task_dependency_edges':
+            (taskRegistry['dependency_edges'] as List<dynamic>).length,
+        'route_consumer_bindings':
+            (taskRegistry['route_consumers'] as List<dynamic>).length,
+        'receipt_contracts':
+            (taskRegistry['receipt_contracts'] as List<dynamic>).length,
       },
       'modules': modules,
       'dart_symbols': symbols,
@@ -218,6 +272,9 @@ class ProjectLogicGenerator {
       'tests': tests,
       'flows': flows,
       'traceability': traceability,
+      'task_registry': taskRegistry,
+      'documentation_lifecycle': contracts['documentation_lifecycle'],
+      'receipt_contracts': contracts['receipt_contracts'],
       'runtime_introspection': contracts['runtime_introspection'],
       'known_limits': contracts['known_limits'],
       'lineage': {
@@ -239,6 +296,7 @@ class ProjectLogicGenerator {
       'docs/generated/openapi.generated.json': _prettyJson(openApi),
       'docs/generated/DATABASE_ERD.md': _databaseErd(manifest),
       'docs/generated/TRACEABILITY_MATRIX.md': _traceability(manifest),
+      'docs/generated/TASK_REGISTRY.json': _prettyJson(taskRegistry),
     };
     return ProjectLogicResult(root, outputs, manifest);
   }
@@ -266,6 +324,8 @@ class ProjectLogicGenerator {
     for (final key in [
       'source_policy',
       'canonical_documents',
+      'documentation_lifecycle',
+      'receipt_contracts',
       'flows',
       'traceability',
       'runtime_introspection',
@@ -298,6 +358,262 @@ class ProjectLogicGenerator {
         }
       }
     }
+    _validateDocumentationLifecycle(contracts);
+    _validateReceiptContracts(contracts, flowIds);
+  }
+
+  void _validateDocumentationLifecycle(Map<String, dynamic> contracts) {
+    final lifecycle = contracts['documentation_lifecycle'];
+    if (lifecycle is! Map<String, dynamic> ||
+        lifecycle['schema_version'] != 1) {
+      throw ProjectLogicException(
+        'documentation_lifecycle must be an object with schema_version 1.',
+      );
+    }
+
+    final rawStates = lifecycle['states'];
+    if (rawStates is! List || rawStates.isEmpty) {
+      throw ProjectLogicException(
+        'documentation_lifecycle.states must be a non-empty list.',
+      );
+    }
+    final stateIds = <String>{};
+    final priorityAuthorityStates = <String>{};
+    for (final rawState in rawStates) {
+      if (rawState is! Map<String, dynamic>) {
+        throw ProjectLogicException(
+          'Each documentation lifecycle state must be an object.',
+        );
+      }
+      final id = rawState['id'];
+      final priorityAuthority = rawState['priority_authority'];
+      final mutationAuthority = rawState['mutation_authority'];
+      if (id is! String || id.isEmpty || !stateIds.add(id)) {
+        throw ProjectLogicException(
+          'Documentation lifecycle state ids must be present and unique: $id',
+        );
+      }
+      if (priorityAuthority is! bool || mutationAuthority is! bool) {
+        throw ProjectLogicException(
+          'Documentation lifecycle state $id must declare boolean authority flags.',
+        );
+      }
+      if (priorityAuthority) priorityAuthorityStates.add(id);
+      if (mutationAuthority) {
+        throw ProjectLogicException(
+          'Documents cannot authorize live mutations by lifecycle state: $id',
+        );
+      }
+    }
+    const expectedPriorityAuthorityStates = <String>{
+      'current_decision',
+      'current_task_index',
+    };
+    if (!expectedPriorityAuthorityStates.containsAll(priorityAuthorityStates) ||
+        !priorityAuthorityStates.containsAll(const {
+          'current_decision',
+          'current_task_index',
+        })) {
+      throw ProjectLogicException(
+        'Only current_decision and current_task_index may set current priority.',
+      );
+    }
+
+    for (final key in ['canonical_default_state', 'default_state']) {
+      final value = lifecycle[key];
+      if (value is! String || !stateIds.contains(value)) {
+        throw ProjectLogicException(
+          'documentation_lifecycle.$key must reference a declared state.',
+        );
+      }
+    }
+
+    final overridePaths = <String>{};
+    final overrideStates = <String, String>{};
+    final rawOverrides = lifecycle['document_overrides'];
+    if (rawOverrides is! List || rawOverrides.isEmpty) {
+      throw ProjectLogicException(
+        'documentation_lifecycle.document_overrides must not be empty.',
+      );
+    }
+    for (final rawOverride in rawOverrides) {
+      if (rawOverride is! Map<String, dynamic>) {
+        throw ProjectLogicException(
+          'Each documentation lifecycle override must be an object.',
+        );
+      }
+      final path = rawOverride['path'];
+      final state = rawOverride['state'];
+      final reason = rawOverride['reason'];
+      if (path is! String ||
+          !path.startsWith('docs/') ||
+          path.contains('..') ||
+          !overridePaths.add(path)) {
+        throw ProjectLogicException(
+          'Documentation override paths must be unique normalized docs paths: $path',
+        );
+      }
+      if (state is! String || !stateIds.contains(state)) {
+        throw ProjectLogicException(
+          'Documentation override $path references an unknown state: $state',
+        );
+      }
+      if (reason is! String || reason.trim().isEmpty) {
+        throw ProjectLogicException(
+          'Documentation override $path must explain its lifecycle.',
+        );
+      }
+      overrideStates[path] = state;
+    }
+
+    final prefixes = <String>{};
+    final rawPrefixRules = lifecycle['prefix_rules'];
+    if (rawPrefixRules is! List) {
+      throw ProjectLogicException(
+        'documentation_lifecycle.prefix_rules must be a list.',
+      );
+    }
+    for (final rawRule in rawPrefixRules) {
+      if (rawRule is! Map<String, dynamic>) {
+        throw ProjectLogicException(
+          'Each documentation lifecycle prefix rule must be an object.',
+        );
+      }
+      final prefix = rawRule['prefix'];
+      final state = rawRule['state'];
+      if (prefix is! String ||
+          !prefix.startsWith('docs/') ||
+          !prefix.endsWith('/') ||
+          prefix.contains('..') ||
+          !prefixes.add(prefix)) {
+        throw ProjectLogicException(
+          'Documentation lifecycle prefixes must be unique normalized directories: $prefix',
+        );
+      }
+      if (state is! String || !stateIds.contains(state)) {
+        throw ProjectLogicException(
+          'Documentation prefix $prefix references an unknown state: $state',
+        );
+      }
+    }
+
+    final guards = lifecycle['guards'];
+    if (guards is! Map<String, dynamic> ||
+        guards['historical_or_generated_may_set_priority'] != false ||
+        guards['document_may_authorize_live_mutation'] != false ||
+        guards['historical_commands_are_examples_only'] != true) {
+      throw ProjectLogicException(
+        'Documentation lifecycle guards must keep history/generated output non-authoritative and non-mutating.',
+      );
+    }
+
+    final canonicalDocuments =
+        (contracts['canonical_documents'] as List<dynamic>).cast<String>();
+    for (final path in canonicalDocuments) {
+      final state = _resolveDocumentationLifecycle(path, contracts);
+      if (!const {
+        'current_decision',
+        'current_task_index',
+        'current_contract',
+        'current_context',
+      }.contains(state)) {
+        throw ProjectLogicException(
+          'Canonical document $path resolves to non-current lifecycle $state.',
+        );
+      }
+    }
+    if (overrideStates['docs/status/CURRENT_PRODUCT_DECISION.md'] !=
+            'current_decision' ||
+        overrideStates[_taskBacklogPath] != 'current_task_index') {
+      throw ProjectLogicException(
+        'Current decision and task backlog require explicit authoritative lifecycle overrides.',
+      );
+    }
+  }
+
+  void _validateReceiptContracts(
+    Map<String, dynamic> contracts,
+    Set<String> flowIds,
+  ) {
+    final rawReceipts = contracts['receipt_contracts'];
+    if (rawReceipts is! List || rawReceipts.isEmpty) {
+      throw ProjectLogicException(
+        'receipt_contracts must be a non-empty list.',
+      );
+    }
+    final ids = <String>{};
+    var hasDigestBoundReceipt = false;
+    for (final rawReceipt in rawReceipts) {
+      if (rawReceipt is! Map<String, dynamic>) {
+        throw ProjectLogicException('Each receipt contract must be an object.');
+      }
+      final id = rawReceipt['id'];
+      if (id is! String ||
+          !RegExp(r'^[a-z][a-z0-9_]+_v[0-9]+$').hasMatch(id) ||
+          !ids.add(id)) {
+        throw ProjectLogicException(
+          'Receipt ids must be versioned, present and unique: $id',
+        );
+      }
+      for (final key in [
+        'flows',
+        'producers',
+        'consumers',
+        'allowed_statuses',
+        'required_bindings',
+      ]) {
+        final values = rawReceipt[key];
+        if (values is! List ||
+            values.isEmpty ||
+            values.any((value) => value is! String || value.trim().isEmpty) ||
+            values.toSet().length != values.length) {
+          throw ProjectLogicException(
+            'Receipt $id must declare a non-empty unique string list for $key.',
+          );
+        }
+      }
+      final flows = (rawReceipt['flows'] as List<dynamic>).cast<String>();
+      final unknownFlows = flows.where((flow) => !flowIds.contains(flow));
+      if (unknownFlows.isNotEmpty) {
+        throw ProjectLogicException(
+          'Receipt $id references unknown flows: ${unknownFlows.join(', ')}',
+        );
+      }
+      final durability = rawReceipt['durability'];
+      if (durability is! String || durability.isEmpty) {
+        throw ProjectLogicException(
+          'Receipt $id must declare its durability policy.',
+        );
+      }
+      final requiredBindings =
+          (rawReceipt['required_bindings'] as List<dynamic>).cast<String>();
+      if (requiredBindings.any(
+        (binding) => binding.contains('digest') || binding.contains('sha256'),
+      )) {
+        hasDigestBoundReceipt = true;
+      }
+      if (id == 'manaloom_e2e_suite_v1') {
+        final semantics = rawReceipt['status_semantics'];
+        final partial = semantics is Map<String, dynamic>
+            ? semantics['PARTIAL']
+            : null;
+        if (partial is! Map<String, dynamic> ||
+            partial['strict_exit_code'] != 3 ||
+            partial['diagnostic_gate_eligible'] != false ||
+            !requiredBindings.contains('gate_eligible')) {
+          throw ProjectLogicException(
+            'E2E PARTIAL must be strict exit 3, diagnostic-only and bind '
+            'gate_eligible.',
+          );
+        }
+      }
+    }
+    if (!hasDigestBoundReceipt) {
+      throw ProjectLogicException(
+        'At least one receipt contract must bind evidence to a digest or '
+        'sha256 field.',
+      );
+    }
   }
 
   void _validateDeclaredPaths(Map<String, dynamic> contracts) {
@@ -328,6 +644,18 @@ class ProjectLogicGenerator {
         for (final path in (map[key] as List<dynamic>).cast<String>()) {
           paths.add(path);
         }
+      }
+    }
+    final lifecycle =
+        contracts['documentation_lifecycle'] as Map<String, dynamic>;
+    for (final declaration
+        in (lifecycle['document_overrides'] as List<dynamic>)) {
+      paths.add((declaration as Map<String, dynamic>)['path'] as String);
+    }
+    for (final receipt in (contracts['receipt_contracts'] as List<dynamic>)) {
+      final map = receipt as Map<String, dynamic>;
+      for (final key in ['producers', 'consumers']) {
+        paths.addAll((map[key] as List<dynamic>).cast<String>());
       }
     }
     final missing = paths.where((path) => !_file(path).existsSync()).toList()
@@ -369,6 +697,618 @@ class ProjectLogicGenerator {
         '${missing.join(', ')}',
       );
     }
+  }
+
+  Map<String, Object?> _taskRegistry(
+    File backlogFile,
+    Map<String, dynamic> contracts,
+    List<Map<String, Object?>> apiRoutes,
+    List<Map<String, Object?>> appRoutes,
+    List<Map<String, Object?>> webRoutes,
+  ) {
+    final backlog = _parseTaskBacklog(
+      backlogFile.readAsStringSync(),
+      sourcePath: _relative(backlogFile),
+    );
+    final routes = _routeConsumerRegistry(
+      contracts,
+      apiRoutes,
+      appRoutes,
+      webRoutes,
+    );
+    final lifecycle = _documentationLifecycleRegistry(contracts);
+    final receipts = (contracts['receipt_contracts'] as List<dynamic>)
+        .cast<Map<String, dynamic>>()
+        .map<Map<String, Object?>>((receipt) => Map.of(receipt))
+        .toList(growable: false);
+
+    return <String, Object?>{
+      'schema_version': _taskRegistrySchemaVersion,
+      'generated_from': {
+        'path': _relative(backlogFile),
+        'sha256': sha256.convert(backlogFile.readAsBytesSync()).toString(),
+      },
+      'required_task_fields': [
+        'id',
+        'priority',
+        'status',
+        'delivery',
+        'depends_on',
+        'acceptance',
+      ],
+      ...backlog,
+      'documentation_lifecycle': lifecycle,
+      'route_consumers': routes['route_consumers'],
+      'non_route_entrypoints': routes['non_route_entrypoints'],
+      'receipt_contracts': receipts,
+      'guards': {
+        'unique_task_ids': true,
+        'required_task_schema': true,
+        'dependencies_resolved': true,
+        'dependency_graph_acyclic': true,
+        'out_of_table_task_definitions': 0,
+        'historical_or_generated_priority_authority': false,
+        'historical_documents_in_canonical_inputs': false,
+        'receipt_bindings_declared': true,
+        'registry_source_digest_bound': true,
+      },
+    };
+  }
+
+  Map<String, Object?> _parseTaskBacklog(
+    String source, {
+    required String sourcePath,
+  }) {
+    final taskIdPattern = RegExp(r'^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$');
+    final taskLikeCellPattern = RegExp(
+      r'^`[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+[^`]*`$',
+    );
+    final outOfTablePattern = RegExp(
+      r'^\s*(?:[-*]|\d+\.)\s+`([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)`\s*:',
+      multiLine: true,
+    );
+    final outOfTable = outOfTablePattern.allMatches(source).toList();
+    if (outOfTable.isNotEmpty) {
+      throw ProjectLogicException(
+        'Task definitions must use the canonical six-column table schema in '
+        '$sourcePath: ${outOfTable.map((match) => match.group(1)).join(', ')}',
+      );
+    }
+
+    final lines = const LineSplitter().convert(source);
+    final tasks = <Map<String, Object?>>[];
+    final tasksById = <String, Map<String, Object?>>{};
+    var section = '<document-root>';
+    List<String>? activeHeaders;
+
+    for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      final line = lines[lineIndex];
+      final heading = RegExp(r'^#{2,6}\s+(.+?)\s*$').firstMatch(line);
+      if (heading != null) {
+        section = heading.group(1)!.trim();
+        activeHeaders = null;
+        continue;
+      }
+      if (!line.trimLeft().startsWith('|')) {
+        activeHeaders = null;
+        continue;
+      }
+
+      final cells = _markdownTableCells(line);
+      if (cells.isEmpty) continue;
+      final normalizedCells = cells.map(_normalizeTaskHeader).toList();
+      if (normalizedCells.first == 'id') {
+        if (normalizedCells.length != _taskRequiredColumns.length ||
+            !_sameStringList(normalizedCells, _taskRequiredColumns)) {
+          throw ProjectLogicException(
+            'Task table at $sourcePath:${lineIndex + 1} must use exactly: '
+            '${_taskRequiredColumns.join(', ')}.',
+          );
+        }
+        activeHeaders = normalizedCells;
+        continue;
+      }
+      if (cells.every((cell) => RegExp(r'^:?-{3,}:?$').hasMatch(cell.trim()))) {
+        continue;
+      }
+
+      final firstCell = cells.first.trim();
+      if (activeHeaders != null && !taskLikeCellPattern.hasMatch(firstCell)) {
+        throw ProjectLogicException(
+          'Invalid task id cell at $sourcePath:${lineIndex + 1}; canonical '
+          'task rows require one exact id in backticks: $firstCell',
+        );
+      }
+      if (!taskLikeCellPattern.hasMatch(firstCell)) continue;
+      if (activeHeaders == null) {
+        throw ProjectLogicException(
+          'Task row outside a canonical task table at '
+          '$sourcePath:${lineIndex + 1}.',
+        );
+      }
+      if (cells.length != activeHeaders.length) {
+        throw ProjectLogicException(
+          'Task row at $sourcePath:${lineIndex + 1} has ${cells.length} cells; '
+          '${activeHeaders.length} are required.',
+        );
+      }
+
+      final id = _stripSingleBacktickPair(firstCell);
+      if (!taskIdPattern.hasMatch(id)) {
+        throw ProjectLogicException(
+          'Invalid task id at $sourcePath:${lineIndex + 1}: $id',
+        );
+      }
+      if (tasksById.containsKey(id)) {
+        throw ProjectLogicException(
+          'Duplicate task id at $sourcePath:${lineIndex + 1}: $id',
+        );
+      }
+
+      final priority = cells[1].trim();
+      final status = cells[2].trim();
+      final delivery = cells[3].trim();
+      final dependencies = _parseTaskDependencies(
+        cells[4],
+        taskId: id,
+        sourcePath: sourcePath,
+        sourceLine: lineIndex + 1,
+      );
+      final acceptance = cells[5].trim();
+      if (!RegExp(r'^(?:P0 [A-Z]+(?: [A-Z]+)*|P1|P2)$').hasMatch(priority)) {
+        throw ProjectLogicException(
+          'Invalid priority for $id at $sourcePath:${lineIndex + 1}: '
+          '$priority',
+        );
+      }
+      if (!_taskAllowedStatuses.contains(status)) {
+        throw ProjectLogicException(
+          'Invalid status for $id at $sourcePath:${lineIndex + 1}: $status',
+        );
+      }
+      if (delivery.isEmpty || acceptance.isEmpty) {
+        throw ProjectLogicException(
+          'Task $id at $sourcePath:${lineIndex + 1} is missing delivery or '
+          'minimum acceptance.',
+        );
+      }
+
+      final task = <String, Object?>{
+        'id': id,
+        'priority': priority,
+        'status': status,
+        'delivery': delivery,
+        'depends_on': dependencies,
+        'acceptance': acceptance,
+        'section': section,
+        'source_line': lineIndex + 1,
+      };
+      tasks.add(task);
+      tasksById[id] = task;
+    }
+
+    if (tasks.isEmpty) {
+      throw ProjectLogicException(
+        'No canonical task rows found in $sourcePath.',
+      );
+    }
+
+    final unresolved = <String>[];
+    final selfDependencies = <String>[];
+    for (final task in tasks) {
+      final id = task['id']! as String;
+      for (final dependency
+          in (task['depends_on']! as List<dynamic>).cast<String>()) {
+        if (dependency == id) selfDependencies.add(id);
+        if (!tasksById.containsKey(dependency)) {
+          unresolved.add('$id -> $dependency');
+        }
+      }
+    }
+    if (selfDependencies.isNotEmpty) {
+      selfDependencies.sort();
+      throw ProjectLogicException(
+        'Tasks cannot depend on themselves: ${selfDependencies.join(', ')}',
+      );
+    }
+    if (unresolved.isNotEmpty) {
+      unresolved.sort();
+      throw ProjectLogicException(
+        'Task dependencies must reference existing ids:\n'
+        '${unresolved.join('\n')}',
+      );
+    }
+
+    final graph = _taskDependencyGraph(tasksById);
+    return <String, Object?>{
+      'task_count': tasks.length,
+      'tasks': tasks,
+      'dependency_edges': graph['dependency_edges'],
+      'topological_order': graph['topological_order'],
+    };
+  }
+
+  Map<String, Object?> _taskDependencyGraph(
+    Map<String, Map<String, Object?>> tasksById,
+  ) {
+    final dependents = <String, Set<String>>{
+      for (final id in tasksById.keys) id: <String>{},
+    };
+    final indegree = <String, int>{};
+    final edges = <Map<String, Object?>>[];
+    for (final entry in tasksById.entries) {
+      final dependencies = (entry.value['depends_on']! as List<dynamic>)
+          .cast<String>();
+      indegree[entry.key] = dependencies.length;
+      for (final dependency in dependencies) {
+        dependents[dependency]!.add(entry.key);
+        edges.add({'from': dependency, 'to': entry.key});
+      }
+    }
+    edges.sort((left, right) {
+      final from = (left['from']! as String).compareTo(
+        right['from']! as String,
+      );
+      return from != 0
+          ? from
+          : (left['to']! as String).compareTo(right['to']! as String);
+    });
+
+    final ready = SplayTreeSet<String>()
+      ..addAll(
+        indegree.entries
+            .where((entry) => entry.value == 0)
+            .map((entry) => entry.key),
+      );
+    final order = <String>[];
+    while (ready.isNotEmpty) {
+      final id = ready.first;
+      ready.remove(id);
+      order.add(id);
+      final sortedDependents = dependents[id]!.toList()..sort();
+      for (final dependent in sortedDependents) {
+        final next = indegree[dependent]! - 1;
+        indegree[dependent] = next;
+        if (next == 0) ready.add(dependent);
+      }
+    }
+    if (order.length != tasksById.length) {
+      final cyclic =
+          indegree.entries
+              .where((entry) => entry.value > 0)
+              .map((entry) => entry.key)
+              .toList()
+            ..sort();
+      throw ProjectLogicException(
+        'Task dependency graph contains a cycle involving: '
+        '${cyclic.join(', ')}',
+      );
+    }
+    return <String, Object?>{
+      'dependency_edges': edges,
+      'topological_order': order,
+    };
+  }
+
+  List<String> _parseTaskDependencies(
+    String raw, {
+    required String taskId,
+    required String sourcePath,
+    required int sourceLine,
+  }) {
+    final value = raw.trim();
+    if (value == '—') return const <String>[];
+    final matches = RegExp(r'`([^`]+)`').allMatches(value).toList();
+    var residual = value;
+    for (final match in matches.reversed) {
+      residual = residual.replaceRange(match.start, match.end, '');
+    }
+    residual = residual.replaceAll(',', '').trim();
+    if (matches.isEmpty || residual.isNotEmpty) {
+      throw ProjectLogicException(
+        'Dependencies for $taskId at $sourcePath:$sourceLine must be an em '
+        'dash or comma-separated exact task ids in backticks: $value',
+      );
+    }
+    final dependencies = matches.map((match) => match.group(1)!).toList();
+    if (dependencies.toSet().length != dependencies.length) {
+      throw ProjectLogicException(
+        'Dependencies for $taskId at $sourcePath:$sourceLine contain '
+        'duplicates.',
+      );
+    }
+    final invalid = dependencies.where(
+      (dependency) =>
+          !RegExp(r'^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$').hasMatch(dependency),
+    );
+    if (invalid.isNotEmpty) {
+      throw ProjectLogicException(
+        'Dependencies for $taskId at $sourcePath:$sourceLine contain '
+        'placeholders or ranges: ${invalid.join(', ')}',
+      );
+    }
+    return dependencies;
+  }
+
+  List<String> _markdownTableCells(String line) {
+    var value = line.trim();
+    if (value.startsWith('|')) value = value.substring(1);
+    if (value.endsWith('|')) value = value.substring(0, value.length - 1);
+    return value.split('|').map((cell) => cell.trim()).toList();
+  }
+
+  String _normalizeTaskHeader(String value) => value
+      .toLowerCase()
+      .replaceAll('á', 'a')
+      .replaceAll('à', 'a')
+      .replaceAll('ã', 'a')
+      .replaceAll('â', 'a')
+      .replaceAll('é', 'e')
+      .replaceAll('ê', 'e')
+      .replaceAll('í', 'i')
+      .replaceAll('ó', 'o')
+      .replaceAll('ô', 'o')
+      .replaceAll('õ', 'o')
+      .replaceAll('ú', 'u')
+      .replaceAll('ç', 'c')
+      .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+      .trim();
+
+  String _stripSingleBacktickPair(String value) {
+    final trimmed = value.trim();
+    return trimmed.length >= 2 &&
+            trimmed.startsWith('`') &&
+            trimmed.endsWith('`')
+        ? trimmed.substring(1, trimmed.length - 1)
+        : trimmed;
+  }
+
+  bool _sameStringList(List<String> left, List<String> right) {
+    if (left.length != right.length) return false;
+    for (var index = 0; index < left.length; index++) {
+      if (left[index] != right[index]) return false;
+    }
+    return true;
+  }
+
+  Map<String, Object?> _routeConsumerRegistry(
+    Map<String, dynamic> contracts,
+    List<Map<String, Object?>> apiRoutes,
+    List<Map<String, Object?>> appRoutes,
+    List<Map<String, Object?>> webRoutes,
+  ) {
+    final receiptIdsByFlow = <String, Set<String>>{};
+    for (final rawReceipt
+        in (contracts['receipt_contracts'] as List<dynamic>)) {
+      final receipt = rawReceipt as Map<String, dynamic>;
+      for (final flow in (receipt['flows'] as List<dynamic>).cast<String>()) {
+        receiptIdsByFlow
+            .putIfAbsent(flow, () => <String>{})
+            .add(receipt['id']! as String);
+      }
+    }
+
+    final bindings = <Map<String, Object?>>[];
+    final nonRouteEntrypoints = <Map<String, Object?>>[];
+    for (final rawFlow in (contracts['flows'] as List<dynamic>)) {
+      final flow = rawFlow as Map<String, dynamic>;
+      final flowId = flow['id']! as String;
+      final implementations = (flow['implementation'] as List<dynamic>)
+          .cast<String>();
+      final consumers =
+          implementations
+              .where(
+                (path) =>
+                    path.startsWith('app/') || path.startsWith('web-public/'),
+              )
+              .toSet()
+              .toList()
+            ..sort();
+      final producers =
+          implementations
+              .where(
+                (path) =>
+                    path.startsWith('server/') ||
+                    path.startsWith('services/') ||
+                    path.startsWith('docs/hermes-analysis/manaloom-knowledge/'),
+              )
+              .toSet()
+              .toList()
+            ..sort();
+
+      for (final entrypoint
+          in (flow['entrypoints'] as List<dynamic>).cast<String>()) {
+        if (!entrypoint.startsWith('/')) {
+          nonRouteEntrypoints.add({
+            'flow_id': flowId,
+            'entrypoint': entrypoint,
+          });
+          continue;
+        }
+        final pattern = _normalizeRoutePattern(entrypoint);
+        final sources = <Map<String, Object?>>[];
+        final methods = <String>{};
+        for (final route in apiRoutes.where(
+          (route) =>
+              _normalizeRoutePattern(route['path']! as String) == pattern,
+        )) {
+          final routeMethods =
+              (route['methods'] as List<dynamic>?)?.cast<String>() ??
+              const <String>[];
+          methods.addAll(routeMethods);
+          sources.add({
+            'surface': 'api',
+            'path': route['path'],
+            'source': route['source'],
+            'methods': routeMethods,
+          });
+        }
+        for (final route in appRoutes.where((route) {
+          final path = route['canonical_path'];
+          return path is String && _normalizeRoutePattern(path) == pattern;
+        })) {
+          sources.add({
+            'surface': 'app',
+            'path': route['canonical_path'],
+            'source': route['source'],
+            'screen': route['screen'],
+          });
+        }
+        for (final route in webRoutes.where(
+          (route) =>
+              _normalizeRoutePattern(route['path']! as String) == pattern,
+        )) {
+          sources.add({
+            'surface': 'web',
+            'path': route['path'],
+            'source': route['source'],
+          });
+        }
+        if (sources.isEmpty) {
+          throw ProjectLogicException(
+            'Flow $flowId entrypoint $entrypoint does not resolve to an API, '
+            'app or public web route.',
+          );
+        }
+        sources.sort((left, right) {
+          final surface = (left['surface']! as String).compareTo(
+            right['surface']! as String,
+          );
+          return surface != 0
+              ? surface
+              : (left['path']! as String).compareTo(right['path']! as String);
+        });
+        final surfaces =
+            sources
+                .map((source) => source['surface']! as String)
+                .toSet()
+                .toList()
+              ..sort();
+        final receiptIds = receiptIdsByFlow[flowId]?.toList() ?? <String>[];
+        receiptIds.sort();
+        bindings.add({
+          'flow_id': flowId,
+          'entrypoint': entrypoint,
+          'normalized_pattern': pattern,
+          'surfaces': surfaces,
+          'methods': methods.toList()..sort(),
+          'sources': sources,
+          'producers': producers,
+          'consumers': consumers,
+          'storage': List<String>.from(flow['storage'] as List<dynamic>),
+          'gates': List<String>.from(flow['gates'] as List<dynamic>),
+          'receipt_contract_ids': receiptIds,
+        });
+      }
+    }
+    bindings.sort((left, right) {
+      final flow = (left['flow_id']! as String).compareTo(
+        right['flow_id']! as String,
+      );
+      return flow != 0
+          ? flow
+          : (left['entrypoint']! as String).compareTo(
+              right['entrypoint']! as String,
+            );
+    });
+    nonRouteEntrypoints.sort((left, right) {
+      final flow = (left['flow_id']! as String).compareTo(
+        right['flow_id']! as String,
+      );
+      return flow != 0
+          ? flow
+          : (left['entrypoint']! as String).compareTo(
+              right['entrypoint']! as String,
+            );
+    });
+    return <String, Object?>{
+      'route_consumers': bindings,
+      'non_route_entrypoints': nonRouteEntrypoints,
+    };
+  }
+
+  String _normalizeRoutePattern(String path) => path
+      .replaceAll(RegExp(r'\{[^/{}]+\}'), '{}')
+      .replaceAll(RegExp(r':[A-Za-z_][A-Za-z0-9_]*'), '{}');
+
+  Map<String, Object?> _documentationLifecycleRegistry(
+    Map<String, dynamic> contracts,
+  ) {
+    final lifecycle =
+        contracts['documentation_lifecycle'] as Map<String, dynamic>;
+    final states = (lifecycle['states'] as List<dynamic>)
+        .cast<Map<String, dynamic>>();
+    final statesById = <String, Map<String, dynamic>>{
+      for (final state in states) state['id']! as String: state,
+    };
+    Map<String, Object?> declaration(String path, String source) {
+      final stateId = _resolveDocumentationLifecycle(path, contracts);
+      final state = statesById[stateId]!;
+      return <String, Object?>{
+        'path': path,
+        'state': stateId,
+        'declaration_source': source,
+        'priority_authority': state['priority_authority'],
+        'mutation_authority': state['mutation_authority'],
+      };
+    }
+
+    final canonicalDocuments =
+        (contracts['canonical_documents'] as List<dynamic>)
+            .cast<String>()
+            .map((path) => declaration(path, 'canonical_documents'))
+            .toList();
+    final overrides = (lifecycle['document_overrides'] as List<dynamic>)
+        .cast<Map<String, dynamic>>()
+        .map((override) {
+          final resolved = declaration(
+            override['path']! as String,
+            'document_override',
+          );
+          return <String, Object?>{...resolved, 'reason': override['reason']};
+        })
+        .toList();
+    canonicalDocuments.sort(
+      (left, right) =>
+          (left['path']! as String).compareTo(right['path']! as String),
+    );
+    overrides.sort(
+      (left, right) =>
+          (left['path']! as String).compareTo(right['path']! as String),
+    );
+
+    return <String, Object?>{
+      'schema_version': lifecycle['schema_version'],
+      'precedence': lifecycle['guards']['current_priority_precedence'],
+      'canonical_documents': canonicalDocuments,
+      'document_overrides': overrides,
+      'prefix_rules': lifecycle['prefix_rules'],
+      'default_state': lifecycle['default_state'],
+      'guards': lifecycle['guards'],
+    };
+  }
+
+  String _resolveDocumentationLifecycle(
+    String path,
+    Map<String, dynamic> contracts,
+  ) {
+    final lifecycle =
+        contracts['documentation_lifecycle'] as Map<String, dynamic>;
+    for (final rawOverride
+        in (lifecycle['document_overrides'] as List<dynamic>)) {
+      final override = rawOverride as Map<String, dynamic>;
+      if (override['path'] == path) return override['state']! as String;
+    }
+    if ((contracts['canonical_documents'] as List<dynamic>).contains(path)) {
+      return lifecycle['canonical_default_state']! as String;
+    }
+    for (final rawRule in (lifecycle['prefix_rules'] as List<dynamic>)) {
+      final rule = rawRule as Map<String, dynamic>;
+      if (path.startsWith(rule['prefix']! as String)) {
+        return rule['state']! as String;
+      }
+    }
+    return lifecycle['default_state']! as String;
   }
 
   List<File> _dartSourceFiles() => _filesUnder([

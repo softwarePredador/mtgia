@@ -5,6 +5,7 @@ import '../../../lib/health_readiness_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/e2e_validation_policy.dart';
 import '../../../lib/runtime_environment.dart';
+import '../../../lib/release_capability_policy.dart';
 
 /// GET /health/ready - Readiness check (verifica dependências)
 ///
@@ -19,6 +20,11 @@ Future<Response> onRequest(RequestContext context) async {
 
   final checks = <String, dynamic>{};
   var allHealthy = true;
+  final releasePolicy = context.read<ReleaseCapabilityPolicy>();
+  checks['release_capabilities'] = releasePolicy.readinessCheck();
+  if (!releasePolicy.isValid) {
+    allHealthy = false;
+  }
 
   // Check 1: Database connection
   final databaseStopwatch = Stopwatch()..start();
@@ -121,40 +127,13 @@ Future<Response> onRequest(RequestContext context) async {
 
   // Check 3: production AI contract is fail-closed and provider-backed.
   final env = loadRuntimeEnvironment();
-  final battleJobWorker = evaluateBattleJobWorkerReadiness(env);
-  checks['battle_job_worker'] = battleJobWorker.check;
-  if (!battleJobWorker.healthy) {
-    allHealthy = false;
-  }
-
-  final aiRuntime = evaluateAiRuntimeReadiness(env);
-  checks['ai_runtime'] = aiRuntime.check;
-  if (!aiRuntime.healthy) {
-    allHealthy = false;
-  }
-
-  // Check 4: every engine required by the configured Battle mode responds.
-  final battleRuntime = await evaluateBattleRuntimeReadiness(env);
-  checks['battle_runtime'] = battleRuntime.check;
-  if (!battleRuntime.healthy) {
-    allHealthy = false;
-  }
-
-  final battleLiveSpectator = await evaluateBattleLiveSpectatorReadiness(
-    env,
-    context.read<Pool>(),
+  final capabilityRuntime = await evaluateReleaseCapabilityRuntimeReadiness(
+    policy: releasePolicy,
+    env: env,
+    pool: context.read<Pool>(),
   );
-  checks['battle_live_spectator'] = battleLiveSpectator.check;
-  if (!battleLiveSpectator.healthy) {
-    allHealthy = false;
-  }
-
-  final interactiveBattle = await evaluateInteractiveBattleReadiness(
-    env,
-    context.read<Pool>(),
-  );
-  checks['interactive_battle'] = interactiveBattle.check;
-  if (!interactiveBattle.healthy) {
+  checks.addAll(capabilityRuntime.checks);
+  if (!capabilityRuntime.healthy) {
     allHealthy = false;
   }
 

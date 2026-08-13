@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/services/activation_funnel_service.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/home/onboarding_core_flow_screen.dart';
@@ -101,12 +102,22 @@ class _FakeEventTracker implements ActivationEventTracker {
   }
 }
 
+const _onboardingFixtureCapabilities = <ReleaseCapability>{
+  ReleaseCapability.catalogPrivate,
+  ReleaseCapability.decksPrivate,
+  ReleaseCapability.collectionPrivate,
+  ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+  ReleaseCapability.aiGenerateRebuild,
+  ReleaseCapability.lifeCounterLocal,
+};
+
 Widget _subject({
   required _FakeOnboardingRepository repository,
   required _FakeEventTracker tracker,
   required ValueChanged<GoRouter> onRouter,
   VoidCallback? onSettled,
   double textScale = 1,
+  Set<ReleaseCapability> allowedCapabilities = _onboardingFixtureCapabilities,
 }) {
   final router = GoRouter(
     initialLocation: '/onboarding/core-flow',
@@ -160,6 +171,9 @@ Widget _subject({
   onRouter(router);
   return MultiProvider(
     providers: [
+      ChangeNotifierProvider(
+        create: (_) => ReleaseCapabilitiesProvider.seeded(allowedCapabilities),
+      ),
       ChangeNotifierProvider(create: (_) => MessageProvider()),
       ChangeNotifierProvider(create: (_) => NotificationProvider()),
     ],

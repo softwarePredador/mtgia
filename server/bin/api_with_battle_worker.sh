@@ -27,7 +27,16 @@ trap 'terminate_children; exit 130' INT
   --port "${PORT:-8080}" &
 api_pid=$!
 
-if [ "${BATTLE_JOB_WORKER_ENABLED:-true}" != "true" ]; then
+if [ "${BATTLE_JOB_WORKER_ENABLED:-false}" != "true" ]; then
+  wait "$api_pid"
+  exit $?
+fi
+
+battle_worker_policy="$(
+  /app/server/manaloom-battle-worker --release-capability-status 2>/dev/null ||
+    printf 'invalid'
+)"
+if [ "$battle_worker_policy" != "enabled" ]; then
   wait "$api_pid"
   exit $?
 fi

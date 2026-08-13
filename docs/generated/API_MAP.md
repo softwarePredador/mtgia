@@ -40,6 +40,7 @@
 | `/binder/import/apply` | `POST` | `server/routes/binder/import/apply/index.dart` | 2 | `source` |
 | `/binder/import/preview` | `POST` | `server/routes/binder/import/preview/index.dart` | 2 | `source` |
 | `/binder/{id}` | `DELETE, GET, PUT` | `server/routes/binder/[id]/index.dart` | 2 | `source` |
+| `/capabilities` | `GET` | `server/routes/capabilities/index.dart` | 1 | `source` |
 | `/cards` | `GET` | `server/routes/cards/index.dart` | 1 | `source` |
 | `/cards/printings` | `GET` | `server/routes/cards/printings/index.dart` | 1 | `source` |
 | `/cards/resolve` | `POST` | `server/routes/cards/resolve/index.dart` | 1 | `source` |

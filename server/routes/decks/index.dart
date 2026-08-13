@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_schema_support.dart';
 import '../../lib/deck_validation_state_support.dart';
+import '../../lib/e2e_validation_policy.dart';
 import '../../lib/deck_card_name_resolution_support.dart';
 import '../../lib/deck_format_support.dart';
 import '../../lib/deck_readiness_contract.dart';
@@ -14,6 +15,7 @@ import '../../lib/deck_rules_service.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
+import '../../lib/release_capability_policy.dart';
 import '../../lib/scryfall_image_url.dart';
 import '../../lib/ai/deck_learning_event_support.dart';
 
@@ -540,7 +542,10 @@ Future<Response> _createDeck(RequestContext context) async {
       return exposeDeckValidationState(deckMap);
     });
 
-    final productLearningEnabled = shouldWriteProductLearning();
+    final isolatedE2eRuntime = isManaloomE2eIsolatedRuntime();
+    final productLearningEnabled =
+        context.read<ReleaseCapabilityPolicy>().isAllowed('learning_writes') &&
+        shouldWriteProductLearning();
     if (productLearningEnabled) {
       unawaited(
         _logDeckCreateLearning(
@@ -551,13 +556,22 @@ Future<Response> _createDeck(RequestContext context) async {
           rawCards: cards,
         ),
       );
-    } else {
+    } else if (isolatedE2eRuntime) {
       newDeck['e2e_validation'] = const {
         'isolated_runtime': true,
         'product_learning_writes_suppressed': true,
       };
       Log.d(
         'Deck learning writes suppressed for isolated E2E deck '
+        '${newDeck['id']}.',
+      );
+    } else {
+      newDeck['product_learning'] = const {
+        'writes_enabled': false,
+        'reason': 'product_learning_disabled',
+      };
+      Log.d(
+        'Deck learning writes disabled by product policy for deck '
         '${newDeck['id']}.',
       );
     }

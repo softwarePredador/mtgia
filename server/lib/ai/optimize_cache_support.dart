@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
 import '../e2e_validation_policy.dart';
@@ -7,7 +10,7 @@ import 'optimize_functional_role_support.dart';
 // Bump whenever the player-facing optimize response contract changes. Cached
 // payloads are returned as-is, so reusing an older schema can omit safety fields
 // or retain an obsolete candidate ranking for up to six hours.
-const optimizeCacheContractVersion = 'v19';
+const optimizeCacheContractVersion = 'v20';
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   final entries = <String>[];
@@ -59,28 +62,34 @@ String buildOptimizeCacheKey({
 }
 
 String stableOptimizeHash(String value) {
-  var hash = 2166136261;
-  for (final code in value.codeUnits) {
-    hash ^= code;
-    hash = (hash * 16777619) & 0xFFFFFFFF;
-  }
-  return hash.toRadixString(16);
+  return sha256.convert(utf8.encode(value)).toString();
 }
 
 Future<Map<String, dynamic>?> loadOptimizeCache({
   required Pool pool,
   required String cacheKey,
+  required String userId,
+  required String deckId,
+  required String deckSignature,
 }) async {
   final result = await pool.execute(
     Sql.named('''
       SELECT payload
       FROM ai_optimize_cache
       WHERE cache_key = @cache_key
+        AND user_id = CAST(@user_id AS uuid)
+        AND deck_id = CAST(@deck_id AS uuid)
+        AND deck_signature = @deck_signature
         AND expires_at > NOW()
       ORDER BY created_at DESC
       LIMIT 1
     '''),
-    parameters: {'cache_key': cacheKey},
+    parameters: {
+      'cache_key': cacheKey,
+      'user_id': userId,
+      'deck_id': deckId,
+      'deck_signature': deckSignature,
+    },
   );
 
   if (result.isEmpty) return null;

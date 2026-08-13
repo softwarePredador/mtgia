@@ -1,5 +1,9 @@
 # ManaLoom Active Product Backlog - 2026-07-06
 
+> `SUPERSEDED_FOR_PRIORITIZATION`: este documento preserva o backlog e as
+> evidências de 2026-07-06. A ordem vigente, os novos blockers e os critérios de
+> aceite estão em `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.
+
 Status padrao desta lista: tudo que antes estava como "falta" foi colocado em
 andamento. Itens com dependencia externa seguem ativos, mas bloqueados por uma
 entrada concreta do usuario ou fornecedor.

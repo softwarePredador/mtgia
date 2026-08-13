@@ -4,7 +4,7 @@
 > Este índice contém somente normas e rotas vigentes. Diários detalhados de
 > pacotes e decisões ficam no arquivo histórico de S9-03.
 
-Updated: 2026-07-23
+Updated: 2026-08-12
 
 ## Fonte de verdade e ordem de leitura
 
@@ -17,6 +17,10 @@ Updated: 2026-07-23
 
 Antes de executar trabalho Hermes/XMage/Commander, consulte:
 
+- [`docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`](../BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md)
+  (`current_deckbuilder_ai_learning_flow`);
+- [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md)
+  (`current_product_execution_backlog`);
 - `MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md`
   (`current_lookup_index`);
 - `MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md`
@@ -78,6 +82,13 @@ Evidências globais de referência:
 Nenhuma lista, carta ou regra é promovida automaticamente. `607` permanece
 protegido; sinais de estrutura, forced access e agregados sem exposição
 natural são diagnósticos.
+
+O boundary de aprendizado reorganizado em 2026-08-12 permanece fail-closed:
+`server/bin/optimizer_loop.sh` está tombstoned e não é um entrypoint
+operacional; promoção automática de learned decks está desabilitada. Preview
+de IA, sync Hermes e candidato estrutural não equivalem a aceitação, ativação
+ou promoção. PostgreSQL/backend continua sendo a verdade de produto;
+Hermes/SQLite continua cache, laboratório e evidência.
 
 ## Ponte de produto e dados
 

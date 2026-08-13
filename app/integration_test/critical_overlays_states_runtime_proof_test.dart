@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/branding/product_identity.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/core/widgets/app_state_panel.dart';
@@ -450,6 +451,11 @@ Widget _deckApp({
 }) {
   return MultiProvider(
     providers: [
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+        value: ReleaseCapabilitiesProvider.seeded(const {
+          ReleaseCapability.decksPrivate,
+        }),
+      ),
       ChangeNotifierProvider<DeckProvider>.value(value: deckProvider),
       ChangeNotifierProvider<CardProvider>.value(value: cardProvider),
       ChangeNotifierProvider<MessageProvider>(
