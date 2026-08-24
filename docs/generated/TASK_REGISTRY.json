@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "7fd9172d917aca8b3721c09827fba2329b399140a9f1c26ef3a46775d88187fb"
+    "sha256": "9f7d05f128c94655e41254872516322dea13da28b11613c93e3540d5dc39f142"
   },
   "required_task_fields": [
     "id",
@@ -4715,6 +4715,13 @@
         "mutation_authority": false
       },
       {
+        "path": "docs/execution/README.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "docs/hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
@@ -4821,6 +4828,14 @@
         "priority_authority": false,
         "mutation_authority": false,
         "reason": "duplicate ADR id superseded by ADR 0012"
+      },
+      {
+        "path": "docs/execution/CURRENT_QUEUE.md",
+        "state": "current_context",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "single WIP-1 coordination queue derived from the canonical task index; it cannot set priority, status or acceptance"
       },
       {
         "path": "docs/status/CURRENT_PRODUCT_DECISION.md",
@@ -6845,5 +6860,5 @@
     "receipt_bindings_declared": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "81ac7eb69bd81aced48e59b6d5fbcb0c14d38caa9976cc43cfb73a04b8a3b6a6"
+  "project_logic_source_digest_sha256": "0043cb4094dacefa313db1d259177999a0716ba2b4cb2fafa9be9bff3b99c581"
 }

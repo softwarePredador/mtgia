@@ -158,6 +158,7 @@ void main() {
       canonicalDocuments,
       contains('docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md'),
     );
+    expect(canonicalDocuments, contains('docs/execution/README.md'));
     expect(
       canonicalDocuments,
       contains('docs/adr/0012-xmage-human-spike-go.md'),
@@ -296,6 +297,12 @@ void main() {
       )['state'],
       'current_task_index',
     );
+    final executionQueue = overrides.singleWhere(
+      (document) => document['path'] == 'docs/execution/CURRENT_QUEUE.md',
+    );
+    expect(executionQueue['state'], 'current_context');
+    expect(executionQueue['priority_authority'], false);
+    expect(executionQueue['mutation_authority'], false);
     for (final path in [
       'docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md',
       'docs/MANALOOM_BATTLE_LAB_TRACKER.md',

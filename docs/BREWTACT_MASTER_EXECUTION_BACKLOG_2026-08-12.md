@@ -677,7 +677,16 @@ enquanto suas capabilities estiverem comprovadamente OFF.
 
 ## 9. Modelo de execução de cada task
 
-Ao iniciar um ID, abrir uma ficha com:
+O contrato operacional, a fila WIP 1 e o template da ficha ficam em:
+
+- `docs/execution/README.md` — contrato canônico de execução e fechamento;
+- `docs/execution/CURRENT_QUEUE.md` — coordenação derivada, sem autoridade para
+  alterar prioridade, estado, dependências ou aceite;
+- `docs/execution/TASK_PACKET_TEMPLATE.md` — modelo do ledger de uma execução.
+
+Ao iniciar um ID, criar uma ficha a partir do template. A ficha referencia a
+linha canônica pelo ID e pelo hash do registry; ela não redefine os seis campos
+da task. No mínimo, registra:
 
 ```text
 Task ID:
@@ -695,6 +704,10 @@ Rollback:
 Receipts:
 Decisão: PASS | FAIL | BLOCKED | DEFERRED_BY_SCOPE
 ```
+
+Somente um ID pode ocupar o slot `NOW`. Pacotes de onda e fichas são material
+de execução não autoritativo: o estado só muda nesta tabela, depois de receipt
+revisado e regeneração do registry.
 
 Regras de atualização deste backlog:
 

@@ -11,6 +11,7 @@
     "docs/CONTEXTO_PRODUTO_ATUAL.md",
     "docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md",
     "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
+    "docs/execution/README.md",
     "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
     "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
     "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
@@ -89,6 +90,11 @@
         "path": "docs/CONTEXTO_PRODUTO_ATUAL.md",
         "state": "current_context",
         "reason": "context router whose historical body cannot override the current decision or task index"
+      },
+      {
+        "path": "docs/execution/CURRENT_QUEUE.md",
+        "state": "current_context",
+        "reason": "single WIP-1 coordination queue derived from the canonical task index; it cannot set priority, status or acceptance"
       },
       {
         "path": "docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md",

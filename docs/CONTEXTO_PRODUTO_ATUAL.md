@@ -3,7 +3,9 @@
 > A decisão curta que prevalece para escopo, oferta e release está em
 > `docs/status/CURRENT_PRODUCT_DECISION.md`. O backlog mestre define a ordem de
 > execução e `docs/MANALOOM_E2E_RELEASE_CONTRACT.md` define validação e
-> conclusão. O restante deste arquivo preserva contexto por data.
+> conclusão. A fila WIP 1, o contrato de fechamento e as fichas ficam em
+> `docs/execution/CURRENT_QUEUE.md` e `docs/execution/README.md`. O restante
+> deste arquivo preserva contexto por data.
 
 ## Decisão vigente — 2026-08-13
 
