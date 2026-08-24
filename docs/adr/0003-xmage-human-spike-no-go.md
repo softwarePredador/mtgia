@@ -1,13 +1,14 @@
 # ADR 0003 — NO-GO do spike XMage humano contra IA
 
-- Estado: substituído pelo ADR 0004 em 2026-07-27
+- Estado: substituído pelo ADR 0012 em 2026-07-27; o arquivo ADR 0004 com o
+  antigo número permanece somente como evidência histórica
 - Data: 2026-07-26
 - Programa: `BL7`
 - Decisão: `NO_GO`
 
 > Registro histórico: esta decisão era correta para a evidência disponível em
 > 2026-07-26. O runtime adicional e a política de encerramento explícito que
-> satisfizeram a reabertura estão no ADR 0004.
+> satisfizeram a reabertura estão no ADR 0012.
 
 ## Contexto
 

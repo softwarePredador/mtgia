@@ -7,6 +7,7 @@
     "human_decisions": "ADRs and current canonical contracts; generated files never infer architectural intent"
   },
   "canonical_documents": [
+    ".github/AGENT_POLICY.md",
     "docs/status/CURRENT_PRODUCT_DECISION.md",
     "docs/CONTEXTO_PRODUTO_ATUAL.md",
     "docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md",
@@ -15,6 +16,8 @@
     "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
     "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
     "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
+    "docs/MANALOOM_COLLECTION_INGESTION_CONTRACT.md",
+    "docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md",
     "docs/adr/0001-generated-project-logic.md",
     "docs/adr/0002-battle-lab-execution-boundaries.md",
     "docs/adr/0003-xmage-human-spike-no-go.md",
@@ -29,9 +32,13 @@
     "docs/adr/0012-xmage-human-spike-go.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+    "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
+    "docs/hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json",
     "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
     "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+    "docs/hermes-analysis/DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md",
     "docs/hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",
+    "docs/hermes-analysis/XMAGE_GOVERNED_RUNTIME_PATCH_CONTRACT.json",
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "documentation_lifecycle": {
@@ -76,6 +83,31 @@
     "canonical_default_state": "current_contract",
     "default_state": "supporting_reference_non_authoritative",
     "document_overrides": [
+      {
+        "path": ".github/AGENT_POLICY.md",
+        "state": "current_contract",
+        "reason": "single current policy inherited by every GitHub agent and instruction profile"
+      },
+      {
+        "path": "README.md",
+        "state": "current_context",
+        "reason": "repository entrypoint that routes to current authorities without setting priority"
+      },
+      {
+        "path": "docs/README.md",
+        "state": "current_context",
+        "reason": "documentation entrypoint that separates current contracts, evidence and history"
+      },
+      {
+        "path": ".github/instructions/guia.instructions.md",
+        "state": "current_context",
+        "reason": "global safe router to AGENTS and the current project authorities"
+      },
+      {
+        "path": ".github/instructions/roadmap.instructions.md",
+        "state": "current_context",
+        "reason": "global guard that prevents non-canonical roadmaps from setting execution priority"
+      },
       {
         "path": "docs/status/CURRENT_PRODUCT_DECISION.md",
         "state": "current_decision",
@@ -125,9 +157,27 @@
         "path": "docs/adr/0004-xmage-human-spike-go.md",
         "state": "historical_evidence",
         "reason": "duplicate ADR id superseded by ADR 0012"
+      },
+      {
+        "path": "ROADMAP.md",
+        "state": "historical_evidence",
+        "reason": "legacy strategic router superseded by the current decision and master task index"
+      },
+      {
+        "path": "server/manual-de-instrucao.md",
+        "state": "historical_evidence",
+        "reason": "large historical manual retained for evidence and explicitly excluded from operational authority"
       }
     ],
     "prefix_rules": [
+      {
+        "prefix": ".github/agents/",
+        "state": "supporting_reference_non_authoritative"
+      },
+      {
+        "prefix": ".github/instructions/",
+        "state": "current_context"
+      },
       {
         "prefix": "docs/generated/",
         "state": "generated_snapshot"
@@ -157,6 +207,10 @@
       "historical_or_generated_may_set_priority": false,
       "document_may_authorize_live_mutation": false,
       "historical_commands_are_examples_only": true,
+      "historical_header_markers": [
+        "HISTORICAL_EVIDENCE",
+        "NO_MUTATION_AUTHORITY"
+      ],
       "current_priority_precedence": [
         "current_decision",
         "current_task_index"

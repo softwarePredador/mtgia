@@ -1,5 +1,9 @@
 # ManaLoom agent contract
 
+Perfis e instruções em `.github/` herdam
+`.github/AGENT_POLICY.md`, são auxiliares não prioritários e nunca substituem
+este contrato, a decisão corrente ou o backlog mestre.
+
 Antes de analisar ou editar:
 
 1. Leia `project_logic_manifest.json` e `docs/generated/CURRENT_SYSTEM.md`;

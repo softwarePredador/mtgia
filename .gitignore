@@ -54,6 +54,7 @@ wget-log
 
 # Local QA / visual proof artifacts (do not commit)
 dddddd/
+docs/qa/ui-live/videos/
 app/doc/*proofs*/
 app/doc/*_proof_*/
 app/doc/visual_qa_*/

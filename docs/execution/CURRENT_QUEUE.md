@@ -4,11 +4,16 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 
 - Atualizada em: `2026-08-24`
 - Branch de partida: `codex/free-beta-release-candidate-2026-07-17`
-- SHA de partida: `fd0397a5a97742bcb5127c7b2d08d80aca4bf738`
+- SHA local na abertura de `BT-DOC-001`: `b09ac6dbb6b88f2ea235404431049609da3215ff`
+- Upstream observado na abertura: `b2d3fc04f823f1c58434349a0cf0b48d74919862`
+- Divergência observada: `ahead_by=3`, `behind_by=0`, `NOT_PUSHED`
+- Observado em UTC: `2026-08-24T18:56:24Z`
 - Backlog/registry SHA-256: `baed1f2b2ccd0cbc9620fa073d13311d5a8354513d2222a324881ca70d003016`
-- Project logic source digest: `44ab0563e6703bad2d1a8a47128d318d88401c050fb98b07d38a3b2a299ab042`
+- Project logic baseline na abertura de `BT-DOC-001`:
+  `44ab0563e6703bad2d1a8a47128d318d88401c050fb98b07d38a3b2a299ab042`
 - WIP máximo: `1`
-- Limite de subagentes: `15`
+- Limite de subagentes nesta execução: `3`, sem descendentes, por solicitação
+  do usuário
 
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
 backlog mestre e o registry gerado.
@@ -61,7 +66,8 @@ do core enquanto suas capabilities permanecerem comprovadamente OFF.
 
 ## Estado operacional conhecido
 
-- A branch candidata foi publicada no SHA de partida acima.
+- Na abertura, a branch local estava três commits à frente do upstream. Essa é
+  uma observação Git local, não publicação, PR, deploy ou release.
 - A validação pública read-only observou produção no SHA
   `a6ee09c8f16cf17c2867de4b089e5e65b3527254`:
   `SERVER_BEHIND`; `/capabilities` ainda retornava `404` e readiness anunciava

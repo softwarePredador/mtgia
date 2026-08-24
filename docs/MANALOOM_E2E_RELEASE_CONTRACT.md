@@ -187,21 +187,19 @@ classificados como `active_consumer`, `manifest_only` ou `ungoverned` pelo gate
 de retenção. `ungoverned` falha o gate. `manifest_only` continua dívida de
 arquivo explícita e não pode inflar a contagem de consumidores ativos.
 
-## Evidência da rodada corrente
+## Evidência de execução
 
-A revalidação mais recente do checkout local está em
-`docs/qa/MANALOOM_E2E_CORE_DOCUMENTATION_AUDIT_2026-07-21.md`. O aggregate
-determinístico daquela rodada terminou `FAIL` com 8 etapas aprovadas, 2 falhas
-e 9 skips explícitos. O Battle passou isoladamente antes/depois, mas o analysis
-server caiu dentro do aggregate; retenção permaneceu vermelha por 18 artefatos
-locais e o host ficou sem espaço durante `full`/Flutter completo. Portanto, a
-evidência de 2026-07-21 não declara conclusão local nem release.
+Este contrato não incorpora uma “rodada corrente”. Resultados envelhecem e
+devem permanecer em receipts task-scoped, ligados ao SHA e ao digest que
+provaram. Para conhecer o estado atual, siga:
 
-O resultado e os resíduos da varredura anterior de 2026-07-15 ficam em
-`docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`. Naquela execução, o perfil
-determinístico ficou sem falhas e as 35 migrations estavam executadas, mas não
-havia release implantada. O follow-up operacional do mesmo dia publicou a API,
-o app Flutter autenticado em `/app` e o APK Android assinado no servidor novo;
-o APK passou em aparelho físico e teve o download conferido por SHA-256. Isso
-não altera retroativamente o resultado da suíte nem fecha iOS: a distribuição
-nativa ainda exige uma equipe Apple Developer/App Store Connect da ManaLoom.
+1. `docs/execution/CURRENT_QUEUE.md` para o único ID `NOW`;
+2. `docs/execution/tasks/<TASK-ID>.md` para o ledger da execução;
+3. `docs/qa/execution/` para receipts duráveis;
+4. o summary machine-readable produzido pelo gate solicitado;
+5. `docs/status/CURRENT_PRODUCT_DECISION.md` para o veredito de release.
+
+Relatórios antigos em `docs/qa/` continuam preservados como
+`historical_evidence`. Eles nunca são promovidos por data, quantidade de testes
+ou link neste contrato. Um receipt local também não prova release sem
+identidade same-SHA do alvo implantado e todos os critérios da seção anterior.

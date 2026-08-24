@@ -1,5 +1,9 @@
 # Sprints canônicas de conclusão do produto ManaLoom
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Autorizações e comandos abaixo pertencem à execução datada; são evidência,
+> não runbook nem permissão corrente.
+>
 > `SUPERSEDED_FOR_PRIORITIZATION`: o programa abaixo permanece como histórico
 > executável S0–S10. A ordem e o escopo vigentes estão em
 > `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.

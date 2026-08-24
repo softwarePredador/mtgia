@@ -102,6 +102,102 @@ void main() {
     expect(digestInputs.toSet().length, digestInputs.length);
   });
 
+  test('governs every active agent instruction and repository entrypoint', () {
+    final lineage = result.manifest['lineage'] as Map<String, Object?>;
+    final digestInputs = (lineage['digest_inputs'] as List<dynamic>)
+        .cast<String>();
+    final governancePaths =
+        Directory(p.join(root.path, '.github'))
+            .listSync(recursive: true)
+            .whereType<File>()
+            .map(
+              (file) =>
+                  p.relative(file.path, from: root.path).replaceAll('\\', '/'),
+            )
+            .where((path) => path.endsWith('.md'))
+            .toList()
+          ..sort();
+
+    expect(governancePaths.length, greaterThanOrEqualTo(14));
+    expect(digestInputs, containsAll(governancePaths));
+    expect(
+      digestInputs,
+      containsAll([
+        'README.md',
+        'docs/README.md',
+        'docs/execution/CURRENT_QUEUE.md',
+        'tools/project_logic/README.md',
+      ]),
+    );
+    expect(digestInputs, isNot(contains('ROADMAP.md')));
+    expect(digestInputs, isNot(contains('server/manual-de-instrucao.md')));
+
+    final rootReadme = File(p.join(root.path, 'README.md')).readAsStringSync();
+    final docsReadme = File(
+      p.join(root.path, 'docs/README.md'),
+    ).readAsStringSync();
+    for (final content in [rootReadme, docsReadme]) {
+      expect(content, contains('CURRENT_PRODUCT_DECISION.md'));
+      expect(
+        content,
+        contains('BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md'),
+      );
+      expect(content, isNot(contains('ManaLoom Guardrails')));
+      expect(content, isNot(contains('35 migrations')));
+      expect(content, isNot(contains('server/manual-de-instrucao.md')));
+    }
+    for (final entry in {
+      'README.md': rootReadme,
+      'docs/README.md': docsReadme,
+    }.entries) {
+      final base = p.dirname(p.join(root.path, entry.key));
+      final targets = RegExp(r'\[[^\]]+\]\(([^)]+)\)')
+          .allMatches(entry.value)
+          .map((match) => match.group(1)!)
+          .where(
+            (target) =>
+                !target.startsWith('#') &&
+                !target.startsWith('http://') &&
+                !target.startsWith('https://') &&
+                !target.startsWith('mailto:'),
+          );
+      for (final target in targets) {
+        final withoutFragment = target.split('#').first;
+        final resolved = p.normalize(p.join(base, withoutFragment));
+        expect(
+          FileSystemEntity.typeSync(resolved),
+          isNot(FileSystemEntityType.notFound),
+          reason: '${entry.key} -> $target',
+        );
+      }
+    }
+
+    for (final path in governancePaths) {
+      final content = File(p.join(root.path, path)).readAsStringSync();
+      expect(content, contains('MANALOOM_AGENT_POLICY_V1'), reason: path);
+      expect(
+        content,
+        isNot(contains('Commits are pushed to origin/master')),
+        reason: path,
+      );
+      expect(
+        content,
+        isNot(contains('DELETE FROM ai_optimize_cache')),
+        reason: path,
+      );
+      if (path.startsWith('.github/agents/')) {
+        expect(
+          content,
+          contains('disable-model-invocation: true'),
+          reason: path,
+        );
+        expect(content, contains('.github/AGENT_POLICY.md'), reason: path);
+        expect(content, isNot(contains('  - agent\n')), reason: path);
+        expect(content, isNot(contains('  - github/*\n')), reason: path);
+      }
+    }
+  });
+
   test('keeps the complete battle sidecar source surface in lineage', () {
     final lineage = result.manifest['lineage'] as Map<String, Object?>;
     final digestInputs = (lineage['digest_inputs'] as List<dynamic>)
@@ -269,6 +365,52 @@ void main() {
     },
   );
 
+  test('rejects an operational historical document without a safe banner', () {
+    final contracts =
+        jsonDecode(
+              File(
+                p.join(root.path, 'docs/project_logic_contracts.json'),
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>;
+    final temp = Directory.systemTemp.createTempSync(
+      'manaloom_logic_historical_banner_',
+    );
+    addTearDown(() => temp.deleteSync(recursive: true));
+    final lifecycle =
+        contracts['documentation_lifecycle'] as Map<String, dynamic>;
+    final overrides = (lifecycle['document_overrides'] as List<dynamic>)
+        .cast<Map<String, dynamic>>();
+    final historicalPaths = overrides
+        .where((override) => override['state'] == 'historical_evidence')
+        .map((override) => override['path']! as String);
+    for (final path in historicalPaths) {
+      final file = File(p.join(temp.path, path));
+      file.parent.createSync(recursive: true);
+      file.writeAsStringSync(
+        '# Historical fixture\n\n'
+        'Lifecycle: `HISTORICAL_EVIDENCE · NO_MUTATION_AUTHORITY`.\n',
+      );
+    }
+
+    const unsafePath = 'docs/MANALOOM_BATTLE_LAB_TRACKER.md';
+    File(p.join(temp.path, unsafePath)).writeAsStringSync(
+      '# Tracker executável\n\n'
+      'Autorizado: migration, escrita live e deploy imediato.\n',
+    );
+    final generator = ProjectLogicGenerator(temp);
+    expect(
+      () => generator.validateContractsForTesting(contracts),
+      throwsA(
+        isA<ProjectLogicException>().having(
+          (error) => error.toString(),
+          'message',
+          allOf(contains(unsafePath), contains('NO_MUTATION_AUTHORITY')),
+        ),
+      ),
+    );
+  });
+
   test('resolves document lifecycle, route consumers and receipt bindings', () {
     final registry = result.manifest['task_registry'] as Map<String, Object?>;
     final lifecycle =
@@ -303,6 +445,22 @@ void main() {
     expect(executionQueue['state'], 'current_context');
     expect(executionQueue['priority_authority'], false);
     expect(executionQueue['mutation_authority'], false);
+    for (final entry in {
+      '.github/AGENT_POLICY.md': 'current_contract',
+      '.github/instructions/guia.instructions.md': 'current_context',
+      '.github/instructions/roadmap.instructions.md': 'current_context',
+      'README.md': 'current_context',
+      'docs/README.md': 'current_context',
+      'ROADMAP.md': 'historical_evidence',
+      'server/manual-de-instrucao.md': 'historical_evidence',
+    }.entries) {
+      expect(
+        overrides.singleWhere(
+          (document) => document['path'] == entry.key,
+        )['state'],
+        entry.value,
+      );
+    }
     for (final path in [
       'docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md',
       'docs/MANALOOM_BATTLE_LAB_TRACKER.md',

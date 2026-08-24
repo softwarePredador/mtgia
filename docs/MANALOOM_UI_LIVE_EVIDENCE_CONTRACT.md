@@ -204,6 +204,15 @@ registra o hash de cada manifesto, todos os perfis revisados e a quantidade
 total de screenshots. O verificador exige igualdade exata desses conjuntos;
 revisar apenas uma seleção de imagens não concede `PASS_VISUAL_REVIEWED`.
 
+Vídeo é evidência complementar. Uma gravação contínua pode ajudar a revisar
+sequência e interação, mas não substitui manifests, PNGs, hashes nem a abertura
+de todas as capturas. Um reel montado a partir de screenshots aprovadas deve ser
+rotulado explicitamente como `derived_runtime_frames`; ele não prova uma
+interação contínua nem recebe crédito E2E adicional. MP4s derivados permanecem
+locais sob `docs/qa/ui-live/videos/`, ignorados pelo Git. Se uma task exigir
+vídeo durável, o receipt deve manter o arquivo fora do checkout e versionar
+somente classificação, origem, digest, duração e política de retenção.
+
 O Life Counter é uma platform view Android. Screenshot produzida pela surface
 Flutter não comprova sua composição nativa e pode resultar em frame preto.
 Nesse checkpoint o harness anuncia prontidão e

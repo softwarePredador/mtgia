@@ -1,4 +1,5 @@
-> **HISTORICAL / SUPERSEDED — NAO USE COMO RUNBOOK OU PLANO ATUAL.**
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> **NAO USE COMO RUNBOOK OU PLANO ATUAL.**
 >
 > Este manual continuo preserva decisoes e operacoes de checkouts anteriores.
 > Entradas abaixo sobre hosts, deploy, crons, sync, IA, aprendizado ou promocao
@@ -8,8 +9,11 @@
 > Para tarefas e prioridades vigentes, use
 > [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](../docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
 >
-> Manual tecnico continuo e historico de implementacao.
-> Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+> Manual historico de implementacao.
+> Para decisao e prioridade atuais, consultar primeiro
+> `docs/status/CURRENT_PRODUCT_DECISION.md`,
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` e
+> `docs/execution/CURRENT_QUEUE.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 

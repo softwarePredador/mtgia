@@ -1,5 +1,9 @@
 # ManaLoom Active Product Backlog - 2026-07-06
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Autorizações e comandos abaixo pertencem à execução datada; são evidência,
+> não backlog, runbook nem permissão corrente.
+>
 > `SUPERSEDED_FOR_PRIORITIZATION`: este documento preserva o backlog e as
 > evidências de 2026-07-06. A ordem vigente, os novos blockers e os critérios de
 > aceite estão em `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.

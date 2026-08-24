@@ -1,13 +1,18 @@
 # Roadmap de Produto — ManaLoom
 
-Este documento é **estratégico**, não operacional.
+Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_PRIORITY_AUTHORITY · NO_MUTATION_AUTHORITY`
 
-Para prioridade diária, sequência de execução e decisões de escopo, usar:
+Este documento é histórico e estratégico, não operacional. Seu corpo preserva
+uma visão anterior e não descreve a sequência ou o escopo correntes.
 
-- [docs/CONTEXTO_PRODUTO_ATUAL.md](docs/CONTEXTO_PRODUTO_ATUAL.md)
-- [docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md](docs/MANALOOM_PRODUCT_COMPLETION_SPRINTS.md)
-- [docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md](docs/MANALOOM_PRODUCT_COMPLETION_TRACKER.md)
+Para prioridade, sequência e decisão atuais, usar:
+
+- [decisão corrente](docs/status/CURRENT_PRODUCT_DECISION.md)
+- [backlog mestre](docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md)
+- [fila operacional](docs/execution/CURRENT_QUEUE.md)
 - [docs/MANALOOM_E2E_RELEASE_CONTRACT.md](docs/MANALOOM_E2E_RELEASE_CONTRACT.md)
+
+As seções abaixo não autorizam implementação, mutação, commit, push ou deploy.
 
 ## Posição atual
 

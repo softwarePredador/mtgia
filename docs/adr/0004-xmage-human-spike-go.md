@@ -1,5 +1,9 @@
 # Registro histórico — GO limitado do spike XMage humano contra IA
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Autorizações ou comandos preservados neste ADR não têm validade operacional
+> corrente.
+>
 > Status: `historical_duplicate_id · superseded_by_adr_0012`.
 > Este arquivo recebeu o número 0004 quando o repositório já possuía o ADR
 > 0004 de Battle Live. Ele permanece byte-oriented como evidência histórica,

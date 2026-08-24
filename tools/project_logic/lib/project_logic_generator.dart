@@ -12,7 +12,7 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
-const _generatorVersion = '1.3.0';
+const _generatorVersion = '1.4.0';
 const _taskBacklogPath = 'docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md';
 const _taskRegistrySchemaVersion = 1;
 const _taskRequiredColumns = <String>[
@@ -105,6 +105,9 @@ class ProjectLogicGenerator {
   Map<String, Object?> taskBacklogForTesting(String source) =>
       _parseTaskBacklog(source, sourcePath: _taskBacklogPath);
 
+  void validateContractsForTesting(Map<String, dynamic> contracts) =>
+      _validateContracts(contracts);
+
   Future<ProjectLogicResult> generate() async {
     final contractFile = _file('docs/project_logic_contracts.json');
     final inventoryFile = _file(
@@ -129,6 +132,7 @@ class ProjectLogicGenerator {
     final contracts = _decodeMap(contractFile);
     final surfaceInventory = _decodeMap(inventoryFile);
     _validateContracts(contracts);
+    _validateGovernanceInstructionFiles();
 
     final dartFiles = _dartSourceFiles();
     final units = <_DartUnit>[];
@@ -166,7 +170,7 @@ class ProjectLogicGenerator {
       webRoutes,
     );
 
-    final canonicalDocumentFiles = _canonicalDocumentFiles(contracts);
+    final currentDocumentFiles = _currentDocumentFiles(contracts);
 
     final digestInputByPath = <String, File>{};
     for (final file in <File>[
@@ -174,7 +178,7 @@ class ProjectLogicGenerator {
       inventoryFile,
       migrationFile,
       databaseSetupFile,
-      ...canonicalDocumentFiles,
+      ...currentDocumentFiles,
       ...dartFiles,
       ...testFiles,
       ...scriptFiles,
@@ -359,6 +363,7 @@ class ProjectLogicGenerator {
       }
     }
     _validateDocumentationLifecycle(contracts);
+    _validateHistoricalDocumentBanners(contracts);
     _validateReceiptContracts(contracts, flowIds);
   }
 
@@ -446,11 +451,10 @@ class ProjectLogicGenerator {
       final state = rawOverride['state'];
       final reason = rawOverride['reason'];
       if (path is! String ||
-          !path.startsWith('docs/') ||
-          path.contains('..') ||
+          !_isNormalizedRepositoryPath(path) ||
           !overridePaths.add(path)) {
         throw ProjectLogicException(
-          'Documentation override paths must be unique normalized docs paths: $path',
+          'Documentation override paths must be unique normalized repository paths: $path',
         );
       }
       if (state is! String || !stateIds.contains(state)) {
@@ -482,12 +486,14 @@ class ProjectLogicGenerator {
       final prefix = rawRule['prefix'];
       final state = rawRule['state'];
       if (prefix is! String ||
-          !prefix.startsWith('docs/') ||
           !prefix.endsWith('/') ||
-          prefix.contains('..') ||
+          prefix.length <= 1 ||
+          !_isNormalizedRepositoryPath(
+            prefix.substring(0, prefix.length - 1),
+          ) ||
           !prefixes.add(prefix)) {
         throw ProjectLogicException(
-          'Documentation lifecycle prefixes must be unique normalized directories: $prefix',
+          'Documentation lifecycle prefixes must be unique normalized repository directories: $prefix',
         );
       }
       if (state is! String || !stateIds.contains(state)) {
@@ -528,6 +534,116 @@ class ProjectLogicGenerator {
       throw ProjectLogicException(
         'Current decision and task backlog require explicit authoritative lifecycle overrides.',
       );
+    }
+  }
+
+  bool _isNormalizedRepositoryPath(String path) {
+    if (path.isEmpty ||
+        p.isAbsolute(path) ||
+        path.contains('\\') ||
+        path.split('/').contains('..') ||
+        path == '.') {
+      return false;
+    }
+    return p.normalize(path).replaceAll('\\', '/') == path;
+  }
+
+  void _validateHistoricalDocumentBanners(Map<String, dynamic> contracts) {
+    final lifecycle =
+        contracts['documentation_lifecycle'] as Map<String, dynamic>;
+    final guards = lifecycle['guards'] as Map<String, dynamic>;
+    final rawMarkers = guards['historical_header_markers'];
+    if (rawMarkers is! List ||
+        rawMarkers.length < 2 ||
+        rawMarkers.any(
+          (marker) => marker is! String || marker.trim().isEmpty,
+        ) ||
+        rawMarkers.toSet().length != rawMarkers.length) {
+      throw ProjectLogicException(
+        'documentation_lifecycle.guards.historical_header_markers must '
+        'declare at least two unique markers.',
+      );
+    }
+    final markers = rawMarkers.cast<String>();
+    for (final rawOverride
+        in (lifecycle['document_overrides'] as List<dynamic>)) {
+      final override = rawOverride as Map<String, dynamic>;
+      if (override['state'] != 'historical_evidence') continue;
+      final path = override['path']! as String;
+      final file = _file(path);
+      if (!file.existsSync()) {
+        throw ProjectLogicException(
+          'Historical lifecycle document does not exist: $path',
+        );
+      }
+      final header = file.readAsLinesSync().take(16).join('\n').toUpperCase();
+      final missing = markers
+          .where((marker) => !header.contains(marker.toUpperCase()))
+          .toList();
+      if (missing.isNotEmpty) {
+        throw ProjectLogicException(
+          'Historical lifecycle document $path is missing required header '
+          'markers: ${missing.join(', ')}',
+        );
+      }
+    }
+  }
+
+  void _validateGovernanceInstructionFiles() {
+    final policyFile = _file('.github/AGENT_POLICY.md');
+    if (!policyFile.existsSync()) {
+      throw ProjectLogicException('Missing canonical .github/AGENT_POLICY.md.');
+    }
+
+    final instructionFiles = _filesUnder([
+      '.github/agents',
+      '.github/instructions',
+    ], (file) => file.path.endsWith('.md'));
+    if (instructionFiles.isEmpty) {
+      throw ProjectLogicException(
+        'At least one governed .github agent or instruction file is required.',
+      );
+    }
+
+    const policyMarker = 'MANALOOM_AGENT_POLICY_V1';
+    const forbiddenFragments = <String>[
+      'Commits are pushed to origin/master',
+      'Deploy/push when safe',
+      'DELETE FROM ai_optimize_cache',
+      'git push origin master',
+      'git push origin/master',
+      'server/manual-de-instrucao.md',
+      'ROADMAP_SOCIAL_TRADES.md',
+      './scripts/quality_gate.sh general',
+    ];
+
+    final governedFiles = <File>[policyFile, ...instructionFiles];
+    for (final file in governedFiles) {
+      final relative = _relative(file);
+      final content = file.readAsStringSync();
+      if (!content.contains(policyMarker)) {
+        throw ProjectLogicException(
+          'Governance instruction $relative must reference $policyMarker.',
+        );
+      }
+      for (final forbidden in forbiddenFragments) {
+        if (content.contains(forbidden)) {
+          throw ProjectLogicException(
+            'Governance instruction $relative contains forbidden stale authority: $forbidden',
+          );
+        }
+      }
+      if (relative.startsWith('.github/agents/')) {
+        if (!content.contains('disable-model-invocation: true') ||
+            !content.contains('.github/AGENT_POLICY.md') ||
+            !content.contains('AGENTS.md') ||
+            content.contains('  - agent\n') ||
+            content.contains('  - github/*\n')) {
+          throw ProjectLogicException(
+            'Agent profile $relative must be user-invoked, inherit the canonical policy, and omit nested-agent/GitHub mutation tools.',
+          );
+        }
+      }
     }
   }
 
@@ -1469,20 +1585,44 @@ class ProjectLogicGenerator {
           .toList()
         ..sort((a, b) => _relative(a).compareTo(_relative(b)));
 
-  List<File> _canonicalDocumentFiles(Map<String, dynamic> contracts) =>
-      (contracts['canonical_documents'] as List<dynamic>)
-          .cast<String>()
-          .map(_file)
-          .toList()
-        ..sort((a, b) => _relative(a).compareTo(_relative(b)));
+  List<File> _currentDocumentFiles(Map<String, dynamic> contracts) {
+    final lifecycle =
+        contracts['documentation_lifecycle'] as Map<String, dynamic>;
+    final paths = <String>{
+      ...(contracts['canonical_documents'] as List<dynamic>).cast<String>(),
+      for (final rawOverride
+          in (lifecycle['document_overrides'] as List<dynamic>))
+        if (const {
+          'current_decision',
+          'current_task_index',
+          'current_contract',
+          'current_context',
+        }.contains((rawOverride as Map<String, dynamic>)['state']))
+          rawOverride['path']! as String,
+    };
+    return paths.map(_file).toList()
+      ..sort((a, b) => _relative(a).compareTo(_relative(b)));
+  }
 
   List<File> _governanceFiles() =>
       [
           _file('AGENTS.md'),
+          _file('README.md'),
+          _file('docs/README.md'),
+          _file('.gitignore'),
           _file('.tbls.yml'),
           _file('melos.yaml'),
           _file('.githooks/pre-commit'),
           _file('.githooks/pre-push'),
+          ..._filesUnder(
+            ['.github'],
+            (file) => const {
+              '.json',
+              '.md',
+              '.yaml',
+              '.yml',
+            }.contains(p.extension(file.path).toLowerCase()),
+          ),
         ].where((file) => file.existsSync()).toList()
         ..sort((a, b) => _relative(a).compareTo(_relative(b)));
 
@@ -1490,6 +1630,7 @@ class ProjectLogicGenerator {
     ['tools/project_logic'],
     (file) =>
         file.path.endsWith('.dart') ||
+        file.path.endsWith('.md') ||
         file.path.endsWith('.yaml') ||
         file.path.endsWith('.yml'),
   );

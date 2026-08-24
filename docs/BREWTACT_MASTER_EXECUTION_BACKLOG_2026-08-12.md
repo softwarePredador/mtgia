@@ -1,6 +1,6 @@
 # BrewTact — Backlog mestre de produto, arquitetura, UX e release
 
-Status: `MASTER_TASK_INDEX · CURRENT_DECISION_NO_GO · DECK_AI_CONTAINMENT_IMPLEMENTED · FINAL_BACKLOG_NOT_STARTED`
+Status: `MASTER_TASK_INDEX · CURRENT_DECISION_NO_GO · EXECUTION_IN_PROGRESS · WIP_LIMIT_1`
 
 Data-base: `2026-08-12`
 Checkout auditado: `8264ffb27292`

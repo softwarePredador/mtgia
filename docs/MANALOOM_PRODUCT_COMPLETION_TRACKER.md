@@ -1,5 +1,9 @@
 # Tracker executável de conclusão do ManaLoom
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Autorizações e comandos abaixo pertencem à execução datada; são evidência,
+> não runbook nem permissão corrente.
+>
 > `SUPERSEDED_FOR_PRIORITIZATION`: este tracker preserva owners, gates e
 > evidências do programa S0–S10. Novas tasks, dependências e prioridades devem
 > ser abertas a partir de

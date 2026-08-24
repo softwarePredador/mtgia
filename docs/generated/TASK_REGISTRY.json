@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "baed1f2b2ccd0cbc9620fa073d13311d5a8354513d2222a324881ca70d003016"
+    "sha256": "f8d2ed1ace379fe250ef04259b4d2fbf4fd58e83d905491abe78d7dded118804"
   },
   "required_task_fields": [
     "id",
@@ -4582,6 +4582,13 @@
     ],
     "canonical_documents": [
       {
+        "path": ".github/AGENT_POLICY.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "app/doc/UI_TEST_SURFACE_MAP.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
@@ -4617,7 +4624,21 @@
         "mutation_authority": false
       },
       {
+        "path": "docs/MANALOOM_COLLECTION_INGESTION_CONTRACT.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "path": "docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
         "priority_authority": false,
@@ -4736,6 +4757,13 @@
         "mutation_authority": false
       },
       {
+        "path": "docs/hermes-analysis/DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
@@ -4743,7 +4771,28 @@
         "mutation_authority": false
       },
       {
+        "path": "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "path": "docs/hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "path": "docs/hermes-analysis/XMAGE_GOVERNED_RUNTIME_PATCH_CONTRACT.json",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
         "priority_authority": false,
@@ -4765,6 +4814,46 @@
       }
     ],
     "document_overrides": [
+      {
+        "path": ".github/AGENT_POLICY.md",
+        "state": "current_contract",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "single current policy inherited by every GitHub agent and instruction profile"
+      },
+      {
+        "path": ".github/instructions/guia.instructions.md",
+        "state": "current_context",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "global safe router to AGENTS and the current project authorities"
+      },
+      {
+        "path": ".github/instructions/roadmap.instructions.md",
+        "state": "current_context",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "global guard that prevents non-canonical roadmaps from setting execution priority"
+      },
+      {
+        "path": "README.md",
+        "state": "current_context",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "repository entrypoint that routes to current authorities without setting priority"
+      },
+      {
+        "path": "ROADMAP.md",
+        "state": "historical_evidence",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "legacy strategic router superseded by the current decision and master task index"
+      },
       {
         "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
         "state": "current_task_index",
@@ -4822,6 +4911,14 @@
         "reason": "superseded S0-S10 execution record"
       },
       {
+        "path": "docs/README.md",
+        "state": "current_context",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "documentation entrypoint that separates current contracts, evidence and history"
+      },
+      {
         "path": "docs/adr/0004-xmage-human-spike-go.md",
         "state": "historical_evidence",
         "declaration_source": "document_override",
@@ -4844,9 +4941,25 @@
         "priority_authority": true,
         "mutation_authority": false,
         "reason": "single current product and release-scope decision"
+      },
+      {
+        "path": "server/manual-de-instrucao.md",
+        "state": "historical_evidence",
+        "declaration_source": "document_override",
+        "priority_authority": false,
+        "mutation_authority": false,
+        "reason": "large historical manual retained for evidence and explicitly excluded from operational authority"
       }
     ],
     "prefix_rules": [
+      {
+        "prefix": ".github/agents/",
+        "state": "supporting_reference_non_authoritative"
+      },
+      {
+        "prefix": ".github/instructions/",
+        "state": "current_context"
+      },
       {
         "prefix": "docs/generated/",
         "state": "generated_snapshot"
@@ -4877,6 +4990,10 @@
       "historical_or_generated_may_set_priority": false,
       "document_may_authorize_live_mutation": false,
       "historical_commands_are_examples_only": true,
+      "historical_header_markers": [
+        "HISTORICAL_EVIDENCE",
+        "NO_MUTATION_AUTHORITY"
+      ],
       "current_priority_precedence": [
         "current_decision",
         "current_task_index"
@@ -6860,5 +6977,5 @@
     "receipt_bindings_declared": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "44ab0563e6703bad2d1a8a47128d318d88401c050fb98b07d38a3b2a299ab042"
+  "project_logic_source_digest_sha256": "be3bf02dba40befead607ba4f34a55595e1322ef9dc1a7bccc6396b1ccac9cee"
 }

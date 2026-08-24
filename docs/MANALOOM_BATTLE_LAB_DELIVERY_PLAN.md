@@ -1,5 +1,11 @@
 # Plano de entrega do ManaLoom Battle Lab e Coach
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Este é um registro do programa de 2026-07-26–2026-08-02. Autorizações,
+> migrations, escritas, deploys e comandos descritos abaixo estão esgotados e
+> não constituem runbook ou permissão corrente. Battle permanece conforme a
+> decisão e as capabilities atuais.
+
 **Estado:** `M3_ALPHA_DEPLOYED / BL10_SOFTWARE_PASS / HARDWARE_GO_PENDING`
 
 **Atualizado em:** 2026-08-02
